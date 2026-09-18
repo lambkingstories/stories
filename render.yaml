@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: lks-be
+    name: lbs-be
     runtime: node
     region: frankfurt
     plan: starter
