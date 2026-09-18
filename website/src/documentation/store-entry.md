@@ -3,7 +3,10 @@ Kategorie: Kinder / Familie (Christian Children's App)
 Entwickler: Anton Bernt / Konstantin Steinmiller
 
 1. Datenerhebung & Privatsphäre (Data Privacy)
-   Keine personenbezogenen Daten: Die App erhebt, speichert oder überträgt keinerlei personenbezogene Daten.
+   Keine personenbezogenen Daten: Die App fragt keine persönlichen Daten ab. Einzige Ausnahme ist eine anonyme
+   Nutzungszählung der Android- und iOS-App: eine zufällige, in der App erzeugte Kennung geht an unseren eigenen Server,
+   der pro Kennung und Tag einen Eintrag speichert und ihn nach 13 Monaten löscht (Details: Datenschutzerklärung,
+   Abschnitt 3; Angaben für App Store Connect: app-store-listing.md).
 
 Keine Benutzerkonten: Es gibt kein Registrierungssystem und keinen Login (weder intern noch über Drittanbieter wie
 Google oder Facebook).
@@ -25,8 +28,9 @@ den Nutzer durchgeführt oder gespeichert.
 
 Es gibt keine versteckten In-App-Käufe (IAP).
 
-Externe Links: Links zu externen Inhalten (Webseite/Shop) sind klar gekennzeichnet und führen aus der App heraus. (
-Hinweis: Falls von den Stores gefordert, ist ein „Parental Gate“ / Kindersicherung für diese Links implementiert).
+Externe Links: Links zu externen Inhalten (Webseite/Shop) sind klar gekennzeichnet und führen aus der App heraus. In der
+iOS-App (Kategorie „Kinder“) liegt vor jedem solchen Link eine Elternabfrage (Rechenaufgabe, die eingetippt werden
+muss); die Spenden-Schaltflächen gibt es dort nicht.
 
 4. Technischer Stack
    Webseite: lambking.store (Informationsseite)
