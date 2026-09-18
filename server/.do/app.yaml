@@ -22,7 +22,7 @@ services:
   - name: api
     environment_slug: node-js
     github:
-      repo: antonb84-cpu/lambking-stories
+      repo: lambkingstories/stories
       branch: main
       deploy_on_push: true
     source_dir: /

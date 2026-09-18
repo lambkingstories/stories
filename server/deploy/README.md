@@ -64,7 +64,7 @@ On the Web Service's **Environment** tab, set the values Render marks as require
 |-------------------|------------------------------------------------------------------------------|
 | `MONGO_URI`       | `mongodb+srv://<user>:<pw>@cluster0.lhlvowv.mongodb.net/?retryWrites=true`   |
 | `ADMIN_PASSWORD`  | 24+ random chars                                                             |
-| `CORS_ORIGIN`     | `https://antonb84-cpu.github.io,https://your-public-site.com`                |
+| `CORS_ORIGIN`     | `https://lambkingstories.github.io,https://your-public-site.com`             |
 | `PUBLIC_BASE_URL` | `https://little-bible-stories-server.onrender.com` (Render assigns this URL) |
 | `REDIS_URL`       | Upstash `rediss://...` URL (only if you set `REDIS_ENABLED=true`)            |
 | `SENTRY_DSN`      | Sentry project DSN (optional)                                                |

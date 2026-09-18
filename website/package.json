@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --build && vite build",
-    "build-github-lamb-king": "vite build --base=/lambking-stories/lamb-king/ --outDir=dist/lamb-king",
+    "build-github-lamb-king": "vite build --base=/stories/lamb-king/ --outDir=dist/lamb-king",
     "preview": "vite preview --port 2099",
     "type-check": "vue-tsc --noEmit",
     "deploy": "vite build && surge dist/ --domain senfkorn.surge.sh"
