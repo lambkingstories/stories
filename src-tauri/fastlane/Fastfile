@@ -90,25 +90,19 @@ platform :ios do
     end
   end
 
-  # Idempotent App Store Connect app record creation. Required before the
-  # first TestFlight / App Store upload — `pilot` will fail with "Could not
-  # find app with bundle id" otherwise. Same trick as above: `produce` doesn't
-  # accept an api_key, so use Spaceship directly.
+  # The App Store Connect app record must exist before the first upload, or
+  # `pilot` fails with "Could not find app with bundle id". It can't be created
+  # from here: the App Store Connect API answers App.create with "The resource
+  # 'apps' does not allow 'CREATE'" for API-key auth (seen 2026-09-19). The
+  # record for this app was created once by hand (primary language German,
+  # SKU lamb-king-stories); this check just fails early with the fix.
   def register_app_in_app_store_connect_if_missing(api_key)
     Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(**api_key)
     bundle_id = "com.stories.lambking"
-    existing = Spaceship::ConnectAPI::App.find(bundle_id)
-    if existing
-      UI.message("App '#{bundle_id}' already exists in App Store Connect, skipping.")
+    if Spaceship::ConnectAPI::App.find(bundle_id)
+      UI.message("App '#{bundle_id}' exists in App Store Connect.")
     else
-      Spaceship::ConnectAPI::App.create(
-        name: "LambKing Stories",
-        primary_locale: "en-US",
-        bundle_id: bundle_id,
-        sku: "lamb-king-stories",
-        platforms: ["IOS"]
-      )
-      UI.success("Created app '#{bundle_id}' in App Store Connect.")
+      UI.user_error!("No App Store Connect app for '#{bundle_id}'. Create it once by hand: App Store Connect → Apps → + → Neue App (platform iOS, bundle ID #{bundle_id}, SKU lamb-king-stories).")
     end
   end
 

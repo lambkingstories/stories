@@ -160,25 +160,24 @@ jobs:
                   print(f"OK: {path}")
           PY
 
-      - name: Set CFBundleVersion to unique per-run build number
+      # The build number is NOT set here: `tauri ios build` rewrites
+      # CFBundleVersion to the app version right before compiling (agvtool),
+      # which made the first upload "1.0.0" and would have made every later
+      # one a rejected duplicate. It gets `--build-number` below instead.
+      - name: Declare export compliance in Info.plist
         run: |
-          BUILD_NUMBER="${{ github.run_number }}"
           INFO_PLIST=$(find src-tauri/gen/apple -maxdepth 3 -name Info.plist -not -path '*/build/*' | head -n 1)
           if [ -z "$INFO_PLIST" ]; then
             echo "::error::Could not locate iOS Info.plist under src-tauri/gen/apple"
             find src-tauri/gen/apple -maxdepth 4 -type f -name '*.plist'
             exit 1
           fi
-          echo "Patching $INFO_PLIST with CFBundleVersion=$BUILD_NUMBER"
-          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" "$INFO_PLIST" \
-            || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $BUILD_NUMBER" "$INFO_PLIST"
-          /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$INFO_PLIST"
-          /usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$INFO_PLIST"
           # The app uses only the OS's standard HTTPS (exempt encryption), so
           # declare it once here instead of answering the export-compliance
           # question in App Store Connect after every single upload.
           /usr/libexec/PlistBuddy -c "Set :ITSAppUsesNonExemptEncryption false" "$INFO_PLIST" \
             || /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" "$INFO_PLIST"
+          /usr/libexec/PlistBuddy -c "Print :ITSAppUsesNonExemptEncryption" "$INFO_PLIST"
 
       - name: Install signing material via match
         working-directory: src-tauri
@@ -197,7 +196,9 @@ jobs:
           APPLE_DEVELOPMENT_TEAM: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           echo "${APP_STORE_CONNECT_API_KEY_KEY}" | base64 --decode > "$APPLE_API_KEY_PATH"
-          pnpm exec tauri ios build --export-method "${{ inputs.export_method }}"
+          # CFBundleVersion becomes <version>.<run number> (1.0.0.7, …): unique
+          # per run and always higher than the first upload's plain "1.0.0".
+          pnpm exec tauri ios build --export-method "${{ inputs.export_method }}" --build-number "${{ github.run_number }}"
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
