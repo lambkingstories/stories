@@ -21,6 +21,7 @@ declare const APP_VERSION: string
 export const isNative = import.meta.env.VITE_APP_NATIVE === 'true'
 export const isWeb = import.meta.env.VITE_APP_NATIVE !== 'true'
 export const isDemo = import.meta.env.VITE_APP_DEMO === 'true'
+export { isIOS } from '@/utils/platform'
 export const version: string = APP_VERSION
 
 const userDifficulty: Ref<Difficulties> = ref(DIFFICULTY.MEDIUM)

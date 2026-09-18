@@ -44,6 +44,23 @@ jobs:
       FASTLANE_SKIP_UPDATE_CHECK: "1"
       LC_ALL: en_US.UTF-8
       LANG: en_US.UTF-8
+      # The Vite build inside `tauri ios build` (beforeBuildCommand) reads
+      # these. A clean checkout has none of the gitignored .env files, and
+      # without the client key every API call answers 401 MISSING_CLIENT_KEY —
+      # a TestFlight build with no books. Mirrors the local `.env.tauri`.
+      # VITE_APP_PLATFORM=ios switches on the App Store rules (no donation
+      # buttons, parental gate on links out). Client keys are not secrets.
+      VITE_APP_NATIVE: "true"
+      VITE_APP_PLATFORM: ios
+      VITE_APP_DEMO: "false"
+      VITE_NODE_ENV: production
+      VITE_ENABLE_OBFUSCATION: "false"
+      VITE_APP_FPS_CAP: "60"
+      VITE_APP_DEBUG: "false"
+      VITE_DEBUG_CONSOLE: "false"
+      VITE_APP_TITLE: LambKing Stories
+      VITE_CLIENT_KEY: tauri-key-public-1111
+      VITE_API_BASE_URL: ${{ vars.API_BASE_URL || 'https://lbs-be.onrender.com' }}
 
     steps:
       - name: Checkout
@@ -64,10 +81,13 @@ jobs:
         with:
           workspaces: src-tauri
 
+      # Same pnpm and install flags as server.yml / static.yml, which build
+      # this lockfile green; pnpm 9 with --frozen-lockfile would be the only
+      # job in the repo installing it differently.
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 10.6.2
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -76,7 +96,7 @@ jobs:
           cache: pnpm
 
       - name: Install JS dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
       - name: Setup Ruby + Fastlane
         uses: ruby/setup-ruby@v1
@@ -154,6 +174,11 @@ jobs:
             || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $BUILD_NUMBER" "$INFO_PLIST"
           /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$INFO_PLIST"
           /usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$INFO_PLIST"
+          # The app uses only the OS's standard HTTPS (exempt encryption), so
+          # declare it once here instead of answering the export-compliance
+          # question in App Store Connect after every single upload.
+          /usr/libexec/PlistBuddy -c "Set :ITSAppUsesNonExemptEncryption false" "$INFO_PLIST" \
+            || /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" "$INFO_PLIST"
 
       - name: Install signing material via match
         working-directory: src-tauri

@@ -24,6 +24,7 @@ const AppHoerenView = () => import('@/views/app/AppHoerenView.vue')
 const AppAwardsView = () => import('@/views/app/AppAwardsView.vue')
 const AppColoringView = () => import('@/views/app/AppColoringView.vue')
 const AppProfileView = () => import('@/views/app/AppProfileView.vue')
+const AppLegalView = () => import('@/views/app/AppLegalView.vue')
 
 const routes: RouteRecordRaw[] = [
   // The welcome screen is the app's front door on every launch; its single
@@ -45,7 +46,8 @@ const routes: RouteRecordRaw[] = [
   { path: '/app/hoeren', name: 'app-hoeren', component: AppHoerenView },
   { path: '/app/awards', name: 'app-awards', component: AppAwardsView },
   { path: '/app/coloring', name: 'app-coloring', component: AppColoringView },
-  { path: '/app/profile', name: 'app-profile', component: AppProfileView }
+  { path: '/app/profile', name: 'app-profile', component: AppProfileView },
+  { path: '/app/legal', name: 'app-legal', component: AppLegalView }
 ]
 
 const router = createRouter({

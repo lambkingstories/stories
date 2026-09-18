@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import request from 'supertest'
 import { ADMIN_AUTH, createApp } from './helpers.js'
-import { UserActivity } from '../src/models/UserActivity.js'
+import { USAGE_RETENTION_DAYS, UserActivity } from '../src/models/UserActivity.js'
 import { UsageService } from '../src/services/UsageService.js'
 
 const UUID_A = '11111111-2222-4333-8444-555555555555'
@@ -139,6 +139,23 @@ describe('GET /api/admin/usage/daily', () => {
     expect(res.body.from).toBe(addDays(today, -3))
     expect(res.body.days).toHaveLength(4)
     expect(res.body.totals.firstDay).toBe(addDays(today, -3))
+  })
+})
+
+describe('usage retention', () => {
+  // The privacy policy promises deletion after 13 months; this pins both
+  // halves of that promise — the upsert stamps `createdAt`, and startup
+  // creates the TTL index that expires rows by it.
+  it('stamps createdAt on the upserted row and expires rows through a TTL index', async () => {
+    await request(app).get('/api/books').set('X-User-Uuid', UUID_A)
+    expect(await waitForRows(1)).toBe(1)
+    const [row] = await UserActivity.find({}).lean().exec()
+    expect(row!.createdAt).toBeInstanceOf(Date)
+
+    await UsageService.ensureIndexes()
+    const indexes = await UserActivity.collection.indexes()
+    const ttl = indexes.find((index) => index.key?.createdAt === 1)
+    expect(ttl?.expireAfterSeconds).toBe(USAGE_RETENTION_DAYS * 24 * 60 * 60)
   })
 })
 

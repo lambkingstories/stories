@@ -27,6 +27,14 @@ const UserActivitySchema = new Schema(
 // index the upsert path hits on every first-request-of-the-day.
 UserActivitySchema.index({ day: 1, userUuid: 1 }, { unique: true })
 
+// ≈ 13 months. The privacy policy promises the rows are deleted after that
+// (App Review Guideline 5.1.1(i) requires a stated retention), and MongoDB's
+// TTL monitor does the deleting. `UsageService.ensureIndexes()` creates this
+// index at startup together with the unique one; `createdAt` is set on the
+// upsert by the schema's `timestamps` option.
+export const USAGE_RETENTION_DAYS = 396
+UserActivitySchema.index({ createdAt: 1 }, { expireAfterSeconds: USAGE_RETENTION_DAYS * 24 * 60 * 60 })
+
 UserActivitySchema.set('toJSON', {
   versionKey: false,
   transform: (_doc, ret: Record<string, unknown>) => {

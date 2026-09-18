@@ -125,3 +125,53 @@ describe('openExternal', () => {
     expect(isExternalUrl('tel:+491234')).toBe(true)
   })
 })
+
+describe('openExternal on the iOS App Store build', () => {
+  // Kids Category (App Review Guideline 1.3): no link may leave the iOS app
+  // before a grown-up passes the parental gate. The Android case above
+  // ("inside the Tauri app") opens without one.
+  async function iosModule() {
+    vi.stubEnv('VITE_APP_PLATFORM', 'ios')
+    vi.stubGlobal('isTauri', true)
+    const { openExternal } = await freshModule()
+    // Same module instance `openExternal` just loaded (resetModules ran first).
+    const gate = await import('@/use/useParentalGate')
+    return { openExternal, gate }
+  }
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
+  })
+
+  it('opens the link only after the parental gate is passed', async () => {
+    const { openExternal, gate } = await iosModule()
+
+    const opening = openExternal('https://lambking.store')
+    expect(gate.gateQuestion.value).not.toBeNull()
+    expect(openUrl).not.toHaveBeenCalled()
+
+    gate.settleParentalGate(true)
+
+    await expect(opening).resolves.toBe(true)
+    expect(openUrl).toHaveBeenCalledWith('https://lambking.store')
+  })
+
+  it('stays in the app when the gate is cancelled', async () => {
+    const { openExternal, gate } = await iosModule()
+
+    const opening = openExternal('https://lambking.store')
+    gate.settleParentalGate(false)
+
+    await expect(opening).resolves.toBe(false)
+    expect(openUrl).not.toHaveBeenCalled()
+    expect(windowOpen).not.toHaveBeenCalled()
+    expect(assign).not.toHaveBeenCalled()
+  })
+
+  it('refuses a blocked protocol without even asking', async () => {
+    const { openExternal, gate } = await iosModule()
+
+    await expect(openExternal('javascript:alert(1)')).resolves.toBe(false)
+    expect(gate.gateQuestion.value).toBeNull()
+  })
+})

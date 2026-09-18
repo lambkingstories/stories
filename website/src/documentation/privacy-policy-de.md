@@ -27,7 +27,8 @@ diese App nutzt oder unsere Website besuchst. Personenbezogene Daten sind alle D
 identifiziert werden kannst.
 
 Datenerfassung in dieser App
-In dieser App werden keine Benutzerkonten erstellt und keine Daten zur Identifizierung oder Verhaltensanalyse erhoben.
+In dieser App werden keine Benutzerkonten erstellt und keine Daten erhoben, mit denen wir dich identifizieren könnten.
+Damit wir wissen, wie viele Geräte die App täglich nutzen, zählt die Android- und iOS-App anonym mit (siehe Abschnitt 3).
 Die App folgt dem Prinzip der Datensparsamkeit.
 
 2. Verantwortlicher
@@ -43,6 +44,26 @@ E-Mail: hello@lambking.store
    Die Nutzung der App erfolgt ohne Anmeldung. Wir nutzen keine Google-Konten, Facebook-Logins oder eigenen
    Registrierungssysteme. Es werden keine Profile erstellt.
 
+Lokal gespeicherte Daten
+Dein Name und dein Profilbild in „Mein Bereich“, deine Merkliste und dein Lesefortschritt werden nur auf deinem Gerät
+gespeichert und nicht an uns übertragen.
+
+Abruf der Inhalte
+Die App lädt Geschichten, Bilder und Hörbücher von unserem Server. Er wird bei Render Services, Inc. betrieben und steht
+in Frankfurt am Main; die Inhalte liegen in einer Datenbank bei MongoDB, Inc. (MongoDB Atlas). Bei jedem Abruf werden
+technisch notwendige Daten verarbeitet, insbesondere deine IP-Adresse, Datum und Uhrzeit sowie die abgerufene Adresse.
+Sie dienen nur der Auslieferung der Inhalte und der Sicherheit des Dienstes (Rechtsgrundlage: Art. 6 Abs. 1 lit. f
+DSGVO).
+
+Anonyme Nutzungszählung (nur Android- und iOS-App)
+Beim ersten Start erzeugt die App eine zufällige Kennung. Sie wird nicht aus Daten deines Geräts abgeleitet und nur in
+der App gespeichert. Bei Anfragen an unseren Server sendet die App diese Kennung mit. Der Server speichert daraus pro
+Kennung und Kalendertag einen Eintrag (Kennung, Datum, App-Variante), um zu zählen, wie viele Geräte die App täglich
+nutzen. Die Kennung wird mit keinen anderen Daten verknüpft, nicht an Dritte weitergegeben und nicht für Werbung oder
+Tracking verwendet. Die Einträge werden nach 13 Monaten automatisch gelöscht. Wenn du die App löschst, ist auch die
+Kennung auf deinem Gerät weg; eine neue Installation erzeugt eine neue Kennung. Rechtsgrundlage ist unser berechtigtes
+Interesse an einer einfachen Nutzungsstatistik (Art. 6 Abs. 1 lit. f DSGVO).
+
 Bilder-Teilen-Funktion
 Die App bietet die Möglichkeit, Bilder zu teilen. Hierbei nutzt die App ausschließlich die systemeigenen
 „Teilen“-Funktionen deines Endgeräts (z. B. das Share-Sheet von iOS oder Android).
@@ -52,8 +73,8 @@ Wir haben keinen Zugriff auf deine Kontakte, Empfänger oder die genutzten Diens
 Die Verarbeitung findet lokal auf deinem Gerät statt.
 
 Keine Analyse und Werbung
-Wir setzen keine Analyse-Tools (wie Google Analytics) und keine Werbenetzwerke ein. Dein Nutzungsverhalten wird nicht
-überwacht oder ausgewertet.
+Wir setzen keine Analyse-Tools (wie Google Analytics) und keine Werbenetzwerke ein. Abgesehen von der anonymen
+Zählung oben wird dein Nutzungsverhalten nicht erfasst oder ausgewertet.
 
 Sprachdaten
 Es werden keine Sprachaufnahmen durch den Nutzer erstellt, verarbeitet oder auf Servern gespeichert.
@@ -88,13 +109,21 @@ Hinweis zum geplanten Wechsel (Shopify):
 Sobald der Shop auf Shopify umgestellt wird, wird diese Datenschutzerklärung aktualisiert, um die Datenverarbeitung
 durch Shopify (E-Commerce-Abwicklung, Zahlungsdienstleister) abzudecken.
 
+Spenden (Website und Android-App)
+Die Spenden-Schaltflächen führen zu PayPal bzw. Ko-fi. Dort gelten deren eigene Datenschutzbestimmungen. Die iOS-App
+enthält keine Spenden-Schaltflächen.
+
 App-Stores
 Die Links zum Google Play Store oder Apple App Store führen dazu, dass die jeweiligen Betreiber Daten über den Aufruf
 und den Download erheben. Hierauf haben wir keinen Einfluss.
 
+Links aus der App
+In der iOS-App ist jeder Link, der die App verlässt, durch eine Abfrage für Erwachsene geschützt.
+
 6. Besonderer Schutz von Kindern
-   Unsere App und Webseite richten sich an Kinder. Wir erheben keine personenbezogenen Daten von Minderjährigen. Wir
-   fordern Kinder nicht auf, Namen, Adressen oder sonstige private Informationen preiszugeben.
+   Unsere App und Webseite richten sich an Kinder. Über die technisch notwendigen Daten und die anonyme Zählung aus
+   Abschnitt 3 hinaus erheben wir keine personenbezogenen Daten von Minderjährigen. Wir fordern Kinder nicht auf,
+   Namen, Adressen oder sonstige private Informationen preiszugeben.
 
 7. Deine Rechte (Betroffenenrechte)
    Du hast jederzeit das Recht:

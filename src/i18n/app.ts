@@ -206,6 +206,21 @@ export default {
         keepGoing: 'Keep going',
         achievements: 'ACHIEVEMENTS'
       },
+      parentalGate: {
+        title: 'Ask a grown-up',
+        text: 'This link leaves the app. Please ask a grown-up to solve this task:',
+        question: 'What is {a} × {b}?',
+        answerLabel: 'Answer',
+        confirm: 'Continue',
+        cancel: 'Cancel',
+        wrong: 'Not quite. Here is a new task.'
+      },
+      legal: {
+        title: 'Privacy & Legal notice',
+        linkLabel: 'Privacy & Legal notice',
+        privacyTitle: 'Privacy policy',
+        germanOnly: 'Our privacy policy and legal notice are only available in German.'
+      },
       profile: {
         title: 'My Area',
         greeting: 'My Area',
@@ -440,6 +455,21 @@ export default {
         title: 'Auszeichnungen',
         keepGoing: 'Weiter so',
         achievements: 'ERFOLGE'
+      },
+      parentalGate: {
+        title: 'Frag eine erwachsene Person',
+        text: 'Dieser Link führt aus der App heraus. Bitte lass eine erwachsene Person diese Aufgabe lösen:',
+        question: 'Was ist {a} × {b}?',
+        answerLabel: 'Antwort',
+        confirm: 'Weiter',
+        cancel: 'Abbrechen',
+        wrong: 'Leider falsch. Hier ist eine neue Aufgabe.'
+      },
+      legal: {
+        title: 'Datenschutz & Impressum',
+        linkLabel: 'Datenschutz & Impressum',
+        privacyTitle: 'Datenschutzerklärung',
+        germanOnly: 'Die Datenschutzerklärung und das Impressum gibt es nur auf Deutsch.'
       },
       profile: {
         title: 'Mein Bereich',

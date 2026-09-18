@@ -26,7 +26,7 @@ function routeToNav(name: string): AppNavId {
   ) return 'series'
   if (name === 'app-hoeren') return 'hoeren'
   if (name === 'app-coloring' || name === 'app-awards') return 'malen'
-  if (name === 'app-profile') return 'profile'
+  if (name === 'app-profile' || name === 'app-legal') return 'profile'
   return 'home'
 }
 

@@ -144,6 +144,10 @@ function goBack() {
   else router.push({ name: 'app-main' })
 }
 
+function openLegal() {
+  router.push({ name: 'app-legal' })
+}
+
 // Pug attribute expressions are evaluated as plain JS (no TypeScript),
 // so a `($event.target as HTMLInputElement).checked` cast trips the
 // template compiler with "Unexpected identifier 'as'". The handler
@@ -364,6 +368,11 @@ function onBackendToggle(e: Event) {
               svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4")
                 path(d="M18 6 6 18M6 6l12 12")
 
+    //- Outside `.profile-content` so its grid columns stay untouched. App
+    //- Review 5.1.1(i) wants the privacy policy reachable inside the app.
+    div(class="profile-legal")
+      button(type="button" class="profile-legal-link" @click="openLegal") {{ t('app.legal.linkLabel') }}
+
     AvatarPickerModal(:open="avatarOpen" @close="closeAvatar")
 </template>
 
@@ -373,6 +382,22 @@ $cream-card: #fdf8ed
 $navy: #1a2f4a
 $brown: #7a6b55
 $gold: #d4a83e
+
+.profile-legal
+  display: flex
+  justify-content: center
+  padding: 20px 16px 0
+
+.profile-legal-link
+  padding: 8px 16px
+  font-size: 14px
+  font-weight: 600
+  color: $navy
+  background: rgba(253, 248, 237, 0.85)
+  border: 1px solid #e6d6b5
+  border-radius: 999px
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
 $border: #e6d6b5
 
 button

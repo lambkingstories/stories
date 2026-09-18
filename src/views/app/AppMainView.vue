@@ -16,7 +16,7 @@ import useCatalogNames from '@/use/useCatalogNames'
 import useReadingProgress from '@/use/useReadingProgress'
 import useAvatar, { onAvatarFallback } from '@/use/useAvatar'
 import useUserName from '@/use/useUserName'
-import { isMobileLandscape, isMobilePortrait } from '@/use/useUser'
+import { isIOS, isMobileLandscape, isMobilePortrait } from '@/use/useUser'
 import type { ApiBook, Locale } from '@/types/apiBook'
 import { pickLocalizedImage } from '@/types/apiBook'
 import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
@@ -221,15 +221,20 @@ const layoutClass = computed(() => {
 
 const ENABLE_MISSION_OF_DAY = false
 
-// Welcome-banner slider — three rotating illustrations shown above the
-// search bar. Auto-advances every 6s; the user can also swipe or tap a
-// dot to jump. The second slide will host PayPal + Ko-fi donate buttons
-// once those land (see #overlay-1 slot below).
-const welcomeSlides = computed(() => [
-  prependBaseUrl('images/bg/welcome-bg-1.webp'),
-  prependBaseUrl('images/bg/welcome-bg-2.webp'),
-  prependBaseUrl('images/bg/welcome-bg-3.webp')
-])
+// Welcome-banner slider — rotating illustrations shown above the search bar.
+// Auto-advances every 6s; the user can also swipe or tap a dot to jump. The
+// second slide is the mission slide with the PayPal + Ko-fi donate buttons.
+// The iOS App Store build leaves it out (App Review Guideline 3.1.1(a) bans
+// calls to action for non-IAP payments outside the US storefront), so there
+// the books slide moves up into the `overlay-1` slot.
+const welcomeSlides = computed(() => isIOS
+  ? [prependBaseUrl('images/bg/welcome-bg-1.webp'), prependBaseUrl('images/bg/welcome-bg-3.webp')]
+  : [
+      prependBaseUrl('images/bg/welcome-bg-1.webp'),
+      prependBaseUrl('images/bg/welcome-bg-2.webp'),
+      prependBaseUrl('images/bg/welcome-bg-3.webp')
+    ])
+const booksSlide = isIOS ? 'overlay-1' : 'overlay-2'
 </script>
 
 <template lang="pug">
@@ -463,7 +468,7 @@ const welcomeSlides = computed(() => [
             :images="welcomeSlides"
             :interval-ms="60000"
           )
-            template(#overlay-2)
+            template(#[booksSlide])
               div(class="slide-copy" data-swipe-through)
                 h3(class="slide-copy-title") {{ t('app.main.welcomeTitle2') }}
                 p(class="slide-copy-text") {{ t('app.main.welcomeText2') }}
@@ -482,7 +487,7 @@ const welcomeSlides = computed(() => [
                 h3(class="slide-copy-title") {{ t('app.main.welcomeTitle0') }}
                 p(class="slide-copy-text") {{ t('app.main.welcomeText0') }}
 
-            template(#overlay-1)
+            template(v-if="!isIOS" #overlay-1)
               div(class="slide-copy !right-[0%]" data-swipe-through)
                 h3(class="slide-copy-title") {{ t('app.main.welcomeTitle1') }}
                 //- Hairline + diamond, matching the mission slide's design
