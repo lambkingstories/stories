@@ -118,7 +118,7 @@ jobs:
         run: |
           python3 - <<'PY'
           from PIL import Image
-          path = "src-tauri/icons/icon.png"
+          path = "src-tauri/icons/app-icon.png"
           img = Image.open(path)
           if img.mode != "RGB":
               rgba = img.convert("RGBA")
@@ -131,7 +131,7 @@ jobs:
           PY
 
       - name: Sync app icons into iOS asset catalog
-        run: pnpm exec tauri icon src-tauri/icons/icon.png
+        run: pnpm exec tauri icon src-tauri/icons/app-icon.png  # full-bleed 1024 master from `pnpm icons`
 
       - name: Strip alpha from generated iOS icons (defense in depth — App Store rejects 1024x1024 with alpha)
         run: |

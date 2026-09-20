@@ -99,7 +99,7 @@ jobs:
           fi
 
       - name: Sync app icons into iOS asset catalog
-        run: pnpm exec tauri icon src-tauri/icons/icon.png
+        run: pnpm exec tauri icon src-tauri/icons/app-icon.png  # full-bleed 1024 master from `pnpm icons`
 
       - name: Build simulator .app
         run: |

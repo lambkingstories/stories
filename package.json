@@ -38,6 +38,7 @@
     "tauri:build-android-aab": "node scripts/patch-android-signing.mjs && dotenv -e .env.tauri -e .env.tauri.remote -- tauri android build --aab && node scripts/rename-android-output.mjs aab && node scripts/bump-android-version-code.mjs",
     "tauri:build-ios": "dotenv -e .env.tauri -v VITE_APP_PLATFORM=ios -- tauri ios build",
     "ci:ios:testflight": "gh workflow run ios-build.yml -f export_method=app-store-connect -f upload_testflight=true && echo \"Triggered iOS TestFlight build — track at: $(gh repo view --json url -q .url)/actions/workflows/ios-build.yml\"",
+    "icons": "node scripts/generate-app-icons.mjs",
     "handover:pdf": "node scripts/md-to-pdf.mjs handover-lambking-stories.md --lang=de && node scripts/md-to-pdf.mjs handover-migration-runbook.md"
   },
   "build": {
@@ -104,6 +105,7 @@
     "pug": "^3.0.3",
     "sass": "^1.97.3",
     "sass-loader": "^16.0.7",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4.2.1",
     "tsx": "^4.21.0",
     "typescript": "~5.9.3",
