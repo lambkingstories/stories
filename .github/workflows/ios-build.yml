@@ -48,8 +48,8 @@ jobs:
       # these. A clean checkout has none of the gitignored .env files, and
       # without the client key every API call answers 401 MISSING_CLIENT_KEY —
       # a TestFlight build with no books. Mirrors the local `.env.tauri`.
-      # VITE_APP_PLATFORM=ios switches on the App Store rules (no donation
-      # buttons, parental gate on links out). Client keys are not secrets.
+      # VITE_APP_PLATFORM=ios switches on the App Store rules (a StoreKit tip
+      # in place of the PayPal / Ko-fi buttons). Client keys are not secrets.
       VITE_APP_NATIVE: "true"
       VITE_APP_PLATFORM: ios
       VITE_APP_DEMO: "false"
