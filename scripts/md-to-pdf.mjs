@@ -2,10 +2,14 @@
 // Render a Markdown file to a print-ready A4 PDF.
 //
 // Usage:
-//   node scripts/md-to-pdf.mjs [input.md] [output.pdf] [--lang=de]
+//   node scripts/md-to-pdf.mjs [input.md] [output.pdf] [--lang=de] [--style=invoice]
 //   pnpm handover:pdf                      # handover-lambking-stories.md → .pdf
+//   pnpm invoice:pdf                       # invoice.md → Rechnung-lambking-stories-Konstantin-Steinmiller.pdf
 //
 // `--lang` sets the document language (hyphenation, footer labels); default `en`.
+// `--style=invoice` swaps the handover look for a one-page business letter:
+// no "confidential" footer, and layout for the `<div class="letterhead">`,
+// `parties` / `recipient` / `meta` and `totals` blocks used in invoice.md.
 //
 // Markdown → HTML goes through `marked` (GFM: tables, task lists, fenced
 // code). HTML → PDF goes through the Chrome / Edge / Chromium that is already
@@ -31,6 +35,45 @@ const LABELS = {
   de: { confidential: 'vertraulich', page: 'Seite' }
 }
 const labels = LABELS[lang] ?? LABELS.en
+const STYLES = {
+  document: { footer: (title) => `${title} — ${labels.confidential}`, softBreaks: true, css: '' },
+  invoice: {
+    footer: (title) => title,
+    // A letter has no narrow URL columns, and Chrome breaks at <wbr> even
+    // under `white-space: nowrap` — it split the PayPal address in two.
+    softBreaks: false,
+    css: `
+  @page { margin: 20mm 20mm 20mm 22mm; }
+  body { line-height: 1.5; }
+  h1 { font-size: 16pt; margin: 0 0 4mm; padding: 0; border: 0; }
+  .letterhead { text-align: right; margin-bottom: 14mm; }
+  .letterhead p, .recipient p { margin: 0; }
+  .letterhead strong { font-size: 13pt; }
+  .parties { display: flex; justify-content: space-between; align-items: flex-end; gap: 10mm; margin-bottom: 14mm; }
+  .recipient .return-address {
+    display: inline-block; margin-bottom: 3mm; padding-bottom: 0.5mm;
+    border-bottom: 0.5pt solid #bbb; font-size: 7.5pt; color: #777;
+  }
+  th, td { border: 0; border-bottom: 0.5pt solid #ddd; padding: 2mm; font-variant-numeric: tabular-nums; }
+  th { background: none; border-bottom: 1pt solid #1d1d1f; }
+  tbody tr:nth-child(even) td { background: none; }
+  body > table { font-size: 9.5pt; margin: 5mm 0 2mm; }
+  body > table td:last-child { white-space: nowrap; }
+  .meta table, .totals table { width: auto; }
+  .meta table { margin: 0; font-size: 9pt; }
+  .meta td { border: 0; padding: 0.5mm 0 0.5mm 6mm; white-space: nowrap; hyphens: manual; }
+  .meta td:first-child { padding-left: 0; color: #666; }
+  .totals table { margin: 0 0 8mm auto; font-size: 10pt; }
+  .totals td { border: 0; padding: 1mm 2mm 1mm 12mm; white-space: nowrap; }
+  .totals tr:last-child td { border-top: 1pt solid #1d1d1f; padding-top: 2mm; font-size: 11pt; font-weight: 600; }`
+  }
+}
+const styleName = args.find((a) => a.startsWith('--style='))?.slice('--style='.length) || 'document'
+const style = STYLES[styleName]
+if (!style) {
+  console.error(`[md-to-pdf] unknown --style=${styleName} (expected: ${Object.keys(STYLES).join(', ')})`)
+  process.exit(1)
+}
 const input = resolve(positional[0] || join(ROOT, 'handover-lambking-stories.md'))
 const output = resolve(positional[1] || input.replace(new RegExp(`${extname(input)}$`), '.pdf'))
 
@@ -62,7 +105,7 @@ const html = `<!doctype html>
   @page {
     size: A4;
     margin: 16mm 14mm 18mm 14mm;
-    @bottom-left { content: "${escapeCss(title)} — ${labels.confidential}"; font: 8pt system-ui, sans-serif; color: #888; }
+    @bottom-left { content: "${escapeCss(style.footer(title))}"; font: 8pt system-ui, sans-serif; color: #888; }
     @bottom-right { content: "${labels.page} " counter(page) " / " counter(pages); font: 8pt system-ui, sans-serif; color: #888; }
   }
   * { box-sizing: border-box; }
@@ -97,6 +140,9 @@ const html = `<!doctype html>
   thead { display: table-header-group; }
   tr { break-inside: avoid; }
   th, td { border: 1px solid #d9d6cf; padding: 1.2mm 1.8mm; text-align: left; vertical-align: top; overflow-wrap: break-word; hyphens: auto; }
+  /* GFM column alignment (\`|--:|\`) arrives as an align attribute, which the rule above would override. */
+  th[align="center"], td[align="center"] { text-align: center; }
+  th[align="right"], td[align="right"] { text-align: right; }
   code, pre { hyphens: none; }
   th { background: #f6efd9; font-weight: 600; }
   tbody tr:nth-child(even) td { background: #fbfaf7; }
@@ -106,6 +152,7 @@ const html = `<!doctype html>
   }
   blockquote p:last-child { margin-bottom: 0; }
   hr { border: 0; border-top: 1px solid #ddd; margin: 5mm 0; }
+${style.css}
 </style>
 </head>
 <body>
@@ -187,7 +234,7 @@ function findBrowser() {
 
 // `&` and `;` are excluded so HTML entities (`&amp;`, `&quot;`) stay intact.
 function softBreaks(text) {
-  return text.replace(/([/.,:?=@_])(?=\S)/g, '$1<wbr>')
+  return style.softBreaks ? text.replace(/([/.,:?=@_])(?=\S)/g, '$1<wbr>') : text
 }
 
 function escapeHtml(s) {

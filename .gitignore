@@ -31,6 +31,11 @@ coverage
 /handover-*.md
 /handover-*.pdf
 
+# Invoices carry a home address and tax number — same rule as the handover.
+/invoice*.md
+/Rechnung-lambking-stories-Konstantin-Steinmiller.pdf
+/invoice.pdf
+
 # Editor directories and files
 .vscode/settings.json
 !.vscode/extensions.json
