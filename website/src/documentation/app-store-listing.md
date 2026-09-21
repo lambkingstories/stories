@@ -6,17 +6,17 @@ Everything marked ✏️ is still Anton's decision.
 
 ## Fields that are the same in every language
 
-| Field | Value |
-|---|---|
-| Category | **Kids** (Kinder) · age band ✏️ (5 and under / 6–8 / 9–11) · secondary category: Books |
-| Age rating | ✏️ answer the questionnaire in App Store Connect (expected 4+) |
-| Copyright | `2026 Anton Bernt` |
-| Support URL | `https://lambking.store` |
-| Marketing URL | `https://lambking.store` |
-| Privacy policy URL | `https://lambkingstories.github.io/stories/lamb-king/?privacy-policy=de` |
-| Price | free, no in-app purchases |
-| Devices | iPhone and iPad |
-| Screenshots | 6.9" iPhone 1320×2868 and 13" iPad 2064×2752, five each per language |
+| Field | Value                                                                                    |
+|---|------------------------------------------------------------------------------------------|
+| Category | **Kids** (Kinder) · age band 18️+ (5 and under / 6–8 / 9–11) · secondary category: Books |
+| Age rating | 18+ answer the questionnaire in App Store Connect (expected 4+)                          |
+| Copyright | `2026 Anton Bernt`                                                                       |
+| Support URL | `https://lambking.store`                                                                 |
+| Marketing URL | `https://lambking.store`                                                                 |
+| Privacy policy URL | `https://lambking.store/datenschutz` — Anton fügt dort zuerst den App-Abschnitt ein (Text: `handover-datenschutz-app-abschnitt.md`, gitignored). Bis er online ist, ersatzweise `https://lambkingstories.github.io/stories/lamb-king/?privacy-policy=de` |
+| Price | free, no in-app purchases                                                                |
+| Devices | iPhone and iPad                                                                          |
+| Screenshots | 6.9" iPhone 1320×2868 and 13" iPad 2064×2752, five each per language                     |
 
 ## Deutsch (primary)
 
@@ -88,7 +88,7 @@ FOR PARENTS
 
 ## App Review information
 
-Sign-in required: **no**. Contact: Anton Bernt, hello@lambking.store, phone ✏️.
+Sign-in required: **no**. Contact: Anton Bernt, hello@lambking.store, phone +49 176 24693524️.
 
 Notes (English, pasted into „Notizen“):
 
