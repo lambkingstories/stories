@@ -13,7 +13,6 @@ import useCheats from '@/use/useCheats'
 import useAssets from '@/use/useAssets'
 import useAppNav from '@/use/useAppNav'
 import ZBottomNav from '@/components/atoms/ZBottomNav.vue'
-import ParentalGate from '@/components/molecules/ParentalGate.vue'
 import { GAME_USER_LANGUAGE } from '@/utils/constants.ts'
 
 const { initMusic, pauseMusic, continueMusic } = useMusic()
@@ -164,9 +163,6 @@ function isCrazyGamesUrl() {
       :model-value="activeNav"
       @update:model-value="onNav"
     )
-
-    //- Asks a grown-up before `openExternal` leaves the app (iOS Kids Category).
-    ParentalGate
 </template>
 
 <style lang="sass">

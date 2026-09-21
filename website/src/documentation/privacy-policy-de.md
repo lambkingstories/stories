@@ -110,15 +110,22 @@ Sobald der Shop auf Shopify umgestellt wird, wird diese Datenschutzerklärung ak
 durch Shopify (E-Commerce-Abwicklung, Zahlungsdienstleister) abzudecken.
 
 Spenden (Website und Android-App)
-Die Spenden-Schaltflächen führen zu PayPal bzw. Ko-fi. Dort gelten deren eigene Datenschutzbestimmungen. Die iOS-App
-enthält keine Spenden-Schaltflächen.
+Die Spenden-Schaltflächen führen zu PayPal bzw. Ko-fi. Dort gelten deren eigene Datenschutzbestimmungen.
+
+Unterstützen (iOS-App)
+Die iOS-App enthält keine Spenden-Schaltflächen. Stattdessen kann man uns dort mit einem freiwilligen einmaligen
+Trinkgeld über den In-App-Kauf von Apple unterstützen. Der Kauf wird vollständig von Apple abgewickelt; wir erhalten
+weder Zahlungsdaten noch den Namen, die Apple-ID oder den Kaufbeleg der kaufenden Person. An unseren Server werden
+keinerlei Daten zu diesem Kauf übermittelt. Es gilt die Datenschutzerklärung von Apple:
+https://www.apple.com/legal/privacy/de-ww/.
 
 App-Stores
 Die Links zum Google Play Store oder Apple App Store führen dazu, dass die jeweiligen Betreiber Daten über den Aufruf
 und den Download erheben. Hierauf haben wir keinen Einfluss.
 
 Links aus der App
-In der iOS-App ist jeder Link, der die App verlässt, durch eine Abfrage für Erwachsene geschützt.
+Links, die aus der App herausführen, öffnen sich im Browser des Geräts, nicht innerhalb der App. Ab dort gelten die
+Datenschutzbestimmungen der jeweiligen Seite.
 
 6. Besonderer Schutz von Kindern
    Unsere App und Webseite richten sich an Kinder. Über die technisch notwendigen Daten und die anonyme Zählung aus

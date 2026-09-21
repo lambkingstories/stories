@@ -10,8 +10,8 @@ import { openExternal } from '@/utils/openExternal'
 import privacyText from '../../../website/src/documentation/privacy-policy-de.md?raw'
 
 // App Review Guideline 5.1.1(i): the privacy policy must be reachable inside
-// the app, not only on the store page. Rendered in-app rather than linked,
-// because a link out would need the parental gate first (Kids Category).
+// the app, not only on the store page — so it is rendered here rather than
+// linked out to lambking.store, which a reviewer offline could not reach.
 const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
 
@@ -22,8 +22,8 @@ function goBack() {
   else router.push({ name: 'app-profile' })
 }
 
-// URLs inside the text leave through `openExternal` (gated on iOS) instead of
-// navigating the WebView away from the app.
+// URLs inside the text leave through `openExternal` instead of navigating the
+// WebView away from the app.
 function onTextClick(event: MouseEvent) {
   const link = (event.target as HTMLElement | null)?.closest('a')
   if (!link) return

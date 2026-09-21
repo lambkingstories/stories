@@ -8,6 +8,7 @@ import ZIconography from '@/components/atoms/ZIconography.vue'
 import AvatarPickerModal from '@/components/molecules/AvatarPickerModal.vue'
 import WelcomeSlider from '@/components/molecules/WelcomeSlider.vue'
 import KoFiButton from '@/components/molecules/KoFiButton.vue'
+import TipButton from '@/components/molecules/TipButton.vue'
 import useModels from '@/use/useModels'
 import useApiBooks from '@/use/useApiBooks'
 import useApiCategories from '@/use/useApiCategories'
@@ -223,18 +224,17 @@ const ENABLE_MISSION_OF_DAY = false
 
 // Welcome-banner slider — rotating illustrations shown above the search bar.
 // Auto-advances every 6s; the user can also swipe or tap a dot to jump. The
-// second slide is the mission slide with the PayPal + Ko-fi donate buttons.
-// The iOS App Store build leaves it out (App Review Guideline 3.1.1(a) bans
-// calls to action for non-IAP payments outside the US storefront), so there
-// the books slide moves up into the `overlay-1` slot.
-const welcomeSlides = computed(() => isIOS
-  ? [prependBaseUrl('images/bg/welcome-bg-1.webp'), prependBaseUrl('images/bg/welcome-bg-3.webp')]
-  : [
-      prependBaseUrl('images/bg/welcome-bg-1.webp'),
-      prependBaseUrl('images/bg/welcome-bg-2.webp'),
-      prependBaseUrl('images/bg/welcome-bg-3.webp')
-    ])
-const booksSlide = isIOS ? 'overlay-1' : 'overlay-2'
+// second slide is the mission slide: PayPal + Ko-fi donate buttons on web and
+// Android, a StoreKit tip on iOS. App Review Guideline 3.1.1(a) bans calls to
+// action for non-IAP payments outside the US storefront, but a tip *through*
+// in-app purchase is explicitly allowed (3.1.1) — so the slide itself is the
+// same everywhere, only the button on it differs.
+const welcomeSlides = computed(() => [
+  prependBaseUrl('images/bg/welcome-bg-1.webp'),
+  prependBaseUrl('images/bg/welcome-bg-2.webp'),
+  prependBaseUrl('images/bg/welcome-bg-3.webp')
+])
+const booksSlide = 'overlay-2'
 </script>
 
 <template lang="pug">
@@ -487,7 +487,7 @@ const booksSlide = isIOS ? 'overlay-1' : 'overlay-2'
                 h3(class="slide-copy-title") {{ t('app.main.welcomeTitle0') }}
                 p(class="slide-copy-text") {{ t('app.main.welcomeText0') }}
 
-            template(v-if="!isIOS" #overlay-1)
+            template(#overlay-1)
               div(class="slide-copy !right-[0%]" data-swipe-through)
                 h3(class="slide-copy-title") {{ t('app.main.welcomeTitle1') }}
                 //- Hairline + diamond, matching the mission slide's design
@@ -496,7 +496,13 @@ const booksSlide = isIOS ? 'overlay-1' : 'overlay-2'
                 span(class="slide-copy-rule" aria-hidden="true")
                 p(class="slide-copy-text") {{ t('app.main.welcomeText1') }}
 
-              div(class="welcome-donate-row -mb-6")
+              //- iOS may not link out to PayPal / Ko-fi, so it gets a single
+              //- centred StoreKit tip button instead of the two-corner row.
+              //- It hides itself until StoreKit has a product to sell.
+              div(v-if="isIOS" class="welcome-tip-row -mb-6")
+                TipButton(:compact="true")
+
+              div(v-else class="welcome-donate-row -mb-6")
                 KoFiButton(
                   href="https://www.paypal.com/ncp/payment/5CWTQPB6NGWLU"
                   tone="paypal"
@@ -896,6 +902,27 @@ button
       justify-items: center
       --kofi-scale: 1.3
       margin: 0 .5rem
+
+// iOS variant of the row above: one tip button, centred. Same `bottom` so
+// it clears the dots row, same `--kofi-scale`-style hand-off (`--tip-scale`)
+// so the outer size-up composes with the button's own press transform
+// instead of replacing it.
+.welcome-tip-row
+  position: absolute
+  left: 0
+  right: 0
+  bottom: 36px
+  display: flex
+  justify-content: center
+  align-items: center
+
+  :deep(.tip-btn)
+    @media(min-width: 360px) and (max-width: 500px)
+      --tip-scale: 1.3
+
+  :deep(.tip-btn)
+    @media(min-height: 360px) and (max-height: 500px)
+      --tip-scale: 1.3
 
 // CTA on the first slide — centred above the dots row (`bottom: 36px`
 // clears them) and width-capped so the primary button doesn't stretch

@@ -8,7 +8,7 @@
  * headings would otherwise turn into an ordered list.
  *
  * Links carry no `target`: the page intercepts clicks and routes them through
- * `openExternal`, so on iOS they pass the parental gate like any other link.
+ * `openExternal`, which is the only reliable way out of a native WebView.
  */
 function escapeHtml(s: string): string {
   return s

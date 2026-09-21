@@ -19,6 +19,14 @@ tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
+# In-app purchases, iOS only: the App Store forbids linking out to PayPal /
+# Ko-fi for donations (App Review Guideline 3.1.1(a)), so the iOS build offers
+# a tip through StoreKit instead. Scoped to iOS on purpose — pulling it into
+# the Android build would add Google Play Billing, which the Play release
+# neither uses nor should declare.
+[target.'cfg(target_os = "ios")'.dependencies]
+tauri-plugin-iap = "0.9"
+
 [profile.release]
 panic = "abort"
 codegen-units = 1

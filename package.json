@@ -1,6 +1,6 @@
 {
   "name": "little-bible-stories",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "type": "module",
   "main": "./electron/out/main/main.js",
@@ -12,8 +12,8 @@
     "build-github-develop": "vite build --base=/stories/develop/ --outDir=dist/develop",
     "build-github-demo": "vite build --mode demo --base=/stories/demo/ --outDir=dist/demo",
     "validated-build": "vue-tsc -b && vite build",
-    "deploy": "vite build && surge dist/ --domain little-bible-stories.surge.sh",
-    "deploy-demo": "vite build --mode demo && surge dist/ --domain little-bible-stories-demo.surge.sh",
+    "deploy": "vite build && surge dist/ --domain lambking-stories.surge.sh",
+    "deploy-demo": "vite build --mode demo && surge dist/ --domain lambking-stories-demo.surge.sh",
     "type-check": "vue-tsc --build",
     "format": "prettier --write --experimental-cli src",
     "test": "vitest",
@@ -39,7 +39,8 @@
     "tauri:build-ios": "dotenv -e .env.tauri -v VITE_APP_PLATFORM=ios -- tauri ios build",
     "ci:ios:testflight": "gh workflow run ios-build.yml -f export_method=app-store-connect -f upload_testflight=true && echo \"Triggered iOS TestFlight build — track at: $(gh repo view --json url -q .url)/actions/workflows/ios-build.yml\"",
     "icons": "node scripts/generate-app-icons.mjs",
-    "handover:pdf": "node scripts/md-to-pdf.mjs handover-lambking-stories.md --lang=de && node scripts/md-to-pdf.mjs handover-migration-runbook.md"
+    "handover:pdf": "node scripts/md-to-pdf.mjs handover-lambking-stories.md --lang=de && node scripts/md-to-pdf.mjs handover-migration-runbook.md",
+    "invoice:pdf": "node scripts/md-to-pdf.mjs invoice.md --lang=de --style=invoice"
   },
   "build": {
     "appId": "com.stories.lambking",
@@ -65,6 +66,7 @@
     ]
   },
   "dependencies": {
+    "@choochmeque/tauri-plugin-iap-api": "^0.9.1",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2.5.5",
     "@vueuse/core": "^14.2.1",

@@ -1,8 +1,8 @@
 /**
- * `true` in the iOS App Store build. That build hides the donation CTAs (App
- * Review Guideline 3.1.1(a): no calls to action for payments outside in-app
- * purchase, except on the US storefront) and puts a parental gate in front of
- * every link out of the app (Kids Category, Guideline 1.3).
+ * `true` in the iOS App Store build. That build replaces the PayPal / Ko-fi
+ * donation CTAs with a StoreKit tip (App Review Guideline 3.1.1(a): no calls
+ * to action for payments outside in-app purchase, except on the US
+ * storefront; a tip *through* in-app purchase is allowed by 3.1.1).
  *
  * `ios-build.yml` and `pnpm tauri:build-ios` set VITE_APP_PLATFORM=ios. The
  * user-agent check covers a local iOS build that forgot it; iPadOS WebViews

@@ -44,8 +44,6 @@
  * handing the link to the system browser is also the policy-safe shape.
  */
 import { isTauri } from '@tauri-apps/api/core'
-import { isIOS } from '@/utils/platform'
-import { requestParentalGate } from '@/use/useParentalGate'
 
 // Same two-signal check `useUserUuid` uses: `isTauri()` reads the
 // `window.isTauri` marker the v2 WebView injects, `__TAURI_INTERNALS__` is the
@@ -85,8 +83,6 @@ function openInBrowserTab(url: string): boolean {
  */
 export async function openExternal(url: string): Promise<boolean> {
   if (!isExternalUrl(url)) return false
-  // Kids Category: nothing leaves the iOS app without a grown-up (Guideline 1.3).
-  if (isIOS && !(await requestParentalGate())) return false
 
   if (inTauriApp()) {
     try {

@@ -206,14 +206,14 @@ export default {
         keepGoing: 'Keep going',
         achievements: 'ACHIEVEMENTS'
       },
-      parentalGate: {
-        title: 'Ask a grown-up',
-        text: 'This link leaves the app. Please ask a grown-up to solve this task:',
-        question: 'What is {a} × {b}?',
-        answerLabel: 'Answer',
-        confirm: 'Continue',
-        cancel: 'Cancel',
-        wrong: 'Not quite. Here is a new task.'
+      // In-app tip, iOS only — the App Store build cannot link out to
+      // PayPal / Ko-fi, so it offers a StoreKit tip instead. See `useTips`.
+      tip: {
+        label: 'Support us',
+        labelWithPrice: 'Support us · {price}',
+        purchasing: 'Please wait …',
+        thanks: 'Thank you!',
+        retry: 'Try again'
       },
       legal: {
         title: 'Privacy & Legal notice',
@@ -456,14 +456,14 @@ export default {
         keepGoing: 'Weiter so',
         achievements: 'ERFOLGE'
       },
-      parentalGate: {
-        title: 'Frag eine erwachsene Person',
-        text: 'Dieser Link führt aus der App heraus. Bitte lass eine erwachsene Person diese Aufgabe lösen:',
-        question: 'Was ist {a} × {b}?',
-        answerLabel: 'Antwort',
-        confirm: 'Weiter',
-        cancel: 'Abbrechen',
-        wrong: 'Leider falsch. Hier ist eine neue Aufgabe.'
+      // In-app tip, iOS only — the App Store build cannot link out to
+      // PayPal / Ko-fi, so it offers a StoreKit tip instead. See `useTips`.
+      tip: {
+        label: 'Unterstützen',
+        labelWithPrice: 'Unterstützen · {price}',
+        purchasing: 'Bitte warten …',
+        thanks: 'Danke!',
+        retry: 'Erneut versuchen'
       },
       legal: {
         title: 'Datenschutz & Impressum',

@@ -127,51 +127,33 @@ describe('openExternal', () => {
 })
 
 describe('openExternal on the iOS App Store build', () => {
-  // Kids Category (App Review Guideline 1.3): no link may leave the iOS app
-  // before a grown-up passes the parental gate. The Android case above
-  // ("inside the Tauri app") opens without one.
+  // The iOS build used to hold every outgoing link behind a parental gate,
+  // which the Kids Category requires (App Review Guideline 1.3). The app has
+  // left that category and is rated 18+, so iOS now behaves like every other
+  // shell — these cases exist to keep the gate from creeping back in.
   async function iosModule() {
     vi.stubEnv('VITE_APP_PLATFORM', 'ios')
     vi.stubGlobal('isTauri', true)
-    const { openExternal } = await freshModule()
-    // Same module instance `openExternal` just loaded (resetModules ran first).
-    const gate = await import('@/use/useParentalGate')
-    return { openExternal, gate }
+    return freshModule()
   }
 
   afterEach(() => {
     vi.unstubAllEnvs()
   })
 
-  it('opens the link only after the parental gate is passed', async () => {
-    const { openExternal, gate } = await iosModule()
+  it('opens the link straight away, with nothing to confirm', async () => {
+    const { openExternal } = await iosModule()
 
-    const opening = openExternal('https://lambking.store')
-    expect(gate.gateQuestion.value).not.toBeNull()
-    expect(openUrl).not.toHaveBeenCalled()
-
-    gate.settleParentalGate(true)
-
-    await expect(opening).resolves.toBe(true)
+    await expect(openExternal('https://lambking.store')).resolves.toBe(true)
     expect(openUrl).toHaveBeenCalledWith('https://lambking.store')
   })
 
-  it('stays in the app when the gate is cancelled', async () => {
-    const { openExternal, gate } = await iosModule()
+  it('still refuses a blocked protocol', async () => {
+    const { openExternal } = await iosModule()
 
-    const opening = openExternal('https://lambking.store')
-    gate.settleParentalGate(false)
-
-    await expect(opening).resolves.toBe(false)
+    await expect(openExternal('javascript:alert(1)')).resolves.toBe(false)
     expect(openUrl).not.toHaveBeenCalled()
     expect(windowOpen).not.toHaveBeenCalled()
     expect(assign).not.toHaveBeenCalled()
-  })
-
-  it('refuses a blocked protocol without even asking', async () => {
-    const { openExternal, gate } = await iosModule()
-
-    await expect(openExternal('javascript:alert(1)')).resolves.toBe(false)
-    expect(gate.gateQuestion.value).toBeNull()
   })
 })

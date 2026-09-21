@@ -26,11 +26,13 @@ den Nutzer durchgeführt oder gespeichert.
 3. Konformität mit Richtlinien für Kinder (COPPA / DSGVO)
    Die App wurde nach dem Prinzip „Privacy by Design“ entwickelt, um den Schutz minderjähriger Nutzer sicherzustellen.
 
-Es gibt keine versteckten In-App-Käufe (IAP).
+Es gibt keine versteckten In-App-Käufe (IAP). Alle Geschichten sind kostenlos; nichts steht hinter einer
+Bezahlschranke. Die iOS-Fassung enthält einen einzigen freiwilligen In-App-Kauf – ein einmaliges Trinkgeld, das nichts
+freischaltet und an die Stelle der dort unzulässigen Spenden-Schaltflächen tritt.
 
-Externe Links: Links zu externen Inhalten (Webseite/Shop) sind klar gekennzeichnet und führen aus der App heraus. In der
-iOS-App (Kategorie „Kinder“) liegt vor jedem solchen Link eine Elternabfrage (Rechenaufgabe, die eingetippt werden
-muss); die Spenden-Schaltflächen gibt es dort nicht.
+Externe Links: Links zu externen Inhalten (Webseite/Shop) sind klar gekennzeichnet und führen aus der App heraus, und
+zwar in den Browser des Geräts. Die Spenden-Schaltflächen (PayPal/Ko-fi) gibt es nur in der Android-Fassung und auf der
+Webseite.
 
 4. Technischer Stack
    Webseite: lambking.store (Informationsseite)

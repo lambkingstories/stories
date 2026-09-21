@@ -11,6 +11,9 @@ importers:
 
   .:
     dependencies:
+      '@choochmeque/tauri-plugin-iap-api':
+        specifier: ^0.9.1
+        version: 0.9.1
       '@tauri-apps/api':
         specifier: ^2
         version: 2.11.0
@@ -633,6 +636,9 @@ packages:
     engines: {node: '>=14.21.3'}
     cpu: [x64]
     os: [win32]
+
+  '@choochmeque/tauri-plugin-iap-api@0.9.1':
+    resolution: {integrity: sha512-ifn8OutdYxWYJ5uPF0cBgyPVLXJgci/6Ycr3VTfPoR63UXPp6KlHb1LW008h6rAYq+64dkKj9i3wLtkZ3xWumQ==}
 
   '@colors/colors@1.6.0':
     resolution: {integrity: sha512-Ir+AOibqzrIsL6ajt3Rz3LskB7OiMVHqltZmspbW/TJuTVuyOMirVqAkjfY6JISiLHgyNqicAC8AyHHGzNd/dA==}
@@ -6474,6 +6480,10 @@ snapshots:
 
   '@biomejs/cli-win32-x64@2.4.6':
     optional: true
+
+  '@choochmeque/tauri-plugin-iap-api@0.9.1':
+    dependencies:
+      '@tauri-apps/api': 2.11.0
 
   '@colors/colors@1.6.0': {}
 
