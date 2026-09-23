@@ -170,9 +170,9 @@ developer"). Everything user-facing therefore says *Trinkgeld* / *tip* and never
 in-app purchase (3.2.1(vi)), so a donation label on these products invites a
 rejection. The sheet spells this out in its footnote.
 
-`com.stories.lambking.tip` (2,99 €) was the earlier single-amount product. It is
-superseded by the five above and can be deleted in App Store Connect — it was
-never submitted, so nothing depends on it.
+`com.stories.lambking.tip` (2,99 €) was an earlier single-amount product,
+superseded by the five above and deleted on 2026-09-23. It had never been
+submitted or sold, so nothing depended on it.
 
 **Blocker:** the product cannot be sold until the **Paid Apps agreement** is
 accepted in App Store Connect → Business, with bank and tax details filled in.
