@@ -41,9 +41,11 @@ const label = computed(() => t('app.tip.label'))
 </script>
 
 <template lang="pug">
-  //- Hidden until StoreKit actually offers the products, so the slide never
-  //- shows a button that cannot do anything.
-  span(v-if="status !== 'idle' && status !== 'unavailable'")
+  //- Always rendered on iOS. It used to wait for StoreKit to offer the
+  //- products, which meant it never appeared at all: Apple wants a review
+  //- screenshot of the purchase UI before it releases the products, and the
+  //- products are what the button was waiting for.
+  span
     button(
       type="button"
       :class="['tip-btn', { 'is-compact': compact, 'is-pressed': pressed }]"

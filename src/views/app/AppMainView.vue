@@ -903,17 +903,18 @@ button
       --kofi-scale: 1.3
       margin: 0 .5rem
 
-// iOS variant of the row above: one tip button, centred. Same `bottom` so
-// it clears the dots row, same `--kofi-scale`-style hand-off (`--tip-scale`)
-// so the outer size-up composes with the button's own press transform
-// instead of replacing it.
+// iOS variant of the row above: a single tip button parked in the same
+// bottom-right corner the Ko-fi button occupies on Android, so the slide reads
+// the same on both. Same `bottom` so it clears the dots row, and the same
+// `--kofi-scale`-style hand-off (`--tip-scale`) so an outer size-up composes
+// with the button's own press transform instead of replacing it.
 .welcome-tip-row
   position: absolute
-  left: 0
-  right: 0
+  left: 12px
+  right: 12px
   bottom: 36px
   display: flex
-  justify-content: center
+  justify-content: flex-end
   align-items: center
 
   :deep(.tip-btn)

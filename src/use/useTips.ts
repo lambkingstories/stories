@@ -35,9 +35,18 @@ export const TIP_TIERS: readonly TipTier[] = [
   { id: 'com.stories.lambking.support.100', amount: 100 }
 ]
 
-export type TipStatus = 'idle' | 'loading' | 'ready' | 'unavailable' | 'purchasing' | 'thanks' | 'failed'
+export type TipStatus = 'idle' | 'loading' | 'ready' | 'purchasing' | 'thanks' | 'failed'
 
 const status = ref<TipStatus>('idle')
+/**
+ * False when StoreKit returned nothing — no Paid Apps agreement yet, or the
+ * products have not left "Missing Metadata". The sheet still opens and still
+ * lists the amounts: hiding the button instead created a deadlock, because
+ * Apple wants a review screenshot *of the purchase UI* before it will move the
+ * products out of exactly that state. A purchase attempted in this condition
+ * fails and says so, which is the honest outcome.
+ */
+const storeReady = ref(false)
 /** Product id → the localized price string StoreKit formats for the device. */
 const priceLabels = ref<Record<string, string>>({})
 /** The tier currently being bought, so only its row shows a spinner. */
@@ -56,17 +65,15 @@ async function loadTipProducts(): Promise<void> {
     for (const p of products) {
       if (p.formattedPrice) labels[p.productId] = p.formattedPrice
     }
-    // Nothing offered means the Paid Apps agreement is still missing, or the
-    // products have not cleared review yet. Either way there is nothing to sell.
-    if (!Object.keys(labels).length) {
-      status.value = 'unavailable'
-      return
-    }
     priceLabels.value = labels
+    storeReady.value = Object.keys(labels).length > 0
     status.value = 'ready'
   } catch (error) {
+    // Includes the plain browser build, where the plugin has no host to talk
+    // to. The sheet falls back to the plain euro amounts.
     console.warn('[tips] product lookup failed', error)
-    status.value = 'unavailable'
+    storeReady.value = false
+    status.value = 'ready'
   }
 }
 
@@ -103,5 +110,5 @@ function resetTipStatus(): void {
 }
 
 export default function useTips() {
-  return { status, priceLabels, pendingId, loadTipProducts, buyTip, resetTipStatus }
+  return { status, storeReady, priceLabels, pendingId, loadTipProducts, buyTip, resetTipStatus }
 }
