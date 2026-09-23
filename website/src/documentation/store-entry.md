@@ -3,10 +3,10 @@ Kategorie: Kinder / Familie (Christian Children's App)
 Entwickler: Anton Bernt / Konstantin Steinmiller
 
 1. Datenerhebung & Privatsphäre (Data Privacy)
-   Keine personenbezogenen Daten: Die App fragt keine persönlichen Daten ab. Einzige Ausnahme ist eine anonyme
-   Nutzungszählung der Android- und iOS-App: eine zufällige, in der App erzeugte Kennung geht an unseren eigenen Server,
-   der pro Kennung und Tag einen Eintrag speichert und ihn nach 13 Monaten löscht (Details: Datenschutzerklärung,
-   Abschnitt 3; Angaben für App Store Connect: app-store-listing.md).
+   Keine personenbezogenen Daten: Die App fragt keine persönlichen Daten ab, erzeugt keine Gerätekennung und sendet
+   nichts, woran sich ein Gerät oder eine Person erkennen ließe. Unser eigener Server zählt lediglich, wie oft eine
+   Buchseite geöffnet wurde – ein Eintrag pro Kalendertag, bestehend aus Datum und Anzahl (Details:
+   Datenschutzerklärung, Abschnitt 3; Angaben für App Store Connect: app-store-listing.md).
 
 Keine Benutzerkonten: Es gibt kein Registrierungssystem und keinen Login (weder intern noch über Drittanbieter wie
 Google oder Facebook).

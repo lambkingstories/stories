@@ -60,10 +60,10 @@ const schema = z.object({
       return map
     }),
 
-  // Anonymous usage tracking for the /admin/usage dashboard. Clients send a
-  // locally generated `X-User-Uuid`; the server keeps one row per user per
-  // calendar day. Set to `false` to stop recording entirely (the dashboard
-  // then just shows the history collected so far).
+  // View counting for the /admin/usage dashboard: one row per calendar day
+  // holding how often a book detail page was opened. Nothing about the
+  // caller is stored — no id, no address, nothing. Set to `false` to stop
+  // counting entirely (the dashboard then shows the history so far).
   USAGE_TRACKING_ENABLED: z
     .string()
     .default('true')

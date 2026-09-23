@@ -1,5 +1,7 @@
 import type { Request, Response } from 'express'
 import { BookService } from '../services/BookService.js'
+import { UsageService } from '../services/UsageService.js'
+import { env } from '../config/env.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
 
 export const listBooks = asyncHandler(async (req: Request, res: Response) => {
@@ -12,6 +14,10 @@ export const listBooks = asyncHandler(async (req: Request, res: Response) => {
 export const getBook = asyncHandler(async (req: Request, res: Response) => {
   const { book, cacheHit } = await BookService.getById(req.params.id as string)
   res.setHeader('X-Cache', cacheHit ? 'HIT' : 'MISS')
+  // The book detail page is the one screen worth counting, and this is the
+  // request it makes. Fire-and-forget on purpose: the counter is a
+  // side-effect of the fetch, never a reason for it to be slower or to fail.
+  if (env.USAGE_TRACKING_ENABLED) void UsageService.recordBookView()
   res.json({ book })
 })
 

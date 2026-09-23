@@ -210,10 +210,12 @@ export default {
       // PayPal / Ko-fi, so it offers a StoreKit tip instead. See `useTips`.
       tip: {
         label: 'Support us',
-        labelWithPrice: 'Support us · {price}',
-        purchasing: 'Please wait …',
-        thanks: 'Thank you!',
-        retry: 'Try again'
+        modalTitle: 'Support our mission',
+        modalText: 'Every story stays free. If you would like to help us make more of them, you can leave a one-off tip.',
+        modalNote: 'A tip unlocks nothing in the app and is not a donation to a charity.',
+        buyAria: 'Tip {price}',
+        failed: 'That did not work. Please try again.',
+        thanksLong: 'Thank you so much for your support!'
       },
       legal: {
         title: 'Privacy & Legal notice',
@@ -460,10 +462,12 @@ export default {
       // PayPal / Ko-fi, so it offers a StoreKit tip instead. See `useTips`.
       tip: {
         label: 'Unterstützen',
-        labelWithPrice: 'Unterstützen · {price}',
-        purchasing: 'Bitte warten …',
-        thanks: 'Danke!',
-        retry: 'Erneut versuchen'
+        modalTitle: 'Unterstütze unsere Mission',
+        modalText: 'Alle Geschichten bleiben kostenlos. Wenn du uns helfen möchtest, neue zu schaffen, kannst du uns ein einmaliges Trinkgeld geben.',
+        modalNote: 'Ein Trinkgeld schaltet nichts in der App frei und ist keine Spende an eine gemeinnützige Organisation.',
+        buyAria: '{price} Trinkgeld geben',
+        failed: 'Das hat leider nicht geklappt. Bitte versuche es noch einmal.',
+        thanksLong: 'Ganz herzlichen Dank für deine Unterstützung!'
       },
       legal: {
         title: 'Datenschutz & Impressum',

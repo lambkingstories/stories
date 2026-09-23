@@ -14,7 +14,7 @@ Everything marked ✏️ is still Anton's decision.
 | Support URL | `https://lambking.store`                                                                 |
 | Marketing URL | `https://lambking.store`                                                                 |
 | Privacy policy URL | `https://lambking.store/datenschutz` — Anton fügt dort zuerst den App-Abschnitt ein (Text: `handover-datenschutz-app-abschnitt.md`, gitignored). Bis er online ist, ersatzweise `https://lambkingstories.github.io/stories/lamb-king/?privacy-policy=de` |
-| Price | free, **one in-app purchase**: „Unterstützen" / "Support us", consumable, `com.stories.lambking.tip` |
+| Price | free, **five in-app purchases**: „Unterstützen" / "Support us" at 3, 10, 20, 50 and 100 € (consumables) |
 | Devices | iPhone and iPad                                                                          |
 | Screenshots | 6.9" iPhone 1320×2868 and 13" iPad 2064×2752, five each per language                     |
 
@@ -119,41 +119,59 @@ Notes (English, pasted into „Notizen“):
 
 > LambKing Stories is a free Bible story app. No account or login is needed; all stories are loaded from our own server and cached on the device. There are no ads and no third-party SDKs, and every story is free — nothing in the app is behind a paywall.
 >
-> In-app purchase: the app offers one consumable, "Support us" (com.stories.lambking.tip), a voluntary tip for the developer. It unlocks no content and changes nothing in the app — the only feedback is a "Thank you!" on the button. To see it, open the home screen and swipe the welcome banner to the second slide ("Support our mission"); the button sits at the bottom of that slide. The iOS build contains no links to PayPal, Ko-fi or any other payment outside in-app purchase.
+> In-app purchases: the app offers five consumables, "Support us" at 3, 10, 20, 50 and 100 €. They are voluntary tips for the developer, exactly as Guideline 3.1.1 permits. They unlock no content and change nothing in the app — the only feedback is a thank-you message. This is a tip, not a charitable donation, and the app says so in the sheet itself. To see it, open the home screen, swipe the welcome banner to the second slide ("Support our mission") and tap "Support us"; the five amounts appear in a sheet. The iOS build contains no links to PayPal, Ko-fi or any other payment outside in-app purchase.
 >
-> Privacy: the privacy policy is in the app under "My Area" → "Privacy & Legal notice" (bottom of the page). To count daily active devices, the app sends a random, app-generated install ID to our own server with each request. It is not derived from device data, not linked to a person, not shared with anyone and not used for tracking; the server keeps one entry per ID and day and deletes entries after 13 months.
+> Privacy: the privacy policy is in the app under "My Area" → "Privacy & Legal notice" (bottom of the page). The app collects no data at all. It mints no identifier, stores none and sends none; our server only increments a per-day counter of how often a book detail page was opened, which is a date and a number for all users together.
 >
 > The app supports iPhone and iPad in portrait and landscape.
 
 ## App privacy („App-Datenschutz“) answers
 
-- Data collected: **yes**
-  - **Identifiers → Device ID** (the random install ID) — purpose: Analytics · linked to the user: **no** · used for tracking: **no**
-  - **Usage Data → Product Interaction** (the app was used on a given day) — purpose: Analytics · linked: **no** · tracking: **no**
-- Nothing else is collected: no contact info, location, contacts, user content, health, purchases or diagnostics leave the device. Name, avatar, watch list and reading progress stay on the device.
-- The tip purchase does **not** change this answer. StoreKit handles it end to end; the app never sends the transaction, the receipt or anything derived from it to our server, so "Purchases" stays unchecked.
+- Data collected: **no** — answer "Nein, wir erfassen keine Daten von dieser App".
+- The app mints no identifier, stores none on the device and sends none. The only thing the server records is a per-day counter of how often a book detail page was opened: one document holding a date and a number, for all users together. Nothing in it refers to a device or a person, so it is not "data collected from this app" in Apple's sense.
+- Nothing else is collected either: no contact info, location, contacts, user content, health, purchases or diagnostics leave the device. Name, avatar, watch list and reading progress stay on the device.
+- The tip purchase does not change this. StoreKit handles it end to end; the app never sends the transaction, the receipt or anything derived from it to our server, so "Purchases" stays unchecked.
+
+> This replaced an earlier answer of *Device ID + Product Interaction, both Analytics*. That was accurate for the previous build, which sent a random per-install id on every request. Both the id and the per-install rows are gone — if a future build reintroduces any identifier, this section and the privacy policy have to change back together.
 
 ## In-app purchase — „Unterstützen" / "Support us"
 
+Five consumables, one per amount. All share the same type, wording pattern and
+review screenshot; only the amount differs.
+
+| Product ID | Amount | Display name (de / en) |
+|---|---|---|
+| `com.stories.lambking.support.3` | 3 € | Unterstützen · 3 € / Support us · €3 |
+| `com.stories.lambking.support.10` | 10 € | Unterstützen · 10 € / Support us · €10 |
+| `com.stories.lambking.support.20` | 20 € | Unterstützen · 20 € / Support us · €20 |
+| `com.stories.lambking.support.50` | 50 € | Unterstützen · 50 € / Support us · €50 |
+| `com.stories.lambking.support.100` | 100 € | Unterstützen · 100 € / Support us · €100 |
+
 | Field | Value |
 |---|---|
-| Product ID | `com.stories.lambking.tip` |
 | Type | **Consumable** (can be given more than once) |
-| Reference name | LambKing Stories Tip |
-| Display name (de) | Unterstützen |
-| Display name (en) | Support us |
+| Reference name | LambKing Stories Support <amount> |
 | Description (de) | Ein freiwilliges Trinkgeld für die Entwicklung neuer Geschichten. Schaltet nichts frei. |
 | Description (en) | A voluntary tip towards new stories. Unlocks nothing. |
-| Price tier | ✏️ Anton's decision — suggestion: Tier 3 (2,99 €) |
-| Review screenshot | home screen, welcome banner on slide 2 („Unterstütze unsere Mission") with the button visible |
+| Base region | Deutschland (EUR) — Apple derives every other currency |
+| Review screenshot | home screen, welcome banner on slide 2 („Unterstütze unsere Mission"), amount sheet open |
 
 Guideline 3.1.1 allows tips explicitly ("Apps may enable customers to tip the
-developer"). Because it is a *tip* and not a donation to a registered nonprofit,
-it must go through in-app purchase — the nonprofit exemption (3.2.1(vi)) does not
-apply here and would need Anton to register the app as a nonprofit.
+developer"). Everything user-facing therefore says *Trinkgeld* / *tip* and never
+*Spende* / *donation*: a donation to a registered nonprofit may **not** go through
+in-app purchase (3.2.1(vi)), so a donation label on these products invites a
+rejection. The sheet spells this out in its footnote.
+
+At 100 € the amount is above what Apple's standard price points cover in some
+currencies; if a tier cannot be created at exactly that value, take the nearest
+available point and note the actual figure here.
+
+`com.stories.lambking.tip` (2,99 €) was the earlier single-amount product. It is
+superseded by the five above and can be deleted in App Store Connect once they
+exist — it was never submitted, so nothing depends on it.
 
 **Blocker:** the product cannot be sold until the **Paid Apps agreement** is
 accepted in App Store Connect → Business, with bank and tax details filled in.
-Until then StoreKit returns no product and the button hides itself — the app still
+Until then StoreKit returns no products and the button hides itself — the app still
 builds, ships and passes review-readiness without it, so this does not block a
 TestFlight build.

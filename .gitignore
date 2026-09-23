@@ -75,3 +75,6 @@ src-tauri/target
 src-tauri/gen
 .bundle
 src-tauri/vendor
+
+# Scratch dirs the server test suite writes uploads and audio into.
+server/tests/.tmp/

@@ -24,8 +24,8 @@
         <div>
           <h2 class="panel-title">App-Nutzung</h2>
           <p class="panel-subtitle">
-            Anonyme Gerätekennung (UUID) pro App-Installation (Android, iOS) — Web- und
-            Desktop-Aufrufe werden nicht gezählt. Keine Konten, keine Drittanbieter-Analytics.
+            Gezählt wird, wie oft eine Buchseite geöffnet wurde — ein Zähler pro Tag, sonst
+            nichts. Keine Gerätekennung, keine Konten, keine Drittanbieter-Analytics.
           </p>
         </div>
       </header>
@@ -34,12 +34,12 @@
 
       <div class="stat-row">
         <div class="stat-tile">
-          <span class="stat-label">Heute aktiv</span>
-          <span class="stat-value is-hero">{{ report?.totals.activeToday ?? '–' }}</span>
+          <span class="stat-label">Heute</span>
+          <span class="stat-value is-hero">{{ report?.totals.viewsToday ?? '–' }}</span>
         </div>
         <div class="stat-tile">
-          <span class="stat-label">Aktiv im Zeitraum</span>
-          <span class="stat-value">{{ report?.totals.uniqueInRange ?? '–' }}</span>
+          <span class="stat-label">Im Zeitraum</span>
+          <span class="stat-value">{{ report?.totals.viewsInRange ?? '–' }}</span>
         </div>
         <div class="stat-tile">
           <span class="stat-label">Ø pro Tag</span>
@@ -47,12 +47,12 @@
         </div>
         <div class="stat-tile">
           <span class="stat-label">Spitzentag</span>
-          <span class="stat-value">{{ report?.totals.peak?.users ?? '–' }}</span>
+          <span class="stat-value">{{ report?.totals.peak?.views ?? '–' }}</span>
           <span v-if="report?.totals.peak" class="stat-note">{{ formatDay(report.totals.peak.day) }}</span>
         </div>
         <div class="stat-tile">
-          <span class="stat-label">Nutzer insgesamt</span>
-          <span class="stat-value">{{ report?.totals.uniqueAllTime ?? '–' }}</span>
+          <span class="stat-label">Aufrufe insgesamt</span>
+          <span class="stat-value">{{ report?.totals.viewsAllTime ?? '–' }}</span>
           <span v-if="report?.totals.firstDay" class="stat-note">seit {{ formatDay(report.totals.firstDay) }}</span>
         </div>
       </div>
@@ -73,17 +73,17 @@
         </button>
         <div v-if="showTable" class="usage-table-scroll">
           <table class="usage-table">
-            <caption class="sr-only">Täglich aktive Nutzer je Tag</caption>
+            <caption class="sr-only">Geöffnete Buchseiten je Tag</caption>
             <thead>
             <tr>
               <th scope="col">Tag</th>
-              <th scope="col" class="is-num">Aktive Nutzer</th>
+              <th scope="col" class="is-num">Aufrufe</th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="d in tableRows" :key="d.day">
               <td>{{ formatDay(d.day) }}</td>
-              <td class="is-num">{{ d.users }}</td>
+              <td class="is-num">{{ d.views }}</td>
             </tr>
             </tbody>
           </table>

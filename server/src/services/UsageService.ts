@@ -1,4 +1,4 @@
-import { UserActivity } from '../models/UserActivity.js'
+import { BookView } from '../models/BookView.js'
 import { env } from '../config/env.js'
 import { logger } from '../config/logger.js'
 import { addDays, dayKey, dayRange } from '../utils/dayKey.js'
@@ -7,7 +7,7 @@ export type UsageRange = '7' | '30' | '90' | '365' | 'all'
 
 export interface DailyUsagePoint {
   day: string
-  users: number
+  views: number
 }
 
 export interface UsageReport {
@@ -17,9 +17,9 @@ export interface UsageReport {
   to: string
   days: DailyUsagePoint[]
   totals: {
-    activeToday: number
-    uniqueInRange: number
-    uniqueAllTime: number
+    viewsToday: number
+    viewsInRange: number
+    viewsAllTime: number
     averagePerDay: number
     peak: DailyUsagePoint | null
     firstDay: string | null
@@ -33,38 +33,13 @@ const RANGE_DAYS: Record<Exclude<UsageRange, 'all'>, number> = {
   '365': 365
 }
 
-/**
- * Per-process "already recorded today" set. The tracking middleware runs on
- * every API request, but a user only needs ONE row per day — without this we
- * would fire an upsert per book fetch, per image, per app resume. The set is
- * keyed by uuid and dropped wholesale when the calendar day rolls over, so it
- * stays roughly DAU-sized. A restart (or a second instance) just costs one
- * redundant upsert per user, which the unique index absorbs.
- */
-let seenDay = ''
-const seenUuids = new Set<string>()
-// Hard ceiling so a flood of forged uuids can't grow the set without bound.
-const SEEN_CAP = 100_000
-
-function markSeen(day: string, userUuid: string): boolean {
-  if (day !== seenDay) {
-    seenDay = day
-    seenUuids.clear()
-  }
-  if (seenUuids.has(userUuid)) return false
-  if (seenUuids.size >= SEEN_CAP) seenUuids.clear()
-  seenUuids.add(userUuid)
-  return true
-}
-
-async function countUnique(from?: string): Promise<number> {
+async function sumViews(from?: string): Promise<number> {
   const match = from ? [{ $match: { day: { $gte: from } } }] : []
-  const rows = await UserActivity.aggregate<{ users: number }>([
+  const rows = await BookView.aggregate<{ views: number }>([
     ...match,
-    { $group: { _id: '$userUuid' } },
-    { $count: 'users' }
+    { $group: { _id: null, views: { $sum: '$views' } } }
   ]).exec()
-  return rows[0]?.users ?? 0
+  return rows[0]?.views ?? 0
 }
 
 export const UsageService = {
@@ -73,48 +48,33 @@ export const UsageService = {
   },
 
   /**
-   * Record that `userUuid` was active today. Idempotent per (uuid, day):
-   * the first call of the day inserts, every later one is a no-op — first
-   * in-process (the `seen` set), then in Mongo (`$setOnInsert` + the unique
-   * index) for the multi-instance case.
+   * Count one book detail view against today. A bare `$inc` upsert, so
+   * concurrent requests can't lose each other's increment the way a
+   * read-modify-write would.
    */
-  async recordActivity(userUuid: string, client = ''): Promise<void> {
+  async recordBookView(): Promise<void> {
     const day = this.today()
-    if (!markSeen(day, userUuid)) return
     try {
-      await UserActivity.updateOne(
-        { day, userUuid },
-        { $setOnInsert: { day, userUuid, client } },
-        { upsert: true }
-      ).exec()
+      await BookView.updateOne({ day }, { $inc: { views: 1 } }, { upsert: true }).exec()
     } catch (err) {
-      // A concurrent upsert on the same (day, uuid) loses the unique-index
-      // race — the row exists either way, which is all we wanted. Anything
-      // else is logged and swallowed: usage tracking must never break a
-      // user-facing request.
+      // Two requests racing to create the same day's row: one loses the
+      // unique index and its increment is lost. That is a single view off a
+      // counter, once a day — not worth a retry, and never worth failing the
+      // book fetch this hangs off.
       const code = (err as { code?: number }).code
       if (code !== 11000) {
-        // Drop the memo so the next request retries instead of silently
-        // skipping this user for the rest of the day.
-        seenUuids.delete(userUuid)
-        logger.warn('usage tracking upsert failed', { err: (err as Error).message })
+        logger.warn('book view counter failed', { err: (err as Error).message })
       }
     }
   },
 
-  /** Earliest recorded day, or null when nothing has been tracked yet. */
+  /** Earliest recorded day, or null when nothing has been counted yet. */
   async firstDay(): Promise<string | null> {
-    const doc = await UserActivity.findOne({}, { day: 1 }).sort({ day: 1 }).lean().exec()
+    const doc = await BookView.findOne({}, { day: 1 }).sort({ day: 1 }).lean().exec()
     return doc?.day ?? null
   },
 
-  /**
-   * Zero-filled daily-active-user series plus headline totals.
-   *
-   * Days are grouped by (day, uuid) before counting so a duplicate row —
-   * possible if the unique index was never built on an older deployment —
-   * can't inflate a day's number.
-   */
+  /** Zero-filled daily view series plus headline totals. */
   async report(range: UsageRange): Promise<UsageReport> {
     const to = this.today()
     const first = await this.firstDay()
@@ -123,28 +83,26 @@ export const UsageService = {
         ? (first && first < to ? first : to)
         : addDays(to, -(RANGE_DAYS[range] - 1))
 
-    const [rows, uniqueInRange, uniqueAllTime] = await Promise.all([
-      UserActivity.aggregate<{ _id: string; users: number }>([
-        { $match: { day: { $gte: from, $lte: to } } },
-        { $group: { _id: { day: '$day', userUuid: '$userUuid' } } },
-        { $group: { _id: '$_id.day', users: { $sum: 1 } } },
-        { $sort: { _id: 1 } }
-      ]).exec(),
-      countUnique(from),
-      countUnique()
+    const [rows, viewsInRange, viewsAllTime] = await Promise.all([
+      BookView.find({ day: { $gte: from, $lte: to } }, { day: 1, views: 1 })
+        .sort({ day: 1 })
+        .lean()
+        .exec(),
+      sumViews(from),
+      sumViews()
     ])
 
-    const byDay = new Map(rows.map((r) => [r._id, r.users]))
+    const byDay = new Map(rows.map((r) => [r.day, r.views]))
     const days: DailyUsagePoint[] = dayRange(from, to).map((day) => ({
       day,
-      users: byDay.get(day) ?? 0
+      views: byDay.get(day) ?? 0
     }))
 
     const peak = days.reduce<DailyUsagePoint | null>(
-      (best, d) => (d.users > 0 && (!best || d.users > best.users) ? d : best),
+      (best, d) => (d.views > 0 && (!best || d.views > best.views) ? d : best),
       null
     )
-    const sum = days.reduce((acc, d) => acc + d.users, 0)
+    const sum = days.reduce((acc, d) => acc + d.views, 0)
 
     return {
       range,
@@ -153,9 +111,9 @@ export const UsageService = {
       to,
       days,
       totals: {
-        activeToday: byDay.get(to) ?? 0,
-        uniqueInRange,
-        uniqueAllTime,
+        viewsToday: byDay.get(to) ?? 0,
+        viewsInRange,
+        viewsAllTime,
         averagePerDay: days.length ? Math.round((sum / days.length) * 10) / 10 : 0,
         peak,
         firstDay: first
@@ -164,23 +122,17 @@ export const UsageService = {
   },
 
   /**
-   * Build the (day, userUuid) unique index explicitly.
+   * Build the unique day index explicitly.
    *
    * `connectDatabase` disables mongoose autoIndex in production, so without
-   * this the collection would run index-less in the only environment where
-   * the write volume matters.
+   * this the upsert would run index-less in the only environment where it
+   * matters — and the day row would stop being unique.
    */
   async ensureIndexes(): Promise<void> {
     try {
-      await UserActivity.createIndexes()
+      await BookView.createIndexes()
     } catch (err) {
-      logger.warn('failed to create UserActivity indexes', { err: (err as Error).message })
+      logger.warn('failed to create BookView indexes', { err: (err as Error).message })
     }
-  },
-
-  /** Test seam — drops the in-process dedupe memo. */
-  resetMemo(): void {
-    seenDay = ''
-    seenUuids.clear()
   }
 }

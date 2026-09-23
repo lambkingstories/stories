@@ -10,7 +10,6 @@ import { mongoSanitize } from './middleware/sanitize.js'
 import { helmetMiddleware } from './config/security.js'
 import { requestLogger } from './middleware/requestLogger.js'
 import { readLimiter } from './middleware/rateLimit.js'
-import { usageTracking } from './middleware/usageTracking.js'
 import apiRouter from './routes/index.js'
 import healthRouter from './routes/health.routes.js'
 import { adminRouter } from './routes/admin.routes.js'
@@ -108,7 +107,7 @@ export function createApp(): Express {
         return cb(null, {
           origin: '*',
           credentials: false,
-          allowedHeaders: ['Content-Type', 'X-Client-Key', 'X-User-Uuid'],
+          allowedHeaders: ['Content-Type', 'X-Client-Key'],
           methods: ['GET', 'OPTIONS']
         })
       }
@@ -131,12 +130,6 @@ export function createApp(): Express {
 
   // Health
   app.use(healthRouter)
-
-  // Anonymous DAU tracking. Mounted in front of the API router so every
-  // call the app makes counts as activity — including ones the read limiter
-  // is about to reject, since a throttled client is still an active user.
-  // It never blocks or awaits, so it adds nothing to request latency.
-  app.use('/api', usageTracking)
 
   // API with public-read rate limit as baseline; writes have their own strict limiter.
   app.use('/api', readLimiter, apiRouter)

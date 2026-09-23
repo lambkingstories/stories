@@ -1,8 +1,9 @@
 <script setup lang="ts">
 /**
- * "Support us" button for the iOS build: buys the consumable tip through
- * StoreKit. The web and Android builds keep `KoFiButton`, which links out to
- * PayPal / Ko-fi — links the App Store does not allow (see `useTips`).
+ * "Support us" button for the iOS build: opens the amount picker, which buys
+ * a consumable tip through StoreKit. The web and Android builds keep
+ * `KoFiButton`, which links out to PayPal / Ko-fi — links the App Store does
+ * not allow (see `useTips`).
  *
  * Shape and press behaviour mirror `KoFiButton` so the welcome slider looks
  * the same on every platform, including the pointer-driven press state the
@@ -11,6 +12,7 @@
 import { onMounted, computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useTips from '@/use/useTips'
+import SupportModal from '@/components/molecules/SupportModal.vue'
 
 interface Props {
   compact?: boolean
@@ -18,42 +20,48 @@ interface Props {
 withDefaults(defineProps<Props>(), { compact: false })
 
 const { t } = useI18n({ useScope: 'global' })
-const { status, priceLabel, loadTipProduct, buyTip } = useTips()
+const { status, loadTipProducts } = useTips()
 
-onMounted(() => void loadTipProduct())
+onMounted(() => void loadTipProducts())
 
 const pressed = ref(false)
 const onDown = () => (pressed.value = true)
 const onUp = () => (pressed.value = false)
 
-const busy = computed(() => status.value === 'purchasing' || status.value === 'loading')
-const label = computed(() => {
-  if (status.value === 'purchasing') return t('app.tip.purchasing')
-  if (status.value === 'thanks') return t('app.tip.thanks')
-  if (status.value === 'failed') return t('app.tip.retry')
-  return priceLabel.value ? t('app.tip.labelWithPrice', { price: priceLabel.value }) : t('app.tip.label')
-})
+const open = ref(false)
+// The slider swallows a plain click as a swipe often enough that the button
+// opens on release instead, the same way the donate buttons behave.
+function openModal() {
+  if (status.value === 'loading') return
+  open.value = true
+}
+
+const busy = computed(() => status.value === 'loading')
+const label = computed(() => t('app.tip.label'))
 </script>
 
 <template lang="pug">
-  //- Hidden until StoreKit actually offers the product, so the slide never
+  //- Hidden until StoreKit actually offers the products, so the slide never
   //- shows a button that cannot do anything.
-  button(
-    v-if="status !== 'idle' && status !== 'unavailable'"
-    type="button"
-    :class="['tip-btn', { 'is-compact': compact, 'is-pressed': pressed, 'is-thanks': status === 'thanks' }]"
-    :disabled="busy"
-    :aria-label="label"
-    @pointerdown="onDown"
-    @pointerup="onUp"
-    @pointercancel="onUp"
-    @pointerleave="onUp"
-    @click="buyTip"
-  )
-    span(class="tip-btn-icon" aria-hidden="true")
-      svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4")
-        path(d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1L12 21l7.7-7.6 1.1-1a5.5 5.5 0 0 0 0-7.8z")
-    span(class="tip-btn-label") {{ label }}
+  span(v-if="status !== 'idle' && status !== 'unavailable'")
+    button(
+      type="button"
+      :class="['tip-btn', { 'is-compact': compact, 'is-pressed': pressed }]"
+      :disabled="busy"
+      :aria-label="label"
+      aria-haspopup="dialog"
+      @pointerdown="onDown"
+      @pointerup="onUp"
+      @pointercancel="onUp"
+      @pointerleave="onUp"
+      @click="openModal"
+    )
+      span(class="tip-btn-icon" aria-hidden="true")
+        svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4")
+          path(d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1L12 21l7.7-7.6 1.1-1a5.5 5.5 0 0 0 0-7.8z")
+      span(class="tip-btn-label") {{ label }}
+
+    SupportModal(:open="open" @close="open = false")
 </template>
 
 <style scoped lang="sass">
@@ -92,11 +100,6 @@ const label = computed(() => {
   &:disabled
     opacity: 0.75
     cursor: default
-
-.tip-btn.is-thanks
-  border-color: #3f7d3f
-  background: linear-gradient(180deg, #55a355 0%, #3f7d3f 100%)
-  box-shadow: 0 4px 0 -1px #2f5f2f, 0 6px 14px -6px rgba(47, 95, 47, 0.7)
 
 .tip-btn.is-compact
   padding: 7px 12px

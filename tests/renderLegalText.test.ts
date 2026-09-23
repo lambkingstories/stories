@@ -26,7 +26,15 @@ describe('renderLegalText', () => {
     const html = renderLegalText(privacyText)
 
     for (let n = 1; n <= 7; n++) expect(html).toMatch(new RegExp(`<h3>${n}\\. `))
-    // App Review 5.1.1(i): the retention of the usage count must be stated.
-    expect(html).toContain('nach 13 Monaten automatisch gelöscht')
+    // The policy is hard-wrapped and the renderer turns each wrap into a
+    // `<br>`, so a sentence is split mid-phrase in the markup. Flatten both
+    // the tags and the whitespace before matching.
+    const flat = html.replace(/<br>/g, ' ').replace(/\s+/g, ' ')
+    // The app stores nothing per device any more, so there is no retention
+    // period left to state. What has to survive instead is the promise the
+    // App Store privacy answers now rest on: no identifier, just a counter.
+    expect(flat).toContain('Aufrufzählung ohne Personenbezug')
+    expect(flat).toContain('Es wird keine Kennung erzeugt, gespeichert oder übertragen')
+    expect(flat).not.toMatch(/13 Monaten/)
   })
 })

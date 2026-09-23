@@ -28,8 +28,9 @@ identifiziert werden kannst.
 
 Datenerfassung in dieser App
 In dieser App werden keine Benutzerkonten erstellt und keine Daten erhoben, mit denen wir dich identifizieren könnten.
-Damit wir wissen, wie viele Geräte die App täglich nutzen, zählt die Android- und iOS-App anonym mit (siehe Abschnitt 3).
-Die App folgt dem Prinzip der Datensparsamkeit.
+Die App speichert auch keine Kennung auf deinem Gerät und sendet keine an uns. Wir zählen lediglich, wie oft eine
+Buchseite geöffnet wurde – als reine Zahl pro Tag, ohne jeden Bezug zu einer Person oder einem Gerät (siehe
+Abschnitt 3). Die App folgt dem Prinzip der Datensparsamkeit.
 
 2. Verantwortlicher
    Der Verantwortliche für die Datenverarbeitung auf dieser Website und in der App ist:
@@ -55,14 +56,13 @@ technisch notwendige Daten verarbeitet, insbesondere deine IP-Adresse, Datum und
 Sie dienen nur der Auslieferung der Inhalte und der Sicherheit des Dienstes (Rechtsgrundlage: Art. 6 Abs. 1 lit. f
 DSGVO).
 
-Anonyme Nutzungszählung (nur Android- und iOS-App)
-Beim ersten Start erzeugt die App eine zufällige Kennung. Sie wird nicht aus Daten deines Geräts abgeleitet und nur in
-der App gespeichert. Bei Anfragen an unseren Server sendet die App diese Kennung mit. Der Server speichert daraus pro
-Kennung und Kalendertag einen Eintrag (Kennung, Datum, App-Variante), um zu zählen, wie viele Geräte die App täglich
-nutzen. Die Kennung wird mit keinen anderen Daten verknüpft, nicht an Dritte weitergegeben und nicht für Werbung oder
-Tracking verwendet. Die Einträge werden nach 13 Monaten automatisch gelöscht. Wenn du die App löschst, ist auch die
-Kennung auf deinem Gerät weg; eine neue Installation erzeugt eine neue Kennung. Rechtsgrundlage ist unser berechtigtes
-Interesse an einer einfachen Nutzungsstatistik (Art. 6 Abs. 1 lit. f DSGVO).
+Aufrufzählung ohne Personenbezug
+Wenn du eine Buchseite öffnest, erhöht unser Server einen Zähler um eins. Gespeichert wird ausschließlich das Datum und
+die Zahl der Aufrufe dieses Tages – also ein einziger Eintrag pro Kalendertag für alle Nutzer zusammen. Es wird keine
+Kennung erzeugt, gespeichert oder übertragen, nichts wird einem Gerät oder einer Person zugeordnet, und es entstehen
+keine Nutzungsprofile. Aus diesen Zahlen lässt sich weder ablesen, wer die App benutzt, noch wie oft eine einzelne
+Person sie öffnet. Rechtsgrundlage ist unser berechtigtes Interesse an einer einfachen Nutzungsstatistik
+(Art. 6 Abs. 1 lit. f DSGVO).
 
 Bilder-Teilen-Funktion
 Die App bietet die Möglichkeit, Bilder zu teilen. Hierbei nutzt die App ausschließlich die systemeigenen
@@ -73,8 +73,8 @@ Wir haben keinen Zugriff auf deine Kontakte, Empfänger oder die genutzten Diens
 Die Verarbeitung findet lokal auf deinem Gerät statt.
 
 Keine Analyse und Werbung
-Wir setzen keine Analyse-Tools (wie Google Analytics) und keine Werbenetzwerke ein. Abgesehen von der anonymen
-Zählung oben wird dein Nutzungsverhalten nicht erfasst oder ausgewertet.
+Wir setzen keine Analyse-Tools (wie Google Analytics) und keine Werbenetzwerke ein. Abgesehen von dem Tageszähler oben
+wird dein Nutzungsverhalten nicht erfasst oder ausgewertet.
 
 Sprachdaten
 Es werden keine Sprachaufnahmen durch den Nutzer erstellt, verarbeitet oder auf Servern gespeichert.
@@ -128,7 +128,7 @@ Links, die aus der App herausführen, öffnen sich im Browser des Geräts, nicht
 Datenschutzbestimmungen der jeweiligen Seite.
 
 6. Besonderer Schutz von Kindern
-   Unsere App und Webseite richten sich an Kinder. Über die technisch notwendigen Daten und die anonyme Zählung aus
+   Unsere App und Webseite richten sich an Kinder. Über die technisch notwendigen Daten und den Tageszähler aus
    Abschnitt 3 hinaus erheben wir keine personenbezogenen Daten von Minderjährigen. Wir fordern Kinder nicht auf,
    Namen, Adressen oder sonstige private Informationen preiszugeben.
 

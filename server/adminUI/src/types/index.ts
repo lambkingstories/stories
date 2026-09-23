@@ -121,7 +121,8 @@ export type UsageRange = '7' | '30' | '90' | '365' | 'all'
 export interface UsageDayDTO {
   /** Local calendar day as `YYYY-MM-DD` (see the report's `timezone`). */
   day: string
-  users: number
+  /** How often a book detail page was opened that day. */
+  views: number
 }
 
 export interface UsageReportDTO {
@@ -133,9 +134,9 @@ export interface UsageReportDTO {
   /** Zero-filled — one entry per day in [from, to]. */
   days: UsageDayDTO[]
   totals: {
-    activeToday: number
-    uniqueInRange: number
-    uniqueAllTime: number
+    viewsToday: number
+    viewsInRange: number
+    viewsAllTime: number
     averagePerDay: number
     peak: UsageDayDTO | null
     firstDay: string | null

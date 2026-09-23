@@ -17,8 +17,8 @@ async function bootstrap() {
   await connectDatabase()
   await ensureReservedCategories()
   await ensureSeriesOrder()
-  // Mongoose's autoIndex is off in production, so the usage collection's
-  // (day, userUuid) unique index has to be created explicitly.
+  // Mongoose's autoIndex is off in production, so the view counter's unique
+  // day index has to be created explicitly.
   await UsageService.ensureIndexes()
   if (env.REDIS_ENABLED) getRedis()
 

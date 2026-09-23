@@ -1,7 +1,7 @@
 <template>
   <figure ref="root" class="viz-root" :class="{ 'is-stale': loading }">
     <figcaption class="viz-caption">
-      Täglich aktive Nutzer<span v-if="timezone" class="viz-caption-note"> · Tagesgrenze {{ timezone }}</span>
+      Geöffnete Buchseiten pro Tag<span v-if="timezone" class="viz-caption-note"> · Tagesgrenze {{ timezone }}</span>
     </figcaption>
 
     <div v-if="!hasActivity" class="viz-empty">
@@ -116,7 +116,7 @@
           :y="l.y - 12"
           class="viz-value"
           :text-anchor="l.anchor"
-        >{{ l.users }}
+        >{{ l.views }}
         </text>
 
         <text
@@ -131,8 +131,8 @@
       </svg>
 
       <div v-if="activePoint" class="viz-tooltip" :style="tooltipStyle" role="status">
-        <span class="viz-tooltip-value">{{ activePoint.users }}</span>
-        <span class="viz-tooltip-label">Nutzer · {{ longDate(activePoint.day) }}</span>
+        <span class="viz-tooltip-value">{{ activePoint.views }}</span>
+        <span class="viz-tooltip-label">Aufrufe · {{ longDate(activePoint.day) }}</span>
       </div>
     </div>
   </figure>
@@ -166,7 +166,7 @@ const width = computed(() => Math.max(320, Math.round(measured.value || 720)))
 
 const active = ref<number | null>(null)
 
-const hasActivity = computed(() => props.days.some((d) => d.users > 0))
+const hasActivity = computed(() => props.days.some((d) => d.views > 0))
 const asBars = computed(() => props.days.length <= BAR_LIMIT)
 
 const plotW = computed(() => width.value - PAD.left - PAD.right)
@@ -174,7 +174,7 @@ const plotH = computed(() => height - PAD.top - PAD.bottom)
 
 /** Round the axis top up to a clean number so ticks read 0 / 5 / 10 / 15. */
 const yMax = computed(() => {
-  const peak = props.days.reduce((m, d) => Math.max(m, d.users), 0)
+  const peak = props.days.reduce((m, d) => Math.max(m, d.views), 0)
   if (peak <= 4) return 4
   const rough = peak / 4
   const magnitude = 10 ** Math.floor(Math.log10(rough))
@@ -187,8 +187,8 @@ const yTicks = computed(() => {
   return [0, 1, 2, 3, 4].map((i) => Math.round(step * i))
 })
 
-function yOf(users: number): number {
-  return PAD.top + plotH.value - (users / yMax.value) * plotH.value
+function yOf(views: number): number {
+  return PAD.top + plotH.value - (views / yMax.value) * plotH.value
 }
 
 const band = computed(() => plotW.value / Math.max(props.days.length, 1))
@@ -208,7 +208,7 @@ const points = computed<Point[]>(() =>
     x: asBars.value
       ? PAD.left + band.value * (index + 0.5)
       : PAD.left + (plotW.value * index) / Math.max(props.days.length - 1, 1),
-    y: yOf(d.users)
+    y: yOf(d.views)
   }))
 )
 
@@ -255,11 +255,11 @@ const lastPoint = computed(() => points.value[points.value.length - 1] ?? null)
 const directLabels = computed<Array<Point & { anchor: 'start' | 'middle' | 'end' }>>(() => {
   const last = lastPoint.value
   if (!last) return []
-  const peak = points.value.reduce((best, p) => (p.users > best.users ? p : best), points.value[0]!)
-  const chosen = last.users > 0 ? [last] : []
+  const peak = points.value.reduce((best, p) => (p.views > best.views ? p : best), points.value[0]!)
+  const chosen = last.views > 0 ? [last] : []
   // Only label the peak when it sits far enough from the last day's label
   // that the two can't collide.
-  if (peak.users > 0 && Math.abs(peak.x - last.x) > 28) chosen.unshift(peak)
+  if (peak.views > 0 && Math.abs(peak.x - last.x) > 28) chosen.unshift(peak)
   // Anchor the labels near either edge inwards — centred text on the last
   // point would hang past the plot and get clipped by the card.
   return chosen.map((p) => ({
@@ -319,8 +319,8 @@ const tooltipStyle = computed(() => {
 })
 
 const ariaLabel = computed(() => {
-  const total = props.days.reduce((sum, d) => sum + d.users, 0)
-  return `Diagramm der täglich aktiven Nutzer über ${props.days.length} Tage, zusammen ${total} aktive Nutzertage. Die Tabellenansicht unter dem Diagramm enthält alle Einzelwerte.`
+  const total = props.days.reduce((sum, d) => sum + d.views, 0)
+  return `Diagramm der geöffneten Buchseiten über ${props.days.length} Tage, zusammen ${total} Aufrufe. Die Tabellenansicht unter dem Diagramm enthält alle Einzelwerte.`
 })
 
 function indexFromX(clientX: number, target: SVGSVGElement): number {
