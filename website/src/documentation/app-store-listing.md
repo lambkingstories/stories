@@ -139,13 +139,21 @@ Notes (English, pasted into „Notizen“):
 Five consumables, one per amount. All share the same type, wording pattern and
 review screenshot; only the amount differs.
 
-| Product ID | Amount | Display name (de / en) |
-|---|---|---|
-| `com.stories.lambking.support.3` | 3 € | Unterstützen · 3 € / Support us · €3 |
-| `com.stories.lambking.support.10` | 10 € | Unterstützen · 10 € / Support us · €10 |
-| `com.stories.lambking.support.20` | 20 € | Unterstützen · 20 € / Support us · €20 |
-| `com.stories.lambking.support.50` | 50 € | Unterstützen · 50 € / Support us · €50 |
-| `com.stories.lambking.support.100` | 100 € | Unterstützen · 100 € / Support us · €100 |
+All five exist in App Store Connect, each with both localizations, all 175
+territories and a price schedule based on Germany. State: *Missing Metadata*
+until the review screenshot is attached.
+
+| Product ID | Apple ID | Price | Display name (de / en) |
+|---|---|---|---|
+| `com.stories.lambking.support.3` | 6815237420 | 3,00 € | Unterstützen · 3 € / Support us · €3 |
+| `com.stories.lambking.support.10` | 6815237433 | 10,00 € | Unterstützen · 10 € / Support us · €10 |
+| `com.stories.lambking.support.20` | 6815237469 | 20,00 € | Unterstützen · 20 € / Support us · €20 |
+| `com.stories.lambking.support.50` | 6815237633 | 50,00 € | Unterstützen · 50 € / Support us · €50 |
+| `com.stories.lambking.support.100` | 6815237534 | 100,00 € | Unterstützen · 100 € / Support us · €100 |
+
+Round euro amounts are not in Apple's default price list (which is all x,99) —
+they live behind *Weitere Preise anzeigen* in the picker, or come for free when
+the products are configured through the App Store Connect API.
 
 | Field | Value |
 |---|---|
@@ -162,13 +170,9 @@ developer"). Everything user-facing therefore says *Trinkgeld* / *tip* and never
 in-app purchase (3.2.1(vi)), so a donation label on these products invites a
 rejection. The sheet spells this out in its footnote.
 
-At 100 € the amount is above what Apple's standard price points cover in some
-currencies; if a tier cannot be created at exactly that value, take the nearest
-available point and note the actual figure here.
-
 `com.stories.lambking.tip` (2,99 €) was the earlier single-amount product. It is
-superseded by the five above and can be deleted in App Store Connect once they
-exist — it was never submitted, so nothing depends on it.
+superseded by the five above and can be deleted in App Store Connect — it was
+never submitted, so nothing depends on it.
 
 **Blocker:** the product cannot be sold until the **Paid Apps agreement** is
 accepted in App Store Connect → Business, with bank and tax details filled in.
