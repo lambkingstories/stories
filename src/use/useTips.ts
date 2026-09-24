@@ -16,9 +16,9 @@ import { isIOS } from '@/utils/platform'
  * "Spende" label on these products is a rejection waiting to happen.
  *
  * Each amount is its own consumable in App Store Connect, so it can be given
- * more than once. Until the Paid Apps agreement is accepted with bank and tax
- * details, StoreKit returns no products at all — the button then stays hidden
- * instead of failing in front of the user.
+ * more than once. StoreKit hands out no product at all — not even in the
+ * sandbox or TestFlight — until the Paid Apps agreement is active and every
+ * product has left "Missing Metadata" (which needs a review screenshot).
  */
 export interface TipTier {
   /** Product id in App Store Connect. */
@@ -35,16 +35,19 @@ export const TIP_TIERS: readonly TipTier[] = [
   { id: 'com.stories.lambking.support.100', amount: 100 }
 ]
 
-export type TipStatus = 'idle' | 'loading' | 'ready' | 'purchasing' | 'thanks' | 'failed'
+/**
+ * - `unavailable`: StoreKit has nothing to sell (see above) — a store-side
+ *   state, so the sheet says so instead of "please try again".
+ * - `pending`: Ask to Buy — a parent still has to approve on their device.
+ */
+export type TipStatus = 'idle' | 'purchasing' | 'thanks' | 'pending' | 'unavailable' | 'failed'
 
 const status = ref<TipStatus>('idle')
 /**
- * False when StoreKit returned nothing — no Paid Apps agreement yet, or the
- * products have not left "Missing Metadata". The sheet still opens and still
- * lists the amounts: hiding the button instead created a deadlock, because
- * Apple wants a review screenshot *of the purchase UI* before it will move the
- * products out of exactly that state. A purchase attempted in this condition
- * fails and says so, which is the honest outcome.
+ * False while StoreKit returned nothing. The sheet still opens and still lists
+ * the amounts: hiding the button instead created a deadlock, because Apple
+ * wants a review screenshot *of the purchase UI* before it will move the
+ * products out of "Missing Metadata".
  */
 const storeReady = ref(false)
 /** Product id → the localized price string StoreKit formats for the device. */
@@ -55,26 +58,49 @@ const pendingId = ref('')
 // Dynamic so the web and Android bundles never pull the plugin API in.
 const iapApi = () => import('@choochmeque/tauri-plugin-iap-api')
 
-async function loadTipProducts(): Promise<void> {
-  if (!isIOS || status.value !== 'idle') return
-  status.value = 'loading'
-  try {
-    const { getProducts } = await iapApi()
-    const { products } = await getProducts(TIP_TIERS.map((t) => t.id), 'inapp')
-    const labels: Record<string, string> = {}
-    for (const p of products) {
-      if (p.formattedPrice) labels[p.productId] = p.formattedPrice
+let lookup: Promise<void> | null = null
+
+/**
+ * Asks StoreKit for the products. Repeats on every call until StoreKit has
+ * answered with at least one, so opening the sheet again picks them up once
+ * the store side is sorted — no app restart needed.
+ */
+function loadTipProducts(): Promise<void> {
+  if (!isIOS || storeReady.value) return Promise.resolve()
+  if (lookup) return lookup
+  lookup = (async () => {
+    try {
+      const { getProducts } = await iapApi()
+      const { products } = await getProducts(TIP_TIERS.map((t) => t.id), 'inapp')
+      const labels: Record<string, string> = {}
+      for (const p of products) {
+        if (p.formattedPrice) labels[p.productId] = p.formattedPrice
+      }
+      priceLabels.value = labels
+      storeReady.value = Object.keys(labels).length > 0
+      if (!storeReady.value) console.warn('[tips] StoreKit returned no products')
+    } catch (error) {
+      // Includes the plain browser build, where the plugin has no host to
+      // talk to. The sheet falls back to the plain euro amounts.
+      console.warn('[tips] product lookup failed', error)
+    } finally {
+      lookup = null
     }
-    priceLabels.value = labels
-    storeReady.value = Object.keys(labels).length > 0
-    status.value = 'ready'
-  } catch (error) {
-    // Includes the plain browser build, where the plugin has no host to talk
-    // to. The sheet falls back to the plain euro amounts.
-    console.warn('[tips] product lookup failed', error)
-    storeReady.value = false
-    status.value = 'ready'
-  }
+  })()
+  return lookup
+}
+
+/**
+ * The plugin rejects for every outcome but a completed purchase, with the
+ * StoreKit result as the message ("Purchase cancelled by user", "Purchase is
+ * pending", "Product not found", …). Cancelling is not a failure.
+ */
+function statusForRejection(error: unknown): TipStatus {
+  const message = String((error as { message?: string })?.message ?? error)
+  if (/cancel/i.test(message)) return 'idle'
+  if (/pending/i.test(message)) return 'pending'
+  if (/not found/i.test(message)) return 'unavailable'
+  return 'failed'
 }
 
 async function buyTip(productId: string): Promise<void> {
@@ -94,11 +120,10 @@ async function buyTip(productId: string): Promise<void> {
       status.value = 'thanks'
       return
     }
-    // Cancelled in the StoreKit sheet, or left pending (Ask to Buy).
-    status.value = 'ready'
+    status.value = result?.purchaseState === PurchaseState.PENDING ? 'pending' : 'idle'
   } catch (error) {
-    console.warn('[tips] purchase failed', error)
-    status.value = 'failed'
+    console.warn('[tips] purchase did not complete', error)
+    status.value = statusForRejection(error)
   } finally {
     pendingId.value = ''
   }
@@ -106,7 +131,7 @@ async function buyTip(productId: string): Promise<void> {
 
 /** Back to the amount list, e.g. when the modal is reopened after a thank-you. */
 function resetTipStatus(): void {
-  if (status.value === 'thanks' || status.value === 'failed') status.value = 'ready'
+  if (status.value !== 'purchasing') status.value = 'idle'
 }
 
 export default function useTips() {

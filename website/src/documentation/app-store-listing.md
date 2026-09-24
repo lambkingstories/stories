@@ -140,8 +140,9 @@ Five consumables, one per amount. All share the same type, wording pattern and
 review screenshot; only the amount differs.
 
 All five exist in App Store Connect, each with both localizations, all 175
-territories and a price schedule based on Germany. State: *Missing Metadata*
-until the review screenshot is attached.
+territories, a price schedule based on Germany and the review screenshot
+(uploaded 2026-09-24 over the API: the amount sheet at 1320×2868). State:
+*Ready to Submit*.
 
 | Product ID | Apple ID | Price | Display name (de / en) |
 |---|---|---|---|
@@ -174,8 +175,11 @@ rejection. The sheet spells this out in its footnote.
 superseded by the five above and deleted on 2026-09-23. It had never been
 submitted or sold, so nothing depended on it.
 
-**Blocker:** the product cannot be sold until the **Paid Apps agreement** is
-accepted in App Store Connect → Business, with bank and tax details filled in.
-Until then StoreKit returns no products and the button hides itself — the app still
-builds, ships and passes review-readiness without it, so this does not block a
-TestFlight build.
+**Blocker:** the product cannot be sold — not even in TestFlight or the sandbox —
+until the **Paid Apps agreement** is active in App Store Connect → Business, with
+bank and tax details filled in. Until then StoreKit returns no products: the sheet
+still opens with the plain euro amounts, and tapping one says the App Store is not
+offering tips right now. The sheet asks StoreKit again every time it opens, so the
+prices appear without reinstalling once the agreement is active. The first
+purchase also has to go to review together with an app version (*Add for Review*
+on the product, then add it to the version's submission).

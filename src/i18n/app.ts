@@ -215,6 +215,8 @@ export default {
         modalNote: 'A tip unlocks nothing in the app and is not a donation to a charity.',
         buyAria: 'Tip {price}',
         failed: 'That did not work. Please try again.',
+        unavailable: 'The App Store is not offering tips right now. Please try again later.',
+        pending: 'Your tip is waiting for a parent to approve it.',
         thanksLong: 'Thank you so much for your support!'
       },
       legal: {
@@ -467,6 +469,8 @@ export default {
         modalNote: 'Ein Trinkgeld schaltet nichts in der App frei und ist keine Spende an eine gemeinnützige Organisation.',
         buyAria: '{price} Trinkgeld geben',
         failed: 'Das hat leider nicht geklappt. Bitte versuche es noch einmal.',
+        unavailable: 'Der App Store bietet gerade keine Trinkgelder an. Bitte versuche es später noch einmal.',
+        pending: 'Dein Trinkgeld wartet noch auf die Zustimmung eines Elternteils.',
         thanksLong: 'Ganz herzlichen Dank für deine Unterstützung!'
       },
       legal: {

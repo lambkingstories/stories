@@ -20,8 +20,10 @@ interface Props {
 withDefaults(defineProps<Props>(), { compact: false })
 
 const { t } = useI18n({ useScope: 'global' })
-const { status, loadTipProducts } = useTips()
+const { loadTipProducts } = useTips()
 
+// Early, so StoreKit's localized prices are usually in by the time the sheet
+// opens. The sheet asks again on every open until StoreKit has answered.
 onMounted(() => void loadTipProducts())
 
 const pressed = ref(false)
@@ -29,14 +31,6 @@ const onDown = () => (pressed.value = true)
 const onUp = () => (pressed.value = false)
 
 const open = ref(false)
-// The slider swallows a plain click as a swipe often enough that the button
-// opens on release instead, the same way the donate buttons behave.
-function openModal() {
-  if (status.value === 'loading') return
-  open.value = true
-}
-
-const busy = computed(() => status.value === 'loading')
 const label = computed(() => t('app.tip.label'))
 </script>
 
@@ -49,14 +43,13 @@ const label = computed(() => t('app.tip.label'))
     button(
       type="button"
       :class="['tip-btn', { 'is-compact': compact, 'is-pressed': pressed }]"
-      :disabled="busy"
       :aria-label="label"
       aria-haspopup="dialog"
       @pointerdown="onDown"
       @pointerup="onUp"
       @pointercancel="onUp"
       @pointerleave="onUp"
-      @click="openModal"
+      @click="open = true"
     )
       span(class="tip-btn-icon" aria-hidden="true")
         svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4")

@@ -7,7 +7,7 @@
  * on backdrop click and Escape, panel capped to the viewport so landscape
  * phones scroll the list rather than the page.
  */
-import { onMounted, onUnmounted, watch } from 'vue'
+import { computed, onMounted, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useTips, { TIP_TIERS } from '@/use/useTips'
 
@@ -19,7 +19,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<{ (e: 'close'): void }>()
 
 const { t } = useI18n({ useScope: 'global' })
-const { status, priceLabels, pendingId, buyTip, resetTipStatus } = useTips()
+const { status, priceLabels, pendingId, loadTipProducts, buyTip, resetTipStatus } = useTips()
 
 function close() {
   emit('close')
@@ -32,8 +32,22 @@ function onKey(e: KeyboardEvent) {
   if (e.key === 'Escape' && status.value !== 'purchasing') close()
 }
 
-// Reopening after a thank-you (or a failure) should show the amounts again.
-watch(() => props.open, (open) => { if (open) resetTipStatus() })
+// Reopening after a thank-you (or a failure) should show the amounts again,
+// and asks StoreKit again if it had nothing to sell last time.
+watch(() => props.open, (open) => {
+  if (!open) return
+  resetTipStatus()
+  void loadTipProducts()
+})
+
+// Only one message at a time, and only for outcomes the user should know
+// about — cancelling StoreKit's own sheet just returns to the list.
+const notice = computed(() => {
+  if (status.value === 'failed') return { key: 'app.tip.failed', tone: 'error' }
+  if (status.value === 'unavailable') return { key: 'app.tip.unavailable', tone: 'error' }
+  if (status.value === 'pending') return { key: 'app.tip.pending', tone: 'info' }
+  return null
+})
 
 onMounted(() => window.addEventListener('keydown', onKey))
 onUnmounted(() => window.removeEventListener('keydown', onKey))
@@ -94,7 +108,11 @@ function label(id: string, amount: number): string {
                 span(class="support-amount-value") {{ label(tier.id, tier.amount) }}
                 span(v-if="pendingId === tier.id" class="support-amount-spinner" aria-hidden="true")
 
-            p(v-if="status === 'failed'" class="support-error" role="alert") {{ t('app.tip.failed') }}
+            p(
+              v-if="notice"
+              :class="['support-notice', `is-${notice.tone}`]"
+              role="alert"
+            ) {{ t(notice.key) }}
 
             p(class="support-modal-note") {{ t('app.tip.modalNote') }}
 </template>
@@ -158,6 +176,8 @@ button
   gap: 8px
   margin-top: 16px
   overflow-y: auto
+  // Room for the last button's drop shadow, which the scroll box clips.
+  padding-bottom: 6px
 
 .support-amount
   position: relative
@@ -206,12 +226,17 @@ button
   .support-amount-spinner
     animation-duration: 2s
 
-.support-error
+.support-notice
   margin: 12px 0 0
   font-size: 13px
   font-weight: 700
-  color: #a93d2e
   text-align: center
+
+  &.is-error
+    color: #a93d2e
+
+  &.is-info
+    color: #1a2f4a
 
 .support-modal-note
   margin: 14px 0 0

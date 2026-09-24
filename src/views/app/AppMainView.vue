@@ -488,7 +488,10 @@ const booksSlide = 'overlay-2'
                 p(class="slide-copy-text") {{ t('app.main.welcomeText0') }}
 
             template(#overlay-1)
-              div(class="slide-copy !right-[0%]" data-swipe-through)
+              div(
+                :class="['slide-copy !right-[0%]', { 'has-tip': isIOS }]"
+                data-swipe-through
+              )
                 h3(class="slide-copy-title") {{ t('app.main.welcomeTitle1') }}
                 //- Hairline + diamond, matching the mission slide's design
                 //- reference; the other two slides run title straight into
@@ -496,13 +499,14 @@ const booksSlide = 'overlay-2'
                 span(class="slide-copy-rule" aria-hidden="true")
                 p(class="slide-copy-text") {{ t('app.main.welcomeText1') }}
 
-              //- iOS may not link out to PayPal / Ko-fi, so it gets a single
-              //- centred StoreKit tip button instead of the two-corner row.
-              //- It hides itself until StoreKit has a product to sell.
-              div(v-if="isIOS" class="welcome-tip-row -mb-6")
-                TipButton(:compact="true")
+                //- iOS may not link out to PayPal / Ko-fi, so it gets a single
+                //- StoreKit tip button instead of the two-corner row. It sits
+                //- in the copy column right under the text, so it moves with
+                //- the text on every phone and iPad size.
+                div(v-if="isIOS" class="slide-copy-tip")
+                  TipButton
 
-              div(v-else class="welcome-donate-row -mb-6")
+              div(v-if="!isIOS" class="welcome-donate-row -mb-6")
                 KoFiButton(
                   href="https://www.paypal.com/ncp/payment/5CWTQPB6NGWLU"
                   tone="paypal"
@@ -903,27 +907,38 @@ button
       --kofi-scale: 1.3
       margin: 0 .5rem
 
-// iOS variant of the row above: a single tip button parked in the same
-// bottom-right corner the Ko-fi button occupies on Android, so the slide reads
-// the same on both. Same `bottom` so it clears the dots row, and the same
-// `--kofi-scale`-style hand-off (`--tip-scale`) so an outer size-up composes
-// with the button's own press transform instead of replacing it.
-.welcome-tip-row
-  position: absolute
-  left: 12px
-  right: 12px
-  bottom: 36px
-  display: flex
-  justify-content: flex-end
-  align-items: center
+// iOS: the tip button, last item of the mission slide's copy column. The
+// column is `data-swipe-through`, so the button opts back in to taps. Sized
+// in em against the copy (itself sized in cqw) instead of px: a fixed-size
+// button outgrows the gap under the text on small banners and looks lost on
+// big ones, while this keeps the same proportions on every screen. The column
+// starts a little higher to make room for it above the dots row, which does
+// not scale with the banner.
+.slide-copy.has-tip
+  top: 4%
+
+.slide-copy-tip
+  pointer-events: auto
+  margin-top: 0.5em
 
   :deep(.tip-btn)
-    @media(min-width: 360px) and (max-width: 500px)
-      --tip-scale: 1.3
+    gap: 0.45em
+    padding: 0.45em 1.1em
+    border-radius: 0.65em
+    font-size: 1em
+    line-height: 1.2
+    position: relative
 
-  :deep(.tip-btn)
-    @media(min-height: 360px) and (max-height: 500px)
-      --tip-scale: 1.3
+  // Invisible tap margin: the button has to stay small to fit between the
+  // text and the dots, but a finger should not have to be that precise.
+  :deep(.tip-btn)::after
+    content: ''
+    position: absolute
+    inset: -7px -6px
+
+  :deep(.tip-btn-icon svg)
+    width: 1.2em
+    height: 1.2em
 
 // CTA on the first slide — centred above the dots row (`bottom: 36px`
 // clears them) and width-capped so the primary button doesn't stretch
