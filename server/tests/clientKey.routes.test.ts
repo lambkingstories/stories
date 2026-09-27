@@ -61,6 +61,24 @@ describe('public-read client-key gate', () => {
       expect(res.status).toBe(200)
     })
 
+    it('lets older app builds that still send X-User-Uuid through the preflight', async () => {
+      const preflight = await request(app)
+        .options('/api/books')
+        .set('Origin', 'http://tauri.localhost')
+        .set('Access-Control-Request-Method', 'GET')
+        .set('Access-Control-Request-Headers', 'x-client-key,x-user-uuid')
+      expect(preflight.status).toBe(204)
+      expect(preflight.headers['access-control-allow-origin']).toBe('*')
+      expect(preflight.headers['access-control-allow-headers'].toLowerCase()).toContain('x-user-uuid')
+
+      const res = await request(app)
+        .get('/api/books')
+        .set('Origin', 'http://tauri.localhost')
+        .set('X-Client-Key', 'test-key-tauri')
+        .set('X-User-Uuid', '00000000-0000-4000-8000-000000000000')
+      expect(res.status).toBe(200)
+    })
+
     it('does not gate admin write endpoints — 401 still comes from basic auth, not the client-key middleware', async () => {
       const res = await request(app).post('/api/books').send(sampleBook())
       // Without basic-auth header → basicAuthGuard 401, not the

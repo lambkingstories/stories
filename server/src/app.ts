@@ -107,7 +107,11 @@ export function createApp(): Express {
         return cb(null, {
           origin: '*',
           credentials: false,
-          allowedHeaders: ['Content-Type', 'X-Client-Key'],
+          // `X-User-Uuid` is no longer read or stored anywhere, but app builds
+          // made between 2026-09-01 and 2026-09-23 still send it on every call.
+          // Dropping it from this list makes their preflight fail and the app
+          // shows no books, so it stays for as long as those installs exist.
+          allowedHeaders: ['Content-Type', 'X-Client-Key', 'X-User-Uuid'],
           methods: ['GET', 'OPTIONS']
         })
       }
