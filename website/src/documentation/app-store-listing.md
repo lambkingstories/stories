@@ -115,15 +115,94 @@ FOR PARENTS
 
 Sign-in required: **no**. Contact: Anton Bernt, hello@lambking.store, +49 176 24693524.
 
-Notes (English, pasted into „Notizen“):
+Notes (English, in „Notizen“ since 2026-10-02 — set over the App Store Connect API, 3373 of 4,000 characters).
+They carry the answers Apple asked for under Guideline 2.1, so future submissions have them on file:
 
-> LambKing Stories is a free Bible story app. No account or login is needed; all stories are loaded from our own server and cached on the device. There are no ads and no third-party SDKs, and every story is free — nothing in the app is behind a paywall.
->
-> In-app purchases: the app offers five consumables, "Support us" at 3, 10, 20, 50 and 100 €. They are voluntary tips for the developer, exactly as Guideline 3.1.1 permits. They unlock no content and change nothing in the app — the only feedback is a thank-you message. This is a tip, not a charitable donation, and the app says so in the sheet itself. To see it, open the home screen, swipe the welcome banner to the second slide ("Support our mission") and tap "Support us" right under the slide's text; the five amounts appear in a sheet. The iOS build contains no links to PayPal, Ko-fi or any other payment outside in-app purchase.
->
-> Privacy: the privacy policy is in the app under "My Area" → "Privacy & Legal notice" (bottom of the page). The app collects no data at all. It mints no identifier, stores none and sends none; our server only increments a per-day counter of how often a book detail page was opened, which is a date and a number for all users together.
->
-> The app supports iPhone and iPad in portrait and landscape.
+```text
+LambKing Stories (version 1.0) - information requested under Guideline 2.1.
+
+1. SCREEN RECORDING
+https://youtu.be/kNHE3gFljwg - captured on a physical iPhone Air running the latest iOS, with the submitted build installed from TestFlight. It starts with launching the app and shows: the welcome screen, browsing the library, opening a book and reading, listening to an audiobook, a coloring page, "My Area" (name, avatar, language), the in-app privacy policy, and a complete in-app purchase (tip).
+
+The app has no account registration, no login and therefore no account deletion. It has no user-generated content: the name, avatar, watch list, reading progress and colored pictures stay on the device and are never uploaded or shown to other users. A colored picture can only leave the app through the standard iOS share sheet, on the user's own action.
+
+2. PURPOSE AND AUDIENCE
+LambKing Stories is a free library of illustrated Bible stories for children, to read aloud, read alone, listen to and color. It is aimed at parents and families who want calm, trustworthy, ad-free story content for their children, in German and English. All stories are free; nothing is behind a paywall.
+
+3. SETUP AND ACCESS
+No setup, credentials or sample files are needed. Launch the app, tap the button on the welcome screen, and the full library is available. An internet connection is needed on first launch to load the stories; they are then cached on the device. The app supports iPhone and iPad in portrait and landscape.
+
+4. EXTERNAL SERVICES
+- Our own backend server, which delivers the story texts, images and audio.
+- Apple StoreKit (In-App Purchase) for the voluntary tips.
+There are no ads, no analytics or tracking SDKs, no authentication service, no third-party payment processor and no AI services.
+
+5. REGIONAL DIFFERENCES
+The app functions identically in all regions. The only variation is the interface and story language (German or English), which the user can switch in "My Area".
+
+6. REGULATED INDUSTRY / THIRD-PARTY MATERIAL
+The app does not operate in a regulated industry. All story texts, illustrations and audio recordings are original works, and all rights to them are owned by the developer, Anton Bernt. The app contains no protected third-party material.
+
+7. IN-APP PURCHASES
+The app offers five consumable In-App Purchases, "Support us" at 3, 10, 20, 50 and 100 EUR (com.stories.lambking.support.3 / .10 / .20 / .50 / .100). They are voluntary tips to the developer as permitted by Guideline 3.1.1. They unlock no content and change nothing in the app; the only result is a thank-you message. They are tips, not charitable donations, and the purchase sheet says so.
+
+To reach the purchase flow: open the app, continue from the welcome screen to the home screen, swipe the banner at the top to the second slide ("Support our mission"), and tap "Support us" below the text. A sheet opens with the five amounts; tapping one starts the purchase. The iOS app contains no links to PayPal, Ko-fi or any other payment method outside In-App Purchase.
+
+PRIVACY
+The privacy policy is in the app under "My Area" > "Privacy & Legal notice" (bottom of the page). The app collects no data. It mints no identifier, stores none and sends none; our server only increments a per-day counter of how often a book detail page was opened - a date and a number for all users together.
+```
+
+## Reply to the 2.1 "Information Needed" rejection
+
+The first submission came back on 2026-10-02 with *Guideline 2.1 – Information
+Needed – New App Submission* (developer account with limited review history).
+Apple wants a screen recording from a physical device plus answers to six
+questions, both as a reply in App Store Connect and in the „Notizen“ field.
+
+The text below is that reply, sent on 2026-10-02. For a future reply of this kind:
+
+- Fill in the video line in section 1 (attachment or a link that opens without a login).
+- Section 1 lists the screens the recording shows — drop any that were not recorded.
+- „Notizen“ holds 4,000 characters, so the notes above are a trimmed version of this
+  text (no greeting, privacy paragraph kept) rather than both together.
+
+```text
+Hello,
+
+Thank you for the review. Here is the requested information for LambKing Stories (version 1.0).
+
+1. SCREEN RECORDING
+A screen recording is available on Youtube https://youtu.be/kNHE3gFljwg?si=uKhRmO0E6AeOKaV2. It was captured on a physical iPhone Air running the latest iOS, with the submitted build installed from TestFlight. It starts with launching the app and shows: 
+the welcome screen, browsing the library, opening a book and reading, an audiobook listening, a coloring page, "My Area" (name, avatar, language), the in-app privacy policy, and a complete in-app purchase for tips 3...100€ .
+
+The app has no account registration, no login and therefore no account deletion. It has no user-generated content: the name, avatar, watch list, reading progress and colored pictures stay on the device and are never uploaded or shown to other users. A colored picture can only leave the app through the standard iOS share sheet, on the user's own action.
+
+2. PURPOSE AND AUDIENCE
+LambKing Stories is a free library of illustrated Bible stories for children, to read aloud, read alone, listen to and color. It is aimed at parents and families who want calm, trustworthy, ad-free story content for their children, in German and English. All stories are free; nothing is behind a paywall.
+
+3. SETUP AND ACCESS
+No setup, credentials or sample files are needed. Launch the app, tap the button on the welcome screen, and the full library is available. An internet connection is needed on first launch to load the stories; they are then cached on the device.
+
+4. EXTERNAL SERVICES
+- Our own backend server, which delivers the story texts, images and audio.
+- Apple StoreKit (In-App Purchase) for the voluntary tips.
+There are no ads, no analytics or tracking SDKs, no authentication service, no third-party payment processor and no AI services.
+
+5. REGIONAL DIFFERENCES
+The app functions identically in all regions. The only variation is the interface and story language (German or English), which the user can switch in "My Area".
+
+6. REGULATED INDUSTRY / THIRD-PARTY MATERIAL
+The app does not operate in a regulated industry. All story texts, illustrations and audio recordings are original works, and all rights to them are owned by the developer, Anton Bernt. The app contains no protected third-party material.
+
+7. IN-APP PURCHASES
+The app offers five consumable In-App Purchases, "Support us" at 3, 10, 20, 50 and 100 EUR (com.stories.lambking.support.3 / .10 / .20 / .50 / .100). They are voluntary tips to the developer as permitted by Guideline 3.1.1. They unlock no content and change nothing in the app; the only result is a thank-you message. They are tips, not charitable donations, and the purchase sheet says so.
+
+To reach the purchase flow: open the app, continue from the welcome screen to the home screen, swipe the banner at the top to the second slide ("Support our mission"), and tap "Support us" below the text. A sheet opens with the five amounts; tapping one starts the purchase. The iOS app contains no links to PayPal, Ko-fi or any other payment method outside In-App Purchase.
+
+Contact: Anton Bernt, hello@lambking.store
+
+Kind regards
+```
 
 ## App privacy („App-Datenschutz“) answers
 
