@@ -1,0 +1,3 @@
+[default]
+description = "Lets the app save an image to the photo library."
+permissions = ["allow-save"]

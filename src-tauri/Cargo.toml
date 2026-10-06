@@ -26,6 +26,9 @@ serde_json = "1"
 # neither uses nor should declare.
 [target.'cfg(target_os = "ios")'.dependencies]
 tauri-plugin-iap = "0.9"
+# Coloring page download button: WKWebView ignores <a download>, so the
+# picture goes straight into Photos through this app-local plugin.
+tauri-plugin-save-photo = { path = "plugins/tauri-plugin-save-photo" }
 
 [profile.release]
 panic = "abort"

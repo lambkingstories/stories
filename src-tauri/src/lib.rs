@@ -7,6 +7,10 @@ pub fn run() {
     #[cfg(target_os = "ios")]
     let builder = builder.plugin(tauri_plugin_iap::init());
 
+    // Coloring page download — saves the picture to Photos (see the plugin).
+    #[cfg(target_os = "ios")]
+    let builder = builder.plugin(tauri_plugin_save_photo::init());
+
     builder
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,0 +1,14 @@
+{
+  "$schema": "../gen/schemas/mobile-schema.json",
+  "identifier": "ios-save-photo",
+  "description": "Coloring page download button in the iOS build: saves the picture to Photos. iOS only, like the plugin itself, so desktop and Android builds still validate.",
+  "platforms": [
+    "iOS"
+  ],
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "save-photo:default"
+  ]
+}

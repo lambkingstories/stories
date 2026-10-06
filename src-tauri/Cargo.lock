@@ -1863,6 +1863,7 @@ dependencies = [
  "tauri-build",
  "tauri-plugin-iap",
  "tauri-plugin-opener",
+ "tauri-plugin-save-photo",
 ]
 
 [[package]]
@@ -3533,6 +3534,16 @@ dependencies = [
  "url",
  "windows",
  "zbus",
+]
+
+[[package]]
+name = "tauri-plugin-save-photo"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "tauri",
+ "tauri-plugin",
 ]
 
 [[package]]

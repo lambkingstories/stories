@@ -27,6 +27,7 @@ import { useI18n } from 'vue-i18n'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 import ZBackButton from '@/components/atoms/ZBackButton.vue'
 import { prependBaseUrl } from '@/utils/function'
+import { isIOS } from '@/utils/platform'
 import * as pdfjsLib from 'pdfjs-dist'
 // `?worker&inline` makes Vite inline the worker source into the chunk as
 // a blob — no separate asset file (which the production obfuscator drops),
@@ -1000,10 +1001,41 @@ function flattenCanvas(): HTMLCanvasElement | null {
 function downloadPng() {
   const out = flattenCanvas()
   if (!out) return
+  // The iOS app's WKWebView ignores `<a download>` — the tap would do
+  // nothing — so the picture goes straight into Photos instead.
+  if (isIOS) {
+    void saveToPhotos(out)
+    return
+  }
   const a = document.createElement('a')
   a.download = buildExportFilename()
   a.href = out.toDataURL('image/png')
   a.click()
+}
+
+// Short confirmation under the header after a save to Photos. One message at
+// a time; a new one restarts the timer.
+const saveNotice = ref<'saved' | 'denied' | null>(null)
+let saveNoticeTimer: ReturnType<typeof setTimeout> | undefined
+
+function showSaveNotice(kind: 'saved' | 'denied') {
+  saveNotice.value = kind
+  clearTimeout(saveNoticeTimer)
+  saveNoticeTimer = setTimeout(() => { saveNotice.value = null }, kind === 'saved' ? 2500 : 5000)
+}
+
+async function saveToPhotos(out: HTMLCanvasElement) {
+  const data = out.toDataURL('image/png').split(',')[1]
+  try {
+    const { invoke } = await import('@tauri-apps/api/core')
+    const res = await invoke<{ status: 'saved' | 'denied' }>('plugin:save-photo|save', { data })
+    showSaveNotice(res.status)
+  } catch (err) {
+    // The plugin is missing (an older build) or Photos refused the write —
+    // the share sheet still lets the user save or send the picture.
+    console.warn('save to Photos failed', err)
+    void shareCanvas()
+  }
 }
 
 // Web Share API surfaces the OS share sheet — WhatsApp, Telegram, Mail,
@@ -1305,6 +1337,7 @@ onMounted(() => {
   }
 })
 onBeforeUnmount(() => {
+  clearTimeout(saveNoticeTimer)
   mainResizeObserver?.disconnect()
   mainResizeObserver = null
   window.removeEventListener('resize', onResize)
@@ -1658,6 +1691,13 @@ watch([querySource, querySourceType], ([url, type]) => {
         stroke-linejoin="round"
       )
         path(d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7")
+
+    transition(name="ac-notice")
+      p(
+        v-if="saveNotice"
+        :class="['ac-save-notice', { 'is-denied': saveNotice === 'denied' }]"
+        role="status"
+      ) {{ t(saveNotice === 'saved' ? 'app.coloring.savedToPhotos' : 'app.coloring.photosDenied') }}
 
     div(ref="cursorRing" class="ac-cursor-ring")
 
@@ -2387,6 +2427,37 @@ input[type=range]::-moz-range-thumb
     background: $p-pale
     color: $p
     border: 1.5px solid $p-bdr
+
+.ac-save-notice
+  position: fixed
+  top: calc(max(env(safe-area-inset-top, 0px), 8px) + 56px)
+  left: 50%
+  transform: translateX(-50%)
+  z-index: 60
+  max-width: min(90vw, 360px)
+  margin: 0
+  padding: 8px 16px
+  border-radius: 999px
+  background: $p
+  color: #ffffff
+  font-size: 14px
+  font-weight: 700
+  text-align: center
+  box-shadow: 0 8px 20px -8px rgba(10, 26, 48, 0.5)
+  pointer-events: none
+
+  &.is-denied
+    border-radius: 16px
+    background: $p-pale
+    color: $text
+    border: 1px solid $p-bdr
+
+.ac-notice-enter-active, .ac-notice-leave-active
+  transition: opacity 200ms ease-out, transform 200ms ease-out
+
+.ac-notice-enter-from, .ac-notice-leave-to
+  opacity: 0
+  transform: translate(-50%, -6px)
 
 .ac-vh
   position: absolute

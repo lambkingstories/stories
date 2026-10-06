@@ -7,7 +7,10 @@
   The coloring page's image import (<input type="file" accept="image/*">) makes
   WebKit offer "Take Photo", and its share sheet offers "Save Image". iOS kills
   the app outright if either is used without its usage description — build
-  1.0.0.7 was rejected for exactly that on the camera.
+  1.0.0.7 was rejected for exactly that on the camera. The download button
+  saves to Photos too (plugins/tauri-plugin-save-photo).
+
+  German translations: ios-localizations/de.lproj/InfoPlist.strings.
 -->
 <plist version="1.0">
 <dict>
@@ -16,6 +19,6 @@
   <key>NSPhotoLibraryUsageDescription</key>
   <string>LambKing Stories opens your photos only when you pick a picture to color.</string>
   <key>NSPhotoLibraryAddUsageDescription</key>
-  <string>LambKing Stories saves your finished coloring picture to your photos when you choose "Save Image".</string>
+  <string>LambKing Stories saves your finished coloring picture to your photos when you tap download or choose "Save Image".</string>
 </dict>
 </plist>
