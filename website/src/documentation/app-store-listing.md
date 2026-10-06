@@ -115,12 +115,20 @@ FOR PARENTS
 
 Sign-in required: **no**. Contact: Anton Bernt, hello@lambking.store, +49 176 24693524.
 
-Notes (English, in „Notizen“ set over the App Store Connect API; build-1.0.0.9 fix note added on top 2026-10-06, 3883 of 4,000 characters).
-They carry the answers Apple asked for under Guideline 2.1, so future submissions have them on file:
+Notes (English, in „Notizen“, set over the App Store Connect API on 2026-10-06 for build 2 — the 1.0.0.10 code, renumbered by Xcode — 3950 of 4,000 characters).
+The tip location leads because App Review could not find the tips (2.1(b)): until build 2 the app opened in German on their English iPad.
+They also carry the answers Apple asked for under Guideline 2.1, so future submissions have them on file:
 
 ```text
-BUILD 1.0.0.9 - FIX FOR THE REPORTED CRASH
-The crash when tapping "Take Photo" in the coloring page (iPad, iOS 27.0) was caused by a missing camera usage description. Build 1.0.0.9 adds NSCameraUsageDescription, NSPhotoLibraryUsageDescription and NSPhotoLibraryAddUsageDescription (English and German). "Take Photo" now asks for camera permission, and the download button in the coloring page saves the picture to Photos after asking for add-only access. Both were tested on a physical iPhone via TestFlight.
+WHERE TO FIND THE IN-APP PURCHASES (TIPS)
+The app starts in the device language (German on German devices, English otherwise). Two ways to the tips, both open the same sheet:
+1. "My Area" tab (bottom bar) > "Support our mission" > tap "Support us".
+2. Home screen ("Start" tab): swipe the large banner under the search field to its second slide, "Support our mission" (or tap its second dot), then tap "Support us" under the text.
+The sheet lists the five tips (3, 10, 20, 50, 100 EUR); tapping one opens the App Store purchase sheet. No storefront, region or device restrictions apply. German labels: "Mein Bereich", "Unterstütze unsere Mission", "Unterstützen".
+
+THIS BUILD (1.0.0, build 2)
+- Fixes the "Take Photo" crash in the coloring page: camera and Photos usage descriptions added (English and German). The coloring download button saves to Photos after asking for add-only access.
+- Starts in the device language and adds the tip button to "My Area", because the previous review could not locate the tips. Tested on a physical iPhone via TestFlight.
 
 LambKing Stories (version 1.0) - information requested under Guideline 2.1.
 
@@ -147,12 +155,10 @@ The app functions identically in all regions. The only variation is the interfac
 The app does not operate in a regulated industry. All story texts, illustrations and audio recordings are original works, and all rights to them are owned by the developer, Anton Bernt. The app contains no protected third-party material.
 
 7. IN-APP PURCHASES
-The app offers five consumable In-App Purchases, "Support us" at 3, 10, 20, 50 and 100 EUR (com.stories.lambking.support.3 / .10 / .20 / .50 / .100). They are voluntary tips to the developer as permitted by Guideline 3.1.1. They unlock no content and change nothing in the app; the only result is a thank-you message. They are tips, not charitable donations, and the purchase sheet says so.
-
-To reach the purchase flow: open the app, continue from the welcome screen to the home screen, swipe the banner at the top to the second slide ("Support our mission"), and tap "Support us" below the text. A sheet opens with the five amounts; tapping one starts the purchase. The iOS app contains no links to PayPal, Ko-fi or any other payment method outside In-App Purchase.
+The app offers five consumable In-App Purchases, "Support us" at 3, 10, 20, 50 and 100 EUR (com.stories.lambking.support.3 / .10 / .20 / .50 / .100). They are voluntary tips to the developer as permitted by Guideline 3.1.1. They unlock no content and change nothing in the app; the only result is a thank-you message. They are tips, not charitable donations, and the purchase sheet says so. The iOS app contains no links to PayPal, Ko-fi or any other payment method outside In-App Purchase.
 
 PRIVACY
-The privacy policy is in the app under "My Area" > "Privacy & Legal notice" (bottom of the page). The app collects no data. It mints no identifier, stores none and sends none; our server only increments a per-day counter of how often a book detail page was opened - a date and a number for all users together.
+The privacy policy is in the app under "My Area" > "Privacy & Legal notice". The app collects no data.
 ```
 
 ## Reply to the 2.1 "Information Needed" rejection
