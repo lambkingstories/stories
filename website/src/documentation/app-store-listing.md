@@ -115,10 +115,13 @@ FOR PARENTS
 
 Sign-in required: **no**. Contact: Anton Bernt, hello@lambking.store, +49 176 24693524.
 
-Notes (English, in „Notizen“ since 2026-10-02 — set over the App Store Connect API, 3373 of 4,000 characters).
+Notes (English, in „Notizen“ set over the App Store Connect API; build-1.0.0.9 fix note added on top 2026-10-06, 3883 of 4,000 characters).
 They carry the answers Apple asked for under Guideline 2.1, so future submissions have them on file:
 
 ```text
+BUILD 1.0.0.9 - FIX FOR THE REPORTED CRASH
+The crash when tapping "Take Photo" in the coloring page (iPad, iOS 27.0) was caused by a missing camera usage description. Build 1.0.0.9 adds NSCameraUsageDescription, NSPhotoLibraryUsageDescription and NSPhotoLibraryAddUsageDescription (English and German). "Take Photo" now asks for camera permission, and the download button in the coloring page saves the picture to Photos after asking for add-only access. Both were tested on a physical iPhone via TestFlight.
+
 LambKing Stories (version 1.0) - information requested under Guideline 2.1.
 
 1. SCREEN RECORDING
@@ -202,6 +205,59 @@ To reach the purchase flow: open the app, continue from the welcome screen to th
 Contact: Anton Bernt, hello@lambking.store
 
 Kind regards
+```
+
+## Reply to the 2.1 crash rejection (build 1.0.0.9)
+
+The second review (2026-10-05, iPad, iOS 27.0) crashed on „Foto aufnehmen" in
+the coloring page: no `NSCameraUsageDescription`. Fixed in 1.0.0.8, and in
+1.0.0.9 the coloring download button also saves to Photos (it did nothing in
+the iOS app before). 1.0.0.9 was attached to version 1.0 on 2026-10-06 and the
+same fix paragraph leads the „Notizen" field (3,883 of 4,000 characters). The
+reply repeats the earlier 2.1 answers so the reviewer has everything in one
+message.
+
+```text
+Hello,
+
+Thank you for the review and the crash log.
+
+FIX FOR THE REPORTED CRASH (BUILD 1.0.0.9)
+The crash when tapping "Take Photo" in the coloring page was caused by a missing camera usage description in Info.plist. Build 1.0.0.9 adds NSCameraUsageDescription, NSPhotoLibraryUsageDescription and NSPhotoLibraryAddUsageDescription, in English and German. "Take Photo" now asks for camera permission and works, and the download button in the coloring page saves the picture to Photos after asking for add-only access. We tested both on a physical iPhone via TestFlight. Build 1.0.0.9 is attached to version 1.0.
+
+For completeness, here again is the information requested earlier under Guideline 2.1:
+
+1. SCREEN RECORDING
+A screen recording is available on YouTube: https://youtu.be/kNHE3gFljwg. It was captured on a physical iPhone Air running the latest iOS, with the build installed from TestFlight. It starts with launching the app and shows: the welcome screen, browsing the library, opening a book and reading, listening to an audiobook, a coloring page, "My Area" (name, avatar, language), the in-app privacy policy, and a complete in-app purchase (tip).
+
+The app has no account registration, no login and therefore no account deletion. It has no user-generated content: the name, avatar, watch list, reading progress and colored pictures stay on the device and are never uploaded or shown to other users. A colored picture only leaves the app when the user saves it to Photos or sends it through the standard iOS share sheet.
+
+2. PURPOSE AND AUDIENCE
+LambKing Stories is a free library of illustrated Bible stories for children, to read aloud, read alone, listen to and color. It is aimed at parents and families who want calm, trustworthy, ad-free story content for their children, in German and English. All stories are free; nothing is behind a paywall.
+
+3. SETUP AND ACCESS
+No setup, credentials or sample files are needed. Launch the app, tap the button on the welcome screen, and the full library is available. An internet connection is needed on first launch to load the stories; they are then cached on the device.
+
+4. EXTERNAL SERVICES
+- Our own backend server, which delivers the story texts, images and audio.
+- Apple StoreKit (In-App Purchase) for the voluntary tips.
+There are no ads, no analytics or tracking SDKs, no authentication service, no third-party payment processor and no AI services.
+
+5. REGIONAL DIFFERENCES
+The app functions identically in all regions. The only variation is the interface and story language (German or English), which the user can switch in "My Area".
+
+6. REGULATED INDUSTRY / THIRD-PARTY MATERIAL
+The app does not operate in a regulated industry. All story texts, illustrations and audio recordings are original works, and all rights to them are owned by the developer, Anton Bernt. The app contains no protected third-party material.
+
+7. IN-APP PURCHASES
+The app offers five consumable In-App Purchases, "Support us" at 3, 10, 20, 50 and 100 EUR (com.stories.lambking.support.3 / .10 / .20 / .50 / .100). They are voluntary tips to the developer as permitted by Guideline 3.1.1. They unlock no content and change nothing in the app; the only result is a thank-you message. They are tips, not charitable donations, and the purchase sheet says so.
+
+To reach the purchase flow: open the app, continue from the welcome screen to the home screen, swipe the banner at the top to the second slide ("Support our mission"), and tap "Support us" below the text. A sheet opens with the five amounts; tapping one starts the purchase. The iOS app contains no links to PayPal, Ko-fi or any other payment method outside In-App Purchase.
+
+Contact: Anton Bernt, hello@lambking.store
+
+Kind regards
+Anton Bernt
 ```
 
 ## App privacy („App-Datenschutz“) answers
