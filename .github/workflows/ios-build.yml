@@ -177,9 +177,10 @@ jobs:
           PY
 
       # The build number is NOT set here: `tauri ios build` rewrites
-      # CFBundleVersion to the app version right before compiling (agvtool),
-      # which made the first upload "1.0.0" and would have made every later
-      # one a rejected duplicate. It gets `--build-number` below instead.
+      # CFBundleVersion right before compiling (agvtool), which made the first
+      # upload "1.0.0" and would have made every later one a rejected
+      # duplicate. It comes from bundle.iOS.bundleVersion + `--build-number`
+      # in the build step below.
       - name: Declare export compliance in Info.plist
         run: |
           INFO_PLIST=$(find src-tauri/gen/apple -maxdepth 3 -name Info.plist -not -path '*/build/*' | head -n 1)
@@ -212,8 +213,12 @@ jobs:
           APPLE_DEVELOPMENT_TEAM: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           echo "${APP_STORE_CONNECT_API_KEY_KEY}" | base64 --decode > "$APPLE_API_KEY_PATH"
-          # CFBundleVersion becomes <version>.<run number> (1.0.0.7, …): unique
-          # per run and always higher than the first upload's plain "1.0.0".
+          # CFBundleVersion becomes <bundle.iOS.bundleVersion>.<run number>
+          # (2.11, 2.12, …): unique per run and always rising. ASC compares
+          # build numbers part by part, and Xcode's export renumbered run 10 to
+          # plain "2" (its 1.0.0.10 was taken by a hung upload), so the old
+          # <app version>.<run> scheme (1.0.0.x) would now be "lower than 2".
+          # If Xcode ever renumbers again, raise bundleVersion above it.
           pnpm exec tauri ios build --export-method "${{ inputs.export_method }}" --build-number "${{ github.run_number }}"
 
       # iOS terminates the app (no prompt, no error) when it touches the camera
@@ -226,6 +231,14 @@ jobs:
           WORK=$(mktemp -d)
           unzip -q "$IPA" 'Payload/*.app/Info.plist' -d "$WORK"
           PLIST=$(find "$WORK/Payload" -maxdepth 2 -name Info.plist | head -n 1)
+          # Build number actually shipped. Xcode's App Store export may swap in
+          # its own number (it turned 1.0.0.10 into "2"); say so loudly.
+          BUILT=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$PLIST")
+          EXPECTED="$(node -p "require('./src-tauri/tauri.conf.json').bundle.iOS.bundleVersion").${{ github.run_number }}"
+          echo "CFBundleVersion: $BUILT (expected $EXPECTED)"
+          if [ "$BUILT" != "$EXPECTED" ]; then
+            echo "::warning::Xcode shipped build $BUILT instead of $EXPECTED — raise bundle.iOS.bundleVersion in tauri.conf.json above it before the next upload"
+          fi
           for KEY in NSCameraUsageDescription NSPhotoLibraryUsageDescription NSPhotoLibraryAddUsageDescription; do
             VALUE=$(/usr/libexec/PlistBuddy -c "Print :$KEY" "$PLIST" 2>/dev/null || true)
             if [ -z "$VALUE" ]; then
