@@ -200,6 +200,25 @@ jobs:
           # per run and always higher than the first upload's plain "1.0.0".
           pnpm exec tauri ios build --export-method "${{ inputs.export_method }}" --build-number "${{ github.run_number }}"
 
+      # iOS terminates the app (no prompt, no error) when it touches the camera
+      # or Photos without a usage description; 1.0.0.7 was rejected for that.
+      # The keys come from src-tauri/Info.ios.plist — check they survived the
+      # merge into the shipped bundle.
+      - name: Verify privacy usage descriptions in the IPA
+        run: |
+          IPA=$(find src-tauri/gen/apple/build -name '*.ipa' | head -n 1)
+          WORK=$(mktemp -d)
+          unzip -q "$IPA" 'Payload/*.app/Info.plist' -d "$WORK"
+          PLIST=$(find "$WORK/Payload" -maxdepth 2 -name Info.plist | head -n 1)
+          for KEY in NSCameraUsageDescription NSPhotoLibraryUsageDescription NSPhotoLibraryAddUsageDescription; do
+            VALUE=$(/usr/libexec/PlistBuddy -c "Print :$KEY" "$PLIST" 2>/dev/null || true)
+            if [ -z "$VALUE" ]; then
+              echo "::error::$KEY missing from the built Info.plist — the app would crash on use"
+              exit 1
+            fi
+            echo "$KEY: $VALUE"
+          done
+
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:

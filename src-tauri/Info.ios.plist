@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Merged by the Tauri CLI into the generated iOS Info.plist (src-tauri/gen/apple
+  is recreated in CI, so keys must live here).
+
+  The coloring page's image import (<input type="file" accept="image/*">) makes
+  WebKit offer "Take Photo", and its share sheet offers "Save Image". iOS kills
+  the app outright if either is used without its usage description — build
+  1.0.0.7 was rejected for exactly that on the camera.
+-->
+<plist version="1.0">
+<dict>
+  <key>NSCameraUsageDescription</key>
+  <string>LambKing Stories uses the camera only when you choose "Take Photo" to bring a picture into the coloring page.</string>
+  <key>NSPhotoLibraryUsageDescription</key>
+  <string>LambKing Stories opens your photos only when you pick a picture to color.</string>
+  <key>NSPhotoLibraryAddUsageDescription</key>
+  <string>LambKing Stories saves your finished coloring picture to your photos when you choose "Save Image".</string>
+</dict>
+</plist>
