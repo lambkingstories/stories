@@ -1,0 +1,7 @@
+/*
+  German permission texts. ios-build.yml copies every *.lproj folder here into
+  the generated Xcode project; the English originals are in Info.ios.plist.
+*/
+"NSCameraUsageDescription" = "LambKing Stories nutzt die Kamera nur, wenn du „Foto aufnehmen“ wählst, um ein Bild zum Ausmalen zu holen.";
+"NSPhotoLibraryUsageDescription" = "LambKing Stories öffnet deine Fotos nur, wenn du ein Bild zum Ausmalen auswählst.";
+"NSPhotoLibraryAddUsageDescription" = "LambKing Stories speichert dein fertiges Ausmalbild in deinen Fotos, wenn du auf Herunterladen tippst oder „Bild sichern“ wählst.";

@@ -111,6 +111,22 @@ jobs:
             pnpm exec tauri ios init
           fi
 
+      # Localized permission texts (de.lproj/InfoPlist.strings). Info.ios.plist
+      # cannot carry translations, so the .lproj folders are copied into the
+      # app folder and XcodeGen is re-run to reference them as resources.
+      # Regenerating Info.plist here loses nothing: `tauri ios build` merges
+      # Info.ios.plist later, and the export-compliance step below runs after.
+      - name: Add iOS localizations
+        run: |
+          APP_DIR=$(find src-tauri/gen/apple -maxdepth 1 -type d -name '*_iOS' | head -n 1)
+          if [ -z "$APP_DIR" ]; then
+            echo "::error::No *_iOS folder under src-tauri/gen/apple"
+            exit 1
+          fi
+          cp -R src-tauri/ios-localizations/*.lproj "$APP_DIR/"
+          command -v xcodegen >/dev/null || brew install xcodegen
+          (cd src-tauri/gen/apple && xcodegen generate --spec project.yml)
+
       - name: Install Pillow (for alpha-strip)
         run: python3 -m pip install --quiet --user --break-system-packages Pillow || python3 -m pip install --quiet --user Pillow
 
@@ -218,6 +234,17 @@ jobs:
             fi
             echo "$KEY: $VALUE"
           done
+          # German texts from src-tauri/ios-localizations (compiled to a binary
+          # plist in the bundle, hence plutil).
+          DE=$(unzip -Z1 "$IPA" | grep -E '^Payload/[^/]+\.app/de\.lproj/InfoPlist\.strings$' | head -n 1)
+          if [ -z "$DE" ]; then
+            echo "::error::de.lproj/InfoPlist.strings missing from the IPA — German permission texts would not show"
+            exit 1
+          fi
+          unzip -q -o "$IPA" "$DE" -d "$WORK"
+          plutil -p "$WORK/$DE"
+          plutil -p "$WORK/$DE" | grep -q NSCameraUsageDescription \
+            || { echo "::error::German NSCameraUsageDescription missing"; exit 1; }
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
