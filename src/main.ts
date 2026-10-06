@@ -7,6 +7,7 @@ import { createI18n } from 'vue-i18n'
 import baseTranslations from '@/i18n/translations'
 import bookTranslations from '@/i18n/books'
 import appTranslations from '@/i18n/app'
+import { defaultLanguage } from '@/utils/defaultLanguage'
 import { mergeObjectsRecursive } from '@/utils/function'
 import { GAME_USER_LANGUAGE } from '@/utils/constants.ts'
 
@@ -46,14 +47,14 @@ const translations = mergeObjectsRecursive(
   appTranslations
 )
 
-// German is the app's primary audience, so it's the default for any
-// user without a stored preference. Returning users keep whichever
-// language they last picked via the profile toggle (localStorage), and
+// Without a stored preference the website starts in German and the native
+// apps in the device's language (see `defaultLanguage`). Returning users
+// keep whichever language they last picked via the profile toggle (localStorage), and
 // the in-tab session storage entry covers anonymous private-mode usage.
 const userLanguage = ref(
   localStorage.getItem(GAME_USER_LANGUAGE)
   || sessionStorage.getItem(GAME_USER_LANGUAGE)
-  || 'de'
+  || defaultLanguage()
 )
 
 const i18n: any = createI18n({

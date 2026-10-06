@@ -4,6 +4,7 @@ import useUserDb from '@/use/useUserDb'
 import { type Difficulties, DIFFICULTY } from '@/utils/enums'
 import { mobileCheck } from '@/utils/function'
 import useModels from '@/use/useModels.ts'
+import { defaultLanguage } from '@/utils/defaultLanguage'
 
 export const windowWidth = ref(window.innerWidth)
 export const windowHeight = ref(window.innerHeight)
@@ -27,7 +28,7 @@ export const version: string = APP_VERSION
 const userDifficulty: Ref<Difficulties> = ref(DIFFICULTY.MEDIUM)
 const userSoundVolume: Ref<number> = ref(0.7)
 const userMusicVolume: Ref<number> = ref(0.1)
-const userLanguage: Ref<string> = ref('de')
+const userLanguage: Ref<string> = ref(defaultLanguage())
 
 const userTutorialsDoneMap: Ref<any> = ref('{}')
 const tutorialPhase: Ref<string> = ref('')

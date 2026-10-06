@@ -6,6 +6,7 @@ import ZBackButton from '@/components/atoms/ZBackButton.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import ZLanguageSwitcher from '@/components/atoms/ZLanguageSwitcher.vue'
 import AvatarPickerModal from '@/components/molecules/AvatarPickerModal.vue'
+import TipButton from '@/components/molecules/TipButton.vue'
 import useModels from '@/use/useModels'
 import useApiBooks from '@/use/useApiBooks'
 import useUser from '@/use/useUser'
@@ -13,7 +14,7 @@ import useReadingProgress from '@/use/useReadingProgress'
 import useAvatar, { onAvatarFallback } from '@/use/useAvatar'
 import useUserName from '@/use/useUserName'
 import useApiConfig from '@/use/useApiConfig'
-import { isMobileLandscape } from '@/use/useUser'
+import { isIOS, isMobileLandscape } from '@/use/useUser'
 import type { ApiBook, Locale } from '@/types/apiBook'
 import { pickLocalizedImage } from '@/types/apiBook'
 import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
@@ -368,6 +369,13 @@ function onBackendToggle(e: Event) {
               svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4")
                 path(d="M18 6 6 18M6 6l12 12")
 
+    //- iOS tip, also reachable from here: the home banner's second slide is
+    //- easy to miss (App Review could not find it), and a settings-like
+    //- screen is where people look for purchases. iOS only, like TipButton.
+    div(v-if="isIOS" class="profile-support")
+      p(class="profile-support-title") {{ t('app.tip.modalTitle') }}
+      TipButton
+
     //- Outside `.profile-content` so its grid columns stay untouched. App
     //- Review 5.1.1(i) wants the privacy policy reachable inside the app.
     div(class="profile-legal")
@@ -382,6 +390,22 @@ $cream-card: #fdf8ed
 $navy: #1a2f4a
 $brown: #7a6b55
 $gold: #d4a83e
+
+.profile-support
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: 8px
+  padding: 24px 16px 0
+
+.profile-support-title
+  margin: 0
+  padding: 4px 12px
+  font-size: 14px
+  font-weight: 700
+  color: $navy
+  background: rgba(253, 248, 237, 0.85)
+  border-radius: 999px
 
 .profile-legal
   display: flex
