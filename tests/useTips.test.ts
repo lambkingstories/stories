@@ -9,8 +9,13 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
  */
 const getProducts = vi.fn()
 const purchase = vi.fn()
+const invoke = vi.fn()
 
 vi.mock('@/utils/platform', () => ({ isIOS: true }))
+// The app-local `purchase-check` plugin (StoreKit's canMakePayments).
+vi.mock('@tauri-apps/api/core', () => ({
+  invoke: (...args: unknown[]) => invoke(...args)
+}))
 vi.mock('@choochmeque/tauri-plugin-iap-api', () => ({
   getProducts: (...args: unknown[]) => getProducts(...args),
   purchase: (...args: unknown[]) => purchase(...args),
@@ -31,6 +36,8 @@ const ID = 'com.stories.lambking.support.3'
 beforeEach(() => {
   getProducts.mockReset()
   purchase.mockReset()
+  invoke.mockReset()
+  invoke.mockResolvedValue({ allowed: true })
   vi.spyOn(console, 'warn').mockImplementation(() => {})
 })
 
@@ -72,6 +79,38 @@ describe('buyTip', () => {
     const tips = await freshTips()
     await tips.buyTip('com.example.other')
     expect(purchase).not.toHaveBeenCalled()
+  })
+})
+
+describe('purchases turned off on the device', () => {
+  it('says so instead of starting a purchase StoreKit would refuse', async () => {
+    invoke.mockResolvedValue({ allowed: false })
+    const tips = await freshTips()
+    await tips.buyTip(ID)
+    expect(invoke).toHaveBeenCalledWith('plugin:purchase-check|can_make_payments')
+    expect(purchase).not.toHaveBeenCalled()
+    expect(tips.status.value).toBe('blocked')
+  })
+
+  it('shows the notice as soon as the sheet asks', async () => {
+    invoke.mockResolvedValue({ allowed: false })
+    const tips = await freshTips()
+    await tips.checkPurchasesAllowed()
+    expect(tips.status.value).toBe('blocked')
+  })
+
+  it('leaves the list alone when purchases are allowed', async () => {
+    const tips = await freshTips()
+    await tips.checkPurchasesAllowed()
+    expect(tips.status.value).toBe('idle')
+  })
+
+  it('treats a failed check as allowed, so it never hides a working tip', async () => {
+    invoke.mockRejectedValue(new Error('plugin missing'))
+    purchase.mockResolvedValue({ purchaseState: 0, purchaseToken: 't' })
+    const tips = await freshTips()
+    await tips.buyTip(ID)
+    expect(tips.status.value).toBe('thanks')
   })
 })
 

@@ -218,6 +218,7 @@ export default {
         buyAria: 'Tip {price}',
         failed: 'That did not work. Please try again.',
         unavailable: 'The App Store is not offering tips right now. Please try again later.',
+        blocked: 'In-app purchases are turned off on this device (Screen Time or a work device). Please tip from another device.',
         pending: 'Your tip is waiting for a parent to approve it.',
         thanksLong: 'Thank you so much for your support!'
       },
@@ -474,6 +475,7 @@ export default {
         buyAria: '{price} Trinkgeld geben',
         failed: 'Das hat leider nicht geklappt. Bitte versuche es noch einmal.',
         unavailable: 'Der App Store bietet gerade keine Trinkgelder an. Bitte versuche es später noch einmal.',
+        blocked: 'In-App-Käufe sind auf diesem Gerät ausgeschaltet (Bildschirmzeit oder Firmengerät). Bitte gib dein Trinkgeld über ein anderes Gerät.',
         pending: 'Dein Trinkgeld wartet noch auf die Zustimmung eines Elternteils.',
         thanksLong: 'Ganz herzlichen Dank für deine Unterstützung!'
       },

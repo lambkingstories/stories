@@ -29,6 +29,9 @@ tauri-plugin-iap = "0.9"
 # Coloring page download button: WKWebView ignores <a download>, so the
 # picture goes straight into Photos through this app-local plugin.
 tauri-plugin-save-photo = { path = "plugins/tauri-plugin-save-photo" }
+# Tip sheet: says up front when Screen Time or a work-device profile blocks
+# in-app purchases (tauri-plugin-iap has no such check).
+tauri-plugin-purchase-check = { path = "plugins/tauri-plugin-purchase-check" }
 
 [profile.release]
 panic = "abort"

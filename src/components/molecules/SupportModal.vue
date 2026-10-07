@@ -19,7 +19,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<{ (e: 'close'): void }>()
 
 const { t } = useI18n({ useScope: 'global' })
-const { status, priceLabels, pendingId, loadTipProducts, buyTip, resetTipStatus } = useTips()
+const { status, priceLabels, pendingId, loadTipProducts, checkPurchasesAllowed, buyTip, resetTipStatus } = useTips()
 
 function close() {
   emit('close')
@@ -38,6 +38,7 @@ watch(() => props.open, (open) => {
   if (!open) return
   resetTipStatus()
   void loadTipProducts()
+  void checkPurchasesAllowed()
 })
 
 // Only one message at a time, and only for outcomes the user should know
@@ -45,6 +46,7 @@ watch(() => props.open, (open) => {
 const notice = computed(() => {
   if (status.value === 'failed') return { key: 'app.tip.failed', tone: 'error' }
   if (status.value === 'unavailable') return { key: 'app.tip.unavailable', tone: 'error' }
+  if (status.value === 'blocked') return { key: 'app.tip.blocked', tone: 'info' }
   if (status.value === 'pending') return { key: 'app.tip.pending', tone: 'info' }
   return null
 })

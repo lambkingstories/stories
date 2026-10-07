@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { invoke } from '@tauri-apps/api/core'
 import { isIOS } from '@/utils/platform'
 
 /**
@@ -39,8 +40,10 @@ export const TIP_TIERS: readonly TipTier[] = [
  * - `unavailable`: StoreKit has nothing to sell (see above) — a store-side
  *   state, so the sheet says so instead of "please try again".
  * - `pending`: Ask to Buy — a parent still has to approve on their device.
+ * - `blocked`: Screen Time or a device-management profile (a work iPad)
+ *   turned in-app purchases off, so StoreKit would refuse every purchase.
  */
-export type TipStatus = 'idle' | 'purchasing' | 'thanks' | 'pending' | 'unavailable' | 'failed'
+export type TipStatus = 'idle' | 'purchasing' | 'thanks' | 'pending' | 'unavailable' | 'blocked' | 'failed'
 
 const status = ref<TipStatus>('idle')
 /**
@@ -59,6 +62,28 @@ const pendingId = ref('')
 const iapApi = () => import('@choochmeque/tauri-plugin-iap-api')
 
 let lookup: Promise<void> | null = null
+
+/**
+ * Asks StoreKit (via the app-local `purchase-check` plugin) whether this device
+ * may buy at all. Asked every time, since the restriction can be lifted while
+ * the app runs. Anything but a clear "no" counts as allowed, so a failed check
+ * never hides a tip that would have worked.
+ */
+async function purchasesAllowed(): Promise<boolean> {
+  if (!isIOS) return true
+  try {
+    const { allowed } = await invoke<{ allowed: boolean }>('plugin:purchase-check|can_make_payments')
+    return allowed !== false
+  } catch (error) {
+    console.warn('[tips] purchase check failed', error)
+    return true
+  }
+}
+
+/** Shows the "turned off on this device" notice up front when the sheet opens. */
+async function checkPurchasesAllowed(): Promise<void> {
+  if (!(await purchasesAllowed()) && status.value === 'idle') status.value = 'blocked'
+}
 
 /**
  * Asks StoreKit for the products. Repeats on every call until StoreKit has
@@ -106,6 +131,10 @@ function statusForRejection(error: unknown): TipStatus {
 async function buyTip(productId: string): Promise<void> {
   if (status.value === 'purchasing') return
   if (!TIP_TIERS.some((t) => t.id === productId)) return
+  if (!(await purchasesAllowed())) {
+    status.value = 'blocked'
+    return
+  }
   pendingId.value = productId
   status.value = 'purchasing'
   try {
@@ -135,5 +164,5 @@ function resetTipStatus(): void {
 }
 
 export default function useTips() {
-  return { status, storeReady, priceLabels, pendingId, loadTipProducts, buyTip, resetTipStatus }
+  return { status, storeReady, priceLabels, pendingId, loadTipProducts, checkPurchasesAllowed, buyTip, resetTipStatus }
 }

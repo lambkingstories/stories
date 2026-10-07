@@ -1,0 +1,3 @@
+[default]
+description = "Lets the app ask whether in-app purchases are allowed on this device."
+permissions = ["allow-can-make-payments"]

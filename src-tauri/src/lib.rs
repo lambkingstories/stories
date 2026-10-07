@@ -11,6 +11,11 @@ pub fn run() {
     #[cfg(target_os = "ios")]
     let builder = builder.plugin(tauri_plugin_save_photo::init());
 
+    // Whether this device may buy at all (Screen Time / work iPad), for the
+    // tip sheet's message.
+    #[cfg(target_os = "ios")]
+    let builder = builder.plugin(tauri_plugin_purchase_check::init());
+
     builder
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

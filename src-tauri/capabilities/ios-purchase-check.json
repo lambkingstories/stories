@@ -1,0 +1,14 @@
+{
+  "$schema": "../gen/schemas/mobile-schema.json",
+  "identifier": "ios-purchase-check",
+  "description": "Tip sheet in the iOS build: asks StoreKit whether in-app purchases are allowed on this device. iOS only, like the plugin itself, so desktop and Android builds still validate.",
+  "platforms": [
+    "iOS"
+  ],
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "purchase-check:default"
+  ]
+}
