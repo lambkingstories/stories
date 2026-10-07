@@ -235,18 +235,28 @@ const welcomeSlides = computed(() => [
   prependBaseUrl('images/bg/welcome-bg-3.webp')
 ])
 const booksSlide = 'overlay-2'
+
+// Backdrop artwork. Phones stretch the tall one over `.bg-zone` only; on a
+// tablet the whole page shows it behind a centred panel, swapping to the
+// wide artwork in landscape (see the tablet block at the end of the styles).
+// Fed in as custom properties because the files live in `public/` and a bare
+// `url(…)` in the SFC style block would be resolved by Vite as an asset.
+const backdropVars = computed(() => ({
+  '--main-bg-portrait': `url(${prependBaseUrl('images/bg/main_portrait.webp')})`,
+  '--main-bg-landscape': `url(${prependBaseUrl('images/bg/main_landscape.webp')})`
+}))
 </script>
 
 <template lang="pug">
-  div(:class="['app-main', layoutClass, 'min-h-screen w-full pb-[calc(8rem+env(safe-area-inset-bottom,0px))]', isSearching ? '!pb-[calc(4rem+env(safe-area-inset-bottom,0px))]' : '']")
+  div(
+    :class="['app-main', layoutClass, 'min-h-screen w-full pb-[calc(8rem+env(safe-area-inset-bottom,0px))]', isSearching ? '!pb-[calc(4rem+env(safe-area-inset-bottom,0px))]' : '']"
+    :style="backdropVars"
+  )
     //- ===== bg_path artwork zone =====
     //- Wraps the header + (search/hero) so the image is sized to fit
     //- exactly that area; the green bottom of the path stays visible
     //- right above where the .path-overlay rises up.
-    div(
-      :class="['bg-zone', { 'bg-zone-fill': isSearching }]"
-      :style="{ backgroundImage: `url(${prependBaseUrl('images/bg/main_portrait.webp')})` }"
-    )
+    div(:class="['bg-zone', { 'bg-zone-fill': isSearching }]")
       //- ===== Header bar — centered crown + banner; bell · avatar pinned to the right =====
       header(class="main-header")
         //div(class="main-header-inner")
@@ -694,6 +704,7 @@ button
 .bg-zone
   position: relative
   background-color: $cream-bg
+  background-image: var(--main-bg-portrait)
   background-size: 100% 100%
   background-repeat: no-repeat
   background-position: top center
@@ -1795,6 +1806,54 @@ button
 
   .new-tile
     flex: 0 0 22%
+
+// ===== Tablet (iPad / Android tablet) =====
+// Both report a non-phone UA, so they land in `.is-default`. The narrow
+// panel would otherwise leave bare parchment on both sides below the
+// artwork: the artwork moves to a fixed full-page layer instead, and the
+// panel stretches down to the nav so it reads as one centred column.
+@media (min-width: 768px)
+  .is-default
+    position: relative
+    z-index: 0
+    display: flex
+    flex-direction: column
+    background-color: transparent
+
+    &::before
+      content: ''
+      position: fixed
+      top: 0
+      left: 0
+      width: 100%
+      // Sized instead of `inset: 0`: the page-pop-scale transform makes the
+      // page the containing block mid-animation, and `bottom: 0` would then
+      // stretch the artwork over the whole document (see AppProfileView).
+      height: 100vh
+      height: 100dvh
+      z-index: -1
+      pointer-events: none
+      background-color: $cream-bg
+      background-image: var(--main-bg-portrait)
+      background-repeat: no-repeat
+      background-position: center
+      background-size: cover
+
+    .bg-zone
+      background: transparent
+
+    > .main-content:last-child
+      display: flex
+      flex-direction: column
+      flex: 1 0 auto
+      width: 100%
+
+    .path-overlay
+      flex: 1 0 auto
+
+@media (min-width: 768px) and (orientation: landscape)
+  .is-default::before
+    background-image: var(--main-bg-landscape)
 
 @media (min-width: 700px)
   .upcoming-row

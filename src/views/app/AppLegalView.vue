@@ -54,6 +54,9 @@ function onTextClick(event: MouseEvent) {
   display: flex
   align-items: center
   gap: 12px
+  // Same column as the card below, so both centre on a tablet.
+  max-width: 792px
+  margin: 0 auto
   padding: 16px 16px 8px
 
 .legal-title
@@ -64,6 +67,11 @@ function onTextClick(event: MouseEvent) {
 .legal-card
   margin: 8px 16px 0
   max-width: 760px
+
+  // Centre the column once the screen is wider than card + side margins.
+  @media (min-width: 792px)
+    margin-left: auto
+    margin-right: auto
   padding: 18px 18px 22px
   background: rgba(255, 255, 255, 0.72)
   border: 1.5px solid #e6d6b5

@@ -177,6 +177,11 @@ button
   &:active
     transform: scale(0.94)
 
+  // Tablet: line the button up with the left edge of the centred 28rem
+  // column below instead of leaving it alone in the screen corner.
+  @media (min-width: 768px)
+    left: calc(50% - 14rem + 8px)
+
 .hero-crest
   position: absolute
   top: calc(env(safe-area-inset-top, 0px) + 12px)

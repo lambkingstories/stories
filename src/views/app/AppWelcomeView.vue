@@ -36,13 +36,21 @@ const art = computed(() => {
   }
 })
 
+// The same two artworks, fed to CSS for the blurred tablet backdrop. The
+// files live in `public/`, so a bare `url(…)` in the style block would be
+// resolved by Vite as a bundled asset.
+const backdropVars = computed(() => ({
+  '--welcome-bg-portrait': `url(${art.value.portrait})`,
+  '--welcome-bg-landscape': `url(${art.value.landscape})`
+}))
+
 function onStart() {
   router.push({ name: 'app-main' })
 }
 </script>
 
 <template lang="pug">
-  div(class="welcome-page")
+  div(class="welcome-page" :style="backdropVars")
     div(class="welcome-stage")
       picture
         source(:srcset="art.landscape" media="(orientation: landscape)")
@@ -91,15 +99,6 @@ $gold: #d4a83e
 
   picture
     background-size: fill
-
-.welcome-art
-//display: block
-//width: auto
-//height: auto
-//background-size: fill
-//max-width: 100vw
-//max-height: 100vh
-//max-height: 100dvh
 
 // Same trick as the CTA: percentage offsets inside .welcome-stage track the
 // artwork's own box, so the flags stay pinned to the picture's corner rather
@@ -163,4 +162,37 @@ $gold: #d4a83e
     left: 26%
     bottom: 16%
     width: 30%
+
+// ===== Tablet =====
+// The copy is baked into the artwork, so it is never cropped to fill the
+// screen. Instead the art scales up to a full `contain` fit (it would stop
+// at its natural size otherwise) and the strips beside it show a blurred,
+// cover-fitted copy of the same picture rather than bare beige.
+@media (min-width: 768px)
+  .welcome-page::before
+    content: ''
+    position: absolute
+    // Overscan so the blur's soft edge stays off-screen.
+    inset: -40px
+    background-image: var(--welcome-bg-portrait)
+    background-position: center
+    background-size: cover
+    filter: blur(28px) saturate(1.1)
+    opacity: 0.85
+
+  .welcome-stage
+    box-shadow: 0 20px 60px -20px rgba(10, 26, 48, 0.55)
+
+  // 692×1500 portrait art (the en file is 700×1517, the same ratio).
+  .welcome-art
+    width: min(100vw, 100dvh * 692 / 1500)
+    height: auto
+
+@media (min-width: 768px) and (orientation: landscape)
+  .welcome-page::before
+    background-image: var(--welcome-bg-landscape)
+
+  // 1244×700 landscape art.
+  .welcome-art
+    width: min(100vw, 100dvh * 1244 / 700)
 </style>

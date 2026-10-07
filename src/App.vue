@@ -149,7 +149,10 @@ function isCrazyGamesUrl() {
 </script>
 
 <template lang="pug">
-  div(id="app-root").min-h-screen.w-screen.app-container.root-protection.game-ui-immune.relative
+  //- `w-full`, not `w-screen`: WKWebView can keep a stale `100vw` after the
+  //- window resizes (iPad Split View → full screen), which left every page
+  //- at the old half width while fixed layers already spanned the screen.
+  div(id="app-root").min-h-screen.w-full.app-container.root-protection.game-ui-immune.relative
     RouterView(v-slot="{ Component, route }")
       transition(name="page-pop-scale" appear)
         component(:is="Component" :key="route.fullPath")
