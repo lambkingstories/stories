@@ -1,14 +1,19 @@
 <script setup lang="ts">
+/**
+ * One series: its picture and name on top, below it all its books as a grid with the state of each (read, how far, not
+ * started). A tap on a book opens it.
+ */
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import ZBackButton from '@/components/atoms/ZBackButton.vue'
-import BookGridSection from '@/components/organisms/BookGridSection.vue'
+import ZIconography from '@/components/atoms/ZIconography.vue'
+import LkCompanion from '@/components/atoms/LkCompanion.vue'
+import AppHeader from '@/components/molecules/AppHeader.vue'
 import useModels from '@/use/useModels'
 import useApiBooks from '@/use/useApiBooks'
 import useApiSeries from '@/use/useApiSeries'
 import useCatalogNames from '@/use/useCatalogNames'
-import { isMobileLandscape } from '@/use/useUser'
+import useReadingProgress from '@/use/useReadingProgress'
 import type { ApiBook, Locale } from '@/types/apiBook'
 import { pickLocalizedImage } from '@/types/apiBook'
 import { onImgFallback, withPlaceholder, PLACEHOLDER_IMAGE } from '@/utils/placeholder'
@@ -20,18 +25,15 @@ const { getSeries } = useModels()
 const apiBooks = useApiBooks()
 const apiSeries = useApiSeries()
 const { seriesName } = useCatalogNames()
+const { getPct } = useReadingProgress()
 
 onMounted(() => {
   void apiBooks.loadAllBooks()
-  // Fetch the live series records so the hero pulls the
-  // editor-uploaded `coverImage` instead of falling back to the first
-  // book's preview.
   void apiSeries.loadAll()
 })
 
 const lang = computed<Locale>(() => (locale.value === 'en' ? 'en' : 'de'))
 const seriesId = computed(() => String(route.params.seriesId))
-
 const seriesMeta = computed(() => getSeries(seriesId.value))
 
 const books = computed<ApiBook[]>(() => {
@@ -39,202 +41,284 @@ const books = computed<ApiBook[]>(() => {
   return apiBooks.booksOfSeries(seriesId.value)
 })
 
-// Hero image source priority:
-//   1. The server-side series record (carries the cover uploaded via
-//      the AdminUI dropzone).
-//   2. The hard-coded `useModels` catalogue.
-//   3. The first book's preview as a graceful fallback.
-//   4. The shared placeholder.
+// Picture of the series: the server record (cover from the AdminUI), then the catalogue, then the first book.
 const heroImage = computed<string>(() => {
   void apiSeries.state.all
   const apiMeta = apiSeries.getById(seriesId.value)
   if (apiMeta?.coverImage) return apiMeta.coverImage
-  const meta = seriesMeta.value
-  if (meta?.coverImage) return meta.coverImage
+  if (seriesMeta.value?.coverImage) return seriesMeta.value.coverImage
   const first = books.value[0]
   if (first) return pickLocalizedImage(first.previewImage, lang.value)
   return PLACEHOLDER_IMAGE
 })
 
 const description = computed<string>(() => {
-  return seriesMeta.value?.description
-    || ''
+  void apiSeries.state.all
+  return apiSeries.getById(seriesId.value)?.description || seriesMeta.value?.description || ''
 })
 
-// Title priority mirrors the hero image: the server-side series record
-// first (the legacy `useModels` catalogue only covers one series, so it
-// left the heading blank for every other one), then the localized override
-// for the id, then the raw seriesId as a last resort.
 const seriesTitle = computed<string>(() => {
   void apiSeries.state.all
   const apiMeta = apiSeries.getById(seriesId.value)
   return seriesName(seriesId.value, apiMeta?.name || seriesMeta.value?.name || '')
 })
 
+const NEW_DAYS = 90
+
+interface Cell {
+  book: ApiBook
+  title: string
+  isNew: boolean
+  /** done = read to the end, going = begun, open = not started */
+  state: 'done' | 'going' | 'open'
+  pct: number
+  pages: number
+  page: number
+}
+
+function titleOf(book: ApiBook): string {
+  return book.localizations?.[lang.value]?.title || book.localizations?.de?.title || ''
+}
+
+const cells = computed<Cell[]>(() =>
+  books.value.map((book) => {
+    const pages = book.localizations?.[lang.value]?.content?.length || book.localizations?.de?.content?.length || 0
+    const pct = getPct(book.bookId, pages)
+    const age = Date.now() - new Date(book.releaseDate).getTime()
+    return {
+      book,
+      title: titleOf(book),
+      isNew: age >= 0 && age < NEW_DAYS * 86400000,
+      state: pct >= 0.98 ? 'done' : pct > 0 ? 'going' : 'open',
+      pct,
+      pages,
+      page: Math.max(1, Math.round(pct * pages))
+    }
+  })
+)
+
 function goBack() {
   if (window.history.length > 1) router.back()
-  else router.push({ name: 'app-all-books' })
+  else void router.push({ name: 'app-all-books' })
+}
+
+function openBook(bookId: string) {
+  void router.push({ name: 'app-book', params: { bookId } })
 }
 </script>
 
 <template lang="pug">
-  div(:class="['series-detail-page', isMobileLandscape ? 'is-landscape' : '', 'min-h-screen w-full pb-[calc(8rem+env(safe-area-inset-bottom,0px))]']")
-    //- ===== Hero image with back arrow (stretched series cover) =====
-    div(class="hero")
-      img(
-        :src="withPlaceholder(heroImage)"
-        :alt="seriesTitle"
-        class="hero-img"
-        loading="eager"
-        @error="onImgFallback"
-      )
-      span(class="hero-fade")
-      ZBackButton(
-        variant="floating"
-        :size="40"
-        class="hero-back"
-        @click="goBack"
-      )
+  div(class="series-page")
+    AppHeader
 
-      //- Title + tagline floating on the lower portion of the hero
-      div(class="hero-title-block")
-        h1(class="hero-title") {{ seriesTitle }}
-        p(
-          v-if="seriesMeta?.description"
-          class="hero-subtitle"
-        ) {{ t('app.bookSeries.tagline') }}
+    main(class="series-body")
+      button(type="button" class="back lk-btn lk-btn--outline lk-btn--small" @click="goBack")
+        ZIconography(name="chevron-left" :size="20")
+        span {{ t('app.read.back') }}
 
-    div(class="content")
-      p(class="series-desc") {{ description }}
+      //- the picture of the series with its name below; the lamb sits on the rim
+      div(class="hero lk-panel")
+        img(
+          :src="withPlaceholder(heroImage)"
+          :alt="seriesTitle"
+          class="hero-img"
+          loading="eager"
+          draggable="false"
+          @error="onImgFallback"
+        )
+        div(class="hero-text")
+          LkCompanion(class="hero-lamb" pose="sitzen" :size="84")
+          h1(class="series-title") {{ seriesTitle }}
+          p(v-if="description" class="series-desc") {{ description }}
 
-      //- Shared book list (layout toggle + cards) — the same component
-      //- renders the Categories page, so the two stay in sync.
-      BookGridSection(
-        :books="books"
-        :title="t('app.bookSeries.books')"
-        :empty-text="t('app.bookSeries.empty')"
-      )
+      section(class="all lk-panel")
+        h2(class="grid-title") {{ t('app.read.allBooks') }}
+        div(v-if="cells.length" class="grid")
+          button(
+            v-for="c in cells"
+            :key="c.book.bookId"
+            type="button"
+            class="cell"
+            @click="openBook(c.book.bookId)"
+          )
+            span(class="cell-cover")
+              img(
+                :src="withPlaceholder(pickLocalizedImage(c.book.previewImage, lang))"
+                :alt="c.title"
+                loading="lazy"
+                draggable="false"
+                @error="onImgFallback"
+              )
+              span(v-if="c.isNew" class="new-badge") {{ t('app.read.newBadge') }}
+            span(class="cell-title") {{ c.title }}
+            span(v-if="c.state !== 'done'" class="cell-bar")
+              span(class="cell-bar-fill" :style="{ width: Math.round(c.pct * 100) + '%' }")
+            span(v-if="c.state === 'going'" class="cell-meta") {{ t('app.read.pageShort', { n: c.page, total: c.pages }) }}
+            span(v-else-if="c.state === 'open'" class="cell-meta") {{ t('app.read.open') }}
+            span(v-else class="cell-meta cell-done")
+              ZIconography(name="check" :size="16")
+              span {{ t('app.read.done') }}
+        p(v-else class="series-desc") {{ t('app.read.booksInSeries') }}
 </template>
 
 <style scoped lang="sass">
-$cream-bg: #f3e6c4
-$cream-card: #fdf8ed
-$navy: #1a2f4a
-$brown: #7a6b55
-$gold: #d4a83e
-$border: #e6d6b5
-
 button
   -webkit-tap-highlight-color: transparent
+  font-family: inherit
 
-.series-detail-page
-  background: radial-gradient(ellipse at top, #faf2dc 0%, #f3e6c4 60%, #e8d29a 100%)
-  color: $navy
+.series-page
+  min-height: 100vh
+  background: var(--lk-bg)
+  color: var(--lk-text)
+  padding-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px))
+
+.series-body
+  max-width: 980px
+  margin: 0 auto
+  padding: 0 16px
+  display: flex
+  flex-direction: column
+  gap: 8px
+
+.back
+  align-self: flex-start
+  gap: 4px
+  padding: 0 18px 0 10px
+
+  :deep(.z-icon-outline)
+    color: currentColor
 
 .hero
   position: relative
-  width: 100%
-  max-height: 320px
-  aspect-ratio: 4 / 3
+  border-radius: var(--lk-r-panel)
   overflow: hidden
-  background: linear-gradient(160deg, #f3e6c4 0%, #c89030 100%)
+  margin-top: 8px
 
 .hero-img
-  position: absolute
-  inset: 0
   width: 100%
-  height: 100%
+  aspect-ratio: 16 / 9
   object-fit: cover
-  object-position: center
+  display: block
+  background: var(--lk-surface-2)
 
-.hero-fade
+.hero-text
+  position: relative
+  padding: 34px 18px 20px
+
+.hero-lamb
   position: absolute
-  inset: 0
-  background: linear-gradient(180deg, rgba(20, 14, 6, 0) 40%, rgba(20, 14, 6, 0.55) 100%)
-  pointer-events: none
-
-.hero-back
-  position: absolute
-  top: calc(env(safe-area-inset-top, 0px) + 12px)
-  left: 12px
-  width: 40px
-  height: 40px
-  border-radius: 999px
-  background-color: rgba(255, 255, 255, 0.85)
-  border: 1.5px solid rgba(230, 214, 181, 0.6)
-  color: $navy
-  display: inline-flex
-  align-items: center
-  justify-content: center
-  cursor: pointer
-  box-shadow: 0 6px 14px -6px rgba(0, 0, 0, 0.35)
-  transition: transform 150ms ease-out, background-color 150ms ease-out
-
-  &:hover
-    background-color: #ffffff
-    transform: translateY(-1px)
-
-  &:active
-    transform: scale(0.94)
-
-  // Tablet: line the button up with the left edge of the centred 28rem
-  // column below instead of leaving it alone in the screen corner.
-  @media (min-width: 768px)
-    left: calc(50% - 14rem + 8px)
-
-.hero-crest
-  position: absolute
-  top: calc(env(safe-area-inset-top, 0px) + 12px)
   right: 14px
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35))
+  top: -56px
 
-.hero-title-block
-  position: absolute
-  left: 50%
-  transform: translateX(-50%)
-  bottom: 14px
-  text-align: center
-  width: calc(100% - 40px)
+.all
+  margin-top: 20px
+  padding: 18px 14px 20px
 
-.hero-title
-  font-size: 26px
-  font-weight: 700
-  color: #ffffff
+.series-title
   margin: 0
-  letter-spacing: -0.005em
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55)
-
-.hero-subtitle
-  font-size: 13px
-  color: #fbf1d6
-  margin-top: 4px
-  font-weight: 700
-  letter-spacing: 0.01em
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5)
-
-.content
-  max-width: 28rem
-  margin: 0 auto
-  padding: 14px 20px 0
-  display: flex
-  flex-direction: column
-  gap: 14px
+  font-weight: 800
+  font-size: 1.9rem
+  line-height: 1.15
 
 .series-desc
-  font-size: 14px
-  line-height: 1.5
-  color: $navy
-  text-align: center
   margin: 0
-  padding: 0 4px
+  color: var(--lk-muted)
+  font-size: 1.05rem
+  line-height: 1.4
 
-// ===== Mobile landscape =====
-.is-landscape
-  .hero
-    max-height: 220px
-    aspect-ratio: 16 / 6
+.grid-title
+  margin: 0 0 10px
+  font-weight: 800
+  font-size: 1.4rem
 
-  .content
-    max-width: 64rem
-    grid-template-columns: 1fr 1fr
+.grid
+  display: grid
+  grid-template-columns: repeat(3, minmax(0, 1fr))
+  gap: 16px 12px
+  margin-top: 6px
+
+.cell
+  display: flex
+  flex-direction: column
+  gap: 4px
+  min-width: 0
+  padding: 0
+  border: none
+  background: transparent
+  color: var(--lk-text)
+  text-align: left
+  cursor: pointer
+
+.cell-cover
+  position: relative
+  display: block
+  aspect-ratio: 3 / 4
+  border-radius: var(--lk-r-cover)
+  overflow: hidden
+  background: var(--lk-surface-2)
+  box-shadow: var(--lk-shadow)
+
+  img
+    width: 100%
+    height: 100%
+    object-fit: cover
+    display: block
+
+.new-badge
+  position: absolute
+  top: 8px
+  left: 8px
+  padding: 2px 8px
+  border-radius: 6px
+  background: var(--lk-new)
+  color: #fff
+  font-size: 0.72rem
+  font-weight: 800
+  letter-spacing: 0.04em
+
+.cell-title
+  margin-top: 4px
+  font-weight: 700
+  font-size: 0.95rem
+  line-height: 1.2
+  display: -webkit-box
+  -webkit-line-clamp: 3
+  -webkit-box-orient: vertical
+  overflow: hidden
+
+.cell-bar
+  display: block
+  height: 6px
+  border-radius: 999px
+  background: var(--lk-track)
+  overflow: hidden
+
+.cell-bar-fill
+  display: block
+  height: 100%
+  border-radius: 999px
+  background: var(--lk-fill)
+
+.cell-meta
+  font-size: 0.88rem
+  color: var(--lk-muted)
+
+.cell-done
+  display: inline-flex
+  align-items: center
+  gap: 6px
+  color: var(--lk-ok)
+  font-weight: 700
+
+  :deep(.z-icon-outline),
+  :deep(svg)
+    color: currentColor
+
+@media (min-width: 720px)
+  .series-body
+    padding: 0 28px
+
+  .grid
+    grid-template-columns: repeat(4, minmax(0, 1fr))
+    gap: 22px 16px
 </style>

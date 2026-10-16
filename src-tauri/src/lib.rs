@@ -16,6 +16,10 @@ pub fn run() {
     #[cfg(target_os = "ios")]
     let builder = builder.plugin(tauri_plugin_purchase_check::init());
 
+    // Apple Pencil double tap -> eraser on / off in the coloring screen.
+    #[cfg(target_os = "ios")]
+    let builder = builder.plugin(tauri_plugin_pencil::init());
+
     builder
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

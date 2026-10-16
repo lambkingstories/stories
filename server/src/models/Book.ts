@@ -5,7 +5,11 @@ const PageSchema = new Schema(
   {
     page: { type: Number, required: true, min: 1 },
     title: { type: String, default: '' },
-    text: { type: String, required: true }
+    // The text of a story page. A coloring page may have none (the picture is the page), see utils/coloring.ts.
+    text: { type: String, default: '' },
+    // Coloring books: the line art, the Bible passage and the text that belongs to the picture is `text`.
+    image: { type: String, default: '' },
+    reference: { type: String, default: '', maxlength: 300 }
   },
   { _id: false }
 )
@@ -17,7 +21,9 @@ const OptionalPageSchema = new Schema(
   {
     page: { type: Number, required: true, min: 1 },
     title: { type: String, default: '' },
-    text: { type: String, default: '' }
+    text: { type: String, default: '' },
+    image: { type: String, default: '' },
+    reference: { type: String, default: '', maxlength: 300 }
   },
   { _id: false }
 )
@@ -65,6 +71,10 @@ const BookSchema = new Schema(
     author: { type: String, required: true, trim: true, maxlength: 200 },
     category: { type: String, required: true, trim: true, maxlength: 120 },
     bookSeriesId: { type: String, required: true, trim: true, index: true },
+    // 'coloring' = a coloring book (Ausmalbuch): its pages are pictures that open in the coloring program.
+    kind: { type: String, enum: ['story', 'coloring'], default: 'story' },
+    // Coloring books: how many pictures are free (empty = the rule of the app).
+    freePages: { type: Number, min: 0, max: 500, default: null },
     releaseDate: { type: Date, required: true },
     updatedDate: { type: Date, required: true, default: () => new Date() },
     badges: { type: [String], default: [] },

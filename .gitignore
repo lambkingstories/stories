@@ -78,3 +78,8 @@ src-tauri/vendor
 
 # Scratch dirs the server test suite writes uploads and audio into.
 server/tests/.tmp/
+dist-phone
+
+# test-only coloring books (never commit or publish)
+public/images/ausmalbuecher/
+dist-paywall

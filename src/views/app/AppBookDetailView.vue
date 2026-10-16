@@ -3,7 +3,7 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import ZButton from '@/components/atoms/ZButton.vue'
-import ZBackButton from '@/components/atoms/ZBackButton.vue'
+import LkCompanion from '@/components/atoms/LkCompanion.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import AAudioPlayer from '@/components/atoms/AAudioPlayer.vue'
 import AttachmentTile from '@/components/molecules/AttachmentTile.vue'
@@ -17,8 +17,10 @@ import { isMobileLandscape } from '@/use/useUser'
 import type { ApiBook, ApiBookAttachment, Locale } from '@/types/apiBook'
 import { pickLocalizedImage } from '@/types/apiBook'
 import { markdownToHtml } from '@/utils/markdownToHtml'
-import { isColoringCategory } from '@/utils/coloringBook'
+import { isColoringBook } from '@/utils/coloringBook'
+import useColoringShelf from '@/use/useColoringShelf'
 import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
+import usePremium from '@/use/usePremium'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
@@ -47,7 +49,10 @@ const localizedTitle = computed(() => localization.value?.title || '')
 const localizedDescription = computed(() => localization.value?.description || '')
 // Coloring books have no audio — the "Anhören" CTA is hidden and listen mode
 // is never entered for them.
-const isColoring = computed(() => isColoringCategory(book.value?.category))
+const isColoring = computed(() => isColoringBook(book.value))
+// a coloring book is not "saved" but put into the paint shelf of the painting program
+const paintShelf = useColoringShelf()
+const inPaintShelf = computed(() => (book.value ? paintShelf.ids.value.includes(book.value.bookId) : false))
 const contentNotes = computed(() => localization.value?.contentNotes?.trim() || '')
 const contentNotesHtml = computed(() =>
   contentNotes.value ? markdownToHtml(contentNotes.value) : ''
@@ -82,7 +87,10 @@ type ViewMode = 'detail' | 'listen'
 // Deep-link support: `/app/book/:id?mode=listen` opens the audio
 // player directly (used by the "Anhören" CTA on the Weiterlesen
 // hero). Defaults to the standard detail screen otherwise.
-const mode = ref<ViewMode>(route.query.mode === 'listen' ? 'listen' : 'detail')
+// Listening to the stories is a LambKing Plus feature once the subscription is on
+// (always allowed until then, see `usePremium`).
+const { hasFeature, showUpsell } = usePremium()
+const mode = ref<ViewMode>(route.query.mode === 'listen' && hasFeature('readAloud') ? 'listen' : 'detail')
 
 // A coloring book can never enter listen mode, even via a `?mode=listen`
 // deep link — there is no audio to play.
@@ -283,10 +291,16 @@ function goBack() {
 }
 
 function onToggleWatchList() {
-  if (book.value) toggleWatchList(book.value.bookId)
+  if (!book.value) return
+  if (isColoring.value) paintShelf.toggle(book.value.bookId)
+  else toggleWatchList(book.value.bookId)
 }
 
 function onListen() {
+  if (!hasFeature('readAloud')) {
+    showUpsell('readAloud')
+    return
+  }
   mode.value = 'listen'
   setTimeout(() => {
     if (audioEl.value && !isPlaying.value) {
@@ -385,6 +399,12 @@ function saveAttachmentToPhone() {
   closeAttachmentMenu()
 }
 
+/** A coloring book opens its own overview: the pages as painted so far, to go on painting from. */
+function onPaintBook() {
+  if (!book.value) return
+  router.push({ name: 'app-coloring-book', params: { bookId: book.value.bookId } })
+}
+
 function useInColoringApp() {
   const att = menuAttachment.value
   if (!att?.data) {
@@ -416,43 +436,27 @@ const seriesName = computed(() => seriesNameOfBook(book.value))
       //- The cover floats inside the cream page (no edge bleed) so the
       //- whole header reads as parchment with a contained book illustration.
       div(class="hero")
-        ZBackButton(
-          variant="flat"
-          :size="40"
-          class="hero-back"
-          @click="goBack"
-        )
+        button(type="button" class="hero-back lk-btn lk-btn--outline lk-btn--small" @click="goBack")
+          ZIconography(name="chevron-left" :size="20")
+          span {{ t('app.read.back') }}
 
-        div(class="hero-cover")
-          img(
-            :src="withPlaceholder(pickLocalizedImage(book.previewImage, lang))"
-            :alt="localizedTitle"
-            class="hero-cover-img"
-            loading="eager"
-            @error="onImgFallback"
-          )
-
-        //- Bookmark (replaces heart). Reuses watchlist functionality.
-        button(
-          type="button"
-          class="hero-bookmark"
-          :class="{ 'is-active': inWatchList }"
-          :aria-label="inWatchList ? t('app.bookDetail.saved') : t('app.bookDetail.save')"
-          @click="onToggleWatchList"
-        )
-          ZIconography(name="bookmark" :size="22")
+        div(class="hero-row")
+          div(class="hero-cover")
+            img(
+              :src="withPlaceholder(pickLocalizedImage(book.previewImage, lang))"
+              :alt="localizedTitle"
+              class="hero-cover-img"
+              loading="eager"
+              @error="onImgFallback"
+            )
+          div(class="hero-info")
+            span(class="series-eyebrow") {{ seriesName }}
+            h1(class="book-band-title") {{ localizedTitle }}
+            LkCompanion(class="hero-lamb" pose="buch" :size="96")
 
       template(v-if="mode === 'detail'")
         //- ===== Detail section =====
         div(class="detail-content")
-          span(class="series-eyebrow") {{ seriesName }}
-          h1(class="book-band-title")
-            //span(v-if="bandLabel") {{ bandLabel }}{{ ': ' }}
-            span {{ localizedTitle }}
-          //p(
-          //  v-if="localization?.shortDescription"
-          //  class="book-subtitle"
-          //) {{ localization.shortDescription }}
 
           //- ===== CTAs =====
           //- Both buttons render unconditionally so the layout never
@@ -460,15 +464,33 @@ const seriesName = computed(() => seriesNameOfBook(book.value))
           //- audio file, `onListen` still flips the view into listen mode
           //- and shows the empty player — the editor can confirm in
           //- AdminUI whether the upload is missing.
-          div(class="cta-row" :class="{ 'is-single': isColoring }")
-            ZButton(type="primary" icon="book" @click="onRead") {{ t('app.bookDetail.readMyself') }}
-            ZButton(
-              v-if="!isColoring"
-              type="secondary"
-              icon="volume"
-              :is-disabled="!audioSrc"
-              @click="onListen"
-            ) {{ t('app.bookDetail.listen') }}
+          div(class="cta-row")
+            //- Coloring book: paint it (turn the pages, keep on painting) or just leaf through it.
+            button(v-if="isColoring" type="button" class="lk-btn lk-btn--full" @click="onPaintBook")
+              ZIconography(name="brush" :size="22")
+              span {{ t('app.bookDetail.paint') }}
+            button(type="button" :class="['lk-btn', 'lk-btn--full', { 'lk-btn--outline': isColoring }]" @click="onRead")
+              ZIconography(name="series" :size="22")
+              span {{ isColoring ? t('app.bookDetail.browse') : t('app.bookDetail.readMyself') }}
+            div(class="cta-second")
+              button(
+                v-if="!isColoring"
+                type="button"
+                class="lk-btn lk-btn--outline"
+                :disabled="!audioSrc"
+                @click="onListen"
+              )
+                ZIconography(name="headphones" :size="22")
+                span {{ t('app.bookDetail.listen') }}
+              button(
+                type="button"
+                class="lk-btn lk-btn--outline"
+                :aria-pressed="isColoring ? inPaintShelf : inWatchList"
+                @click="onToggleWatchList"
+              )
+                ZIconography(name="bookmark" :size="22")
+                span(v-if="isColoring") {{ inPaintShelf ? t('app.bookDetail.inShelf') : t('app.bookDetail.toShelf') }}
+                span(v-else) {{ inWatchList ? t('app.bookDetail.saved') : t('app.bookDetail.save') }}
 
           //- ===== Reading progress (below the CTAs) =====
           div(
@@ -557,18 +579,18 @@ const seriesName = computed(() => seriesNameOfBook(book.value))
 </template>
 
 <style scoped lang="sass">
-$cream-bg: #f3e6c4
-$cream-card: #fdf8ed
-$navy: #1a2f4a
-$brown: #7a6b55
-$gold: #d4a83e
-$border: #e6d6b5
+$cream-bg: var(--lk-bg)
+$cream-card: var(--lk-surface)
+$navy: var(--lk-text)
+$brown: var(--lk-muted)
+$gold: var(--lk-accent)
+$border: var(--lk-line)
 
 button
   -webkit-tap-highlight-color: transparent
 
 .book-detail-page
-  background: radial-gradient(ellipse at top, #faf2dc 0%, #f3e6c4 60%, #e8d29a 100%)
+  background: var(--lk-bg)
   color: $navy
 
 // ===== Hero =====
@@ -577,24 +599,33 @@ button
   width: 100%
   max-width: 28rem
   margin: 0 auto
-  padding: max(env(safe-area-inset-top), 0.5rem) 14px 8px
+  padding: calc(max(env(safe-area-inset-top), 0.5rem) + 8px) 16px 8px
   display: flex
   flex-direction: column
-  align-items: center
+  gap: 14px
 
-// Floating 3:4 cover. Height is the limit (~35vh of visible viewport),
-// width follows the aspect ratio so the cover never bleeds to the edge
-// and stays optically centered on the cream page.
+.hero-back
+  align-self: flex-start
+  gap: 4px
+  padding: 0 18px 0 10px
+
+  :deep(.z-icon-outline)
+    color: currentColor
+
+.hero-row
+  display: flex
+  gap: 16px
+  align-items: stretch
+
+// the cover is shown whole (3:4)
 .hero-cover
-  width: auto
-  height: 35vh
-  max-height: 360px
+  flex: 0 0 44%
   aspect-ratio: 3 / 4
-  border-radius: 14px
+  border-radius: var(--lk-r-cover)
   overflow: hidden
-  background: linear-gradient(160deg, #f3e6c4 0%, #e8d29a 100%)
+  background: var(--lk-surface-2)
   border: 1px solid $border
-  box-shadow: 0 18px 38px -16px rgba(58, 42, 18, 0.55), 0 6px 14px -8px rgba(58, 42, 18, 0.35)
+  box-shadow: var(--lk-shadow)
 
 .hero-cover-img
   width: 100%
@@ -602,60 +633,42 @@ button
   object-fit: cover
   display: block
 
-.hero-back
+.hero-info
+  position: relative
+  flex: 1
+  min-width: 0
+  display: flex
+  flex-direction: column
+  gap: 6px
+  padding-bottom: 96px
+
+.hero-lamb
   position: absolute
-  top: calc(env(safe-area-inset-top, 0px) + 10px)
-  left: 10px
-  z-index: 2
-
-.hero-bookmark
-  position: absolute
-  top: calc(env(safe-area-inset-top, 0px) + 14px)
-  right: 14px
-  z-index: 2
-  width: 40px
-  height: 40px
-  border-radius: 999px
-  background-color: rgba(255, 255, 255, 0.85)
-  border: 1.5px solid rgba(230, 214, 181, 0.6)
-  color: $navy
-  display: inline-flex
-  align-items: center
-  justify-content: center
-  cursor: pointer
-  box-shadow: 0 6px 14px -6px rgba(0, 0, 0, 0.35)
-  transition: transform 150ms ease-out, background-color 150ms ease-out, color 150ms ease-out
-
-  &:hover
-    background-color: #ffffff
-    transform: translateY(-1px)
-
-  &:active
-    transform: scale(0.94)
-
-  // Active state — wine-red pill with a cream bookmark fill so it
-  // reads instantly against the parchment background. The deep override
-  // is required because `.z-icon-outline` hard-codes `color: #1a2f4a`,
-  // which otherwise wins over the parent's `color`.
-  &.is-active
-    background: linear-gradient(180deg, #b94535 0%, #8e2f23 100%)
-    border-color: #5b1a12
-    box-shadow: 0 6px 14px -6px rgba(91, 26, 18, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.25)
-
-    :deep(.z-icon-outline)
-      color: #fdf8ed
-
-    :deep(svg path)
-      fill: #fdf8ed
+  right: 0
+  bottom: 0
 
 // ===== Detail =====
 .detail-content
   max-width: 28rem
   margin: 0 auto
-  padding: 16px 20px 0
+  padding: 12px 16px 0
+  display: flex
+  flex-direction: column
+  gap: 14px
+
+.cta-row
   display: flex
   flex-direction: column
   gap: 10px
+
+.cta-second
+  display: grid
+  grid-template-columns: 1fr 1fr
+  gap: 10px
+
+.cta-second .lk-btn:disabled
+  opacity: 0.55
+  cursor: default
 
 .series-eyebrow
   font-size: 12px
@@ -664,8 +677,8 @@ button
   letter-spacing: 0.06em
 
 .book-band-title
-  font-size: 22px
-  font-weight: 700
+  font-size: 1.55rem
+  font-weight: 800
   color: $navy
   line-height: 1.15
   margin: 0
@@ -685,10 +698,14 @@ button
 
 // ===== Awaits =====
 .awaits-block
-  margin-top: 12px
+  margin-top: 4px
+  padding: 16px
+  border: 1px solid var(--lk-line)
+  border-radius: var(--lk-r-group)
+  background: var(--lk-surface)
   display: flex
   flex-direction: column
-  gap: 8px
+  gap: 10px
 
 .awaits-title
   font-size: 15px
@@ -717,41 +734,12 @@ button
   width: 22px
   height: 22px
   border-radius: 999px
-  background: linear-gradient(180deg, #6da045 0%, #4a7332 100%)
-  color: #ffffff
+  background: var(--lk-paint)
+  color: var(--lk-on-color)
   display: inline-flex
   align-items: center
   justify-content: center
   margin-top: 1px
-  box-shadow: 0 4px 8px -3px rgba(74, 115, 50, 0.5)
-
-// ===== CTAs =====
-// ZButton wraps its <button> in an outer div that applies a size-based
-// `scale-*` transform plus a 140/180px min-width. Inside a 2-column grid
-// on a narrow phone that combination either overflows the row or leaves
-// the two buttons at visibly different sizes (one shrunk by transform,
-// the other expanded to fit min-content). The overrides below neutralise
-// both so the buttons truly split the row 50/50.
-.cta-row
-  display: grid
-  grid-template-columns: 1fr 1fr
-  gap: 10px
-  align-items: stretch
-
-  // Coloring books drop the "Anhören" CTA, so the single "Lesen" button
-  // claims the full row instead of leaving an empty half.
-  &.is-single
-    grid-template-columns: 1fr
-
-.cta-row > :deep(div)
-  transform: none !important
-  width: 100%
-
-.cta-row :deep(.z-button)
-  min-width: 0
-  width: 100%
-  padding-left: 14px
-  padding-right: 14px
 
 // ===== Reading progress =====
 .reading-progress
@@ -788,7 +776,7 @@ button
   transition: width 240ms ease-out
 
   &.is-done
-    background: linear-gradient(90deg, #6da045 0%, #4a7332 100%)
+    background: var(--lk-paint)
 
 // ===== Attachments =====
 .attachments-section

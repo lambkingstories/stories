@@ -119,6 +119,10 @@ vi.mock('@/components/atoms/ZBackButton.vue', () => ({
   default: { name: 'ZBackButton', template: '<button class="z-back-btn-stub" />' }
 }))
 
+vi.mock('@/components/molecules/AppHeader.vue', () => ({
+  default: { name: 'AppHeader', template: '<header class="app-header-stub" />' }
+}))
+
 vi.mock('@/components/atoms/ZBottomNav.vue', () => ({
   default: { name: 'ZBottomNav', template: '<nav class="z-bottom-nav-stub" />' }
 }))
@@ -131,51 +135,39 @@ describe('AppBookSeriesView · Bücher der Serie grid', () => {
     // nothing to seed here beyond the module mocks above.
   })
 
-  it('renders one .book-card per book in the series', async () => {
+  it('renders one .cell per book in the series', async () => {
     const { default: AppBookSeriesView } = await import('@/views/app/AppBookSeriesView.vue')
     const wrapper = mount(AppBookSeriesView)
     await wrapper.vm.$nextTick()
 
-    const cards = wrapper.findAll('.book-card')
-    expect(cards.length).toBe(FIXTURE_BOOKS.length)
+    expect(wrapper.findAll('.cell').length).toBe(FIXTURE_BOOKS.length)
   })
 
-  it('renders the .book-grid container exactly once', async () => {
+  it('renders the .grid container exactly once', async () => {
     const { default: AppBookSeriesView } = await import('@/views/app/AppBookSeriesView.vue')
     const wrapper = mount(AppBookSeriesView)
     await wrapper.vm.$nextTick()
 
-    const grids = wrapper.findAll('.book-grid')
-    expect(grids.length).toBe(1)
+    expect(wrapper.findAll('.grid').length).toBe(1)
   })
 
-  it('each card has an image well wrapping a <img class="book-card-img">', async () => {
+  it('each cell has a cover image and the localized title', async () => {
     const { default: AppBookSeriesView } = await import('@/views/app/AppBookSeriesView.vue')
     const wrapper = mount(AppBookSeriesView)
     await wrapper.vm.$nextTick()
 
-    const cards = wrapper.findAll('.book-card')
-    for (const card of cards) {
-      const wrap = card.find('.book-card-img-wrap')
-      expect(wrap.exists()).toBe(true)
-      const img = wrap.find('img.book-card-img')
-      expect(img.exists()).toBe(true)
-    }
-  })
-
-  it('each card has a meta block carrying the localized title', async () => {
-    const { default: AppBookSeriesView } = await import('@/views/app/AppBookSeriesView.vue')
-    const wrapper = mount(AppBookSeriesView)
-    await wrapper.vm.$nextTick()
-
-    const cards = wrapper.findAll('.book-card')
-    cards.forEach((card, i) => {
-      const meta = card.find('.book-card-meta')
-      expect(meta.exists()).toBe(true)
-      const title = meta.find('.book-card-title')
-      expect(title.exists()).toBe(true)
-      expect(title.text()).toContain(`Band ${i + 1}`)
+    wrapper.findAll('.cell').forEach((cell, i) => {
+      expect(cell.find('.cell-cover img').exists()).toBe(true)
+      expect(cell.find('.cell-title').text()).toContain(`Band ${i + 1}`)
     })
+  })
+
+  it('a book that was not started says so', async () => {
+    const { default: AppBookSeriesView } = await import('@/views/app/AppBookSeriesView.vue')
+    const wrapper = mount(AppBookSeriesView)
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.find('.cell .cell-meta').text()).toContain('app.read.open')
   })
 
   it('image well declares the 4:3 padding-bottom aspect lock in its scoped style', async () => {

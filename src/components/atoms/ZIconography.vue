@@ -1,4 +1,67 @@
+<script lang="ts">
+/**
+ * The symbols of the app are pictures made by the image model (`public/images/icons/ui/<name>.webp`, one colour, transparent;
+ * the code only tints them with the colour of the text). A symbol that is open (active tab, filled) has the extra file
+ * `<name>-an.webp`. While a picture does not exist, the older line symbol below is shown, so that nothing is ever empty.
+ */
+import { reactive } from 'vue'
+
+/** The name of a symbol in the code -> the name of its picture file. */
+export const ICON_FILES: Record<string, string> = {
+  home: 'start',
+  series: 'lesen',
+  library: 'lesen',
+  compass: 'reise',
+  brush: 'malen',
+  pencil: 'malen',
+  profile: 'ich',
+  lock: 'schloss',
+  'chevron-left': 'zurueck',
+  'chevron-right': 'weiter',
+  'chevron-down': 'unten',
+  check: 'haken',
+  headphones: 'anhoeren',
+  bookmark: 'merken',
+  plus: 'plus',
+  search: 'suche',
+  settings: 'einstellungen',
+  shop: 'shop',
+  shield: 'datenschutz',
+  heart: 'herz',
+  sun: 'sonne',
+  moon: 'mond',
+  auto: 'automatisch',
+  globe: 'sprache',
+  edit: 'bearbeiten',
+  download: 'download',
+  restart: 'neustart',
+  eye: 'auge',
+  error: 'fehler',
+  'wifi-off': 'wlan-aus',
+  image: 'bild'
+}
+
+const known = reactive<Record<string, boolean | undefined>>({})
+
+/** Does the picture exist? Asks once per file (the answer is remembered), `undefined` while it is being asked. */
+export function iconFileExists(url: string): boolean | undefined {
+  if (known[url] === undefined && typeof Image !== 'undefined' && !(url in known)) {
+    known[url] = undefined
+    const img = new Image()
+    img.onload = () => {
+      known[url] = true
+    }
+    img.onerror = () => {
+      known[url] = false
+    }
+    img.src = url
+  }
+  return known[url]
+}
+</script>
+
 <script setup lang="ts">
+import { computed } from 'vue'
 type IconName =
   | 'heart'        // 3D crimson heart
   | 'speaker'      // 3D navy/gold speaker
@@ -9,6 +72,7 @@ type IconName =
   | 'profile'      // outline nav
   | 'star'         // outline nav
   | 'bookmark'     // outline nav
+  | 'compass'      // outline nav (Abenteuer)
   | 'headphones'   // outline nav (Hören)
   | 'brush'        // outline nav (Malen)
   | 'pencil'       // outline nav alias
@@ -25,16 +89,38 @@ type IconName =
   | 'chevron-left'
   | 'chevron-down'
   | 'plus'
+  | 'lock'          // outline (parents)
+  | 'shop'          // picture only (bag)
+  | 'shield'        // picture only (privacy)
+  | 'sun' | 'moon' | 'auto' | 'globe' | 'edit' | 'download' | 'restart' | 'eye' | 'error' | 'wifi-off' | 'image' // pictures only
 
 interface Props {
   name: IconName
   size?: number | string
   label?: string
+  /** The open form of the symbol (active tab): uses `<name>-an.webp` when it exists. */
+  filled?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   size: 32,
-  label: ''
+  label: '',
+  filled: false
+})
+
+const base = import.meta.env.BASE_URL || '/'
+const fileUrl = (file: string) => `${base}images/icons/ui/${file}.webp`
+
+/** The picture to show, or '' while there is none (then the older line symbol is shown). */
+const maskUrl = computed(() => {
+  const file = ICON_FILES[props.name]
+  if (!file) return ''
+  if (props.filled) {
+    const on = fileUrl(`${file}-an`)
+    if (iconFileExists(on)) return on
+  }
+  const url = fileUrl(file)
+  return iconFileExists(url) ? url : ''
 })
 </script>
 
@@ -46,9 +132,15 @@ withDefaults(defineProps<Props>(), {
     :aria-label="label || undefined"
     :aria-hidden="label ? undefined : 'true'"
   )
+    //- the symbol as a picture (tinted with the text colour)
+    span(
+      v-if="maskUrl"
+      class="z-icon-mask"
+      :style="{ '-webkit-mask-image': `url(${maskUrl})`, 'mask-image': `url(${maskUrl})` }"
+    )
     //- 3D crimson heart
     svg(
-      v-if="name === 'heart'"
+      v-else-if="name === 'heart'"
       viewBox="0 0 48 48"
       class="w-full h-full z-icon-heart"
     )
@@ -185,6 +277,20 @@ withDefaults(defineProps<Props>(), {
       path(d="M3 17v-5a9 9 0 0 1 18 0v5")
       path(d="M3 17a2 2 0 0 0 2 2h1a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1H5a2 2 0 0 0-2 2v2Z")
       path(d="M21 17a2 2 0 0 1-2 2h-1a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h1a2 2 0 0 1 2 2v2Z")
+
+    //- Compass (Abenteuer)
+    svg(
+      v-else-if="name === 'compass'"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="w-full h-full z-icon-outline"
+    )
+      circle(cx="12" cy="12" r="9")
+      path(d="m15.5 8.5-2 5-5 2 2-5 5-2z")
 
     //- Brush / pencil (Malen)
     svg(
@@ -397,6 +503,22 @@ withDefaults(defineProps<Props>(), {
     )
       path(d="M12 5v14M5 12h14")
 
+    //- Lock (parents)
+    svg(
+      v-else-if="name === 'lock'"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="w-full h-full z-icon-outline"
+    )
+      rect(x="5" y="11" width="14" height="9" rx="2.5")
+      path(d="M8 11V8a4 4 0 0 1 8 0v3")
+
+    //- shop / shield exist as pictures only
+    template(v-else-if="['shop', 'shield', 'sun', 'moon', 'auto', 'globe', 'edit', 'download', 'restart', 'eye', 'error', 'wifi-off', 'image'].includes(name)")
     //- Outline nav: bookmark (default fallback)
     svg(
       v-else
@@ -415,6 +537,18 @@ withDefaults(defineProps<Props>(), {
 .z-icon
   line-height: 0
 
+.z-icon-mask
+  display: block
+  width: 100%
+  height: 100%
+  background-color: currentColor
+  -webkit-mask-repeat: no-repeat
+  mask-repeat: no-repeat
+  -webkit-mask-position: center
+  mask-position: center
+  -webkit-mask-size: contain
+  mask-size: contain
+
 .z-icon-heart
   animation: z-heart-pulse 3.6s ease-in-out infinite
 
@@ -424,7 +558,7 @@ withDefaults(defineProps<Props>(), {
 
 // outline icons inherit currentColor — default to navy when standalone
 .z-icon-outline
-  color: #1a2f4a
+  color: var(--lk-text, #1a2f4a)
 
 @keyframes z-heart-pulse
   0%, 100%

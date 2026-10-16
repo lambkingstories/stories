@@ -1,7 +1,8 @@
 import { fileURLToPath, URL } from 'node:url'
 import { resolve, dirname } from 'node:path'
+import { rmSync } from 'node:fs'
 
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig, loadEnv, type Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
@@ -43,6 +44,23 @@ export default defineConfig(({ mode }) => {
       })
     )
   }
+
+  // Test-only coloring books (see src/data/localColoringBooks.ts) live in public/, which Vite copies into every
+  // build. Unless the build is a test build (VITE_LOCAL_TEST_BOOKS=true) their pictures are taken out again, so a
+  // store build never ships them.
+  let outDir = 'dist'
+  const stripLocalTestBooks: Plugin = {
+    name: 'strip-local-test-books',
+    apply: 'build',
+    configResolved(config) {
+      outDir = resolve(config.root, config.build.outDir)
+    },
+    closeBundle() {
+      if (env.VITE_LOCAL_TEST_BOOKS === 'true') return
+      rmSync(resolve(outDir, 'images/ausmalbuecher'), { recursive: true, force: true })
+    }
+  }
+  plugins.push(stripLocalTestBooks)
 
   return {
     base: '/',

@@ -15,14 +15,18 @@ import confetti from 'canvas-confetti'
 import ABookCard from '@/components/atoms/ABookCard.vue'
 import AchievementBadge from '@/components/atoms/AchievementBadge.vue'
 import ZButton from '@/components/atoms/ZButton.vue'
+import ZIconography from '@/components/atoms/ZIconography.vue'
+import LkCompanion from '@/components/atoms/LkCompanion.vue'
 import SwipeHintHand, { hasSeenSwipeHint } from '@/components/molecules/SwipeHintHand.vue'
 import AttachmentContextMenu from '@/components/molecules/AttachmentContextMenu.vue'
 import useApiBooks from '@/use/useApiBooks'
 import useBookCache from '@/use/useBookCache'
 import useReadingProgress from '@/use/useReadingProgress'
+import { allowedPages, freePageCount, isLimited, previewTexts, type BookKind } from '@/use/useBookAccess'
+import usePremium from '@/use/usePremium'
 import type { ApiBook, ApiLocalizedPage, Locale } from '@/types/apiBook'
 import { pickLocalizedImage } from '@/types/apiBook'
-import { isColoringCategory } from '@/utils/coloringBook'
+import { coloringPagesOfBook, isColoringBook, pageCaptionOf, pageImageOf } from '@/utils/coloringBook'
 import { hasVerticalCenter, markdownToHtml, renderInline } from '@/utils/markdownToHtml'
 import { onImgFallback, PLACEHOLDER_IMAGE } from '@/utils/placeholder'
 
@@ -80,15 +84,15 @@ const pages = computed<ApiLocalizedPage[]>(() => localization.value?.content ?? 
 
 // Coloring books (Ausmalbücher): each content page is a single image that
 // fills the viewport and can be tapped to open in the coloring app.
-const isColoring = computed(() => isColoringCategory(book.value?.category))
+const isColoring = computed(() => isColoringBook(book.value))
 
-// First image URL on a page — used in coloring mode to render the page as a
-// single full-bleed image. Matches markdown `![alt](url)` and raw `<img>`.
-const PAGE_IMG_RE = /!\[[^\]]*\]\(([^)\s]+)\)|<img[^>]+src=["']([^"']+)["']/i
-
-function firstImageUrl(text?: string): string {
-  const m = PAGE_IMG_RE.exec(text ?? '')
-  return m ? (m[1] ?? m[2] ?? '') : ''
+// The picture of a coloring page: its own `image` field, or (old form) markdown in the text.
+const imageOf = (p: ApiLocalizedPage | undefined): string => pageImageOf(p)
+const captionOf = (p: ApiLocalizedPage) => pageCaptionOf(p)
+/** A page with a text or a Bible passage shows it under the picture (the title alone is on the coloring screen anyway). */
+const hasCaption = (p: ApiLocalizedPage) => {
+  const c = pageCaptionOf(p)
+  return !!(c.text || c.reference)
 }
 
 const coverImage = computed<string>(() => {
@@ -105,19 +109,67 @@ type DisplayEntry =
   | { kind: 'cover'; image: string }
   | { kind: 'page'; page: ApiLocalizedPage; pageNumber: number }
   | { kind: 'celebration' }
+  | { kind: 'locked' }
+
+const { showUpsell } = usePremium()
+const bookKind = computed<BookKind>(() => (isColoring.value ? 'coloring' : 'story'))
+
+/**
+ * How much of the book may be seen: the first pictures of a coloring book, the first 15 % of the text of any
+ * other book (see `useBookAccess`). Only while the book is locked; then the rest is replaced by one page that says so.
+ */
+const pageAccess = computed(() => {
+  const b = book.value
+  const list = pages.value
+  if (isColoring.value) {
+    // a coloring book counts its pictures, not its text pages (an intro)
+    const units = list.filter((p) => !!imageOf(p)).length
+    const allowed = b ? allowedPages(b.bookId, 'coloring', units, b.freePages) : units
+    return { units, allowed, locked: allowed < units, shown: list }
+  }
+  if (!b || !isLimited(b.bookId)) return { units: list.length, allowed: list.length, locked: false, shown: list }
+  const cut = previewTexts(list.map((p) => p.text))
+  const shown = cut.texts.map((text, i) => ({ ...list[i]!, text }))
+  return { units: list.length, allowed: shown.length, locked: cut.cut, shown }
+})
 
 const displayEntries = computed<DisplayEntry[]>(() => {
   const list: DisplayEntry[] = []
   if (coverImage.value) list.push({ kind: 'cover', image: coverImage.value })
-  pages.value.forEach((p, i) => list.push({ kind: 'page', page: p, pageNumber: i + 1 }))
-  list.push({ kind: 'celebration' })
+  const { allowed, locked, shown } = pageAccess.value
+  if (isColoring.value) {
+    let unit = 0
+    for (const [i, p] of shown.entries()) {
+      const isUnit = !!imageOf(p)
+      if (isUnit) unit++
+      if (locked && isUnit && unit > allowed) break
+      list.push({ kind: 'page', page: p, pageNumber: i + 1 })
+    }
+  } else {
+    shown.forEach((p, i) => list.push({ kind: 'page', page: p, pageNumber: i + 1 }))
+  }
+  list.push(locked ? { kind: 'locked' } : { kind: 'celebration' })
   return list
 })
+
+function openUpsell() {
+  const b = book.value
+  if (!b) return
+  const shop = pickLocalizedImage(b.etsyLink, lang.value)
+  showUpsell('allBooks', {
+    bookId: b.bookId,
+    kind: bookKind.value,
+    title: localization.value?.title ?? b.bookId,
+    freePages: freePageCount(bookKind.value, pageAccess.value.units, book.value?.freePages),
+    totalPages: pageAccess.value.units,
+    shopLink: shop || undefined
+  })
+}
 
 // `totalPages` for progress excludes the synthetic celebration page — the
 // last real content page is the one that "completes" the book.
 const totalPagesForProgress = computed(() => {
-  const realPages = displayEntries.value.filter((e) => e.kind !== 'celebration').length
+  const realPages = displayEntries.value.filter((e) => e.kind !== 'celebration' && e.kind !== 'locked').length
   return Math.max(1, realPages)
 })
 
@@ -319,7 +371,7 @@ function endSwipe(e?: Event) {
   if (wasTap && shift === 0 && isColoring.value && start) {
     const entry = displayEntries.value[currentIndex.value]
     if (entry && entry.kind === 'page') {
-      const url = firstImageUrl(entry.page.text)
+      const url = imageOf(entry.page)
       if (url) {
         e?.preventDefault()
         openColoringMenuAt(start.x, start.y, url)
@@ -616,13 +668,28 @@ function openTappedImageInColoring() {
     closeColoringMenu()
     return
   }
-  const isPdf = /\.pdf(?:\?.*)?$/i.test(url)
-  router.push({
-    name: 'app-coloring',
-    query: { source: url, type: isPdf ? 'pdf' : 'image' }
-  })
+  openPageInColoring(url)
   closeColoringMenu()
 }
+
+/** A page of a coloring book opens in the editor as a page of that book (paint is kept per page, pages can be turned). */
+function openPageInColoring(url: string) {
+  const b = book.value
+  const idx = b && isColoring.value ? coloringPagesOfBook(b, lang.value).findIndex((p) => p.url === url) : -1
+  if (b && idx >= 0) {
+    router.push({ name: 'app-coloring', query: { book: b.bookId, p: String(idx + 1) } })
+    return
+  }
+  const isPdf = /\.pdf(?:\?.*)?$/i.test(url)
+  router.push({ name: 'app-coloring', query: { source: url, type: isPdf ? 'pdf' : 'image' } })
+}
+
+/** The picture of the page on show, when this is a coloring book (drives the "Ausmalen" button). */
+const currentColoringUrl = computed(() => {
+  if (!isColoring.value) return ''
+  const entry = displayEntries.value[currentIndex.value]
+  return entry && entry.kind === 'page' ? imageOf(entry.page) : ''
+})
 
 // ----- Next volume in series -----
 
@@ -693,7 +760,8 @@ function goToBookDetail() {
       :aria-label="t('app.reader.back') || 'Zurück'"
       @click="goBack"
     )
-      span(class="back-btn-icon" aria-hidden="true")
+      ZIconography(name="chevron-left" :size="20")
+      span {{ t('app.read.back') }}
 
     div(
       ref="stageRef"
@@ -751,19 +819,24 @@ function goToBookDetail() {
             div(
               v-else-if="slot.entry.kind === 'page'"
               class="page-frame"
-              :class="isColoring ? 'coloring-frame' : 'content-frame'"
+              :class="isColoring ? ['coloring-frame', { 'has-caption': hasCaption(slot.entry.page) }] : 'content-frame'"
             )
               //- Coloring book: one full-bleed image per page. Tapping it
               //- opens the context menu to drop it into the coloring app.
               img(
-                v-if="isColoring"
-                :src="resolved(firstImageUrl(slot.entry.page.text)) || PLACEHOLDER_IMAGE"
+                v-if="isColoring && imageOf(slot.entry.page)"
+                :src="resolved(imageOf(slot.entry.page)) || PLACEHOLDER_IMAGE"
                 :alt="slot.entry.page.title || ''"
                 class="coloring-page-img"
                 draggable="false"
                 @dragstart.prevent
                 @error="onImgFallback"
               )
+              //- the words that belong to the picture
+              div(v-if="isColoring && imageOf(slot.entry.page) && hasCaption(slot.entry.page)" class="coloring-caption")
+                h2(v-if="captionOf(slot.entry.page).title" class="coloring-caption-title") {{ captionOf(slot.entry.page).title }}
+                p(v-if="captionOf(slot.entry.page).reference" class="coloring-caption-ref") {{ captionOf(slot.entry.page).reference }}
+                p(v-if="captionOf(slot.entry.page).text" class="coloring-caption-text") {{ captionOf(slot.entry.page).text }}
               div(v-else class="page-inner")
                 h1(
                   v-if="slot.entry.page.title && slot.entry.page.title.trim()"
@@ -775,12 +848,23 @@ function goToBookDetail() {
                   v-html="renderPageHtml(slot.entry.page.text)"
                 )
 
+            //- The rest of the book is locked: a friendly page says where to get it
+            div(
+              v-else-if="slot.entry.kind === 'locked'"
+              class="page-frame locked-frame"
+            )
+              div(class="locked-inner")
+                h3(class="locked-title") {{ t(`app.premium.bookTitle_${bookKind}`) }}
+                p(class="locked-text") {{ t(`app.premium.bookText_${bookKind}`, { title: localization?.title ?? '', free: freePageCount(bookKind, pageAccess.units, book?.freePages), total: pageAccess.units }) }}
+                ZButton(type="primary" @click="openUpsell") {{ t('app.reader.unlockBook') }}
+
             //- Celebration
             div(
               v-else-if="slot.entry.kind === 'celebration'"
               class="page-frame celebration-frame"
             )
               div(class="celebration-inner")
+                LkCompanion(class="celebration-lamb" pose="winken" :size="96")
                 AchievementBadge(
                   v-if="achievementBadge"
                   :src="resolved(achievementBadge)"
@@ -849,6 +933,14 @@ function goToBookDetail() {
         aria-live="polite"
       ) {{ counterText }}
 
+    //- Coloring book: one clear way into the editor for the page on show.
+    button(
+      v-if="currentColoringUrl"
+      type="button"
+      class="color-this"
+      @click="openPageInColoring(currentColoringUrl)"
+    ) {{ t('app.reader.paintThis') }}
+
     //- Context menu for a tapped coloring-book image (Teleports to body).
     AttachmentContextMenu(
       :anchor="colorMenuAnchor"
@@ -860,13 +952,59 @@ function goToBookDetail() {
 </template>
 
 <style scoped lang="sass">
+.locked-frame
+  display: flex
+  align-items: center
+  justify-content: center
+  padding: 24px
+
+.locked-inner
+  max-width: 420px
+  margin: auto
+  text-align: center
+
+.locked-title
+  margin: 0 0 12px
+  font-size: 1.4rem
+  font-weight: 800
+  color: var(--lk-text)
+
+.locked-text
+  margin: 0 0 22px
+  font-size: 1rem
+  line-height: 1.55
+  color: var(--lk-text)
+
+.color-this
+  position: fixed
+  left: 50%
+  bottom: max(env(safe-area-inset-bottom, 0px), 14px)
+  transform: translateX(-50%)
+  z-index: 30
+  min-height: 46px
+  padding: 0 26px
+  white-space: nowrap
+  border: 0
+  border-radius: 999px
+  background: #1f3a5f
+  color: #ffffff
+  font: inherit
+  font-size: 0.95rem
+  font-weight: 800
+  box-shadow: 0 8px 20px -8px rgba(10, 26, 48, 0.6)
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+
+  &:active
+    transform: translateX(-50%) scale(0.97)
+
 .reader-root
   position: fixed
   inset: 0
   // Parchment radial mirroring the rest of the app's body background so
   // the reader feels like a continuous surface rather than its own theme.
-  background: radial-gradient(ellipse at top, #faf2dc 0%, #f3e6c4 60%, #e8d29a 100%)
-  color: #1a2f4a
+  background: var(--lk-bg)
+  color: var(--lk-text)
   overflow: hidden
   user-select: none
   z-index: 50
@@ -879,44 +1017,28 @@ function goToBookDetail() {
   top: calc(env(safe-area-inset-top, 0px) + 14px)
   left: 14px
   z-index: 30
-  width: 40px
-  height: 40px
+  height: 48px
+  padding: 0 18px 0 10px
+  gap: 4px
   display: inline-flex
   align-items: center
   justify-content: center
-  border-radius: 999px
-  background-color: rgba(255, 255, 255, 0.85)
-  color: #1a2f4a
-  border: 1.5px solid rgba(230, 214, 181, 0.6)
-  box-shadow: 0 6px 14px -6px rgba(0, 0, 0, 0.35)
+  border-radius: 28px
+  background-color: var(--lk-surface)
+  color: var(--lk-text)
+  font-family: inherit
+  font-size: 1rem
+  font-weight: 600
+  border: 1px solid var(--lk-line)
+  box-shadow: var(--lk-shadow)
   cursor: pointer
   -webkit-tap-highlight-color: transparent
-  transition: transform 150ms ease-out, background-color 150ms ease-out
-
-  &:hover
-    background-color: #ffffff
-    transform: translateY(-1px)
 
   &:active
-    transform: scale(0.94)
+    transform: translateY(1px)
 
-// Tinted arrow — `mask-image` lets us paint the asset brown so it
-// matches the parchment palette instead of rendering as flat black.
-.back-btn-icon
-  width: 70%
-  height: 70%
-  display: block
-  background-color: #5a3f12
-  -webkit-mask-image: url('/images/icons/back-icon_128x105.webp')
-  mask-image: url('/images/icons/back-icon_128x105.webp')
-  -webkit-mask-repeat: no-repeat
-  mask-repeat: no-repeat
-  -webkit-mask-position: center
-  mask-position: center
-  -webkit-mask-size: contain
-  mask-size: contain
-  pointer-events: none
-  filter: drop-shadow(0 1px 1px rgba(58, 42, 18, 0.2))
+  :deep(.z-icon-outline)
+    color: currentColor
 
 .stage
   position: absolute
@@ -951,7 +1073,7 @@ function goToBookDetail() {
 .cover-frame
   // Match the content-page surface so the unfilled top/bottom around the
   // cover image blend into the rest of the book.
-  background: #fffdf7
+  background: var(--lk-paper)
   // Center the image vertically; horizontal centering inherited from the
   // page-frame's flex column.
   align-items: center
@@ -972,7 +1094,7 @@ function goToBookDetail() {
   -webkit-user-drag: none
 
 .content-frame
-  background: #fffdf7
+  background: var(--lk-paper)
   // Top reserves the back-button (44px) + 14px top offset + 14px gap.
   // Bottom reserves pager dots + page-counter + their bottom offset + gap.
   padding-top: calc(env(safe-area-inset-top, 0px) + 72px)
@@ -988,14 +1110,52 @@ function goToBookDetail() {
 // spans full width or full height (whichever the aspect ratio allows). The
 // floating back button / pager / counter overlay on top.
 .coloring-frame
-  background: #fffdf7
+  background: var(--lk-paper)
   padding: 0
   align-items: center
   justify-content: center
 
+// a page with words: the picture above, the words below it, both clear of the buttons at the top and the bottom
+.coloring-frame.has-caption
+  flex-direction: column
+  padding: calc(env(safe-area-inset-top, 0px) + 56px) 16px calc(env(safe-area-inset-bottom, 0px) + 150px)
+  gap: 10px
+
+  .coloring-page-img
+    flex: 1 1 0
+    width: 100%
+    height: auto
+
+.coloring-caption
+  flex: 0 0 auto
+  width: 100%
+  max-width: 560px
+  max-height: 34%
+  overflow-y: auto
+  text-align: center
+  color: var(--lk-paper-text)
+
+.coloring-caption-title
+  margin: 0 0 2px
+  font-size: 1.15rem
+  font-weight: 800
+
+.coloring-caption-ref
+  margin: 0 0 6px
+  font-size: 0.82rem
+  font-weight: 700
+  color: #7a6b55
+
+.coloring-caption-text
+  margin: 0
+  font-size: 1.05rem
+  line-height: 1.5
+  white-space: pre-line
+
 .coloring-page-img
   width: 100%
   height: 100%
+  min-height: 0
   object-fit: contain
   display: block
   cursor: pointer
@@ -1023,13 +1183,13 @@ function goToBookDetail() {
   font-size: 20px
   font-weight: 700
   line-height: 1.18
-  color: #1a2f4a
+  color: var(--lk-text)
   margin: 0
 
 .page-body
-  font-size: 18px
+  font-size: 20px
   line-height: 1.5
-  color: #1a2f4a
+  color: var(--lk-text)
   font-weight: 400
   letter-spacing: 0.005em
   flex: 1 1 auto
@@ -1054,7 +1214,7 @@ function goToBookDetail() {
 .page-body :deep(h3)
   font-size: 20px
   font-weight: 700
-  color: #1a2f4a
+  color: var(--lk-text)
   line-height: 1.2
   margin: 0.4em 0 0.2em
 
@@ -1167,10 +1327,13 @@ function goToBookDetail() {
 // Achievement badge presentation lives in `AchievementBadge.vue` — keeping
 // only the celebration-page emoji-fallback styles here.
 
+.celebration-lamb
+  margin: 0 auto -10px
+
 .celebration-title
   font-size: 32px
   font-weight: 700
-  color: #1a2f4a
+  color: var(--lk-text)
 
 .celebration-sub
   font-size: 17px
@@ -1237,15 +1400,14 @@ function goToBookDetail() {
   bottom: calc(env(safe-area-inset-bottom, 0px) + 14px)
   right: 14px
   z-index: 14
-  padding: 4px 11px
+  padding: 6px 14px
   border-radius: 999px
-  font-size: 12px
+  font-size: 14px
   font-weight: 700
-  letter-spacing: 0.04em
-  color: #fff
-  background: rgba(30, 50, 70, 0.6)
-  backdrop-filter: blur(6px)
-  -webkit-backdrop-filter: blur(6px)
+  letter-spacing: 0.02em
+  color: var(--lk-text)
+  background: var(--lk-surface)
+  border: 1px solid var(--lk-line)
   pointer-events: none
   font-variant-numeric: tabular-nums
 
@@ -1258,7 +1420,7 @@ function goToBookDetail() {
     transition: transform 0.15s ease, background 0.15s ease
 
     &:hover
-      background: rgba(30, 50, 70, 0.75)
+      background: var(--lk-surface-2)
 
     &:active
       transform: scale(0.95)

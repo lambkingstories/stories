@@ -1,28 +1,31 @@
 #!/usr/bin/env node
-// Regenerate every Tauri app icon from `src-tauri/icons/logo.png`.
+// Regenerate every app icon from ONE source image:
+// `src-tauri/icons/source/lamb-icon.png` — the crowned lamb with the Bible on
+// a flat cream background, square and full-bleed, no text.
 //
 // Usage:
 //   pnpm icons
 //
-// `logo.png` is pre-shaped: a squircle with transparent corners. That is
-// right wherever the OS shows the image unmasked — desktop (.ico/.icns/PNGs,
-// Windows Square*Logo) and Android's legacy pre-8.0 `ic_launcher` /
-// `ic_launcher_round`. iOS and Android adaptive icons are the opposite: a
-// full-bleed square the OS cuts its own shape out of. iOS flattens the
-// transparent corners (`ios-build.yml` flattens them to black), and Android
-// shows only the middle 72dp of a 108dp adaptive layer, which would crop the
-// "LambKing" title. So there are two passes:
+// Three shapes come out of that one image, because the platforms want
+// different things:
 //
-//   1. `tauri icon logo.png` — desktop, Windows, legacy Android.
-//   2. `app-icon.png`, derived here — `logo.png` with its corners filled by
-//      a blurred zoom of itself — for iOS (`icons/ios`, and the asset
-//      catalog CI regenerates from it) and the Android adaptive layers.
+//   * `app-icon.png` — the square itself, opaque 1024x1024. iOS (the OS cuts
+//     the rounded corners itself, and App Store Connect rejects transparency)
+//     and the master for the Android adaptive layers. `ios-build.yml`
+//     regenerates the iOS asset catalog from it, so it is committed.
+//   * `logo.png` — the same picture with squircle corners and transparent
+//     outside. Desktop (.ico/.icns/Windows Square*Logo) and Android's
+//     pre-8.0 `ic_launcher` / `ic_launcher_round` show the image unmasked.
+//   * Android adaptive layers — a foreground (the lamb, shrunk into the safe
+//     zone: launchers show only the middle 72dp of the 108dp layer, and a
+//     circular mask would cut the crown) over a solid cream background, so
+//     the layers stay seamless whatever mask the launcher applies.
 //
-// `app-icon.png` is committed because CI has no `sharp`; re-run this script
-// whenever `logo.png` changes.
+// The in-app loader / PWA logos (`public/images/logo`), `favicon.ico` and the
+// Electron icon are refreshed too, so no old artwork is left anywhere.
 
 import { execFileSync } from 'node:child_process'
-import { cpSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { copyFileSync, cpSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -30,100 +33,64 @@ import sharp from 'sharp'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const ICONS = join(ROOT, 'src-tauri/icons')
+const SOURCE = join(ICONS, 'source/lamb-icon.png')
 const LOGO = join(ICONS, 'logo.png')
 const MASTER = join(ICONS, 'app-icon.png')
+const WEB_LOGOS = join(ROOT, 'public/images/logo')
 const ANDROID_RES = join(ROOT, 'src-tauri/gen/android/app/src/main/res')
 const TAURI = join(ROOT, 'node_modules/@tauri-apps/cli/tauri.js')
 
 const SIZE = 1024
-// Both edges of logo.png carry a 1px light seam; drop it.
-const TRIM = 2
-// The squircle rim is a light pixel plus a dark outline up to ~6px deep.
-// Erode the mask past it so the fill meets clean artwork.
-const RIM = 8
-// Android adaptive icons: the launcher mask shows the middle 72dp of the
-// 108dp layer (66.7%). Scale the artwork to just past that so the title
-// survives a circular mask and nothing but artwork shows inside it.
-const ANDROID_FG_SCALE = 0.68
+// The flat cream of the source, used for the Android adaptive background.
+const CREAM = { r: 254, g: 246, b: 217 }
+// iOS-style squircle radius (22.37% of the edge) for the unmasked variants.
+const CORNER = Math.round(SIZE * 0.2237)
+// Launcher mask shows 66.7% of the layer; the lamb's box is ~80% x 88% of the
+// source, so 0.60 keeps crown and hooves inside even a circular mask.
+const ANDROID_FG_SCALE = 0.60
 
 const tauriIcon = (...args) =>
   execFileSync(process.execPath, [TAURI, 'icon', ...args], { cwd: ROOT, stdio: 'inherit' })
 
-async function buildMaster() {
-  const meta = await sharp(LOGO).metadata()
-  const W = meta.width - TRIM * 2
-  const H = meta.height - TRIM * 2
-  const { data } = await sharp(LOGO)
-    .ensureAlpha()
-    .extract({ left: TRIM, top: TRIM, width: W, height: H })
-    .raw()
-    .toBuffer({ resolveWithObject: true })
-
-  // Separable min filter; outside the image counts as opaque so the straight
-  // edges stay put and only the rounded corners are eroded.
-  const erode = (src, horizontal) => {
-    const out = new Uint8Array(W * H)
-    for (let y = 0; y < H; y++)
-      for (let x = 0; x < W; x++) {
-        let m = 255
-        for (let k = -RIM; k <= RIM; k++) {
-          const xx = horizontal ? x + k : x
-          const yy = horizontal ? y : y + k
-          const v = xx < 0 || yy < 0 || xx >= W || yy >= H ? 255 : src[yy * W + xx]
-          if (v < m) m = v
-        }
-        out[y * W + x] = m
-      }
-    return out
-  }
-  const alpha = new Uint8Array(W * H)
-  for (let i = 0; i < W * H; i++) alpha[i] = data[i * 4 + 3]
-  const eroded = erode(erode(alpha, true), false)
-  const { data: soft, info } = await sharp(Buffer.from(eroded), { raw: { width: W, height: H, channels: 1 } })
-    .blur(1.5)
-    .toColourspace('b-w')
-    .raw()
-    .toBuffer({ resolveWithObject: true })
-  if (info.channels !== 1) throw new Error(`expected a 1-channel mask, got ${info.channels}`)
-  const art = Buffer.from(data)
-  for (let i = 0; i < W * H; i++) art[i * 4 + 3] = soft[i]
-
-  // At 125% the zoomed logo is opaque edge to edge, so blurred it fills the
-  // corners with the colours that surround them.
-  const Z = Math.round(W * 1.25)
-  const off = Math.round((Z - W) / 2)
-  const fill = await sharp(LOGO)
-    .resize(Z, Z)
-    .extract({ left: off, top: off, width: W, height: H })
-    .removeAlpha()
-    .blur(16)
-    .png()
+async function buildMasters() {
+  const square = await sharp(SOURCE)
+    .resize(SIZE, SIZE, { kernel: 'lanczos3' })
+    .flatten({ background: CREAM })
+    .png({ compressionLevel: 9 })
     .toBuffer()
-  const full = await sharp(fill)
-    .composite([{ input: art, raw: { width: W, height: H, channels: 4 } }])
-    .removeAlpha()
-    .png()
-    .toBuffer()
-  await sharp(full).resize(SIZE, SIZE, { kernel: 'lanczos3' }).png({ compressionLevel: 9 }).toFile(MASTER)
+  await sharp(square).toFile(MASTER)
   console.log(`Wrote ${MASTER} (${SIZE}x${SIZE}, opaque)`)
+
+  const mask = Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${SIZE}" height="${SIZE}"><rect width="${SIZE}" height="${SIZE}" rx="${CORNER}" ry="${CORNER}" fill="#fff"/></svg>`
+  )
+  await sharp(square).composite([{ input: mask, blend: 'dest-in' }]).png({ compressionLevel: 9 }).toFile(LOGO)
+  console.log(`Wrote ${LOGO} (squircle, transparent corners)`)
+
+  // In-app loader and PWA manifest.
+  await sharp(LOGO).resize(512, 512).png().toFile(join(WEB_LOGOS, 'logo_512x512.png'))
+  await sharp(LOGO).resize(512, 512).webp({ quality: 92 }).toFile(join(WEB_LOGOS, 'logo_512x512.webp'))
+  await sharp(LOGO).resize(256, 256).webp({ quality: 92 }).toFile(join(WEB_LOGOS, 'logo_256x256.webp'))
+  await sharp(LOGO).resize(192, 192).png().toFile(join(WEB_LOGOS, 'logo_192x192.png'))
 }
 
 async function buildAndroidLayers(dir) {
   const inner = Math.round(SIZE * ANDROID_FG_SCALE)
   const off = Math.round((SIZE - inner) / 2)
-  await sharp({ create: { width: SIZE, height: SIZE, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+  await sharp({ create: { width: SIZE, height: SIZE, channels: 4, background: { ...CREAM, alpha: 0 } } })
     .composite([{ input: await sharp(MASTER).resize(inner, inner).toBuffer(), left: off, top: off }])
     .png()
     .toFile(join(dir, 'android-fg.png'))
-  // Only seen where a launcher animation overshoots the mask.
-  await sharp(MASTER).blur(24).png().toFile(join(dir, 'android-bg.png'))
+  await sharp({ create: { width: SIZE, height: SIZE, channels: 3, background: CREAM } })
+    .png()
+    .toFile(join(dir, 'android-bg.png'))
   writeFileSync(
     join(dir, 'manifest.json'),
     JSON.stringify({ default: MASTER, android_fg: 'android-fg.png', android_bg: 'android-bg.png', android_fg_scale: 100 })
   )
 }
 
-await buildMaster()
+await buildMasters()
 
 console.log('\nPass 1: desktop + legacy Android from logo.png')
 tauriIcon(LOGO)
@@ -148,3 +115,10 @@ try {
 } finally {
   rmSync(tmp, { recursive: true, force: true })
 }
+
+// Browser tab and Windows desktop (Electron) use the multi-size .ico from pass 1.
+copyFileSync(join(ICONS, 'icon.ico'), join(ROOT, 'public/favicon.ico'))
+copyFileSync(join(ICONS, 'icon.ico'), join(ROOT, 'electron/resources/icon.ico'))
+copyFileSync(join(ICONS, 'icon.icns'), join(ROOT, 'electron/resources/icon.icns'))
+copyFileSync(join(ICONS, 'icon.png'), join(ROOT, 'electron/resources/icon.png'))
+console.log('Refreshed favicon and Electron icons')

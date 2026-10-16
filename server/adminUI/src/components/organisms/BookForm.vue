@@ -52,6 +52,24 @@
           <CategoryPicker v-model="draft.book.category" :categories="categoriesStore.items" />
         </div>
 
+        <div class="field" :class="isColoring ? 'col-6' : 'col-12'">
+          <label class="field-label">
+            Art des Buchs
+            <span class="muted">Ausmalbuch: jede Seite ist ein Bild, das im Malprogramm geöffnet wird</span>
+          </label>
+          <div class="kind-switch" role="group" aria-label="Art des Buchs">
+            <XButton label="Geschichte" :class="{ primary: !isColoring }" :aria-pressed="!isColoring" @click="draft.book.kind = 'story'" />
+            <XButton label="Ausmalbuch" :class="{ primary: isColoring }" :aria-pressed="isColoring" @click="draft.book.kind = 'coloring'" />
+          </div>
+        </div>
+        <div v-if="isColoring" class="field col-6">
+          <label class="field-label">
+            Freie Bilder
+            <span class="muted">leer = Standard der App (derzeit 5)</span>
+          </label>
+          <input v-model.number="draft.book.freePages" type="number" min="0" max="500" class="glass w-full" placeholder="Standard">
+        </div>
+
         <div class="field col-12">
           <label class="field-label">Badges</label>
           <BadgeEditor v-model="draft.book.badges" />
@@ -183,8 +201,29 @@
       </div>
     </section>
 
+    <!-- CONTENT PANEL: the pages of a coloring book (pictures with their words) -->
+    <section v-if="isColoring" class="form-panel">
+      <header class="panel-header">
+        <div>
+          <h2 class="panel-title">Seiten des Ausmalbuchs · {{ activeLocale.toUpperCase() }}</h2>
+          <p class="panel-subtitle">
+            Jede Seite ist ein Bild mit Titel, Bibelstelle und einem kurzen Text. Die Kinder öffnen sie direkt im Malprogramm.
+          </p>
+        </div>
+      </header>
+      <div id="field-content" :class="activeLocale === 'de' ? fieldClass('field-content') : ''">
+        <ColoringPagesEditor
+          :model-value="draft.activeLocalization.content"
+          :de-pages="draft.book.localizations.de?.content ?? []"
+          :locale="activeLocale"
+          @update:model-value="(v) => (draft.activeLocalization.content = v)"
+          @image-removed="onImageRemoved"
+        />
+      </div>
+    </section>
+
     <!-- CONTENT PANEL -->
-    <section class="form-panel">
+    <section v-else class="form-panel">
       <header class="panel-header">
         <div>
           <h2 class="panel-title">Seiteneditor · {{ activeLocale.toUpperCase() }}</h2>
@@ -291,6 +330,8 @@ import XInput from '@/components/atoms/XInput.vue'
 import XButton from '@/components/atoms/XButton.vue'
 import RichTextEditor from './RichTextEditor.vue'
 import RichTextNotesEditor from './RichTextNotesEditor.vue'
+import ColoringPagesEditor from './ColoringPagesEditor.vue'
+import { alignToGerman } from '@/utils/coloringPages'
 import AttachmentsEditor from './AttachmentsEditor.vue'
 import ConfirmDiscardModal from '@/components/molecules/ConfirmDiscardModal.vue'
 import { PLACEHOLDER_IMAGE } from '@/utils/placeholder'
@@ -312,6 +353,7 @@ const categoriesStore = useCategoryStore()
 const toast = useToastStore()
 
 const { activeLocale } = storeToRefs(draft)
+const isColoring = computed(() => draft.book.kind === 'coloring')
 const submitting = ref(false)
 const translating = ref(false)
 
@@ -490,7 +532,13 @@ async function onTranslateSwitch(from: 'de' | 'en', to: 'de' | 'en') {
       title: source.title,
       shortDescription: source.shortDescription,
       description: source.description,
-      content: source.content.map((p) => ({ page: p.page, title: p.title, text: p.text }))
+      content: source.content.map((p) => ({
+        page: p.page,
+        title: p.title,
+        text: p.text,
+        // coloring books: the picture is shared, the Bible passage is copied (and edited by hand)
+        ...(p.image ? { image: p.image, reference: p.reference ?? '' } : {})
+      }))
     }
   }
   const target = draft.book.localizations[to]!
@@ -626,6 +674,10 @@ async function submit() {
     // saved cleanly. The EN tab seeds an empty localization on first hover,
     // which would otherwise be persisted as a hollow sub-doc.
     const localizations = draft.book.localizations
+    // coloring books: the English pages follow the German ones (their order, and no page whose picture was removed)
+    if (draft.book.kind === 'coloring' && localizations.en?.content && localizations.de) {
+      localizations.en.content = alignToGerman(localizations.en.content, localizations.de.content)
+    }
     const en = localizations.en
     const enIsEmpty = !en || (
       !en.title?.trim() &&
@@ -668,3 +720,10 @@ async function submit() {
   }
 }
 </script>
+
+<style scoped>
+.kind-switch {
+  display: flex;
+  gap: 10px;
+}
+</style>

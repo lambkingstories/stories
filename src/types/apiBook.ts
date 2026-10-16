@@ -8,7 +8,12 @@ export type Locale = 'de' | 'en'
 export interface ApiLocalizedPage {
   page: number
   title: string
+  /** The text of a story page. Empty in the slim list (`lean`) and for a coloring page without a text. */
   text: string
+  /** Coloring books: the line art of the page. */
+  image?: string
+  /** Coloring books: the Bible passage of the picture. */
+  reference?: string
 }
 
 export interface ApiLocalization {
@@ -51,6 +56,12 @@ export interface ApiBook {
   author: string
   category: string
   bookSeriesId: string
+  /** 'coloring' = Ausmalbuch. Older books have none; `isColoringBook` then looks at the category. */
+  kind?: 'story' | 'coloring'
+  /** Coloring books: how many pictures are free (missing = the rule of the app). */
+  freePages?: number | null
+  /** Only in the slim list: the pages carry no story text, the book has to be fetched in full to read it. */
+  lean?: boolean
   releaseDate: string
   updatedDate: string
   badges: string[]
@@ -62,6 +73,8 @@ export interface ApiBook {
   previewImage: ApiLocalizedImage
   contentCoverImage?: ApiLocalizedAsset
   achievementBadge?: ApiLocalizedAsset
+  /** Where the printed book can be bought (the backend calls the field `etsyLink`). */
+  etsyLink?: ApiLocalizedAsset
   audio?: ApiLocalizedAsset
   attachments?: ApiBookAttachment[]
   localizations: {

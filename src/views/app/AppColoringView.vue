@@ -14,9 +14,10 @@
  *     bucket bounded by black borders, which is what the prompt asks for.
  *
  * Tools: felt / watercolor / pencil (crayon) / graphite / fill / eraser.
- * Quick-access strip (fill, pencil, eraser) lives in the top-right of
- * the header so kids don't have to open the toolbox to switch between
- * the most common actions; the rest stays in the floating minibar.
+ * The five tools sit in a rail next to the page (below it on a phone held
+ * upright) and the pencils stand in a case underneath, so a child never has
+ * to open a menu. The "big pencil box" and other extras sit behind
+ * LambKing Plus (see `usePremium`).
  *
  * The view also accepts a `?source=<url>&type=image|pdf` query so the
  * BookDetail "Use in coloring app" CTA can drop straight into the
@@ -25,28 +26,153 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
-import ZBackButton from '@/components/atoms/ZBackButton.vue'
 import { prependBaseUrl } from '@/utils/function'
 import { isIOS } from '@/utils/platform'
-import * as pdfjsLib from 'pdfjs-dist'
-// `?worker&inline` makes Vite inline the worker source into the chunk as
-// a blob — no separate asset file (which the production obfuscator drops),
-// and the CSP's `worker-src 'self' blob:` accepts it.
-import PdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?worker&inline'
-
-pdfjsLib.GlobalWorkerOptions.workerPort = new PdfWorker()
-
-// pdf.js is bundled as a regular npm dep so it ships in the same lazy
-// chunk as this view (the router already imports `AppColoringView.vue`
-// dynamically). cMaps come from jsdelivr — the CSP's
-// `connect-src 'self' https:` allows any https origin for fetches.
+import { goBackTo } from '@/utils/navBack'
+import { screenToSheet } from '@/utils/sheetMath'
+import { PatchHistory } from '@/utils/patchHistory'
+import { useToolbarDock } from '@/use/useToolbarDock'
+import { installPenTaps } from '@/use/usePenTaps'
+import useAdventure from '@/use/useAdventure'
+import { LOG_SCALE, MIN_STEPS, TimelapseLog, packTimelapse, recordStep, unpackTimelapse, type TimelapseData } from '@/utils/timelapse'
+import { floodFillPaint } from '@/utils/coloringFill'
+import { requireParent } from '@/use/useParentalGate'
+import AdvButton from '@/components/atoms/AdvButton.vue'
+import ColoringShelf from '@/components/molecules/ColoringShelf.vue'
+import ColoringToolbar, { type ToolbarTool } from '@/components/molecules/ColoringToolbar.vue'
+import ColoringColorPicker from '@/components/molecules/ColoringColorPicker.vue'
+import ColoringZoomBar from '@/components/molecules/ColoringZoomBar.vue'
+import ColoringMenu from '@/components/molecules/ColoringMenu.vue'
+import ColoringTimelapse from '@/components/molecules/ColoringTimelapse.vue'
+import type { BookCard, GalleryGroup, GalleryItem } from '@/types/coloringMenu'
+import { BACKDROPS, BACKDROP_KEY, DEFAULT_BACKDROP, PLAIN_COLORS, PLAIN_KEY, isBackdropId, isPlainColorId, type BackdropId } from '@/data/coloringBackdrops'
+import {
+  BRUSH_LOOK,
+  drawOilSegment,
+  eraseSegment,
+  emptyBounds,
+  growBounds,
+  type Bounds,
+  isLayeredTool,
+  ROUND_TIP,
+  isTipShape,
+  tipOf,
+  type Tip,
+  type TipShape,
+  newOilState,
+  newStrokeState,
+  paintLayerSegment,
+  shapeOptionsOf,
+  shapeRegion,
+  strokeReach,
+  widthFactor,
+  type LayeredTool,
+  type ShapeOptions
+} from '@/utils/coloringBrushes'
+import { KIT_ARTWORK, LINE_ICONS, TOOL_SPRITES, type KitArtwork, type KitItem } from '@/data/coloringKits'
+import usePremium, { PREMIUM_TEASER } from '@/use/usePremium'
+import useApiBooks from '@/use/useApiBooks'
+import { pickLocalizedImage, type ApiBook } from '@/types/apiBook'
+import { BUILTIN_COLORING_PAGES } from '@/data/builtinColoringPages'
+import { coloringPagesOfBook, isColoringBook, type ColoringBookPage } from '@/utils/coloringBook'
+import { cacheUrlToBlobUrl } from '@/use/useBookCache'
+import { allowedPages, freePageCount } from '@/use/useBookAccess'
+import useAwards from '@/use/useAwards'
+import { AWARDS, type AwardId } from '@/utils/awards'
+import confetti from 'canvas-confetti'
+import { buildBackup, deliverBackup, restoreBackup } from '@/use/useArtworkBackup'
+import { buildRegionMap, gapFor, labelAt, paintedShare, regionMaskAlpha, type RegionMap } from '@/utils/coloringRegions'
+import { paintStars } from '@/utils/adventureScore'
+import useChrome from '@/use/useChrome'
+import useColoringShelf from '@/use/useColoringShelf'
+import { journeys } from '@/data/adventures'
+import { maxPoints, medalFor, pointsOf } from '@/utils/adventureScore'
+import type { RewardItem } from '@/types/coloringMenu'
+import {
+  type ArtworkMeta,
+  deleteArtwork,
+  getArtwork,
+  getTimelapse,
+  listArtworks,
+  pageArtworkId,
+  saveArtwork,
+  saveTimelapse
+} from '@/use/useArtworks'
+// pdf.js is large (it was most of this screen's 1.7 MB) and only a PDF needs it, so it is loaded the first time a PDF is
+// opened, not with the screen. `?worker&inline` makes Vite inline the worker source as a blob — no separate asset file
+// (which the production obfuscator drops), and the CSP's `worker-src 'self' blob:` accepts it. cMaps come from jsdelivr —
+// the CSP's `connect-src 'self' https:` allows any https origin for fetches.
 const PDFJS_CMAP = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/cmaps/'
+let pdfjsReady: Promise<typeof import('pdfjs-dist')> | null = null
 
-const { t } = useI18n({ useScope: 'global' })
+function loadPdfjs(): Promise<typeof import('pdfjs-dist')> {
+  pdfjsReady ??= (async () => {
+    const [lib, worker] = await Promise.all([import('pdfjs-dist'), import('pdfjs-dist/build/pdf.worker.min.mjs?worker&inline')])
+    lib.GlobalWorkerOptions.workerPort = new worker.default()
+    return lib
+  })()
+  return pdfjsReady
+}
+
+const { t, locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
 const router = useRouter()
 
 // ── Source from query --------------------------------------------------------
+
+/**
+ * A picture painted as the task of an adventure stage (`?adv=josef:6`): a finished picture earns three stars, leaving after
+ * painting something one star; the way back leads to the stage.
+ */
+const adventure = useAdventure()
+const advCtx = computed<{ journeyId: string; stageId: number } | null>(() => {
+  const v = route.query.adv
+  if (typeof v !== 'string') return null
+  const [journeyId, stage] = v.split(':')
+  const stageId = Number(stage)
+  return journeyId && Number.isFinite(stageId) && stageId >= 1 ? { journeyId, stageId } : null
+})
+
+/** Back to the stage; `done` shows the finished picture there ("well done") with its stars, otherwise the stage goes on with the questions. */
+function backToStage(done = false, stars = 0) {
+  const c = advCtx.value
+  if (!c) return
+  void router.replace({
+    name: 'app-adventure-stage',
+    params: { journeyId: c.journeyId, stageId: String(c.stageId) },
+    query: done ? { back: 'task', done: '1', stars: String(stars) } : { back: 'task', stars: String(stars) }
+  })
+}
+
+/** How much of the picture is painted (0 to 1), counted on the fields of the line art. */
+function currentPaintShare(): number {
+  const map = ensureRegionMap()
+  const dc = drawCanvas.value
+  if (!map || !dc || !dc.width || !dc.height) return 0
+  const c = document.createElement('canvas')
+  c.width = map.w
+  c.height = map.h
+  const ctx = c.getContext('2d', { willReadFrequently: true })
+  if (!ctx) return 0
+  ctx.drawImage(dc, 0, 0, c.width, c.height)
+  const px = ctx.getImageData(0, 0, c.width, c.height).data
+  const alpha = new Uint8Array(c.width * c.height)
+  for (let i = 0; i < alpha.length; i++) alpha[i] = px[i * 4 + 3]!
+  return paintedShare(map, alpha)
+}
+
+/** Leaving the picture of a stage without pressing "done": what is painted so far counts (30 % one star, 40 % two, 70 % three). */
+async function leaveToStage() {
+  const c = advCtx.value
+  if (!c) return
+  // (saving clears the flag of "something was painted", so it is read first)
+  const painted = hasUserAction.value
+  await persistNow()
+  const share = currentPaintShare()
+  const stars = painted || share > 0 ? paintStars(share) : 0
+  if (stars > 0) adventure.recordStars(c.journeyId, c.stageId, stars)
+  backToStage(false, stars)
+}
 
 const querySource = computed<string>(() => {
   const v = route.query.source
@@ -62,76 +188,656 @@ const querySourceType = computed<'image' | 'pdf' | ''>(() => {
 
 // ── Backdrop -----------------------------------------------------------------
 
-// Two artworks — a tall one for portrait, a wide one for landscape. The
-// swap itself happens in CSS (`@media (orientation: …)`); we only feed the
-// base-url-corrected `url()` values in as custom properties, because the
-// files live in `public/` and a bare `url(…)` inside the SFC style block
-// would be resolved by Vite as a bundled asset.
-const backdropVars = computed(() => ({
-  '--ac-bg-portrait': `url(${prependBaseUrl('images/bg/ausmalen_portrait.webp')})`,
-  '--ac-bg-landscape': `url(${prependBaseUrl('images/bg/ausmalen_landscape.webp')})`
-}))
+// The picture behind the paper: the plain warm light, or a table, a meadow, the beach (see `coloringBackdrops.ts`).
+// The choice is remembered. The `url()` goes in as a custom property because a bare `url(...)` in the SFC style
+// block would be resolved by Vite as a bundled asset.
+function readBackdrop(): BackdropId {
+  try {
+    const v = localStorage.getItem(BACKDROP_KEY)
+    return isBackdropId(v) ? v : DEFAULT_BACKDROP
+  } catch {
+    return DEFAULT_BACKDROP
+  }
+}
+
+function readPlain(): string {
+  try {
+    const v = localStorage.getItem(PLAIN_KEY)
+    return isPlainColorId(v) ? v : 'warm'
+  } catch {
+    return 'warm'
+  }
+}
+
+const backdropId = ref<BackdropId>(readBackdrop())
+const plainColorId = ref<string>(readPlain())
+const backdropVars = computed(() => {
+  // the main menu keeps the calm warm light, so its text can always be read; the backdrop belongs to the sheet
+  if (!hasImage.value) return {}
+  const b = BACKDROPS.find((x) => x.id === backdropId.value)
+  if (b?.image) return { '--ac-bg-image': `url(${b.image})` }
+  const c = PLAIN_COLORS.find((x) => x.id === plainColorId.value) ?? PLAIN_COLORS[0]!
+  return { '--ac-bg-image': c.css }
+})
+
+function setBackdrop(id: string) {
+  if (!isBackdropId(id)) return
+  backdropId.value = id
+  try {
+    localStorage.setItem(BACKDROP_KEY, id)
+  } catch {
+    // not remembered in a private window
+  }
+}
+
+function setPlainColor(id: string) {
+  if (!isPlainColorId(id)) return
+  plainColorId.value = id
+  try {
+    localStorage.setItem(PLAIN_KEY, id)
+  } catch {
+    // not remembered in a private window
+  }
+}
+
+// ── Choose a coloring page ---------------------------------------------------
+
+// The built-in pages plus every coloring attachment of every book, so a child
+// can pick a picture without going through a story first.
+const { state: booksState, loadAllBooks } = useApiBooks()
+
+const looksLikePdf = (url: string) => /\.pdf(?:\?.*)?$/i.test(url)
+
+const galleryGroups = computed<GalleryGroup[]>(() => {
+  // The pages that ship with the app come first, then one group per ordinary book that has a coloring attachment.
+  // Coloring books themselves are shown as books (see `coloringBooks`).
+  const groups: GalleryGroup[] = [
+    {
+      key: 'builtin',
+      title: t('app.coloring.pagesTitle'),
+      items: BUILTIN_COLORING_PAGES.map((p) => {
+        const url = prependBaseUrl(p.file)
+        return { key: `builtin-${p.id}`, title: t(`app.coloring.pages.${p.id}`), data: url, preview: url }
+      })
+    }
+  ]
+  for (const book of booksState.all ?? []) {
+    if (isColoringBook(book)) continue
+    const items: GalleryItem[] = []
+    ;(book.attachments ?? []).forEach((a, i) => {
+      if (a.type !== 'coloring' || !a.data) return
+      items.push({
+        key: `${book.bookId}-a${i}`,
+        title: t('app.coloring.defaultTitle'),
+        data: a.data,
+        preview: a.previewImage || (looksLikePdf(a.data) ? '' : a.data)
+      })
+    })
+    if (!items.length) continue
+    const loc = book.localizations as Record<string, { title?: string } | null | undefined>
+    groups.push({
+      key: book.bookId,
+      title: loc[locale.value]?.title || loc.de?.title || book.bookId,
+      items: items.slice(0, 80)
+    })
+  }
+  return groups
+})
+
+// ── Finished pictures and awards -------------------------------------------------------------
+
+const awards = useAwards()
+
+/** Awards won a moment ago, shown as a small banner. */
+const awardBanner = ref<AwardId[]>([])
+let awardBannerTimer: ReturnType<typeof setTimeout> | undefined
+
+function celebrate(won: AwardId[]) {
+  if (!won.length) return
+  awardBanner.value = [...awardBanner.value, ...won]
+  clearTimeout(awardBannerTimer)
+  awardBannerTimer = setTimeout(() => {
+    awardBanner.value = []
+  }, 5000)
+}
+
+const lastAward = computed<AwardId | null>(() => awardBanner.value[awardBanner.value.length - 1] ?? null)
+const awardImage = (id: AwardId) => prependBaseUrl(`images/awards/${AWARDS.find((a) => a.id === id)?.image ?? 'star'}.webp`)
+const STAR_IMAGE = prependBaseUrl('images/awards/star.webp')
+
+/** The dialog after "picture finished". */
+const finishInfo = ref<{ won: AwardId[]; bookDone: boolean; hasNext: boolean; hasLapse: boolean } | null>(null)
+const finishNote = ref('')
+
+async function finishPicture() {
+  menuOpen.value = false
+  const id = identity?.id
+  if (!identity || !id || !drawCanvas.value) {
+    finishNote.value = t('app.coloring.finishNeedsSave')
+    return
+  }
+  hasUserAction.value = true
+  await persistNow()
+  const rec = await getArtwork(id)
+  if (!rec) {
+    finishNote.value = t('app.coloring.finishPaintFirst')
+    return
+  }
+  const { drawing: layer, ...meta } = rec
+  await saveArtwork({ ...meta, done: true }, layer)
+  identity.done = true
+  await flushTimelapse()
+
+  // A whole coloring book is finished when every one of its pictures is.
+  let complete = false
+  const ctx = bookCtx.value
+  if (ctx) {
+    const saved = new Map((await listArtworks()).map((a) => [a.id, a]))
+    complete = ctx.pages.every((p) => saved.get(pageArtworkId(p.url, 1))?.done)
+  }
+  const won = awards.pictureFinished(id, ctx ? { bookId: ctx.bookId, complete } : undefined)
+  if (advCtx.value) {
+    // the picture of a stage is done: the stars follow the painted share (70 % three, 40 % two, 30 % one), and on to the stage, where the finished picture is shown
+    // a picture that was saved has something painted on it, so taking part earns at least one star
+    const stars = paintStars(currentPaintShare(), true)
+    if (stars > 0) adventure.recordStars(advCtx.value.journeyId, advCtx.value.stageId, stars)
+    void refreshMyWorks()
+    backToStage(true, stars)
+    return
+  }
+  const hasNext = !!ctx && ctx.index + 1 < allowedPages(ctx.bookId, 'coloring', ctx.pages.length, ctx.freePages)
+  finishInfo.value = { won, bookDone: complete, hasNext, hasLapse: timelapse.count >= MIN_STEPS }
+  void refreshMyWorks()
+  confetti({ particleCount: 90, spread: 70, origin: { y: 0.65 }, disableForReducedMotion: true })
+}
+
+const finishImage = computed(() => {
+  const first = finishInfo.value?.won[0]
+  return first ? awardImage(first) : STAR_IMAGE
+})
+
+function closeFinish() {
+  finishInfo.value = null
+}
+
+async function watchTimelapse() {
+  await openTimelapse()
+}
+
+async function finishNext() {
+  closeFinish()
+  await gotoBookPage(1)
+}
+
+async function finishOverview() {
+  closeFinish()
+  if (advCtx.value) {
+    backToStage()
+    return
+  }
+  if (bookCtx.value) await leaveToBook()
+  else await closePicture()
+}
+
+// ── Backup of all paintings (for parents) --------------------------------------------------------
+
+const backupBusy = ref(false)
+const backupMessage = ref('')
+const backupInput = ref<HTMLInputElement | null>(null)
+
+async function exportBackup() {
+  if (!(await requireParent())) return
+  backupBusy.value = true
+  backupMessage.value = t('app.coloring.backupWorking')
+  try {
+    const { blob, count } = await buildBackup()
+    if (!count) {
+      backupMessage.value = t('app.coloring.backupEmpty')
+      return
+    }
+    await deliverBackup(blob, `LambKing-Bilder-${new Date().toISOString().slice(0, 10)}.zip`)
+    backupMessage.value = t('app.coloring.backupDone', { n: count })
+  } catch (err) {
+    console.error('backup failed', err)
+    backupMessage.value = t('app.coloring.backupFailed')
+  } finally {
+    backupBusy.value = false
+  }
+}
+
+async function pickBackup() {
+  if (!(await requireParent())) return
+  backupInput.value?.click()
+}
+
+async function onBackupFile(e: Event) {
+  const inp = e.target as HTMLInputElement
+  const file = inp.files?.[0]
+  inp.value = ''
+  if (!file) return
+  backupBusy.value = true
+  backupMessage.value = t('app.coloring.backupWorking')
+  try {
+    const { restored, kept } = await restoreBackup(file)
+    await refreshMyWorks()
+    backupMessage.value = t('app.coloring.restoreDone', { restored, kept })
+  } catch (err) {
+    console.error('restore failed', err)
+    backupMessage.value = t('app.coloring.restoreFailed')
+  } finally {
+    backupBusy.value = false
+  }
+}
+
+// ── Coloring books (Ausmalbücher) -----------------------------------------------------------
+
+const coloringBooks = computed<BookCard[]>(() => {
+  const saved = new Map(myWorks.value.map((w) => [w.id, w]))
+  const cards: BookCard[] = []
+  for (const book of booksState.all ?? []) {
+    if (!isColoringBook(book)) continue
+    const pages = coloringPagesOfBook(book as ApiBook, locale.value)
+    if (!pages.length) continue
+    const loc = book.localizations as Record<string, { title?: string } | null | undefined>
+    let done = 0
+    let updatedAt = 0
+    for (const p of pages) {
+      const w = saved.get(pageArtworkId(p.url, 1))
+      if (w) {
+        done++
+        updatedAt = Math.max(updatedAt, w.updatedAt)
+      }
+    }
+    cards.push({
+      bookId: book.bookId,
+      title: (loc[locale.value]?.title || loc.de?.title || book.bookId).replace(/^Buch\s*\d+\s*[–-]\s*/i, ''),
+      cover: pickLocalizedImage(book.previewImage, locale.value === 'en' ? 'en' : 'de'),
+      total: pages.length,
+      done,
+      updatedAt
+    })
+  }
+  return cards.sort((a, b) => a.bookId.localeCompare(b.bookId))
+})
+
+/** The books of the main menu: the ones the child is painting first (the one painted on last at the front), then the rest. */
+const paintShelf = useColoringShelf()
+// the very first time: the books that were already painted on stay on the shelf
+
+const orderedBooks = computed(() =>
+  coloringBooks.value
+    .filter((b) => paintShelf.ids.value.includes(b.bookId))
+    .sort((a, b) => {
+      if ((a.done > 0) !== (b.done > 0)) return a.done > 0 ? -1 : 1
+      return a.done > 0 ? b.updatedAt - a.updatedAt : a.bookId.localeCompare(b.bookId)
+    })
+)
+
+
+/** Paintings that do not belong to a coloring book (blank sheets, built-in pages, own images). */
+const looseWorks = computed(() => {
+  const inBooks = new Set<string>()
+  for (const book of booksState.all ?? []) {
+    if (!isColoringBook(book)) continue
+    for (const p of coloringPagesOfBook(book as ApiBook, locale.value)) inBooks.add(pageArtworkId(p.url, 1))
+  }
+  return myWorks.value.filter((w) => !inBooks.has(w.id))
+})
+
+// the presents won on journeys: a cup at the end of a journey gives a picture to paint, which is kept here
+const rewards = computed<RewardItem[]>(() =>
+  journeys
+    .filter((j) => {
+      const p = adventure.progressOf(j.id)
+      return !!p?.exam && !!medalFor(pointsOf(p), maxPoints(j))
+    })
+    .map((j) => ({ id: `gift-${j.id}`, title: j.gift.title, image: prependBaseUrl(j.gift.image), from: j.title }))
+)
+
+function openReward(item: RewardItem) {
+  pendingTitle = item.title
+  void router.replace({ name: 'app-coloring', query: { source: item.image, type: 'image' } })
+}
+
+function openBookCard(card: BookCard) {
+  void router.push({ name: 'app-coloring-book', params: { bookId: card.bookId } })
+}
+
+function pickGalleryItem(item: GalleryItem) {
+  pendingTitle = item.title
+  void router.replace({
+    name: 'app-coloring',
+    query: { source: item.data, type: looksLikePdf(item.data) ? 'pdf' : 'image' }
+  })
+}
+
+// Blank sheets: 3:4 at a size that stays light on a phone (undo keeps ten copies).
+const BLANK_PORTRAIT = { w: 1200, h: 1600 }
+const BLANK_LANDSCAPE = { w: 1600, h: 1200 }
+
+function startBlankSheet(shape: 'portrait' | 'landscape') {
+  const size = shape === 'portrait' ? BLANK_PORTRAIT : BLANK_LANDSCAPE
+  void startBlank(size.w, size.h)
+}
+
+async function startBlank(w: number, h: number, existing?: ArtworkMeta) {
+  const c = document.createElement('canvas')
+  c.width = w
+  c.height = h
+  const ctx = c.getContext('2d')!
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, w, h)
+  identity = {
+    id: existing?.id ?? `blank:${Date.now()}`,
+    title: existing?.title ?? t('app.coloring.blankTitle'),
+    kind: 'blank',
+    sourceUrl: '',
+    sourceType: '',
+    page: 1
+  }
+  isLoading.value = true
+  try {
+    await openImageUrl(c.toDataURL('image/png'))
+  } finally {
+    isLoading.value = false
+  }
+}
+
+function openWork(meta: ArtworkMeta) {
+  if (meta.kind === 'blank') {
+    void startBlank(meta.width, meta.height, meta)
+    return
+  }
+  initialPdfPage = meta.page
+  pendingTitle = meta.title
+  void router.replace({
+    name: 'app-coloring',
+    query: { source: meta.sourceUrl, type: meta.sourceType || 'image' }
+  })
+}
 
 // ── Tool & paint state -------------------------------------------------------
 
-type ToolId = 'felt' | 'watercolor' | 'pencil' | 'graphite' | 'fill' | 'eraser'
+type ToolId = 'felt' | 'watercolor' | 'pencil' | 'graphite' | 'chalk' | 'oil' | 'fill' | 'eraser' | 'pipette'
 
-const FULL_PALETTE = [
-  '#F5A5A5', '#F47B7B', '#F5C78F', '#F5E490',
-  '#C8E5A0', '#8FC88F', '#9ED8D8', '#A5C8F0',
-  '#A8A8E0', '#C896D8', '#F09EC8', '#D4A874',
-  '#7B2FBE', '#4A7B9D', '#B94A3E', '#5A8F5C',
-  '#C8963E', '#1A0A2E'
+// The boxes a child can open. Each one has its own tool and its own set of
+// colours (the artwork lives in `coloringKits.ts`); the chosen colour carries
+// over when switching boxes.
+type KitId = 'pencil' | 'marker' | 'watercolor' | 'oil' | 'graphite' | 'chalk' | 'bucket'
+
+interface KitDef extends KitArtwork {
+  id: KitId
+  tool: ToolId
+  /** Premium feature that unlocks the whole box, if any (see usePremium). */
+  feature: 'pencilBox' | 'paintBoxes' | null
+}
+
+const KITS: KitDef[] = [
+  { id: 'pencil', tool: 'pencil', feature: null, ...KIT_ARTWORK.pencil },
+  { id: 'marker', tool: 'felt', feature: null, ...KIT_ARTWORK.marker },
+  { id: 'watercolor', tool: 'watercolor', feature: null, ...KIT_ARTWORK.watercolor },
+  { id: 'oil', tool: 'oil', feature: null, ...KIT_ARTWORK.oil },
+  { id: 'graphite', tool: 'graphite', feature: null, ...KIT_ARTWORK.graphite },
+  { id: 'chalk', tool: 'chalk', feature: null, ...KIT_ARTWORK.chalk },
+  // the bucket has its own buckets of paint, and with them its own colour
+  { id: 'bucket', tool: 'fill', feature: null, ...KIT_ARTWORK.bucket }
 ]
-const GRAY_PALETTE = ['#FFFFFF', '#CCCCCC', '#999999', '#555555', '#111111']
 
-const tool = ref<ToolId>('felt')
-const color = ref<string>(FULL_PALETTE[0]!)
-const customColor = ref<string | null>(null)
-const brushSize = ref<number>(10)
-const alphaSliderValue = ref<number>(0)
-const opacity = computed(() => 1 - alphaSliderValue.value / 100)
+const kit = ref<KitId>('pencil')
+const kitDef = computed(() => KITS.find((k) => k.id === kit.value)!)
 
-const palette = computed(() =>
-  tool.value === 'eraser' ? [] : tool.value === 'graphite' ? GRAY_PALETTE : FULL_PALETTE
-)
-const isGraphitePal = computed(() => tool.value === 'graphite')
+const tool = ref<ToolId>('pencil')
+/**
+ * The eraser that a pen button (S Pen, Apple Pencil double tap) switches on for a moment. `null` = the chosen tool.
+ * The chosen tool itself is untouched, so letting go of the button brings the painting tool right back.
+ */
+const toolOverride = ref<ToolId | null>(null)
+const activeTool = computed<ToolId>(() => toolOverride.value ?? tool.value)
+
+// Every tool has its own colour and keeps it until it is changed in that very tool (remembered).
+interface ToolPaint {
+  color: string
+  /** Chosen with the colour picker or the pipette rather than a pencil of the box. */
+  custom: boolean
+}
+
+const COLORS_KEY = 'lk-coloring-tool-colors'
+const HEX_COLOR = /^#[0-9a-f]{6}$/i
+
+function readToolColors(): Record<KitId, ToolPaint> {
+  const out = {} as Record<KitId, ToolPaint>
+  for (const k of KITS) out[k.id] = { color: k.base[0]?.color ?? '#E53935', custom: false }
+  try {
+    const saved = JSON.parse(localStorage.getItem(COLORS_KEY) ?? 'null') as Record<string, Partial<ToolPaint>> | null
+    if (saved && typeof saved === 'object') {
+      for (const k of KITS) {
+        const v = saved[k.id]
+        if (v && typeof v.color === 'string' && HEX_COLOR.test(v.color)) out[k.id] = { color: v.color.toUpperCase(), custom: !!v.custom }
+      }
+    }
+  } catch {
+    // the first colours of the boxes
+  }
+  return out
+}
+
+const toolColors = ref<Record<KitId, ToolPaint>>(readToolColors())
+/** The colour of the tool that is chosen (the last painting tool, while the eraser, the bucket or the pipette is chosen). */
+const color = computed<string>(() => toolColors.value[kit.value].color)
+const customColor = computed<string | null>(() => (toolColors.value[kit.value].custom ? toolColors.value[kit.value].color : null))
+
+function setPaint(c: string, custom: boolean) {
+  toolColors.value = { ...toolColors.value, [kit.value]: { color: c.toUpperCase(), custom } }
+  try {
+    localStorage.setItem(COLORS_KEY, JSON.stringify(toolColors.value))
+  } catch {
+    // not remembered in a private window
+  }
+}
+/** Brush size on a 2–60 scale; the picture's width scales it, so it feels the same on every picture. */
+const brushSize = ref<number>(14)
+/** The eraser has its own size and its own way of working, remembered between visits. */
+const ERASER_KEY = 'lk-coloring-eraser'
+const ERASER_SIZES = [6, 14, 26, 44]
+function readEraser(): { size: number; field: boolean } {
+  try {
+    const saved = JSON.parse(localStorage.getItem(ERASER_KEY) ?? 'null') as { size?: unknown; field?: unknown } | null
+    const size = typeof saved?.size === 'number' ? Math.round(Math.max(2, Math.min(60, saved.size))) : 14
+    return { size, field: saved?.field !== false }
+  } catch {
+    return { size: 14, field: true }
+  }
+}
+const eraserSaved = readEraser()
+const eraserSize = ref<number>(eraserSaved.size)
+/** A tap with the eraser inside a field of the line art takes away all the paint of that field. */
+const eraserField = ref<boolean>(eraserSaved.field)
+watch([eraserSize, eraserField], () => {
+  try {
+    localStorage.setItem(ERASER_KEY, JSON.stringify({ size: eraserSize.value, field: eraserField.value }))
+  } catch {
+    // not remembered in a private window
+  }
+})
+/** The size the size slider of the tool bar shows and changes: that of the eraser while the eraser is chosen. */
+const sizeModel = computed<number>({
+  get: () => (tool.value === 'eraser' ? eraserSize.value : brushSize.value),
+  set: (n) => {
+    if (tool.value === 'eraser') eraserSize.value = n
+    else brushSize.value = n
+  }
+})
+/** How strong the paint goes on, 15–100 %. */
+const strength = ref<number>(100)
+const opacity = computed(() => strength.value / 100)
+
+/**
+ * Something was set up for painting (a tool, a colour, a size) while the tool bar is open: the next press on the paper paints
+ * at once and folds the bar. Without it, that press only closes the bar.
+ */
+let armed = false
+function arm() {
+  armed = true
+}
+watch([brushSize, eraserSize, strength], arm)
+// The shape of the tip, one choice for every painting tool (remembered). Watercolour and oil start with an oval.
+const TIPS_KEY = 'lk-coloring-tips'
+const DEFAULT_TIPS: Record<string, TipShape> = { watercolor: 'oval-left', oil: 'oval-left' }
+
+function readTips(): Record<string, TipShape> {
+  const tips = { ...DEFAULT_TIPS }
+  try {
+    const saved = JSON.parse(localStorage.getItem(TIPS_KEY) ?? 'null') as Record<string, unknown> | null
+    if (saved && typeof saved === 'object') for (const [k, v] of Object.entries(saved)) if (isTipShape(v)) tips[k] = v
+  } catch {
+    // the defaults
+  }
+  return tips
+}
+
+const tips = ref<Record<string, TipShape>>(readTips())
+const tipOfTool = (id: string): Tip => tipOf(tips.value[id] ?? 'round')
+
+function setTip(shape: TipShape) {
+  arm()
+  tips.value = { ...tips.value, [tool.value]: shape }
+  try {
+    localStorage.setItem(TIPS_KEY, JSON.stringify(tips.value))
+  } catch {
+    // not remembered in a private window
+  }
+}
+
+const { hasFeature, showUpsell } = usePremium()
+// The big pencil box only locks the pencil kit's extra colours.
+const extraLocked = computed(() => kit.value === 'pencil' && !hasFeature('pencilBox'))
+
+function kitLocked(k: KitDef): boolean {
+  return !!k.feature && k.feature !== 'pencilBox' && !hasFeature(k.feature)
+}
+
+function selectKit(k: KitDef) {
+  if (kitLocked(k)) {
+    showUpsell(k.feature!)
+    return
+  }
+  kit.value = k.id
+  tool.value = k.tool
+}
+
+/** Back to the open box's drawing tool (after the pipette, for example). */
+function selectPaint() {
+  tool.value = kitDef.value.tool
+}
+
+function selectToolById(id: string) {
+  arm()
+  const k = KITS.find((x) => x.tool === id)
+  if (k) {
+    selectKit(k)
+    return
+  }
+  tool.value = id as ToolId
+}
+
+/** A colour chosen below goes with a painting tool: after the eraser, the bucket or the pipette the box's tool comes back. */
+function backToPaint() {
+  if (tool.value === 'eraser' || tool.value === 'fill' || tool.value === 'pipette') selectPaint()
+  toolOverride.value = null
+}
 
 function pickPreset(c: string) {
-  color.value = c
-  customColor.value = null
+  arm()
+  backToPaint()
+  setPaint(c, false)
 }
 
 function pickCustom(c: string) {
-  color.value = c
-  customColor.value = c
+  arm()
+  backToPaint()
+  setPaint(c, true)
 }
 
-function isPresetActive(c: string) {
-  return color.value === c && !customColor.value
-}
+/** The free colour picker (the rainbow item of a box). */
+const pickerOpen = ref(false)
 
-watch(tool, (next) => {
-  if (next === 'graphite' && !GRAY_PALETTE.includes(color.value)) {
-    color.value = '#111111'
-    customColor.value = null
+// The palette item opens the free colour picker, which belongs to the big box
+// once the subscription is switched on.
+function onCustomPencil() {
+  if (PREMIUM_TEASER && kit.value === 'pencil' && extraLocked.value) {
+    showUpsell('pencilBox')
+    return
   }
-})
+  pickerOpen.value = !pickerOpen.value
+}
+
+function sqDist(a: string, b: string): number {
+  const p = (h: string, i: number) => parseInt(h.replace('#', '').slice(i, i + 2), 16) || 0
+  return (p(a, 0) - p(b, 0)) ** 2 + (p(a, 2) - p(b, 2)) ** 2 + (p(a, 4) - p(b, 4)) ** 2
+}
+
+/** The picture of the pencil, marker, brush… of a tool that matches that tool's colour (or comes closest to it). */
+function spriteFor(k: KitDef): string {
+  const want = toolColors.value[k.id].color
+  let best: KitItem | undefined = k.base[0]
+  let bd = Infinity
+  for (const it of [...k.base, ...k.extra]) {
+    const d = sqDist(it.color, want)
+    if (d < bd) {
+      bd = d
+      best = it
+    }
+  }
+  return best?.src ?? ''
+}
+
+/** Every tool of the tool bar with its picture (in the colour of that tool): the tools of the boxes (the graphite pencil last), then eraser, bucket and pipette. */
+const TOOL_ORDER: KitId[] = ['pencil', 'marker', 'watercolor', 'oil', 'chalk', 'graphite']
+const toolbarTools = computed<ToolbarTool[]>(() => [
+  ...TOOL_ORDER.map((id) => KITS.find((k) => k.id === id)!).map((k) => ({ id: k.tool, label: t(`app.coloring.toolName.${k.tool}`), sprite: spriteFor(k) })),
+  { id: 'fill', label: t('app.coloring.toolName.fill'), sprite: spriteFor(KITS.find((k) => k.id === 'bucket')!) || TOOL_SPRITES.fill },
+  { id: 'pipette', label: t('app.coloring.toolName.pipette'), sprite: TOOL_SPRITES.pipette }
+])
+// the eraser is no pen of the bar, but the folded tab shows it while it is chosen
+const currentSprite = computed(() => (tool.value === 'eraser' ? TOOL_SPRITES.eraser : (toolbarTools.value.find((x) => x.id === tool.value)?.sprite ?? '')))
+
+// The tool bar and the small menu.
+const toolbarOpen = ref(true)
+const menuOpen = ref(false)
+/** The menu has its main list and two small pages: the eraser (size, what a tap does) and the scene behind the paper. */
+const menuPage = ref<'main' | 'eraser' | 'scene'>('main')
+
+function toggleMenu() {
+  menuOpen.value = !menuOpen.value
+  menuPage.value = 'main'
+}
+
+function menuAction(fn: () => void) {
+  menuOpen.value = false
+  fn()
+}
 
 // ── Canvas refs --------------------------------------------------------------
 
 const bgCanvas = ref<HTMLCanvasElement | null>(null)
 const drawCanvas = ref<HTMLCanvasElement | null>(null)
+const previewCanvas = ref<HTMLCanvasElement | null>(null)
 const canvasWrap = ref<HTMLDivElement | null>(null)
 const mainEl = ref<HTMLElement | null>(null)
 const cursorRing = ref<HTMLDivElement | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
-const colorPickerEl = ref<HTMLInputElement | null>(null)
 
 let bgCtx: CanvasRenderingContext2D | null = null
 let drawCtx: CanvasRenderingContext2D | null = null
+let previewCtx: CanvasRenderingContext2D | null = null
+/** The stroke layer lies over the paint while a stroke is drawn: its opacity and blend are set per tool. */
+const previewStyle = ref<Record<string, string>>({ opacity: '0' })
 
 const hasImage = ref(false)
+// the main menu (no picture open) keeps the tab bar of the app
+const { coloringMenuShown } = useChrome()
+watch(hasImage, (v) => (coloringMenuShown.value = !v), { immediate: true })
+onBeforeUnmount(() => (coloringMenuShown.value = false))
 const isLoading = ref(false)
 const dropOver = ref(false)
 
@@ -140,9 +846,43 @@ const totalPages = ref(1)
 const currentPage = ref(1)
 const pageDrawings: Record<number, string> = {}
 
-const MAX_HIST = 10
-let historyStack: ImageData[] = []
-let historyIdx = -1
+/**
+ * The time-lapse: every change of the picture is also remembered as a small picture of its area (see `utils/timelapse.ts`).
+ * It is saved a little after the last change, when the picture is left, and when it is finished.
+ */
+const timelapse = new TimelapseLog()
+let lapseDirty = false
+let lapseTimer: ReturnType<typeof setTimeout> | undefined
+
+function scheduleTimelapseSave() {
+  lapseDirty = true
+  clearTimeout(lapseTimer)
+  lapseTimer = setTimeout(() => void flushTimelapse(), 8000)
+}
+
+async function flushTimelapse() {
+  clearTimeout(lapseTimer)
+  const id = identity?.id
+  if (!lapseDirty || !id) return
+  lapseDirty = false
+  try {
+    await saveTimelapse(id, packTimelapse(await timelapse.snapshot()))
+  } catch (err) {
+    console.warn('time-lapse not saved', err)
+  }
+}
+
+/** The time-lapse window, opened from the dialog after "picture finished". */
+const lapseOpen = ref(false)
+const lapseData = ref<TimelapseData | null>(null)
+
+async function openTimelapse() {
+  lapseData.value = await timelapse.snapshot()
+  lapseOpen.value = true
+}
+
+/** Undo and redo keep only the area each change touched (see `patchHistory.ts`), so a long session stays light on a tablet. */
+const history = new PatchHistory(40)
 const canUndo = ref(false)
 const canRedo = ref(false)
 
@@ -153,68 +893,410 @@ let activeTouchId: number | null = null
 
 const zoom = {
   scale: 1,
-  minScale: 1,
-  maxScale: 5,
+  minScale: 0.5,
+  maxScale: 6,
   panX: 0,
   panY: 0,
   baseW: 0,
   baseH: 0
 }
 
-const minibarVisible = ref(false)
-const minibarCollapsed = ref(true)
-const minibarPos = ref<{ left: number; top: number }>({ left: 0, top: 0 })
-const minibarDragging = ref(false)
 const isFullscreen = ref(false)
-const minibarRoot = ref<HTMLDivElement | null>(null)
+// While a stroke is on, the bars fade back so the hand and the picture stay clear.
+const isPainting = ref(false)
 
 // ── Bottom nav ---------------------------------------------------------------
 
-// ── Unsaved-changes guard ----------------------------------------------------
-// `hasUserAction` flips true the moment the user commits anything to the
-// canvas (a stroke, a flood-fill, a clear). It resets when a fresh image is
-// loaded. Both router navigations and full page reloads are gated against
-// it so kids don't lose minutes of coloring to a stray tap.
+// ── Autosave / resume ---------------------------------------------------------
+// Every picture is saved on the device as the child paints (and when leaving),
+// so there is no "unsaved changes" warning: opening the picture again continues
+// exactly where it stopped. See `useArtworks`.
 
+interface WorkIdentity {
+  id: string
+  title: string
+  kind: 'page' | 'blank'
+  sourceUrl: string
+  sourceType: 'image' | 'pdf' | ''
+  page: number
+  bookId?: string
+  bookPage?: number
+  /** Marked as finished before (kept when the child paints on). */
+  done?: boolean
+}
+
+/** Who the picture on the canvas is, `null` for a picture opened from the device's files (not saved). */
+let identity: WorkIdentity | null = null
+/** Title for the next coloring page that gets loaded from a URL. */
+let pendingTitle = ''
+/** PDF page to open first when a saved work is resumed. */
+let initialPdfPage = 1
+
+/** True once the child changed anything since the last save. */
 const hasUserAction = ref(false)
-const showLeaveConfirm = ref(false)
-let pendingLeave: (() => void) | null = null
+const myWorks = ref<ArtworkMeta[]>([])
 
-function onBack() {
-  // Drives the same router exit as the bottom-nav used to. The route guard
-  // installed below intercepts when there are unsaved changes.
-  if (window.history.length > 1) router.back()
-  else router.push({ name: 'app-main' })
+function seedPaintShelf(list: BookCard[]) {
+  if (list.length) paintShelf.seedShelf(list.filter((b) => b.done > 0).map((b) => b.bookId))
+}
+watch(coloringBooks, seedPaintShelf)
+onMounted(() => seedPaintShelf(coloringBooks.value))
+
+const deleteCandidate = ref<ArtworkMeta | null>(null)
+let autosaveTimer: ReturnType<typeof setTimeout> | undefined
+
+async function refreshMyWorks() {
+  myWorks.value = await listArtworks()
 }
 
-function cancelLeave() {
-  showLeaveConfirm.value = false
-  pendingLeave = null
+/** Runs `fn` when the browser has nothing better to do (Safari has no idle callback: then straight away). */
+function whenIdle(fn: () => void, timeout = 3000) {
+  if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(fn, { timeout })
+  else setTimeout(fn, 50)
 }
 
-function confirmLeave() {
-  showLeaveConfirm.value = false
-  const proceed = pendingLeave
-  pendingLeave = null
-  hasUserAction.value = false // user accepted the loss; allow nav through.
-  proceed?.()
+/** The picture is packed and saved a moment after the last stroke, and never while a stroke is on (it would stall the pen). */
+function scheduleAutosave() {
+  clearTimeout(autosaveTimer)
+  autosaveTimer = setTimeout(autosaveWhenQuiet, 2500)
 }
 
-function onBeforeUnload(e: BeforeUnloadEvent) {
-  if (!hasUserAction.value) return
-  // The browser shows its own native dialog — `returnValue` is the legacy
-  // contract; modern browsers ignore the message and use a generic prompt
-  // but the truthy `returnValue` is what triggers the dialog.
-  e.preventDefault()
-  e.returnValue = ''
+function autosaveWhenQuiet() {
+  if (drawing) {
+    autosaveTimer = setTimeout(autosaveWhenQuiet, 1200)
+    return
+  }
+  whenIdle(() => void persistNow())
 }
 
+/** The picture as it looks on screen: white paper, the paint, the line art multiplied on top. */
+function paintComposite(ctx: CanvasRenderingContext2D, w: number, h: number) {
+  const dc = drawCanvas.value!, bg = bgCanvas.value!
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, w, h)
+  ctx.drawImage(dc, 0, 0, w, h)
+  ctx.save()
+  ctx.globalCompositeOperation = 'multiply'
+  ctx.drawImage(bg, 0, 0, w, h)
+  ctx.restore()
+}
+
+function makeThumb(): string {
+  const dc = drawCanvas.value, bg = bgCanvas.value
+  if (!dc || !bg) return ''
+  const w = 280
+  const h = Math.max(1, Math.round((bg.height / bg.width) * w))
+  // A big picture is shrunk in halves: one jump to thumbnail size would leave the fine lines as scattered dots.
+  let cw = Math.max(w, Math.min(bg.width, w * 4))
+  let ch = Math.max(h, Math.round((bg.height / bg.width) * cw))
+  let c = document.createElement('canvas')
+  c.width = cw
+  c.height = ch
+  let ctx = c.getContext('2d')!
+  ctx.imageSmoothingQuality = 'high'
+  try {
+    paintComposite(ctx, cw, ch)
+    while (cw > w) {
+      const nw = Math.max(w, Math.round(cw / 2))
+      const nh = Math.max(h, Math.round(ch / 2))
+      const next = document.createElement('canvas')
+      next.width = nw
+      next.height = nh
+      const nctx = next.getContext('2d')!
+      nctx.imageSmoothingQuality = 'high'
+      nctx.drawImage(c, 0, 0, nw, nh)
+      c = next
+      ctx = nctx
+      cw = nw
+      ch = nh
+    }
+    return c.toDataURL('image/jpeg', 0.78)
+  } catch {
+    // A line-art image from another origin can taint the canvas; fall back to
+    // the child's own paint on white.
+    const f = document.createElement('canvas')
+    f.width = w
+    f.height = h
+    const fctx = f.getContext('2d')!
+    fctx.fillStyle = '#ffffff'
+    fctx.fillRect(0, 0, w, h)
+    fctx.drawImage(dc, 0, 0, w, h)
+    return f.toDataURL('image/jpeg', 0.72)
+  }
+}
+
+async function persistNow() {
+  clearTimeout(autosaveTimer)
+  const dc = drawCanvas.value
+  if (!identity || !dc || !hasImage.value || !hasUserAction.value) return
+  const snapshot = identity
+  try {
+    const drawing: Blob | null = await new Promise((resolve) => dc.toBlob((b) => resolve(b), 'image/png'))
+    if (!drawing) return
+    await saveArtwork(
+      {
+        id: snapshot.id,
+        title: snapshot.title,
+        kind: snapshot.kind,
+        sourceUrl: snapshot.sourceUrl,
+        sourceType: snapshot.sourceType,
+        page: snapshot.page,
+        bookId: snapshot.bookId,
+        bookPage: snapshot.bookPage,
+        done: snapshot.done,
+        width: dc.width,
+        height: dc.height,
+        thumb: makeThumb(),
+        updatedAt: Date.now()
+      },
+      drawing
+    )
+    hasUserAction.value = false
+    celebrate(awards.paintedToday())
+  } catch (err) {
+    console.warn('autosave failed', err)
+  }
+}
+
+/** Put the saved paint of the current picture back on the canvas. Returns true when something was restored. */
+async function restoreSavedDrawing(): Promise<boolean> {
+  const dc = drawCanvas.value
+  if (!dc) return false
+  // every picture has its own time-lapse
+  clearTimeout(lapseTimer)
+  lapseDirty = false
+  timelapse.reset(dc.width, dc.height)
+  if (!identity || !drawCtx) return false
+  const rec = await getArtwork(identity.id)
+  if (!rec) return false
+  identity.done = !!rec.done
+  try {
+    const bmp = await createImageBitmap(rec.drawing)
+    drawCtx.clearRect(0, 0, dc.width, dc.height)
+    drawCtx.drawImage(bmp, 0, 0, dc.width, dc.height)
+    await loadTimelapseOf(identity.id, bmp)
+    bmp.close?.()
+    return true
+  } catch {
+    return false
+  }
+}
+
+/** The saved time-lapse of the picture; without one (a picture from before there was a time-lapse) the paint so far is its base. */
+async function loadTimelapseOf(id: string, painted: ImageBitmap) {
+  const dc = drawCanvas.value
+  if (!dc) return
+  const saved = await getTimelapse(id)
+  const data = saved ? await unpackTimelapse(saved) : null
+  if (data && data.w === Math.max(1, Math.round(dc.width * LOG_SCALE)) && data.h === Math.max(1, Math.round(dc.height * LOG_SCALE))) {
+    timelapse.load(data)
+    return
+  }
+  const c = document.createElement('canvas')
+  c.width = timelapse.w
+  c.height = timelapse.h
+  c.getContext('2d')?.drawImage(painted, 0, 0, c.width, c.height)
+  timelapse.base = await new Promise<Blob | null>((resolve) => c.toBlob((b) => resolve(b), 'image/webp', 0.72))
+}
+
+function onVisibilityHidden() {
+  if (document.visibilityState === 'hidden') void persistNow()
+}
+
+/**
+ * Back is one step: from a picture to the main menu of the painting program (never page by page through the book),
+ * and from the main menu out of the painting program into the app.
+ */
+async function onBack() {
+  if (advCtx.value) {
+    await leaveToStage()
+    return
+  }
+  if (hasImage.value) {
+    await persistNow()
+    bookCtx.value = null
+    hasImage.value = false
+    identity = null
+    pdfDoc = null
+    totalPages.value = 1
+    currentPage.value = 1
+    // the menu is the page before when the picture was opened from a book or the menu: a real step back
+    goBackTo(router, { name: 'app-coloring', query: {} })
+    void refreshMyWorks()
+    return
+  }
+  goBackTo(router, { name: 'app-main' })
+}
+
+/** Back to the choose-a-picture screen; the picture is saved first. */
+async function closePicture() {
+  if (advCtx.value) {
+    await leaveToStage()
+    return
+  }
+  if (bookCtx.value) {
+    await leaveToBook()
+    return
+  }
+  await persistNow()
+  hasImage.value = false
+  identity = null
+  pdfDoc = null
+  totalPages.value = 1
+  currentPage.value = 1
+  void router.replace({ name: 'app-coloring', query: {} })
+  void refreshMyWorks()
+}
+
+function askDelete(meta: ArtworkMeta) {
+  deleteCandidate.value = meta
+}
+
+async function confirmDelete() {
+  const meta = deleteCandidate.value
+  deleteCandidate.value = null
+  if (!meta) return
+  await deleteArtwork(meta.id)
+  void refreshMyWorks()
+}
+
+// ── Painting a coloring book -----------------------------------------------------------------
+// Opened from a book (`?book=<id>&p=<n>`), the editor turns its pages like a real
+// coloring book: every page keeps its own painting on the device, the arrows in the
+// top bar go to the next and the previous page.
+
+interface BookContext {
+  bookId: string
+  title: string
+  pages: ColoringBookPage[]
+  /** How many pictures are free, when the book has its own number. */
+  freePages?: number | null
+  /** 0-based index of the page on the canvas. */
+  index: number
+  /** Where the printed book is sold, if the book has a link. */
+  shopLink?: string
+}
+
+const bookCtx = ref<BookContext | null>(null)
+/** The text of the picture on the sheet (coloring books carry a short text and a Bible passage with each picture). */
+const pageInfo = computed(() => {
+  const ctx = bookCtx.value
+  const p = ctx?.pages[ctx.index]
+  return p && (p.text || p.reference) ? p : null
+})
+const textOpen = ref(false)
+
+const navTotal = computed(() => (bookCtx.value ? bookCtx.value.pages.length : pdfDoc ? totalPages.value : 1))
+const navCurrent = computed(() => (bookCtx.value ? bookCtx.value.index + 1 : currentPage.value))
+const { loadBook } = useApiBooks()
+
+const queryBook = computed<string>(() => (typeof route.query.book === 'string' ? route.query.book : ''))
+const queryBookPage = computed<number>(() => {
+  const n = Number(route.query.p)
+  return Number.isFinite(n) && n >= 1 ? Math.floor(n) : 1
+})
+
+/** Opens the sheet that says where the rest of the book comes from. */
+function upsellForBook(ctx: BookContext) {
+  showUpsell('book', {
+    bookId: ctx.bookId,
+    kind: 'coloring',
+    title: ctx.title,
+    freePages: freePageCount('coloring', ctx.pages.length, ctx.freePages),
+    totalPages: ctx.pages.length,
+    shopLink: ctx.shopLink
+  })
+}
+
+async function openBookPage(index: number) {
+  const ctx = bookCtx.value
+  if (!ctx) return
+  // Only the free pictures of a locked book can be painted; a link to another page goes to the book's overview.
+  const allowed = allowedPages(ctx.bookId, 'coloring', ctx.pages.length, ctx.freePages)
+  if (index >= allowed) {
+    void router.replace({ name: 'app-coloring-book', params: { bookId: ctx.bookId }, query: { p: String(index + 1) } })
+    return
+  }
+  const i = Math.min(Math.max(0, index), ctx.pages.length - 1)
+  const page = ctx.pages[i]!
+  ctx.index = i
+  pendingTitle = page.title
+  await loadFromUrl(page.url, 'image', { bookId: ctx.bookId, page: page.n })
+}
+
+async function openBook(bookId: string, page: number) {
+  isLoading.value = true
+  try {
+    const book = await loadBook(bookId)
+    const pages = book ? coloringPagesOfBook(book as ApiBook, locale.value) : []
+    if (!book || !pages.length) {
+      bookCtx.value = null
+      void router.replace({ name: 'app-coloring', query: {} })
+      return
+    }
+    const loc = book.localizations as Record<string, { title?: string } | null | undefined>
+    bookCtx.value = {
+      bookId,
+      title: loc[locale.value]?.title || loc.de?.title || bookId,
+      pages,
+      freePages: (book as ApiBook).freePages ?? null,
+      index: 0,
+      shopLink: pickLocalizedImage((book as ApiBook).etsyLink, locale.value === 'en' ? 'en' : 'de') || undefined
+    }
+  } catch (err) {
+    console.error('coloring book load error', err)
+    bookCtx.value = null
+    return
+  } finally {
+    isLoading.value = false
+  }
+  await openBookPage(page - 1)
+}
+
+/** One page forward or back; the page on the canvas is saved first. */
+async function gotoBookPage(delta: 1 | -1) {
+  const ctx = bookCtx.value
+  if (!ctx) return
+  const next = ctx.index + delta
+  if (next < 0 || next >= ctx.pages.length) return
+  if (next >= allowedPages(ctx.bookId, 'coloring', ctx.pages.length, ctx.freePages)) {
+    upsellForBook(ctx)
+    return
+  }
+  await persistNow()
+  await openBookPage(next)
+  // keep the address in step so a reload comes back to the same page
+  void router.replace({ name: 'app-coloring', query: { book: ctx.bookId, p: String(ctx.pages[next]!.n) } })
+}
+
+/** Back to the book's overview (the pages and how they look now). */
+async function leaveToBook() {
+  const ctx = bookCtx.value
+  await persistNow()
+  if (ctx) {
+    void router.replace({
+      name: 'app-coloring-book',
+      params: { bookId: ctx.bookId },
+      query: { p: String(ctx.pages[ctx.index]?.n ?? 1) }
+    })
+  }
+}
 
 // ── Loading sources ----------------------------------------------------------
 
-async function loadFromUrl(url: string, type: 'image' | 'pdf') {
+async function loadFromUrl(url: string, type: 'image' | 'pdf', inBook?: { bookId: string; page: number }) {
   if (!url) return
-  showMinibar()
+  identity = {
+    id: pageArtworkId(url, 1),
+    title: pendingTitle || t('app.coloring.defaultTitle'),
+    kind: 'page',
+    sourceUrl: url,
+    sourceType: type,
+    page: 1,
+    bookId: inBook?.bookId,
+    bookPage: inBook?.page
+  }
+  pendingTitle = ''
   isLoading.value = true
   try {
     if (type === 'pdf') {
@@ -223,7 +1305,13 @@ async function loadFromUrl(url: string, type: 'image' | 'pdf') {
       const buf = new Uint8Array(await res.arrayBuffer())
       await openPdfBytes(buf)
     } else {
-      await openImageUrl(url)
+      // A page of a book that was opened before comes from the device, so it works without a connection.
+      const local = await cacheUrlToBlobUrl(url, inBook?.bookId)
+      try {
+        await openImageUrl(local)
+      } finally {
+        if (local !== url) URL.revokeObjectURL(local)
+      }
     }
   } catch (err) {
     console.error('coloring source load error', err)
@@ -233,6 +1321,13 @@ async function loadFromUrl(url: string, type: 'image' | 'pdf') {
   }
 }
 
+/** The longest side of the working canvases. */
+function maxSheetSide(): number {
+  const phone = Math.min(window.innerWidth, window.innerHeight) < 600
+  const screenLong = Math.max(screen.width, screen.height) * Math.min(window.devicePixelRatio || 1, 2)
+  return Math.round(Math.min(phone ? 1800 : 2600, Math.max(1400, screenLong * 1.25)))
+}
+
 function openImageUrl(url: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const img = new Image()
@@ -240,7 +1335,9 @@ function openImageUrl(url: string): Promise<void> {
     img.onload = () => {
       const bg = bgCanvas.value, dc = drawCanvas.value
       if (!bg || !dc || !bgCtx || !drawCtx) return reject(new Error('canvas not ready'))
-      const MAX_DIM = 4096
+      // Every canvas of a picture costs 4 bytes a pixel and there are several: a phone gets a smaller working size than a
+      // tablet, and nothing is bigger than the screen can show.
+      const MAX_DIM = maxSheetSide()
       const r = Math.min(MAX_DIM / img.width, MAX_DIM / img.height, 1)
       const w = Math.max(1, Math.round(img.width * r))
       const h = Math.max(1, Math.round(img.height * r))
@@ -248,6 +1345,8 @@ function openImageUrl(url: string): Promise<void> {
       bg.height = h
       dc.width = w
       dc.height = h
+      forgetRegions()
+      syncPreview()
       bgCtx.fillStyle = '#ffffff'
       bgCtx.fillRect(0, 0, w, h)
       bgCtx.drawImage(img, 0, 0, w, h)
@@ -257,8 +1356,12 @@ function openImageUrl(url: string): Promise<void> {
       currentPage.value = 1
       hasImage.value = true
       fitCanvas()
-      resetHistory()
-      resolve()
+      // the fields of the line art are found in a quiet moment, not at the first stroke
+      if (stayInside.value) whenIdle(() => void ensureRegionMap(), 4000)
+      void restoreSavedDrawing().then(() => {
+        resetHistory()
+        resolve()
+      })
     }
     img.onerror = () => reject(new Error('Bild konnte nicht geladen werden'))
     img.src = url
@@ -266,11 +1369,14 @@ function openImageUrl(url: string): Promise<void> {
 }
 
 async function openPdfBytes(data: Uint8Array) {
+  const pdfjsLib = await loadPdfjs()
   pdfDoc = await pdfjsLib.getDocument({ data, cMapUrl: PDFJS_CMAP, cMapPacked: true }).promise
   totalPages.value = pdfDoc.numPages
   currentPage.value = 1
   Object.keys(pageDrawings).forEach((k) => delete pageDrawings[Number(k)])
-  await renderPdfPage(1)
+  const first = Math.min(Math.max(1, initialPdfPage), pdfDoc.numPages)
+  initialPdfPage = 1
+  await renderPdfPage(first)
 }
 
 function readFileAsUint8Array(file: File): Promise<Uint8Array> {
@@ -283,7 +1389,7 @@ function readFileAsUint8Array(file: File): Promise<Uint8Array> {
 }
 
 async function openFile(file: File) {
-  showMinibar()
+  identity = null
   isLoading.value = true
   try {
     if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name)) {
@@ -325,6 +1431,8 @@ async function renderPdfPage(num: number) {
     bg.height = Math.floor(vp.height)
     dc.width = bg.width
     dc.height = bg.height
+    forgetRegions()
+    syncPreview()
     bgCtx.fillStyle = '#ffffff'
     bgCtx.fillRect(0, 0, bg.width, bg.height)
     await page.render({ canvasContext: bgCtx, viewport: vp }).promise
@@ -333,7 +1441,12 @@ async function renderPdfPage(num: number) {
     currentPage.value = num
     fitCanvas()
 
+    if (identity && identity.sourceType === 'pdf') {
+      identity.page = num
+      identity.id = pageArtworkId(identity.sourceUrl, num)
+    }
     const saved = pageDrawings[num]
+    if (!saved) await restoreSavedDrawing()
     if (saved) {
       await new Promise<void>((resolve) => {
         const img = new Image()
@@ -362,11 +1475,15 @@ function savePageDrawing() {
 }
 
 function gotoPage(delta: 1 | -1) {
+  if (bookCtx.value) {
+    void gotoBookPage(delta)
+    return
+  }
   if (!pdfDoc) return
   const next = currentPage.value + delta
   if (next < 1 || next > totalPages.value) return
   savePageDrawing()
-  void renderPdfPage(next)
+  void persistNow().then(() => renderPdfPage(next))
 }
 
 // ── Fit / zoom ---------------------------------------------------------------
@@ -402,12 +1519,74 @@ function fitCanvas() {
   })
 }
 
+// Breathing room around the paper; the top bar floats over the top edge, so the paper starts below it.
+const PAGE_INSET = 10
+const topInset = () => (isFullscreen.value ? PAGE_INSET : 62)
+
+// The colour box at the bottom edge lies over the paper; only its little tab keeps room (and not in fullscreen).
+/** Room for the little arrow tab that stays at the bottom edge while the colour box is hidden. */
+const FOLDED_TAB = 30
+const SHELF_KEY = 'lk-coloring-box-open'
+function readShelfOpen(): boolean {
+  try {
+    return localStorage.getItem(SHELF_KEY) !== '0'
+  } catch {
+    return true
+  }
+}
+const shelfOpen = ref(readShelfOpen())
+const shelfEl = ref<InstanceType<typeof ColoringShelf> | null>(null)
+function bottomInset(): number {
+  // The colour box lies over the picture when it is pulled out: the paper never gets smaller (or moves) for it.
+  if (isFullscreen.value || !hasImage.value) return PAGE_INSET
+  return FOLDED_TAB
+}
+
+/** In fullscreen the box is not part of the layout: it is pulled out over the picture and goes away again. */
+const shelfPeek = ref(false)
+const shelfVisible = computed(() => (isFullscreen.value ? shelfPeek.value : shelfOpen.value))
+
+function toggleShelf() {
+  if (isFullscreen.value) {
+    shelfPeek.value = !shelfPeek.value
+    return
+  }
+  shelfOpen.value = !shelfOpen.value
+  try {
+    localStorage.setItem(SHELF_KEY, shelfOpen.value ? '1' : '0')
+  } catch {
+    // private window: the choice just is not remembered
+  }
+}
+
+// ── The tool bar: where it sits and how it is moved (see `use/useToolbarDock.ts`) ------------------------------
+const { dock, carry, justCarried, toolbarStyle, onHandleDown, onHandleMove, onHandleUp, setDock, swallowCarryClick } = useToolbarDock({
+  room: () => shelfRoom(),
+  fullscreen: isFullscreen
+})
+
+/** The zoom buttons show with a mouse, and on a touch screen as soon as the sheet is zoomed. */
+const showZoom = computed(() => finePointer.value || zoomPct.value !== 100)
+/** The corner of the picture where undo and redo sit: the one away from the tool bar. */
+const cornerSide = computed(() => (dock.value.edge === 'right' ? 'left' : 'right'))
+/** The room of the colour box at the bottom edge is always kept free for the tool bar, so the bar never moves when the box comes out. */
+const shelfRoom = () => (isFullscreen.value ? 0 : (shelfEl.value?.height() || 134) + 6)
+const cornerStyle = computed<Record<string, string>>(() => ({ '--lift': `${shelfRoom()}px` }))
+const pickerLift = computed(() => shelfRoom())
+
+/** A tap on the folded tab brings the bar back; the click that ends a carried tab must not. */
+function onTabClick() {
+  if (swallowCarryClick()) return
+  armed = false
+  toolbarOpen.value = true
+}
+
 function fitCanvasInner(bg: HTMLCanvasElement, wrap: HTMLDivElement, r: DOMRect) {
   // Contain-fit dimensions — the largest the unscaled artwork can be
   // while staying entirely inside the canvas area. Centering is then
   // handled inside applyTransform based on whether we're in fullscreen.
-  const aw = r.width
-  const ah = r.height
+  const aw = r.width - PAGE_INSET * 2
+  const ah = r.height - topInset() - bottomInset()
   const ratio = bg.width / bg.height
   let w = aw, h = aw / ratio
   if (h > ah) {
@@ -437,9 +1616,96 @@ function applyTransform() {
   // geometric middle of the canvas area in every mode.
   const sw = zoom.baseW * zoom.scale
   const sh = zoom.baseH * zoom.scale
-  const baseLeft = (r.width - sw) / 2
-  const baseTop = (r.height - sh) / 2
-  wrap.style.transform = `translate(${baseLeft + zoom.panX}px, ${baseTop + zoom.panY}px) scale(${zoom.scale})`
+  const baseLeft = PAGE_INSET + (r.width - PAGE_INSET * 2 - sw) / 2
+  const baseTop = topInset() + (r.height - topInset() - bottomInset() - sh) / 2
+  // the sheet turns about its middle: the same list of functions in both positions, so it turns smoothly
+  const cx = baseLeft + zoom.panX + sw / 2
+  const cy = baseTop + zoom.panY + sh / 2
+  zoomPct.value = Math.round(zoom.scale * 100)
+  wrap.style.transform = `translate(${cx}px, ${cy}px) rotate(${rotation.value}deg) scale(${zoom.scale}) translate(${-zoom.baseW / 2}px, ${-zoom.baseH / 2}px)`
+}
+
+/** How far the sheet is turned, from −90 to 90 degrees; 0 is the normal position. */
+const rotation = ref(0)
+
+/** Turns the sheet (about its middle); near 0 it clicks into the normal position. `smooth` lets it glide there. */
+function setRotation(deg: number, smooth = false) {
+  let v = Math.round(Math.max(-90, Math.min(90, deg)))
+  if (Math.abs(v) <= 3) v = 0
+  if (v === rotation.value) return
+  const wrap = canvasWrap.value
+  if (wrap && smooth) {
+    wrap.style.transition = 'transform 420ms cubic-bezier(0.22, 1, 0.36, 1)'
+    window.setTimeout(() => {
+      wrap.style.transition = ''
+    }, 460)
+  }
+  rotation.value = v
+  applyTransform()
+}
+
+// ── Zoom and move with the mouse (two fingers do it on a touch screen) -----------------------------------------------
+const zoomPct = ref(100)
+/** The hand tool: dragging moves the sheet instead of painting (for a mouse). */
+const panMode = ref(false)
+const spaceHeld = ref(false)
+const finePointer = ref(typeof matchMedia === 'function' && matchMedia('(hover: hover) and (pointer: fine)').matches)
+let panning: { x: number; y: number; px: number; py: number; id: number } | null = null
+
+/** Sets the zoom; the point under (clientX, clientY) stays where it is (the middle of the sheet without a point). */
+function zoomAt(next: number, clientX?: number, clientY?: number) {
+  const wrap = canvasWrap.value
+  if (!wrap) return
+  const s1 = zoom.scale
+  const s2 = Math.min(zoom.maxScale, Math.max(zoom.minScale, next))
+  if (Math.abs(s2 - s1) < 0.0005) return
+  if (clientX !== undefined && clientY !== undefined) {
+    const wr = wrap.getBoundingClientRect()
+    const k = 1 - s2 / s1
+    zoom.panX += (clientX - (wr.left + wr.width / 2)) * k
+    zoom.panY += (clientY - (wr.top + wr.height / 2)) * k
+  }
+  zoom.scale = s2
+  clampPan()
+  applyTransform()
+  updateCursorRing()
+}
+
+function zoomStep(factor: number) {
+  zoomAt(zoom.scale * factor)
+}
+
+/** The whole sheet again, in the middle. */
+function resetZoom() {
+  zoom.scale = 1
+  zoom.panX = 0
+  zoom.panY = 0
+  applyTransform()
+  updateCursorRing()
+}
+
+function onWheel(e: WheelEvent) {
+  if (!hasImage.value) return
+  e.preventDefault()
+  // a trackpad pinch arrives as a wheel with the control key: finer steps
+  zoomAt(zoom.scale * Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0016)), e.clientX, e.clientY)
+}
+
+function startPan(e: PointerEvent) {
+  panning = { x: e.clientX, y: e.clientY, px: zoom.panX, py: zoom.panY, id: e.pointerId }
+  try {
+    ;(e.currentTarget as Element).setPointerCapture?.(e.pointerId)
+  } catch {
+    // the move events of the sheet still arrive
+  }
+}
+
+function movePan(e: PointerEvent) {
+  if (!panning) return
+  zoom.panX = panning.px + (e.clientX - panning.x)
+  zoom.panY = panning.py + (e.clientY - panning.y)
+  clampPan()
+  applyTransform()
 }
 
 function clampPan() {
@@ -451,8 +1717,8 @@ function clampPan() {
     return
   }
   // Layout-box dims (see fitCanvas note).
-  const aw = m.clientWidth
-  const ah = m.clientHeight
+  const aw = m.clientWidth - PAGE_INSET * 2
+  const ah = m.clientHeight - topInset() - bottomInset()
   const sw = zoom.baseW * zoom.scale
   const sh = zoom.baseH * zoom.scale
   const maxX = Math.max(0, (sw - aw) / 2 + 40)
@@ -463,15 +1729,6 @@ function clampPan() {
 
 function onResize() {
   fitCanvas()
-  // Keep the floating toolbox inside the viewport after a rotation /
-  // window resize. Without this re-clamp, a toolbox positioned at the
-  // right edge in landscape ends up off-screen once the device flips
-  // to portrait (narrower width), so the kid can't grab it any more
-  // to drag it back into view.
-  if (minibarVisible.value && minibarRoot.value) {
-    const r = minibarRoot.value.getBoundingClientRect()
-    clampMinibar(r.left, r.top)
-  }
 }
 
 // ── Cursor ring --------------------------------------------------------------
@@ -492,168 +1749,242 @@ function hexToRgba(hex: string, a: number) {
   return `rgba(${r},${g},${b},${a})`
 }
 
+/** Canvas pixels of one brush unit: the picture's width scales it. */
+const brushPx = () => (activeTool.value === 'eraser' ? eraserSize.value : brushSize.value) * ((drawCanvas.value?.width ?? 1000) / 1000)
+
+/** Screen pixels per canvas pixel (zoom included). */
+const screenPerCanvas = () => {
+  const dc = drawCanvas.value
+  return dc && dc.width ? (zoom.baseW * zoom.scale) / dc.width : 1
+}
+
+/** How wide each tool draws, as a factor of the brush size (at a steady pressure): round tip, and a tip with a shape. */
+const RING_FACTOR: Record<string, [number, number]> = {
+  pencil: [0.6, 0.6],
+  graphite: [0.42, 0.42],
+  felt: [1.05, 1.05],
+  watercolor: [0.9, 1.1],
+  chalk: [1.1, 1.1],
+  oil: [0.8, 1],
+  eraser: [1.5, 1.5],
+  fill: [0.5, 0.5],
+  pipette: [0.5, 0.5]
+}
+
+/** The pen's pressure when it hovers: nearly none, so the ring starts small. */
+let ringPressure = 0.7
+
 function updateCursorRing() {
   const ring = cursorRing.value
   if (!ring) return
-  const isErase = tool.value === 'eraser'
-  ring.style.width = `${brushSize.value}px`
-  ring.style.height = `${brushSize.value}px`
+  const t = activeTool.value
+  const isErase = t === 'eraser'
+  const k = screenPerCanvas()
+  const painting = t !== 'fill' && t !== 'pipette' && !isErase
+  const tip = painting ? tipOfTool(t) : ROUND_TIP
+  const [roundF, shapeF] = RING_FACTOR[t] ?? [1, 1]
+  // the width follows the pressure, like the stroke does
+  const wf = isErase || !painting ? 1 : widthFactor(drawing ? pressureNow : ringPressure)
+  if (!tip.round) {
+    // The cursor shows the tip that is chosen, turned the way it paints.
+    const long = Math.max(8, brushPx() * k * shapeF * wf)
+    ring.style.width = `${long}px`
+    ring.style.height = `${Math.max(4, long * tip.ratio)}px`
+    ring.style.borderRadius = tip.kind === 'ellipse' ? '50%' : '3px'
+    ring.style.transform = `translate(-50%, -50%) rotate(${(tip.angle * 180) / Math.PI}deg)`
+  } else {
+    const d = Math.max(6, brushPx() * k * roundF * wf)
+    ring.style.width = `${d}px`
+    ring.style.height = `${d}px`
+    ring.style.borderRadius = '50%'
+    ring.style.transform = ''
+  }
   ring.classList.toggle('eraser-cursor', isErase)
-  ring.style.background = isErase
-    ? 'rgba(192,82,106,.10)'
-    : hexToRgba(tool.value === 'graphite' ? '#111111' : color.value, 0.15)
+  ring.style.background = isErase ? 'rgba(192, 82, 106, 0.10)' : hexToRgba(color.value, 0.15)
 }
 
 // ── Drawing engine ----------------------------------------------------------
+// The looks themselves (paper grain, wax, wet rim, bristles…) live in
+// `utils/coloringBrushes.ts`; this part decides what happens on which touch.
 
 interface PaintPos {
-  x: number;
-  y: number;
+  x: number
+  y: number
   pressure: number
+  /** True for a pen (Apple Pencil, S Pen), whose pressure is real. */
+  pen: boolean
 }
 
-function getPosFromClient(cx: number, cy: number, pressure = 1): PaintPos {
+function getPosFromClient(cx: number, cy: number, pressure = 0.7, pen = false): PaintPos {
   const dc = drawCanvas.value!
   const r = dc.getBoundingClientRect()
-  const sx = dc.width / r.width
-  const sy = dc.height / r.height
-  return { x: (cx - r.left) * sx, y: (cy - r.top) * sy, pressure }
+  const p = screenToSheet(cx, cy, r, rotation.value, dc.width, dc.height)
+  return { x: p.x, y: p.y, pressure, pen }
 }
 
-function applyStyle(p: PaintPos) {
-  const ctx = drawCtx!
-  const a = opacity.value
-  const sz = brushSize.value
-  const col = tool.value === 'graphite' ? (customColor.value ?? color.value) : color.value
-  ctx.globalCompositeOperation = 'source-over'
-  switch (tool.value) {
-    case 'felt':
-      ctx.globalAlpha = a * p.pressure
-      ctx.strokeStyle = ctx.fillStyle = col
-      ctx.lineWidth = sz * p.pressure
-      ctx.lineCap = ctx.lineJoin = 'round'
-      break
-    case 'watercolor':
-      ctx.globalAlpha = Math.min(0.16, a * 0.20) * p.pressure
-      ctx.strokeStyle = ctx.fillStyle = col
-      ctx.lineWidth = sz * p.pressure * 1.7
-      ctx.lineCap = ctx.lineJoin = 'round'
-      break
-    case 'pencil':
-      ctx.globalAlpha = 0
-      ctx.strokeStyle = ctx.fillStyle = col
-      ctx.lineWidth = Math.max(1, sz * 0.6 * p.pressure)
-      ctx.lineCap = ctx.lineJoin = 'round'
-      break
-    case 'graphite':
-      ctx.globalAlpha = Math.min(0.50, a * 0.45) * p.pressure
-      ctx.strokeStyle = ctx.fillStyle = col
-      ctx.lineWidth = Math.max(0.8, sz * 0.55 * p.pressure)
-      ctx.lineCap = ctx.lineJoin = 'round'
-      break
-    case 'eraser':
-      ctx.globalCompositeOperation = 'destination-out'
-      ctx.globalAlpha = Math.min(1, a * 1.2) * p.pressure
-      ctx.strokeStyle = ctx.fillStyle = 'rgba(0,0,0,1)'
-      ctx.lineWidth = sz * 1.5 * p.pressure
-      ctx.lineCap = ctx.lineJoin = 'round'
-      break
-  }
+function syncPreview() {
+  const dc = drawCanvas.value, pc = previewCanvas.value
+  if (!dc || !pc) return
+  if (pc.width !== dc.width) pc.width = dc.width
+  if (pc.height !== dc.height) pc.height = dc.height
+  previewCtx = pc.getContext('2d', { willReadFrequently: true })
 }
 
-function graphiteTexture(x: number, y: number, p: PaintPos) {
-  const ctx = drawCtx!
-  const sz = Math.max(1, brushSize.value * 0.65)
-  const spread = sz * 0.8
-  const n = Math.floor(sz * 1.4)
-  const ba = Math.min(0.22, opacity.value * 0.20) * p.pressure
-  ctx.globalCompositeOperation = 'source-over'
-  ctx.fillStyle = color.value
-  for (let i = 0; i < n; i++) {
-    const dx = (Math.random() - 0.5) * spread * 2
-    const dy = (Math.random() - 0.5) * spread * 2
-    const r = Math.random() * (sz * 0.22) + 0.25
-    ctx.globalAlpha = ba * (0.35 + Math.random() * 0.65)
-    ctx.beginPath()
-    ctx.arc(x + dx, y + dy, r, 0, Math.PI * 2)
-    ctx.fill()
-  }
+// Eyedropper: the colour of the picture (paint plus line art) at a point.
+function sampleColor(x: number, y: number): string | null {
+  const bg = bgCanvas.value, dc = drawCanvas.value
+  if (!bg || !dc) return null
+  const px = Math.max(0, Math.min(bg.width - 1, Math.round(x)))
+  const py = Math.max(0, Math.min(bg.height - 1, Math.round(y)))
+  const c = document.createElement('canvas')
+  c.width = 1
+  c.height = 1
+  const ctx = c.getContext('2d', { willReadFrequently: true })!
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, 1, 1)
+  ctx.drawImage(dc, px, py, 1, 1, 0, 0, 1, 1)
+  ctx.globalCompositeOperation = 'multiply'
+  ctx.drawImage(bg, px, py, 1, 1, 0, 0, 1, 1)
+  const d = ctx.getImageData(0, 0, 1, 1).data
+  const hex = (v: number) => v.toString(16).padStart(2, '0')
+  return `#${hex(d[0]!)}${hex(d[1]!)}${hex(d[2]!)}`
 }
 
-function watercolorBlob(x: number, y: number, p: PaintPos) {
-  const ctx = drawCtx!
-  const sz = brushSize.value * 1.5 * p.pressure
-  ctx.globalCompositeOperation = 'source-over'
-  ctx.fillStyle = color.value
-  for (let i = 0; i < 6; i++) {
-    const dx = (Math.random() - 0.5) * sz * 0.8
-    const dy = (Math.random() - 0.5) * sz * 0.8
-    const r = sz * (0.3 + Math.random() * 0.45)
-    ctx.globalAlpha = Math.min(0.055, opacity.value * 0.08) * p.pressure
-    ctx.beginPath()
-    ctx.arc(x + dx, y + dy, r, 0, Math.PI * 2)
-    ctx.fill()
+// ── Fields of the line art: stay inside the lines, and the bucket that does not leak -------------
+
+/** "In den Linien bleiben": a stroke only paints in the field where it started. Remembered between visits. */
+const STAY_KEY = 'lk-coloring-stay-inside-v2'
+function readStay(): boolean {
+  try {
+    return localStorage.getItem(STAY_KEY) !== '0'
+  } catch {
+    return true
   }
 }
+const stayInside = ref(readStay())
 
-function crayonStroke(x1: number, y1: number, x2: number, y2: number, pressure: number) {
-  const ctx = drawCtx!
-  const sz = brushSize.value
-  const a = opacity.value
-  const col = color.value
-  const dx = x2 - x1, dy = y2 - y1
-  const len = Math.hypot(dx, dy)
-  if (len < 0.5) {
-    ctx.globalCompositeOperation = 'source-over'
-    ctx.globalAlpha = Math.min(0.9, a * 0.95) * pressure
-    ctx.fillStyle = col
-    ctx.beginPath()
-    ctx.arc(x1, y1, sz * 0.45 * pressure, 0, Math.PI * 2)
-    ctx.fill()
-    return
-  }
-  const ux = dx / len, uy = dy / len
-  const px = -uy, py = ux
-  const numStripes = Math.max(3, Math.floor(sz * 0.58))
-  ctx.globalCompositeOperation = 'source-over'
-  for (let i = 0; i < numStripes; i++) {
-    const t = numStripes === 1 ? 0 : (i / (numStripes - 1)) - 0.5
-    const baseOff = t * sz * 0.88
-    const jitter = (Math.random() - 0.5) * sz * 0.14
-    const off = baseOff + jitter
-    const sx = x1 + px * off + ux * (Math.random() - 0.4) * sz * 0.10
-    const sy = y1 + py * off + uy * (Math.random() - 0.4) * sz * 0.10
-    const ex = x2 + px * (off + (Math.random() - 0.5) * sz * 0.07)
-    const ey = y2 + py * (off + (Math.random() - 0.5) * sz * 0.07)
-    const midX = (sx + ex) / 2 + (Math.random() - 0.5) * 2.2
-    const midY = (sy + ey) / 2 + (Math.random() - 0.5) * 2.2
-    const stripeW = (sz / numStripes) * (0.45 + Math.random() * 1.05) * pressure
-    const stripeA = Math.min(0.88, a * 0.90) * pressure * (0.48 + Math.random() * 0.52)
-    ctx.globalAlpha = stripeA
-    ctx.strokeStyle = col
-    ctx.lineWidth = Math.max(0.4, stripeW)
-    ctx.lineCap = 'butt'
-    ctx.lineJoin = 'round'
-    ctx.beginPath()
-    ctx.moveTo(sx, sy)
-    ctx.quadraticCurveTo(midX, midY, ex, ey)
-    ctx.stroke()
-  }
-  const grainCount = Math.floor(sz * len * 0.045)
-  ctx.fillStyle = col
-  for (let i = 0; i < grainCount; i++) {
-    const gt = Math.random()
-    const gx = x1 + dx * gt + px * (Math.random() - 0.5) * sz * 1.05
-    const gy = y1 + dy * gt + py * (Math.random() - 0.5) * sz * 1.05
-    ctx.globalAlpha = Math.min(0.42, opacity.value * 0.48) * pressure * Math.random()
-    ctx.beginPath()
-    ctx.arc(gx, gy, Math.random() * sz * 0.055 + 0.2, 0, Math.PI * 2)
-    ctx.fill()
+/**
+ * Colours that lie over each other and get darker (the see-through look of pencil, marker and watercolour). Off by default: going
+ * over the same place twice is mostly an accident and leaves a darker spot. Off, a stroke replaces the paint under it instead.
+ */
+const OVERLAP_KEY = 'lk-coloring-overlap'
+function readOverlap(): boolean {
+  try {
+    return localStorage.getItem(OVERLAP_KEY) === '1'
+  } catch {
+    return false
   }
 }
+const overlap = ref(readOverlap())
+watch(overlap, (on) => {
+  try {
+    localStorage.setItem(OVERLAP_KEY, on ? '1' : '0')
+  } catch {
+    // not remembered in a private window
+  }
+})
+watch(stayInside, (on) => {
+  if (on && hasImage.value) whenIdle(() => void ensureRegionMap(), 4000)
+  try {
+    localStorage.setItem(STAY_KEY, on ? '1' : '0')
+  } catch {
+    // not remembered in a private window
+  }
+})
 
-// Flood fill — paint-bucket bounded by black outlines. Reads the merged
-// (bg + draw) canvas so users can repaint already-painted regions.
+let regionMap: RegionMap | null = null
+/** The field a stroke stays in: as a picture (to cut the stroke layer) and as numbers (for the oil paint). */
+interface MaskInfo {
+  canvas: HTMLCanvasElement
+  alpha: Uint8Array
+  /** Width of `alpha` and how many picture pixels one of its pixels is. */
+  w: number
+  scale: number
+}
+
+let maskInfo: MaskInfo | null = null
+let maskLabel = -1
+/** The mask of the stroke that is on the canvas now (`null` = paints everywhere). */
+let strokeMask: MaskInfo | null = null
+/** For the oil paint: how much of the new paint a place accepts. */
+let oilAllow: ((x: number, y: number) => number) | undefined
+
+/** The picture changed: the fields have to be found again. */
+function forgetRegions() {
+  regionMap = null
+  maskInfo = null
+  maskLabel = -1
+}
+
+function ensureRegionMap(): RegionMap | null {
+  if (regionMap) return regionMap
+  const bg = bgCanvas.value
+  if (!bg || !bg.width || !bg.height) return null
+  // Very large pictures are looked at in half size: the fields do not need every pixel.
+  const scale = Math.max(1, Math.ceil(Math.max(bg.width, bg.height) / 2200))
+  const c = document.createElement('canvas')
+  c.width = Math.ceil(bg.width / scale)
+  c.height = Math.ceil(bg.height / scale)
+  const ctx = c.getContext('2d', { willReadFrequently: true })!
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, c.width, c.height)
+  ctx.drawImage(bg, 0, 0, c.width, c.height)
+  const gap = Math.max(1, Math.round(gapFor(bg.width) / scale))
+  regionMap = buildRegionMap(ctx.getImageData(0, 0, c.width, c.height), scale, gap)
+  return regionMap
+}
+
+/** The field under a point as a mask, or `null` when the touch is in no field. */
+function maskAt(x: number, y: number): MaskInfo | null {
+  const map = ensureRegionMap()
+  const dc = drawCanvas.value
+  if (!map || !dc) return null
+  const label = labelAt(map, x / map.scale, y / map.scale)
+  if (label <= 0) return null
+  if (label === maskLabel && maskInfo && maskInfo.canvas.width === dc.width && maskInfo.canvas.height === dc.height) return maskInfo
+  const alpha = regionMaskAlpha(map, label, map.gap + 1)
+  const small = document.createElement('canvas')
+  small.width = map.w
+  small.height = map.h
+  const sctx = small.getContext('2d')!
+  const img = sctx.createImageData(map.w, map.h)
+  for (let i = 0; i < alpha.length; i++) img.data[i * 4 + 3] = alpha[i]!
+  sctx.putImageData(img, 0, 0)
+  const full = maskInfo?.canvas ?? document.createElement('canvas')
+  full.width = dc.width
+  full.height = dc.height
+  const fctx = full.getContext('2d')!
+  fctx.clearRect(0, 0, full.width, full.height)
+  fctx.drawImage(small, 0, 0, full.width, full.height)
+  maskInfo = { canvas: full, alpha, w: map.w, scale: map.scale }
+  maskLabel = label
+  return maskInfo
+}
+
+function allowOf(m: MaskInfo): (x: number, y: number) => number {
+  return (x, y) => (m.alpha[(((y / m.scale) | 0) * m.w) + ((x / m.scale) | 0)] ?? 0) / 255
+}
+
+/** Takes away what was painted outside the field, in the area of the last piece of the stroke. */
+function clipToMask(ctx: CanvasRenderingContext2D, mask: HTMLCanvasElement, x0: number, y0: number, x1: number, y1: number) {
+  const sx = Math.max(0, Math.floor(Math.min(x0, x1)))
+  const sy = Math.max(0, Math.floor(Math.min(y0, y1)))
+  const ex = Math.min(mask.width, Math.ceil(Math.max(x0, x1)))
+  const ey = Math.min(mask.height, Math.ceil(Math.max(y0, y1)))
+  if (ex <= sx || ey <= sy) return
+  ctx.save()
+  // `destination-in` works on the whole canvas, so without a clip rectangle everything outside the piece that is
+  // drawn here would be wiped (the whole stroke would vanish except its last piece).
+  ctx.beginPath()
+  ctx.rect(sx, sy, ex - sx, ey - sy)
+  ctx.clip()
+  ctx.globalCompositeOperation = 'destination-in'
+  ctx.globalAlpha = 1
+  ctx.drawImage(mask, sx, sy, ex - sx, ey - sy, sx, sy, ex - sx, ey - sy)
+  ctx.restore()
+}
+
+// The paint bucket itself is in `utils/coloringFill.ts`; this part hands it the pixels of the picture.
 function floodFill(sx: number, sy: number) {
   const dc = drawCanvas.value, bg = bgCanvas.value
   if (!dc || !bg || !drawCtx || !bgCtx) return
@@ -662,73 +1993,85 @@ function floodFill(sx: number, sy: number) {
   const merged = document.createElement('canvas')
   merged.width = cw
   merged.height = ch
-  const mCtx = merged.getContext('2d')!
-  mCtx.drawImage(bg, 0, 0)
-  mCtx.drawImage(dc, 0, 0)
-  const mData = mCtx.getImageData(0, 0, cw, ch).data
-  const drawImg = drawCtx.getImageData(0, 0, cw, ch)
-  const dData = drawImg.data
-  const ti = (sy * cw + sx) * 4
-  const tR = mData[ti]!, tG = mData[ti + 1]!, tB = mData[ti + 2]!
-  const fR = parseInt(color.value.slice(1, 3), 16)
-  const fG = parseInt(color.value.slice(3, 5), 16)
-  const fB = parseInt(color.value.slice(5, 7), 16)
-  const fA = Math.round(opacity.value * 255)
-  if (Math.abs(tR - fR) < 3 && Math.abs(tG - fG) < 3 && Math.abs(tB - fB) < 3) return
-  const tol = 35
-  const ok = (i: number) =>
-    Math.abs(mData[i]! - tR) <= tol && Math.abs(mData[i + 1]! - tG) <= tol && Math.abs(mData[i + 2]! - tB) <= tol
-  const vis = new Uint8Array(cw * ch)
-  const stk: [number, number][] = [[sx, sy]]
-  while (stk.length > 0) {
-    const top = stk.pop()!
-    let x = top[0], y = top[1]
-    if (y < 0 || y >= ch) continue
-    while (x > 0 && ok((y * cw + x - 1) * 4) && !vis[y * cw + x - 1]) x--
-    let sa = false, sb = false
-    while (x < cw) {
-      const mi = (y * cw + x) * 4, pi = y * cw + x
-      if (!ok(mi) || vis[pi]) break
-      vis[pi] = 1
-      dData[mi] = fR
-      dData[mi + 1] = fG
-      dData[mi + 2] = fB
-      dData[mi + 3] = fA
-      if (y > 0) {
-        const ai = (y - 1) * cw + x
-        if (ok(ai * 4) && !vis[ai]) {
-          if (!sa) {
-            stk.push([x, y - 1])
-            sa = true
-          }
-        } else sa = false
-      }
-      if (y < ch - 1) {
-        const bi = (y + 1) * cw + x
-        if (ok(bi * 4) && !vis[bi]) {
-          if (!sb) {
-            stk.push([x, y + 1])
-            sb = true
-          }
-        } else sb = false
-      }
-      x++
-    }
-  }
-  drawCtx.putImageData(drawImg, 0, 0)
+  const mCtx = merged.getContext('2d', { willReadFrequently: true })!
+  paintComposite(mCtx, cw, ch)
+  const paint = drawCtx.getImageData(0, 0, cw, ch)
+  const c = color.value
+  const did = floodFillPaint({
+    merged: mCtx.getImageData(0, 0, cw, ch).data,
+    paint: paint.data,
+    w: cw,
+    h: ch,
+    x: sx,
+    y: sy,
+    r: parseInt(c.slice(1, 3), 16),
+    g: parseInt(c.slice(3, 5), 16),
+    b: parseInt(c.slice(5, 7), 16),
+    a: Math.round(opacity.value * 255),
+    map: ensureRegionMap()
+  })
+  if (did) drawCtx.putImageData(paint, 0, 0)
+}
+
+// While a pen (Apple Pencil, S Pen) is in use, fingers and the resting palm are
+// ignored, otherwise a hand on the tablet paints along.
+let lastPenAt = 0
+const PEN_GRACE_MS = 1500
+const penInUse = () => Date.now() - lastPenAt < PEN_GRACE_MS
+
+/** Pen pressure 0.1–1; a mouse or finger paints at a steady, medium pressure. */
+function pressureOf(e: PointerEvent): number {
+  return e.pointerType === 'pen' && e.pressure !== 0.5 ? Math.max(0.1, e.pressure) : 0.7
+}
+
+/**
+ * A pen's button (the S Pen button, the other end of a pen) is pressed. Browsers report it as the barrel
+ * button (bit 2), the second button (bit 4) or the eraser end (bit 32) of `buttons`.
+ */
+const penButtonDown = (e: PointerEvent) =>
+  e.pointerType === 'pen' && ((e.buttons & (2 | 4 | 32)) !== 0 || (e.type === 'pointerdown' && (e.button === 2 || e.button === 5)))
+
+/**
+ * `?penlog=1` in the address shows what the pen reports (type, button, buttons), so a pen button that does nothing can be read off the screen.
+ */
+const penLog = ref('')
+const penLogOn = typeof location !== 'undefined' && /[?&]penlog=1/.test(location.href)
+function logPen(e: PointerEvent) {
+  if (penLogOn && e.pointerType !== 'touch') penLog.value = `${e.pointerType} ${e.type} button=${e.button} buttons=${e.buttons} p=${e.pressure.toFixed(2)}`
+}
+
+/** While the button is held the pen erases; letting go brings the chosen tool back. */
+function followPenButton(e: PointerEvent) {
+  logPen(e)
+  const want: ToolId | null = penButtonDown(e) ? 'eraser' : null
+  if (toolOverride.value !== want) toolOverride.value = want
 }
 
 function onPointerDown(e: PointerEvent) {
+  ignoreUntilUp = false
+  if (e.pointerType === 'pen') lastPenAt = Date.now()
   if (!hasImage.value) return
+  if (e.pointerType === 'pen') followPenButton(e)
   if (activeTouchId !== null) return
   if (e.pointerType === 'touch') return
+  // the middle mouse button, the space key or the hand tool move the sheet instead of painting
+  if (e.pointerType === 'mouse' && (panMode.value || spaceHeld.value || e.button === 1)) {
+    e.preventDefault()
+    startPan(e)
+    return
+  }
+  // this press only closed the tool bar: nothing is painted, and the rest of the touch paints nothing
+  if (swallowPress) {
+    swallowPress = false
+    ignoreUntilUp = true
+    return
+  }
   e.preventDefault()
   try {
     (e.currentTarget as Element).setPointerCapture?.(e.pointerId)
   } catch { /* ignore */
   }
-  const p = getPosFromClient(e.clientX, e.clientY, e.pointerType === 'pen' && e.pressure !== 0.5 ? Math.max(0.1, e.pressure) : 1)
-  beginStroke(p)
+  beginStroke(getPosFromClient(e.clientX, e.clientY, pressureOf(e), e.pointerType === 'pen'))
 }
 
 function onPointerMove(e: PointerEvent) {
@@ -738,28 +2081,66 @@ function onPointerMove(e: PointerEvent) {
     ring.style.top = `${e.clientY}px`
     ring.classList.add('show')
   }
-  if (!drawing) return
+  if (e.pointerType === 'pen') lastPenAt = Date.now()
+  // The button can be pressed in the air before the tip touches: the cursor already shows the eraser.
+  if (e.pointerType === 'pen') followPenButton(e)
+  // the ring follows the pen's pressure
+  const hover = e.pointerType === 'pen' ? (e.pressure > 0 ? Math.max(0.1, e.pressure) : 0.1) : 0.7
+  if (hover !== ringPressure || drawing) {
+    ringPressure = hover
+    updateCursorRing()
+  }
+  if (panning && e.pointerId === panning.id) {
+    movePan(e)
+    return
+  }
+  if (!drawing || ignoreUntilUp) return
   if (activeTouchId !== null) return
   if (e.pointerType === 'touch') return
   e.preventDefault()
-  const p = getPosFromClient(e.clientX, e.clientY, e.pointerType === 'pen' && e.pressure !== 0.5 ? Math.max(0.1, e.pressure) : 1)
-  continueStroke(p)
+  // Button pressed or let go in the middle of a line: that line ends and a new one starts with the other tool.
+  if (e.pointerType === 'pen' && activeTool.value !== strokeTool) {
+    finishStroke()
+    beginStroke(getPosFromClient(e.clientX, e.clientY, pressureOf(e), true))
+    return
+  }
+  // A pen reports many more points than there are frames; using all of them
+  // keeps fast curves smooth and the pressure along the line exact.
+  const pen = e.pointerType === 'pen'
+  const points = pen && e.getCoalescedEvents ? e.getCoalescedEvents() : []
+  if (points.length) {
+    const minStep = Math.max(1.5, brushPx() * 0.1)
+    for (const c of points) {
+      const p = getPosFromClient(c.clientX, c.clientY, pressureOf(c), true)
+      if (Math.hypot(p.x - lastX, p.y - lastY) < minStep) continue
+      continueStroke(p)
+    }
+  } else {
+    continueStroke(getPosFromClient(e.clientX, e.clientY, pressureOf(e), pen))
+  }
+  flushStroke()
 }
 
 function onPointerEnd(e: PointerEvent) {
-  if (!drawing) return
-  drawing = false
-  drawCtx!.globalCompositeOperation = 'source-over'
-  drawCtx!.globalAlpha = 1
+  if (panning && e.pointerId === panning.id) panning = null
   try {
     (e.currentTarget as Element).releasePointerCapture?.(e.pointerId)
   } catch { /* ignore */
   }
-  saveHistory()
+  finishStroke()
+  ignoreUntilUp = false
+  // the pen button only counts while it is held down
+  if (e.pointerType === 'pen' && toolOverride.value && !penButtonDown(e)) toolOverride.value = null
+}
+
+/** The page lost the pen (for example the screen changed size): that stroke ends, the rest of the touch paints nothing. */
+function onPointerLost() {
+  abortStroke()
 }
 
 function onPointerLeaveCanvas() {
   cursorRing.value?.classList.remove('show')
+  if (!drawing) toolOverride.value = null
 }
 
 const gesture = {
@@ -780,15 +2161,22 @@ function tMid(t1: Touch, t2: Touch) {
   return { x: (t1.clientX + t2.clientX) / 2, y: (t1.clientY + t2.clientY) / 2 }
 }
 
+const touchPressure = (t: Touch) => (t.force && t.force > 0 ? Math.max(0.1, Math.min(1, t.force)) : 0.7)
+
 function onTouchStart(e: TouchEvent) {
+  ignoreUntilUp = false
   if (!hasImage.value) return
   e.preventDefault()
+  // this press only closed the tool bar: nothing is painted
+  if (swallowPress) {
+    swallowPress = false
+    return
+  }
+  if (penInUse()) return
   if (e.touches.length >= 2) {
     if (drawing) {
-      drawing = false
+      finishStroke()
       activeTouchId = null
-      drawCtx!.globalCompositeOperation = 'source-over'
-      drawCtx!.globalAlpha = 1
     }
     gesture.mode = 'pinch'
     const t1 = e.touches[0]!, t2 = e.touches[1]!
@@ -802,15 +2190,17 @@ function onTouchStart(e: TouchEvent) {
     return
   }
   if (activeTouchId !== null) return
+  // one finger paints only on the paper; beside it, it does nothing (a second finger can still start the zoom)
+  if (!(e.target instanceof Element && e.target.closest('.ac-canvas-wrap'))) return
   gesture.mode = 'draw'
   const t = e.changedTouches[0]
   if (!t) return
   activeTouchId = t.identifier
-  const p = getPosFromClient(t.clientX, t.clientY, t.force && t.force > 0 ? t.force : 1)
-  beginStroke(p)
+  beginStroke(getPosFromClient(t.clientX, t.clientY, touchPressure(t), false))
 }
 
 function onTouchMove(e: TouchEvent) {
+  if (!hasImage.value) return
   e.preventDefault()
   if (gesture.mode === 'pinch' && e.touches.length >= 2) {
     const t1 = e.touches[0]!, t2 = e.touches[1]!
@@ -823,9 +2213,10 @@ function onTouchMove(e: TouchEvent) {
     zoom.panY = gesture.startPanY + (mid.y - gesture.startMidY)
     clampPan()
     applyTransform()
+    updateCursorRing()
     return
   }
-  if (gesture.mode !== 'draw' || activeTouchId === null || !drawing) return
+  if (gesture.mode !== 'draw' || activeTouchId === null || !drawing || ignoreUntilUp) return
   let t: Touch | null = null
   for (let i = 0; i < e.changedTouches.length; i++) {
     if (e.changedTouches[i]!.identifier === activeTouchId) {
@@ -839,11 +2230,13 @@ function onTouchMove(e: TouchEvent) {
     ring.style.left = `${t.clientX}px`
     ring.style.top = `${t.clientY}px`
   }
-  const p = getPosFromClient(t.clientX, t.clientY, t.force && t.force > 0 ? t.force : 1)
-  continueStroke(p)
+  continueStroke(getPosFromClient(t.clientX, t.clientY, touchPressure(t), false))
+  flushStroke()
 }
 
 function onTouchEnd(e: TouchEvent) {
+  if (!hasImage.value) return
+  e.preventDefault()
   if (gesture.mode === 'pinch') {
     if (e.touches.length < 2) gesture.mode = null
     return
@@ -859,127 +2252,360 @@ function onTouchEnd(e: TouchEvent) {
   if (!ended) return
   activeTouchId = null
   gesture.mode = null
-  if (!drawing) return
-  drawing = false
-  drawCtx!.globalCompositeOperation = 'source-over'
-  drawCtx!.globalAlpha = 1
-  saveHistory()
+  finishStroke()
+}
+
+// One stroke. The tools that are see-through or dusty (pencil, graphite, felt, watercolour, chalk) first paint the plain
+// shape of the stroke into the stroke layer (`previewCanvas`). After every piece of the stroke that layer is laid onto a
+// copy of the picture as it was before the stroke (`baseCanvas`), with the tool's own look. So the paint is shown exactly
+// as it will stay, and nothing changes when the pen is lifted. Oil paint and the eraser work straight on the picture.
+let activeLayered: LayeredTool | null = null
+let strokeState = newStrokeState()
+let oilState = newOilState('#000000')
+let strokeBounds = emptyBounds()
+/** What was painted since the picture was last updated. */
+let dirty = emptyBounds()
+/** The tool the stroke on the canvas was started with; a pen button pressed in the middle starts a new stroke. */
+let strokeTool: ToolId = 'pencil'
+/** The picture before the stroke, and (for watercolour and felt) the finished look of the stroke layer. */
+let baseCanvas: HTMLCanvasElement | null = null
+let shapedCanvas: HTMLCanvasElement | null = null
+let shapeOpts: ShapeOptions | null = null
+/** Pen pressure, smoothed along the stroke so the line gets thicker and thinner softly. */
+let pressureNow = 0.7
+
+function smoothPressure(p: number, first: boolean): number {
+  pressureNow = first ? p : pressureNow + (p - pressureNow) * 0.4
+  return pressureNow
+}
+
+/** Copies the picture as it is now into `baseCanvas`: the "before" of the action that starts. */
+function takeBase() {
+  const dc = drawCanvas.value
+  if (!dc) return
+  baseCanvas = sizedCanvas(baseCanvas, dc.width, dc.height)
+  const bctx = baseCanvas.getContext('2d', { willReadFrequently: true })!
+  bctx.clearRect(0, 0, baseCanvas.width, baseCanvas.height)
+  bctx.drawImage(dc, 0, 0)
+}
+
+function sizedCanvas(c: HTMLCanvasElement | null, w: number, h: number): HTMLCanvasElement {
+  const el = c ?? document.createElement('canvas')
+  if (el.width !== w) el.width = w
+  if (el.height !== h) el.height = h
+  return el
 }
 
 function beginStroke(p: PaintPos) {
-  if (tool.value === 'fill') {
-    floodFill(Math.round(p.x), Math.round(p.y))
-    saveHistory()
+  if (activeTool.value === 'pipette') {
+    const picked = sampleColor(p.x, p.y)
+    if (picked) pickCustom(picked)
+    selectPaint()
     return
   }
+  if (activeTool.value === 'fill') {
+    takeBase()
+    floodFill(Math.round(p.x), Math.round(p.y))
+    commitHistory()
+    return
+  }
+  // Painting starts: the small menu and the colour picker go away.
+  menuOpen.value = false
+  pickerOpen.value = false
   drawing = true
+  isPainting.value = true
   lastX = p.x
   lastY = p.y
-  if (tool.value === 'pencil') {
-    drawCtx!.globalCompositeOperation = 'source-over'
-    drawCtx!.globalAlpha = Math.min(0.85, opacity.value * 0.88) * p.pressure
-    drawCtx!.fillStyle = color.value
-    drawCtx!.beginPath()
-    drawCtx!.arc(p.x, p.y, brushSize.value * 0.38 * p.pressure, 0, Math.PI * 2)
-    drawCtx!.fill()
-    drawCtx!.globalAlpha = 1
-  } else {
-    drawCtx!.save()
-    applyStyle(p)
-    const r = (drawCtx!.lineWidth || brushSize.value * p.pressure) / 2
-    drawCtx!.beginPath()
-    drawCtx!.arc(p.x, p.y, r, 0, Math.PI * 2)
-    drawCtx!.fill()
-    drawCtx!.restore()
+  const t = activeTool.value
+  strokeTool = t
+  celebrate(awards.toolUsed(t))
+  const pressure = smoothPressure(p.pressure, true)
+  const size = brushPx() * widthFactor(pressure)
+  // "Stay inside the lines": the field where the stroke starts is the only place it paints.
+  strokeMask = stayInside.value && t !== 'eraser' ? maskAt(p.x, p.y) : null
+  oilAllow = strokeMask ? allowOf(strokeMask) : undefined
+  const dc = drawCanvas.value
+  strokeBounds = emptyBounds()
+  // the picture as it is now: the stroke of a layered tool is laid on it again and again while it grows, and it is the
+  // "before" of every stroke for undo
+  takeBase()
+  if (isLayeredTool(t) && previewCtx && previewCanvas.value && dc) {
+    activeLayered = t
+    strokeState = newStrokeState()
+    dirty = emptyBounds()
+    previewCtx.clearRect(0, 0, previewCanvas.value.width, previewCanvas.value.height)
+    shapeOpts = shapeOptionsOf(t, brushPx())
+    if (shapeOpts) shapedCanvas = sizedCanvas(shapedCanvas, dc.width, dc.height)
+    paintPiece(p.x, p.y, p.x, p.y, pressure)
+    flushStroke()
+  } else if (t === 'oil') {
+    oilState = newOilState(color.value)
+    growBounds(strokeBounds, p.x, p.y, oilReach())
+    drawOilSegment(drawCtx!, p.x, p.y, p.x + 0.01, p.y, size, oilState, opacity.value, tipOfTool('oil'), oilAllow)
+  } else if (t === 'eraser') {
+    eraserTap = eraserField.value ? { x: p.x, y: p.y, moved: false } : null
+    growBounds(strokeBounds, p.x, p.y, eraserReach())
+    eraseSegment(drawCtx!, p.x, p.y, p.x + 0.01, p.y, brushPx() * 1.5)
   }
-  if (tool.value === 'graphite') graphiteTexture(p.x, p.y, p)
-  if (tool.value === 'watercolor') watercolorBlob(p.x, p.y, p)
+}
+
+/** Where the eraser went down, while it has not moved yet: a stroke that stays a tap wipes the whole field. */
+let eraserTap: { x: number; y: number; moved: boolean } | null = null
+
+/** The part of a field's mask that is not empty, in picture pixels (a little larger than the field). */
+function maskBounds(m: MaskInfo): Bounds {
+  const w = m.w
+  const h = Math.floor(m.alpha.length / w)
+  let x0 = w
+  let y0 = h
+  let x1 = -1
+  let y1 = -1
+  for (let y = 0; y < h; y++) {
+    const row = y * w
+    for (let x = 0; x < w; x++) {
+      if (!m.alpha[row + x]) continue
+      if (x < x0) x0 = x
+      if (x > x1) x1 = x
+      if (y < y0) y0 = y
+      if (y > y1) y1 = y
+    }
+  }
+  if (x1 < 0) return emptyBounds()
+  return { x0: x0 * m.scale - 2, y0: y0 * m.scale - 2, x1: (x1 + 1) * m.scale + 2, y1: (y1 + 1) * m.scale + 2 }
+}
+
+/**
+ * The eraser was only tapped inside a field of the line art: the little dot it made is taken back and all the paint of the
+ * field goes (the paint that reaches under the outline too). A tap in no field, or one that moved, stays an ordinary dot.
+ */
+function eraseTappedField() {
+  const tap = eraserTap
+  eraserTap = null
+  const dc = drawCanvas.value
+  if (!tap || tap.moved || !dc || !drawCtx || !baseCanvas) return
+  const mask = maskAt(tap.x, tap.y)
+  if (!mask) return
+  drawCtx.save()
+  drawCtx.globalCompositeOperation = 'source-over'
+  drawCtx.globalAlpha = 1
+  drawCtx.clearRect(0, 0, dc.width, dc.height)
+  drawCtx.drawImage(baseCanvas, 0, 0)
+  drawCtx.globalCompositeOperation = 'destination-out'
+  drawCtx.drawImage(mask.canvas, 0, 0)
+  drawCtx.restore()
+  strokeBounds = maskBounds(mask)
+}
+
+/** How far from its path the oil brush and the eraser can change the picture (for the area undo has to keep). */
+const oilReach = () => brushPx() * widthFactor(1) * 0.7 + 6
+const eraserReach = () => brushPx() * 0.75 + 10
+
+/** One piece of a stroke of a layered tool, into the stroke layer; the picture is updated by `flushStroke`. */
+function paintPiece(ax: number, ay: number, bx: number, by: number, pressure: number) {
+  const t = activeLayered
+  if (!t || !previewCtx) return
+  const size = brushPx()
+  paintLayerSegment(t, previewCtx, ax, ay, bx, by, { size, color: color.value, pressure, tip: tipOfTool(t) }, strokeState)
+  const reach = strokeReach(t, size)
+  growBounds(strokeBounds, bx, by, reach)
+  growBounds(dirty, ax, ay, reach)
+  growBounds(dirty, bx, by, reach)
+}
+
+let footCanvas: HTMLCanvasElement | null = null
+// (no shifted copies: a footprint wider than the stroke leaves a pale rim of cleared paint along its edges)
+
+/** The area a stroke covers in a region, as a (nearly) solid shape: the layer's grain and thin places are filled in. */
+function footprintOf(layer: HTMLCanvasElement, x0: number, y0: number, w: number, h: number): HTMLCanvasElement | null {
+  if (!footCanvas) footCanvas = document.createElement('canvas')
+  if (footCanvas.width < w || footCanvas.height < h) {
+    footCanvas.width = Math.max(footCanvas.width, w)
+    footCanvas.height = Math.max(footCanvas.height, h)
+  }
+  const f = footCanvas.getContext('2d')
+  if (!f) return null
+  f.globalCompositeOperation = 'source-over'
+  f.globalAlpha = 1
+  f.clearRect(0, 0, w, h)
+  f.drawImage(layer, x0, y0, w, h, 0, 0, w, h)
+  // laid over itself a few times the faint places of the grain fill up (but not further than the stroke itself reaches)
+  for (let i = 0; i < 3; i++) f.drawImage(footCanvas, 0, 0, w, h, 0, 0, w, h)
+  return footCanvas
+}
+
+/** Shows what was painted since the last time: the stroke layer, finished, laid on the picture as it was before the stroke. */
+function flushStroke() {
+  const t = activeLayered
+  const dc = drawCanvas.value
+  const pc = previewCanvas.value
+  if (!t || !dc || !pc || !drawCtx || !previewCtx || !baseCanvas || dirty.x1 <= dirty.x0) return
+  // the rim of watercolour looks at the neighbours, so the area to update is a little larger than what changed
+  const pad = (shapeOpts?.rim ?? 0) + 2
+  const x0 = Math.max(0, Math.floor(dirty.x0 - pad))
+  const y0 = Math.max(0, Math.floor(dirty.y0 - pad))
+  const x1 = Math.min(dc.width, Math.ceil(dirty.x1 + pad))
+  const y1 = Math.min(dc.height, Math.ceil(dirty.y1 + pad))
+  dirty = emptyBounds()
+  const w = x1 - x0
+  const h = y1 - y0
+  if (w < 1 || h < 1) return
+  // the field's edge cuts what was painted since the last update (once for all the points a pen sent in this frame)
+  if (strokeMask) clipToMask(previewCtx, strokeMask.canvas, x0, y0, x1, y1)
+  let layer: HTMLCanvasElement = pc
+  if (shapeOpts && shapedCanvas) {
+    shapeRegion(previewCtx, shapedCanvas.getContext('2d')!, x0, y0, w, h, dc.width, dc.height, shapeOpts)
+    layer = shapedCanvas
+  }
+  drawCtx.save()
+  drawCtx.beginPath()
+  drawCtx.rect(x0, y0, w, h)
+  drawCtx.clip()
+  drawCtx.globalCompositeOperation = 'source-over'
+  drawCtx.globalAlpha = 1
+  drawCtx.clearRect(x0, y0, w, h)
+  drawCtx.drawImage(baseCanvas, x0, y0, w, h, x0, y0, w, h)
+  // without overlapping the stroke takes away the paint under it first, so the same place looks the same the second time
+  // The whole footprint of the stroke is cleared, not only the paint of the stroke: a grainy pencil leaves gaps, and the old paint would
+  // show through them as a darker place. So the same place looks like the first stroke, however often it is gone over.
+  if (!overlap.value) {
+    const foot = footprintOf(layer, x0, y0, w, h)
+    if (foot) {
+      drawCtx.globalCompositeOperation = 'destination-out'
+      drawCtx.drawImage(foot, 0, 0, w, h, x0, y0, w, h)
+    }
+  }
+  for (const pass of BRUSH_LOOK[t].passes) {
+    drawCtx.globalCompositeOperation = pass.blend
+    drawCtx.globalAlpha = Math.min(1, pass.alpha * opacity.value)
+    drawCtx.drawImage(layer, x0, y0, w, h, x0, y0, w, h)
+  }
+  drawCtx.restore()
 }
 
 function continueStroke(p: PaintPos) {
-  if (tool.value === 'pencil') {
-    crayonStroke(lastX, lastY, p.x, p.y, p.pressure)
-  } else {
-    drawCtx!.save()
-    applyStyle(p)
-    drawCtx!.beginPath()
-    drawCtx!.moveTo(lastX, lastY)
-    drawCtx!.lineTo(p.x, p.y)
-    drawCtx!.stroke()
-    drawCtx!.restore()
-    if (tool.value === 'graphite') {
-      const dist = Math.hypot(p.x - lastX, p.y - lastY)
-      const steps = Math.max(1, Math.floor(dist / 4))
-      for (let i = 0; i < steps; i++) {
-        const t = i / steps
-        graphiteTexture(lastX + (p.x - lastX) * t, lastY + (p.y - lastY) * t, {
-          x: 0,
-          y: 0,
-          pressure: p.pressure * 0.35
-        })
-      }
-    }
-    if (tool.value === 'watercolor') watercolorBlob(p.x, p.y, p)
+  const t = strokeTool
+  const pressure = smoothPressure(p.pressure, false)
+  if (activeLayered && previewCtx) {
+    paintPiece(lastX, lastY, p.x, p.y, pressure)
+  } else if (t === 'oil') {
+    growBounds(strokeBounds, p.x, p.y, oilReach())
+    drawOilSegment(drawCtx!, lastX, lastY, p.x, p.y, brushPx() * widthFactor(pressure), oilState, opacity.value, tipOfTool('oil'), oilAllow)
+  } else if (t === 'eraser') {
+    // more than a tap: the eraser is wiping along a line
+    if (eraserTap && !eraserTap.moved && Math.hypot(p.x - eraserTap.x, p.y - eraserTap.y) * screenPerCanvas() > 7) eraserTap.moved = true
+    growBounds(strokeBounds, p.x, p.y, eraserReach())
+    eraseSegment(drawCtx!, lastX, lastY, p.x, p.y, brushPx() * 1.5)
   }
   lastX = p.x
   lastY = p.y
+}
+
+function finishStroke() {
+  if (!drawing) return
+  flushStroke()
+  drawing = false
+  isPainting.value = false
+  const dc = drawCanvas.value
+  if (activeLayered && previewCtx && dc) {
+    const x0 = Math.max(0, Math.floor(strokeBounds.x0))
+    const y0 = Math.max(0, Math.floor(strokeBounds.y0))
+    const x1 = Math.min(dc.width, Math.ceil(strokeBounds.x1))
+    const y1 = Math.min(dc.height, Math.ceil(strokeBounds.y1))
+    if (x1 > x0 && y1 > y0) previewCtx.clearRect(x0, y0, x1 - x0, y1 - y0)
+    activeLayered = null
+  }
+  strokeMask = null
+  oilAllow = undefined
+  drawCtx!.globalCompositeOperation = 'source-over'
+  drawCtx!.globalAlpha = 1
+  if (strokeTool === 'eraser') eraseTappedField()
+  commitHistory(strokeBounds)
+}
+
+/** Something took the pen's line away (the screen changed size, the page lost focus): the stroke ends here, and the rest of that touch paints nothing. */
+let ignoreUntilUp = false
+
+function abortStroke() {
+  if (drawing) {
+    if (eraserTap) eraserTap.moved = true
+    finishStroke()
+    ignoreUntilUp = true
+  }
+  activeTouchId = null
+  gesture.mode = null
 }
 
 // ── History ----------------------------------------------------------------
 
-function saveHistory() {
+/**
+ * Records the change of the action that just ended: the area `b` (the whole picture without it) as it was in `baseCanvas`
+ * before, and as it is now. This is also the single place that flags the picture as changed and saves it.
+ */
+function commitHistory(b?: { x0: number; y0: number; x1: number; y1: number }) {
   const dc = drawCanvas.value
-  if (!dc || !drawCtx) return
-  historyStack = historyStack.slice(0, historyIdx + 1)
-  historyStack.push(drawCtx.getImageData(0, 0, dc.width, dc.height))
-  if (historyStack.length > MAX_HIST) historyStack.shift()
-  historyIdx = historyStack.length - 1
+  const base = baseCanvas
+  if (!dc || !drawCtx || !base) return
+  const x0 = b ? Math.max(0, Math.floor(b.x0)) : 0
+  const y0 = b ? Math.max(0, Math.floor(b.y0)) : 0
+  const x1 = b ? Math.min(dc.width, Math.ceil(b.x1)) : dc.width
+  const y1 = b ? Math.min(dc.height, Math.ceil(b.y1)) : dc.height
+  if (x1 > x0 && y1 > y0) {
+    const before = base.getContext('2d', { willReadFrequently: true })!.getImageData(x0, y0, x1 - x0, y1 - y0)
+    history.record(drawCtx, x0, y0, x1 - x0, y1 - y0, before)
+    recordStep(timelapse, dc, x0, y0, x1, y1)
+  }
+  scheduleTimelapseSave()
   refreshHistButtons()
-  // The user just committed something — undo/redo/clear all go through here,
-  // so this is the single place we flip the unsaved-changes flag.
   hasUserAction.value = true
+  scheduleAutosave()
 }
 
 function resetHistory() {
-  const dc = drawCanvas.value
-  if (!dc || !drawCtx) return
-  historyStack = [drawCtx.getImageData(0, 0, dc.width, dc.height)]
-  historyIdx = 0
+  history.clear()
   refreshHistButtons()
-  // Loading a fresh image is a clean slate — drop the dirty flag.
+  // Loading a fresh image (or restoring a saved one) is a clean slate.
   hasUserAction.value = false
 }
 
 function refreshHistButtons() {
-  canUndo.value = historyIdx > 0
-  canRedo.value = historyIdx < historyStack.length - 1
+  canUndo.value = history.canUndo
+  canRedo.value = history.canRedo
 }
 
 function undo() {
-  if (historyIdx <= 0) return
-  historyIdx--
-  const dc = drawCanvas.value!
-  drawCtx!.clearRect(0, 0, dc.width, dc.height)
-  drawCtx!.putImageData(historyStack[historyIdx]!, 0, 0)
+  if (!drawCtx || !history.undo(drawCtx)) return
+  timelapse.undo()
+  scheduleTimelapseSave()
   refreshHistButtons()
+  hasUserAction.value = true
+  scheduleAutosave()
 }
 
 function redo() {
-  if (historyIdx >= historyStack.length - 1) return
-  historyIdx++
-  const dc = drawCanvas.value!
-  drawCtx!.clearRect(0, 0, dc.width, dc.height)
-  drawCtx!.putImageData(historyStack[historyIdx]!, 0, 0)
+  if (!drawCtx || !history.redo(drawCtx)) return
+  timelapse.redo()
+  scheduleTimelapseSave()
   refreshHistButtons()
+  hasUserAction.value = true
+  scheduleAutosave()
 }
+
+/** Clearing all colours asks first, in the language of the app. */
+const clearAsk = ref(false)
 
 function clearAll() {
   if (!hasImage.value) return
-  if (!confirm('Alle Farben löschen?')) return
+  clearAsk.value = true
+}
+
+function confirmClear() {
+  clearAsk.value = false
+  if (!hasImage.value) return
   const dc = drawCanvas.value!
+  takeBase()
   drawCtx!.clearRect(0, 0, dc.width, dc.height)
   delete pageDrawings[currentPage.value]
-  saveHistory()
+  commitHistory()
 }
 
 function buildExportFilename(): string {
@@ -992,9 +2618,7 @@ function flattenCanvas(): HTMLCanvasElement | null {
   const out = document.createElement('canvas')
   out.width = bg.width
   out.height = bg.height
-  const oCtx = out.getContext('2d')!
-  oCtx.drawImage(bg, 0, 0)
-  oCtx.drawImage(dc, 0, 0)
+  paintComposite(out.getContext('2d')!, bg.width, bg.height)
   return out
 }
 
@@ -1021,6 +2645,7 @@ let saveNoticeTimer: ReturnType<typeof setTimeout> | undefined
 function showSaveNotice(kind: 'saved' | 'denied') {
   saveNotice.value = kind
   clearTimeout(saveNoticeTimer)
+  clearTimeout(autosaveTimer)
   saveNoticeTimer = setTimeout(() => { saveNotice.value = null }, kind === 'saved' ? 2500 : 5000)
 }
 
@@ -1050,6 +2675,8 @@ const canShareCanvas = ref(
 )
 
 async function shareCanvas() {
+  // Sharing leaves the app, so it sits behind the parental gate.
+  if (!(await requireParent())) return
   const out = flattenCanvas()
   if (!out) return
   const blob: Blob | null = await new Promise((resolve) =>
@@ -1077,179 +2704,134 @@ async function shareCanvas() {
   }
 }
 
-// ── Minibar ----------------------------------------------------------------
-
-function showMinibar() {
-  if (minibarVisible.value) return
-  // Default position sits just above the sticky fullscreen toggle in
-  // the bottom-right corner so the two don't visually fight on first
-  // open. The toolbox stays freely draggable afterwards.
-  minibarPos.value = {
-    left: window.innerWidth - 68,
-    top: window.innerHeight - 68 - 64
-  }
-  minibarVisible.value = true
-}
-
-const mb = {
-  active: false,
-  dragging: false,
-  pointerId: -2,
-  startX: 0,
-  startY: 0,
-  offsetX: 0,
-  offsetY: 0,
-  moved: false,
-  timer: null as ReturnType<typeof setTimeout> | null
-}
-const DRAG_THRESHOLD = 5
-const LONG_PRESS_MS = 260
-
-function clampMinibar(left: number, top: number) {
-  const el = minibarRoot.value
-  if (!el) return
-  const r = el.getBoundingClientRect()
-  const pad = 6
-  const x = Math.max(pad, Math.min(left, window.innerWidth - r.width - pad))
-  const y = Math.max(pad, Math.min(top, window.innerHeight - r.height - pad))
-  minibarPos.value = { left: x, top: y }
-}
-
-function mbStart(clientX: number, clientY: number, pointerId: number) {
-  const el = minibarRoot.value
-  if (!el) return
-  mb.active = true
-  mb.moved = false
-  mb.dragging = false
-  mb.pointerId = pointerId
-  const r = el.getBoundingClientRect()
-  mb.offsetX = clientX - r.left
-  mb.offsetY = clientY - r.top
-  mb.startX = clientX
-  mb.startY = clientY
-  if (!minibarCollapsed.value) {
-    mb.dragging = true
-    minibarDragging.value = true
-  } else {
-    mb.timer = setTimeout(() => {
-      if (!mb.active) return
-      mb.dragging = true
-      minibarDragging.value = true
-    }, LONG_PRESS_MS)
-  }
-}
-
-function mbMove(clientX: number, clientY: number) {
-  if (!mb.active) return
-  const dx = clientX - mb.startX, dy = clientY - mb.startY
-  if (!mb.moved && (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD)) {
-    mb.moved = true
-    if (minibarCollapsed.value && mb.timer) {
-      clearTimeout(mb.timer)
-      mb.timer = null
-      mb.dragging = true
-      minibarDragging.value = true
-    }
-  }
-  if (!mb.dragging) return
-  clampMinibar(clientX - mb.offsetX, clientY - mb.offsetY)
-}
-
-function mbEnd() {
-  if (!mb.active) return
-  if (mb.timer) {
-    clearTimeout(mb.timer)
-    mb.timer = null
-  }
-  const wasDrag = mb.dragging
-  mb.active = false
-  mb.dragging = false
-  mb.pointerId = -2
-  minibarDragging.value = false
-  if (minibarCollapsed.value && !wasDrag && !mb.moved) {
-    expandMinibar()
-  }
-}
-
-function expandMinibar() {
-  minibarCollapsed.value = false
-  void nextTick(() => {
-    const el = minibarRoot.value
-    if (!el) return
-    const r = el.getBoundingClientRect()
-    clampMinibar(r.left, r.top)
-  })
-}
-
-function collapseMinibar() {
-  minibarCollapsed.value = true
-  void nextTick(() => {
-    const el = minibarRoot.value
-    if (!el) return
-    const r = el.getBoundingClientRect()
-    clampMinibar(r.left, r.top)
-  })
-}
-
-function onMinibarHandleDown(e: PointerEvent) {
-  e.stopPropagation()
-  mbStart(e.clientX, e.clientY, e.pointerId)
-}
-
-function onMinibarHandleTouchStart(e: TouchEvent) {
-  e.stopPropagation()
-  const t = e.touches[0]
-  if (t) mbStart(t.clientX, t.clientY, -1)
-}
-
-function onDocPointerMove(e: PointerEvent) {
-  if (!mb.active) return
-  if (mb.pointerId !== -1 && mb.pointerId !== e.pointerId) return
-  if (mb.dragging) e.preventDefault()
-  mbMove(e.clientX, e.clientY)
-}
-
-function onDocTouchMove(e: TouchEvent) {
-  if (!mb.active || mb.pointerId !== -1) return
-  const t = e.touches[0]
-  if (!t) return
-  if (mb.dragging) e.preventDefault()
-  mbMove(t.clientX, t.clientY)
-}
-
-function onDocPointerUp(e: PointerEvent) {
-  if (!mb.active) return
-  if (mb.pointerId !== -1 && mb.pointerId !== e.pointerId) return
-  mbEnd()
-}
-
-function onDocTouchEnd() {
-  if (!mb.active || mb.pointerId !== -1) return
-  mbEnd()
-}
-
-function onOutsidePointerDown(e: PointerEvent) {
-  if (minibarCollapsed.value) return
-  if (!minibarVisible.value) return
-  const el = minibarRoot.value
-  if (!el) return
-  if (el.contains(e.target as Node)) return
-  collapseMinibar()
-}
-
 function enterFullscreen() {
   isFullscreen.value = true
+  menuOpen.value = false
+  // On the web this really goes fullscreen; the native apps already are.
+  void document.documentElement.requestFullscreen?.().catch(() => undefined)
   void nextTick(fitCanvas)
 }
 
 function exitFullscreen() {
   isFullscreen.value = false
+  if (document.fullscreenElement) void document.exitFullscreen?.().catch(() => undefined)
   void nextTick(fitCanvas)
 }
 
-function toggleFullscreen() {
-  if (isFullscreen.value) exitFullscreen()
-  else enterFullscreen()
+/**
+ * The browser leaves full screen by itself (Esc on a computer, a swipe from the screen edge on a tablet). A stroke that
+ * is on ends there, because the screen changes size under the pen. On a computer the controls come back; a touch
+ * screen keeps the picture's full-screen layout, and only the button leaves it.
+ */
+function onFullscreenChange() {
+  abortStroke()
+  if (!document.fullscreenElement && isFullscreen.value && navigator.maxTouchPoints === 0) isFullscreen.value = false
+  // the browser animates the change of size: the paper is fitted again when it has settled
+  window.scrollTo(0, 0)
+  void nextTick(fitCanvas)
+  window.setTimeout(fitCanvas, 300)
+  window.setTimeout(fitCanvas, 800)
+}
+
+/** The press that closed the tool bar on the paper is only for closing: it paints nothing (no dot, no fill). */
+let swallowPress = false
+let swallowTimer: ReturnType<typeof setTimeout> | undefined
+
+/** A press anywhere outside the tool bar, the colour box and the colour picker folds the bar and the picker away. */
+function onAnyPointerDown(e: PointerEvent) {
+  swallowPress = false
+  const el = e.target instanceof Element ? e.target : null
+  if (el?.closest('.tb, .sh, .cp, .ac-menu, .ac-confirm-overlay')) return
+  let closed = false
+  if (toolbarOpen.value) {
+    toolbarOpen.value = false
+    closed = true
+  }
+  if (pickerOpen.value) {
+    pickerOpen.value = false
+    closed = true
+  }
+  // a press that closes the bar after something was chosen paints right away; otherwise it only closes
+  swallowPress = closed && !armed && !!el?.closest('.ac-main')
+  if (closed) armed = false
+  clearTimeout(swallowTimer)
+  // safety: a press that nobody took must not hold back the next one
+  if (swallowPress) swallowTimer = setTimeout(() => (swallowPress = false), 700)
+}
+
+/**
+ * Eraser on / off with one gesture: the double tap of the Apple Pencil (sent by the native app, see
+ * `src-tauri/plugins/tauri-plugin-pencil`) or the E key. The tool before the eraser comes back the second time.
+ */
+let toolBeforeEraser: ToolId = 'pencil'
+
+function toggleEraser() {
+  if (!hasImage.value) return
+  // chosen with the bar open: the next press on the paper already works, it does not only close the bar
+  arm()
+  if (tool.value === 'eraser') {
+    tool.value = toolBeforeEraser === 'eraser' ? kitDef.value.tool : toolBeforeEraser
+  } else {
+    toolBeforeEraser = tool.value
+    tool.value = 'eraser'
+  }
+}
+
+/**
+ * The eraser button of the top bar is a switch: one tap and the next press erases, a second tap (or choosing a pen) puts it away.
+ * Nothing opens, so the first press on the paper already erases. Its size lies in the menu (the three dots).
+ */
+function onQuickEraser() {
+  menuOpen.value = false
+  toggleEraser()
+}
+
+const setEraserSize = (n: number) => {
+  arm()
+  eraserSize.value = n
+}
+
+function onEraserRange(e: Event) {
+  if (e.target instanceof HTMLInputElement) setEraserSize(Number(e.target.value))
+}
+
+const PENCIL_TAP_EVENT = 'lambking-pencil-tap'
+
+function onKeyup(e: KeyboardEvent) {
+  if (e.key === ' ') spaceHeld.value = false
+}
+
+function onKeydown(e: KeyboardEvent) {
+  const typing = e.target instanceof HTMLElement && /^(input|textarea|select)$/i.test(e.target.tagName)
+  if (hasImage.value && !typing && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    if (e.key === ' ') {
+      spaceHeld.value = true
+      e.preventDefault()
+      return
+    }
+    if (e.key === '+' || e.key === '=') {
+      zoomStep(1.25)
+      return
+    }
+    if (e.key === '-') {
+      zoomStep(0.8)
+      return
+    }
+    if (e.key === '0') {
+      resetZoom()
+      return
+    }
+  }
+  if ((e.key === 'e' || e.key === 'E') && !e.metaKey && !e.ctrlKey && !e.altKey) {
+    const el = e.target as HTMLElement | null
+    if (!el || !/^(input|textarea|select)$/i.test(el.tagName)) {
+      toggleEraser()
+      return
+    }
+  }
+  if (e.key !== 'Escape') return
+  if (menuOpen.value) menuOpen.value = false
+  else if (isFullscreen.value) exitFullscreen()
 }
 
 // ── File upload --------------------------------------------------------------
@@ -1283,40 +2865,39 @@ function onMainDrop(e: DragEvent) {
   if (f) void openFile(f)
 }
 
-function onColorPickerInput(e: Event) {
-  pickCustom((e.target as HTMLInputElement).value)
-}
-
 // ── Lifecycle --------------------------------------------------------------
 
-// SPA navigation guard — pause and surface the modal when there are
-// uncommitted changes; the user's choice resolves through `confirmLeave` /
-// `cancelLeave`.
-onBeforeRouteLeave((_to, _from, next) => {
-  if (!hasUserAction.value) {
-    next()
-    return
-  }
-  pendingLeave = () => next()
-  showLeaveConfirm.value = true
-  next(false)
+// Leaving the page saves the picture first, so nothing is ever lost and there is
+// nothing to ask the child about.
+onBeforeRouteLeave(async () => {
+  await persistNow()
+  await flushTimelapse()
 })
 
 let mainResizeObserver: ResizeObserver | null = null
+let bodyOverflow = ''
+let stopPenTaps: (() => void) | undefined
 
 onMounted(() => {
   bgCtx = bgCanvas.value?.getContext('2d') ?? null
   drawCtx = drawCanvas.value?.getContext('2d', { willReadFrequently: true }) ?? null
+  syncPreview()
   window.addEventListener('resize', onResize)
   window.addEventListener('orientationchange', onResize)
-  window.addEventListener('beforeunload', onBeforeUnload)
-  document.addEventListener('pointermove', onDocPointerMove)
-  document.addEventListener('touchmove', onDocTouchMove, { passive: false })
-  document.addEventListener('pointerup', onDocPointerUp)
-  document.addEventListener('touchend', onDocTouchEnd)
-  document.addEventListener('pointercancel', onDocPointerUp)
-  document.addEventListener('touchcancel', onDocTouchEnd)
-  document.addEventListener('pointerdown', onOutsidePointerDown, { capture: true })
+  document.addEventListener('visibilitychange', onVisibilityHidden)
+  document.addEventListener('fullscreenchange', onFullscreenChange)
+  window.addEventListener('pagehide', onVisibilityHidden)
+  window.addEventListener('keydown', onKeydown)
+  window.addEventListener('keyup', onKeyup)
+  window.addEventListener(PENCIL_TAP_EVENT, toggleEraser)
+  window.addEventListener('pointerdown', onAnyPointerDown, true)
+  window.addEventListener('blur', abortStroke)
+  // a short touch of a button with the pen always counts as a tap
+  stopPenTaps = installPenTaps()
+  window.visualViewport?.addEventListener('resize', onResize)
+  // the page behind a picture never scrolls (a full screen change must not push it down)
+  bodyOverflow = document.body.style.overflow
+  document.body.style.overflow = 'hidden'
 
   // Observe the canvas main area so the artwork re-fits whenever the
   // area's size changes — covers initial layout settle (deferred
@@ -1332,8 +2913,21 @@ onMounted(() => {
 
   updateCursorRing()
 
-  if (querySource.value && querySourceType.value) {
+  if (queryBook.value) {
+    void openBook(queryBook.value, queryBookPage.value)
+  } else if (querySource.value && querySourceType.value) {
     void loadFromUrl(querySource.value, querySourceType.value as 'image' | 'pdf')
+  } else if (!booksState.all) {
+    void loadAllBooks()
+  }
+  void refreshMyWorks()
+  // `?work=<id>`: a picture of "my works" opened straight from the start page ("Dein Bild")
+  const workId = typeof route.query.work === 'string' ? route.query.work : ''
+  if (workId && !queryBook.value && !querySource.value) {
+    void listArtworks().then((list) => {
+      const meta = list.find((w) => w.id === workId)
+      if (meta) openWork(meta)
+    })
   }
 })
 onBeforeUnmount(() => {
@@ -1342,141 +2936,93 @@ onBeforeUnmount(() => {
   mainResizeObserver = null
   window.removeEventListener('resize', onResize)
   window.removeEventListener('orientationchange', onResize)
-  window.removeEventListener('beforeunload', onBeforeUnload)
-  document.removeEventListener('pointermove', onDocPointerMove)
-  document.removeEventListener('touchmove', onDocTouchMove)
-  document.removeEventListener('pointerup', onDocPointerUp)
-  document.removeEventListener('touchend', onDocTouchEnd)
-  document.removeEventListener('pointercancel', onDocPointerUp)
-  document.removeEventListener('touchcancel', onDocTouchEnd)
-  document.removeEventListener('pointerdown', onOutsidePointerDown, true)
+  document.removeEventListener('visibilitychange', onVisibilityHidden)
+  document.removeEventListener('fullscreenchange', onFullscreenChange)
+  if (document.fullscreenElement) void document.exitFullscreen?.().catch(() => undefined)
+  window.removeEventListener('pagehide', onVisibilityHidden)
+  window.removeEventListener('keydown', onKeydown)
+  window.removeEventListener('keyup', onKeyup)
+  window.removeEventListener(PENCIL_TAP_EVENT, toggleEraser)
+  window.removeEventListener('pointerdown', onAnyPointerDown, true)
+  window.removeEventListener('blur', abortStroke)
+  stopPenTaps?.()
+  window.visualViewport?.removeEventListener('resize', onResize)
+  document.body.style.overflow = bodyOverflow
+  void persistNow()
 })
 
-watch([tool, brushSize, color], updateCursorRing)
+watch([activeTool, brushSize, eraserSize, color, tips], updateCursorRing)
+watch([isFullscreen, hasImage], () => void nextTick(fitCanvas))
+watch(isFullscreen, () => {
+  shelfPeek.value = false
+})
 watch([querySource, querySourceType], ([url, type]) => {
-  if (url && (type === 'image' || type === 'pdf')) void loadFromUrl(url, type as 'image' | 'pdf')
+  if (queryBook.value) return
+  if (url && (type === 'image' || type === 'pdf')) {
+    bookCtx.value = null
+    void loadFromUrl(url, type as 'image' | 'pdf')
+  }
+})
+watch(queryBook, (id) => {
+  if (!id) {
+    bookCtx.value = null
+    return
+  }
+  // A page turn inside the open book changes `p` only, which `gotoBookPage` already handled.
+  if (bookCtx.value?.bookId === id) return
+  void openBook(id, queryBookPage.value)
 })
 </script>
 
 <template lang="pug">
   div(
     class="ac-app"
-    :class="{ 'is-fullscreen': isFullscreen }"
+    :class="{ 'has-image': hasImage, 'is-painting': isPainting, 'ui-hidden': isFullscreen }"
     :style="backdropVars"
   )
-    header(class="ac-hdr")
-      //- Shared back button matches the rest of the app (parchment glyph
-      //- on a flat cream surface). Goes through the router so the
-      //- unsaved-changes guard can intercept and prompt.
-      ZBackButton(
-        variant="flat"
-        :size="40"
-        class="ac-back-btn"
-        :aria-label="t('app.coloring.back')"
-        @click="onBack"
-      )
-      div(class="ac-title") {{ t('app.coloring.title') }}
-
-      div(class="ac-pages" v-if="pdfDoc && totalPages > 1")
-        button(class="ac-pg-btn" :disabled="currentPage <= 1" @click="gotoPage(-1)") ‹
-        span(class="ac-pg-info") {{ currentPage }} / {{ totalPages }}
-        button(class="ac-pg-btn" :disabled="currentPage >= totalPages" @click="gotoPage(1)") ›
-
-      div(class="ac-spacer")
-
-      //- Quick-tools strip — always visible top-right so kids don't have
-      //- to reopen the toolbox to switch between fill / pencil / eraser.
-      div(class="ac-quick" v-if="hasImage")
-        button(
-          type="button"
-          class="ac-q"
-          :class="{ active: tool === 'fill' }"
-          :title="t('app.coloring.toolFill')"
-          @click="tool = 'fill'"
-        )
-          svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round")
-            path(d="M8 4 C 8 1.5, 16 1.5, 16 4")
-            path(d="M5 5 L19 5 L17 19 C 17 20.5, 7 20.5, 7 19 Z" fill="currentColor" fill-opacity=".18")
-            ellipse(cx="12" cy="5" rx="7" ry="1.2" fill="currentColor" fill-opacity=".3")
-            circle(cx="20" cy="15" r="1.3" fill="currentColor" stroke="none")
-        button(
-          type="button"
-          class="ac-q"
-          :class="{ active: tool === 'pencil' }"
-          :title="t('app.coloring.toolPencil')"
-          @click="tool = 'pencil'"
-        )
-          svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
-            path(d="m18 2 4 4-14 14H4v-4Z")
-            path(d="m14.5 5.5 4 4")
-        button(
-          type="button"
-          class="ac-q ac-q-eraser"
-          :class="{ active: tool === 'eraser' }"
-          :title="t('app.coloring.toolEraser')"
-          @click="tool = 'eraser'"
-        )
-          svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
-            rect(x="2" y="8" width="20" height="11" rx="2.5")
-            line(x1="8" y1="8" x2="8" y2="19")
-            line(x1="2" y1="14.5" x2="22" y2="14.5" stroke-width="1" opacity=".45")
-
-      div(class="ac-actions")
-        button(class="ac-h-btn" :disabled="!canUndo" :title="t('app.coloring.undo')" @click="undo")
-          svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round")
-            path(d="M3 7v6h6")
-            path(d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6.7 2.9L3 13")
-        button(class="ac-h-btn" :disabled="!canRedo" :title="t('app.coloring.redo')" @click="redo")
-          svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round")
-            path(d="M21 7v6h-6")
-            path(d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6.7 2.9L21 13")
-        button(
-          v-if="canShareCanvas"
-          class="ac-h-btn"
-          :disabled="!hasImage"
-          :title="t('app.coloring.share')"
-          @click="shareCanvas"
-        )
-          svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round")
-            circle(cx="18" cy="5" r="3")
-            circle(cx="6" cy="12" r="3")
-            circle(cx="18" cy="19" r="3")
-            line(x1="8.6" y1="13.5" x2="15.4" y2="17.5")
-            line(x1="15.4" y1="6.5" x2="8.6" y2="10.5")
-        button(class="ac-h-btn ac-save" :disabled="!hasImage" :title="t('app.coloring.savePng')" @click="downloadPng")
-          svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round")
-            path(d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4")
-            polyline(points="7 10 12 15 17 10")
-            line(x1="12" y1="15" x2="12" y2="3")
-
+    //- ───────── The picture gets the whole screen ─────────
     main(
       ref="mainEl"
       class="ac-main"
-      :class="{ 'drop-over': dropOver }"
+      :class="{ 'drop-over': dropOver, 'is-pan': panMode || spaceHeld }"
       @dragover.prevent="onMainDragOver"
       @dragleave="onMainDragLeave"
       @drop="onMainDrop"
+      @wheel="onWheel"
+      @touchstart="onTouchStart"
+      @touchmove="onTouchMove"
+      @touchend="onTouchEnd"
+      @touchcancel="onTouchEnd"
     )
-      div(
-        v-show="!hasImage"
-        class="ac-upload"
+      //- ───────── Choose a coloring page ─────────
+      ColoringMenu(
+        v-show="!hasImage && !isLoading"
+        :books="orderedBooks"
+        :works="looseWorks"
+        :groups="galleryGroups"
+        :rewards="rewards"
+        :backup-busy="backupBusy"
+        :backup-message="backupMessage"
+        @open-book="openBookCard"
+        @remove-book="(card) => paintShelf.remove(card.bookId)"
+        @to-reading="router.push({ name: 'app-all-books' })"
+        @blank="startBlankSheet"
+        @own-image="pickFile"
+        @open-work="openWork"
+        @ask-delete="askDelete"
+        @pick-item="pickGalleryItem"
+        @open-reward="openReward"
+        @export-backup="exportBackup"
+        @pick-backup="pickBackup"
       )
-        div(class="ac-upload-icon") 🖼️
-        div(class="ac-upload-title") {{ t('app.coloring.emptyTitle') }}
-        div(class="ac-upload-text") {{ t('app.coloring.uploadHint') }}
-        button(type="button" class="ac-upload-btn" @click="pickFile")
-          svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round")
-            path(d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4")
-            polyline(points="17 8 12 3 7 8")
-            line(x1="12" y1="3" x2="12" y2="15")
-          | {{ t('app.coloring.uploadButton') }}
+      input(ref="backupInput" type="file" accept=".zip,application/zip" class="ac-vh" @change="onBackupFile")
 
+      //- The paper: paint underneath, the line art on top (multiplied), so colour never covers an outline.
       div(
         ref="canvasWrap"
         class="ac-canvas-wrap"
         :class="{ active: hasImage }"
       )
-        canvas(ref="bgCanvas" class="ac-bg")
         canvas(
           ref="drawCanvas"
           class="ac-draw"
@@ -1484,213 +3030,251 @@ watch([querySource, querySourceType], ([url, type]) => {
           @pointermove="onPointerMove"
           @pointerup="onPointerEnd"
           @pointercancel="onPointerEnd"
+          @lostpointercapture="onPointerLost"
           @pointerleave="onPointerLeaveCanvas"
-          @touchstart.prevent="onTouchStart"
-          @touchmove.prevent="onTouchMove"
-          @touchend.prevent="onTouchEnd"
-          @touchcancel.prevent="onTouchEnd"
         )
-        div(v-show="isLoading" class="ac-loading")
-          div(class="ac-spinner")
-          div(class="ac-loading-txt") {{ t('app.coloring.loading') }}
+        canvas(ref="previewCanvas" class="ac-preview" :style="previewStyle")
+        canvas(ref="bgCanvas" class="ac-bg")
 
-    //- ───────── Floating minibar — full toolbox ─────────
-    div(
-      v-if="minibarVisible"
-      ref="minibarRoot"
-      class="ac-minibar"
-      :class="{ collapsed: minibarCollapsed, dragging: minibarDragging }"
-      :style="{ left: minibarPos.left + 'px', top: minibarPos.top + 'px' }"
-    )
-      div(
-        class="ac-mb-handle"
-        @pointerdown="onMinibarHandleDown"
-        @touchstart.passive="onMinibarHandleTouchStart"
+      div(v-show="isLoading" class="ac-loading")
+        div(class="ac-spinner")
+        div(class="ac-loading-txt") {{ t('app.coloring.loading') }}
+
+    div(v-if="penLogOn" class="ac-penlog") {{ penLog || 'penlog' }}
+
+    //- ───────── Floating top bar ─────────
+    header(v-if="hasImage" class="ac-top")
+      button(type="button" class="ac-btn" :aria-label="t('app.coloring.back')" @click="onBack")
+        img(:src="LINE_ICONS.back" alt="" draggable="false")
+      div(v-if="!hasImage" class="ac-title") {{ t('app.coloring.title') }}
+      //- the picture of an adventure stage: this button hands the finished picture in and goes back to the stage
+      AdvButton(v-if="advCtx && hasImage" class="ac-adv-done" tone="gold" small @click="finishPicture") {{ t('app.coloring.doneShort') }}
+      div(class="ac-spacer")
+
+      button(
+        v-if="pageInfo"
+        type="button"
+        class="ac-btn"
+        :class="{ on: textOpen }"
+        :aria-pressed="textOpen"
+        :aria-label="t('app.coloring.pageText')"
+        :title="t('app.coloring.pageText')"
+        @click="textOpen = !textOpen"
       )
-        div(class="ac-mb-color-dot" :style="{ background: color }")
+        img(:src="LINE_ICONS.text" alt="" draggable="false")
 
-      div(class="ac-mb-panel" v-show="!minibarCollapsed")
-        div(
-          class="ac-mb-dragbar"
-          @pointerdown="onMinibarHandleDown"
-          @touchstart.passive="onMinibarHandleTouchStart"
+      //- Zoom: the hand, minus, the percentage, plus (a touch screen shows only the percentage once it is zoomed)
+      ColoringZoomBar(
+        v-if="hasImage && showZoom"
+        :percent="zoomPct"
+        :pan="panMode"
+        :mouse="finePointer"
+        @zoom-in="zoomStep(1.25)"
+        @zoom-out="zoomStep(0.8)"
+        @reset="resetZoom"
+        @toggle-pan="panMode = !panMode"
+      )
+
+      //- Quick eraser, undo and redo next to the page arrows
+      div(v-if="hasImage" class="ac-quick")
+        button(
+          type="button"
+          class="ac-btn"
+          :class="{ on: tool === 'eraser' }"
+          :aria-pressed="tool === 'eraser'"
+          :aria-label="t('app.coloring.toolName.eraser')"
+          @click="onQuickEraser"
         )
-          div(class="ac-mb-grip")
-            span
-            span
-            span
-          span(class="ac-mb-label") {{ t('app.coloring.toolbox') }}
-          button(
-            type="button"
-            class="ac-mb-x"
-            :title="t('app.coloring.minimize')"
-            @click.stop="collapseMinibar"
-          )
-            svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round")
-              polyline(points="6 9 12 15 18 9")
+          img(:src="LINE_ICONS.eraser" alt="" draggable="false")
+        button(type="button" class="ac-btn" :disabled="!canUndo" :aria-label="t('app.coloring.undo')" @click="undo")
+          img(:src="LINE_ICONS.undo" alt="" draggable="false")
+        button(type="button" class="ac-btn" :disabled="!canRedo" :aria-label="t('app.coloring.redo')" @click="redo")
+          img(:src="LINE_ICONS.redo" alt="" draggable="false")
 
-        div(
-          class="ac-mb-pal"
-          :class="{ 'is-graphite': isGraphitePal }"
-          v-if="palette.length"
-        )
-          button(
-            v-for="c in palette"
-            :key="c"
-            type="button"
-            class="ac-sw"
-            :class="{ active: isPresetActive(c) }"
-            :style="{ background: c }"
-            :title="c"
-            @click="pickPreset(c)"
-          )
-          button(
-            v-if="!isGraphitePal"
-            type="button"
-            class="ac-sw ac-sw-rainbow"
-            :class="{ active: !!customColor }"
-            :title="t('app.coloring.customColor')"
-            :style="customColor ? { background: customColor } : undefined"
-            @click="colorPickerEl?.click()"
-          )
+      div(class="ac-pages" v-if="hasImage && navTotal > 1")
+        button(class="ac-pg-btn" :disabled="navCurrent <= 1" :aria-label="t('app.coloring.prevPage')" @click="gotoPage(-1)") ‹
+        span(class="ac-pg-info") {{ navCurrent }} / {{ navTotal }}
+        button(class="ac-pg-btn" :disabled="navCurrent >= navTotal" :aria-label="t('app.coloring.nextPage')" @click="gotoPage(1)") ›
 
-        div(class="ac-mb-tools")
-          button(
-            type="button"
-            class="ac-tb"
-            :class="{ active: tool === 'felt' }"
-            @click="tool = 'felt'"
-          )
-            svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
-              path(d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z")
-            | {{ t('app.coloring.toolFelt') }}
-          button(
-            type="button"
-            class="ac-tb"
-            :class="{ active: tool === 'watercolor' }"
-            @click="tool = 'watercolor'"
-          )
-            svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round")
-              path(d="M3 21 L15 9" stroke-width="1.8")
-              path(d="M5 21 L17 9" stroke-width="1.8")
-              path(d="M14 8 L17 11 L19.5 8.5 L16.5 5.5 Z" fill="currentColor" stroke="currentColor")
-              path(d="M17 5.5 Q 21 4, 21.5 2.5 Q 19 2, 16.5 5.5 Z" fill="currentColor" stroke="currentColor")
-            | {{ t('app.coloring.toolWatercolor') }}
-          button(
-            type="button"
-            class="ac-tb"
-            :class="{ active: tool === 'pencil' }"
-            @click="tool = 'pencil'"
-          )
-            svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
-              path(d="m18 2 4 4-14 14H4v-4Z")
-              path(d="m14.5 5.5 4 4")
-            | {{ t('app.coloring.toolPencil') }}
-          button(
-            type="button"
-            class="ac-tb"
-            :class="{ active: tool === 'graphite' }"
-            @click="tool = 'graphite'"
-          )
-            svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
-              path(d="M12 20h9")
-              path(d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z")
-            | {{ t('app.coloring.toolGraphite') }}
-          button(
-            type="button"
-            class="ac-tb"
-            :class="{ active: tool === 'fill' }"
-            @click="tool = 'fill'"
-          )
-            svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round")
-              path(d="M8 4 C 8 1.5, 16 1.5, 16 4")
-              path(d="M5 5 L19 5 L17 19 C 17 20.5, 7 20.5, 7 19 Z" fill="currentColor" fill-opacity=".15")
-              ellipse(cx="12" cy="5" rx="7" ry="1.2" fill="currentColor" fill-opacity=".3")
-              circle(cx="20" cy="15" r="1.3" fill="currentColor" stroke="none")
-            | {{ t('app.coloring.toolFill') }}
-          button(
-            type="button"
-            class="ac-tb ac-tb-eraser"
-            :class="{ active: tool === 'eraser' }"
-            @click="tool = 'eraser'"
-          )
-            svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round")
-              rect(x="2" y="8" width="20" height="11" rx="2.5")
-              line(x1="8" y1="8" x2="8" y2="19")
-            | {{ t('app.coloring.toolEraser') }}
+      template(v-if="hasImage")
+        button(type="button" class="ac-btn" :class="{ on: menuOpen }" :aria-label="t('app.coloring.menu')" :aria-expanded="menuOpen" @click="toggleMenu")
+          img(:src="LINE_ICONS.more" alt="" draggable="false")
 
-        div(class="ac-mb-sliders")
-          div(class="ac-sl-group")
-            div(class="ac-sl-label")
-              | {{ t('app.coloring.size') }}
-              b {{ Math.round(brushSize) }}
-            input(type="range" min="1" max="100" v-model.number="brushSize")
-          div(class="ac-sl-group")
-            div(class="ac-sl-label")
-              | {{ t('app.coloring.transparency') }}
-              b {{ alphaSliderValue }}%
-            input(type="range" min="0" max="95" v-model.number="alphaSliderValue")
+    //- The text that belongs to the picture of a coloring book; the button above shows and hides it
+    transition(name="ac-text")
+      div(v-if="textOpen && pageInfo && !isFullscreen" class="ac-text" role="dialog" :aria-label="t('app.coloring.pageText')")
+        h3(class="ac-text-title") {{ pageInfo.title }}
+        p(v-if="pageInfo.reference" class="ac-text-ref") {{ pageInfo.reference }}
+        p(v-if="pageInfo.text" class="ac-text-body") {{ pageInfo.text }}
 
-        div(class="ac-mb-acts")
-          button(class="ac-act-btn" :disabled="!canUndo" @click="undo")
-            svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round")
-              path(d="M3 7v6h6")
-              path(d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6.7 2.9L3 13")
-            | {{ t('app.coloring.undo') }}
-          button(class="ac-act-btn" :disabled="!canRedo" @click="redo")
-            svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round")
-              path(d="M21 7v6h-6")
-              path(d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6.7 2.9L21 13")
-            | {{ t('app.coloring.redo') }}
-          button(class="ac-act-btn danger" :disabled="!hasImage" @click="clearAll")
-            svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round")
-              path(d="M20 5H9l-7 7 7 7h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z")
-              line(x1="18" y1="9" x2="12" y2="15")
-              line(x1="12" y1="9" x2="18" y2="15")
-            | {{ t('app.coloring.clear') }}
+    //- Menu: only what is needed now and then.
+    div(v-if="menuOpen" class="ac-menu-shade" @click="menuOpen = false")
+    div(v-if="menuOpen" class="ac-menu" :class="{ wide: menuPage !== 'main' }" role="menu")
+      //- the eraser: how big it is and what a tap does
+      template(v-if="menuPage === 'eraser'")
+        button(type="button" class="ac-mi ac-mi-back" @click="menuPage = 'main'")
+          img(:src="LINE_ICONS.back" alt="" draggable="false")
+          span {{ t('app.coloring.toolName.eraser') }}
+        div(class="ac-erpop-sizes" role="group" :aria-label="t('app.coloring.size')")
+          button(
+            v-for="(n, i) in ERASER_SIZES"
+            :key="n"
+            type="button"
+            class="ac-erpop-size"
+            :class="{ on: eraserSize === n }"
+            :aria-pressed="eraserSize === n"
+            :aria-label="t(`app.coloring.eraserSize${i + 1}`)"
+            @click="setEraserSize(n)"
+          )
+            span(:style="{ width: `${Math.max(6, n * 0.7)}px`, height: `${Math.max(6, n * 0.7)}px` }")
+        label(class="ac-erpop-row")
+          input(type="range" min="2" max="60" step="1" :value="eraserSize" :aria-label="t('app.coloring.size')" @input="onEraserRange")
+        label(class="ac-erpop-tap")
+          input(type="checkbox" v-model="eraserField")
+          span {{ t('app.coloring.eraserField') }}
+      //- the scene behind the paper
+      template(v-else-if="menuPage === 'scene'")
+        button(type="button" class="ac-mi ac-mi-back" @click="menuPage = 'main'")
+          img(:src="LINE_ICONS.back" alt="" draggable="false")
+          span {{ t('app.coloring.backdropShort') }}
+        div(class="ac-scenes")
+          button(
+            v-for="b in BACKDROPS"
+            :key="b.id"
+            type="button"
+            class="ac-scene"
+            :class="{ on: backdropId === b.id }"
+            :aria-pressed="backdropId === b.id"
+            @click="setBackdrop(b.id)"
+          )
+            span(class="ac-scene-thumb" :class="`is-${b.id}`" :style="b.thumb ? { backgroundImage: `url(${b.thumb})` } : {}")
+            span(class="ac-scene-name") {{ t(`app.coloring.backdrops.${b.id}`) }}
+        div(v-if="backdropId === 'plain'" class="ac-plain" role="group" :aria-label="t('app.coloring.plainColor')")
+          button(
+            v-for="c in PLAIN_COLORS"
+            :key="c.id"
+            type="button"
+            class="ac-swatch"
+            :class="{ on: plainColorId === c.id }"
+            :style="{ background: c.css }"
+            :aria-pressed="plainColorId === c.id"
+            :aria-label="t(`app.coloring.plainColors.${c.id}`)"
+            :title="t(`app.coloring.plainColors.${c.id}`)"
+            @click="setPlainColor(c.id)"
+          )
+      template(v-else)
+        button(type="button" role="menuitem" class="ac-mi ac-mi-main" @click="finishPicture")
+          img(:src="LINE_ICONS.check" alt="" draggable="false")
+          span {{ t('app.coloring.finish') }}
+        button(type="button" role="menuitem" class="ac-mi" @click="menuPage = 'eraser'")
+          img(:src="LINE_ICONS.eraser" alt="" draggable="false")
+          span {{ t('app.coloring.toolName.eraser') }}
+        button(type="button" role="menuitem" class="ac-mi" @click="menuPage = 'scene'")
+          img(:src="LINE_ICONS.background" alt="" draggable="false")
+          span {{ t('app.coloring.backdropShort') }}
+        button(type="button" role="menuitem" class="ac-mi" @click="menuAction(downloadPng)")
+          img(:src="LINE_ICONS.save" alt="" draggable="false")
+          span {{ t('app.coloring.savePng') }}
+        button(v-if="canShareCanvas" type="button" role="menuitem" class="ac-mi" @click="menuAction(shareCanvas)")
+          img(:src="LINE_ICONS.share" alt="" draggable="false")
+          span {{ t('app.coloring.share') }}
+        button(type="button" role="menuitem" class="ac-mi" @click="menuAction(enterFullscreen)")
+          img(:src="LINE_ICONS.fullscreen" alt="" draggable="false")
+          span {{ t('app.coloring.fullscreen') }}
+        button(type="button" role="menuitem" class="ac-mi" @click="menuAction(closePicture)")
+          img(:src="LINE_ICONS.frames" alt="" draggable="false")
+          span {{ advCtx ? t('app.coloring.backToStage') : bookCtx ? t('app.coloring.bookOverview') : t('app.coloring.newPage') }}
+        button(type="button" role="menuitem" class="ac-mi danger" @click="menuAction(clearAll)")
+          img(:src="LINE_ICONS.trash" alt="" draggable="false")
+          span {{ t('app.coloring.clear') }}
 
-        div(class="ac-mb-fs-row")
-          button(class="ac-fs-btn enter" v-if="!isFullscreen" @click="enterFullscreen")
-            svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round")
-              path(d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3")
-            | {{ t('app.coloring.fullscreen') }}
-          button(class="ac-fs-btn exit" v-else @click="exitFullscreen")
-            svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round")
-              path(d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7")
-            | {{ t('app.coloring.fullscreenExit') }}
-
-    //- ───────── Sticky fullscreen toggle ─────────
-    //- Lives outside the grid so it stays pinned to the bottom-right of
-    //- the viewport in both the normal and fullscreen layouts. The same
-    //- button toggles in either direction.
+    //- Leave fullscreen
     button(
+      v-if="isFullscreen"
       type="button"
-      class="ac-fs-floating"
-      :class="{ 'is-on': isFullscreen }"
-      :aria-label="isFullscreen ? t('app.coloring.fullscreenExit') : t('app.coloring.fullscreen')"
-      :title="isFullscreen ? t('app.coloring.fullscreenExit') : t('app.coloring.fullscreen')"
-      @click="toggleFullscreen"
+      class="ac-btn ac-exitfs"
+      :aria-label="t('app.coloring.fullscreenExit')"
+      @click="exitFullscreen"
     )
-      svg(
-        v-if="!isFullscreen"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+      img(:src="LINE_ICONS.fullscreen" alt="" draggable="false")
+
+    //- ───────── The floating tool bar ─────────
+    ColoringToolbar(
+      v-if="hasImage"
+      :style="toolbarStyle"
+      :expanded="toolbarOpen"
+      :tools="toolbarTools"
+      :tool="tool"
+      :color="color"
+      v-model:size="sizeModel"
+      v-model:strength="strength"
+      :tips="tips"
+      :stay-inside="stayInside"
+      :overlap="overlap"
+      :rotation="rotation"
+      :can-undo="canUndo"
+      :can-redo="canRedo"
+      :shelf-open="shelfVisible"
+      :edge="dock.edge"
+      :carrying="!!carry"
+      :current-sprite="currentSprite"
+      @select-tool="selectToolById"
+      @undo="undo"
+      @redo="redo"
+      @toggle-shelf="toggleShelf"
+      @toggle-stay="stayInside = !stayInside"
+      @toggle-overlap="overlap = !overlap"
+      @set-rotation="setRotation"
+      @collapse="toolbarOpen = false"
+      @expand="onTabClick"
+      @set-tip="setTip"
+      :just-carried="justCarried"
+      @set-dock="setDock"
+      @grip-down="onHandleDown"
+      @grip-move="onHandleMove"
+      @grip-up="onHandleUp"
+    )
+
+    //- The way back to 0 degrees; in full screen (no top bar) also eraser, undo and redo, quiet in a corner of the picture
+    div(v-if="hasImage && (isFullscreen || rotation !== 0)" class="ac-corner" :class="`on-${cornerSide}`" :style="cornerStyle")
+      button(v-if="rotation !== 0" type="button" class="ac-corner-btn ac-corner-zero" :aria-label="t('app.coloring.rotateReset')" @click="setRotation(0, true)") 0°
+      template(v-if="isFullscreen")
+        button(type="button" class="ac-corner-btn" :class="{ on: tool === 'eraser' }" :aria-label="t('app.coloring.toolName.eraser')" @click="toggleEraser")
+          img(:src="LINE_ICONS.eraser" alt="" draggable="false")
+        button(type="button" class="ac-corner-btn" :disabled="!canUndo" :aria-label="t('app.coloring.undo')" @click="undo")
+          img(:src="LINE_ICONS.undo" alt="" draggable="false")
+        button(type="button" class="ac-corner-btn" :disabled="!canRedo" :aria-label="t('app.coloring.redo')" @click="redo")
+          img(:src="LINE_ICONS.redo" alt="" draggable="false")
+      ColoringZoomBar(
+        v-if="isFullscreen && showZoom"
+        variant="corner"
+        :percent="zoomPct"
+        :pan="panMode"
+        :mouse="finePointer"
+        @zoom-in="zoomStep(1.25)"
+        @zoom-out="zoomStep(0.8)"
+        @reset="resetZoom"
+        @toggle-pan="panMode = !panMode"
       )
-        path(d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3")
-      svg(
-        v-else
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      )
-        path(d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7")
+
+    //- ───────── Colour box at the bottom edge: tips of pencils, markers, brushes… ─────────
+    ColoringShelf(
+      v-if="hasImage"
+      ref="shelfEl"
+      :variant="kitDef.variant"
+      :items="kitDef.base"
+      :extra="kitDef.extra"
+      :extra-locked="extraLocked"
+      :rainbow="kitDef.rainbow"
+      :color="color"
+      :custom-active="!!customColor"
+      :open="shelfVisible"
+      :arrow-icon="LINE_ICONS.back"
+      @pick-color="pickPreset"
+      @pick-locked="showUpsell('pencilBox')"
+      @custom="onCustomPencil"
+      @toggle="toggleShelf"
+    )
 
     transition(name="ac-notice")
       p(
@@ -1698,6 +3282,50 @@ watch([querySource, querySourceType], ([url, type]) => {
         :class="['ac-save-notice', { 'is-denied': saveNotice === 'denied' }]"
         role="status"
       ) {{ t(saveNotice === 'saved' ? 'app.coloring.savedToPhotos' : 'app.coloring.photosDenied') }}
+
+    //- Small banner when an award was just won
+    transition(name="ac-notice")
+      router-link(
+        v-if="lastAward"
+        :to="{ name: 'app-awards' }"
+        class="ac-award-banner"
+        role="status"
+      )
+        img(:src="awardImage(lastAward)" alt="" draggable="false")
+        span
+          strong {{ t('app.awards.newAward') }}
+          | {{ t(`app.awards.items.${lastAward}.title`) }}
+
+    //- Picture finished
+    div(
+      v-if="finishInfo"
+      class="ac-confirm-overlay"
+      role="dialog"
+      aria-modal="true"
+      @click.self="closeFinish"
+    )
+      div(class="ac-confirm-dialog ac-finish")
+        img(class="ac-finish-star" :src="finishImage" alt="" draggable="false")
+        h2(class="ac-confirm-title") {{ finishInfo.bookDone ? t('app.coloring.bookFinished') : t('app.coloring.pictureFinished') }}
+        p(v-if="finishInfo.won.length" class="ac-confirm-body")
+          span(class="ac-finish-label") {{ t('app.awards.newAward') }}
+          strong(class="ac-finish-name") {{ finishInfo.won.map((w) => t(`app.awards.items.${w}.title`)).join(', ') }}
+        p(v-else class="ac-confirm-body") {{ t('app.coloring.pictureFinishedText') }}
+        button(v-if="finishInfo.hasLapse" type="button" class="ac-lapse-btn" @click="watchTimelapse") {{ t('app.coloring.timelapseWatch') }}
+        div(class="ac-confirm-actions")
+          button(type="button" class="ac-confirm-leave" @click="finishOverview") {{ bookCtx ? t('app.coloring.bookOverview') : t('app.coloring.newPage') }}
+          button(v-if="finishInfo.hasNext" type="button" class="ac-confirm-stay" @click="finishNext") {{ t('app.coloring.nextPage') }}
+          button(v-else type="button" class="ac-confirm-stay" @click="closeFinish") {{ t('app.coloring.keepPainting') }}
+
+    ColoringTimelapse(
+      :open="lapseOpen"
+      :data="lapseData"
+      :line-art="bgCanvas"
+      :gate="requireParent"
+      @close="lapseOpen = false"
+    )
+
+    p(v-if="finishNote" class="ac-save-notice is-denied" role="status" @click="finishNote = ''") {{ finishNote }}
 
     div(ref="cursorRing" class="ac-cursor-ring")
 
@@ -1708,335 +3336,103 @@ watch([querySource, querySourceType], ([url, type]) => {
       class="ac-vh"
       @change="onFileInput"
     )
-    input(
-      ref="colorPickerEl"
-      type="color"
-      class="ac-vh"
-      :value="customColor || color"
-      @input="onColorPickerInput"
-      @change="onColorPickerInput"
+    ColoringColorPicker(
+      :open="pickerOpen && hasImage"
+      :color="customColor || color"
+      :lift="pickerLift"
+      @pick="pickCustom"
+      @close="pickerOpen = false"
     )
 
-    //- ===== Unsaved-changes confirmation modal =====
+    //- ===== Clear all colours of the sheet =====
     div(
-      v-if="showLeaveConfirm"
+      v-if="clearAsk"
       class="ac-confirm-overlay"
       role="dialog"
       aria-modal="true"
-      @click.self="cancelLeave"
+      @click.self="clearAsk = false"
     )
       div(class="ac-confirm-dialog")
-        h2(class="ac-confirm-title") {{ t('app.coloring.leaveTitle') }}
-        p(class="ac-confirm-body") {{ t('app.coloring.leaveBody') }}
+        h2(class="ac-confirm-title") {{ t('app.coloring.clearTitle') }}
+        p(class="ac-confirm-body") {{ t('app.coloring.clearBody') }}
         div(class="ac-confirm-actions")
-          button(type="button" class="ac-confirm-stay" @click="cancelLeave") {{ t('app.coloring.leaveStay') }}
-          button(type="button" class="ac-confirm-leave" @click="confirmLeave") {{ t('app.coloring.leaveDiscard') }}
+          button(type="button" class="ac-confirm-stay" @click="clearAsk = false") {{ t('app.coloring.deleteNo') }}
+          button(type="button" class="ac-confirm-leave" @click="confirmClear") {{ t('app.coloring.clearYes') }}
+
+    //- ===== Delete a saved picture =====
+    div(
+      v-if="deleteCandidate"
+      class="ac-confirm-overlay"
+      role="dialog"
+      aria-modal="true"
+      @click.self="deleteCandidate = null"
+    )
+      div(class="ac-confirm-dialog")
+        h2(class="ac-confirm-title") {{ t('app.coloring.deleteTitle') }}
+        p(class="ac-confirm-body") {{ t('app.coloring.deleteBody') }}
+        div(class="ac-confirm-actions")
+          button(type="button" class="ac-confirm-stay" @click="deleteCandidate = null") {{ t('app.coloring.deleteNo') }}
+          button(type="button" class="ac-confirm-leave" @click="confirmDelete") {{ t('app.coloring.deleteYes') }}
 </template>
 
 <style scoped lang="sass">
-// LambKing parchment palette. Variable names kept as `$p*` to minimise
-// churn — they're sprinkled across hundreds of rules below.
-//   $p / $p-dark / $p-mid → navy primary (used for action gradients)
-//   $p-bg / $p-pale       → cream parchment surfaces
-//   $p-bdr                → warm border
-//   $text / $text-m / $text-l → navy + warm-brown text tones
-$p: #21406a
-$p-dark: #142a47
-$p-mid: #2b4d7a
-$p-bg: #f3e6c4
-$p-pale: #fdf8ed
-$p-bdr: #e6d6b5
-$text: #1a2f4a
-$text-m: #7a6b55
-$text-l: #a08962
+// A calm painting-app look: a neutral desk, the paper in the middle, small glass
+// controls floating above it. Everything that is not the picture stays out of the way.
+$ink: #22262e
+$muted: #6c7280
+$line: rgba(20, 24, 32, 0.1)
+$accent: #1f3a5f
+$glass: rgba(252, 251, 248, 0.88)
 
-// `100dvh` follows mobile address-bar collapse/expand; the static `100vh`
-// is the iOS<15.4 fallback. Padding-bottom carves out the bottom nav (and
-// home-indicator safe area) inside the grid so the canvas never sits under
-// the nav. In fullscreen mode the nav is hidden, so we drop the padding.
-// The coloring view owns the full viewport — no bottom-nav reservation,
-// no edge padding. The header sits flush at the top (the safe-area inset
-// only adds the iOS notch reserve, nothing else); the canvas main area
-// fills the rest edge-to-edge so kids paint right up to the device frame.
-// The backdrop illustration is `contain`-fitted so it is *never* cropped by
-// a viewport edge, whatever the screen ratio — the leftover strip on the
-// short axis falls back to the cream parchment colour. The two artworks
-// (tall / wide) come in as custom properties from the component so the
-// production base-url stays correct; the orientation swap is pure CSS.
+// Values the picker and dialog rules below were written with.
+$text: $ink
+$text-m: $muted
+$p-bdr: #e6d3a8
+$p-pale: #fffaf0
+$accent-dark: $accent
+
 .ac-app
   position: fixed
   inset: 0
-  display: grid
-  grid-template-rows: auto 1fr
-  background-color: $p-bg
-  background-image: var(--ac-bg-portrait)
-  background-repeat: no-repeat
-  background-position: center
-  background-size: cover
-  color: $text
+  overflow: hidden
+  color: $ink
   user-select: none
-  overflow: hidden
-  height: 100vh
-  height: 100dvh
+  overscroll-behavior: none
+  background-color: #cbc6bb
+  background-image: var(--ac-bg-image, radial-gradient(ellipse at 50% 30%, #fff2d9 0%, #fbdcae 55%, #f3c58b 100%))
+  background-size: cover
+  background-position: center
 
-@media (orientation: landscape)
-  .ac-app
-    background-image: var(--ac-bg-landscape)
-
-.ac-app.is-fullscreen .ac-hdr
-  // Take the header out of the grid flow so .ac-main can stretch to
-  // the full viewport, then float it back on top as a translucent
-  // strip so the back / undo / save controls are still reachable.
-  position: absolute
-  top: 0
-  left: 0
-  right: 0
-  z-index: 50
-  background: transparent
-  //backdrop-filter: blur(10px)
-  -webkit-backdrop-filter: blur(10px)
-  border-bottom: 0px solid rgba(230, 214, 181, 0.5)
-
-// Cream parchment header — same surface as the rest of the app so the
-// coloring screen reads as a continuation of LambKing's design.
-.ac-hdr
-  background: transparent
-  border-bottom: 1px solid $p-bdr
-  display: flex
-  align-items: center
-  gap: 8px
-  min-height: 52px
-  padding: 8px 12px
-  padding-top: max(env(safe-area-inset-top, 0px), 8px)
-
-// `.ac-back-btn` is now a styling hook for the shared ZBackButton; the
-// component already paints itself with the parchment palette so we only
-// need the position marker.
-.ac-back-btn
-  flex-shrink: 0
-  //color: $text!important
-  --back-icon-color: #1a2f4a !important
-
-.ac-title
-  font-weight: 700
-  font-size: 1.05rem
-  color: $text
-  flex-shrink: 0
-
-.ac-pages
-  display: flex
-  align-items: center
-  gap: 5px
-  flex-shrink: 0
-
-// Cream pill buttons matching the rest of the app's flat-cream surface.
-.ac-pg-btn
-  width: 28px
-  height: 28px
-  border-radius: 50%
-  background: $p-pale
-  border: 1px solid $p-bdr
-  color: $text
-  font-size: 0.9rem
-  font-weight: 700
-  cursor: pointer
-  transition: background 0.13s, transform 0.1s
-
-  &:hover
-    background: #ffffff
-
-  &:active
-    transform: scale(0.94)
-
-  &:disabled
-    opacity: 0.35
-    cursor: default
-
-.ac-pg-info
-  font-size: 0.78rem
-  color: $text-m
-  font-weight: 700
-
-.ac-spacer
-  flex: 1
-
-.ac-quick
-  display: flex
-  gap: 5px
-
-.ac-q
-  width: 32px
-  height: 32px
-  border-radius: 10px
-  background: $p-pale
-  border: 1px solid $p-bdr
-  color: $text
-  cursor: pointer
-  display: grid
-  place-items: center
-  transition: background 0.13s, transform 0.1s
-
-  &:hover
-    background: #ffffff
-
-  &:active
-    transform: scale(0.94)
-
-  // Active tool — solid navy pill with cream icon, mirrors the "Lesen"
-  // button's primary look elsewhere in the app.
-  &.active
-    background: linear-gradient(180deg, $p 0%, $p-dark 100%)
-    color: #ffffff
-    border-color: $p-dark
-    box-shadow: 0 4px 10px -4px rgba(10, 26, 48, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.18)
-
-  svg
-    width: 16px
-    height: 16px
-
-// Eraser keeps the wine-red accent so it reads as the destructive tool.
-.ac-q-eraser.active
-  background: linear-gradient(180deg, #b94535 0%, #8e2f23 100%)
-  color: #ffffff
-  border-color: #5b1a12
-  box-shadow: 0 4px 10px -4px rgba(91, 26, 18, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.18)
-
-.ac-actions
-  display: flex
-  gap: 5px
-
-.ac-h-btn
-  width: 32px
-  height: 32px
-  border-radius: 50%
-  background: $p-pale
-  border: 1px solid $p-bdr
-  color: $text
-  display: grid
-  place-items: center
-  cursor: pointer
-  transition: background 0.13s, transform 0.1s
-
-  &:hover
-    background: #ffffff
-
-  &:active
-    transform: scale(0.94)
-
-  &:disabled
-    opacity: 0.35
-    cursor: not-allowed
-
-  svg
-    width: 15px
-    height: 15px
-
-  // "Save" stands out as a navy primary so it reads as the commit action.
-  &.ac-save
-    background: linear-gradient(180deg, $p 0%, $p-dark 100%)
-    color: #ffffff
-    border-color: $p-dark
-    box-shadow: 0 4px 10px -4px rgba(10, 26, 48, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.18)
-
-// Transparent so the .ac-app backdrop illustration shows through the whole
-// canvas area (the canvas wrap itself only covers the artwork's own box).
+// ── The picture area: the whole screen ───────────────────────────────────
 .ac-main
-  position: relative
-  overflow: hidden
-  background: transparent
-  padding: 0
-
-.ac-app.is-fullscreen .ac-main
-  // Lift .ac-main out of the grid in fullscreen so it covers the entire
-  // viewport directly — the `auto 1fr` grid was sometimes leaving an
-  // implicit-sized first track even though the header is absolutely
-  // positioned, which pushed the canvas wrap down by ~50 px and left a
-  // dead cream strip across the bottom of the artwork. inset:0 makes
-  // the box edge-to-edge with the .ac-app (which is itself fixed inset:0).
   position: absolute
   inset: 0
-  padding: 0
+  overflow: hidden
   background: transparent
+
+// with a picture open the whole area is for the fingers of the picture: one paints, two zoom and move
+.ac-app.has-image .ac-main
+  touch-action: none
 
 .ac-main.drop-over::after
-  content: '🎨'
+  content: ''
   position: absolute
-  inset: 0
-  background: rgba(33, 64, 106, 0.07)
-  border: 3px dashed $p-mid
-  border-radius: 12px
-  display: flex
-  align-items: center
-  justify-content: center
-  font-size: 1rem
-  font-weight: 700
-  color: $p
+  inset: 10px
+  border: 2px dashed $accent
+  border-radius: 18px
+  background: rgba(31, 58, 95, 0.06)
   z-index: 50
   pointer-events: none
 
-.ac-upload
-  position: absolute
-  top: 50%
-  left: 50%
-  transform: translate(-50%, -50%)
-  display: flex
-  flex-direction: column
-  align-items: center
-  text-align: center
-  max-width: 340px
-  padding: 28px 22px
-  background: #fff
-  border-radius: 24px
-  opacity: 0.8
-  box-shadow: 0 8px 32px rgba(33, 64, 106, 0.22)
-
-.ac-upload-icon
-  width: 64px
-  height: 64px
-  border-radius: 18px
-  background: $p-bg
-  display: grid
-  place-items: center
-  font-size: 32px
-  margin-bottom: 14px
-
-.ac-upload-title
-  font-weight: 700
-  font-size: 1.3rem
-  margin-bottom: 6px
-
-.ac-upload-text
-  color: $text-m
-  font-size: 0.85rem
-  margin-bottom: 18px
-
-.ac-upload-btn
-  display: inline-flex
-  align-items: center
-  gap: 8px
-  padding: 12px 26px
-  border-radius: 50px
-  background: linear-gradient(135deg, $p-dark, $p-mid)
-  color: #fff
-  border: none
-  cursor: pointer
-  font: inherit
-  font-weight: 700
-  font-size: 0.92rem
-  box-shadow: 0 4px 16px rgba(33, 64, 106, 0.38)
-
-  svg
-    width: 15px
-    height: 15px
-
 .ac-canvas-wrap
-  position: relative
+  position: absolute
+  top: 0
+  left: 0
   display: none
-  // No border-radius — coloring sheets should sit edge-to-edge with
-  // square corners so the kid's lines reach the paper boundary instead
-  // of being clipped into a rounded mask.
   overflow: hidden
-  box-shadow: 0 8px 40px rgba(33, 64, 106, 0.22)
+  isolation: isolate
+  background: #ffffff
+  box-shadow: 0 10px 40px rgba(30, 25, 15, 0.35), 0 1px 3px rgba(0, 0, 0, 0.25)
   transform-origin: 0 0
   will-change: transform
   touch-action: none
@@ -2044,19 +3440,8 @@ $text-l: #a08962
   &.active
     display: block
 
-// Both canvases must lay out at the wrap's pixel size, not their internal
-// resolution. The internal `<canvas width="…" height="…">` keeps the
-// rasterisation grid at the source image's true resolution (so flood-fill,
-// pixel reads, and PNG export are pixel-perfect), while the CSS sizing
-// scales the displayed bitmap to whatever the wrap was fitted to. Without
-// `width: 100% / height: 100%` on `.ac-bg`, the bg canvas would render at
-// its intrinsic 4096-ish pixel size and overflow the wrap — that's why the
-// art looked "original size" before.
-.ac-bg
-  display: block
-  width: 100%
-  height: 100%
-
+// Paint (draw) at the bottom, the stroke being drawn above it, the line art on
+// top and multiplied: white paper lets the paint through, black lines stay black.
 .ac-draw
   position: absolute
   inset: 0
@@ -2068,19 +3453,36 @@ $text-l: #a08962
   user-select: none
   cursor: none
 
+.ac-preview
+  position: absolute
+  inset: 0
+  width: 100%
+  height: 100%
+  pointer-events: none
+  opacity: 0
+
+.ac-bg
+  position: absolute
+  inset: 0
+  width: 100%
+  height: 100%
+  mix-blend-mode: multiply
+  pointer-events: none
+
 .ac-loading
   position: absolute
   inset: 0
-  background: rgba(245, 240, 255, 0.92)
   display: grid
   place-items: center
+  align-content: center
+  background: rgba(246, 205, 150, 0.92)
   z-index: 20
 
 .ac-spinner
   width: 38px
   height: 38px
-  border: 3px solid $p-bdr
-  border-top-color: $p
+  border: 3px solid rgba(31, 58, 95, 0.2)
+  border-top-color: $accent
   border-radius: 50%
   animation: ac-spin 0.7s linear infinite
 
@@ -2088,9 +3490,13 @@ $text-l: #a08962
   to
     transform: rotate(360deg)
 
+@media (prefers-reduced-motion: reduce)
+  .ac-spinner
+    animation-duration: 2s
+
 .ac-loading-txt
-  color: $p
-  font-size: 0.85rem
+  color: $ink
+  font-size: 0.9rem
   font-weight: 700
   margin-top: 12px
 
@@ -2100,345 +3506,556 @@ $text-l: #a08962
   border-radius: 50%
   z-index: 9000
   transform: translate(-50%, -50%)
-  border: 2px solid rgba(33, 64, 106, 0.7)
+  border: 1.5px solid rgba(31, 58, 95, 0.75)
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.7)
   opacity: 0
-  transition: opacity 0.12s, width 0.08s, height 0.08s
+  transition: opacity 0.12s
 
   &.show
     opacity: 1
 
   &.eraser-cursor
-    border-color: rgba(192, 82, 106, 0.75)
+    border-color: rgba(192, 82, 106, 0.8)
 
-// Sticky fullscreen toggle — pinned to the bottom-right of the
-// viewport in every layout so the kid can flip in and out at any time.
-// Sits below the toolbox z-layer so a dragged toolbox can park on top
-// of it instead of being permanently obscured by it.
-.ac-fs-floating
-  position: fixed
-  right: calc(env(safe-area-inset-right, 0px) + 16px)
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px)
-  z-index: 350
-  width: 44px
-  height: 44px
-  border-radius: 999px
-  display: inline-flex
+// ── Floating top bar ───────────────────────────────────────────────────────
+.ac-top
+  position: absolute
+  top: 0
+  left: 0
+  right: 0
+  z-index: 30
+  display: flex
   align-items: center
-  justify-content: center
-  background: rgba(253, 248, 237, 0.92)
-  border: 1px solid $p-bdr
-  color: $text
+  gap: 8px
+  padding: 10px 12px
+  padding-top: max(env(safe-area-inset-top, 0px), 10px)
+  pointer-events: none
+  transition: opacity 160ms ease-out
+
+  > *
+    pointer-events: auto
+
+.ac-spacer
+  flex: 1
+  pointer-events: none !important
+
+.ac-title
+  padding: 8px 14px
+  border-radius: 12px
+  background: $glass
+  backdrop-filter: blur(14px)
+  -webkit-backdrop-filter: blur(14px)
+  font-weight: 800
+  font-size: 0.95rem
+  box-shadow: 0 2px 10px rgba(20, 24, 32, 0.15)
+
+.ac-btn
+  flex: 0 0 auto
+  width: 42px
+  height: 42px
+  display: grid
+  place-items: center
+  border: 1px solid $line
+  border-radius: 12px
+  background: $glass
+  backdrop-filter: blur(14px)
+  -webkit-backdrop-filter: blur(14px)
+  box-shadow: 0 2px 10px rgba(20, 24, 32, 0.15)
   cursor: pointer
-  box-shadow: 0 8px 22px -8px rgba(10, 26, 48, 0.45), 0 2px 6px -2px rgba(58, 42, 18, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.55)
-  backdrop-filter: blur(8px)
-  -webkit-backdrop-filter: blur(8px)
-  transition: transform 150ms ease-out, background-color 150ms ease-out
   -webkit-tap-highlight-color: transparent
+  transition: background 120ms ease-out, transform 100ms ease-out
 
-  &:hover
-    background: #ffffff
-    transform: translateY(-1px)
-
-  &:active
-    transform: scale(0.94)
-
-  &.is-on
-    background: linear-gradient(180deg, $p 0%, $p-dark 100%)
-    color: #ffffff
-    border-color: $p-dark
-    box-shadow: 0 8px 22px -6px rgba(10, 26, 48, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.18)
-
-  svg
+  img
     width: 22px
     height: 22px
+    object-fit: contain
+    pointer-events: none
 
-.ac-minibar
-  position: fixed
-  z-index: 400
-  user-select: none
-  -webkit-user-select: none
-  transition: width 0.24s cubic-bezier(0.34, 1.2, 0.64, 1), height 0.24s, border-radius 0.24s
-
-.ac-minibar.collapsed
-  width: 52px
-  height: 52px
-  border-radius: 50%
-  cursor: pointer
-  filter: drop-shadow(0 4px 14px rgba(33, 64, 106, 0.55))
-
-.ac-minibar.collapsed .ac-mb-panel
-  display: none
-
-.ac-mb-handle
-  width: 100%
-  height: 100%
-  display: grid
-  place-items: center
-  background: linear-gradient(135deg, $p-dark, $p-mid)
-  border-radius: 50%
-
-.ac-mb-color-dot
-  width: 26px
-  height: 26px
-  border-radius: 50%
-  border: 2.5px solid rgba(255, 255, 255, 0.75)
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25)
-
-.ac-minibar:not(.collapsed) .ac-mb-handle
-  display: none
-
-.ac-minibar.dragging
-  transition: none !important
-  transform: scale(1.06)
-  filter: drop-shadow(0 12px 30px rgba(33, 64, 106, 0.6))
-
-.ac-minibar:not(.collapsed)
-  background: #fff
-  border-radius: 12px
-  box-shadow: 0 8px 32px rgba(33, 64, 106, 0.22)
-  border: 1.5px solid $p-bdr
-  overflow: hidden
-
-.ac-mb-panel
-  display: flex
-  flex-direction: column
-  gap: 7px
-  padding: 8px
-  width: min(230px, calc(100vw - 24px))
-  max-height: calc(100dvh - 24px)
-  overflow-y: auto
-
-.ac-mb-dragbar
-  display: flex
-  align-items: center
-  justify-content: space-between
-  padding-bottom: 8px
-  border-bottom: 1.5px solid $p-bdr
-  cursor: grab
-
-.ac-mb-dragbar:active
-  cursor: grabbing
-
-.ac-mb-grip
-  display: flex
-  flex-direction: column
-  gap: 3px
-
-.ac-mb-grip span
-  width: 18px
-  height: 2.5px
-  background: $p-bdr
-  border-radius: 2px
-  display: block
-
-.ac-mb-label
-  font-size: 0.68rem
-  font-weight: 700
-  letter-spacing: 0.08em
-  text-transform: uppercase
-  color: $p
-
-.ac-mb-x
-  width: 22px
-  height: 22px
-  border-radius: 50%
-  background: $p-pale
-  border: none
-  cursor: pointer
-  display: grid
-  place-items: center
-  color: $text-m
-
-  svg
-    width: 11px
-    height: 11px
-
-.ac-mb-pal
-  display: grid
-  grid-template-columns: repeat(7, 1fr)
-  gap: 4px
-
-.ac-mb-pal.is-graphite
-  grid-template-columns: repeat(5, 1fr)
-
-.ac-sw
-  width: 24px
-  height: 24px
-  border-radius: 50%
-  border: 2px solid #fff
-  box-shadow: 0 0 0 1.2px $p-bdr
-  cursor: pointer
-  margin: 0 auto
-
-  &.active
-    box-shadow: 0 0 0 2.5px $p-mid
-    transform: scale(1.15)
-
-.ac-sw-rainbow
-  background: conic-gradient(red, #ff0, lime, cyan, blue, magenta, red)
-
-.ac-mb-tools
-  display: grid
-  grid-template-columns: 1fr 1fr 1fr
-  gap: 4px
-
-.ac-tb
-  display: flex
-  flex-direction: column
-  align-items: center
-  gap: 2px
-  padding: 6px 2px 4px
-  border-radius: 11px
-  background: $p-pale
-  border: 2px solid transparent
-  cursor: pointer
-  font: inherit
-  font-size: 0.58rem
-  font-weight: 700
-  color: $text-m
-
-  svg
-    width: 18px
-    height: 18px
-
-  &.active
-    background: linear-gradient(135deg, $p-dark, $p-mid)
-    color: #fff
-
-.ac-tb.ac-tb-eraser
-  background: #FFF5F7
-  color: #B04060
-
-  &.active
-    background: linear-gradient(135deg, #B04060, #D05080)
-    color: #fff
-
-.ac-mb-sliders
-  display: flex
-  flex-direction: column
-  gap: 7px
-
-.ac-sl-group
-  display: flex
-  flex-direction: column
-  gap: 3px
-
-.ac-sl-label
-  display: flex
-  justify-content: space-between
-  font-size: 0.65rem
-  font-weight: 700
-  color: $text-l
-  text-transform: uppercase
-  letter-spacing: 0.04em
-
-  b
-    color: $p
-    font-weight: 700
-
-input[type=range]
-  -webkit-appearance: none
-  appearance: none
-  width: 100%
-  height: 6px
-  border-radius: 50px
-  background: $p-bg
-  outline: none
-  cursor: pointer
-
-input[type=range]::-webkit-slider-thumb
-  -webkit-appearance: none
-  width: 18px
-  height: 18px
-  border-radius: 50%
-  background: #fff
-  border: 2.5px solid $p
-  cursor: pointer
-
-input[type=range]::-moz-range-thumb
-  width: 18px
-  height: 18px
-  border-radius: 50%
-  background: #fff
-  border: 2.5px solid $p
-  cursor: pointer
-
-.ac-mb-acts
-  display: grid
-  grid-template-columns: 1fr 1fr 1fr
-  gap: 5px
-
-.ac-act-btn
-  display: flex
-  align-items: center
-  justify-content: center
-  gap: 4px
-  padding: 7px 4px
-  border-radius: 10px
-  background: $p-pale
-  border: none
-  cursor: pointer
-  font: inherit
-  font-size: 0.68rem
-  font-weight: 700
-  color: $text-m
+  &:active:not(:disabled)
+    transform: scale(0.94)
 
   &:disabled
-    opacity: 0.3
-    cursor: not-allowed
+    opacity: 0.4
+    cursor: default
 
-  svg
-    width: 13px
-    height: 13px
-    flex-shrink: 0
+  &.on
+    background: rgba(31, 58, 95, 0.12)
 
-  &.danger
-    background: #FFF5F7
-    color: #B04060
+// the eraser page of the menu: size and what a tap does
+.ac-erpop-sizes
+  display: grid
+  grid-template-columns: repeat(4, 1fr)
+  gap: 8px
+  padding: 4px 6px
 
-.ac-mb-fs-row
-  display: flex
-  gap: 5px
-
-.ac-fs-btn
-  flex: 1
-  padding: 8px
-  border-radius: 50px
-  border: none
+.ac-erpop-size
+  height: 56px
+  display: grid
+  place-items: center
+  border: 1px solid $line
+  border-radius: 14px
+  background: #fff
   cursor: pointer
-  font: inherit
-  font-size: 0.74rem
-  font-weight: 700
+  -webkit-tap-highlight-color: transparent
+
+  span
+    display: block
+    border-radius: 50%
+    background: #c0526a
+    opacity: 0.75
+
+  &.on
+    border-color: #1f3a5f
+    background: rgba(31, 58, 95, 0.1)
+    box-shadow: 0 0 0 2px rgba(31, 58, 95, 0.35)
+
+.ac-erpop-row
+  display: flex
+  margin: 8px 6px 0
+
+  input[type="range"]
+    flex: 1
+    min-width: 0
+    height: 28px
+    accent-color: #1f3a5f
+
+.ac-erpop-tap
   display: flex
   align-items: center
-  justify-content: center
-  gap: 5px
+  gap: 10px
+  min-height: 44px
+  margin: 4px 6px 2px
+  font-size: 0.85rem
+  font-weight: 700
+  color: $ink
+  cursor: pointer
 
-  svg
-    width: 13px
-    height: 13px
+  input
+    flex: 0 0 22px
+    width: 22px
+    height: 22px
+    accent-color: #1f3a5f
 
-  &.enter
-    background: linear-gradient(135deg, $p-dark, $p-mid)
-    color: #fff
-    box-shadow: 0 3px 10px rgba(33, 64, 106, 0.35)
-
-  &.exit
-    background: $p-pale
-    color: $p
-    border: 1.5px solid $p-bdr
-
-.ac-save-notice
+// the window with the text of the picture, under the top bar
+.ac-text
   position: fixed
-  top: calc(max(env(safe-area-inset-top, 0px), 8px) + 56px)
+  top: calc(max(env(safe-area-inset-top, 0px), 10px) + 52px)
+  right: 12px
+  z-index: 45
+  width: min(380px, calc(100vw - 24px))
+  max-height: min(60vh, 460px)
+  overflow-y: auto
+  padding: 16px 18px 18px
+  border: 1px solid $line
+  border-radius: 18px
+  background: rgba(252, 251, 248, 0.97)
+  backdrop-filter: blur(16px)
+  -webkit-backdrop-filter: blur(16px)
+  box-shadow: 0 14px 40px rgba(20, 24, 32, 0.34)
+  user-select: text
+  -webkit-user-select: text
+
+.ac-text-enter-active,
+.ac-text-leave-active
+  transition: opacity 200ms ease-out, transform 280ms cubic-bezier(0.22, 1, 0.36, 1)
+
+.ac-text-enter-from,
+.ac-text-leave-to
+  opacity: 0
+  transform: translateY(-8px)
+
+.ac-text-title
+  margin: 0 0 4px
+  font-size: 1.05rem
+  font-weight: 800
+
+.ac-text-ref
+  margin: 0 0 10px
+  font-size: 0.8rem
+  font-weight: 700
+  color: $muted
+
+.ac-text-body
+  margin: 0
+  font-size: 1rem
+  line-height: 1.55
+  white-space: pre-line
+
+.ac-main.is-pan .ac-draw
+  cursor: grab
+
+// buttons answer at once: no waiting to see whether a second tap follows
+.ac-app :deep(:where(button, a))
+  touch-action: manipulation
+
+.ac-quick
+  display: flex
+  align-items: center
+  gap: 6px
+
+.ac-pages
+  display: flex
+  align-items: center
+  gap: 6px
+  padding: 4px 8px
+  border-radius: 12px
+  background: $glass
+  backdrop-filter: blur(14px)
+  -webkit-backdrop-filter: blur(14px)
+  box-shadow: 0 2px 10px rgba(20, 24, 32, 0.15)
+
+.ac-pg-btn
+  width: 30px
+  height: 30px
+  border: 0
+  border-radius: 8px
+  background: transparent
+  color: $ink
+  font-size: 1.1rem
+  font-weight: 800
+  cursor: pointer
+
+  &:disabled
+    opacity: 0.35
+
+.ac-pg-info
+  font-size: 0.85rem
+  font-weight: 700
+  color: $muted
+  white-space: nowrap
+
+// Phones: smaller buttons so the whole top bar fits; where it still does not (a very narrow screen, or the zoom buttons
+// showing), the bar can be swiped sideways and the last button (the menu) is reached.
+@media (max-width: 520px)
+  .ac-top
+    gap: 4px
+    padding-left: 8px
+    padding-right: 8px
+    padding-bottom: 14px
+    overflow-x: auto
+    overflow-y: hidden
+    overscroll-behavior-x: contain
+    scrollbar-width: none
+    touch-action: pan-x
+
+    &::-webkit-scrollbar
+      display: none
+
+    > *
+      flex-shrink: 0
+
+  .ac-btn
+    width: 36px
+    height: 36px
+    border-radius: 10px
+
+    img
+      width: 20px
+      height: 20px
+
+  .ac-quick
+    gap: 4px
+
+  .ac-pages
+    gap: 2px
+    padding: 2px 4px
+
+  .ac-pg-btn
+    width: 28px
+    height: 30px
+
+  .ac-pg-info
+    font-size: 0.78rem
+
+// ── Finished picture, awards ────────────────────────────────────────────────────────
+.ac-mi-main
+  font-weight: 800
+
+.ac-finish
+  text-align: center
+
+.ac-lapse-btn
+  display: block
+  margin: 0 auto 14px
+  min-height: 44px
+  padding: 0 20px
+  border: 2px solid $accent
+  border-radius: 999px
+  background: transparent
+  color: $accent
+  font: inherit
+  font-weight: 800
+  font-size: 0.92rem
+  cursor: pointer
+
+.ac-finish-label
+  display: block
+  font-size: 0.7rem
+  font-weight: 800
+  letter-spacing: 0.08em
+  text-transform: uppercase
+  color: #7a6b55
+
+.ac-finish-name
+  display: block
+  font-size: 1.1rem
+  color: $ink
+
+.ac-finish-star
+  display: block
+  width: 96px
+  height: 96px
+  margin: 0 auto 8px
+  object-fit: contain
+  filter: drop-shadow(0 6px 10px rgba(60, 40, 10, 0.35))
+
+.ac-award-banner
+  position: fixed
+  top: calc(max(env(safe-area-inset-top, 0px), 10px) + 56px)
   left: 50%
   transform: translateX(-50%)
+  z-index: 80
+  display: flex
+  align-items: center
+  gap: 10px
+  max-width: min(92vw, 380px)
+  padding: 8px 16px 8px 8px
+  border-radius: 16px
+  background: $accent
+  color: #ffffff
+  font-size: 0.85rem
+  text-decoration: none
+  box-shadow: 0 8px 20px -8px rgba(10, 26, 48, 0.55)
+
+  img
+    width: 42px
+    height: 42px
+    object-fit: contain
+    flex: 0 0 auto
+
+  strong
+    display: block
+    font-size: 0.7rem
+    letter-spacing: 0.06em
+    text-transform: uppercase
+    color: #f5d27a
+
+.ac-ico-sm
+  display: block
+  width: 18px
+  height: 18px
+  object-fit: contain
+  pointer-events: none
+
+.ac-exitfs
+  position: absolute
+  top: max(env(safe-area-inset-top, 0px), 10px)
+  right: 12px
+  z-index: 40
+  opacity: 0.55
+
+  &:hover
+    opacity: 1
+
+// ── Menu ──────────────────────────────────────────────────────────────────────
+.ac-penlog
+  position: fixed
+  left: 8px
+  bottom: 8px
+  z-index: 99
+  padding: 4px 10px
+  border-radius: 10px
+  background: rgba(0, 0, 0, 0.75)
+  color: #fff
+  font: 12px monospace
+  pointer-events: none
+
+.ac-menu-shade
+  position: fixed
+  inset: 0
+  z-index: 55
+
+.ac-menu
+  position: absolute
+  top: calc(max(env(safe-area-inset-top, 0px), 10px) + 50px)
+  right: 12px
   z-index: 60
+  min-width: 220px
+  padding: 6px
+  border-radius: 14px
+  background: rgba(252, 251, 248, 0.97)
+  backdrop-filter: blur(18px)
+  -webkit-backdrop-filter: blur(18px)
+  border: 1px solid $line
+  box-shadow: 0 14px 40px rgba(20, 24, 32, 0.3)
+
+.ac-menu.wide
+  width: 292px
+
+.ac-mi-back
+  font-weight: 800
+
+.ac-scenes
+  display: grid
+  grid-template-columns: repeat(2, 1fr)
+  gap: 8px
+  padding: 4px 6px
+
+.ac-scene
+  display: flex
+  flex-direction: column
+  gap: 4px
+  padding: 5px
+  border: 2px solid transparent
+  border-radius: 12px
+  background: transparent
+  color: inherit
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+
+  &.on
+    border-color: #1f3a5f
+
+.ac-scene-thumb
+  display: block
+  aspect-ratio: 4 / 3
+  border-radius: 8px
+  background-size: cover
+  background-position: center
+  box-shadow: inset 0 0 0 1px rgba(20, 24, 32, 0.14)
+
+  &.is-plain
+    background: radial-gradient(ellipse at 50% 30%, #fff2d9 0%, #fbdcae 55%, #f3c58b 100%)
+
+.ac-scene-name
+  font-size: 0.75rem
+  font-weight: 700
+  text-align: center
+
+.ac-plain
+  display: flex
+  flex-wrap: wrap
+  gap: 8px
+  margin: 6px 6px 4px
+  padding-top: 10px
+  border-top: 1px solid $line
+
+.ac-swatch
+  width: 30px
+  height: 30px
+  padding: 0
+  border: 2px solid #ffffff
+  border-radius: 50%
+  box-shadow: 0 0 0 1px rgba(20, 24, 32, 0.25)
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+
+  &.on
+    box-shadow: 0 0 0 2px #1f3a5f
+
+.ac-mi
+  width: 100%
+  display: flex
+  align-items: center
+  gap: 12px
+  padding: 11px 12px
+  border: 0
+  border-radius: 10px
+  background: transparent
+  color: $ink
+  font-size: 0.92rem
+  font-weight: 600
+  text-align: left
+  cursor: pointer
+
+  img
+    width: 20px
+    height: 20px
+    object-fit: contain
+    opacity: 0.85
+
+  &:active
+    background: rgba(20, 24, 32, 0.07)
+
+  &.danger
+    color: #a93d2e
+
+// Undo and redo, quiet in a corner of the picture
+.ac-corner
+  position: fixed
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px) + var(--lift, 0px))
+  z-index: 40
+  display: flex
+  gap: 6px
+  transition: bottom 460ms cubic-bezier(0.22, 1, 0.36, 1)
+
+  &.on-right
+    right: calc(14px + env(safe-area-inset-right, 0px))
+
+  &.on-left
+    left: calc(14px + env(safe-area-inset-left, 0px))
+
+.ac-corner-btn
+  display: grid
+  place-items: center
+  min-width: 38px
+  height: 38px
+  padding: 0
+  border: 1px solid rgba(20, 24, 32, 0.08)
+  border-radius: 13px
+  background: rgba(252, 251, 248, 0.6)
+  backdrop-filter: blur(8px)
+  -webkit-backdrop-filter: blur(8px)
+  color: $ink
+  opacity: 0.62
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+  transition: opacity 140ms ease-out, transform 100ms ease-out
+
+  img
+    width: 19px
+    height: 19px
+    object-fit: contain
+    pointer-events: none
+
+  &:active:not(:disabled)
+    opacity: 1
+    transform: scale(0.94)
+
+  &:disabled
+    opacity: 0.22
+    cursor: default
+
+.ac-corner-btn.on
+  opacity: 1
+  background: rgba(31, 58, 95, 0.18)
+
+.ac-corner-zero
+  padding: 0 10px
+  font-size: 0.82rem
+  font-weight: 800
+  opacity: 0.85
+
+// Everything fades while a stroke is on, so nothing distracts from the paper.
+.ac-app.is-painting .ac-top
+  opacity: 0.12
+  pointer-events: none
+
+.ac-app.ui-hidden .ac-top
+  display: none
+
+// ── Notices ────────────────────────────────────────────────────────────────────────
+.ac-save-notice
+  position: fixed
+  top: calc(max(env(safe-area-inset-top, 0px), 10px) + 56px)
+  left: 50%
+  transform: translateX(-50%)
+  z-index: 80
   max-width: min(90vw, 360px)
   margin: 0
-  padding: 8px 16px
-  border-radius: 999px
-  background: $p
+  padding: 10px 18px
+  border-radius: 12px
+  background: $accent
   color: #ffffff
   font-size: 14px
   font-weight: 700
@@ -2447,10 +4064,9 @@ input[type=range]::-moz-range-thumb
   pointer-events: none
 
   &.is-denied
-    border-radius: 16px
-    background: $p-pale
-    color: $text
-    border: 1px solid $p-bdr
+    background: $glass
+    color: $ink
+    border: 1px solid $line
 
 .ac-notice-enter-active, .ac-notice-leave-active
   transition: opacity 200ms ease-out, transform 200ms ease-out
@@ -2465,74 +4081,39 @@ input[type=range]::-moz-range-thumb
   pointer-events: none
   width: 1px
   height: 1px
-
-// Responsive header — phones in portrait have very little horizontal room
-// once the page nav, quick-tools, and action buttons all line up. We hide
-// the title text below 480px so the actually-useful controls keep their
-// minimum tap target. Below 360px (smallest common phones), the page
-// counter shrinks too.
-@media (max-width: 480px)
-  .ac-title
-    font-size: 0
-  .ac-q
-    width: 30px
-    height: 30px
-  .ac-h-btn
-    width: 30px
-    height: 30px
-
-@media (max-width: 360px)
-  .ac-hdr
-    gap: 4px
-    padding: 8px 8px
-    padding-top: max(8px, env(safe-area-inset-top))
-  .ac-quick
-    gap: 3px
-  .ac-actions
-    gap: 3px
-  .ac-q,
-  .ac-h-btn
-    width: 28px
-    height: 28px
-  .ac-pg-btn
-    width: 22px
-    height: 22px
-
-// Tablets / desktop — keep the same edge-to-edge fit as on phones per
-// product call. (The previous gutter on >=900px was removed.)
-
 // ── Unsaved-changes confirmation modal ───────────────────────────────────
 .ac-confirm-overlay
   position: fixed
   inset: 0
   z-index: 1000
-  background: rgba(20, 6, 38, 0.55)
+  background: rgba(20, 14, 6, 0.55)
   display: flex
   align-items: center
   justify-content: center
   padding: 20px
-  backdrop-filter: blur(2px)
-  -webkit-backdrop-filter: blur(2px)
+  backdrop-filter: blur(3px)
+  -webkit-backdrop-filter: blur(3px)
   animation: ac-fade-in 0.16s ease-out
 
 .ac-confirm-dialog
   width: 100%
   max-width: 360px
-  background: #fff
-  border-radius: 18px
+  background: linear-gradient(180deg, #fffaf0 0%, #f6e9c8 100%)
+  border: 1.5px solid $p-bdr
+  border-radius: 22px
   padding: 22px 22px 18px
-  box-shadow: 0 20px 60px -16px rgba(20, 6, 38, 0.55), 0 6px 20px -6px rgba(20, 6, 38, 0.3)
+  box-shadow: 0 20px 60px -16px rgba(58, 42, 18, 0.5)
   animation: ac-pop-in 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)
 
 .ac-confirm-title
   margin: 0 0 8px
-  font-size: 1.15rem
-  font-weight: 700
+  font-size: 1.2rem
+  font-weight: 800
   color: $text
 
 .ac-confirm-body
   margin: 0 0 18px
-  font-size: 0.92rem
+  font-size: 0.95rem
   line-height: 1.45
   color: $text-m
 
@@ -2545,29 +4126,26 @@ input[type=range]::-moz-range-thumb
 .ac-confirm-stay,
 .ac-confirm-leave
   font: inherit
-  font-weight: 700
-  font-size: 0.88rem
+  font-weight: 800
+  font-size: 0.95rem
   border: none
   cursor: pointer
-  padding: 10px 18px
+  padding: 12px 20px
   border-radius: 999px
-  transition: background 0.13s, transform 0.1s
+  min-height: 46px
 
   &:active
     transform: scale(0.96)
 
 .ac-confirm-stay
-  background: $p-pale
-  color: $p
-  border: 1.5px solid $p-bdr
-
-  &:hover
-    background: $p-bg
+  background: $accent
+  color: #ffffff
+  box-shadow: none
 
 .ac-confirm-leave
-  background: linear-gradient(135deg, #B04060, #D05080)
-  color: #fff
-  box-shadow: 0 4px 12px -4px rgba(176, 64, 96, 0.45)
+  background: $p-pale
+  color: $text
+  border: 2px solid $p-bdr
 
 @keyframes ac-fade-in
   from

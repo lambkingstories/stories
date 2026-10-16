@@ -167,12 +167,12 @@ function setLayout(mode: LayoutMode) {
 </template>
 
 <style scoped lang="sass">
-$cream-bg: #f3e6c4
-$cream-card: #fdf8ed
-$navy: #1a2f4a
-$brown: #7a6b55
-$gold: #d4a83e
-$border: #e6d6b5
+$cream-bg: var(--lk-bg)
+$cream-card: var(--lk-surface)
+$navy: var(--lk-text)
+$brown: var(--lk-muted)
+$gold: var(--lk-accent)
+$border: var(--lk-line)
 
 button
   -webkit-tap-highlight-color: transparent
@@ -240,7 +240,7 @@ button
 
   &.is-active
     color: $cream-card
-    background: linear-gradient(180deg, #233a5e 0%, #142a47 100%)
+    background: var(--lk-accent)
     box-shadow: 0 2px 6px -2px rgba(10, 26, 48, 0.45)
 
 // Default tracks: three equal columns. `minmax(0, 1fr)` lets long
@@ -308,7 +308,7 @@ button
   aspect-ratio: 3 / 4
   border-radius: 10px
   overflow: hidden
-  background: linear-gradient(160deg, #f3e6c4 0%, #e8d29a 100%)
+  background: var(--lk-surface-2)
   border: 1px solid $border
 
 .book-card-img

@@ -75,7 +75,7 @@ import { useBookDraftStore } from '@/stores/bookDraft'
 import { useToastStore } from '@/stores/toast'
 import { useRecentBooks } from '@/composables/useRecentBooks'
 import { booksApi } from '@/api/books'
-import { isColoringCategory } from '@/utils/coloringBook'
+import { isColoringBook as isColoringBookDto } from '@/utils/coloringBook'
 import type { BookDTO } from '@/types'
 
 const series = useSeriesStore()
@@ -100,7 +100,7 @@ const previewAchievementBadge = computed(() => {
   if (!ab) return ''
   return ab[draft.activeLocale] || ab.de || ab.en || ''
 })
-const isColoringBook = computed(() => isColoringCategory(draft.book.category))
+const isColoringBook = computed(() => isColoringBookDto(draft.book))
 
 onMounted(async () => {
   // Recover an unsaved new-book draft *before* fetching the catalogue —

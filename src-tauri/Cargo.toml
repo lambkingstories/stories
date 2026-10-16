@@ -32,6 +32,8 @@ tauri-plugin-save-photo = { path = "plugins/tauri-plugin-save-photo" }
 # Tip sheet: says up front when Screen Time or a work-device profile blocks
 # in-app purchases (tauri-plugin-iap has no such check).
 tauri-plugin-purchase-check = { path = "plugins/tauri-plugin-purchase-check" }
+# Apple Pencil double tap: switches the coloring screen between the eraser and the tool before.
+tauri-plugin-pencil = { path = "plugins/tauri-plugin-pencil" }
 
 [profile.release]
 panic = "abort"

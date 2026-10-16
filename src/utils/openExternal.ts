@@ -44,6 +44,7 @@
  * handing the link to the system browser is also the policy-safe shape.
  */
 import { isTauri } from '@tauri-apps/api/core'
+import { requireParent } from '@/use/useParentalGate'
 
 // Same two-signal check `useUserUuid` uses: `isTauri()` reads the
 // `window.isTauri` marker the v2 WebView injects, `__TAURI_INTERNALS__` is the
@@ -78,11 +79,14 @@ function openInBrowserTab(url: string): boolean {
 }
 
 /**
- * Hands `url` to the OS browser. Resolves `true` when something took the link.
+ * Hands `url` to the OS browser after the parental gate. Resolves `true` when something took the link.
  * Never throws — a dead donate button is a bug, a crashing one is worse.
  */
 export async function openExternal(url: string): Promise<boolean> {
   if (!isExternalUrl(url)) return false
+
+  // Kids' app: nothing leaves it without a grown-up (resolves true on the web build).
+  if (!(await requireParent())) return false
 
   if (inTauriApp()) {
     try {

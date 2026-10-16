@@ -67,6 +67,8 @@
   },
   "dependencies": {
     "@choochmeque/tauri-plugin-iap-api": "^0.9.1",
+    "@fontsource/fraunces": "^5.3.0",
+    "@fontsource/source-sans-3": "^5.3.1",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2.5.5",
     "@vueuse/core": "^14.2.1",

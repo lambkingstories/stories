@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import ZBackButton from '@/components/atoms/ZBackButton.vue'
+import LkPageHead from '@/components/molecules/LkPageHead.vue'
 import { renderLegalText } from '@/utils/renderLegalText'
 import { openExternal } from '@/utils/openExternal'
 // Same file the website's privacy modal shows, so both always match. It
@@ -34,9 +34,7 @@ function onTextClick(event: MouseEvent) {
 
 <template lang="pug">
   div(class="legal-page min-h-screen w-full pb-[calc(8rem+env(safe-area-inset-bottom,0px))]")
-    header(class="legal-header")
-      ZBackButton(variant="flat" @click="goBack")
-      h1(class="legal-title") {{ t('app.legal.title') }}
+    LkPageHead(:title="t('app.legal.title')" :lamb="false" @back="goBack")
 
     article(class="legal-card")
       p(v-if="locale !== 'de'" class="legal-note") {{ t('app.legal.germanOnly') }}

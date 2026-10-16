@@ -86,15 +86,15 @@ function openBook(bookId: string) {
 </template>
 
 <style scoped lang="sass">
-$cream-bg: #f3e6c4
-$cream-card: #fdf8ed
-$navy: #1a2f4a
-$brown: #7a6b55
-$gold: #d4a83e
-$border: #e6d6b5
+$cream-bg: var(--lk-bg)
+$cream-card: var(--lk-surface)
+$navy: var(--lk-text)
+$brown: var(--lk-muted)
+$gold: var(--lk-accent)
+$border: var(--lk-line)
 
 .hoeren-page
-  background: radial-gradient(ellipse at top, #faf2dc 0%, #f3e6c4 60%, #e8d29a 100%)
+  background: var(--lk-bg)
   color: $navy
 
 .page-header
@@ -158,7 +158,7 @@ $border: #e6d6b5
   aspect-ratio: 3 / 4
   border-radius: 10px
   overflow: hidden
-  background: linear-gradient(160deg, #f3e6c4 0%, #e8d29a 100%)
+  background: var(--lk-surface-2)
   display: flex
   align-items: center
   justify-content: center

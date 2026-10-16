@@ -22,8 +22,12 @@ export const booksApi = {
     return getApiBase()
   },
 
+  /**
+   * All books, slim: the server leaves the text of the story pages out (about three quarters of the list). Such a book has
+   * `lean: true`; the text comes with `getById` when the book is opened. A server that does not know `lean` sends everything.
+   */
   async list(): Promise<ApiBook[]> {
-    const data = await request<ApiBookListResponse>('/api/books')
+    const data = await request<ApiBookListResponse>('/api/books?lean=1')
     return data.books ?? []
   },
 

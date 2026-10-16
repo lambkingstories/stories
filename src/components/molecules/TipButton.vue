@@ -13,6 +13,7 @@ import { onMounted, computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useTips from '@/use/useTips'
 import SupportModal from '@/components/molecules/SupportModal.vue'
+import { requireParent } from '@/use/useParentalGate'
 
 interface Props {
   compact?: boolean
@@ -31,6 +32,11 @@ const onDown = () => (pressed.value = true)
 const onUp = () => (pressed.value = false)
 
 const open = ref(false)
+
+// A purchase is for grown-ups: the amount list only opens after the gate.
+async function openTips() {
+  if (await requireParent()) open.value = true
+}
 const label = computed(() => t('app.tip.label'))
 </script>
 
@@ -49,7 +55,7 @@ const label = computed(() => t('app.tip.label'))
       @pointerup="onUp"
       @pointercancel="onUp"
       @pointerleave="onUp"
-      @click="open = true"
+      @click="openTips"
     )
       span(class="tip-btn-icon" aria-hidden="true")
         svg(viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4")

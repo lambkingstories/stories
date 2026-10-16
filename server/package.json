@@ -14,6 +14,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "migrate:test-to-main": "dotenv -e .env.local -- tsx scripts/migrate-test-to-main.ts",
+    "migrate:coloring-kind": "dotenv -e .env.local -- tsx scripts/migrate-coloring-kind.ts",
     "migrate:content-cover-image": "dotenv -e .env.local -- tsx scripts/migrate-content-cover-image.ts",
     "translate:books": "dotenv -e .env.local -- tsx scripts/translate-books.ts",
     "migrate:rewrite-upload-urls": "dotenv -e .env.local -- tsx scripts/migrate-rewrite-upload-urls.ts",

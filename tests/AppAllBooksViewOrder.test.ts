@@ -108,6 +108,10 @@ vi.mock('@/use/useUser', () => ({
   isMobilePortrait: { value: true }
 }))
 
+vi.mock('@/components/molecules/AppHeader.vue', () => ({
+  default: { name: 'AppHeader', template: '<header class="app-header-stub" />' }
+}))
+
 vi.mock('@/components/atoms/ZBackButton.vue', () => ({
   default: { name: 'ZBackButton', template: '<button class="z-back-btn-stub" />' }
 }))
@@ -115,22 +119,39 @@ vi.mock('@/components/atoms/ZBackButton.vue', () => ({
 // ---- Test ------------------------------------------------------------------
 
 describe('AppAllBooksView · series display order', () => {
-  it('orders the tiles by the AdminUI sortOrder, unpositioned series last', async () => {
+  it('orders the shelves by the AdminUI sortOrder, unpositioned series last', async () => {
     const { default: AppAllBooksView } = await import('@/views/app/AppAllBooksView.vue')
     const wrapper = mount(AppAllBooksView)
     await wrapper.vm.$nextTick()
 
-    const names = wrapper.findAll('.series-tile-name').map((n) => n.text())
+    const names = wrapper.findAll('.shelf-name').map((n) => n.text())
     expect(names).toEqual(['Charlie Reihe', 'Bravo Reihe', 'Alpha Reihe', 'Zulu Reihe'])
   })
 
-  it('applies the same order to the filter chips', async () => {
+  it('every shelf has its books and an "all" link', async () => {
     const { default: AppAllBooksView } = await import('@/views/app/AppAllBooksView.vue')
     const wrapper = mount(AppAllBooksView)
     await wrapper.vm.$nextTick()
 
-    // The first chip is the "all" filter; the rest track the tiles.
-    const labels = wrapper.findAllComponents({ name: 'ZChip' }).map((c) => c.props('label'))
-    expect(labels.slice(1)).toEqual(['Charlie Reihe', 'Bravo Reihe', 'Alpha Reihe', 'Zulu Reihe'])
+    expect(wrapper.findAll('.shelf')).toHaveLength(4)
+    expect(wrapper.findAll('.shelf-all')).toHaveLength(4)
+    expect(wrapper.findAll('.shelf-book')).toHaveLength(4)
+  })
+
+  it('the search shows the matching books instead of the shelves, and says so when nothing matches', async () => {
+    const { default: AppAllBooksView } = await import('@/views/app/AppAllBooksView.vue')
+    const wrapper = mount(AppAllBooksView)
+    await wrapper.vm.$nextTick()
+
+    await wrapper.find('.ask-input').setValue('titel')
+    expect(wrapper.findAll('.shelf')).toHaveLength(0)
+    expect(wrapper.findAll('.result')).toHaveLength(4)
+
+    await wrapper.find('.ask-input').setValue('zzzz')
+    expect(wrapper.findAll('.result')).toHaveLength(0)
+    expect(wrapper.find('.results-empty').exists()).toBe(true)
+
+    await wrapper.find('.ask-input').setValue('')
+    expect(wrapper.findAll('.shelf')).toHaveLength(4)
   })
 })

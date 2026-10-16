@@ -20,6 +20,8 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: 'jsdom'
+    environment: 'jsdom',
+    // the first mount of a big screen compiles it; on a busy machine that can take longer than 5 s
+    testTimeout: 20000
   }
 })

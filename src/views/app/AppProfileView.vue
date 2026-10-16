@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import useTheme, { type ThemeChoice } from '@/use/useTheme'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import ZBackButton from '@/components/atoms/ZBackButton.vue'
+import AppHeader from '@/components/molecules/AppHeader.vue'
+import ParentSheet from '@/components/molecules/ParentSheet.vue'
+import LkCompanion from '@/components/atoms/LkCompanion.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import ZLanguageSwitcher from '@/components/atoms/ZLanguageSwitcher.vue'
 import AvatarPickerModal from '@/components/molecules/AvatarPickerModal.vue'
@@ -92,6 +95,7 @@ const userXpMax = computed(() => 500)
 const xpPct = computed(() => Math.min(1, userXp.value / userXpMax.value))
 
 const avatarOpen = ref(false)
+const parentOpen = ref(false)
 
 function openAvatar() {
   avatarOpen.value = true
@@ -105,6 +109,13 @@ function closeAvatar() {
 // looking for it shouldn't have to discover the gear first. The gear is
 // now purely a way to collapse it out of the way.
 const settingsOpen = ref(true)
+
+const { choice: themeChoice, setChoice: setThemeChoice } = useTheme()
+const themeOptions = computed<{ id: ThemeChoice; label: string; icon: 'sun' | 'moon' | 'auto' }[]>(() => [
+  { id: 'day', label: t('app.theme.day'), icon: 'sun' },
+  { id: 'night', label: t('app.theme.night'), icon: 'moon' },
+  { id: 'auto', label: t('app.theme.auto'), icon: 'auto' }
+])
 
 function toggleSettings() {
   settingsOpen.value = !settingsOpen.value
@@ -162,34 +173,21 @@ function onBackendToggle(e: Event) {
 <template lang="pug">
   div(
     :class="['profile-page', isMobileLandscape ? 'is-landscape' : '', 'min-h-screen w-full pb-[calc(8rem+env(safe-area-inset-bottom,0px))]']"
-    :style="backdropVars"
   )
-    //- ===== Header (back · crown · title · settings) =====
-    header(class="profile-header")
-      ZBackButton(
-        class="profile-back-btn"
-        variant="flat"
-        @click="goBack"
-      )
-      div(class="title-cluster")
-        div(class="brand-stack flex flex-col items-center justify-center gap-0")
-          img(
-            :src="prependBaseUrl('images/icons/crown_256x256.webp')"
-            alt="LambKing"
-            class="brand-crown w-[44px] object-contain -mb-1"
-            decoding="async"
-          )
-          h1(class="page-title")
-            span {{ t('app.profile.title') }}
-      button(
-        type="button"
-        class="header-btn"
-        :aria-label="t('app.profile.settings')"
-        @click="toggleSettings"
-      )
-        ZIconography(name="settings" :size="22")
+    AppHeader
+    div(class="profile-head")
+      div
+        h1(class="profile-title") {{ t('app.nav.profile') }}
+        p(class="profile-sub") {{ t('app.profile.settings') }}
+      LkCompanion(class="profile-lamb" pose="winken" :size="92")
 
     div(class="profile-content")
+      //- the parents' area (support us, shop, settings, legal) lives here; every link in it asks the parental gate on its own
+      button(type="button" class="parent-open lk-btn lk-btn--outline lk-btn--full" @click="parentOpen = true")
+        ZIconography(name="lock" :size="22")
+        span {{ t('app.parent.button') }}
+      ParentSheet(:open="parentOpen" @close="parentOpen = false")
+
       //- ===== Profile card =====
       div(class="profile-card")
         div(class="profile-row")
@@ -206,26 +204,7 @@ function onBackendToggle(e: Event) {
               :aria-label="t('app.profile.chooseAvatar')"
               @click="openAvatar"
             )
-              //- Photo camera with a crayon, signalling the avatar
-              //- portrait is editable.
-              svg(viewBox="0 0 32 32" fill="none" class="w-full h-full" aria-hidden="true")
-                //- Camera body
-                rect(x="3" y="9" width="26" height="18" rx="3.5" fill="#1a2f4a" stroke="#ffffff" stroke-width="1.4")
-                //- Top hump above the lens
-                path(d="M11 9l1.6-3h6.8L21 9z" fill="#1a2f4a" stroke="#ffffff" stroke-width="1.4" stroke-linejoin="round")
-                //- Lens outer ring
-                circle(cx="16" cy="18.5" r="5.2" fill="#0d1b2e" stroke="#ffffff" stroke-width="1.4")
-                //- Lens glass + highlight
-                circle(cx="16" cy="18.5" r="3" fill="#3a6fa8")
-                circle(cx="14.4" cy="17" r="1.1" fill="#cfe4ff")
-                //- Flash window (top-left)
-                rect(x="6" y="11.5" width="3" height="2" rx="0.5" fill="#cfe4ff")
-                //- Crayon — orange shaft + sharpened tip + tape band
-                g(transform="rotate(-32 22 11)")
-                  rect(x="14" y="9.5" width="13" height="3.6" rx="0.6" fill="#f0a040" stroke="#7a4a10" stroke-width="0.6")
-                  rect(x="22" y="9.5" width="2.4" height="3.6" fill="#7a4a10")
-                  path(d="M27 9.5l3 1.8-3 1.8z" fill="#fff2d8" stroke="#7a4a10" stroke-width="0.6" stroke-linejoin="round")
-                  path(d="M30 11.3l0.8 0.5l-0.8 0.5z" fill="#3b2410")
+              ZIconography(name="edit" :size="18")
 
           div(class="profile-meta")
             //- View mode: name + pencil edit affordance.
@@ -239,7 +218,7 @@ function onBackendToggle(e: Event) {
                   :aria-label="t('app.profile.editName')"
                   @click="startEditName"
                 )
-                  ZIconography(name="pencil" :size="16")
+                  ZIconography(name="edit" :size="16")
             template(v-else)
               form(
                 class="name-edit-form"
@@ -280,25 +259,6 @@ function onBackendToggle(e: Event) {
             //    :style="{ width: Math.round(xpPct * 100) + '%' }"
             //  )
 
-        //- Quick action grid
-        div(class="quick-grid")
-          button(
-            v-for="qa in quickActions"
-            :key="qa.id"
-            type="button"
-            :class="['quick-tile', { 'is-disabled': qa.disabled }]"
-            :disabled="qa.disabled"
-            :aria-label="qa.label"
-            @click="onQuickAction(qa)"
-          )
-            span(class="quick-icon")
-              img(
-                :src="qa.icon"
-                :alt="qa.label"
-                class="quick-icon-img"
-                @error="onImgFallback"
-              )
-            span(class="quick-label") {{ qa.label }}
 
       //- ===== Settings (collapsible) =====
       div(
@@ -310,6 +270,23 @@ function onBackendToggle(e: Event) {
           span(class="settings-label") {{ t('app.profile.language') }}
           div(class="settings-actions")
             ZLanguageSwitcher(:size="34")
+
+        //- day / night look of the whole app
+        div(class="settings-row settings-row--col theme-row")
+          span(class="settings-label") {{ t('app.theme.title') }}
+          div(class="theme-seg" role="radiogroup" :aria-label="t('app.theme.title')")
+            button(
+              v-for="opt in themeOptions"
+              :key="opt.id"
+              type="button"
+              role="radio"
+              :aria-checked="themeChoice === opt.id"
+              :class="['theme-opt', { 'is-on': themeChoice === opt.id }]"
+              @click="setThemeChoice(opt.id)"
+            )
+              ZIconography(:name="opt.icon" :size="20")
+              span {{ opt.label }}
+          span(class="theme-hint") {{ t('app.theme.hint') }}
 
         //- Backend feature flag — flip the API host between Render and
         //- the local dev server. Reloads the page so the IndexedDB cache
@@ -336,7 +313,7 @@ function onBackendToggle(e: Event) {
         class="favorites-section"
       )
         h3(class="card-section-title")
-          span.text-white {{ t('app.profile.favorites') }}
+          span {{ t('app.profile.favorites') }}
           span(class="count-pill") {{ watchListBooks.length }}
 
         div(
@@ -385,11 +362,11 @@ function onBackendToggle(e: Event) {
 </template>
 
 <style scoped lang="sass">
-$cream-bg: #f3e6c4
-$cream-card: #fdf8ed
-$navy: #1a2f4a
-$brown: #7a6b55
-$gold: #d4a83e
+$cream-bg: var(--lk-bg)
+$cream-card: var(--lk-surface)
+$navy: var(--lk-text)
+$brown: var(--lk-muted)
+$gold: var(--lk-accent)
 
 .profile-support
   display: flex
@@ -418,11 +395,11 @@ $gold: #d4a83e
   font-weight: 600
   color: $navy
   background: rgba(253, 248, 237, 0.85)
-  border: 1px solid #e6d6b5
+  border: 1px solid var(--lk-line)
   border-radius: 999px
   cursor: pointer
   -webkit-tap-highlight-color: transparent
-$border: #e6d6b5
+$border: var(--lk-line)
 
 button
   -webkit-tap-highlight-color: transparent
@@ -442,33 +419,31 @@ button
 .profile-page
   position: relative
   z-index: 0
-  background: transparent
-  color: $navy
+  background: var(--lk-bg)
+  color: var(--lk-text)
 
-.profile-page::before
-  content: ''
-  position: fixed
-  top: 0
-  left: 0
-  width: 100%
-  // Sized instead of `inset: 0` on purpose: during the page-pop-scale route
-  // animation the transform on .profile-page turns it into the containing
-  // block for this fixed layer, and `bottom: 0` would then stretch the
-  // artwork over the full document height and snap back when the animation
-  // ends. A viewport-height box looks identical in both states.
-  height: 100vh
-  height: 100dvh
-  z-index: -1
-  pointer-events: none
-  background-color: $cream-bg
-  background-image: var(--profile-bg-portrait)
-  background-repeat: no-repeat
-  background-position: center
-  background-size: cover
+.profile-head
+  display: flex
+  align-items: flex-end
+  justify-content: space-between
+  max-width: 28rem
+  margin: 0 auto
+  padding: 0 20px
+  min-height: 92px
 
-@media (orientation: landscape)
-  .profile-page::before
-    background-image: var(--profile-bg-landscape)
+.profile-title
+  margin: 0
+  font-weight: 800
+  font-size: 1.9rem
+  line-height: 1.1
+
+.profile-sub
+  margin: 2px 0 8px
+  color: var(--lk-muted)
+  font-size: 1.1rem
+
+.profile-lamb
+  margin-bottom: -6px
 
 .profile-header
   padding: max(env(safe-area-inset-top), 0.75rem) 20px 8px
@@ -512,7 +487,7 @@ button
 
 
 .profile-back-btn
-  --back-icon-color: #1a2f4a !important
+  --back-icon-color: var(--lk-text) !important
 
 .page-title
   display: inline-flex
@@ -533,16 +508,23 @@ button
 
 // ===== Profile card =====
 .profile-card
-  background: linear-gradient(180deg, #fdf8ed 0%, #f5e8c2 100%)
-  border: 1.5px solid $border
-  border-radius: 24px
-  padding: 16px
-  box-shadow: 0 12px 28px -14px rgba(58, 42, 18, 0.3)
+  background: var(--lk-surface)
+  border: 1px solid var(--lk-line)
+  border-radius: var(--lk-r-group)
+  padding: 18px 16px
+  box-shadow: var(--lk-shadow)
 
 .profile-row
   display: flex
   align-items: center
   gap: 14px
+
+.parent-open
+  margin-bottom: 14px
+  gap: 10px
+
+  :deep(.z-icon-outline)
+    color: currentColor
 
 .avatar-wrap
   position: relative
@@ -555,7 +537,7 @@ button
   object-fit: cover
   border: 3px solid $gold
   box-shadow: 0 6px 16px -6px rgba(212, 168, 62, 0.5)
-  background: linear-gradient(160deg, #f3e6c4 0%, #e8d29a 100%)
+  background: var(--lk-surface-2)
 
 .avatar-picker-btn
   position: absolute
@@ -564,7 +546,7 @@ button
   width: 34px
   height: 34px
   border-radius: 999px
-  background: linear-gradient(180deg, #21406a 0%, #142a47 100%)
+  background: var(--lk-read)
   color: #ffffff
   border: 2px solid $cream-card
   display: inline-flex
@@ -664,12 +646,12 @@ button
     transform: scale(0.92)
 
 .name-edit-save
-  background: linear-gradient(180deg, #6da045 0%, #4a7332 100%)
+  background: var(--lk-paint)
   color: #ffffff
-  border-color: #4a7332
+  border-color: var(--lk-line)
 
   &:hover
-    background: linear-gradient(180deg, #7cb24f 0%, #588439 100%)
+    background: var(--lk-paint)
 
 .name-edit-cancel
   background-color: $cream-card
@@ -716,7 +698,7 @@ button
 
 .xp-fill
   height: 100%
-  background: linear-gradient(90deg, #6da045 0%, #4a7332 100%)
+  background: var(--lk-paint)
   border-radius: inherit
   transition: width 240ms ease-out
 
@@ -774,10 +756,10 @@ button
 // ===== Settings =====
 .settings-card
   background: $cream-card
-  border: 1px solid $border
-  border-radius: 18px
-  padding: 14px 16px
-  box-shadow: 0 6px 18px -10px rgba(58, 42, 18, 0.25)
+  border: 1px solid var(--lk-line)
+  border-radius: var(--lk-r-group)
+  padding: 16px
+  box-shadow: var(--lk-shadow)
   display: flex
   flex-direction: column
   gap: 10px
@@ -843,12 +825,12 @@ button
   width: 20px
   height: 20px
   border-radius: 999px
-  background: linear-gradient(180deg, #ffffff 0%, #fbf1d6 100%)
+  background: var(--lk-surface)
   box-shadow: 0 2px 6px -1px rgba(58, 42, 18, 0.4)
   transition: transform 180ms ease-out
 
 .backend-switch input:checked + .backend-switch-track
-  background: linear-gradient(180deg, #21406a 0%, #142a47 100%)
+  background: var(--lk-read)
 
 .backend-switch input:checked + .backend-switch-track .backend-switch-thumb
   transform: translateX(22px)
@@ -889,8 +871,8 @@ button
 .empty-card
   text-align: center
   background: $cream-card
-  border: 1px dashed $border
-  border-radius: 18px
+  border: 1px dashed var(--lk-line)
+  border-radius: var(--lk-r-group)
   padding: 22px 16px
   color: $brown
   font-size: 13px
@@ -918,7 +900,7 @@ button
   border-radius: 10px
   overflow: hidden
   cursor: pointer
-  background: linear-gradient(160deg, #f3e6c4 0%, #e8d29a 100%)
+  background: var(--lk-surface-2)
   display: flex
   align-items: center
   justify-content: center
@@ -997,4 +979,39 @@ button
   // and leave column 1 empty; let it span both columns instead.
   .profile-content:not(:has(.settings-card)) .favorites-section
     grid-column: 1 / -1
+
+// day / night switch
+.theme-seg
+  display: flex
+  gap: 4px
+  padding: 4px
+  border-radius: 32px
+  background: var(--lk-surface-2)
+  border: 1px solid var(--lk-line)
+
+.theme-opt
+  display: flex
+  align-items: center
+  justify-content: center
+  gap: 6px
+  flex: 1
+  min-height: 48px
+  border: none
+  border-radius: 28px
+  background: transparent
+  color: var(--lk-text)
+  font-weight: 700
+  font-size: 1rem
+  cursor: pointer
+
+  :deep(.z-icon-outline)
+    color: currentColor
+
+  &.is-on
+    background: var(--lk-accent)
+    color: var(--lk-on-accent)
+
+.theme-hint
+  font-size: 0.88rem
+  color: var(--lk-muted)
 </style>

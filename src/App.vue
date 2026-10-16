@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RouterView, useRoute } from 'vue-router'
+import { RouterView, useRoute, useRouter } from 'vue-router'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { orientation } from '@/use/useUser'
@@ -13,12 +13,32 @@ import useCheats from '@/use/useCheats'
 import useAssets from '@/use/useAssets'
 import useAppNav from '@/use/useAppNav'
 import ZBottomNav from '@/components/atoms/ZBottomNav.vue'
+import useChrome from '@/use/useChrome'
+import ParentalGateModal from '@/components/molecules/ParentalGateModal.vue'
+import PremiumSheet from '@/components/molecules/PremiumSheet.vue'
 import { GAME_USER_LANGUAGE } from '@/utils/constants.ts'
 
 const { initMusic, pauseMusic, continueMusic } = useMusic()
 const { userLanguage } = useUser()
 const { t, locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
+const router = useRouter()
+
+// A screen that has to be loaded first leaves the tap without any answer for a moment: a thin gold bar at the top shows that it was
+// understood (only when it takes longer than a blink).
+const navigating = ref(false)
+let navTimer: ReturnType<typeof setTimeout> | undefined
+const stopNavBar = () => {
+  clearTimeout(navTimer)
+  navigating.value = false
+}
+router.beforeEach(() => {
+  clearTimeout(navTimer)
+  navTimer = setTimeout(() => (navigating.value = true), 90)
+  return true
+})
+router.afterEach(stopNavBar)
+router.onError(stopNavBar)
 const { navItems, activeNav, onNav } = useAppNav(t)
 
 // Routes that render the shared ZBottomNav. Keeping the nav rendered at
@@ -34,9 +54,14 @@ const NAV_ROUTES = new Set([
   'app-book',
   'app-hoeren',
   'app-profile',
-  'app-legal'
+  'app-adventure',
+  'app-adventure-map',
+  'app-adventure-stage',
+  'app-legal',
+  'app-awards'
 ])
-const showAppNav = computed(() => NAV_ROUTES.has(String(route.name || '')))
+const { coloringMenuShown } = useChrome()
+const showAppNav = computed(() => NAV_ROUTES.has(String(route.name || '')) || (route.name === 'app-coloring' && coloringMenuShown.value))
 
 // Keep i18n locale + localStorage in sync with the user's stored language.
 // IDB seeds `userLanguage` after boot, so `immediate: true` updates the
@@ -153,6 +178,7 @@ function isCrazyGamesUrl() {
   //- window resizes (iPad Split View → full screen), which left every page
   //- at the old half width while fixed layers already spanned the screen.
   div(id="app-root").min-h-screen.w-full.app-container.root-protection.game-ui-immune.relative
+    div(v-if="navigating" class="nav-bar" role="progressbar" aria-busy="true")
     RouterView(v-slot="{ Component, route }")
       transition(name="page-pop-scale" appear)
         component(:is="Component" :key="route.fullPath")
@@ -166,11 +192,40 @@ function isCrazyGamesUrl() {
       :model-value="activeNav"
       @update:model-value="onNav"
     )
+
+    //- One shared parental-gate dialog, opened from anywhere via requireParent().
+    ParentalGateModal
+    //- "LambKing Plus" hint for locked features; only reachable with VITE_PREMIUM_TEASER=true.
+    PremiumSheet
 </template>
 
 <style lang="sass">
+// the thin bar at the top while a screen is being loaded
+.nav-bar
+  position: fixed
+  top: 0
+  left: 0
+  height: 4px
+  width: 100%
+  z-index: 500
+  background: linear-gradient(90deg, #ffe38a, #d4a83e, #ffe38a)
+  background-size: 200% 100%
+  transform-origin: left
+  animation: nav-bar-run 1.6s ease-out forwards, nav-bar-shine 1s linear infinite
+  pointer-events: none
+
+@keyframes nav-bar-run
+  from
+    transform: scaleX(0.05)
+  to
+    transform: scaleX(0.92)
+
+@keyframes nav-bar-shine
+  to
+    background-position: -200% 0
+
 *
-  font-family: 'Nunito', sans-serif
+  font-family: 'Source Sans 3', 'Nunito', system-ui, sans-serif
   user-select: none
   // Standard
   -webkit-user-select: none
@@ -262,7 +317,7 @@ img
     opacity: 0
     transform: scale(0.96)
 
-// ----- Extra playful transitions (showcased on /design-system-a) -----
+// ----- Extra playful transitions -----
 // 1. Balloon bounce — drops in from above with a squash-and-stretch bounce
 .page-balloon-enter-active
   animation: page-balloon-in 820ms cubic-bezier(0.34, 1.56, 0.64, 1) both

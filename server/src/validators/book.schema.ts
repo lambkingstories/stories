@@ -1,10 +1,14 @@
 import { z } from 'zod'
 import { BOOK_ID_PATTERN } from '../utils/bookId.js'
 
+// A story page needs its text, a coloring page its picture: `assertPagesValid` in BookService checks that, because it
+// depends on the book's `kind`.
 const pageSchema = z.object({
   page: z.number().int().min(1, 'page must be a positive integer'),
   title: z.string().max(300).default(''),
-  text: z.string().min(1, 'text must not be empty')
+  text: z.string().default(''),
+  image: z.string().default(''),
+  reference: z.string().max(300).default('')
 })
 
 const localizationSchema = z.object({
@@ -34,7 +38,9 @@ const localizationSchema = z.object({
 const optionalPageSchema = z.object({
   page: z.number().int().min(1, 'page must be a positive integer'),
   title: z.string().max(300).default(''),
-  text: z.string().default('')
+  text: z.string().default(''),
+  image: z.string().default(''),
+  reference: z.string().max(300).default('')
 })
 
 const optionalLocalizationSchema = z.object({
@@ -118,6 +124,8 @@ export const createBookSchema = z.object({
       author: z.string().trim().min(1, 'author must not be empty').max(200),
       category: z.string().trim().min(1, 'category must not be empty').max(120),
       bookSeriesId: z.string().trim().min(1, 'bookSeriesId must not be empty'),
+      kind: z.enum(['story', 'coloring']).default('story'),
+      freePages: z.number().int().min(0).max(500).nullable().default(null),
       releaseDate: z
         .string()
         .datetime({ message: 'releaseDate must be an ISO 8601 datetime string' })

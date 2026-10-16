@@ -2,7 +2,7 @@
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import ZBackButton from '@/components/atoms/ZBackButton.vue'
+import LkPageHead from '@/components/molecules/LkPageHead.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import ZBadge from '@/components/atoms/ZBadge.vue'
 import useApiBooks from '@/use/useApiBooks'
@@ -61,21 +61,9 @@ function goBack() {
     :class="['new-books-page', isMobileLandscape ? 'is-landscape' : '', 'min-h-screen w-full pb-[calc(8rem+env(safe-area-inset-bottom,0px))]']"
     :style="backdropVars"
   )
-    header(class="page-header")
-      ZBackButton(variant="flat" class="page-back" @click="goBack")
-      div(class="title-cluster")
-        img(
-          :src="prependBaseUrl('images/icons/crown_256x256.webp')"
-          alt=""
-          class="page-crown"
-          decoding="async"
-          aria-hidden="true"
-        )
-        h1(class="page-title") {{ t('app.newBooks.title') }}
+    LkPageHead(:title="t('app.home.newTitle')" :subtitle="t('app.newBooks.sub')" @back="goBack")
 
     div(class="page-content")
-      span(class="page-breadcrumb") {{ t('app.newBooks.breadcrumb') }}
-
       div(v-if="newBooks.length" class="tile-grid")
         div(
           v-for="(book, idx) in newBooks"
@@ -109,12 +97,12 @@ function goBack() {
 </template>
 
 <style scoped lang="sass">
-$cream-bg: #f3e6c4
-$cream-card: #fdf8ed
-$navy: #1a2f4a
-$brown: #7a6b55
-$gold: #d4a83e
-$border: #e6d6b5
+$cream-bg: var(--lk-bg)
+$cream-card: var(--lk-surface)
+$navy: var(--lk-text)
+$brown: var(--lk-muted)
+$gold: var(--lk-accent)
+$border: var(--lk-line)
 
 button
   -webkit-tap-highlight-color: transparent
@@ -152,14 +140,14 @@ button
   z-index: -1
   pointer-events: none
   background-color: $cream-bg
-  background-image: var(--series-bg-portrait)
+  background-image: none
   background-repeat: no-repeat
   background-position: center
   background-size: cover
 
 @media (orientation: landscape)
   .new-books-page::before
-    background-image: var(--series-bg-landscape)
+    background-image: none
 
 .page-header
   position: relative
@@ -173,7 +161,7 @@ button
   position: absolute
   top: calc(max(env(safe-area-inset-top), 0.75rem))
   left: 12px
-  --back-icon-color: #1a2f4a !important
+  --back-icon-color: var(--lk-text) !important
 
 .title-cluster
   display: flex
@@ -220,7 +208,7 @@ button
   position: relative
   display: grid
   grid-template-columns: 1.25fr 1fr
-  background: linear-gradient(180deg, #fdf8ed 0%, #f5e8c2 100%)
+  background: var(--lk-surface)
   border: 1.5px solid $border
   border-radius: 12px
   overflow: hidden
@@ -265,7 +253,7 @@ button
 .book-tile-image
   position: relative
   overflow: hidden
-  background: linear-gradient(160deg, #f3e6c4 0%, #e8d29a 100%)
+  background: var(--lk-surface-2)
   display: flex
   align-items: stretch
   justify-content: center

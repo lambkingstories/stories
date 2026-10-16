@@ -121,8 +121,9 @@ function onClick(event: MouseEvent) {
   justify-content: center
   align-items: center
   gap: 8px
-  padding: 9px 16px
-  border-radius: 8px
+  padding: 0 22px
+  min-height: 52px
+  border-radius: 28px
   font-size: 13px
   font-weight: 700
   letter-spacing: 0.02em

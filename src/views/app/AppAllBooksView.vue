@@ -1,19 +1,22 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+/**
+ * "Lesen": the shelves. One row per series (the name on the left, "Alle" on the right); the books of the series stand on a
+ * board and can be swiped sideways. A tap on a book opens it, a tap on the name or on "Alle" opens the whole series.
+ * Publishers other than LambKing get their own shelf with the same look (a series of theirs is a row like any other).
+ */
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import ZBackButton from '@/components/atoms/ZBackButton.vue'
-import ZChip from '@/components/atoms/ZChip.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
+import LkCompanion from '@/components/atoms/LkCompanion.vue'
+import AppHeader from '@/components/molecules/AppHeader.vue'
 import useModels from '@/use/useModels'
 import useApiBooks from '@/use/useApiBooks'
 import useApiSeries from '@/use/useApiSeries'
 import useCatalogNames from '@/use/useCatalogNames'
-import { isMobileLandscape, isMobilePortrait } from '@/use/useUser'
 import type { ApiBook, Locale } from '@/types/apiBook'
 import { pickLocalizedImage } from '@/types/apiBook'
-import { onImgFallback, withPlaceholder, PLACEHOLDER_IMAGE } from '@/utils/placeholder'
-import { prependBaseUrl } from '@/utils/function'
+import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
@@ -22,48 +25,43 @@ const apiBooks = useApiBooks()
 const apiSeries = useApiSeries()
 const { seriesName } = useCatalogNames()
 
-onMounted(() => {
+// no net: the page says so and offers to try again
+const online = ref(typeof navigator === 'undefined' ? true : navigator.onLine)
+const setOnline = () => {
+  online.value = navigator.onLine
+}
+
+function reload() {
   void apiBooks.loadAllBooks()
-  // Pull the real series records (with editor-uploaded coverImage)
-  // alongside the books list so tiles can render the banner instead of
-  // falling back to a derived first-book preview.
   void apiSeries.loadAll()
+}
+
+onMounted(() => {
+  reload()
+  window.addEventListener('online', setOnline)
+  window.addEventListener('offline', setOnline)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('online', setOnline)
+  window.removeEventListener('offline', setOnline)
 })
 
 const lang = computed<Locale>(() => (locale.value === 'en' ? 'en' : 'de'))
 const allBooks = computed<ApiBook[]>(() => (apiBooks.state.all ?? []) as ApiBook[])
 
-// Backdrop — a tall artwork for portrait, a wide one for landscape. The swap
-// itself happens in CSS (`@media (orientation: …)`); we only feed the
-// base-url-corrected `url()` values in as custom properties, because the
-// files live in `public/` and a bare `url(…)` inside the SFC style block
-// would be resolved by Vite as a bundled asset.
-const backdropVars = computed(() => ({
-  '--series-bg-portrait': `url(${prependBaseUrl('images/bg/series_portrait.webp')})`,
-  '--series-bg-landscape': `url(${prependBaseUrl('images/bg/series_portrait.webp')})`
-}))
-
-// Derive series tiles directly from the API books. Series metadata
-// (display name + tagline) comes from the static `useModels.getSeries`
-// catalog when available; otherwise we fall back to the raw seriesId so
-// brand-new series still render without a content migration. The resolved
-// German name then passes through `seriesName`, which swaps in the English
-// override in EN mode (see useCatalogNames).
-interface SeriesTile {
+interface Shelf {
   seriesId: string
   name: string
-  subtitle: string
-  description: string
-  bookCount: number
-  coverImage: string
+  books: ApiBook[]
+  /** The main picture of the series: the cover from the AdminUI, else the first book's picture. */
+  cover: string
   /** Display position from the AdminUI — lower first. */
   sortOrder: number
 }
 
-// A series the editor has never positioned (or one the app knows only from
-// its books, with no server record yet) sorts after every positioned one
-// rather than jumping to the front.
+// A series the editor has never positioned (or one the app knows only from its books) sorts after every positioned one.
 const UNPOSITIONED = Number.MAX_SAFE_INTEGER
+const NEW_DAYS = 90
 
 function humaniseId(id: string): string {
   return id
@@ -73,9 +71,7 @@ function humaniseId(id: string): string {
     .join(' ')
 }
 
-const seriesList = computed<SeriesTile[]>(() => {
-  // touch the reactive series state so the computed re-runs when the
-  // API list arrives.
+const shelves = computed<Shelf[]>(() => {
   void apiSeries.state.all
   const groups = new Map<string, ApiBook[]>()
   for (const b of allBooks.value) {
@@ -84,392 +80,415 @@ const seriesList = computed<SeriesTile[]>(() => {
     arr.push(b)
     groups.set(sid, arr)
   }
-  const list: SeriesTile[] = []
+  const list: Shelf[] = []
   for (const [sid, books] of groups) {
-    // Prefer the server-side series record (carries `coverImage` from
-    // the AdminUI dropzone). Fall back to the hard-coded `useModels`
-    // catalogue for display name + description, and finally to the
-    // first book's preview so a series without any uploaded banner
-    // still renders a thumbnail instead of the bare placeholder.
     const apiMeta = apiSeries.getById(sid)
     const legacyMeta = getSeries(sid)
-    const firstBook = books[0]
+    const ofSeries = apiBooks.booksOfSeries(sid).length ? apiBooks.booksOfSeries(sid) : books
+    const first = ofSeries[0]
     list.push({
       seriesId: sid,
       name: seriesName(sid, apiMeta?.name || legacyMeta?.name || humaniseId(sid)),
-      subtitle: '',
-      description: apiMeta?.description
-        || legacyMeta?.description
-        || t('app.allBooks.bookCount', books.length),
-      bookCount: books.length,
-      coverImage: apiMeta?.coverImage
-        || legacyMeta?.coverImage
-        || (firstBook ? pickLocalizedImage(firstBook.previewImage, lang.value) : '')
-        || PLACEHOLDER_IMAGE,
+      books: ofSeries,
+      cover: apiMeta?.coverImage || legacyMeta?.coverImage || (first ? pickLocalizedImage(first.previewImage, lang.value) : ''),
       sortOrder: apiMeta?.sortOrder && apiMeta.sortOrder > 0 ? apiMeta.sortOrder : UNPOSITIONED
     })
   }
-  // The tiles are grouped out of the books list, so they arrive in book
-  // order — re-sort by the editor's position, falling back to the display
-  // name so unpositioned series stay in a stable, readable order.
-  return list.sort((a, b) => {
-    if (a.sortOrder !== b.sortOrder) return a.sortOrder - b.sortOrder
-    return a.name.localeCompare(b.name)
+  return list.sort((a, b) => (a.sortOrder !== b.sortOrder ? a.sortOrder - b.sortOrder : a.name.localeCompare(b.name)))
+})
+
+// Search: a part of the title (German or English), the author or the name of the series.
+const query = ref('')
+const isSearching = computed(() => query.value.trim().length > 0)
+
+const results = computed<ApiBook[]>(() => {
+  const term = query.value.trim().toLowerCase()
+  if (!term) return []
+  const nameOf = new Map(shelves.value.map((sh) => [sh.seriesId, sh.name.toLowerCase()]))
+  return allBooks.value.filter((b) => {
+    const de = b.localizations?.de?.title?.toLowerCase() ?? ''
+    const en = b.localizations?.en?.title?.toLowerCase() ?? ''
+    const author = b.author?.toLowerCase() ?? ''
+    const series = nameOf.get(b.bookSeriesId || 'misc') ?? ''
+    return de.includes(term) || en.includes(term) || author.includes(term) || series.includes(term)
   })
 })
 
-// Filter chips. The "Alle" chip is always present and selected by
-// default; the rest are derived from the actual series list so the chip
-// row tracks the catalogue without needing manual upkeep.
-const ALL_FILTER = '__all__'
-const activeFilter = ref<string>(ALL_FILTER)
-
-interface FilterChip {
-  id: string
-  label: string
+function isNew(book: ApiBook): boolean {
+  const age = Date.now() - new Date(book.releaseDate).getTime()
+  return age >= 0 && age < NEW_DAYS * 86400000
 }
 
-const filterChips = computed<FilterChip[]>(() => {
-  const chips: FilterChip[] = [
-    { id: ALL_FILTER, label: t('app.allBooks.filterAll') }
-  ]
-  for (const s of seriesList.value) chips.push({ id: s.seriesId, label: s.name })
-  return chips
-})
-
-const filteredSeries = computed<SeriesTile[]>(() =>
-  activeFilter.value === ALL_FILTER
-    ? seriesList.value
-    : seriesList.value.filter((s) => s.seriesId === activeFilter.value)
-)
+function bookTitle(book: ApiBook): string {
+  return book.localizations?.[lang.value]?.title || book.localizations?.de?.title || ''
+}
 
 function openSeries(seriesId: string) {
-  router.push({ name: 'app-series', params: { seriesId } })
+  void router.push({ name: 'app-series', params: { seriesId } })
 }
 
-function goBack() {
-  if (window.history.length > 1) router.back()
-  else router.push({ name: 'app-main' })
+function openBook(bookId: string) {
+  void router.push({ name: 'app-book', params: { bookId } })
 }
 </script>
 
 <template lang="pug">
-  div(
-    :class="['serien-page', isMobileLandscape ? 'is-landscape' : '', 'min-h-screen w-full pb-[calc(8rem+env(safe-area-inset-bottom,0px))]']"
-    :style="backdropVars"
-  )
-    //- ===== Header — back · crown · title =====
-    header(class="serien-header")
-      ZBackButton(variant="flat" class="serien-back" @click="goBack")
-      div(class="title-cluster")
-        img(
-          :src="prependBaseUrl('images/icons/crown_256x256.webp')"
-          alt=""
-          class="serien-crown"
-          decoding="async"
-          aria-hidden="true"
+  div(class="read-page")
+    AppHeader
+
+    main(class="read-body")
+      h1(class="read-title") {{ t('app.allBooks.title') }}
+      //- the question of the lamb is the search field: "Which book shall we read?" is typed over
+      label(class="ask")
+        LkCompanion(class="ask-lamb" pose="lesen" :size="64")
+        input(
+          v-model="query"
+          type="text"
+          class="ask-input"
+          :placeholder="t('app.read.ask')"
+          :aria-label="t('app.read.ask')"
+          autocomplete="off"
+          enterkeyhint="search"
+          @keydown.esc="query = ''"
         )
-        h1(class="serien-title") {{ t('app.allBooks.title') }}
+        button(v-if="isSearching" type="button" class="search-clear" :aria-label="t('app.parent.close')" @click.prevent="query = ''")
+          ZIconography(name="plus" :size="20" class="close-x")
+        ZIconography(v-else name="search" :size="22" class="ask-search")
 
-    //- ===== Filter chips (swipable) =====
-    div(class="filter-row-wrap")
-      div(class="filter-row")
-        ZChip(
-          v-for="chip in filterChips"
-          :key="chip.id"
-          clickable
-          :selected="chip.id === activeFilter"
-          :label="chip.label"
-          size="md"
-          @click="activeFilter = chip.id"
-        )
+      //- results replace the shelves while something is typed
+      section(v-if="isSearching" class="results")
+        p(v-if="!results.length" class="results-empty") {{ t('app.main.searchEmpty') }}
+        div(v-else class="results-grid")
+          button(
+            v-for="book in results"
+            :key="book.bookId"
+            type="button"
+            class="result"
+            @click="openBook(book.bookId)"
+          )
+            span(class="result-cover")
+              img(
+                :src="withPlaceholder(pickLocalizedImage(book.previewImage, lang))"
+                :alt="bookTitle(book)"
+                loading="lazy"
+                draggable="false"
+                @error="onImgFallback"
+              )
+              span(v-if="isNew(book)" class="new-badge") {{ t('app.read.newBadge') }}
+            span(class="result-title") {{ bookTitle(book) }}
 
-    //- ===== Series tiles =====
-    div(class="serien-content")
-      div(
-        v-for="series in filteredSeries"
-        :key="series.seriesId"
-        class="series-tile"
-        :class="{'max-h-[180px]': isMobilePortrait, 'max-h-[200px]': isMobileLandscape }"
-        @click="openSeries(series.seriesId)"
-      )
-        //- Cover image fills the entire tile; the text column sits on
-        //- top with a parchment-to-transparent gradient bleeding into
-        //- the artwork on its right edge.
-        img(
-          :src="withPlaceholder(series.coverImage)"
-          :alt="series.name"
-          class="series-tile-img"
-          loading="lazy"
-          @error="onImgFallback"
-        )
-        span(class="series-tile-fade")
-        div(class="series-tile-text")
-          h3(class="series-tile-name") {{ series.name }}
-          p(
-            v-if="series.subtitle"
-            class="series-tile-sub"
-          ) {{ series.subtitle }}
-          //p(class="series-tile-desc") {{ series.description }}
-          div(class="series-tile-count-row")
-            span.mr-1(class="series-tile-count") {{ series.bookCount }}
-            span(class="text-[12px]") {{ t('app.allBooks.bookLabel', series.bookCount) }}
+      template(v-else)
+        section(v-for="shelf in shelves" :key="shelf.seriesId" class="shelf lk-panel")
+          div(class="shelf-head")
+            button(type="button" class="shelf-name" @click="openSeries(shelf.seriesId)") {{ shelf.name }}
+            button(type="button" class="shelf-all lk-btn lk-btn--outline lk-btn--small" @click="openSeries(shelf.seriesId)")
+              span {{ t('app.read.all') }}
+              ZIconography(name="chevron-right" :size="18")
+          button(type="button" class="shelf-hero" :aria-label="shelf.name" @click="openSeries(shelf.seriesId)")
+            img(
+              :src="withPlaceholder(shelf.cover)"
+              :alt="shelf.name"
+              loading="lazy"
+              draggable="false"
+              @error="onImgFallback"
+            )
+          div(class="shelf-row")
+            button(
+              v-for="book in shelf.books"
+              :key="book.bookId"
+              type="button"
+              class="shelf-book"
+              :aria-label="bookTitle(book)"
+              @click="openBook(book.bookId)"
+            )
+              img(
+                :src="withPlaceholder(pickLocalizedImage(book.previewImage, lang))"
+                :alt="bookTitle(book)"
+                loading="lazy"
+                draggable="false"
+                @error="onImgFallback"
+              )
+              span(v-if="isNew(book)" class="new-badge") {{ t('app.read.newBadge') }}
+          div(class="shelf-board" aria-hidden="true")
 
-
-      div(
-        v-if="!filteredSeries.length"
-        class="empty-card"
-      )
-        h3(class="empty-title") {{ t('app.allBooks.emptyTitle') }}
-        p(class="empty-sub") {{ t('app.allBooks.emptySub') }}
+      div(v-if="!shelves.length && !isSearching" class="empty lk-panel")
+        LkCompanion(class="empty-lamb" :pose="!online ? 'offline' : 'leer'" :size="110")
+        template(v-if="!online")
+          h2(class="empty-title") {{ t('app.state.offlineTitle') }}
+          p(class="empty-sub") {{ t('app.state.offlineText') }}
+          button(type="button" class="lk-btn lk-btn--outline" @click="reload")
+            ZIconography(name="restart" :size="22")
+            span {{ t('app.state.reconnect') }}
+        template(v-else-if="apiBooks.state.error")
+          h2(class="empty-title") {{ t('app.state.errorTitle') }}
+          p(class="empty-sub") {{ t('app.state.errorText') }}
+          button(type="button" class="lk-btn" @click="reload")
+            ZIconography(name="restart" :size="22")
+            span {{ t('app.state.retry') }}
+        template(v-else)
+          h2(class="empty-title") {{ t('app.allBooks.emptyTitle') }}
+          p(class="empty-sub") {{ t('app.allBooks.emptySub') }}
 </template>
 
 <style scoped lang="sass">
-$cream-bg: #f3e6c4
-$cream-card: #fdf8ed
-$navy: #1a2f4a
-$brown: #7a6b55
-$gold: #d4a83e
-$border: #e6d6b5
-
 button
   -webkit-tap-highlight-color: transparent
+  font-family: inherit
 
-// The backdrop artwork lives on a viewport-pinned ::before layer instead of
-// on the page box: the page scrolls (and is taller than the screen), so a
-// plain background would scroll away and be sized against the whole document
-// rather than the screen. `cover` keeps it filling the viewport edge-to-edge
-// at every aspect ratio, with the beige palette colour underneath as a
-// paint-in fallback while the artwork loads.
-//
-// `position: relative` + `z-index: 0` makes .serien-page its own stacking
-// context so the `z-index: -1` layer stays above #app-root's opaque
-// background (which would otherwise hide it) while still sitting behind the
-// page content.
-.serien-page
-  position: relative
-  z-index: 0
-  background: transparent
-  color: $navy
+.read-page
+  min-height: 100vh
+  background: var(--lk-bg)
+  color: var(--lk-text)
+  padding-bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px))
 
-.serien-page::before
-  content: ''
-  position: fixed
-  top: 0
-  left: 0
-  width: 100%
-  // Sized instead of `inset: 0` on purpose: during the page-pop-scale route
-  // animation the transform on .serien-page turns it into the containing
-  // block for this fixed layer, and `bottom: 0` would then stretch the
-  // artwork over the full document height and snap back when the animation
-  // ends. A viewport-height box looks identical in both states.
-  height: 100vh
-  height: 100dvh
-  z-index: -1
-  pointer-events: none
-  background-color: $cream-bg
-  background-image: var(--series-bg-portrait)
-  background-repeat: no-repeat
-  background-position: center
-  background-size: cover
-
-@media (orientation: landscape)
-  .serien-page::before
-    background-image: var(--series-bg-landscape)
-
-.serien-header
-  position: relative
-  padding: max(env(safe-area-inset-top), 0.75rem) 20px 8px
-  max-width: 28rem
+.read-body
+  max-width: 980px
   margin: 0 auto
-
-// Back button floats over the centred title block so the crown +
-// "Serien" stack stays optically centred regardless of side widgets.
-.serien-back
-  position: absolute
-  top: calc(max(env(safe-area-inset-top), 0.75rem))
-  left: 12px
-  --back-icon-color: #1a2f4a !important
-
-.title-cluster
+  padding: 0 16px
   display: flex
   flex-direction: column
+  gap: 28px
+
+.read-title
+  margin: 0
+  font-weight: 800
+  font-size: 1.9rem
+
+.search-clear
+  width: 36px
+  height: 36px
+  border: none
+  border-radius: 50%
+  background: var(--lk-surface-2)
+  color: var(--lk-text)
+  display: flex
   align-items: center
   justify-content: center
-  gap: 2px
+  cursor: pointer
 
-.serien-crown
-  width: 28px
-  height: auto
-  object-fit: contain
-  filter: drop-shadow(0 2px 4px rgba(58, 42, 18, 0.3))
+  .close-x
+    transform: rotate(45deg)
 
-.serien-title
-  font-size: 24px
-  font-weight: 700
-  color: $navy
-  letter-spacing: -0.01em
-  margin: 0
-  line-height: 1.1
+  :deep(.z-icon-outline)
+    color: currentColor
 
-.filter-row-wrap
-  max-width: 28rem
-  margin: 0 auto
-  padding: 4px 20px 12px
+.results-empty
+  margin: 20px 0
+  text-align: center
+  color: var(--lk-muted)
 
-.filter-row
+.results-grid
+  display: grid
+  grid-template-columns: repeat(3, minmax(0, 1fr))
+  gap: 16px 12px
+
+.result
   display: flex
+  flex-direction: column
+  gap: 6px
+  min-width: 0
+  padding: 0
+  border: none
+  background: transparent
+  color: var(--lk-text)
+  text-align: left
+  cursor: pointer
+
+.result-cover
+  position: relative
+  display: block
+  aspect-ratio: 3 / 4
+  border-radius: 12px
+  overflow: hidden
+  background: var(--lk-surface-2)
+  box-shadow: var(--lk-shadow)
+
+  img
+    width: 100%
+    height: 100%
+    object-fit: cover
+    display: block
+
+.result-title
+  font-weight: 700
+  font-size: 0.92rem
+  line-height: 1.2
+  display: -webkit-box
+  -webkit-line-clamp: 3
+  -webkit-box-orient: vertical
+  overflow: hidden
+
+.ask
+  position: relative
+  display: flex
+  align-items: center
   gap: 8px
+  min-height: 60px
+  margin-top: 18px
+  padding: 0 12px 0 84px
+  cursor: text
+  border: 1px solid var(--lk-line)
+  border-radius: 28px
+  background: var(--lk-surface)
+
+.ask-lamb
+  position: absolute
+  left: 10px
+  bottom: 0
+
+.ask-input
+  flex: 1
+  min-width: 0
+  height: 56px
+  border: none
+  outline: none
+  background: transparent
+  color: var(--lk-text)
+  font-family: inherit
+  font-weight: 700
+  font-size: 1.05rem
+
+  &::placeholder
+    color: var(--lk-text)
+    opacity: 1
+
+.ask-search
+  flex: 0 0 auto
+  color: var(--lk-muted)
+
+  :deep(.z-icon-outline)
+    color: currentColor
+
+.shelf
+  padding: 14px 14px 16px
+  overflow: hidden
+
+.shelf-head
+  display: flex
+  align-items: center
+  justify-content: space-between
+  gap: 8px
+  margin-bottom: 6px
+
+.shelf-name
+  min-height: 44px
+  padding: 0
+  border: none
+  background: transparent
+  color: var(--lk-text)
+  font-weight: 800
+  font-size: 1.3rem
+  text-align: left
+  cursor: pointer
+
+.shelf-all
+  gap: 2px
+  padding: 0 12px 0 18px
+
+.shelf-hero
+  display: block
+  width: 100%
+  aspect-ratio: 16 / 9
+  margin: 0 0 12px
+  padding: 0
+  border: none
+  border-radius: var(--lk-r-card)
+  overflow: hidden
+  background: var(--lk-surface-2)
+  box-shadow: var(--lk-shadow)
+  cursor: pointer
+
+  img
+    width: 100%
+    height: 100%
+    object-fit: cover
+    display: block
+
+.shelf-row
+  display: flex
+  gap: 10px
   overflow-x: auto
-  overflow-y: hidden
-  -webkit-overflow-scrolling: touch
-  padding-bottom: 4px
+  scroll-snap-type: x proximity
+  margin: 0 -14px
+  padding: 0 14px 4px
+  scroll-padding-left: 14px
+  scrollbar-width: none
 
   &::-webkit-scrollbar
     display: none
 
-.serien-content
-  max-width: 28rem
-  margin: 0 auto
-  padding: 6px 20px 0
-  display: flex
-  flex-direction: column
-  // Stretch tiles to the full column width. With a definite width the
-  // tile's `aspect-ratio: 2.5 / 1` derives the height (~163px at the
-  // 28rem cap, under the `max-h-[180px]` clamp), so the cover image
-  // fills the card edge-to-edge instead of leaving parchment gaps on
-  // either side.
-  align-items: stretch
-  gap: 14px
-
-// Full-bleed image card. The cover (uploaded via the AdminUI dropzone
-// onto `bookSeries.coverImage`) covers the entire tile; the text column
-// sits on top with a parchment-to-transparent gradient bleeding into
-// the artwork on its right edge so the title still reads cleanly.
-.series-tile
+.shelf-book
   position: relative
-  display: block
-  background: linear-gradient(160deg, #f3e6c4 0%, #e8d29a 100%)
-  border: 1.5px solid $border
-  border-radius: 14px
+  flex: 0 0 29%
+  max-width: 190px
+  aspect-ratio: 3 / 4
+  padding: 0
+  border: none
+  border-radius: 10px
   overflow: hidden
+  background: var(--lk-surface-2)
+  box-shadow: var(--lk-shadow)
+  scroll-snap-align: start
   cursor: pointer
-  aspect-ratio: 2.5 / 1
-  min-height: 110px
-  box-shadow: 0 10px 28px -14px rgba(58, 42, 18, 0.35)
-  transition: transform 220ms ease-out, box-shadow 220ms ease-out
 
-  &:hover
-    transform: translateY(-3px)
-    box-shadow: 0 18px 36px -14px rgba(212, 168, 62, 0.4)
+  img
+    width: 100%
+    height: 100%
+    object-fit: cover
+    display: block
 
-  &:active
-    transform: translateY(-1px) scale(0.995)
-
-.series-tile-img
+.new-badge
   position: absolute
-  inset: 0
-  width: 100% !important
-  height: 100% !important
-  max-width: 100%
-  max-height: 100%
-  object-fit: cover
-  display: block
+  top: 8px
+  left: 8px
+  padding: 2px 8px
+  border-radius: 6px
+  background: var(--lk-new)
+  color: #fff
+  font-size: 0.72rem
+  font-weight: 800
+  letter-spacing: 0.04em
 
-// Parchment gradient that fades from solid cream on the left (where the
-// text sits) into the artwork on the right. Stops are calibrated so the
-// title is fully legible while the image is still recognisable.
-.series-tile-fade
-  position: absolute
-  inset: 0
-  background: linear-gradient(109deg, #132637 0%, #192e4377 26%, rgba(44, 57, 66, 0.5) 38%, rgba(202, 39, 26, 0.1) 55%)
-  //background: linear-gradient(108deg, $cream-bg 0%, #E6D6B5FF 26%, rgba(253, 248, 237, 0.7) 42%, rgba(253, 248, 237, 0) 65%)
-  pointer-events: none
+// the board the books stand on
+.shelf-board
+  height: 12px
+  margin-top: -2px
+  border-radius: 8px
+  background: var(--lk-shelf)
 
-.series-tile-text
-  position: absolute
-  top: 0
-  bottom: 0
-  left: 0
-  width: 55%
-  padding: 14px 12px
+.empty
   display: flex
   flex-direction: column
-  justify-content: center
-  gap: 5px
-  min-width: 0
-  z-index: 2
-
-.series-tile-name
-  font-size: 18px
-  font-weight: 700
-  color: white
-  margin: 0
-  line-height: 1.1
-  display: -webkit-box
-  -webkit-line-clamp: 2
-  -webkit-box-orient: vertical
-  overflow: hidden
-
-.series-tile-sub
-  font-size: 11px
-  font-weight: 700
-  color: $gold
-  letter-spacing: 0.04em
-  margin: 0
-  text-transform: uppercase
-
-.series-tile-desc
-  font-size: 12px
-  color: $brown
-  line-height: 1.35
-  margin: 0
-  display: -webkit-box
-  -webkit-line-clamp: 2
-  -webkit-box-orient: vertical
-  overflow: hidden
-
-
-.series-tile-count-row
-  color: white
-  display: inline-flex
-  align-items: baseline
-  margin-top: 2px
-
-.series-tile-count
-  font-size: 12px
-  font-weight: 700
-  color: $gold
-
-.empty-card
+  align-items: center
+  gap: 6px
+  padding: 16px 20px 24px
   text-align: center
-  background: $cream-card
-  border: 1px dashed $border
-  border-radius: 18px
-  padding: 26px 18px
-  color: $brown
+
+.empty-lamb
+  margin-top: -64px
 
 .empty-title
-  font-size: 16px
-  font-weight: 700
-  color: $navy
   margin: 0 0 6px
+  font-size: 1.2rem
+  font-weight: 800
 
 .empty-sub
-  font-size: 13px
   margin: 0
+  color: var(--lk-muted)
 
-// ===== Mobile landscape =====
-.is-landscape
-  .serien-content
-    max-width: 64rem
-    display: grid
-    // Reset the portrait `align-items: center` so grid cells stretch as
-    // before — two tiles per row at full cell height.
-    align-items: stretch
-    grid-template-columns: 1fr 1fr
-    gap: 14px
+@media (min-width: 720px)
+  .read-body
+    padding: 0 28px
 
-  .filter-row-wrap, .serien-header
-    max-width: 64rem
+  .shelf-row
+    margin: 0 -28px
+    padding-left: 28px
+    padding-right: 28px
+    scroll-padding-left: 28px
+
+  .shelf-book
+    flex-basis: 150px
+
+  .shelf-hero
+    aspect-ratio: 21 / 8
 </style>

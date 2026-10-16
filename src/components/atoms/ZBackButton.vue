@@ -65,7 +65,7 @@ button
   width: 70%
   height: 70%
   display: block
-  background-color: var(--back-icon-color, #5a3f12)
+  background-color: var(--back-icon-color, var(--lk-text))
   -webkit-mask-image: url('/images/icons/back-icon_128x105.webp')
   mask-image: url('/images/icons/back-icon_128x105.webp')
   -webkit-mask-repeat: no-repeat
@@ -81,7 +81,7 @@ button
 // the parchment palette and reads instantly without a contrasting pill.
 .z-back-btn--flat
   border-radius: 999px
-  --back-icon-color: #5a3f12
+  --back-icon-color: var(--lk-text)
 
   &:hover
     background-color: rgba(255, 255, 255, 0.5)
@@ -93,7 +93,7 @@ button
   background-color: rgba(255, 255, 255, 0.85)
   border: 1.5px solid rgba(230, 214, 181, 0.6)
   box-shadow: 0 6px 14px -6px rgba(0, 0, 0, 0.35)
-  --back-icon-color: #5a3f12
+  --back-icon-color: #1a2f4a
 
   &:hover
     background-color: #ffffff

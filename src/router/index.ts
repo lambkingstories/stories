@@ -1,18 +1,9 @@
 import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router'
-import AppMainView from '@/views/app/AppMainView.vue'
+import AppHomeView from '@/views/app/AppHomeView.vue'
 import AppWelcomeView from '@/views/app/AppWelcomeView.vue'
 import useUser, { isWeb } from '@/use/useUser'
 
-// Lazy-loaded design-system routes. These views pull in every A/S/F atom
-// for preview purposes, so we code-split them into their own chunks to
-// keep them out of the main app bundle. Vite names the chunks via the
-// magic comment so they're easy to identify in `vite build` output.
-const DesignSystemView = () => import(/* webpackChunkName: "design-system" */ '@/views/DesignSystemView.vue')
-const DesignSystemSView = () => import(/* webpackChunkName: "design-system-s" */ '@/views/DesignSystemSView.vue')
-const DesignSystemAView = () => import(/* webpackChunkName: "design-system-a" */ '@/views/DesignSystemAView.vue')
-const DesignSystemZView = () => import(/* webpackChunkName: "design-system-z" */ '@/views/DesignSystemZView.vue')
-
-// Lazy-load the secondary app routes as well — AppMainView stays eager
+// Lazy-load the secondary app routes as well — AppHomeView stays eager
 // because it's the landing route.
 const AppAllBooksView = () => import('@/views/app/AppAllBooksView.vue')
 const AppAllNewBooksView = () => import('@/views/app/AppAllNewBooksView.vue')
@@ -23,20 +14,43 @@ const AppReaderView = () => import('@/views/app/AppReaderView.vue')
 const AppHoerenView = () => import('@/views/app/AppHoerenView.vue')
 const AppAwardsView = () => import('@/views/app/AppAwardsView.vue')
 const AppColoringView = () => import('@/views/app/AppColoringView.vue')
+const AppColoringBookView = () => import('@/views/app/AppColoringBookView.vue')
+const AppAdventureHomeView = () => import('@/views/app/AppAdventureHomeView.vue')
+const AppAdventureView = () => import('@/views/app/AppAdventureView.vue')
+const AppAdventureStageView = () => import('@/views/app/AppAdventureStageView.vue')
 const AppProfileView = () => import('@/views/app/AppProfileView.vue')
 const AppLegalView = () => import('@/views/app/AppLegalView.vue')
 
+/**
+ * Loads the screens that are opened from the bottom bar before they are asked for (a moment after the app has started, and not when
+ * the device saves data), so that the first tap on "Abenteuer" or "Malen" does not have to wait for them.
+ */
+export function prefetchRoutes() {
+  const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData
+  if (saveData) return
+  void AppAdventureHomeView()
+  void AppAdventureView()
+  void AppAdventureStageView()
+  void AppColoringView()
+}
+
+/** The welcome screen was shown once (see AppWelcomeView). */
+export const WELCOME_SEEN_KEY = 'lk-welcome-seen'
+function welcomeSeen(): boolean {
+  try {
+    return localStorage.getItem(WELCOME_SEEN_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
 const routes: RouteRecordRaw[] = [
-  // The welcome screen is the app's front door on every launch; its single
-  // CTA continues to `app-main`. Eager-loaded for the same reason
-  // AppMainView is — the landing route shouldn't wait on a chunk fetch.
-  { path: '/', name: 'main-menu', redirect: '/welcome' },
+  // The welcome screen is the front door of the very first launch only: its single CTA continues to `app-main` and
+  // remembers that it was seen. Every later start (also after the app was left for a web page and is loaded again)
+  // goes straight to the start page. Eager-loaded for the same reason AppHomeView is.
+  { path: '/', name: 'main-menu', redirect: () => (welcomeSeen() ? '/app' : '/welcome') },
   { path: '/welcome', name: 'app-welcome', component: AppWelcomeView },
-  { path: '/design-system', name: 'design-system', component: DesignSystemView },
-  { path: '/design-system-s', name: 'design-system-s', component: DesignSystemSView },
-  { path: '/design-system-a', name: 'design-system-a', component: DesignSystemAView },
-  { path: '/design-system-z', name: 'design-system-z', component: DesignSystemZView },
-  { path: '/app', name: 'app-main', component: AppMainView },
+  { path: '/app', name: 'app-main', component: AppHomeView },
   { path: '/app/all-books', name: 'app-all-books', component: AppAllBooksView },
   { path: '/app/new-books', name: 'app-all-new-books', component: AppAllNewBooksView },
   { path: '/app/series/:seriesId', name: 'app-series', component: AppBookSeriesView },
@@ -46,6 +60,10 @@ const routes: RouteRecordRaw[] = [
   { path: '/app/hoeren', name: 'app-hoeren', component: AppHoerenView },
   { path: '/app/awards', name: 'app-awards', component: AppAwardsView },
   { path: '/app/coloring', name: 'app-coloring', component: AppColoringView },
+  { path: '/app/coloring/book/:bookId', name: 'app-coloring-book', component: AppColoringBookView },
+  { path: '/app/adventure', name: 'app-adventure', component: AppAdventureHomeView },
+  { path: '/app/adventure/:journeyId', name: 'app-adventure-map', component: AppAdventureView },
+  { path: '/app/adventure/:journeyId/:stageId', name: 'app-adventure-stage', component: AppAdventureStageView },
   { path: '/app/profile', name: 'app-profile', component: AppProfileView },
   { path: '/app/legal', name: 'app-legal', component: AppLegalView }
 ]
@@ -85,6 +103,22 @@ router.beforeEach((to, from) => {
   }
 
   return true
+})
+
+// A screen of the app is loaded when it is first opened. If the app was updated while it was open, the old file is gone and the
+// tap seems to do nothing: the page is loaded again once (the new files come with it) and goes on to the screen that was wanted.
+const CHUNK_ERROR = /dynamically imported module|importing a module script|Unable to preload|error loading dynamically|Failed to fetch/i
+router.onError((error, to) => {
+  if (!CHUNK_ERROR.test(String((error as Error)?.message ?? error))) return
+  try {
+    const last = Number(sessionStorage.getItem('lk-chunk-reload') ?? 0)
+    if (Date.now() - last < 15000) return
+    sessionStorage.setItem('lk-chunk-reload', String(Date.now()))
+  } catch {
+    // without storage the page may be loaded again more than once, which is harmless
+  }
+  window.location.hash = `#${to.fullPath}`
+  window.location.reload()
 })
 
 export default router

@@ -1,19 +1,21 @@
 /**
  * Shared bottom-nav config + routing helpers for every "app/*" view.
- * Centralises the 5-item LambKing nav (Start, Serien, Hören, Malen, Mein
- * Bereich) so each view only needs to call `useAppNav(t)` and pass the
+ * Centralises the 5-item LambKing nav (Start, Lesen, Reise, Malen, Ich) so each view only needs to call `useAppNav(t)` and pass the
  * returned `navItems` / `activeNav` / `onNav` into `<ZBottomNav>`.
  */
 import { computed, type ComputedRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { ComposerTranslation } from 'vue-i18n'
+import { prependBaseUrl } from '@/utils/function'
 
-export type AppNavId = 'home' | 'series' | 'hoeren' | 'malen' | 'profile'
+export type AppNavId = 'home' | 'series' | 'abenteuer' | 'hoeren' | 'malen' | 'profile'
 
 export interface AppNavItem {
   id: AppNavId
   label: string
-  icon: 'home' | 'series' | 'headphones' | 'brush' | 'profile'
+  icon: 'home' | 'series' | 'compass' | 'headphones' | 'brush' | 'profile'
+  /** A painted (coloured) picture instead of the tinted icon, for the highlight of the app. */
+  image?: string
 }
 
 function routeToNav(name: string): AppNavId {
@@ -24,8 +26,9 @@ function routeToNav(name: string): AppNavId {
     || name === 'app-series'
     || name === 'app-all-new-books'
   ) return 'series'
+  if (name === 'app-adventure' || name === 'app-adventure-map' || name === 'app-adventure-stage') return 'abenteuer'
   if (name === 'app-hoeren') return 'hoeren'
-  if (name === 'app-coloring' || name === 'app-awards') return 'malen'
+  if (name === 'app-coloring' || name === 'app-coloring-book' || name === 'app-awards') return 'malen'
   if (name === 'app-profile' || name === 'app-legal') return 'profile'
   return 'home'
 }
@@ -33,6 +36,7 @@ function routeToNav(name: string): AppNavId {
 const ROUTE_BY_NAV: Record<AppNavId, string> = {
   home: 'app-main',
   series: 'app-all-books',
+  abenteuer: 'app-adventure',
   hoeren: 'app-hoeren',
   malen: 'app-coloring',
   profile: 'app-profile'
@@ -49,9 +53,9 @@ export default function useAppNav(t: ComposerTranslation): {
   const navItems = computed<AppNavItem[]>(() => [
     { id: 'home', label: t('app.nav.home'), icon: 'home' },
     { id: 'series', label: t('app.nav.series'), icon: 'series' },
-    // { id: 'hoeren', label: t('app.nav.hoeren'), icon: 'headphones' },
-    { id: 'profile', label: t('app.nav.profile'), icon: 'profile' },
+    { id: 'abenteuer', label: t('app.nav.abenteuer'), icon: 'compass', image: prependBaseUrl('images/icons/ui/reise-stern.webp') },
     { id: 'malen', label: t('app.nav.color'), icon: 'brush' },
+    { id: 'profile', label: t('app.nav.profile'), icon: 'profile' },
   ])
 
   const activeNav = computed<string | number>(() => routeToNav(String(route.name || '')))

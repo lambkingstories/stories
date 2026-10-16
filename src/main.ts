@@ -1,8 +1,15 @@
+import '@fontsource/fraunces/latin-700.css'
+import '@fontsource/source-sans-3/latin-400.css'
+import '@fontsource/source-sans-3/latin-600.css'
+import '@fontsource/source-sans-3/latin-700.css'
+import '@fontsource/source-sans-3/latin-800.css'
 import { createApp, ref } from 'vue'
 import App from '@/App.vue'
-import router from '@/router'
+import router, { prefetchRoutes } from '@/router'
 import '@/assets/css/tailwind.css'
 import '@/assets/css/index.sass'
+import '@/assets/css/theme.css'
+import { startTheme } from '@/use/useTheme'
 import { createI18n } from 'vue-i18n'
 import baseTranslations from '@/i18n/translations'
 import bookTranslations from '@/i18n/books'
@@ -65,9 +72,28 @@ const i18n: any = createI18n({
   fallbackWarn: false
 })
 
+startTheme()
 const app = createApp(App)
 
 app.use(router)
 app.use(i18n)
 
 app.mount('#app')
+
+// While the first screen is read, the screens of the bottom bar are loaded quietly in the background.
+const whenQuiet = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback
+if (whenQuiet) whenQuiet(prefetchRoutes, { timeout: 4000 })
+else setTimeout(prefetchRoutes, 2500)
+
+// The web version keeps what it has loaded, so the app opens and the coloring screen works without a net (`public/sw.js`).
+// The native apps have their files on the device and need none of this.
+if (
+  import.meta.env.PROD &&
+  'serviceWorker' in navigator &&
+  location.protocol.startsWith('http') &&
+  !('__TAURI_INTERNALS__' in window)
+) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => undefined)
+  })
+}

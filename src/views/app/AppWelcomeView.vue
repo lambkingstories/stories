@@ -1,198 +1,187 @@
 <script setup lang="ts">
 /**
- * Welcome / title screen — the app's front door.
- *
- * Everything the user reads (logo, "Willkommen!", the subtitle) is baked
- * into the artwork, so this view is just the picture plus a single CTA that
- * hands over to the home page. Four assets cover the matrix: {de,en} ×
- * {portrait,landscape}. Language comes from the i18n locale; the
- * orientation swap is native `<picture media>` so a rotation re-picks the
- * source without a resize listener.
- *
- * The artwork is `contain`-fitted — never cropped by a screen edge — which
- * means its rendered box rarely matches the viewport. The CTA therefore
- * lives inside `.welcome-stage`, a shrink-to-fit wrapper that ends up
- * exactly the size of the `<img>`, so the button's percentage offsets track
- * the illustration itself instead of the screen. That keeps it planted on
- * the flower meadow (portrait) / below the text block (landscape) at every
- * aspect ratio, letterbox bars included.
+ * Welcome / language choice: shown on the very first start only (see the router). A picture with a short greeting, the choice of
+ * the language, and one button that goes to the start page. The companion lamb sits on the rim of the greeting card.
+ * The language is written through `setSettingValue('language', …)` only; App.vue syncs it to i18n and localStorage.
  */
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import ZLanguageSwitcher from '@/components/atoms/ZLanguageSwitcher.vue'
+import ZIconography from '@/components/atoms/ZIconography.vue'
+import LkCompanion from '@/components/atoms/LkCompanion.vue'
+import AppHeader from '@/components/molecules/AppHeader.vue'
+import useUser from '@/use/useUser'
 import { prependBaseUrl } from '@/utils/function'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
+const { setSettingValue } = useUser()
 
-// Portrait assets are spelled "wilkommen", landscape ones "willkommen" —
-// that's how they ship in `public/images/bg/`, so keep both spellings.
-const art = computed(() => {
-  const lang = locale.value === 'en' ? 'en' : 'de'
-  return {
-    portrait: prependBaseUrl(`images/bg/wilkommen_portrait_${lang}.webp`),
-    landscape: prependBaseUrl(`images/bg/willkommen_landscape_${lang}.webp`)
-  }
-})
+const current = computed<'de' | 'en'>(() => (locale.value === 'en' ? 'en' : 'de'))
 
-// The same two artworks, fed to CSS for the blurred tablet backdrop. The
-// files live in `public/`, so a bare `url(…)` in the style block would be
-// resolved by Vite as a bundled asset.
-const backdropVars = computed(() => ({
-  '--welcome-bg-portrait': `url(${art.value.portrait})`,
-  '--welcome-bg-landscape': `url(${art.value.landscape})`
-}))
+const languages = computed(() => [
+  { code: 'de' as const, label: t('app.language.german'), flag: 'DE' },
+  { code: 'en' as const, label: t('app.language.english'), flag: 'EN' }
+])
+
+function pick(code: 'de' | 'en') {
+  if (current.value !== code) setSettingValue('language', code)
+}
 
 function onStart() {
-  router.push({ name: 'app-main' })
+  try {
+    localStorage.setItem('lk-welcome-seen', '1')
+  } catch {
+    // private window: the welcome screen shows again next time
+  }
+  void router.push({ name: 'app-main' })
 }
 </script>
 
 <template lang="pug">
-  div(class="welcome-page" :style="backdropVars")
-    div(class="welcome-stage")
-      picture
-        source(:srcset="art.landscape" media="(orientation: landscape)")
+  div(class="welcome-page")
+    AppHeader
+    main(class="welcome-body")
+      div(class="welcome-card lk-panel")
         img(
-          :src="art.portrait"
-          :alt="t('app.welcome.artAlt')"
-          class="welcome-art"
+          :src="prependBaseUrl('images/bg/welcome-bg-1.webp')"
+          alt=""
+          class="welcome-img"
           fetchpriority="high"
           decoding="async"
+          draggable="false"
         )
-      //- Language picker — parked in the artwork's top-right corner so a
-      //- parent can flip the welcome copy (which is baked into the picture)
-      //- to their language before handing the phone over.
-      div(class="welcome-lang")
-        ZLanguageSwitcher(:size="34")
-      button(
-        type="button"
-        class="welcome-cta"
-        @click="onStart"
-      ) {{ t('app.welcome.cta') }}
+        div(class="welcome-text")
+          LkCompanion(class="welcome-lamb" pose="sitzen" :size="88")
+          h1(class="welcome-title") {{ t('app.welcome.title') }}
+          p(class="welcome-sub") {{ t('app.home.hero0Text') }}
+
+      section(class="lang")
+        h2(class="lang-title") {{ t('app.welcome.chooseLanguage') }}
+        div(class="lang-list" role="radiogroup" :aria-label="t('app.language.aria')")
+          button(
+            v-for="l in languages"
+            :key="l.code"
+            type="button"
+            role="radio"
+            :aria-checked="current === l.code"
+            :class="['lang-row', { 'is-on': current === l.code }]"
+            @click="pick(l.code)"
+          )
+            span(class="lang-radio" aria-hidden="true")
+            span(class="lang-flag" aria-hidden="true") {{ l.flag }}
+            span(class="lang-name") {{ l.label }}
+
+      button(type="button" class="lk-btn lk-btn--full" @click="onStart")
+        span {{ t('app.welcome.cta') }}
+        ZIconography(name="chevron-right" :size="22")
 </template>
 
 <style scoped lang="sass">
-$navy: #21406a
-$navy-dark: #142a47
-$gold: #d4a83e
-
-// Fixed + grid-centred: the screen never scrolls and the artwork sits dead
-// centre. The beige matches #app-root so the letterbox strip (whenever the
-// screen's ratio differs from the artwork's) blends into the app shell.
 .welcome-page
-  position: fixed
-  inset: 0
-  display: grid
-  place-items: center
+  min-height: 100vh
+  background: var(--lk-bg)
+  color: var(--lk-text)
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px))
+
+.welcome-body
+  max-width: 520px
+  margin: 0 auto
+  padding: 8px 16px 0
+  display: flex
+  flex-direction: column
+  gap: 22px
+
+.welcome-card
   overflow: hidden
-  background-color: var(--color-bg-main)
+  border-radius: var(--lk-r-panel)
 
-// No explicit size: the box shrinks to the <img>'s rendered dimensions, so
-// the absolutely-positioned CTA inside resolves its percentages against the
-// artwork's real box. `line-height: 0` kills the inline descender gap that
-// would otherwise offset it by a couple of pixels.
-.welcome-stage
+.welcome-img
+  display: block
+  width: 100%
+  aspect-ratio: 16 / 10
+  object-fit: cover
+
+.welcome-text
   position: relative
-  line-height: 0
+  padding: 32px 20px 20px
 
-  picture
-    background-size: fill
-
-// Same trick as the CTA: percentage offsets inside .welcome-stage track the
-// artwork's own box, so the flags stay pinned to the picture's corner rather
-// than the screen's — letterbox bars included. The frosted plaque is what
-// lets two small flags read against the foliage that fills that corner in
-// both the portrait and the landscape art.
-.welcome-lang
+.welcome-lamb
   position: absolute
-  top: 3%
-  right: 4%
-  display: inline-flex
-  padding: 5px 7px
-  border-radius: 999px
-  line-height: 0
-  background: rgba(255, 255, 255, 0.62)
-  backdrop-filter: blur(6px)
-  -webkit-backdrop-filter: blur(6px)
-  box-shadow: 0 4px 14px -8px rgba(10, 26, 48, 0.55), inset 0 0 0 1px rgba(255, 255, 255, 0.85)
+  right: 16px
+  top: -62px
 
-// Navy plaque with a gold rim, mirroring the app's primary buttons. Sizes
-// are percentages of the artwork box so the CTA keeps its proportions on
-// every screen; the font falls back to vmin, which tracks whichever axis
-// the `contain` fit is bounded by.
-.welcome-cta
-  position: absolute
-  left: 50%
-  bottom: 20%
-  transform: translateX(-50%)
-  width: 78%
-  padding: 0.72em 1em
-  border: 2px solid rgba(212, 168, 62, 0.85)
-  border-radius: 1.2em
-  background: linear-gradient(180deg, $navy 0%, $navy-dark 100%)
-  color: #ffffff
-  font-family: inherit
+.welcome-title
+  margin: 0
+  font-size: 1.9rem
   font-weight: 800
-  font-size: clamp(1rem, 4.4vmin, 1.75rem)
-  line-height: 1.2
-  letter-spacing: 0.01em
-  text-align: center
+  line-height: 1.12
+
+.welcome-sub
+  margin: 6px 0 0
+  color: var(--lk-muted)
+  font-size: 1.1rem
+  line-height: 1.4
+
+.lang-title
+  margin: 0 0 10px
+  font-size: 1.3rem
+  font-weight: 800
+
+.lang-list
+  display: flex
+  flex-direction: column
+  gap: 10px
+
+.lang-row
+  display: flex
+  align-items: center
+  gap: 12px
+  min-height: 56px
+  padding: 0 18px
+  border: 1px solid var(--lk-line)
+  border-radius: var(--lk-r-btn)
+  background: var(--lk-surface)
+  color: var(--lk-text)
+  font-family: inherit
+  font-size: 1.05rem
+  font-weight: 600
   cursor: pointer
-  touch-action: manipulation
   -webkit-tap-highlight-color: transparent
-  box-shadow: 0 10px 24px -10px rgba(10, 26, 48, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.18)
-  transition: transform 140ms ease-out, box-shadow 140ms ease-out
 
-  &:hover
-    box-shadow: 0 14px 28px -10px rgba(10, 26, 48, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.24)
+  &.is-on
+    border-color: var(--lk-accent)
+    box-shadow: inset 0 0 0 1px var(--lk-accent)
 
-  &:active
-    transform: translateX(-50%) scale(0.96)
+.lang-radio
+  width: 22px
+  height: 22px
+  border-radius: 50%
+  border: 2px solid var(--lk-muted)
+  display: inline-block
+  position: relative
 
-  &:focus-visible
-    outline: 3px solid rgba(212, 168, 62, 0.9)
-    outline-offset: 3px
+  .is-on &
+    border-color: var(--lk-accent)
 
-// Landscape artwork puts the copy in the left third — park the CTA under it
-// so it never covers the illustration on the right.
-@media (orientation: landscape)
-  .welcome-cta
-    left: 26%
-    bottom: 16%
-    width: 30%
+    &::after
+      content: ''
+      position: absolute
+      inset: 3px
+      border-radius: 50%
+      background: var(--lk-accent)
 
-// ===== Tablet =====
-// The copy is baked into the artwork, so it is never cropped to fill the
-// screen. Instead the art scales up to a full `contain` fit (it would stop
-// at its natural size otherwise) and the strips beside it show a blurred,
-// cover-fitted copy of the same picture rather than bare beige.
-@media (min-width: 768px)
-  .welcome-page::before
-    content: ''
-    position: absolute
-    // Overscan so the blur's soft edge stays off-screen.
-    inset: -40px
-    background-image: var(--welcome-bg-portrait)
-    background-position: center
-    background-size: cover
-    filter: blur(28px) saturate(1.1)
-    opacity: 0.85
+.lang-flag
+  min-width: 34px
+  padding: 2px 6px
+  border-radius: 8px
+  background: var(--lk-surface-2)
+  font-size: 0.8rem
+  font-weight: 800
+  letter-spacing: 0.04em
+  text-align: center
 
-  .welcome-stage
-    box-shadow: 0 20px 60px -20px rgba(10, 26, 48, 0.55)
-
-  // 692×1500 portrait art (the en file is 700×1517, the same ratio).
-  .welcome-art
-    width: min(100vw, 100dvh * 692 / 1500)
-    height: auto
-
-@media (min-width: 768px) and (orientation: landscape)
-  .welcome-page::before
-    background-image: var(--welcome-bg-landscape)
-
-  // 1244×700 landscape art.
-  .welcome-art
-    width: min(100vw, 100dvh * 1244 / 700)
+.lang-name
+  flex: 1
+  text-align: left
 </style>

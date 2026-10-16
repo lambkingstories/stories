@@ -1,0 +1,167 @@
+/*
+ * The two looks of the app: day ("Petrol und Creme") and night ("Abendblau").
+ * Every screen takes its colours from these custom properties, so the switch in the settings changes the whole app.
+ * The old `--color-*` names of the first palette are mapped onto the new tokens so that older screens follow, too.
+ * Artwork (book covers, painted maps, the coloring sheet) is never recoloured.
+ */
+:root,
+:root[data-theme='day'] {
+  color-scheme: light;
+
+  --lk-bg: #edf3f1;
+  --lk-surface: #fafcfa;
+  --lk-surface-2: #e2ece9;
+  --lk-text: #163c40;
+  --lk-muted: #49676a;
+  --lk-accent: #1d666a;
+  --lk-accent-soft: rgba(29, 102, 106, 0.14);
+  --lk-paint: #2e665a;
+  --lk-read: #245d75;
+  --lk-adventure: #806431;
+  --lk-shelf: #69928e;
+  --lk-line: rgba(22, 60, 64, 0.14);
+  --lk-track: #d5e2df;
+  --lk-fill: #1d666a;
+  --lk-on-color: #ffffff;
+  --lk-nav-bg: #fafcfa;
+  --lk-nav-line: rgba(22, 60, 64, 0.12);
+  --lk-nav-active: #1d666a;
+  --lk-shadow: 0 6px 18px -10px rgba(22, 60, 64, 0.35);
+  --lk-new: #c8372d;
+  --lk-ok: #2e665a;
+  --lk-gold: #d7ba7e;
+  /* paper of the reader and its text */
+  --lk-paper: #fffdf7;
+  --lk-paper-text: #22262e;
+
+  /* names of the first palette, now following the theme */
+  --color-bg-main: var(--lk-bg);
+  --color-bg-card: var(--lk-surface);
+  --color-bg-card-soft: var(--lk-surface-2);
+  --color-bg-active-pill: var(--lk-accent-soft);
+  --color-text-primary: var(--lk-text);
+  --color-text-secondary: var(--lk-muted);
+  --color-text-muted: var(--lk-muted);
+  --color-text-link: var(--lk-accent);
+  --color-border-subtle: var(--lk-line);
+  --color-border-strong: var(--lk-line);
+  --color-progress-track: var(--lk-track);
+  --color-progress-fill: var(--lk-fill);
+  --color-nav-bg: var(--lk-nav-bg);
+  --color-nav-active: var(--lk-nav-active);
+  --color-nav-inactive: var(--lk-muted);
+}
+
+:root[data-theme='night'] {
+  color-scheme: dark;
+
+  --lk-bg: #162433;
+  --lk-surface: #203348;
+  --lk-surface-2: #1b2c3f;
+  --lk-text: #f4f4ee;
+  --lk-muted: #b8c6d3;
+  --lk-accent: #d7ba7e;
+  --lk-accent-soft: rgba(215, 186, 126, 0.18);
+  --lk-paint: #27483f;
+  --lk-read: #2b4664;
+  --lk-adventure: #55472f;
+  --lk-shelf: #5b7088;
+  --lk-line: rgba(244, 244, 238, 0.12);
+  --lk-track: #34495f;
+  --lk-fill: #d7ba7e;
+  --lk-on-color: #f4f4ee;
+  --lk-nav-bg: #1b2c3f;
+  --lk-nav-line: rgba(244, 244, 238, 0.1);
+  --lk-nav-active: #d7ba7e;
+  --lk-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.6);
+  --lk-new: #d6453a;
+  --lk-ok: #8fc7a8;
+  --lk-gold: #d7ba7e;
+  --lk-paper: #1f3045;
+  --lk-paper-text: #eef0ea;
+}
+
+html,
+body {
+  background: var(--lk-bg);
+  color: var(--lk-text);
+}
+
+/*
+ * Shapes of the "Gesamtdesign" (soft capsules, open frames): main buttons are full capsules, panels are softly rounded.
+ * The pieces below are shared by all screens so that they look the same everywhere.
+ */
+:root {
+  --lk-r-btn: 28px;
+  --lk-r-panel: 32px;
+  --lk-r-group: 28px;
+  --lk-r-card: 24px;
+  --lk-r-cover: 20px;
+  --lk-on-accent: #ffffff;
+}
+
+:root[data-theme='night'] {
+  --lk-on-accent: #162433;
+}
+
+/* main button: a capsule, 56 px high, petrol by day and gold by night; secondary: the same shape with a fine line */
+.lk-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 56px;
+  padding: 0 24px;
+  border: 1px solid transparent;
+  border-radius: var(--lk-r-btn);
+  background: var(--lk-accent);
+  color: var(--lk-on-accent);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14), 0 1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.lk-btn:active {
+  transform: translateY(1px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.lk-btn:focus-visible {
+  outline: 2px solid var(--lk-text);
+  outline-offset: 2px;
+}
+
+.lk-btn--full {
+  width: 100%;
+}
+
+.lk-btn--outline {
+  background: transparent;
+  color: var(--lk-text);
+  border-color: var(--lk-accent);
+  box-shadow: none;
+}
+
+:root[data-theme='night'] .lk-btn--outline {
+  border-color: var(--lk-line);
+  border-color: rgba(244, 244, 238, 0.45);
+}
+
+.lk-btn--small {
+  min-height: 44px;
+  padding: 0 16px;
+  font-size: 0.95rem;
+}
+
+/* a framed group: softly rounded, in the surface colour, with a fine line */
+.lk-panel {
+  background: var(--lk-surface);
+  border: 1px solid var(--lk-line);
+  border-radius: var(--lk-r-group);
+  box-shadow: var(--lk-shadow);
+}

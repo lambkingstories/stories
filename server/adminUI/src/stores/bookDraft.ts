@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { BookDTO, BookLocalization, Locale } from '@/types'
 import { normalizeAttachment, normalizeLocalizedImage } from '@/types'
+import { isColoringCategory } from '@/utils/coloringBook'
 
 const AUTOSAVE_KEY_PREFIX = 'bookDraft:'
 const AUTOSAVE_INTERVAL_MS = 5000
@@ -54,6 +55,8 @@ function emptyBook(): BookDTO {
     author: 'Anton Bernt',
     category: '',
     bookSeriesId: '',
+    kind: 'story',
+    freePages: null,
     releaseDate: new Date().toISOString().slice(0, 10),
     badges: [],
     websiteTags: [],
@@ -194,6 +197,9 @@ export const useBookDraftStore = defineStore('bookDraft', () => {
   const load = (b: BookDTO) => {
     const cloned = JSON.parse(JSON.stringify(b)) as BookDTO
     if (!cloned.localizations.de) cloned.localizations.de = emptyLocalization()
+    // books from before the kind existed: the category name says what they are
+    if (cloned.kind !== 'story' && cloned.kind !== 'coloring') cloned.kind = isColoringCategory(cloned.category) ? 'coloring' : 'story'
+    if (typeof cloned.freePages !== 'number') cloned.freePages = null
     if (!Array.isArray(cloned.websiteTags)) cloned.websiteTags = []
     if (typeof cloned.websitePrice !== 'string') cloned.websitePrice = ''
     // Older books store coverImage / previewImage as a plain URL string.

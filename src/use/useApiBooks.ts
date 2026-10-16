@@ -10,6 +10,7 @@ import { reactive, readonly } from 'vue'
 import { booksApi } from '@/api/booksApi'
 import useBookCache from '@/use/useBookCache'
 import type { ApiBook } from '@/types/apiBook'
+import { localColoringBooks } from '@/data/localColoringBooks'
 
 const state = reactive<{
   byId: Record<string, ApiBook>
@@ -49,11 +50,21 @@ async function refreshBookInBackground(bookId: string): Promise<void> {
   }
 }
 
+/** Books that ship inside a test build (see `localColoringBooks`); they never touch the cache or the network. */
+const localBookById = (id: string): ApiBook | undefined => localColoringBooks().find((b) => b.bookId === id)
+
 async function loadBook(bookId: string): Promise<ApiBook | null> {
+  const local = localBookById(bookId)
+  if (local) {
+    state.byId[bookId] = local
+    return local
+  }
   if (state.loading[bookId]) return state.byId[bookId] ?? null
   state.loading[bookId] = true
   try {
-    const cached = await cache.getCached(bookId)
+    const stored = await cache.getCached(bookId)
+    // a slim copy (no story text) is never used for reading
+    const cached = stored && !stored.lean ? stored : null
     if (cached) {
       state.byId[bookId] = cached
       void refreshBookInBackground(bookId)
@@ -76,15 +87,20 @@ async function loadAllBooks(): Promise<ApiBook[]> {
   if (state.listLoading) return state.all ?? []
   state.listLoading = true
   try {
-    const books = await booksApi.list()
+    const books = [...(await booksApi.list()), ...localColoringBooks()]
     state.all = books
     for (const b of books) {
-      state.byId[b.bookId] = b
-      void cache.saveBook(b)
+      // a slim entry (no story text) never replaces a whole book that is already known, and is not kept for offline use:
+      // the whole book is fetched and cached when it is opened
+      const known = state.byId[b.bookId]
+      if (!(b.lean && known && !known.lean)) state.byId[b.bookId] = b
+      if (!b.lean && !localBookById(b.bookId)) void cache.saveBook(b)
     }
     return books
   } catch (err) {
     state.error = (err as Error).message
+    // offline: a test build still has its own books
+    if (!state.all && localColoringBooks().length) state.all = localColoringBooks()
     return state.all ?? []
   } finally {
     state.listLoading = false

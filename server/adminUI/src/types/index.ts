@@ -4,6 +4,10 @@ export interface BookPage {
   page: number
   title: string
   text: string
+  /** Coloring books: the line art of the page. */
+  image?: string
+  /** Coloring books: the Bible passage of the picture. */
+  reference?: string
 }
 
 export interface BookLocalization {
@@ -64,6 +68,10 @@ export interface BookDTO {
   author: string
   category: string
   bookSeriesId: string
+  /** 'coloring' = Ausmalbuch: every page is a picture that opens in the coloring program. */
+  kind?: 'story' | 'coloring'
+  /** Coloring books: how many pictures are free (empty = the rule of the app). */
+  freePages?: number | null
   releaseDate: string
   updatedDate?: string
   badges: string[]

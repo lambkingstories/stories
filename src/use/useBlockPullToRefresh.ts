@@ -26,10 +26,12 @@ import { onBeforeUnmount, onMounted } from 'vue'
  */
 export function useBlockPullToRefresh(): void {
   let startY = 0
+  let startX = 0
 
   const onTouchStart = (e: TouchEvent): void => {
     if (e.touches.length !== 1) return
     startY = e.touches[0]!.clientY
+    startX = e.touches[0]!.clientX
   }
 
   const onTouchMove = (e: TouchEvent): void => {
@@ -43,6 +45,9 @@ export function useBlockPullToRefresh(): void {
 
     const dy = e.touches[0]!.clientY - startY
     if (dy <= 0) return // Finger moving up → not a refresh attempt.
+    // A mostly sideways swipe (a map, a slider) is no refresh gesture: cancelling it made such swipes stop at the first
+    // little downward drift of the finger.
+    if (Math.abs(e.touches[0]!.clientX - startX) >= dy) return
 
     // Walk from the touch target up to <body>. If any ancestor is a
     // scroll container that's scrolled past its top, the browser will

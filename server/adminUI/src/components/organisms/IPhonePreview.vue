@@ -162,6 +162,8 @@ const COLORING_IMG_RE = /!\[[^\]]*\]\(([^)\s]+)\)|<img[^>]+src=["']([^"']+)["']/
 const coloringImage = computed(() => {
   const current = currentDisplay.value
   if (!current || current.kind !== 'page') return ''
+  // a page in the new form has its picture in its own field
+  if (current.page.image) return current.page.image
   const m = COLORING_IMG_RE.exec(current.page.text ?? '')
   return m ? (m[1] ?? m[2] ?? '') : ''
 })

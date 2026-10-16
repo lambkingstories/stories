@@ -2,7 +2,7 @@
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import ZBackButton from '@/components/atoms/ZBackButton.vue'
+import LkPageHead from '@/components/molecules/LkPageHead.vue'
 import BookGridSection from '@/components/organisms/BookGridSection.vue'
 import useApiBooks from '@/use/useApiBooks'
 import useApiCategories from '@/use/useApiCategories'
@@ -52,29 +52,7 @@ function goBack() {
 
 <template lang="pug">
   div(:class="['category-page', isMobileLandscape ? 'is-landscape' : '', 'min-h-screen w-full pb-[calc(8rem+env(safe-area-inset-bottom,0px))]']")
-    //- ===== Header — back · crown · category name =====
-    //- Same crown header as the Serien page: no cover hero here, the
-    //- category name under the crown is the page title.
-    header(class="category-header")
-      ZBackButton(variant="flat" class="category-back" @click="goBack")
-      div(class="title-cluster")
-        img(
-          :src="prependBaseUrl('images/icons/crown_256x256.webp')"
-          alt=""
-          class="category-crown"
-          decoding="async"
-          aria-hidden="true"
-        )
-        div(class="category-title-row")
-          img(
-            v-if="categoryIcon"
-            :src="categoryIcon"
-            alt=""
-            class="category-title-icon"
-            decoding="async"
-            aria-hidden="true"
-          )
-          h1(class="category-title") {{ categoryLabel }}
+    LkPageHead(:title="categoryLabel" :subtitle="t('app.categories.sub')" @back="goBack")
 
     div(class="content")
       //- Shared book list (layout toggle + cards) — same component as
@@ -87,18 +65,18 @@ function goBack() {
 </template>
 
 <style scoped lang="sass">
-$cream-bg: #f3e6c4
-$cream-card: #fdf8ed
-$navy: #1a2f4a
-$brown: #7a6b55
-$gold: #d4a83e
-$border: #e6d6b5
+$cream-bg: var(--lk-bg)
+$cream-card: var(--lk-surface)
+$navy: var(--lk-text)
+$brown: var(--lk-muted)
+$gold: var(--lk-accent)
+$border: var(--lk-line)
 
 button
   -webkit-tap-highlight-color: transparent
 
 .category-page
-  background: radial-gradient(ellipse at top, #faf2dc 0%, #f3e6c4 60%, #e8d29a 100%)
+  background: var(--lk-bg)
   color: $navy
 
 .category-header
@@ -113,7 +91,7 @@ button
   position: absolute
   top: calc(max(env(safe-area-inset-top), 0.75rem))
   left: 12px
-  --back-icon-color: #1a2f4a !important
+  --back-icon-color: var(--lk-text) !important
 
 .title-cluster
   display: flex

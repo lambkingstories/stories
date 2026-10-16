@@ -85,17 +85,19 @@ function mapBook<T>(
   }
 
   const loc = out.localizations as {
-    de?: { content?: { text?: string }[] };
-    en?: { content?: { text?: string }[] }
+    de?: { content?: { text?: string; image?: string }[] };
+    en?: { content?: { text?: string; image?: string }[] }
   } | undefined
   if (loc && typeof loc === 'object') {
-    const rewriteLoc = (l?: { content?: { text?: string }[] }) => {
+    const rewriteLoc = (l?: { content?: { text?: string; image?: string }[] }) => {
       if (!l || !Array.isArray(l.content)) return l
       return {
         ...l,
         content: l.content.map((p) => ({
           ...p,
-          text: typeof p.text === 'string' ? mapEmbedded(p.text) : p.text
+          text: typeof p.text === 'string' ? mapEmbedded(p.text) : p.text,
+          // the picture of a coloring page
+          ...(typeof p.image === 'string' ? { image: mapString(p.image) } : {})
         }))
       }
     }

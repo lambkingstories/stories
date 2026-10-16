@@ -6,7 +6,9 @@ import { asyncHandler } from '../utils/asyncHandler.js'
 
 export const listBooks = asyncHandler(async (req: Request, res: Response) => {
   const includeHidden = req.query.all === 'true'
-  const { books, cacheHit } = await BookService.list({ includeHidden })
+  // `?lean=1`: without the text of the story pages (the app reads those when a book is opened)
+  const lean = req.query.lean === '1' || req.query.lean === 'true'
+  const { books, cacheHit } = await BookService.list({ includeHidden, lean })
   res.setHeader('X-Cache', cacheHit ? 'HIT' : 'MISS')
   res.json({ books })
 })
