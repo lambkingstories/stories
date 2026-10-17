@@ -8,6 +8,11 @@ name: Android Build & Sign
 
 on:
   workflow_dispatch:
+  # Runs from the redesign branch, because a workflow can only be started by
+  # hand once the file is on `main`. Remove this block when it is merged.
+  push:
+    branches: [ueberarbeitung-2026-10]
+    paths: ['.github/workflows/android-build.yml']
 
 concurrency:
   group: android-build
