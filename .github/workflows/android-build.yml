@@ -131,7 +131,8 @@ jobs:
             exit 1
           fi
           case "$APK" in *unsigned*) echo "::error::APK is unsigned: $APK"; exit 1;; esac
-          "$ANDROID_HOME"/build-tools/*/apksigner verify --print-certs "$APK" | grep -i "SHA-256"
+          APKSIGNER=$(ls -d "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -n 1)
+          "$APKSIGNER" verify --print-certs "$APK" | grep -i "SHA-256"
           echo "$APK"
 
       - name: Upload AAB
