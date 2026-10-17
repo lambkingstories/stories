@@ -93,8 +93,11 @@ jobs:
       # that are in Git are restored afterwards, so the store icon stays ours.
       - name: Initialize Tauri Android project
         run: |
+          # `init` refuses a half-filled gen/android, so set the icons aside first.
+          cp -R src-tauri/gen/android/app/src/main/res "$RUNNER_TEMP/android-res"
+          rm -rf src-tauri/gen/android
           pnpm exec tauri android init --ci
-          git checkout -- src-tauri/gen/android/app/src/main/res || true
+          cp -R "$RUNNER_TEMP/android-res/." src-tauri/gen/android/app/src/main/res/
 
       - name: Patch Gradle (release signing + versionCode)
         run: |
