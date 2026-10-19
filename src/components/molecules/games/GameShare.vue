@@ -111,6 +111,7 @@ function drop(basketId: number, receiverId: number | string) {
   const rd = current.value
   let reason: 'full' | 'food' | null = null
   if (rd.marks && placedOf(r.id).length >= marksOf(r.id)) reason = 'full'
+  else if (r.single && placedOf(r.id).length >= 1 && !isNobody(b.kind) && r.accepts.includes(b.kind)) reason = 'full'
   else if (rd.checkContent && !r.accepts.includes(b.kind)) reason = 'food'
   if (reason) {
     mistakes.value++

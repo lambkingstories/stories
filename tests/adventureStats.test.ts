@@ -18,8 +18,30 @@ vi.mock('vue-router', () => ({
 }))
 
 const played: string[] = []
+/** Everything that happened to the sounds, with the time (fake clock): a sound starts, a sound ends, everything is stopped. */
+const events: { what: string; name?: string; at: number }[] = []
+/** How long the real files ring (seconds x 1000, measured from the files): the promise of `play` comes true when the sound has rung out. */
+const LENGTH: Record<string, number> = { star: 670, coin: 780, bead: 493, fanfare: 2100, result: 1340, trophy: 3100, button: 350 }
 vi.mock('@/use/useSfx', () => ({
-  default: () => ({ play: (n: string) => played.push(n), preload: vi.fn(), enabled: { value: true }, setEnabled: vi.fn(), toggle: vi.fn(), playedSince: () => true })
+  default: () => ({
+    play: (n: string) => {
+      played.push(n)
+      events.push({ what: 'start', name: n, at: Date.now() })
+      return new Promise<void>((resolve) =>
+        setTimeout(() => {
+          events.push({ what: 'end', name: n, at: Date.now() })
+          resolve()
+        }, LENGTH[n] ?? 400)
+      )
+    },
+    preload: vi.fn(),
+    stopAll: () => events.push({ what: 'stop', at: Date.now() }),
+    lengthOf: (n: string) => (LENGTH[n] ?? 400) / 1000,
+    enabled: { value: true },
+    setEnabled: vi.fn(),
+    toggle: vi.fn(),
+    playedSince: () => true
+  })
 }))
 const burst = vi.fn()
 vi.mock('canvas-confetti', () => ({ default: (...a: unknown[]) => burst(...a) }))
@@ -31,6 +53,7 @@ const josef = journeys.find((j) => j.id === 'josef')!
 let warnings: string[] = []
 beforeEach(() => {
   played.length = 0
+  events.length = 0
   burst.mockClear()
   push.mockClear()
   replace.mockClear()
@@ -287,6 +310,21 @@ describe('the way back from a stage that was played again', () => {
     expect(replace.mock.calls[replace.mock.calls.length - 1]![0].name).toBe('app-adventure-map')
   })
 
+  it('leaving a stage for the map stops every sound that is still ringing, and the tones of the star page that are still to come are dropped', async () => {
+    await play([3, 3])
+    const w = await mountStage('2')
+    await w.find('.stage-back').trigger('click')
+    expect(events.some((e) => e.what === 'stop')).toBe(true)
+    // an AdventureStars that is told to hush drops the tones that are still to come (the fanfare of the star page)
+    const { default: Stars } = await import('@/components/molecules/AdventureStars.vue')
+    const stars = mount(Stars, { ...opts, props: { stars: 3, celebrate: true } })
+    await tick(300)
+    expect(played).toEqual(['star'])
+    await stars.setProps({ hush: true })
+    await tick(5000)
+    expect(played).toEqual(['star'])
+  })
+
   it('a stage that was not opened from the statistics is not touched by the mark of another stage', async () => {
     await play([3, 1, 1])
     markViaStats('josef', '3', 'bronze')
@@ -338,22 +376,93 @@ describe('the map: the cup opens the statistics; first the stars, then the way',
     expect(problems()).toEqual([])
   })
 
-  it('coming back from a finished stage: the star tones ring first (no fanfare over them), and only then the coin and the beads of the way', async () => {
+  const startsOf = (name: string) => events.filter((e) => e.what === 'start' && e.name === name)
+
+  it('coming back from a finished stage: only the star tones ring (one per star, no fanfare, no result tone); the way starts exactly when the last star tone has rung out, not by a fixed time', async () => {
     await play([3, 3])
+    const t0 = Date.now()
     await mountMap({ from: '2' })
-    // the stars of stage 2: three tones, one after the other, nothing else yet
-    await tick(1400)
-    expect(played.filter((p) => p === 'star')).toHaveLength(3)
-    expect(played).not.toContain('fanfare')
-    expect(played).not.toContain('coin')
-    expect(played).not.toContain('bead')
-    // then the way lights up
+    // the sounds of the page we come from are stopped first
+    expect(events[0]).toMatchObject({ what: 'stop' })
+    await tick(1500)
+    expect(startsOf('star')).toHaveLength(3)
+    expect(played).toEqual(['star', 'star', 'star'])
     await tick(3000)
-    expect(played).toContain('coin')
-    expect(played).toContain('bead')
-    const firstStarAt = played.indexOf('star')
-    expect(played.indexOf('coin')).toBeGreaterThan(firstStarAt)
-    expect(played.lastIndexOf('star')).toBeLessThan(played.indexOf('coin'))
+    // the order: three stars, then the coin, then the beads; nothing else at all
+    expect(played.slice(0, 5)).toEqual(['star', 'star', 'star', 'coin', 'bead'])
+    expect(played.filter((p) => !['star', 'coin', 'bead'].includes(p))).toEqual([])
+    const lastStarEnd = events.filter((e) => e.what === 'end' && e.name === 'star').at(-1)!.at
+    const coinAt = startsOf('coin')[0]!.at
+    // the coin rings at the moment the last star tone ends (the clock moves in steps of a few ms) and never over it
+    expect(coinAt).toBeGreaterThanOrEqual(lastStarEnd)
+    expect(coinAt - lastStarEnd).toBeLessThan(60)
+    // the first bead after the coin; no star tone after the coin starts
+    expect(startsOf('bead')[0]!.at).toBeGreaterThan(coinAt)
+    expect(Math.max(...startsOf('star').map((e) => e.at))).toBeLessThan(coinAt)
+    // no tone of the way is started before the stars are over, however slow the tones are (3 stars: 250 + 2 x 380 + 670 = 1680 ms after the start)
+    expect(coinAt - t0).toBeGreaterThanOrEqual(1680)
+  })
+
+  it('a stage with one star: one tone, then the way; a stage without stars: no star tone, the way starts at once', async () => {
+    await play([3, 1])
+    await mountMap({ from: '2' })
+    await tick(5000)
+    expect(played.slice(0, 3)).toEqual(['star', 'coin', 'bead'])
+    expect(played.filter((p) => p === 'star')).toHaveLength(1)
+    played.length = 0
+    events.length = 0
+    await play([3, 0])
+    await mountMap({ from: '2' })
+    await tick(5000)
+    expect(played.filter((p) => p === 'star')).toHaveLength(0)
+    expect(played[0]).toBe('coin')
+  })
+
+  it('the map cannot be moved by hand while the way runs (stars, light, camera), and is free again when the way has arrived and when the page is left', async () => {
+    await play([3, 3])
+    const w = await mountMap({ from: '2' })
+    await tick(100)
+    expect(w.find('.map-scroll').classes()).toContain('locked')
+    // still locked while the stars ring and while the light runs
+    await tick(1500)
+    expect(w.find('.map-scroll').classes()).toContain('locked')
+    await tick(1500)
+    expect(w.find('.map-scroll').classes()).toContain('locked')
+    // free after the camera has arrived (about 2.6 s after the way starts at most) and the last bead is lit
+    await tick(5000)
+    expect(w.find('.map-scroll').classes()).not.toContain('locked')
+    // leaving while locked leaves no timer behind
+    w.unmount()
+    played.length = 0
+    const v = await mountMap({ from: '2' })
+    await tick(50)
+    v.unmount()
+    await tick(8000)
+    expect(played).toEqual([])
+  })
+
+  it('no lock for a replay (at), for a plain visit, or for a stage that is shown again: nothing slides there', async () => {
+    await play([3, 3])
+    for (const q of [{ at: '2' }, {}] as Record<string, string>[]) {
+      const w = await mountMap(q)
+      await tick(100)
+      expect(w.find('.map-scroll').classes(), JSON.stringify(q)).not.toContain('locked')
+      w.unmount()
+    }
+  })
+
+  it('the lock never lasts for ever, even when the star tone does not ring out', async () => {
+    await play([3, 3])
+    LENGTH.star = 60 * 60 * 1000
+    try {
+      const w = await mountMap({ from: '2' })
+      await tick(100)
+      expect(w.find('.map-scroll').classes()).toContain('locked')
+      await tick(15000)
+      expect(w.find('.map-scroll').classes()).not.toContain('locked')
+    } finally {
+      LENGTH.star = 670
+    }
   })
 
   it('a replay (at): the stars light up, the way does not', async () => {

@@ -10,7 +10,7 @@ import messages from '@/i18n/app'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
-  default: () => ({ play: (n: string) => played.push(n), preload: vi.fn(), enabled: { value: true }, setEnabled: vi.fn(), toggle: vi.fn(), playedSince: () => true })
+  default: () => ({ play: (n: string) => played.push(n), preload: vi.fn(), stopAll: vi.fn(), lengthOf: () => 0, enabled: { value: true }, setEnabled: vi.fn(), toggle: vi.fn(), playedSince: () => true })
 }))
 
 const i18n = createI18n({ legacy: false, locale: 'de', fallbackLocale: 'de', messages: messages as never, missingWarn: false, fallbackWarn: false })

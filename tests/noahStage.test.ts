@@ -19,7 +19,7 @@ vi.mock('vue-router', () => ({
   useRouter: () => ({ push, replace, back: vi.fn(), beforeEach: vi.fn(), afterEach: vi.fn(), onError: vi.fn() })
 }))
 vi.mock('@/use/useSfx', () => ({
-  default: () => ({ play: vi.fn(), preload: vi.fn(), enabled: { value: true }, setEnabled: vi.fn(), toggle: vi.fn(), playedSince: () => true })
+  default: () => ({ play: vi.fn(), preload: vi.fn(), stopAll: vi.fn(), lengthOf: () => 0, enabled: { value: true }, setEnabled: vi.fn(), toggle: vi.fn(), playedSince: () => true })
 }))
 vi.mock('@/data/adventures', async (original) => {
   const real = await original<typeof import('@/data/adventures')>()

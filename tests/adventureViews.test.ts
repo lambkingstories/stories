@@ -20,7 +20,7 @@ vi.mock('vue-router', () => ({
 }))
 
 vi.mock('@/use/useSfx', () => ({
-  default: () => ({ play: vi.fn(), preload: vi.fn(), enabled: { value: true }, setEnabled: vi.fn(), toggle: vi.fn(), playedSince: () => true })
+  default: () => ({ play: vi.fn(), preload: vi.fn(), stopAll: vi.fn(), lengthOf: () => 0, enabled: { value: true }, setEnabled: vi.fn(), toggle: vi.fn(), playedSince: () => true })
 }))
 
 const i18n = createI18n({ legacy: false, locale: 'de', fallbackLocale: 'de', messages: messages as never, missingWarn: false, fallbackWarn: false })
@@ -417,11 +417,11 @@ describe('the new games of Noah (build, share)', () => {
       // round 1 is over although the empty jug is still in the tray; round 2 has more animals and more things
       expect(w.find('.sh-round').text()).toContain('Runde 2 von 2')
       expect(w.findAll('.sh-card').length).toBe(6)
-      expect(w.findAll('.sh-basket').length).toBe(11)
+      expect(w.findAll('.sh-basket').length).toBe(10)
       await give(w, indexOfKind(w, /Holzhammer/), GOAT)
       expect(w.findAll('.sh-card')[GOAT]!.find('.gm.bad').exists()).toBe(true)
       expect(w.find('.sh-fb').text()).toContain('niemand')
-      expect(w.findAll('.sh-basket').length).toBe(11)
+      expect(w.findAll('.sh-basket').length).toBe(10)
     })
 
     it('round 2 is free sharing: the goat and the donkey take hay, "Done" with somebody empty only wiggles (the first time no mistake); sharing right gives three stars', async () => {
@@ -443,6 +443,28 @@ describe('the new games of Noah (build, share)', () => {
       await finish(w)
       expect(emitted(w)).toEqual([[3]])
       expect(problems()).toEqual([])
+    })
+
+    it('every animal gets exactly one food (hay or grain, one each): a second one springs back with "enough already" and counts as a mistake; the family may take several', async () => {
+      const { noah } = await import('@/data/adventures/noah')
+      const share = noah.stages[2]!.task.share!
+      for (const id of ['taube', 'kamel', 'schaf', 'ziege', 'esel']) expect(share.receivers.find((r) => r.id === id)!.single, id).toBe(true)
+      expect(share.receivers.find((r) => r.id === 'familie')!.single).toBeFalsy()
+      const w = await mountShare()
+      await round1(w)
+      await give(w, indexOfKind(w, /Heu/), CAMEL)
+      expect(w.findAll('.sh-card')[CAMEL]!.find('.gm.good').exists()).toBe(true)
+      await tick(1000)
+      const before = w.findAll('.sh-basket').length
+      await give(w, indexOfKind(w, /Heu/), CAMEL)
+      expect(w.findAll('.sh-card')[CAMEL]!.find('.gm.bad').exists()).toBe(true)
+      expect(w.find('.sh-fb').text()).toBe('Hier sind schon genug Körbe.')
+      expect(w.findAll('.sh-basket').length).toBe(before)
+      await tick(1000)
+      // the family takes more than one fruit
+      await give(w, indexOfKind(w, FRUIT), FAMILY)
+      await give(w, indexOfKind(w, FRUIT), FAMILY)
+      expect(w.findAll('.sh-card')[FAMILY]!.findAll('.sh-slot.filled').length).toBe(2)
     })
 
     it('mistakes cost stars: three wrong ones and a second empty "Done" leave two stars; six mistakes one star', async () => {

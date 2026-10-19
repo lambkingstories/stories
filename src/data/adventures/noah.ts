@@ -118,7 +118,7 @@ const tierMemory: MemoryGame = {
 }
 
 /**
- * Etappe 3, "Teilen/Verteilen": die Familie bekommt Früchte (fünf Sorten), jedes Tier sein Futter: die Taube Körner (Futtersack), Kamel, Schaf, Ziege und Esel Heu.
+ * Etappe 3, "Teilen/Verteilen": die Familie bekommt Früchte (fünf Sorten), jedes Tier genau ein Futterstück (ein zweites springt zurück): die Taube Körner (Futtersack), Kamel, Schaf, Ziege und Esel Heu.
  * Falsches Futter: rotes Kreuz und ein kurzer Satz. Ein leerer Krug und ein Holzhammer sind für niemanden. Zwei Runden: in Runde 2 sind mehr Tiere da.
  * Die Früchte sind fünf Körbe (Codex: BILDAUFTRAG-Teilen-Essen-2.md); auf den Karten steht kein Futter vorab.
  */
@@ -130,11 +130,11 @@ const vorratTeilen: ShareGame = {
   empty: `${TEILEN}korb-leer.webp`,
   receivers: [
     { id: 'familie', image: `${TEILEN}familie.webp`, label: 'Noahs Familie', accepts: FRUECHTE, rejects: { heu: 'Noahs Familie isst kein Heu.', korn: 'Noahs Familie isst keine Futterkörner.' } },
-    { id: 'taube', image: `${TIERE}taube.webp`, label: 'die Taube', accepts: ['korn'], rejects: { heu: 'Die Taube frisst kein Heu.', '*': 'Das ist nichts für die Taube.' } },
-    { id: 'kamel', image: `${TIERE}kamel.webp`, label: 'das Kamel', accepts: ['heu'], rejects: { korn: 'Das Kamel mag keine Körner.', '*': 'Das ist nichts für das Kamel.' } },
-    { id: 'schaf', image: `${TIERE}schaf.webp`, label: 'das Schaf', accepts: ['heu'], rejects: { korn: 'Das Schaf mag keine Körner.', '*': 'Das ist nichts für das Schaf.' } },
-    { id: 'ziege', image: `${TIERE}ziege.webp`, label: 'die Ziege', accepts: ['heu'], rejects: { korn: 'Die Ziege mag keine Körner.', '*': 'Das ist nichts für die Ziege.' } },
-    { id: 'esel', image: `${TIERE}esel.webp`, label: 'der Esel', accepts: ['heu'], rejects: { korn: 'Der Esel mag keine Körner.', '*': 'Das ist nichts für den Esel.' } }
+    { id: 'taube', image: `${TIERE}taube.webp`, label: 'die Taube', accepts: ['korn'], single: true, rejects: { heu: 'Die Taube frisst kein Heu.', '*': 'Das ist nichts für die Taube.' } },
+    { id: 'kamel', image: `${TIERE}kamel.webp`, label: 'das Kamel', accepts: ['heu'], single: true, rejects: { korn: 'Das Kamel mag keine Körner.', '*': 'Das ist nichts für das Kamel.' } },
+    { id: 'schaf', image: `${TIERE}schaf.webp`, label: 'das Schaf', accepts: ['heu'], single: true, rejects: { korn: 'Das Schaf mag keine Körner.', '*': 'Das ist nichts für das Schaf.' } },
+    { id: 'ziege', image: `${TIERE}ziege.webp`, label: 'die Ziege', accepts: ['heu'], single: true, rejects: { korn: 'Die Ziege mag keine Körner.', '*': 'Das ist nichts für die Ziege.' } },
+    { id: 'esel', image: `${TIERE}esel.webp`, label: 'der Esel', accepts: ['heu'], single: true, rejects: { korn: 'Der Esel mag keine Körner.', '*': 'Das ist nichts für den Esel.' } }
   ],
   baskets: [
     { id: 'feige', image: `${TEILEN}korb-feigen.webp`, label: 'Feigen' },
@@ -151,7 +151,7 @@ const vorratTeilen: ShareGame = {
   rounds: [
     // keine Zielkörbe und keine Zahlen: die Kinder kommen selbst darauf, wer was braucht (Anton, 18.10.2026); kein Essen gehört zu beiden Gruppen
     { hint: 'Runde 1: Wer braucht was? Schiebe jedes Essen zu denen, die es brauchen. Manches braucht hier niemand.', receivers: ['familie', 'taube', 'kamel', 'schaf'], baskets: ['feige', 'heu', 'korn', 'traube', 'heu', 'krug'], checkContent: true },
-    { hint: 'Runde 2: Jetzt sind mehr Tiere da. Niemand soll leer ausgehen. Tippe dann auf Fertig.', receivers: ['familie', 'taube', 'kamel', 'schaf', 'ziege', 'esel'], baskets: ['dattel', 'heu', 'korn', 'granat', 'heu', 'olive', 'heu', 'korn', 'heu', 'feige', 'hammer'], checkContent: true, free: true }
+    { hint: 'Runde 2: Jetzt sind mehr Tiere da. Niemand soll leer ausgehen. Tippe dann auf Fertig.', receivers: ['familie', 'taube', 'kamel', 'schaf', 'ziege', 'esel'], baskets: ['dattel', 'heu', 'korn', 'granat', 'heu', 'olive', 'heu', 'heu', 'feige', 'hammer'], checkContent: true, free: true }
   ]
 }
 

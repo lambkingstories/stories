@@ -121,6 +121,8 @@ export interface ShareReceiver {
   accepts: string[]
   /** What is said when the wrong food is given ("Die Taube frisst kein Heu."), by kind of basket; `*` is for all the other kinds. */
   rejects?: Record<string, string>
+  /** An animal takes just one basket of food; a second one springs back ("enough already"). The family takes several. */
+  single?: boolean
 }
 export interface ShareBasket {
   id: string

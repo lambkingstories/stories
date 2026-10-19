@@ -4,27 +4,58 @@
  * With `celebrate` the earned stars appear one after the other with a pop and a glow, and throw sparks: a little for one star,
  * more for two and the most for three. The sparks are the painted "star burst" picture.
  */
-import { computed, onBeforeUnmount, onMounted } from 'vue'
+import { computed, onBeforeUnmount, onMounted, watch } from 'vue'
 import { MAX_STARS } from '@/utils/adventureScore'
 import useMusic from '@/use/useMusic'
 import useSfx from '@/use/useSfx'
 import { prependBaseUrl } from '@/utils/function'
 
-const props = withDefaults(defineProps<{ stars: number; size?: number; celebrate?: boolean; fanfare?: boolean }>(), { size: 22, celebrate: false, fanfare: true })
+const props = withDefaults(defineProps<{ stars: number; size?: number; celebrate?: boolean; fanfare?: boolean; hush?: boolean }>(), { size: 22, celebrate: false, fanfare: true, hush: false })
+/** The last star tone has rung out (at once when there is nothing to ring): whatever comes next may start now, without a sound laid over it. */
+const emit = defineEmits<{ sounded: [] }>()
 const star = (on: boolean, i: number) => prependBaseUrl(`images/abenteuer/ui/stern-${on ? 'gold' : 'aus'}-${i}.webp`)
 const burst = prependBaseUrl('images/abenteuer/ui/sternglanz.webp')
 
 // every earned star pops with a little sound, three stars end with a fanfare
-const { play } = useSfx()
+const { play, preload } = useSfx()
 const timers: number[] = []
+let sent = false
+const send = () => {
+  if (sent) return
+  sent = true
+  emit('sounded')
+}
+const stop = () => {
+  timers.forEach((t) => window.clearTimeout(t))
+  timers.length = 0
+}
 onMounted(() => {
   // the star page is the end of the game: its music fades out
   if (props.celebrate) useMusic().stop('game')
-  if (!props.celebrate || props.stars <= 0) return
-  for (let i = 0; i < Math.min(props.stars, MAX_STARS); i++) timers.push(window.setTimeout(() => play('star'), i * 380 + 250))
+  if (!props.celebrate || props.stars <= 0) {
+    send()
+    return
+  }
+  preload(['star'])
+  const n = Math.min(props.stars, MAX_STARS)
+  for (let i = 0; i < n; i++) {
+    timers.push(
+      window.setTimeout(() => {
+        const rung = Promise.resolve(play('star'))
+        // the way on starts when the last tone is over (and never later than a moment after, if a phone keeps the sound waiting)
+        if (i === n - 1) void rung.then(send)
+      }, i * 380 + 250)
+    )
+  }
+  // a sound that cannot be loaded (no net) must not keep the way waiting for ever
+  timers.push(window.setTimeout(send, (n - 1) * 380 + 250 + 3000))
   if (props.fanfare && props.stars >= MAX_STARS) timers.push(window.setTimeout(() => play('fanfare'), (MAX_STARS - 1) * 380 + 600))
 })
-onBeforeUnmount(() => timers.forEach((t) => window.clearTimeout(t)))
+// the page is being left: what is still to come does not ring any more
+watch(() => props.hush, (on) => {
+  if (on) stop()
+})
+onBeforeUnmount(stop)
 
 /** Sparks around every earned star: the more stars, the more sparks. */
 const sparkCount = computed(() => (props.stars >= 3 ? 8 : props.stars === 2 ? 5 : 3))

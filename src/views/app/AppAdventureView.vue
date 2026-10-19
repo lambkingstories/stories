@@ -25,7 +25,7 @@ const { t } = useI18n({ useScope: 'global' })
 const route = useRoute()
 const router = useRouter()
 const adv = useAdventure()
-const { play } = useSfx()
+const { play, preload, stopAll } = useSfx()
 // the soft map music (switched off with the speaker switch)
 useButtonSounds()
 const music = useMusic()
@@ -119,6 +119,7 @@ function leftFor(spot: MapSpot): number {
 }
 
 /** Slides the map to a position (an eased move over about a second; the same on every browser). */
+let slideFrame = 0
 function slideTo(el: HTMLElement, left: number, ms = 1100) {
   const start = el.scrollLeft
   const dist = left - start
@@ -128,9 +129,48 @@ function slideTo(el: HTMLElement, left: number, ms = 1100) {
   const step = (now: number) => {
     const k = Math.min(1, (now - t0) / ms)
     el.scrollLeft = start + dist * ease(k)
-    if (k < 1) requestAnimationFrame(step)
+    slideFrame = k < 1 ? requestAnimationFrame(step) : 0
   }
-  requestAnimationFrame(step)
+  slideFrame = requestAnimationFrame(step)
+}
+
+/**
+ * While the way runs (the stars ring, the light runs along the beads, the camera slides on to the next stage) the map cannot be moved by
+ * hand: a finger and the sliding camera would pull against each other and the picture would jump. Free again when the way has arrived.
+ * `roadGo` starts the light and the camera: it comes true when the last star tone has rung out.
+ */
+const locked = ref(false)
+const roadGo = ref(false)
+const roadTimers: number[] = []
+const later = (fn: () => void, ms: number) => {
+  roadTimers.push(window.setTimeout(fn, ms))
+}
+/** The longest the map stays locked, whatever happens (a lock must never be for ever). */
+const LOCK_MAX_MS = 14000
+onBeforeUnmount(() => {
+  roadTimers.forEach((id) => window.clearTimeout(id))
+  roadTimers.length = 0
+  if (slideFrame) cancelAnimationFrame(slideFrame)
+  locked.value = false
+})
+
+/** The way of the stage that was just finished: the coin rings at once, then a tick for every bead that lights up, and the camera follows the light. */
+const BEAD_FIRST_MS = 250
+function startRoad(el: HTMLElement, from: number, target: MapSpot) {
+  if (roadGo.value) return
+  roadGo.value = true
+  const beads = journey.value.map.path[from - 1]?.length ?? 12
+  const slideMs = Math.min(2600, 800 + beads * 85)
+  play('coin')
+  for (let i = 0; i < beads; i++) later(() => play('bead'), i * 95 + BEAD_FIRST_MS + 80)
+  later(() => slideTo(el, leftFor(target), slideMs), BEAD_FIRST_MS)
+  // free again when the camera has arrived and the last bead has lit up
+  later(() => (locked.value = false), Math.max(BEAD_FIRST_MS + slideMs, (beads - 1) * 95 + BEAD_FIRST_MS + 700) + 100)
+}
+/** The stars of the stage have rung out (or there are none): the way starts. */
+let onStarsSounded: () => void = () => undefined
+function starsSounded() {
+  onStarsSounded()
 }
 
 onMounted(async () => {
@@ -147,15 +187,15 @@ onMounted(async () => {
   } else if (Number.isFinite(from) && from >= 1 && from <= journey.value.stages.length) {
     // coming back from a stage finished for the first time: stand at that stage, then slide on to the next one
     el.scrollLeft = leftFor(spotOf(from - 1))
-    // the camera follows the light that runs along the opened stretch
-    const beads = journey.value.map.path[from - 1]?.length ?? 12
-    // the stars of the stage light up first (one tone each), then the way goes on
-    // (only the star tones play there, no fanfare on top; the coin and the beads start when the last star tone has rung out)
-    const lead = celebrateId.value === from ? stageStars(from) * 380 + 900 : 0
-    // a coin for the stage that is done, then a tick for every bead that lights up
-    window.setTimeout(() => play('coin'), 200 + lead)
-    for (let i = 0; i < beads; i++) window.setTimeout(() => play('bead'), i * 95 + 450 + 80 + lead)
-    window.setTimeout(() => slideTo(el, leftFor(target), Math.min(2600, 800 + beads * 85)), 700 + lead)
+    // what still rings from the page we come from is stopped; the stars of the stage ring first (one tone each, no fanfare on top), and
+    // when the last tone has rung out the way starts: the coin, the beads, the camera. The map is locked until it has arrived.
+    stopAll()
+    preload(['star', 'coin', 'bead'])
+    locked.value = true
+    onStarsSounded = () => startRoad(el, from, target)
+    later(() => (locked.value = false), LOCK_MAX_MS)
+    // a stage without stars rings nothing: the way starts after a short moment
+    if (celebrateId.value !== from) later(starsSounded, 300)
   } else {
     el.scrollLeft = leftFor(target)
   }
@@ -195,7 +235,7 @@ onMounted(async () => {
             AdventureStars(v-else-if="stageDone(s.id)" :stars="stageStars(s.id)" :size="22")
             ZIconography(v-else name="chevron-right" :size="22")
 
-    div(v-else ref="scroller" class="map-scroll")
+    div(v-else ref="scroller" class="map-scroll" :class="{ locked }")
       div(class="map-strip" :style="{ '--aspect': String(journey.map.aspect) }")
         //- the map picture in pieces, side by side (each a little wider than its share, so that no hairline shows between them)
         img(
@@ -216,7 +256,7 @@ onMounted(async () => {
               v-for="(b, i) in seg"
               :key="`${k}-${i}`"
               class="bead"
-              :class="{ lit: segmentLit(k), run: k === runSegment }"
+              :class="{ lit: segmentLit(k), run: k === runSegment, go: k === runSegment && roadGo }"
               :style="beadStyle(b, i)"
             )
 
@@ -245,7 +285,7 @@ onMounted(async () => {
           div(class="spot-below")
             span(class="spot-name") {{ s.soon ? t('app.adventure.stageListSoonTitle', { n: s.id }) : s.title }}
             span(v-if="s.soon" class="spot-soon") {{ t('app.adventure.stageListSoon') }}
-            AdventureStars(v-else-if="stageDone(s.id)" :stars="stageStars(s.id)" :size="24" :celebrate="s.id === celebrateId" :fanfare="false" class="spot-stars")
+            AdventureStars(v-else-if="stageDone(s.id)" :stars="stageStars(s.id)" :size="24" :celebrate="s.id === celebrateId" :fanfare="false" class="spot-stars" @sounded="s.id === celebrateId && starsSounded()")
             button(v-else-if="i === next" type="button" class="spot-go lk-btn lk-btn--small" @click="openStage(i)") {{ t('app.adventure.continue') }}
 
         //- the exam at the end of the way
@@ -448,6 +488,11 @@ $ink: #3b2a12
   &::-webkit-scrollbar
     display: none
 
+  // the way is running: no panning by hand (finger and camera would pull against each other)
+  &.locked
+    overflow-x: hidden
+    touch-action: none
+
 .map-strip
   --w: calc(var(--h) * var(--aspect, 4.6767))
   position: relative
@@ -488,8 +533,11 @@ $ink: #3b2a12
   &.run
     background: rgba(255, 250, 235, 0.82)
     box-shadow: 0 0 0 calc(var(--w) * 0.0005) rgba(96, 64, 22, 0.55)
+
+  // the light starts when the last star tone has rung out
+  &.run.go
     animation: bead-run 700ms ease-out both
-    animation-delay: calc(var(--i) * 95ms + 450ms)
+    animation-delay: calc(var(--i) * 95ms + 250ms)
 
 @keyframes bead-run
   0%
@@ -505,7 +553,7 @@ $ink: #3b2a12
     box-shadow: 0 0 calc(var(--w) * 0.003) calc(var(--w) * 0.0012) rgba(255, 205, 70, 0.75), 0 0 0 calc(var(--w) * 0.0005) rgba(150, 100, 20, 0.7)
 
 @media (prefers-reduced-motion: reduce)
-  .bead.run
+  .bead.run.go
     animation: none
     background: radial-gradient(circle, #fffbe0 0%, #ffdf70 55%, #f0b030 100%)
 

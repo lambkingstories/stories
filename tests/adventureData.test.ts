@@ -235,8 +235,12 @@ describe('Noah: die Spiele der Etappen 2, 3 und 4', () => {
     expect(r2.receivers!.length).toBeGreaterThan(r1.receivers!.length)
     for (const id of r1.receivers!) expect(r2.receivers, id).toContain(id)
     for (const id of r2.receivers!) expect(r2.baskets.filter((k) => byId(id).accepts.includes(k)).length, id).toBeGreaterThanOrEqual(id === 'esel' || id === 'ziege' || id === 'kamel' || id === 'schaf' ? 1 : 1)
-    // Heu muss für die vier Heu-Tiere reichen, jedes Futter in Runde 1 hat einen Abnehmer
-    expect(r2.baskets.filter((k) => k === 'heu').length).toBeGreaterThanOrEqual(4)
+    // jedes Tier genau ein Futterstück: genau vier Mal Heu und ein Futtersack in Runde 2, in Runde 1 zwei Mal Heu und ein Futtersack
+    expect(r2.baskets.filter((k) => k === 'heu').length).toBe(4)
+    expect(r2.baskets.filter((k) => k === 'korn').length).toBe(1)
+    expect(r1.baskets.filter((k) => k === 'heu').length).toBe(2)
+    expect(r1.baskets.filter((k) => k === 'korn').length).toBe(1)
+    for (const id of ['taube', 'kamel', 'schaf', 'ziege', 'esel']) expect(byId(id).single, id).toBe(true)
     expect(r2.baskets.filter((k) => byId('familie').accepts.includes(k)).length).toBeGreaterThanOrEqual(2)
     for (const k of r1.baskets.filter((x) => !nobody.includes(x))) expect(r1.receivers!.some((id) => byId(id).accepts.includes(k)), k).toBe(true)
     // falsches Futter: ein kurzer Satz für jedes Tier (Taube kein Heu, Kamel keine Körner), keine Futterbilder auf den Karten

@@ -204,6 +204,9 @@ const heroSrc = computed(() => (stage.value?.image ? img(stage.value.image) : ''
 
 const backLabel = computed(() => (phase.value === 'text' || phase.value === 'result' ? t('app.adventure.backToMap') : t('app.adventure.back')))
 
+/** The way back has been taken: the star tones of this page that are still to come are dropped. */
+const leaving = ref(false)
+
 /**
  * Back to the map. From a stage that was finished for the first time the map slides on to the next one and the way lights up
  * (`from`); from a stage that was played again, or when the child just leaves, the map stays at that stage (`at`).
@@ -211,6 +214,9 @@ const backLabel = computed(() => (phase.value === 'text' || phase.value === 'res
 function goMap(stageId?: number, first = false) {
   const j = journey.value
   if (!j) return
+  // the page is left in silence: what is still to ring (star tones, the fanfare of the result) stops, so that nothing rings into the next page
+  leaving.value = true
+  stopAll()
   // a stage (or the exam) that was played again from the statistics: the way back leads to the statistics
   if (isViaStats(j.id, isExam.value ? 'pruefung' : String(stage.value?.id ?? ''))) {
     clearViaStats()
@@ -345,7 +351,7 @@ function startPaint() {
   })
 }
 
-const { play } = useSfx()
+const { play, stopAll } = useSfx()
 
 // the mini game music plays only while the game itself is open (never while the story is read, and not in the questions, on the star
 // page or in the result: the star page of a game stops it, see AdventureStars); the piece fits the game (calm, medium, lively)
@@ -489,7 +495,7 @@ function openGift() {
         div(class="painted")
           img(v-if="paintedSrc" :src="paintedSrc" alt="" class="painted-img" draggable="false")
           img(v-for="(g, k) in glints" :key="k" :src="ui('sternglanz')" alt="" class="glint" :style="glintStyle(g)" draggable="false")
-        AdventureStars(:stars="paintedStars" :size="52" :celebrate="paintedStars > 0" class="burst-stars")
+        AdventureStars(:stars="paintedStars" :size="52" :celebrate="paintedStars > 0" :hush="leaving" class="burst-stars")
         ul(v-if="paintRows.length" class="painted-jobs" :aria-label="t('app.adventure.paintJobsTitle')")
           li(v-for="(r, i) in paintRows" :key="i" class="painted-job" :class="{ done: r.status === 'met', open: r.status && r.status !== 'met' }")
             span(class="painted-mark" aria-hidden="true") {{ r.mark }}
@@ -530,7 +536,7 @@ function openGift() {
             AdvButton(tone="blau" @click="goMap()") {{ t('app.adventure.backToMap') }}
         template(v-else)
           h2(class="stage-h2") {{ t('app.adventure.stageDone') }}
-          AdventureStars(:stars="shownStars" :size="60" celebrate class="burst-stars")
+          AdventureStars(:stars="shownStars" :size="60" celebrate :hush="leaving" class="burst-stars")
           p(class="result-line") {{ shownStars === 0 ? t('app.adventure.noStars') : t('app.adventure.starsEarned', { n: shownStars }, shownStars) }}
           //- the account of the stars: the same lines at every stage, so the child sees where each star came from
           ul(class="account")

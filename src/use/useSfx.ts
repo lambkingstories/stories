@@ -67,28 +67,73 @@ async function load(name: SfxName): Promise<AudioBuffer | null> {
   return job
 }
 
-/** `rate` plays the sound higher (above 1) or lower: a bell ticking up a little scale while things are counted. */
-function play(name: SfxName, volume = 1, rate = 1) {
-  if (settings.sfxVolume.value <= 0) return
+/** The sounds that ring right now (so that a page can be left in silence). */
+const ringing = new Map<AudioBufferSourceNode, { name: SfxName; gain: GainNode }>()
+/** The little tick of a button is too short to disturb anything and belongs to the tap that leaves the page. */
+const KEEP_RINGING: SfxName[] = ['button', 'tap']
+
+/**
+ * `rate` plays the sound higher (above 1) or lower: a bell ticking up a little scale while things are counted.
+ * The promise comes true when the sound has rung out (at once when it does not play at all, and at the latest a moment after it should have ended),
+ * so that the next thing can start exactly then.
+ */
+function play(name: SfxName, volume = 1, rate = 1): Promise<void> {
+  if (settings.sfxVolume.value <= 0) return Promise.resolve()
   lastPlayAt = performance.now()
   wakeOnTouch()
   const c = context()
-  if (!c) return
-  void load(name).then((buf) => {
-    if (!buf || settings.sfxVolume.value <= 0 || c.state === 'closed') return
+  if (!c) return Promise.resolve()
+  return load(name).then(
+    (buf) =>
+      new Promise<void>((resolve) => {
+        if (!buf || settings.sfxVolume.value <= 0 || c.state === 'closed') return resolve()
+        try {
+          const src = c.createBufferSource()
+          src.buffer = buf
+          src.playbackRate.value = rate
+          const gain = c.createGain()
+          gain.gain.value = Math.min(1, GAIN[name] * volume * settings.sfxVolume.value)
+          src.connect(gain)
+          gain.connect(c.destination)
+          ringing.set(src, { name, gain })
+          // a context that never wakes up must not hold things up: the end is also given by the length of the file
+          const giveUp = window.setTimeout(() => finish(), (buf.duration / rate) * 1000 + 1200)
+          const finish = () => {
+            window.clearTimeout(giveUp)
+            ringing.delete(src)
+            resolve()
+          }
+          src.onended = finish
+          void c.resume().then(() => src.start())
+        } catch {
+          // a sound that does not play is not a problem
+          resolve()
+        }
+      })
+  )
+}
+
+/** How long a sound lasts (seconds), once it has been loaded; 0 while it is not. */
+function lengthOf(name: SfxName): number {
+  const b = buffers.get(name)
+  return b && 'duration' in b ? b.duration : 0
+}
+
+/** Every sound that is still ringing stops (a short fade, no click): a page that is left must not ring into the next one. The tick of a button stays. */
+function stopAll(fadeMs = 60) {
+  if (!ctx) return
+  for (const [src, info] of [...ringing]) {
+    if (KEEP_RINGING.includes(info.name)) continue
     try {
-      const src = c.createBufferSource()
-      src.buffer = buf
-      src.playbackRate.value = rate
-      const gain = c.createGain()
-      gain.gain.value = Math.min(1, GAIN[name] * volume * settings.sfxVolume.value)
-      src.connect(gain)
-      gain.connect(c.destination)
-      void c.resume().then(() => src.start())
+      const now = ctx.currentTime
+      info.gain.gain.cancelScheduledValues(now)
+      info.gain.gain.setValueAtTime(info.gain.gain.value, now)
+      info.gain.gain.linearRampToValueAtTime(0, now + fadeMs / 1000)
+      src.stop(now + fadeMs / 1000 + 0.01)
     } catch {
-      // a sound that does not play is not a problem
+      // a sound that was not started yet cannot be stopped; it ends by itself
     }
-  })
+  }
 }
 
 /** Loads sounds in advance (a game does this when it opens, so the first tap is not late). */
@@ -113,5 +158,5 @@ function setEnabled(on: boolean) {
 const playedSince = (t: number) => lastPlayAt >= t
 
 export default function useSfx() {
-  return { enabled, play, preload, setEnabled, toggle: () => setEnabled(!enabled.value), playedSince }
+  return { enabled, play, preload, stopAll, lengthOf, setEnabled, toggle: () => setEnabled(!enabled.value), playedSince }
 }
