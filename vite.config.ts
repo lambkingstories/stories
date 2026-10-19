@@ -1,4 +1,4 @@
-import { stripAdamFiles, stripNoahFiles } from './vite.config.noah'
+import { stripAdamFiles, stripBabelFiles, stripNoahFiles } from './vite.config.noah'
 import { fileURLToPath, URL } from 'node:url'
 import { resolve, dirname } from 'node:path'
 import { rmSync } from 'node:fs'
@@ -66,6 +66,10 @@ export default defineConfig(({ mode }) => {
       // The same for "Adam und Eva" (`VITE_INCLUDE_ADAM=true` / `vite --mode adam`).
       if (env.VITE_SHOW_ADAM !== 'true' && env.VITE_INCLUDE_ADAM !== 'true') {
         stripAdamFiles(outDir)
+      }
+      // The same for "Der Turm von Babel" (`VITE_INCLUDE_BABEL=true` / `vite --mode babel`).
+      if (env.VITE_SHOW_BABEL !== 'true' && env.VITE_INCLUDE_BABEL !== 'true') {
+        stripBabelFiles(outDir)
       }
     }
   }

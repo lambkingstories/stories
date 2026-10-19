@@ -30,6 +30,9 @@ export const NOAH_ONLY_DIRS = [
  */
 export const ADAM_ONLY_DIRS = ['images/abenteuer/adam-eva', 'images/abenteuer/spiele/adam-eva', 'audio/abenteuer/adam-eva']
 
+/** The folders that belong to the journey "Der Turm von Babel" (id `babel`) alone, in the same three places as Adam and Eve. */
+export const BABEL_ONLY_DIRS = ['images/abenteuer/babel', 'images/abenteuer/spiele/babel', 'audio/abenteuer/babel']
+
 function strip(outDir: string, dirs: string[]) {
   for (const dir of dirs) rmSync(resolve(outDir, dir), { recursive: true, force: true })
 }
@@ -42,4 +45,9 @@ export function stripNoahFiles(outDir: string) {
 /** Takes the folders of Adam and Eve out of a finished build. */
 export function stripAdamFiles(outDir: string) {
   strip(outDir, ADAM_ONLY_DIRS)
+}
+
+/** Takes the folders of the Tower of Babel out of a finished build. */
+export function stripBabelFiles(outDir: string) {
+  strip(outDir, BABEL_ONLY_DIRS)
 }

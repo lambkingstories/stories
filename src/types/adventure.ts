@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur'
 
 export interface AdventureQuestion {
   q: string
@@ -461,6 +461,103 @@ export interface HerdGame {
   rounds: HerdRound[]
 }
 
+/** A person of the caravan in the memory game "Who is missing?": a picture (200 x 320, standing) and a few words for screen readers. */
+export interface MissingPerson {
+  id: string
+  image: string
+  label: string
+}
+/** One task: the people of the row (ids, in the order of the places) and who is gone when the dust cloud has passed (one or two of them). */
+export interface MissingTask {
+  row: string[]
+  gone: string[]
+}
+export interface MissingRound {
+  hint: string
+  /** Three tasks per round. */
+  tasks: MissingTask[]
+}
+/** "Who is missing from the caravan?": look at the row, a dust cloud passes, somebody is gone, and the child picks who it was (at most two rounds). */
+export interface MissingGame {
+  /** The picture behind the row (the stage picture) and the dust cloud (900 x 300, transparent). */
+  background: string
+  cloud: string
+  people: MissingPerson[]
+  /** The places of the row, as [x, y] (the feet of a person) in percent of the picture; a row uses the first places it needs. */
+  slots: [number, number][]
+  rounds: MissingRound[]
+}
+
+/** A part of the picture to wipe free, as a percentage of the picture. */
+export interface WipeRound {
+  hint: string
+  region: { x: number; y: number; w: number; h: number }
+}
+/** "Wipe away the fog": soft evening fog lies over the picture, the finger wipes it away; the child has to free a part of the picture (at most two rounds). */
+export interface WipeGame {
+  /** The picture below (the stage picture) and the fog over it (a soft picture with an alpha channel). */
+  background: string
+  mist: string
+  rounds: WipeRound[]
+}
+
+/** A round of the brick chain: how many people stand in the row, what comes out of the oven one after the other, and where everything is (percent of the picture). */
+export interface ChainRound {
+  hint: string
+  people: number
+  items: ('brick' | 'pitch')[]
+  /** The places of the people, from the oven to the stack (`slots.length` equals `people`), the oven's mouth and the middle of the stack. */
+  slots: [number, number][]
+  source: [number, number]
+  sink: [number, number]
+}
+/** "The brick chain": the builders pass bricks and pots of pitch from hand to hand from the oven to the stack (at most two rounds). */
+export interface ChainGame {
+  background: string
+  worker: string
+  brick: string
+  pitch: string
+  rounds: ChainRound[]
+}
+
+/** A round of the tower-stacking game. */
+export interface StackRound {
+  hint: string
+  /** How many steps are put on the tower in this round. */
+  layers: number
+  /** The width of the step below the first block, in percent of the picture width. */
+  baseWidth: number
+  /** How much narrower every step is than the one below (0 to 1). */
+  shrink: number
+  /** How fast the block glides along the beam, in picture widths per second (0.15 to 0.35). */
+  speed: number
+}
+/** "Stack the stepped tower": a block glides to and fro on a beam, a tap lowers it onto the step below; the tower never falls (at most two rounds). */
+export interface StackGame {
+  background: string
+  block: string
+  beam: string
+  rounds: StackRound[]
+}
+
+/** A road of the tracing game: its line (percent of the picture), half its width, and where it leads (`mountains`, `river`, `palms`, `hills`). */
+export interface TracePath {
+  id: string
+  points: [number, number][]
+  r: number
+  goal: string
+}
+export interface TraceRound {
+  hint: string
+  paths: TracePath[]
+}
+/** "Trace the roads": roads lead from the unfinished tower into the plain; the child follows each with a finger and a little walker goes along (at most two rounds). */
+export interface TraceGame {
+  scene: string
+  walker: string
+  rounds: TraceRound[]
+}
+
 /** The tools and colours a picture of an adventure can ask for. */
 export type PaintToolName = 'pencil' | 'felt' | 'watercolor' | 'graphite' | 'chalk' | 'oil' | 'fill'
 export type PaintColor = 'yellow' | 'blue' | 'brown' | 'green' | 'red' | 'orange' | 'purple' | 'pink'
@@ -523,6 +620,11 @@ export interface StageTask {
   mirror?: MirrorGame
   sow?: SowGame
   herd?: HerdGame
+  missing?: MissingGame
+  wipe?: WipeGame
+  chain?: ChainGame
+  stack?: StackGame
+  trace?: TraceGame
 }
 
 export interface AdventureStage {
