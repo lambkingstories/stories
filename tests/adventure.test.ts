@@ -19,11 +19,11 @@ import {
 } from '@/utils/adventureScore'
 
 describe('stars and cups', () => {
-  it('gives stars for a quiz: all right 3, half right 2, otherwise 1', () => {
+  it('gives stars for a quiz: all right 3, half right 2, some right 1, none right 0', () => {
     expect(quizStars(3, 3)).toBe(3)
     expect(quizStars(2, 3)).toBe(2)
     expect(quizStars(1, 3)).toBe(1)
-    expect(quizStars(0, 3)).toBe(1)
+    expect(quizStars(0, 3)).toBe(0)
     expect(quizStars(1, 2)).toBe(2)
     expect(quizStars(0, 0)).toBe(0)
   })
@@ -197,13 +197,18 @@ describe('the journeys', () => {
     for (const f of files) expect(existsSync(`public/${f}`), f).toBe(true)
   })
 
-  it('the questions bring a star for every right answer and take one for every wrong answer (0 to 3, one at least for those who played)', () => {
+  it('the questions bring a star for every right answer and take one for every wrong answer (0 to 3, no minimum: nothing right is 0)', () => {
     // two questions
     expect([0, 1, 2].map((w) => finalStars(3, 2 - w, w))).toEqual([3, 2, 1])
     expect(finalStars(1, 2, 0)).toBe(3)
     expect(finalStars(1, 1, 1)).toBe(1)
     expect(finalStars(2, 1, 1)).toBe(2)
-    expect(finalStars(2, 0, 2)).toBe(1)
+    expect(finalStars(2, 0, 2)).toBe(0)
+    // no minimum star: nothing right is 0, a game with one star and one wrong answer is 0, never below 0
+    expect(finalStars(1, 0, 1)).toBe(0)
+    expect(finalStars(3, 0, 5)).toBe(0)
+    expect(finalStars(0, 0, 3)).toBe(0)
+    expect(finalStars(1, 0, 0)).toBe(1)
     expect(finalStars(0, 0, 0)).toBe(0)
     expect(stageStarsOf({ stars: 3, gameStars: 3, finalStars: 2 })).toBe(2)
     expect(stageStarsOf({ stars: 3 })).toBe(3)

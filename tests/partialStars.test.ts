@@ -76,8 +76,8 @@ describe('the steps', () => {
       expect(medalFor(Math.ceil(max * 0.5) - 1, max), j.id).toBeNull()
       expect(medalFor(Math.ceil(max * 0.5), max), j.id).toBe('bronze')
     }
-    // the questions are untouched: a quiz still brings a star for taking part
-    expect(quizStars(0, 3)).toBe(1)
+    // the questions: no star for answering alone
+    expect(quizStars(0, 3)).toBe(0)
   })
 })
 
@@ -207,5 +207,80 @@ describe('painting tasks follow the same steps', () => {
   it('all tasks met 3 stars, two thirds 2, a third 1, none 0 (3 tasks), and with seven tasks the same shares', () => {
     expect([0, 1, 2, 3].map((m) => partialStars(m, 3))).toEqual([0, 1, 2, 3])
     expect([0, 1, 2, 3, 4, 5, 6, 7].map((m) => partialStars(m, 7))).toEqual([0, 0, 0, 1, 1, 2, 2, 3])
+  })
+})
+
+describe('the questions: no minimum star (Anton, 19.10.2026)', () => {
+  const josef = baseJourneys.find((j) => j.id === 'josef')!
+  const quizOnly = josef.stages.find((s) => s.task.kind === 'quiz')!
+
+  /** Answer every question of the open stage: `right(i)` says whether question i is answered right. */
+  const answer = async (w: ReturnType<typeof mount>, questions: { options: string[]; answer: number }[], right: (i: number) => boolean) => {
+    for (let i = 0; i < questions.length; i++) {
+      const q = questions[i]!
+      const want = right(i) ? q.options[q.answer] : q.options.find((_, k) => k !== q.answer)
+      const opt = w.findAll('.quiz-option').find((o) => o.find('.quiz-text').text() === want)
+      expect(opt, `question ${i + 1}`).toBeTruthy()
+      await opt!.trigger('click')
+      await w.find('.quiz-next button').trigger('click')
+      await flushPromises()
+    }
+  }
+  const press = async (w: ReturnType<typeof mount>, text: RegExp) => {
+    const b = w.findAll('button').find((x) => text.test(x.text()))
+    expect(b, `button ${text}`).toBeTruthy()
+    await b!.trigger('click')
+    await flushPromises()
+  }
+
+  it('a game skipped and every question wrong: 0 stars, a friendly line (no "almost"), and the way to try again stays', async () => {
+    const { default: Stage } = await import('@/views/app/AppAdventureStageView.vue')
+    const { default: useAdventure } = await import('@/use/useAdventure')
+    for (const [locale, line, again] of [['de', 'Diesmal ist noch kein Stern dabei. Versuch es gern noch einmal!', /Nochmal versuchen/], ['en', 'No star yet this time. Try again whenever you like!', /Try again/]] as const) {
+      useAdventure().reset('josef')
+      route.params = { journeyId: 'josef', stageId: '2' }
+      const w = mount(Stage, opts(locale))
+      await flushPromises()
+      await press(w, /Zur Aufgabe|To the task/)
+      await press(w, /Überspringen|Skip/)
+      await press(w, /Zu den Fragen|To the questions/)
+      await answer(w, josef.stages[1]!.questions, () => false)
+      expect(w.text(), locale).toContain(line)
+      expect(w.text()).not.toMatch(/Fast|Almost/)
+      expect(useAdventure().stageOf('josef', 2)?.finalStars).toBe(0)
+      expect(w.findAll('button').some((b) => again.test(b.text())), `${locale} again`).toBe(true)
+      w.unmount()
+    }
+  })
+
+  it('a stage that is only questions: nothing right 0 stars, one right one star, all right three', async () => {
+    const { default: Stage } = await import('@/views/app/AppAdventureStageView.vue')
+    const { default: useAdventure } = await import('@/use/useAdventure')
+    const n = quizOnly.questions.length
+    for (const [rights, stars] of [[0, 0], [1, 1], [n, 3]] as const) {
+      useAdventure().reset('josef')
+      route.params = { journeyId: 'josef', stageId: String(quizOnly.id) }
+      const w = mount(Stage, opts())
+      await flushPromises()
+      await press(w, /Zu den Fragen/)
+      await answer(w, quizOnly.questions, (i) => i < rights)
+      expect(useAdventure().stageOf('josef', quizOnly.id)?.finalStars, `${rights} right`).toBe(stars)
+      w.unmount()
+    }
+  })
+
+  it('the exam: no star either; the points are the right answers alone (nothing right is 0 points and no cup)', async () => {
+    const { default: Stage } = await import('@/views/app/AppAdventureStageView.vue')
+    const { default: useAdventure } = await import('@/use/useAdventure')
+    const { pointsOf } = await import('@/utils/adventureScore')
+    useAdventure().reset('josef')
+    route.params = { journeyId: 'josef', stageId: 'pruefung' }
+    const w = mount(Stage, opts())
+    await flushPromises()
+    await answer(w, josef.exam, () => false)
+    const prog = useAdventure().progressOf('josef')
+    expect(prog?.exam?.correct).toBe(0)
+    expect(pointsOf(prog)).toBe(0)
+    expect(w.find('.result-medal').exists()).toBe(false)
   })
 })

@@ -3,9 +3,9 @@ import type { JourneyProgress, Journey, Medal } from '@/types/adventure'
 
 export const MAX_STARS = 3
 
-/** Stars for a quiz: all right 3, at least half right 2, otherwise 1 (taking part is worth a star). */
+/** Stars for a quiz: all right 3, at least half right 2, some right 1, none right 0 (answering alone earns no star; Anton, 19.10.2026). */
 export function quizStars(correct: number, total: number): number {
-  if (total <= 0) return 0
+  if (total <= 0 || correct <= 0) return 0
   if (correct >= total) return 3
   if (correct * 2 >= total) return 2
   return 1
@@ -52,12 +52,11 @@ export function catchStars(caught: number, total: number): number {
 /**
  * The stars of a stage after the questions (the same for all games): every right answer brings one star back, up to three; then every wrong
  * answer takes one away, so a wrong answer always shows (three stars from the game, one right and one wrong answer make two).
- * Whoever took part in the game keeps at least one star.
+ * There is no minimum: nothing right and nothing from the game is 0 stars, and never below 0 (Anton, 19.10.2026).
  */
 export function finalStars(gameStars: number, correct: number, wrong: number): number {
   const net = Math.min(MAX_STARS, gameStars + Math.max(0, correct)) - Math.max(0, wrong)
-  const floor = gameStars > 0 ? 1 : 0
-  return Math.min(MAX_STARS, Math.max(floor, net))
+  return Math.min(MAX_STARS, Math.max(0, net))
 }
 
 /** The stars that count for a stage: the final ones once the questions are done, otherwise those of the game. */
