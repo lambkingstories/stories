@@ -37,6 +37,9 @@ jobs:
       VITE_APP_DEBUG: "false"
       VITE_DEBUG_CONSOLE: "false"
       VITE_APP_TITLE: LambKing Stories
+      # Test build: the adventure Noah is not public yet and is always shown here, so it can be tried on a phone.
+      # Remove this line before a build that goes to the stores (a normal build leaves Noah out completely).
+      VITE_SHOW_NOAH: "true"
       VITE_CLIENT_KEY: tauri-key-public-1111
       VITE_API_BASE_URL: ${{ vars.API_BASE_URL || 'https://lbs-be.onrender.com' }}
 
