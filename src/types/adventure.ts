@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter'
 
 export interface AdventureQuestion {
   q: string
@@ -244,6 +244,80 @@ export interface FlyGame {
   rounds: FlyRound[]
 }
 
+/** A picture card of the story-ordering game (one scene of the story). */
+export interface OrderCard {
+  id: string
+  /** The picture of the card (4:3, a path below `public/`). */
+  image: string
+  /** What the card shows, in a few words (read out for screen readers). */
+  label: string
+}
+export interface OrderRound {
+  hint: string
+  /** The places carry dots (one, two, three ...) in this round; without them the child remembers the story. */
+  numbered: boolean
+  /** The cards of this round (ids of `OrderGame.cards`) in the RIGHT order, from the first place to the last. */
+  cards: string[]
+}
+/** The ordering game: the cards of a story lie mixed and are laid in the order of the story (at most two rounds). */
+export interface OrderGame {
+  cards: OrderCard[]
+  rounds: OrderRound[]
+}
+
+/** A plant of the watering game: a small one that grows when it has had enough water. */
+export interface WaterPlant {
+  id: string
+  /** The plant before it is watered, and after it has had all its jugs (paths below `public/`). */
+  small: string
+  grown: string
+  /** What it is, in a few words (read out for screen readers). */
+  label: string
+  /** The middle of its foot and its width, as a percentage of the garden picture. */
+  x: number
+  y: number
+  w: number
+  /** How many jugs it needs (1, or 2 for a thirsty tree). */
+  need: 1 | 2
+}
+export interface WaterRound {
+  hint: string
+  /** The plants of this round (ids of `WaterGame.plants`). */
+  plants: string[]
+}
+/** The watering game: fill the jug at the stream and water the plants (at most two rounds). */
+export interface WaterGame {
+  /** The garden (3:4) with the stream. */
+  scene: string
+  /** Where the stream is, as a percentage of the garden picture (a tap or a drop there fills the jug). */
+  river: { x: number; y: number; w: number; h: number }
+  jugEmpty: string
+  jugFull: string
+  plants: WaterPlant[]
+  rounds: WaterRound[]
+}
+
+/** A light in the dark picture of the light-collecting game: the middle and the width, as a percentage of the picture. */
+export interface LightSpot {
+  x: number
+  y: number
+  w: number
+}
+export interface LightRound {
+  hint: string
+  spots: LightSpot[]
+  /** How many lights shine at the same time (1 when left out: they come one after the other). */
+  together?: number
+}
+/** The light-collecting game: the picture is dark, the lights are tapped and the picture gets bright (at most two rounds). */
+export interface LightGame {
+  /** The bright picture (3:4); the code dims it and brightens it again. */
+  scene: string
+  /** The picture of one soft light (a path below `public/`). */
+  light: string
+  rounds: LightRound[]
+}
+
 /** The tools and colours a picture of an adventure can ask for. */
 export type PaintToolName = 'pencil' | 'felt' | 'watercolor' | 'graphite' | 'chalk' | 'oil' | 'fill'
 export type PaintColor = 'yellow' | 'blue' | 'brown' | 'green' | 'red' | 'orange' | 'purple' | 'pink'
@@ -297,6 +371,9 @@ export interface StageTask {
   build?: BuildGame
   dots?: DotsGame
   fly?: FlyGame
+  order?: OrderGame
+  water?: WaterGame
+  light?: LightGame
 }
 
 export interface AdventureStage {

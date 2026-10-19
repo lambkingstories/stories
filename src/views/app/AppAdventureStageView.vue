@@ -19,6 +19,9 @@ import GameFly from '@/components/molecules/games/GameFly.vue'
 import GameFind from '@/components/molecules/games/GameFind.vue'
 import GameHarvest from '@/components/molecules/games/GameHarvest.vue'
 import GameMemory from '@/components/molecules/games/GameMemory.vue'
+import GameOrder from '@/components/molecules/games/GameOrder.vue'
+import GameWater from '@/components/molecules/games/GameWater.vue'
+import GameLights from '@/components/molecules/games/GameLights.vue'
 import GamePuzzle from '@/components/molecules/games/GamePuzzle.vue'
 import GameShare from '@/components/molecules/games/GameShare.vue'
 import GameSort from '@/components/molecules/games/GameSort.vue'
@@ -306,7 +309,7 @@ const hasPart = computed(() => partStars.value > 0 && !progress.finished.value)
 
 /** The games have a restart sign: a new key mounts the game afresh (round, mistakes and what was done begin again). */
 const gameKey = ref(0)
-const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly'] as const
+const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'light'] as const
 const hasGame = computed(() => hasCountGame.value || GAME_FIELDS.some((f) => !!gameTask.value?.[f]))
 function restartGame() {
   progress.reset()
@@ -372,6 +375,9 @@ const gameKind = computed(() => {
   if (g?.build) return g.build.ordered ? 'stones' : 'build'
   if (g?.dots) return 'dots'
   if (g?.fly) return 'fly'
+  if (g?.order) return 'order'
+  if (g?.water) return 'water'
+  if (g?.light) return 'light'
   return undefined
 })
 watch(
@@ -473,6 +479,9 @@ function openGift() {
         GameBuild(:key="gameKey" v-else-if="gameTask?.build" :game="gameTask.build" @done="taskDone")
         GameDots(:key="gameKey" v-else-if="gameTask?.dots" :game="gameTask.dots" @done="taskDone")
         GameFly(:key="gameKey" v-else-if="gameTask?.fly" :game="gameTask.fly" @done="taskDone")
+        GameOrder(:key="gameKey" v-else-if="gameTask?.order" :game="gameTask.order" @done="taskDone")
+        GameWater(:key="gameKey" v-else-if="gameTask?.water" :game="gameTask.water" @done="taskDone")
+        GameLights(:key="gameKey" v-else-if="gameTask?.light" :game="gameTask.light" @done="taskDone")
         template(v-else-if="isPaint")
           img(:src="img(taskImage)" alt="" class="stage-paint" draggable="false")
           div(class="stage-actions")
