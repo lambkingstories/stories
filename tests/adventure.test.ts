@@ -74,11 +74,20 @@ describe('adventure progress', () => {
     useAdventure().reset('t')
   })
 
-  it('keeps the best result of a stage', () => {
+  it('the result of the newest try replaces the old one (better or worse)', () => {
     const a = useAdventure()
     a.recordStars('t', 1, 2)
+    a.recordFinal('t', 1, 2)
+    a.recordQuiz('t', 1, 2)
+    // a new try: its game stars count at once, the stars of the questions of the old try are gone until the new ones are in
     a.recordStars('t', 1, 1)
-    expect(a.stageOf('t', 1)?.stars).toBe(2)
+    expect(a.stageOf('t', 1)?.stars).toBe(1)
+    expect(a.stageOf('t', 1)?.gameStars).toBe(1)
+    expect(a.stageOf('t', 1)?.finalStars).toBeUndefined()
+    expect(a.stageOf('t', 1)?.quizCorrect).toBeUndefined()
+    a.recordFinal('t', 1, 0)
+    expect(a.stageOf('t', 1)?.finalStars).toBe(0)
+    a.recordQuiz('t', 1, 0)
     a.recordStars('t', 1, 3)
     expect(a.stageOf('t', 1)?.stars).toBe(3)
     a.recordStars('t', 1, 9)

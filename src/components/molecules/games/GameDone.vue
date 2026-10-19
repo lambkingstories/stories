@@ -3,10 +3,13 @@
 import { useI18n } from 'vue-i18n'
 import AdvButton from '@/components/atoms/AdvButton.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
+import useTaskProgress from '@/use/useTaskProgress'
 
 defineProps<{ stars: number; text?: string }>()
 defineEmits<{ next: [] }>()
 const { t } = useI18n({ useScope: 'global' })
+// the game is over: the stage page stops offering "go on with one star for what you did"
+useTaskProgress().finish()
 </script>
 
 <template lang="pug">

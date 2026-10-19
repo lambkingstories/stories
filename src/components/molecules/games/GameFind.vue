@@ -73,7 +73,7 @@ function sceneTap(e: MouseEvent) {
         class="fd-thing"
         :class="{ found: found[i] }"
         :style="style(f, found[i] ? 40 : 10)"
-        :aria-label="t('app.adventure.findOne')"
+        :aria-label="game.labels?.[i] ?? t('app.adventure.findOne')"
         @click="find(i)"
       )
         img(:src="prependBaseUrl(f.image)" alt="" draggable="false")
@@ -89,7 +89,7 @@ function sceneTap(e: MouseEvent) {
         draggable="false"
       )
     p(v-if="!finished" class="fd-count" role="status") {{ t('app.adventure.findCount', { n: count, total }) }}
-    GameDone(v-else :stars="stars" :text="t('app.adventure.findDone')" @next="emit('done', stars)")
+    GameDone(v-else :stars="stars" :text="game.doneText ?? t('app.adventure.findDone')" @next="emit('done', stars)")
 </template>
 
 <style scoped lang="sass">
@@ -120,6 +120,16 @@ function sceneTap(e: MouseEvent) {
   cursor: pointer
   -webkit-tap-highlight-color: transparent
   touch-action: manipulation
+
+  // a small figure (a man 27 px wide) still has a finger-sized hit area: an invisible box of at least 44 x 44 px around its middle
+  &::before
+    content: ''
+    position: absolute
+    left: 50%
+    top: 50%
+    width: max(100%, 44px)
+    height: max(100%, 44px)
+    transform: translate(-50%, -50%)
 
   img
     display: block

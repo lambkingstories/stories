@@ -6,15 +6,22 @@ import { ref } from 'vue'
  * part the game can only be skipped, without a star.
  */
 const parts = ref(0)
+/** The game is over (its end page with the stars is on): the link that gives one star for a part is not offered any more. */
+const finished = ref(false)
 
 export default function useTaskProgress() {
   return {
     parts,
+    finished,
     mark: () => {
       parts.value++
     },
+    finish: () => {
+      finished.value = true
+    },
     reset: () => {
       parts.value = 0
+      finished.value = false
     }
   }
 }

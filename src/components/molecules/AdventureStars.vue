@@ -6,10 +6,11 @@
  */
 import { computed, onBeforeUnmount, onMounted } from 'vue'
 import { MAX_STARS } from '@/utils/adventureScore'
+import useMusic from '@/use/useMusic'
 import useSfx from '@/use/useSfx'
 import { prependBaseUrl } from '@/utils/function'
 
-const props = withDefaults(defineProps<{ stars: number; size?: number; celebrate?: boolean }>(), { size: 22, celebrate: false })
+const props = withDefaults(defineProps<{ stars: number; size?: number; celebrate?: boolean; fanfare?: boolean }>(), { size: 22, celebrate: false, fanfare: true })
 const star = (on: boolean, i: number) => prependBaseUrl(`images/abenteuer/ui/stern-${on ? 'gold' : 'aus'}-${i}.webp`)
 const burst = prependBaseUrl('images/abenteuer/ui/sternglanz.webp')
 
@@ -17,9 +18,11 @@ const burst = prependBaseUrl('images/abenteuer/ui/sternglanz.webp')
 const { play } = useSfx()
 const timers: number[] = []
 onMounted(() => {
+  // the star page is the end of the game: its music fades out
+  if (props.celebrate) useMusic().stop('game')
   if (!props.celebrate || props.stars <= 0) return
   for (let i = 0; i < Math.min(props.stars, MAX_STARS); i++) timers.push(window.setTimeout(() => play('star'), i * 380 + 250))
-  if (props.stars >= MAX_STARS) timers.push(window.setTimeout(() => play('fanfare'), (MAX_STARS - 1) * 380 + 600))
+  if (props.fanfare && props.stars >= MAX_STARS) timers.push(window.setTimeout(() => play('fanfare'), (MAX_STARS - 1) * 380 + 600))
 })
 onBeforeUnmount(() => timers.forEach((t) => window.clearTimeout(t)))
 

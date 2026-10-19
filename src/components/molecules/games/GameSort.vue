@@ -200,13 +200,13 @@ const { dragging, selected, down, tapPlace, toggleSelect, dragStyle } = useDragD
   color: #fff3cf
   font-family: 'Fraunces', serif
   font-weight: 700
-  font-size: 0.9rem
+  font-size: 1rem
 
 .so-round
   margin: 0
   text-align: center
   font-weight: 800
-  font-size: 0.85rem
+  font-size: 1rem
   letter-spacing: 0.06em
   text-transform: uppercase
   color: #8a6a1f

@@ -27,6 +27,11 @@ function press(e: MouseEvent) {
   min-width: 200px
   max-width: 100%
 
+  // the quiet button is solid, too (never see-through): it is read over pictures and sand as well as on a plain page
+  &.lk-btn--outline
+    background: var(--lk-surface)
+    border-width: 2px
+
   &.lk-btn--small
     min-width: 0
 

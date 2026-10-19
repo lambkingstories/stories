@@ -4,7 +4,13 @@
  */
 import { onBeforeUnmount, reactive, ref } from 'vue'
 
-export function useDragDrop(onDrop: (id: string, target: string) => void) {
+/** Where on the screen the piece was let go or the place was tapped (for games that decide by the point, not by the element). */
+export interface DropPoint {
+  x: number
+  y: number
+}
+
+export function useDragDrop(onDrop: (id: string, target: string, at?: DropPoint) => void) {
   const dragging = ref<string | null>(null)
   const selected = ref<string | null>(null)
   const offset = reactive({ x: 0, y: 0 })
@@ -41,7 +47,7 @@ export function useDragDrop(onDrop: (id: string, target: string) => void) {
       const target = targetAt(e.clientX, e.clientY)
       if (target !== null) {
         selected.value = null
-        onDrop(id, target)
+        onDrop(id, target, { x: e.clientX, y: e.clientY })
       }
     } else {
       selected.value = selected.value === id ? null : id
@@ -68,11 +74,11 @@ export function useDragDrop(onDrop: (id: string, target: string) => void) {
   }
 
   /** A place was tapped while a piece is chosen. */
-  function tapPlace(target: string) {
+  function tapPlace(target: string, at?: DropPoint) {
     const id = selected.value
     if (id === null) return
     selected.value = null
-    onDrop(id, target)
+    onDrop(id, target, at)
   }
 
   /** The keyboard's way to choose a piece (Enter or Space) without dragging it. */

@@ -227,4 +227,14 @@ const boardStyle = computed(() => ({
     transform: translateX(-7px) rotate(-3deg)
   75%
     transform: translateX(7px) rotate(3deg)
+
+@media (prefers-reduced-motion: reduce)
+  .pz-slot,
+  .pz-slot.done,
+  .pz-slot.flash-good,
+  .pz-slot.flash-bad,
+  .pz-piece,
+  .pz-piece.wobble
+    animation: none
+    transition: none
 </style>

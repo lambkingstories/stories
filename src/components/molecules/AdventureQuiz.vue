@@ -1,5 +1,8 @@
 <script setup lang="ts">
-/** The questions of a stage or of the exam: one at a time, three answers; a wrong answer shows the right one. */
+/**
+ * The questions of a stage or of the exam: one at a time, three answers. After the answer the chosen box shows a tick (right, green) or a
+ * cross (wrong, red); there are no words and no chips in the boxes, so that a box never grows when it is answered.
+ */
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AdvButton from '@/components/atoms/AdvButton.vue'
@@ -63,15 +66,13 @@ function next() {
         class="quiz-option"
         :class="{ right: answered && o.i === question.answer, wrong: answered && picked === o.i && o.i !== question.answer, dim: answered && o.i !== question.answer && picked !== o.i }"
         :disabled="answered"
+        :aria-label="answered && (o.i === question.answer || picked === o.i) ? `${o.text}: ${t(o.i === question.answer ? 'app.adventure.answerRight' : 'app.adventure.answerWrong')}` : undefined"
         @click="pick(o.i)"
       )
         span(class="quiz-radio" aria-hidden="true")
           ZIconography(v-if="answered && o.i === question.answer" name="check" :size="18")
           span(v-else-if="answered && picked === o.i" class="quiz-x") ✕
-        span(class="quiz-text") {{ o.text }}
-        span(v-if="answered && o.i === question.answer" class="quiz-tag") {{ t('app.adventure.right') }}
-        span(v-else-if="answered && picked === o.i" class="quiz-tag") {{ t('app.adventure.wrong') }}
-    p(v-if="answered" class="quiz-feedback" role="status") {{ picked === question.answer ? t('app.adventure.right') : t('app.adventure.wrong') }}
+        span(class="quiz-text" :class="{ long: o.text.length > 34, longer: o.text.length > 46 }") {{ o.text }}
     div(class="quiz-next")
       AdvButton(v-if="answered" tone="gold" @click="next") {{ isLast ? t('app.adventure.finish') : t('app.adventure.next') }}
 </template>
@@ -144,7 +145,7 @@ function next() {
   display: flex
   align-items: center
   justify-content: center
-  font-size: 0.85rem
+  font-size: 1rem
   font-weight: 800
 
   .right &
@@ -163,20 +164,23 @@ function next() {
 .quiz-text
   flex: 1
   min-width: 0
+  line-height: 1.2
 
-.quiz-tag
-  flex: none
-  padding: 2px 10px
-  border-radius: 999px
-  font-size: 0.85rem
-  font-weight: 800
-  background: var(--lk-surface-2)
+  // a long answer gets a smaller letter instead of a taller box
+  &.long
+    font-size: 0.98rem
 
-.quiz-feedback
-  margin: 0
-  font-weight: 800
-  color: var(--lk-text)
+  &.longer
+    font-size: 0.88rem
+
 
 .quiz-next
   min-height: 70px
+  // the one main button of the questions sits in the middle, like the buttons of the other pages of a stage
+  display: flex
+  justify-content: center
+
+@media (prefers-reduced-motion: reduce)
+  .quiz-option
+    transition: none
 </style>

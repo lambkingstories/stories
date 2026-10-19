@@ -219,4 +219,14 @@ function choose(side: 'left' | 'right' | 'middle') {
     transform: translate(-102%, -180%) scale(0.6)
   100%
     transform: translate(-50%, -100%)
+
+@media (prefers-reduced-motion: reduce)
+  // the sheep and the way stand where they go instead of moving there
+  .way-scene,
+  .way-walker,
+  .way-walker.go-back-middle,
+  .way-walker.go-back-right,
+  .way-walker.go-back-left
+    animation: none
+    transition: none
 </style>

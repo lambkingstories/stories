@@ -180,7 +180,7 @@ function turn(c: Card) {
 .mem-rule
   flex: 1
   min-width: 140px
-  font-size: 0.85rem
+  font-size: 1rem
   color: #7a6a4d
 
 .mem-text

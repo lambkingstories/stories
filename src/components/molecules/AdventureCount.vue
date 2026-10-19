@@ -261,4 +261,8 @@ function choose(n: number) {
 
 .count-next
   margin-top: 6px
+
+@media (prefers-reduced-motion: reduce)
+  *
+    transition: none
 </style>
