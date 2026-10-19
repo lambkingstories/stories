@@ -120,15 +120,15 @@ export const noahEn: TextOverlay<Journey> = {
         'Noah does not have to look for them or call them. They come to him, and all of them go into the ark, just as God said. Now there is nothing left to do but wait, for seven days.'
       ],
       task: {
-        hint: 'Find the matching animals. You only see a few kinds of animals as examples.',
+        hint: 'Find the male and the female. You only see a few kinds of animals as examples.',
         memory: {
           pairs: [
-            { text: 'The sheep: An animal from the field. It goes into the ark.' },
-            { text: 'The donkey: Also an animal from the field. It goes into the ark.' },
-            { text: 'The camel: The camel also belongs to the animals from the field.' },
-            { text: 'The lion: An animal from the wild. It goes into the ark, too.' },
-            { text: 'The deer: An animal from the wild. Males and females of its kind go into the ark.' },
-            { text: 'The dove: A bird of the air. Males and females of the birds go into the ark, too.' }
+            { text: 'Stag and doe: Animals from the wild. The male and the female go into the ark.', labels: ['Stag', 'Doe'] },
+            { text: 'Ram and ewe: Animals from the field. The male and the female go into the ark.', labels: ['Ram', 'Ewe'] },
+            { text: 'Peacock and peahen: Birds of the air. Males and females of the birds come, too.', labels: ['Peacock', 'Peahen'] },
+            { text: 'Bull and cow: Animals from the field. Of every kind, male and female come to Noah.', labels: ['Bull', 'Cow'] },
+            { text: 'Rooster and hen: They belong there, too. Male and female go into the ark.', labels: ['Rooster', 'Hen'] },
+            { text: 'Drake and duck: A male and a female. They go into the ark, too, just as God said.', labels: ['Drake', 'Duck'] }
           ]
         }
       },

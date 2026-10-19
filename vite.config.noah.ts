@@ -10,7 +10,7 @@ export const NOAH_ONLY_DIRS = [
   'images/abenteuer/noah',
   'images/abenteuer/spiele/noah',
   'images/abenteuer/spiele/wimmel-noah',
-  'images/abenteuer/spiele/memory-tiere',
+  'images/abenteuer/spiele/memory-paare',
   'images/abenteuer/spiele/bauen',
   'images/abenteuer/spiele/teilen',
   'images/abenteuer/spiele/tiere',

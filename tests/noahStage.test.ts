@@ -64,27 +64,36 @@ const openTask = async (stageId: number) => {
 }
 
 describe('Noah: the stage page with the new games', () => {
-  it('stage 2 shows the building game, stage 3 the sharing game; stage 4 is a memory with six animals (the pairs game is gone)', async () => {
+  it('stage 2 shows the building game, stage 3 the sharing game; stage 4 is a memory of six pairs, male and female (the pairs game is gone)', async () => {
     const a = await openTask(2)
     expect(a.find('.bd-board').exists()).toBe(true)
     expect(a.find('.stage-hint').text()).toContain('Baue die Arche')
     const b = await openTask(3)
     expect(b.findAll('.sh-card').length).toBe(4)
-    // stage 4: twelve cards, two of every animal, and the hint with the words "some animals as an example"
+    // stage 4: twelve different cards (six pairs of male and female), and the hint with the words "some animals as an example"
     const c = await openTask(4)
     expect(c.findAll('.mem-card').length).toBe(12)
-    expect(c.find('.stage-hint').text()).toBe('Finde die gleichen Tiere. Du siehst nur einige Tierarten als Beispiel.')
-    const fronts = c.findAll('.mem-front').map((i) => i.attributes('src'))
-    expect(new Set(fronts).size).toBe(6)
-    for (const f of new Set(fronts)) expect(fronts.filter((x) => x === f)).toHaveLength(2)
-    // the two cards of one animal turned up: the sentence of that animal shows and the pair stays
-    const first = fronts[0]!
-    const same = c.findAll('.mem-card').map((card, i) => (fronts[i] === first ? card : null)).filter(Boolean)
-    await same[0]!.trigger('click')
-    await same[1]!.trigger('click')
+    expect(c.find('.stage-hint').text()).toBe('Finde Männchen und Weibchen. Du siehst nur einige Tierarten als Beispiel.')
+    const fronts = c.findAll('.mem-front').map((i) => i.attributes('src')!)
+    expect(new Set(fronts).size).toBe(12)
+    const pairs = noah.stages[3]!.task.memory!.pairs
+    const cardOf = (file: string) => c.findAll('.mem-card')[fronts.findIndex((f) => f.endsWith(file.split('/').pop()!))]!
+    // two cards that do not belong together turn back (no mistake)
+    await cardOf(pairs[0]!.image).trigger('click')
+    await cardOf(pairs[1]!.imageB!).trigger('click')
     await flushPromises()
-    expect(c.find('.mem-text').text()).toMatch(/Arche|Feld|Wildnis/)
+    expect(c.findAll('.mem-card.found')).toHaveLength(0)
+    await new Promise((r) => setTimeout(r, 1100))
+    await flushPromises()
+    expect(c.findAll('.mem-card.up')).toHaveLength(0)
+    // the male and the female of one animal: the pair stays open, its sentence shows, and each card is named for screen readers
+    await cardOf(pairs[3]!.image).trigger('click')
+    await cardOf(pairs[3]!.imageB!).trigger('click')
+    await flushPromises()
+    expect(c.find('.mem-text').text()).toBe(pairs[3]!.text)
     expect(c.findAll('.mem-card.found')).toHaveLength(2)
+    expect(cardOf(pairs[3]!.image).attributes('aria-label')).toBe('Stier')
+    expect(cardOf(pairs[3]!.imageB!).attributes('aria-label')).toBe('Kuh')
     expect(problems()).toEqual([])
   })
 

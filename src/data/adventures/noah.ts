@@ -100,18 +100,20 @@ const AUSMALEN_9_AUFGABEN: PaintJob[] = [
 ]
 
 /**
- * Etappe 4, Memory: sechs Tierpaare (zwei gleiche Karten), die Sätze erscheinen beim Treffer und sagen nur, was in der Etappe steht (ENTWURF_Noah.md).
- * Die Karten sind gemalt (Codex, 256 x 256, Creme-Goldrand-Look); die Rückseite ist die der anderen Memory-Spiele (Anton prüft sie noch).
+ * Etappe 4, Memory: sechs Paare aus Männchen und Weibchen (1. Mose 7,2–3: von allen Arten Männchen und Weibchen). Die zwei Karten eines Paares sind
+ * verschieden (Männchen und Weibchen, 256 x 256, gemalt von Codex); die Sätze erscheinen beim Treffer und sagen nur, was in der Etappe steht.
+ * Die Rückseite hat Anton für passend befunden.
  */
+const PAARE = `${G}memory-paare/`
 const tierMemory: MemoryGame = {
-  back: `${G}memory/rueck.webp`,
+  back: `${PAARE}rueck.webp`,
   pairs: [
-    { image: `${G}memory-tiere/schaf.webp`, text: 'Das Schaf: Ein Tier vom Feld. Es geht in die Arche.' },
-    { image: `${G}memory-tiere/esel.webp`, text: 'Der Esel: Auch ein Tier vom Feld. Er geht in die Arche.' },
-    { image: `${G}memory-tiere/kamel.webp`, text: 'Das Kamel: Auch das Kamel gehört zu den Tieren vom Feld.' },
-    { image: `${G}memory-tiere/loewe.webp`, text: 'Der Löwe: Ein Tier aus der Wildnis. Auch er geht in die Arche.' },
-    { image: `${G}memory-tiere/hirsch.webp`, text: 'Der Hirsch: Ein Tier aus der Wildnis. Von seiner Art gehen Männchen und Weibchen in die Arche.' },
-    { image: `${G}memory-tiere/taube.webp`, text: 'Die Taube: Ein Vogel aus der Luft. Auch von den Vögeln gehen Männchen und Weibchen in die Arche.' }
+    { image: `${PAARE}hirsch-m.webp`, imageB: `${PAARE}hirsch-w.webp`, labels: ['Hirsch', 'Hirschkuh'], text: 'Hirsch und Hirschkuh: Tiere aus der Wildnis. Das Männchen und das Weibchen gehen in die Arche.' },
+    { image: `${PAARE}widder-m.webp`, imageB: `${PAARE}schaf-w.webp`, labels: ['Widder', 'Schaf'], text: 'Widder und Schaf: Tiere vom Feld. Das Männchen und das Weibchen gehen in die Arche.' },
+    { image: `${PAARE}pfau-m.webp`, imageB: `${PAARE}pfau-w.webp`, labels: ['Pfau', 'Pfauenhenne'], text: 'Pfau und Pfauenhenne: Vögel aus der Luft. Auch von den Vögeln kommen Männchen und Weibchen.' },
+    { image: `${PAARE}stier-m.webp`, imageB: `${PAARE}kuh-w.webp`, labels: ['Stier', 'Kuh'], text: 'Stier und Kuh: Tiere vom Feld. Von allen Arten kommen Männchen und Weibchen zu Noah.' },
+    { image: `${PAARE}hahn-m.webp`, imageB: `${PAARE}henne-w.webp`, labels: ['Hahn', 'Henne'], text: 'Hahn und Henne: Auch sie gehören dazu. Männchen und Weibchen gehen in die Arche.' },
+    { image: `${PAARE}ente-m.webp`, imageB: `${PAARE}ente-w.webp`, labels: ['Erpel', 'Ente'], text: 'Erpel und Ente: Ein Männchen und ein Weibchen. Auch sie gehen in die Arche, so wie Gott es gesagt hat.' }
   ]
 }
 
@@ -314,7 +316,7 @@ export const noah: Journey = {
         'Und dann kommen die Tiere. Aus allen Richtungen ziehen sie heran, Tiere vom Feld und aus der Wildnis, Vögel aus der Luft und kleine Tiere vom Boden. Von allen Arten kommen Männchen und Weibchen zu Noah.',
         'Noah muss sie nicht suchen und nicht rufen. Sie kommen zu ihm, und alle gehen in die Arche, so wie Gott es gesagt hat. Nun ist nichts mehr zu tun, als zu warten, sieben Tage lang.'
       ],
-      task: { kind: 'memory', hint: 'Finde die gleichen Tiere. Du siehst nur einige Tierarten als Beispiel.', memory: tierMemory },
+      task: { kind: 'memory', hint: 'Finde Männchen und Weibchen. Du siehst nur einige Tierarten als Beispiel.', memory: tierMemory },
       questions: [
         { q: 'Muss Noah die Tiere suchen?', options: ['nein, sie kommen zu ihm', 'ja, er sucht sie überall', 'ja, er ruft sie mit einem Horn'], answer: 0 },
         { q: 'Wie lange dauert es noch, bis der Regen beginnt?', options: ['sieben Tage', 'zwei Tage', 'zehn Tage'], answer: 0 }

@@ -148,7 +148,7 @@ describe('Noah: die Spiele der Etappen 2, 3 und 4', () => {
       }
     }
     // Etappe 4 ist ein Memory; der Hinweis sagt kindgerecht, dass die Tierarten nur Beispiele sind (die Bibel nennt keine Arten)
-    expect(stage(4).task.hint).toBe('Finde die gleichen Tiere. Du siehst nur einige Tierarten als Beispiel.')
+    expect(stage(4).task.hint).toBe('Finde Männchen und Weibchen. Du siehst nur einige Tierarten als Beispiel.')
     expect(stage(4).task.pairs).toBeUndefined()
   })
 
@@ -254,18 +254,25 @@ describe('Noah: die Spiele der Etappen 2, 3 und 4', () => {
     expect(share.baskets.find((b) => b.id === 'korn')!.image).toMatch(/futtersack/)
   })
 
-  it('Tier-Memory (Etappe 4): sechs Tiere, zwei gleiche Karten je Tier, die Sätze sagen nur, was in der Etappe steht', () => {
+  it('Tier-Memory (Etappe 4): sechs Paare aus Männchen und Weibchen, jede Karte nur einmal, die Sätze sagen nur, was in der Etappe steht', () => {
     const m = stage(4).task.memory!
     expect(m.pairs).toHaveLength(6)
-    expect(new Set(m.pairs.map((p) => p.image)).size).toBe(6)
-    expect(m.pairs.map((p) => p.text.split(':')[0])).toEqual(['Das Schaf', 'Der Esel', 'Das Kamel', 'Der Löwe', 'Der Hirsch', 'Die Taube'])
-    expect(m.pairs[0]!.text).toBe('Das Schaf: Ein Tier vom Feld. Es geht in die Arche.')
-    expect(m.pairs[4]!.text).toBe('Der Hirsch: Ein Tier aus der Wildnis. Von seiner Art gehen Männchen und Weibchen in die Arche.')
-    for (const p of m.pairs) expect(p.text.length, p.text).toBeLessThan(110)
-    // keine Eisbären und Kängurus; die Karten sind gemalt (256 x 256), nicht mehr die Einzeltiere auf einer Creme-Karte
-    expect(m.pairs.map((p) => p.image).join(' ')).not.toMatch(/eisbaer|kaenguru|känguru/i)
+    // zwölf verschiedene Karten: die zwei Karten eines Paares sind nicht gleich (Männchen und Weibchen), keine Karte kommt zweimal vor
+    const images = m.pairs.flatMap((p) => [p.image, p.imageB!])
+    expect(images.every(Boolean)).toBe(true)
+    expect(new Set(images).size).toBe(12)
+    for (const p of m.pairs) expect(p.image).not.toBe(p.imageB)
+    expect(m.pairs.map((p) => p.labels)).toEqual([['Hirsch', 'Hirschkuh'], ['Widder', 'Schaf'], ['Pfau', 'Pfauenhenne'], ['Stier', 'Kuh'], ['Hahn', 'Henne'], ['Erpel', 'Ente']])
+    // die Sätze: nur Männchen und Weibchen von den Arten, keine feste Zahl, keine Zahlen
+    for (const p of m.pairs) {
+      expect(p.text.length, p.text).toBeLessThan(120)
+      expect(p.text, p.text).toMatch(/Männchen/)
+      expect(p.text, p.text).not.toMatch(/\d|zwei Tiere|Paare/)
+    }
+    // keine Eisbären und Kängurus; die Karten sind gemalt (256 x 256) und liegen im Ordner nur für Noah
+    expect(images.join(' ')).not.toMatch(/eisbaer|kaenguru|känguru|loewe/i)
+    for (const f of [...images, m.back]) expect(f, f).toMatch(/memory-paare\//)
     expect(m.plainFront).toBeUndefined()
-    for (const p of m.pairs) expect(p.image, p.text).toMatch(/memory-tiere\//)
   })
 
   it('alle Spielbilder gibt es, jedes unter 620 KB, zusammen höchstens 3 MB', () => {

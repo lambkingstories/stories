@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * The memory: every picture is on two cards, which lie face down. Two turned cards with the same picture stay open and tell what
- * the picture is in the story; two different ones turn back. Turning cards that do not match is the game itself, not a mistake. The game has a time limit
+ * The memory: every pair is two cards, which lie face down (two alike cards, or two different pictures that belong together, such as the male and the female of an animal). Two turned cards of one pair stay open and tell what
+ * the pair is in the story; two cards of different pairs turn back. Turning cards that do not match is the game itself, not a mistake. The game has a time limit
  * instead: every full minute takes one star away (three stars at first, one at least once all pairs are found; a skipped game earns one).
  */
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
@@ -25,14 +25,15 @@ interface Card {
   id: number
   pair: number
   src: string
+  label: string
 }
 
 /** The cards in a fixed mixed order (a small deterministic shuffle). */
 const cards = computed<Card[]>(() => {
   const list: Card[] = []
   props.game.pairs.forEach((p, i) => {
-    list.push({ id: i * 2, pair: i, src: prependBaseUrl(p.image) })
-    list.push({ id: i * 2 + 1, pair: i, src: prependBaseUrl(p.image) })
+    list.push({ id: i * 2, pair: i, src: prependBaseUrl(p.image), label: p.labels?.[0] ?? '' })
+    list.push({ id: i * 2 + 1, pair: i, src: prependBaseUrl(p.imageB ?? p.image), label: p.labels?.[1] ?? '' })
   })
   let seed = list.length * 6151 + 29
   const rnd = () => {
@@ -105,7 +106,7 @@ function turn(c: Card) {
         type="button"
         class="mem-card"
         :class="{ up: faceUp(c), found: matched.includes(c.pair) }"
-        :aria-label="faceUp(c) ? t('app.adventure.memoryCard') : t('app.adventure.memoryHidden')"
+        :aria-label="faceUp(c) ? c.label || t('app.adventure.memoryCard') : t('app.adventure.memoryHidden')"
         :aria-pressed="faceUp(c)"
         @click="turn(c)"
       )

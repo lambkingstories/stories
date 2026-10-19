@@ -46,7 +46,12 @@ export interface HarvestGame {
 
 /** The memory: two equal cards per picture. */
 export interface MemoryPair {
+  /** The picture of the first card (and of the second one, when `imageB` is not given). */
   image: string
+  /** A second, different picture: the two cards of the pair are not alike (male and female). */
+  imageB?: string
+  /** What the two cards are called (for screen readers when they are turned up). */
+  labels?: [string, string]
   /** What the picture is in the story, shown when the pair is found. */
   text: string
 }
