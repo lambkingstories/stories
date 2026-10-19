@@ -126,7 +126,8 @@ const src = (p: string) => prependBaseUrl(p)
           :aria-label="t('app.adventure.lightsLight')"
           @click.stop="take(i)"
         )
-          img(:src="src(game.light)" alt="" draggable="false")
+          img(:src="src(game.glow)" alt="" draggable="false")
+          img(v-if="s.cloud" :src="src(s.cloud)" alt="" draggable="false" class="lt-cloud")
         span(v-if="ring" :key="ring.k" class="lt-ring" :style="{ left: `${ring.x}%`, top: `${ring.y}%` }" aria-hidden="true")
       p(class="lt-count") {{ t('app.adventure.lightsCount', { n: collected, total }) }}
     GameDone(v-else :stars="stars" :text="t('app.adventure.lightsDone')" @next="emit('done', stars)")
@@ -209,6 +210,14 @@ const src = (p: string) => prependBaseUrl(p)
     height: auto
     pointer-events: none
     filter: drop-shadow(0 0 10px rgba(255, 224, 130, 0.95))
+
+  // a cloud lies half over the light (the light is still tapped through it)
+  .lt-cloud
+    position: absolute
+    left: 22%
+    top: 30%
+    width: 120%
+    filter: none
 
 .lt-ring
   position: absolute

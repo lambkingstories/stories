@@ -8,7 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
 import { partialStars } from '@/utils/adventureScore'
-import type { LightGame, OrderGame, WaterGame } from '@/types/adventure'
+import type { EchoGame, LightGame, OrderGame, VerseGame, WaterGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -332,7 +332,7 @@ describe('Füllen und Gießen (water)', () => {
 describe('Lichter sammeln (lights)', () => {
   const game: LightGame = {
     scene: 'images/x/nacht.webp',
-    light: 'images/x/licht.webp',
+    glow: 'images/x/glow.webp',
     rounds: [
       {
         hint: 'Tippe die Lichter an, eins nach dem anderen.',
@@ -348,7 +348,7 @@ describe('Lichter sammeln (lights)', () => {
         spots: [
           { x: 15, y: 20, w: 10 },
           { x: 50, y: 15, w: 10 },
-          { x: 85, y: 22, w: 10 },
+          { x: 85, y: 22, w: 10, cloud: 'images/x/wolke-1.webp' },
           { x: 30, y: 70, w: 10 }
         ]
       }
@@ -392,6 +392,17 @@ describe('Lichter sammeln (lights)', () => {
     expect(lights(w)).toHaveLength(1)
     expect(dark(w)).toBeCloseTo(0.8 * (1 - 1 / 7), 2)
     expect(w.find('.lt-count').text()).toBe('Lichter: 1 von 7')
+  })
+
+  it('a light behind a cloud: the cloud lies over it, the light is still tapped (through the cloud)', async () => {
+    const w = await open()
+    await collectRound(w, 3)
+    await tick(1600)
+    expect(w.findAll('.lt-cloud')).toHaveLength(1)
+    expect(w.find('.lt-cloud').attributes('src')).toContain('wolke-1')
+    const withCloud = lights(w).find((l) => l.find('.lt-cloud').exists())!
+    await withCloud.trigger('click')
+    expect(useTaskProgress().parts.value).toBe(4)
   })
 
   it('a tap beside the lights is a small slip (a faint ring, no mistake message, nothing is lost)', async () => {
@@ -446,5 +457,249 @@ describe('Lichter sammeln (lights)', () => {
     expect(w.find('.lt-round').text()).toBe('Round 1 of 2')
     expect(w.find('.lt-count').text()).toBe('Lights: 0 of 7')
     expect(lights(w)[0]!.attributes('aria-label')).toBe('A light')
+  })
+})
+
+// ---------------------------------------------------------------- the verse with a gap
+describe('Lückenvers (verse)', () => {
+  const game: VerseGame = {
+    scene: 'images/x/lichtung.webp',
+    board: 'images/x/tafel.webp',
+    leaf: 'images/x/blatt.webp',
+    rounds: [
+      {
+        hint: 'Ziehe das passende Blatt in die Lücke.',
+        words: ['Namen', 'Futter', 'Stall', 'nennte', 'kleidete'],
+        verses: [
+          { parts: ['Der Mensch gab jedem Tier seinen ', '.'], answers: [0] },
+          { parts: ['Gott brachte sie zu dem Menschen, dass er sähe, wie er sie ', '.'], answers: [3] }
+        ]
+      },
+      {
+        hint: 'Jetzt fehlen zwei Wörter.',
+        words: ['Vieh', 'Vogel', 'Fisch', 'allein', 'Gehilfin', 'Hütte'],
+        verses: [
+          { parts: ['Der Mensch gab jedem ', ' und ', ' einen Namen.'], answers: [0, 1] },
+          { parts: ['Es ist nicht gut, dass der Mensch ', ' sei; ich will ihm eine ', ' machen.'], answers: [3, 4] }
+        ]
+      }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Verse } = await import('@/components/molecules/games/GameVerse.vue')
+    const w = mount(Verse, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  const leaf = (w: ReturnType<typeof mount>, word: string) => w.findAll('.vs-leaf').find((l) => l.text() === word)!
+  const gaps = (w: ReturnType<typeof mount>) => w.findAll('.vs-gap')
+  /** Tap a leaf, then a gap (the second way to move a leaf). */
+  const put = async (w: ReturnType<typeof mount>, word: string, gap: number) => {
+    await choose(leaf(w, word).element)
+    await gaps(w)[gap]!.trigger('click')
+    await flushPromises()
+  }
+
+  it('round 1: two verses with one gap each and the leaves with their words; the goal is the number of all gaps (1+1+2+2 = 6); two rounds at most', async () => {
+    expect(game.rounds.length).toBeLessThanOrEqual(2)
+    for (const r of game.rounds) for (const v of r.verses) expect(v.parts.length).toBe(v.answers.length + 1)
+    const w = await open()
+    expect(gaps(w)).toHaveLength(2)
+    expect(w.findAll('.vs-leaf')).toHaveLength(5)
+    expect(w.find('.vs-round').text()).toContain('Runde 1 von 2')
+    expect(w.findAll('.vs-text')[0]!.text()).toContain('Der Mensch gab jedem Tier seinen')
+    expect(useTaskProgress().goal.value).toBe(6)
+    expect(gaps(w)[0]!.attributes('aria-label')).toBe('Lücke 1')
+    expect(leaf(w, 'Namen').attributes('aria-label')).toBe('Blatt: Namen')
+    expect(problems()).toEqual([])
+  })
+
+  it('the right word stays in the gap (tick, one part counted, the leaf is used up); a wrong word is a mistake and the leaf stays on the branch', async () => {
+    const w = await open()
+    await put(w, 'Futter', 0)
+    expect(gaps(w)[0]!.find('.gm.bad').exists()).toBe(true)
+    expect(w.find('.vs-fb').text()).toBe('Dieses Wort passt hier nicht.')
+    expect(w.findAll('.vs-leaf')).toHaveLength(5)
+    expect(useTaskProgress().parts.value).toBe(0)
+    expect(played).toContain('wrong')
+    await tick(1000)
+    await put(w, 'Namen', 0)
+    expect(gaps(w)[0]!.text()).toContain('Namen')
+    expect(gaps(w)[0]!.classes()).toContain('filled')
+    expect(gaps(w)[0]!.attributes('aria-label')).toBe('Lücke: Namen')
+    expect(w.findAll('.vs-leaf')).toHaveLength(4)
+    expect(useTaskProgress().parts.value).toBe(1)
+    // a word that belongs to the other verse does not fit here, either
+    await put(w, 'kleidete', 1)
+    expect(gaps(w)[1]!.find('.gm.bad').exists()).toBe(true)
+  })
+
+  it('all the way through: round 2 has verses with two gaps each; a clean game is three stars; mistakes cost stars', async () => {
+    for (const [mistakes, stars] of [[0, 3], [3, 2], [6, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      for (let i = 0; i < mistakes; i++) {
+        await put(w, 'Stall', 0)
+        await tick(1000)
+      }
+      await put(w, 'Namen', 0)
+      await put(w, 'nennte', 1)
+      await tick(1700)
+      expect(w.find('.vs-round').text()).toContain('Runde 2 von 2')
+      expect(gaps(w)).toHaveLength(4)
+      await put(w, 'Vieh', 0)
+      await put(w, 'Vogel', 1)
+      await put(w, 'allein', 2)
+      await put(w, 'Gehilfin', 3)
+      await tick(1200)
+      expect(useTaskProgress().parts.value, `${mistakes} mistakes`).toBe(6)
+      expect(useTaskProgress().finished.value).toBe(true)
+      expect(w.text()).toContain('Jeder Vers ist wieder ganz!')
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${mistakes} mistakes`).toEqual([[stars]])
+      w.unmount()
+    }
+  })
+
+  it('the gaps can be filled in any order, and the steps of "Go on" for 6 gaps: 2 gaps one star, 4 two stars, one gap nothing', () => {
+    expect([1, 2, 3, 4, 5].map((d) => partialStars(d, 6))).toEqual([0, 1, 1, 2, 2])
+  })
+
+  it('English: the words of the game', async () => {
+    const w = await open('en')
+    expect(w.find('.vs-round').text()).toBe('Round 1 of 2')
+    expect(gaps(w)[0]!.attributes('aria-label')).toBe('Gap 1')
+    await put(w, 'Futter', 0)
+    expect(w.find('.vs-fb').text()).toBe('That word does not fit here.')
+  })
+})
+
+// ---------------------------------------------------------------- call and answer
+describe('Ruf und Antwort (echo)', () => {
+  const RATES = [1, 1.1225, 1.2599, 1.4983]
+  const game: EchoGame = {
+    scene: 'images/x/abend.webp',
+    notes: RATES.map((rate, i) => ({ id: `n${i}`, image: `images/x/bluete-${i + 1}.webp`, imageOn: `images/x/bluete-${i + 1}-an.webp`, rate })),
+    rounds: [
+      { hint: 'Hör gut zu und antworte mit denselben Klängen.', calls: [[0, 1, 2], [1, 0, 2], [2, 1, 0]] },
+      { hint: 'Jetzt etwas länger.', calls: [[0, 1, 2, 3], [3, 2, 1, 0], [1, 3, 0, 2]] }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Echo } = await import('@/components/molecules/games/GameEcho.vue')
+    const w = mount(Echo, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  const note = (w: ReturnType<typeof mount>, i: number) => w.findAll('.ec-note')[i]!
+  const again = (w: ReturnType<typeof mount>, label = 'Nochmal hören') => w.findAll('button').find((b) => b.text() === label)!
+  /** Wait until the call has rung (the blossoms shine one after the other, 750 ms apart) and the child is asked to answer. */
+  const heardCall = async (w: ReturnType<typeof mount>, _n: number, text = 'Jetzt du: Spiel es nach.') => {
+    for (let waited = 0; waited < 9000 && w.find('.ec-fb').text() !== text; waited += 250) await tick(250)
+    expect(w.find('.ec-fb').text(), 'the child is asked to answer').toBe(text)
+  }
+  const answer = async (w: ReturnType<typeof mount>, call: number[]) => {
+    for (const i of call) await note(w, i).trigger('click')
+    await flushPromises()
+  }
+
+  it('the call rings and shines: the blossoms light up in order with their own tones; the answer is only possible afterwards; the goal is 6 calls; two rounds at most', async () => {
+    expect(game.rounds.length).toBeLessThanOrEqual(2)
+    expect(game.notes).toHaveLength(4)
+    for (const r of game.rounds) for (const c of r.calls) for (const i of c) expect(i >= 0 && i < 4).toBe(true)
+    const w = await open()
+    expect(w.find('.ec-round').text()).toContain('Runde 1 von 2')
+    expect(w.find('.ec-hint').text()).toContain('antworte mit denselben Klängen')
+    expect(useTaskProgress().goal.value).toBe(6)
+    // while it rings the blossoms cannot be answered with
+    expect(w.findAll('.ec-note').every((b) => b.attributes('disabled') !== undefined)).toBe(true)
+    await tick(400)
+    expect(w.find('.ec-fb').text()).toBe('Hör gut zu ...')
+    // the first blossom shines at 300 ms, the next ones every 750 ms
+    expect(note(w, 0).classes()).toContain('lit')
+    expect(note(w, 0).find('img').attributes('src')).toContain('bluete-1-an')
+    await tick(750)
+    expect(note(w, 1).classes()).toContain('lit')
+    expect(note(w, 0).classes()).not.toContain('lit')
+    await tick(750)
+    expect(note(w, 2).classes()).toContain('lit')
+    await tick(1000)
+    expect(played.filter((p) => p === 'bead')).toHaveLength(3)
+    expect(w.findAll('.ec-note').every((b) => b.attributes('disabled') === undefined)).toBe(true)
+    expect(note(w, 3).attributes('aria-label')).toBe('Blüte 4')
+    expect(problems()).toEqual([])
+  })
+
+  it('the right answer lights the blossoms and counts one call; a wrong blossom is a mistake and the call is played again', async () => {
+    const w = await open()
+    await heardCall(w, 3)
+    await note(w, 2).trigger('click')
+    expect(note(w, 2).find('.gm.bad').exists()).toBe(true)
+    expect(w.find('.ec-fb').text()).toBe('Nicht diese. Hör noch einmal zu.')
+    expect(played).toContain('wrong')
+    expect(useTaskProgress().parts.value).toBe(0)
+    // the call is played again by itself
+    await heardCall(w, 3)
+    await answer(w, [0, 1, 2])
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(w.find('.ec-fb').text()).toBe('Richtig!')
+    expect(w.findAll('.ec-step.on')).toHaveLength(3)
+  })
+
+  it('"Listen again" plays the call once more and costs nothing; it is a pill button and only offered while the child may answer', async () => {
+    const w = await open()
+    expect(again(w).attributes('disabled')).toBeDefined()
+    await heardCall(w, 3)
+    expect(again(w).attributes('disabled')).toBeUndefined()
+    await note(w, 0).trigger('click')
+    await again(w).trigger('click')
+    expect(w.find('.ec-fb').text()).toBe('Hör gut zu ...')
+    await heardCall(w, 3)
+    await answer(w, [0, 1, 2])
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect((again(w).element as HTMLElement).className).toContain('lk-btn')
+  })
+
+  it('all the way through: round 2 has longer calls; a clean game is three stars; mistakes cost stars (three: two, six: one)', async () => {
+    for (const [mistakes, stars] of [[0, 3], [3, 2], [6, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      await heardCall(w, 3)
+      for (let i = 0; i < mistakes; i++) {
+        await note(w, 3).trigger('click')
+        await heardCall(w, 3)
+      }
+      await answer(w, [0, 1, 2])
+      for (const call of [[1, 0, 2], [2, 1, 0]]) {
+        await heardCall(w, 3)
+        await answer(w, call)
+      }
+      await tick(3200)
+      expect(w.find('.ec-round').text()).toContain('Runde 2 von 2')
+      for (const call of game.rounds[1]!.calls) {
+        await heardCall(w, 4)
+        await answer(w, call)
+      }
+      await tick(1500)
+      expect(useTaskProgress().parts.value, `${mistakes} mistakes`).toBe(6)
+      expect(useTaskProgress().finished.value).toBe(true)
+      expect(w.text()).toContain('Du hast jeden Ruf gehört und beantwortet!')
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${mistakes} mistakes`).toEqual([[stars]])
+      w.unmount()
+    }
+  })
+
+  it('the steps of "Go on" for 6 calls: 2 calls one star, 4 calls two stars', () => {
+    expect([1, 2, 3, 4, 5].map((d) => partialStars(d, 6))).toEqual([0, 1, 1, 2, 2])
+  })
+
+  it('English: the words of the game', async () => {
+    const w = await open('en')
+    expect(w.find('.ec-round').text()).toBe('Round 1 of 2')
+    await tick(400)
+    expect(w.find('.ec-fb').text()).toBe('Listen closely ...')
+    await heardCall(w, 3, 'Now you: play it back.')
+    expect(again(w, 'Listen again')).toBeTruthy()
   })
 })

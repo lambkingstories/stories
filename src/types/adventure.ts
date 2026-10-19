@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo'
 
 export interface AdventureQuestion {
   q: string
@@ -302,6 +302,8 @@ export interface LightSpot {
   x: number
   y: number
   w: number
+  /** A cloud (picture) that lies half over this light; the light can still be tapped through it. */
+  cloud?: string
 }
 export interface LightRound {
   hint: string
@@ -314,8 +316,50 @@ export interface LightGame {
   /** The bright picture (3:4); the code dims it and brightens it again. */
   scene: string
   /** The picture of one soft light (a path below `public/`). */
-  light: string
+  glow: string
   rounds: LightRound[]
+}
+
+/** A verse with gaps: the text pieces between the gaps, and for every gap the number of its word in `VerseRound.words`. */
+export interface VerseLine {
+  /** The pieces of the verse around the gaps: one more piece than there are gaps ("... gab einem jeglichen Vieh seinen", "."). */
+  parts: string[]
+  /** For each gap, from left to right: the index of the right word in `VerseRound.words`. */
+  answers: number[]
+}
+export interface VerseRound {
+  hint: string
+  verses: VerseLine[]
+  /** The words on the leaves (the right ones and the wrong ones); the English file keeps the same order, so that `answers` fits both. */
+  words: string[]
+}
+/** The verse game: leaves with words are dragged into the gaps of short verses (at most two rounds). */
+export interface VerseGame {
+  /** The clearing behind the boards (3:4), the wooden board under a verse, and the leaf that carries a word. */
+  scene: string
+  board: string
+  leaf: string
+  rounds: VerseRound[]
+}
+
+/** A sound blossom of the call-and-answer game: calm and shining, and the pitch of its tone (the playback rate of the marimba tone). */
+export interface EchoNote {
+  id: string
+  image: string
+  imageOn: string
+  rate: number
+}
+export interface EchoRound {
+  hint: string
+  /** The calls of this round: each is a series of blossoms (indexes in `EchoGame.notes`) in the order they ring. */
+  calls: number[][]
+}
+/** The call-and-answer game: a call rings and shines, the child plays it back (four blossoms, at most two rounds). */
+export interface EchoGame {
+  /** The evening garden behind the blossoms (3:4). */
+  scene: string
+  notes: EchoNote[]
+  rounds: EchoRound[]
 }
 
 /** The tools and colours a picture of an adventure can ask for. */
@@ -373,7 +417,9 @@ export interface StageTask {
   fly?: FlyGame
   order?: OrderGame
   water?: WaterGame
-  light?: LightGame
+  lights?: LightGame
+  verse?: VerseGame
+  echo?: EchoGame
 }
 
 export interface AdventureStage {
