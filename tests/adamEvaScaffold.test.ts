@@ -64,6 +64,6 @@ describe('Adam und Eva: the scaffold', () => {
     expect(adamEva.subtitle).toBe('The Garden of Eden')
     expect(adamEva.stages[0]!.title).toBe('In the Beginning')
     expect(adamEva.stages[8]!.ref).toBe('Genesis 3:22–24; 4:1')
-    expect(adamEva.gift.title).toBe('Adam and Eve in the Garden')
+    expect(adamEva.gift.title).toBe('Adam and Eve in the Garden with the Animals')
   })
 })

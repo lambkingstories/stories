@@ -10,7 +10,7 @@ import type { TextOverlay } from '../localize'
 export const adamEvaEn: TextOverlay<Journey> = {
   title: 'Adam and Eve',
   subtitle: 'The Garden of Eden',
-  gift: { title: 'Adam and Eve in the Garden' },
+  gift: { title: 'Adam and Eve in the Garden with the Animals' },
   stages: [
     {
       title: 'In the Beginning',
