@@ -64,7 +64,7 @@ export const GAME_MUSIC: MusicPiece[] = [
 
 /** Which mood fits which game: quiet looking and remembering, steady building and sorting, quick flying and dots. */
 const GAME_MOOD: Record<string, Mood> = {
-  find: 'ruhig', memory: 'ruhig', share: 'ruhig', count: 'ruhig', stones: 'ruhig', order: 'ruhig', water: 'ruhig', lights: 'ruhig', verse: 'ruhig', echo: 'ruhig',
+  find: 'ruhig', memory: 'ruhig', share: 'ruhig', count: 'ruhig', stones: 'ruhig', order: 'ruhig', water: 'ruhig', lights: 'ruhig', verse: 'ruhig', echo: 'ruhig', channels: 'mittel', mirror: 'ruhig',
   puzzle: 'mittel', sort: 'mittel', harvest: 'mittel', build: 'mittel', way: 'mittel',
   fly: 'lebhaft', dots: 'lebhaft'
 }

@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln'
 
 export interface AdventureQuestion {
   q: string
@@ -362,6 +362,59 @@ export interface EchoGame {
   rounds: EchoRound[]
 }
 
+/** A tile of the channel game: what it is, how it lies at the start (quarter turns, clockwise), and for a plant its id. */
+export type ChannelKind = 'straight' | 'corner' | 'tee' | 'cross' | 'empty' | 'source' | 'goal'
+export interface ChannelTile {
+  kind: ChannelKind
+  /** The quarter turns at the start (0 to 3). A source opens to the right and a goal to the left when `rot` is 0. */
+  rot: number
+  /** For a goal: the id of its plant in `ChannelGame.goals`. */
+  goal?: string
+}
+export interface ChannelGoal {
+  /** What the plant is called (screen readers), and its picture before and after the water has reached it. */
+  label: string
+  wilted: string
+  bloom: string
+}
+export interface ChannelRound {
+  hint: string
+  /** The tiles row by row; the stream (a `source`) sits at the left edge. */
+  grid: ChannelTile[][]
+}
+/** The channel game: pieces of the garden's water channels are turned until the water reaches the plants (at most two rounds). */
+export interface ChannelGame {
+  /** The picture of every kind of tile, dry and wet (seen from above, 200 x 200). */
+  tiles: Record<ChannelKind, string>
+  wet: Record<ChannelKind, string>
+  goals: Record<string, ChannelGoal>
+  rounds: ChannelRound[]
+}
+
+/** A flower stone of the mirror game: its picture (160 x 160) and what it is, in a few words (screen readers). */
+export interface MirrorStone {
+  id: string
+  image: string
+  label: string
+}
+export interface MirrorRound {
+  hint: string
+  /** How many columns and rows each bank has (the left pattern and the right fields are the same size). */
+  cols: number
+  rows: number
+  /** The pattern on the left bank: the ids of the stones, row by row. The right bank is its mirror image: right[r][c] = left[r][cols - 1 - c]. */
+  left: string[][]
+}
+/** The mirror game: the left bank has a pattern, the child completes the right bank as its mirror image (at most two rounds). */
+export interface MirrorGame {
+  /** The meadow with the stream down the middle (3:4). */
+  scene: string
+  /** The picture of an empty field. */
+  empty: string
+  stones: MirrorStone[]
+  rounds: MirrorRound[]
+}
+
 /** The tools and colours a picture of an adventure can ask for. */
 export type PaintToolName = 'pencil' | 'felt' | 'watercolor' | 'graphite' | 'chalk' | 'oil' | 'fill'
 export type PaintColor = 'yellow' | 'blue' | 'brown' | 'green' | 'red' | 'orange' | 'purple' | 'pink'
@@ -420,6 +473,8 @@ export interface StageTask {
   lights?: LightGame
   verse?: VerseGame
   echo?: EchoGame
+  channels?: ChannelGame
+  mirror?: MirrorGame
 }
 
 export interface AdventureStage {

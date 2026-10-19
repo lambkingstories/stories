@@ -24,6 +24,8 @@ import GameWater from '@/components/molecules/games/GameWater.vue'
 import GameLights from '@/components/molecules/games/GameLights.vue'
 import GameVerse from '@/components/molecules/games/GameVerse.vue'
 import GameEcho from '@/components/molecules/games/GameEcho.vue'
+import GameChannels from '@/components/molecules/games/GameChannels.vue'
+import GameMirror from '@/components/molecules/games/GameMirror.vue'
 import GamePuzzle from '@/components/molecules/games/GamePuzzle.vue'
 import GameShare from '@/components/molecules/games/GameShare.vue'
 import GameSort from '@/components/molecules/games/GameSort.vue'
@@ -311,7 +313,7 @@ const hasPart = computed(() => partStars.value > 0 && !progress.finished.value)
 
 /** The games have a restart sign: a new key mounts the game afresh (round, mistakes and what was done begin again). */
 const gameKey = ref(0)
-const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo'] as const
+const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror'] as const
 const hasGame = computed(() => hasCountGame.value || GAME_FIELDS.some((f) => !!gameTask.value?.[f]))
 function restartGame() {
   progress.reset()
@@ -382,6 +384,8 @@ const gameKind = computed(() => {
   if (g?.lights) return 'lights'
   if (g?.verse) return 'verse'
   if (g?.echo) return 'echo'
+  if (g?.channels) return 'channels'
+  if (g?.mirror) return 'mirror'
   return undefined
 })
 watch(
@@ -488,6 +492,8 @@ function openGift() {
         GameLights(:key="gameKey" v-else-if="gameTask?.lights" :game="gameTask.lights" @done="taskDone")
         GameVerse(:key="gameKey" v-else-if="gameTask?.verse" :game="gameTask.verse" @done="taskDone")
         GameEcho(:key="gameKey" v-else-if="gameTask?.echo" :game="gameTask.echo" @done="taskDone")
+        GameChannels(:key="gameKey" v-else-if="gameTask?.channels" :game="gameTask.channels" @done="taskDone")
+        GameMirror(:key="gameKey" v-else-if="gameTask?.mirror" :game="gameTask.mirror" @done="taskDone")
         template(v-else-if="isPaint")
           img(:src="img(taskImage)" alt="" class="stage-paint" draggable="false")
           div(class="stage-actions")

@@ -8,7 +8,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
 import { partialStars } from '@/utils/adventureScore'
-import type { EchoGame, LightGame, OrderGame, VerseGame, WaterGame } from '@/types/adventure'
+import { CHANNEL_GRID_1, CHANNEL_GRID_2 } from '@/data/adventures/adamEvaChannels'
+import { flow, goalsOf, solve } from '@/utils/channels'
+import type { ChannelGame, EchoGame, LightGame, MirrorGame, OrderGame, VerseGame, WaterGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -701,5 +703,283 @@ describe('Ruf und Antwort (echo)', () => {
     expect(w.find('.ec-fb').text()).toBe('Listen closely ...')
     await heardCall(w, 3, 'Now you: play it back.')
     expect(again(w, 'Listen again')).toBeTruthy()
+  })
+})
+
+// ---------------------------------------------------------------- turn the channels
+describe('Kanäle drehen (channels)', () => {
+  const pic = (n: string) => `images/x/${n}.webp`
+  const kinds = ['straight', 'corner', 'tee', 'cross', 'empty', 'source', 'goal'] as const
+  const game: ChannelGame = {
+    tiles: Object.fromEntries(kinds.map((k) => [k, pic(`${k}-trocken`)])) as ChannelGame['tiles'],
+    wet: Object.fromEntries(kinds.map((k) => [k, pic(`${k}-nass`)])) as ChannelGame['wet'],
+    goals: Object.fromEntries(
+      ['feige', 'dattel', 'granatapfel', 'wein', 'olive', 'blumen'].map((id) => [id, { label: id[0]!.toUpperCase() + id.slice(1), wilted: pic(`${id}-welk`), bloom: pic(`${id}-bluete`) }])
+    ),
+    rounds: [
+      { hint: 'Drehe die Stücke, bis das Wasser die Pflanzen erreicht.', grid: CHANNEL_GRID_1 },
+      { hint: 'Der Strom teilt sich in vier Arme.', grid: CHANNEL_GRID_2 }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Channels } = await import('@/components/molecules/games/GameChannels.vue')
+    const w = mount(Channels, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  const tile = (w: ReturnType<typeof mount>, r: number, c: number, cols: number) => w.findAll('.ch-tile')[r * cols + c]!
+  /** Turn a tile n quarters. */
+  const turn = async (w: ReturnType<typeof mount>, r: number, c: number, cols: number, n: number) => {
+    for (let i = 0; i < n; i++) await tile(w, r, c, cols).trigger('click')
+    await flushPromises()
+  }
+
+  it('both gardens can be solved, nothing reaches a plant at the start, the plants are the garden plants of the stage (no tree of life or of knowledge), two rounds at most', () => {
+    expect(game.rounds.length).toBeLessThanOrEqual(2)
+    const goalIds = game.rounds.flatMap((r) => r.grid.flat().filter((t) => t.kind === 'goal').map((t) => t.goal!))
+    expect(goalIds).toEqual(['feige', 'dattel', 'granatapfel', 'wein', 'olive', 'blumen'])
+    expect(goalIds.every((g) => game.goals[g])).toBe(true)
+    expect(goalIds.join(' ')).not.toMatch(/leben|erkenntnis|baum/i)
+    for (const r of game.rounds) {
+      expect(flow(r.grid).reached, 'nothing is wet at the start').toEqual([])
+      const sol = solve(r.grid)
+      expect(sol, 'the garden has a solution').toBeTruthy()
+      const solved = r.grid.map((row, i) => row.map((t, c) => ({ ...t, rot: sol![i]![c]! })))
+      expect(flow(solved).reached.length).toBe(goalsOf(r.grid))
+    }
+    expect(game.rounds.map((r) => goalsOf(r.grid))).toEqual([2, 4])
+    // the whole search is quick
+    const t0 = Date.now()
+    solve(CHANNEL_GRID_2)
+    expect(Date.now() - t0).toBeLessThan(500)
+  })
+
+  it('round 1: a 4 x 3 garden; the goal is the number of plants (2 + 4 = 6); only turnable pieces can be tapped', async () => {
+    const w = await open()
+    expect(w.findAll('.ch-tile')).toHaveLength(12)
+    expect(w.find('.ch-round').text()).toContain('Runde 1 von 2')
+    expect(useTaskProgress().goal.value).toBe(6)
+    expect(tile(w, 1, 0, 4).attributes('disabled')).toBeDefined()
+    expect(tile(w, 1, 0, 4).attributes('aria-label')).toBe('Der Strom')
+    expect(tile(w, 1, 1, 4).attributes('aria-label')).toBe('Kanalstück, Reihe 2, Spalte 2: drehen')
+    expect(tile(w, 0, 3, 4).attributes('aria-label')).toBe('Pflanze: Feige, noch welk')
+    expect(tile(w, 0, 3, 4).attributes('disabled')).toBeDefined()
+    expect(problems()).toEqual([])
+  })
+
+  it('turning a piece turns its picture a quarter; when the way is whole the water flows (wet pictures), the plant blooms and a part is counted', async () => {
+    const w = await open()
+    expect(tile(w, 1, 1, 4).find('.ch-base').attributes('style')).toContain('rotate(90deg)')
+    expect(tile(w, 1, 1, 4).find('img').attributes('src')).toContain('tee-trocken')
+    // one quarter on: the fork opens to the stream (left), so it is wet already
+    await turn(w, 1, 1, 4, 1)
+    expect(tile(w, 1, 1, 4).find('.ch-base').attributes('style')).toContain('rotate(180deg)')
+    expect(tile(w, 1, 1, 4).find('img').attributes('src')).toContain('tee-nass')
+    // tee to 0, the corner above to 1, the straight pieces to 0
+    await turn(w, 1, 1, 4, 2)
+    await turn(w, 1, 2, 4, 1)
+    expect(tile(w, 1, 3, 4).attributes('aria-label')).toBe('Pflanze: Dattel, blühend')
+    expect(tile(w, 1, 3, 4).find('.ch-plant').attributes('src')).toContain('dattel-bluete')
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(w.find('.ch-fb').text()).toBe('Das Wasser kommt an und die Pflanze blüht!')
+    expect(played).toEqual(expect.arrayContaining(['tap', 'right']))
+  })
+
+  it('a plant that has bloomed stays in bloom and is counted once, whatever is turned afterwards', async () => {
+    const w = await open()
+    await turn(w, 1, 1, 4, 3)
+    await turn(w, 1, 2, 4, 1)
+    expect(useTaskProgress().parts.value).toBe(1)
+    await turn(w, 1, 2, 4, 2)
+    await turn(w, 1, 2, 4, 2)
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(tile(w, 1, 3, 4).find('.ch-plant').attributes('src')).toContain('dattel-bluete')
+  })
+
+  it('all the way through: round 2 is a 5 x 4 garden with four plants; with no hint it is three stars; hints take stars (one: two, two: one); no mistakes exist', async () => {
+    for (const [hints, stars] of [[0, 3], [1, 2], [2, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      for (let i = 0; i < hints; i++) {
+        await w.findAll('button').find((b) => b.text() === 'Tipp')!.trigger('click')
+        expect(w.find('.ch-tile.hint').exists()).toBe(true)
+      }
+      // round 1: tee 3 turns (1 to 0), corner 1 (0 to 1), straight (0,2) 1, straight (1,2) 1
+      await turn(w, 1, 1, 4, 3)
+      await turn(w, 0, 1, 4, 1)
+      await turn(w, 0, 2, 4, 1)
+      await turn(w, 1, 2, 4, 1)
+      await tick(2200)
+      expect(w.find('.ch-round').text()).toContain('Runde 2 von 2')
+      expect(w.findAll('.ch-tile')).toHaveLength(20)
+      // round 2 (5 columns): the tees (1,1) 3 turns and (1,3) 2 turns, the corners and straights of the ways
+      await turn(w, 1, 1, 5, 3)
+      await turn(w, 0, 1, 5, 1)
+      await turn(w, 0, 2, 5, 1)
+      await turn(w, 0, 3, 5, 1)
+      await turn(w, 1, 3, 5, 2)
+      await turn(w, 2, 3, 5, 2)
+      await turn(w, 2, 2, 5, 1)
+      await turn(w, 3, 2, 5, 3)
+      await turn(w, 3, 3, 5, 1)
+      await tick(1800)
+      expect(useTaskProgress().parts.value, `${hints} hints`).toBe(6)
+      expect(useTaskProgress().finished.value).toBe(true)
+      expect(w.text()).toContain('Der Strom bewässert den ganzen Garten!')
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${hints} hints`).toEqual([[stars]])
+      w.unmount()
+    }
+  })
+
+  it('the hint makes one piece that still has to be turned blink and goes away after a moment', async () => {
+    const w = await open()
+    await w.findAll('button').find((b) => b.text() === 'Tipp')!.trigger('click')
+    const blinking = w.findAll('.ch-tile.hint')
+    expect(blinking).toHaveLength(1)
+    expect(blinking[0]!.attributes('aria-label')).toContain('Kanalstück')
+    await tick(3000)
+    expect(w.find('.ch-tile.hint').exists()).toBe(false)
+  })
+
+  it('the steps of "Go on" for 6 plants: 2 plants one star, 4 plants two stars', () => {
+    expect([1, 2, 3, 4, 5].map((d) => partialStars(d, 6))).toEqual([0, 1, 1, 2, 2])
+  })
+
+  it('English: the words of the game', async () => {
+    const w = await open('en')
+    expect(w.find('.ch-round').text()).toBe('Round 1 of 2')
+    expect(tile(w, 1, 0, 4).attributes('aria-label')).toBe('The stream')
+    expect(w.findAll('button').some((b) => b.text() === 'Hint')).toBe(true)
+  })
+})
+
+// ---------------------------------------------------------------- mirror the pattern
+describe('Spiegeln (mirror)', () => {
+  const game: MirrorGame = {
+    scene: 'images/x/wiese.webp',
+    empty: 'images/x/leer.webp',
+    stones: [
+      { id: 'rot', image: 'images/x/stein-rot.webp', label: 'roter Blütenstein' },
+      { id: 'gelb', image: 'images/x/stein-gelb.webp', label: 'gelber Blütenstein' },
+      { id: 'blau', image: 'images/x/stein-blau.webp', label: 'blauer Blütenstein' }
+    ],
+    rounds: [
+      {
+        hint: 'Ergänze die andere Seite, so dass beide Seiten zusammenpassen.',
+        cols: 2,
+        rows: 3,
+        left: [
+          ['rot', 'gelb'],
+          ['gelb', 'gelb'],
+          ['rot', 'rot']
+        ]
+      },
+      {
+        hint: 'Jetzt ein größeres Muster.',
+        cols: 3,
+        rows: 4,
+        left: [
+          ['rot', 'gelb', 'blau'],
+          ['blau', 'rot', 'gelb'],
+          ['gelb', 'blau', 'rot'],
+          ['rot', 'rot', 'blau']
+        ]
+      }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Mirror } = await import('@/components/molecules/games/GameMirror.vue')
+    const w = mount(Mirror, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  const right = (w: ReturnType<typeof mount>) => w.findAll('.mr-cell.right')
+  const stone = (w: ReturnType<typeof mount>, label: string) => w.findAll('.mr-stone').find((s) => s.attributes('aria-label')!.includes(label))!
+  /** Choose a stone, then tap a field of the right bank (row r, column c, 0-based; `cols` fields per row). */
+  const set = async (w: ReturnType<typeof mount>, label: string, r: number, c: number, cols: number) => {
+    await choose(stone(w, label).element)
+    await right(w)[r * cols + c]!.trigger('click')
+    await flushPromises()
+  }
+  /** Lay the whole right bank of a round as its mirror image. */
+  const complete = async (w: ReturnType<typeof mount>, round: MirrorGame['rounds'][number]) => {
+    const names: Record<string, string> = { rot: 'roter', gelb: 'gelber', blau: 'blauer' }
+    for (let r = 0; r < round.rows; r++) for (let c = 0; c < round.cols; c++) await set(w, names[round.left[r]![round.cols - 1 - c]!]!, r, c, round.cols)
+  }
+
+  it('round 1: a 2 x 3 pattern on the left, empty fields on the right, a row of three colours; the goal is the number of right-bank stones (6 + 12 = 18); two rounds at most', async () => {
+    expect(game.rounds.length).toBeLessThanOrEqual(2)
+    for (const r of game.rounds) {
+      expect(r.left).toHaveLength(r.rows)
+      for (const row of r.left) expect(row).toHaveLength(r.cols)
+    }
+    const w = await open()
+    expect(w.findAll('.mr-cell.left')).toHaveLength(6)
+    expect(right(w)).toHaveLength(6)
+    expect(w.findAll('.mr-stone')).toHaveLength(2)
+    expect(w.find('.mr-round').text()).toContain('Runde 1 von 2')
+    expect(useTaskProgress().goal.value).toBe(18)
+    expect(w.findAll('.mr-cell.left')[0]!.attributes('aria-label')).toBe('Linke Seite: roter Blütenstein')
+    expect(right(w)[0]!.attributes('aria-label')).toBe('Rechte Seite, Reihe 1, Feld 1')
+    expect(problems()).toEqual([])
+  })
+
+  it('the right bank is the mirror image: the first field of a row takes the last stone of the left row; a wrong colour is a mistake and the field stays empty', async () => {
+    const w = await open()
+    // the first row on the left is red, yellow: the right bank is yellow, red
+    await set(w, 'roter', 0, 0, 2)
+    expect(right(w)[0]!.find('.gm.bad').exists()).toBe(true)
+    expect(right(w)[0]!.classes()).not.toContain('filled')
+    expect(w.find('.mr-fb').text()).toBe('Der passt hier nicht. Schau auf die andere Seite.')
+    expect(useTaskProgress().parts.value).toBe(0)
+    expect(played).toContain('wrong')
+    await tick(1000)
+    await set(w, 'gelber', 0, 0, 2)
+    expect(right(w)[0]!.classes()).toContain('filled')
+    expect(right(w)[0]!.find('.gm.good').exists()).toBe(true)
+    expect(right(w)[0]!.attributes('aria-label')).toBe('Rechte Seite: gelber Blütenstein')
+    expect(useTaskProgress().parts.value).toBe(1)
+    await set(w, 'roter', 0, 1, 2)
+    expect(right(w)[1]!.classes()).toContain('filled')
+    // a field that is filled does not take another stone and costs nothing
+    await set(w, 'roter', 0, 0, 2)
+    expect(right(w)[0]!.find('.gm.bad').exists()).toBe(false)
+  })
+
+  it('all the way through: round 2 is 3 x 4 with three colours; a clean game is three stars, three mistakes still three, four two, seven one', async () => {
+    for (const [mistakes, stars] of [[0, 3], [3, 3], [4, 2], [7, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      for (let i = 0; i < mistakes; i++) {
+        await set(w, 'roter', 0, 0, 2)
+        await tick(1000)
+      }
+      await complete(w, game.rounds[0]!)
+      await tick(1800)
+      expect(w.find('.mr-round').text()).toContain('Runde 2 von 2')
+      expect(right(w)).toHaveLength(12)
+      expect(w.findAll('.mr-stone')).toHaveLength(3)
+      await complete(w, game.rounds[1]!)
+      await tick(1500)
+      expect(useTaskProgress().parts.value, `${mistakes} mistakes`).toBe(18)
+      expect(useTaskProgress().finished.value).toBe(true)
+      expect(w.text()).toContain('Beide Seiten passen zusammen!')
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${mistakes} mistakes`).toEqual([[stars]])
+      w.unmount()
+    }
+  })
+
+  it('the steps of "Go on" for 18 stones: 6 one star, 12 two stars', () => {
+    expect([5, 6, 11, 12].map((d) => partialStars(d, 18))).toEqual([0, 1, 1, 2])
+  })
+
+  it('English: the words of the game', async () => {
+    const w = await open('en')
+    expect(w.find('.mr-round').text()).toBe('Round 1 of 2')
+    expect(right(w)[0]!.attributes('aria-label')).toBe('Right side, row 1, field 1')
+    await set(w, 'roter', 0, 0, 2)
+    expect(w.find('.mr-fb').text()).toBe('That one does not match here. Look at the other side.')
   })
 })
