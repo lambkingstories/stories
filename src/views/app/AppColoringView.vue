@@ -83,6 +83,8 @@ import confetti from 'canvas-confetti'
 import { buildBackup, deliverBackup, restoreBackup } from '@/use/useArtworkBackup'
 import { buildRegionMap, gapFor, labelAt, paintedShare, regionMaskAlpha, type RegionMap } from '@/utils/coloringRegions'
 import { paintStars } from '@/utils/adventureScore'
+import { paintJobsOf, saveJobResults } from '@/utils/paintJobs'
+import { evaluateJob, gridSize, TOOL_CODES, ToolMap, zoneCells, type JobStatus, type PaintTool } from '@/utils/toolMap'
 import useChrome from '@/use/useChrome'
 import useColoringShelf from '@/use/useColoringShelf'
 import { journeys } from '@/data/adventures'
@@ -144,6 +146,129 @@ function backToStage(done = false, stars = 0) {
   })
 }
 
+// ── The tool a picture of an adventure asks for ------------------------------------------------
+// ("Paint with the felt-tip marker"): a coarse map beside the picture remembers which tool painted every place (see `utils/toolMap.ts`).
+// It is kept only for such pictures, so the free painting program is not touched.
+
+/** The task of the stage whose picture is painted. */
+const advTask = computed(() => {
+  const c = advCtx.value
+  if (!c) return null
+  return journeys.find((j) => j.id === c.journeyId)?.stages.find((s) => s.id === c.stageId)?.task ?? null
+})
+/** The tasks drawn for this stage (the stage page draws them when it is entered; here the same ones are read). */
+const advJobs = computed(() => (advCtx.value ? paintJobsOf(advCtx.value.journeyId, advCtx.value.stageId, advTask.value?.jobs, advTask.value?.jobCount ?? 3) : []))
+/** The tools are noted for every picture that has tasks, so tasks drawn later find the map complete. */
+const advTracks = computed(() => !!advTask.value?.jobs?.length)
+/** What the tasks look like now (checked a moment after every stroke); the list at the top shows a tick for the ones that are done. */
+const jobStatus = ref<JobStatus[]>([])
+const jobsFolded = ref(false)
+let jobsAutoFolded = false
+const jobsDone = computed(() => jobStatus.value.filter((s) => s === 'met').length)
+let toolMap: ToolMap | null = null
+let gridCanvas: HTMLCanvasElement | null = null
+const toolMapKey = () => `lk-toolmap:${identity?.id ?? ''}`
+
+function ensureToolMap(): ToolMap | null {
+  const dc = drawCanvas.value
+  if (!advTracks.value || !dc || !dc.width || !dc.height) return null
+  const g = gridSize(dc.width, dc.height)
+  if (!toolMap || toolMap.w !== g.w || toolMap.h !== g.h) toolMap = new ToolMap(g.w, g.h)
+  return toolMap
+}
+
+/** The picture (or the one before the action) on the coarse grid, as RGBA. */
+function gridPixels(src: CanvasImageSource, w: number, h: number): Uint8ClampedArray {
+  const c = (gridCanvas ??= document.createElement('canvas'))
+  c.width = w
+  c.height = h
+  const ctx = c.getContext('2d', { willReadFrequently: true })!
+  ctx.clearRect(0, 0, w, h)
+  ctx.drawImage(src, 0, 0, w, h)
+  return ctx.getImageData(0, 0, w, h).data
+}
+
+/** An action ended: the tool that did it is written where the picture changed (the eraser clears what is bare now). */
+function trackTool(before: HTMLCanvasElement, after: HTMLCanvasElement, tool: ToolId) {
+  const tm = ensureToolMap()
+  if (!tm) return
+  const code = tool === 'eraser' ? 0 : tool in TOOL_CODES ? TOOL_CODES[tool as PaintTool] : -1
+  if (code < 0) return
+  tm.record(code, gridPixels(before, tm.w, tm.h), gridPixels(after, tm.w, tm.h))
+}
+
+/** The cells of the grid that belong to a zone (found once per zone: the fields of the line art). */
+const zoneCache = new Map<string, Uint8Array>()
+function zoneMaskOf(zoneName: string, w: number, h: number): Uint8Array | null {
+  const seeds = advTask.value?.zones?.[zoneName]?.seeds
+  const map = ensureRegionMap()
+  if (!seeds?.length || !map) return null
+  const key = `${advCtx.value?.journeyId}:${advCtx.value?.stageId}:${zoneName}:${w}x${h}`
+  let mask = zoneCache.get(key)
+  if (!mask) {
+    mask = zoneCells(map, seeds, w, h)
+    zoneCache.set(key, mask)
+  }
+  return mask
+}
+
+/** How each of the drawn tasks stands (done, wrong tool or colour, or not enough yet). `null` when the picture has no tasks or cannot be read. */
+function evaluateJobs(): JobStatus[] | null {
+  const jobs = advJobs.value
+  const dc = drawCanvas.value
+  const tm = ensureToolMap()
+  if (!jobs.length || !dc || !tm) return null
+  const rgba = gridPixels(dc, tm.w, tm.h)
+  const out: JobStatus[] = []
+  for (const job of jobs) {
+    const zone = zoneMaskOf(job.zone, tm.w, tm.h)
+    if (!zone) return null
+    out.push(evaluateJob({ codes: tm.codes, rgba, zone, tool: job.tool, color: job.color }).status)
+  }
+  return out
+}
+
+let jobTimer = 0
+/** A moment after the last stroke the list of tasks is checked again. */
+function scheduleJobCheck() {
+  if (!advTracks.value) return
+  clearTimeout(jobTimer)
+  jobTimer = window.setTimeout(() => {
+    jobStatus.value = evaluateJobs() ?? []
+  }, 500)
+}
+
+/** The stars of the picture: one for every task that is done. Without a result (no map of fields) the painted share counts as before. */
+function jobStars(painted: boolean): number {
+  const c = advCtx.value
+  const results = evaluateJobs()
+  if (!c || !results) return painted ? paintStars(currentPaintShare(), true) : 0
+  jobStatus.value = results
+  saveJobResults(c.journeyId, c.stageId, results)
+  return results.filter((s) => s === 'met').length
+}
+
+function saveToolMap() {
+  if (!toolMap || !identity) return
+  try {
+    localStorage.setItem(toolMapKey(), toolMap.encode())
+  } catch {
+    // no room: the picture then counts every place with an unknown tool as right
+  }
+}
+
+function loadToolMap() {
+  toolMap = null
+  const dc = drawCanvas.value
+  if (!advTracks.value || !dc || !identity) return
+  const g = gridSize(dc.width, dc.height)
+  try {
+    toolMap = ToolMap.decode(localStorage.getItem(toolMapKey()), g.w, g.h)
+  } catch {
+    toolMap = null
+  }
+}
+
 /** How much of the picture is painted (0 to 1), counted on the fields of the line art. */
 function currentPaintShare(): number {
   const map = ensureRegionMap()
@@ -168,9 +293,8 @@ async function leaveToStage() {
   // (saving clears the flag of "something was painted", so it is read first)
   const painted = hasUserAction.value
   await persistNow()
-  const share = currentPaintShare()
-  const stars = painted || share > 0 ? paintStars(share) : 0
-  if (stars > 0) adventure.recordStars(c.journeyId, c.stageId, stars)
+  const stars = jobStars(painted || currentPaintShare() > 0)
+  if (painted || stars > 0) adventure.recordStars(c.journeyId, c.stageId, stars)
   backToStage(false, stars)
 }
 
@@ -337,10 +461,10 @@ async function finishPicture() {
   }
   const won = awards.pictureFinished(id, ctx ? { bookId: ctx.bookId, complete } : undefined)
   if (advCtx.value) {
-    // the picture of a stage is done: the stars follow the painted share (70 % three, 40 % two, 30 % one), and on to the stage, where the finished picture is shown
-    // a picture that was saved has something painted on it, so taking part earns at least one star
-    const stars = paintStars(currentPaintShare(), true)
-    if (stars > 0) adventure.recordStars(advCtx.value.journeyId, advCtx.value.stageId, stars)
+    // the picture of a stage is done: every task that is done is a star (0 to 3; a picture without tasks: the painted share, 70 % three, 40 % two, else one),
+    // and on to the stage, where the finished picture is shown with the tasks ticked or crossed. The newest result replaces the old one.
+    const stars = jobStars(true)
+    adventure.recordStars(advCtx.value.journeyId, advCtx.value.stageId, stars)
     void refreshMyWorks()
     backToStage(true, stars)
     return
@@ -1052,6 +1176,7 @@ async function persistNow() {
       drawing
     )
     hasUserAction.value = false
+    saveToolMap()
     celebrate(awards.paintedToday())
   } catch (err) {
     console.warn('autosave failed', err)
@@ -1067,6 +1192,7 @@ async function restoreSavedDrawing(): Promise<boolean> {
   lapseDirty = false
   timelapse.reset(dc.width, dc.height)
   if (!identity || !drawCtx) return false
+  toolMap = null
   const rec = await getArtwork(identity.id)
   if (!rec) return false
   identity.done = !!rec.done
@@ -1074,6 +1200,8 @@ async function restoreSavedDrawing(): Promise<boolean> {
     const bmp = await createImageBitmap(rec.drawing)
     drawCtx.clearRect(0, 0, dc.width, dc.height)
     drawCtx.drawImage(bmp, 0, 0, dc.width, dc.height)
+    loadToolMap()
+    scheduleJobCheck()
     await loadTimelapseOf(identity.id, bmp)
     bmp.close?.()
     return true
@@ -1107,11 +1235,25 @@ function onVisibilityHidden() {
  * Back is one step: from a picture to the main menu of the painting program (never page by page through the book),
  * and from the main menu out of the painting program into the app.
  */
+/** The picture was opened from the statistics (the present): the way back leads there, with nothing started afresh. */
+const retStats = computed(() => {
+  const v = route.query.ret
+  return typeof v === 'string' && v.startsWith('stats:') ? v.slice('stats:'.length) : null
+})
+async function backToStats() {
+  const id = retStats.value
+  if (!id) return false
+  await persistNow()
+  void router.replace({ name: 'app-adventure-stats', params: { journeyId: id } })
+  return true
+}
+
 async function onBack() {
   if (advCtx.value) {
     await leaveToStage()
     return
   }
+  if (await backToStats()) return
   if (hasImage.value) {
     await persistNow()
     bookCtx.value = null
@@ -1134,6 +1276,7 @@ async function closePicture() {
     await leaveToStage()
     return
   }
+  if (await backToStats()) return
   if (bookCtx.value) {
     await leaveToBook()
     return
@@ -2303,10 +2446,15 @@ function beginStroke(p: PaintPos) {
     selectPaint()
     return
   }
+  // the list of tasks makes room for the picture as soon as painting starts (its title with the count stays; a tap opens it again)
+  if (advJobs.value.length && !jobsAutoFolded) {
+    jobsAutoFolded = true
+    jobsFolded.value = true
+  }
   if (activeTool.value === 'fill') {
     takeBase()
     floodFill(Math.round(p.x), Math.round(p.y))
-    commitHistory()
+    commitHistory(undefined, 'fill')
     return
   }
   // Painting starts: the small menu and the colour picker go away.
@@ -2519,7 +2667,7 @@ function finishStroke() {
   drawCtx!.globalCompositeOperation = 'source-over'
   drawCtx!.globalAlpha = 1
   if (strokeTool === 'eraser') eraseTappedField()
-  commitHistory(strokeBounds)
+  commitHistory(strokeBounds, strokeTool)
 }
 
 /** Something took the pen's line away (the screen changed size, the page lost focus): the stroke ends here, and the rest of that touch paints nothing. */
@@ -2541,7 +2689,7 @@ function abortStroke() {
  * Records the change of the action that just ended: the area `b` (the whole picture without it) as it was in `baseCanvas`
  * before, and as it is now. This is also the single place that flags the picture as changed and saves it.
  */
-function commitHistory(b?: { x0: number; y0: number; x1: number; y1: number }) {
+function commitHistory(b?: { x0: number; y0: number; x1: number; y1: number }, tool?: ToolId) {
   const dc = drawCanvas.value
   const base = baseCanvas
   if (!dc || !drawCtx || !base) return
@@ -2552,6 +2700,10 @@ function commitHistory(b?: { x0: number; y0: number; x1: number; y1: number }) {
   if (x1 > x0 && y1 > y0) {
     const before = base.getContext('2d', { willReadFrequently: true })!.getImageData(x0, y0, x1 - x0, y1 - y0)
     history.record(drawCtx, x0, y0, x1 - x0, y1 - y0, before)
+    if (tool && advTracks.value) {
+      trackTool(base, dc, tool)
+      scheduleJobCheck()
+    }
     recordStep(timelapse, dc, x0, y0, x1, y1)
   }
   scheduleTimelapseSave()
@@ -2562,6 +2714,7 @@ function commitHistory(b?: { x0: number; y0: number; x1: number; y1: number }) {
 
 function resetHistory() {
   history.clear()
+  toolMap?.rebase()
   refreshHistButtons()
   // Loading a fresh image (or restoring a saved one) is a clean slate.
   hasUserAction.value = false
@@ -2574,6 +2727,8 @@ function refreshHistButtons() {
 
 function undo() {
   if (!drawCtx || !history.undo(drawCtx)) return
+  toolMap?.undo()
+  scheduleJobCheck()
   timelapse.undo()
   scheduleTimelapseSave()
   refreshHistButtons()
@@ -2583,6 +2738,8 @@ function undo() {
 
 function redo() {
   if (!drawCtx || !history.redo(drawCtx)) return
+  toolMap?.redo()
+  scheduleJobCheck()
   timelapse.redo()
   scheduleTimelapseSave()
   refreshHistButtons()
@@ -2605,7 +2762,7 @@ function confirmClear() {
   takeBase()
   drawCtx!.clearRect(0, 0, dc.width, dc.height)
   delete pageDrawings[currentPage.value]
-  commitHistory()
+  commitHistory(undefined, 'eraser')
 }
 
 function buildExportFilename(): string {
@@ -3042,6 +3199,18 @@ watch(queryBook, (id) => {
 
     div(v-if="penLogOn" class="ac-penlog") {{ penLog || 'penlog' }}
 
+    //- the picture of an adventure stage comes with tasks ("Male den Regenbogen mit Wasserfarbe."): a small list under the top bar, ticked as they are done
+    div(v-if="advJobs.length && hasImage" class="ac-jobs" role="group" :aria-label="t('app.adventure.paintJobsTitle')")
+      button(type="button" class="ac-jobs-head" :aria-expanded="!jobsFolded" @click="jobsFolded = !jobsFolded")
+        span {{ t('app.adventure.paintJobsTitle') }}
+        span(class="ac-jobs-count") {{ jobsDone }} / {{ advJobs.length }}
+        span(class="ac-jobs-arrow" aria-hidden="true") {{ jobsFolded ? '▾' : '▴' }}
+      ul(v-show="!jobsFolded" class="ac-jobs-list")
+        li(v-for="(j, i) in advJobs" :key="i" class="ac-job" :class="{ done: jobStatus[i] === 'met' }")
+          span(class="ac-job-mark" aria-hidden="true") {{ jobStatus[i] === 'met' ? '✓' : '○' }}
+          span {{ j.hint }}
+          span(class="ac-vh") {{ jobStatus[i] === 'met' ? t('app.adventure.paintJobDone') : t('app.adventure.paintJobOpen') }}
+
     //- ───────── Floating top bar ─────────
     header(v-if="hasImage" class="ac-top")
       button(type="button" class="ac-btn" :aria-label="t('app.coloring.back')" @click="onBack")
@@ -3313,7 +3482,7 @@ watch(queryBook, (id) => {
         p(v-else class="ac-confirm-body") {{ t('app.coloring.pictureFinishedText') }}
         button(v-if="finishInfo.hasLapse" type="button" class="ac-lapse-btn" @click="watchTimelapse") {{ t('app.coloring.timelapseWatch') }}
         div(class="ac-confirm-actions")
-          button(type="button" class="ac-confirm-leave" @click="finishOverview") {{ bookCtx ? t('app.coloring.bookOverview') : t('app.coloring.newPage') }}
+          button(type="button" class="ac-confirm-leave" @click="finishOverview") {{ retStats ? t('app.coloring.backToStats') : bookCtx ? t('app.coloring.bookOverview') : t('app.coloring.newPage') }}
           button(v-if="finishInfo.hasNext" type="button" class="ac-confirm-stay" @click="finishNext") {{ t('app.coloring.nextPage') }}
           button(v-else type="button" class="ac-confirm-stay" @click="closeFinish") {{ t('app.coloring.keepPainting') }}
 
@@ -3518,6 +3687,65 @@ $accent-dark: $accent
     border-color: rgba(192, 82, 106, 0.8)
 
 // ── Floating top bar ───────────────────────────────────────────────────────
+.ac-jobs
+  position: absolute
+  z-index: 29
+  top: calc(max(env(safe-area-inset-top, 0px), 10px) + 58px)
+  left: 50%
+  transform: translateX(-50%)
+  width: min(440px, calc(100% - 24px))
+  border-radius: 16px
+  background: rgba(255, 243, 207, 0.95)
+  border: 2px solid #d4a83e
+  color: #5f4f35
+  box-shadow: 0 3px 8px rgba(40, 25, 5, 0.25)
+  pointer-events: none
+
+.ac-jobs-head
+  display: flex
+  align-items: center
+  justify-content: center
+  gap: 8px
+  width: 100%
+  min-height: 32px
+  padding: 2px 12px
+  border: 0
+  background: transparent
+  color: inherit
+  font: inherit
+  font-weight: 800
+  font-size: 0.85rem
+  cursor: pointer
+  pointer-events: auto
+
+.ac-jobs-count
+  padding: 0 8px
+  border-radius: 999px
+  background: rgba(212, 168, 62, 0.35)
+
+.ac-jobs-list
+  margin: 0
+  padding: 0 12px 8px
+  list-style: none
+
+.ac-job
+  display: flex
+  gap: 8px
+  align-items: baseline
+  padding: 2px 0
+  font-weight: 700
+  font-size: 0.92rem
+  line-height: 1.25
+
+  &.done
+    color: #1f6b3a
+
+.ac-job-mark
+  flex: none
+  width: 1.2em
+  text-align: center
+  font-weight: 900
+
 .ac-top
   position: absolute
   top: 0

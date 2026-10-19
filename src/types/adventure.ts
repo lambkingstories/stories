@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern'
 
 export interface AdventureQuestion {
   q: string
@@ -90,6 +90,10 @@ export interface FindThing {
   w: number
 }
 export interface FindGame {
+  /** What the things are called (read out for screen readers), one per find; "Brother" when left out. */
+  labels?: string[]
+  /** The line at the end of the game; "You found all eleven brothers!" when left out. */
+  doneText?: string
   scene: string
   finds: FindThing[]
   covers: FindThing[]
@@ -102,10 +106,168 @@ export interface CountGroup {
   count: number
 }
 
+/** The sharing game: baskets are brought to a family and to groups of animals until everybody has enough. */
+export interface ShareReceiver {
+  id: string
+  image: string
+  /** What the receiver is called (read out for screen readers). */
+  label: string
+  /** The kinds of basket this receiver takes (`ShareBasket.id`). */
+  accepts: string[]
+  /** What is said when the wrong food is given ("Die Taube frisst kein Heu."), by kind of basket; `*` is for all the other kinds. */
+  rejects?: Record<string, string>
+}
+export interface ShareBasket {
+  id: string
+  image: string
+  label: string
+  /** A distractor: nobody takes it. Whoever gets it is wrong (red cross); it stays in the tray and does not hold up the end of the round. */
+  nobody?: boolean
+}
+export interface ShareRound {
+  /** What the child is told in this round. */
+  hint: string
+  /** Who takes part in this round (ids of `ShareGame.receivers`); without it everybody (a later round has more animals). */
+  receivers?: string[]
+  /** The kinds of basket in the tray, one entry per basket. */
+  baskets: string[]
+  /** Place marks: how many baskets each receiver gets (by receiver id). Without marks the receivers take what fits them. */
+  marks?: Record<string, number>
+  /** A basket only goes to a receiver that takes its kind (otherwise any basket goes anywhere, up to the marks). */
+  checkContent?: boolean
+  /** The child shares freely and then taps "Done"; nobody must be left with nothing. */
+  free?: boolean
+}
+export interface ShareGame {
+  /** The picture behind the game (the barn). */
+  scene: string
+  /** The empty basket: the faded place mark. */
+  empty: string
+  receivers: ShareReceiver[]
+  baskets: ShareBasket[]
+  rounds: ShareRound[]
+}
+
+/** A part of the building game. The place is a box (percentage of the plan); a piece may also be a polygon cut out of the shared picture. */
+export interface BuildPiece {
+  id: string
+  label: string
+  /** The picture of the part (its own sprite). */
+  image: string
+  /** The place in the plan: top left corner, width and height, as a percentage of the plan. */
+  x: number
+  y: number
+  w: number
+  h: number
+  /** For a piece cut out of one picture (the altar): the corners of its outline, as a percentage of the picture; not used by the ark. */
+  polygon?: [number, number][]
+  /** For the altar: the course (layer) of stones the piece lies in; not used by the ark. */
+  layer?: number
+}
+export interface BuildRound {
+  hint: string
+  /** The plan shows as a blue shadow: the child sees where the parts go. */
+  outline?: boolean
+  /** The round is the pitch: the child smears pitch along the seams in the wooden wall with a finger. */
+  pitch?: boolean
+}
+/** A seam in the wall that the pitch fills: a line of points [x, y] as a percentage of the wall picture, from left to right (straight, gently curved or zigzag). */
+export interface BuildSeam {
+  points: [number, number][]
+}
+export interface BuildGame {
+  /** The plan of the whole ark as a blue shadow (the pieces lie on it); the altar has none (its shadow is the outline of the stone). */
+  shadow?: string
+  /** Width divided by height of the plan. */
+  aspect: number
+  /** The ark: every part is its own sprite. The altar: ONE picture that is cut into stones along the `polygon` of every piece. */
+  image?: string
+  /** The altar: the picture behind the altar (the plain ground the altar stands on). */
+  background?: string
+  pieces: BuildPiece[]
+  /** The parts have to be put in a fixed order (the order of `pieces`, the altar from the bottom up); the ark is built in any order. */
+  ordered?: boolean
+  /** The parts are turned by a tap (a quarter turn) before they are set (the altar); the ark has no turning. */
+  rotate?: boolean
+  rounds: BuildRound[]
+  /** The wall with the seams and the pot of pitch (for the round with `pitch`). */
+  pitch?: {
+    wall: string
+    pot: string
+    seams: BuildSeam[]
+    /** How far the finger may stray from the line, as a percentage of the width of the wall (default 5.5). */
+    tolerance?: number
+    /** The seams are not in the picture (yet): they are shown as a dark groove. */
+    guide?: boolean
+  }
+}
+
+/** Connect the dots: numbered dots along a line in a dimmed picture; every right dot shows more of the picture in colour. */
+export interface DotsGame {
+  /** The picture (3:4); it is shown dimmed first and in colour as the dots are found. */
+  image: string
+  /** The dots in the order they are tapped, from left to right: [x, y] as a percentage of the picture. */
+  points: [number, number][]
+}
+
+/** A thing the dove can touch in the steering game: a soft light, or the olive leaf. */
+export interface FlyTarget {
+  kind: 'light' | 'leaf'
+  /** The middle, as a percentage of the width (x) and of the height (y) of the sky. */
+  x: number
+  y: number
+}
+export interface FlyRound {
+  hint: string
+  /** The sky of this round (3:4). */
+  background: string
+  targets: FlyTarget[]
+  /** The dove must have the olive leaf to land in the ark (round 2). */
+  needLeaf?: boolean
+}
+/** The steering game: the dove follows the finger; it flies through lights, takes the leaf, and lands in the ark window. */
+export interface FlyGame {
+  /** The dove with its wings up and down (it faces right). */
+  dove: [string, string]
+  /** The olive leaf the dove carries. */
+  leaf: string
+  /** The ark window where the dove starts and lands (a picture) and where it is, as a percentage of the sky. */
+  ark: string
+  home: { x: number; y: number }
+  rounds: FlyRound[]
+}
+
+/** The tools and colours a picture of an adventure can ask for. */
+export type PaintToolName = 'pencil' | 'felt' | 'watercolor' | 'graphite' | 'chalk' | 'oil' | 'fill'
+export type PaintColor = 'yellow' | 'blue' | 'brown' | 'green' | 'red' | 'orange' | 'purple' | 'pink'
+
+/** One element of the picture (the rainbow, the sun): the closed fields of the line art that belong to it, found by one point inside each (percent of the picture). */
+export interface PaintZone {
+  seeds: [number, number][]
+}
+
+/** One task of a picture to paint: an element of the picture (a zone) has to be painted with a tool and/or in a colour; the rest the child chooses. */
+export interface PaintJob {
+  /** The name of the element in `StageTask.zones`. */
+  zone: string
+  /** Painted with this tool (and, when `color` is given too, in this colour as well) ... */
+  tool?: PaintToolName
+  /** ... or in this colour family ("green" takes light green, green and dark green). */
+  color?: PaintColor
+  /** The task as the child reads it ("Male den Regenbogen mit Wasserfarbe."). */
+  hint: string
+}
+
 export interface StageTask {
   kind: TaskKind
   /** One line that says what to do. */
   hint?: string
+  /** `ausmalen`: the elements of the picture that conditions can speak about. */
+  zones?: Record<string, PaintZone>
+  /** `ausmalen`: the pool of tasks; at every start of the stage `jobCount` of them (for different zones) are drawn by chance. Every task that is done is one star. */
+  jobs?: PaintJob[]
+  /** `ausmalen`: how many tasks are drawn from the pool (3). */
+  jobCount?: number
   /** `ausmalen`: the line art; `zaehlen`: the picture of the things to count (a path below `public/`; `{n}` is 1–3, a variant). */
   image?: string
   /** `zaehlen`: the same things when they are not counted yet. */
@@ -124,6 +286,10 @@ export interface StageTask {
   memory?: MemoryGame
   sort?: SortGame
   find?: FindGame
+  share?: ShareGame
+  build?: BuildGame
+  dots?: DotsGame
+  fly?: FlyGame
 }
 
 export interface AdventureStage {
@@ -139,6 +305,8 @@ export interface AdventureStage {
   image?: string
   task: StageTask
   questions: AdventureQuestion[]
+  /** The stage is not ready yet (texts or pictures are still missing): it shows "soon", cannot be opened, and its files are not downloaded. */
+  soon?: boolean
 }
 
 /** A place on the painted map that can be tapped: the middle of a round picture, as a share of the whole map picture. */
@@ -159,6 +327,8 @@ export interface JourneyMap {
   ring: string
   /** Width divided by height of the whole map picture. */
   aspect: number
+  /** Width of the whole map picture in pixels (9824 when left out); the pieces overlap by 4 px of it. */
+  widthPx?: number
   /** One spot per stage, in the order of the stages. */
   stages: MapSpot[]
   exam: MapSpot
@@ -171,7 +341,7 @@ export interface Journey {
   title: string
   subtitle: string
   /** The age group the texts are written for. */
-  age: '5-8' | '9-12'
+  age: '8-10'
   stages: AdventureStage[]
   /** The questions of the exam at the end of the journey. */
   exam: AdventureQuestion[]
@@ -182,6 +352,12 @@ export interface Journey {
   cover?: string
   /** About how many MB the one-time download is (shown before it starts). */
   downloadMb?: number
+  /**
+   * The background music of this journey: files below `public/` (`audio/abenteuer/<id>/musik-....mp3`), calm whole pieces of one to two
+   * minutes that follow one another at random with a soft crossfade. Every journey has its own, so that the journeys sound different;
+   * without it the general pieces play.
+   */
+  music?: string[]
   /** The present for finishing the journey. */
   gift: { title: string; image: string }
 }

@@ -1,6 +1,6 @@
 /**
  * What the child has done in the adventures. Everything stays on the device (like the paintings and the awards); nothing is sent
- * anywhere. The best result of a stage is kept: a stage can be played again, and a worse try never takes stars away.
+ * anywhere. A stage can be played again: the result of the new try replaces the old one (it may be better or worse).
  */
 import { computed, reactive } from 'vue'
 import type { JourneyProgress, StageProgress } from '@/types/adventure'
@@ -49,23 +49,25 @@ export default function useAdventure() {
     progressOf: (journeyId: string): JourneyProgress | undefined => state[journeyId],
     stageOf: (journeyId: string, stageId: number): StageProgress | undefined => state[journeyId]?.stages[stageId],
 
-    /** The stars of the task of a stage; the best result is kept. */
+    /** The stars of the task of a stage: the result of the newest try. The stars of the questions of an earlier try are no longer valid. */
     recordStars(journeyId: string, stageId: number, stars: number) {
       const s = stage(journeyId, stageId)
-      s.stars = Math.max(s.stars, clampStars(stars))
-      s.gameStars = Math.max(s.gameStars ?? 0, clampStars(stars))
+      s.stars = clampStars(stars)
+      s.gameStars = clampStars(stars)
+      delete s.finalStars
+      delete s.quizCorrect
       save()
     },
-    /** The stars that count once the questions are done (the best try is kept). */
+    /** The stars that count once the questions are done (the newest try). */
     recordFinal(journeyId: string, stageId: number, stars: number) {
       const s = stage(journeyId, stageId)
-      s.finalStars = Math.max(s.finalStars ?? 0, clampStars(stars))
+      s.finalStars = clampStars(stars)
       save()
     },
-    /** The answers to the questions of a stage. */
+    /** The answers to the questions of a stage (the newest try). */
     recordQuiz(journeyId: string, stageId: number, correct: number) {
       const s = stage(journeyId, stageId)
-      s.quizCorrect = Math.max(s.quizCorrect ?? 0, correct)
+      s.quizCorrect = correct
       save()
     },
     /** The stage was gone through to the end: the next one opens. */

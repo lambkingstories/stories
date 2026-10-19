@@ -18,6 +18,7 @@ const AppColoringBookView = () => import('@/views/app/AppColoringBookView.vue')
 const AppAdventureHomeView = () => import('@/views/app/AppAdventureHomeView.vue')
 const AppAdventureView = () => import('@/views/app/AppAdventureView.vue')
 const AppAdventureStageView = () => import('@/views/app/AppAdventureStageView.vue')
+const AppAdventureStatsView = () => import('@/views/app/AppAdventureStatsView.vue')
 const AppProfileView = () => import('@/views/app/AppProfileView.vue')
 const AppLegalView = () => import('@/views/app/AppLegalView.vue')
 
@@ -31,6 +32,7 @@ export function prefetchRoutes() {
   void AppAdventureHomeView()
   void AppAdventureView()
   void AppAdventureStageView()
+  void AppAdventureStatsView()
   void AppColoringView()
 }
 
@@ -63,6 +65,8 @@ const routes: RouteRecordRaw[] = [
   { path: '/app/coloring/book/:bookId', name: 'app-coloring-book', component: AppColoringBookView },
   { path: '/app/adventure', name: 'app-adventure', component: AppAdventureHomeView },
   { path: '/app/adventure/:journeyId', name: 'app-adventure-map', component: AppAdventureView },
+  // the statistics (opened from the cup on the map); the fixed word comes before the stage number
+  { path: '/app/adventure/:journeyId/statistik', name: 'app-adventure-stats', component: AppAdventureStatsView },
   { path: '/app/adventure/:journeyId/:stageId', name: 'app-adventure-stage', component: AppAdventureStageView },
   { path: '/app/profile', name: 'app-profile', component: AppProfileView },
   { path: '/app/legal', name: 'app-legal', component: AppLegalView }

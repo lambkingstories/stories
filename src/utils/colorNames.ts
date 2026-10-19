@@ -6,7 +6,7 @@
 
 export type NameLang = 'de' | 'en'
 
-type Base =
+export type Base =
   | 'black'
   | 'grey'
   | 'white'
@@ -93,6 +93,13 @@ function baseOf(h: number, s: number, l: number): Base {
   if (h < 255) return 'blue'
   if (h < 300) return 'purple'
   return 'pink'
+}
+
+/** The base name of a colour given as red, green and blue (0 to 255): "yellow", "brown", ... */
+export function baseOfRgb(r: number, g: number, b: number): Base {
+  const hex = '#' + [r, g, b].map((v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('')
+  const [h, s, l] = hslOf(hex)
+  return baseOf(h, s, l)
 }
 
 /** "Hellblau" / "light blue": the base name with "light" or "dark" when the colour is very light or very dark. */

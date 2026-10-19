@@ -5,14 +5,18 @@
  * were painted by the image model; the code only lays them out and puts the names on them. Coming back from a finished stage the
  * map first shows that stage and then slides on to the next one.
  */
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
+import SoundPanel from '@/components/molecules/SoundPanel.vue'
 import { journeyById, journeys } from '@/data/adventures'
 import useAdventure from '@/use/useAdventure'
 import { isExamOpen, isStageOpen, maxPoints, medalFor, nextStageIndex, pointsOf, stageStarsOf } from '@/utils/adventureScore'
+import useButtonSounds from '@/use/useButtonSounds'
+import { clearViaStats } from '@/utils/adventureStats'
+import useMusic from '@/use/useMusic'
 import useSfx from '@/use/useSfx'
 import { prependBaseUrl } from '@/utils/function'
 import type { MapSpot } from '@/types/adventure'
@@ -21,7 +25,12 @@ const { t } = useI18n({ useScope: 'global' })
 const route = useRoute()
 const router = useRouter()
 const adv = useAdventure()
-const { play, enabled: soundOn, toggle: toggleSound } = useSfx()
+const { play } = useSfx()
+// the soft map music (switched off with the speaker switch)
+useButtonSounds()
+const music = useMusic()
+onMounted(() => music.playMap(journey.value.music))
+onBeforeUnmount(() => music.stop('map'))
 
 const journey = computed(() => journeyById(String(route.params.journeyId)) ?? journeys[0]!)
 const progress = computed(() => adv.progressOf(journey.value.id))
@@ -35,6 +44,16 @@ const img = (path: string) => prependBaseUrl(path)
 const ui = (name: string) => img(`images/abenteuer/ui/${name}.webp`)
 const plate = (name: string) => `url(${ui(`plakette-${name}`)})`
 
+/** A journey whose map is not painted yet (the preview of Noah) shows a plain list of its stages instead. */
+const hasMap = computed(() => journey.value.map.images.length > 0)
+/** In the list every stage that is ready can be opened (the preview has no way through the first stage). */
+const listOpen = (i: number) => !journey.value.stages[i]?.soon
+function openFromList(i: number) {
+  const s = journey.value.stages[i]
+  if (!s || s.soon) return
+  void router.push({ name: 'app-adventure-stage', params: { journeyId: journey.value.id, stageId: String(s.id) } })
+}
+
 const stageStars = (id: number) => stageStarsOf(progress.value?.stages[id])
 const stageDone = (id: number) => !!progress.value?.stages[id]?.done
 
@@ -47,6 +66,16 @@ const runSegment = computed(() => {
   return Number.isFinite(from) && from >= 1 && from <= journey.value.stages.length && stageDone(from) ? from - 1 : -1
 })
 const segmentLit = (k: number) => stageDone(k + 1)
+/**
+ * Coming back from a stage (finished, or played again): the stars it earned light up one after the other once more at its station, one tone for
+ * each ("ding, ding, ding"), as on the result page. A stage without stars lights nothing. With reduced motion the stars only appear (and sound).
+ */
+const celebrateId = computed(() => {
+  const from = Number(route.query.from)
+  const at = Number(route.query.at)
+  const id = Number.isFinite(from) && from >= 1 ? from : Number.isFinite(at) && at >= 1 ? at : 0
+  return id >= 1 && id <= journey.value.stages.length && stageDone(id) && stageStars(id) > 0 ? id : 0
+})
 const beadStyle = (b: [number, number], i: number) => ({ left: `calc(var(--w) * ${b[0]})`, top: `calc(var(--h) * ${b[1]})`, '--i': String(i) })
 
 /** The map spot of the stage with this index. */
@@ -55,13 +84,17 @@ const spotOf = (i: number): MapSpot => journey.value.map.stages[i] ?? journey.va
 /** Where a spot sits on its tile, as percentages, and how big its round picture is. */
 const spotStyle = (s: MapSpot) => ({ left: `${s.x * 100}%`, top: `${s.y * 100}%`, width: `${s.d * 100}%` })
 
-/** Each piece of the map picture is a few pixels wider than its share (4 of 9824 px), so that the pieces overlap. */
-const PIECE_LAP = (2456 + 4) / 9824
+/** Each piece of the map picture is a few pixels wider than its share (4 px of the whole width), so that the pieces overlap. */
+const pieceLap = computed(() => 1 / Math.max(1, journey.value.map.images.length) + 4 / (journey.value.map.widthPx ?? 9824))
 
 function openStage(i: number) {
   const s = journey.value.stages[i]
   if (!s || !isStageOpen(journey.value, progress.value, i)) return
   void router.push({ name: 'app-adventure-stage', params: { journeyId: journey.value.id, stageId: String(s.id) } })
+}
+
+function openStats() {
+  void router.push({ name: 'app-adventure-stats', params: { journeyId: journey.value.id } })
 }
 
 function openExam() {
@@ -101,20 +134,28 @@ function slideTo(el: HTMLElement, left: number, ms = 1100) {
 }
 
 onMounted(async () => {
+  clearViaStats()
   await nextTick()
   const el = scroller.value
   if (!el) return
   const target = next.value !== null ? spotOf(next.value) : journey.value.map.exam
   const from = Number(route.query.from)
-  if (Number.isFinite(from) && from >= 1 && from <= journey.value.stages.length) {
-    // coming back from a stage: stand at that stage, then slide on to the next one
+  const at = Number(route.query.at)
+  if (!(Number.isFinite(from) && from >= 1) && Number.isFinite(at) && at >= 1 && at <= journey.value.stages.length) {
+    // back from a stage that was played again (or left): the map stays at that stage, nothing lights up, nothing slides
+    el.scrollLeft = leftFor(spotOf(at - 1))
+  } else if (Number.isFinite(from) && from >= 1 && from <= journey.value.stages.length) {
+    // coming back from a stage finished for the first time: stand at that stage, then slide on to the next one
     el.scrollLeft = leftFor(spotOf(from - 1))
     // the camera follows the light that runs along the opened stretch
     const beads = journey.value.map.path[from - 1]?.length ?? 12
+    // the stars of the stage light up first (one tone each), then the way goes on
+    // (only the star tones play there, no fanfare on top; the coin and the beads start when the last star tone has rung out)
+    const lead = celebrateId.value === from ? stageStars(from) * 380 + 900 : 0
     // a coin for the stage that is done, then a tick for every bead that lights up
-    window.setTimeout(() => play('coin'), 200)
-    for (let i = 0; i < beads; i++) window.setTimeout(() => play('bead'), i * 95 + 450 + 80)
-    window.setTimeout(() => slideTo(el, leftFor(target), Math.min(2600, 800 + beads * 85)), 700)
+    window.setTimeout(() => play('coin'), 200 + lead)
+    for (let i = 0; i < beads; i++) window.setTimeout(() => play('bead'), i * 95 + 450 + 80 + lead)
+    window.setTimeout(() => slideTo(el, leftFor(target), Math.min(2600, 800 + beads * 85)), 700 + lead)
   } else {
     el.scrollLeft = leftFor(target)
   }
@@ -128,13 +169,33 @@ onMounted(async () => {
         ZIconography(name="chevron-left" :size="20")
         span {{ t('app.read.back') }}
       span(class="map-title") {{ journey.title }}
-      button(type="button" class="map-sound" :aria-pressed="soundOn" :aria-label="t(soundOn ? 'app.adventure.soundOff' : 'app.adventure.soundOn')" @click="toggleSound")
-        img(:src="ui(soundOn ? 'ton-an' : 'ton-aus')" alt="" draggable="false")
+      SoundPanel(class="map-sound")
       div(class="map-points")
         img(:src="ui('stern-gold-1')" alt="" draggable="false")
         span {{ t('app.adventure.pointsShort', { n: points, max }) }}
 
-    div(ref="scroller" class="map-scroll")
+    //- no painted map yet: the stages as a list (the preview of a journey that is still being made)
+    div(v-if="!hasMap" class="map-list")
+      p(class="list-note") {{ t('app.adventure.previewNote') }}
+      ul(class="list-stages")
+        li(v-for="(s, i) in journey.stages" :key="s.id")
+          button(
+            type="button"
+            class="list-item"
+            :class="{ soon: s.soon, done: stageDone(s.id) }"
+            :disabled="!listOpen(i)"
+            :aria-label="`${t('app.adventure.stageOf', { n: s.id, total: journey.stages.length })}: ${s.title}`"
+            @click="openFromList(i)"
+          )
+            span(class="list-coin" :style="{ backgroundImage: `url(${ui('coin')})` }") {{ s.id }}
+            span(class="list-text")
+              span(class="list-title") {{ s.soon ? t('app.adventure.stageListSoonTitle', { n: s.id }) : s.title }}
+              span(v-if="!s.soon" class="list-ref") {{ s.ref }}
+            span(v-if="s.soon" class="list-soon") {{ t('app.adventure.stageListSoon') }}
+            AdventureStars(v-else-if="stageDone(s.id)" :stars="stageStars(s.id)" :size="22")
+            ZIconography(v-else name="chevron-right" :size="22")
+
+    div(v-else ref="scroller" class="map-scroll")
       div(class="map-strip" :style="{ '--aspect': String(journey.map.aspect) }")
         //- the map picture in pieces, side by side (each a little wider than its share, so that no hairline shows between them)
         img(
@@ -143,7 +204,7 @@ onMounted(async () => {
           :src="img(piece)"
           alt=""
           class="map-art"
-          :style="{ left: `${(pi / journey.map.images.length) * 100}%`, width: `${(pi < journey.map.images.length - 1 ? PIECE_LAP : 1 / journey.map.images.length) * 100}%` }"
+          :style="{ left: `${(pi / journey.map.images.length) * 100}%`, width: `${(pi < journey.map.images.length - 1 ? pieceLap : 1 / journey.map.images.length) * 100}%` }"
           draggable="false"
           decoding="async"
         )
@@ -182,8 +243,9 @@ onMounted(async () => {
           img(v-if="stageDone(s.id)" :src="ui('check')" alt="" class="spot-check" draggable="false")
           //- under the picture: the name, and the stars or the way on
           div(class="spot-below")
-            span(class="spot-name") {{ s.title }}
-            AdventureStars(v-if="stageDone(s.id)" :stars="stageStars(s.id)" :size="24" class="spot-stars")
+            span(class="spot-name") {{ s.soon ? t('app.adventure.stageListSoonTitle', { n: s.id }) : s.title }}
+            span(v-if="s.soon" class="spot-soon") {{ t('app.adventure.stageListSoon') }}
+            AdventureStars(v-else-if="stageDone(s.id)" :stars="stageStars(s.id)" :size="24" :celebrate="s.id === celebrateId" :fanfare="false" class="spot-stars")
             button(v-else-if="i === next" type="button" class="spot-go lk-btn lk-btn--small" @click="openStage(i)") {{ t('app.adventure.continue') }}
 
         //- the exam at the end of the way
@@ -200,7 +262,9 @@ onMounted(async () => {
           div(class="spot-below")
             span(class="spot-name") {{ t('app.adventure.exam') }}
             button(v-if="examOpen && !progress?.exam" type="button" class="spot-go lk-btn lk-btn--small" @click="openExam") {{ t('app.adventure.continue') }}
-          img(v-if="medal" :src="ui(`pokal-${medal === 'silver' ? 'silber' : medal}`)" alt="" class="spot-cup" :class="`cup-${medal}`" draggable="false")
+          //- the cup over the last station: a tap opens the statistics (at any time, also later)
+          button(v-if="medal" type="button" class="spot-cup" :class="`cup-${medal}`" :aria-label="t('app.adventure.statsOpen')" @click="openStats")
+            img(:src="ui(`pokal-${medal === 'silver' ? 'silber' : medal}`)" alt="" draggable="false")
 </template>
 
 <style scoped lang="sass">
@@ -228,27 +292,6 @@ $ink: #3b2a12
 
 .map-sound
   flex: 0 0 auto
-  pointer-events: auto
-  width: 44px
-  height: 44px
-  padding: 0
-  border: 0
-  background: transparent
-  cursor: pointer
-  -webkit-tap-highlight-color: transparent
-  filter: drop-shadow(0 3px 0 rgba(88, 58, 16, 0.55)) drop-shadow(0 5px 5px rgba(40, 25, 5, 0.3))
-  transition: translate 80ms ease-out, filter 80ms ease-out
-
-  img
-    display: block
-    width: 100%
-    height: 100%
-    object-fit: contain
-    pointer-events: none
-
-  &:active
-    translate: 0 3px
-    filter: drop-shadow(0 1px 0 rgba(88, 58, 16, 0.55))
 
 .map-back
   flex: 0 0 auto
@@ -302,6 +345,87 @@ $ink: #3b2a12
     font-size: 0.85rem
     line-height: 1
     color: var(--lk-text)
+
+// the list of stages (a journey without a painted map)
+.map-list
+  position: absolute
+  inset: 0
+  overflow-y: auto
+  padding: calc(max(env(safe-area-inset-top, 0px), 8px) + 64px) 16px calc(120px + env(safe-area-inset-bottom, 0px))
+  -webkit-overflow-scrolling: touch
+
+.list-note
+  margin: 0 auto 14px
+  max-width: 560px
+  font-size: 0.95rem
+  font-weight: 600
+  color: var(--lk-muted)
+
+.list-stages
+  list-style: none
+  margin: 0 auto
+  padding: 0
+  max-width: 560px
+  display: flex
+  flex-direction: column
+  gap: 10px
+
+.list-item
+  display: flex
+  align-items: center
+  gap: 12px
+  width: 100%
+  min-height: 64px
+  padding: 8px 14px 8px 10px
+  border-radius: 18px
+  border: 1px solid var(--lk-line)
+  background: var(--lk-surface)
+  color: var(--lk-text)
+  text-align: left
+  cursor: pointer
+  box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 0.35)
+
+  &.soon
+    opacity: 0.6
+    cursor: default
+
+.list-coin
+  flex: 0 0 auto
+  display: inline-flex
+  align-items: center
+  justify-content: center
+  width: 44px
+  height: 44px
+  background-size: contain
+  background-repeat: no-repeat
+  background-position: center
+  font-family: 'Fraunces', serif
+  font-weight: 800
+  font-size: 1.1rem
+  color: #4a3208
+
+.list-text
+  flex: 1 1 auto
+  display: flex
+  flex-direction: column
+  min-width: 0
+
+.list-title
+  font-weight: 800
+  font-size: 1.05rem
+  line-height: 1.2
+
+.list-ref
+  font-size: 1rem
+  color: var(--lk-muted)
+
+.list-soon
+  flex: 0 0 auto
+  padding: 2px 12px
+  border-radius: 999px
+  background: rgba(120, 90, 30, 0.15)
+  font-weight: 800
+  font-size: 1rem
 
 // the map: a strip of tiles, as high as the screen allows, scrolling sideways (no filters or masks on it: they make it jerky)
 .map-scroll
@@ -490,6 +614,15 @@ $ink: #3b2a12
   white-space: nowrap
   animation: spot-bob 1.8s ease-in-out infinite
 
+// "soon" under the name of a stage that is not ready
+.spot-soon
+  padding: 0 calc(var(--u) * 0.04)
+  border-radius: 999px
+  background: rgba(255, 246, 215, 0.92)
+  color: #5f4f35
+  font-weight: 800
+  font-size: calc(var(--u) * 0.032)
+
 // the name of a stage under its round picture
 .spot-name
   display: block
@@ -502,7 +635,8 @@ $ink: #3b2a12
   border: 1px solid var(--lk-line)
   color: var(--lk-text)
   font-weight: 800
-  font-size: calc(var(--u) * 0.028)
+  // never smaller than 16 px, however small the map is shown
+  font-size: max(16px, calc(var(--u) * 0.028))
   line-height: 1.15
   text-align: center
   box-shadow: 0 3px 10px -3px rgba(0, 0, 0, 0.4)
@@ -511,7 +645,18 @@ $ink: #3b2a12
   position: absolute
   left: 50%
   transform: translateX(-50%)
-  pointer-events: none
+  display: block
+  padding: 0
+  border: 0
+  background: transparent
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+
+  img
+    display: block
+    width: 100%
+    height: auto
+    pointer-events: none
 
   &.cup-bronze
     top: -34%

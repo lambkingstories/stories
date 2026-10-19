@@ -14,14 +14,16 @@ import AdvDialog from '@/components/molecules/AdvDialog.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
 import { comingSoon, journeys } from '@/data/adventures'
 import useAdventure from '@/use/useAdventure'
+import useButtonSounds from '@/use/useButtonSounds'
 import { deleteArtwork, pageArtworkId } from '@/use/useArtworks'
 import useJourneyPack from '@/use/useJourneyPack'
-import { maxPoints, medalFor, nextStageIndex, pointsOf, stageStarsOf } from '@/utils/adventureScore'
+import { maxPoints, medalFor, nextStageIndex, pointsOf } from '@/utils/adventureScore'
 import { prependBaseUrl } from '@/utils/function'
 
 const { t } = useI18n({ useScope: 'global' })
 const router = useRouter()
 const adv = useAdventure()
+useButtonSounds()
 
 const ui = (name: string) => prependBaseUrl(`images/abenteuer/ui/${name}.webp`)
 
@@ -67,9 +69,9 @@ function askFromDetail(kind: 'reset' | 'delete') {
   dialog.value = { kind, id }
 }
 
-// the stars of all journeys together
-const starTotal = computed(() => journeys.reduce((n, j) => n + Object.values(adv.progressOf(j.id)?.stages ?? {}).reduce((m, st) => m + stageStarsOf(st), 0), 0))
-const starMax = computed(() => journeys.reduce((n, j) => n + j.stages.length * 3, 0))
+// the stars of all journeys together: counted the way the map counts them (the stars of the stages plus the right answers of the exam)
+const starTotal = computed(() => journeys.reduce((n, j) => n + pointsOf(adv.progressOf(j.id)), 0))
+const starMax = computed(() => journeys.reduce((n, j) => n + maxPoints(j), 0))
 const starShare = computed(() => (starMax.value ? Math.min(1, starTotal.value / starMax.value) : 0))
 
 function go(id: string) {
@@ -577,4 +579,9 @@ $ink: var(--lk-text)
   font-size: 0.9rem
   font-weight: 800
   color: var(--lk-text)
+
+@media (prefers-reduced-motion: reduce)
+  .dl-fill,
+  .medal
+    transition: none
 </style>

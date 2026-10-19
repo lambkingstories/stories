@@ -4,7 +4,7 @@
  * The round picture at the top is the stage's scene cut out of the painted map. The coloring task opens the coloring screen and
  * comes back here (`?back=task`) with the stars it earned.
  */
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
@@ -13,20 +13,32 @@ import AdvButton from '@/components/atoms/AdvButton.vue'
 import AdventureCount from '@/components/molecules/AdventureCount.vue'
 import AdventureOverview, { type OverviewRow } from '@/components/molecules/AdventureOverview.vue'
 import AdventureQuiz from '@/components/molecules/AdventureQuiz.vue'
+import GameBuild from '@/components/molecules/games/GameBuild.vue'
+import GameDots from '@/components/molecules/games/GameDots.vue'
+import GameFly from '@/components/molecules/games/GameFly.vue'
 import GameFind from '@/components/molecules/games/GameFind.vue'
 import GameHarvest from '@/components/molecules/games/GameHarvest.vue'
 import GameMemory from '@/components/molecules/games/GameMemory.vue'
 import GamePuzzle from '@/components/molecules/games/GamePuzzle.vue'
+import GameShare from '@/components/molecules/games/GameShare.vue'
 import GameSort from '@/components/molecules/games/GameSort.vue'
+import GameStones from '@/components/molecules/games/GameStones.vue'
 import GameWay from '@/components/molecules/games/GameWay.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
+import SoundPanel from '@/components/molecules/SoundPanel.vue'
 import ReadAloud from '@/components/molecules/ReadAloud.vue'
 import { journeyById } from '@/data/adventures'
 import useAdventure from '@/use/useAdventure'
 import { getArtwork, pageArtworkId } from '@/use/useArtworks'
 import { prependBaseUrl } from '@/utils/function'
 import useTaskProgress from '@/use/useTaskProgress'
+import useButtonSounds from '@/use/useButtonSounds'
+import useMusic from '@/use/useMusic'
+import useSfx from '@/use/useSfx'
 import { finalStars, maxPoints, medalFor, pointsOf, quizStars, stageStarsOf } from '@/utils/adventureScore'
+import { jobNoteKey, paintJobsOf, readJobResults } from '@/utils/paintJobs'
+import { clearViaStats, isViaStats } from '@/utils/adventureStats'
+import useCelebration from '@/use/useCelebration'
 import type { AdventureStage } from '@/types/adventure'
 
 const { t } = useI18n({ useScope: 'global' })
@@ -67,10 +79,29 @@ const shownStars = computed(() => tryFinal.value ?? stageStars.value)
 const lostStars = computed(() => (phase.value === 'result' ? Math.max(0, gameStars.value - shownStars.value) : 0))
 /** Stars the right answers brought back (the net gain of the questions). */
 const gainedStars = computed(() => (phase.value === 'result' && tryFinal.value !== null ? Math.max(0, tryFinal.value - gameStars.value) : 0))
-/** The best result is higher than this try. */
-const bestHigher = computed(() => (phase.value === 'result' && tryFinal.value !== null && stageStars.value > tryFinal.value ? stageStars.value : 0))
+/** The last time the stage was finished it was the first time (then the map slides on to the next stage; a replay leaves the map where it is). */
+const lastWasFirst = ref(false)
 /** Which try this is: a new one starts the questions afresh. */
 const attempt = ref(0)
+
+/**
+ * The tasks of the picture, drawn by chance every time the stage is entered anew (back from the painting screen they are the same ones, so
+ * "keep painting" keeps them). Every task that is done is one star.
+ */
+const paintJobs = ref(
+  stage.value?.task.kind === 'ausmalen'
+    ? paintJobsOf(String(route.params.journeyId), Number(route.params.stageId), stage.value.task.jobs, stage.value.task.jobCount ?? 3, { redraw: route.query.back !== 'task' })
+    : []
+)
+/** What the last "done" found for each task (in the order of the tasks): done, wrong tool or colour, not enough yet. */
+const jobResults = computed(() => (phase.value === 'painted' ? readJobResults(String(route.params.journeyId), Number(route.params.stageId)) : []))
+const paintRows = computed(() =>
+  paintJobs.value.map((job, i) => {
+    const status = jobResults.value[i]
+    const key = status ? jobNoteKey(job, status) : null
+    return { job, status, mark: status === 'met' ? '✓' : '✗', note: key ? t(key) : '' }
+  })
+)
 
 /** The stars the painted picture earned (30 % of it painted: one, 40 %: two, 70 %: three). */
 const paintedStars = computed(() => {
@@ -142,12 +173,17 @@ const ui = (name: string) => img(`images/abenteuer/ui/${name}.webp`)
  * (its button then goes back to where the child came from); from the story itself, and from the end, it leads to the map.
  */
 function onBack() {
-  if (isExam.value || phase.value === 'result') {
+  if (isExam.value) {
     goMap()
     return
   }
+  if (phase.value === 'result') {
+    goMap(stage.value?.id, lastWasFirst.value)
+    return
+  }
   if (phase.value === 'text') {
-    goMap()
+    // a stage that was played before: the map stays where it was; a new one: the map shows where the child is
+    goMap(progressOfStage.value?.done ? stage.value?.id : undefined)
     return
   }
   backFrom.value = phase.value === 'task' ? null : phase.value
@@ -168,11 +204,22 @@ const heroSrc = computed(() => (stage.value?.image ? img(stage.value.image) : ''
 
 const backLabel = computed(() => (phase.value === 'text' || phase.value === 'result' ? t('app.adventure.backToMap') : t('app.adventure.back')))
 
-/** Back to the map; from a finished stage the map slides on to the next one (`from`). */
-function goMap(from?: number) {
+/**
+ * Back to the map. From a stage that was finished for the first time the map slides on to the next one and the way lights up
+ * (`from`); from a stage that was played again, or when the child just leaves, the map stays at that stage (`at`).
+ */
+function goMap(stageId?: number, first = false) {
   const j = journey.value
   if (!j) return
-  void router.replace({ name: 'app-adventure-map', params: { journeyId: j.id }, query: from ? { from: String(from) } : {} })
+  // a stage (or the exam) that was played again from the statistics: the way back leads to the statistics
+  if (isViaStats(j.id, isExam.value ? 'pruefung' : String(stage.value?.id ?? ''))) {
+    clearViaStats()
+    void router.replace({ name: 'app-adventure-stats', params: { journeyId: j.id } })
+    return
+  }
+  const query: Record<string, string> = {}
+  if (stageId) query[first ? 'from' : 'at'] = String(stageId)
+  void router.replace({ name: 'app-adventure-map', params: { journeyId: j.id }, query })
 }
 
 /** The picture the child has just painted: the paint with the line art over it, as a small picture. */
@@ -247,9 +294,20 @@ const progress = useTaskProgress()
 watch(phase, (p) => {
   if (p === 'task') progress.reset()
 })
-const hasPart = computed(() => progress.parts.value > 0)
+const hasPart = computed(() => progress.parts.value > 0 && !progress.finished.value)
+
+/** The games have a restart sign: a new key mounts the game afresh (round, mistakes and what was done begin again). */
+const gameKey = ref(0)
+const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly'] as const
+const hasGame = computed(() => hasCountGame.value || GAME_FIELDS.some((f) => !!gameTask.value?.[f]))
+function restartGame() {
+  progress.reset()
+  gameKey.value++
+}
 
 function partTask() {
+  // never for a game that is finished: its stars are already the result
+  if (progress.finished.value) return
   taskDone(1)
 }
 
@@ -287,11 +345,42 @@ function startPaint() {
   })
 }
 
+const { play } = useSfx()
+
+// the mini game music plays only while the game itself is open (never while the story is read, and not in the questions, on the star
+// page or in the result: the star page of a game stops it, see AdventureStars); the piece fits the game (calm, medium, lively)
+useButtonSounds()
+const music = useMusic()
+const gameKind = computed(() => {
+  const g = gameTask.value
+  if (hasCountGame.value) return 'count'
+  if (g?.puzzle) return 'puzzle'
+  if (g?.way) return 'way'
+  if (g?.harvest) return 'harvest'
+  if (g?.memory) return 'memory'
+  if (g?.sort) return 'sort'
+  if (g?.find) return 'find'
+  if (g?.share) return 'share'
+  if (g?.build) return g.build.ordered ? 'stones' : 'build'
+  if (g?.dots) return 'dots'
+  if (g?.fly) return 'fly'
+  return undefined
+})
+watch(
+  () => phase.value === 'task' && !isPaint.value && !!gameKind.value,
+  (on) => (on ? music.playGame(gameKind.value, journey.value?.music) : music.stop('game')),
+  { immediate: true }
+)
+onBeforeUnmount(() => music.stop('game'))
+
 function quizDone(correct: number) {
   const j = journey.value
   if (!j) return
   if (isExam.value) {
     adv.recordExam(j.id, correct, j.exam.length)
+    // the cup is celebrated when the exam result appears: bronze quietly, silver a little more, gold with fireworks (without a cup a gentle chime)
+    if (medal.value) celebrateCup(medal.value)
+    else window.setTimeout(() => play('result'), 300)
   } else if (stage.value) {
     adv.recordQuiz(j.id, stage.value.id, correct)
     const total = stage.value.questions.length
@@ -308,11 +397,13 @@ function quizDone(correct: number) {
       tryFinal.value = f
       adv.recordFinal(j.id, stage.value.id, f)
     }
+    lastWasFirst.value = !adv.stageOf(j.id, stage.value.id)?.done
     adv.completeStage(j.id, stage.value.id)
   }
   phase.value = 'result'
 }
 
+const { celebrate: celebrateCup } = useCelebration()
 const exam = computed(() => (journey.value ? adv.progressOf(journey.value.id)?.exam : undefined))
 const total = computed(() => (journey.value ? pointsOf(adv.progressOf(journey.value.id)) : 0))
 const max = computed(() => (journey.value ? maxPoints(journey.value) : 0))
@@ -332,9 +423,11 @@ function openGift() {
     header(class="stage-head")
       AppHeader
       div(class="stage-head-body")
-        button(type="button" class="stage-back lk-btn lk-btn--outline lk-btn--small" :aria-label="backLabel" @click="onBack")
-          ZIconography(name="chevron-left" :size="20")
-          span {{ backLabel }}
+        div(class="stage-top")
+          button(type="button" class="stage-back lk-btn lk-btn--outline lk-btn--small" :aria-label="backLabel" @click="onBack")
+            ZIconography(name="chevron-left" :size="20")
+            span {{ backLabel }}
+          SoundPanel
         p(class="stage-kind") {{ isExam ? t('app.adventure.exam') : t('app.adventure.stageOf', { n: stage?.id ?? 0, total: journey.stages.length }) }}
         h1(class="stage-title") {{ isExam ? t('app.adventure.examTitle', { title: journey.title }) : stage?.title }}
         p(v-if="stage" class="stage-ref") {{ stage.ref }}
@@ -358,13 +451,20 @@ function openGift() {
       section(v-else-if="phase === 'task' && stage" class="stage-card")
         h2(class="stage-h2") {{ t('app.adventure.task') }}
         p(class="stage-hint") {{ stage.task.hint }}
-        AdventureCount(v-if="hasCountGame" :count="countN" :image="taskImage" :image-off="taskImageOff" :background="taskBackground" :groups="gameTask?.groups" :question="gameTask?.question" @done="taskDone")
-        GamePuzzle(v-else-if="gameTask?.puzzle" :game="gameTask.puzzle" @done="taskDone")
-        GameWay(v-else-if="gameTask?.way" :game="gameTask.way" @done="taskDone")
-        GameHarvest(v-else-if="gameTask?.harvest" :game="gameTask.harvest" @done="taskDone")
-        GameMemory(v-else-if="gameTask?.memory" :game="gameTask.memory" @done="taskDone")
-        GameSort(v-else-if="gameTask?.sort" :game="gameTask.sort" @done="taskDone")
-        GameFind(v-else-if="gameTask?.find" :game="gameTask.find" @done="taskDone")
+        ul(v-if="paintJobs.length" class="stage-jobs" :aria-label="t('app.adventure.paintJobsTitle')")
+          li(v-for="(j, i) in paintJobs" :key="i" class="stage-job") {{ j.hint }}
+        AdventureCount(:key="gameKey" v-if="hasCountGame" :count="countN" :image="taskImage" :image-off="taskImageOff" :background="taskBackground" :groups="gameTask?.groups" :question="gameTask?.question" @done="taskDone")
+        GamePuzzle(:key="gameKey" v-else-if="gameTask?.puzzle" :game="gameTask.puzzle" @done="taskDone")
+        GameWay(:key="gameKey" v-else-if="gameTask?.way" :game="gameTask.way" @done="taskDone")
+        GameHarvest(:key="gameKey" v-else-if="gameTask?.harvest" :game="gameTask.harvest" @done="taskDone")
+        GameMemory(:key="gameKey" v-else-if="gameTask?.memory" :game="gameTask.memory" @done="taskDone")
+        GameSort(:key="gameKey" v-else-if="gameTask?.sort" :game="gameTask.sort" @done="taskDone")
+        GameFind(:key="gameKey" v-else-if="gameTask?.find" :game="gameTask.find" @done="taskDone")
+        GameShare(:key="gameKey" v-else-if="gameTask?.share" :game="gameTask.share" @done="taskDone")
+        GameStones(:key="gameKey" v-else-if="gameTask?.build?.ordered" :game="gameTask.build" @done="taskDone")
+        GameBuild(:key="gameKey" v-else-if="gameTask?.build" :game="gameTask.build" @done="taskDone")
+        GameDots(:key="gameKey" v-else-if="gameTask?.dots" :game="gameTask.dots" @done="taskDone")
+        GameFly(:key="gameKey" v-else-if="gameTask?.fly" :game="gameTask.fly" @done="taskDone")
         template(v-else-if="isPaint")
           img(:src="img(taskImage)" alt="" class="stage-paint" draggable="false")
           div(class="stage-actions")
@@ -376,7 +476,12 @@ function openGift() {
           div(class="stage-actions")
             AdvButton(tone="gold" @click="taskDone(1)") {{ t('app.adventure.next') }}
         button(v-if="hasPart" type="button" class="stage-skip stage-part" @click="partTask") {{ t('app.adventure.partial') }}
-        button(v-else type="button" class="stage-skip" @click="skipTask") {{ t('app.adventure.skip') }}
+        button(v-else-if="!progress.finished.value" type="button" class="stage-skip" @click="skipTask") {{ t('app.adventure.skip') }}
+        //- a small sign at the bottom: play the game again from the start (text and questions stay)
+        button(v-if="hasGame" type="button" class="stage-restart" :aria-label="t('app.adventure.restartGame')" :title="t('app.adventure.restartGame')" @click="restartGame")
+          svg(viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true")
+            path(d="M20 12a8 8 0 1 1-2.6-5.9")
+            path(d="M20 4v5h-5")
 
       //- 2b. the finished picture, with a little shine
       section(v-else-if="phase === 'painted'" class="stage-card stage-result")
@@ -385,9 +490,17 @@ function openGift() {
           img(v-if="paintedSrc" :src="paintedSrc" alt="" class="painted-img" draggable="false")
           img(v-for="(g, k) in glints" :key="k" :src="ui('sternglanz')" alt="" class="glint" :style="glintStyle(g)" draggable="false")
         AdventureStars(:stars="paintedStars" :size="52" :celebrate="paintedStars > 0" class="burst-stars")
-        p(class="result-line") {{ paintedStars > 0 ? t('app.adventure.paintedText') : t('app.adventure.paintedMore') }}
+        ul(v-if="paintRows.length" class="painted-jobs" :aria-label="t('app.adventure.paintJobsTitle')")
+          li(v-for="(r, i) in paintRows" :key="i" class="painted-job" :class="{ done: r.status === 'met', open: r.status && r.status !== 'met' }")
+            span(class="painted-mark" aria-hidden="true") {{ r.mark }}
+            span(class="painted-job-text")
+              span {{ r.job.hint }}
+              span(v-if="r.note" class="painted-note" :class="{ wrong: r.status === 'wrong' }" role="status") {{ r.note }}
+              span(class="sr-only") {{ r.status === 'met' ? t('app.adventure.paintJobDone') : t('app.adventure.paintJobOpen') }}
+        p(class="result-line") {{ paintedStars >= 3 || !paintRows.length ? (paintedStars > 0 ? t('app.adventure.paintedText') : t('app.adventure.paintedMore')) : t('app.adventure.paintedLess') }}
         div(class="stage-actions")
-          AdvButton(v-if="paintedStars === 0" tone="gold" @click="startPaint") {{ t('app.adventure.paintOn') }}
+          //- the child may always go on painting: what is painted stays (the picture is kept), and the next "done" counts again
+          AdvButton(:tone="paintedStars === 0 ? 'gold' : 'blau'" @click="startPaint") {{ t('app.adventure.paintOn') }}
           AdvButton(:tone="paintedStars === 0 ? 'blau' : 'gold'" @click="phase = 'quiz'") {{ t('app.adventure.next') }}
 
       //- 3. the overview between the game and the questions: the game is done, the stage is not
@@ -430,10 +543,9 @@ function openGift() {
             li(v-if="!isQuizStage" class="account-row" :class="{ minus: tryWrong > 0 }")
               span {{ t('app.adventure.accWrong') }}
               strong {{ tryWrong > 0 ? '−' + tryWrong : '0' }}
-          p(v-if="bestHigher > 0" class="result-line") {{ t('app.adventure.bestSoFar', { n: bestHigher }, bestHigher) }}
           AdventureOverview(:rows="overviewRows(false)")
           div(class="stage-actions")
-            AdvButton(tone="gold" @click="goMap(stage?.id)") {{ isLastStage ? t('app.adventure.toExam') : t('app.adventure.backToMap') }}
+            AdvButton(tone="gold" @click="goMap(stage?.id, lastWasFirst)") {{ isLastStage ? t('app.adventure.toExam') : t('app.adventure.backToMap') }}
             AdvButton(v-if="shownStars < 3" tone="blau" @click="retry") {{ t('app.adventure.retry') }}
 
   div(v-else class="stage stage-missing")
@@ -455,6 +567,12 @@ $ink: var(--lk-text)
   margin: 0 auto
   padding: 0 16px
 
+.stage-top
+  display: flex
+  align-items: center
+  justify-content: space-between
+  gap: 8px
+
 .stage-back
   gap: 4px
   padding: 0 18px 0 10px
@@ -475,7 +593,7 @@ $ink: var(--lk-text)
 
 .stage-ref
   margin: 4px 0 0
-  font-size: 0.95rem
+  font-size: 1rem
   font-weight: 600
   color: var(--lk-muted)
 
@@ -523,7 +641,7 @@ $ink: var(--lk-text)
     color: currentColor
 
 .step-label
-  font-size: 0.95rem
+  font-size: 1rem
   font-weight: 600
   color: var(--lk-muted)
 
@@ -572,6 +690,68 @@ $ink: var(--lk-text)
   margin: 0 0 6px
   font-weight: 800
   font-size: 1.5rem
+
+.stage-jobs
+  margin: 6px 0 0
+  padding: 0
+  list-style: none
+  text-align: center
+
+.stage-job
+  margin: 3px 0
+  font-weight: 800
+  color: #8a5a00
+
+.painted-jobs
+  margin: 6px auto 0
+  padding: 0
+  list-style: none
+  width: min(100%, 420px)
+  text-align: left
+
+.painted-job
+  display: flex
+  gap: 10px
+  align-items: flex-start
+  padding: 6px 4px
+  font-weight: 700
+
+.painted-mark
+  flex: none
+  width: 1.6em
+  height: 1.6em
+  border-radius: 50%
+  display: inline-flex
+  align-items: center
+  justify-content: center
+  font-weight: 900
+  background: #ddd
+  color: #fff
+
+.painted-job.done .painted-mark
+  background: #2fae54
+
+.painted-job.open .painted-mark
+  background: #c0392b
+
+.painted-job-text
+  display: flex
+  flex-direction: column
+
+.painted-note
+  font-size: 1rem
+  font-weight: 700
+  color: #5f4f35
+
+  &.wrong
+    color: #a3321f
+
+.sr-only
+  position: absolute
+  width: 1px
+  height: 1px
+  overflow: hidden
+  clip: rect(0 0 0 0)
 
 .stage-hint
   margin: 0 0 14px
@@ -626,18 +806,46 @@ $ink: var(--lk-text)
 .stage-part
   font-weight: 800
 
+.stage-restart
+  display: flex
+  align-items: center
+  justify-content: center
+  width: 44px
+  height: 44px
+  margin: 8px auto 0
+  padding: 0
+  border: 1.5px solid var(--lk-line)
+  border-radius: 50%
+  // solid, so that it can be seen on any page
+  background: var(--lk-surface)
+  color: var(--lk-text)
+  cursor: pointer
+
+  &:hover,
+  &:focus-visible
+    border-color: var(--lk-accent)
+
+// the small buttons under a game ("Weiter (1 Stern)", "Überspringen"): a solid pill with a fine line, centred, as high as a finger
 .stage-skip
-  display: block
+  display: flex
+  align-items: center
+  justify-content: center
+  width: fit-content
+  max-width: 100%
   margin: 12px auto 0
-  padding: 12px 14px
+  padding: 0 22px
   min-height: 44px
-  border: 0
-  background: transparent
-  color: var(--lk-muted)
+  border: 1.5px solid var(--lk-line)
+  border-radius: var(--lk-r-btn)
+  background: var(--lk-surface)
+  color: var(--lk-text)
   font: inherit
   font-weight: 700
-  text-decoration: underline
   cursor: pointer
+
+  &:hover,
+  &:focus-visible
+    border-color: var(--lk-accent)
 
 .stage-result
   text-align: center

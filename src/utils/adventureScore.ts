@@ -28,6 +28,13 @@ export function mistakeStars(mistakes: number, soft = 1, hard = 4): number {
   return mistakes <= soft ? 3 : mistakes <= hard ? 2 : 1
 }
 
+/** Stars for a game where things are caught on the way (the dove's lights): all but one 3 stars, more than half 2, otherwise 1. */
+export function catchStars(caught: number, total: number): number {
+  if (total <= 0) return 0
+  if (total - caught <= 1) return 3
+  return caught * 2 > total ? 2 : 1
+}
+
 /**
  * The stars of a stage after the questions (the same for all games): every right answer brings one star back, up to three; then every wrong
  * answer takes one away, so a wrong answer always shows (three stars from the game, one right and one wrong answer make two).
@@ -45,8 +52,14 @@ export function stageStarsOf(s: { stars: number; gameStars?: number; finalStars?
   return Math.min(MAX_STARS, Math.max(0, s.finalStars ?? s.gameStars ?? s.stars))
 }
 
-/** The stage `index` (0-based) is open when it is the first one or the one before it was gone through. */
+/**
+ * The stage `index` (0-based) is open when it is the first one or the one before it was gone through. A stage that is not ready (`soon`)
+ * is never open; in a journey that is still being made (it has such stages) every ready stage can be opened at once, because
+ * the way through the stages that are missing cannot be walked.
+ */
 export function isStageOpen(journey: Journey, progress: JourneyProgress | undefined, index: number): boolean {
+  if (journey.stages[index]?.soon) return false
+  if (journey.stages.some((s) => s.soon)) return true
   if (index <= 0) return true
   const before = journey.stages[index - 1]
   return !!before && !!progress?.stages[before.id]?.done
@@ -54,7 +67,8 @@ export function isStageOpen(journey: Journey, progress: JourneyProgress | undefi
 
 /** All stages gone through: the exam opens. */
 export function isExamOpen(journey: Journey, progress: JourneyProgress | undefined): boolean {
-  return journey.stages.every((s) => progress?.stages[s.id]?.done)
+  // stages that are not ready (`soon`) cannot be gone through, so they do not hold the exam back
+  return journey.stages.filter((s) => !s.soon).every((s) => progress?.stages[s.id]?.done)
 }
 
 export function starsOf(progress: JourneyProgress | undefined): number {
@@ -63,7 +77,8 @@ export function starsOf(progress: JourneyProgress | undefined): number {
 
 /** What a journey can give at most: three stars per stage and a point for every question of the exam. */
 export function maxPoints(journey: Journey): number {
-  return journey.stages.length * MAX_STARS + journey.exam.length
+  // stages that are not ready (`soon`) cannot give stars yet
+  return journey.stages.filter((st) => !st.soon).length * MAX_STARS + journey.exam.length
 }
 
 /** Stars of all stages plus the right answers of the exam. */
@@ -83,6 +98,6 @@ export function medalFor(points: number, max: number): Medal | null {
 
 /** The first stage that is open but not yet gone through (where the child goes on), or null when all are done. */
 export function nextStageIndex(journey: Journey, progress: JourneyProgress | undefined): number | null {
-  const i = journey.stages.findIndex((s) => !progress?.stages[s.id]?.done)
+  const i = journey.stages.findIndex((s) => !s.soon && !progress?.stages[s.id]?.done)
   return i < 0 ? null : i
 }
