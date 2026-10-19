@@ -109,15 +109,22 @@ describe('Noah: the stage page with the new games', () => {
     expect(problems()).toEqual([])
   })
 
-  it('without a right move the game can only be skipped (no star); with one it goes on and gives one star for it', async () => {
+  it('without enough done the game can only be skipped (no star); with 30 % it goes on and gives one star for it', async () => {
+    const { default: useTaskProgress } = await import('@/use/useTaskProgress')
     const w = await openTask(3)
     expect(w.findAll('button').some((x) => /Überspringen/.test(x.text()))).toBe(true)
     expect(w.findAll('button').some((x) => /Weiter \(1 Stern/.test(x.text()))).toBe(false)
-    // one basket to the family: tap the basket, then the family
+    // one basket to the family: tap the basket, then the family: 1 of 14 is far below 30 %, still only "skip" (no star for a try)
     w.findAll('.sh-basket')[0]!.element.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 5, clientY: 5 }))
     window.dispatchEvent(new MouseEvent('pointerup', { clientX: 5, clientY: 5 }))
     await flushPromises()
     await w.findAll('.sh-card')[0]!.trigger('click')
+    expect(w.findAll('button').some((x) => /Überspringen/.test(x.text()))).toBe(true)
+    expect(w.findAll('button').some((x) => /^Weiter \(/.test(x.text()))).toBe(false)
+    // 5 of 14 (36 %): one star
+    const progress = useTaskProgress()
+    for (let i = 0; i < 4; i++) progress.mark()
+    await flushPromises()
     expect(w.findAll('button').some((x) => /Überspringen/.test(x.text()))).toBe(false)
     await press(w, /Weiter \(1 Stern/)
     // the overview between the game and the questions, then the questions of the stage
@@ -149,6 +156,9 @@ describe('the small sign "play the game again"', () => {
     await tap(fruit.element)
     await w.findAll('.sh-card')[0]!.trigger('click')
     expect(w.findAll('.sh-basket').length).toBe(5)
+    const { default: useTaskProgress } = await import('@/use/useTaskProgress')
+    for (let i = 0; i < 4; i++) useTaskProgress().mark()
+    await flushPromises()
     expect(w.findAll('button').some((x) => /Weiter \(1 Stern/.test(x.text()))).toBe(true)
     await w.find('.stage-restart').trigger('click')
     await flushPromises()
@@ -280,12 +290,12 @@ describe('Noah 9: the picture to paint comes with three tasks that are drawn by 
   })
 })
 
-describe('the small link "Weiter (1 Stern)" belongs to a game that is not finished', () => {
-  it('after one right move it is offered, with the exact words; when the game is over (its end page is on) it is gone and cannot be used', async () => {
+describe('the small link "Weiter (n Sterne)" belongs to a game that is not finished', () => {
+  it('with enough done it is offered, with the exact number of stars; when the game is over (its end page is on) it is gone and cannot be used', async () => {
     const { default: useTaskProgress } = await import('@/use/useTaskProgress')
     const w = await openTask(3)
     const progress = useTaskProgress()
-    progress.mark()
+    for (let i = 0; i < 5; i++) progress.mark()
     await flushPromises()
     const link = () => w.findAll('button').find((x) => /^Weiter \(1 Stern\)$/.test(x.text()))
     expect(link()).toBeTruthy()

@@ -73,6 +73,7 @@ const picture = (i: number, on: boolean) => {
 const tapped = ref<boolean[]>(Array.from({ length: total.value }, () => false))
 const counted = computed(() => tapped.value.filter(Boolean).length)
 const allTapped = computed(() => counted.value >= total.value)
+progress.setGoal(total.value)
 
 /** Three numbers to choose from, the right one among them. */
 const choices = computed(() => {
@@ -92,9 +93,12 @@ const stars = computed(() => attemptStars(attempts.value))
 function tap(i: number) {
   if (finished.value) return
   // a bright little bell, one note higher with every one that is counted
-  if (!tapped.value[i]) play('bead', 1.1, PENTATONIC[counted.value % PENTATONIC.length]!)
+  if (!tapped.value[i]) {
+    play('bead', 1.1, PENTATONIC[counted.value % PENTATONIC.length]!)
+    // a thing counts once, however often it is tapped
+    progress.mark()
+  }
   tapped.value[i] = true
-  progress.mark()
 }
 
 function choose(n: number) {

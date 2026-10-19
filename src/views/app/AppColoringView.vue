@@ -82,7 +82,7 @@ import { AWARDS, type AwardId } from '@/utils/awards'
 import confetti from 'canvas-confetti'
 import { buildBackup, deliverBackup, restoreBackup } from '@/use/useArtworkBackup'
 import { buildRegionMap, gapFor, labelAt, paintedShare, regionMaskAlpha, type RegionMap } from '@/utils/coloringRegions'
-import { paintStars } from '@/utils/adventureScore'
+import { paintStars, partialStars } from '@/utils/adventureScore'
 import { paintJobsOf, saveJobResults } from '@/utils/paintJobs'
 import { evaluateJob, gridSize, TOOL_CODES, ToolMap, zoneCells, type JobStatus, type PaintTool } from '@/utils/toolMap'
 import useChrome from '@/use/useChrome'
@@ -245,7 +245,8 @@ function jobStars(painted: boolean): number {
   if (!c || !results) return painted ? paintStars(currentPaintShare(), true) : 0
   jobStatus.value = results
   saveJobResults(c.journeyId, c.stageId, results)
-  return results.filter((s) => s === 'met').length
+  // by the share of the tasks that are met: all 3 stars, two thirds 2, 30 % one, less none
+  return partialStars(results.filter((s) => s === 'met').length, results.length)
 }
 
 function saveToolMap() {

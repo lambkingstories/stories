@@ -11,11 +11,25 @@ export function quizStars(correct: number, total: number): number {
   return 1
 }
 
-/** Stars for painting: 70 % of the picture painted 3, 40 % 2, otherwise 1 (whoever took part and painted something gets a star; nothing painted, no star). */
+/**
+ * Stars for a game that is left unfinished ("Weiter") and for the tasks of a painting: by the share of the task that was done, the same
+ * for every game. At least two thirds 2 stars, at least 30 % one star, below that none (skipping earns no star). Three stars need the whole task.
+ */
+export function partialStars(done: number, goal: number): number {
+  if (goal <= 0 || done <= 0) return 0
+  const d = Math.min(done, goal)
+  if (d >= goal) return 3
+  if (d * 3 >= goal * 2) return 2
+  if (d * 10 >= goal * 3) return 1
+  return 0
+}
+
+/** Stars for painting a picture that has no tasks: 70 % of it painted 3, 40 % 2, 30 % one star, less than that none. */
 export function paintStars(share: number, painted = true): number {
+  if (!painted) return 0
   if (share >= 0.7) return 3
   if (share >= 0.4) return 2
-  return painted ? 1 : 0
+  return share >= 0.3 ? 1 : 0
 }
 
 /** Stars for counting: right the first time 3, the second time 2, later 1. */

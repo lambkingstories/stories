@@ -25,6 +25,8 @@ const { t } = useI18n({ useScope: 'global' })
 const { play } = useSfx()
 const { later } = useTimers()
 const progress = useTaskProgress()
+// the whole task: every light and the leaf of every round, and the landing of every round
+progress.setGoal(props.game.rounds.reduce((sum, r) => sum + r.targets.length + 1, 0))
 
 /** Radius of a light and of the landing place, in percent of the width of the sky (a light is about 70 px wide on a phone). */
 const R_LIGHT = 10.5

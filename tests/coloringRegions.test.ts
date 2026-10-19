@@ -100,8 +100,8 @@ describe('how much of a picture is painted', () => {
     expect(half).toBeLessThan(0.65)
   })
 
-  it('gives the stars: taking part one, 40 % two, 70 % three', () => {
-    expect([0.1, 0.29, 0.3, 0.39, 0.4, 0.69, 0.7, 1].map((x) => paintStars(x))).toEqual([1, 1, 1, 1, 2, 2, 3, 3])
+  it('gives the stars: 30 % one, 40 % two, 70 % three, less than 30 % none', () => {
+    expect([0.1, 0.29, 0.3, 0.39, 0.4, 0.69, 0.7, 1].map((x) => paintStars(x))).toEqual([0, 0, 1, 1, 2, 2, 3, 3])
     expect(paintStars(0, false)).toBe(0)
   })
 })

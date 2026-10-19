@@ -20,6 +20,7 @@ const { t } = useI18n({ useScope: 'global' })
 const { play } = useSfx()
 const { later } = useTimers()
 const progress = useTaskProgress()
+progress.setGoal(props.game.pairs.length)
 
 interface Card {
   id: number

@@ -22,6 +22,7 @@ const { later } = useTimers()
 const progress = useTaskProgress()
 
 const total = computed(() => props.game.cols * props.game.rows)
+progress.setGoal(total.value)
 const src = computed(() => prependBaseUrl(props.game.image))
 
 /** The same shuffle every time (a small deterministic one), never in the right order. */

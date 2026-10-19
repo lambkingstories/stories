@@ -67,6 +67,8 @@ const wallEl = ref<HTMLElement | null>(null)
 const W = 900
 const H = 1200
 const seams = computed<Pt[][]>(() => (props.game.pitch?.seams ?? []).map((sm) => sm.points.map(([x, y]) => [(x * W) / 100, (y * H) / 100] as Pt)))
+// the whole task: every part of every round, and every seam of the pitch round
+progress.setGoal(rounds.value.reduce((sum, r) => sum + (r.pitch ? (props.game.pitch?.seams.length ?? 0) : props.game.pieces.length), 0))
 const tolerance = computed(() => ((props.game.pitch?.tolerance ?? 5.5) / 100) * W)
 /** A point of the seam counts as covered when pitch lies this close to it; a seam is done at 90 %. */
 const COVER = 0.032 * W

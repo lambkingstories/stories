@@ -35,7 +35,7 @@ import useTaskProgress from '@/use/useTaskProgress'
 import useButtonSounds from '@/use/useButtonSounds'
 import useMusic from '@/use/useMusic'
 import useSfx from '@/use/useSfx'
-import { finalStars, maxPoints, medalFor, pointsOf, quizStars, stageStarsOf } from '@/utils/adventureScore'
+import { finalStars, maxPoints, medalFor, partialStars, pointsOf, quizStars, stageStarsOf } from '@/utils/adventureScore'
 import { jobNoteKey, paintJobsOf, readJobResults } from '@/utils/paintJobs'
 import { clearViaStats, isViaStats } from '@/utils/adventureStats'
 import useCelebration from '@/use/useCelebration'
@@ -295,12 +295,14 @@ function skipTask() {
   phase.value = 'bridge'
 }
 
-// what the child did in the game: with at least one right move the button goes on and gives one star for that part
+// what the child did in the game: the share of the task that was done gives the stars of the button that goes on (two thirds 2 stars, 30 % one star);
+// below that the game can only be skipped, and skipping earns no star
 const progress = useTaskProgress()
 watch(phase, (p) => {
   if (p === 'task') progress.reset()
 })
-const hasPart = computed(() => progress.parts.value > 0 && !progress.finished.value)
+const partStars = computed(() => Math.min(2, partialStars(progress.parts.value, progress.goal.value)))
+const hasPart = computed(() => partStars.value > 0 && !progress.finished.value)
 
 /** The games have a restart sign: a new key mounts the game afresh (round, mistakes and what was done begin again). */
 const gameKey = ref(0)
@@ -313,8 +315,8 @@ function restartGame() {
 
 function partTask() {
   // never for a game that is finished: its stars are already the result
-  if (progress.finished.value) return
-  taskDone(1)
+  if (progress.finished.value || partStars.value <= 0) return
+  taskDone(partStars.value)
 }
 
 function taskDone(stars: number) {
@@ -476,12 +478,12 @@ function openGift() {
           div(class="stage-actions")
             AdvButton(tone="gold" @click="startPaint") {{ t('app.adventure.paint') }}
         template(v-else)
-          //- the other games are still to be built: taking part counts one star
+          //- the other games are still to be built: nothing to play, so no star either
           div(class="stage-soon")
             p {{ t('app.adventure.soon') }}
           div(class="stage-actions")
-            AdvButton(tone="gold" @click="taskDone(1)") {{ t('app.adventure.next') }}
-        button(v-if="hasPart" type="button" class="stage-skip stage-part" @click="partTask") {{ t('app.adventure.partial') }}
+            AdvButton(tone="gold" @click="taskDone(0)") {{ t('app.adventure.next') }}
+        button(v-if="hasPart" type="button" class="stage-skip stage-part" @click="partTask") {{ t('app.adventure.partial', { n: partStars }, partStars) }}
         button(v-else-if="!progress.finished.value" type="button" class="stage-skip" @click="skipTask") {{ t('app.adventure.skip') }}
         //- a small sign at the bottom: play the game again from the start (text and questions stay)
         button(v-if="hasGame" type="button" class="stage-restart" :aria-label="t('app.adventure.restartGame')" :title="t('app.adventure.restartGame')" @click="restartGame")

@@ -47,6 +47,8 @@ const flash = ref<{ x: number; y: number; kind: 'good' | 'bad' } | null>(null)
 const boardEl = ref<HTMLElement | null>(null)
 const stars = computed(() => mistakeStars(mistakes.value, 2, 5))
 const total = computed(() => pieces.value.length)
+// the whole task: every stone of every round
+progress.setGoal(total.value * rounds.value.length)
 
 /** Quarter turns clockwise, counted up for ever: the stone lies right when it is a multiple of 4. Every stone starts turned, never right. */
 const turns = ref(0)

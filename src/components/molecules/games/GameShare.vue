@@ -34,6 +34,10 @@ const rounds = computed(() => props.game.rounds)
 const round = ref(0)
 const current = computed(() => rounds.value[Math.min(round.value, rounds.value.length - 1)]!)
 const lastRound = computed(() => round.value >= rounds.value.length - 1)
+// the whole task: every basket that somebody needs, in every round
+progress.setGoal(
+  rounds.value.reduce((sum, r) => sum + r.baskets.filter((k) => !props.game.baskets.find((b) => b.id === k)?.nobody).length, 0)
+)
 
 /** The baskets of this round: the tray, in the order of the data. */
 /** Who is there in this round: the family and the animals of the round. */

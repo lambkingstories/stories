@@ -20,6 +20,7 @@ const { t } = useI18n({ useScope: 'global' })
 const { play } = useSfx()
 const { later } = useTimers()
 const progress = useTaskProgress()
+progress.setGoal(props.game.scenes.length)
 
 const scene = ref(0)
 const mistakes = ref(0)

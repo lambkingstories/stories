@@ -35,6 +35,8 @@ const perBin = computed(() => current.value.perBin)
 const graySacks = computed(() => !!(current.value as { graySacks?: boolean }).graySacks)
 const grayHouses = computed(() => !!(current.value as { grayHouses?: boolean }).grayHouses)
 const lastRound = computed(() => round.value >= rounds.value.length - 1)
+// the whole task: every sack of every round
+progress.setGoal(rounds.value.reduce((sum, r) => sum + r.perBin * props.game.bins.length, 0))
 
 const sacks = computed<Sack[]>(() => {
   const list: Sack[] = []

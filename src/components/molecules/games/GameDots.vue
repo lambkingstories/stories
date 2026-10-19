@@ -22,6 +22,7 @@ const { t } = useI18n({ useScope: 'global' })
 const { play } = useSfx()
 const { later } = useTimers()
 const progress = useTaskProgress()
+progress.setGoal(props.game.points.length)
 
 const total = computed(() => props.game.points.length)
 /** How many dots are found: the next one to tap has this index. */

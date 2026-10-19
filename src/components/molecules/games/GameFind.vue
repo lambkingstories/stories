@@ -23,6 +23,7 @@ const progress = useTaskProgress()
 const found = reactive<Record<number, boolean>>({})
 const count = computed(() => Object.keys(found).length)
 const total = computed(() => props.game.finds.length)
+progress.setGoal(total.value)
 const finished = computed(() => count.value >= total.value)
 /** Taps on the empty scene are misses; a few are fine, looking around is the game. */
 const misses = ref(0)
