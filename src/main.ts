@@ -17,6 +17,7 @@ import appTranslations from '@/i18n/app'
 import { defaultLanguage } from '@/utils/defaultLanguage'
 import { mergeObjectsRecursive } from '@/utils/function'
 import { GAME_USER_LANGUAGE } from '@/utils/constants.ts'
+import { loadPreviewJourneys } from '@/data/adventures'
 
 // On-device debug console (vConsole). Gated by `VITE_DEBUG_CONSOLE=true`
 // at build time so production APKs / Pages bundles don't ship the
@@ -78,7 +79,8 @@ const app = createApp(App)
 app.use(router)
 app.use(i18n)
 
-app.mount('#app')
+// journeys that are not public yet (Noah) are added on devices that were unlocked, before the first screen is drawn
+void loadPreviewJourneys().finally(() => app.mount('#app'))
 
 // While the first screen is read, the screens of the bottom bar are loaded quietly in the background.
 const whenQuiet = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback

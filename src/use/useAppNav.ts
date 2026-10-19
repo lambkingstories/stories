@@ -1,6 +1,6 @@
 /**
  * Shared bottom-nav config + routing helpers for every "app/*" view.
- * Centralises the 5-item LambKing nav (Start, Lesen, Reise, Malen, Ich) so each view only needs to call `useAppNav(t)` and pass the
+ * Centralises the 5-item LambKing nav (Start, Lesen, Abenteuer, Malen, Ich) so each view only needs to call `useAppNav(t)` and pass the
  * returned `navItems` / `activeNav` / `onNav` into `<ZBottomNav>`.
  */
 import { computed, type ComputedRef } from 'vue'
@@ -26,10 +26,10 @@ function routeToNav(name: string): AppNavId {
     || name === 'app-series'
     || name === 'app-all-new-books'
   ) return 'series'
-  if (name === 'app-adventure' || name === 'app-adventure-map' || name === 'app-adventure-stage') return 'abenteuer'
+  if (name === 'app-adventure' || name === 'app-adventure-map' || name === 'app-adventure-stage' || name === 'app-adventure-stats') return 'abenteuer'
   if (name === 'app-hoeren') return 'hoeren'
-  if (name === 'app-coloring' || name === 'app-coloring-book' || name === 'app-awards') return 'malen'
-  if (name === 'app-profile' || name === 'app-legal') return 'profile'
+  if (name === 'app-coloring' || name === 'app-coloring-book') return 'malen'
+  if (name === 'app-profile' || name === 'app-legal' || name === 'app-awards') return 'profile'
   return 'home'
 }
 

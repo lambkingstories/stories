@@ -1,3 +1,4 @@
+import { stripNoahFiles } from './vite.config.noah'
 import { fileURLToPath, URL } from 'node:url'
 import { resolve, dirname } from 'node:path'
 import { rmSync } from 'node:fs'
@@ -56,8 +57,12 @@ export default defineConfig(({ mode }) => {
       outDir = resolve(config.root, config.build.outDir)
     },
     closeBundle() {
-      if (env.VITE_LOCAL_TEST_BOOKS === 'true') return
-      rmSync(resolve(outDir, 'images/ausmalbuecher'), { recursive: true, force: true })
+      if (env.VITE_LOCAL_TEST_BOOKS !== 'true') rmSync(resolve(outDir, 'images/ausmalbuecher'), { recursive: true, force: true })
+      // The journey "Noah" is not public yet (see src/data/adventures/index.ts): its pictures are taken out of every build that does
+      // not contain it (`VITE_INCLUDE_NOAH=true` is the hidden test build, `vite --mode noah` shows it always).
+      if (env.VITE_SHOW_NOAH !== 'true' && env.VITE_INCLUDE_NOAH !== 'true') {
+        stripNoahFiles(outDir)
+      }
     }
   }
   plugins.push(stripLocalTestBooks)

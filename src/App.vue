@@ -17,6 +17,7 @@ import useChrome from '@/use/useChrome'
 import ParentalGateModal from '@/components/molecules/ParentalGateModal.vue'
 import PremiumSheet from '@/components/molecules/PremiumSheet.vue'
 import { GAME_USER_LANGUAGE } from '@/utils/constants.ts'
+import { setAdventureLanguage } from '@/use/adventureLanguage'
 
 const { initMusic, pauseMusic, continueMusic } = useMusic()
 const { userLanguage } = useUser()
@@ -74,6 +75,8 @@ watch(userLanguage, (v) => {
   } catch { /* quota / disabled */
   }
 }, { immediate: true })
+// the texts of the adventures (stories, questions, hints, recordings) follow the language of the app
+watch(locale, (v) => setAdventureLanguage(String(v)), { immediate: true })
 useExtensionGuard()
 useCheats()
 // Kill the browser's pull-to-refresh gesture without touching scroll CSS.

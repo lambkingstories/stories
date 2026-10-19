@@ -41,7 +41,7 @@ describe('the start page', () => {
     expect(big.map((b) => b.text())).toEqual([
       expect.stringContaining('Malen'),
       expect.stringContaining('Lesen'),
-      expect.stringContaining('Reise')
+      expect.stringContaining('Abenteuer')
     ])
     const routes = ['app-coloring', 'app-all-books', 'app-adventure']
     for (let i = 0; i < big.length; i++) {

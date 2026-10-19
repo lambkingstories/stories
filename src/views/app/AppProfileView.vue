@@ -260,6 +260,10 @@ function onBackendToggle(e: Event) {
             //  )
 
 
+      //- the awards (cups, stars, medals) belong to the child's own place
+      router-link(:to="{ name: 'app-awards' }" class="lk-btn lk-btn--outline lk-btn--full awards-open")
+        span {{ t('app.profile.myAwards') }}
+
       //- ===== Settings (collapsible) =====
       div(
         v-if="settingsOpen"
@@ -518,6 +522,10 @@ button
   display: flex
   align-items: center
   gap: 14px
+
+.awards-open
+  margin-top: 14px
+  text-decoration: none
 
 .parent-open
   margin-bottom: 14px

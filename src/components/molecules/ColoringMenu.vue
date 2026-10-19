@@ -135,8 +135,6 @@ const bookPercent = (b: BookCard) => `${Math.round((b.done / Math.max(1, b.total
               img(v-if="item.preview" :src="item.preview" alt="" draggable="false" loading="lazy")
               span(v-else class="ac-gal-pdf" aria-hidden="true") 🎨
 
-    router-link(:to="{ name: 'app-awards' }" class="ac-link-btn ac-awards-link") {{ t('app.coloring.myAwards') }}
-
     //- For parents: all paintings in one file, and back again.
     div(class="ac-parents")
       p(class="ac-parents-title") {{ t('app.coloring.forParents') }}
@@ -512,13 +510,6 @@ $p-pale: #fffaf0
   margin: 26px auto 40px
   max-width: 520px
   text-align: center
-
-.ac-awards-link
-  display: inline-flex
-  align-items: center
-  justify-content: center
-  margin: 18px auto 0
-  text-decoration: none
 
 .ac-parents-title
   margin: 0 0 8px

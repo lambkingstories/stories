@@ -22,6 +22,8 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     // the first mount of a big screen compiles it; on a busy machine that can take longer than 5 s
-    testTimeout: 20000
+    testTimeout: 20000,
+    // the tests do not depend on a local `.env.local` (the Noah journey is only shown there, see data/adventures/index.ts)
+    env: { VITE_SHOW_NOAH: 'false' }
   }
 })

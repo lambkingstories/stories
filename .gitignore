@@ -17,6 +17,11 @@ node_modules
 .DS_Store
 dist
 dist-ssr
+# builds for the test app, the phone and the paywall page
+dist-cloud
+dist-phone
+dist-paywall
+dist-*
 coverage
 *.local
 *.env

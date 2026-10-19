@@ -230,26 +230,29 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   font-size: 1.05rem
 
 .support-actions
+  // one button per row, full width: the label stays on ONE line (also with the longer English and Spanish words)
   display: grid
-  grid-template-columns: repeat(2, minmax(0, 1fr))
+  grid-template-columns: minmax(0, 1fr)
   gap: 10px
   margin-top: 12px
 
-// the two support buttons: capsules with the sign of the service and two lines of text
+// the two support buttons: wide capsules with the sign of the service on the left and the label on one line
 .support-btn
   display: flex
   align-items: center
-  justify-content: center
-  gap: 10px
-  min-height: 64px
-  padding: 8px 14px
+  justify-content: flex-start
+  gap: 12px
+  min-height: 60px
+  padding: 8px 18px
   border: 1px solid transparent
   border-radius: 32px
   font-family: inherit
-  font-size: 0.98rem
+  // shrinks a little on narrow phones instead of breaking the line
+  font-size: clamp(0.82rem, 4.3vw, 1.05rem)
   font-weight: 700
   line-height: 1.2
   text-align: left
+  white-space: nowrap
   cursor: pointer
   -webkit-tap-highlight-color: transparent
 
@@ -259,6 +262,9 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   span
     flex: 1
     min-width: 0
+    white-space: nowrap
+    overflow: hidden
+    text-overflow: ellipsis
 
   &.is-main
     background: var(--lk-accent)
