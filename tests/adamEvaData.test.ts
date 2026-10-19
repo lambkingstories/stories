@@ -233,6 +233,43 @@ describe('Adam und Eva: every stage has its own new game (no game of Josef or No
   })
 })
 
+describe('Adam und Eva: die Karte', () => {
+  const m = adamEva.map
+  // the painted map is 4938 x 822 px (the height of the picture is the unit of the ring and of the lowest fifth)
+  const W = 4938
+  const H = 822
+  it('vier Stücke eines Bildes, jedes unter 1,8 MB; Stationen von links nach rechts, nicht zu tief und nicht zu dicht', () => {
+    expect(m.images).toEqual([1, 2, 3, 4].map((n) => `images/abenteuer/adam-eva/karte-pano-${n}.webp`))
+    for (const f of m.images) expect(statSync(`public/${f}`).size / 1024, f).toBeLessThan(1800)
+    expect(m.widthPx).toBe(W)
+    expect(m.aspect).toBeCloseTo(W / H, 3)
+    expect(m.stages).toHaveLength(9)
+    const spots = [...m.stages, m.exam]
+    for (let i = 0; i < spots.length; i++) {
+      expect(spots[i]!.y, `Station ${i + 1} nicht hinter der Leiste`).toBeLessThanOrEqual(0.65)
+      expect(spots[i]!.d).toBeCloseTo(168 / W, 3)
+      if (i > 0) {
+        expect(spots[i]!.x, `Station ${i + 1} rechts von ${i}`).toBeGreaterThan(spots[i - 1]!.x)
+        // two rings (168 px) do not touch: at least 170 px apart
+        expect(Math.hypot((spots[i]!.x - spots[i - 1]!.x) * W, (spots[i]!.y - spots[i - 1]!.y) * H)).toBeGreaterThanOrEqual(170)
+      }
+    }
+  })
+  it('nichts liegt in den unteren 20 % der Karte: dort verdeckt die Navigationsleiste Ringe, Namen und Perlen', () => {
+    for (const sp of [...m.stages, m.exam]) expect(sp.y * H, 'Ring-Mitte').toBeLessThanOrEqual(0.65 * H)
+    for (const seg of m.path) for (const [, y] of seg) expect(y * H, 'Perle').toBeLessThanOrEqual(0.8 * H)
+  })
+  it('der Perlenweg hat eine Strecke je Etappe (die letzte führt zum Ziel), alle Perlen liegen im Bild', () => {
+    expect(m.path).toHaveLength(9)
+    for (const seg of m.path) for (const [x, y] of seg) {
+      expect(x).toBeGreaterThan(0)
+      expect(x).toBeLessThan(1)
+      expect(y).toBeGreaterThan(0)
+      expect(y).toBeLessThan(1)
+    }
+  })
+})
+
 describe('Adam und Eva: English', () => {
   const overlay = englishTextsOf(adamEva) as any
 

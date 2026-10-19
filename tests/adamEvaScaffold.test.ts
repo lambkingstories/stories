@@ -36,17 +36,17 @@ describe('Adam und Eva: the scaffold', () => {
     expect(adamEva.stages.map((s) => [s.title, s.ref])).toEqual(PLAN)
   })
 
-  it('all stages are still "soon": none can be opened, no game or recording is downloaded; there is no map and no way yet', () => {
+  it('all stages are still "soon": none can be opened, no game or recording is downloaded; the painted map and the way are there', () => {
     for (const s of adamEva.stages) expect(s.soon, `stage ${s.id}`).toBe(true)
     for (let i = 0; i < adamEva.stages.length; i++) expect(isStageOpen(adamEva, undefined, i), `stage ${i + 1}`).toBe(false)
-    expect(adamEva.map.images).toEqual([])
-    expect(ADAM_EVA_PATH).toEqual([])
+    expect(adamEva.map.images).toHaveLength(4)
+    expect(ADAM_EVA_PATH).toHaveLength(9)
     expect(adamEva.exam).toHaveLength(6)
     // the files of the journey: the medal and the gift in the folder that the normal build removes (and the shared ring and sounds)
     const files = journeyFiles(adamEva)
     const own = files.filter((f) => f.includes('adam-eva/'))
-    // the medal and the gift, the pictures of the stages (they stand on the map even while a stage is not ready) and the four music pieces of the journey; no picture of a game yet
-    expect(own).toEqual([...Array.from({ length: 9 }, (_, i) => `images/abenteuer/adam-eva/etappe-bild-${String(i + 1).padStart(2, '0')}.webp`), 'images/abenteuer/adam-eva/medaille.webp', 'images/abenteuer/adam-eva/geschenk.webp', ...['licht', 'garten', 'strom', 'abend'].map((m) => `audio/abenteuer/adam-eva/musik-${m}-v1.mp3`)].sort((a, b) => own.indexOf(a) - own.indexOf(b)))
+    // the medal and the gift, the four pieces of the painted map, the pictures of the stages (they stand on the map even while a stage is not ready) and the four music pieces of the journey; no picture of a game yet
+    expect(own).toEqual([...Array.from({ length: 9 }, (_, i) => `images/abenteuer/adam-eva/etappe-bild-${String(i + 1).padStart(2, '0')}.webp`), 'images/abenteuer/adam-eva/medaille.webp', ...[1, 2, 3, 4].map((n) => `images/abenteuer/adam-eva/karte-pano-${n}.webp`), 'images/abenteuer/adam-eva/geschenk.webp', ...['licht', 'garten', 'strom', 'abend'].map((m) => `audio/abenteuer/adam-eva/musik-${m}-v1.mp3`)].sort((a, b) => own.indexOf(a) - own.indexOf(b)))
     // everything else is shared with the other journeys and the app itself: the screens, the ring, the sounds and the general music pieces
     const shared = /^(images\/abenteuer\/ui\/|audio\/abenteuer\/(klang|musik)-|images\/abenteuer\/josef\/medaillon-ring)/
     expect(files.filter((f) => !own.includes(f) && !shared.test(f))).toEqual([])

@@ -1,8 +1,27 @@
 /**
- * The beads of the dotted way on the map of "Adam und Eva": one list per stretch between two stations (the last one leads to the exam),
- * [x, y] is the middle of a bead as a share of the whole picture, counted from the top left. EMPTY until the map is painted (the way is measured
- * on the finished picture: `D:/Claude/lambking-design/abenteuer-adam-eva/fertig/`). The rules are the same as for Noah and Josef: the way
- * comes into every medal from the LEFT and leaves it on the RIGHT, it is always a smooth curve, at least 10 beads lie between two medals, and
- * nothing lies in the lowest 20 % of the picture.
+ * The beads of the dotted way on the one-piece map of Adam and Eve: one list per stretch between two stations (the last one leads to the exam).
+ * [x, y] is the middle of a bead as a share of the whole picture (width 4938, height 822), counted from the top left.
+ * Rules (Anton): the way comes into every medal from the LEFT and leaves it on the RIGHT (so the name and the button under the medal stay free),
+ * it is always a smooth curve (never straight), at least 10 beads lie between two medals, nothing lies in the lowest 20 % (y > 658 px).
  */
-export const ADAM_EVA_PATH: [number, number][][] = []
+export const ADAM_EVA_PATH: [number, number][][] = [
+
+  // station 1 to 2
+  [[0.0864, 0.5718], [0.0909, 0.5745], [0.0954, 0.5771], [0.0999, 0.5799], [0.1043, 0.5834], [0.1088, 0.5875], [0.1132, 0.5922], [0.1176, 0.5973], [0.122, 0.6028], [0.1264, 0.608], [0.1309, 0.6123], [0.1354, 0.6141], [0.1399, 0.6128], [0.1443, 0.6088], [0.1487, 0.6029], [0.153, 0.5957], [0.1573, 0.5877], [0.1616, 0.5791], [0.1658, 0.5701], [0.1701, 0.561]],
+  // station 2 to 3
+  [[0.21, 0.5596], [0.2143, 0.5665], [0.2187, 0.5734], [0.223, 0.5805], [0.2273, 0.5879], [0.2317, 0.5951], [0.236, 0.6018], [0.2404, 0.6069], [0.2449, 0.61], [0.2494, 0.6105], [0.2539, 0.6091], [0.2584, 0.6061], [0.2628, 0.6025], [0.2673, 0.5981], [0.2717, 0.5934], [0.2761, 0.5885], [0.2805, 0.5833], [0.285, 0.5781], [0.2894, 0.5728]],
+  // station 3 to 4
+  [[0.3294, 0.5718], [0.3339, 0.5699], [0.3384, 0.568], [0.3429, 0.5664], [0.3474, 0.5651], [0.3519, 0.5647], [0.3564, 0.5662], [0.3608, 0.5708], [0.3651, 0.5794], [0.3692, 0.5901], [0.3733, 0.6013], [0.3774, 0.6122], [0.3816, 0.6228]],
+  // station 4 to 5
+  [[0.4246, 0.6326], [0.4289, 0.6243], [0.4332, 0.6159], [0.4375, 0.6081], [0.4418, 0.6013], [0.4462, 0.5956], [0.4507, 0.5916], [0.4552, 0.5895], [0.4597, 0.5903], [0.4641, 0.5936], [0.4685, 0.599], [0.4729, 0.6051], [0.4773, 0.6109], [0.4817, 0.6161], [0.4862, 0.6202], [0.4907, 0.6231], [0.4951, 0.6255]],
+  // station 5 to 6
+  [[0.536, 0.6265], [0.5405, 0.623], [0.5449, 0.6196], [0.5494, 0.6159], [0.5538, 0.6118], [0.5583, 0.6071], [0.5627, 0.6021], [0.5671, 0.5971], [0.5716, 0.5952], [0.576, 0.6001], [0.5803, 0.6071], [0.5847, 0.6143], [0.589, 0.6214], [0.5934, 0.6282], [0.5977, 0.635]],
+  // station 6 to 7
+  [[0.6393, 0.6387], [0.6437, 0.6342], [0.6482, 0.6298], [0.6526, 0.6252], [0.657, 0.6204], [0.6614, 0.6154], [0.6659, 0.6102], [0.6703, 0.6053], [0.6748, 0.6038], [0.6791, 0.6113], [0.6833, 0.6207], [0.6876, 0.6293]],
+  // station 7 to 8
+  [[0.7284, 0.6326], [0.7315, 0.6132], [0.735, 0.5963], [0.7389, 0.5822], [0.743, 0.572], [0.7475, 0.5681], [0.7518, 0.5735], [0.7555, 0.5889], [0.7581, 0.6109], [0.7599, 0.6357]],
+  // station 8 to 9
+  [[0.7993, 0.6387], [0.801, 0.6137], [0.8031, 0.5898], [0.8057, 0.5677], [0.8088, 0.5485], [0.8127, 0.5347], [0.8171, 0.5311], [0.8213, 0.5407], [0.8246, 0.5588], [0.8271, 0.581], [0.8291, 0.6054], [0.8308, 0.6303]],
+  // station 9 to the exam
+  [[0.8701, 0.6326], [0.8745, 0.639], [0.8789, 0.6455], [0.8832, 0.6528], [0.8876, 0.6594], [0.892, 0.6629], [0.8965, 0.6622], [0.901, 0.659], [0.9054, 0.6545], [0.9099, 0.6494], [0.9143, 0.6439], [0.9187, 0.6383], [0.9231, 0.6325], [0.9275, 0.6267], [0.9319, 0.6209]]
+]
