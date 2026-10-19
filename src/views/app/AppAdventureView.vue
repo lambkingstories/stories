@@ -325,7 +325,8 @@ $ink: #3b2a12
   left: 0
   right: 0
   display: flex
-  align-items: flex-start
+  // everything in this line sits on one centre line: the back button, the name, the sound and the stars
+  align-items: center
   gap: 8px
   padding: max(env(safe-area-inset-top, 0px), 8px) 10px 0
   pointer-events: none
@@ -345,9 +346,12 @@ $ink: #3b2a12
 
 // the name of the journey
 .map-title
-  align-self: center
+  display: inline-flex
+  align-items: center
+  min-height: 44px
+  box-sizing: border-box
   max-width: 40vw
-  padding: 10px 18px
+  padding: 0 18px
   border-radius: 28px
   background: var(--lk-surface)
   border: 1px solid var(--lk-line)
@@ -366,8 +370,10 @@ $ink: #3b2a12
   flex-wrap: nowrap
   align-items: center
   gap: 4px
-  margin: 6px 0 0 auto
-  padding: 3px 10px 3px 6px
+  margin: 0 0 0 auto
+  min-height: 36px
+  box-sizing: border-box
+  padding: 0 12px 0 8px
   border-radius: 999px
   background: var(--lk-surface)
   border: 1px solid var(--lk-line)

@@ -193,6 +193,7 @@ onMounted(() => {
 
 .stats-actions
   display: flex
+  align-items: center
   justify-content: center
   margin-top: 12px
 

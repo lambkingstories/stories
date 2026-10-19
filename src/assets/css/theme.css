@@ -113,7 +113,8 @@ body {
   min-height: 56px;
   padding: 0 24px;
   border: 1px solid transparent;
-  border-radius: var(--lk-r-btn);
+  /* always the full capsule, also when a long text wraps into two lines (never a box with small corners) */
+  border-radius: 999px;
   background: var(--lk-accent);
   color: var(--lk-on-accent);
   font-family: inherit;

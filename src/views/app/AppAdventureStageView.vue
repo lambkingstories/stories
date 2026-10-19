@@ -800,6 +800,7 @@ $ink: var(--lk-text)
 
 .account-row
   display: flex
+  align-items: center
   justify-content: space-between
   gap: 12px
   padding: 6px 4px
@@ -842,7 +843,7 @@ $ink: var(--lk-text)
   padding: 0 22px
   min-height: 44px
   border: 1.5px solid var(--lk-line)
-  border-radius: var(--lk-r-btn)
+  border-radius: 999px
   background: var(--lk-surface)
   color: var(--lk-text)
   font: inherit

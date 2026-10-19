@@ -178,6 +178,7 @@ function next() {
   min-height: 70px
   // the one main button of the questions sits in the middle, like the buttons of the other pages of a stage
   display: flex
+  align-items: center
   justify-content: center
 
 @media (prefers-reduced-motion: reduce)

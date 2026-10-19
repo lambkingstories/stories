@@ -456,6 +456,7 @@ function onWallUp() {
 
 .bd-bar
   display: flex
+  align-items: center
   justify-content: flex-end
 
 .bd-zoom

@@ -422,6 +422,7 @@ $ink: var(--lk-text)
 
 .more-row
   display: flex
+  align-items: center
   gap: 18px
 
 .more-item
@@ -457,6 +458,7 @@ $ink: var(--lk-text)
 
 .medal-tools
   display: flex
+  align-items: center
   flex-wrap: wrap
   justify-content: center
   gap: 2px 14px

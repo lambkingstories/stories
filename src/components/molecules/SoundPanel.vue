@@ -69,7 +69,9 @@ onBeforeUnmount(() => {
 <style scoped lang="sass">
 .sp
   position: relative
-  display: inline-block
+  // a flex box, so that the button fills it exactly (no gap under it from the line height): it sits on the centre line of its row
+  display: inline-flex
+  align-items: center
   pointer-events: auto
 
 .sp-btn
