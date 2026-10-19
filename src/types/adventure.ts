@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten'
 
 export interface AdventureQuestion {
   q: string
@@ -442,6 +442,32 @@ export interface SowGame {
   rounds: SowRound[]
 }
 
+/** An animal of the herding game: its picture (looking right), what it is called (screen readers), where it stands at the start (percent of the meadow) and how wide it is. */
+export interface HerdAnimal {
+  id: string
+  image: string
+  label: string
+  x: number
+  y: number
+  w: number
+  /** A shy animal steps away from the finger earlier. */
+  shy?: boolean
+}
+export interface HerdRound {
+  hint: string
+  /** The animals of this round (ids of `HerdGame.animals`). */
+  animals: string[]
+}
+/** The herding game: the finger is the shepherd's staff and leads the animals to the resting place (at most two rounds, no mistakes). */
+export interface HerdGame {
+  /** The meadow (3:4) with the trees whose shade is the resting place. */
+  scene: string
+  /** The resting place: the middle (percent of the meadow) and the radius (percent of its width). */
+  rest: { x: number; y: number; r: number }
+  animals: HerdAnimal[]
+  rounds: HerdRound[]
+}
+
 /** The tools and colours a picture of an adventure can ask for. */
 export type PaintToolName = 'pencil' | 'felt' | 'watercolor' | 'graphite' | 'chalk' | 'oil' | 'fill'
 export type PaintColor = 'yellow' | 'blue' | 'brown' | 'green' | 'red' | 'orange' | 'purple' | 'pink'
@@ -503,6 +529,7 @@ export interface StageTask {
   channels?: ChannelGame
   mirror?: MirrorGame
   sow?: SowGame
+  herd?: HerdGame
 }
 
 export interface AdventureStage {

@@ -11,7 +11,7 @@ import { partialStars } from '@/utils/adventureScore'
 import { CHANNEL_GRID_1, CHANNEL_GRID_2 } from '@/data/adventures/adamEvaChannels'
 import { flow, goalsOf, solve } from '@/utils/channels'
 import { landing, pullFor } from '@/utils/sow'
-import type { ChannelGame, EchoGame, LightGame, MirrorGame, OrderGame, SowGame, VerseGame, WaterGame } from '@/types/adventure'
+import type { ChannelGame, EchoGame, HerdGame, LightGame, MirrorGame, OrderGame, SowGame, VerseGame, WaterGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -1155,5 +1155,160 @@ describe('Säen (sow)', () => {
     expect(w.find('.sw-count').text()).toBe('Furrows: 0 of 4')
     await missAt(w)
     expect(w.find('.sw-fb').text()).toBe('The seed sank into the earth. Try again.')
+  })
+})
+
+// ---------------------------------------------------------------- herd the animals
+describe('Hüten (herd)', () => {
+  const H = 400 / 3
+  const W = 300
+  const game: HerdGame = {
+    scene: 'images/x/wiese.webp',
+    rest: { x: 70, y: 30, r: 14 },
+    animals: [
+      { id: 'schaf', image: 'images/x/schaf.webp', label: 'Schaf', x: 30, y: 75, w: 13 },
+      { id: 'ziege', image: 'images/x/ziege.webp', label: 'Ziege', x: 42, y: 78, w: 13 },
+      { id: 'hirsch', image: 'images/x/hirsch.webp', label: 'Hirsch', x: 55, y: 74, w: 15 },
+      { id: 'reh', image: 'images/x/reh.webp', label: 'Reh', x: 36, y: 84, w: 12 },
+      { id: 'elefant', image: 'images/x/elefant.webp', label: 'Elefant', x: 50, y: 85, w: 20 },
+      { id: 'hase', image: 'images/x/hase.webp', label: 'Hase', x: 15, y: 60, w: 9, shy: true },
+      { id: 'pfau', image: 'images/x/pfau.webp', label: 'Pfau', x: 80, y: 88, w: 13, shy: true },
+      { id: 'giraffe', image: 'images/x/giraffe.webp', label: 'Giraffe', x: 22, y: 90, w: 14 }
+    ],
+    rounds: [
+      { hint: 'Führe die Tiere sanft in den Schatten.', animals: ['schaf', 'ziege', 'hirsch', 'reh', 'elefant'] },
+      { hint: 'Jetzt sind es mehr, und zwei sind scheu.', animals: ['schaf', 'ziege', 'hirsch', 'reh', 'elefant', 'hase', 'pfau', 'giraffe'] }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, right: W, bottom: 400, width: W, height: 400, x: 0, y: 0, toJSON: () => ({}) })
+    const { default: Herd } = await import('@/components/molecules/games/GameHerd.vue')
+    const w = mount(Herd, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  const field = (w: ReturnType<typeof mount>) => w.find('.hd-field').element
+  const ptr = (w: ReturnType<typeof mount>, type: string, px: number, py: number) => field(w).dispatchEvent(new MouseEvent(type, { bubbles: true, button: 0, clientX: px, clientY: py }))
+  const animals = (w: ReturnType<typeof mount>) => w.findAll('.hd-animal')
+  /** The positions of the animals read from the screen, in width units, and whether they rest. */
+  const seen = (w: ReturnType<typeof mount>) =>
+    animals(w).map((a) => {
+      const st = a.attributes('style')!
+      return { x: Number(/left:\s*([\d.]+)%/.exec(st)![1]), y: (Number(/top:\s*([\d.]+)%/.exec(st)![1]) * H) / 100, resting: a.classes().includes('resting') }
+    })
+  /**
+   * A shepherd: the finger stands behind the animal that is farthest from the resting place and glides after it. Returns when the round is done
+   * (the count says that all animals rest), or gives up after `limit` seconds.
+   */
+  const shepherd = async (w: ReturnType<typeof mount>, total: number, limit = 60) => {
+    const zone = { x: 70, y: (30 * H) / 100 }
+    let finger = { x: 50, y: 120 }
+    ptr(w, 'pointerdown', (finger.x / 100) * W, (finger.y / 100) * W)
+    for (let t = 0; t < limit * 1000; t += 34) {
+      const list = seen(w).filter((a) => !a.resting)
+      if (!list.length) break
+      const far = list.reduce((m, a) => (Math.hypot(a.x - zone.x, a.y - zone.y) > Math.hypot(m.x - zone.x, m.y - zone.y) ? a : m))
+      const dx = zone.x - far.x
+      const dy = zone.y - far.y
+      const d = Math.hypot(dx, dy) || 1
+      const goal = { x: far.x - (dx / d) * 14, y: far.y - (dy / d) * 14 }
+      const gx = goal.x - finger.x
+      const gy = goal.y - finger.y
+      const g = Math.hypot(gx, gy) || 1
+      const step = Math.min(g, 3)
+      finger = { x: finger.x + (gx / g) * step, y: finger.y + (gy / g) * step }
+      ptr(w, 'pointermove', (finger.x / 100) * W, (finger.y / 100) * W)
+      await vi.advanceTimersByTimeAsync(34)
+    }
+    ptr(w, 'pointerup', 0, 0)
+    await flushPromises()
+    expect(w.text()).toContain(`${total} von ${total}`)
+  }
+
+  it('round 1: five animals on the meadow, a resting place, no mistakes to make; the goal is the number of all animals (5 + 8 = 13); two rounds at most', async () => {
+    expect(game.rounds.length).toBeLessThanOrEqual(2)
+    for (const r of game.rounds) for (const id of r.animals) expect(game.animals.some((a) => a.id === id)).toBe(true)
+    const w = await open()
+    expect(animals(w)).toHaveLength(5)
+    expect(w.find('.hd-zone').exists()).toBe(true)
+    expect(w.find('.hd-round').text()).toContain('Runde 1 von 2')
+    expect(w.find('.hd-count').text()).toBe('Es ruhen: 0 von 5')
+    expect(useTaskProgress().goal.value).toBe(13)
+    expect(animals(w)[0]!.attributes('aria-label')).toBe('Tier: Schaf')
+    expect(problems()).toEqual([])
+  })
+
+  it('the animals step away from the finger and stay still without it', async () => {
+    const w = await open()
+    const before = seen(w)
+    // the finger just right of the first animal (the sheep): it goes left
+    const sheep = before[0]!
+    ptr(w, 'pointerdown', ((sheep.x + 10) / 100) * W, (sheep.y / 100) * W)
+    await tick(600)
+    expect(w.find('.hd-staff').exists()).toBe(true)
+    expect(seen(w)[0]!.x).toBeLessThan(sheep.x)
+    ptr(w, 'pointerup', 0, 0)
+    await tick(3000)
+    expect(w.find('.hd-staff').exists()).toBe(false)
+    const rest = seen(w)
+    await tick(1000)
+    expect(seen(w).map((a) => Math.round(a.x * 10))).toEqual(rest.map((a) => Math.round(a.x * 10)))
+  })
+
+  it('all the way through: the shepherd brings round 1 home (a part for every animal), round 2 with two shy animals, and the game is three stars', async () => {
+    const w = await open()
+    await shepherd(w, 5)
+    expect(useTaskProgress().parts.value).toBe(5)
+    expect(w.findAll('.hd-animal.resting')).toHaveLength(5)
+    expect(played).toContain('found')
+    await tick(2200)
+    expect(w.find('.hd-round').text()).toContain('Runde 2 von 2')
+    expect(animals(w)).toHaveLength(8)
+    expect(w.findAll('.hd-animal.resting')).toHaveLength(0)
+    await shepherd(w, 8, 90)
+    await tick(2000)
+    expect(useTaskProgress().parts.value).toBe(13)
+    expect(useTaskProgress().finished.value).toBe(true)
+    expect(w.text()).toContain('Alle Tiere ruhen im Schatten!')
+    await w.find('.gd button').trigger('click')
+    expect(w.emitted('done')).toEqual([[3]])
+    expect(problems()).toEqual([])
+  })
+
+  it('"Help" shows a soft path to the resting place for a few seconds and costs nothing', async () => {
+    const w = await open()
+    expect(w.find('.hd-path').exists()).toBe(false)
+    const help = w.findAll('button').find((b) => b.text() === 'Hilfe')!
+    expect((help.element as HTMLElement).className).toContain('lk-btn')
+    await help.trigger('click')
+    expect(w.find('.hd-path').exists()).toBe(true)
+    await tick(4200)
+    expect(w.find('.hd-path').exists()).toBe(false)
+    await shepherd(w, 5)
+    await tick(2200)
+    await shepherd(w, 8, 90)
+    await tick(2000)
+    await w.find('.gd button').trigger('click')
+    expect(w.emitted('done')).toEqual([[3]])
+  })
+
+  it('the arrow keys move the staff for those who cannot use a finger', async () => {
+    const w = await open()
+    await w.find('.hd-field').trigger('keydown', { key: 'ArrowUp' })
+    expect(w.find('.hd-staff').exists()).toBe(true)
+    await tick(900)
+    expect(w.find('.hd-staff').exists()).toBe(false)
+  })
+
+  it('the steps of "Go on" for 13 animals: 4 rest one star, 9 two stars', () => {
+    expect([3, 4, 8, 9].map((d) => partialStars(d, 13))).toEqual([0, 1, 1, 2])
+  })
+
+  it('English: the words of the game', async () => {
+    const w = await open('en')
+    expect(w.find('.hd-round').text()).toBe('Round 1 of 2')
+    expect(w.find('.hd-count').text()).toBe('Resting: 0 of 5')
+    expect(animals(w)[0]!.attributes('aria-label')).toBe('Animal: Schaf')
+    expect(w.findAll('button').some((b) => b.text() === 'Help')).toBe(true)
   })
 })
