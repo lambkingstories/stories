@@ -390,5 +390,13 @@ export const adamEva: Journey = {
   ]
 }
 
+// the background music of this journey (calm pieces made with Google's Lyria 3.5, ton.md of the skill `lambking-abenteuer-skill`): they follow one another at random
+adamEva.music = [
+  'audio/abenteuer/adam-eva/musik-licht-v1.mp3',
+  'audio/abenteuer/adam-eva/musik-garten-v1.mp3',
+  'audio/abenteuer/adam-eva/musik-strom-v1.mp3',
+  'audio/abenteuer/adam-eva/musik-abend-v1.mp3'
+]
+
 // the English texts (title, stories, questions, hints, recordings) lie over the German ones; the screens show them when the app is English
 localize(adamEva, adamEvaEn)

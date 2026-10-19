@@ -45,8 +45,8 @@ describe('Adam und Eva: the scaffold', () => {
     // the files of the journey: the medal and the gift in the folder that the normal build removes (and the shared ring and sounds)
     const files = journeyFiles(adamEva)
     const own = files.filter((f) => f.includes('adam-eva/'))
-    // the medal and the gift, and the pictures of the stages (they stand on the map even while a stage is not ready); no picture of a game yet
-    expect(own).toEqual([...Array.from({ length: 9 }, (_, i) => `images/abenteuer/adam-eva/etappe-bild-${String(i + 1).padStart(2, '0')}.webp`), 'images/abenteuer/adam-eva/medaille.webp', 'images/abenteuer/adam-eva/geschenk.webp'].sort((a, b) => own.indexOf(a) - own.indexOf(b)))
+    // the medal and the gift, the pictures of the stages (they stand on the map even while a stage is not ready) and the four music pieces of the journey; no picture of a game yet
+    expect(own).toEqual([...Array.from({ length: 9 }, (_, i) => `images/abenteuer/adam-eva/etappe-bild-${String(i + 1).padStart(2, '0')}.webp`), 'images/abenteuer/adam-eva/medaille.webp', 'images/abenteuer/adam-eva/geschenk.webp', ...['licht', 'garten', 'strom', 'abend'].map((m) => `audio/abenteuer/adam-eva/musik-${m}-v1.mp3`)].sort((a, b) => own.indexOf(a) - own.indexOf(b)))
     // everything else is shared with the other journeys and the app itself: the screens, the ring, the sounds and the general music pieces
     const shared = /^(images\/abenteuer\/ui\/|audio\/abenteuer\/(klang|musik)-|images\/abenteuer\/josef\/medaillon-ring)/
     expect(files.filter((f) => !own.includes(f) && !shared.test(f))).toEqual([])
