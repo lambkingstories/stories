@@ -380,7 +380,8 @@ export const josef: Journey = {
 // one painted picture per stage (3:2), shown on the stage page
 for (const s of josef.stages) {
   const nn = String(s.id).padStart(2, '0')
-  s.image = `${IMG}etappe-bild-${nn}.webp`
+  // stage 10: Joseph wears the blue-and-white striped headcloth, so that his brothers do not know him (19.10.2026)
+  s.image = s.id === 10 ? `${IMG}etappe-bild-10-v2.webp` : `${IMG}etappe-bild-${nn}.webp`
   // the story read aloud by a speech model (scripts/tts-gemini.py)
   s.audio = `audio/abenteuer/josef/geschichte-${nn}-v3.mp3`
 }
