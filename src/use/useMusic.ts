@@ -35,7 +35,15 @@ interface Running {
   wish: Wish
   gain: GainNode
   sources: AudioBufferSourceNode[]
+  /** Every source that was ever started for this piece and has not ended yet (`sources` forgets the old ones). */
+  alive: Set<AudioBufferSourceNode>
   timer: number
+}
+
+/** Remembers a started source until it ends, so a stop reaches every one of them. */
+function track(r: Running, src: AudioBufferSourceNode) {
+  r.alive.add(src)
+  src.addEventListener('ended', () => r.alive.delete(src), { once: true })
 }
 
 const { musicVolume } = useSoundSettings()
@@ -76,16 +84,42 @@ function load(src: string): Promise<AudioBuffer | null> {
   return job
 }
 
-function halt(r: Running) {
+/**
+ * Ends a piece. Normally it fades out softly; `hard` (the slider at 0, the child wants silence) cuts it at once: the gain goes to 0 and
+ * every source is stopped right away, nothing depends on a timer that a resting app might not run.
+ */
+function halt(r: Running, hard = false) {
   const c = ctx
   window.clearTimeout(r.timer)
   if (!c) return
+  if (hard) {
+    try {
+      r.gain.gain.cancelScheduledValues(c.currentTime)
+      r.gain.gain.setValueAtTime(0, c.currentTime)
+    } catch {
+      // the stop below is what counts
+    }
+    const all = new Set([...r.sources, ...r.alive])
+    all.forEach((src) => {
+      try {
+        src.stop()
+      } catch {
+        // already stopped
+      }
+    })
+    try {
+      r.gain.disconnect()
+    } catch {
+      // already disconnected
+    }
+    return
+  }
   try {
     r.gain.gain.cancelScheduledValues(c.currentTime)
     r.gain.gain.setValueAtTime(r.gain.gain.value, c.currentTime)
     r.gain.gain.linearRampToValueAtTime(0, c.currentTime + FADE_OUT)
     window.setTimeout(() => {
-      r.sources.forEach((s) => {
+      new Set([...r.sources, ...r.alive]).forEach((s) => {
         try {
           s.stop()
         } catch {
@@ -118,7 +152,7 @@ async function begin(w: Wish) {
   gain.gain.setValueAtTime(0, c.currentTime)
   gain.gain.linearRampToValueAtTime(musicVolume.value * SCALE, c.currentTime + FADE_IN)
   gain.connect(c.destination)
-  const r: Running = { wish: w, gain, sources: [], timer: 0 }
+  const r: Running = { wish: w, gain, sources: [], alive: new Set(), timer: 0 }
   running = r
   void c.resume()
   if (first.loop) seamless(r, first.loop, buf)
@@ -137,6 +171,7 @@ function seamless(r: Running, loop: number, buf: AudioBuffer) {
       src.buffer = buf
       src.connect(r.gain)
       src.start(at)
+      track(r, src)
       r.sources.push(src)
       if (r.sources.length > 3) r.sources.shift()
       at += loop
@@ -163,6 +198,7 @@ function playlist(r: Running, firstBuf: AudioBuffer) {
     src.buffer = b
     src.connect(seg)
     src.start(at)
+    track(r, src)
     r.sources.push(src)
     if (r.sources.length > 4) r.sources.shift()
     at += d - xf
@@ -198,7 +234,7 @@ function hook() {
     () => musicVolume.value,
     (v) => {
       if (v <= 0 && running) {
-        halt(running)
+        halt(running, true)
         running = null
       } else if (v > 0 && running && ctx) {
         running.gain.gain.cancelScheduledValues(ctx.currentTime)
