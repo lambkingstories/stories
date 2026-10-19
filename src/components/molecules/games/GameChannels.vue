@@ -51,7 +51,9 @@ const stars = computed(() => mistakeStars(hints.value, 0, 1))
 
 const src = (p: string) => prependBaseUrl(p)
 const isWet = (r: number, c: number) => !!state.value.wet[r]?.[c]
-const tileSrc = (tile: ChannelTile, r: number, c: number) => src((isWet(r, c) ? props.game.wet : props.game.tiles)[tile.kind])
+const WET_KINDS = ['straight', 'corner', 'tee', 'source']
+const tileSrc = (tile: ChannelTile, r: number, c: number) =>
+  src(isWet(r, c) && WET_KINDS.includes(tile.kind) ? props.game.wet[tile.kind as 'straight' | 'corner' | 'tee' | 'source'] : props.game.tiles[tile.kind])
 const goalOf = (tile: ChannelTile) => (tile.goal ? props.game.goals[tile.goal] : undefined)
 const turn = (tile: ChannelTile) => `rotate(${tile.rot * 90}deg)`
 

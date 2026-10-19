@@ -136,11 +136,12 @@ const heard = computed(() => step.value)
 </script>
 
 <template lang="pug">
-  div(class="ec" :style="{ backgroundImage: `url(${src(game.scene)})` }")
+  div(class="ec" :style="{ backgroundImage: `url(${src(game.background)})` }")
     template(v-if="!finished")
       p(v-if="rounds.length > 1" class="ec-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="ec-hint") {{ current.hint }}
       p(class="ec-fb" role="status") {{ message }}
+      p(class="ec-nosound") {{ t('app.adventure.echoNoSound') }}
       div(class="ec-notes" role="group" :aria-label="t('app.adventure.echoField')")
         button(
           v-for="(n, i) in notes"
@@ -152,7 +153,7 @@ const heard = computed(() => step.value)
           :aria-label="t('app.adventure.echoNote', { n: i + 1 })"
           @click="tap(i)"
         )
-          img(:src="src(lit === i ? n.imageOn : n.image)" alt="" draggable="false")
+          img(:src="src(n.image)" alt="" draggable="false")
           GameMark(v-if="flash?.note === i" :kind="flash.kind" class="ec-mark")
       p(class="ec-steps" aria-hidden="true")
         span(v-for="(_, k) in sequence" :key="k" class="ec-step" :class="{ on: k < heard }")
@@ -209,6 +210,17 @@ const heard = computed(() => step.value)
   &:empty
     display: none
 
+.ec-nosound
+  margin: 0
+  text-align: center
+  font-weight: 700
+  font-size: 1rem
+  color: #3f321b
+  align-self: center
+  padding: 2px 12px
+  border-radius: 12px
+  background: rgba(255, 246, 220, 0.85)
+
 .ec-notes
   display: grid
   grid-template-columns: repeat(4, minmax(0, 1fr))
@@ -234,9 +246,10 @@ const heard = computed(() => step.value)
     pointer-events: none
     filter: drop-shadow(0 4px 4px rgba(60, 30, 10, 0.5))
 
+  // the shining is made here (brighter, a little bigger, a soft glow); there is no second picture
   &.lit
-    transform: scale(1.14)
-    filter: drop-shadow(0 0 14px rgba(255, 230, 120, 0.98))
+    transform: scale(1.18)
+    filter: brightness(1.35) saturate(1.15) drop-shadow(0 0 16px rgba(255, 230, 120, 0.98))
 
   &.flash-good
     filter: drop-shadow(0 0 10px rgba(47, 174, 84, 0.95))

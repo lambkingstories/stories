@@ -207,14 +207,14 @@ const windLeaning = computed(() => (wind.value > 0.05 ? 'right' : wind.value < -
           v-for="f in furrows"
           v-show="sown[f.id]"
           :key="`s-${round}-${f.id}`"
-          :src="src(game.sprout)"
+          :src="src(sown[f.id] === 2 ? game.sprout[1] : game.sprout[0])"
           alt=""
           draggable="false"
           class="sw-sprout"
           :class="{ grown: sown[f.id] === 2 }"
           :style="sproutStyle(f)"
         )
-        img(v-if="game.vane && wind !== 0" :src="src(game.vane)" alt="" draggable="false" class="sw-vane" :class="windLeaning" :aria-label="t('app.adventure.sowWind')")
+        img(v-if="wind !== 0" :src="src(game.vane)" alt="" draggable="false" class="sw-vane" :class="windLeaning" :aria-label="t('app.adventure.sowWind')")
         span(v-if="aim" class="sw-aim" :style="place(aim)" aria-hidden="true")
         img(v-if="seed" :key="seed.k" :src="src(game.seed)" alt="" draggable="false" class="sw-seed" :class="{ flying: seed.flying }" :style="place(seed.at)")
         div(

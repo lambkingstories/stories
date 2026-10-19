@@ -1,120 +1,101 @@
 /**
- * The herd of the herding game: animals stand on a meadow, and the child's finger is the shepherd's staff. Every animal gently steps away from the
- * finger (a shy one from farther off), stays near the others, never crowds them, and slows down in the resting place (the shade of the trees); an
- * animal that has stayed there a moment lies down and rests, and stays. Nothing threatens them and none runs away: it is all soft steering.
- * Everything is in "width units": x and y are both counted in hundredths of the width of the meadow (the game turns the height into these), and
- * speeds are units per second. Plain functions that change the animals in place, so that the game and the tests use the same arithmetic.
+ * The herding game: the child's finger leads one animal (the leader) over the meadow, and the herd follows it in a row on its trail. There is no
+ * physics and no swarm: the followers always stand on points of the trail the leader has walked, a fixed distance apart. A pond may lie in the way;
+ * the leader cannot step into it but stops at its edge and slides along it. Everything is in "width units" (x and y both in hundredths of the
+ * width of the meadow; the game turns the height into these). Plain functions, so that the game and the tests use the same arithmetic.
  */
 export interface Pt {
   x: number
   y: number
 }
 
-export interface Animal extends Pt {
-  vx: number
-  vy: number
-  /** A shy animal steps away from the finger earlier. */
-  shy: boolean
-  /** How long it has been in the resting place (seconds). */
-  calm: number
-  /** It rests: it lies in the shade and does not move any more. */
-  resting: boolean
-}
-
-/** The resting place: its middle and radius. */
-export interface Zone extends Pt {
+export interface Circle extends Pt {
   r: number
 }
 
-export const PUSH_RADIUS = 24
-export const SHY_RADIUS = 36
-const PUSH = 220
-const COHESION = 5
-const SEPARATION_RADIUS = 9
-const SEPARATION = 70
-const LURE = 10
-const MAX_SPEED = 38
-/** An animal counts as in the resting place inside this share of its radius, and rests after this many seconds. */
-export const REST_SHARE = 0.85
-export const REST_AFTER = 0.7
+/** The leader never walks faster than this (units per second), and a new point is put on the trail after this much distance. */
+export const WALK_SPEED = 62
+export const TRAIL_STEP = 0.8
+const TRAIL_MAX = 900
 
-export function makeAnimal(x: number, y: number, shy = false): Animal {
-  return { x, y, vx: 0, vy: 0, shy, calm: 0, resting: false }
+const dist = (a: Pt, b: Pt) => Math.hypot(a.x - b.x, a.y - b.y)
+
+/** Is the point inside the circle? */
+export const inside = (p: Pt, c: Circle): boolean => dist(p, c) < c.r
+
+/** A point inside the circle is moved to its edge (straight away from the middle); a point outside stays where it is. */
+export function clampOutside(p: Pt, c: Circle): Pt {
+  const d = dist(p, c)
+  if (d >= c.r) return { ...p }
+  if (d < 0.0001) return { x: c.x + c.r, y: c.y }
+  return { x: c.x + ((p.x - c.x) / d) * c.r, y: c.y + ((p.y - c.y) / d) * c.r }
 }
 
 /**
- * One step of `dt` seconds. `pointer` is the finger (or null when no finger is down); `bounds` keeps the animals on the meadow.
- * The animals that rest do not move and are not pushed.
+ * One step of the leader towards the finger: it walks at most `WALK_SPEED * dt` and never into the pond (`obstacle`, already widened by the
+ * size of the animal). When the straight step would end inside the pond, the leader ends on its edge, so it slides along it.
  */
-export function stepHerd(animals: Animal[], pointer: Pt | null, dt: number, zone: Zone, bounds: { w: number; h: number } = { w: 100, h: 133 }): void {
-  const moving = animals.filter((a) => !a.resting)
-  const centre = moving.length > 1 ? { x: moving.reduce((s, a) => s + a.x, 0) / moving.length, y: moving.reduce((s, a) => s + a.y, 0) / moving.length } : null
-  for (const a of moving) {
-    let ax = 0
-    let ay = 0
-    // the finger: a step away from it, the closer the stronger
-    if (pointer) {
-      const dx = a.x - pointer.x
-      const dy = a.y - pointer.y
-      const d = Math.hypot(dx, dy) || 0.001
-      const reach = a.shy ? SHY_RADIUS : PUSH_RADIUS
-      if (d < reach) {
-        const k = (1 - d / reach) * PUSH
-        ax += (dx / d) * k
-        ay += (dy / d) * k
-      }
-    }
-    // the others: stay together, but never on top of each other
-    // (only while the finger leads: without it the animals just stand)
-    if (centre && pointer) {
-      ax += (centre.x - a.x) * COHESION * 0.05
-      ay += (centre.y - a.y) * COHESION * 0.05
-    }
-    for (const b of animals) {
-      if (b === a) continue
-      const dx = a.x - b.x
-      const dy = a.y - b.y
-      const d = Math.hypot(dx, dy) || 0.001
-      if (d < SEPARATION_RADIUS) {
-        const k = (1 - d / SEPARATION_RADIUS) * SEPARATION
-        ax += (dx / d) * k
-        ay += (dy / d) * k
-      }
-    }
-    // the resting place calls softly and slows the animal down
-    const zx = zone.x - a.x
-    const zy = zone.y - a.y
-    const zd = Math.hypot(zx, zy)
-    const inside = zd < zone.r * REST_SHARE
-    if (zd < zone.r * 1.7 && zd > 0.001) {
-      ax += (zx / zd) * LURE
-      ay += (zy / zd) * LURE
-    }
-    a.vx += ax * dt
-    a.vy += ay * dt
-    const damping = Math.exp(-(inside ? 6 : 2.2) * dt)
-    a.vx *= damping
-    a.vy *= damping
-    const speed = Math.hypot(a.vx, a.vy)
-    if (speed > MAX_SPEED) {
-      a.vx = (a.vx / speed) * MAX_SPEED
-      a.vy = (a.vy / speed) * MAX_SPEED
-    }
-    a.x = Math.min(bounds.w - 4, Math.max(4, a.x + a.vx * dt))
-    a.y = Math.min(bounds.h - 4, Math.max(10, a.y + a.vy * dt))
-    // in the shade for a moment: it lies down
-    if (inside) {
-      a.calm += dt
-      if (a.calm >= REST_AFTER) {
-        a.resting = true
-        a.vx = 0
-        a.vy = 0
-      }
-    } else {
-      a.calm = 0
-    }
-  }
+export function walk(leader: Pt, target: Pt, dt: number, obstacle?: Circle): Pt {
+  const d = dist(leader, target)
+  const max = WALK_SPEED * dt
+  const to = d <= max || d === 0 ? { ...target } : { x: leader.x + ((target.x - leader.x) / d) * max, y: leader.y + ((target.y - leader.y) / d) * max }
+  return obstacle ? clampOutside(to, obstacle) : to
 }
 
-/** How many animals rest. */
-export const restingCount = (animals: Animal[]): number => animals.filter((a) => a.resting).length
+/** Adds a point to the trail when the leader has moved far enough from the last one (the trail does not grow for ever). */
+export function extendTrail(trail: Pt[], p: Pt): void {
+  const last = trail[trail.length - 1]
+  if (!last || dist(last, p) >= TRAIL_STEP) trail.push({ ...p })
+  if (trail.length > TRAIL_MAX) trail.splice(0, trail.length - TRAIL_MAX)
+}
+
+/**
+ * Where the followers stand: on the trail, behind the head, `spacing` apart along the way the leader walked (the first one `spacing` behind
+ * the head, the next `2 x spacing` ...). A trail that is not long enough yet leaves the followers at its beginning.
+ */
+export function followPositions(trail: Pt[], spacing: number, count: number): Pt[] {
+  const out: Pt[] = []
+  if (!trail.length) return out
+  // walk back along the trail and drop a follower at each multiple of the spacing
+  let along = 0
+  let k = 1
+  let i = trail.length - 1
+  while (out.length < count) {
+    if (i <= 0) {
+      out.push({ ...trail[0]! })
+      continue
+    }
+    const a = trail[i]!
+    const b = trail[i - 1]!
+    const seg = dist(a, b)
+    while (out.length < count && along + seg >= k * spacing) {
+      const f = seg === 0 ? 0 : (k * spacing - along) / seg
+      out.push({ x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f })
+      k++
+    }
+    along += seg
+    i--
+  }
+  return out
+}
+
+/** The way the help shows: a straight line from the leader to the resting place, bent around the pond when the pond is in the way. */
+export function helpPath(from: Pt, to: Pt, obstacle?: Circle): Pt[] {
+  if (!obstacle) return [from, to]
+  // the distance of the pond's middle from the line from -> to
+  const dx = to.x - from.x
+  const dy = to.y - from.y
+  const len2 = dx * dx + dy * dy || 1
+  const t = Math.max(0, Math.min(1, ((obstacle.x - from.x) * dx + (obstacle.y - from.y) * dy) / len2))
+  const near = { x: from.x + dx * t, y: from.y + dy * t }
+  const gap = dist(near, obstacle)
+  if (gap >= obstacle.r * 1.15) return [from, to]
+  // a point beside the pond, on the side the line already passes (or to the right when it goes through the middle)
+  const len = Math.sqrt(len2)
+  const nx = -dy / len
+  const ny = dx / len
+  const side = (near.x - obstacle.x) * nx + (near.y - obstacle.y) * ny >= 0 ? 1 : -1
+  const away = obstacle.r * 1.5
+  const via = { x: obstacle.x + nx * side * away, y: obstacle.y + ny * side * away }
+  return [from, via, to]
+}

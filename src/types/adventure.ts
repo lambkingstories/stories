@@ -302,51 +302,42 @@ export interface LightSpot {
   x: number
   y: number
   w: number
-  /** A cloud (picture) that lies half over this light; the light can still be tapped through it. */
-  cloud?: string
 }
 export interface LightRound {
   hint: string
   spots: LightSpot[]
-  /** How many lights shine at the same time (1 when left out: they come one after the other). */
-  together?: number
+  /** How many lights glimmer at the same time (1: one after the other). */
+  together: number
 }
-/** The light-collecting game: the picture is dark, the lights are tapped and the picture gets bright (at most two rounds). */
+/** The light-collecting game: the picture is dimmed, the lights are tapped and it gets bright again (at most two rounds). The glimmer is made by the app. */
 export interface LightGame {
   /** The bright picture (3:4); the code dims it and brightens it again. */
   scene: string
-  /** The picture of one soft light (a path below `public/`). */
-  glow: string
   rounds: LightRound[]
 }
 
-/** A verse with gaps: the text pieces between the gaps, and for every gap the number of its word in `VerseRound.words`. */
-export interface VerseLine {
-  /** The pieces of the verse around the gaps: one more piece than there are gaps ("... gab einem jeglichen Vieh seinen", "."). */
-  parts: string[]
-  /** For each gap, from left to right: the index of the right word in `VerseRound.words`. */
-  answers: number[]
-}
 export interface VerseRound {
   hint: string
-  verses: VerseLine[]
+  /** The pieces of the sentence around the gaps: one more piece than there are gaps. */
+  parts: string[]
   /** The words on the leaves (the right ones and the wrong ones); the English file keeps the same order, so that `answers` fits both. */
   words: string[]
+  /** For each gap, from left to right: the index of the right word in `words`. */
+  answers: number[]
 }
-/** The verse game: leaves with words are dragged into the gaps of short verses (at most two rounds). */
+/** The verse game: leaves with words are dragged into the gaps of a sentence of the story (at most two rounds). */
 export interface VerseGame {
-  /** The clearing behind the boards (3:4), the wooden board under a verse, and the leaf that carries a word. */
-  scene: string
+  /** The picture behind the board (the stage picture, 3:2 or 3:4), the wooden board under the sentence, and the leaf that carries a word. */
+  background: string
   board: string
   leaf: string
   rounds: VerseRound[]
 }
 
-/** A sound blossom of the call-and-answer game: calm and shining, and the pitch of its tone (the playback rate of the marimba tone). */
+/** A sound blossom of the call-and-answer game and the pitch of its tone (the playback rate of the marimba tone). The shining is made by the app. */
 export interface EchoNote {
   id: string
   image: string
-  imageOn: string
   rate: number
 }
 export interface EchoRound {
@@ -356,14 +347,14 @@ export interface EchoRound {
 }
 /** The call-and-answer game: a call rings and shines, the child plays it back (four blossoms, at most two rounds). */
 export interface EchoGame {
-  /** The evening garden behind the blossoms (3:4). */
-  scene: string
+  /** The picture behind the blossoms (the stage picture). */
+  background: string
   notes: EchoNote[]
   rounds: EchoRound[]
 }
 
 /** A tile of the channel game: what it is, how it lies at the start (quarter turns, clockwise), and for a plant its id. */
-export type ChannelKind = 'straight' | 'corner' | 'tee' | 'cross' | 'empty' | 'source' | 'goal'
+export type ChannelKind = 'straight' | 'corner' | 'tee' | 'empty' | 'source' | 'goal'
 export interface ChannelTile {
   kind: ChannelKind
   /** The quarter turns at the start (0 to 3). A source opens to the right and a goal to the left when `rot` is 0. */
@@ -384,9 +375,13 @@ export interface ChannelRound {
 }
 /** The channel game: pieces of the garden's water channels are turned until the water reaches the plants (at most two rounds). */
 export interface ChannelGame {
-  /** The picture of every kind of tile, dry and wet (seen from above, 200 x 200). */
+  /**
+   * The picture of every kind of tile (seen from above, 200 x 200): a straight piece runs left to right, a curve from left to down, a fork has
+   * its stem to the bottom (left, right, down), the source opens to the right; a goal sits on the ground tile. The wet pictures exist for
+   * the pieces that carry water.
+   */
   tiles: Record<ChannelKind, string>
-  wet: Record<ChannelKind, string>
+  wet: Record<'straight' | 'corner' | 'tee' | 'source', string>
   goals: Record<string, ChannelGoal>
   rounds: ChannelRound[]
 }
@@ -407,8 +402,8 @@ export interface MirrorRound {
 }
 /** The mirror game: the left bank has a pattern, the child completes the right bank as its mirror image (at most two rounds). */
 export interface MirrorGame {
-  /** The meadow with the stream down the middle (3:4). */
-  scene: string
+  /** The picture behind the board (the stage picture). */
+  background: string
   /** The picture of an empty field. */
   empty: string
   stones: MirrorStone[]
@@ -432,39 +427,37 @@ export interface SowRound {
 }
 /** The sowing game: the seed bag is pulled back and let go, the seed flies in an arc into a furrow (at most two rounds). */
 export interface SowGame {
-  /** The field (3:4), the seed bag, one seed, the sprout that grows, and the little flag that shows the wind (a path below `public/`). */
+  /** The field (3:4), the seed bag, one seed, the sprout in two stages (young, grown), and the little flag that shows the wind (a path below `public/`). */
   field: string
   bag: string
   seed: string
-  sprout: string
-  vane?: string
+  sprout: [string, string]
+  vane: string
   furrows: SowFurrow[]
   rounds: SowRound[]
 }
 
-/** An animal of the herding game: its picture (looking right), what it is called (screen readers), where it stands at the start (percent of the meadow) and how wide it is. */
+/** An animal of the herding game: its picture (looking right), what it is (screen readers) and how wide it is (percent of the meadow). */
 export interface HerdAnimal {
   id: string
   image: string
   label: string
-  x: number
-  y: number
   w: number
-  /** A shy animal steps away from the finger earlier. */
-  shy?: boolean
 }
 export interface HerdRound {
   hint: string
-  /** The animals of this round (ids of `HerdGame.animals`). */
-  animals: string[]
-}
-/** The herding game: the finger is the shepherd's staff and leads the animals to the resting place (at most two rounds, no mistakes). */
-export interface HerdGame {
-  /** The meadow (3:4) with the trees whose shade is the resting place. */
-  scene: string
-  /** The resting place: the middle (percent of the meadow) and the radius (percent of its width). */
+  /** The animal the child leads with a finger, and the ones that follow it in a row on its trail. */
+  leader: HerdAnimal
+  followers: HerdAnimal[]
+  /** Where the leader stands at the start, the resting place (percent of the meadow; r is a share of its width) and, if there is one, a pond in the way. */
+  start: { x: number; y: number }
   rest: { x: number; y: number; r: number }
-  animals: HerdAnimal[]
+  obstacle?: { x: number; y: number; r: number }
+}
+/** The herding game: the finger leads one animal to the resting place and the herd follows in a row (at most two rounds, no mistakes). */
+export interface HerdGame {
+  /** The meadow (3:4) with the two resting places and the pond. */
+  scene: string
   rounds: HerdRound[]
 }
 

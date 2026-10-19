@@ -1,8 +1,8 @@
 <script setup lang="ts">
 /**
- * The verse with a gap: a short verse stands on a wooden board and one or two words are missing. Leaves with words hang below; the child drags
+ * The sentence with a gap: a sentence of the story stands on a wooden board and one or two words are missing. Leaves with words hang below; the child drags
  * the right leaf into the gap (or taps the leaf and then the gap). A wrong leaf gets a red cross and flies back (a mistake); the right one
- * stays and the verse reads whole. Nobody has to read fast: whoever does not read just tries. Two rounds: first one gap in each verse, then two.
+ * stays and the verse reads whole. Nobody has to read fast: whoever does not read just tries. Two rounds: first a sentence with one gap, then one with two.
  */
 import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -23,7 +23,7 @@ const { play } = useSfx()
 const { later } = useTimers()
 const progress = useTaskProgress()
 // the whole task: every gap of every verse of every round
-progress.setGoal(props.game.rounds.reduce((sum, r) => sum + r.verses.reduce((s, v) => s + v.answers.length, 0), 0))
+progress.setGoal(props.game.rounds.reduce((sum, r) => sum + r.answers.length, 0))
 
 const rounds = computed(() => props.game.rounds)
 const round = ref(0)
@@ -38,7 +38,7 @@ const finished = ref(false)
 const message = ref('')
 const wobble = ref<number | null>(null)
 const flash = ref<{ key: string; kind: 'good' | 'bad' } | null>(null)
-const stars = computed(() => mistakeStars(mistakes.value, 2, 5))
+const stars = computed(() => mistakeStars(mistakes.value, 1, 3))
 
 const gapKey = (v: number, g: number) => `${v}-${g}`
 const usedWords = computed(() => new Set(Object.values(filled)))
@@ -56,7 +56,9 @@ const leaves = computed(() => {
   }
   return ids
 })
-const totalGaps = computed(() => current.value.verses.reduce((s, v) => s + v.answers.length, 0))
+/** The sentence of this round (one board; the template and the checks work on a list of sentences). */
+const verses = computed(() => [{ parts: current.value.parts, answers: current.value.answers }])
+const totalGaps = computed(() => current.value.answers.length)
 const gapsFilled = computed(() => Object.keys(filled).length)
 
 function flashOn(k: string, kind: 'good' | 'bad') {
@@ -91,7 +93,7 @@ function drop(id: string, target: string) {
   if (!m || usedWords.value.has(word)) return
   const v = Number(m[1])
   const g = Number(m[2])
-  const verse = current.value.verses[v]
+  const verse = verses.value[v]
   const k = gapKey(v, g)
   if (!verse || g >= verse.answers.length || filled[k] !== undefined) return
   if (verse.answers[g] === word) {
@@ -118,12 +120,12 @@ const src = (p: string) => prependBaseUrl(p)
 </script>
 
 <template lang="pug">
-  div(class="vs" :style="{ backgroundImage: `url(${src(game.scene)})` }")
+  div(class="vs" :style="{ backgroundImage: `url(${src(game.background)})` }")
     template(v-if="!finished")
       p(v-if="rounds.length > 1" class="vs-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="vs-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
       div(class="vs-boards")
-        div(v-for="(verse, v) in current.verses" :key="`${round}-${v}`" class="vs-board" :style="{ backgroundImage: `url(${src(game.board)})` }")
+        div(v-for="(verse, v) in verses" :key="`${round}-${v}`" class="vs-board" :style="{ backgroundImage: `url(${src(game.board)})` }")
           p(class="vs-text")
             template(v-for="(part, g) in verse.parts" :key="g")
               | {{ part }}

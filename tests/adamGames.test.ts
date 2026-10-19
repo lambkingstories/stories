@@ -9,7 +9,8 @@ import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
 import { partialStars } from '@/utils/adventureScore'
 import { CHANNEL_GRID_1, CHANNEL_GRID_2 } from '@/data/adventures/adamEvaChannels'
-import { flow, goalsOf, solve } from '@/utils/channels'
+import { flow, goalsOf, isTurnable, openings, solve } from '@/utils/channels'
+import { helpPath } from '@/utils/herd'
 import { landing, pullFor } from '@/utils/sow'
 import type { ChannelGame, EchoGame, HerdGame, LightGame, MirrorGame, OrderGame, SowGame, VerseGame, WaterGame } from '@/types/adventure'
 
@@ -334,11 +335,11 @@ describe('Füllen und Gießen (water)', () => {
 // ---------------------------------------------------------------- collect the lights
 describe('Lichter sammeln (lights)', () => {
   const game: LightGame = {
-    scene: 'images/x/nacht.webp',
-    glow: 'images/x/glow.webp',
+    scene: 'images/x/himmel.webp',
     rounds: [
       {
         hint: 'Tippe die Lichter an, eins nach dem anderen.',
+        together: 1,
         spots: [
           { x: 20, y: 30, w: 14 },
           { x: 70, y: 25, w: 14 },
@@ -351,7 +352,7 @@ describe('Lichter sammeln (lights)', () => {
         spots: [
           { x: 15, y: 20, w: 10 },
           { x: 50, y: 15, w: 10 },
-          { x: 85, y: 22, w: 10, cloud: 'images/x/wolke-1.webp' },
+          { x: 85, y: 22, w: 10 },
           { x: 30, y: 70, w: 10 }
         ]
       }
@@ -373,10 +374,13 @@ describe('Lichter sammeln (lights)', () => {
     }
   }
 
-  it('round 1: one light shines, the picture is dark; the goal is the number of all the lights (3 + 4 = 7); two rounds at most', async () => {
+  it('round 1: one light glimmers, the picture is dark; the goal is the number of all the lights (3 + 4 = 7); two rounds at most', async () => {
     expect(game.rounds.length).toBeLessThanOrEqual(2)
     const w = await open()
     expect(lights(w)).toHaveLength(1)
+    // the glimmer is made by the app: a round light, no picture
+    expect(lights(w)[0]!.find('.lt-dot').exists()).toBe(true)
+    expect(lights(w)[0]!.find('img').exists()).toBe(false)
     expect(dark(w)).toBeCloseTo(0.8, 2)
     expect(w.find('.lt-round').text()).toContain('Runde 1 von 2')
     expect(w.find('.lt-count').text()).toBe('Lichter: 0 von 7')
@@ -385,27 +389,17 @@ describe('Lichter sammeln (lights)', () => {
     expect(problems()).toEqual([])
   })
 
-  it('a light that is tapped is collected (a part counted), the next one appears after a moment, the picture gets brighter', async () => {
+  it('a light that is tapped is collected (a part counted), the next one appears after a moment, the picture gets brighter around it and everywhere', async () => {
     const w = await open()
     await lights(w)[0]!.trigger('click')
     expect(useTaskProgress().parts.value).toBe(1)
     expect(lights(w)).toHaveLength(0)
     expect(played).toContain('found')
+    expect(w.findAll('.lt-lit')).toHaveLength(1)
     await tick(700)
     expect(lights(w)).toHaveLength(1)
     expect(dark(w)).toBeCloseTo(0.8 * (1 - 1 / 7), 2)
     expect(w.find('.lt-count').text()).toBe('Lichter: 1 von 7')
-  })
-
-  it('a light behind a cloud: the cloud lies over it, the light is still tapped (through the cloud)', async () => {
-    const w = await open()
-    await collectRound(w, 3)
-    await tick(1600)
-    expect(w.findAll('.lt-cloud')).toHaveLength(1)
-    expect(w.find('.lt-cloud').attributes('src')).toContain('wolke-1')
-    const withCloud = lights(w).find((l) => l.find('.lt-cloud').exists())!
-    await withCloud.trigger('click')
-    expect(useTaskProgress().parts.value).toBe(4)
   })
 
   it('a tap beside the lights is a small slip (a faint ring, no mistake message, nothing is lost)', async () => {
@@ -419,7 +413,7 @@ describe('Lichter sammeln (lights)', () => {
     expect(w.find('.lt-ring').exists()).toBe(false)
   })
 
-  it('round 2: several lights shine at once; all the way through the picture is bright and a game with few slips is three stars', async () => {
+  it('round 2: several lights glimmer at once; all the way through the picture is bright and a game with few slips is three stars', async () => {
     const w = await open()
     await collectRound(w, 3)
     await tick(1600)
@@ -463,29 +457,15 @@ describe('Lichter sammeln (lights)', () => {
   })
 })
 
-// ---------------------------------------------------------------- the verse with a gap
+// ---------------------------------------------------------------- the sentence with a gap
 describe('Lückenvers (verse)', () => {
   const game: VerseGame = {
-    scene: 'images/x/lichtung.webp',
+    background: 'images/x/etappe-bild-05.webp',
     board: 'images/x/tafel.webp',
     leaf: 'images/x/blatt.webp',
     rounds: [
-      {
-        hint: 'Ziehe das passende Blatt in die Lücke.',
-        words: ['Namen', 'Futter', 'Stall', 'nennte', 'kleidete'],
-        verses: [
-          { parts: ['Der Mensch gab jedem Tier seinen ', '.'], answers: [0] },
-          { parts: ['Gott brachte sie zu dem Menschen, dass er sähe, wie er sie ', '.'], answers: [3] }
-        ]
-      },
-      {
-        hint: 'Jetzt fehlen zwei Wörter.',
-        words: ['Vieh', 'Vogel', 'Fisch', 'allein', 'Gehilfin', 'Hütte'],
-        verses: [
-          { parts: ['Der Mensch gab jedem ', ' und ', ' einen Namen.'], answers: [0, 1] },
-          { parts: ['Es ist nicht gut, dass der Mensch ', ' sei; ich will ihm eine ', ' machen.'], answers: [3, 4] }
-        ]
-      }
+      { hint: 'Ziehe das passende Blatt in die Lücke.', parts: ['Gott formt aus dem Boden alle ', ' des Feldes.'], words: ['Tiere', 'Steine', 'Wolken'], answers: [0] },
+      { hint: 'Jetzt fehlen zwei Wörter.', parts: ['Adam gibt allen Tieren Namen, dem ', ' und den ', '.'], words: ['Vieh', 'Vögeln', 'Fischen', 'Blumen'], answers: [0, 1] }
     ]
   }
   const open = async (locale: 'de' | 'en' = 'de') => {
@@ -503,59 +483,55 @@ describe('Lückenvers (verse)', () => {
     await flushPromises()
   }
 
-  it('round 1: two verses with one gap each and the leaves with their words; the goal is the number of all gaps (1+1+2+2 = 6); two rounds at most', async () => {
+  it('round 1: one sentence with one gap and the leaves with their words; the goal is the number of all gaps (1 + 2 = 3); two rounds at most', async () => {
     expect(game.rounds.length).toBeLessThanOrEqual(2)
-    for (const r of game.rounds) for (const v of r.verses) expect(v.parts.length).toBe(v.answers.length + 1)
+    for (const r of game.rounds) expect(r.parts.length).toBe(r.answers.length + 1)
     const w = await open()
-    expect(gaps(w)).toHaveLength(2)
-    expect(w.findAll('.vs-leaf')).toHaveLength(5)
+    expect(gaps(w)).toHaveLength(1)
+    expect(w.findAll('.vs-leaf')).toHaveLength(3)
     expect(w.find('.vs-round').text()).toContain('Runde 1 von 2')
-    expect(w.findAll('.vs-text')[0]!.text()).toContain('Der Mensch gab jedem Tier seinen')
-    expect(useTaskProgress().goal.value).toBe(6)
+    expect(w.find('.vs-text').text()).toContain('Gott formt aus dem Boden alle')
+    expect(useTaskProgress().goal.value).toBe(3)
     expect(gaps(w)[0]!.attributes('aria-label')).toBe('Lücke 1')
-    expect(leaf(w, 'Namen').attributes('aria-label')).toBe('Blatt: Namen')
+    expect(leaf(w, 'Tiere').attributes('aria-label')).toBe('Blatt: Tiere')
+    expect(w.find('.vs').attributes('style')).toContain('etappe-bild-05')
     expect(problems()).toEqual([])
   })
 
   it('the right word stays in the gap (tick, one part counted, the leaf is used up); a wrong word is a mistake and the leaf stays on the branch', async () => {
     const w = await open()
-    await put(w, 'Futter', 0)
+    await put(w, 'Steine', 0)
     expect(gaps(w)[0]!.find('.gm.bad').exists()).toBe(true)
     expect(w.find('.vs-fb').text()).toBe('Dieses Wort passt hier nicht.')
-    expect(w.findAll('.vs-leaf')).toHaveLength(5)
+    expect(w.findAll('.vs-leaf')).toHaveLength(3)
     expect(useTaskProgress().parts.value).toBe(0)
     expect(played).toContain('wrong')
     await tick(1000)
-    await put(w, 'Namen', 0)
-    expect(gaps(w)[0]!.text()).toContain('Namen')
+    await put(w, 'Tiere', 0)
+    expect(gaps(w)[0]!.text()).toContain('Tiere')
     expect(gaps(w)[0]!.classes()).toContain('filled')
-    expect(gaps(w)[0]!.attributes('aria-label')).toBe('Lücke: Namen')
-    expect(w.findAll('.vs-leaf')).toHaveLength(4)
+    expect(gaps(w)[0]!.attributes('aria-label')).toBe('Lücke: Tiere')
+    expect(w.findAll('.vs-leaf')).toHaveLength(2)
     expect(useTaskProgress().parts.value).toBe(1)
-    // a word that belongs to the other verse does not fit here, either
-    await put(w, 'kleidete', 1)
-    expect(gaps(w)[1]!.find('.gm.bad').exists()).toBe(true)
   })
 
-  it('all the way through: round 2 has verses with two gaps each; a clean game is three stars; mistakes cost stars', async () => {
-    for (const [mistakes, stars] of [[0, 3], [3, 2], [6, 1]] as const) {
+  it('all the way through: round 2 has a sentence with two gaps (in any order); a clean game is three stars; one mistake still three, two or three mistakes two, four one', async () => {
+    for (const [mistakes, stars] of [[0, 3], [1, 3], [2, 2], [3, 2], [4, 1]] as const) {
       useTaskProgress().reset()
       const w = await open()
       for (let i = 0; i < mistakes; i++) {
-        await put(w, 'Stall', 0)
+        await put(w, 'Steine', 0)
         await tick(1000)
       }
-      await put(w, 'Namen', 0)
-      await put(w, 'nennte', 1)
+      await put(w, 'Tiere', 0)
       await tick(1700)
       expect(w.find('.vs-round').text()).toContain('Runde 2 von 2')
-      expect(gaps(w)).toHaveLength(4)
+      expect(gaps(w)).toHaveLength(2)
+      // the second gap first, then the first
+      await put(w, 'Vögeln', 1)
       await put(w, 'Vieh', 0)
-      await put(w, 'Vogel', 1)
-      await put(w, 'allein', 2)
-      await put(w, 'Gehilfin', 3)
       await tick(1200)
-      expect(useTaskProgress().parts.value, `${mistakes} mistakes`).toBe(6)
+      expect(useTaskProgress().parts.value, `${mistakes} mistakes`).toBe(3)
       expect(useTaskProgress().finished.value).toBe(true)
       expect(w.text()).toContain('Jeder Vers ist wieder ganz!')
       await w.find('.gd button').trigger('click')
@@ -564,15 +540,15 @@ describe('Lückenvers (verse)', () => {
     }
   })
 
-  it('the gaps can be filled in any order, and the steps of "Go on" for 6 gaps: 2 gaps one star, 4 two stars, one gap nothing', () => {
-    expect([1, 2, 3, 4, 5].map((d) => partialStars(d, 6))).toEqual([0, 1, 1, 2, 2])
+  it('the steps of "Go on" for 3 gaps: one gap one star, two gaps two stars', () => {
+    expect([0, 1, 2].map((d) => partialStars(d, 3))).toEqual([0, 1, 2])
   })
 
   it('English: the words of the game', async () => {
     const w = await open('en')
     expect(w.find('.vs-round').text()).toBe('Round 1 of 2')
     expect(gaps(w)[0]!.attributes('aria-label')).toBe('Gap 1')
-    await put(w, 'Futter', 0)
+    await put(w, 'Steine', 0)
     expect(w.find('.vs-fb').text()).toBe('That word does not fit here.')
   })
 })
@@ -581,8 +557,8 @@ describe('Lückenvers (verse)', () => {
 describe('Ruf und Antwort (echo)', () => {
   const RATES = [1, 1.1225, 1.2599, 1.4983]
   const game: EchoGame = {
-    scene: 'images/x/abend.webp',
-    notes: RATES.map((rate, i) => ({ id: `n${i}`, image: `images/x/bluete-${i + 1}.webp`, imageOn: `images/x/bluete-${i + 1}-an.webp`, rate })),
+    background: 'images/x/etappe-bild-08.webp',
+    notes: RATES.map((rate, i) => ({ id: `n${i}`, image: `images/x/bluete-${i + 1}.webp`, rate })),
     rounds: [
       { hint: 'Hör gut zu und antworte mit denselben Klängen.', calls: [[0, 1, 2], [1, 0, 2], [2, 1, 0]] },
       { hint: 'Jetzt etwas länger.', calls: [[0, 1, 2, 3], [3, 2, 1, 0], [1, 3, 0, 2]] }
@@ -620,7 +596,8 @@ describe('Ruf und Antwort (echo)', () => {
     expect(w.find('.ec-fb').text()).toBe('Hör gut zu ...')
     // the first blossom shines at 300 ms, the next ones every 750 ms
     expect(note(w, 0).classes()).toContain('lit')
-    expect(note(w, 0).find('img').attributes('src')).toContain('bluete-1-an')
+    expect(note(w, 0).find('img').attributes('src')).toContain('bluete-1.webp')
+    expect(w.find('.ec-nosound').text()).toBe('Schau auf die Lichter: es geht auch ohne Ton.')
     await tick(750)
     expect(note(w, 1).classes()).toContain('lit')
     expect(note(w, 0).classes()).not.toContain('lit')
@@ -710,12 +687,11 @@ describe('Ruf und Antwort (echo)', () => {
 // ---------------------------------------------------------------- turn the channels
 describe('Kanäle drehen (channels)', () => {
   const pic = (n: string) => `images/x/${n}.webp`
-  const kinds = ['straight', 'corner', 'tee', 'cross', 'empty', 'source', 'goal'] as const
   const game: ChannelGame = {
-    tiles: Object.fromEntries(kinds.map((k) => [k, pic(`${k}-trocken`)])) as ChannelGame['tiles'],
-    wet: Object.fromEntries(kinds.map((k) => [k, pic(`${k}-nass`)])) as ChannelGame['wet'],
+    tiles: { straight: pic('gerade'), corner: pic('kurve'), tee: pic('gabel'), source: pic('quelle'), empty: pic('leer'), goal: pic('leer') },
+    wet: { straight: pic('gerade-nass'), corner: pic('kurve-nass'), tee: pic('gabel-nass'), source: pic('quelle-nass') },
     goals: Object.fromEntries(
-      ['feige', 'dattel', 'granatapfel', 'wein', 'olive', 'blumen'].map((id) => [id, { label: id[0]!.toUpperCase() + id.slice(1), wilted: pic(`${id}-welk`), bloom: pic(`${id}-bluete`) }])
+      ['feige', 'granatapfel', 'dattel', 'wein'].map((id) => [id, { label: id[0]!.toUpperCase() + id.slice(1), wilted: pic(`ziel-${id}`), bloom: pic(`ziel-${id}-bluete`) }])
     ),
     rounds: [
       { hint: 'Drehe die Stücke, bis das Wasser die Pflanzen erreicht.', grid: CHANNEL_GRID_1 },
@@ -734,13 +710,32 @@ describe('Kanäle drehen (channels)', () => {
     for (let i = 0; i < n; i++) await tile(w, r, c, cols).trigger('click')
     await flushPromises()
   }
+  /** Solve a round on the screen: every tile is tapped until it lies as the solver says (the tests do what a child works out). */
+  const solveRound = async (w: ReturnType<typeof mount>, grid: ChannelGame['rounds'][number]['grid']) => {
+    const sol = solve(grid)!
+    const cols = grid[0]!.length
+    for (let r = 0; r < grid.length; r++) {
+      for (let c = 0; c < cols; c++) {
+        const t = grid[r]![c]!
+        if (!isTurnable(t.kind)) continue
+        let rot = t.rot
+        let taps = 0
+        const want = openings(t.kind, sol[r]![c]!).slice().sort().join()
+        while (openings(t.kind, rot).slice().sort().join() !== want) {
+          rot = (rot + 1) % 4
+          taps++
+        }
+        await turn(w, r, c, cols, taps)
+      }
+    }
+  }
 
-  it('both gardens can be solved, nothing reaches a plant at the start, the plants are the garden plants of the stage (no tree of life or of knowledge), two rounds at most', () => {
+  it('both gardens can be solved, nothing reaches a plant at the start, the plants are garden plants (no tree of life or of knowledge), two rounds at most', () => {
     expect(game.rounds.length).toBeLessThanOrEqual(2)
     const goalIds = game.rounds.flatMap((r) => r.grid.flat().filter((t) => t.kind === 'goal').map((t) => t.goal!))
-    expect(goalIds).toEqual(['feige', 'dattel', 'granatapfel', 'wein', 'olive', 'blumen'])
+    expect(goalIds).toEqual(['feige', 'dattel', 'feige', 'wein', 'dattel', 'granatapfel'])
     expect(goalIds.every((g) => game.goals[g])).toBe(true)
-    expect(goalIds.join(' ')).not.toMatch(/leben|erkenntnis|baum/i)
+    expect(Object.keys(game.goals).join(' ')).not.toMatch(/leben|erkenntnis|apfel$/i)
     for (const r of game.rounds) {
       expect(flow(r.grid).reached, 'nothing is wet at the start').toEqual([])
       const sol = solve(r.grid)
@@ -749,7 +744,8 @@ describe('Kanäle drehen (channels)', () => {
       expect(flow(solved).reached.length).toBe(goalsOf(r.grid))
     }
     expect(game.rounds.map((r) => goalsOf(r.grid))).toEqual([2, 4])
-    // the whole search is quick
+    // no cross in the pictures, and the search is quick
+    expect(JSON.stringify([CHANNEL_GRID_1, CHANNEL_GRID_2])).not.toContain('cross')
     const t0 = Date.now()
     solve(CHANNEL_GRID_2)
     expect(Date.now() - t0).toBeLessThan(500)
@@ -768,19 +764,18 @@ describe('Kanäle drehen (channels)', () => {
     expect(problems()).toEqual([])
   })
 
-  it('turning a piece turns its picture a quarter; when the way is whole the water flows (wet pictures), the plant blooms and a part is counted', async () => {
+  it('a wet piece shows its wet picture (the pictures do not change for pieces without water); the plant blooms when the water arrives and a part is counted', async () => {
     const w = await open()
-    expect(tile(w, 1, 1, 4).find('.ch-base').attributes('style')).toContain('rotate(90deg)')
-    expect(tile(w, 1, 1, 4).find('img').attributes('src')).toContain('tee-trocken')
-    // one quarter on: the fork opens to the stream (left), so it is wet already
-    await turn(w, 1, 1, 4, 1)
-    expect(tile(w, 1, 1, 4).find('.ch-base').attributes('style')).toContain('rotate(180deg)')
-    expect(tile(w, 1, 1, 4).find('img').attributes('src')).toContain('tee-nass')
-    // tee to 0, the corner above to 1, the straight pieces to 0
-    await turn(w, 1, 1, 4, 2)
+    // the source and the fork (painted position, open to the source) are wet at the start, the straight piece next to it is not
+    expect(tile(w, 1, 0, 4).find('img').attributes('src')).toContain('quelle-nass')
+    expect(tile(w, 1, 1, 4).find('img').attributes('src')).toContain('gabel-nass')
+    expect(tile(w, 1, 2, 4).find('img').attributes('src')).toContain('gerade.webp')
+    // the straight piece turned: the water runs through it to the plant on the right
     await turn(w, 1, 2, 4, 1)
+    expect(tile(w, 1, 2, 4).find('img').attributes('src')).toContain('gerade-nass')
+    expect(tile(w, 1, 2, 4).find('.ch-base').attributes('style')).toContain('rotate(180deg)')
     expect(tile(w, 1, 3, 4).attributes('aria-label')).toBe('Pflanze: Dattel, blühend')
-    expect(tile(w, 1, 3, 4).find('.ch-plant').attributes('src')).toContain('dattel-bluete')
+    expect(tile(w, 1, 3, 4).find('.ch-plant').attributes('src')).toContain('ziel-dattel-bluete')
     expect(useTaskProgress().parts.value).toBe(1)
     expect(w.find('.ch-fb').text()).toBe('Das Wasser kommt an und die Pflanze blüht!')
     expect(played).toEqual(expect.arrayContaining(['tap', 'right']))
@@ -788,13 +783,12 @@ describe('Kanäle drehen (channels)', () => {
 
   it('a plant that has bloomed stays in bloom and is counted once, whatever is turned afterwards', async () => {
     const w = await open()
-    await turn(w, 1, 1, 4, 3)
     await turn(w, 1, 2, 4, 1)
     expect(useTaskProgress().parts.value).toBe(1)
-    await turn(w, 1, 2, 4, 2)
-    await turn(w, 1, 2, 4, 2)
+    await turn(w, 1, 2, 4, 1)
+    await turn(w, 1, 2, 4, 1)
     expect(useTaskProgress().parts.value).toBe(1)
-    expect(tile(w, 1, 3, 4).find('.ch-plant').attributes('src')).toContain('dattel-bluete')
+    expect(tile(w, 1, 3, 4).find('.ch-plant').attributes('src')).toContain('ziel-dattel-bluete')
   })
 
   it('all the way through: round 2 is a 5 x 4 garden with four plants; with no hint it is three stars; hints take stars (one: two, two: one); no mistakes exist', async () => {
@@ -805,24 +799,11 @@ describe('Kanäle drehen (channels)', () => {
         await w.findAll('button').find((b) => b.text() === 'Tipp')!.trigger('click')
         expect(w.find('.ch-tile.hint').exists()).toBe(true)
       }
-      // round 1: tee 3 turns (1 to 0), corner 1 (0 to 1), straight (0,2) 1, straight (1,2) 1
-      await turn(w, 1, 1, 4, 3)
-      await turn(w, 0, 1, 4, 1)
-      await turn(w, 0, 2, 4, 1)
-      await turn(w, 1, 2, 4, 1)
+      await solveRound(w, CHANNEL_GRID_1)
       await tick(2200)
       expect(w.find('.ch-round').text()).toContain('Runde 2 von 2')
       expect(w.findAll('.ch-tile')).toHaveLength(20)
-      // round 2 (5 columns): the tees (1,1) 3 turns and (1,3) 2 turns, the corners and straights of the ways
-      await turn(w, 1, 1, 5, 3)
-      await turn(w, 0, 1, 5, 1)
-      await turn(w, 0, 2, 5, 1)
-      await turn(w, 0, 3, 5, 1)
-      await turn(w, 1, 3, 5, 2)
-      await turn(w, 2, 3, 5, 2)
-      await turn(w, 2, 2, 5, 1)
-      await turn(w, 3, 2, 5, 3)
-      await turn(w, 3, 3, 5, 1)
+      await solveRound(w, CHANNEL_GRID_2)
       await tick(1800)
       expect(useTaskProgress().parts.value, `${hints} hints`).toBe(6)
       expect(useTaskProgress().finished.value).toBe(true)
@@ -858,7 +839,7 @@ describe('Kanäle drehen (channels)', () => {
 // ---------------------------------------------------------------- mirror the pattern
 describe('Spiegeln (mirror)', () => {
   const game: MirrorGame = {
-    scene: 'images/x/wiese.webp',
+    background: 'images/x/etappe-bild-06.webp',
     empty: 'images/x/leer.webp',
     stones: [
       { id: 'rot', image: 'images/x/stein-rot.webp', label: 'roter Blütenstein' },
@@ -991,7 +972,7 @@ describe('Säen (sow)', () => {
     field: 'images/x/acker.webp',
     bag: 'images/x/beutel.webp',
     seed: 'images/x/samen.webp',
-    sprout: 'images/x/spross.webp',
+    sprout: ['images/x/sproessling-1.webp', 'images/x/sproessling-2.webp'],
     vane: 'images/x/fahne.webp',
     furrows: [
       { id: 'a', x: 30, y: 52, w: 34, h: 8 },
@@ -1162,22 +1143,25 @@ describe('Säen (sow)', () => {
 describe('Hüten (herd)', () => {
   const H = 400 / 3
   const W = 300
+  const sprite = (id: string, label: string, w: number) => ({ id, image: `images/x/${id}.webp`, label, w })
   const game: HerdGame = {
     scene: 'images/x/wiese.webp',
-    rest: { x: 70, y: 30, r: 14 },
-    animals: [
-      { id: 'schaf', image: 'images/x/schaf.webp', label: 'Schaf', x: 30, y: 75, w: 13 },
-      { id: 'ziege', image: 'images/x/ziege.webp', label: 'Ziege', x: 42, y: 78, w: 13 },
-      { id: 'hirsch', image: 'images/x/hirsch.webp', label: 'Hirsch', x: 55, y: 74, w: 15 },
-      { id: 'reh', image: 'images/x/reh.webp', label: 'Reh', x: 36, y: 84, w: 12 },
-      { id: 'elefant', image: 'images/x/elefant.webp', label: 'Elefant', x: 50, y: 85, w: 20 },
-      { id: 'hase', image: 'images/x/hase.webp', label: 'Hase', x: 15, y: 60, w: 9, shy: true },
-      { id: 'pfau', image: 'images/x/pfau.webp', label: 'Pfau', x: 80, y: 88, w: 13, shy: true },
-      { id: 'giraffe', image: 'images/x/giraffe.webp', label: 'Giraffe', x: 22, y: 90, w: 14 }
-    ],
     rounds: [
-      { hint: 'Führe die Tiere sanft in den Schatten.', animals: ['schaf', 'ziege', 'hirsch', 'reh', 'elefant'] },
-      { hint: 'Jetzt sind es mehr, und zwei sind scheu.', animals: ['schaf', 'ziege', 'hirsch', 'reh', 'elefant', 'hase', 'pfau', 'giraffe'] }
+      {
+        hint: 'Führe das Schaf mit dem Finger in den Schatten der Bäume.',
+        leader: sprite('schaf', 'Schaf', 13),
+        followers: [sprite('schaf-2', 'Schaf', 12), sprite('schaf-3', 'Schaf', 12), sprite('schaf-4', 'Schaf', 12)],
+        start: { x: 30, y: 88 },
+        rest: { x: 72, y: 45, r: 12 }
+      },
+      {
+        hint: 'Führe den Hirsch zur Wasserstelle. Der Teich liegt im Weg.',
+        leader: sprite('hirsch', 'Hirsch', 15),
+        followers: [sprite('hirschkuh', 'Hirschkuh', 13), sprite('ziege', 'Ziege', 12), sprite('schaf', 'Schaf', 12), sprite('hirsch-2', 'Hirsch', 14)],
+        start: { x: 46, y: 88 },
+        rest: { x: 52, y: 25, r: 12 },
+        obstacle: { x: 50, y: 58, r: 10 }
+      }
     ]
   }
   const open = async (locale: 'de' | 'en' = 'de') => {
@@ -1188,127 +1172,161 @@ describe('Hüten (herd)', () => {
     return w
   }
   const field = (w: ReturnType<typeof mount>) => w.find('.hd-field').element
-  const ptr = (w: ReturnType<typeof mount>, type: string, px: number, py: number) => field(w).dispatchEvent(new MouseEvent(type, { bubbles: true, button: 0, clientX: px, clientY: py }))
-  const animals = (w: ReturnType<typeof mount>) => w.findAll('.hd-animal')
-  /** The positions of the animals read from the screen, in width units, and whether they rest. */
-  const seen = (w: ReturnType<typeof mount>) =>
-    animals(w).map((a) => {
-      const st = a.attributes('style')!
-      return { x: Number(/left:\s*([\d.]+)%/.exec(st)![1]), y: (Number(/top:\s*([\d.]+)%/.exec(st)![1]) * H) / 100, resting: a.classes().includes('resting') }
-    })
-  /**
-   * A shepherd: the finger stands behind the animal that is farthest from the resting place and glides after it. Returns when the round is done
-   * (the count says that all animals rest), or gives up after `limit` seconds.
-   */
-  const shepherd = async (w: ReturnType<typeof mount>, total: number, limit = 60) => {
-    const zone = { x: 70, y: (30 * H) / 100 }
-    let finger = { x: 50, y: 120 }
-    ptr(w, 'pointerdown', (finger.x / 100) * W, (finger.y / 100) * W)
-    for (let t = 0; t < limit * 1000; t += 34) {
-      const list = seen(w).filter((a) => !a.resting)
-      if (!list.length) break
-      const far = list.reduce((m, a) => (Math.hypot(a.x - zone.x, a.y - zone.y) > Math.hypot(m.x - zone.x, m.y - zone.y) ? a : m))
-      const dx = zone.x - far.x
-      const dy = zone.y - far.y
-      const d = Math.hypot(dx, dy) || 1
-      const goal = { x: far.x - (dx / d) * 14, y: far.y - (dy / d) * 14 }
-      const gx = goal.x - finger.x
-      const gy = goal.y - finger.y
-      const g = Math.hypot(gx, gy) || 1
-      const step = Math.min(g, 3)
-      finger = { x: finger.x + (gx / g) * step, y: finger.y + (gy / g) * step }
-      ptr(w, 'pointermove', (finger.x / 100) * W, (finger.y / 100) * W)
-      await vi.advanceTimersByTimeAsync(34)
-    }
-    ptr(w, 'pointerup', 0, 0)
-    await flushPromises()
-    expect(w.text()).toContain(`${total} von ${total}`)
+  /** The finger (width units) as a pointer event on the meadow. */
+  const ptr = (w: ReturnType<typeof mount>, type: string, p: { x: number; y: number }) =>
+    field(w).dispatchEvent(new MouseEvent(type, { bubbles: true, button: 0, clientX: (p.x / 100) * W, clientY: (p.y / 100) * W }))
+  const unitsOf = (el: { attributes: (n: string) => string | undefined }) => {
+    const st = el.attributes('style')!
+    return { x: Number(/left:\s*([\d.]+)%/.exec(st)![1]), y: (Number(/top:\s*([\d.]+)%/.exec(st)![1]) * H) / 100 }
   }
+  const leaderAt = (w: ReturnType<typeof mount>) => unitsOf(w.find('.hd-animal.leader'))
+  const followersAt = (w: ReturnType<typeof mount>) => w.findAll('.hd-animal.follower').map(unitsOf)
+  const dist = (a: { x: number; y: number }, b: { x: number; y: number }) => Math.hypot(a.x - b.x, a.y - b.y)
+  /** Hold the finger on a point until the leader is there, or has come to the resting place (or `seconds` have passed). */
+  const lead = async (w: ReturnType<typeof mount>, to: { x: number; y: number }, seconds = 6) => {
+    ptr(w, 'pointerdown', to)
+    for (let t = 0; t < seconds * 1000; t += 100) {
+      await tick(100)
+      if (dist(leaderAt(w), to) < 1 || w.find('.hd-fb').text() === 'Das Leittier ist da. Die anderen kommen.') break
+    }
+  }
+  /** Let the herd gather and lie down, and the next round begin. */
+  const nextRound = async (w: ReturnType<typeof mount>) => {
+    ptr(w, 'pointerup', { x: 0, y: 0 })
+    await tick(1400)
+    await tick(2000)
+  }
+  const rest1 = { x: 72, y: (45 * H) / 100 }
+  const rest2 = { x: 52, y: (25 * H) / 100 }
+  const pond = { x: 50, y: (58 * H) / 100, r: 10 + 5 }
 
-  it('round 1: five animals on the meadow, a resting place, no mistakes to make; the goal is the number of all animals (5 + 8 = 13); two rounds at most', async () => {
+  it('round 1: a leader with three followers in a row behind it, a resting place, no mistakes to make; the goal is the number of herds (2); two rounds at most', async () => {
     expect(game.rounds.length).toBeLessThanOrEqual(2)
-    for (const r of game.rounds) for (const id of r.animals) expect(game.animals.some((a) => a.id === id)).toBe(true)
     const w = await open()
-    expect(animals(w)).toHaveLength(5)
+    expect(w.findAll('.hd-animal')).toHaveLength(4)
+    expect(w.find('.hd-animal.leader').attributes('aria-label')).toBe('Leittier: Schaf')
     expect(w.find('.hd-zone').exists()).toBe(true)
     expect(w.find('.hd-round').text()).toContain('Runde 1 von 2')
-    expect(w.find('.hd-count').text()).toBe('Es ruhen: 0 von 5')
-    expect(useTaskProgress().goal.value).toBe(13)
-    expect(animals(w)[0]!.attributes('aria-label')).toBe('Tier: Schaf')
+    expect(w.find('.hd-count').text()).toBe('Herden angekommen: 0 von 2')
+    expect(useTaskProgress().goal.value).toBe(2)
+    // the herd stands in a row behind the leader, the same distance apart, on the side away from the resting place
+    const l = leaderAt(w)
+    const f = followersAt(w)
+    expect(dist(l, f[0]!)).toBeCloseTo(8, 0)
+    expect(dist(f[0]!, f[1]!)).toBeCloseTo(8, 0)
+    expect(dist(f[1]!, f[2]!)).toBeCloseTo(8, 0)
+    expect(f[0]!.x).toBeLessThan(l.x)
     expect(problems()).toEqual([])
   })
 
-  it('the animals step away from the finger and stay still without it', async () => {
+  it('the leader walks to the finger, not faster than a calm walk; it stays when the finger lifts; the followers come after it on its trail', async () => {
     const w = await open()
-    const before = seen(w)
-    // the finger just right of the first animal (the sheep): it goes left
-    const sheep = before[0]!
-    ptr(w, 'pointerdown', ((sheep.x + 10) / 100) * W, (sheep.y / 100) * W)
-    await tick(600)
+    const start = leaderAt(w)
+    ptr(w, 'pointerdown', { x: 80, y: start.y })
+    await tick(500)
+    const after = leaderAt(w)
+    expect(after.x).toBeGreaterThan(start.x + 20)
+    expect(after.x - start.x).toBeLessThanOrEqual(62 * 0.55)
     expect(w.find('.hd-staff').exists()).toBe(true)
-    expect(seen(w)[0]!.x).toBeLessThan(sheep.x)
-    ptr(w, 'pointerup', 0, 0)
-    await tick(3000)
-    expect(w.find('.hd-staff').exists()).toBe(false)
-    const rest = seen(w)
+    ptr(w, 'pointerup', { x: 0, y: 0 })
     await tick(1000)
-    expect(seen(w).map((a) => Math.round(a.x * 10))).toEqual(rest.map((a) => Math.round(a.x * 10)))
+    expect(w.find('.hd-staff').exists()).toBe(false)
+    const still = leaderAt(w)
+    await tick(1000)
+    expect(leaderAt(w)).toEqual(still)
+    // the first follower stands behind the leader on the way it walked (same height, to its left), the next ones behind it
+    const f = followersAt(w)
+    expect(f[0]!.x).toBeLessThan(still.x)
+    expect(f[1]!.x).toBeLessThan(f[0]!.x)
+    expect(Math.abs(f[0]!.y - still.y)).toBeLessThan(1.5)
   })
 
-  it('all the way through: the shepherd brings round 1 home (a part for every animal), round 2 with two shy animals, and the game is three stars', async () => {
+  it('round 1 to the end: at the resting place the leader stays, the others gather and all rest (a part counted, the tone of the find), then round 2 begins', async () => {
     const w = await open()
-    await shepherd(w, 5)
-    expect(useTaskProgress().parts.value).toBe(5)
-    expect(w.findAll('.hd-animal.resting')).toHaveLength(5)
+    await lead(w, rest1)
+    expect(w.find('.hd-fb').text()).toBe('Das Leittier ist da. Die anderen kommen.')
+    ptr(w, 'pointerup', { x: 0, y: 0 })
+    await tick(1300)
+    expect(w.findAll('.hd-animal.resting')).toHaveLength(4)
+    expect(w.find('.hd-count').text()).toBe('Herden angekommen: 1 von 2')
+    expect(useTaskProgress().parts.value).toBe(1)
     expect(played).toContain('found')
+    // they gathered round the leader (closer than in the row)
+    const l = leaderAt(w)
+    for (const p of followersAt(w)) expect(dist(l, p)).toBeLessThan(14)
     await tick(2200)
     expect(w.find('.hd-round').text()).toContain('Runde 2 von 2')
-    expect(animals(w)).toHaveLength(8)
+    expect(w.findAll('.hd-animal')).toHaveLength(5)
     expect(w.findAll('.hd-animal.resting')).toHaveLength(0)
-    await shepherd(w, 8, 90)
-    await tick(2000)
-    expect(useTaskProgress().parts.value).toBe(13)
+    expect(w.find('.hd-animal.leader').attributes('aria-label')).toBe('Leittier: Hirsch')
+  })
+
+  it('round 2: the pond lies in the way; dragged into it, the leader stops at its edge and never steps in; led round it, it gets there and the game is three stars', async () => {
+    const w = await open()
+    await lead(w, rest1)
+    await nextRound(w)
+    expect(w.find('.hd-round').text()).toContain('Runde 2 von 2')
+    // the finger straight into the middle of the pond: the leader stays outside
+    let closest = Infinity
+    ptr(w, 'pointerdown', { x: 50, y: pond.y })
+    for (let i = 0; i < 40; i++) {
+      await tick(100)
+      closest = Math.min(closest, dist(leaderAt(w), pond))
+    }
+    expect(closest).toBeGreaterThanOrEqual(pond.r - 0.5)
+    // led round the pond (the way the help shows), it gets to the watering place
+    for (const via of helpPath(leaderAt(w), rest2, pond).slice(1)) {
+      await lead(w, via, 8)
+      closest = Math.min(closest, dist(leaderAt(w), pond))
+    }
+    expect(closest).toBeGreaterThanOrEqual(pond.r - 0.5)
+    ptr(w, 'pointerup', { x: 0, y: 0 })
+    await tick(1500)
+    expect(w.find('.hd-count').text()).toBe('Herden angekommen: 2 von 2')
+    await tick(1800)
+    expect(useTaskProgress().parts.value).toBe(2)
     expect(useTaskProgress().finished.value).toBe(true)
-    expect(w.text()).toContain('Alle Tiere ruhen im Schatten!')
+    expect(w.text()).toContain('Beide Herden ruhen in Frieden!')
     await w.find('.gd button').trigger('click')
     expect(w.emitted('done')).toEqual([[3]])
     expect(problems()).toEqual([])
   })
 
-  it('"Help" shows a soft path to the resting place for a few seconds and costs nothing', async () => {
+  it('"Help" shows a soft path to the resting place for a few seconds (bent round the pond in round 2) and costs nothing', async () => {
     const w = await open()
     expect(w.find('.hd-path').exists()).toBe(false)
     const help = w.findAll('button').find((b) => b.text() === 'Hilfe')!
     expect((help.element as HTMLElement).className).toContain('lk-btn')
     await help.trigger('click')
     expect(w.find('.hd-path').exists()).toBe(true)
+    expect(w.find('.hd-path polyline').attributes('points')!.split(' ')).toHaveLength(2)
     await tick(4200)
     expect(w.find('.hd-path').exists()).toBe(false)
-    await shepherd(w, 5)
-    await tick(2200)
-    await shepherd(w, 8, 90)
-    await tick(2000)
-    await w.find('.gd button').trigger('click')
-    expect(w.emitted('done')).toEqual([[3]])
+    await lead(w, rest1)
+    await nextRound(w)
+    await w.findAll('button').find((b) => b.text() === 'Hilfe')!.trigger('click')
+    expect(w.find('.hd-path polyline').attributes('points')!.split(' ')).toHaveLength(3)
   })
 
-  it('the arrow keys move the staff for those who cannot use a finger', async () => {
+  it('the arrow keys lead the leader for those who cannot use a finger', async () => {
     const w = await open()
+    const before = leaderAt(w)
     await w.find('.hd-field').trigger('keydown', { key: 'ArrowUp' })
-    expect(w.find('.hd-staff').exists()).toBe(true)
+    await tick(300)
+    expect(leaderAt(w).y).toBeLessThan(before.y)
     await tick(900)
     expect(w.find('.hd-staff').exists()).toBe(false)
   })
 
-  it('the steps of "Go on" for 13 animals: 4 rest one star, 9 two stars', () => {
-    expect([3, 4, 8, 9].map((d) => partialStars(d, 13))).toEqual([0, 1, 1, 2])
+  it('the steps of "Go on" for 2 herds: one herd arrived is one star, none is nothing', () => {
+    expect([0, 1].map((d) => partialStars(d, 2))).toEqual([0, 1])
   })
 
   it('English: the words of the game', async () => {
     const w = await open('en')
     expect(w.find('.hd-round').text()).toBe('Round 1 of 2')
-    expect(w.find('.hd-count').text()).toBe('Resting: 0 of 5')
-    expect(animals(w)[0]!.attributes('aria-label')).toBe('Animal: Schaf')
+    expect(w.find('.hd-count').text()).toBe('Herds that arrived: 0 of 2')
+    expect(w.find('.hd-animal.leader').attributes('aria-label')).toBe('Leader: Schaf')
     expect(w.findAll('button').some((b) => b.text() === 'Help')).toBe(true)
   })
 })

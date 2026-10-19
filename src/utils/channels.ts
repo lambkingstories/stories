@@ -5,18 +5,20 @@
  */
 import type { ChannelKind, ChannelTile } from '@/types/adventure'
 
-/** The sides a tile has open at rotation 0 (0 up, 1 right, 2 down, 3 left). */
+/**
+ * The sides a tile has open at rotation 0 (0 up, 1 right, 2 down, 3 left), as the pictures are painted: a straight piece runs left to right, a
+ * curve from left to down, a fork has left, right and down open, the source opens to the right and a goal to the left.
+ */
 const BASE: Record<ChannelKind, number[]> = {
   straight: [1, 3],
-  corner: [0, 1],
-  tee: [0, 1, 3],
-  cross: [0, 1, 2, 3],
+  corner: [3, 2],
+  tee: [3, 1, 2],
   empty: [],
   source: [1],
   goal: [3]
 }
 
-/** Only these can be turned by the child: the source and the goals sit fixed, a cross and an empty tile look the same in every turn. */
+/** Only these can be turned by the child: the source and the goals sit fixed, and an empty tile looks the same in every turn. */
 export const isTurnable = (kind: ChannelKind): boolean => kind === 'straight' || kind === 'corner' || kind === 'tee'
 
 /** How many different positions a tile has (a straight piece only two). */

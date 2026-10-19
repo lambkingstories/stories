@@ -1,150 +1,113 @@
 /**
- * The herd of the herding game (`utils/herd.ts`): animals step away from the finger, stay together, never crowd, slow down in the resting place,
- * lie down there and stay. A simulated shepherd (a finger that stands behind the animals, on the side away from the resting place) has to be able
- * to bring every kind of herd home, so that the game can be won with a finger.
+ * The herd of the herding game (`utils/herd.ts`): the leader walks to the finger (never faster than a calm walk, never into the pond), the herd
+ * follows on the trail in a row at a fixed distance, and the help bends around the pond.
  */
 import { describe, expect, it } from 'vitest'
-import { PUSH_RADIUS, REST_AFTER, SHY_RADIUS, makeAnimal, restingCount, stepHerd, type Animal, type Pt, type Zone } from '@/utils/herd'
+import { TRAIL_STEP, WALK_SPEED, clampOutside, extendTrail, followPositions, helpPath, inside, walk, type Pt } from '@/utils/herd'
 
-const ZONE: Zone = { x: 70, y: 40, r: 14 }
-const DT = 1 / 30
+const dist = (a: Pt, b: Pt) => Math.hypot(a.x - b.x, a.y - b.y)
 
-/** Run `seconds` with a finger that does not move. */
-function run(animals: Animal[], pointer: Pt | null, seconds: number, zone: Zone = ZONE) {
-  for (let t = 0; t < seconds; t += DT) stepHerd(animals, pointer, DT, zone)
-}
-
-/**
- * A simple shepherd: the finger stands a little behind the animal that is farthest from the resting place (seen from the place), so that the
- * herd is driven toward it. Returns the seconds it took, or null if the herd was not at rest after `limit` seconds.
- */
-function shepherd(animals: Animal[], zone: Zone, limit = 40): number | null {
-  let finger: Pt = { x: 50, y: 120 }
-  for (let t = 0; t < limit; t += DT) {
-    const left = animals.filter((a) => !a.resting)
-    if (!left.length) return t
-    const far = left.reduce((m, a) => (Math.hypot(a.x - zone.x, a.y - zone.y) > Math.hypot(m.x - zone.x, m.y - zone.y) ? a : m))
-    const dx = zone.x - far.x
-    const dy = zone.y - far.y
-    const d = Math.hypot(dx, dy) || 1
-    const behind = { x: far.x - (dx / d) * 14, y: far.y - (dy / d) * 14 }
-    // the finger glides to its place (a hand cannot jump)
-    const gx = behind.x - finger.x
-    const gy = behind.y - finger.y
-    const g = Math.hypot(gx, gy) || 1
-    const step = Math.min(g, 90 * DT)
-    finger = { x: finger.x + (gx / g) * step, y: finger.y + (gy / g) * step }
-    stepHerd(animals, finger, DT, zone)
-  }
-  return animals.every((a) => a.resting) ? limit : null
-}
-
-describe('one animal', () => {
-  it('steps away from the finger, the closer the finger the faster; a shy animal already from farther off', () => {
-    const calm = [makeAnimal(50, 70)]
-    run(calm, { x: 50 + PUSH_RADIUS - 2, y: 70 }, 0.5)
-    // the finger is to the right: the animal went left
-    expect(calm[0]!.x).toBeLessThan(50)
-    const near = [makeAnimal(50, 70)]
-    const far = [makeAnimal(50, 70)]
-    run(near, { x: 58, y: 70 }, 0.5)
-    run(far, { x: 50 + PUSH_RADIUS - 2, y: 70 }, 0.5)
-    expect(50 - near[0]!.x).toBeGreaterThan(50 - far[0]!.x)
-    // outside the reach nothing happens; a shy animal reaches farther
-    const out = [makeAnimal(50, 70)]
-    const shy = [makeAnimal(50, 70, true)]
-    const at = { x: 50 + PUSH_RADIUS + 4, y: 70 }
-    run(out, at, 0.5)
-    run(shy, at, 0.5)
-    expect(out[0]!.x).toBeCloseTo(50, 3)
-    expect(shy[0]!.x).toBeLessThan(50)
-    expect(PUSH_RADIUS + 4).toBeLessThan(SHY_RADIUS)
-  })
-
-  it('stops by itself when the finger lifts (damping), and stays on the meadow', () => {
-    const a = [makeAnimal(10, 20)]
-    a[0]!.vx = -30
-    run(a, null, 3)
-    expect(Math.hypot(a[0]!.vx, a[0]!.vy)).toBeLessThan(0.5)
-    expect(a[0]!.x).toBeGreaterThanOrEqual(4)
-    const b = [makeAnimal(96, 128)]
-    run(b, { x: 80, y: 110 }, 5)
-    expect(b[0]!.x).toBeLessThanOrEqual(96)
-    expect(b[0]!.y).toBeLessThanOrEqual(129)
-  })
-
-  it('in the resting place it slows down, lies down after a moment and then stays, even when the finger comes close', () => {
-    const a = [makeAnimal(ZONE.x, ZONE.y)]
-    run(a, null, REST_AFTER - 0.2)
-    expect(a[0]!.resting).toBe(false)
-    run(a, null, 0.5)
-    expect(a[0]!.resting).toBe(true)
-    const where = { x: a[0]!.x, y: a[0]!.y }
-    run(a, { x: where.x + 3, y: where.y }, 3)
-    expect(a[0]!.x).toBe(where.x)
-    expect(a[0]!.y).toBe(where.y)
-    expect(restingCount(a)).toBe(1)
-  })
-
-  it('an animal that only passes through does not rest (the time starts again outside)', () => {
-    const a = [makeAnimal(ZONE.x, ZONE.y)]
-    run(a, null, 0.3)
-    a[0]!.x = 30
-    a[0]!.y = 90
-    run(a, null, 0.2)
-    expect(a[0]!.calm).toBe(0)
-    expect(a[0]!.resting).toBe(false)
+describe('the pond', () => {
+  it('a point inside the pond goes to its edge, straight away from the middle; a point outside stays', () => {
+    const pond = { x: 50, y: 60, r: 10 }
+    const edge = clampOutside({ x: 52, y: 60 }, pond)
+    expect(dist(edge, pond)).toBeCloseTo(10, 5)
+    expect(edge.x).toBeCloseTo(60, 5)
+    expect(edge.y).toBeCloseTo(60, 5)
+    expect(clampOutside({ x: 80, y: 60 }, pond)).toEqual({ x: 80, y: 60 })
+    // exactly in the middle: it still goes to the edge (never stays inside)
+    expect(dist(clampOutside({ x: 50, y: 60 }, pond), pond)).toBeCloseTo(10, 5)
+    expect(inside({ x: 55, y: 60 }, pond)).toBe(true)
+    expect(inside({ x: 61, y: 60 }, pond)).toBe(false)
   })
 })
 
-describe('the herd', () => {
-  it('animals do not crowd each other: two on one spot move apart', () => {
-    const a = [makeAnimal(40, 80), makeAnimal(41, 80)]
-    run(a, null, 1)
-    expect(Math.hypot(a[0]!.x - a[1]!.x, a[0]!.y - a[1]!.y)).toBeGreaterThan(5)
+describe('the leader', () => {
+  it('walks towards the finger, at most as fast as a calm walk, and stops at the finger', () => {
+    let p: Pt = { x: 10, y: 100 }
+    p = walk(p, { x: 90, y: 100 }, 0.1)
+    expect(p.x).toBeCloseTo(10 + WALK_SPEED * 0.1, 5)
+    expect(p.y).toBeCloseTo(100, 5)
+    expect(walk({ x: 10, y: 100 }, { x: 12, y: 100 }, 1)).toEqual({ x: 12, y: 100 })
   })
 
-  it('the herd stays together while it is driven (the finger on one side pushes all of them the same way)', () => {
-    const herd = [makeAnimal(40, 100), makeAnimal(50, 104), makeAnimal(58, 98), makeAnimal(46, 110), makeAnimal(54, 112)]
-    run(herd, { x: 50, y: 125 }, 2)
-    const ys = herd.map((a) => a.y)
-    expect(Math.max(...ys)).toBeLessThan(112)
-    const spread = Math.max(...herd.map((a) => Math.hypot(a.x - 50, a.y - Math.min(...ys))))
-    expect(spread).toBeLessThan(40)
+  it('never steps into the pond: dragged into it, it stops at the edge, and dragged round it, it slides along the edge', () => {
+    const pond = { x: 50, y: 60, r: 12 }
+    let p: Pt = { x: 20, y: 60 }
+    for (let t = 0; t < 4; t += 0.05) p = walk(p, { x: 50, y: 60 }, 0.05, pond)
+    expect(dist(p, pond)).toBeGreaterThanOrEqual(12 - 0.001)
+    expect(p.x).toBeLessThan(50)
+    // the finger moves to the other side of the pond: the leader gets there and never enters
+    let minimum = Infinity
+    for (let t = 0; t < 8; t += 0.05) {
+      p = walk(p, { x: 80, y: 60 }, 0.05, pond)
+      minimum = Math.min(minimum, dist(p, pond))
+    }
+    expect(minimum).toBeGreaterThanOrEqual(12 - 0.001)
+  })
+})
+
+describe('the trail and the followers', () => {
+  const walkAlong = (points: Pt[]) => {
+    const trail: Pt[] = []
+    for (const p of points) extendTrail(trail, p)
+    return trail
+  }
+  const line = (n: number) => Array.from({ length: n }, (_, i) => ({ x: 10 + i, y: 50 }))
+
+  it('a new point comes on the trail only when the leader has moved far enough', () => {
+    const trail: Pt[] = []
+    extendTrail(trail, { x: 10, y: 10 })
+    extendTrail(trail, { x: 10 + TRAIL_STEP / 2, y: 10 })
+    expect(trail).toHaveLength(1)
+    extendTrail(trail, { x: 10 + TRAIL_STEP, y: 10 })
+    expect(trail).toHaveLength(2)
   })
 
-  it('a shepherd that stands behind the herd brings five calm animals into the resting place', () => {
-    const herd = [makeAnimal(30, 100), makeAnimal(42, 104), makeAnimal(55, 98), makeAnimal(36, 112), makeAnimal(50, 114)]
-    const time = shepherd(herd, ZONE)
-    expect(time, 'round 1 can be won').not.toBeNull()
-    expect(restingCount(herd)).toBe(5)
-    expect(time!).toBeLessThan(40)
+  it('the followers stand on the trail behind the head, the same distance apart, in a row (first one `spacing` behind the head)', () => {
+    const trail = walkAlong(line(40))
+    const head = trail[trail.length - 1]!
+    const f = followPositions(trail, 5, 3)
+    expect(f).toHaveLength(3)
+    expect(dist(head, f[0]!)).toBeCloseTo(5, 0)
+    expect(dist(f[0]!, f[1]!)).toBeCloseTo(5, 0)
+    expect(dist(f[1]!, f[2]!)).toBeCloseTo(5, 0)
+    // they are all on the line the leader walked
+    for (const p of f) expect(p.y).toBeCloseTo(50, 5)
+    expect(f[0]!.x).toBeGreaterThan(f[1]!.x)
+    expect(f[1]!.x).toBeGreaterThan(f[2]!.x)
   })
 
-  it('and eight animals, two of them shy (round 2), from different corners of the meadow', () => {
-    const herd = [
-      makeAnimal(15, 60),
-      makeAnimal(30, 105),
-      makeAnimal(45, 118),
-      makeAnimal(60, 108),
-      makeAnimal(85, 95),
-      makeAnimal(20, 85, true),
-      makeAnimal(75, 118, true),
-      makeAnimal(50, 90)
-    ]
-    const time = shepherd(herd, ZONE, 60)
-    expect(time, 'round 2 can be won').not.toBeNull()
-    expect(restingCount(herd)).toBe(8)
+  it('they follow the bends: after a turn they stand on the way the leader took, not on a straight line to it', () => {
+    const trail: Pt[] = []
+    for (let x = 10; x <= 30; x += 1) extendTrail(trail, { x, y: 50 })
+    for (let y = 51; y <= 70; y += 1) extendTrail(trail, { x: 30, y })
+    const f = followPositions(trail, 8, 3)
+    // the first follower is still on the straight part going down, the third one is already round the corner on the first leg
+    expect(f[0]!.x).toBeCloseTo(30, 0)
+    expect(f[0]!.y).toBeCloseTo(70 - 8, 0)
+    expect(f[2]!.y).toBeCloseTo(50, 0)
+    expect(f[2]!.x).toBeCloseTo(30 - 4, 0)
   })
 
-  it('animals that rest stay where they lie while the others are still being driven', () => {
-    const herd = [makeAnimal(ZONE.x, ZONE.y), makeAnimal(30, 100)]
-    run(herd, null, 1.2)
-    expect(herd[0]!.resting).toBe(true)
-    const lie = { x: herd[0]!.x, y: herd[0]!.y }
-    run(herd, { x: 30, y: 118 }, 4)
-    expect(herd[0]!.x).toBe(lie.x)
-    expect(herd[0]!.y).toBe(lie.y)
-    expect(herd[1]!.y).toBeLessThan(100)
+  it('a trail that is too short leaves the followers at its beginning (they are all there, none is lost); an empty trail has no followers', () => {
+    const trail = walkAlong(line(3))
+    const f = followPositions(trail, 5, 3)
+    expect(f).toHaveLength(3)
+    for (const p of f) expect(p).toEqual(trail[0])
+    expect(followPositions([], 5, 3)).toEqual([])
+  })
+})
+
+describe('the help', () => {
+  it('is a straight line when nothing is in the way, and bends round the pond when the pond is on the line', () => {
+    const from = { x: 20, y: 100 }
+    const to = { x: 80, y: 100 }
+    expect(helpPath(from, to)).toEqual([from, to])
+    expect(helpPath(from, to, { x: 50, y: 40, r: 8 })).toEqual([from, to])
+    const bent = helpPath(from, to, { x: 50, y: 100, r: 9 })
+    expect(bent).toHaveLength(3)
+    // the point in between lies beside the pond, outside it
+    expect(dist(bent[1]!, { x: 50, y: 100 })).toBeGreaterThan(9)
   })
 })

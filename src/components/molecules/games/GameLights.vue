@@ -44,7 +44,7 @@ let ringKey = 0
 const stars = computed(() => mistakeStars(slips.value, 3, 8))
 
 /** How many lights shine at the same time in this round (`together`, at least one). */
-const together = computed(() => Math.max(1, current.value.together ?? 1))
+const together = computed(() => Math.max(1, current.value.together))
 const visible = computed(() => current.value.spots.map((s, i) => ({ s, i })).filter(({ i }) => i < appeared.value && !taken[i]))
 /** 0 (dark) to 1 (bright), from the lights collected so far in all rounds. */
 const brightness = computed(() => (finished.value ? 1 : total.value ? collected.value / total.value : 1))
@@ -106,6 +106,9 @@ function sceneTap(e: MouseEvent) {
 }
 
 const spotStyle = (s: { x: number; y: number; w: number }) => ({ left: `${s.x}%`, top: `${s.y}%`, width: `${s.w}%` })
+/** The lights that are collected in this round: a soft brightening stays around each of them (the picture is brightened there, nothing is drawn). */
+const shining = computed(() => current.value.spots.map((s, i) => ({ s, i })).filter(({ i }) => taken[i]))
+const litStyle = (s: { x: number; y: number; w: number }) => ({ left: `${s.x}%`, top: `${s.y}%`, width: `${s.w * 3.2}%` })
 const src = (p: string) => prependBaseUrl(p)
 </script>
 
@@ -117,6 +120,7 @@ const src = (p: string) => prependBaseUrl(p)
       div(class="lt-field" role="group" :aria-label="t('app.adventure.lightsField')" @click="sceneTap")
         img(:src="src(game.scene)" alt="" draggable="false" class="lt-bg")
         div(class="lt-dark" :style="darkStyle" aria-hidden="true")
+        span(v-for="{ s, i } in shining" :key="`lit-${round}-${i}`" class="lt-lit" :style="litStyle(s)" aria-hidden="true")
         button(
           v-for="{ s, i } in visible"
           :key="`${round}-${i}`"
@@ -126,8 +130,7 @@ const src = (p: string) => prependBaseUrl(p)
           :aria-label="t('app.adventure.lightsLight')"
           @click.stop="take(i)"
         )
-          img(:src="src(game.glow)" alt="" draggable="false")
-          img(v-if="s.cloud" :src="src(s.cloud)" alt="" draggable="false" class="lt-cloud")
+          span(class="lt-dot" aria-hidden="true")
         span(v-if="ring" :key="ring.k" class="lt-ring" :style="{ left: `${ring.x}%`, top: `${ring.y}%` }" aria-hidden="true")
       p(class="lt-count") {{ t('app.adventure.lightsCount', { n: collected, total }) }}
     GameDone(v-else :stars="stars" :text="t('app.adventure.lightsDone')" @next="emit('done', stars)")
@@ -204,20 +207,25 @@ const src = (p: string) => prependBaseUrl(p)
   -webkit-tap-highlight-color: transparent
   animation: lt-glow 1800ms ease-in-out infinite
 
-  img
+  // the glimmer: a soft round light, made by the app (it brightens the picture under it)
+  .lt-dot
     display: block
     width: 100%
-    height: auto
+    aspect-ratio: 1
+    border-radius: 50%
+    background: radial-gradient(circle, rgba(255, 252, 226, 0.95) 0%, rgba(255, 232, 150, 0.6) 38%, rgba(255, 220, 120, 0) 72%)
+    mix-blend-mode: screen
     pointer-events: none
-    filter: drop-shadow(0 0 10px rgba(255, 224, 130, 0.95))
 
-  // a cloud lies half over the light (the light is still tapped through it)
-  .lt-cloud
-    position: absolute
-    left: 22%
-    top: 30%
-    width: 120%
-    filter: none
+// what has been collected stays a little brighter
+.lt-lit
+  position: absolute
+  aspect-ratio: 1
+  transform: translate(-50%, -50%)
+  border-radius: 50%
+  background: radial-gradient(circle, rgba(255, 244, 205, 0.55) 0%, rgba(255, 232, 170, 0.28) 40%, rgba(255, 220, 140, 0) 70%)
+  mix-blend-mode: screen
+  pointer-events: none
 
 .lt-ring
   position: absolute

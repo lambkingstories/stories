@@ -112,7 +112,7 @@ const gridStyle = computed(() => ({ '--half': String(current.value.cols) }))
 </script>
 
 <template lang="pug">
-  div(class="mr" :style="{ backgroundImage: `url(${src(game.scene)})` }")
+  div(class="mr" :style="{ backgroundImage: `url(${src(game.background)})` }")
     template(v-if="!finished")
       p(v-if="rounds.length > 1" class="mr-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="mr-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
