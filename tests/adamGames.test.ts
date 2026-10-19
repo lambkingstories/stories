@@ -10,7 +10,8 @@ import useTaskProgress from '@/use/useTaskProgress'
 import { partialStars } from '@/utils/adventureScore'
 import { CHANNEL_GRID_1, CHANNEL_GRID_2 } from '@/data/adventures/adamEvaChannels'
 import { flow, goalsOf, solve } from '@/utils/channels'
-import type { ChannelGame, EchoGame, LightGame, MirrorGame, OrderGame, VerseGame, WaterGame } from '@/types/adventure'
+import { landing, pullFor } from '@/utils/sow'
+import type { ChannelGame, EchoGame, LightGame, MirrorGame, OrderGame, SowGame, VerseGame, WaterGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -981,5 +982,178 @@ describe('Spiegeln (mirror)', () => {
     expect(right(w)[0]!.attributes('aria-label')).toBe('Right side, row 1, field 1')
     await set(w, 'roter', 0, 0, 2)
     expect(w.find('.mr-fb').text()).toBe('That one does not match here. Look at the other side.')
+  })
+})
+
+// ---------------------------------------------------------------- sow the seeds
+describe('Säen (sow)', () => {
+  const game: SowGame = {
+    field: 'images/x/acker.webp',
+    bag: 'images/x/beutel.webp',
+    seed: 'images/x/samen.webp',
+    sprout: 'images/x/spross.webp',
+    vane: 'images/x/fahne.webp',
+    furrows: [
+      { id: 'a', x: 30, y: 52, w: 34, h: 8 },
+      { id: 'b', x: 70, y: 52, w: 34, h: 8 },
+      { id: 'c', x: 30, y: 36, w: 34, h: 8 },
+      { id: 'd', x: 70, y: 36, w: 34, h: 8 },
+      { id: 'e', x: 30, y: 22, w: 34, h: 8 },
+      { id: 'f', x: 70, y: 22, w: 34, h: 8 }
+    ],
+    rounds: [
+      { hint: 'Ziehe den Beutel zurück und lass los.', furrows: ['a', 'b', 'c', 'd'], wind: 0 },
+      { hint: 'Jetzt weht ein leichter Wind.', furrows: ['a', 'b', 'c', 'd', 'e', 'f'], wind: 0.5 }
+    ]
+  }
+  const ORIGIN = { x: 50, y: 90 }
+  const W = 300
+  const H = 400
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, right: W, bottom: H, width: W, height: H, x: 0, y: 0, toJSON: () => ({}) })
+    const { default: Sow } = await import('@/components/molecules/games/GameSow.vue')
+    const w = mount(Sow, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  const furrow = (w: ReturnType<typeof mount>, i: number) => w.findAll('.sw-furrow')[i]!
+  /** The pull (percent) that lands the seed on a point in spite of the wind (the drift is taken off in a few steps). */
+  const pullTo = (target: { x: number; y: number }, wind: number) => {
+    let aim = { ...target }
+    let pull = pullFor(ORIGIN, aim)
+    for (let i = 0; i < 40; i++) {
+      const got = landing(ORIGIN, pull, wind)
+      aim = { x: aim.x + (target.x - got.x), y: aim.y + (target.y - got.y) }
+      pull = pullFor(ORIGIN, aim)
+    }
+    return pull
+  }
+  /** Pull the bag back by `pull` (percent of the field) and let go. */
+  const pullBag = async (w: ReturnType<typeof mount>, pull: { x: number; y: number }, release = true) => {
+    const x0 = 150
+    const y0 = 360
+    w.find('.sw-bag').element.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: x0, clientY: y0 }))
+    window.dispatchEvent(new MouseEvent('pointermove', { clientX: x0 + (pull.x / 100) * W, clientY: y0 + (pull.y / 100) * H }))
+    await flushPromises()
+    if (release) {
+      window.dispatchEvent(new MouseEvent('pointerup', { clientX: x0 + (pull.x / 100) * W, clientY: y0 + (pull.y / 100) * H }))
+      await flushPromises()
+      await tick(800)
+    }
+  }
+  const throwAt = async (w: ReturnType<typeof mount>, f: (typeof game.furrows)[number], wind: number) => pullBag(w, pullTo({ x: f.x, y: f.y }, wind))
+  const missAt = (w: ReturnType<typeof mount>) => pullBag(w, pullTo({ x: 50, y: 70 }, 0))
+
+  it('round 1: four furrows, no wind flag; the goal is the number of all the furrows (4 + 6 = 10); two rounds at most', async () => {
+    expect(game.rounds.length).toBeLessThanOrEqual(2)
+    const w = await open()
+    expect(w.findAll('.sw-furrow')).toHaveLength(4)
+    expect(w.find('.sw-vane').exists()).toBe(false)
+    expect(w.find('.sw-round').text()).toContain('Runde 1 von 2')
+    expect(w.find('.sw-count').text()).toBe('Furchen: 0 von 4')
+    expect(useTaskProgress().goal.value).toBe(10)
+    expect(w.find('.sw-bag').attributes('aria-label')).toBe('Der Beutel mit Samen')
+    expect(problems()).toEqual([])
+  })
+
+  it('a ring shows where the seed would land while the bag is held; a short pull is no throw', async () => {
+    const w = await open()
+    await pullBag(w, { x: 0, y: 10 }, false)
+    expect(w.find('.sw-aim').exists()).toBe(true)
+    window.dispatchEvent(new MouseEvent('pointerup', { clientX: 150, clientY: 360 + 0.1 * H }))
+    await flushPromises()
+    await tick(800)
+    expect(w.find('.sw-aim').exists()).toBe(false)
+    // a tiny pull: nothing flies and nothing is counted as a miss
+    await tick(1000)
+    expect(w.find('.gm.bad').exists()).toBe(false)
+    await pullBag(w, { x: 0, y: 2 })
+    expect(w.find('.sw-seed').exists()).toBe(false)
+    expect(useTaskProgress().parts.value).toBe(0)
+    expect(w.find('.gm.bad').exists()).toBe(false)
+  })
+
+  it('a seed that lands in a furrow sows it: a sprout grows (a part counted, the tone of the sack); a miss sinks into the earth (a cross, a mistake)', async () => {
+    const w = await open()
+    await throwAt(w, game.furrows[0]!, 0)
+    expect(furrow(w, 0).classes()).toContain('sown')
+    expect(furrow(w, 0).attributes('aria-label')).toBe('Eine Furche mit einem Sprössling')
+    expect(w.findAll('.sw-sprout').filter((s) => !s.attributes('style')!.includes('display: none'))).toHaveLength(1)
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(played).toContain('sack')
+    expect(w.find('.sw-count').text()).toBe('Furchen: 1 von 4')
+    await tick(1000)
+    expect(w.find('.sw-sprout.grown').exists()).toBe(true)
+    await missAt(w)
+    expect(w.find('.sw-fb').text()).toBe('Das Samenkorn ist in die Erde gesunken. Versuch es noch einmal.')
+    expect(w.find('.gm.bad').exists()).toBe(true)
+    expect(played).toContain('wrong')
+    expect(useTaskProgress().parts.value).toBe(1)
+    // a seed on a furrow that has its sprout already is neither a mistake nor counted
+    const before = useTaskProgress().parts.value
+    await throwAt(w, game.furrows[0]!, 0)
+    expect(useTaskProgress().parts.value).toBe(before)
+    expect(w.find('.sw-fb').text()).not.toBe('Das Samenkorn ist in die Erde gesunken. Versuch es noch einmal.')
+  })
+
+  it('after three misses in a row a tap helps: the furrows glow and a tap sows; the keyboard (Enter) sows at any time', async () => {
+    const w = await open()
+    for (let i = 0; i < 3; i++) {
+      await missAt(w)
+      await tick(1000)
+    }
+    expect(w.findAll('.sw-furrow.assist')).toHaveLength(4)
+    const click = (el: Element, detail: number) => el.dispatchEvent(new MouseEvent('click', { bubbles: true, detail }))
+    click(furrow(w, 1).element, 1)
+    await flushPromises()
+    expect(furrow(w, 1).classes()).toContain('sown')
+    expect(useTaskProgress().parts.value).toBe(1)
+    // the help is gone after a right one; a touch tap without the help does nothing, a keyboard click (detail 0) sows
+    expect(w.findAll('.sw-furrow.assist')).toHaveLength(0)
+    click(furrow(w, 2).element, 1)
+    await flushPromises()
+    expect(furrow(w, 2).classes()).not.toContain('sown')
+    click(furrow(w, 2).element, 0)
+    await flushPromises()
+    expect(furrow(w, 2).classes()).toContain('sown')
+  })
+
+  it('round 2: six furrows and a wind flag that shows the way; the wind drives the seed; all the way through three stars with up to three misses', async () => {
+    for (const [misses, stars] of [[0, 3], [3, 3], [4, 2], [9, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      for (let i = 0; i < misses; i++) {
+        await missAt(w)
+        await tick(1000)
+      }
+      // a miss run of three turns the help on: the tests throw anyway (a throw sows as well)
+      for (const f of ['a', 'b', 'c', 'd']) await throwAt(w, game.furrows.find((x) => x.id === f)!, 0)
+      await tick(2200)
+      expect(w.find('.sw-round').text()).toContain('Runde 2 von 2')
+      expect(w.findAll('.sw-furrow')).toHaveLength(6)
+      expect(w.find('.sw-vane').exists()).toBe(true)
+      expect(w.find('.sw-vane').classes()).toContain('right')
+      expect(w.find('.sw-vane').attributes('aria-label')).toBe('Der Wind weht')
+      for (const f of ['a', 'b', 'c', 'd', 'e', 'f']) await throwAt(w, game.furrows.find((x) => x.id === f)!, 0.5)
+      await tick(2000)
+      expect(useTaskProgress().parts.value, `${misses} misses`).toBe(10)
+      expect(useTaskProgress().finished.value).toBe(true)
+      expect(w.text()).toContain('Das ganze Feld ist gesät!')
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${misses} misses`).toEqual([[stars]])
+      w.unmount()
+    }
+  })
+
+  it('the steps of "Go on" for 10 furrows: 3 one star, 7 two stars', () => {
+    expect([2, 3, 6, 7].map((d) => partialStars(d, 10))).toEqual([0, 1, 1, 2])
+  })
+
+  it('English: the words of the game', async () => {
+    const w = await open('en')
+    expect(w.find('.sw-round').text()).toBe('Round 1 of 2')
+    expect(w.find('.sw-count').text()).toBe('Furrows: 0 of 4')
+    await missAt(w)
+    expect(w.find('.sw-fb').text()).toBe('The seed sank into the earth. Try again.')
   })
 })

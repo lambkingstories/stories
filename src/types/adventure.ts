@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen'
 
 export interface AdventureQuestion {
   q: string
@@ -415,6 +415,33 @@ export interface MirrorGame {
   rounds: MirrorRound[]
 }
 
+/** A furrow of the sowing game: its middle and size, as a percentage of the field picture (a seed that lands in it, with some room to spare, sows it). */
+export interface SowFurrow {
+  id: string
+  x: number
+  y: number
+  w: number
+  h: number
+}
+export interface SowRound {
+  hint: string
+  /** The furrows of this round (ids of `SowGame.furrows`). */
+  furrows: string[]
+  /** The wind from -1 (to the left) to 1 (to the right); 0 is calm. */
+  wind: number
+}
+/** The sowing game: the seed bag is pulled back and let go, the seed flies in an arc into a furrow (at most two rounds). */
+export interface SowGame {
+  /** The field (3:4), the seed bag, one seed, the sprout that grows, and the little flag that shows the wind (a path below `public/`). */
+  field: string
+  bag: string
+  seed: string
+  sprout: string
+  vane?: string
+  furrows: SowFurrow[]
+  rounds: SowRound[]
+}
+
 /** The tools and colours a picture of an adventure can ask for. */
 export type PaintToolName = 'pencil' | 'felt' | 'watercolor' | 'graphite' | 'chalk' | 'oil' | 'fill'
 export type PaintColor = 'yellow' | 'blue' | 'brown' | 'green' | 'red' | 'orange' | 'purple' | 'pink'
@@ -475,6 +502,7 @@ export interface StageTask {
   echo?: EchoGame
   channels?: ChannelGame
   mirror?: MirrorGame
+  sow?: SowGame
 }
 
 export interface AdventureStage {
