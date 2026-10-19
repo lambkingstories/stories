@@ -108,12 +108,12 @@ const PAARE = `${G}memory-paare/`
 const tierMemory: MemoryGame = {
   back: `${PAARE}rueck.webp`,
   pairs: [
+    { image: `${PAARE}loewe-m.webp`, imageB: `${PAARE}loewe-w.webp`, labels: ['Löwe', 'Löwin'], text: 'Löwe und Löwin: Tiere aus der Wildnis. Auch sie gehen in die Arche, das Männchen und das Weibchen.' },
     { image: `${PAARE}hirsch-m.webp`, imageB: `${PAARE}hirsch-w.webp`, labels: ['Hirsch', 'Hirschkuh'], text: 'Hirsch und Hirschkuh: Tiere aus der Wildnis. Das Männchen und das Weibchen gehen in die Arche.' },
     { image: `${PAARE}widder-m.webp`, imageB: `${PAARE}schaf-w.webp`, labels: ['Widder', 'Schaf'], text: 'Widder und Schaf: Tiere vom Feld. Das Männchen und das Weibchen gehen in die Arche.' },
     { image: `${PAARE}pfau-m.webp`, imageB: `${PAARE}pfau-w.webp`, labels: ['Pfau', 'Pfauenhenne'], text: 'Pfau und Pfauenhenne: Vögel aus der Luft. Auch von den Vögeln kommen Männchen und Weibchen.' },
     { image: `${PAARE}stier-m.webp`, imageB: `${PAARE}kuh-w.webp`, labels: ['Stier', 'Kuh'], text: 'Stier und Kuh: Tiere vom Feld. Von allen Arten kommen Männchen und Weibchen zu Noah.' },
-    { image: `${PAARE}hahn-m.webp`, imageB: `${PAARE}henne-w.webp`, labels: ['Hahn', 'Henne'], text: 'Hahn und Henne: Auch sie gehören dazu. Männchen und Weibchen gehen in die Arche.' },
-    { image: `${PAARE}ente-m.webp`, imageB: `${PAARE}ente-w.webp`, labels: ['Erpel', 'Ente'], text: 'Erpel und Ente: Ein Männchen und ein Weibchen. Auch sie gehen in die Arche, so wie Gott es gesagt hat.' }
+    { image: `${PAARE}hahn-m.webp`, imageB: `${PAARE}henne-w.webp`, labels: ['Hahn', 'Henne'], text: 'Hahn und Henne: Auch sie gehören dazu. Männchen und Weibchen gehen in die Arche.' }
   ]
 }
 

@@ -87,13 +87,13 @@ describe('Noah: the stage page with the new games', () => {
     await flushPromises()
     expect(c.findAll('.mem-card.up')).toHaveLength(0)
     // the male and the female of one animal: the pair stays open, its sentence shows, and each card is named for screen readers
-    await cardOf(pairs[3]!.image).trigger('click')
-    await cardOf(pairs[3]!.imageB!).trigger('click')
+    await cardOf(pairs[4]!.image).trigger('click')
+    await cardOf(pairs[4]!.imageB!).trigger('click')
     await flushPromises()
-    expect(c.find('.mem-text').text()).toBe(pairs[3]!.text)
+    expect(c.find('.mem-text').text()).toBe(pairs[4]!.text)
     expect(c.findAll('.mem-card.found')).toHaveLength(2)
-    expect(cardOf(pairs[3]!.image).attributes('aria-label')).toBe('Stier')
-    expect(cardOf(pairs[3]!.imageB!).attributes('aria-label')).toBe('Kuh')
+    expect(cardOf(pairs[4]!.image).attributes('aria-label')).toBe('Stier')
+    expect(cardOf(pairs[4]!.imageB!).attributes('aria-label')).toBe('Kuh')
     expect(problems()).toEqual([])
   })
 
