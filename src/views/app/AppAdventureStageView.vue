@@ -27,6 +27,11 @@ import GameEcho from '@/components/molecules/games/GameEcho.vue'
 import GameChannels from '@/components/molecules/games/GameChannels.vue'
 import GameMirror from '@/components/molecules/games/GameMirror.vue'
 import GameSow from '@/components/molecules/games/GameSow.vue'
+import GameMissing from '@/components/molecules/games/GameMissing.vue'
+import GameWipe from '@/components/molecules/games/GameWipe.vue'
+import GameChain from '@/components/molecules/games/GameChain.vue'
+import GameStack from '@/components/molecules/games/GameStack.vue'
+import GameTrace from '@/components/molecules/games/GameTrace.vue'
 import GameHerd from '@/components/molecules/games/GameHerd.vue'
 import GamePuzzle from '@/components/molecules/games/GamePuzzle.vue'
 import GameShare from '@/components/molecules/games/GameShare.vue'
@@ -315,7 +320,7 @@ const hasPart = computed(() => partStars.value > 0 && !progress.finished.value)
 
 /** The games have a restart sign: a new key mounts the game afresh (round, mistakes and what was done begin again). */
 const gameKey = ref(0)
-const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd'] as const
+const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace'] as const
 const hasGame = computed(() => hasCountGame.value || GAME_FIELDS.some((f) => !!gameTask.value?.[f]))
 function restartGame() {
   progress.reset()
@@ -390,6 +395,11 @@ const gameKind = computed(() => {
   if (g?.mirror) return 'mirror'
   if (g?.sow) return 'sow'
   if (g?.herd) return 'herd'
+  if (g?.missing) return 'missing'
+  if (g?.wipe) return 'wipe'
+  if (g?.chain) return 'chain'
+  if (g?.stack) return 'stack'
+  if (g?.trace) return 'trace'
   return undefined
 })
 watch(
@@ -500,6 +510,11 @@ function openGift() {
         GameMirror(:key="gameKey" v-else-if="gameTask?.mirror" :game="gameTask.mirror" @done="taskDone")
         GameSow(:key="gameKey" v-else-if="gameTask?.sow" :game="gameTask.sow" @done="taskDone")
         GameHerd(:key="gameKey" v-else-if="gameTask?.herd" :game="gameTask.herd" @done="taskDone")
+        GameMissing(:key="gameKey" v-else-if="gameTask?.missing" :game="gameTask.missing" @done="taskDone")
+        GameWipe(:key="gameKey" v-else-if="gameTask?.wipe" :game="gameTask.wipe" @done="taskDone")
+        GameChain(:key="gameKey" v-else-if="gameTask?.chain" :game="gameTask.chain" @done="taskDone")
+        GameStack(:key="gameKey" v-else-if="gameTask?.stack" :game="gameTask.stack" @done="taskDone")
+        GameTrace(:key="gameKey" v-else-if="gameTask?.trace" :game="gameTask.trace" @done="taskDone")
         template(v-else-if="isPaint")
           img(:src="img(taskImage)" alt="" class="stage-paint" draggable="false")
           div(class="stage-actions")
