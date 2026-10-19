@@ -52,6 +52,9 @@ describe('coloring books over the API', () => {
     const old = sampleBook({
       bookId: 'ba-2-alt',
       category: 'Ausmalbücher',
+      // The validator fills in kind 'story' when none is sent, and a story is read as a story; legacy rows in the database have
+      // no kind at all. So the page form is tested on a coloring book whose pages are still in the old form.
+      kind: 'coloring',
       localizations: {
         de: {
           title: 'Alt',
