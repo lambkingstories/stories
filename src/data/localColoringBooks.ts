@@ -22,6 +22,15 @@ interface BookData {
 
 const SERIES = 'bibelgeschichten-zum-ausmalen'
 
+/**
+ * The id the same book has in the backend (`D:/Claude/ausmalbuch-import/import-baende.mjs`). As soon as the backend delivers
+ * that book, the local test copy is left out so the book does not show up twice.
+ */
+const BACKEND_ID: Record<string, string> = {
+  schoepfung: 'ba-02-gott-erschafft-die-welt',
+  noah: 'ba-03-noah-die-arche-und-der-regenbogen'
+}
+
 const DESCRIPTIONS: Record<string, { short: string; long: string }> = {
   schoepfung: {
     short: '36 Bilder zum Ausmalen: Gott erschafft die Welt, vom ersten Licht bis zum Garten Eden.',
@@ -73,4 +82,23 @@ export function localColoringBooks(): ApiBook[] {
   if (!LOCAL_TEST_BOOKS_ON) return []
   const books = data as Record<string, BookData>
   return [toBook('schoepfung', books.schoepfung!, 1), toBook('noah', books.noah!, 2)]
+}
+
+/** The ids of the local test books that the backend already has under its own id. */
+export function localBookReplacedBy(bookId: string): string | undefined {
+  const books = data as Record<string, BookData>
+  const folder = Object.keys(books).find((k) => books[k]!.bookId === bookId)
+  return folder ? BACKEND_ID[folder] : undefined
+}
+
+/**
+ * The local test books that are not in the given backend list yet. A book the backend has under its own id comes from the
+ * backend only, so the test build never shows a coloring book twice.
+ */
+export function localColoringBooksMissingFrom(remote: readonly Pick<ApiBook, 'bookId'>[]): ApiBook[] {
+  const ids = new Set(remote.map((b) => b.bookId))
+  return localColoringBooks().filter((b) => {
+    const replacement = localBookReplacedBy(b.bookId)
+    return !(replacement && ids.has(replacement))
+  })
 }

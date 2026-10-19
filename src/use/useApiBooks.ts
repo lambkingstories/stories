@@ -10,7 +10,7 @@ import { reactive, readonly } from 'vue'
 import { booksApi } from '@/api/booksApi'
 import useBookCache from '@/use/useBookCache'
 import type { ApiBook } from '@/types/apiBook'
-import { localColoringBooks } from '@/data/localColoringBooks'
+import { localColoringBooks, localColoringBooksMissingFrom } from '@/data/localColoringBooks'
 
 const state = reactive<{
   byId: Record<string, ApiBook>
@@ -87,7 +87,8 @@ async function loadAllBooks(): Promise<ApiBook[]> {
   if (state.listLoading) return state.all ?? []
   state.listLoading = true
   try {
-    const books = [...(await booksApi.list()), ...localColoringBooks()]
+    const remote = await booksApi.list()
+    const books = [...remote, ...localColoringBooksMissingFrom(remote)]
     state.all = books
     for (const b of books) {
       // a slim entry (no story text) never replaces a whole book that is already known, and is not kept for offline use:
