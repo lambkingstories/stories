@@ -1,4 +1,4 @@
-import { stripNoahFiles } from './vite.config.noah'
+import { stripAdamFiles, stripNoahFiles } from './vite.config.noah'
 import { fileURLToPath, URL } from 'node:url'
 import { resolve, dirname } from 'node:path'
 import { rmSync } from 'node:fs'
@@ -62,6 +62,10 @@ export default defineConfig(({ mode }) => {
       // not contain it (`VITE_INCLUDE_NOAH=true` is the hidden test build, `vite --mode noah` shows it always).
       if (env.VITE_SHOW_NOAH !== 'true' && env.VITE_INCLUDE_NOAH !== 'true') {
         stripNoahFiles(outDir)
+      }
+      // The same for "Adam und Eva" (`VITE_INCLUDE_ADAM=true` / `vite --mode adam`).
+      if (env.VITE_SHOW_ADAM !== 'true' && env.VITE_INCLUDE_ADAM !== 'true') {
+        stripAdamFiles(outDir)
       }
     }
   }
