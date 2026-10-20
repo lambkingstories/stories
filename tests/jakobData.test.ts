@@ -80,9 +80,9 @@ describe('Jakob: every stage has the game that was chosen', () => {
   const NEW = ['reihenfolge', 'lichter', 'hueten', 'kanaele', 'lueckenvers', 'spiegeln', 'echo', 'saeen', 'fehlt', 'kette', 'stapeln', 'wischen', 'spur', 'waage', 'sternbild', 'giessen']
 
   it('the games in the order of the plan; stage 2 is only the questions; at most two old mechanics and three new ones', () => {
-    // the plan of the twelve stages; a stage whose new game is not built yet still has its placeholder quiz
+    // the plan of the twelve stages: all the new games are built
     const PLAN = ['zaehlen', 'quiz', 'schieben', 'kurbel', 'jahre', 'fangen', 'schaetzen', 'bund', 'staffel', 'halten', 'puzzle', 'kreis']
-    jakob.stages.forEach((st, i) => expect([PLAN[i], 'quiz'], `stage ${i + 1}`).toContain(st.task.kind))
+    expect(jakob.stages.map((st) => st.task.kind)).toEqual(PLAN)
     const kinds = jakob.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
     expect(new Set(kinds).size).toBe(kinds.length)
     expect(kinds.filter((k) => OLD.includes(k)).sort()).toEqual(['puzzle', 'zaehlen'])
@@ -144,8 +144,9 @@ describe('Jakob: every stage has the game that was chosen', () => {
     expect(JSON.stringify(h)).not.toMatch(/gegner|kampf|feind/i)
   })
 
-  it('5 seasons (when built): four signs, a row of two years and a row of seven years, the gaps lie inside the rows, two of them at the very end in round 2', () => {
+  it('5 seasons: four signs, a row of two years and a row of seven years, the gaps lie inside the rows, two of them at the very end in round 2', () => {
     const c = stage(5).task.cycle
+    expect(c, 'the game is built').toBeDefined()
     if (!c) return
     expect(c.tokens.map((t) => t.id)).toEqual(['fruehling', 'sommer', 'herbst', 'winter'])
     expect(c.rounds.map((r) => r.length)).toEqual([8, 28])
@@ -161,8 +162,9 @@ describe('Jakob: every stage has the game that was chosen', () => {
     expect(c.background).toBe(stage(5).image)
   })
 
-  it('8 cairn (when built): two rounds, three and five stones, the way gets longer, both stones start left and right of the middle and the heap lies in the picture', () => {
+  it('8 cairn: two rounds, three and five stones, the way gets longer, both stones start left and right of the middle and the heap lies in the picture', () => {
     const c = stage(8).task.cairn
+    expect(c, 'the game is built').toBeDefined()
     if (!c) return
     expect(c.rounds.map((r) => r.stones)).toEqual([3, 5])
     expect(c.rounds[1]!.steps).toBeGreaterThan(c.rounds[0]!.steps)
@@ -174,8 +176,9 @@ describe('Jakob: every stage has the game that was chosen', () => {
     expect(c.background).toBe(stage(8).image)
   })
 
-  it('12 ring (when built): four sons, then twelve like the hours of a clock, the tolerance gets smaller, three figures, the ring lies inside the picture', () => {
+  it('12 ring: four sons, then twelve like the hours of a clock, the tolerance gets smaller, three figures, the ring lies inside the picture', () => {
     const g = stage(12).task.ring
+    expect(g, 'the game is built').toBeDefined()
     if (!g) return
     expect(g.rounds.map((r) => r.count)).toEqual([4, 12])
     expect(g.rounds[1]!.tolerance).toBeLessThan(g.rounds[0]!.tolerance)
@@ -190,8 +193,9 @@ describe('Jakob: every stage has the game that was chosen', () => {
     expect(g.background).toBe(stage(12).image)
   })
 
-  it('6 catch (when built): four children, then seven, the second round is faster, every child exists, meadow and tent lie inside the picture', () => {
+  it('6 catch: four children, then seven, the second round is faster, every child exists, meadow and tent lie inside the picture', () => {
     const g = stage(6).task.catch
+    expect(g, 'the game is built').toBeDefined()
     if (!g) return
     expect(g.rounds.map((r) => r.kids.length)).toEqual([4, 7])
     expect(g.rounds[1]!.speed).toBeGreaterThan(g.rounds[0]!.speed)
@@ -207,8 +211,9 @@ describe('Jakob: every stage has the game that was chosen', () => {
     expect(g.background).toBe(stage(6).image)
   })
 
-  it('9 relay (when built): three herds, then five, the room gets narrower and the walk faster, the road runs from left to right inside the picture', () => {
+  it('9 relay: three herds, then five, the room gets narrower and the walk faster, the road runs from left to right inside the picture', () => {
     const g = stage(9).task.relay
+    expect(g, 'the game is built').toBeDefined()
     if (!g) return
     expect(g.rounds.map((r) => r.herds.length)).toEqual([3, 5])
     expect(g.rounds[1]!.minGap).toBeLessThan(g.rounds[0]!.minGap)
@@ -220,8 +225,9 @@ describe('Jakob: every stage has the game that was chosen', () => {
     expect(g.background).toBe(stage(9).image)
   })
 
-  it('7 guessing the herds (when built): round 1 compares herds that are clearly different, round 2 asks for the range that contains the number; the animals exist and stand in the meadow', () => {
+  it('7 guessing the herds: round 1 compares herds that are clearly different, round 2 asks for the range that contains the number; the animals exist and stand in the meadow', () => {
     const g = stage(7).task.guess
+    expect(g, 'the game is built').toBeDefined()
     if (!g) return
     expect(g.rounds.map((r) => r.mode)).toEqual(['compare', 'range'])
     for (const r of g.rounds) {
