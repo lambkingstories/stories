@@ -16,6 +16,9 @@ afterEach(() => setAdventureLanguage('de'))
 const released = abraham.stages.every((s) => !s.soon)
 const stage = (n: number) => abraham.stages[n - 1]!
 /** Words that no text of the German data may use (stage 6 is told calmly: no knife, no binding, no killing). */
+/** The version of the recording per stage: a stage revised again after the first rewrite has a newer file name. */
+const DE_V: Record<number, string> = { 4: 'v3', 6: 'v3' }
+const EN_V: Record<number, string> = { 1: 'v3', 3: 'v3', 4: 'v3' }
 const FORBIDDEN = /\b(Messer|Schwert|gefesselt|Fesseln|Fesselung|töten|getötet|schlachten|Blut|Teufel|Hölle)\b/i
 
 describe('Abraham: stories and questions', () => {
@@ -40,7 +43,7 @@ describe('Abraham: stories and questions', () => {
       expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(60)
       expect(words, `words ${s.id}`).toBeLessThanOrEqual(220)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.audio, s.id.toString()).toBe(`audio/abenteuer/abraham/geschichte-${String(s.id).padStart(2, '0')}-v2.mp3`)
+      expect(s.audio, s.id.toString()).toBe(`audio/abenteuer/abraham/geschichte-${String(s.id).padStart(2, '0')}-${DE_V[s.id] ?? 'v2'}.mp3`)
       expect(s.image).toBe(`images/abenteuer/abraham/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
     }
   })
@@ -274,7 +277,7 @@ describe('Abraham: English', () => {
       expect(s.task.hint, `hint ${s.id}`).not.toBe(de[i]!.hint)
       s.questions.forEach((q, k) => expect(q.q, `question ${s.id}.${k}`).not.toBe(de[i]!.q[k]))
       expect(s.ref, `ref ${s.id}`).toMatch(/^Genesis \d/)
-      expect(s.audio, `audio ${s.id}`).toBe(`audio/abenteuer/abraham/geschichte-${String(s.id).padStart(2, '0')}-en-v2.mp3`)
+      expect(s.audio, `audio ${s.id}`).toBe(`audio/abenteuer/abraham/geschichte-${String(s.id).padStart(2, '0')}-en-${EN_V[s.id] ?? 'v2'}.mp3`)
     })
     expect(abraham.title).toBe('Abraham')
     expect(abraham.subtitle).toBe('God Calls, God Keeps His Word')

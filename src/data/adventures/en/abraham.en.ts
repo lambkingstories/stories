@@ -14,11 +14,11 @@ export const abrahamEn: TextOverlay<Journey> = {
     {
       title: 'The Call',
       ref: 'Genesis 12:1–9',
-      audio: 'audio/abenteuer/abraham/geschichte-01-en-v2.mp3',
+      audio: 'audio/abenteuer/abraham/geschichte-01-en-v3.mp3',
       text: [
-        'After the tower of Babel, the people spread out over the whole earth, but God did not lose sight of them. In the city of Haran lives a man named Abram with his wife Sarai, and it is him that God calls, so that something completely new can begin through him.',
+        'After the tower of Babel, the people spread out over the whole earth, but God did not lose sight of them. In the city of Haran lives a man named Abram with his wife Sarai, and God calls him in particular, so that something completely new can begin through him.',
         'One day God says to him, “Leave your country, your relatives, and your father’s house, and go to the land that I will show you. I will make you a great nation and bless you, and you will be a blessing yourself. Through you all the families of the earth will be blessed.”',
-        'Abram does not ask for long where he is going. He trusts God and sets out, even though he is already seventy-five years old. His wife Sarai goes with him, and so does his nephew Lot, along with all the people who belong to them, and they take everything they own.',
+        'Abram does not stop to ask where he is going. He trusts God and sets out, even though he is already seventy-five years old. His wife Sarai goes with him, and so does his nephew Lot, along with all the people who belong to them, and they take everything they own.',
         'So they travel into the land of Canaan, as far as the great trees at Shechem. There God says to Abram, “I will give this land to your descendants.” Then Abram builds an altar to thank God. After that he moves on to the hills near Bethel, pitches his tent, builds another altar, and prays to God.'
       ],
       task: { hint: 'Put the packs in the baskets so that the camel stands straight.', balance: { packs: [{ label: 'small sack' }, { label: 'small sack' }, { label: 'small sack' }, { label: 'water skin' }, { label: 'water skin' }, { label: 'water skin' }, { label: 'water skin' }, { label: 'big sack' }, { label: 'big sack' }, { label: 'big sack' }], rounds: [{ hint: 'Round 1: Spread the three packs over both sides.' }, { hint: 'Round 2: Now there are more and heavier packs.' }] } },
@@ -46,10 +46,10 @@ export const abrahamEn: TextOverlay<Journey> = {
     {
       title: 'The Stars',
       ref: 'Genesis 15:1–6',
-      audio: 'audio/abenteuer/abraham/geschichte-03-en-v2.mp3',
+      audio: 'audio/abenteuer/abraham/geschichte-03-en-v3.mp3',
       text: [
-        'Many years have passed, and Abram and Sarai still have no child. One day God’s word comes to Abram, “Do not be afraid, Abram! I am your shield, and I will reward you greatly.”',
-        'Sadly Abram answers, “Lord, what can you give me? I have no son. When I die, one of my servants will get everything I own.” But God says, “No, this servant will not be your heir, but your own son.”',
+        'Many years have passed, and Abram and Sarai still have no child. One day God’s word comes to Abram: “Do not be afraid, Abram! I am your shield, and I will reward you greatly.”',
+        'Sadly, Abram answers: “Lord, what can you give me? I have no son. When I die, one of my servants will get everything I own.” But God says, “No, this servant will not be your heir, but your own son.”',
         'Then God leads Abram outside, under the night sky. “Look up at the sky,” he says, “and count the stars, if you can!” Abram looks up. The sky sparkles with countless stars. “That is how many descendants you will have,” says God.',
         'Abram cannot count them, there are so many. But he believes what God promises him, even though he and Sarai are old and still have no child. And God counts this trust as righteousness: in God’s eyes, Abram stands right before him.'
       ],
@@ -62,13 +62,13 @@ export const abrahamEn: TextOverlay<Journey> = {
     {
       title: 'A Visit at the Oaks',
       ref: 'Genesis 18:1–15',
-      audio: 'audio/abenteuer/abraham/geschichte-04-en-v2.mp3',
+      audio: 'audio/abenteuer/abraham/geschichte-04-en-v3.mp3',
       text: [
-        'Meanwhile God has given Abram and Sarai new names: Abram is now called Abraham, which means “father of many,” and Sarai is called Sarah. Both have grown very old.',
-        'It is noon and hot. Abraham is sitting at the entrance of his tent by the great oaks of Mamre when God visits him, so the Bible tells us. He looks up and sees three men standing in front of him.',
-        'At once he runs to meet them and bows low. “Please stay with me,” he says. “I will have water brought so you can wash your feet, and you can rest under the tree. I will fetch a bit of bread.” Then he hurries into the tent to Sarah, “Quick, bake bread for our guests!” And he picks out a young calf.',
+        'By now God has given Abram and Sarai new names: Abram is now called Abraham, which means “father of many,” and Sarai is called Sarah. Both have grown very old.',
+        'It is noon and hot. Abraham is sitting at the entrance of his tent by the great oaks of Mamre when God visits him. He looks up and sees three men standing in front of him.',
+        'At once he runs to meet them and bows low. “Please stay with me,” he says. “I will have water brought so you can wash your feet, and you can rest under the tree. I will fetch a bit of bread.” Then he hurries into the tent and says to Sarah, “Quick, bake bread for our guests!” And he picks out a young calf.',
         'When everything is ready, Abraham sets bread, butter, milk, and meat in front of the men. “Where is Sarah, your wife?” they ask. “In the tent,” he answers. Then one of them says, “In a year I will come back to you, and Sarah will have a son.”',
-        'Sarah is standing behind the tent door and hears it. She laughs quietly, “I am much too old for that!” “Why is Sarah laughing?” asks the guest. “Is anything too hard for God?” Sarah is startled, “I did not laugh.” But he answers, “Yes, you did laugh.”'
+        'Sarah is standing behind the tent door and hears it. She laughs quietly to herself: “I am much too old for that!” “Why is Sarah laughing?” asks the guest. “Is anything too hard for God?” Sarah is startled: “I did not laugh.” But he answers, “Yes, you did laugh.”'
       ],
       task: { hint: 'Fill the jug at the well and pour the water into the guests’ bowls.', water: { plants: [{ label: 'Bowl for the first guest' }, { label: 'Bowl for the second guest' }, { label: 'Bowl for the third guest' }, { label: 'Deep bowl for the first guest' }, { label: 'Deep bowl for the second guest' }, { label: 'Deep bowl for the third guest' }], rounds: [{ hint: 'Round 1: Each bowl needs one jug.' }, { hint: 'Round 2: The deep bowls need two jugs.' }] } },
       questions: [

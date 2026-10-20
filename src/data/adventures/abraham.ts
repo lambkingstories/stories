@@ -193,10 +193,10 @@ export const abraham: Journey = {
       image: `${IMG}etappe-bild-04.webp`,
       title: 'Besuch bei den Eichen',
       ref: '1. Mose 18,1–15',
-      audio: `${REC}geschichte-04-v2.mp3`,
+      audio: `${REC}geschichte-04-v3.mp3`,
       text: [
         'Inzwischen hat Gott Abram und Sarai neue Namen gegeben: Abram heißt jetzt Abraham, das bedeutet „Vater vieler“, und Sarai heißt Sara. Beide sind sehr alt geworden.',
-        'Es ist heißer Mittag. Abraham sitzt am Eingang seines Zeltes bei den großen Eichen von Mamre, als Gott ihn besucht, so erzählt es die Bibel. Er blickt auf und sieht drei Männer vor sich stehen.',
+        'Es ist heißer Mittag. Abraham sitzt am Eingang seines Zeltes bei den großen Eichen von Mamre, als Gott ihn besucht. Er blickt auf und sieht auf einmal drei Männer vor sich stehen.',
         'Sofort läuft er ihnen entgegen und verneigt sich tief. „Bleibt doch bei mir“, bittet er, „ich lasse Wasser bringen, damit ihr eure Füße waschen könnt, und ruht euch unter dem Baum aus. Ich hole auch einen Bissen Brot.“ Dann eilt er zu Sara ins Zelt: „Schnell, back Brot für unsere Gäste!“ Und er sucht ein junges Kalb aus.',
         'Als alles bereit ist, stellt Abraham Brot, Butter, Milch und Fleisch vor die Männer. „Wo ist Sara, deine Frau?“, fragen sie. „Drinnen im Zelt“, antwortet er. Da sagt einer von ihnen: „In einem Jahr komme ich wieder zu dir, dann hat Sara einen Sohn.“',
         'Sara steht hinter der Zelttür und hört es. Sie lacht leise: „Ich bin doch viel zu alt dafür!“ „Warum lacht Sara?“, fragt der Gast. „Ist für Gott irgendetwas zu schwer?“ Sara erschrickt: „Ich habe nicht gelacht.“ Doch er antwortet: „Doch, du hast gelacht.“'
@@ -232,10 +232,10 @@ export const abraham: Journey = {
       image: `${IMG}etappe-bild-06.webp`,
       title: 'Gott sorgt',
       ref: '1. Mose 22,1–14',
-      audio: `${REC}geschichte-06-v2.mp3`,
+      audio: `${REC}geschichte-06-v3.mp3`,
       text: [
-        'Isaak ist ein Junge geworden. Eines Tages will Gott sehen, ob Abraham ihm ganz vertraut. „Abraham!“, ruft er. „Hier bin ich.“ Und Gott sagt: „Nimm Isaak, deinen Sohn, den du so lieb hast, und geh mit ihm in das Land Morija. Auf einem Berg, den ich dir zeige, sollst du ihn mir opfern.“ Eine schwere Prüfung, doch Abraham vertraut Gott.',
-        'Am nächsten Morgen belädt Abraham seinen Esel mit Holz und macht sich mit Isaak und zwei Knechten auf den Weg. Am dritten Tag sieht er den Berg und sagt zu den Knechten: „Bleibt hier mit dem Esel. Der Junge und ich gehen hinauf, um zu beten, und dann kommen wir wieder zu euch zurück.“',
+        'Isaak ist ein Junge geworden. Eines Tages will Gott sehen, ob Abraham ihm ganz vertraut. „Abraham!“, ruft er. „Hier bin ich.“ Und Gott sagt: „Nimm Isaak, deinen Sohn, den du so lieb hast, und geh mit ihm in das Land Morija. Auf einem Berg, den ich dir zeige, sollst du ihn mir opfern.“ Das ist eine schwere Prüfung, aber Abraham vertraut Gott.',
+        'Am nächsten Morgen belädt Abraham seinen Esel mit Holz und geht mit Isaak und zwei Knechten los. Am dritten Tag sieht er den Berg und sagt zu den Knechten: „Bleibt hier mit dem Esel. Der Junge und ich gehen hinauf, um zu beten, und dann kommen wir wieder zu euch zurück.“',
         'Isaak trägt das Holz den Berg hinauf. Unterwegs fragt er: „Vater, wo ist das Tier für das Opfer?“ Abraham antwortet: „Mein Sohn, Gott wird selbst für das Opfertier sorgen.“',
         'Oben baut Abraham einen Altar und legt das Holz bereit. Da ruft eine Stimme vom Himmel: „Abraham! Abraham!“ „Hier bin ich“, antwortet er. „Tu dem Jungen nichts!“, sagt die Stimme. „Jetzt weiß ich, dass du Gott vertraust.“',
         'Abraham blickt auf und sieht einen Widder, der sich mit den Hörnern in einem Gebüsch verfangen hat. Den bringt er Gott als Opfer, an Isaaks Stelle. Isaak steht gesund neben seinem Vater, und Abraham nennt den Ort „Gott sorgt“.'
