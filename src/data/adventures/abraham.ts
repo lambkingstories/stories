@@ -112,13 +112,21 @@ export const abraham: Journey = {
   medal: `${IMG}medaille.webp`, // Abraham und das Zelt unter dem Sternenhimmel (Ruhe, Verheißung)
   // Geschenk-Ausmalbild: Abraham und Sara vor dem Zelt unter dem Sternenhimmel, mit Schafen, friedlich
   gift: { title: 'Abraham und Sara vor dem Zelt unter dem Sternenhimmel', image: `${IMG}geschenk.webp` },
-  // noch keine gemalte Karte (images leer): die Reise zeigt sich als Liste; Stationen und Perlenweg kommen mit dem Panorama
+  // die gemalte Karte (Panorama in vier Stücken, 4850 × 836 px) mit Stationen und Perlenweg aus fertig/messdaten.json und abrahamPath.ts
   map: {
-    images: [],
+    images: [1, 2, 3, 4].map((n) => `${IMG}karte-pano-${n}.webp`),
     ring: 'images/abenteuer/josef/medaillon-ring.webp',
-    aspect: 1,
-    stages: [],
-    exam: { x: 0, y: 0, d: 0 },
+    aspect: 4850 / 836,
+    widthPx: 4850,
+    stages: [
+      { x: 0.0536, y: 0.6459, d: 0.0351 },
+      { x: 0.2577, y: 0.628, d: 0.0351 },
+      { x: 0.3711, y: 0.628, d: 0.0351 },
+      { x: 0.5216, y: 0.6459, d: 0.0351 },
+      { x: 0.8268, y: 0.6459, d: 0.0351 },
+      { x: 0.9031, y: 0.634, d: 0.0351 }
+    ],
+    exam: { x: 0.9835, y: 0.6459, d: 0.0351 },
     path: ABRAHAM_PATH
   },
   stages: [

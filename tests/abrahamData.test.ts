@@ -181,6 +181,40 @@ describe('Abraham: every stage has the game that was chosen', () => {
   })
 })
 
+describe('Abraham: die Karte', () => {
+  const m = abraham.map
+  // the painted map is 4850 x 836 px (the height of the picture is the unit of the ring and of the lowest fifth)
+  const W = 4850
+  const H = 836
+  it('vier Stücke eines Bildes, jedes unter 1,8 MB; Stationen von links nach rechts, nicht zu tief und nicht zu dicht', () => {
+    expect(m.images).toEqual([1, 2, 3, 4].map((n) => `images/abenteuer/abraham/karte-pano-${n}.webp`))
+    for (const f of m.images) expect(statSync(`public/${f}`).size / 1024, f).toBeLessThan(1800)
+    expect(m.widthPx).toBe(W)
+    expect(m.aspect).toBeCloseTo(W / H, 3)
+    expect(m.stages).toHaveLength(6)
+    const spots = [...m.stages, m.exam]
+    for (let i = 0; i < spots.length; i++) {
+      expect(spots[i]!.y, `Station ${i + 1} nicht hinter der Leiste`).toBeLessThanOrEqual(0.65)
+      expect(spots[i]!.d).toBeCloseTo(170 / W, 3)
+      if (i > 0) {
+        expect(spots[i]!.x, `Station ${i + 1} rechts von ${i}`).toBeGreaterThan(spots[i - 1]!.x)
+        // two rings (170 px) do not touch: at least 172 px apart
+        expect(Math.hypot((spots[i]!.x - spots[i - 1]!.x) * W, (spots[i]!.y - spots[i - 1]!.y) * H)).toBeGreaterThanOrEqual(172)
+      }
+    }
+  })
+  it('nichts liegt in den unteren 20 % der Karte; der Perlenweg hat eine Strecke je Etappe (die letzte führt zum Ziel) und alle Perlen liegen im Bild', () => {
+    for (const sp of [...m.stages, m.exam]) expect(sp.y * H, 'Ring-Mitte').toBeLessThanOrEqual(0.65 * H)
+    expect(m.path).toHaveLength(6)
+    for (const seg of m.path) {
+      for (const [x, y] of seg) {
+        expect(y * H, 'Perle').toBeLessThanOrEqual(0.8 * H)
+        expect(x > 0 && x < 1 && y > 0 && y < 1).toBe(true)
+      }
+    }
+  })
+})
+
 describe('Abraham: the scaffold', () => {
   it('until the pictures and recordings are built in all stages are "soon" (none opens, nothing is downloaded, no map yet); afterwards only the first opens at the start', () => {
     expect(abraham.gift.title).toBe('Abraham und Sara vor dem Zelt unter dem Sternenhimmel')
@@ -192,13 +226,12 @@ describe('Abraham: the scaffold', () => {
       // nothing of a game or of a recording is downloaded while all stages are soon
       const own = journeyFiles(abraham).filter((f) => f.includes('abraham/'))
       expect(own.filter((f) => f.includes('spiele/') || f.startsWith('audio/'))).toEqual([])
-      expect(abraham.map.images).toEqual([])
-      expect(ABRAHAM_PATH).toEqual([])
     } else {
       expect(open).toEqual([true, false, false, false, false, false])
-      expect(abraham.map.images).toHaveLength(4)
-      expect(ABRAHAM_PATH).toHaveLength(6)
     }
+    // the painted map and the way are there
+    expect(abraham.map.images).toHaveLength(4)
+    expect(ABRAHAM_PATH).toHaveLength(6)
   })
 })
 
