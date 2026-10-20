@@ -171,7 +171,9 @@ const riverStyle = computed(() => {
           @click="tapOn(p.id)"
           @keydown.enter.space.prevent="tapOn(p.id)"
         )
-          img(:src="src(isGrown(p) ? p.grown : p.small)" alt="" draggable="false" class="wt-img")
+          // the full picture lies over the empty one and fades in (the two are painted separately, a hard swap would jump)
+          img(:src="src(p.small)" alt="" draggable="false" class="wt-img")
+          img(:src="src(p.grown)" alt="" draggable="false" class="wt-img wt-over" :class="{ on: isGrown(p) }")
           span(v-if="p.need > 1" class="wt-drops" aria-hidden="true")
             span(v-for="d in p.need" :key="d" class="wt-drop" :class="{ on: d <= have(p) }")
           GameMark(v-if="flash?.id === p.id" :kind="flash.kind" class="wt-mark")
@@ -185,7 +187,8 @@ const riverStyle = computed(() => {
           @pointerdown="down($event, 'jug')"
           @keydown.enter.space.prevent="toggleSelect('jug')"
         )
-          img(:src="src(jugFull ? game.jugFull : game.jugEmpty)" alt="" draggable="false")
+          img(:src="src(game.jugEmpty)" alt="" draggable="false")
+          img(:src="src(game.jugFull)" alt="" draggable="false" class="wt-jug-full" :class="{ on: jugFull }")
       p(class="wt-fb" role="status") {{ message }}
     GameDone(v-else :stars="stars" :text="t('app.adventure.waterDone')" @next="emit('done', stars)")
 </template>
@@ -269,6 +272,17 @@ const riverStyle = computed(() => {
   pointer-events: none
   filter: drop-shadow(0 4px 4px rgba(40, 60, 20, 0.5))
 
+// the picture that fades in over the first one (same place and size)
+.wt-over
+  position: absolute
+  left: 0
+  top: 0
+  opacity: 0
+  transition: opacity 450ms ease-in-out
+
+  &.on
+    opacity: 1
+
 .wt-drops
   position: absolute
   left: 50%
@@ -314,6 +328,16 @@ const riverStyle = computed(() => {
     pointer-events: none
     filter: drop-shadow(0 5px 5px rgba(40, 60, 20, 0.5))
 
+  .wt-jug-full
+    position: absolute
+    left: 0
+    top: 0
+    opacity: 0
+    transition: opacity 450ms ease-in-out
+
+    &.on
+      opacity: 1
+
   &.chosen
     transform: translateY(-4px) scale(1.06)
 
@@ -349,6 +373,10 @@ const riverStyle = computed(() => {
     transform: translate(-46%, -100%) rotate(3deg)
 
 @media (prefers-reduced-motion: reduce)
+  .wt-over,
+  .wt-jug .wt-jug-full
+    transition: none
+
   .wt-plant.ready,
   .wt-plant.wobble
     animation: none

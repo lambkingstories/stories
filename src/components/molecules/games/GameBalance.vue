@@ -189,7 +189,7 @@ const total = computed(() => rounds.value.reduce((n, r) => n + r.camels.length, 
           )
             img(:src="src(game.basket)" alt="" draggable="false" class="bl-basket-img")
             span(class="bl-load" aria-hidden="true")
-              img(v-for="p in inBasket(side)" :key="p.id" :src="src(p.image)" alt="" draggable="false")
+              img(v-for="p in inBasket(side)" :key="p.id" :src="src(p.image)" alt="" draggable="false" :class="`w${p.weight}`")
         GameMark(v-if="flash" kind="good" class="bl-mark")
       p(class="bl-fb" role="status") {{ message }}
       div(class="bl-tray" role="group" :aria-label="t('app.adventure.balanceTray')")
@@ -198,7 +198,7 @@ const total = computed(() => rounds.value.reduce((n, r) => n + r.camels.length, 
           :key="p.id"
           type="button"
           class="bl-pack"
-          :class="{ chosen: selected === p.id, away: !!sides[p.id], blink: tipFor?.id === p.id }"
+          :class="[`w${p.weight}`, { chosen: selected === p.id, away: !!sides[p.id], blink: tipFor?.id === p.id }]"
           :disabled="done || between"
           :aria-pressed="selected === p.id"
           :aria-label="t('app.adventure.balancePack', { name: p.label, n: p.weight })"
@@ -308,9 +308,16 @@ const total = computed(() => rounds.value.reduce((n, r) => n + r.camels.length, 
   gap: 2px
   pointer-events: none
 
+  // the weight is told by the size of the picture: the three kinds are not drawn equally big
   img
-    width: 36%
+    width: 30%
     height: auto
+
+    &.w2
+      width: 34%
+
+    &.w3
+      width: 44%
 
 .bl-mark
   position: absolute
@@ -343,8 +350,15 @@ const total = computed(() => rounds.value.reduce((n, r) => n + r.camels.length, 
 
 .bl-pack
   position: relative
-  width: 64px
+  width: 56px
   min-height: 64px
+
+  &.w2
+    width: 62px
+
+  &.w3
+    width: 78px
+
   padding: 4px
   border: 2px solid rgba(150, 100, 30, 0.6)
   border-radius: 12px

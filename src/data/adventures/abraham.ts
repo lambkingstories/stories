@@ -24,13 +24,14 @@ const SOON = true
 /**
  * Etappe 1, "Kamele beladen": ein Kamel mit zwei Körben vor dem Etappenbild 1, Pakete in drei Gewichten (Bildauftrag A10). Jede Runde hat zwei Kamele; jedes ist lösbar
  * (die Pakete eines Kamels lassen sich in zwei gleich schwere Hälften teilen). Das Kamel ist das aus Noah (Kopie unter `waage/`, Bildauftrag A10).
- * PLATZHALTER: die Plätze der Körbe am Kamel (`baskets`) kommen aus den Bildern.
+ * Die Körbe hängen an der Flanke des Kamels (`baskets`: Prozent des Kamelbildes, Oberkante des Korbs, nach dem Aussehen des Noah-Kamels gesetzt, am Handy zu prüfen).
+ * Die Pakete haben drei verschieden große Bilder (das Gewicht ist an der Größe zu erkennen, die App skaliert sie nicht auf gleiche Größe).
  */
 const WAAGE: BalanceGame = {
   background: `${IMG}etappe-bild-01.webp`,
   camel: `${G}waage/kamel.webp`,
   basket: `${G}waage/korb.webp`,
-  baskets: [[33, 58], [67, 58]],
+  baskets: [[28, 45], [64, 45]],
   packs: [
     { id: 'klein-1', image: `${G}waage/sack-klein.webp`, weight: 1, label: 'kleiner Sack' },
     { id: 'klein-2', image: `${G}waage/sack-klein.webp`, weight: 1, label: 'kleiner Sack' },
@@ -82,20 +83,20 @@ const STERNBILD: ConstellationGame = {
 /**
  * Etappe 4, "Wasser für die Gäste": Krug am Brunnen füllen, Waschschüsseln der drei Gäste füllen (Bildauftrag A11, gebaute Gieß-Mechanik). Runde 1 drei Schüsseln
  * mit einem Krug, Runde 2 drei tiefe Schüsseln mit zwei Krügen (andere Ids, gleiche Plätze).
- * PLATZHALTER: der Brunnen (`river`) und die Plätze der Schüsseln kommen aus `giessen/eichen-messung.json`.
+ * Der Brunnen (`river`: Ecke x, y, Breite, Höhe) und die drei Plätze der Schüsseln (Mitte x, Fußpunkt y, Breite; vor den drei Sitzplätzen) sind die Messwerte aus `giessen/eichen-messung.json`.
  */
 const GIESSEN: WaterGame = {
   scene: `${G}giessen/eichen.webp`,
-  river: { x: 6, y: 56, w: 22, h: 30 },
+  river: { x: 0, y: 44, w: 30, h: 26 },
   jugEmpty: `${G}giessen/krug-leer.webp`,
   jugFull: `${G}giessen/krug-voll.webp`,
   plants: [
-    { id: 'schuessel-1', small: `${G}giessen/schuessel.webp`, grown: `${G}giessen/schuessel-voll.webp`, label: 'Schüssel für den ersten Gast', x: 38, y: 78, w: 16, need: 1 },
-    { id: 'schuessel-2', small: `${G}giessen/schuessel.webp`, grown: `${G}giessen/schuessel-voll.webp`, label: 'Schüssel für den zweiten Gast', x: 58, y: 78, w: 16, need: 1 },
-    { id: 'schuessel-3', small: `${G}giessen/schuessel.webp`, grown: `${G}giessen/schuessel-voll.webp`, label: 'Schüssel für den dritten Gast', x: 78, y: 78, w: 16, need: 1 },
-    { id: 'tief-1', small: `${G}giessen/schuessel.webp`, grown: `${G}giessen/schuessel-voll.webp`, label: 'Tiefe Schüssel für den ersten Gast', x: 38, y: 78, w: 16, need: 2 },
-    { id: 'tief-2', small: `${G}giessen/schuessel.webp`, grown: `${G}giessen/schuessel-voll.webp`, label: 'Tiefe Schüssel für den zweiten Gast', x: 58, y: 78, w: 16, need: 2 },
-    { id: 'tief-3', small: `${G}giessen/schuessel.webp`, grown: `${G}giessen/schuessel-voll.webp`, label: 'Tiefe Schüssel für den dritten Gast', x: 78, y: 78, w: 16, need: 2 }
+    { id: 'schuessel-1', small: `${G}giessen/schuessel.webp`, grown: `${G}giessen/schuessel-voll.webp`, label: 'Schüssel für den ersten Gast', x: 45, y: 75, w: 18, need: 1 },
+    { id: 'schuessel-2', small: `${G}giessen/schuessel.webp`, grown: `${G}giessen/schuessel-voll.webp`, label: 'Schüssel für den zweiten Gast', x: 66, y: 75, w: 18, need: 1 },
+    { id: 'schuessel-3', small: `${G}giessen/schuessel.webp`, grown: `${G}giessen/schuessel-voll.webp`, label: 'Schüssel für den dritten Gast', x: 87, y: 75, w: 18, need: 1 },
+    { id: 'tief-1', small: `${G}giessen/schuessel.webp`, grown: `${G}giessen/schuessel-voll.webp`, label: 'Tiefe Schüssel für den ersten Gast', x: 45, y: 75, w: 18, need: 2 },
+    { id: 'tief-2', small: `${G}giessen/schuessel.webp`, grown: `${G}giessen/schuessel-voll.webp`, label: 'Tiefe Schüssel für den zweiten Gast', x: 66, y: 75, w: 18, need: 2 },
+    { id: 'tief-3', small: `${G}giessen/schuessel.webp`, grown: `${G}giessen/schuessel-voll.webp`, label: 'Tiefe Schüssel für den dritten Gast', x: 87, y: 75, w: 18, need: 2 }
   ],
   rounds: [
     { hint: 'Jede Schüssel braucht einen Krug.', plants: ['schuessel-1', 'schuessel-2', 'schuessel-3'] },
