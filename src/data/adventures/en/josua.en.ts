@@ -16,7 +16,7 @@ export const josuaEn: TextOverlay<Journey> = {
       title: 'A New Leader',
       ref: 'Joshua 1:1–18',
       text: [
-        'For forty years Moses has led the people of Israel, and now he has died. The Israelites are camped at Shittim, a wide plain east of the Jordan, and only one river still lies between them and the land God has promised them. The new leader is named Joshua; he served Moses for a long time.',
+        'For forty years Moses has led the people of Israel, and now he has died. The Israelites are camped at Shittim, a wide plain east of the Jordan, and only one river still lies between them and the land God has promised them. The new leader is named Joshua, who served Moses for a long time.',
         'God speaks to him: “Moses, my servant, is dead. Now get ready, you and all this people, and cross the Jordan into the land I am giving you. Every place where you set your feet I will give to you. As long as you live, no one will be able to stand against you. As I was with Moses, so I will be with you; I will not fail you or leave you.”',
         'And then God says it once more: “Be strong and courageous! Keep everything Moses commanded you, and never let the book of the law leave your mouth. Think about it day and night, and what you do will succeed. Do not be afraid and do not lose heart, for God is with you wherever you go.”',
         'Joshua calls the officers of the people. “Go through the camp,” he says, “and tell everyone: Get your food ready, for in three days you will cross the Jordan.” The men answer, “Everything you command us we will do, and wherever you send us we will go. May God be with you as he was with Moses!”'
@@ -63,7 +63,7 @@ export const josuaEn: TextOverlay<Journey> = {
       text: [
         'Early in the morning Joshua sets out from Shittim with all the people, and they camp by the Jordan. Three days later the officers go through the camp and call out, “When you see the priests carrying the ark of the covenant, set out and follow it! But keep a wide distance of about two thousand cubits, for you have never gone this way before.” The ark is the golden chest that has already gone with the people through the desert. Joshua says to the people, “Get ready, for tomorrow God will do wonders among you.”',
         'At this time of harvest the Jordan is full to overflowing. Joshua says to the priests, “Take up the ark and go ahead of the people.” And to the people he says, “This is how you will know that God is among you: when the feet of the priests stand in the water, the water from upstream will stand still like a wall.”',
-        'The priests carry the ark to the bank and dip their feet into the water. And then it happens: the water coming from upstream stops far away near the city of Adam and piles up, the water below flows away to the Salt Sea until the riverbed is empty. The people cross opposite Jericho. The priests stand with the ark in the middle of the Jordan on dry ground until all the people have passed through.'
+        'The priests carry the ark to the bank and dip their feet into the water. And then it happens: the water coming from upstream stops far away near the city of Adam and piles up. The water below flows away to the Salt Sea until the riverbed is empty. Now the people cross opposite Jericho, and the priests stand with the ark in the middle of the Jordan on dry ground until everyone has passed through.'
       ],
       task: { hint: 'Listen carefully and answer the questions.' },
       questions: [
