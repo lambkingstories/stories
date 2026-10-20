@@ -764,16 +764,19 @@ describe('Kanäle drehen (channels)', () => {
     expect(problems()).toEqual([])
   })
 
-  it('a wet piece shows its wet picture (the pictures do not change for pieces without water); the plant blooms when the water arrives and a part is counted', async () => {
+  it('a wet piece shows its wet picture over the dry one (it fades in; the dry picture stays); the plant blooms when the water arrives and a part is counted', async () => {
     const w = await open()
     // the source and the fork (painted position, open to the source) are wet at the start, the straight piece next to it is not
-    expect(tile(w, 1, 0, 4).find('img').attributes('src')).toContain('quelle-nass')
-    expect(tile(w, 1, 1, 4).find('img').attributes('src')).toContain('gabel-nass')
-    expect(tile(w, 1, 2, 4).find('img').attributes('src')).toContain('gerade.webp')
+    expect(tile(w, 1, 0, 4).find('.ch-wet.on').attributes('src')).toContain('quelle-nass')
+    expect(tile(w, 1, 1, 4).find('.ch-wet.on').attributes('src')).toContain('gabel-nass')
+    expect(tile(w, 1, 2, 4).find('.ch-wet.on').exists()).toBe(false)
+    expect(tile(w, 1, 2, 4).find('.ch-base').attributes('src')).toContain('gerade.webp')
     // the straight piece turned: the water runs through it to the plant on the right
     await turn(w, 1, 2, 4, 1)
-    expect(tile(w, 1, 2, 4).find('img').attributes('src')).toContain('gerade-nass')
+    expect(tile(w, 1, 2, 4).find('.ch-wet.on').attributes('src')).toContain('gerade-nass')
+    expect(tile(w, 1, 2, 4).find('.ch-base').attributes('src')).toContain('gerade.webp')
     expect(tile(w, 1, 2, 4).find('.ch-base').attributes('style')).toContain('rotate(180deg)')
+    expect(tile(w, 1, 2, 4).find('.ch-wet').attributes('style')).toContain('rotate(180deg)')
     expect(tile(w, 1, 3, 4).attributes('aria-label')).toBe('Pflanze: Dattel, blühend')
     expect(tile(w, 1, 3, 4).find('.ch-plant').attributes('src')).toContain('ziel-dattel-bluete')
     expect(useTaskProgress().parts.value).toBe(1)

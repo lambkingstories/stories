@@ -52,8 +52,9 @@ const stars = computed(() => mistakeStars(hints.value, 0, 1))
 const src = (p: string) => prependBaseUrl(p)
 const isWet = (r: number, c: number) => !!state.value.wet[r]?.[c]
 const WET_KINDS = ['straight', 'corner', 'tee', 'source']
-const tileSrc = (tile: ChannelTile, r: number, c: number) =>
-  src(isWet(r, c) && WET_KINDS.includes(tile.kind) ? props.game.wet[tile.kind as 'straight' | 'corner' | 'tee' | 'source'] : props.game.tiles[tile.kind])
+/** The dry picture of a piece is always there; the wet one of the pieces that carry water lies over it and fades in (the two are not pixel-equal, a hard swap would jump). */
+const tileSrc = (tile: ChannelTile) => src(props.game.tiles[tile.kind])
+const wetSrc = (tile: ChannelTile) => (WET_KINDS.includes(tile.kind) ? src(props.game.wet[tile.kind as 'straight' | 'corner' | 'tee' | 'source']) : '')
 const goalOf = (tile: ChannelTile) => (tile.goal ? props.game.goals[tile.goal] : undefined)
 const turn = (tile: ChannelTile) => `rotate(${tile.rot * 90}deg)`
 
@@ -144,7 +145,8 @@ const cols = computed(() => current.value.grid[0]?.length ?? 1)
             :aria-label="goalOf(tile) ? t(bloomed[tile.goal] ? 'app.adventure.channelGoalBloom' : 'app.adventure.channelGoalWilted', { name: goalOf(tile).label }) : tile.kind === 'source' ? t('app.adventure.channelSource') : isTurnable(tile.kind) ? t('app.adventure.channelTile', { r: r + 1, c: c + 1 }) : t('app.adventure.channelFixed')"
             @click="tapTile(r, c)"
           )
-            img(:src="tileSrc(tile, r, c)" alt="" draggable="false" class="ch-base" :style="{ transform: turn(tile) }")
+            img(:src="tileSrc(tile)" alt="" draggable="false" class="ch-base" :style="{ transform: turn(tile) }")
+            img(v-if="wetSrc(tile)" :src="wetSrc(tile)" alt="" draggable="false" class="ch-wet" :class="{ on: isWet(r, c) }" :style="{ transform: turn(tile) }")
             img(v-if="goalOf(tile)" :src="src(bloomed[tile.goal] ? goalOf(tile).bloom : goalOf(tile).wilted)" alt="" draggable="false" class="ch-plant")
       p(class="ch-fb" role="status") {{ message }}
       div(class="ch-actions")
@@ -221,6 +223,19 @@ const cols = computed(() => current.value.grid[0]?.length ?? 1)
   pointer-events: none
   transition: transform 220ms ease-out
 
+.ch-wet
+  position: absolute
+  inset: 0
+  width: 100%
+  height: 100%
+  object-fit: cover
+  pointer-events: none
+  opacity: 0
+  transition: transform 220ms ease-out, opacity 500ms ease-in-out
+
+  &.on
+    opacity: 1
+
 .ch-plant
   position: absolute
   inset: 6%
@@ -255,7 +270,8 @@ const cols = computed(() => current.value.grid[0]?.length ?? 1)
     transform: scale(1.06)
 
 @media (prefers-reduced-motion: reduce)
-  .ch-base
+  .ch-base,
+  .ch-wet
     transition: none
 
   .ch-tile.hint
