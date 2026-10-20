@@ -80,16 +80,16 @@ export const adamEvaEn: TextOverlay<Journey> = {
     {
       title: 'Adam Names the Animals',
       ref: 'Genesis 2:18–20',
-      audio: 'audio/abenteuer/adam-eva/geschichte-05-en-v1.mp3',
+      audio: 'audio/abenteuer/adam-eva/geschichte-05-en-v2.mp3',
       text: [
         'Adam lives in the garden and has everything he needs. And yet God says, “It is not good for the man to be alone. I will make him a helper who fits him.”',
-        'God forms all the animals of the field and all the birds of the sky out of the ground and brings them to Adam. He wants to see what Adam will call them. And whatever Adam calls each animal, that is to be its name.',
-        'Adam gives names to all the animals, the cattle, the birds, and the wild animals. One after the other they come to him. He looks at them and finds a name for each. But among them all there is none that really fits him.'
+        'God has made all the animals of the field and all the birds of the sky. Now he wants to see what Adam will call them. And whatever Adam calls each animal, that is to be its name.',
+        'Adam gives names to the cattle, the birds, and the wild animals. He looks at the animals and finds a name for each. But among them there is none that really fits him.'
       ],
-      task: { hint: 'Put the missing words into the sentence.', verse: { rounds: [{ hint: 'Round 1: Drag the right leaf into the gap.', parts: ['God forms all the ', ' of the field and all the birds of the sky out of the ground.'], words: ['animals', 'stones', 'clouds'] }, { hint: 'Round 2: Now two words are missing.', parts: ['Adam gives names to all the animals, the ', ', the ', ', and the wild animals.'], words: ['cattle', 'birds', 'fish', 'flowers'] }] } },
+      task: { hint: 'Put the missing words into the sentence.', verse: { rounds: [{ hint: 'Round 1: Drag the right leaf into the gap.', parts: ['God has made all the ', ' of the field and all the birds of the sky.'], words: ['animals', 'stones', 'clouds'] }, { hint: 'Round 2: Now two words are missing.', parts: ['Adam gives names to the ', ', the ', ', and the wild animals.'], words: ['cattle', 'birds', 'fish', 'flowers'] }] } },
       questions: [
         { q: 'What does God say about Adam?', options: ['It is not good for him to be alone.', 'It is good for him to be alone.', 'He should move on soon.'] },
-        { q: 'What does Adam still lack, although he knows all the animals?', options: ['someone who fits him', 'a house', 'a boat'] }
+        { q: 'What does Adam still lack, although he gives the animals names?', options: ['someone who fits him', 'a house', 'a boat'] }
       ]
     },
     {

@@ -170,7 +170,7 @@ describe('SoundPanel', () => {
     return mount(Panel, opts)
   }
 
-  it('the speaker button opens a window with two sliders (music, sounds) and closes it again', async () => {
+  it('the speaker button opens a window with three sliders (music, sounds, voice) and closes it again', async () => {
     const w = await mountPanel()
     expect(w.find('.sp-pop').exists()).toBe(false)
     const btn = w.find('.sp-btn')
@@ -178,7 +178,7 @@ describe('SoundPanel', () => {
     await btn.trigger('click')
     expect(btn.attributes('aria-expanded')).toBe('true')
     const sliders = w.findAll('input[type="range"]')
-    expect(sliders).toHaveLength(2)
+    expect(sliders).toHaveLength(3)
     await btn.trigger('click')
     expect(w.find('.sp-pop').exists()).toBe(false)
     expect(problems()).toEqual([])
@@ -196,14 +196,19 @@ describe('SoundPanel', () => {
     expect(w.findAll('.sp-val')[1]!.text()).toBe('50 %')
     await sfx.trigger('change')
     expect(played).toContain('tap')
+    const voice = w.findAll('input[type="range"]')[2]!
+    await voice.setValue('40')
+    expect(localStorage.getItem('lk-voice-volume')).toBe('0.4')
+    expect(w.findAll('.sp-val')[2]!.text()).toBe('40 %')
   })
 
   it('with everything off the button shows the speaker that is off; Escape and a tap outside close the window', async () => {
     const w = await mountPanel()
     await w.find('.sp-btn').trigger('click')
-    const [music, sfx] = w.findAll('input[type="range"]') as [ReturnType<typeof w.find>, ReturnType<typeof w.find>]
+    const [music, sfx, voice] = w.findAll('input[type="range"]') as [ReturnType<typeof w.find>, ReturnType<typeof w.find>, ReturnType<typeof w.find>]
     await music.setValue('0')
     await sfx.setValue('0')
+    await voice.setValue('0')
     expect(w.find('.sp-btn img').attributes('src')).toContain('ton-aus')
     await sfx.setValue('100')
     expect(w.find('.sp-btn img').attributes('src')).toContain('ton-an')

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * The speaker button of the adventures. A tap opens a little window with two sliders, one for the music and one for the sounds
+ * The speaker button of the adventures. A tap opens a little window with three sliders: the music, the sounds and the reading voice
  * (louder, quieter, all the way to the left = off). The values are remembered (`useSoundSettings`). Used on the map and on every stage.
  */
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
@@ -10,12 +10,12 @@ import useSoundSettings from '@/use/useSoundSettings'
 import { prependBaseUrl } from '@/utils/function'
 
 const { t } = useI18n({ useScope: 'global' })
-const { musicVolume, sfxVolume, setMusicVolume, setSfxVolume } = useSoundSettings()
+const { musicVolume, sfxVolume, voiceVolume, setMusicVolume, setSfxVolume, setVoiceVolume } = useSoundSettings()
 const { play } = useSfx()
 
 const open = ref(false)
 const root = ref<HTMLElement | null>(null)
-const allOff = computed(() => musicVolume.value <= 0 && sfxVolume.value <= 0)
+const allOff = computed(() => musicVolume.value <= 0 && sfxVolume.value <= 0 && voiceVolume.value <= 0)
 const icon = computed(() => prependBaseUrl(`images/abenteuer/ui/${allOff.value ? 'ton-aus' : 'ton-an'}.webp`))
 const percent = (v: number) => Math.round(v * 100)
 
@@ -24,6 +24,9 @@ function onMusic(e: Event) {
 }
 function onSfx(e: Event) {
   setSfxVolume(Number((e.target as HTMLInputElement).value) / 100)
+}
+function onVoice(e: Event) {
+  setVoiceVolume(Number((e.target as HTMLInputElement).value) / 100)
 }
 // when the slider of the sounds is let go, one sound plays so that the child hears how loud it is
 function previewSfx() {
@@ -64,6 +67,10 @@ onBeforeUnmount(() => {
         span(class="sp-name") {{ t('app.adventure.soundSfx') }}
         span(class="sp-val") {{ sfxVolume <= 0 ? t('app.adventure.soundZero') : `${percent(sfxVolume)} %` }}
         input(type="range" min="0" max="100" step="5" :value="percent(sfxVolume)" :aria-label="t('app.adventure.soundSfx')" @input="onSfx" @change="previewSfx")
+      label(class="sp-row")
+        span(class="sp-name") {{ t('app.adventure.soundVoice') }}
+        span(class="sp-val") {{ voiceVolume <= 0 ? t('app.adventure.soundZero') : `${percent(voiceVolume)} %` }}
+        input(type="range" min="0" max="100" step="5" :value="percent(voiceVolume)" :aria-label="t('app.adventure.soundVoice')" @input="onVoice")
 </template>
 
 <style scoped lang="sass">

@@ -4,14 +4,16 @@
  * recordings are made, the device's own voice reads the text (the speech synthesis of the phone, nothing is sent from the app). A
  * second tap stops it, and leaving the screen stops it too.
  */
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AdvButton from '@/components/atoms/AdvButton.vue'
+import useSoundSettings from '@/use/useSoundSettings'
 import { prependBaseUrl } from '@/utils/function'
 
 const props = defineProps<{ text: string[]; audio?: string }>()
 const { t, locale } = useI18n({ useScope: 'global' })
 
+const { voiceVolume } = useSoundSettings()
 const playing = ref(false)
 let player: HTMLAudioElement | null = null
 const synth = typeof window !== 'undefined' && 'speechSynthesis' in window ? window.speechSynthesis : null
@@ -42,6 +44,7 @@ function speak() {
     u.lang = lang
     u.rate = 0.88
     u.pitch = 1.05
+    u.volume = voiceVolume.value
     if (voices[0]) u.voice = voices[0]
     u.onend = next
     u.onerror = () => (playing.value = false)
@@ -59,6 +62,7 @@ function toggle() {
   playing.value = true
   if (props.audio) {
     player = new Audio(prependBaseUrl(props.audio))
+    player.volume = voiceVolume.value
     player.onended = () => (playing.value = false)
     player.onerror = () => {
       player = null
@@ -73,6 +77,10 @@ function toggle() {
   speak()
 }
 
+// the slider of the sound window works while the voice is speaking
+watch(voiceVolume, (v) => {
+  if (player) player.volume = v
+})
 onBeforeUnmount(stop)
 </script>
 

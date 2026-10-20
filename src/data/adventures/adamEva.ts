@@ -132,8 +132,8 @@ const VERS: VerseGame = {
   board: `${G}lueckenvers/tafel.webp`,
   leaf: `${G}lueckenvers/blatt.webp`,
   rounds: [
-    { hint: 'Runde 1: Ziehe das passende Blatt in die Lücke.', parts: ['Gott formt aus dem Boden alle ', ' des Feldes und alle Vögel des Himmels.'], words: ['Tiere', 'Steine', 'Wolken'], answers: [0] },
-    { hint: 'Runde 2: Jetzt fehlen zwei Wörter.', parts: ['Adam gibt allen Tieren Namen, dem ', ', den ', ' und den wilden Tieren.'], words: ['Vieh', 'Vögeln', 'Fischen', 'Blumen'], answers: [0, 1] }
+    { hint: 'Runde 1: Ziehe das passende Blatt in die Lücke.', parts: ['Gott hat alle ', ' des Feldes und alle Vögel des Himmels gemacht.'], words: ['Tiere', 'Steine', 'Wolken'], answers: [0] },
+    { hint: 'Runde 2: Jetzt fehlen zwei Wörter.', parts: ['Adam gibt dem ', ', den ', ' und den wilden Tieren Namen.'], words: ['Vieh', 'Vögeln', 'Fischen', 'Blumen'], answers: [0, 1] }
   ]
 }
 
@@ -304,16 +304,16 @@ export const adamEva: Journey = {
       image: `${IMG}etappe-bild-05.webp`,
       title: 'Adam gibt den Tieren Namen',
       ref: '1. Mose 2,18–20',
-      audio: `${REC}geschichte-05-v1.mp3`,
+      audio: `${REC}geschichte-05-v2.mp3`,
       text: [
         'Adam lebt im Garten und hat alles, was er braucht. Und doch sagt Gott: „Es ist nicht gut, dass der Mensch allein ist. Ich will ihm eine Hilfe machen, die zu ihm passt.“',
-        'Gott formt aus dem Boden alle Tiere des Feldes und alle Vögel des Himmels und bringt sie zu Adam. Er will sehen, wie Adam sie nennt. Und wie Adam jedes Tier nennt, so soll es heißen.',
-        'Adam gibt allen Tieren Namen, dem Vieh, den Vögeln und den wilden Tieren. Eines nach dem anderen kommt zu ihm. Er sieht sie sich an und findet für jedes einen Namen. Aber unter allen ist keines, das wirklich zu ihm passt.'
+        'Gott hat alle Tiere des Feldes und alle Vögel des Himmels gemacht. Nun will er sehen, wie Adam sie nennt. Und wie Adam jedes Tier nennt, so soll es heißen.',
+        'Adam gibt dem Vieh, den Vögeln und den wilden Tieren Namen. Er sieht sich die Tiere an und findet für jedes einen Namen. Aber unter ihnen ist keines, das wirklich zu ihm passt.'
       ],
       task: { kind: 'lueckenvers', hint: 'Setze die fehlenden Wörter in den Satz.', verse: VERS },
       questions: [
         { q: 'Was sagt Gott über Adam?', options: ['Es ist nicht gut, dass er allein ist.', 'Es ist gut, dass er allein ist.', 'Er soll bald weiterziehen.'], answer: 0 },
-        { q: 'Was fehlt Adam, obwohl er alle Tiere kennt?', options: ['jemand, der zu ihm passt', 'ein Haus', 'ein Boot'], answer: 0 }
+        { q: 'Was fehlt Adam, obwohl er den Tieren Namen gibt?', options: ['jemand, der zu ihm passt', 'ein Haus', 'ein Boot'], answer: 0 }
       ],
       soon: SOON
     },

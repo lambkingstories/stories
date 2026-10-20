@@ -50,6 +50,19 @@ describe('the volume sliders', () => {
     expect(again.musicVolume.value).toBe(0.25)
   })
 
+  it('has a third slider for the reading voice: full by default, remembered, between 0 and 1, and the speaker is only off when all three are 0', async () => {
+    const s = (await import('@/use/useSoundSettings')).default()
+    expect(s.voiceVolume.value).toBe(1)
+    s.setVoiceVolume(0.35)
+    expect(s.voiceVolume.value).toBe(0.35)
+    expect(localStorage.getItem('lk-voice-volume')).toBe('0.35')
+    s.setVoiceVolume(-3)
+    expect(s.voiceVolume.value).toBe(0)
+    vi.resetModules()
+    localStorage.setItem('lk-voice-volume', '0.6')
+    expect((await import('@/use/useSoundSettings')).default().voiceVolume.value).toBe(0.6)
+  })
+
   it('treats the speaker as off when both sliders are at 0', async () => {
     const s = (await import('@/use/useSoundSettings')).default()
     const sfx = (await import('@/use/useSfx')).default()

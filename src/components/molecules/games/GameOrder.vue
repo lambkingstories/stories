@@ -204,7 +204,8 @@ const { dragging, selected, down, tapPlace, toggleSelect, dragStyle } = useDragD
 .od-slots
   display: grid
   grid-auto-flow: column
-  grid-auto-columns: 1fr
+  // minmax(0, 1fr): the boxes share the width and never push past the frame (the min-height below would widen them through the aspect ratio)
+  grid-auto-columns: minmax(0, 1fr)
   gap: 6px
 
 .od-slot
@@ -213,7 +214,7 @@ const { dragging, selected, down, tapPlace, toggleSelect, dragStyle } = useDragD
   align-items: center
   justify-content: center
   aspect-ratio: 4 / 3
-  min-height: 56px
+  min-width: 0
   border-radius: 10px
   border: 2px dashed rgba(150, 100, 30, 0.8)
   background: rgba(255, 246, 220, 0.6)
