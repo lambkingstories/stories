@@ -96,6 +96,9 @@ describe('Abraham: stories and questions', () => {
     expect(text[1]).not.toMatch(/wie viele (schafe|tiere|ziegen)/)
     expect(text[2]).not.toMatch(/form|wie viele sterne/)
     expect(text[5]).not.toMatch(/wie viele krüge|schüssel/)
+    // the silver game shows the paying; the question asks who sold the field, not how it was paid
+    expect(text[9]).not.toMatch(/bezahl|silber/)
+    expect(abraham.stages[9]!.questions[0]!.options[0]).toBe('von Ephron')
   })
 })
 

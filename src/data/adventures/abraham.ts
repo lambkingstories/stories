@@ -449,7 +449,7 @@ export const abraham: Journey = {
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
       task: { kind: 'silber', hint: 'Bezahle das Land mit genau vierhundert Silberstücken.', silver: SILBER },
       questions: [
-        { q: 'Wie bekommt Abraham das Land für Saras Grab?', options: ['Er bezahlt es mit Silber.', 'Er bekommt es geschenkt.', 'Er nimmt es sich einfach.'], answer: 0 },
+        { q: 'Von wem kauft Abraham das Feld mit der Höhle?', options: ['von Ephron', 'von Lot', 'von Isaak'], answer: 0 },
         { q: 'Wozu braucht Abraham dieses Stück Land?', options: ['als Grab für Sara', 'als Weide für seine Herden', 'für ein neues Haus'], answer: 0 }
       ],
       soon: SOON

@@ -165,7 +165,7 @@ export const abrahamEn: TextOverlay<Journey> = {
       ],
       task: { hint: 'Pay for the land with exactly four hundred pieces of silver.', silver: { rounds: [{ hint: 'Pay for the land with exactly four hundred pieces of silver. The sum on the cloth helps you.' }, { hint: 'Four hundred once more. Now you reckon it yourself.' }] } },
       questions: [
-        { q: 'How does Abraham get the land for Sarah’s grave?', options: ['He pays for it with silver.', 'He is given it as a gift.', 'He simply takes it.'] },
+        { q: 'From whom does Abraham buy the field with the cave?', options: ['From Ephron', 'From Lot', 'From Isaac'] },
         { q: 'What does Abraham need this piece of land for?', options: ['as a grave for Sarah', 'as pasture for his herds', 'for a new house'] }
       ]
     },
