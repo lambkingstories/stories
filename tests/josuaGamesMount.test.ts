@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { StepGame } from '@/types/adventure'
+import type { LowerGame, StepGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -252,5 +252,136 @@ describe('Im Gleichschritt (step)', () => {
     expect(w.findAll('.st-actions button')[1]!.text()).toBe('Show the beat')
     await start(w)
     expect(w.find('.st-go').text()).toBe('Step!')
+  })
+})
+
+// ---------------------------------------------------------------- down the rope
+describe('Am Seil herablassen (lower)', () => {
+  const game: LowerGame = {
+    background: 'images/x/wall.webp',
+    men: [
+      { id: 'a', image: 'images/x/a.webp', w: 16 },
+      { id: 'b', image: 'images/x/b.webp', w: 16 }
+    ],
+    window: [38, 14],
+    ground: 92,
+    rounds: [
+      { hint: 'Runde eins.', man: 'a', steps: 2, period: 4, amplitude: 10, threshold: 2 },
+      { hint: 'Runde zwei.', man: 'b', steps: 3, period: 4, amplitude: 10, threshold: 2 }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Lower } = await import('@/components/molecules/games/GameLower.vue')
+    const w = mount(Lower, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  const isFreeNow = (w: W) => w.find('.lw-rope').classes().includes('free')
+  /** Wait (in steps of a tenth of a second) until the rope swings away from the wall, or until it swings towards it. */
+  const waitFor = async (w: W, free: boolean) => {
+    for (let i = 0; i < 80 && isFreeNow(w) !== free; i++) await tick(100)
+  }
+  const go = async (w: W) => {
+    await w.find('.lw-go').trigger('click')
+    await flushPromises()
+  }
+  const turnOf = (w: W) => Number(/rotate\((-?[\d.]+)deg\)/.exec(w.find('.lw-rope').attributes('style') ?? '')![1])
+  const dropOf = (w: W) => Number(/height: ([\d.]+)%/.exec(w.find('.lw-line').attributes('style') ?? '')![1])
+
+  it('the goal is every step of both rounds; the man hangs at the window, nothing is down yet', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(5)
+    expect(w.find('.lw-round').text()).toContain('Runde 1 von 2')
+    expect(w.find('.lw-count').text()).toBe('Schritte hinab: 0 von 2')
+    expect(dropOf(w)).toBe(0)
+  })
+
+  it('the rope swings round the window: away from the wall it is turned to the right; the arrow and the green rope show when it is free', async () => {
+    const w = await open()
+    await tick(1000)
+    expect(turnOf(w)).toBeCloseTo(-10, 0)
+    expect(isFreeNow(w)).toBe(true)
+    expect(w.find('.lw-arrow').exists()).toBe(true)
+    await tick(2000)
+    expect(turnOf(w)).toBeCloseTo(10, 0)
+    expect(isFreeNow(w)).toBe(false)
+    expect(w.find('.lw-arrow').exists()).toBe(false)
+  })
+
+  it('a tap while he swings away lets him down a step; a second tap in the same moment is ignored, a later one in the same swing works', async () => {
+    const w = await open()
+    await tick(1000)
+    await go(w)
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(played).toContain('tap')
+    expect(dropOf(w)).toBeGreaterThan(0)
+    await go(w)
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(played).not.toContain('wrong')
+  })
+
+  it('a tap while he swings towards the wall: a cross, a dull sound, a mistake, he stays where he is', async () => {
+    const w = await open()
+    await tick(3000)
+    await go(w)
+    expect(played).toContain('wrong')
+    expect(w.find('.lw-fb').text()).toContain('Mauer')
+    expect(w.find('.lw-mark').exists()).toBe(true)
+    expect(dropOf(w)).toBe(0)
+    expect(useTaskProgress().parts.value).toBe(0)
+  })
+
+  it('two steps end round 1; round 2 has the other man and three steps', async () => {
+    const w = await open()
+    for (let i = 0; i < 2; i++) {
+      await waitFor(w, true)
+      await go(w)
+      await tick(600)
+    }
+    expect(useTaskProgress().parts.value).toBe(2)
+    await tick(1900)
+    expect(w.find('.lw-round').text()).toContain('Runde 2 von 2')
+    expect(w.find('.lw-count').text()).toBe('Schritte hinab: 0 von 3')
+    expect(dropOf(w)).toBe(0)
+  })
+
+  it('the whole game: the end with three stars; the mistakes give the stars (up to two: three, up to five: two, more: one)', async () => {
+    for (const [wrong, stars] of [[0, 3], [2, 3], [3, 2], [5, 2], [6, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      for (let i = 0; i < wrong; i++) {
+        await waitFor(w, false)
+        await go(w)
+        await tick(100)
+      }
+      for (let i = 0; i < 2; i++) {
+        await waitFor(w, true)
+        await go(w)
+        await tick(600)
+      }
+      await tick(1900)
+      for (let i = 0; i < 3; i++) {
+        await waitFor(w, true)
+        await go(w)
+        await tick(600)
+      }
+      await tick(1100)
+      expect(useTaskProgress().parts.value).toBe(5)
+      expect(useTaskProgress().finished.value).toBe(true)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${wrong} mistakes`).toEqual([[stars]])
+      w.unmount()
+    }
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.lw-count').text()).toBe('Steps down: 0 of 2')
+    expect(w.find('.lw-go').text()).toBe('Let down')
+    await tick(3000)
+    await go(w)
+    expect(w.find('.lw-fb').text()).toContain('He touches the wall')
   })
 })

@@ -106,7 +106,7 @@ describe('Josua: stories and questions', () => {
 
 describe('Josua: the placeholders until the games and pictures come', () => {
   it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(josua.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'quiz', 'schritt', 'memory', 'quiz', 'quiz', 'quiz', 'quiz', 'lueckenvers'])
+    expect(josua.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'abseilen', 'schritt', 'memory', 'quiz', 'quiz', 'quiz', 'quiz', 'lueckenvers'])
     for (const s of josua.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
@@ -142,6 +142,21 @@ describe('Josua: the placeholders until the games and pictures come', () => {
     expect(g.path.length).toBeGreaterThanOrEqual(6)
     for (let i = 1; i < g.path.length; i++) expect(g.path[i]![1], 'the path goes up').toBeLessThan(g.path[i - 1]![1])
     for (const [x, y] of g.path) expect(x >= 0 && x <= 100 && y >= 0 && y <= 100).toBe(true)
+  })
+
+  it('3 lower: five steps with a calm wind, then six with a stronger one; the swing is wider than the free threshold; the rope hangs from a window above the ground and the man fits in between', () => {
+    const g = stage(3).task.lower
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => [r.steps, r.period, r.amplitude, r.threshold])).toEqual([[5, 3.4, 12, 2], [6, 2.8, 14, 4]])
+    for (const r of g.rounds) {
+      expect(r.amplitude).toBeGreaterThan(r.threshold)
+      expect(g.men.map((m) => m.id)).toContain(r.man)
+    }
+    expect(new Set(g.rounds.map((r) => r.man)).size).toBe(2)
+    const manH = (g.men[0]!.w * (560 / 160)) / (4 / 3)
+    expect(g.ground - g.window[1], 'room for the man').toBeGreaterThan(manH)
+    expect(g.window[0] >= 0 && g.window[0] <= 100).toBe(true)
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

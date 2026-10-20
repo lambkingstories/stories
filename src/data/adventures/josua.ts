@@ -11,7 +11,7 @@
  * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit den ersten zehn Stationen (PLATZHALTER bis zum eigenen Panorama); Medaille und Geschenk sind ebenfalls die von Josef.
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme. Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { Journey, MemoryGame, StepGame, VerseGame } from '@/types/adventure'
+import type { Journey, LowerGame, MemoryGame, StepGame, VerseGame } from '@/types/adventure'
 import { josef } from './josef'
 import { JOSUA_PATH } from './josuaPath'
 import { localize } from './localize'
@@ -20,6 +20,26 @@ import { josuaEn } from './en/josua.en'
 // PLATZHALTER bis zum eigenen Bild: die Etappenbilder von Josef (Ordner images/abenteuer/josef/); danach `images/abenteuer/josua/etappe-bild-NN.webp`
 const PLACEHOLDER = 'images/abenteuer/josef/'
 const G = 'images/abenteuer/spiele/josua/'
+
+/**
+ * Etappe 3, "Am Seil herablassen": ein Mann hängt am Seil aus dem Fenster in der Stadtmauer und schwingt im Wind hin und her; ein Tippen, wenn er von der Mauer wegschwingt, lässt ihn einen Schritt tiefer
+ * (Bildauftrag JO12; eigener Hintergrund `abseilen/mauer.webp`, die Mauer steht links). Runde 1: ein Mann, fünf Schritte, ruhiger Wind (3,4 s je Schwung, 12°, frei ab 2°); Runde 2: der zweite Mann, sechs Schritte,
+ * stärkerer Wind (2,8 s, 14°, frei ab 4°). Fenster und Boden (Prozent des Bildes) sind vorläufig geschätzt, bis die Datei `abseilen-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `abseilen/mauer.webp` 900 × 1200, `mann-am-seil-a.webp`, `mann-am-seil-b.webp` je 160 × 560 (transparent, das Seil gehört zum Bild).
+ */
+const ABSEILEN: LowerGame = {
+  background: `${G}abseilen/mauer.webp`,
+  men: [
+    { id: 'a', image: `${G}abseilen/mann-am-seil-a.webp`, w: 16 },
+    { id: 'b', image: `${G}abseilen/mann-am-seil-b.webp`, w: 16 }
+  ],
+  window: [38, 14],
+  ground: 92,
+  rounds: [
+    { hint: 'Tippe, wenn der Mann von der Mauer wegschwingt. Dann sinkt er einen Schritt.', man: 'a', steps: 5, period: 3.4, amplitude: 12, threshold: 2 },
+    { hint: 'Der zweite Mann kommt. Der Wind ist stärker, die freie Zeit kürzer.', man: 'b', steps: 6, period: 2.8, amplitude: 14, threshold: 4 }
+  ]
+}
 
 /**
  * Etappe 4, "Im Gleichschritt": die Priester tragen die Lade durch das trockene Flussbett, das Kind tippt im Takt der Schritte (Bildauftrag JO13; eigener Hintergrund `schritt/flussbett.webp`).
@@ -130,7 +150,7 @@ export const josua: Journey = {
         'Drei Tage bleiben die Männer im Gebirge, und die Verfolger finden sie nicht. Dann kehren sie zu Josua zurück: „Gott hat uns das ganze Land gegeben. Die Menschen dort verzagen vor uns.“'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild; vorgesehen: Am Seil herablassen (abseilen, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'abseilen', hint: 'Lass den Mann am Seil hinab, wenn er von der Mauer wegschwingt.', lower: ABSEILEN },
       questions: [
         { q: 'Was bindet Rahab als Zeichen an ihr Fenster?', options: ['eine rote Schnur', 'ein weißes Tuch', 'einen grünen Zweig'], answer: 0 },
         { q: 'Wie lange sollen sich die Männer im Gebirge verstecken?', options: ['drei Tage', 'sieben Tage', 'eine Nacht'], answer: 0 }

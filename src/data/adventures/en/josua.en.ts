@@ -51,7 +51,7 @@ export const josuaEn: TextOverlay<Journey> = {
         'Rahab’s house is part of the city wall, so she lets the two men down through the window on a rope. “Go to the hills and hide for three days,” she says, “until the pursuers have come back. Then go on your way.” The men explain the sign: “Tie this red cord in the window you let us down through, and gather your whole family into your house. Whoever stays in your house will be safe.” “So be it,” says Rahab, and she ties the red cord in the window.',
         'For three days the men stay in the hills, and the pursuers do not find them. Then they return to Joshua: “God has given us the whole land. The people there are losing heart because of us.”'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Let the man down the rope when he swings away from the wall.', lower: { rounds: [{ hint: 'Tap when the man swings away from the wall. Then he goes down a step.' }, { hint: 'The second man comes. The wind is stronger, the free time shorter.' }] } },
       questions: [
         { q: 'What does Rahab tie in her window as a sign?', options: ['a red cord', 'a white cloth', 'a green branch'] },
         { q: 'How long should the men hide in the hills?', options: ['three days', 'seven days', 'one night'] }
