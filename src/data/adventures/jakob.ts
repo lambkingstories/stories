@@ -60,15 +60,15 @@ const KURBEL: CrankGame = {
 
 /**
  * Etappe 5, "Morgenrot halten": das Flussufer bei Nacht (Etappenbild 5, von der App abgedunkelt und aufgehellt) mit einem sanften Licht (Bildauftrag J11); kein Gegner, keine Gestalt.
- * Runde 1 bleibt das Licht stehen (10 Sekunden Halten), Runde 2 wandert es das Ufer entlang (15 Sekunden). PLATZHALTER: Lage und Weg des Lichts kommen aus `halten/funke-messung.json`.
+ * Runde 1 bleibt das Licht stehen (10 Sekunden Halten), Runde 2 wandert es das Ufer entlang (15 Sekunden). Lage und Weg des Lichts sind die Messwerte aus `halten/halten-messung.json` (Prozent des Etappenbildes 5, im Ufersand vor Jakobs Füßen, von links nach rechts).
  */
 const HALTEN: HoldGame = {
   background: `${IMG}etappe-bild-05.webp`,
   spark: `${G}halten/funke.webp`,
-  start: [50, 74],
+  start: [22, 89],
   rounds: [
     { hint: 'Lege den Finger auf das Licht und halte es.', seconds: 10 },
-    { hint: 'Jetzt wandert das Licht am Ufer: geh mit.', seconds: 15, path: [[20, 76], [38, 70], [56, 74], [74, 68], [86, 72]] }
+    { hint: 'Jetzt wandert das Licht am Ufer: geh mit.', seconds: 15, path: [[22, 89], [29, 92], [36, 94], [43, 95], [50, 95], [57, 95], [64, 94], [71, 93]] }
   ]
 }
 
