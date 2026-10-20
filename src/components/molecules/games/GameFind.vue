@@ -29,6 +29,10 @@ const finished = computed(() => count.value >= total.value)
 const misses = ref(0)
 const stars = computed(() => mistakeStars(misses.value, 4, 10))
 const sceneSrc = computed(() => prependBaseUrl(props.game.scene))
+/** The pictures that could not be loaded (not painted yet): a quiet one-colour shape stands in their place, so that the game can be played all the same. */
+const missing = reactive(new Set<string>())
+const STAND = ['#c9895a', '#6f9fc2', '#b58ac4', '#e0c25a', '#7fb069', '#c98a8a']
+const standOf = (i: number) => STAND[i % STAND.length]
 const burst = prependBaseUrl('images/abenteuer/ui/sternglanz.webp')
 
 const style = (f: { x: number; y: number; w: number }, z: number) => ({
@@ -66,7 +70,7 @@ function sceneTap(e: MouseEvent) {
 <template lang="pug">
   div(class="fd")
     div(v-if="!finished" class="fd-scene" @click="sceneTap")
-      img(:src="sceneSrc" alt="" class="fd-bg" draggable="false")
+      img(v-if="!missing.has(game.scene)" :src="sceneSrc" alt="" class="fd-bg" draggable="false" @error="missing.add(game.scene)")
       button(
         v-for="(f, i) in game.finds"
         :key="`f-${i}`"
@@ -77,18 +81,21 @@ function sceneTap(e: MouseEvent) {
         :aria-label="game.labels?.[i] ?? t('app.adventure.findOne')"
         @click="find(i)"
       )
-        img(:src="prependBaseUrl(f.image)" alt="" draggable="false")
+        img(v-if="!missing.has(f.image)" :src="prependBaseUrl(f.image)" alt="" draggable="false" @error="missing.add(f.image)")
+        span(v-else class="fd-stand" :style="{ background: standOf(i) }")
         img(v-if="found[i]" :src="burst" alt="" class="fd-spark" draggable="false")
       span(v-if="miss" :key="miss.k" class="fd-miss" :style="{ left: `${miss.x}%`, top: `${miss.y}%` }")
-      img(
-        v-for="(c, i) in game.covers"
-        :key="`c-${i}`"
-        :src="prependBaseUrl(c.image)"
-        alt=""
-        class="fd-cover"
-        :style="style(c, 20)"
-        draggable="false"
-      )
+      template(v-for="(c, i) in game.covers" :key="`c-${i}`")
+        img(
+          v-if="!missing.has(c.image)"
+          :src="prependBaseUrl(c.image)"
+          alt=""
+          class="fd-cover"
+          :style="style(c, 20)"
+          draggable="false"
+          @error="missing.add(c.image)"
+        )
+        span(v-else class="fd-cover fd-cover-stand" :style="style(c, 20)")
     p(v-if="!finished" class="fd-count" role="status") {{ t('app.adventure.findCount', { n: count, total }) }}
     GameDone(v-else :stars="stars" :text="game.doneText ?? t('app.adventure.findDone')" @next="emit('done', stars)")
 </template>
@@ -102,6 +109,7 @@ function sceneTap(e: MouseEvent) {
   border-radius: 18px
   overflow: hidden
   border: 3px solid #d4a83e
+  background: #b5c48c
   box-shadow: 0 10px 24px -12px rgba(60, 40, 10, 0.6)
 
 .fd-bg
@@ -179,6 +187,22 @@ function sceneTap(e: MouseEvent) {
   height: auto
   transform: translate(-50%, -100%)
   pointer-events: none
+
+// stand-ins: a figure (140 x 220) and a bush, barrel or rock (330 x 260)
+.fd-stand
+  display: block
+  width: 100%
+  aspect-ratio: 140 / 220
+  border-radius: 40% 40% 12% 12%
+  border: 2px solid rgba(255, 255, 255, 0.7)
+  pointer-events: none
+
+.fd-cover-stand
+  display: block
+  aspect-ratio: 330 / 260
+  border-radius: 45% 45% 10% 10%
+  background: rgba(86, 120, 64, 0.92)
+  border: 2px solid rgba(255, 255, 255, 0.5)
 
 .fd-count
   margin: 10px 0 0

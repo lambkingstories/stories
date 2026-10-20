@@ -112,7 +112,7 @@ describe('Gideon: stories and questions', () => {
 
 describe('Gideon: the placeholders until the games and pictures come', () => {
   it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(gideon.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'quiz', 'wort', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz'])
+    expect(gideon.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'quiz', 'wort', 'quiz', 'quiz', 'quiz', 'wimmelbild', 'quiz', 'quiz', 'quiz', 'memory'])
     for (const s of gideon.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
@@ -134,6 +134,27 @@ describe('Gideon: the placeholders until the games and pictures come', () => {
     expect(stage(4).task.word!.rounds.map((r) => r.word)).toEqual(['PEACE', 'ROCK'])
     expect(stage(4).task.word!.rounds.reduce((n, r) => n + r.word.length, 0)).toBe(9)
     setAdventureLanguage('de')
+  })
+
+  it('8 hidden picture: six men and three covers, every man lies on the scene and at least half of them are partly hidden; 12 memory: six pairs with a sentence that is true to the text', () => {
+    const f = stage(8).task.find
+    expect(f, 'the game is built').toBeDefined()
+    expect(stage(8).task.count).toBe(6)
+    expect(f!.finds).toHaveLength(6)
+    expect(f!.covers).toHaveLength(3)
+    expect(f!.labels).toHaveLength(6)
+    for (const t of [...f!.finds, ...f!.covers]) expect(t.x >= 0 && t.x <= 100 && t.y >= 0 && t.y <= 100).toBe(true)
+    // a cover hides a man when it stands in front of him: near in the width and its bottom edge a little lower
+    const hidden = f!.finds.filter((m) => f!.covers.some((c) => Math.abs(c.x - m.x) < c.w / 2 && c.y >= m.y && c.y - m.y < 12))
+    expect(hidden.length).toBeGreaterThanOrEqual(3)
+    const m = stage(12).task.memory
+    expect(m, 'the game is built').toBeDefined()
+    expect(m!.pairs).toHaveLength(6)
+    const told = gideon.stages.map((s) => s.text.join(' ')).join(' ')
+    for (const word of ['Palme', 'Kelter', 'Fell', 'Altar', 'Fackel', 'Horn', 'Friede', 'Debora', 'Weizen']) expect(told, word).toContain(word)
+    expect(m!.back).toMatch(/spiele\/gideon\/memory\//)
+    expect(stage(8).task.kind).toBe('wimmelbild')
+    expect(stage(12).task.kind).toBe('memory')
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

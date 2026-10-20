@@ -128,7 +128,7 @@ export const gideonEn: TextOverlay<Journey> = {
         '“With these three hundred I will save you and give the Midianites into your hands,” God says to Gideon. “Let all the others go home.”',
         'The three hundred take supplies and their trumpets with them. All the others Gideon sends home, each to his tent. Only the three hundred he keeps with him. Down in the valley lies the huge camp of the Midianites.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Find the six men who scoop the water to their mouths with their hands. Some of them are hiding!', find: { labels: ['Man at the stream scooping the water to his mouth with his hand', 'Man at the stream scooping the water to his mouth with his hand', 'Man at the stream scooping the water to his mouth with his hand', 'Man at the stream scooping the water to his mouth with his hand', 'Man at the stream scooping the water to his mouth with his hand', 'Man at the stream scooping the water to his mouth with his hand'], doneText: 'You found all six men who scoop the water to their mouths with their hands!' } },
       questions: [
         { q: 'How many men does Gideon keep with him?', options: ['three hundred', 'ten thousand', 'twenty-two thousand'] },
         { q: 'What do most of the men do at the brook?', options: ['They kneel down and drink.', 'They wash their feet.', 'They fill their jars.'] }
@@ -188,7 +188,7 @@ export const gideonEn: TextOverlay<Journey> = {
         'Gideon makes a priestly garment out of it and puts it in his town of Ophrah. But later the people worship this garment, and that becomes a mistake for Gideon and his house.',
         'The Midianites never lift up their heads again. The land has peace for forty years, as long as Gideon lives. And the altar in Ophrah that Gideon once built keeps its name: God is Peace.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Find the matching cards. Remember where each one lies.', memory: { pairs: [{ text: 'The palm tree: Deborah sits here and gives judgment.' }, { text: 'The winepress: Gideon secretly threshes wheat here.' }, { text: 'The fleece: Dew twice, a sign twice.' }, { text: 'The altar: God is Peace.' }, { text: 'The jar: A torch is inside.' }, { text: 'The horn: It calls the three hundred.' }] } },
       questions: [
         { q: 'What does Gideon answer when they want to make him ruler?', options: ['“God shall be your Lord.”', '“Yes, I will be your king.”', '“My son shall be it.”'] },
         { q: 'How long does the land have peace as long as Gideon lives?', options: ['forty years', 'seven years', 'twenty years'] }

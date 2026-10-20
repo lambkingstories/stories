@@ -11,7 +11,7 @@
  * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit allen zwölf Stationen und dem Ziel (PLATZHALTER bis zum eigenen Panorama); Medaille und Geschenk sind ebenfalls die von Josef.
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme. Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { Journey, WordGame } from '@/types/adventure'
+import type { FindGame, Journey, MemoryGame, WordGame } from '@/types/adventure'
 import { josef } from './josef'
 import { GIDEON_PATH } from './gideonPath'
 import { localize } from './localize'
@@ -31,6 +31,43 @@ const WORT: WordGame = {
   rounds: [
     { hint: 'Wie nennt Gideon den Altar? Gott ist der …', word: 'FRIEDE', extra: ['T', 'L'] },
     { hint: 'Worauf legt Gideon das Brot und das Fleisch? Auf den …', word: 'FELSEN', extra: ['A', 'M'] }
+  ]
+}
+
+/**
+ * Etappe 8, "Am Wasser" (Wimmelbild, alte Mechanik): am Bachufer knien viele Männer, sechs davon führen das Wasser mit der Hand zum Mund; einige stehen halb hinter Schilf, Busch und Fels (Bildauftrag G14;
+ * eigene Szene `wimmel/wasser-szene.webp`). Die Lagen (Mitte der Unterkante und Breite, Prozent der Szene) sind vorläufig geschätzt, bis die Datei `wimmel-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `wimmel/wasser-szene.webp` 1100 × 1467, `finde-a.webp`, `finde-b.webp`, `finde-c.webp` je ca. 140 × 220, `deck-schilf.webp`, `deck-busch.webp`, `deck-fels.webp` je 330 × 260.
+ */
+const WIMMEL: FindGame = {
+  labels: ['Mann am Bach, der das Wasser mit der Hand zum Mund führt', 'Mann am Bach, der das Wasser mit der Hand zum Mund führt', 'Mann am Bach, der das Wasser mit der Hand zum Mund führt', 'Mann am Bach, der das Wasser mit der Hand zum Mund führt', 'Mann am Bach, der das Wasser mit der Hand zum Mund führt', 'Mann am Bach, der das Wasser mit der Hand zum Mund führt'],
+  doneText: 'Du hast alle sechs Männer gefunden, die das Wasser mit der Hand zum Mund führen!',
+  scene: `${G}wimmel/wasser-szene.webp`,
+  finds: [
+    { image: `${G}wimmel/finde-a.webp`, x: 18, y: 40, w: 12 },
+    { image: `${G}wimmel/finde-b.webp`, x: 72, y: 36, w: 12 },
+    { image: `${G}wimmel/finde-c.webp`, x: 42, y: 58, w: 12 },
+    { image: `${G}wimmel/finde-a.webp`, x: 80, y: 62, w: 12 },
+    { image: `${G}wimmel/finde-b.webp`, x: 24, y: 78, w: 12 },
+    { image: `${G}wimmel/finde-c.webp`, x: 62, y: 86, w: 12 }
+  ],
+  covers: [
+    { image: `${G}wimmel/deck-schilf.webp`, x: 18, y: 46, w: 26 },
+    { image: `${G}wimmel/deck-busch.webp`, x: 80, y: 68, w: 28 },
+    { image: `${G}wimmel/deck-fels.webp`, x: 62, y: 92, w: 30 }
+  ]
+}
+
+/** Etappe 12, "Rückblick" (Memory, alte Mechanik): sechs Paare aus den Etappen des Abenteuers, zu jedem Treffer ein Satz aus dem Text. Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `memory/karte-*.webp` und `rueck.webp`, je 256 × 256 (Bildauftrag G17). */
+const MEMORY: MemoryGame = {
+  back: `${G}memory/rueck.webp`,
+  pairs: [
+    { image: `${G}memory/karte-palme.webp`, text: 'Die Palme: Hier sitzt Debora und spricht Recht.' },
+    { image: `${G}memory/karte-kelter.webp`, text: 'Die Kelter: Hier drischt Gideon heimlich Weizen.' },
+    { image: `${G}memory/karte-fell.webp`, text: 'Das Fell: Zweimal Tau, zweimal ein Zeichen.' },
+    { image: `${G}memory/karte-altar.webp`, text: 'Der Altar: Gott ist der Friede.' },
+    { image: `${G}memory/karte-krug.webp`, text: 'Der Krug: Darin steckt eine Fackel.' },
+    { image: `${G}memory/karte-horn.webp`, text: 'Das Horn: Es ruft die Dreihundert.' }
   ]
 }
 
@@ -194,7 +231,7 @@ export const gideon: Journey = {
         'Die dreihundert nehmen Vorrat und ihre Posaunen mit. Alle anderen schickt Gideon heim, jeden in sein Zelt. Nur die dreihundert behält er bei sich. Unten in der Ebene liegt das riesige Lager der Midianiter.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Wimmelbild (wimmelbild, alt)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'wimmelbild', hint: 'Finde die sechs Männer, die das Wasser mit der Hand zum Mund führen. Manche verstecken sich!', count: 6, find: WIMMEL },
       questions: [
         { q: 'Wie viele Männer behält Gideon bei sich?', options: ['dreihundert', 'zehntausend', 'zweiundzwanzigtausend'], answer: 0 },
         { q: 'Was tun die meisten Männer am Bach?', options: ['Sie knien nieder und trinken.', 'Sie waschen ihre Füße.', 'Sie füllen ihre Krüge.'], answer: 0 }
@@ -266,7 +303,7 @@ export const gideon: Journey = {
         'Die Midianiter erheben ihren Kopf nicht mehr. Das Land hat vierzig Jahre Frieden, solange Gideon lebt. Und der Altar in Ophra, den Gideon einst gebaut hat, trägt weiter den Namen: Gott ist der Friede.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Memory (memory, alt)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'memory', hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.', memory: MEMORY },
       questions: [
         { q: 'Was antwortet Gideon, als sie ihn zum Herrscher machen wollen?', options: ['„Gott soll euer Herr sein.“', '„Ja, ich werde euer König.“', '„Mein Sohn soll es werden.“'], answer: 0 },
         { q: 'Wie lange hat das Land Frieden, solange Gideon lebt?', options: ['vierzig Jahre', 'sieben Jahre', 'zwanzig Jahre'], answer: 0 }

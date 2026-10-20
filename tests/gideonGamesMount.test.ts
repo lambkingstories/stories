@@ -174,3 +174,35 @@ describe('Das Wort legen (word)', () => {
     expect(w.find('.wd-fb').text()).toBe('This letter does not fit here.')
   })
 })
+
+// ---------------------------------------------------------------- the hidden-picture game and the memory with pictures that are not painted yet
+describe('Wimmelbild and Memory with pictures that are not painted yet', () => {
+  it('a picture that cannot be loaded is a plain shape in its place: the scene, the men and the covers; a man can be found all the same', async () => {
+    const { gideon } = await import('@/data/adventures/gideon')
+    const { default: Find } = await import('@/components/molecules/games/GameFind.vue')
+    const w = mount(Find, { ...opts(), props: { game: gideon.stages[7]!.task.find! } })
+    await flushPromises()
+    expect(w.findAll('img')).toHaveLength(10)
+    for (const img of w.findAll('img')) await img.trigger('error')
+    await flushPromises()
+    expect(w.findAll('img')).toHaveLength(0)
+    expect(w.findAll('.fd-stand')).toHaveLength(6)
+    expect(w.findAll('.fd-cover-stand')).toHaveLength(3)
+    await w.findAll('.fd-thing')[0]!.trigger('click')
+    expect(w.find('.fd-count').text()).toContain('1')
+    expect(played).toContain('found')
+    expect(problems()).toEqual([])
+  })
+
+  it('the memory of the last stage works with plain cards', async () => {
+    const { gideon } = await import('@/data/adventures/gideon')
+    const { default: Memory } = await import('@/components/molecules/games/GameMemory.vue')
+    const w = mount(Memory, { ...opts(), props: { game: gideon.stages[11]!.task.memory! } })
+    await flushPromises()
+    expect(w.findAll('.mem-card')).toHaveLength(12)
+    for (const img of w.findAll('img.mem-face')) await img.trigger('error')
+    await flushPromises()
+    expect(w.findAll('.mem-stand.mem-front')).toHaveLength(12)
+    expect(new Set(w.findAll('.mem-stand.mem-front').map((x) => x.attributes('style'))).size).toBe(6)
+  })
+})
