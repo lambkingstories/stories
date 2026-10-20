@@ -80,13 +80,21 @@ export const jakob: Journey = {
   medal: `${IMG}medaille.webp`, // Jakob und die Himmelsleiter (Treppe aus Steinen im Sternenlicht)
   // Geschenk-Ausmalbild: Jakob und die Himmelsleiter im Traum (Treppe aus Steinen, Sterne, Tiere der Herde schlafend, friedlich)
   gift: { title: 'Jakob und die Himmelsleiter im Traum', image: `${IMG}geschenk.webp` },
-  // noch keine gemalte Karte (images leer): die Reise zeigt sich als Liste; Stationen und Perlenweg kommen mit dem Panorama
+  // die gemalte Karte (Panorama in vier Stücken, 4944 × 821 px) mit Stationen und Perlenweg aus fertig/messdaten.json und jakobPath.ts
   map: {
-    images: [],
+    images: [1, 2, 3, 4].map((n) => `${IMG}karte-pano-${n}.webp`),
     ring: 'images/abenteuer/josef/medaillon-ring.webp',
-    aspect: 1,
-    stages: [],
-    exam: { x: 0, y: 0, d: 0 },
+    aspect: 4944 / 821,
+    widthPx: 4944,
+    stages: [
+      { x: 0.1416, y: 0.6456, d: 0.0339 },
+      { x: 0.2528, y: 0.6456, d: 0.0339 },
+      { x: 0.3904, y: 0.6151, d: 0.0339 },
+      { x: 0.5138, y: 0.5627, d: 0.0339 },
+      { x: 0.7282, y: 0.609, d: 0.0339 },
+      { x: 0.8212, y: 0.5968, d: 0.0339 }
+    ],
+    exam: { x: 0.981, y: 0.5847, d: 0.0339 },
     path: JAKOB_PATH
   },
   stages: [
