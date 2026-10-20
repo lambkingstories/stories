@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis'
 
 export interface AdventureQuestion {
   q: string
@@ -642,6 +642,137 @@ export interface HoldGame {
   rounds: HoldRound[]
 }
 
+/** A sign of a season in the cycle game: its picture (160 x 160) and a few words for screen readers. */
+export interface CycleToken {
+  id: string
+  image: string
+  label: string
+}
+/** A round of the cycle game: the signs in their order (`cycle`, repeated again and again), how many places the row has, and which places are empty (indices). */
+export interface CycleRound {
+  hint: string
+  cycle: string[]
+  length: number
+  gaps: number[]
+}
+/** The cycle game "Years go by": a row of places in which the signs of the seasons come again and again; the gaps are filled with the right sign (at most two rounds). */
+export interface CycleGame {
+  background: string
+  tokens: CycleToken[]
+  rounds: CycleRound[]
+}
+
+/** A child in the catch game: its picture (120 x 180) and how wide it stands (percent of the picture, 6 to 8). */
+export interface CatchKid {
+  id: string
+  image: string
+  w: number
+}
+/** A round of the catch game: which children (ids, a child may be used several times) walk about, and how fast (picture widths a second, 0.04 to 0.09). */
+export interface CatchRound {
+  hint: string
+  kids: string[]
+  speed: number
+}
+/**
+ * The catch game "Call the children to the tent": children walk about on the meadow, a tap sends one to the tent (nothing runs out, nobody is lost).
+ * `tent` is the place of the tent and `field` the meadow, in percent of the picture.
+ */
+export interface CatchGame {
+  background: string
+  kids: CatchKid[]
+  tent: [number, number]
+  field: { x: number; y: number; w: number; h: number }
+  rounds: CatchRound[]
+}
+
+/** An animal of the guessing game: its picture and how wide it stands (percent of the picture). */
+export interface GuessAnimal {
+  id: string
+  image: string
+  w: number
+}
+/**
+ * A task of the guessing game: the herd `a` (and, to compare, a second herd `b`), or the three ranges to choose from (`ranges`, the right one is the range that
+ * contains `a.count`); `seed` places the animals on the meadow (always the same).
+ */
+export interface GuessTask {
+  a: { animal: string; count: number }
+  b?: { animal: string; count: number }
+  ranges?: [number, number][]
+  seed: number
+}
+export interface GuessRound {
+  hint: string
+  mode: 'compare' | 'range'
+  tasks: GuessTask[]
+}
+/** The guessing game "Which herd is bigger": herds too big to count are compared and estimated (at most two rounds). `region` is the meadow in percent of the picture. */
+export interface GuessGame {
+  background: string
+  animals: GuessAnimal[]
+  region: { x: number; y: number; w: number; h: number }
+  rounds: GuessRound[]
+}
+
+/** A round of the cairn game: how many stones are brought to the heap and how many steps each side has to go to the middle. */
+export interface CairnRound {
+  hint: string
+  stones: number
+  steps: number
+}
+/**
+ * The cairn game "A heap for two": two big stones are pushed to the middle together, a step on each side in turn (two fingers, or one finger left and right in turn);
+ * when both have come equally far they meet and lie on the heap. Positions in percent of the picture.
+ */
+export interface CairnGame {
+  background: string
+  stoneLeft: string
+  stoneRight: string
+  stoneSmall: string
+  centre: [number, number]
+  leftStart: [number, number]
+  rightStart: [number, number]
+  rounds: CairnRound[]
+}
+
+/** A herd of the relay game: its picture (260 x 160) and how wide it is (percent of the picture). */
+export interface RelayHerd {
+  id: string
+  image: string
+  w: number
+}
+/** A round of the relay game: the herds in the order they wait (ids), the room that has to stay between two herds (percent of the length of the road), and how fast a herd goes (road lengths a second). */
+export interface RelayRound {
+  hint: string
+  herds: string[]
+  minGap: number
+  speed: number
+}
+/** The relay game "Leave room between the herds": herds are sent along a road one after the other; the one behind keeps its distance. `road` is a line in percent of the picture. */
+export interface RelayGame {
+  background: string
+  herds: RelayHerd[]
+  road: [number, number][]
+  rounds: RelayRound[]
+}
+
+/** A round of the ring game: how many sons are put round the altar and how far (degrees) the gaps between neighbours may differ from the ideal one. */
+export interface RingRound {
+  hint: string
+  count: number
+  tolerance: number
+}
+/** The ring game "Twelve sons": figures are put on a ring round the altar so that all gaps are the same. `centre` and `radius` are in percent of the picture (the radius of the width). */
+export interface RingGame {
+  background: string
+  altar: string
+  tokens: string[]
+  centre: [number, number]
+  radius: number
+  rounds: RingRound[]
+}
+
 /** A round of the constellation game: the stars of the model as points in the frame (0 to 100 each way), and whether the model stays in view. */
 export interface ConstellationRound {
   hint: string
@@ -732,6 +863,12 @@ export interface StageTask {
   slide?: SlideGame
   crank?: CrankGame
   hold?: HoldGame
+  cycle?: CycleGame
+  catch?: CatchGame
+  guess?: GuessGame
+  cairn?: CairnGame
+  relay?: RelayGame
+  ring?: RingGame
   constellation?: ConstellationGame
 }
 
