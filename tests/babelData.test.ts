@@ -132,13 +132,22 @@ describe('Babel: every stage has its own new game (no game of Josef, Noah or Ada
     expect(c.rounds[0]!.items.every((i) => i === 'brick')).toBe(true)
     expect(c.rounds[1]!.items.filter((i) => i === 'pitch')).toHaveLength(4)
     expect(c.rounds[1]!.items.filter((i) => i === 'brick')).toHaveLength(4)
-    // the builders stand in a row from the oven to the stack: from left to right
+    // the builders stand in a row from left to right, side by side without touching (16 % wide), and the stack lies to the right of the last one
     for (const r of c.rounds) {
       const xs = r.slots.map((s) => s[0])
       expect(xs).toEqual([...xs].sort((a, b) => a - b))
-      expect(r.source[0]).toBeLessThan(xs[0]!)
+      for (let i = 1; i < xs.length; i++) expect(xs[i]! - xs[i - 1]!).toBeGreaterThanOrEqual(14)
+      for (const [x, y] of r.slots) {
+        expect(x - 8).toBeGreaterThanOrEqual(0)
+        expect(x + 8).toBeLessThanOrEqual(100)
+        expect(y).toBeLessThanOrEqual(96)
+      }
       expect(r.sink[0]).toBeGreaterThan(xs[xs.length - 1]!)
     }
+    // the measured oven, the same in both rounds, and the rounds use the first places of the row
+    expect(c.rounds[0]!.source).toEqual([48.5, 25.5])
+    expect(c.rounds[1]!.source).toEqual(c.rounds[0]!.source)
+    expect(c.rounds[1]!.slots.slice(0, 3)).toEqual(c.rounds[0]!.slots)
     expect(c.background).toBe('images/abenteuer/babel/etappe-bild-02.webp')
   })
 

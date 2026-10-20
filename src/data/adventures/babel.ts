@@ -60,7 +60,8 @@ const FEHLT: MissingGame = {
 
 /**
  * Etappe 2, "Ziegelkette": Bauleute reichen Ziegel und Pechtöpfe vom Ofen zum Stapel (Bildauftrag B11, Hintergrund Etappenbild 2).
- * PLATZHALTER: Ofen, Plätze und Stapel kommen aus `kette/kette-messung.json`.
+ * Ofen (Mund des linken Brennofens), Plätze (Fußpunkte, Figurenbreite 16 %) und Stapel sind die Messwerte aus `kette/kette-messung.json` (Prozent des Etappenbildes 2; die Plätze sind gegenüber
+ * dem ersten Messwert des Bildgenerators verschoben). Der Hintergrund wird im Spiel unscharf gezeichnet, weil das Etappenbild sehr voll ist.
  */
 const KETTE: ChainGame = {
   background: `${IMG}etappe-bild-02.webp`,
@@ -72,17 +73,17 @@ const KETTE: ChainGame = {
       hint: 'Tippe den, der etwas in den Händen hält, er reicht es weiter.',
       people: 3,
       items: ['brick', 'brick', 'brick', 'brick'],
-      slots: [[38, 76], [54, 76], [70, 76]],
-      source: [24, 66],
-      sink: [86, 80]
+      slots: [[30, 94], [46, 94], [62, 94]],
+      source: [48.5, 25.5],
+      sink: [90.6, 80]
     },
     {
       hint: 'Jetzt kommen auch Pechtöpfe, und eine Person mehr hilft.',
       people: 4,
       items: ['brick', 'pitch', 'brick', 'brick', 'pitch', 'pitch', 'brick', 'pitch'],
-      slots: [[34, 76], [48, 76], [62, 76], [76, 76]],
-      source: [22, 66],
-      sink: [89, 80]
+      slots: [[30, 94], [46, 94], [62, 94], [78, 94]],
+      source: [48.5, 25.5],
+      sink: [90.6, 80]
     }
   ]
 }

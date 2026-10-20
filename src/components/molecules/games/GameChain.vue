@@ -109,7 +109,8 @@ function roundOver() {
     template(v-if="!finished")
       p(v-if="rounds.length > 1" class="ch-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="ch-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
-      div(class="ch-field" role="group" :aria-label="t('app.adventure.chainField')" :style="{ backgroundImage: `url(${src(game.background)})` }")
+      div(class="ch-field" role="group" :aria-label="t('app.adventure.chainField')")
+        div(class="ch-bg" :style="{ backgroundImage: `url(${src(game.background)})` }" aria-hidden="true")
         span(class="ch-oven" :style="place(current.source)" aria-hidden="true")
         div(class="ch-stack" :style="place(current.sink)" role="img" :aria-label="t('app.adventure.chainStack', { n: state.stacked.length })")
           img(v-for="(kind, i) in state.stacked" :key="i" :src="itemSrc(kind)" alt="" draggable="false" :style="{ bottom: `${(i % 4) * 22}%`, left: `${Math.floor(i / 4) * 30}%` }")
@@ -171,8 +172,14 @@ function roundOver() {
   border-radius: 14px
   border: 3px solid #d4a83e
   background-color: #cdb98e
+
+// the picture behind the row is a little soft: the stage picture is very full, and the row of builders has to stand out of it
+.ch-bg
+  position: absolute
+  inset: -3%
   background-size: cover
   background-position: center
+  filter: blur(2px) brightness(1.05)
 
 // the mouth of the oven: a warm glow (the picture shows the oven itself)
 .ch-oven
@@ -198,7 +205,7 @@ function roundOver() {
 
 .ch-worker
   position: absolute
-  width: 11%
+  width: 16%
   min-width: 44px
   padding: 0
   border: 0
