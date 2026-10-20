@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen'
 
 export interface AdventureQuestion {
   q: string
@@ -1002,6 +1002,152 @@ export interface HushGame {
   rounds: HushRound[]
 }
 
+/** A puzzle of the cave game: the size of the cave, rock, niches (places for the sacks), sacks and the man at the start; a place is (column, row). */
+export interface CaveLevel {
+  hint: string
+  cols: number
+  rows: number
+  walls: [number, number][]
+  niches: [number, number][]
+  sacks: [number, number][]
+  man: [number, number]
+}
+/** The cave game "Sacks into the cave": the child leads a small man who pushes sacks into the niches (only pushing, one sack at a time). `area` is the grid in percent of the picture. */
+export interface CaveGame {
+  background: string
+  man: string
+  sack: string
+  niche: string
+  wall: string
+  area: { x: number; y: number; w: number; h: number }
+  rounds: CaveLevel[]
+}
+
+/** A round of the winnowing game: the pieces of chaff and the grains in the tray, the right wind (percent), how much the wind swings and the seed of the order. */
+export interface WinnowRound {
+  hint: string
+  chaff: number
+  grains: number
+  window: [number, number]
+  gust: number
+  seed: number
+}
+/** The winnowing game "Chaff in the wind": the wind is set so that the light chaff flies away and the heavy grains stay. `trayBox` is the tray in percent of the picture. */
+export interface WinnowGame {
+  background: string
+  tray: string
+  grain: string
+  chaffImage: string
+  handle: string
+  trayBox: { x: number; y: number; w: number; h: number }
+  rounds: WinnowRound[]
+}
+
+/** A round of the word game: the word (in capitals) and the extra letters. */
+export interface WordRound {
+  hint: string
+  word: string
+  extra: string[]
+}
+/** The word game "Lay the word": letter tiles are put in the boxes (the words are written for each language). */
+export interface WordGame {
+  background: string
+  rounds: WordRound[]
+}
+
+/** A round of the dew game: where the dew lies (on the fleece or on the ground) and the places of the drops (percent of the threshing floor). */
+export interface DewRound {
+  hint: string
+  wet: 'fleece' | 'ground'
+  spots: [number, number][]
+}
+/** The dew game "The night goes by": the moon is drawn across the sky to the morning; then the drops glitter, and the child taps them where the dew lies. */
+export interface DewGame {
+  background: string
+  fleece: string
+  bowl: string
+  moon: string
+  sun: string
+  fleeceBox: { x: number; y: number; w: number; h: number }
+  rounds: DewRound[]
+}
+
+/** A man of the switch game: his picture and his width (percent of the picture). */
+export interface SwitchMan {
+  id: string
+  image: string
+  w: number
+}
+/** A round of the switch game: what each man wants (go home or stay), how many wait at the same time, and after how long the bubble goes away. */
+export interface SwitchRound {
+  hint: string
+  men: ('home' | 'stay')[]
+  hideBubbleMs?: number
+  queue: number
+}
+/** The switch game "Who goes home?": the men come down the path to a fork; the child sets the switch so that each goes where he wants. `fork` is the place of the fork (percent of the picture). */
+export interface SwitchGame {
+  background: string
+  men: SwitchMan[]
+  bubbleHome: string
+  bubbleHorn: string
+  leverLeft: string
+  leverRight: string
+  fork: [number, number]
+  rounds: SwitchRound[]
+}
+
+/** A watcher and his cone of light: his place (percent of the picture), the two ends of the swing (degrees), the time of one swing and how far the light reaches (percent of the width). */
+export interface SneakWatcher {
+  x: number
+  y: number
+  from: number
+  to: number
+  periodMs: number
+  reach: number
+}
+export interface SneakRound {
+  hint: string
+  stops: [number, number][]
+  watchers: SneakWatcher[]
+}
+/** The sneak game "Quietly down the slope": the pair is led along `path` from one place in the shadow to the next, and waits whenever a cone of light comes. */
+export interface SneakGame {
+  background: string
+  pair: string
+  watcherImages: string[]
+  path: [number, number][]
+  rounds: SneakRound[]
+}
+
+/** A group of men with jars, and the place where they stand (percent of the picture). */
+export interface CueGroup {
+  id: string
+  image: string
+  x: number
+  y: number
+  jars: number
+}
+/** A round of the signal game: the signals, the false signals that must not be answered, and the shortest and longest wait (ms). */
+export interface CueRound {
+  hint: string
+  signals: number
+  decoys: ('owl' | 'wind')[]
+  waitMs: [number, number]
+}
+/** The signal game "On Gideon's sign": wait for the horn, then answer in the right order (`leader` Gideon's jar first, then the `groups`); `front` is the group that stands round Gideon (only to look at). */
+export interface CueGame {
+  background: string
+  groups: CueGroup[]
+  leader: CueGroup
+  front: CueGroup
+  horn: string
+  decoyImages: Record<string, string>
+  jar: string
+  shards: string
+  rounds: CueRound[]
+}
+
 /** A round of the constellation game: the stars of the model as points in the frame (0 to 100 each way), and whether the model stays in view. */
 export interface ConstellationRound {
   hint: string
@@ -1108,6 +1254,13 @@ export interface StageTask {
   step?: StepGame
   bake?: BakeGame
   hush?: HushGame
+  cave?: CaveGame
+  winnow?: WinnowGame
+  word?: WordGame
+  dew?: DewGame
+  swit?: SwitchGame
+  sneak?: SneakGame
+  cue?: CueGame
   constellation?: ConstellationGame
 }
 
