@@ -1,13 +1,14 @@
 /**
- * Abenteuer "Abraham" (1. Mose 12; 13; 15; 18; 21; 22) für 8 bis 10 Jahre: 6 Etappen, Untertitel "Gott ruft, Gott hält Wort". Entstanden nach dem Skill "LambKing Abenteuer Skill".
+ * Abenteuer "Abraham" (1. Mose 12; 13; 15; 16; 17; 18; 21; 22; 23; 24) für 8 bis 10 Jahre: 11 Etappen, Untertitel "Gott ruft, Gott hält Wort". Entstanden nach dem Skill "LambKing Abenteuer Skill".
  * Quelle der Texte: D:/Claude/Abenteuer-Abraham/ENTWURF_Abraham.md (Entwurf v1 der Text-Sitzung), Plan: ETAPPENPLAN.md. Die richtige Antwort steht in den Daten
  * IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
- * Spiele (Wahl der Leitung vom 20.10.2026, höchstens zwei alte Mechaniken): 1 Kamele beladen (neu), 2 Zählen (alt), 3 Sternbild nachlegen (neu), 4 Wasser für die Gäste
- * (neu im Einsatz: die gebaute Gieß-Mechanik), 5 Puzzle (alt), 6 nur Quiz.
+ * Spiele (Wahl der Leitung vom 20.10.2026, höchstens zwei alte Mechaniken): 1 Kamele beladen (neu), 2 Zählen (alt), 3 Sternbild nachlegen (neu), 6 Wasser für die Gäste
+ * (neu im Einsatz: die gebaute Gieß-Mechanik), 8 Puzzle (alt), 9 nur Quiz. Die Etappen 4, 5, 7, 10 und 11 (Ausbau auf 11 Etappen, Etappenplan v2) haben bis zum Einbau
+ * ihrer Spiele und Bilder eine Quiz-Aufgabe (PLATZHALTER) und ein vorhandenes Etappenbild; die Karte (6 Stationen) bleibt unverändert, wie bei Jakob.
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/abraham/, images/abenteuer/spiele/abraham/<spiel>/, audio/abenteuer/abraham/.
  *
- * STAND 20.10.2026: alle Bilder (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder), Messwerte und Vorlese-Aufnahmen (Deutsch und Englisch) sind eingebaut, die Etappen sind spielbar.
+ * STAND 20.10.2026: alle Bilder der Etappen 1 bis 3, 6, 8 und 9 (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder) und die Messwerte sind eingebaut; Aufnahmen siehe `audio` der Etappen (eine Etappe ohne `audio` hat noch keine).
  * Das Abenteuer ist aber nicht öffentlich: es ist hinter `comingSoon` und dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
 import type { BalanceGame, ConstellationGame, CountGroup, Journey, WaterGame } from '@/types/adventure'
@@ -190,10 +191,48 @@ export const abraham: Journey = {
     },
     {
       id: 4,
+      image: `${IMG}etappe-bild-02.webp`,
+      title: 'Hagar und der Brunnen',
+      ref: '1. Mose 16',
+      text: [
+        'Viele Jahre sind seit Gottes Versprechen vergangen, und Abram und Sarai haben immer noch kein Kind. Sarai hat eine Magd aus Ägypten, die Hagar heißt. Weil Sarai selbst keine Kinder bekommen kann, gibt sie Hagar ihrem Mann, in der Hoffnung, dass Hagar ihm ein Kind schenkt.',
+        'Bald erwartet Hagar tatsächlich ein Kind. Doch zwischen den beiden Frauen gibt es Streit, und Hagar läuft in ihrer Not davon, mitten in die Wüste. Erschöpft setzt sie sich an einen Brunnen am Weg.',
+        'Aber Gott hat Hagar gesehen. Ein Bote Gottes findet sie am Brunnen und fragt: „Hagar, woher kommst du, und wohin gehst du?“ „Ich laufe vor Sarai davon“, antwortet sie. Da sagt der Bote: „Kehr zu ihr zurück. Du wirst einen Sohn bekommen, und du sollst ihn Ismael nennen, das bedeutet: Gott hört. Denn Gott hat gehört, wie schlecht es dir geht.“',
+        'Hagar ist tief bewegt. „Du bist ein Gott, der mich sieht“, sagt sie, denn nun weiß sie, dass Gott sie nicht vergessen hat. Von da an trägt der Brunnen einen besonderen Namen: Brunnen des Lebendigen, der mich sieht. Hagar geht zurück und bekommt ihren Sohn, und Abram nennt ihn Ismael.'
+      ],
+      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
+      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      questions: [
+        { q: 'Wo findet der Bote Gottes die flüchtige Hagar?', options: ['an einem Brunnen in der Wüste', 'in einem Zelt', 'auf einem hohen Berg'], answer: 0 },
+        { q: 'Wie nennt Hagar Gott?', options: ['ein Gott, der mich sieht', 'ein Gott, der schläft', 'ein Gott, der weit weg wohnt'], answer: 0 }
+      ],
+      soon: SOON
+    },
+    {
+      id: 5,
+      image: `${IMG}etappe-bild-03.webp`,
+      title: 'Der Bund und die neuen Namen',
+      ref: '1. Mose 17,1–8.15–19',
+      text: [
+        'Dreizehn Jahre später, Abram ist jetzt neunundneunzig Jahre alt, spricht Gott wieder zu ihm: „Ich bin der allmächtige Gott. Geh deinen Weg vor mir und lebe so, wie es mir gefällt. Ich will einen Bund mit dir schließen, ein festes Versprechen, und dich sehr zahlreich machen.“',
+        'Da wirft sich Abram vor Gott zu Boden. Gott sagt: „Du sollst nicht mehr Abram heißen, sondern Abraham, denn ich mache dich zum Vater vieler Völker. Mein Versprechen gilt für dich und alle deine Nachkommen, für immer: Ich will euer Gott sein, und das Land Kanaan soll euch gehören.“',
+        'Auch Sarai bekommt einen neuen Namen. „Sie soll Sara heißen“, sagt Gott. „Ich will sie segnen, und sie wird einen Sohn bekommen. Aus ihr sollen Völker werden.“',
+        'Abraham muss lachen, so überrascht ist er. „Kann ein Mann mit hundert Jahren noch Vater werden?“, denkt er, „und Sara ist neunzig!“ Doch Gott sagt: „Ja, Sara wird dir einen Sohn schenken. Den sollst du Isaak nennen, und mit ihm will ich meinen Bund halten.“'
+      ],
+      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
+      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      questions: [
+        { q: 'Welchen neuen Namen bekommt Abram?', options: ['Abraham', 'Isaak', 'Ismael'], answer: 0 },
+        { q: 'Wie alt ist Abram, als Gott ihm den neuen Namen gibt?', options: ['neunundneunzig Jahre', 'fünfundsiebzig Jahre', 'zwanzig Jahre'], answer: 0 }
+      ],
+      soon: SOON
+    },
+    {
+      id: 6,
       image: `${IMG}etappe-bild-04.webp`,
       title: 'Besuch bei den Eichen',
       ref: '1. Mose 18,1–15',
-      audio: `${REC}geschichte-04-v3.mp3`,
+      audio: `${REC}geschichte-06-v3.mp3`,
       text: [
         'Inzwischen hat Gott Abram und Sarai neue Namen gegeben: Abram heißt jetzt Abraham, das bedeutet „Vater vieler“, und Sarai heißt Sara. Beide sind sehr alt geworden.',
         'Es ist heißer Mittag. Abraham sitzt am Eingang seines Zeltes bei den großen Eichen von Mamre, als Gott ihn besucht. Er blickt auf und sieht auf einmal drei Männer vor sich stehen.',
@@ -209,11 +248,30 @@ export const abraham: Journey = {
       soon: SOON
     },
     {
-      id: 5,
+      id: 7,
+      image: `${IMG}etappe-bild-04.webp`,
+      title: 'Abraham bittet für Sodom',
+      ref: '1. Mose 18,16–33',
+      text: [
+        'Zwei der drei Männer machen sich auf den Weg nach Sodom, und Abraham begleitet sie ein Stück. Doch Gott selbst bleibt bei ihm stehen und sagt: „Aus Abraham soll ein großes Volk werden, und durch ihn sollen alle Völker gesegnet werden. Darum will ich ihm nicht verschweigen, was ich vorhabe. Ich habe gehört, wie schlimm es in Sodom zugeht, und will selbst nachsehen.“',
+        'Abraham tritt nahe an Gott heran und fragt mutig: „Willst du die Guten mit den Bösen verderben? Vielleicht leben fünfzig gute Menschen in der Stadt. Willst du ihnen nicht verzeihen?“ Gott antwortet: „Wenn ich in Sodom fünfzig gute Menschen finde, will ich die ganze Stadt verschonen.“',
+        'Aber Abraham fragt noch einmal, ganz vorsichtig: „Verzeih mir, dass ich so viel frage. Und wenn es nur fünfundvierzig sind? Oder vierzig? Oder dreißig? Oder zwanzig?“ Und jedes Mal antwortet Gott: „Dann will ich die Stadt auch um ihretwillen verschonen.“',
+        'Zuletzt fragt Abraham: „Und wenn es nur zehn gute Menschen sind?“ „Auch um der Zehn willen will ich die Stadt nicht verderben“, sagt Gott. Dann geht Gott weg, und Abraham kehrt heim in sein Zelt. Später denkt Gott an Abraham und bringt Lot in Sicherheit.'
+      ],
+      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
+      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      questions: [
+        { q: 'Wie viele gute Menschen reichen Gott zuletzt, um die Stadt zu verschonen?', options: ['zehn', 'fünfzig', 'hundert'], answer: 0 },
+        { q: 'Wen bringt Gott in Sicherheit?', options: ['Lot', 'Hagar', 'Isaak'], answer: 0 }
+      ],
+      soon: SOON
+    },
+    {
+      id: 8,
       image: `${IMG}etappe-bild-05.webp`,
       title: 'Isaak',
       ref: '1. Mose 21,1–7',
-      audio: `${REC}geschichte-05-v2.mp3`,
+      audio: `${REC}geschichte-08-v2.mp3`,
       text: [
         'Ein Jahr geht ins Land, und dann geschieht genau das, was Gott versprochen hat: Sara bekommt einen Sohn, zu der Zeit, die Gott genannt hat. Fünfundzwanzig Jahre sind vergangen, seit Abraham damals von Haran aufgebrochen ist, und nun ist er hundert Jahre alt.',
         'Abraham gibt dem Kind den Namen, den Gott ihm genannt hat: Isaak. Das bedeutet „er lacht“, und besser könnte kein Name zu dieser Geschichte passen.',
@@ -228,23 +286,61 @@ export const abraham: Journey = {
       soon: SOON
     },
     {
-      id: 6,
+      id: 9,
       image: `${IMG}etappe-bild-06.webp`,
       title: 'Gott sorgt',
-      ref: '1. Mose 22,1–14',
-      audio: `${REC}geschichte-06-v3.mp3`,
+      ref: '1. Mose 22,1–19',
       text: [
-        'Isaak ist ein Junge geworden. Eines Tages will Gott sehen, ob Abraham ihm ganz vertraut. „Abraham!“, ruft er. „Hier bin ich.“ Und Gott sagt: „Nimm Isaak, deinen Sohn, den du so lieb hast, und geh mit ihm in das Land Morija. Auf einem Berg, den ich dir zeige, sollst du ihn mir opfern.“ Das ist eine schwere Prüfung, aber Abraham vertraut Gott.',
-        'Am nächsten Morgen belädt Abraham seinen Esel mit Holz und geht mit Isaak und zwei Knechten los. Am dritten Tag sieht er den Berg und sagt zu den Knechten: „Bleibt hier mit dem Esel. Der Junge und ich gehen hinauf, um zu beten, und dann kommen wir wieder zu euch zurück.“',
-        'Isaak trägt das Holz den Berg hinauf. Unterwegs fragt er: „Vater, wo ist das Tier für das Opfer?“ Abraham antwortet: „Mein Sohn, Gott wird selbst für das Opfertier sorgen.“',
-        'Oben baut Abraham einen Altar und legt das Holz bereit. Da ruft eine Stimme vom Himmel: „Abraham! Abraham!“ „Hier bin ich“, antwortet er. „Tu dem Jungen nichts!“, sagt die Stimme. „Jetzt weiß ich, dass du Gott vertraust.“',
-        'Abraham blickt auf und sieht einen Widder, der sich mit den Hörnern in einem Gebüsch verfangen hat. Den bringt er Gott als Opfer, an Isaaks Stelle. Isaak steht gesund neben seinem Vater, und Abraham nennt den Ort „Gott sorgt“.'
+        'Isaak ist ein Junge geworden, da will Gott sehen, ob Abraham ihm ganz vertraut. „Abraham!“, ruft er. „Hier bin ich.“ „Nimm Isaak, deinen Sohn, den du so lieb hast, und geh mit ihm in das Land Morija. Dort sollst du ihn mir auf einem Berg opfern.“ Das ist eine schwere Prüfung, aber Abraham vertraut Gott.',
+        'Am nächsten Morgen lädt er Holz auf seinen Esel und geht mit Isaak und zwei Knechten los. Am dritten Tag sieht er den Berg und lässt die Knechte mit dem Esel zurück: „Der Junge und ich gehen hinauf, um zu beten, und dann kommen wir wieder zu euch.“',
+        'Auf dem Weg fragt Isaak: „Vater, wo ist das Tier für das Opfer?“ „Mein Sohn“, antwortet Abraham, „Gott wird selbst für das Opfertier sorgen.“',
+        'Oben baut Abraham einen Altar. Da ruft eine Stimme vom Himmel: „Abraham! Tu dem Jungen nichts! Jetzt weiß ich, dass du Gott vertraust.“ Abraham sieht einen Widder, der sich mit den Hörnern in einem Gebüsch verfangen hat. Den bringt er Gott als Opfer, an Isaaks Stelle. Isaak ist gerettet, und Abraham nennt den Ort „Gott sorgt“.',
+        'Noch einmal ruft die Stimme: „Weil du mir deinen Sohn nicht verweigert hast, will ich dich segnen. Deine Nachkommen sollen so zahlreich sein wie die Sterne, und durch sie sollen alle Völker gesegnet werden.“'
       ],
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
-        { q: 'Was trägt Isaak auf dem Weg den Berg hinauf?', options: ['das Holz', 'das Wasser', 'das Zelt'], answer: 0 },
         { q: 'Was antwortet Abraham auf Isaaks Frage nach dem Opfertier?', options: ['Gott wird dafür sorgen.', 'Ich habe es vergessen.', 'Wir kaufen es unterwegs.'], answer: 0 },
-        { q: 'Was sieht Abraham im Gebüsch?', options: ['einen Widder', 'einen Hirsch', 'einen Esel'], answer: 0 }
+        { q: 'Was sieht Abraham im Gebüsch?', options: ['einen Widder', 'einen Hirsch', 'einen Esel'], answer: 0 },
+        { q: 'Was verspricht Gott Abraham zum Schluss?', options: ['Durch seine Nachkommen sollen alle Völker gesegnet werden.', 'Er soll König über Kanaan werden.', 'Er soll nach Ägypten ziehen.'], answer: 0 }
+      ],
+      soon: SOON
+    },
+    {
+      id: 10,
+      image: `${IMG}etappe-bild-05.webp`,
+      title: 'Saras Grab',
+      ref: '1. Mose 23',
+      text: [
+        'Viele Jahre sind vergangen. Sara ist hundertsiebenundzwanzig Jahre alt, als sie in Hebron stirbt, und Abraham trauert um sie. Dann steht er auf und geht zu den Männern der Stadt: „Ich bin ein Fremder und Gast bei euch. Gebt mir ein Stück Land, damit ich meine Frau begraben kann.“',
+        'Die Männer antworten freundlich: „Du bist ein Mann, den Gott groß gemacht hat. Begrabe deine Frau in dem schönsten unserer Gräber, keiner von uns wird es dir verweigern.“ Abraham verneigt sich und bittet um die Höhle Machpela am Rand eines Feldes, die einem Mann namens Ephron gehört.',
+        'Ephron will sie ihm schenken, mit dem ganzen Feld. Aber Abraham will nichts geschenkt, er will das Land bezahlen. „Nimm mein Geld“, sagt er. Da nennt Ephron den Preis: vierhundert Silberstücke. Abraham wiegt das Silber ab und gibt es ihm, vor allen Zeugen.',
+        'Nun gehören das Feld und die Höhle als Grab Abraham. Dort begräbt er Sara. Es ist das erste Stück Land, das Abraham in Kanaan besitzt, in dem Land, das Gott ihm und seinen Nachkommen versprochen hat.'
+      ],
+      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
+      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      questions: [
+        { q: 'Wie bekommt Abraham das Land für Saras Grab?', options: ['Er bezahlt es mit Silber.', 'Er bekommt es geschenkt.', 'Er nimmt es sich einfach.'], answer: 0 },
+        { q: 'Wozu braucht Abraham dieses Stück Land?', options: ['als Grab für Sara', 'als Weide für seine Herden', 'für ein neues Haus'], answer: 0 }
+      ],
+      soon: SOON
+    },
+    {
+      id: 11,
+      image: `${IMG}etappe-bild-01.webp`,
+      title: 'Eine Frau für Isaak',
+      ref: '1. Mose 24',
+      text: [
+        'Abraham ist nun sehr alt, und Isaak soll eine Frau aus der eigenen Verwandtschaft bekommen. Darum schickt Abraham seinen ältesten Knecht mit zehn Kamelen in das ferne Land seiner Familie. „Gott wird seinen Boten vor dir hergehen lassen“, sagt er, „und du wirst dort eine Frau für meinen Sohn finden.“',
+        'Am Abend kommt der Knecht an einen Brunnen vor der Stadt, lässt die Kamele niederknien und betet: „Gott, hilf mir! Wenn ein Mädchen kommt und ich sie um einen Schluck Wasser bitte, und sie sagt: ‚Trink, ich will auch deine Kamele tränken‘, dann soll sie die Richtige sein.“',
+        'Er hat noch nicht zu Ende gebetet, da kommt Rebekka mit dem Krug auf der Schulter zum Brunnen. Sie reicht ihm zu trinken und sagt: „Ich schöpfe auch für deine Kamele, bis sie genug haben.“ Der Knecht schaut ihr still zu.',
+        'Der Knecht dankt Gott und erzählt Rebekkas Familie, was geschehen ist. Ihr Vater und ihr Bruder Laban sagen: „Das kommt von Gott.“ Und Rebekka sagt: „Ja, ich gehe mit.“',
+        'Als die Karawane in Kanaan ankommt, ist Isaak am Abend auf dem Feld, um nachzudenken. Er blickt auf und sieht die Kamele kommen. Rebekka wird seine Frau, er hat sie lieb, und nach dem Tod seiner Mutter wird er wieder froh.'
+      ],
+      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
+      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      questions: [
+        { q: 'Wen schickt Abraham in das Land seiner Familie?', options: ['seinen ältesten Knecht', 'seinen Sohn Isaak', 'seinen Neffen Lot'], answer: 0 },
+        { q: 'Woran erkennt der Knecht die richtige Frau?', options: ['Sie gibt auch den Kamelen zu trinken.', 'Sie trägt einen roten Schleier.', 'Sie singt am Brunnen.'], answer: 0 }
       ],
       soon: SOON
     }

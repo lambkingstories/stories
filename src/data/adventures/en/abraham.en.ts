@@ -60,9 +60,39 @@ export const abrahamEn: TextOverlay<Journey> = {
       ]
     },
     {
+      title: 'Hagar and the Well',
+      ref: 'Genesis 16',
+      text: [
+        'Many years have passed since God’s promise, and Abram and Sarai still have no child. Sarai has a maidservant from Egypt named Hagar. Because Sarai cannot have children herself, she gives Hagar to her husband, hoping that Hagar will give him a child.',
+        'Soon Hagar really is expecting a child. But there is quarreling between the two women, and in her distress Hagar runs away, out into the desert. Exhausted, she sits down at a well beside the road.',
+        'But God has seen Hagar. A messenger of God finds her at the well and asks, “Hagar, where have you come from, and where are you going?” “I am running away from Sarai,” she answers. Then the messenger says, “Go back to her. You will have a son, and you are to name him Ishmael, which means: God hears. For God has heard how badly things are going for you.”',
+        'Hagar is deeply moved. “You are a God who sees me,” she says, for now she knows that God has not forgotten her. From then on the well has a special name: the well of the Living One who sees me. Hagar goes back and has her son, and Abram names him Ishmael.'
+      ],
+      task: { hint: 'Listen carefully and answer the questions.' },
+      questions: [
+        { q: 'Where does the messenger of God find Hagar when she has run away?', options: ['at a well in the desert', 'in a tent', 'on a high mountain'] },
+        { q: 'What does Hagar call God?', options: ['a God who sees me', 'a God who sleeps', 'a God who lives far away'] }
+      ]
+    },
+    {
+      title: 'The Covenant and the New Names',
+      ref: 'Genesis 17:1–8, 15–19',
+      text: [
+        'Thirteen years later, when Abram is ninety-nine years old, God speaks to him again: “I am God Almighty. Walk before me and live as pleases me. I will make a covenant with you, a firm promise, and I will make you very numerous.”',
+        'Then Abram throws himself to the ground before God. God says, “You shall no longer be called Abram, but Abraham, for I am making you the father of many nations. My promise holds for you and for all your descendants, forever: I will be your God, and the land of Canaan shall belong to you.”',
+        'Sarai receives a new name, too. “She shall be called Sarah,” says God. “I will bless her, and she will have a son. Nations shall come from her.”',
+        'Abraham has to laugh, he is so surprised. “Can a man of a hundred still become a father?” he thinks, “and Sarah is ninety!” But God says, “Yes, Sarah will give you a son. You shall call him Isaac, and with him I will keep my covenant.”'
+      ],
+      task: { hint: 'Listen carefully and answer the questions.' },
+      questions: [
+        { q: 'What new name does Abram receive?', options: ['Abraham', 'Isaac', 'Ishmael'] },
+        { q: 'How old is Abram when God gives him the new name?', options: ['ninety-nine years old', 'seventy-five years old', 'twenty years old'] }
+      ]
+    },
+    {
       title: 'A Visit at the Oaks',
       ref: 'Genesis 18:1–15',
-      audio: 'audio/abenteuer/abraham/geschichte-04-en-v3.mp3',
+      audio: 'audio/abenteuer/abraham/geschichte-06-en-v3.mp3',
       text: [
         'By now God has given Abram and Sarai new names: Abram is now called Abraham, which means “father of many,” and Sarai is called Sarah. Both have grown very old.',
         'It is noon and hot. Abraham is sitting at the entrance of his tent by the great oaks of Mamre when God visits him. He looks up and sees three men standing in front of him.',
@@ -77,9 +107,24 @@ export const abrahamEn: TextOverlay<Journey> = {
       ]
     },
     {
+      title: 'Abraham Pleads for Sodom',
+      ref: 'Genesis 18:16–33',
+      text: [
+        'Two of the three men set out toward Sodom, and Abraham walks with them for a while. But God himself stays behind with him and says, “A great nation shall come from Abraham, and all nations shall be blessed through him. So I will not hide from him what I plan to do. I have heard how bad things are in Sodom, and I will go and see for myself.”',
+        'Abraham steps close to God and asks boldly, “Will you destroy the good along with the wicked? Perhaps fifty good people live in the city. Will you not forgive them?” God answers, “If I find fifty good people in Sodom, I will spare the whole city.”',
+        'But Abraham asks once more, very carefully, “Forgive me for asking so much. And if there are only forty-five? Or forty? Or thirty? Or twenty?” And every time God answers, “Then I will spare the city for their sake.”',
+        'At last Abraham asks, “And if there are only ten good people?” “For the sake of ten I will not destroy the city,” says God. Then God goes away, and Abraham returns home to his tent. Later God remembers Abraham and brings Lot to safety.'
+      ],
+      task: { hint: 'Listen carefully and answer the questions.' },
+      questions: [
+        { q: 'How many good people does it take in the end for God to spare the city?', options: ['ten', 'fifty', 'one hundred'] },
+        { q: 'Whom does God bring to safety?', options: ['Lot', 'Hagar', 'Isaac'] }
+      ]
+    },
+    {
       title: 'Isaac',
       ref: 'Genesis 21:1–7',
-      audio: 'audio/abenteuer/abraham/geschichte-05-en-v2.mp3',
+      audio: 'audio/abenteuer/abraham/geschichte-08-en-v2.mp3',
       text: [
         'A year goes by, and then exactly what God promised happens: Sarah has a son, at the very time God had named. Twenty-five years have passed since Abraham left Haran, and now he is one hundred years old.',
         'Abraham gives the child the name God told him: Isaac. It means “he laughs,” and no name could fit this story better.',
@@ -94,20 +139,50 @@ export const abrahamEn: TextOverlay<Journey> = {
     },
     {
       title: 'God Provides',
-      ref: 'Genesis 22:1–14',
-      audio: 'audio/abenteuer/abraham/geschichte-06-en-v2.mp3',
+      ref: 'Genesis 22:1–19',
       text: [
-        'Isaac has grown into a boy. One day God wants to see whether Abraham trusts him completely. “Abraham!” he calls. “Here I am.” And God says, “Take Isaac, your son, whom you love so much, and go with him to the land of Moriah. On a mountain that I will show you, you are to offer him to me.” A hard test, yet Abraham trusts God.',
-        'The next morning Abraham loads his donkey with wood and sets out with Isaac and two servants. On the third day he sees the mountain and says to the servants, “Stay here with the donkey. The boy and I will go up there to pray, and then we will come back to you.”',
-        'Isaac carries the wood up the mountain. He asks, “Father, where is the animal for the offering?” Abraham answers, “My son, God himself will provide the animal for the offering.”',
-        'At the top Abraham builds an altar and lays the wood ready. Then a voice calls from heaven, “Abraham! Abraham!” “Here I am,” he answers. “Do not harm the boy!” says the voice. “Now I know that you trust God.”',
-        'Abraham looks up and sees a ram caught by its horns in a thicket. He offers it to God in Isaac’s place. Isaac stands safe and sound next to his father, and Abraham calls the place “God Provides.”'
+        'Isaac has grown into a boy, and God wants to see whether Abraham trusts him completely. “Abraham!” he calls. “Here I am.” “Take Isaac, your son, whom you love so much, and go with him to the land of Moriah. There, on a mountain, you are to offer him to me.” It is a hard test, but Abraham trusts God.',
+        'The next morning he loads wood onto his donkey and sets out with Isaac and two servants. On the third day he sees the mountain and leaves the servants behind with the donkey: “The boy and I will go up there to pray, and then we will come back to you.”',
+        'On the way Isaac asks, “Father, where is the animal for the offering?” “My son,” Abraham answers, “God himself will provide the animal for the offering.”',
+        'At the top Abraham builds an altar. Then a voice calls from heaven, “Abraham! Do not harm the boy! Now I know that you trust God.” Abraham sees a ram caught by its horns in a thicket. He offers it to God in Isaac’s place. Isaac is safe, and Abraham calls the place “God Provides.”',
+        'Once more the voice calls, “Because you did not hold back your son from me, I will bless you. Your descendants will be as many as the stars, and through them all nations shall be blessed.”'
       ],
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
-        { q: 'What does Isaac carry up the mountain?', options: ['the wood', 'the water', 'the tent'] },
-        { q: 'What does Abraham answer when Isaac asks about the animal?', options: ['God will provide it.', 'I forgot it.', 'We will buy one on the way.'] },
-        { q: 'What does Abraham see in the thicket?', options: ['a ram', 'a deer', 'a donkey'] }
+        { q: 'What does Abraham answer when Isaac asks about the animal for the offering?', options: ['God will provide it.', 'I have forgotten it.', 'We will buy it on the way.'] },
+        { q: 'What does Abraham see in the thicket?', options: ['a ram', 'a deer', 'a donkey'] },
+        { q: 'What does God promise Abraham at the end?', options: ['All nations shall be blessed through his descendants.', 'He shall become king over Canaan.', 'He shall move to Egypt.'] }
+      ]
+    },
+    {
+      title: 'Sarah’s Grave',
+      ref: 'Genesis 23',
+      text: [
+        'Many years have passed. Sarah is a hundred and twenty-seven years old when she dies in Hebron, and Abraham mourns for her. Then he gets up and goes to the men of the town: “I am a stranger and a guest among you. Give me a piece of land so that I can bury my wife.”',
+        'The men answer kindly, “You are a man whom God has made great. Bury your wife in the finest of our graves; none of us will refuse you.” Abraham bows and asks for the cave of Machpelah at the edge of a field that belongs to a man named Ephron.',
+        'Ephron wants to give it to him, together with the whole field. But Abraham does not want a gift; he wants to pay for the land. “Take my money,” he says. Then Ephron names the price: four hundred pieces of silver. Abraham weighs out the silver and gives it to him in front of all the witnesses.',
+        'Now the field and the cave belong to Abraham as a grave. There he buries Sarah. It is the first piece of land that Abraham owns in Canaan, in the land that God promised to him and his descendants.'
+      ],
+      task: { hint: 'Listen carefully and answer the questions.' },
+      questions: [
+        { q: 'How does Abraham get the land for Sarah’s grave?', options: ['He pays for it with silver.', 'He is given it as a gift.', 'He simply takes it.'] },
+        { q: 'What does Abraham need this piece of land for?', options: ['as a grave for Sarah', 'as pasture for his herds', 'for a new house'] }
+      ]
+    },
+    {
+      title: 'A Wife for Isaac',
+      ref: 'Genesis 24',
+      text: [
+        'Abraham is very old now, and Isaac is to have a wife from his own relatives. So Abraham sends his oldest servant with ten camels to the far-off land of his family. “God will send his messenger ahead of you,” he says, “and there you will find a wife for my son.”',
+        'In the evening the servant comes to a well outside the town, lets the camels kneel down, and prays, “God, help me! If a girl comes and I ask her for a drink of water, and she says, ‘Drink, and I will water your camels, too,’ then let her be the right one.”',
+        'He has not even finished praying when Rebekah comes to the well with her jar on her shoulder. She gives him a drink and says, “I will draw water for your camels, too, until they have had enough.” The servant watches her quietly.',
+        'The servant thanks God and tells Rebekah’s family what has happened. Her father and her brother Laban say, “This comes from God.” And Rebekah says, “Yes, I will go with him.”',
+        'When the caravan reaches Canaan, Isaac is out in the field that evening to think. He looks up and sees the camels coming. Rebekah becomes his wife, he loves her, and after the death of his mother he is happy again.'
+      ],
+      task: { hint: 'Listen carefully and answer the questions.' },
+      questions: [
+        { q: 'Whom does Abraham send to the land of his family?', options: ['his oldest servant', 'his son Isaac', 'his nephew Lot'] },
+        { q: 'How does the servant recognize the right woman?', options: ['She gives the camels water to drink, too.', 'She wears a red veil.', 'She sings at the well.'] }
       ]
     }
   ],
