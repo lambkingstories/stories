@@ -227,9 +227,9 @@ export const adamEva: Journey = {
       image: `${IMG}etappe-bild-01.webp`,
       title: 'Am Anfang',
       ref: '1. Mose 1,1–13',
-      audio: `${REC}geschichte-01-v2.mp3`,
+      audio: `${REC}geschichte-01-v3.mp3`,
       text: [
-        'Ganz am Anfang schafft Gott Himmel und Erde. Die Erde ist leer und dunkel, Finsternis liegt über dem Wasser, und Gottes Geist schwebt darüber. Da spricht Gott: „Es werde Licht!“ Und es wird Licht.',
+        'Ganz am Anfang schafft Gott Himmel und Erde. Die Erde ist leer und öde, Finsternis liegt über dem Wasser, und Gottes Geist schwebt darüber. Da spricht Gott: „Es werde Licht!“ Und es wird Licht.',
         'Gott sieht, dass das Licht gut ist. Er trennt es von der Finsternis und gibt beiden einen Namen: Das Licht nennt er Tag, und die Finsternis nennt er Nacht. Dann wird es Abend, und es wird Morgen. Das ist der erste Tag.',
         'Am zweiten Tag spricht Gott noch einmal. Zwischen dem Wasser unten und dem Wasser oben spannt er eine weite Wölbung aus und nennt sie Himmel. Wieder wird es Abend und Morgen: der zweite Tag.',
         'Am dritten Tag lässt Gott das Wasser sich an einem Ort sammeln, und trockenes Land wird sichtbar. Das Land nennt er Erde und das Wasser Meer. Dann spricht er: „Die Erde soll grün werden!“ Da wächst Gras, da wachsen Kräuter mit Samen und Bäume mit Früchten, jedes nach seiner Art. Gott sieht es an, und es ist gut.'
@@ -289,7 +289,7 @@ export const adamEva: Journey = {
       text: [
         'Nun erzählt die Bibel noch einmal genauer, wie es mit dem Menschen anfing. Gott nimmt Erde vom Boden und formt daraus einen Menschen: Adam. Dann haucht er ihm seinen Atem in die Nase, und Adam beginnt zu leben.',
         'Im Osten legt Gott einen Garten an, den Garten Eden, und setzt Adam hinein. Er lässt Bäume aus dem Boden wachsen, die schön anzusehen sind und von denen man gut essen kann. In der Mitte des Gartens aber stehen zwei besondere Bäume: der Baum des Lebens und der Baum der Erkenntnis von Gut und Böse.',
-        'Mitten durch den Garten fließt ein Strom und gibt ihm Wasser. Danach teilt er sich in vier Flüsse.',
+        'In Eden entspringt ein Strom, der den Garten bewässert. Von dort teilt er sich in vier Flüsse.',
         'Adam soll den Garten bearbeiten und auf ihn aufpassen. Und Gott sagt zu ihm: „Du darfst von allen Bäumen im Garten essen. Nur vom Baum der Erkenntnis von Gut und Böse darfst du nicht essen, denn wenn du davon isst, musst du sterben.“'
       ],
       task: { kind: 'kanaele', hint: 'Drehe die Kanalstücke, bis das Wasser zu den Bäumen fließt.', channels: KANAELE },
@@ -325,7 +325,7 @@ export const adamEva: Journey = {
       audio: `${REC}geschichte-06-v2.mp3`,
       text: [
         'Da lässt Gott einen tiefen Schlaf auf Adam fallen. Während Adam ruhig schläft, nimmt Gott eine seiner Rippen und verschließt die Stelle wieder. Aus der Rippe baut er eine Frau.',
-        'Dann bringt Gott die Frau zu Adam, und Adam freut sich: „Endlich! Sie gehört zu mir wie ein Stück von mir selbst.“ Die Frau heißt Eva.',
+        'Dann bringt Gott die Frau zu Adam, und Adam freut sich: „Endlich! Sie gehört zu mir wie ein Stück von mir selbst.“ Adam wird sie bald Eva nennen.',
         'Darum verlässt ein Mann später Vater und Mutter und hält sich zu seiner Frau, und die beiden gehören zusammen. So ist es auch bei Adam und Eva: Sie sind gern beieinander, und sie schämen sich nicht voreinander.'
       ],
       task: { kind: 'spiegeln', hint: 'Ergänze die andere Seite, so dass beide Seiten zusammenpassen.', mirror: SPIEGELN },
@@ -346,7 +346,7 @@ export const adamEva: Journey = {
         'Eva antwortet: „Wir dürfen von den Früchten der Bäume essen. Nur von dem Baum in der Mitte des Gartens hat Gott gesagt: Esst nicht davon, rührt ihn nicht an, sonst müsst ihr sterben.“',
         'Doch die Schlange sagt: „Nein, ihr werdet nicht sterben. Gott weiß, dass euch die Augen aufgehen, sobald ihr davon esst. Dann seid ihr wie Gott und wisst, was gut und böse ist.“',
         'Eva sieht den Baum an. Seine Früchte sehen gut aus, und klug sollen sie auch machen. Da nimmt sie eine Frucht und isst, und sie gibt auch Adam davon, der bei ihr ist, und er isst.',
-        'Im selben Augenblick gehen den beiden die Augen auf. Sie merken, was sie getan haben, und sie schämen sich. Darum flechten sie Feigenblätter zusammen und machen sich Schurze daraus.'
+        'Im selben Augenblick gehen den beiden die Augen auf. Sie merken, dass sie nackt sind, und sie schämen sich. Darum flechten sie Feigenblätter zusammen und machen sich Schürzen daraus.'
       ],
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
@@ -365,7 +365,7 @@ export const adamEva: Journey = {
       text: [
         'Am Abend, als ein kühler Wind durch den Garten weht, hören Adam und Eva Gott im Garten gehen. Da verstecken sie sich zwischen den Bäumen.',
         'Aber Gott ruft: „Adam, wo bist du?“ Adam antwortet: „Ich habe dich gehört und mich gefürchtet. Darum habe ich mich versteckt.“',
-        'Gott fragt, ob Adam von dem Baum gegessen hat, von dem er nicht essen sollte. Adam sagt: „Die Frau, die du mir gegeben hast, gab mir davon.“ Und Eva sagt: „Die Schlange hat mich getäuscht.“ So schieben beide die Schuld auf einen anderen.',
+        'Gott fragt, ob Adam von dem Baum gegessen hat, von dem er nicht essen sollte. Adam sagt: „Die Frau, die du mir gegeben hast, gab mir davon, und ich habe gegessen.“ Und Eva sagt: „Die Schlange hat mich getäuscht.“ So schieben beide die Schuld auf einen anderen.',
         'Dann sagt Gott ihnen, was nun anders wird: Das Leben wird schwerer. Adam muss hart arbeiten, damit der Acker ihm Brot gibt, und auf dem Acker wachsen Dornen und Disteln. Auch für Eva wird es mühsam. Die Welt ist nicht mehr so heil wie im Garten.',
         'Aber Gott lässt die beiden nicht allein. Adam nennt seine Frau Eva, denn sie wird die Mutter aller Menschen sein. Und Gott macht Adam und Eva Kleider aus Fell und zieht sie ihnen an. So sorgt er für sie.'
       ],
@@ -383,7 +383,7 @@ export const adamEva: Journey = {
       ref: '1. Mose 3,22–24; 4,1',
       audio: `${REC}geschichte-09-v2.mp3`,
       text: [
-        'Nun ist nicht mehr alles wie vorher. Gott sagt: „Der Mensch soll nicht auch noch vom Baum des Lebens essen und für immer so bleiben.“',
+        'Nun ist nicht mehr alles wie vorher. Gott sagt: „Nun weiß der Mensch, was gut und böse ist. Er soll nicht auch noch vom Baum des Lebens essen und für immer leben.“',
         'Darum schickt Gott Adam und Eva aus dem Garten Eden hinaus. Draußen sollen sie den Boden bearbeiten, aus dem Adam genommen ist. Still gehen die beiden den Weg hinaus, und der Garten bleibt hinter ihnen zurück. Im Osten des Gartens stellt Gott Cherubim auf, mächtige Engel, und ein flammendes Schwert, das sich hin und her bewegt. Sie bewachen den Weg zum Baum des Lebens.',
         'Aber Adam und Eva sind nicht allein. Gott hat ihnen Kleider aus Fell gemacht, und er hilft ihnen auch draußen. Später bekommt Eva einen Sohn und nennt ihn Kain. „Ich habe einen Sohn bekommen“, sagt sie, „mit Gottes Hilfe.“'
       ],

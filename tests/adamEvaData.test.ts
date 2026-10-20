@@ -11,6 +11,9 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { flow, goalsOf, solve } from '@/utils/channels'
 import { journeyFiles } from '@/utils/journeyFiles'
+/** The version of each recording. Second check 20.10.2026: only stage 1 (German) is re-recorded; the changed sentences of the stages 4, 6, 7, 8, 9 (German) and 1, 3, 4, 6, 7, 8, 9 (English) wait for the daily quota of the speech model (`D:/Claude/Abenteuer-Adam-Eva/NEUAUFNAHME-v3.md`). */
+const DE_VERSION = [3, 2, 2, 2, 3, 2, 2, 2, 2]
+const EN_VERSION = [2, 2, 2, 2, 3, 2, 2, 2, 2]
 
 afterEach(() => setAdventureLanguage('de'))
 const released = adamEva.stages.every((s) => !s.soon)
@@ -29,7 +32,7 @@ describe('Adam und Eva: stories and questions', () => {
       expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(60)
       expect(words, `words ${s.id}`).toBeLessThanOrEqual(220)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.audio, s.id.toString()).toBe(`audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-v${s.id === 5 ? 3 : 2}.mp3`)
+      expect(s.audio, s.id.toString()).toBe(`audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-v${DE_VERSION[s.id - 1]}.mp3`)
       expect(s.image).toBe(`images/abenteuer/adam-eva/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
     }
   })
@@ -326,7 +329,7 @@ describe('Adam und Eva: English', () => {
       expect(s.task.hint, `hint ${s.id}`).not.toBe(de[i]!.hint)
       s.questions.forEach((q, k) => expect(q.q, `question ${s.id}.${k}`).not.toBe(de[i]!.q[k]))
       expect(s.ref, `ref ${s.id}`).toMatch(/^Genesis \d/)
-      expect(s.audio, `audio ${s.id}`).toBe(`audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-en-v${s.id === 5 ? 3 : 2}.mp3`)
+      expect(s.audio, `audio ${s.id}`).toBe(`audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-en-v${EN_VERSION[s.id - 1]}.mp3`)
       if (s.task.verse) expect(s.task.verse.rounds.map((r) => r.words.length)).toEqual(de[i]!.verse)
     })
     expect(adamEva.title).toBe('Adam and Eve')

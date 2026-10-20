@@ -17,7 +17,7 @@ export const adamEvaEn: TextOverlay<Journey> = {
       ref: 'Genesis 1:1–13',
       audio: 'audio/abenteuer/adam-eva/geschichte-01-en-v2.mp3',
       text: [
-        'At the very beginning, God creates the heavens and the earth. The earth is empty and dark, darkness lies over the water, and God’s Spirit hovers above it. Then God speaks: “Let there be light!” And there is light.',
+        'At the very beginning, God creates the heavens and the earth. The earth is empty and barren, darkness lies over the water, and God’s Spirit hovers above it. Then God speaks: “Let there be light!” And there is light.',
         'God sees that the light is good. He separates it from the darkness and gives each a name: the light he calls day, and the darkness he calls night. Then it becomes evening, and it becomes morning. That is the first day.',
         'On the second day God speaks once more. Between the water below and the water above, he stretches out a wide dome and calls it sky. Again it becomes evening and morning: the second day.',
         'On the third day God lets the water gather in one place, and dry land appears. He calls the land earth and the water sea. Then he says, “Let the earth turn green!” Grass grows, plants with seeds appear, and trees with fruit, each of its own kind. God looks at it, and it is good.'
@@ -49,7 +49,7 @@ export const adamEvaEn: TextOverlay<Journey> = {
       ref: 'Genesis 1:24–2:3',
       audio: 'audio/abenteuer/adam-eva/geschichte-03-en-v2.mp3',
       text: [
-        'On the sixth day the land is to be full of life, too. God speaks, and there come the cattle, the wild animals, and everything that crawls on the ground, each of its own kind. God looks at them, and it is good.',
+        'On the sixth day the land is to be full of life, too. God speaks, and the cattle, the wild animals, and everything that crawls on the ground appear, each of its own kind. God looks at them, and it is good.',
         'Then God says, “I will make people who are like me.” And he creates human beings in his own image, as man and as woman.',
         'God blesses them. They shall become many and fill the earth, and he trusts the earth and all the animals to their care. For food he gives them the plants with seeds and the trees with fruit, and to the animals he gives the green plants.',
         'God looks at everything he has made, and it is very good. Then it becomes evening and morning: the sixth day.',
@@ -68,7 +68,7 @@ export const adamEvaEn: TextOverlay<Journey> = {
       text: [
         'Now the Bible tells once more, and more exactly, how people began. God takes earth from the ground and shapes a man out of it: Adam. Then he breathes his own breath into his nose, and Adam begins to live.',
         'In the east, God plants a garden, the Garden of Eden, and puts Adam in it. He makes trees grow out of the ground that are beautiful to look at and good to eat. In the middle of the garden, however, stand two special trees: the tree of life and the tree of the knowledge of good and evil.',
-        'A river flows right through the garden and waters it. After that it divides into four rivers.',
+        'A river rises in Eden and waters the garden. From there it divides into four rivers.',
         'Adam is to work in the garden and take care of it. And God says to him, “You may eat from every tree in the garden. Only from the tree of the knowledge of good and evil you must not eat, for if you eat from it, you will die.”'
       ],
       task: { hint: 'Turn the channel pieces until the water flows to the trees.', channels: { goals: { feige: { label: 'Fig tree' }, granatapfel: { label: 'Pomegranate tree' }, dattel: { label: 'Date palm' }, wein: { label: 'Grapevine' } }, rounds: [{ hint: 'Round 1: Tap a channel piece to turn it. Lead the water to the trees.' }, { hint: 'Round 2: The river divides. Lead the water to all four trees.' }] } },
@@ -98,7 +98,7 @@ export const adamEvaEn: TextOverlay<Journey> = {
       audio: 'audio/abenteuer/adam-eva/geschichte-06-en-v2.mp3',
       text: [
         'Then God lets a deep sleep fall on Adam. While Adam sleeps peacefully, God takes one of his ribs and closes the place again. Out of the rib he builds a woman.',
-        'Then God brings the woman to Adam, and Adam is happy: “At last! She belongs to me like a part of myself.” The woman’s name is Eve.',
+        'Then God brings the woman to Adam, and Adam is happy: “At last! She belongs to me like a part of myself.” Adam will soon call her Eve.',
         'That is why a man later leaves his father and mother and holds on to his wife, and the two belong together. So it is with Adam and Eve: they are happy to be together, and they are not ashamed in front of each other.'
       ],
       task: { hint: 'Complete the other side so that both sides match.', mirror: { stones: [{ label: 'red flower stone (rose)' }, { label: 'yellow flower stone (sunflower)' }, { label: 'blue flower stone (bellflower)' }], rounds: [{ hint: 'Round 1: Place the blossoms so that both halves look the same.' }, { hint: 'Round 2: The pattern is bigger and has more colors.' }] } },
@@ -116,7 +116,7 @@ export const adamEvaEn: TextOverlay<Journey> = {
         'Eve answers, “We may eat the fruit of the trees. Only about the tree in the middle of the garden God said: Do not eat from it, do not touch it, or you will die.”',
         'But the snake says, “No, you will not die. God knows that your eyes will be opened as soon as you eat from it. Then you will be like God and know what is good and what is evil.”',
         'Eve looks at the tree. Its fruit looks good, and it is supposed to make you wise. So she takes a piece of fruit and eats, and she gives some to Adam, who is with her, and he eats, too.',
-        'At that moment the eyes of both are opened. They realize what they have done, and they are ashamed. So they sew fig leaves together and make aprons out of them.'
+        'At that moment the eyes of both are opened. They realize that they are naked, and they are ashamed. So they sew fig leaves together and make aprons out of them.'
       ],
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
@@ -132,9 +132,9 @@ export const adamEvaEn: TextOverlay<Journey> = {
       text: [
         'In the evening, when a cool wind blows through the garden, Adam and Eve hear God walking in it. Then they hide among the trees.',
         'But God calls, “Adam, where are you?” Adam answers, “I heard you and I was afraid. That is why I hid.”',
-        'God asks whether Adam has eaten from the tree he was not to eat from. Adam says, “The woman you gave me gave me some.” And Eve says, “The snake tricked me.” So both of them blame somebody else.',
+        'God asks whether Adam has eaten from the tree he was not to eat from. Adam says, “The woman you gave me gave me some, and I ate.” And Eve says, “The snake tricked me.” So both of them blame somebody else.',
         'Then God tells them what will be different now: Life will be harder. Adam will have to work hard so that the field gives him bread, and thorns and thistles will grow in it. For Eve, too, it will be difficult. The world is no longer as whole as it was in the garden.',
-        'But God does not leave the two alone. Adam calls his wife Eve, because she will be the mother of all people. And God makes clothes of animal skins for Adam and Eve and puts them on them. That is how he takes care of them.'
+        'But God does not leave the two alone. Adam calls his wife Eve, because she will be the mother of all people. And God makes clothes of animal skins for Adam and Eve and dresses them himself. That is how he takes care of them.'
       ],
       task: { hint: 'Listen or look closely and answer with the same blossoms.', echo: { rounds: [{ hint: 'Round 1: Listen or look closely: The call lights up, too. Tap the blossoms in the same order.' }, { hint: 'Round 2: The call is longer. You can listen to it and watch it again at any time.' }] } },
       questions: [
@@ -147,7 +147,7 @@ export const adamEvaEn: TextOverlay<Journey> = {
       ref: 'Genesis 3:22–24; 4:1',
       audio: 'audio/abenteuer/adam-eva/geschichte-09-en-v2.mp3',
       text: [
-        'Now everything is no longer as before. God says, “The man must not also eat from the tree of life and stay like this forever.”',
+        'Now everything is no longer as before. God says, “Now the man knows what is good and evil. He must not also eat from the tree of life and live forever.”',
         'So God sends Adam and Eve out of the Garden of Eden. Outside, they are to work the ground from which Adam was taken. Quietly the two walk the path out, and the garden stays behind them. In the east of the garden, God sets cherubim, mighty angels, and a flaming sword that turns this way and that. They guard the way to the tree of life.',
         'But Adam and Eve are not alone. God has made them clothes of animal skins, and he helps them outside, too. Later Eve has a son and calls him Cain. “I have had a son,” she says, “with God’s help.”'
       ],
