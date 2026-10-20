@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { CairnGame, CatchGame, CycleGame, GuessGame, RingGame } from '@/types/adventure'
+import type { CairnGame, CatchGame, CycleGame, GuessGame, RelayGame, RingGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -696,5 +696,148 @@ describe('Kinder zum Zelt rufen (catch)', () => {
     expect(w.find('.ct-count').text()).toBe('Children at the tent: 0 of 2')
     await tick(21000)
     expect(w.find('.ct-all').text()).toBe('Call everyone')
+  })
+})
+
+// ---------------------------------------------------------------- the herds on the road
+describe('Herden mit Abstand losschicken (relay)', () => {
+  const game: RelayGame = {
+    background: 'images/x/road.webp',
+    herds: [
+      { id: 'ziegen', image: 'images/x/ziegen.webp', w: 16 },
+      { id: 'schafe', image: 'images/x/schafe.webp', w: 16 }
+    ],
+    // a straight road over the whole width: a percent of the road is a percent of the width
+    road: [[0, 80], [100, 80]],
+    rounds: [
+      { hint: 'Runde eins.', herds: ['ziegen', 'schafe'], minGap: 30, speed: 0.2 },
+      { hint: 'Runde zwei.', herds: ['ziegen', 'schafe', 'ziegen'], minGap: 20, speed: 0.25 }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Relay } = await import('@/components/molecules/games/GameRelay.vue')
+    const w = mount(Relay, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  const go = async (w: W) => {
+    await w.find('.rl-go').trigger('click')
+    await flushPromises()
+  }
+  /** The herds that walk (not the one that waits at the start): how far they are, percent of the width. */
+  const walkers = (w: W) => w.findAll('.rl-herd:not(.waiting)').map((h) => Number(/left: ([\d.]+)%/.exec(h.attributes('style') ?? '')![1]))
+  const roundOne = async (w: W) => {
+    await go(w)
+    await tick(1600)
+    await go(w)
+    await tick(5200)
+  }
+  const roundTwo = async (w: W) => {
+    await go(w)
+    await tick(900)
+    await go(w)
+    await tick(900)
+    await go(w)
+    await tick(4200)
+  }
+
+  it('the goal is every herd of both rounds; the first herd waits at the start, nobody walks, no band', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(5)
+    expect(w.find('.rl-round').text()).toContain('Runde 1 von 2')
+    expect(w.find('.rl-herd.waiting').exists()).toBe(true)
+    expect(walkers(w)).toHaveLength(0)
+    expect(w.find('.rl-band polyline').exists()).toBe(false)
+    expect(w.find('.rl-count').text()).toBe('Herden losgeschickt: 0 von 2')
+  })
+
+  it('"Go" sends the herd along the road; a light band shows the room behind it; the next herd waits at the start', async () => {
+    const w = await open()
+    await go(w)
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(played).toContain('tap')
+    expect(walkers(w)).toHaveLength(1)
+    await tick(1000)
+    const at = walkers(w)[0]!
+    expect(at).toBeGreaterThan(15)
+    expect(at).toBeLessThan(25)
+    expect(w.find('.rl-band polyline').exists()).toBe(true)
+    expect(w.find('.rl-herd.waiting').exists()).toBe(true)
+    expect(w.find('.rl-count').text()).toBe('Herden losgeschickt: 1 von 2')
+  })
+
+  it('"Go" too soon: red, a cross, a dull sound, a mistake; the herd stays at the start; later it goes', async () => {
+    const w = await open()
+    await go(w)
+    await tick(500)
+    await go(w)
+    expect(played).toContain('wrong')
+    expect(w.find('.rl-fb').text()).toContain('Zu nah')
+    expect(walkers(w)).toHaveLength(1)
+    expect(useTaskProgress().parts.value).toBe(1)
+    await tick(1500)
+    await go(w)
+    expect(walkers(w)).toHaveLength(2)
+    expect(useTaskProgress().parts.value).toBe(2)
+  })
+
+  it('sending late is no mistake: the herds wait as long as they like', async () => {
+    const w = await open()
+    await go(w)
+    await tick(30000)
+    await go(w)
+    expect(played).not.toContain('wrong')
+    expect(walkers(w)).toHaveLength(1)
+  })
+
+  it('when every herd of round 1 has come to the end of the road, round 2 begins with three herds', async () => {
+    const w = await open()
+    await roundOne(w)
+    await tick(1600)
+    expect(w.find('.rl-round').text()).toContain('Runde 2 von 2')
+    expect(w.find('.rl-count').text()).toBe('Herden losgeschickt: 0 von 3')
+    expect(walkers(w)).toHaveLength(0)
+    expect(played).not.toContain('wrong')
+  })
+
+  it('the whole game without a mistake: the end with three stars', async () => {
+    const w = await open()
+    await roundOne(w)
+    await tick(1600)
+    await roundTwo(w)
+    await tick(1000)
+    expect(useTaskProgress().parts.value).toBe(5)
+    expect(useTaskProgress().finished.value).toBe(true)
+    expect(w.text()).toContain('mit Raum dazwischen')
+    await w.find('.gd button').trigger('click')
+    expect(w.emitted('done')).toEqual([[3]])
+    expect(problems()).toEqual([])
+  })
+
+  it('stars follow the mistakes: two mistakes three stars, four two stars, five one star', async () => {
+    for (const [mistakes, stars] of [[2, 3], [3, 2], [4, 2], [5, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      await go(w)
+      for (let i = 0; i < mistakes; i++) await go(w)
+      await tick(1600)
+      await go(w)
+      await tick(5200)
+      await tick(1600)
+      await roundTwo(w)
+      await tick(1000)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${mistakes} mistakes`).toEqual([[stars]])
+      w.unmount()
+    }
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.rl-go').text()).toBe('Go!')
+    await go(w)
+    await go(w)
+    expect(w.find('.rl-fb').text()).toContain('Too close')
   })
 })

@@ -207,6 +207,19 @@ describe('Jakob: every stage has the game that was chosen', () => {
     expect(g.background).toBe(stage(6).image)
   })
 
+  it('9 relay (when built): three herds, then five, the room gets narrower and the walk faster, the road runs from left to right inside the picture', () => {
+    const g = stage(9).task.relay
+    if (!g) return
+    expect(g.rounds.map((r) => r.herds.length)).toEqual([3, 5])
+    expect(g.rounds[1]!.minGap).toBeLessThan(g.rounds[0]!.minGap)
+    expect(g.rounds[1]!.speed).toBeGreaterThan(g.rounds[0]!.speed)
+    for (const r of g.rounds) for (const id of r.herds) expect(g.herds.map((h) => h.id)).toContain(id)
+    expect(g.road.length).toBeGreaterThanOrEqual(2)
+    for (const [x, y] of g.road) expect(x >= 0 && x <= 100 && y >= 0 && y <= 100).toBe(true)
+    expect(g.road[g.road.length - 1]![0]).toBeGreaterThan(g.road[0]![0])
+    expect(g.background).toBe(stage(9).image)
+  })
+
   it('7 guessing the herds (when built): round 1 compares herds that are clearly different, round 2 asks for the range that contains the number; the animals exist and stand in the meadow', () => {
     const g = stage(7).task.guess
     if (!g) return

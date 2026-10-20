@@ -64,7 +64,7 @@ export const GAME_MUSIC: MusicPiece[] = [
 
 /** Which mood fits which game: quiet looking and remembering, steady building and sorting, quick flying and dots. */
 const GAME_MOOD: Record<string, Mood> = {
-  find: 'ruhig', memory: 'ruhig', share: 'ruhig', count: 'ruhig', stones: 'ruhig', order: 'ruhig', water: 'ruhig', lights: 'ruhig', verse: 'ruhig', echo: 'ruhig', channels: 'mittel', mirror: 'ruhig', sow: 'mittel', herd: 'ruhig', missing: 'ruhig', wipe: 'ruhig', chain: 'mittel', stack: 'mittel', trace: 'ruhig', balance: 'mittel', constellation: 'ruhig', slide: 'ruhig', crank: 'mittel', hold: 'ruhig', catch: 'ruhig', ring: 'ruhig', cairn: 'ruhig', cycle: 'ruhig', guess: 'ruhig',
+  find: 'ruhig', memory: 'ruhig', share: 'ruhig', count: 'ruhig', stones: 'ruhig', order: 'ruhig', water: 'ruhig', lights: 'ruhig', verse: 'ruhig', echo: 'ruhig', channels: 'mittel', mirror: 'ruhig', sow: 'mittel', herd: 'ruhig', missing: 'ruhig', wipe: 'ruhig', chain: 'mittel', stack: 'mittel', trace: 'ruhig', balance: 'mittel', constellation: 'ruhig', slide: 'ruhig', crank: 'mittel', hold: 'ruhig', relay: 'ruhig', catch: 'ruhig', ring: 'ruhig', cairn: 'ruhig', cycle: 'ruhig', guess: 'ruhig',
   puzzle: 'mittel', sort: 'mittel', harvest: 'mittel', build: 'mittel', way: 'mittel',
   fly: 'lebhaft', dots: 'lebhaft'
 }

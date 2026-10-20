@@ -151,7 +151,7 @@ export const jakobEn: TextOverlay<Journey> = {
         'Jacob becomes very afraid. He divides his people and herds into two camps, so that at least one can escape if Esau attacks the other. Then he prays, “God of my fathers, you said to me: Go home, I will do you good. I am too small for all you have given me. I crossed the Jordan with only my staff, and now I have two camps. Save me from my brother!”',
         'Then Jacob chooses a gift for Esau from his herds: goats, sheep, camels, cows, and donkeys, each kind as a herd of its own. His servants are to drive them toward Esau one by one, with space between them. “I will make peace with him through the gift,” Jacob thinks, “maybe then he will welcome me kindly.”'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Send the herds off with room between them.', relay: { rounds: [{ hint: 'Send the herds off one after the other. Leave room between them.' }, { hint: 'Five more herds. The room may be a little narrower now.' }] } },
       questions: [
         { q: 'Whom does Jacob meet on the way?', options: ['angels of God', 'robbers', 'shepherds'] },
         { q: 'What does Jacob send ahead to meet Esau?', options: ['animals as a gift', 'a letter', 'a sword'] }

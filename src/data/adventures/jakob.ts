@@ -11,7 +11,7 @@
  * Davor: alle Bilder (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder), Messwerte und Vorlese-Aufnahmen (Deutsch und Englisch) sind eingebaut, die Etappen sind spielbar.
  * Das Abenteuer ist aber nicht öffentlich: es ist hinter `comingSoon` und dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { CairnGame, CatchGame, CrankGame, CycleGame, GuessGame, HoldGame, Journey, RingGame, SlideGame } from '@/types/adventure'
+import type { CairnGame, CatchGame, CrankGame, CycleGame, GuessGame, HoldGame, Journey, RelayGame, RingGame, SlideGame } from '@/types/adventure'
 import { JAKOB_PATH } from './jakobPath'
 import { localize } from './localize'
 import { jakobEn } from './en/jakob.en'
@@ -144,6 +144,26 @@ const FANGEN: CatchGame = {
   rounds: [
     { hint: 'Tippe die Kinder an. Jedes läuft zum Zelt.', kids: ['kind-1', 'kind-2', 'kind-3', 'kind-4'], speed: 0.04 },
     { hint: 'Die Familie wächst. Rufe noch sieben Kinder zum Zelt.', kids: ['kind-1', 'kind-2', 'kind-3', 'kind-4', 'kind-1', 'kind-2', 'kind-3'], speed: 0.07 }
+  ]
+}
+
+/**
+ * Etappe 9, "Herden mit Abstand losschicken": die Herden ziehen als Geschenke voraus, zwischen zwei Herden soll Raum bleiben (Bildauftrag J24; Hintergrund = das Etappenbild, unten gesetzt).
+ * Runde 1 drei Herden, weites Band (25 % der Straße), langsam; Runde 2 fünf Herden, engeres Band (18 %), etwas schneller. Die Straße `road` (Prozent des Etappenbildes) ist vorläufig
+ * geschätzt, bis die Datei `staffel-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `staffel/herde-ziegen.webp`, `herde-schafe.webp`, `herde-kamele.webp`, je 260 × 160, transparent.
+ */
+const STAFFEL: RelayGame = {
+  background: '',
+  herds: [
+    { id: 'ziegen', image: `${G}staffel/herde-ziegen.webp`, w: 16 },
+    { id: 'schafe', image: `${G}staffel/herde-schafe.webp`, w: 16 },
+    { id: 'kamele', image: `${G}staffel/herde-kamele.webp`, w: 16 }
+  ],
+  road: [[6, 88], [28, 82], [48, 80], [66, 72], [82, 64], [94, 58]],
+  rounds: [
+    { hint: 'Schicke die Herden nacheinander los. Lass Raum zwischen ihnen.', herds: ['ziegen', 'schafe', 'kamele'], minGap: 25, speed: 0.1 },
+    { hint: 'Noch fünf Herden. Der Raum darf jetzt etwas enger sein.', herds: ['ziegen', 'schafe', 'kamele', 'ziegen', 'schafe'], minGap: 18, speed: 0.14 }
   ]
 }
 
@@ -386,7 +406,7 @@ export const jakob: Journey = {
         'Dann sucht Jakob aus seinen Herden ein Geschenk für Esau aus: Ziegen, Schafe, Kamele, Kühe und Esel, jede Art als eigene Herde. Seine Knechte sollen sie einzeln und mit Abstand Esau entgegentreiben. „Ich will ihn mit dem Geschenk versöhnen“, denkt Jakob, „vielleicht nimmt er mich dann freundlich auf.“'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'staffel', hint: 'Schicke die Herden mit Abstand los.', relay: STAFFEL },
       questions: [
         { q: 'Wem begegnet Jakob auf dem Weg?', options: ['Engeln Gottes', 'Räubern', 'Hirten'], answer: 0 },
         { q: 'Was schickt Jakob Esau entgegen?', options: ['Tiere als Geschenk', 'einen Brief', 'ein Schwert'], answer: 0 }
@@ -466,7 +486,7 @@ export const jakob: Journey = {
 // the game of a stage lies on the picture of the stage (it follows when the stage picture is replaced)
 for (const s of jakob.stages) {
   const t = s.task
-  for (const g of [t.guess, t.cycle, t.cairn, t.ring, t.catch]) if (g) g.background = s.image
+  for (const g of [t.guess, t.cycle, t.cairn, t.ring, t.catch, t.relay]) if (g) g.background = s.image
 }
 
 // the English texts (title, stories, questions, hints, recordings) lie over the German ones; the screens show them when the app is English
