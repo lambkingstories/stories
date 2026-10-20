@@ -201,7 +201,7 @@ export const moseEn: TextOverlay<Journey> = {
         'Then God speaks the ten commandments. “I am your God, who freed you from Egypt,” he begins. “You shall have no other gods before me, and you shall not make an idol to bow down to. You shall not misuse my name. Keep the day of rest holy. Honor your father and your mother. You shall not murder, break your marriage promise, steal, or lie when you speak about others. And you shall not want what belongs to your neighbor.”',
         'The people see the thunder and lightning and the smoking mountain and shrink back. “You speak to us,” they ask Moses, “but God must not speak to us, or we will die.” “Do not be afraid,” says Moses. “God has come so that you respect him and do nothing wrong.” Then he goes into the darkness where God is.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: "Put the words together to make God's words.", words: { rounds: [{ hint: 'Lay the words in the strip in the right order.', sentences: ['You shall not murder.', 'Honor your father and your mother.', 'Keep the day of rest holy.'] }, { hint: "Now longer sentences. God's words from the story.", sentences: ['You shall have no other gods before me.', 'You shall not misuse my name.', 'I am your God, who freed you from Egypt.'] }] } },
       questions: [
         { q: 'How many commandments does God give at Mount Sinai?', options: ['ten', 'seven', 'twelve'] },
         { q: 'What do the people answer to God’s offer?', options: ['Everything God has said we will do.', 'We will think about it.', 'We would rather go back.'] }

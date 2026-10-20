@@ -11,7 +11,8 @@ import { MOSE_PATH } from '@/data/adventures/mosePath'
 import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
-import { journeyFiles } from '@/utils/journeyFiles'
+import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
+import { shuffle, wordsOf } from '@/utils/moseGames'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => mose.stages[n - 1]!
@@ -117,10 +118,37 @@ describe('Mose: stories and questions', () => {
   })
 })
 
-describe('Mose: the placeholders until the games and pictures come', () => {
+describe('Mose: the games, and the placeholders until the pictures come', () => {
   it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(mose.stages.map((s) => s.task.kind)).toEqual(Array(15).fill('quiz'))
+    expect(mose.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'worte', 'quiz', 'quiz'])
     for (const s of mose.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
+  })
+
+  it('13 words: three sentences in each round, all word for word in the text of the stage (also in English); the sentence of the quiz question is not used; the goal is 6', () => {
+    const g = stage(13).task.words
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => r.sentences.length)).toEqual([3, 3])
+    const check = () => {
+      const text = stage(13).text.join(' ')
+      for (const r of stage(13).task.words!.rounds) {
+        for (const sentence of r.sentences) {
+          expect(text, sentence).toContain(sentence.replace(/[.!?]$/, ''))
+          expect(sentence.split(' ').length).toBeGreaterThanOrEqual(4)
+        }
+      }
+    }
+    check()
+    // the round 2 sentences are longer than the round 1 sentences
+    const avg = (xs: string[]) => xs.reduce((n, s) => n + s.split(' ').length, 0) / xs.length
+    expect(avg(g.rounds[1]!.sentences)).toBeGreaterThan(avg(g.rounds[0]!.sentences))
+    expect(g.rounds.flatMap((r) => r.sentences).join(' ')).not.toContain('Alles, was Gott gesagt hat')
+    for (const r of g.rounds) for (const s of r.sentences) expect(shuffle(wordsOf(s), 1).join(' ')).not.toBe(wordsOf(s).join(' '))
+    setAdventureLanguage('en')
+    expect(stage(13).task.words!.rounds.map((r) => r.sentences.length)).toEqual([3, 3])
+    check()
+    setAdventureLanguage('de')
+    expect(g.background).toBe(stage(13).image)
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {
@@ -138,6 +166,7 @@ describe('Mose: the placeholders until the games and pictures come', () => {
   it('every file that the data names exists (the pictures of Josef, the map, the medal) and is small enough', () => {
     let bytes = 0
     for (const f of journeyFiles(mose)) {
+      if (notPaintedYet(f) && !existsSync(`public/${f}`)) continue
       expect(existsSync(`public/${f}`), `missing: ${f}`).toBe(true)
       const size = statSync(`public/${f}`).size
       expect(size, f).toBeLessThan(1_800_000)

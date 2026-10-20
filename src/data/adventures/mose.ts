@@ -12,7 +12,7 @@
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme (Liste der Aufnahmen: D:/Claude/Abenteuer-Mose/NEUAUFNAHME-Mose.md).
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { Journey } from '@/types/adventure'
+import type { Journey, WordsGame } from '@/types/adventure'
 import { josef } from './josef'
 import { MOSE_PATH } from './mosePath'
 import { localize } from './localize'
@@ -20,6 +20,24 @@ import { moseEn } from './en/mose.en'
 
 // PLATZHALTER bis zum eigenen Bild: die Etappenbilder von Josef (Ordner images/abenteuer/josef/); danach `images/abenteuer/mose/etappe-bild-NN.webp`
 const PLACEHOLDER = 'images/abenteuer/josef/'
+
+const G = 'images/abenteuer/spiele/mose/'
+
+/**
+ * Etappe 13, "Worte ordnen": die Wörter eines Satzes liegen in gemischter Folge auf Steinplättchen und werden der Reihe nach in den Satzstreifen gelegt (Bildauftrag M17; Hintergrund = das Etappenbild der Etappe,
+ * Mischung immer gleich und nie in der richtigen Ordnung). Die Sätze stehen wörtlich im Text der Etappe; jede Sprache hat ihre eigenen Sätze (Runde 1 kurze, Runde 2 längere). Die Sätze der Frage der Etappe
+ * ("Alles, was Gott gesagt hat, wollen wir tun.") sind hier nicht benutzt.
+ * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `worte/stein.webp` 260 × 110 (leer, das Wort schreibt die App), `worte/streifen.webp` 900 × 160 (leer), beide transparent.
+ */
+const WORTE: WordsGame = {
+  background: `${PLACEHOLDER}etappe-bild-04.webp`,
+  chip: `${G}worte/stein.webp`,
+  strip: `${G}worte/streifen.webp`,
+  rounds: [
+    { hint: 'Lege die Wörter in der richtigen Reihenfolge in den Streifen.', sentences: ['Du sollst nicht töten.', 'Ehre Vater und Mutter.', 'Halte den Ruhetag heilig.'] },
+    { hint: 'Jetzt längere Sätze. Gottes Worte aus dem Text.', sentences: ['Du sollst keine anderen Götter neben mir haben.', 'Du sollst meinen Namen nicht missbrauchen.', 'Ich bin dein Gott, der dich aus Ägypten befreit hat.'] }
+  ]
+}
 
 export const mose: Journey = {
   id: 'mose',
@@ -285,7 +303,7 @@ export const mose: Journey = {
         'Das Volk sieht Donner und Blitz und den rauchenden Berg und weicht zurück. „Rede du mit uns“, bitten sie Mose, „aber Gott soll nicht mit uns reden, sonst sterben wir.“ „Fürchtet euch nicht“, sagt Mose. „Gott ist gekommen, damit ihr ihn achtet und nichts Böses tut.“ Dann geht er in das Dunkel hinein, wo Gott ist.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Worte ordnen (worte, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'worte', hint: 'Lege die Wörter zu Gottes Worten zusammen.', words: WORTE },
       questions: [
         { q: 'Wie viele Gebote gibt Gott am Berg Sinai?', options: ['zehn', 'sieben', 'zwölf'], answer: 0 },
         { q: 'Was antwortet das Volk auf Gottes Angebot?', options: ['Alles, was Gott gesagt hat, wollen wir tun.', 'Wir wollen es uns überlegen.', 'Wir wollen lieber zurück.'], answer: 0 }

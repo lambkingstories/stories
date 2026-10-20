@@ -55,6 +55,7 @@ function pathsIn(value: unknown, out: Set<string>) {
  * server does not have is no failure of the download. Take a folder out of this list when its pictures are delivered.
  */
 export const NOT_PAINTED_YET = [
+  'images/abenteuer/spiele/mose/worte/',
   'images/abenteuer/spiele/gideon/schleichen/',
   'images/abenteuer/spiele/gideon/hoehle/',
   'images/abenteuer/spiele/gideon/zeichen/',
