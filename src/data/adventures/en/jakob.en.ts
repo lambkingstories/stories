@@ -135,7 +135,7 @@ export const jakobEn: TextOverlay<Journey> = {
         '“Why did you run away in secret?” asks Laban. “I would have sent you off with music, and I would have liked to kiss my grandchildren and daughters goodbye.” Jacob reminds him of the twenty years in which he worked for him day and night, in heat and in frost. “If God had not been with me,” he says, “you would have sent me away empty-handed.”',
         'Then Laban gives in. The two make peace. Jacob sets up a large stone, and the others gather stones into a heap, on which they eat together. The heap is to be a witness and is called Mizpah, which means “watchtower,” because Laban says, “May God keep watch between you and me when we are out of each other’s sight.” The next morning Laban kisses his grandchildren and daughters and goes home.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: "Push Jacob's and Laban's stones to the middle together.", cairn: { rounds: [{ hint: 'Push both stones to the middle together. Tap left and right in turn, or use two fingers.' }, { hint: 'Once more, with longer ways. The heap grows higher.' }] } },
       questions: [
         { q: 'Who speaks to Laban in a dream?', options: ['God', 'Jacob', 'Isaac'] },
         { q: 'What does the heap of stones between Jacob and Laban stand for?', options: ['their peace', 'a house', 'a grave'] }

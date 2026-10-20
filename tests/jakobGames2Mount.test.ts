@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { CycleGame, GuessGame } from '@/types/adventure'
+import type { CairnGame, CycleGame, GuessGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -296,5 +296,116 @@ describe('Jahreszeiten fortsetzen (cycle)', () => {
     expect(gap(w, 2).attributes('aria-label')).toBe('Gap at place 3')
     await put(w, 'Winter', 2)
     expect(w.find('.cy-fb').text()).toContain('not the next season')
+  })
+})
+
+// ---------------------------------------------------------------- the cairn
+describe('Steinhaufen zu zweit (cairn)', () => {
+  const game: CairnGame = {
+    background: 'images/x/hill.webp',
+    stoneLeft: 'images/x/left.webp',
+    stoneRight: 'images/x/right.webp',
+    stoneSmall: 'images/x/small.webp',
+    centre: [50, 70],
+    leftStart: [10, 66],
+    rightStart: [90, 66],
+    rounds: [
+      { hint: 'Runde eins.', stones: 2, steps: 2 },
+      { hint: 'Runde zwei.', stones: 3, steps: 3 }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Cairn } = await import('@/components/molecules/games/GameCairn.vue')
+    const w = mount(Cairn, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  const push = async (w: W, side: 'left' | 'right') => {
+    await w.find(`.ca-big.${side}`).trigger('click')
+    await flushPromises()
+  }
+  const both = async (w: W, steps: number) => {
+    for (let i = 0; i < steps; i++) {
+      await push(w, 'left')
+      await push(w, 'right')
+    }
+    await tick(600)
+  }
+
+  it('the goal is every small stone of both rounds; the big stones stand at their start, the heap is empty', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(5)
+    expect(w.find('.ca-round').text()).toContain('Runde 1 von 2')
+    expect(w.find('.ca-big.left').attributes('style')).toContain('left: 10%')
+    expect(w.find('.ca-big.right').attributes('style')).toContain('left: 90%')
+    expect(w.findAll('.ca-small')).toHaveLength(0)
+    expect(w.find('.ca-count').text()).toBe('Steine am Haufen: 0 von 2')
+    expect(w.findAll('.ca-btn')).toHaveLength(2)
+  })
+
+  it('a tap on a side pushes its stone one step towards the middle (the buttons do the same as the stones)', async () => {
+    const w = await open()
+    await w.findAll('.ca-btn')[0]!.trigger('click')
+    expect(w.find('.ca-big.left').attributes('style')).toContain('left: 27.5%')
+    expect(w.find('.ca-big.right').attributes('style')).toContain('left: 90%')
+    await w.findAll('.ca-btn')[1]!.trigger('click')
+    expect(w.find('.ca-big.right').attributes('style')).toContain('left: 72.5%')
+  })
+
+  it('a side that is a step ahead waits: no step, no mistake, no cross, a friendly line', async () => {
+    const w = await open()
+    await push(w, 'left')
+    await push(w, 'left')
+    expect(w.find('.ca-big.left').attributes('style')).toContain('left: 27.5%')
+    expect(w.find('.ca-fb').text()).toContain('Warte kurz')
+    expect(played).not.toContain('wrong')
+    await push(w, 'right')
+    expect(w.find('.ca-fb').text()).toBe('')
+  })
+
+  it('the arrow keys push the left and the right stone', async () => {
+    const w = await open()
+    await w.find('.ca-field').trigger('keydown', { key: 'ArrowRight' })
+    expect(w.find('.ca-big.right').attributes('style')).toContain('left: 72.5%')
+    await w.find('.ca-field').trigger('keydown', { key: 'ArrowLeft' })
+    expect(w.find('.ca-big.left').attributes('style')).toContain('left: 27.5%')
+  })
+
+  it('both stones in turn meet in the middle: a small stone lies on the heap, the big ones go back to the start', async () => {
+    const w = await open()
+    await both(w, 2)
+    expect(w.findAll('.ca-small')).toHaveLength(1)
+    expect(played).toContain('snap')
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(w.find('.ca-big.left').attributes('style')).toContain('left: 10%')
+    expect(w.find('.ca-count').text()).toBe('Steine am Haufen: 1 von 2')
+  })
+
+  it('round 2 has three stones and longer ways; the end always gives three stars (nothing can go wrong)', async () => {
+    const w = await open()
+    await both(w, 2)
+    await both(w, 2)
+    expect(w.find('.ca-field').classes()).toContain('lit')
+    await tick(1600)
+    expect(w.find('.ca-round').text()).toContain('Runde 2 von 2')
+    expect(w.findAll('.ca-small')).toHaveLength(0)
+    for (let i = 0; i < 3; i++) await both(w, 3)
+    await tick(1100)
+    expect(useTaskProgress().parts.value).toBe(5)
+    expect(useTaskProgress().finished.value).toBe(true)
+    expect(w.text()).toContain('Der Steinhaufen ist ein Zeichen')
+    await w.find('.gd button').trigger('click')
+    expect(w.emitted('done')).toEqual([[3]])
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.ca-count').text()).toBe('Stones on the heap: 0 of 2')
+    expect(w.findAll('.ca-btn')[1]!.text()).toBe("Push Laban's stone")
+    await push(w, 'left')
+    await push(w, 'left')
+    expect(w.find('.ca-fb').text()).toContain('Wait a moment')
   })
 })

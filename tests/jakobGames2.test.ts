@@ -11,6 +11,7 @@ import {
   expected,
   fitsRing,
   gapOk,
+  heapSpot,
   hit,
   isEven,
   positionAt,
@@ -137,6 +138,22 @@ describe('cairn of two stones', () => {
     expect(arrived(s, 3)).toBe(true)
     expect(advance(s, 'left', 3).moved).toBe(false)
     expect(arrived({ left: 3, right: 2 }, 3)).toBe(false)
+  })
+
+  it('the heap grows from the bottom row up: every stone has its own place, the rows get narrower, the heap stands in the middle', () => {
+    for (const total of [3, 5]) {
+      const spots = Array.from({ length: total }, (_, i) => heapSpot(i, total))
+      expect(new Set(spots.map((p) => `${p.x}/${p.y}`)).size, `places of ${total}`).toBe(total)
+      expect(Math.min(...spots.map((p) => p.y))).toBe(0)
+      // the lowest row is the widest
+      const rows = [...new Set(spots.map((p) => p.y))].sort((a, b) => a - b).map((y) => spots.filter((p) => p.y === y).length)
+      expect(rows).toEqual([...rows].sort((a, b) => b - a))
+      // balanced around the middle
+      expect(spots.filter((p) => p.y === 0).reduce((s, p) => s + p.x, 0)).toBeCloseTo(0)
+    }
+    expect(heapSpot(0, 3)).toEqual({ x: -0.5, y: 0 })
+    expect(heapSpot(2, 3)).toEqual({ x: 0, y: 0.8 })
+    expect(heapSpot(4, 5)).toEqual({ x: 0.5, y: 0.8 })
   })
 
   it('only one side tapped again and again goes one step and stops', () => {

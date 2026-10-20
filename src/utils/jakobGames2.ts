@@ -140,6 +140,24 @@ export function advance(state: Pair, side: Side, steps: number): { state: Pair; 
 /** Both stones have come to the middle. */
 export const arrived = (state: Pair, steps: number): boolean => state.left >= steps && state.right >= steps
 
+/**
+ * Where the small stone number `index` (0-based) of a heap of `total` stones lies, in stone sizes from the middle of the foot of the heap: the lowest row is the widest and
+ * is filled first, every row above is one stone narrower and lies in the gaps of the row below (`x` to the right, `y` upwards).
+ */
+export function heapSpot(index: number, total: number): { x: number; y: number } {
+  let base = 1
+  while ((base * (base + 1)) / 2 < total) base++
+  let row = 0
+  let left = index
+  let width = base
+  while (left >= width && width > 1) {
+    left -= width
+    width--
+    row++
+  }
+  return { x: left - (width - 1) / 2, y: row * 0.8 }
+}
+
 // ------------------------------------------------------------------ the herds on the road
 
 /** The length of a line of points (percent of the picture), counted in widths of the picture. */

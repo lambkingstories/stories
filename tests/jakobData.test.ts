@@ -161,6 +161,19 @@ describe('Jakob: every stage has the game that was chosen', () => {
     expect(c.background).toBe(stage(5).image)
   })
 
+  it('8 cairn (when built): two rounds, three and five stones, the way gets longer, both stones start left and right of the middle and the heap lies in the picture', () => {
+    const c = stage(8).task.cairn
+    if (!c) return
+    expect(c.rounds.map((r) => r.stones)).toEqual([3, 5])
+    expect(c.rounds[1]!.steps).toBeGreaterThan(c.rounds[0]!.steps)
+    expect(c.leftStart[0]).toBeLessThan(c.centre[0])
+    expect(c.rightStart[0]).toBeGreaterThan(c.centre[0])
+    for (const [x, y] of [c.centre, c.leftStart, c.rightStart]) {
+      expect(x >= 0 && x <= 100 && y >= 0 && y <= 100).toBe(true)
+    }
+    expect(c.background).toBe(stage(8).image)
+  })
+
   it('7 guessing the herds (when built): round 1 compares herds that are clearly different, round 2 asks for the range that contains the number; the animals exist and stand in the meadow', () => {
     const g = stage(7).task.guess
     if (!g) return

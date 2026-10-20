@@ -11,7 +11,7 @@
  * Davor: alle Bilder (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder), Messwerte und Vorlese-Aufnahmen (Deutsch und Englisch) sind eingebaut, die Etappen sind spielbar.
  * Das Abenteuer ist aber nicht öffentlich: es ist hinter `comingSoon` und dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { CrankGame, CycleGame, GuessGame, HoldGame, Journey, SlideGame } from '@/types/adventure'
+import type { CairnGame, CrankGame, CycleGame, GuessGame, HoldGame, Journey, SlideGame } from '@/types/adventure'
 import { JAKOB_PATH } from './jakobPath'
 import { localize } from './localize'
 import { jakobEn } from './en/jakob.en'
@@ -89,6 +89,26 @@ const JAHRE: CycleGame = {
   rounds: [
     { hint: 'Zwei Jahre vergehen. Welches Zeichen fehlt in der Lücke?', cycle: ['fruehling', 'sommer', 'herbst', 'winter'], length: 8, gaps: [2, 5] },
     { hint: 'Sieben Jahre vergehen. Setze die fehlenden Zeichen ein, auch am Ende der Reihe.', cycle: ['fruehling', 'sommer', 'herbst', 'winter'], length: 28, gaps: [10, 17, 26, 27] }
+  ]
+}
+
+/**
+ * Etappe 8, "Steinhaufen zu zweit": Jakob und Laban schieben ihre großen Steine gemeinsam in die Mitte, dort legt sich ein kleiner Stein auf den Haufen (Bildauftrag J23; Hintergrund =
+ * das Etappenbild, unten gesetzt). Runde 1 drei Steine mit drei Schritten, Runde 2 fünf Steine mit fünf Schritten. Mitte und Startplätze (Prozent des Etappenbildes) sind vorläufig
+ * geschätzt, bis die Datei `bund-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `bund/stein-links.webp`, `stein-rechts.webp` je 220 × 180, `stein-klein.webp` 110 × 90, transparent.
+ */
+const BUND: CairnGame = {
+  background: '',
+  stoneLeft: `${G}bund/stein-links.webp`,
+  stoneRight: `${G}bund/stein-rechts.webp`,
+  stoneSmall: `${G}bund/stein-klein.webp`,
+  centre: [50, 72],
+  leftStart: [14, 66],
+  rightStart: [86, 66],
+  rounds: [
+    { hint: 'Schiebt die beiden Steine zusammen in die Mitte. Tippe abwechselnd links und rechts, oder nimm zwei Finger.', stones: 3, steps: 3 },
+    { hint: 'Noch einmal, jetzt mit längeren Wegen. Der Haufen wird höher.', stones: 5, steps: 5 }
   ]
 }
 
@@ -311,7 +331,7 @@ export const jakob: Journey = {
         'Da lenkt Laban ein. Die beiden schließen Frieden. Jakob stellt einen großen Stein auf, und die anderen sammeln Steine zu einem Haufen, auf dem sie gemeinsam essen. Der Haufen soll Zeuge sein und heißt Mizpa, das bedeutet „Warte“, denn Laban sagt: „Gott sei Wächter zwischen mir und dir, wenn wir einander nicht sehen.“ Am nächsten Morgen küsst Laban seine Enkel und Töchter und kehrt heim.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'bund', hint: 'Schiebe die Steine von Jakob und Laban gemeinsam in die Mitte.', cairn: BUND },
       questions: [
         { q: 'Wer spricht im Traum zu Laban?', options: ['Gott', 'Jakob', 'Isaak'], answer: 0 },
         { q: 'Wofür steht der Steinhaufen zwischen Jakob und Laban?', options: ['für ihren Frieden', 'für ein Haus', 'für ein Grab'], answer: 0 }
@@ -411,7 +431,7 @@ export const jakob: Journey = {
 // the game of a stage lies on the picture of the stage (it follows when the stage picture is replaced)
 for (const s of jakob.stages) {
   const t = s.task
-  for (const g of [t.guess, t.cycle]) if (g) g.background = s.image
+  for (const g of [t.guess, t.cycle, t.cairn]) if (g) g.background = s.image
 }
 
 // the English texts (title, stories, questions, hints, recordings) lie over the German ones; the screens show them when the app is English
