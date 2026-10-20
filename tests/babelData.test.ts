@@ -107,6 +107,18 @@ describe('Babel: every stage has its own new game (no game of Josef, Noah or Ada
       expect(t.gone).toHaveLength(2)
     }
     expect(m.slots.length).toBeGreaterThanOrEqual(6)
+    // the places are the measured ones: the six stand side by side at the foot of the picture without touching, every person fully inside it
+    expect(m.personWidth).toBe(14)
+    const xs = m.slots.map((p) => p[0])
+    expect(xs).toEqual([...xs].sort((a, b) => a - b))
+    for (let i = 1; i < xs.length; i++) expect(xs[i]! - xs[i - 1]!, 'people overlap').toBeGreaterThanOrEqual(m.personWidth!)
+    for (const [x, y] of m.slots) {
+      expect(x - m.personWidth! / 2).toBeGreaterThanOrEqual(0)
+      expect(x + m.personWidth! / 2).toBeLessThanOrEqual(100)
+      expect(y).toBeLessThanOrEqual(95)
+    }
+    // only one child, smaller than the grown-ups
+    expect(m.people.filter((p) => (p.scale ?? 1) < 1)).toHaveLength(1)
     // the same people are not gone every time
     expect(new Set(m.rounds.flatMap((r) => r.tasks.flatMap((t) => t.gone))).size).toBeGreaterThanOrEqual(5)
     expect(m.background).toBe('images/abenteuer/babel/etappe-bild-01.webp')

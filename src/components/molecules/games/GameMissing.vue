@@ -126,7 +126,8 @@ function taskOver() {
   }, 1100)
 }
 
-const personStyle = (i: number) => ({ left: `${slotOf(i)[0]}%`, top: `${slotOf(i)[1]}%` })
+const personStyle = (i: number, id: string) => ({ left: `${slotOf(i)[0]}%`, top: `${slotOf(i)[1]}%`, width: `${(props.game.personWidth ?? 11) * (personOf(id)?.scale ?? 1)}%` })
+const gapStyle = (i: number) => ({ left: `${slotOf(i)[0]}%`, top: `${slotOf(i)[1]}%` })
 </script>
 
 <template lang="pug">
@@ -134,10 +135,11 @@ const personStyle = (i: number) => ({ left: `${slotOf(i)[0]}%`, top: `${slotOf(i
     template(v-if="!finished")
       p(v-if="rounds.length > 1" class="ms-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="ms-hint") {{ phase === 'look' ? current.hint : message || current.hint }}
-      div(class="ms-field" role="group" :aria-label="t('app.adventure.missingRow')" :style="{ backgroundImage: `url(${src(game.background)})` }")
+      div(class="ms-field" role="group" :aria-label="t('app.adventure.missingRow')")
+        div(class="ms-bg" :style="{ backgroundImage: `url(${src(game.background)})` }" aria-hidden="true")
         template(v-for="(id, i) in standing" :key="`${round}-${taskNo}-${i}`")
-          img(v-if="id" :src="src(personOf(id)?.image ?? '')" alt="" draggable="false" class="ms-person" :class="{ back: task.gone.includes(id) && found[id] }" :style="personStyle(i)")
-          span(v-else class="ms-gap" :style="personStyle(i)" role="img" :aria-label="t('app.adventure.missingGap')")
+          img(v-if="id" :src="src(personOf(id)?.image ?? '')" alt="" draggable="false" class="ms-person" :class="{ back: task.gone.includes(id) && found[id] }" :style="personStyle(i, id)")
+          span(v-else class="ms-gap" :style="gapStyle(i)" role="img" :aria-label="t('app.adventure.missingGap')")
         img(v-if="phase === 'dust'" :src="src(game.cloud)" alt="" draggable="false" class="ms-cloud" aria-hidden="true")
       p(class="ms-fb" role="status") {{ phase === 'look' ? t('app.adventure.missingLook') : message }}
       div(v-if="phase === 'look'" class="ms-actions")
@@ -202,13 +204,18 @@ const personStyle = (i: number) => ({ left: `${slotOf(i)[0]}%`, top: `${slotOf(i
   border-radius: 14px
   border: 3px solid #d4a83e
   background-color: #cdb98e
+
+// the picture behind the row is soft and a little lighter: the stage picture is full of people itself, and they must not be mixed up with the people of the game
+.ms-bg
+  position: absolute
+  inset: -4%
   background-size: cover
   background-position: center
+  filter: blur(3px) brightness(1.12) saturate(0.9)
 
 // a person stands with the feet at the place; the picture is 200 x 320
 .ms-person
   position: absolute
-  width: 11%
   height: auto
   transform: translate(-50%, -100%)
   pointer-events: none
@@ -228,9 +235,9 @@ const personStyle = (i: number) => ({ left: `${slotOf(i)[0]}%`, top: `${slotOf(i
 
 .ms-cloud
   position: absolute
-  left: 0
-  top: 38%
-  width: 100%
+  left: -25%
+  top: 30%
+  width: 150%
   height: auto
   pointer-events: none
   animation: ms-dust 1700ms ease-in-out both

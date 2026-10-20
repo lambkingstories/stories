@@ -466,6 +466,8 @@ export interface MissingPerson {
   id: string
   image: string
   label: string
+  /** How big the person stands compared with the others (1 when left out; a child is smaller). */
+  scale?: number
 }
 /** One task: the people of the row (ids, in the order of the places) and who is gone when the dust cloud has passed (one or two of them). */
 export interface MissingTask {
@@ -483,6 +485,8 @@ export interface MissingGame {
   background: string
   cloud: string
   people: MissingPerson[]
+  /** How wide a person stands, in percent of the picture (11 when left out). */
+  personWidth?: number
   /** The places of the row, as [x, y] (the feet of a person) in percent of the picture; a row uses the first places it needs. */
   slots: [number, number][]
   rounds: MissingRound[]

@@ -22,7 +22,8 @@ const SOON = true
 
 /**
  * Etappe 1, "Wer fehlt im Zug?": eine Reihe von Menschen vor dem Etappenbild 1, eine Staubwolke zieht vorbei, jemand fehlt (Bildauftrag B10).
- * PLATZHALTER: die sechs Plätze (Fußpunkte, Prozent des Etappenbildes) kommen aus `fehlt/fehlt-messung.json`.
+ * Die sechs Plätze (Fußpunkte, Prozent des Etappenbildes 1, Figurenbreite 14 %) sind die Messwerte aus `fehlt/fehlt-messung.json`. Der Hintergrund wird im Spiel unscharf und heller gezeichnet
+ * (das Etappenbild ist selbst voller Menschen). Der Junge (Figur 3) steht auf 80 % verkleinert; es gibt nur ein Kind (das Zopfmädchen hat der Bildgenerator abgelehnt, Figur 6 ist eine junge Frau).
  */
 const FEHLT: MissingGame = {
   background: `${IMG}etappe-bild-01.webp`,
@@ -30,12 +31,13 @@ const FEHLT: MissingGame = {
   people: [
     { id: 'mensch-1', image: `${G}fehlt/mensch-1.webp`, label: 'Mann mit blauem Kopftuch' },
     { id: 'mensch-2', image: `${G}fehlt/mensch-2.webp`, label: 'Frau mit ockerfarbenem Tuch und Wasserkrug' },
-    { id: 'mensch-3', image: `${G}fehlt/mensch-3.webp`, label: 'Kind mit rotem Tuch' },
-    { id: 'mensch-4', image: `${G}fehlt/mensch-4.webp`, label: 'Mann mit großem Bündel' },
-    { id: 'mensch-5', image: `${G}fehlt/mensch-5.webp`, label: 'Frau mit Korb' },
-    { id: 'mensch-6', image: `${G}fehlt/mensch-6.webp`, label: 'Mädchen mit Zopf' }
+    { id: 'mensch-3', image: `${G}fehlt/mensch-3.webp`, label: 'Junge mit rotem Tuch', scale: 0.8 },
+    { id: 'mensch-4', image: `${G}fehlt/mensch-4.webp`, label: 'Mann mit olivgrünem Tuch und großem Bündel' },
+    { id: 'mensch-5', image: `${G}fehlt/mensch-5.webp`, label: 'Frau in Blau mit Korb' },
+    { id: 'mensch-6', image: `${G}fehlt/mensch-6.webp`, label: 'junge Frau mit Zopf' }
   ],
-  slots: [[14, 84], [28, 84], [42, 84], [56, 84], [70, 84], [84, 84]],
+  personWidth: 14,
+  slots: [[14, 91], [28.5, 91], [43, 91], [57.5, 91], [72, 91], [86.5, 91]],
   rounds: [
     {
       hint: 'Vier Menschen ziehen. Wer ist weg, wenn die Staubwolke vorbei ist?',

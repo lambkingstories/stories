@@ -20,7 +20,7 @@ export const babelEn: TextOverlay<Journey> = {
         'One day the people set out and travel on together, families with their children, with animals and bundles. They talk and laugh along the way, and nobody has to ask another what he means.',
         'At last they find a wide, flat plain in the land of Shinar. There is so much room here that everyone can live side by side. They settle there.'
       ],
-      task: { hint: 'Look closely: Who is missing from the caravan?', missing: { people: [{ label: 'Man with a blue headscarf' }, { label: 'Woman with an ochre cloth and a water jug' }, { label: 'Child with a red cloth' }, { label: 'Man with a big bundle' }, { label: 'Woman with a basket' }, { label: 'Girl with a braid' }], rounds: [{ hint: 'Round 1: Four people are walking. Who is gone when the dust cloud has passed?' }, { hint: 'Round 2: Now two are missing.' }] } },
+      task: { hint: 'Look closely: Who is missing from the caravan?', missing: { people: [{ label: 'Man with a blue headscarf' }, { label: 'Woman with an ochre cloth and a water jug' }, { label: 'Boy with a red cloth' }, { label: 'Man with an olive-green cloth and a big bundle' }, { label: 'Woman in blue with a basket' }, { label: 'Young woman with a braid' }], rounds: [{ hint: 'Round 1: Four people are walking. Who is gone when the dust cloud has passed?' }, { hint: 'Round 2: Now two are missing.' }] } },
       questions: [
         { q: 'Which language do the people speak at the beginning?', options: ['all the same one', 'a different one in every family', 'none at all'] },
         { q: 'What do the people find in the land of Shinar?', options: ['a wide plain', 'a high mountain', 'a deep forest'] }
