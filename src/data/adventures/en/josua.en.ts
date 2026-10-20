@@ -36,7 +36,7 @@ export const josuaEn: TextOverlay<Journey> = {
         'Rahab has already hidden them. On her flat roof, stalks of flax lie spread out to dry, and under them she has hidden the men. “Yes, men came to me,” she tells the messengers, “but I do not know where they were from. When it grew dark and the city gate was about to be shut, they went away. Hurry after them, and you will catch them!”',
         'The king’s messengers set off toward the Jordan, to the crossing places. As soon as they have left, the gate is shut behind them.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Cover the men with bundles of flax.', hide: { rounds: [{ hint: 'Rahab hides the man under the flax. Lay the bundles over him until nothing looks out any more.' }, { hint: 'Now two men lie on the roof, and the bundles only just reach. Tap a bundle and it turns.' }] } },
       questions: [
         { q: 'Where does Joshua send the two men?', options: ['to Jericho', 'to Hebron', 'to Egypt'] },
         { q: 'Where does Rahab hide the men?', options: ['on the roof under flax', 'in the cellar under sacks', 'in a well'] }

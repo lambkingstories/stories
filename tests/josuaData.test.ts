@@ -12,7 +12,7 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
-import { solvable } from '@/utils/josuaGames'
+import { covered, solvable } from '@/utils/josuaGames'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => josua.stages[n - 1]!
@@ -107,7 +107,7 @@ describe('Josua: stories and questions', () => {
 
 describe('Josua: the placeholders until the games and pictures come', () => {
   it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(josua.stages.map((s) => s.task.kind)).toEqual(['packen', 'quiz', 'abseilen', 'schritt', 'memory', 'backen', 'quiz', 'quiz', 'quiz', 'lueckenvers'])
+    expect(josua.stages.map((s) => s.task.kind)).toEqual(['packen', 'verstecken', 'abseilen', 'schritt', 'memory', 'backen', 'quiz', 'quiz', 'quiz', 'lueckenvers'])
     for (const s of josua.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
@@ -195,6 +195,42 @@ describe('Josua: the placeholders until the games and pictures come', () => {
       expect(r.dough).toBeGreaterThan(r.stones)
     }
     expect(g.rounds[1]!.goldenTo - g.rounds[1]!.goldenFrom).toBeLessThan(g.rounds[0]!.goldenTo - g.rounds[0]!.goldenFrom)
+  })
+
+  it('2 hide: one man and three bundles, then two men and five; every round can be won with real placements; the men lie on the roof and apart; the bundles are not too big', () => {
+    const g = stage(2).task.hide
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => [r.men.length, r.bundles.length])).toEqual([[1, 3], [2, 5]])
+    const H = 4 / 3
+    const man = (id: string) => {
+      const m = g.men.find((x) => x.id === id)!
+      return { x: m.x, y: m.y * H, w: m.w, h: m.h * H }
+    }
+    const at = (id: string, cx: number, cy: number) => {
+      const b = g.bundles.find((x) => x.id === id)!
+      return { x: cx - b.w / 2, y: cy - b.h / 2, w: b.w, h: b.h }
+    }
+    // round 1: two big bundles that lie a little over each other hide the man; the small one alone does not
+    const a = man('mann-a')
+    expect(covered(a, [at('gross-1', a.x + 15, a.y + 5.4), at('gross-2', a.x + 15, a.y + a.h - 5.4)])).toBe(true)
+    expect(covered(a, [at('klein-1', a.x + 15, a.y + 5)])).toBe(false)
+    // round 2: man a as before, man b with a big, a middle and a small bundle
+    const b = man('mann-b')
+    const bundlesB = [at('gross-3', b.x + 15, b.y + 5.4), at('mittel-1', b.x + 8.3 + 10.85, b.y + 2.5 + 5), at('klein-1', b.x + 7.5, b.y + 3.3 + 4.6)]
+    expect(covered(b, bundlesB)).toBe(true)
+    // the roof is 100 wide and 133 high: both men lie inside and do not touch
+    for (const m of [a, b]) {
+      expect(m.x).toBeGreaterThanOrEqual(0)
+      expect(m.x + m.w).toBeLessThanOrEqual(100)
+      expect(m.y + m.h).toBeLessThanOrEqual(100 * H)
+    }
+    expect(a.y + a.h).toBeLessThan(b.y)
+    // all the bundles of a round are less than the roof: the area is smaller than a quarter of the roof
+    for (const r of g.rounds) {
+      const area = r.bundles.reduce((n, id) => n + g.bundles.find((x) => x.id === id)!.w * g.bundles.find((x) => x.id === id)!.h, 0)
+      expect(area).toBeLessThan(100 * 100 * H * 0.25)
+    }
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

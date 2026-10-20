@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { BakeGame, LowerGame, PackGame, StepGame } from '@/types/adventure'
+import type { BakeGame, HideGame, LowerGame, PackGame, StepGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -707,5 +707,182 @@ describe('Fladen backen (bake)', () => {
     expect(word(w, 0)).toBe('still raw')
     await tick(2200)
     expect(word(w, 0)).toBe('ready')
+  })
+})
+
+// ---------------------------------------------------------------- under the flax
+describe('Unter dem Flachs verstecken (hide)', () => {
+  const bundle = (id: string, image: string, w: number, h: number) => ({ id, image: `images/x/${image}.webp`, w, h })
+  const game: HideGame = {
+    background: 'images/x/roof.webp',
+    messenger: 'images/x/messengers.webp',
+    men: [
+      { id: 'mann-a', image: 'images/x/a.webp', x: 10, y: 24, w: 30, h: 9.375 },
+      { id: 'mann-b', image: 'images/x/b.webp', x: 52, y: 60, w: 30, h: 9.375 }
+    ],
+    bundles: [bundle('gross-1', 'gross', 30, 10.8), bundle('gross-2', 'gross', 30, 10.8), bundle('gross-3', 'gross', 30, 10.8), bundle('mittel-1', 'mittel', 21.7, 10), bundle('klein-1', 'klein', 15, 9.2)],
+    rounds: [
+      { hint: 'Runde eins.', men: ['mann-a'], bundles: ['gross-1', 'gross-2', 'klein-1'] },
+      { hint: 'Runde zwei.', men: ['mann-a', 'mann-b'], bundles: ['gross-1', 'gross-2', 'gross-3', 'mittel-1', 'klein-1'] }
+    ]
+  }
+  // the roof is 300 x 400 pixels: a unit (a percent of the width) is three pixels in both directions
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, width: 300, height: 400, right: 300, bottom: 400, x: 0, y: 0, toJSON: () => ({}) })
+    const { default: Hide } = await import('@/components/molecules/games/GameHide.vue')
+    const w = mount(Hide, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  /** Choose the bundle at this place of the tray (a press and a release without moving), then tap the roof at the middle (in units). */
+  const lay = async (w: W, trayIndex: number, cx: number, cy: number) => {
+    const el = w.findAll('.hd-token')[trayIndex]!.element
+    el.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 5, clientY: 5 }))
+    window.dispatchEvent(new MouseEvent('pointerup', { clientX: 5, clientY: 5 }))
+    await flushPromises()
+    await w.find('.hd-roof').trigger('click', { clientX: cx * 3, clientY: cy * 3 })
+    await flushPromises()
+  }
+  /** A percent of the first bundle on the roof, as a number (the sums leave tiny rounding). */
+  const pct = (w: W, name: 'left' | 'top' | 'width' | 'height') => Number(new RegExp(name + ': (-?[0-9.e-]+)%').exec(w.find('.hd-bundle').attributes('style') ?? '')![1])
+  const look = async (w: W) => {
+    await w.find('.hd-look').trigger('click')
+    await tick(1400)
+  }
+  const roundOne = async (w: W) => {
+    await lay(w, 0, 25, 37.4)
+    await lay(w, 0, 25, 39.1)
+  }
+  const roundTwo = async (w: W) => {
+    await lay(w, 0, 25, 37.4)
+    await lay(w, 0, 25, 39.1)
+    await lay(w, 0, 67, 85.4)
+    await lay(w, 0, 71.15, 87.5)
+    await lay(w, 0, 59.5, 87.9)
+  }
+
+  it('the goal is every man of both rounds; one man lies on the roof, three bundles wait at the edge', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(3)
+    expect(w.find('.hd-round').text()).toContain('Runde 1 von 2')
+    expect(w.findAll('.hd-man')).toHaveLength(1)
+    expect(w.findAll('.hd-token')).toHaveLength(3)
+    expect(w.find('.hd-count').text()).toBe('Zugedeckt: 0 von 1')
+  })
+
+  it('a bundle lies where it was put, with its size (percent of the picture); the tray has one less', async () => {
+    const w = await open()
+    await lay(w, 0, 25, 37.4)
+    expect(pct(w, 'left')).toBeCloseTo(10, 6)
+    expect(pct(w, 'top')).toBeCloseTo(24, 6)
+    expect(pct(w, 'width')).toBeCloseTo(30, 6)
+    expect(pct(w, 'height')).toBeCloseTo(8.1, 6)
+    expect(w.findAll('.hd-token')).toHaveLength(2)
+    expect(played).toContain('tap')
+  })
+
+  it('a bundle let go near the edge is moved in and stays on the roof', async () => {
+    const w = await open()
+    await lay(w, 0, 99, 5)
+    expect(pct(w, 'left')).toBeCloseTo(70, 6)
+    expect(pct(w, 'top')).toBeCloseTo(0, 6)
+  })
+
+  it('a tap on a bundle on the roof turns it across', async () => {
+    const w = await open()
+    await lay(w, 0, 50, 70)
+    const el = w.find('.hd-bundle').element
+    el.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 150, clientY: 210 }))
+    window.dispatchEvent(new MouseEvent('pointerup', { clientX: 150, clientY: 210 }))
+    await flushPromises()
+    expect(pct(w, 'width')).toBeCloseTo(10.8, 6)
+    expect(pct(w, 'height')).toBeCloseTo(22.5, 6)
+  })
+
+  it('a bundle can be dragged on the roof; let go outside the roof it goes back to the edge', async () => {
+    const w = await open()
+    await lay(w, 0, 50, 70)
+    const el = w.find('.hd-bundle').element
+    el.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 150, clientY: 210 }))
+    window.dispatchEvent(new MouseEvent('pointermove', { clientX: 180, clientY: 240 }))
+    window.dispatchEvent(new MouseEvent('pointerup', { clientX: 180, clientY: 240 }))
+    await flushPromises()
+    expect(pct(w, 'left')).toBeCloseTo(45, 6)
+    const again = w.find('.hd-bundle').element
+    again.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 180, clientY: 240 }))
+    window.dispatchEvent(new MouseEvent('pointermove', { clientX: 400, clientY: 500 }))
+    window.dispatchEvent(new MouseEvent('pointerup', { clientX: 400, clientY: 500 }))
+    await flushPromises()
+    expect(w.findAll('.hd-bundle')).toHaveLength(0)
+    expect(w.findAll('.hd-token')).toHaveLength(3)
+  })
+
+  it('from the keyboard: Enter on a bundle in the tray puts it over the man; the arrow keys move it, Enter turns it, Delete takes it back', async () => {
+    const w = await open()
+    await w.findAll('.hd-token')[0]!.trigger('keydown', { key: 'Enter' })
+    expect(w.findAll('.hd-bundle')).toHaveLength(1)
+    const left = () => pct(w, 'left')
+    const before = left()
+    await w.find('.hd-bundle').trigger('keydown', { key: 'ArrowRight' })
+    expect(left()).toBeCloseTo(before + 2, 6)
+    await w.find('.hd-bundle').trigger('keydown', { key: 'Delete' })
+    expect(w.findAll('.hd-bundle')).toHaveLength(0)
+  })
+
+  it('"The messengers come" with a corner still looking out: the places are marked, a cross, a mistake; the messengers walk by', async () => {
+    const w = await open()
+    await lay(w, 2, 25, 38)
+    await w.find('.hd-look').trigger('click')
+    expect(w.find('.hd-messengers').exists()).toBe(true)
+    await tick(1400)
+    expect(w.find('.hd-messengers').exists()).toBe(false)
+    expect(played).toContain('wrong')
+    expect(w.findAll('.hd-peek').length).toBeGreaterThan(0)
+    expect(w.find('.hd-mark').exists()).toBe(true)
+    expect(w.find('.hd-fb').text()).toContain('schaut noch etwas heraus')
+    expect(useTaskProgress().parts.value).toBe(0)
+  })
+
+  it('every man covered: nothing can be seen, a star; the marks go away when a bundle is moved; after a while round 2 has two men', async () => {
+    const w = await open()
+    await roundOne(w)
+    await look(w)
+    expect(played).toContain('star')
+    expect(w.find('.hd-fb').text()).toContain('Niemand ist zu sehen')
+    expect(useTaskProgress().parts.value).toBe(1)
+    await tick(1900)
+    expect(w.find('.hd-round').text()).toContain('Runde 2 von 2')
+    expect(w.findAll('.hd-man')).toHaveLength(2)
+    expect(w.findAll('.hd-token')).toHaveLength(5)
+    expect(w.findAll('.hd-bundle')).toHaveLength(0)
+  })
+
+  it('the whole game: the end with three stars; the looks with a corner give the stars (up to one: three, up to three: two, more: one)', async () => {
+    for (const [wrong, stars] of [[0, 3], [1, 3], [2, 2], [3, 2], [4, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      for (let i = 0; i < wrong; i++) await look(w)
+      await roundOne(w)
+      await look(w)
+      await tick(1900)
+      await roundTwo(w)
+      await look(w)
+      await tick(1300)
+      expect(useTaskProgress().parts.value).toBe(3)
+      expect(useTaskProgress().finished.value).toBe(true)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${wrong} looks`).toEqual([[stars]])
+      w.unmount()
+    }
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.hd-count').text()).toBe('Covered: 0 of 1')
+    expect(w.find('.hd-look').text()).toBe('The messengers come')
+    await look(w)
+    expect(w.find('.hd-fb').text()).toContain('Something is still looking out')
   })
 })

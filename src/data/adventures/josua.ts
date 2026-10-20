@@ -11,7 +11,7 @@
  * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit den ersten zehn Stationen (PLATZHALTER bis zum eigenen Panorama); Medaille und Geschenk sind ebenfalls die von Josef.
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme. Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { BakeGame, Journey, LowerGame, MemoryGame, PackGame, StepGame, VerseGame } from '@/types/adventure'
+import type { BakeGame, HideGame, Journey, LowerGame, MemoryGame, PackGame, StepGame, VerseGame } from '@/types/adventure'
 import { josef } from './josef'
 import { JOSUA_PATH } from './josuaPath'
 import { localize } from './localize'
@@ -20,6 +20,33 @@ import { josuaEn } from './en/josua.en'
 // PLATZHALTER bis zum eigenen Bild: die Etappenbilder von Josef (Ordner images/abenteuer/josef/); danach `images/abenteuer/josua/etappe-bild-NN.webp`
 const PLACEHOLDER = 'images/abenteuer/josef/'
 const G = 'images/abenteuer/spiele/josua/'
+
+/**
+ * Etappe 2, "Unter dem Flachs verstecken": die Männer liegen in Mäntel gewickelt auf dem Dach (Draufsicht), Flachsbündel werden darüber gelegt, bis nichts mehr herausschaut (Bildauftrag JO11; eigener Hintergrund
+ * `verstecken/dach.webp`, 3:4). Die Größen der Bündel sind in Prozent der Dachbreite (in beide Richtungen), die Männer in Prozent des Bildes. Runde 1 ein Mann, drei Bündel (zwei große, ein kleines), Runde 2 zwei
+ * Männer, fünf Bündel (drei große, ein mittleres, ein kleines). Beide Runden sind lösbar (Test). Die Lage der Männer ist vorläufig geschätzt, bis die Datei `verstecken-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `verstecken/dach.webp` 900 × 1200, `mann-a.webp`, `mann-b.webp` je 360 × 150, `flachs-gross.webp` 360 × 130, `flachs-mittel.webp` 260 × 120,
+ * `flachs-klein.webp` 180 × 110, `boten.webp` 220 × 160 (alle außer dem Dach transparent).
+ */
+const VERSTECKEN: HideGame = {
+  background: `${G}verstecken/dach.webp`,
+  messenger: `${G}verstecken/boten.webp`,
+  men: [
+    { id: 'mann-a', image: `${G}verstecken/mann-a.webp`, x: 10, y: 24, w: 30, h: 9.375 },
+    { id: 'mann-b', image: `${G}verstecken/mann-b.webp`, x: 52, y: 60, w: 30, h: 9.375 }
+  ],
+  bundles: [
+    { id: 'gross-1', image: `${G}verstecken/flachs-gross.webp`, w: 30, h: 10.8 },
+    { id: 'gross-2', image: `${G}verstecken/flachs-gross.webp`, w: 30, h: 10.8 },
+    { id: 'gross-3', image: `${G}verstecken/flachs-gross.webp`, w: 30, h: 10.8 },
+    { id: 'mittel-1', image: `${G}verstecken/flachs-mittel.webp`, w: 21.7, h: 10 },
+    { id: 'klein-1', image: `${G}verstecken/flachs-klein.webp`, w: 15, h: 9.2 }
+  ],
+  rounds: [
+    { hint: 'Rahab versteckt den Mann unter dem Flachs. Lege die Bündel über ihn, bis nichts mehr herausschaut.', men: ['mann-a'], bundles: ['gross-1', 'gross-2', 'klein-1'] },
+    { hint: 'Jetzt liegen zwei Männer auf dem Dach, und die Bündel reichen nur knapp. Tippe ein Bündel an, dann dreht es sich.', men: ['mann-a', 'mann-b'], bundles: ['gross-1', 'gross-2', 'gross-3', 'mittel-1', 'klein-1'] }
+  ]
+}
 
 /**
  * Etappe 6, "Fladen backen": Teigkugeln werden auf heiße Steine gelegt, werden zum Fladen, sind eine Weile goldbraun (Antippen wendet sie) und werden dann zu dunkel (Bildauftrag JO15; eigener Hintergrund
@@ -180,7 +207,7 @@ export const josua: Journey = {
         'Die Boten des Königs machen sich auf den Weg zum Jordan, bis zu den Furten. Kaum sind sie aus dem Tor, wird es hinter ihnen verschlossen.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild; vorgesehen: Unter dem Flachs verstecken (verstecken, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'verstecken', hint: 'Decke die Männer mit Flachsbündeln zu.', hide: VERSTECKEN },
       questions: [
         { q: 'Wohin schickt Josua die beiden Männer?', options: ['nach Jericho', 'nach Hebron', 'nach Ägypten'], answer: 0 },
         { q: 'Wo versteckt Rahab die Männer?', options: ['auf dem Dach unter Flachs', 'im Keller unter Säcken', 'in einem Brunnen'], answer: 0 }
