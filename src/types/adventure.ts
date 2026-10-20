@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke'
 
 export interface AdventureQuestion {
   q: string
@@ -869,6 +869,8 @@ export interface PackItem {
   image: string
   w: number
   h: number
+  /** What the thing is called (screen readers and the tip); the app has names for the things of the basket when this is left out. */
+  label?: string
 }
 /** A round of the packing game: the size of the grid in the basket and the things to pack (ids). */
 export interface PackRound {
@@ -1147,6 +1149,119 @@ export interface CueGame {
   rounds: CueRound[]
 }
 
+/** A round of the plaiting game: the number of stakes and rows and whether every row begins like the one before (`same`) or the other way round (`alternate`). */
+export interface WeaveRound {
+  hint: string
+  stakes: number
+  rows: number
+  pattern: 'same' | 'alternate'
+}
+/** The plaiting game "Plait the little basket": the cells where the reed runs in front of the stakes are tapped; `tiles` are the pictures of a cell (192 x 192) and `done` the finished basket. */
+export interface WeaveGame {
+  background: string
+  tiles: { stake: string; front: string; behind: string; active: string }
+  done: string
+  rounds: WeaveRound[]
+}
+
+/** A round of the glow game: the picture, the place where Moses starts and where the bush stands (percent of the picture), how close he has to come and an optional layer of rocks in front. */
+export interface GlowRound {
+  hint: string
+  background: string
+  start: [number, number]
+  target: [number, number]
+  threshold: number
+  cover?: string
+}
+/** The glow game "Follow the glow": Moses is led over the slope towards a glow that gets brighter the closer he comes. */
+export interface GlowGame {
+  walker: string
+  bush: string
+  rounds: GlowRound[]
+}
+
+/** A thing that is added in the right picture (its middle and width, percent of the picture). */
+export interface DiffItem {
+  image: string
+  x: number
+  y: number
+  w: number
+}
+export interface DiffRound {
+  hint: string
+  base: string
+  items: DiffItem[]
+}
+/** The differences game "Find the differences": two pictures side by side, the right one has some things more; they are tapped in the right picture. */
+export interface DiffGame {
+  rounds: DiffRound[]
+}
+
+/** A round of the drum game: the beats a minute and the slots of the pattern (`1` a ring comes, `0` a pause). */
+export interface BeatRound {
+  hint: string
+  bpm: number
+  pattern: (0 | 1)[]
+}
+/** The drum game "Miriam's drum": rings run towards the drum and the child taps it when a ring reaches it. */
+export interface BeatGame {
+  background: string
+  drum: string
+  ring: string
+  rounds: BeatRound[]
+}
+
+/** A day of the manna game: how many jars are needed (`0` is the day of rest). */
+export interface MannaDay {
+  jars: number
+}
+export interface MannaRound {
+  hint: string
+  days: MannaDay[]
+}
+/** The manna game "Gather manna": grains are gathered into jars, day after day, the right amount (twice as much on the sixth day, nothing on the seventh). */
+export interface MannaGame {
+  background: string
+  flakes: string[]
+  jar: string
+  jarFull: string
+  dwellers: string
+  flakesPerJar: number
+  rounds: MannaRound[]
+}
+
+export interface WordsRound {
+  hint: string
+  sentences: string[]
+}
+/** The words game "Put the words in order": the words of a sentence lie on stone chips in a mixed order and are put in the strip one after the other. */
+export interface WordsGame {
+  background: string
+  chip: string
+  strip: string
+  rounds: WordsRound[]
+}
+
+/** One trial of the cloud game: the pillar rises or stays, and what moves round it as a distraction. */
+export interface CloudTrial {
+  pillar: 'rises' | 'stays'
+  distractors: ('smoke' | 'birds' | 'banner' | 'sparks')[]
+}
+export interface CloudRound {
+  hint: string
+  mode: 'day' | 'night'
+  trials: CloudTrial[]
+}
+/** The cloud game "Follow the cloud": the child decides whether the people break up (the pillar rises) or stay (it does not). */
+export interface CloudGame {
+  dayScene: string
+  nightScene: string
+  pillarDay: string
+  pillarNight: string
+  extras: Record<string, string>
+  rounds: CloudRound[]
+}
+
 /** A round of the constellation game: the stars of the model as points in the frame (0 to 100 each way), and whether the model stays in view. */
 export interface ConstellationRound {
   hint: string
@@ -1260,6 +1375,13 @@ export interface StageTask {
   swit?: SwitchGame
   sneak?: SneakGame
   cue?: CueGame
+  weave?: WeaveGame
+  glow?: GlowGame
+  diff?: DiffGame
+  beat?: BeatGame
+  manna?: MannaGame
+  words?: WordsGame
+  cloud?: CloudGame
   constellation?: ConstellationGame
 }
 
