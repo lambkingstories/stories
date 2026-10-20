@@ -161,19 +161,19 @@ describe('Jakob: every stage has the game that was chosen', () => {
 
 describe('Jakob: die Karte', () => {
   const m = jakob.map
-  // the painted map is 4944 x 821 px (the height of the picture is the unit of the ring and of the lowest fifth)
-  const W = 4944
-  const H = 821
+  // the painted map is 9908 x 1648 px (the height of the picture is the unit of the ring and of the lowest fifth)
+  const W = 9908
+  const H = 1648
   it('vier Stücke eines Bildes, jedes unter 1,8 MB; Stationen von links nach rechts, nicht zu tief und nicht zu dicht', () => {
-    expect(m.images).toEqual([1, 2, 3, 4].map((n) => `images/abenteuer/jakob/karte-pano-${n}.webp`))
+    expect(m.images).toEqual([1, 2, 3, 4].map((n) => `images/abenteuer/jakob/karte-pano-v2-${n}.webp`))
     for (const f of m.images) expect(statSync(`public/${f}`).size / 1024, f).toBeLessThan(1800)
     expect(m.widthPx).toBe(W)
     expect(m.aspect).toBeCloseTo(W / H, 3)
-    expect(m.stages).toHaveLength(6)
+    expect(m.stages).toHaveLength(12)
     const spots = [...m.stages, m.exam]
     for (let i = 0; i < spots.length; i++) {
       expect(spots[i]!.y, `Station ${i + 1} nicht hinter der Leiste`).toBeLessThanOrEqual(0.65)
-      expect(spots[i]!.d).toBeCloseTo(167 / W, 3)
+      expect(spots[i]!.d).toBeCloseTo((336 * H) / 1648 / W, 3)
       if (i > 0) {
         expect(spots[i]!.x, `Station ${i + 1} rechts von ${i}`).toBeGreaterThan(spots[i - 1]!.x)
         // two rings do not touch
@@ -183,7 +183,7 @@ describe('Jakob: die Karte', () => {
   })
   it('nichts liegt in den unteren 20 % der Karte; der Perlenweg hat eine Strecke je Etappe (die letzte führt zum Ziel) und alle Perlen liegen im Bild', () => {
     for (const sp of [...m.stages, m.exam]) expect(sp.y * H, 'Ring-Mitte').toBeLessThanOrEqual(0.65 * H)
-    expect(m.path).toHaveLength(6)
+    expect(m.path).toHaveLength(12)
     for (const seg of m.path) {
       for (const [x, y] of seg) {
         expect(y * H, 'Perle').toBeLessThanOrEqual(0.8 * H)
@@ -208,7 +208,7 @@ describe('Jakob: the scaffold', () => {
     }
     // the painted map and the way are there
     expect(jakob.map.images).toHaveLength(4)
-    expect(JAKOB_PATH).toHaveLength(6)
+    expect(JAKOB_PATH).toHaveLength(12)
   })
 })
 
@@ -274,7 +274,7 @@ describe.runIf(released)('Jakob: when the stages are released, every file exists
     for (const f of journeyFiles(jakob)) {
       expect(existsSync(`public/${f}`), `missing: ${f}`).toBe(true)
       const size = statSync(`public/${f}`).size
-      expect(size, f).toBeLessThan(620_000)
+      expect(size, f).toBeLessThan(f.includes('karte-pano') ? 1_800_000 : 620_000)
       bytes += size
     }
     const mb = bytes / 1_000_000

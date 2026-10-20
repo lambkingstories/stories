@@ -78,25 +78,31 @@ export const jakob: Journey = {
   title: 'Jakob',
   subtitle: 'Ein Weg mit Umwegen',
   age: '8-10',
-  downloadMb: 10, // 9,7 MB gezählt am 20.10.2026 nach dem Ausbau auf 12 Etappen (der Test sagt die echte Größe)
+  downloadMb: 13, // etwa 13 MB nach der neuen Karte (vier Stücke zusammen 4,8 MB) am 20.10.2026 (der Test sagt die echte Größe)
   medal: `${IMG}medaille.webp`, // Jakob und die Himmelsleiter (Treppe aus Steinen im Sternenlicht)
   // Geschenk-Ausmalbild: Jakob und die Himmelsleiter im Traum (Treppe aus Steinen, Sterne, Tiere der Herde schlafend, friedlich)
   gift: { title: 'Jakob und die Himmelsleiter im Traum', image: `${IMG}geschenk.webp` },
-  // die gemalte Karte (Panorama in vier Stücken, 4944 × 821 px) mit Stationen und Perlenweg aus fertig/messdaten.json und jakobPath.ts
+  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v2 mit zwölf Orten) mit Stationen und Perlenweg aus fertig/messdaten.json und jakobPath.ts
   map: {
-    images: [1, 2, 3, 4].map((n) => `${IMG}karte-pano-${n}.webp`),
+    images: [1, 2, 3, 4].map((n) => `${IMG}karte-pano-v2-${n}.webp`),
     ring: 'images/abenteuer/josef/medaillon-ring.webp',
-    aspect: 4944 / 821,
-    widthPx: 4944,
+    aspect: 9908 / 1648,
+    widthPx: 9908,
     stages: [
-      { x: 0.1416, y: 0.6456, d: 0.0339 },
-      { x: 0.2528, y: 0.6456, d: 0.0339 },
-      { x: 0.3904, y: 0.6151, d: 0.0339 },
-      { x: 0.5138, y: 0.5627, d: 0.0339 },
-      { x: 0.7282, y: 0.609, d: 0.0339 },
-      { x: 0.8212, y: 0.5968, d: 0.0339 }
+      { x: 0.0252, y: 0.5704, d: 0.0339 },
+      { x: 0.105, y: 0.4976, d: 0.0339 },
+      { x: 0.1847, y: 0.5097, d: 0.0339 },
+      { x: 0.2644, y: 0.5825, d: 0.0339 },
+      { x: 0.3442, y: 0.5461, d: 0.0339 },
+      { x: 0.4239, y: 0.5825, d: 0.0339 },
+      { x: 0.5036, y: 0.5643, d: 0.0339 },
+      { x: 0.5834, y: 0.4187, d: 0.0339 },
+      { x: 0.6631, y: 0.5825, d: 0.0339 },
+      { x: 0.7428, y: 0.5643, d: 0.0339 },
+      { x: 0.8226, y: 0.6311, d: 0.0339 },
+      { x: 0.9023, y: 0.6068, d: 0.0339 }
     ],
-    exam: { x: 0.981, y: 0.5847, d: 0.0339 },
+    exam: { x: 0.982, y: 0.4369, d: 0.0339 },
     path: JAKOB_PATH
   },
   stages: [
