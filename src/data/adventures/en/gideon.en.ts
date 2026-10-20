@@ -68,7 +68,7 @@ export const gideonEn: TextOverlay<Journey> = {
         'Then the angel touches the meat and the bread with the tip of his staff. Fire comes up out of the rock and consumes everything. When Gideon looks up again, the angel has vanished. Gideon is frightened. “Oh, my God,” he cries, “I have seen an angel of God face to face!”',
         'But God speaks to him, “Peace be with you! Do not be afraid, you will not die.” Then Gideon builds an altar there and calls it: God is Peace. It stands in Ophrah for a long time.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Lay the word with the letters.', word: { rounds: [{ hint: 'What does Gideon call the altar? God is …', word: 'PEACE', extra: ['T', 'L'] }, { hint: 'Where does Gideon lay the bread and the meat? On the …', word: 'ROCK', extra: ['A', 'M'] }] } },
       questions: [
         { q: 'What consumes the meat and the bread?', options: ['fire out of the rock', 'a strong storm', 'a hungry shepherd'] },
         { q: 'What does God say to Gideon after the angel has vanished?', options: ['“Peace be with you! Do not be afraid.”', '“Go home at once.”', '“Build a wall.”'] }

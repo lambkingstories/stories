@@ -11,7 +11,8 @@ import { GIDEON_PATH } from '@/data/adventures/gideonPath'
 import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
-import { journeyFiles } from '@/utils/journeyFiles'
+import { tilesFor } from '@/utils/gideonGames'
+import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => gideon.stages[n - 1]!
@@ -111,8 +112,28 @@ describe('Gideon: stories and questions', () => {
 
 describe('Gideon: the placeholders until the games and pictures come', () => {
   it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(gideon.stages.map((s) => s.task.kind)).toEqual(Array(12).fill('quiz'))
+    expect(gideon.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'quiz', 'wort', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz'])
     for (const s of gideon.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
+  })
+
+  it('4 word: two words from the text (FRIEDE and FELSEN), two extra letters each that are not in the word; the English words are PEACE and ROCK; the goal comes from the letters', () => {
+    const g = stage(4).task.word
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => r.word)).toEqual(['FRIEDE', 'FELSEN'])
+    for (const r of g.rounds) {
+      expect(r.word).toBe(r.word.toUpperCase())
+      expect(r.extra).toHaveLength(2)
+      for (const l of r.extra) expect(r.word, `extra ${l}`).not.toContain(l)
+      expect(stage(4).text.join(' ').toUpperCase()).toContain(r.word)
+      const tiles = tilesFor(r.word, r.extra)
+      expect(tiles).toHaveLength(r.word.length + 2)
+    }
+    expect(g.rounds.reduce((n, r) => n + r.word.length, 0)).toBe(12)
+    setAdventureLanguage('en')
+    expect(stage(4).task.word!.rounds.map((r) => r.word)).toEqual(['PEACE', 'ROCK'])
+    expect(stage(4).task.word!.rounds.reduce((n, r) => n + r.word.length, 0)).toBe(9)
+    setAdventureLanguage('de')
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {
@@ -130,6 +151,7 @@ describe('Gideon: the placeholders until the games and pictures come', () => {
   it('every file that the data names exists (the pictures of Josef, the map, the medal) and is small enough', () => {
     let bytes = 0
     for (const f of journeyFiles(gideon)) {
+      if (notPaintedYet(f) && !existsSync(`public/${f}`)) continue
       expect(existsSync(`public/${f}`), `missing: ${f}`).toBe(true)
       const size = statSync(`public/${f}`).size
       expect(size, f).toBeLessThan(1_800_000)

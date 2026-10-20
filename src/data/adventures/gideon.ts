@@ -11,7 +11,7 @@
  * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit allen zwölf Stationen und dem Ziel (PLATZHALTER bis zum eigenen Panorama); Medaille und Geschenk sind ebenfalls die von Josef.
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme. Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { Journey } from '@/types/adventure'
+import type { Journey, WordGame } from '@/types/adventure'
 import { josef } from './josef'
 import { GIDEON_PATH } from './gideonPath'
 import { localize } from './localize'
@@ -19,6 +19,20 @@ import { gideonEn } from './en/gideon.en'
 
 // PLATZHALTER bis zum eigenen Bild: die Etappenbilder von Josef (Ordner images/abenteuer/josef/); danach `images/abenteuer/gideon/etappe-bild-NN.webp`
 const PLACEHOLDER = 'images/abenteuer/josef/'
+
+const G = 'images/abenteuer/spiele/gideon/'
+
+/**
+ * Etappe 4, "Das Wort legen": ein Satzanfang aus dem Text als Hinweis, darunter Kästchen für die Buchstaben des gesuchten Wortes und Kacheln, zwei davon überzählig (Bildauftrag: keiner, die Buchstaben sind Text).
+ * Hintergrund = das Etappenbild 4 (von der App abgedunkelt). Jede Sprache hat ihre eigenen Wörter und Hinweise (Runde 1 Friede / Peace, Runde 2 Felsen / Rock).
+ */
+const WORT: WordGame = {
+  background: `${PLACEHOLDER}etappe-bild-04.webp`,
+  rounds: [
+    { hint: 'Wie nennt Gideon den Altar? Gott ist der …', word: 'FRIEDE', extra: ['T', 'L'] },
+    { hint: 'Worauf legt Gideon das Brot und das Fleisch? Auf den …', word: 'FELSEN', extra: ['A', 'M'] }
+  ]
+}
 
 export const gideon: Journey = {
   id: 'gideon',
@@ -108,7 +122,7 @@ export const gideon: Journey = {
         'Aber Gott spricht zu ihm: „Friede sei mit dir! Fürchte dich nicht, du wirst nicht sterben.“ Da baut Gideon dort einen Altar und nennt ihn: Gott ist der Friede. In Ophra bleibt er noch lange stehen.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Das Wort legen (wort, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'wort', hint: 'Lege das Wort aus den Buchstaben.', word: WORT },
       questions: [
         { q: 'Was verzehrt das Fleisch und das Brot?', options: ['Feuer aus dem Felsen', 'ein starker Sturm', 'ein hungriger Hirte'], answer: 0 },
         { q: 'Was sagt Gott zu Gideon, nachdem der Engel verschwunden ist?', options: ['„Friede sei mit dir! Fürchte dich nicht.“', '„Geh sofort nach Hause.“', '„Bau eine Mauer.“'], answer: 0 }
