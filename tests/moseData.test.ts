@@ -12,7 +12,7 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
-import { dayOk, diffAt, distance, frontCells, frontCount, glow, noTriple, shuffle, wordsOf } from '@/utils/moseGames'
+import { dayOk, diffAt, distance, frontCells, frontCount, glow, noTriple, ringTimes, shuffle, wordsOf } from '@/utils/moseGames'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => mose.stages[n - 1]!
@@ -120,7 +120,7 @@ describe('Mose: stories and questions', () => {
 
 describe('Mose: the games, and the placeholders until the pictures come', () => {
   it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(mose.stages.map((s) => s.task.kind)).toEqual(['quiz', 'flechten', 'quiz', 'leuchten', 'unterschied', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'manna', 'worte', 'quiz', 'wolke'])
+    expect(mose.stages.map((s) => s.task.kind)).toEqual(['quiz', 'flechten', 'quiz', 'leuchten', 'unterschied', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'takt', 'manna', 'worte', 'quiz', 'wolke'])
     for (const s of mose.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
@@ -232,6 +232,28 @@ describe('Mose: the games, and the placeholders until the pictures come', () => 
     }
     expect(g.rounds[0]!.background).not.toBe(g.rounds[1]!.background)
     expect(g.rounds).toHaveLength(2)
+  })
+
+  it('11 beat: eight rings, then twelve with two pauses; 20 rings in all; the second round is a little quicker; the goal is 20', () => {
+    const g = stage(11).task.beat
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => r.pattern.filter((p) => p === 1).length)).toEqual([8, 12])
+    expect(g.rounds.map((r) => r.pattern.filter((p) => p === 0).length)).toEqual([0, 2])
+    expect(g.rounds[0]!.bpm).toBeLessThan(g.rounds[1]!.bpm)
+    for (const r of g.rounds) {
+      expect(r.bpm).toBeGreaterThanOrEqual(60)
+      expect(r.bpm).toBeLessThanOrEqual(90)
+      expect(r.pattern[0], 'starts with a ring').toBe(1)
+      expect(r.pattern[r.pattern.length - 1], 'ends with a ring').toBe(1)
+      // no two pauses in a row: the beat stays easy to feel
+      expect(r.pattern.join('')).not.toContain('00')
+      // the gaps between the rings are far wider than the window of a hit
+      const times = ringTimes(r.bpm, r.pattern)
+      for (let i = 1; i < times.length; i++) expect(times[i]! - times[i - 1]!).toBeGreaterThan(0.5)
+    }
+    expect(g.background).toBe(stage(11).image)
+    expect(g.drum).not.toBe(g.ring)
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

@@ -171,7 +171,7 @@ export const moseEn: TextOverlay<Journey> = {
         'During the night the pillar of cloud stands between the Israelites and the Egyptians. At God’s word Moses stretches his hand out over the sea, and a strong wind parts the water. In the middle of the sea there is dry ground, with a wall of water on the right and on the left, and the Israelites cross over, family after family. When the Egyptians follow them, the water flows back and covers chariots and riders. Of the whole army, no one follows the people anymore.',
         'But the Israelites are saved. They trust God and his servant Moses and sing a song of thanks. Miriam, the sister of Moses and Aaron, takes a tambourine in her hand, and all the women follow her with tambourines and dancing. “Sing to God,” calls Miriam, “for he has done a great deed!”'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Play the drum with Miriam.', beat: { rounds: [{ hint: 'Golden rings draw in towards the drum. Tap the drum when a ring reaches it.' }, { hint: 'Now a ring is missing every now and then. Wait for the next one.' }] } },
       questions: [
         { q: 'What does Moses do at the sea at God’s word?', options: ['He stretches his hand out over the sea.', 'He strikes a rock.', 'He throws his cloak into the water.'] },
         { q: 'Who takes a tambourine in her hand after the rescue?', options: ['Miriam', 'Zipporah', 'Shiphrah'] }

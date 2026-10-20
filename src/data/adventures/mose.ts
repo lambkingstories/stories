@@ -12,7 +12,7 @@
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme (Liste der Aufnahmen: D:/Claude/Abenteuer-Mose/NEUAUFNAHME-Mose.md).
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { CloudGame, DiffGame, GlowGame, Journey, MannaGame, WeaveGame, WordsGame } from '@/types/adventure'
+import type { BeatGame, CloudGame, DiffGame, GlowGame, Journey, MannaGame, WeaveGame, WordsGame } from '@/types/adventure'
 import { josef } from './josef'
 import { MOSE_PATH } from './mosePath'
 import { localize } from './localize'
@@ -156,6 +156,23 @@ const LEUCHTEN: GlowGame = {
   rounds: [
     { hint: 'Führe Mose mit dem Finger über den Hang. Dort leuchtet etwas. Je näher du kommst, desto heller wird es.', background: `${G}leuchten/hang-offen.webp`, start: [18, 76], target: [74, 36], threshold: 7 },
     { hint: 'Jetzt verdecken Felsen das Licht. Nur der Schein dringt durch. Geh dem Leuchten nach.', background: `${G}leuchten/hang-felsen.webp`, start: [12, 78], target: [70, 28], threshold: 7, cover: `${G}leuchten/felsen-vorn.webp` }
+  ]
+}
+
+/**
+ * Etappe 11, "Mirjams Pauke": der Danktanz am Ufer (2. Mose 15,20f), nicht die Rettung; kein Heer, kein Wasser über Menschen (Bildauftrag M16). Goldene Ringe ziehen sich auf die Pauke zu, das Kind tippt, wenn ein Ring
+ * sie erreicht (Fenster ± 0,25 s, `judge` in `utils/moseGames.ts`). Ein ausgelassener Ring verblasst ohne Fehler; ein Tipp ohne Ring in der Nähe ist ein Fehler. Kein Zeitdruck: die Runde endet, wenn der letzte Ring vorbei ist,
+ * wer zu wenige trifft, darf es noch einmal versuchen. Runde 1: acht Ringe, 72 Schläge je Minute; Runde 2: zwölf Ringe, 80 Schläge, an zwei Stellen fehlt ein Ring (`0`). Zusammen 8 + 12 = 20 Ringe.
+ * Der Hintergrund ist das Etappenbild 11. Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `takt/pauke.webp` 500 × 500 (transparent), `takt/ring.webp` 512 × 512 (transparent). Töne `pauke.mp3` und `pauke-dumpf.mp3`
+ * sind noch nicht da (Ton-Agent); bis dahin klingen `bead` und `wrong`.
+ */
+const TAKT: BeatGame = {
+  background: `${PLACEHOLDER}etappe-bild-11.webp`,
+  drum: `${G}takt/pauke.webp`,
+  ring: `${G}takt/ring.webp`,
+  rounds: [
+    { hint: 'Goldene Ringe ziehen sich auf die Pauke zu. Tippe die Pauke, wenn ein Ring sie erreicht.', bpm: 72, pattern: [1, 1, 1, 1, 1, 1, 1, 1] },
+    { hint: 'Jetzt fehlt manchmal ein Ring im Takt. Warte, bis der nächste kommt.', bpm: 80, pattern: [1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1] }
   ]
 }
 
@@ -387,7 +404,7 @@ export const mose: Journey = {
         'Die Israeliten aber sind gerettet. Sie glauben Gott und seinem Diener Mose und singen ein Danklied. Mirjam, die Schwester von Mose und Aaron, nimmt eine Pauke in die Hand, und alle Frauen folgen ihr mit Pauken und Tanz. „Singt Gott ein Lied“, ruft Mirjam, „denn er hat eine große Tat getan!“'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Mirjams Pauke (takt, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'takt', hint: 'Spiele mit Mirjam auf der Pauke.', beat: TAKT },
       questions: [
         { q: 'Was tut Mose auf Gottes Wort am Meer?', options: ['Er streckt seine Hand über das Meer aus.', 'Er schlägt auf einen Felsen.', 'Er wirft seinen Mantel ins Wasser.'], answer: 0 },
         { q: 'Wer nimmt nach der Rettung eine Pauke in die Hand?', options: ['Mirjam', 'Zippora', 'Schifra'], answer: 0 }

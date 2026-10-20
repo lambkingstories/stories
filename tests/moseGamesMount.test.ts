@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { CloudGame, DiffGame, GlowGame, MannaGame, WeaveGame, WordsGame } from '@/types/adventure'
+import type { BeatGame, CloudGame, DiffGame, GlowGame, MannaGame, WeaveGame, WordsGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -884,5 +884,223 @@ describe('Dem Leuchten nachgehen (glow)', () => {
     expect(w.find('.gl-count').text()).toBe('Bushes found: 0 of 2')
     await touch(w, 66, 32)
     expect(w.find('.gl-fb').text()).toBe('Moses is there: the bush shines and stays green.')
+  })
+})
+
+
+// ---------------------------------------------------------------- Mirjam's drum
+describe('Mirjams Pauke (beat)', () => {
+  const game: BeatGame = {
+    background: 'images/x/shore.webp',
+    drum: 'images/x/drum.webp',
+    ring: 'images/x/ring.webp',
+    rounds: [
+      { hint: 'Runde eins.', bpm: 72, pattern: [1, 1, 1, 1, 1, 1, 1, 1] },
+      { hint: 'Runde zwei.', bpm: 80, pattern: [1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1] }
+    ]
+  }
+  // the first ring arrives two seconds after the start; round 1 is 60 / 72 seconds apart, round 2 0.75 seconds
+  const GAP1 = 60 / 72
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Beat } = await import('@/components/molecules/games/GameBeat.vue')
+    const w = mount(Beat, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  /** A round of rings with a clock of its own: `to(seconds)` runs the time to this second after the start. */
+  const run = async (w: W) => {
+    await w.find('.bt-go').trigger('click')
+    let now = 0
+    return {
+      to: async (s: number) => {
+        await tick(Math.round((s - now) * 1000))
+        now = s
+      },
+      tap: async () => {
+        await w.find('.bt-drum').trigger('pointerdown')
+      }
+    }
+  }
+  const ringAt = (i: number) => 2 + i * GAP1
+
+  it('the goal is every ring of both rounds (20); the drum waits for "Go"', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(20)
+    expect(w.find('.bt-round').text()).toContain('Runde 1 von 2')
+    expect(w.find('.bt-count').text()).toBe('Ringe getroffen: 0 von 8')
+    expect(w.find('.bt-drum').attributes('disabled')).toBeDefined()
+    await w.find('.bt-go').trigger('click')
+    expect(w.find('.bt-drum').attributes('disabled')).toBeUndefined()
+    expect(w.find('.bt-go').exists()).toBe(false)
+  })
+
+  it('a tap when the ring arrives counts: the drum shines, a tick, the progress goes up; the same ring cannot be hit twice', async () => {
+    const w = await open()
+    const r = await run(w)
+    await r.to(ringAt(0))
+    await r.tap()
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(played).toContain('bead')
+    expect(w.find('.bt-drum').classes()).toContain('shine')
+    expect(w.find('.bt-count').text()).toBe('Ringe getroffen: 1 von 8')
+    // a second tap on the same ring: no new ring in reach, a mistake
+    await r.to(ringAt(0) + 0.1)
+    await r.tap()
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(played).toContain('wrong')
+    expect(w.find('.bt-fb').text()).toContain('kein Ring')
+  })
+
+  it('the window is a quarter of a second to both sides', async () => {
+    for (const [offset, ok] of [[-0.24, true], [0.24, true], [-0.3, false], [0.3, false]] as const) {
+      useTaskProgress().reset()
+      played.length = 0
+      const w = await open()
+      const r = await run(w)
+      await r.to(ringAt(0) + offset)
+      await r.tap()
+      expect(useTaskProgress().parts.value, `${offset}`).toBe(ok ? 1 : 0)
+      expect(played.includes('wrong'), `${offset}`).toBe(!ok)
+      w.unmount()
+    }
+  })
+
+  it('a tap with no ring near is a dull sound, a cross and a mistake', async () => {
+    const w = await open()
+    const r = await run(w)
+    await r.to(1)
+    await r.tap()
+    expect(played).toContain('wrong')
+    expect(w.find('.bt-mark').exists()).toBe(true)
+    expect(useTaskProgress().parts.value).toBe(0)
+  })
+
+  it('a ring that is let go fades without a mistake and without a sound; after the round "Once more" or "Go on" shows', async () => {
+    const w = await open()
+    const r = await run(w)
+    await r.to(ringAt(0) + 0.4)
+    expect(w.findAll('.bt-ring').length).toBeGreaterThan(0)
+    await r.to(ringAt(7) + 0.9)
+    expect(played).not.toContain('wrong')
+    expect(w.find('.bt-fb').text()).toContain('vorbeigezogen')
+    expect(w.findAll('.bt-actions button').map((b) => b.text())).toEqual(['Noch einmal', 'Weiter'])
+    expect(useTaskProgress().parts.value).toBe(0)
+  })
+
+  it('"Once more" plays the round again; the progress counts only what is beyond the best try', async () => {
+    const w = await open()
+    let r = await run(w)
+    for (const i of [0, 1, 2]) {
+      await r.to(ringAt(i))
+      await r.tap()
+    }
+    await r.to(ringAt(7) + 0.9)
+    expect(useTaskProgress().parts.value).toBe(3)
+    await w.findAll('.bt-actions button')[0]!.trigger('click')
+    expect(w.find('.bt-go').exists()).toBe(true)
+    r = await run(w)
+    for (const i of [0, 1, 2, 3, 4]) {
+      await r.to(ringAt(i))
+      await r.tap()
+    }
+    expect(useTaskProgress().parts.value).toBe(5)
+    await r.to(ringAt(7) + 0.9)
+    await w.findAll('.bt-actions button')[0]!.trigger('click')
+    r = await run(w)
+    for (const i of [0, 1]) {
+      await r.to(ringAt(i))
+      await r.tap()
+    }
+    expect(useTaskProgress().parts.value).toBe(5)
+    expect(w.find('.bt-round').text()).toContain('Runde 1 von 2')
+  })
+
+  it('"Go on" after a round with misses leads to round 2', async () => {
+    const w = await open()
+    const r = await run(w)
+    await r.to(ringAt(7) + 0.9)
+    await w.findAll('.bt-actions button')[1]!.trigger('click')
+    await tick(1500)
+    expect(w.find('.bt-round').text()).toContain('Runde 2 von 2')
+    expect(w.find('.bt-count').text()).toBe('Ringe getroffen: 0 von 12')
+  })
+
+  it('round 2 has pauses: a tap where a ring is missing is a mistake; the whole game ends with three stars', async () => {
+    const w = await open()
+    let r = await run(w)
+    for (let i = 0; i < 8; i++) {
+      await r.to(ringAt(i))
+      await r.tap()
+    }
+    expect(useTaskProgress().parts.value).toBe(8)
+    await r.to(ringAt(7) + 0.9)
+    expect(w.find('.bt-fb').text()).toContain('Alle Ringe getroffen')
+    expect(played).toContain('star')
+    await tick(3200)
+    expect(w.find('.bt-round').text()).toContain('Runde 2 von 2')
+    r = await run(w)
+    const times = [0, 1, 2, 4, 5, 6, 7, 9, 10, 11, 12, 13].map((slot) => 2 + slot * 0.75)
+    expect(times).toHaveLength(12)
+    for (const [k, t] of times.entries()) {
+      await r.to(t)
+      await r.tap()
+      if (k === 2) {
+        // tap in the first pause (slot 3): nothing is near
+        await r.to(2 + 3 * 0.75)
+        await r.tap()
+        expect(played.filter((p) => p === 'wrong')).toHaveLength(1)
+      }
+    }
+    await r.to(times[11]! + 1)
+    expect(useTaskProgress().parts.value).toBe(20)
+    await tick(2000)
+    expect(useTaskProgress().finished.value).toBe(true)
+    await w.find('.gd button').trigger('click')
+    expect(w.emitted('done')).toEqual([[3]])
+    expect(problems()).toEqual([])
+  })
+
+  it('the stars follow the wrong taps: up to four three stars, up to ten two, more one', async () => {
+    for (const [wrong, stars] of [[4, 3], [5, 2], [11, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      let r = await run(w)
+      for (let i = 0; i < wrong; i++) {
+        await r.to(0.1 + i * 0.05)
+        await r.tap()
+      }
+      for (let i = 0; i < 8; i++) {
+        await r.to(ringAt(i))
+        await r.tap()
+      }
+      await r.to(ringAt(7) + 0.9)
+      await tick(3200)
+      r = await run(w)
+      await r.to(2.1 + 14 * 0.75 + 2)
+      await w.findAll('.bt-actions button')[1]!.trigger('click')
+      await tick(100)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${wrong} wrong`).toEqual([[stars]])
+      w.unmount()
+    }
+  })
+
+  it('the space key starts the round and taps the drum', async () => {
+    const w = await open()
+    await w.find('.bt').trigger('keydown', { key: ' ' })
+    expect(w.find('.bt-go').exists()).toBe(false)
+    await tick(2000)
+    await w.find('.bt').trigger('keydown', { key: ' ' })
+    expect(useTaskProgress().parts.value).toBe(1)
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.bt-count').text()).toBe('Rings hit: 0 of 8')
+    await w.find('.bt-go').trigger('click')
+    await tick(1000)
+    await w.find('.bt-drum').trigger('pointerdown')
+    expect(w.find('.bt-fb').text()).toBe('There was no ring here. Wait until it reaches the drum.')
   })
 })
