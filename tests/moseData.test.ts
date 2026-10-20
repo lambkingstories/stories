@@ -12,7 +12,7 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
-import { dayOk, diffAt, distance, shuffle, wordsOf } from '@/utils/moseGames'
+import { dayOk, diffAt, distance, noTriple, shuffle, wordsOf } from '@/utils/moseGames'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => mose.stages[n - 1]!
@@ -120,7 +120,7 @@ describe('Mose: stories and questions', () => {
 
 describe('Mose: the games, and the placeholders until the pictures come', () => {
   it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(mose.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'quiz', 'quiz', 'unterschied', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'manna', 'worte', 'quiz', 'quiz'])
+    expect(mose.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'quiz', 'quiz', 'unterschied', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'manna', 'worte', 'quiz', 'wolke'])
     for (const s of mose.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
@@ -187,6 +187,24 @@ describe('Mose: the games, and the placeholders until the pictures come', () => 
       expect(dayOk(d, d.jars * 4 + 4, 4)).toBe(false)
     }
     expect(g.background).toBe(stage(12).image)
+  })
+
+  it('15 cloud: five questions by day, five by night; never three times the same in a row; both answers occur in each round; the extras have pictures; the goal is 10', () => {
+    const g = stage(15).task.cloud
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => [r.mode, r.trials.length])).toEqual([['day', 5], ['night', 5]])
+    for (const r of g.rounds) {
+      expect(noTriple(r.trials)).toBe(true)
+      expect(r.trials.some((t) => t.pillar === 'rises')).toBe(true)
+      expect(r.trials.some((t) => t.pillar === 'stays')).toBe(true)
+      for (const t of r.trials) {
+        expect(t.distractors.length).toBeGreaterThanOrEqual(1)
+        for (const d of t.distractors) expect(Object.keys(g.extras).concat('banner')).toContain(d)
+      }
+    }
+    expect(g.rounds[1]!.trials.every((t) => !t.distractors.includes('birds'))).toBe(true)
+    expect(g.rounds.reduce((n, r) => n + r.trials.length, 0)).toBe(10)
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

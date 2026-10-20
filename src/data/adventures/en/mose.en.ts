@@ -232,7 +232,7 @@ export const moseEn: TextOverlay<Journey> = {
         'Then God says to Moses, “Cut two new stone tablets!” Early in the morning Moses climbs the mountain once more. Then God comes down in the cloud and calls out, “God, merciful and gracious, slow to anger, and abounding in love and truth!” Moses bows low and worships. For forty days and nights he stays with God, and when he comes down, his face shines, because he has spoken with God.',
         'Later the people build a great tent, the tent of God, in the middle of the camp, at God’s word. Then the cloud covers the tent, and God’s glory fills it. Whenever the cloud rises, the people set out, and as long as it stays over the tent, they stay where they are. So God goes with his people, by day and by night, all along the way.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Follow the cloud: break up when it rises.', cloud: { rounds: [{ hint: 'When the pillar of cloud rises, the people break up. When it stays, the people stay. Tap when you are sure.' }, { hint: 'Now it is night. The pillar of fire leads the people. Sparks fly, but they are no sign.' }] } },
       questions: [
         { q: 'What does Moses call the tent outside the camp?', options: ['the tent of meeting', 'Pharaoh’s tent', 'the shepherds’ tent'] },
         { q: 'What happens to Moses’ face after he has spoken with God?', options: ['It shines.', 'It turns pale.', 'It grows older.'] }

@@ -37,6 +37,7 @@ import GameConstellation from '@/components/molecules/games/GameConstellation.vu
 import GameSlide from '@/components/molecules/games/GameSlide.vue'
 import GameCrank from '@/components/molecules/games/GameCrank.vue'
 import GameHold from '@/components/molecules/games/GameHold.vue'
+import GameCloud from '@/components/molecules/games/GameCloud.vue'
 import GameManna from '@/components/molecules/games/GameManna.vue'
 import GameDiff from '@/components/molecules/games/GameDiff.vue'
 import GameWords from '@/components/molecules/games/GameWords.vue'
@@ -351,7 +352,7 @@ const hasPart = computed(() => partStars.value > 0 && !progress.finished.value)
 
 /** The games have a restart sign: a new key mounts the game afresh (round, mistakes and what was done begin again). */
 const gameKey = ref(0)
-const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna'] as const
+const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud'] as const
 const hasGame = computed(() => hasCountGame.value || GAME_FIELDS.some((f) => !!gameTask.value?.[f]))
 function restartGame() {
   progress.reset()
@@ -436,6 +437,7 @@ const gameKind = computed(() => {
   if (g?.slide) return 'slide'
   if (g?.crank) return 'crank'
   if (g?.hold) return 'hold'
+  if (g?.cloud) return 'cloud'
   if (g?.manna) return 'manna'
   if (g?.diff) return 'diff'
   if (g?.words) return 'words'
@@ -582,6 +584,7 @@ function openGift() {
         GameSlide(:key="gameKey" v-else-if="gameTask?.slide" :game="gameTask.slide" @done="taskDone")
         GameCrank(:key="gameKey" v-else-if="gameTask?.crank" :game="gameTask.crank" @done="taskDone")
         GameHold(:key="gameKey" v-else-if="gameTask?.hold" :game="gameTask.hold" @done="taskDone")
+        GameCloud(:key="gameKey" v-else-if="gameTask?.cloud" :game="gameTask.cloud" @done="taskDone")
         GameManna(:key="gameKey" v-else-if="gameTask?.manna" :game="gameTask.manna" @done="taskDone")
         GameDiff(:key="gameKey" v-else-if="gameTask?.diff" :game="gameTask.diff" @done="taskDone")
         GameWords(:key="gameKey" v-else-if="gameTask?.words" :game="gameTask.words" @done="taskDone")

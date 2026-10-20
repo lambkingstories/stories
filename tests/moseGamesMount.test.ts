@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { DiffGame, MannaGame, WordsGame } from '@/types/adventure'
+import type { CloudGame, DiffGame, MannaGame, WordsGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -465,5 +465,156 @@ describe('Manna sammeln (manna)', () => {
     expect(w.find('.mn-enough').text()).toBe('Enough')
     await enough(w)
     expect(w.find('.mn-fb').text()).toBe('Today we need one jar.')
+  })
+})
+
+// ---------------------------------------------------------------- follow the cloud
+describe('Der Wolke folgen (cloud)', () => {
+  const game: CloudGame = {
+    dayScene: 'images/x/day.webp',
+    nightScene: 'images/x/night.webp',
+    pillarDay: 'images/x/cloud.webp',
+    pillarNight: 'images/x/fire.webp',
+    extras: { smoke: 'images/x/smoke.webp', birds: 'images/x/bird.webp', sparks: 'images/x/sparks.webp' },
+    rounds: [
+      { hint: 'Runde eins.', mode: 'day', trials: [{ pillar: 'rises', distractors: ['smoke', 'birds'] }, { pillar: 'stays', distractors: ['birds'] }] },
+      { hint: 'Runde zwei.', mode: 'night', trials: [{ pillar: 'stays', distractors: ['sparks'] }, { pillar: 'rises', distractors: ['sparks'] }] }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Cloud } = await import('@/components/molecules/games/GameCloud.vue')
+    const w = mount(Cloud, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  const go = async (w: W) => {
+    await w.findAll('.cd-answers button')[0]!.trigger('click')
+    await flushPromises()
+  }
+  const stay = async (w: W) => {
+    await w.findAll('.cd-answers button')[1]!.trigger('click')
+    await flushPromises()
+  }
+  const rises = (w: W) => w.find('.cd-pillar').classes().includes('rises')
+  /** Answer the trial that is shown right. */
+  const right = async (w: W) => {
+    if (rises(w)) await go(w)
+    else await stay(w)
+  }
+  const wrong = async (w: W) => {
+    if (rises(w)) await stay(w)
+    else await go(w)
+  }
+  const allRight = async (w: W) => {
+    await right(w)
+    await tick(1100)
+    await right(w)
+    await tick(1100)
+    await tick(1600)
+    await right(w)
+    await tick(1100)
+    await right(w)
+    await tick(1100)
+  }
+
+  it('the goal is every question of both rounds; the pillar of cloud by day, it rises first; things drift round it; two buttons answer', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(4)
+    expect(w.find('.cd-round').text()).toContain('Runde 1 von 2')
+    expect(rises(w)).toBe(true)
+    expect(w.find('.cd-field').classes()).not.toContain('night')
+    expect(w.find('.cd-pillar').attributes('aria-label')).toBe('Die Wolkensäule')
+    expect(w.findAll('.cd-extra.smoke')).toHaveLength(2)
+    expect(w.findAll('.cd-extra.birds')).toHaveLength(2)
+    expect(w.findAll('.cd-answers button')).toHaveLength(2)
+    expect(w.find('.cd-count').text()).toBe('Richtige Antworten: 0 von 2')
+  })
+
+  it('the right answer: a tick; the next question comes after a moment (here the pillar stays)', async () => {
+    const w = await open()
+    await go(w)
+    expect(played).toContain('snap')
+    expect(w.find('.cd-fb').text()).toBe('Richtig!')
+    expect(useTaskProgress().parts.value).toBe(1)
+    await go(w)
+    expect(useTaskProgress().parts.value).toBe(1)
+    await tick(1100)
+    expect(rises(w)).toBe(false)
+    expect(w.find('.cd-pillar').classes()).toContain('stays')
+  })
+
+  it('a wrong answer: a cross, a dull sound, a mistake, the right way is told; the same question comes once more at the end of the round', async () => {
+    const w = await open()
+    await stay(w)
+    expect(played).toContain('wrong')
+    expect(w.find('.cd-fb').text()).toContain('Das Volk bricht auf')
+    expect(w.find('.gm.bad').exists()).toBe(true)
+    expect(useTaskProgress().parts.value).toBe(0)
+    await tick(2300)
+    // now the second question (the pillar stays) is shown
+    expect(rises(w)).toBe(false)
+    await stay(w)
+    await tick(1100)
+    // and the first one again at the end
+    expect(rises(w)).toBe(true)
+    await go(w)
+    await tick(1100)
+    await tick(1600)
+    expect(w.find('.cd-round').text()).toContain('Runde 2 von 2')
+    expect(useTaskProgress().parts.value).toBe(2)
+  })
+
+  it('the arrow keys answer: up breaks up, down stays', async () => {
+    const w = await open()
+    await w.find('.cd').trigger('keydown', { key: 'ArrowUp' })
+    expect(useTaskProgress().parts.value).toBe(1)
+    await tick(1100)
+    await w.find('.cd').trigger('keydown', { key: 'ArrowDown' })
+    expect(useTaskProgress().parts.value).toBe(2)
+  })
+
+  it('round 2 is by night: the other scene, the pillar of fire, sparks', async () => {
+    const w = await open()
+    await right(w)
+    await tick(1100)
+    await right(w)
+    await tick(1100)
+    await tick(1600)
+    expect(w.find('.cd-round').text()).toContain('Runde 2 von 2')
+    expect(w.find('.cd-field').classes()).toContain('night')
+    expect(w.find('.cd-field').attributes('style')).toContain('night.webp')
+    expect(w.find('.cd-pillar').attributes('aria-label')).toBe('Die Feuersäule')
+    expect(w.findAll('.cd-extra.sparks')).toHaveLength(2)
+  })
+
+  it('the whole game: the end with three stars; the wrong answers give the stars (one: three, up to three: two, more: one)', async () => {
+    for (const [mistakes, stars] of [[0, 3], [1, 3], [2, 2], [3, 2], [4, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      for (let i = 0; i < mistakes; i++) {
+        await wrong(w)
+        await tick(2300)
+      }
+      // the trials that were wrong are at the end of the round; answer whatever is shown, until the game is over
+      for (let i = 0; i < 30 && !useTaskProgress().finished.value; i++) {
+        await right(w)
+        await tick(2800)
+      }
+      expect(useTaskProgress().parts.value).toBe(4)
+      expect(useTaskProgress().finished.value).toBe(true)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${mistakes} wrong`).toEqual([[stars]])
+      w.unmount()
+    }
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.findAll('.cd-answers button')[0]!.text()).toBe('Break up')
+    expect(w.findAll('.cd-answers button')[1]!.text()).toBe('Stay')
+    await stay(w)
+    expect(w.find('.cd-fb').text()).toContain('the people break up')
   })
 })

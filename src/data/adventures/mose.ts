@@ -12,7 +12,7 @@
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme (Liste der Aufnahmen: D:/Claude/Abenteuer-Mose/NEUAUFNAHME-Mose.md).
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { DiffGame, Journey, MannaGame, WordsGame } from '@/types/adventure'
+import type { CloudGame, DiffGame, Journey, MannaGame, WordsGame } from '@/types/adventure'
 import { josef } from './josef'
 import { MOSE_PATH } from './mosePath'
 import { localize } from './localize'
@@ -87,6 +87,45 @@ const MANNA: MannaGame = {
   rounds: [
     { hint: 'Jeden Tag sammelt ihr zwei Krüge voll. Tippe die Körnchen an und dann „Genug“.', days: [{ jars: 2 }, { jars: 2 }, { jars: 2 }] },
     { hint: 'Am sechsten Tag sammelt ihr doppelt so viel. Am siebten Tag liegt nichts auf dem Boden.', days: [{ jars: 2 }, { jars: 2 }, { jars: 4 }, { jars: 0 }] }
+  ]
+}
+
+/**
+ * Etappe 15, "Der Wolke folgen": die Säule hebt sich (das Volk bricht auf) oder bleibt (das Volk bleibt); ringsum treiben Dinge, die nichts damit zu tun haben; das Kind antwortet, wenn es sicher ist, die Szene
+ * wiederholt sich, bis es antwortet (Bildauftrag M18; eigene Szenen für Tag und Nacht). Runde 1 fünf Fragen am Tag, Runde 2 fünf in der Nacht (Feuersäule als Lichtsäule, ohne Gesicht und ohne Gestalt). Eine falsch
+ * beantwortete Frage kommt am Ende der Runde noch einmal. Nie dreimal dasselbe hintereinander (Test).
+ * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `wolke/tag.webp`, `nacht.webp` je 1000 × 750 (ohne Säule), `saeule-tag.webp`, `saeule-nacht.webp` je 220 × 640 (transparent), `rauch.webp`, `vogel.webp`,
+ * `funken.webp` (transparent).
+ */
+const WOLKE: CloudGame = {
+  dayScene: `${G}wolke/tag.webp`,
+  nightScene: `${G}wolke/nacht.webp`,
+  pillarDay: `${G}wolke/saeule-tag.webp`,
+  pillarNight: `${G}wolke/saeule-nacht.webp`,
+  extras: { smoke: `${G}wolke/rauch.webp`, birds: `${G}wolke/vogel.webp`, sparks: `${G}wolke/funken.webp` },
+  rounds: [
+    {
+      hint: 'Hebt sich die Wolkensäule, bricht das Volk auf. Bleibt sie stehen, bleibt das Volk. Tippe, wenn du sicher bist.',
+      mode: 'day',
+      trials: [
+        { pillar: 'rises', distractors: ['smoke', 'birds'] },
+        { pillar: 'stays', distractors: ['birds'] },
+        { pillar: 'rises', distractors: ['smoke'] },
+        { pillar: 'stays', distractors: ['smoke', 'birds'] },
+        { pillar: 'stays', distractors: ['birds'] }
+      ]
+    },
+    {
+      hint: 'Jetzt ist es Nacht. Die Feuersäule führt das Volk. Funken fliegen, aber das ist kein Zeichen.',
+      mode: 'night',
+      trials: [
+        { pillar: 'stays', distractors: ['sparks'] },
+        { pillar: 'rises', distractors: ['sparks'] },
+        { pillar: 'rises', distractors: ['sparks', 'smoke'] },
+        { pillar: 'stays', distractors: ['sparks'] },
+        { pillar: 'rises', distractors: ['smoke'] }
+      ]
+    }
   ]
 }
 
@@ -391,7 +430,7 @@ export const mose: Journey = {
         'Später baut das Volk auf Gottes Wort ein großes Zelt, das Zelt Gottes, mitten im Lager. Da bedeckt die Wolke das Zelt, und Gottes Herrlichkeit erfüllt es. Immer wenn sich die Wolke erhebt, bricht das Volk auf, und solange sie über dem Zelt bleibt, bleibt es stehen. So geht Gott mit seinem Volk, bei Tag und bei Nacht, auf dem ganzen Weg.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Der Wolke folgen (wolke, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'wolke', hint: 'Folge der Wolke: Breche auf, wenn sie sich hebt.', cloud: WOLKE },
       questions: [
         { q: 'Wie nennt Mose das Zelt vor dem Lager?', options: ['Zelt der Begegnung', 'Zelt des Pharao', 'Zelt der Hirten'], answer: 0 },
         { q: 'Was geschieht mit Moses Gesicht, nachdem er mit Gott geredet hat?', options: ['Es glänzt.', 'Es wird blass.', 'Es wird älter.'], answer: 0 }
