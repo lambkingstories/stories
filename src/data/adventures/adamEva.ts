@@ -6,8 +6,8 @@
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/adam-eva/, images/abenteuer/spiele/adam-eva/<spiel>/, audio/abenteuer/adam-eva/.
  *
- * STAND: Etappen noch `soon` (nicht spielbar), bis die Bilder (Panorama, Etappenbilder, Medaille, Spielbilder) und die Vorlese-Aufnahmen eingebaut sind.
- * Zahlen, die aus Messdateien der Bilder kommen, sind mit PLATZHALTER markiert und werden beim Einbau durch die gemessenen ersetzt.
+ * STAND 20.10.2026: alle Bilder (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder), Messwerte, Vorlese-Aufnahmen (Deutsch und Englisch) und Musik sind eingebaut, die Etappen sind spielbar.
+ * Das Abenteuer ist aber nicht öffentlich: es ist hinter `comingSoon` und dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
 import type { ChannelGame, EchoGame, HerdGame, Journey, LightGame, MirrorGame, OrderGame, SowGame, VerseGame } from '@/types/adventure'
 import { ADAM_EVA_PATH } from './adamEvaPath'
@@ -18,8 +18,8 @@ import { adamEvaEn } from './en/adamEva.en'
 const IMG = 'images/abenteuer/adam-eva/'
 const G = 'images/abenteuer/spiele/adam-eva/'
 const REC = 'audio/abenteuer/adam-eva/'
-/** Alle Etappen sind noch nicht spielbar; beim Einbau der Bilder und Töne auf `false` setzen. */
-const SOON = true
+/** `true` = die Etappen sind noch nicht spielbar (Gerüst); jetzt sind alle Bilder und Töne eingebaut. */
+const SOON = false
 
 /** Etappe 1, "Reihenfolge legen": vier Bilder der ersten drei Schöpfungstage in der Reihenfolge der Erzählung (Bildauftrag 08). */
 const ORDER: OrderGame = {
@@ -197,7 +197,7 @@ export const adamEva: Journey = {
   title: 'Adam und Eva',
   subtitle: 'Der Garten Eden',
   age: '8-10',
-  downloadMb: 1, // beim Einbau neu zählen (der Test sagt die echte Größe)
+  downloadMb: 11, // 10,6 MB gezählt am 20.10.2026 (der Test sagt die echte Größe)
   medal: `${IMG}medaille.webp`, // Der Garten Eden (Lichtung mit Strom, Bäumen und warmem Morgenlicht, ohne Menschen)
   // Geschenk-Ausmalbild: Adam und Eva im Garten mit den Tieren, im Hintergrund der Baum des Lebens (nur Geschenk, nicht mehr Aufgabe der Etappe 9)
   gift: { title: 'Adam und Eva im Garten', image: `${IMG}geschenk.webp` },
