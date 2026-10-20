@@ -68,12 +68,12 @@ const ZAEHLEN_GRUPPEN: CountGroup[] = [
 
 /**
  * Etappe 3, "Sternbild nachlegen": ein Rahmen am Nachthimmel (Etappenbild 3); der Stern ist der Goldstern der Oberfläche, Rahmen und Vorbild macht die App.
- * PLATZHALTER: der Rahmen (Prozent des Etappenbildes) muss auf freiem Himmel liegen (mindestens 40 % der Breite, oben); er wird am Etappenbild geprüft.
+ * Der Rahmen (Prozent des Etappenbildes 3) liegt auf dem freien Nachthimmel rechts von Abrahams Kopf und Hand (Milchstraße), oberhalb der Berge; das Vorbild steht klein links oben.
  */
 const STERNBILD: ConstellationGame = {
   background: `${IMG}etappe-bild-03.webp`,
   star: 'images/abenteuer/ui/stern-gold-1.webp',
-  frame: { x: 32, y: 6, w: 60, h: 44 },
+  frame: { x: 54, y: 3, w: 44, h: 32 },
   rounds: [
     { hint: 'Das Vorbild bleibt sichtbar: vier Sterne.', showAlways: true, targets: [[18, 72], [42, 28], [68, 58], [86, 20]] },
     { hint: 'Schau gut hin: Das Vorbild verschwindet. Sechs Sterne.', showAlways: false, targets: [[10, 62], [26, 24], [48, 48], [60, 14], [76, 66], [90, 30]] }
