@@ -14,12 +14,12 @@ export const abrahamEn: TextOverlay<Journey> = {
     {
       title: 'The Call',
       ref: 'Genesis 12:1–9',
-      audio: 'audio/abenteuer/abraham/geschichte-01-en-v1.mp3',
+      audio: 'audio/abenteuer/abraham/geschichte-01-en-v2.mp3',
       text: [
-        'After the people of Babel have scattered over the whole earth, God calls one single man. His name is Abram, and he lives in Haran with his wife Sarai.',
-        'God says to him, “Leave your country, your family, and your father’s house, and go to the land that I will show you. I will make you a great nation and bless you. And through you all the families of the earth will be blessed.”',
-        'Abram trusts God and sets out. He is seventy-five years old. Sarai goes with him, and so does his nephew Lot, along with the servants and shepherds with their sheep, goats, and camels. A long caravan sets out, carrying everything they own.',
-        'They travel into the land of Canaan. At the great trees of Shechem, God says, “I will give this land to your descendants.” So Abram builds an altar to thank God. Later he builds another one near Bethel and pitches his tent there. Then he travels on toward the south.'
+        'After the tower of Babel, the people spread out over the whole earth, but God did not lose sight of them. In the city of Haran lives a man named Abram with his wife Sarai, and it is him that God calls, so that something completely new can begin through him.',
+        'One day God says to him, “Leave your country, your relatives, and your father’s house, and go to the land that I will show you. I will make you a great nation and bless you, and you will be a blessing yourself. Through you all the families of the earth will be blessed.”',
+        'Abram does not ask for long where he is going. He trusts God and sets out, even though he is already seventy-five years old. His wife Sarai goes with him, and so does his nephew Lot, along with all the people who belong to them, and they take everything they own.',
+        'So they travel into the land of Canaan, as far as the great trees at Shechem. There God says to Abram, “I will give this land to your descendants.” Then Abram builds an altar to thank God. After that he moves on to the hills near Bethel, pitches his tent, builds another altar, and prays to God.'
       ],
       task: { hint: 'Put the packs in the baskets so that the camel stands straight.', balance: { packs: [{ label: 'small sack' }, { label: 'small sack' }, { label: 'small sack' }, { label: 'water skin' }, { label: 'water skin' }, { label: 'water skin' }, { label: 'water skin' }, { label: 'big sack' }, { label: 'big sack' }, { label: 'big sack' }], rounds: [{ hint: 'Round 1: Spread the three packs over both sides.' }, { hint: 'Round 2: Now there are more and heavier packs.' }] } },
       questions: [
@@ -30,12 +30,12 @@ export const abrahamEn: TextOverlay<Journey> = {
     {
       title: 'Abram and Lot',
       ref: 'Genesis 13',
-      audio: 'audio/abenteuer/abraham/geschichte-02-en-v1.mp3',
+      audio: 'audio/abenteuer/abraham/geschichte-02-en-v2.mp3',
       text: [
-        'Abram has become rich in sheep, goats, and camels, and Lot has large herds, too. But the land is not big enough for both of them. Soon there is quarreling between their shepherds.',
-        'So Abram says to Lot, “There must be no quarreling between you and me, or between our shepherds. We are family! Let us go our separate ways. You choose first where you want to go.”',
-        'Lot looks around. He sees the wide plain along the Jordan River. It is green and well watered, like a garden of God. Lot chooses this plain and goes there with his herds. So the two part in peace.',
-        'Abram stays in the land of Canaan. Then God says to him, “Look around in every direction! All the land that you see I will give to you and your descendants. They will be as many as the dust of the earth.” Abram pitches his tent by the great oaks of Mamre and builds an altar there for God.'
+        'Abram has become rich, and Lot, too, has large herds and many tents. But the land is too small for the two of them. Soon there is quarreling between Abram’s shepherds and Lot’s shepherds.',
+        'When Abram hears this, he goes to Lot and says, “There must be no quarreling between you and me, or between our shepherds, because we are family. The whole land lies before you. Let us part. Choose where you want to go, and I will go the other way.” Abram is the older one, and yet he lets Lot choose first.',
+        'Lot looks around. He sees the wide plain along the Jordan River, green and well watered, as lovely as a garden of God. Lot chooses this plain and goes east with his herds, and he pitches his tents near the city of Sodom. But the people of Sodom are wicked in God’s eyes.',
+        'Abram stays in the land of Canaan. Then God says to him, “Look around, to the north and the south, to the east and the west! All the land that you see I will give to you and your descendants forever. They will be as many as the dust of the earth.” So Abram moves on and pitches his tent by the great oaks of Mamre.'
       ],
       task: { hint: 'Tap the animals and count them.', question: 'How many animals are there together?' },
       questions: [
@@ -46,12 +46,12 @@ export const abrahamEn: TextOverlay<Journey> = {
     {
       title: 'The Stars',
       ref: 'Genesis 15:1–6',
-      audio: 'audio/abenteuer/abraham/geschichte-03-en-v1.mp3',
+      audio: 'audio/abenteuer/abraham/geschichte-03-en-v2.mp3',
       text: [
-        'Abram and Sarai have grown old, and they still have no child. Abram sits in front of his tent and waits for what God has promised.',
-        'Then God speaks to him, “Do not be afraid, Abram! I am your shield.” Sadly Abram answers, “I have no son. Who will get everything I own one day? Maybe one of my servants?” God says, “No. Your own son will be your heir.”',
-        'Then God leads Abram out of the tent into the night. “Look up at the sky,” he says, “and count the stars, if you can!” Abram looks up. The sky sparkles, there are so many stars. “That is how many descendants you will have,” says God.',
-        'Abram cannot count them. But he believes what God has promised him. That is good in God’s eyes.'
+        'Many years have passed, and Abram and Sarai still have no child. One day God’s word comes to Abram, “Do not be afraid, Abram! I am your shield, and I will reward you greatly.”',
+        'Sadly Abram answers, “Lord, what can you give me? I have no son. When I die, one of my servants will get everything I own.” But God says, “No, this servant will not be your heir, but your own son.”',
+        'Then God leads Abram outside, under the night sky. “Look up at the sky,” he says, “and count the stars, if you can!” Abram looks up. The sky sparkles with countless stars. “That is how many descendants you will have,” says God.',
+        'Abram cannot count them, there are so many. But he believes what God promises him, even though he and Sarai are old and still have no child. And God counts this trust as righteousness: in God’s eyes, Abram stands right before him.'
       ],
       task: { hint: 'Place the stars the way you see them in the model.', constellation: { rounds: [{ hint: 'Round 1: The model stays visible: four stars.' }, { hint: 'Round 2: Look closely: The model disappears. Six stars.' }] } },
       questions: [
@@ -62,13 +62,13 @@ export const abrahamEn: TextOverlay<Journey> = {
     {
       title: 'A Visit at the Oaks',
       ref: 'Genesis 18:1–15',
-      audio: 'audio/abenteuer/abraham/geschichte-04-en-v1.mp3',
+      audio: 'audio/abenteuer/abraham/geschichte-04-en-v2.mp3',
       text: [
-        'Meanwhile God has given Abram and Sarai new names. Abram is now called Abraham, which means “father of many,” and Sarai is called Sarah. Both have grown very old.',
-        'It is noon, and the sun is burning hot. Abraham is sitting at the entrance of his tent by the great oaks of Mamre. There God visits him, so the Bible tells us. Abraham sees three men standing in front of him, travelers in dusty cloaks.',
-        'He runs to meet them and bows. “Please stay with me,” he says. “I will bring water for your feet, and you can rest under the tree.” He calls to Sarah, “Quick, bake bread!” He fetches a young calf. Then he sets bread, butter, milk, and the meat in front of his guests and stays near them under the tree while they eat.',
-        '“Where is Sarah, your wife?” the men ask. “In the tent,” says Abraham. Then one says, “In a year I will come back. By then Sarah will have a son.” Sarah hears it behind the tent door. She laughs quietly to herself, “I am much too old!”',
-        '“Why is Sarah laughing?” asks the guest. “Is anything too hard for God?” Sarah is startled and says, “I did not laugh.” But he answers, “Yes, you did laugh.”'
+        'Meanwhile God has given Abram and Sarai new names: Abram is now called Abraham, which means “father of many,” and Sarai is called Sarah. Both have grown very old.',
+        'It is noon and hot. Abraham is sitting at the entrance of his tent by the great oaks of Mamre when God visits him, so the Bible tells us. He looks up and sees three men standing in front of him.',
+        'At once he runs to meet them and bows low. “Please stay with me,” he says. “I will have water brought so you can wash your feet, and you can rest under the tree. I will fetch a bit of bread.” Then he hurries into the tent to Sarah, “Quick, bake bread for our guests!” And he picks out a young calf.',
+        'When everything is ready, Abraham sets bread, butter, milk, and meat in front of the men. “Where is Sarah, your wife?” they ask. “In the tent,” he answers. Then one of them says, “In a year I will come back to you, and Sarah will have a son.”',
+        'Sarah is standing behind the tent door and hears it. She laughs quietly, “I am much too old for that!” “Why is Sarah laughing?” asks the guest. “Is anything too hard for God?” Sarah is startled, “I did not laugh.” But he answers, “Yes, you did laugh.”'
       ],
       task: { hint: 'Fill the jug at the well and pour the water into the guests’ bowls.', water: { plants: [{ label: 'Bowl for the first guest' }, { label: 'Bowl for the second guest' }, { label: 'Bowl for the third guest' }, { label: 'Deep bowl for the first guest' }, { label: 'Deep bowl for the second guest' }, { label: 'Deep bowl for the third guest' }], rounds: [{ hint: 'Round 1: Each bowl needs one jug.' }, { hint: 'Round 2: The deep bowls need two jugs.' }] } },
       questions: [
@@ -79,12 +79,12 @@ export const abrahamEn: TextOverlay<Journey> = {
     {
       title: 'Isaac',
       ref: 'Genesis 21:1–7',
-      audio: 'audio/abenteuer/abraham/geschichte-05-en-v1.mp3',
+      audio: 'audio/abenteuer/abraham/geschichte-05-en-v2.mp3',
       text: [
-        'A year goes by. Then what God promised happens: Sarah has a son, at exactly the time God had said. Abraham is one hundred years old.',
-        'Abraham gives the child the name God told him: Isaac. It means “he laughs.”',
-        'Sarah holds her son in her arms and says, “God has given me laughter. Everyone who hears about it will laugh with me.” And she says, “Who would ever have told Abraham that Sarah would have children? And now I have borne him a son in his old age.”',
-        'There is a baby in the tent now. Sarah laughs, and Abraham laughs. God has kept his word.'
+        'A year goes by, and then exactly what God promised happens: Sarah has a son, at the very time God had named. Twenty-five years have passed since Abraham left Haran, and now he is one hundred years old.',
+        'Abraham gives the child the name God told him: Isaac. It means “he laughs,” and no name could fit this story better.',
+        'Sarah holds her son in her arms and says, “God has given me laughter. Everyone who hears about it will laugh with me.” And she adds, “Who would ever have told Abraham that Sarah would have a child at her breast? And now I have borne him a son, even though he is so old.”',
+        'Now there is a baby in the tent, one that the two of them have waited for so long. Sarah laughs, Abraham laughs, and both know: God has kept his word.'
       ],
       task: { hint: 'Put the family picture together.' },
       questions: [
@@ -95,12 +95,13 @@ export const abrahamEn: TextOverlay<Journey> = {
     {
       title: 'God Provides',
       ref: 'Genesis 22:1–14',
-      audio: 'audio/abenteuer/abraham/geschichte-06-en-v1.mp3',
+      audio: 'audio/abenteuer/abraham/geschichte-06-en-v2.mp3',
       text: [
-        'Isaac has grown into a boy. Then God tests Abraham, because he wants to see whether Abraham trusts him completely. “Abraham!” God calls. “Here I am.” God says, “Take Isaac, your son, whom you love so much, and go with him to the land of Moriah. On a mountain that I will show you, you are to offer him to me.” That is a hard test. But Abraham knows God, who has always kept his word.',
-        'Early the next morning Abraham loads his donkey with wood and sets out with Isaac and two servants. On the third day he sees the mountain. “Stay here with the donkey,” he says to the servants. “The boy and I will go up there, and we will come back to you.”',
-        'Isaac carries the wood on his shoulders. “Father,” he asks, “where is the animal for the offering?” Abraham answers, “My son, God himself will provide the animal for the offering.”',
-        'At the top Abraham builds an altar and lays the wood ready. Then a voice calls from heaven, “Abraham! Abraham!” He answers, “Here I am.” “Do not harm the boy! Now I know that you trust God.” Abraham looks up and sees a ram caught by its horns in a thicket. He offers it to God in Isaac’s place. Isaac stands next to him, safe and sound. Abraham calls the place “God Provides.”'
+        'Isaac has grown into a boy. One day God wants to see whether Abraham trusts him completely. “Abraham!” he calls. “Here I am.” And God says, “Take Isaac, your son, whom you love so much, and go with him to the land of Moriah. On a mountain that I will show you, you are to offer him to me.” A hard test, yet Abraham trusts God.',
+        'The next morning Abraham loads his donkey with wood and sets out with Isaac and two servants. On the third day he sees the mountain and says to the servants, “Stay here with the donkey. The boy and I will go up there to pray, and then we will come back to you.”',
+        'Isaac carries the wood up the mountain. He asks, “Father, where is the animal for the offering?” Abraham answers, “My son, God himself will provide the animal for the offering.”',
+        'At the top Abraham builds an altar and lays the wood ready. Then a voice calls from heaven, “Abraham! Abraham!” “Here I am,” he answers. “Do not harm the boy!” says the voice. “Now I know that you trust God.”',
+        'Abraham looks up and sees a ram caught by its horns in a thicket. He offers it to God in Isaac’s place. Isaac stands safe and sound next to his father, and Abraham calls the place “God Provides.”'
       ],
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [

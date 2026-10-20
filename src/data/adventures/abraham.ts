@@ -136,12 +136,12 @@ export const abraham: Journey = {
       image: `${IMG}etappe-bild-01.webp`,
       title: 'Der Ruf',
       ref: '1. Mose 12,1–9',
-      audio: `${REC}geschichte-01-v1.mp3`,
+      audio: `${REC}geschichte-01-v2.mp3`,
       text: [
-        'Als sich die Menschen nach Babel über die ganze Erde verteilt haben, ruft Gott einen einzelnen Mann. Er heißt Abram und wohnt mit seiner Frau Sarai in Haran.',
-        'Gott sagt zu ihm: „Geh aus deinem Land, weg von deiner Familie und aus dem Haus deines Vaters, in das Land, das ich dir zeigen werde. Ich will dich zu einem großen Volk machen und dich segnen. Und durch dich sollen alle Familien auf der Erde gesegnet werden.“',
-        'Abram vertraut Gott und macht sich auf den Weg. Er ist fünfundsiebzig Jahre alt. Sarai geht mit ihm und sein Neffe Lot, dazu die Knechte und Hirten mit den Schafen, den Ziegen und den Kamelen. Ein langer Zug macht sich auf, mit allem, was sie besitzen.',
-        'Sie ziehen in das Land Kanaan. Bei den großen Bäumen von Sichem sagt Gott: „Dieses Land will ich deinen Nachkommen geben.“ Da baut Abram einen Altar, um Gott zu danken. Später baut er noch einen bei Bethel und schlägt dort sein Zelt auf. Dann zieht er weiter nach Süden.'
+        'Nach dem Turm von Babel haben sich die Menschen über die ganze Erde verteilt, aber Gott hat sie nicht aus den Augen verloren. In der Stadt Haran wohnt ein Mann namens Abram mit seiner Frau Sarai, und gerade ihn ruft Gott, damit durch ihn etwas ganz Neues beginnt.',
+        'Eines Tages spricht Gott zu ihm: „Zieh fort aus deinem Land, weg von deiner Verwandtschaft und aus dem Haus deines Vaters, in das Land, das ich dir zeigen werde. Ich will dich zu einem großen Volk machen und dich segnen, und du sollst selbst ein Segen sein. Durch dich sollen alle Familien auf der Erde gesegnet werden.“',
+        'Abram fragt nicht lange nach dem Wohin. Er vertraut Gott und bricht auf, obwohl er schon fünfundsiebzig Jahre alt ist. Seine Frau Sarai geht mit ihm und sein Neffe Lot, dazu alle Leute, die zu ihnen gehören, und alles, was sie besitzen, nehmen sie mit.',
+        'So ziehen sie in das Land Kanaan hinein, bis zu den großen Bäumen bei Sichem. Dort spricht Gott zu Abram: „Dieses Land will ich deinen Nachkommen geben.“ Da baut Abram einen Altar, um Gott zu danken. Dann wandert er weiter zu den Bergen bei Bethel, schlägt sein Zelt auf, baut noch einen Altar und betet zu Gott.'
       ],
       task: { kind: 'waage', hint: 'Lege die Pakete so in die Körbe, dass das Kamel gerade steht.', balance: WAAGE },
       questions: [
@@ -155,12 +155,12 @@ export const abraham: Journey = {
       image: `${IMG}etappe-bild-02.webp`,
       title: 'Abram und Lot',
       ref: '1. Mose 13',
-      audio: `${REC}geschichte-02-v1.mp3`,
+      audio: `${REC}geschichte-02-v2.mp3`,
       text: [
-        'Abram ist reich geworden an Schafen, Ziegen und Kamelen, und auch Lot hat große Herden. Aber das Land ist nicht groß genug für beide. Bald gibt es Streit zwischen ihren Hirten.',
-        'Da sagt Abram zu Lot: „Es soll kein Streit sein zwischen dir und mir und zwischen unseren Hirten. Wir gehören doch zur selben Familie! Lass uns getrennte Wege gehen. Such du dir zuerst aus, wohin du ziehen willst.“',
-        'Lot schaut sich um. Er sieht die weite Ebene am Fluss Jordan. Sie ist grün und gut bewässert, wie ein Garten Gottes. Lot wählt diese Ebene und zieht mit seinen Herden dorthin. So gehen die beiden in Frieden auseinander.',
-        'Abram bleibt im Land Kanaan. Da sagt Gott zu ihm: „Schau dich um, nach allen Seiten! Das ganze Land, das du siehst, will ich dir und deinen Nachkommen geben. Sie werden so viele sein wie der Staub auf der Erde.“ Abram stellt sein Zelt bei den großen Eichen von Mamre auf und baut dort einen Altar für Gott.'
+        'Abram ist reich geworden, und auch Lot hat große Herden und viele Zelte. Doch das Land ist zu klein für sie beide. Schon bald gibt es Streit zwischen den Hirten von Abram und den Hirten von Lot.',
+        'Als Abram das hört, geht er zu Lot und sagt: „Es soll kein Streit sein zwischen dir und mir und zwischen unseren Hirten, denn wir gehören doch zu einer Familie. Das ganze Land liegt vor dir. Lass uns auseinandergehen. Such dir aus, wohin du ziehen willst, und ich gehe in die andere Richtung.“ Dabei ist Abram der Ältere, und trotzdem darf Lot zuerst wählen.',
+        'Lot schaut sich um. Er sieht die weite Ebene am Fluss Jordan, grün und gut bewässert, so schön wie ein Garten Gottes. Lot wählt diese Ebene und zieht mit seinen Herden nach Osten, und er schlägt seine Zelte in der Nähe der Stadt Sodom auf. Die Menschen in Sodom sind allerdings böse vor Gott.',
+        'Abram bleibt im Land Kanaan. Da sagt Gott zu ihm: „Schau dich um, nach Norden und Süden, nach Osten und Westen! Das ganze Land, das du siehst, will ich dir und deinen Nachkommen für immer geben. Sie werden so viele sein wie der Staub auf der Erde.“ Da zieht Abram weiter und stellt sein Zelt bei den großen Eichen von Mamre auf.'
       ],
       task: { kind: 'zaehlen', hint: 'Tippe die Tiere an und zähle sie.', count: 13, image: '', question: 'Wie viele Tiere sind es zusammen?', background: `${IMG}etappe-bild-02.webp`, groups: ZAEHLEN_GRUPPEN },
       questions: [
@@ -174,12 +174,12 @@ export const abraham: Journey = {
       image: `${IMG}etappe-bild-03.webp`,
       title: 'Die Sterne',
       ref: '1. Mose 15,1–6',
-      audio: `${REC}geschichte-03-v1.mp3`,
+      audio: `${REC}geschichte-03-v2.mp3`,
       text: [
-        'Abram und Sarai sind alt geworden, und noch immer haben sie kein Kind. Abram sitzt vor seinem Zelt und wartet auf das, was Gott versprochen hat.',
-        'Da spricht Gott zu ihm: „Fürchte dich nicht, Abram! Ich bin dein Schutz.“ Abram antwortet traurig: „Ich habe keinen Sohn. Wer soll einmal alles bekommen, was ich habe? Vielleicht einer meiner Knechte?“ Gott sagt: „Nein. Dein eigener Sohn soll dein Erbe sein.“',
-        'Dann führt Gott Abram aus dem Zelt hinaus in die Nacht. „Sieh zum Himmel“, sagt er, „und zähle die Sterne, wenn du kannst!“ Abram schaut hinauf. Der Himmel funkelt, so viele Sterne sind da. „So viele sollen deine Nachkommen sein“, sagt Gott.',
-        'Abram kann sie nicht zählen. Aber er glaubt Gott, was er ihm versprochen hat. Das ist gut in Gottes Augen.'
+        'Viele Jahre sind vergangen, und Abram und Sarai haben immer noch kein Kind. Eines Tages kommt Gottes Wort zu Abram: „Fürchte dich nicht, Abram! Ich bin dein Schutz, und ich werde dich reich belohnen.“',
+        'Abram antwortet traurig: „Herr, was willst du mir schon geben? Ich habe keinen Sohn. Wenn ich sterbe, wird einer meiner Knechte alles bekommen, was ich habe.“ Aber Gott sagt: „Nein, nicht dieser Knecht soll dein Erbe sein, sondern dein eigener Sohn.“',
+        'Dann führt Gott Abram hinaus unter den Nachthimmel. „Sieh zum Himmel“, sagt er, „und zähle die Sterne, wenn du es kannst!“ Abram schaut hinauf. Der Himmel funkelt von unzähligen Sternen. „So viele sollen deine Nachkommen sein“, sagt Gott.',
+        'Abram kann sie nicht zählen, so viele sind es. Doch er glaubt, was Gott ihm verspricht, obwohl er und Sarai alt sind und noch immer kein Kind haben. Und Gott rechnet ihm dieses Vertrauen als Gerechtigkeit an: In Gottes Augen steht Abram richtig vor ihm.'
       ],
       task: { kind: 'sternbild', hint: 'Setze die Sterne so, wie du sie im Vorbild siehst.', constellation: STERNBILD },
       questions: [
@@ -193,13 +193,13 @@ export const abraham: Journey = {
       image: `${IMG}etappe-bild-04.webp`,
       title: 'Besuch bei den Eichen',
       ref: '1. Mose 18,1–15',
-      audio: `${REC}geschichte-04-v1.mp3`,
+      audio: `${REC}geschichte-04-v2.mp3`,
       text: [
-        'Inzwischen hat Gott Abram und Sarai neue Namen gegeben. Abram heißt jetzt Abraham, das bedeutet „Vater vieler“, und Sarai heißt Sara. Beide sind sehr alt geworden.',
-        'Es ist Mittag, und die Sonne brennt heiß. Abraham sitzt am Eingang seines Zeltes bei den großen Eichen von Mamre. Dort besucht ihn Gott, so erzählt die Bibel. Abraham sieht drei Männer vor sich stehen, Reisende in staubigen Mänteln.',
-        'Er läuft ihnen entgegen und verneigt sich. „Bleibt doch bei mir“, sagt er, „ich hole Wasser für eure Füße, und ihr ruht euch unter dem Baum aus.“ Er ruft Sara: „Schnell, back Brot!“ Er holt ein junges Kalb. Dann stellt er Brot, Butter, Milch und das Fleisch vor seine Gäste und bleibt unter dem Baum bei ihnen, während sie essen.',
-        '„Wo ist Sara, deine Frau?“, fragen die Männer. „Drinnen im Zelt“, sagt Abraham. Da sagt einer: „In einem Jahr komme ich wieder. Dann hat Sara einen Sohn.“ Sara hört es hinter der Zelttür. Sie lacht leise in sich hinein: „Ich bin doch viel zu alt!“',
-        '„Warum lacht Sara?“, fragt der Gast. „Ist für Gott etwas zu schwer?“ Sara erschrickt und sagt: „Ich habe nicht gelacht.“ Aber er antwortet: „Doch, du hast gelacht.“'
+        'Inzwischen hat Gott Abram und Sarai neue Namen gegeben: Abram heißt jetzt Abraham, das bedeutet „Vater vieler“, und Sarai heißt Sara. Beide sind sehr alt geworden.',
+        'Es ist heißer Mittag. Abraham sitzt am Eingang seines Zeltes bei den großen Eichen von Mamre, als Gott ihn besucht, so erzählt es die Bibel. Er blickt auf und sieht drei Männer vor sich stehen.',
+        'Sofort läuft er ihnen entgegen und verneigt sich tief. „Bleibt doch bei mir“, bittet er, „ich lasse Wasser bringen, damit ihr eure Füße waschen könnt, und ruht euch unter dem Baum aus. Ich hole auch einen Bissen Brot.“ Dann eilt er zu Sara ins Zelt: „Schnell, back Brot für unsere Gäste!“ Und er sucht ein junges Kalb aus.',
+        'Als alles bereit ist, stellt Abraham Brot, Butter, Milch und Fleisch vor die Männer. „Wo ist Sara, deine Frau?“, fragen sie. „Drinnen im Zelt“, antwortet er. Da sagt einer von ihnen: „In einem Jahr komme ich wieder zu dir, dann hat Sara einen Sohn.“',
+        'Sara steht hinter der Zelttür und hört es. Sie lacht leise: „Ich bin doch viel zu alt dafür!“ „Warum lacht Sara?“, fragt der Gast. „Ist für Gott irgendetwas zu schwer?“ Sara erschrickt: „Ich habe nicht gelacht.“ Doch er antwortet: „Doch, du hast gelacht.“'
       ],
       task: { kind: 'giessen', hint: 'Fülle den Krug am Brunnen und gieße das Wasser in die Schüsseln der Gäste.', water: GIESSEN },
       questions: [
@@ -213,12 +213,12 @@ export const abraham: Journey = {
       image: `${IMG}etappe-bild-05.webp`,
       title: 'Isaak',
       ref: '1. Mose 21,1–7',
-      audio: `${REC}geschichte-05-v1.mp3`,
+      audio: `${REC}geschichte-05-v2.mp3`,
       text: [
-        'Ein Jahr vergeht. Dann geschieht, was Gott versprochen hat: Sara bekommt einen Sohn, genau zu der Zeit, die Gott gesagt hat. Abraham ist hundert Jahre alt.',
-        'Abraham gibt dem Kind den Namen, den Gott ihm genannt hat: Isaak. Das bedeutet „er lacht“.',
-        'Sara hält ihren Sohn im Arm und sagt: „Gott hat mir ein Lachen geschenkt. Jeder, der davon hört, wird mit mir lachen.“ Und sie sagt: „Wer hätte Abraham je gesagt, dass Sara Kinder bekommt? Und nun habe ich ihm doch einen Sohn geboren, als er alt war.“',
-        'Im Zelt liegt nun ein Baby. Sara lacht, und Abraham lacht. Gott hat Wort gehalten.'
+        'Ein Jahr geht ins Land, und dann geschieht genau das, was Gott versprochen hat: Sara bekommt einen Sohn, zu der Zeit, die Gott genannt hat. Fünfundzwanzig Jahre sind vergangen, seit Abraham damals von Haran aufgebrochen ist, und nun ist er hundert Jahre alt.',
+        'Abraham gibt dem Kind den Namen, den Gott ihm genannt hat: Isaak. Das bedeutet „er lacht“, und besser könnte kein Name zu dieser Geschichte passen.',
+        'Sara hält ihren Sohn im Arm und sagt: „Gott hat mir ein Lachen geschenkt. Jeder, der davon hört, wird mit mir lachen.“ Und sie fügt hinzu: „Wer hätte Abraham je gesagt, dass Sara einmal ein Kind an ihrer Brust haben wird? Und nun habe ich ihm doch einen Sohn geboren, obwohl er schon so alt ist.“',
+        'Nun liegt ein Baby im Zelt, auf das die beiden so lange gewartet haben. Sara lacht, Abraham lacht, und beide wissen: Gott hat sein Wort gehalten.'
       ],
       task: { kind: 'puzzle', hint: 'Setze das Familienbild zusammen.', puzzle: { image: `${G}puzzle/familie.webp`, cols: 2, rows: 3 } },
       questions: [
@@ -232,12 +232,13 @@ export const abraham: Journey = {
       image: `${IMG}etappe-bild-06.webp`,
       title: 'Gott sorgt',
       ref: '1. Mose 22,1–14',
-      audio: `${REC}geschichte-06-v1.mp3`,
+      audio: `${REC}geschichte-06-v2.mp3`,
       text: [
-        'Isaak ist ein Junge geworden. Da prüft Gott Abraham, denn er will sehen, ob Abraham ihm ganz vertraut. „Abraham!“, ruft Gott. „Hier bin ich.“ Gott sagt: „Nimm Isaak, deinen Sohn, den du so lieb hast, und geh mit ihm in das Land Morija. Auf einem Berg, den ich dir zeige, sollst du ihn mir opfern.“ Das ist eine schwere Prüfung. Aber Abraham kennt Gott, der immer Wort gehalten hat.',
-        'Früh am nächsten Morgen belädt Abraham seinen Esel mit Holz und geht mit Isaak und zwei Knechten los. Am dritten Tag sieht er den Berg. „Bleibt hier mit dem Esel“, sagt er zu den Knechten. „Der Junge und ich gehen hinauf, und wir kommen wieder zu euch zurück.“',
-        'Isaak trägt das Holz auf den Schultern. „Vater“, fragt er, „wo ist das Tier für das Opfer?“ Abraham antwortet: „Mein Sohn, Gott wird selbst für das Opfertier sorgen.“',
-        'Oben baut Abraham einen Altar und legt das Holz bereit. Da ruft eine Stimme vom Himmel: „Abraham! Abraham!“ Er antwortet: „Hier bin ich.“ „Tu dem Jungen nichts! Nun weiß ich, dass du Gott vertraust.“ Abraham blickt auf und sieht einen Widder, der sich mit den Hörnern im Gebüsch verfangen hat. Den bringt er Gott als Opfer, an Isaaks Stelle. Isaak steht gesund neben ihm. Abraham nennt den Ort „Gott sorgt“.'
+        'Isaak ist ein Junge geworden. Eines Tages will Gott sehen, ob Abraham ihm ganz vertraut. „Abraham!“, ruft er. „Hier bin ich.“ Und Gott sagt: „Nimm Isaak, deinen Sohn, den du so lieb hast, und geh mit ihm in das Land Morija. Auf einem Berg, den ich dir zeige, sollst du ihn mir opfern.“ Eine schwere Prüfung, doch Abraham vertraut Gott.',
+        'Am nächsten Morgen belädt Abraham seinen Esel mit Holz und macht sich mit Isaak und zwei Knechten auf den Weg. Am dritten Tag sieht er den Berg und sagt zu den Knechten: „Bleibt hier mit dem Esel. Der Junge und ich gehen hinauf, um zu beten, und dann kommen wir wieder zu euch zurück.“',
+        'Isaak trägt das Holz den Berg hinauf. Unterwegs fragt er: „Vater, wo ist das Tier für das Opfer?“ Abraham antwortet: „Mein Sohn, Gott wird selbst für das Opfertier sorgen.“',
+        'Oben baut Abraham einen Altar und legt das Holz bereit. Da ruft eine Stimme vom Himmel: „Abraham! Abraham!“ „Hier bin ich“, antwortet er. „Tu dem Jungen nichts!“, sagt die Stimme. „Jetzt weiß ich, dass du Gott vertraust.“',
+        'Abraham blickt auf und sieht einen Widder, der sich mit den Hörnern in einem Gebüsch verfangen hat. Den bringt er Gott als Opfer, an Isaaks Stelle. Isaak steht gesund neben seinem Vater, und Abraham nennt den Ort „Gott sorgt“.'
       ],
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
