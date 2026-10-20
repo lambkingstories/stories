@@ -16,6 +16,7 @@ import {
   isEven,
   positionAt,
   rangeAbout,
+  ringSlots,
   rightRange,
   roadLength,
   scatter,
@@ -211,6 +212,14 @@ describe('ring of the twelve sons', () => {
     expect(fitsRing([0, 5], 12, 14)).toBe(false)
     expect(fitsRing(twelve, 11, 14)).toBe(false)
     expect(fitsRing([], 12, 14)).toBe(true)
+  })
+
+  it('the places of the ring: with no figure it starts at the top, with some the places lie where they would be right', () => {
+    const empty = ringSlots([], 12)
+    expect(empty).toHaveLength(12)
+    expect(empty).toContain(270)
+    expect(ringSlots([10, 100, 190], 4).map(Math.round).sort((a, b) => a - b)).toEqual([10, 100, 190, 280])
+    for (const a of [3, 47, 200]) expect(fitsRing(ringSlots([a], 12).slice(0, 5), 12, 14), `from ${a}`).toBe(true)
   })
 
   it('two figures are not a ring yet (the first of a game cannot be wrong)', () => {

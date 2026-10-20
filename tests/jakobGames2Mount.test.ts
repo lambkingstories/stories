@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { CairnGame, CycleGame, GuessGame } from '@/types/adventure'
+import type { CairnGame, CycleGame, GuessGame, RingGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -407,5 +407,168 @@ describe('Steinhaufen zu zweit (cairn)', () => {
     await push(w, 'left')
     await push(w, 'left')
     expect(w.find('.ca-fb').text()).toContain('Wait a moment')
+  })
+})
+
+// ---------------------------------------------------------------- the ring of the sons
+describe('Zwölferkreis (ring)', () => {
+  const game: RingGame = {
+    background: 'images/x/tree.webp',
+    altar: 'images/x/altar.webp',
+    tokens: ['images/x/a.webp', 'images/x/b.webp', 'images/x/c.webp'],
+    centre: [50, 58],
+    radius: 22,
+    rounds: [
+      { hint: 'Runde eins.', count: 4, tolerance: 25 },
+      { hint: 'Runde zwei.', count: 12, tolerance: 14 }
+    ]
+  }
+  // the field is 300 x 200 pixels: a point in percent of the picture is three pixels (wide) and two pixels (high) for each percent
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, width: 300, height: 200, right: 300, bottom: 200, x: 0, y: 0, toJSON: () => ({}) })
+    const { default: Ring } = await import('@/components/molecules/games/GameRing.vue')
+    const w = mount(Ring, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  const spot = (angle: number, away = 1) => {
+    const rad = (angle * Math.PI) / 180
+    const r = game.radius * away
+    return { clientX: (50 + r * Math.cos(rad)) * 3, clientY: (58 + r * Math.sin(rad) * 1.5) * 2 }
+  }
+  /** Choose the son (a press and a release without moving), then tap a place of the field. */
+  const put = async (w: W, son: number, angle: number, away = 1) => {
+    const el = w.findAll('.rg-token').find((x) => x.attributes('aria-label') === `Sohn ${son + 1}`)!.element
+    el.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 5, clientY: 5 }))
+    window.dispatchEvent(new MouseEvent('pointerup', { clientX: 5, clientY: 5 }))
+    await flushPromises()
+    await w.find('.rg-field').trigger('click', spot(angle, away))
+    await flushPromises()
+  }
+  const roundOne = async (w: W) => {
+    await put(w, 0, 270)
+    await put(w, 1, 0)
+    await put(w, 2, 90)
+    await put(w, 3, 180)
+  }
+  const roundTwo = async (w: W) => {
+    for (let i = 0; i < 12; i++) await put(w, i, 270 + i * 30)
+  }
+
+  it('the goal is every son of both rounds; four sons wait, the ring is empty, the altar stands in the middle', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(16)
+    expect(w.find('.rg-round').text()).toContain('Runde 1 von 2')
+    expect(w.findAll('.rg-token')).toHaveLength(4)
+    expect(w.findAll('.rg-son')).toHaveLength(0)
+    expect(w.find('.rg-altar').exists()).toBe(true)
+    expect(w.find('.rg-count').text()).toBe('Söhne am Altar: 0 von 4')
+  })
+
+  it('the first son cannot be wrong; the app snaps him to the ring, even if he was let go beside it', async () => {
+    const w = await open()
+    await put(w, 0, 0, 1.25)
+    expect(w.findAll('.rg-son')).toHaveLength(1)
+    expect(w.find('.rg-son').attributes('style')).toContain('left: 72%')
+    expect(played).toContain('snap')
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(w.findAll('.rg-token')).toHaveLength(3)
+  })
+
+  it('a son let go far from the ring is not placed and it is no mistake (a friendly line)', async () => {
+    const w = await open()
+    await put(w, 0, 0, 0.1)
+    expect(w.findAll('.rg-son')).toHaveLength(0)
+    expect(w.find('.rg-fb').text()).toContain('hellen Kreis')
+    expect(played).not.toContain('wrong')
+    expect(w.findAll('.rg-token')).toHaveLength(4)
+  })
+
+  it('a son who spoils the even gaps lights red with a cross and goes back (a mistake); a place that is taken is no mistake', async () => {
+    const w = await open()
+    await put(w, 0, 270)
+    await put(w, 1, 40)
+    expect(played).toContain('wrong')
+    expect(w.find('.rg-son.bad').exists()).toBe(true)
+    expect(w.findAll('.rg-son')).toHaveLength(2)
+    await tick(1000)
+    expect(w.find('.rg-son.bad').exists()).toBe(false)
+    expect(w.findAll('.rg-son')).toHaveLength(1)
+    expect(w.findAll('.rg-token')).toHaveLength(3)
+    played.length = 0
+    await put(w, 1, 275)
+    expect(played).not.toContain('wrong')
+    expect(w.find('.rg-fb').text()).toContain('schon ein Sohn')
+    expect(w.findAll('.rg-son')).toHaveLength(1)
+  })
+
+  it('the help shows the right places for three seconds (four marks, one at a time)', async () => {
+    const w = await open()
+    await put(w, 0, 270)
+    await w.find('.rg-btn').trigger('click')
+    expect(w.findAll('.rg-help')).toHaveLength(4)
+    expect(w.find('.rg-btn').attributes('disabled')).toBeDefined()
+    await tick(3100)
+    expect(w.findAll('.rg-help')).toHaveLength(0)
+    expect(w.find('.rg-btn').attributes('disabled')).toBeUndefined()
+  })
+
+  it('from the keyboard: choose a son with Enter, Enter on the field puts him at the next free place', async () => {
+    const w = await open()
+    await w.findAll('.rg-token')[0]!.trigger('keydown', { key: 'Enter' })
+    await w.find('.rg-field').trigger('keydown', { key: 'Enter' })
+    expect(w.findAll('.rg-son')).toHaveLength(1)
+    await w.findAll('.rg-token')[0]!.trigger('keydown', { key: 'Enter' })
+    await w.find('.rg-field').trigger('keydown', { key: 'Enter' })
+    expect(w.findAll('.rg-son')).toHaveLength(2)
+    expect(played).not.toContain('wrong')
+  })
+
+  it('round 2 has twelve sons like the hours of a clock; all placed: the end with three stars when nothing went wrong', async () => {
+    const w = await open()
+    await roundOne(w)
+    await tick(1600)
+    expect(w.find('.rg-round').text()).toContain('Runde 2 von 2')
+    expect(w.findAll('.rg-token')).toHaveLength(12)
+    expect(w.findAll('.rg-son')).toHaveLength(0)
+    await roundTwo(w)
+    await tick(1100)
+    expect(useTaskProgress().parts.value).toBe(16)
+    expect(useTaskProgress().finished.value).toBe(true)
+    expect(w.text()).toContain('ein Kreis ohne Lücke')
+    await w.find('.gd button').trigger('click')
+    expect(w.emitted('done')).toEqual([[3]])
+    expect(problems()).toEqual([])
+  })
+
+  it('stars follow mistakes and tips together: up to three three stars, up to eight two stars, more one star', async () => {
+    for (const [mistakes, stars] of [[3, 3], [4, 2], [8, 2], [9, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      await put(w, 0, 270)
+      for (let i = 0; i < mistakes; i++) {
+        await put(w, 1, 40)
+        await tick(1000)
+      }
+      await put(w, 1, 0)
+      await put(w, 2, 90)
+      await put(w, 3, 180)
+      await tick(1600)
+      await roundTwo(w)
+      await tick(1100)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${mistakes} mistakes`).toEqual([[stars]])
+      w.unmount()
+    }
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.rg-count').text()).toBe('Sons at the altar: 0 of 4')
+    expect(w.find('.rg-btn').text()).toBe('Help')
+    await w.findAll('.rg-token')[0]!.trigger('keydown', { key: 'Enter' })
+    await w.find('.rg-field').trigger('click', spot(0, 0.1))
+    expect(w.find('.rg-fb').text()).toContain('light ring')
   })
 })

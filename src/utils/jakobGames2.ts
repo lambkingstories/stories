@@ -212,11 +212,9 @@ export function snapToRing(point: Pt, centre: Pt, radius: number): { angle: numb
  * Can these angles (degrees) belong to a ring of `count` equal gaps, after the best turn of the ring? The gap between two neighbours may differ from the ideal one by `tolerance`
  * degrees at most; that is the case when every angle lies within half of it of its own place of the ring. No two on the same place.
  */
-export function fitsRing(angles: number[], count: number, tolerance: number): boolean {
-  if (angles.length === 0) return true
-  if (angles.length > count) return false
+/** The best turn of a ring of `count` places for these angles: the middle of the leftovers when every angle is taken modulo one step (circular mean). */
+function ringTurn(angles: number[], count: number): number {
   const step = 360 / count
-  // the best turn: the middle of the leftovers when every angle is taken modulo one step (circular mean)
   let sx = 0
   let sy = 0
   for (const a of angles) {
@@ -224,7 +222,21 @@ export function fitsRing(angles: number[], count: number, tolerance: number): bo
     sx += Math.cos(r)
     sy += Math.sin(r)
   }
-  const turn = ((Math.atan2(sy, sx) / (2 * Math.PI)) * step + step) % step
+  return ((Math.atan2(sy, sx) / (2 * Math.PI)) * step + step) % step
+}
+
+/** The places (angles) of a ring of `count` that fits the figures that stand already; with none, the ring starts at the top (270 degrees, y goes down). */
+export function ringSlots(angles: number[], count: number): number[] {
+  const step = 360 / count
+  const turn = angles.length ? ringTurn(angles, count) : 270 % step
+  return Array.from({ length: count }, (_, i) => norm(turn + i * step))
+}
+
+export function fitsRing(angles: number[], count: number, tolerance: number): boolean {
+  if (angles.length === 0) return true
+  if (angles.length > count) return false
+  const step = 360 / count
+  const turn = ringTurn(angles, count)
   const used = new Set<number>()
   for (const a of angles) {
     const place = Math.round(norm(a - turn) / step) % count

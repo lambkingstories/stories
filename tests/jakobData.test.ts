@@ -174,6 +174,22 @@ describe('Jakob: every stage has the game that was chosen', () => {
     expect(c.background).toBe(stage(8).image)
   })
 
+  it('12 ring (when built): four sons, then twelve like the hours of a clock, the tolerance gets smaller, three figures, the ring lies inside the picture', () => {
+    const g = stage(12).task.ring
+    if (!g) return
+    expect(g.rounds.map((r) => r.count)).toEqual([4, 12])
+    expect(g.rounds[1]!.tolerance).toBeLessThan(g.rounds[0]!.tolerance)
+    for (const r of g.rounds) expect(r.tolerance, 'less than half a gap').toBeLessThan(360 / r.count)
+    expect(g.tokens).toHaveLength(3)
+    const [cx, cy] = g.centre
+    // the ring is a circle of the picture's width: in height it reaches one and a half times as far
+    expect(cx - g.radius).toBeGreaterThanOrEqual(0)
+    expect(cx + g.radius).toBeLessThanOrEqual(100)
+    expect(cy + g.radius * 1.5).toBeLessThanOrEqual(100)
+    expect(cy - g.radius * 1.5).toBeGreaterThanOrEqual(0)
+    expect(g.background).toBe(stage(12).image)
+  })
+
   it('7 guessing the herds (when built): round 1 compares herds that are clearly different, round 2 asks for the range that contains the number; the animals exist and stand in the meadow', () => {
     const g = stage(7).task.guess
     if (!g) return

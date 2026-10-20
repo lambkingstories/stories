@@ -199,7 +199,7 @@ export const jakobEn: TextOverlay<Journey> = {
         'Now Jacob has twelve sons: Reuben, Simeon, Levi, Judah, Issachar, and Zebulun, Joseph and Benjamin, Dan and Naphtali, Gad and Asher. From them the people of Israel will come, who carry their father’s new name.',
         'Jacob lives in the land of Canaan, where his father lived as a stranger. Joseph, the son of his old age, is the dearest to him, and he has a colorful robe made for him. When the brothers see that their father loves Joseph more than them, they become angry with him and can no longer speak a friendly word to him. Here a new story begins, the story of Joseph.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Place the twelve sons evenly round the altar.', ring: { rounds: [{ hint: 'Place the four sons round the altar, with the same gap between them.' }, { hint: 'Now all twelve sons. They stand like the hours of a clock.' }] } },
       questions: [
         { q: 'Where does Jacob go at God’s word?', options: ['to Bethel', 'to Haran', 'to Egypt'] },
         { q: 'Which son does Jacob love best?', options: ['Joseph', 'Benjamin', 'Reuben'] }
