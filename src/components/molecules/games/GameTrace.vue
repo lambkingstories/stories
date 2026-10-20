@@ -137,6 +137,8 @@ function walkAll(road: TracePath, e: MouseEvent) {
 const src = (p: string) => prependBaseUrl(p)
 const walkerAt = (road: TracePath) => pointAt(road.points, walked[road.id] ?? 0)
 const walkerStyle = (road: TracePath) => ({ left: `${walkerAt(road).x}%`, top: `${walkerAt(road).y}%` })
+/** The walker of the picture walks to the right: on a road that leads to the left it is turned round. */
+const goesLeft = (road: TracePath) => road.points[road.points.length - 1]![0] < road.points[0]![0]
 const goalStyle = (road: TracePath) => {
   const end = road.points[road.points.length - 1]!
   return { left: `${end[0]}%`, top: `${end[1]}%` }
@@ -164,7 +166,7 @@ const doneCount = computed(() => current.value.paths.filter((r) => arrived[r.id]
       )
         template(v-for="road in current.paths" :key="`${round}-${road.id}`")
           span(class="tr-goal" :class="{ lit: arrived[road.id] }" :style="goalStyle(road)" aria-hidden="true")
-          img(:src="src(game.walker)" alt="" draggable="false" class="tr-walker" :class="{ wobble: wobble === road.id, arrived: arrived[road.id] }" :style="walkerStyle(road)")
+          img(:src="src(game.walker)" alt="" draggable="false" class="tr-walker" :class="{ wobble: wobble === road.id, arrived: arrived[road.id], left: goesLeft(road) }" :style="walkerStyle(road)")
         button(
           v-for="road in current.paths"
           :key="`k-${round}-${road.id}`"
@@ -247,6 +249,9 @@ const doneCount = computed(() => current.value.paths.filter((r) => arrived[r.id]
   transform: translate(-50%, -90%)
   pointer-events: none
   filter: drop-shadow(0 3px 3px rgba(40, 30, 10, 0.5))
+
+  &.left
+    scale: -1 1
 
   &.wobble
     animation: tr-shake 480ms ease-in-out

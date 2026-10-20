@@ -10,7 +10,7 @@ import { BABEL_PATH } from '@/data/adventures/babelPath'
 import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
-import { buildTask, lineLength, pointAt, stepWidths } from '@/utils/babelGames'
+import { advance, buildTask, lineLength, pointAt, stepWidths } from '@/utils/babelGames'
 import { journeyFiles } from '@/utils/journeyFiles'
 
 afterEach(() => setAdventureLanguage('de'))
@@ -195,8 +195,8 @@ describe('Babel: every stage has its own new game (no game of Josef, Noah or Ada
           expect(x >= 0 && x <= 100 && y >= 0 && y <= 100, p.id).toBe(true)
         }
         // the road starts at the foot of the tower in the middle of the picture
-        expect(Math.abs(p.points[0]![0] - 50), p.id).toBeLessThanOrEqual(8)
-        expect(Math.abs(p.points[0]![1] - 50), p.id).toBeLessThanOrEqual(10)
+        expect(Math.abs(p.points[0]![0] - 50), p.id).toBeLessThanOrEqual(15)
+        expect(Math.abs(p.points[0]![1] - 46), p.id).toBeLessThanOrEqual(10)
         expect(lineLength(p.points), p.id).toBeGreaterThan(30)
         // the walker at the end of the road stands where the road ends
         const end = pointAt(p.points, lineLength(p.points))
@@ -210,7 +210,25 @@ describe('Babel: every stage has its own new game (no game of Josef, Noah or Ada
     // the roads of round 2 are narrower than those of round 1
     expect(t.rounds[1]!.paths[0]!.r).toBeLessThan(t.rounds[0]!.paths[0]!.r)
     // the road ids and goals have words in the app
-    expect(t.scene).toBe('images/abenteuer/spiele/babel/spur/wege.webp')
+    expect(t.scene).toBe('images/abenteuer/spiele/babel/spur/wege-b.webp')
+  })
+
+  it('6 following the roads: a finger that follows the middle of every road, one step at a time, brings the walker to the goal without straying', () => {
+    const t = stage(6).task.trace!
+    for (const r of t.rounds) {
+      for (const p of r.paths) {
+        const len = lineLength(p.points)
+        let progress = 0
+        for (let along = 0; along <= len; along += 1) {
+          const finger = pointAt(p.points, along)
+          const a = advance(p.points, progress, finger, p.r)
+          expect(a.strayed, `${p.id} strayed at ${along}`).toBe(false)
+          expect(a.on, `${p.id} lost at ${along}`).toBe(true)
+          progress = a.progress
+        }
+        expect(progress, p.id).toBeGreaterThanOrEqual(len - Math.max(2.5, p.r))
+      }
+    }
   })
 
   it('every picture and recording that the games name lies in the folders that only this adventure uses', () => {

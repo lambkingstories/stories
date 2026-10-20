@@ -114,27 +114,28 @@ const WISCHEN: WipeGame = {
 }
 
 /**
- * Etappe 6, "Wege nachfahren": Wege führen vom unfertigen Turm in die Ebene (Bildauftrag B14); Runde 1 zwei fast gerade Wege, Runde 2 vier geschwungene.
- * PLATZHALTER: die Linien (8 bis 12 Punkte je Weg) und die halbe Wegbreite kommen aus `spur/wege-messung.json`.
+ * Etappe 6, "Wegen nachfahren": vier Wege führen vom unfertigen Turm in die Ebene (Bildauftrag B14, Fassung B: ein Bild mit allen vier Wegen); Runde 1 zwei Wege (die zwei unteren, breiten),
+ * Runde 2 alle vier. Die Wegpunkte (Prozent des Bildes, vom Turm zum Ziel) sind die Messwerte aus `spur/wege-b-messung.json`, die Wegbreite `r` ist für die schmalste Stelle gemessen und für Kinderfinger
+ * auf mindestens 2,5 % der Bildbreite erhöht.
  */
 const SPUR: TraceGame = {
-  scene: `${G}spur/wege.webp`,
+  scene: `${G}spur/wege-b.webp`,
   walker: `${G}spur/wanderer.webp`,
   rounds: [
     {
       hint: 'Fahre die beiden Wege nach.',
       paths: [
-        { id: 'berge', points: [[54, 50], [60, 49], [66, 48], [72, 47], [78, 45], [84, 43], [90, 40]], r: 4, goal: 'berge' },
-        { id: 'fluss', points: [[46, 50], [40, 51], [34, 52], [28, 54], [22, 56], [16, 59], [10, 62]], r: 4, goal: 'fluss' }
+        { id: 'palmen', points: [[38, 50.5], [33, 52], [27, 54], [23.5, 57], [23.5, 60], [26, 64], [29, 68], [30, 72], [29, 76], [25, 79.5], [20, 81.5]], r: 3, goal: 'palmen' },
+        { id: 'huegel', points: [[63, 51], [69, 53], [75, 55.5], [79, 58.5], [80, 62], [78, 65], [75, 68], [73.5, 71], [75, 74], [79, 77], [84, 79]], r: 3, goal: 'huegel' }
       ]
     },
     {
       hint: 'Jetzt vier Wege in alle Richtungen.',
       paths: [
-        { id: 'berge', points: [[53, 47], [58, 42], [62, 36], [67, 30], [72, 25], [77, 20], [82, 16]], r: 3, goal: 'berge' },
-        { id: 'fluss', points: [[47, 47], [42, 42], [38, 36], [32, 31], [27, 26], [22, 21], [17, 17]], r: 3, goal: 'fluss' },
-        { id: 'palmen', points: [[53, 54], [58, 59], [63, 64], [69, 68], [75, 72], [81, 75], [87, 78]], r: 3, goal: 'palmen' },
-        { id: 'huegel', points: [[47, 54], [42, 59], [36, 64], [30, 68], [24, 72], [18, 75], [12, 78]], r: 3, goal: 'huegel' }
+        { id: 'berge', points: [[38, 41], [34, 39], [32.5, 36], [33, 33], [34, 30], [32, 27.5], [27, 25.5], [21, 23.5], [17, 21.5], [17, 19.5], [20, 17.5], [21, 16]], r: 2.5, goal: 'berge' },
+        { id: 'fluss', points: [[63, 43], [69, 42], [74, 40], [75, 37], [75, 34], [77, 31.5], [82, 29.5], [85, 27.5], [86, 25.5], [85, 24.5]], r: 2.5, goal: 'fluss' },
+        { id: 'palmen', points: [[38, 50.5], [33, 52], [27, 54], [23.5, 57], [23.5, 60], [26, 64], [29, 68], [30, 72], [29, 76], [25, 79.5], [20, 81.5]], r: 3, goal: 'palmen' },
+        { id: 'huegel', points: [[63, 51], [69, 53], [75, 55.5], [79, 58.5], [80, 62], [78, 65], [75, 68], [73.5, 71], [75, 74], [79, 77], [84, 79]], r: 3, goal: 'huegel' }
       ]
     }
   ]
