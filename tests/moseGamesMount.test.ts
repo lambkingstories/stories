@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { WordsGame } from '@/types/adventure'
+import type { DiffGame, WordsGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -174,5 +174,141 @@ describe('Worte ordnen (words)', () => {
     expect(w.find('.ww-tip').text()).toBe('Tip')
     await lay(w, 'töten.')
     expect(w.find('.ww-fb').text()).toBe('This word does not come yet.')
+  })
+})
+
+// ---------------------------------------------------------------- find the differences
+describe('Unterschiede finden (diff)', () => {
+  const game: DiffGame = {
+    rounds: [
+      {
+        hint: 'Runde eins.',
+        base: 'images/x/camp-1.webp',
+        items: [
+          { image: 'images/x/a.webp', x: 30, y: 40, w: 12 },
+          { image: 'images/x/b.webp', x: 70, y: 60, w: 12 }
+        ]
+      },
+      {
+        hint: 'Runde zwei.',
+        base: 'images/x/camp-2.webp',
+        items: [
+          { image: 'images/x/c.webp', x: 20, y: 30, w: 8 },
+          { image: 'images/x/d.webp', x: 50, y: 70, w: 8 },
+          { image: 'images/x/e.webp', x: 80, y: 40, w: 8 }
+        ]
+      }
+    ]
+  }
+  // the pictures are 400 x 300 pixels: a percent of the width is four pixels, a percent of the height three
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, width: 400, height: 300, right: 400, bottom: 300, x: 0, y: 0, toJSON: () => ({}) })
+    const { default: Diff } = await import('@/components/molecules/games/GameDiff.vue')
+    const w = mount(Diff, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  /** A tap on the right picture at this place (percent). */
+  const tapAt = async (w: W, x: number, y: number) => {
+    await w.find('.df-pic.right').trigger('click', { clientX: x * 4, clientY: y * 3 })
+    await flushPromises()
+  }
+  const roundOne = async (w: W) => {
+    await tapAt(w, 30, 40)
+    await tapAt(w, 70, 60)
+  }
+  const roundTwo = async (w: W) => {
+    await tapAt(w, 20, 30)
+    await tapAt(w, 50, 70)
+    await tapAt(w, 80, 40)
+  }
+
+  it('the goal is every extra thing of both rounds; two pictures, two things in the right one, no ring yet', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(5)
+    expect(w.find('.df-round').text()).toContain('Runde 1 von 2')
+    expect(w.findAll('.df-pic')).toHaveLength(2)
+    expect(w.findAll('.df-thing')).toHaveLength(2)
+    expect(w.findAll('.df-ring.dashed').every((r) => r.attributes('style')?.includes('display: none'))).toBe(true)
+    expect(w.find('.df-count').text()).toBe('Unterschiede gefunden: 0 von 2')
+  })
+
+  it('a tap on a thing (a little beside the middle is fine) finds it: a tick, a green ring on the right, a dashed circle on the left', async () => {
+    const w = await open()
+    await tapAt(w, 32, 41)
+    expect(played).toContain('found')
+    expect(w.findAll('.df-thing.found')).toHaveLength(1)
+    expect(w.find('.df-ring.solid').exists()).toBe(true)
+    expect(w.findAll('.df-ring.dashed').filter((r) => !r.attributes('style')?.includes('display: none'))).toHaveLength(1)
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(w.find('.df-count').text()).toBe('Unterschiede gefunden: 1 von 2')
+  })
+
+  it('the thing is a button, too (Tab and Enter): a click on it finds it', async () => {
+    const w = await open()
+    await w.findAll('.df-thing')[1]!.trigger('click')
+    expect(w.findAll('.df-thing.found')).toHaveLength(1)
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(played).not.toContain('wrong')
+  })
+
+  it('a tap on nothing is a cross and a mistake; a thing that is found already is not found twice', async () => {
+    const w = await open()
+    await tapAt(w, 5, 5)
+    expect(played).toContain('wrong')
+    expect(w.find('.df-cross').exists()).toBe(true)
+    expect(w.find('.df-fb').text()).toContain('nichts Neues')
+    await tapAt(w, 30, 40)
+    played.length = 0
+    await tapAt(w, 30, 40)
+    expect(played).toContain('wrong')
+    expect(useTaskProgress().parts.value).toBe(1)
+  })
+
+  it('after more than three empty taps in a row the hint says where to look (free); a find starts the count again', async () => {
+    const w = await open()
+    for (let i = 0; i < 3; i++) await tapAt(w, 5, 5)
+    expect(w.find('.df-fb').text()).toContain('nichts Neues')
+    await tapAt(w, 5, 5)
+    expect(w.find('.df-fb').text()).toBe('Schau auf die Mitte des Lagers.')
+    await tapAt(w, 30, 40)
+    await tapAt(w, 5, 5)
+    expect(w.find('.df-fb').text()).toContain('nichts Neues')
+  })
+
+  it('both things found: round 2 has the other picture and three things', async () => {
+    const w = await open()
+    await roundOne(w)
+    await tick(1800)
+    expect(w.find('.df-round').text()).toContain('Runde 2 von 2')
+    expect(w.findAll('.df-thing')).toHaveLength(3)
+    expect(w.find('.df-pic').attributes('style')).toContain('camp-2')
+    expect(w.find('.df-count').text()).toBe('Unterschiede gefunden: 0 von 3')
+  })
+
+  it('the whole game: the end with three stars; the empty taps give the stars (up to three: three, up to eight: two, more: one)', async () => {
+    for (const [wrong, stars] of [[0, 3], [3, 3], [4, 2], [8, 2], [9, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      for (let i = 0; i < wrong; i++) await tapAt(w, 5, 5)
+      await roundOne(w)
+      await tick(1800)
+      await roundTwo(w)
+      await tick(1300)
+      expect(useTaskProgress().parts.value).toBe(5)
+      expect(useTaskProgress().finished.value).toBe(true)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${wrong} empty taps`).toEqual([[stars]])
+      w.unmount()
+    }
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.df-count').text()).toBe('Differences found: 0 of 2')
+    await tapAt(w, 5, 5)
+    expect(w.find('.df-fb').text()).toBe('Nothing new here. Look again.')
   })
 })

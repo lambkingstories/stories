@@ -83,7 +83,7 @@ export const moseEn: TextOverlay<Journey> = {
         'Moses says goodbye to Jethro, who tells him, “Go in peace.” Then he sets his wife and sons on a donkey, takes the staff of God in his hand, and travels to Egypt. At the mountain of God he meets his brother Aaron, and the two fall into each other’s arms.',
         'Together they call the elders of Israel. Aaron tells them everything God has said to Moses, and Moses shows the signs. Then the Israelites believe them, and when they hear that God has seen their misery, they bow down and worship him.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Find what is more in the right picture.', diff: { rounds: [{ hint: 'The right camp has a few things more. Tap on the right what is missing on the left.' }, { hint: 'Once more, now there are more and smaller things.' }] } },
       questions: [
         { q: 'What does Moses’ staff turn into on the ground?', options: ['a snake', 'a tree', 'a rope'] },
         { q: 'Who goes to meet Moses and is to speak for him?', options: ['Aaron', 'Jethro', 'Gershom'] }

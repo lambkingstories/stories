@@ -12,7 +12,7 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
-import { shuffle, wordsOf } from '@/utils/moseGames'
+import { diffAt, distance, shuffle, wordsOf } from '@/utils/moseGames'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => mose.stages[n - 1]!
@@ -120,7 +120,7 @@ describe('Mose: stories and questions', () => {
 
 describe('Mose: the games, and the placeholders until the pictures come', () => {
   it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(mose.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'worte', 'quiz', 'quiz'])
+    expect(mose.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'quiz', 'quiz', 'unterschied', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'worte', 'quiz', 'quiz'])
     for (const s of mose.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
@@ -149,6 +149,25 @@ describe('Mose: the games, and the placeholders until the pictures come', () => 
     check()
     setAdventureLanguage('de')
     expect(g.background).toBe(stage(13).image)
+  })
+
+  it('5 differences: four things, then six; every thing lies in the picture, the things are apart from each other (so that a tap belongs to one), the sprites differ; the goal is 10', () => {
+    const g = stage(5).task.diff
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => r.items.length)).toEqual([4, 6])
+    expect(g.rounds[0]!.base).not.toBe(g.rounds[1]!.base)
+    for (const r of g.rounds) {
+      for (const [i, a] of r.items.entries()) {
+        expect(a.x >= 0 && a.x <= 100 && a.y >= 0 && a.y <= 100).toBe(true)
+        for (const b of r.items.slice(i + 1)) expect(distance(a, b), 'apart').toBeGreaterThan(12)
+      }
+    }
+    // a tap on the middle of a thing hits exactly this thing
+    for (const r of g.rounds) r.items.forEach((it, i) => expect(diffAt(r.items, { x: it.x, y: it.y }, r.items.map(() => false))).toBe(i))
+    expect(new Set(g.rounds.flatMap((r) => r.items.map((it) => it.image))).size).toBe(10)
+    expect(g.rounds[1]!.items.reduce((n, it) => n + it.w, 0) / 6).toBeLessThan(g.rounds[0]!.items.reduce((n, it) => n + it.w, 0) / 4)
+    expect(g.rounds.reduce((n, r) => n + r.items.length, 0)).toBe(10)
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

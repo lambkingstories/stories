@@ -12,7 +12,7 @@
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme (Liste der Aufnahmen: D:/Claude/Abenteuer-Mose/NEUAUFNAHME-Mose.md).
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { Journey, WordsGame } from '@/types/adventure'
+import type { DiffGame, Journey, WordsGame } from '@/types/adventure'
 import { josef } from './josef'
 import { MOSE_PATH } from './mosePath'
 import { localize } from './localize'
@@ -36,6 +36,39 @@ const WORTE: WordsGame = {
   rounds: [
     { hint: 'Lege die Wörter in der richtigen Reihenfolge in den Streifen.', sentences: ['Du sollst nicht töten.', 'Ehre Vater und Mutter.', 'Halte den Ruhetag heilig.'] },
     { hint: 'Jetzt längere Sätze. Gottes Worte aus dem Text.', sentences: ['Du sollst keine anderen Götter neben mir haben.', 'Du sollst meinen Namen nicht missbrauchen.', 'Ich bin dein Gott, der dich aus Ägypten befreit hat.'] }
+  ]
+}
+
+/**
+ * Etappe 5, "Unterschiede finden": zwei Bilder des Lagers am Berg Gottes, das rechte hat einige kleine Dinge mehr; das Kind tippt rechts, was links fehlt (Bildauftrag M12; zwei eigene Grundbilder). Runde 1 vier große
+ * Dinge, Runde 2 sechs kleinere. Lagen (Mitte und Breite, Prozent des Bildes) sind vorläufig geschätzt, bis die Datei `unterschied-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `unterschied/lager-1.webp`, `lager-2.webp` je 900 × 675 (ohne die Zusatzdinge), zehn Sprites höchstens 160 px: `stab`, `krug`, `buendel`, `schaf`, `korb`,
+ * `brot`, `decke`, `schuhe`, `vogel`, `schlauch` (transparent).
+ */
+const UNTERSCHIED: DiffGame = {
+  rounds: [
+    {
+      hint: 'Das rechte Lager hat ein paar Dinge mehr. Tippe rechts, was links fehlt.',
+      base: `${G}unterschied/lager-1.webp`,
+      items: [
+        { image: `${G}unterschied/stab.webp`, x: 22, y: 64, w: 12 },
+        { image: `${G}unterschied/krug.webp`, x: 48, y: 74, w: 10 },
+        { image: `${G}unterschied/buendel.webp`, x: 76, y: 62, w: 12 },
+        { image: `${G}unterschied/schaf.webp`, x: 60, y: 36, w: 12 }
+      ]
+    },
+    {
+      hint: 'Noch einmal, jetzt sind es mehr und kleinere Dinge.',
+      base: `${G}unterschied/lager-2.webp`,
+      items: [
+        { image: `${G}unterschied/korb.webp`, x: 18, y: 70, w: 9 },
+        { image: `${G}unterschied/brot.webp`, x: 36, y: 40, w: 8 },
+        { image: `${G}unterschied/decke.webp`, x: 50, y: 78, w: 10 },
+        { image: `${G}unterschied/schuhe.webp`, x: 68, y: 54, w: 7 },
+        { image: `${G}unterschied/vogel.webp`, x: 84, y: 24, w: 8 },
+        { image: `${G}unterschied/schlauch.webp`, x: 28, y: 28, w: 8 }
+      ]
+    }
   ]
 }
 
@@ -161,7 +194,7 @@ export const mose: Journey = {
         'Gemeinsam rufen sie die Ältesten Israels zusammen. Aaron erzählt ihnen alles, was Gott zu Mose gesagt hat, und Mose zeigt die Zeichen. Da glauben die Israeliten ihnen, und als sie hören, dass Gott ihr Elend gesehen hat, verneigen sie sich und beten ihn an.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Unterschiede finden (unterschied, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'unterschied', hint: 'Finde, was im rechten Bild mehr ist.', diff: UNTERSCHIED },
       questions: [
         { q: 'Wozu wird Moses Stab auf der Erde?', options: ['zur Schlange', 'zum Baum', 'zum Seil'], answer: 0 },
         { q: 'Wer geht Mose entgegen und soll für ihn reden?', options: ['Aaron', 'Jitro', 'Gerschom'], answer: 0 }
