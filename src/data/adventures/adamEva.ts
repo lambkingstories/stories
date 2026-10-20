@@ -64,7 +64,9 @@ const LICHTER: LightGame = {
 
 /**
  * Etappe 3, "Hüten": ein Leittier mit seiner Herde; Runde 1 zum Schatten der Bäume, Runde 2 zur Wasserstelle, ein Teich liegt im Weg (Bildauftrag 14).
- * Die Tiere kommen aus den Noah-Bildern (unter neuen Namen in `hueten/`). PLATZHALTER: Start, Ruheplatz und Teich kommen aus `hueten/wiese-messung.json`.
+ * Die Tiere kommen aus den Noah-Bildern (Kopien in `hueten/`). Start, Ruheplatz und Teich sind die Messwerte aus `hueten/wiese-messung.json` (am Bild geprüft): Runde 1 vom
+ * freien Stück rechts unten (start1) zum schattigen Hain rechts (ruhe1), Runde 2 von links unten (start2) zum Seeufer links oben (ruhe2), der flache Teich in der Mitte liegt im Weg
+ * (Kreis, auf Radius 17 verkleinert; der Ruheplatz des Seeufers ist auf 8,5 vergrößert, damit der Finger ihn gut trifft und der Teich nicht überlappt).
  */
 const HUETEN: HerdGame = {
   scene: `${G}hueten/wiese.webp`,
@@ -77,8 +79,8 @@ const HUETEN: HerdGame = {
         { id: 'schaf-3', image: `${G}hueten/schaf.webp`, label: 'Schaf', w: 12 },
         { id: 'schaf-4', image: `${G}hueten/schaf.webp`, label: 'Schaf', w: 12 }
       ],
-      start: { x: 26, y: 88 },
-      rest: { x: 70, y: 30, r: 12 }
+      start: { x: 73, y: 81 },
+      rest: { x: 71, y: 28.5, r: 9 }
     },
     {
       hint: 'Runde 2: Jetzt liegt ein Teich im Weg. Ziehe das Leittier um den Teich herum zur Wasserstelle.',
@@ -89,9 +91,9 @@ const HUETEN: HerdGame = {
         { id: 'schaf', image: `${G}hueten/schaf.webp`, label: 'Schaf', w: 12 },
         { id: 'hirsch-2', image: `${G}hueten/hirsch.webp`, label: 'Hirsch', w: 14 }
       ],
-      start: { x: 60, y: 90 },
-      rest: { x: 28, y: 22, r: 12 },
-      obstacle: { x: 46, y: 58, r: 10 }
+      start: { x: 30, y: 82 },
+      rest: { x: 35, y: 29, r: 8.5 },
+      obstacle: { x: 47, y: 46.5, r: 17 }
     }
   ]
 }
