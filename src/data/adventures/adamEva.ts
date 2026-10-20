@@ -37,7 +37,8 @@ const ORDER: OrderGame = {
 
 /**
  * Etappe 2, "Lichter sammeln": ein helles Bild (Sterne, Mond, Meer, Fische, Vögel), das die App abdunkelt; die 14 Lichter sind Orte in diesem Bild.
- * PLATZHALTER: x, y, w kommen aus `lichter/himmel-messung.json` (Bildauftrag 09), ihre Zahl stimmt (6 + 8).
+ * Die Orte x, y kommen aus `lichter/himmel-messung.json` (Bildauftrag 09, am Bild geprüft; Mond und die fünf größten Sterne in Runde 1, die acht kleinen in Runde 2).
+ * w ist die Größe des Tippfelds und des Leuchtens, nicht der gemessene Durchmesser (der Mond misst 22 %, die kleinen Sterne 2,5 %): zwischen 8 und 12 % begrenzt.
  */
 const LICHTER: LightGame = {
   scene: `${G}lichter/himmel.webp`,
@@ -46,16 +47,16 @@ const LICHTER: LightGame = {
       hint: 'Runde 1: Tippe jedes Licht an, das aufleuchtet.',
       together: 1,
       spots: [
-        { x: 20, y: 14, w: 12 }, { x: 52, y: 10, w: 12 }, { x: 80, y: 20, w: 12 },
-        { x: 30, y: 34, w: 12 }, { x: 62, y: 32, w: 12 }, { x: 84, y: 46, w: 12 }
+        { x: 80.3, y: 12.7, w: 12 }, { x: 14.7, y: 7.8, w: 9 }, { x: 43.9, y: 9.4, w: 8 },
+        { x: 21.4, y: 24.7, w: 9 }, { x: 53.9, y: 27.2, w: 8 }, { x: 84.7, y: 31.5, w: 8 }
       ]
     },
     {
       hint: 'Runde 2: Jetzt leuchten mehrere zugleich, und sie sind kleiner.',
       together: 3,
       spots: [
-        { x: 12, y: 12, w: 8 }, { x: 40, y: 20, w: 8 }, { x: 70, y: 8, w: 8 }, { x: 92, y: 28, w: 8 },
-        { x: 18, y: 44, w: 8 }, { x: 46, y: 46, w: 8 }, { x: 72, y: 40, w: 8 }, { x: 54, y: 30, w: 8 }
+        { x: 9.3, y: 17.4, w: 8 }, { x: 39.7, y: 19.4, w: 8 }, { x: 64.5, y: 22.4, w: 8 }, { x: 12.0, y: 34.0, w: 8 },
+        { x: 37.5, y: 32.8, w: 8 }, { x: 61.9, y: 35.1, w: 8 }, { x: 26.6, y: 39.8, w: 8 }, { x: 79.7, y: 40.8, w: 8 }
       ]
     }
   ]
