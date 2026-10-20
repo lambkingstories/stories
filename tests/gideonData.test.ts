@@ -11,7 +11,7 @@ import { GIDEON_PATH } from '@/data/adventures/gideonPath'
 import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
-import { blow, inBox, makePieces, tilesFor } from '@/utils/gideonGames'
+import { blow, deadlock, inBox, isSolved, makePieces, pushesOf, solvable, tilesFor } from '@/utils/gideonGames'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 
 afterEach(() => setAdventureLanguage('de'))
@@ -112,7 +112,7 @@ describe('Gideon: stories and questions', () => {
 
 describe('Gideon: the placeholders until the games and pictures come', () => {
   it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(gideon.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'worfeln', 'wort', 'quiz', 'tau', 'weiche', 'wimmelbild', 'quiz', 'zeichen', 'quiz', 'memory'])
+    expect(gideon.stages.map((s) => s.task.kind)).toEqual(['quiz', 'hoehle', 'worfeln', 'wort', 'quiz', 'tau', 'weiche', 'wimmelbild', 'quiz', 'zeichen', 'quiz', 'memory'])
     for (const s of gideon.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
@@ -223,6 +223,25 @@ describe('Gideon: the placeholders until the games and pictures come', () => {
     expect(g.groups[1]!.x).toBeGreaterThan(g.leader.x)
     // the answers: Gideon first, then the two groups; the signals are as many as the goal says
     expect(g.rounds.reduce((n, r) => n + r.signals, 0)).toBe(6)
+  })
+
+  it('2 cave: two sacks in 5 x 4, then three in 6 x 5 with rock in the middle; both puzzles can be solved (6 and 12 pushes); nobody starts on a niche or in a dead end; the goal is 5', () => {
+    const g = stage(2).task.cave
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => [r.cols, r.rows, r.sacks.length, r.niches.length])).toEqual([[5, 4, 2, 2], [6, 5, 3, 3]])
+    expect(g.rounds.map((r) => pushesOf(r, { man: r.man, sacks: r.sacks }))).toEqual([6, 12])
+    for (const r of g.rounds) {
+      expect(solvable(r)).toBe(true)
+      const start = { man: r.man, sacks: r.sacks }
+      expect(isSolved(r, start)).toBe(false)
+      expect(deadlock(r, start), 'no dead end at the start').toBe(false)
+      for (const [c, row] of [r.man, ...r.sacks, ...r.niches, ...r.walls]) expect(c >= 0 && c < r.cols && row >= 0 && row < r.rows).toBe(true)
+      expect(r.sacks.every((s) => !r.niches.some((n) => n[0] === s[0] && n[1] === s[1]))).toBe(true)
+    }
+    expect(g.area.x + g.area.w).toBeLessThanOrEqual(100)
+    expect(g.area.y + g.area.h).toBeLessThanOrEqual(100)
+    expect(g.rounds.reduce((n, r) => n + r.sacks.length, 0)).toBe(5)
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

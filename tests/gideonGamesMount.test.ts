@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { CueGame, DewGame, SwitchGame, WinnowGame, WordGame } from '@/types/adventure'
+import type { CaveGame, CueGame, DewGame, SwitchGame, WinnowGame, WordGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -798,5 +798,158 @@ describe('Auf Gideons Zeichen (cue)', () => {
     expect(w.find('.cu-horn').attributes('aria-label')).toBe('The horn is dark. Wait.')
     await w.find('.cu-field').trigger('click')
     expect(w.find('.cu-fb').text()).toBe('Pst! Not yet. Wait for the horn.')
+  })
+})
+
+// ---------------------------------------------------------------- sacks into the cave
+describe('Säcke in die Höhle schieben (cave)', () => {
+  const game: CaveGame = {
+    background: 'images/x/cave.webp',
+    man: 'images/x/man.webp',
+    sack: 'images/x/sack.webp',
+    niche: 'images/x/niche.webp',
+    wall: 'images/x/rock.webp',
+    area: { x: 12, y: 30, w: 76, h: 50 },
+    rounds: [
+      { hint: 'Runde eins.', cols: 4, rows: 3, walls: [[1, 2]], niches: [[3, 1]], sacks: [[1, 1]], man: [0, 1] },
+      { hint: 'Runde zwei.', cols: 4, rows: 3, walls: [], niches: [[3, 0], [3, 2]], sacks: [[1, 0], [1, 2]], man: [0, 0] }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Cave } = await import('@/components/molecules/games/GameCave.vue')
+    const w = mount(Cave, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  const arrow = async (w: W, dir: 'up' | 'down' | 'left' | 'right') => {
+    await w.find(`.cv-key.${dir}`).trigger('click')
+    await flushPromises()
+  }
+  const manAt = (w: W) => /left: ([\d.]+)%; top: ([\d.]+)%/.exec(w.find('.cv-cell.man').attributes('style') ?? '')!.slice(1, 3).map(Number)
+  const roundOne = async (w: W) => {
+    await arrow(w, 'right')
+    await arrow(w, 'right')
+  }
+  const roundTwo = async (w: W) => {
+    for (const d of ['right', 'right', 'left', 'left', 'down', 'down', 'right', 'right'] as const) await arrow(w, d)
+  }
+
+  it('the goal is every sack of both rounds; the cave has rock, a niche, a sack and the man at his start', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(3)
+    expect(w.find('.cv-round').text()).toContain('Runde 1 von 2')
+    expect(w.findAll('.cv-cell')).toHaveLength(4)
+    expect(w.findAll('.cv-cell.sack')).toHaveLength(1)
+    expect(manAt(w)[0]).toBe(0)
+    expect(manAt(w)[1]).toBeCloseTo(33.333, 2)
+    expect(w.find('.cv-count').text()).toBe('Säcke in den Nischen: 0 von 1')
+    expect(w.find('.cv-actions button').attributes('disabled')).toBeDefined()
+  })
+
+  it('the arrow buttons and the arrow keys lead the man; into rock he does not go', async () => {
+    const w = await open()
+    await arrow(w, 'up')
+    expect(manAt(w)[1]).toBe(0)
+    await w.find('.cv').trigger('keydown', { key: 'ArrowDown' })
+    expect(manAt(w)[1]).toBeCloseTo(33.333, 2)
+    // down again: (0, 2) is free, then the rock at (1, 2) is next to him
+    await arrow(w, 'down')
+    await arrow(w, 'right')
+    expect(manAt(w)[0]).toBe(0)
+    expect(manAt(w)[1]).toBeCloseTo(66.667, 2)
+  })
+
+  it('a sack is pushed on and the man follows; a sack in a niche shines with a tick; all in: a star, the round is over', async () => {
+    const w = await open()
+    await arrow(w, 'right')
+    expect(played).toContain('tap')
+    expect(w.find('.cv-cell.sack').attributes('style')).toContain('left: 50%')
+    await arrow(w, 'right')
+    expect(played).toContain('snap')
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(played).toContain('star')
+    expect(w.find('.cv-fb').text()).toContain('Alle Säcke')
+  })
+
+  it('a sack that cannot go on (rock behind it) wobbles with a cross and a dull sound; it is no mistake and nothing moves', async () => {
+    const w = await open()
+    await arrow(w, 'up')
+    await arrow(w, 'right')
+    expect(manAt(w)[0]).toBe(25)
+    await arrow(w, 'down')
+    expect(played).toContain('wrong')
+    expect(w.find('.cv-cell.sack.wobble').exists()).toBe(true)
+    expect(w.find('.cv-fb').text()).toContain('kann nicht weiter')
+    expect(w.find('.gm.bad').exists()).toBe(true)
+    expect(manAt(w)[1]).toBe(0)
+    // the table of the stars is not touched: finish and look
+    expect(w.find('.cv-count').text()).toBe('Säcke in den Nischen: 0 von 1')
+  })
+
+  it('"One step back" takes the last step back, as often as wanted, for nothing', async () => {
+    const w = await open()
+    await arrow(w, 'right')
+    await arrow(w, 'right')
+    await tick(2100)
+    await arrow(w, 'right')
+    await arrow(w, 'down')
+    expect(w.find('.cv-actions button').attributes('disabled')).toBeUndefined()
+    await w.find('.cv-actions button').trigger('click')
+    expect(manAt(w)[1]).toBeCloseTo(0, 2)
+    await w.find('.cv-actions button').trigger('click')
+    await w.find('.cv-actions button').trigger('click')
+    expect(w.find('.cv-actions button').attributes('disabled')).toBeDefined()
+    expect(manAt(w)[0]).toBe(0)
+    expect(manAt(w)[1]).toBe(0)
+  })
+
+  it('"Start again" puts everything back, "Tip" shows the next step on the arrow pad; each is a mistake', async () => {
+    const w = await open()
+    await arrow(w, 'right')
+    await w.findAll('.cv-actions button')[1]!.trigger('click')
+    expect(manAt(w)[0]).toBe(0)
+    await w.findAll('.cv-actions button')[2]!.trigger('click')
+    expect(w.find('.cv-key.right').classes()).toContain('tip')
+    expect(w.find('.cv-fb').text()).toBe('Gehe nach rechts.')
+    await arrow(w, 'right')
+    expect(w.find('.cv-key.right').classes()).not.toContain('tip')
+  })
+
+  it('round 2: two sacks and two niches; both home: the end', async () => {
+    const w = await open()
+    await roundOne(w)
+    await tick(2100)
+    expect(w.find('.cv-round').text()).toContain('Runde 2 von 2')
+    expect(w.findAll('.cv-cell.sack')).toHaveLength(2)
+    await roundTwo(w)
+    expect(useTaskProgress().parts.value).toBe(3)
+    await tick(1600)
+    expect(useTaskProgress().finished.value).toBe(true)
+  })
+
+  it('the whole game: the end with three stars; "Start again" and "Tip" give the stars (one: three, up to three: two, more: one)', async () => {
+    for (const [wrong, stars] of [[0, 3], [1, 3], [2, 2], [3, 2], [4, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      for (let i = 0; i < wrong; i++) await w.findAll('.cv-actions button')[1]!.trigger('click')
+      await roundOne(w)
+      await tick(2100)
+      await roundTwo(w)
+      await tick(1600)
+      expect(useTaskProgress().finished.value).toBe(true)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${wrong} wrong`).toEqual([[stars]])
+      w.unmount()
+    }
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.cv-count').text()).toBe('Sacks in the niches: 0 of 1')
+    expect(w.findAll('.cv-actions button')[0]!.text()).toBe('One step back')
+    await w.findAll('.cv-actions button')[2]!.trigger('click')
+    expect(w.find('.cv-fb').text()).toBe('Go to the right.')
   })
 })

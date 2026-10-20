@@ -38,7 +38,7 @@ export const gideonEn: TextOverlay<Journey> = {
         'The Israelites hide in clefts of the rocks, in caves and in mountain strongholds. They have become poor and feel small before the Midianites. At last they cry out to God for help.',
         'God has heard their cry. He sends a prophet to them. The prophet says, “This is what God, the God of Israel, says: I led you out of Egypt, out of the house of slavery. I gave you this land. I said to you: I am your God. But you did not listen to me.”'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Push the sacks into the niches of the cave.', cave: { rounds: [{ hint: 'Push the sacks into the glowing niches. You can only push, not pull.' }, { hint: 'Now three sacks, and a rock stands in the middle. Think before you push.' }] } },
       questions: [
         { q: 'How long are the Midianites stronger than Israel?', options: ['seven years', 'twenty years', 'forty years'] },
         { q: 'Where do the Israelites hide?', options: ['in caves and clefts of the rocks', 'in tents by the river', 'behind high city walls'] }

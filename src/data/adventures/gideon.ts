@@ -11,7 +11,7 @@
  * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit allen zwölf Stationen und dem Ziel (PLATZHALTER bis zum eigenen Panorama); Medaille und Geschenk sind ebenfalls die von Josef.
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme. Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { CueGame, DewGame, FindGame, Journey, MemoryGame, SwitchGame, WinnowGame, WordGame } from '@/types/adventure'
+import type { CaveGame, CueGame, DewGame, FindGame, Journey, MemoryGame, SwitchGame, WinnowGame, WordGame } from '@/types/adventure'
 import { josef } from './josef'
 import { GIDEON_PATH } from './gideonPath'
 import { localize } from './localize'
@@ -158,6 +158,25 @@ const ZEICHEN: CueGame = {
   ]
 }
 
+/**
+ * Etappe 2, "Säcke in die Höhle schieben": der Grundriss einer Höhle von oben; ein kleiner Mann schiebt Kornsäcke in die Nischen (nur schieben, nie ziehen, ein Sack zur Zeit; Bildauftrag G10; eigener Hintergrund
+ * `hoehle/hoehle-plan.webp`). Runde 1 ein Raster von 5 × 4 mit zwei Säcken (sechs Schiebungen), Runde 2 6 × 5 mit drei Säcken und Fels in der Mitte (zwölf Schiebungen); beide Rätsel sind lösbar (Breitensuche im
+ * Test). Plätze sind (Spalte, Zeile). Der Bereich `area` (Prozent des Bildes) für das Raster ist vorläufig geschätzt, bis die Datei `hoehle-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `hoehle/hoehle-plan.webp` 900 × 1200, `sack.webp`, `nische.webp`, `felsen.webp` je 120 × 120, `mann.webp` 120 × 160 (alle außer dem Plan transparent).
+ */
+const HOEHLE: CaveGame = {
+  background: `${G}hoehle/hoehle-plan.webp`,
+  man: `${G}hoehle/mann.webp`,
+  sack: `${G}hoehle/sack.webp`,
+  niche: `${G}hoehle/nische.webp`,
+  wall: `${G}hoehle/felsen.webp`,
+  area: { x: 12, y: 30, w: 76, h: 50 },
+  rounds: [
+    { hint: 'Schiebe die Säcke in die leuchtenden Nischen. Du kannst nur schieben, nicht ziehen.', cols: 5, rows: 4, walls: [[4, 3], [1, 0]], niches: [[3, 0], [0, 0]], sacks: [[2, 2], [3, 2]], man: [2, 3] },
+    { hint: 'Jetzt drei Säcke, und ein Fels steht in der Mitte. Überlege, bevor du schiebst.', cols: 6, rows: 5, walls: [[3, 2], [3, 0], [4, 2]], niches: [[0, 0], [5, 2], [5, 4]], sacks: [[0, 3], [2, 1], [3, 1]], man: [0, 4] }
+  ]
+}
+
 export const gideon: Journey = {
   id: 'gideon',
   title: 'Gideon',
@@ -210,7 +229,7 @@ export const gideon: Journey = {
         'Gott hat ihr Rufen gehört. Er schickt einen Propheten zu ihnen. Der sagt: „So spricht Gott, der Gott Israels: Ich habe euch aus Ägypten geführt, aus dem Haus der Sklaven. Ich habe euch dieses Land gegeben. Ich habe zu euch gesagt: Ich bin euer Gott. Aber ihr habt nicht auf mich gehört.“'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Säcke in die Höhle schieben (hoehle, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'hoehle', hint: 'Schiebe die Säcke in die Nischen der Höhle.', cave: HOEHLE },
       questions: [
         { q: 'Wie lange sind die Midianiter stärker als Israel?', options: ['sieben Jahre', 'zwanzig Jahre', 'vierzig Jahre'], answer: 0 },
         { q: 'Wohin verstecken sich die Israeliten?', options: ['in Höhlen und Felsspalten', 'in Zelten am Fluss', 'hinter hohen Stadtmauern'], answer: 0 }
