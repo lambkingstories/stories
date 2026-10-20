@@ -197,28 +197,28 @@ export const adamEva: Journey = {
   title: 'Adam und Eva',
   subtitle: 'Der Garten Eden',
   age: '8-10',
-  downloadMb: 11, // 10,6 MB gezählt am 20.10.2026 (der Test sagt die echte Größe)
+  downloadMb: 15, // gut 14 MB gezählt nach der neuen Karte (vier Stücke zusammen 5,6 MB) am 20.10.2026 (der Test sagt die echte Größe)
   medal: `${IMG}medaille.webp`, // Der Garten Eden (Lichtung mit Strom, Bäumen und warmem Morgenlicht, ohne Menschen)
   // Geschenk-Ausmalbild: Adam und Eva im Garten mit den Tieren, im Hintergrund der Baum des Lebens (nur Geschenk, nicht mehr Aufgabe der Etappe 9)
   gift: { title: 'Adam und Eva im Garten', image: `${IMG}geschenk.webp` },
-  // die gemalte Karte (Panorama in vier Stücken, 4938 × 822 px) mit Stationen und Perlenweg aus den Messdaten von fertig/messdaten.json und adamEvaPath.ts
+  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v2) mit Stationen und Perlenweg aus den Messdaten von fertig/messdaten.json und adamEvaPath.ts
   map: {
-    images: [1, 2, 3, 4].map((n) => `${IMG}karte-pano-${n}.webp`),
+    images: [1, 2, 3, 4].map((n) => `${IMG}karte-pano-v2-${n}.webp`),
     ring: 'images/abenteuer/josef/medaillon-ring.webp',
-    aspect: 4938 / 822,
-    widthPx: 4938,
+    aspect: 9908 / 1648,
+    widthPx: 9908,
     stages: [
-      { x: 0.0668, y: 0.5718, d: 0.0339 },
-      { x: 0.1904, y: 0.5596, d: 0.0339 },
-      { x: 0.3098, y: 0.5718, d: 0.0339 },
-      { x: 0.405, y: 0.6326, d: 0.0339 },
-      { x: 0.5164, y: 0.6265, d: 0.0339 },
-      { x: 0.6197, y: 0.6387, d: 0.0339 },
-      { x: 0.7088, y: 0.6326, d: 0.0339 },
-      { x: 0.7797, y: 0.6387, d: 0.0339 },
-      { x: 0.8505, y: 0.6326, d: 0.0339 }
+      { x: 0.0343, y: 0.6432, d: 0.0339 },
+      { x: 0.2019, y: 0.6068, d: 0.0339 },
+      { x: 0.3018, y: 0.6311, d: 0.0339 },
+      { x: 0.3866, y: 0.6311, d: 0.0339 },
+      { x: 0.5198, y: 0.534, d: 0.0339 },
+      { x: 0.6157, y: 0.6068, d: 0.0339 },
+      { x: 0.7045, y: 0.6432, d: 0.0339 },
+      { x: 0.8034, y: 0.6371, d: 0.0339 },
+      { x: 0.8942, y: 0.6311, d: 0.0339 }
     ],
-    exam: { x: 0.9518, y: 0.6204, d: 0.0339 },
+    exam: { x: 0.979, y: 0.4976, d: 0.0339 },
     path: ADAM_EVA_PATH
   },
   stages: [

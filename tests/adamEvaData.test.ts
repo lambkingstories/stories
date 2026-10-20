@@ -252,11 +252,11 @@ describe('Adam und Eva: every stage has its own new game (no game of Josef or No
 
 describe('Adam und Eva: die Karte', () => {
   const m = adamEva.map
-  // the painted map is 4938 x 822 px (the height of the picture is the unit of the ring and of the lowest fifth)
-  const W = 4938
-  const H = 822
+  // the painted map is 9908 x 1648 px (the height of the picture is the unit of the ring and of the lowest fifth)
+  const W = 9908
+  const H = 1648
   it('vier Stücke eines Bildes, jedes unter 1,8 MB; Stationen von links nach rechts, nicht zu tief und nicht zu dicht', () => {
-    expect(m.images).toEqual([1, 2, 3, 4].map((n) => `images/abenteuer/adam-eva/karte-pano-${n}.webp`))
+    expect(m.images).toEqual([1, 2, 3, 4].map((n) => `images/abenteuer/adam-eva/karte-pano-v2-${n}.webp`))
     for (const f of m.images) expect(statSync(`public/${f}`).size / 1024, f).toBeLessThan(1800)
     expect(m.widthPx).toBe(W)
     expect(m.aspect).toBeCloseTo(W / H, 3)
@@ -264,7 +264,7 @@ describe('Adam und Eva: die Karte', () => {
     const spots = [...m.stages, m.exam]
     for (let i = 0; i < spots.length; i++) {
       expect(spots[i]!.y, `Station ${i + 1} nicht hinter der Leiste`).toBeLessThanOrEqual(0.65)
-      expect(spots[i]!.d).toBeCloseTo(168 / W, 3)
+      expect(spots[i]!.d).toBeCloseTo((336 * H) / 1648 / W, 3)
       if (i > 0) {
         expect(spots[i]!.x, `Station ${i + 1} rechts von ${i}`).toBeGreaterThan(spots[i - 1]!.x)
         // two rings (168 px) do not touch: at least 170 px apart
@@ -347,7 +347,7 @@ describe.runIf(released)('Adam und Eva: when the stages are released, every file
     for (const f of journeyFiles(adamEva)) {
       expect(existsSync(`public/${f}`), `missing: ${f}`).toBe(true)
       const size = statSync(`public/${f}`).size
-      expect(size, f).toBeLessThan(620_000)
+      expect(size, f).toBeLessThan(f.includes('karte-pano') ? 1_800_000 : 620_000)
       bytes += size
     }
     const mb = bytes / 1_000_000
