@@ -45,6 +45,9 @@ export const JOSUA_ONLY_DIRS = ['images/abenteuer/josua', 'images/abenteuer/spie
 /** The folders that belong to the journey "Gideon" (id `gideon`) alone, in the same three places as Adam and Eva. */
 export const GIDEON_ONLY_DIRS = ['images/abenteuer/gideon', 'images/abenteuer/spiele/gideon', 'audio/abenteuer/gideon']
 
+/** The folders that belong to the journey "Mose" (id `mose`) alone, in the same three places as Adam and Eva. */
+export const MOSE_ONLY_DIRS = ['images/abenteuer/mose', 'images/abenteuer/spiele/mose', 'audio/abenteuer/mose']
+
 function strip(outDir: string, dirs: string[]) {
   for (const dir of dirs) rmSync(resolve(outDir, dir), { recursive: true, force: true })
 }
@@ -82,4 +85,9 @@ export function stripJosuaFiles(outDir: string) {
 /** Takes the folders of Gideon out of a finished build. */
 export function stripGideonFiles(outDir: string) {
   strip(outDir, GIDEON_ONLY_DIRS)
+}
+
+/** Takes the folders of Mose out of a finished build. */
+export function stripMoseFiles(outDir: string) {
+  strip(outDir, MOSE_ONLY_DIRS)
 }

@@ -11,7 +11,8 @@ import { abraham } from '@/data/adventures/abraham'
 import { jakob } from '@/data/adventures/jakob'
 import { josua } from '@/data/adventures/josua'
 import { gideon } from '@/data/adventures/gideon'
-import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, GIDEON_ONLY_DIRS, JAKOB_ONLY_DIRS, JOSUA_ONLY_DIRS, NOAH_ONLY_DIRS, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripGideonFiles, stripJakobFiles, stripJosuaFiles, stripNoahFiles } from '../vite.config.noah'
+import { mose } from '@/data/adventures/mose'
+import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, GIDEON_ONLY_DIRS, JAKOB_ONLY_DIRS, JOSUA_ONLY_DIRS, MOSE_ONLY_DIRS, NOAH_ONLY_DIRS, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripGideonFiles, stripJakobFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles } from '../vite.config.noah'
 
 const inNoahDir = (f: string) => NOAH_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
 
@@ -330,6 +331,49 @@ describe('a build without Gideon ships nothing of it', () => {
       for (const f of gideonFiles) expect(existsSync(join(out, f)), f).toBe(false)
       for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
       expect(() => stripGideonFiles(out)).not.toThrow()
+    } finally {
+      rmSync(out, { recursive: true, force: true })
+    }
+  })
+})
+
+const inMoseDir = (f: string) => MOSE_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
+
+describe('a build without Mose ships nothing of it', () => {
+  it('every file that only Mose uses lies in a folder that the normal build removes (until its own pictures exist it uses the ones of Josef, so the list may be empty)', () => {
+    const others = new Set([...journeys, noah, adamEva, babel, abraham, jakob, josua, gideon].flatMap((j) => journeyFiles(j)))
+    const app = /^audio\/abenteuer\/(klang|musik)-/
+    const only = journeyFiles(mose).filter((f) => !others.has(f) && !app.test(f))
+    const leaks = only.filter((f) => !inMoseDir(f))
+    expect(leaks, `files of Mose outside the folders that are removed: ${leaks.join(', ')}`).toEqual([])
+  })
+
+  it('the folders of Mose are only the three places that belong to it, none is on the lists of the others, and no folder with "mose" in its name is missing', () => {
+    expect([...MOSE_ONLY_DIRS].sort()).toEqual(['audio/abenteuer/mose', 'images/abenteuer/mose', 'images/abenteuer/spiele/mose'])
+    for (const d of MOSE_ONLY_DIRS) {
+      for (const list of [NOAH_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, ABRAHAM_ONLY_DIRS, JAKOB_ONLY_DIRS, JOSUA_ONLY_DIRS, GIDEON_ONLY_DIRS]) expect(list).not.toContain(d)
+    }
+    const found: string[] = []
+    for (const base of ['public/images/abenteuer', 'public/audio/abenteuer', 'public/images/abenteuer/spiele']) {
+      for (const n of readdirSync(base)) if (/mose/i.test(n) && !n.includes('.')) found.push(`${base.replace('public/', '')}/${n}`)
+    }
+    for (const d of found) expect(MOSE_ONLY_DIRS, d).toContain(d)
+    for (const j of [...journeys, noah, adamEva, babel, abraham, jakob, josua, gideon]) for (const f of journeyFiles(j)) expect(inMoseDir(f), `${j.id}: ${f}`).toBe(false)
+  })
+
+  it('removing takes the folders of Mose out of a build and leaves everything else (the other journeys, the sounds)', () => {
+    const out = mkdtempSync(join(tmpdir(), 'lk-build-mose-'))
+    try {
+      const moseFiles = ['audio/abenteuer/mose/geschichte-01-v1.mp3', 'images/abenteuer/mose/etappe-bild-01.webp', 'images/abenteuer/spiele/mose/hoehle/sack.webp']
+      const keep = ['images/abenteuer/josef/etappe-01.webp', 'audio/abenteuer/noah/geschichte-01.mp3', 'audio/abenteuer/gideon/geschichte-01-v1.mp3', 'images/abenteuer/spiele/jakob/kurbel/eimer.webp', 'audio/abenteuer/klang-stern.mp3']
+      for (const f of [...moseFiles, ...keep]) {
+        mkdirSync(join(out, f, '..'), { recursive: true })
+        writeFileSync(join(out, f), 'x')
+      }
+      stripMoseFiles(out)
+      for (const f of moseFiles) expect(existsSync(join(out, f)), f).toBe(false)
+      for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
+      expect(() => stripMoseFiles(out)).not.toThrow()
     } finally {
       rmSync(out, { recursive: true, force: true })
     }
