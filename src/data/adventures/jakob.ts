@@ -7,8 +7,8 @@
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/jakob/, images/abenteuer/spiele/jakob/<spiel>/, audio/abenteuer/jakob/.
  *
- * STAND: Etappen noch `soon` (nicht spielbar), bis die Bilder (Panorama, Etappenbilder, Medaille, Spielbilder) und die Vorlese-Aufnahmen eingebaut sind.
- * Zahlen, die aus Messdateien der Bilder kommen, sind mit PLATZHALTER markiert und werden beim Einbau durch die gemessenen ersetzt.
+ * STAND 20.10.2026: alle Bilder (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder), Messwerte und Vorlese-Aufnahmen (Deutsch und Englisch) sind eingebaut, die Etappen sind spielbar.
+ * Das Abenteuer ist aber nicht öffentlich: es ist hinter `comingSoon` und dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
 import type { CrankGame, HoldGame, Journey, SlideGame } from '@/types/adventure'
 import { JAKOB_PATH } from './jakobPath'
@@ -18,8 +18,8 @@ import { jakobEn } from './en/jakob.en'
 const IMG = 'images/abenteuer/jakob/'
 const G = 'images/abenteuer/spiele/jakob/'
 const REC = 'audio/abenteuer/jakob/'
-/** `true` = die Etappen sind noch nicht spielbar (Gerüst); beim Einbau der Bilder und Töne auf `false` setzen. */
-const SOON = true
+/** `true` = die Etappen sind noch nicht spielbar (Gerüst); jetzt sind alle Bilder und Töne eingebaut. */
+const SOON = false
 
 /**
  * Etappe 1, "Zählen": Jakobs Schafe vor dem Zelt (Etappenbild 1), jedes angetippt und mitgezählt. Das Zählspiel hat nur eine Szene (keine Runden).
@@ -77,7 +77,7 @@ export const jakob: Journey = {
   title: 'Jakob',
   subtitle: 'Ein Weg mit Umwegen',
   age: '8-10',
-  downloadMb: 1, // beim Einbau neu zählen (der Test sagt die echte Größe)
+  downloadMb: 7, // 7,2 MB gezählt am 20.10.2026 (der Test sagt die echte Größe)
   medal: `${IMG}medaille.webp`, // Jakob und die Himmelsleiter (Treppe aus Steinen im Sternenlicht)
   // Geschenk-Ausmalbild: Jakob und die Himmelsleiter im Traum (Treppe aus Steinen, Sterne, Tiere der Herde schlafend, friedlich)
   gift: { title: 'Jakob und die Himmelsleiter im Traum', image: `${IMG}geschenk.webp` },
