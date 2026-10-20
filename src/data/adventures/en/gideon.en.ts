@@ -99,7 +99,7 @@ export const gideonEn: TextOverlay<Journey> = {
         'So it happens. When Gideon gets up early in the morning, the ground is dry. But the fleece is so wet that he can wring the dew out of it, a whole bowl full of water.',
         'But Gideon asks once more, “Do not be angry with me for asking once more. This time let the fleece stay dry and let there be dew on all the ground around it.” And God does it that night. The fleece is dry, and on all the ground there is dew. Now Gideon knows that he can rely on God.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Let the night go by and find the dew.', dew: { rounds: [{ hint: 'The first night: Draw the moon to the morning. Then dew lies on the fleece. Tap the drops.' }, { hint: 'The second night: This time the fleece is dry. Where does the dew lie now?' }] } },
       questions: [
         { q: 'What does Gideon put on the threshing floor?', options: ['a fleece of wool', 'a cloak', 'a sack of flour'] },
         { q: 'What does Gideon ask God for a second time?', options: ['that the fleece stays dry and the ground gets wet', 'that it rains', 'that the fleece disappears'] }

@@ -11,7 +11,7 @@ import { GIDEON_PATH } from '@/data/adventures/gideonPath'
 import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
-import { tilesFor } from '@/utils/gideonGames'
+import { inBox, tilesFor } from '@/utils/gideonGames'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 
 afterEach(() => setAdventureLanguage('de'))
@@ -112,7 +112,7 @@ describe('Gideon: stories and questions', () => {
 
 describe('Gideon: the placeholders until the games and pictures come', () => {
   it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(gideon.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'quiz', 'wort', 'quiz', 'quiz', 'quiz', 'wimmelbild', 'quiz', 'quiz', 'quiz', 'memory'])
+    expect(gideon.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'quiz', 'wort', 'quiz', 'tau', 'quiz', 'wimmelbild', 'quiz', 'quiz', 'quiz', 'memory'])
     for (const s of gideon.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
@@ -155,6 +155,22 @@ describe('Gideon: the placeholders until the games and pictures come', () => {
     expect(m!.back).toMatch(/spiele\/gideon\/memory\//)
     expect(stage(8).task.kind).toBe('wimmelbild')
     expect(stage(12).task.kind).toBe('memory')
+  })
+
+  it('6 dew: the first night five drops on the fleece, the second eight drops on the ground round it; the fleece lies on the floor; the goal is 13', () => {
+    const g = stage(6).task.dew
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => [r.wet, r.spots.length])).toEqual([['fleece', 5], ['ground', 8]])
+    for (const r of g.rounds) {
+      for (const [x, y] of r.spots) {
+        expect(x >= 0 && x <= 100 && y >= 0 && y <= 100).toBe(true)
+        expect(inBox({ x, y }, g.fleeceBox), `(${x}, ${y}) ${r.wet}`).toBe(r.wet === 'fleece')
+      }
+    }
+    expect(g.fleeceBox.x + g.fleeceBox.w).toBeLessThanOrEqual(100)
+    expect(g.fleeceBox.y + g.fleeceBox.h).toBeLessThanOrEqual(100)
+    expect(g.rounds.reduce((n, r) => n + r.spots.length, 0)).toBe(13)
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

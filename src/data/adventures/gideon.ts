@@ -11,7 +11,7 @@
  * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit allen zwölf Stationen und dem Ziel (PLATZHALTER bis zum eigenen Panorama); Medaille und Geschenk sind ebenfalls die von Josef.
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme. Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { FindGame, Journey, MemoryGame, WordGame } from '@/types/adventure'
+import type { DewGame, FindGame, Journey, MemoryGame, WordGame } from '@/types/adventure'
 import { josef } from './josef'
 import { GIDEON_PATH } from './gideonPath'
 import { localize } from './localize'
@@ -68,6 +68,25 @@ const MEMORY: MemoryGame = {
     { image: `${G}memory/karte-altar.webp`, text: 'Der Altar: Gott ist der Friede.' },
     { image: `${G}memory/karte-krug.webp`, text: 'Der Krug: Darin steckt eine Fackel.' },
     { image: `${G}memory/karte-horn.webp`, text: 'Das Horn: Es ruft die Dreihundert.' }
+  ]
+}
+
+/**
+ * Etappe 6, "Die Nacht vergeht": der Mond wird am Regler vom Abend zum Morgen gezogen, der Himmel tönt sich dabei; am Morgen funkelt der Tau, den das Kind antippt (Bildauftrag G12; eigener Hintergrund
+ * `tau/tenne.webp`, neutral beleuchtet). Runde 1 "die erste Nacht": Tau nur auf dem Fell (fünf Tropfen), Runde 2 "die zweite Nacht": Tau nur auf dem Boden ringsum (acht Tropfen). Fellrechteck und Tropfen
+ * (Prozent der Tenne) sind vorläufig geschätzt, bis die Datei `tau-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `tau/tenne.webp` 1200 × 900, `fell.webp` 420 × 300, `schale.webp` 240 × 160, `mond.webp`, `sonne.webp` je 120 × 120 (alle außer der Tenne transparent).
+ */
+const TAU: DewGame = {
+  background: `${G}tau/tenne.webp`,
+  fleece: `${G}tau/fell.webp`,
+  bowl: `${G}tau/schale.webp`,
+  moon: `${G}tau/mond.webp`,
+  sun: `${G}tau/sonne.webp`,
+  fleeceBox: { x: 30, y: 34, w: 40, h: 34 },
+  rounds: [
+    { hint: 'Die erste Nacht: Ziehe den Mond bis zum Morgen. Dann liegt Tau auf dem Fell. Tippe die Tropfen an.', wet: 'fleece', spots: [[37, 42], [46, 38], [55, 44], [40, 56], [60, 58]] },
+    { hint: 'Die zweite Nacht: Diesmal ist das Fell trocken. Wo liegt der Tau jetzt?', wet: 'ground', spots: [[12, 28], [20, 66], [34, 80], [50, 84], [66, 80], [82, 64], [88, 38], [72, 22]] }
   ]
 }
 
@@ -196,7 +215,7 @@ export const gideon: Journey = {
         'Doch Gideon bittet noch einmal: „Sei mir nicht böse, dass ich noch einmal bitte. Diesmal soll das Fell trocken bleiben und auf dem Boden ringsum Tau liegen.“ Und Gott tut es in dieser Nacht. Das Fell ist trocken, und auf der ganzen Erde liegt Tau. Nun weiß Gideon, dass er sich auf Gott verlassen kann.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Die Nacht vergeht (tau, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'tau', hint: 'Lass die Nacht vergehen und finde den Tau.', dew: TAU },
       questions: [
         { q: 'Was legt Gideon auf die Tenne?', options: ['ein Fell mit Wolle', 'einen Mantel', 'einen Sack Mehl'], answer: 0 },
         { q: 'Worum bittet Gideon Gott ein zweites Mal?', options: ['dass das Fell trocken bleibt und der Boden nass wird', 'dass es regnet', 'dass das Fell verschwindet'], answer: 0 }

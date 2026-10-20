@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { WordGame } from '@/types/adventure'
+import type { DewGame, WordGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -204,5 +204,164 @@ describe('Wimmelbild and Memory with pictures that are not painted yet', () => {
     await flushPromises()
     expect(w.findAll('.mem-stand.mem-front')).toHaveLength(12)
     expect(new Set(w.findAll('.mem-stand.mem-front').map((x) => x.attributes('style'))).size).toBe(6)
+  })
+})
+
+// ---------------------------------------------------------------- the night goes by
+describe('Die Nacht vergeht (dew)', () => {
+  const game: DewGame = {
+    background: 'images/x/floor.webp',
+    fleece: 'images/x/fleece.webp',
+    bowl: 'images/x/bowl.webp',
+    moon: 'images/x/moon.webp',
+    sun: 'images/x/sun.webp',
+    fleeceBox: { x: 30, y: 34, w: 40, h: 34 },
+    rounds: [
+      { hint: 'Die erste Nacht.', wet: 'fleece', spots: [[40, 45], [55, 50]] },
+      { hint: 'Die zweite Nacht.', wet: 'ground', spots: [[10, 20], [85, 80], [50, 85]] }
+    ]
+  }
+  // everything is 400 x 300 pixels: a percent of the width is four pixels, a percent of the height three
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, width: 400, height: 300, right: 400, bottom: 300, x: 0, y: 0, toJSON: () => ({}) })
+    const { default: Dew } = await import('@/components/molecules/games/GameDew.vue')
+    const w = mount(Dew, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  const morning = async (w: W) => {
+    await w.find('.dw-track').trigger('keydown', { key: 'End' })
+  }
+  const tapField = async (w: W, x: number, y: number) => {
+    await w.find('.dw-field').trigger('click', { clientX: x * 4, clientY: y * 3 })
+    await flushPromises()
+  }
+  const roundOne = async (w: W) => {
+    await morning(w)
+    await w.findAll('.dw-spot')[0]!.trigger('click')
+    await w.findAll('.dw-spot')[1]!.trigger('click')
+  }
+  const roundTwo = async (w: W) => {
+    await morning(w)
+    for (let i = 0; i < 3; i++) await w.findAll('.dw-spot')[i]!.trigger('click')
+  }
+
+  it('the goal is every drop of both rounds; it is evening, no drops yet, the moon is on the bar', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(5)
+    expect(w.find('.dw-round').text()).toContain('Runde 1 von 2')
+    expect(w.find('.dw-track').attributes('aria-valuenow')).toBe('0')
+    expect(w.find('.dw-track').attributes('aria-valuetext')).toBe('Nacht')
+    expect(w.findAll('.dw-spot')).toHaveLength(0)
+    expect(w.find('.dw-count').text()).toBe('Tautropfen: 0 von 2')
+  })
+
+  it('drawing the moon along the bar changes the sky: dark, rose, light; from the dawn on the sun takes the place of the moon', async () => {
+    const w = await open()
+    const dark = w.find('.dw-sky').attributes('style')
+    expect(dark).toContain('rgb(22, 32, 72)')
+    w.find('.dw-track').element.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 200 }))
+    window.dispatchEvent(new MouseEvent('pointerup'))
+    await flushPromises()
+    expect(w.find('.dw-track').attributes('aria-valuenow')).toBe('50')
+    expect(w.find('.dw-sky').attributes('style')).not.toBe(dark)
+    w.find('.dw-track').element.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 300 }))
+    window.dispatchEvent(new MouseEvent('pointerup'))
+    await flushPromises()
+    expect(w.find('.dw-track').attributes('aria-valuetext')).toBe('Morgendämmerung')
+  })
+
+  it('the arrow keys move the moon; the end key brings the morning, the drops glitter', async () => {
+    const w = await open()
+    await w.find('.dw-track').trigger('keydown', { key: 'ArrowRight' })
+    expect(w.find('.dw-track').attributes('aria-valuenow')).toBe('5')
+    await w.find('.dw-track').trigger('keydown', { key: 'ArrowLeft' })
+    await w.find('.dw-track').trigger('keydown', { key: 'ArrowLeft' })
+    expect(w.find('.dw-track').attributes('aria-valuenow')).toBe('0')
+    await morning(w)
+    expect(w.find('.dw-track').attributes('aria-valuetext')).toBe('Morgen')
+    expect(w.findAll('.dw-spot')).toHaveLength(2)
+  })
+
+  it('a tap on a drop finds it: a tick, the drop turns green, the point is counted', async () => {
+    const w = await open()
+    await morning(w)
+    await w.findAll('.dw-spot')[0]!.trigger('click')
+    expect(w.findAll('.dw-spot.found')).toHaveLength(1)
+    expect(played).toContain('bead')
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(w.find('.dw-count').text()).toBe('Tautropfen: 1 von 2')
+  })
+
+  it('before the morning a tap on the floor does nothing; in the morning a tap on a dry place is a little sun with a cross and a mistake, a tap on the wet place between the drops is nothing', async () => {
+    const w = await open()
+    await tapField(w, 10, 10)
+    expect(played).toHaveLength(0)
+    await morning(w)
+    await tapField(w, 50, 60)
+    expect(played).not.toContain('wrong')
+    await tapField(w, 10, 10)
+    expect(played).toContain('wrong')
+    expect(w.find('.dw-dry').exists()).toBe(true)
+    expect(w.find('.dw-fb').text()).toContain('Boden trocken')
+    await tick(1000)
+    expect(w.find('.dw-dry').exists()).toBe(false)
+  })
+
+  it('when the moon is drawn back the drops are gone for the moment, and the found ones stay found', async () => {
+    const w = await open()
+    await morning(w)
+    await w.findAll('.dw-spot')[0]!.trigger('click')
+    await w.find('.dw-track').trigger('keydown', { key: 'Home' })
+    expect(w.findAll('.dw-spot')).toHaveLength(0)
+    await morning(w)
+    expect(w.findAll('.dw-spot.found')).toHaveLength(1)
+    expect(played).not.toContain('wrong')
+  })
+
+  it('all the drops of the first night found: the bowl fills; the second night starts in the evening with dew on the ground and a dry fleece', async () => {
+    const w = await open()
+    await roundOne(w)
+    expect(w.find('.dw-bowl').classes()).toContain('full')
+    expect(played).toContain('star')
+    await tick(2300)
+    expect(w.find('.dw-round').text()).toContain('Runde 2 von 2')
+    expect(w.find('.dw-track').attributes('aria-valuenow')).toBe('0')
+    expect(w.find('.dw-count').text()).toBe('Tautropfen: 0 von 3')
+    await morning(w)
+    expect(w.findAll('.dw-spot')).toHaveLength(3)
+    // now the fleece is dry
+    await tapField(w, 50, 50)
+    expect(played).toContain('wrong')
+    expect(w.find('.dw-fb').text()).toContain('Fell trocken')
+  })
+
+  it('the whole game: the end with three stars; the taps on dry places give the stars (up to two: three, up to six: two, more: one)', async () => {
+    for (const [wrong, stars] of [[0, 3], [2, 3], [3, 2], [6, 2], [7, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      await morning(w)
+      for (let i = 0; i < wrong; i++) await tapField(w, 10, 10)
+      await roundOne(w)
+      await tick(2300)
+      await roundTwo(w)
+      await tick(1600)
+      expect(useTaskProgress().parts.value).toBe(5)
+      expect(useTaskProgress().finished.value).toBe(true)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${wrong} wrong`).toEqual([[stars]])
+      w.unmount()
+    }
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.dw-count').text()).toBe('Drops of dew: 0 of 2')
+    expect(w.find('.dw-track').attributes('aria-valuetext')).toBe('Night')
+    await morning(w)
+    await tapField(w, 10, 10)
+    expect(w.find('.dw-fb').text()).toBe('The ground is dry here. The dew lies on the fleece.')
   })
 })
