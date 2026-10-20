@@ -11,7 +11,7 @@
  * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit den ersten zehn Stationen (PLATZHALTER bis zum eigenen Panorama); Medaille und Geschenk sind ebenfalls die von Josef.
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme. Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { Journey } from '@/types/adventure'
+import type { Journey, MemoryGame, VerseGame } from '@/types/adventure'
 import { josef } from './josef'
 import { JOSUA_PATH } from './josuaPath'
 import { localize } from './localize'
@@ -19,6 +19,31 @@ import { josuaEn } from './en/josua.en'
 
 // PLATZHALTER bis zum eigenen Bild: die Etappenbilder von Josef (Ordner images/abenteuer/josef/); danach `images/abenteuer/josua/etappe-bild-NN.webp`
 const PLACEHOLDER = 'images/abenteuer/josef/'
+const G = 'images/abenteuer/spiele/josua/'
+
+/** Etappe 10, "Lückenvers": zwei Sätze aus dem Text der Etappe; die Wörter sind kurze Blätter (das richtige zuerst, `answers` zeigt auf sie). Tafel und Blatt sind die aus Adam und Eva, kopiert. Hintergrund ist das Etappenbild 10. */
+const VERS: VerseGame = {
+  background: `${PLACEHOLDER}etappe-bild-11.webp`,
+  board: `${G}lueckenvers/tafel.webp`,
+  leaf: `${G}lueckenvers/blatt.webp`,
+  rounds: [
+    { hint: 'Runde 1: Ziehe das passende Blatt in die Lücke.', parts: ['Ich aber und mein Haus, wir wollen Gott ', '.'], words: ['dienen', 'vergessen', 'verlassen'], answers: [0] },
+    { hint: 'Runde 2: Jetzt fehlen zwei Wörter.', parts: ['Dieser Stein soll ', ' sein, denn er hat alle ', ' gehört, die Gott zu uns gesprochen hat.'], words: ['Zeuge', 'Worte', 'Zeichen', 'Steine'], answers: [0, 1] }
+  ]
+}
+
+/** Etappe 5, "Erinnerungs-Memory": sechs Paare aus den Etappen 1 bis 5; zu jedem Treffer ein Satz aus dem Text. Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `memory/karte-*.webp` und `rueck.webp`, je 256 × 256. */
+const MEMORY: MemoryGame = {
+  back: `${G}memory/rueck.webp`,
+  pairs: [
+    { image: `${G}memory/karte-buch.webp`, text: 'Die Schriftrolle: Gott sagt Josua, er soll das Buch des Gesetzes nicht aus seinem Mund lassen.' },
+    { image: `${G}memory/karte-flachs.webp`, text: 'Das Flachsbündel: Darunter hat Rahab die Männer versteckt.' },
+    { image: `${G}memory/karte-schnur.webp`, text: 'Die rote Schnur am Fenster: Sie ist das Zeichen für Rahabs Haus.' },
+    { image: `${G}memory/karte-seil.webp`, text: 'Das Seil: An ihm lässt Rahab die Männer aus dem Fenster hinab.' },
+    { image: `${G}memory/karte-lade.webp`, text: 'Die Lade des Bundes: Die Priester tragen sie voran in den Jordan.' },
+    { image: `${G}memory/karte-stein.webp`, text: 'Der Stein: Zwölf Steine erinnern an den Weg durch den Jordan.' }
+  ]
+}
 
 export const josua: Journey = {
   id: 'josua',
@@ -123,7 +148,7 @@ export const josua: Journey = {
         'Es ist der zehnte Tag des ersten Monats, als das Volk bei Gilgal lagert, östlich von Jericho. Dort stellt Josua die zwölf Steine auf. „Wenn eure Kinder fragen, was sie bedeuten“, sagt er, „dann erzählt ihnen: Israel ist auf trockenem Boden durch den Jordan gegangen, so wie Gott es einst beim Schilfmeer getan hat. Alle Völker sollen sehen, wie mächtig Gott ist.“'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild; vorgesehen: Erinnerungs-Memory (memory, alt)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'memory', hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.', memory: MEMORY },
       questions: [
         { q: 'Wo lagert das Volk, als Josua die Steine aufstellt?', options: ['in Gilgal', 'in Jericho', 'in Sichem'], answer: 0 },
         { q: 'Was sollen die Eltern antworten, wenn die Kinder nach den Steinen fragen?', options: ['Das Wasser des Jordan floss nicht mehr.', 'Wir haben sie für ein Haus gesammelt.', 'Gott hat sie uns geschenkt.'], answer: 0 }
@@ -212,7 +237,7 @@ export const josua: Journey = {
         'An diesem Tag schließt Josua mit dem Volk einen Bund. Er schreibt die Worte in das Buch des Gesetzes Gottes und richtet unter der Eiche einen großen Stein auf. „Seht, dieser Stein soll Zeuge sein“, sagt er, „denn er hat alle Worte gehört, die Gott zu uns gesprochen hat.“ Dann schickt er das Volk heim. Nach diesen Ereignissen stirbt Josua im Alter von hundertzehn Jahren, und das Volk dient Gott, solange er und die Ältesten nach ihm leben.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild; vorgesehen: Lückenvers (lueckenvers, alt)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'lueckenvers', hint: 'Setze die fehlenden Wörter in den Satz.', verse: VERS },
       questions: [
         { q: 'Wo versammelt Josua das Volk?', options: ['in Sichem', 'in Jericho', 'in Gilgal'], answer: 0 },
         { q: 'Was richtet Josua unter der Eiche auf?', options: ['einen großen Stein', 'ein Zelt', 'einen Altar mit Feuer'], answer: 0 }

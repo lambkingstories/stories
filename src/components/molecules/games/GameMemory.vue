@@ -4,7 +4,7 @@
  * the pair is in the story; two cards of different pairs turn back. Turning cards that do not match is the game itself, not a mistake. The game has a time limit
  * instead: every full minute takes one star away (three stars at first, one at least once all pairs are found; a skipped game earns one).
  */
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useTimers from '@/use/useTimers'
 import GameDone from '@/components/molecules/games/GameDone.vue'
@@ -49,6 +49,10 @@ const cards = computed<Card[]>(() => {
 })
 
 const back = computed(() => prependBaseUrl(props.game.back))
+/** The pictures that could not be loaded (not painted yet): a quiet one-colour card stands in their place. */
+const missing = reactive(new Set<string>())
+const STAND = ['#d98b5f', '#6f9fc2', '#7fb069', '#e0c25a', '#b58ac4', '#7fc4b8', '#c98a8a', '#9aa5b5']
+const standOf = (pair: number) => STAND[pair % STAND.length]
 const open = ref<number[]>([])
 const matched = ref<number[]>([])
 const locked = ref(false)
@@ -112,8 +116,10 @@ function turn(c: Card) {
         @click="turn(c)"
       )
         span(class="mem-in")
-          img(class="mem-face mem-back" :src="back" alt="" draggable="false")
-          img(class="mem-face mem-front" :src="c.src" alt="" draggable="false")
+          img(v-if="!missing.has(back)" class="mem-face mem-back" :src="back" alt="" draggable="false" @error="missing.add(back)")
+          span(v-else class="mem-face mem-back mem-stand back")
+          img(v-if="!missing.has(c.src)" class="mem-face mem-front" :src="c.src" alt="" draggable="false" @error="missing.add(c.src)")
+          span(v-else class="mem-face mem-front mem-stand" :style="{ background: standOf(c.pair) }")
     p(v-if="text" class="mem-text" role="status") {{ text }}
     p(v-else class="mem-text mem-quiet") {{ t('app.adventure.memoryHint') }}
     GameDone(v-if="finished" :stars="stars" @next="emit('done', stars)")
@@ -162,6 +168,15 @@ function turn(c: Card) {
 
 .mem-front
   transform: rotateY(180deg)
+
+.mem-stand
+  box-sizing: border-box
+  border-radius: 14%
+  border: 3px solid rgba(255, 255, 255, 0.75)
+  filter: none
+
+  &.back
+    background: #8d6b3f
 
 .mem-card.found .mem-front
   filter: drop-shadow(0 0 4px #2fae54) drop-shadow(0 0 10px #2fae54)

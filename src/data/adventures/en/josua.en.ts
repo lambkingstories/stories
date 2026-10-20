@@ -80,7 +80,7 @@ export const josuaEn: TextOverlay<Journey> = {
         'The priests stay in the riverbed until everything is done, and the people hurry across. Then, at Joshua’s command, they climb up out of the Jordan. As soon as they step onto the bank, the water returns and flows over its banks again as before.',
         'It is the tenth day of the first month when the people camp at Gilgal, east of Jericho. There Joshua sets up the twelve stones. “When your children ask what they mean,” he says, “tell them: Israel crossed the Jordan on dry ground, just as God once did at the Red Sea. All the peoples should see how mighty God is.”'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Find the matching cards. Remember where each one lies.', memory: { pairs: [{ text: 'The scroll: God tells Joshua not to let the Book of the Law depart from his mouth.' }, { text: 'The bundle of flax: Rahab hid the men under it.' }, { text: 'The red cord at the window: It is the sign for Rahab’s house.' }, { text: 'The rope: Rahab lets the men down from the window on it.' }, { text: 'The ark of the covenant: The priests carry it ahead into the Jordan.' }, { text: 'The stone: Twelve stones remind us of the way through the Jordan.' }] } },
       questions: [
         { q: 'Where do the people camp when Joshua sets up the stones?', options: ['at Gilgal', 'at Jericho', 'at Shechem'] },
         { q: 'What should the parents answer when the children ask about the stones?', options: ['The water of the Jordan stopped flowing.', 'We gathered them to build a house.', 'God gave them to us.'] }
@@ -154,7 +154,7 @@ export const josuaEn: TextOverlay<Journey> = {
         'The people answer, “Far be it from us to leave God! He brought us out of Egypt and protected us all along our way. We will serve God, for he is our God.”',
         'On that day Joshua makes a covenant with the people. He writes the words in the book of God’s law and sets up a large stone under the oak. “Look, this stone shall be a witness,” he says, “for it has heard all the words God has spoken to us.” Then he sends the people home. After these events Joshua dies at the age of one hundred and ten, and the people serve God as long as he and the elders after him live.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Put the missing words into the sentence.', verse: { rounds: [{ hint: 'Round 1: Drag the right leaf into the gap.', parts: ['As for me and my household, we will ', ' God.'], words: ['serve', 'forget', 'leave'] }, { hint: 'Round 2: Now two words are missing.', parts: ['This stone shall be a ', ' for it has heard all the ', ' that God has spoken to us.'], words: ['witness', 'words', 'sign', 'stones'] }] } },
       questions: [
         { q: 'Where does Joshua gather the people?', options: ['at Shechem', 'at Jericho', 'at Gilgal'] },
         { q: 'What does Joshua set up under the oak?', options: ['a large stone', 'a tent', 'an altar with fire'] }

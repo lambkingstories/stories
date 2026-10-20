@@ -11,7 +11,7 @@ import { JOSUA_PATH } from '@/data/adventures/josuaPath'
 import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
-import { journeyFiles } from '@/utils/journeyFiles'
+import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => josua.stages[n - 1]!
@@ -106,8 +106,32 @@ describe('Josua: stories and questions', () => {
 
 describe('Josua: the placeholders until the games and pictures come', () => {
   it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(josua.stages.map((s) => s.task.kind)).toEqual(Array(10).fill('quiz'))
+    expect(josua.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'quiz', 'quiz', 'memory', 'quiz', 'quiz', 'quiz', 'quiz', 'lueckenvers'])
     for (const s of josua.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
+  })
+
+  it('5 memory: six pairs from the stages 1 to 5, each with a sentence that is true to the text; 10 verse: two sentences from the text with the right words first', () => {
+    const m = stage(5).task.memory
+    expect(m, 'the game is built').toBeDefined()
+    expect(m!.pairs).toHaveLength(6)
+    const told = josua.stages.slice(0, 5).map((x) => x.text.join(' ')).join(' ')
+    for (const word of ['Buch des Gesetzes', 'Flachs', 'Schnur', 'Seil', 'Lade', 'Steine']) expect(told, word).toContain(word)
+    for (const p of m!.pairs) expect(p.text.length).toBeGreaterThan(20)
+    expect(stage(5).task.memory!.back).toMatch(/spiele\/josua\/memory\//)
+    const v = stage(10).task.verse
+    expect(v, 'the game is built').toBeDefined()
+    expect(v!.rounds).toHaveLength(2)
+    expect(v!.rounds.map((r) => r.answers.length)).toEqual([1, 2])
+    for (const r of v!.rounds) {
+      expect(r.parts).toHaveLength(r.answers.length + 1)
+      expect(r.answers.map((a) => r.words[a])).toBeDefined()
+    }
+    expect(v!.rounds[0]!.answers.map((a) => v!.rounds[0]!.words[a])).toEqual(['dienen'])
+    expect(v!.rounds[1]!.answers.map((a) => v!.rounds[1]!.words[a])).toEqual(['Zeuge', 'Worte'])
+    // the words and the sentences come from the text of the stage
+    const text = stage(10).text.join(' ')
+    for (const word of ['dienen', 'Zeuge', 'Worte']) expect(text, word).toContain(word)
+    expect(v!.background).toBe(stage(10).image)
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {
@@ -125,6 +149,7 @@ describe('Josua: the placeholders until the games and pictures come', () => {
   it('every file that the data names exists (the pictures of Josef, the map, the medal) and is small enough', () => {
     let bytes = 0
     for (const f of journeyFiles(josua)) {
+      if (notPaintedYet(f) && !existsSync(`public/${f}`)) continue
       expect(existsSync(`public/${f}`), `missing: ${f}`).toBe(true)
       const size = statSync(`public/${f}`).size
       expect(size, f).toBeLessThan(1_800_000)
