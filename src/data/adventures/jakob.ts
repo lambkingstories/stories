@@ -40,7 +40,8 @@ const SCHIEBEN: SlideGame = {
 
 /**
  * Etappe 4, "Brunnen kurbeln": der Brunnen im Etappenbild 4 mit einer Kurbel, einem Eimer am Seil und einem Trog (Bildauftrag J10). Runde 1 ein Eimer, Runde 2 drei.
- * PLATZHALTER: die Plätze (Kurbelmitte, Seil x und Eimer oben/unten, Trog x, y, Breite; Prozent des Etappenbildes) kommen aus `kurbel/kurbel-messung.json`.
+ * Die Plätze (Kurbelmitte, Seil x und Eimer oben/unten, Trog Mitte x, y und Breite; Prozent des Etappenbildes 4) sind die Messwerte aus `kurbel/kurbel-messung.json`; der Trog (dort als linke Kante x 62, Unterkante y 97,
+ * Breite 23, Höhe 2:1 gemessen) ist auf seine Mitte umgerechnet: x 62 + 11,5, y 97 - 8,6. Der Trog steht am Fuß der rechten Brunnenwand (die Lage links aus dem Bildlauf lag auf den Schafsköpfen).
  */
 const KURBEL: CrankGame = {
   background: `${IMG}etappe-bild-04.webp`,
@@ -48,9 +49,9 @@ const KURBEL: CrankGame = {
   bucket: `${G}kurbel/eimer.webp`,
   troughEmpty: `${G}kurbel/trog-leer.webp`,
   troughFull: `${G}kurbel/trog-voll.webp`,
-  crankAt: [72, 50],
-  bucketAt: [52, 36, 62],
-  troughAt: [26, 76, 26],
+  crankAt: [44, 82],
+  bucketAt: [59, 63, 75],
+  troughAt: [73.5, 88.4, 23],
   rounds: [
     { hint: 'Hole einen Eimer Wasser für die Schafe.', buckets: 1 },
     { hint: 'Jetzt trinkt die ganze Herde: drei Eimer.', buckets: 3 }
