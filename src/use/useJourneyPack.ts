@@ -6,7 +6,7 @@
  */
 import { computed, reactive, ref } from 'vue'
 import type { Journey } from '@/types/adventure'
-import { journeyFiles, PACK_VERSION } from '@/utils/journeyFiles'
+import { journeyFiles, notPaintedYet, PACK_VERSION } from '@/utils/journeyFiles'
 import { prependBaseUrl } from '@/utils/function'
 
 const KEY = 'lk-journey-packs'
@@ -87,7 +87,15 @@ export default function useJourneyPack() {
         async (path) => {
           const url = prependBaseUrl(path)
           const res = await fetch(url)
-          if (!res.ok) throw new Error(`${res.status} ${path}`)
+          if (!res.ok) {
+            // a picture that is not painted yet is replaced by a plain shape in the game
+            if (notPaintedYet(path)) {
+              done++
+              progress.value = done / urls.length
+              return
+            }
+            throw new Error(`${res.status} ${path}`)
+          }
           bytes += Number(res.headers.get('content-length') ?? 0)
           if (cache) await cache.put(url, res)
           else await res.arrayBuffer()

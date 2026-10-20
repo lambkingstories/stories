@@ -50,6 +50,14 @@ function pathsIn(value: unknown, out: Set<string>) {
   }
 }
 
+/**
+ * Folders of pictures that are not painted yet (the games stand in with plain shapes, see `GameImage`): a file of these folders that the
+ * server does not have is no failure of the download. Take a folder out of this list when its pictures are delivered.
+ */
+export const NOT_PAINTED_YET = ['images/abenteuer/spiele/jakob/jahre/']
+
+export const notPaintedYet = (path: string) => NOT_PAINTED_YET.some((p) => path.startsWith(p))
+
 export function journeyFiles(journey: Journey): string[] {
   // the general music pieces only belong to a journey that has no music of its own (its own pieces are written in its data)
   const out = new Set<string>([...ADVENTURE_UI_FILES, ...SFX_FILES, ...(journey.music?.length ? [] : MUSIC_FILES)])

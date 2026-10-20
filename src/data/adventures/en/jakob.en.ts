@@ -87,7 +87,7 @@ export const jakobEn: TextOverlay<Journey> = {
         'Then Laban invites all the people to the wedding feast. But in the evening he brings not Rachel to Jacob but his older daughter Leah, and Jacob does not notice until morning. It is a bitter surprise. “Why have you done this?” he asks Laban. “In our country we do not give the younger daughter before the older,” answers Laban.',
         '“Finish the wedding week with Leah,” he says, “then you will get Rachel, too, if you work for me another seven years.” Jacob agrees, and after the week Rachel becomes his wife as well. So he stays with Laban another seven years.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Drag the seasons into the gaps, year after year.', cycle: { tokens: [{ label: 'Spring: a branch with blossoms' }, { label: 'Summer: a sun with ears of grain' }, { label: 'Autumn: falling leaves' }, { label: 'Winter: a rain cloud with drops' }], rounds: [{ hint: 'Two years go by. Which sign is missing in the gap?' }, { hint: 'Seven years go by. Fill in the missing signs, even at the end of the row.' }] } },
       questions: [
         { q: 'How many years does Jacob work for Rachel at first?', options: ['seven', 'two', 'twenty'] },
         { q: 'Whom does Laban bring to Jacob on the wedding evening?', options: ['Leah', 'Rachel', 'Rebekah'] }

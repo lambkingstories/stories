@@ -11,7 +11,7 @@
  * Davor: alle Bilder (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder), Messwerte und Vorlese-Aufnahmen (Deutsch und Englisch) sind eingebaut, die Etappen sind spielbar.
  * Das Abenteuer ist aber nicht öffentlich: es ist hinter `comingSoon` und dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { CrankGame, GuessGame, HoldGame, Journey, SlideGame } from '@/types/adventure'
+import type { CrankGame, CycleGame, GuessGame, HoldGame, Journey, SlideGame } from '@/types/adventure'
 import { JAKOB_PATH } from './jakobPath'
 import { localize } from './localize'
 import { jakobEn } from './en/jakob.en'
@@ -70,6 +70,25 @@ const HALTEN: HoldGame = {
   rounds: [
     { hint: 'Lege den Finger auf das Licht und halte es.', seconds: 10 },
     { hint: 'Jetzt wandert das Licht am Ufer: geh mit.', seconds: 15, path: [[22, 89], [29, 92], [36, 94], [43, 95], [50, 95], [57, 95], [64, 94], [71, 93]] }
+  ]
+}
+
+/**
+ * Etappe 5, "Jahreszeiten fortsetzen": eine Reihe von Plätzen, in der die vier Zeichen der Jahreszeiten Jahr für Jahr wiederkehren, einige Plätze sind leer (Bildauftrag J20; Hintergrund = das
+ * Etappenbild, unten gesetzt). Ein Jahr ist eine Reihe von vier Plätzen. Runde 1 zwei Jahre mit zwei Lücken in der Mitte, Runde 2 sieben Jahre mit vier Lücken, zwei davon am Ende.
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `jahre/fruehling.webp`, `sommer.webp`, `herbst.webp`, `winter.webp`, je 160 × 160, transparent.
+ */
+const JAHRE: CycleGame = {
+  background: '',
+  tokens: [
+    { id: 'fruehling', image: `${G}jahre/fruehling.webp`, label: 'Frühling: ein Zweig mit Blüten' },
+    { id: 'sommer', image: `${G}jahre/sommer.webp`, label: 'Sommer: eine Sonne mit Ähren' },
+    { id: 'herbst', image: `${G}jahre/herbst.webp`, label: 'Herbst: fallende Blätter' },
+    { id: 'winter', image: `${G}jahre/winter.webp`, label: 'Winter: eine Regenwolke mit Tropfen' }
+  ],
+  rounds: [
+    { hint: 'Zwei Jahre vergehen. Welches Zeichen fehlt in der Lücke?', cycle: ['fruehling', 'sommer', 'herbst', 'winter'], length: 8, gaps: [2, 5] },
+    { hint: 'Sieben Jahre vergehen. Setze die fehlenden Zeichen ein, auch am Ende der Reihe.', cycle: ['fruehling', 'sommer', 'herbst', 'winter'], length: 28, gaps: [10, 17, 26, 27] }
   ]
 }
 
@@ -232,7 +251,7 @@ export const jakob: Journey = {
         '„Feiere erst die Hochzeitswoche mit Lea zu Ende“, sagt er, „dann bekommst du auch Rahel, wenn du noch einmal sieben Jahre für mich arbeitest.“ Jakob ist einverstanden, und nach der Woche wird auch Rahel seine Frau. So bleibt er noch weitere sieben Jahre bei Laban.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'jahre', hint: 'Ziehe die Jahreszeiten in die Lücken, Jahr für Jahr.', cycle: JAHRE },
       questions: [
         { q: 'Wie viele Jahre arbeitet Jakob zuerst für Rahel?', options: ['sieben', 'zwei', 'zwanzig'], answer: 0 },
         { q: 'Wen führt Laban am Hochzeitsabend zu Jakob?', options: ['Lea', 'Rahel', 'Rebekka'], answer: 0 }
@@ -392,7 +411,7 @@ export const jakob: Journey = {
 // the game of a stage lies on the picture of the stage (it follows when the stage picture is replaced)
 for (const s of jakob.stages) {
   const t = s.task
-  for (const g of [t.guess]) if (g) g.background = s.image
+  for (const g of [t.guess, t.cycle]) if (g) g.background = s.image
 }
 
 // the English texts (title, stories, questions, hints, recordings) lie over the German ones; the screens show them when the app is English

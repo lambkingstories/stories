@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { GuessGame } from '@/types/adventure'
+import type { CycleGame, GuessGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -172,5 +172,129 @@ describe('Herden schätzen (guess)', () => {
     expect(w.findAll('.gs-choices button').map((b) => b.text())).toEqual(['The left herd', 'The right herd'])
     await btn(w, 'The left herd').trigger('click')
     expect(w.find('.gs-fb').text()).toBe('Look again, closely.')
+  })
+})
+
+// ---------------------------------------------------------------- seasons of the years
+describe('Jahreszeiten fortsetzen (cycle)', () => {
+  const tok = (id: string, label: string) => ({ id, image: `images/x/${id}.webp`, label })
+  const game: CycleGame = {
+    background: 'images/x/field.webp',
+    tokens: [tok('fruehling', 'Frühling'), tok('sommer', 'Sommer'), tok('herbst', 'Herbst'), tok('winter', 'Winter')],
+    rounds: [
+      { hint: 'Runde eins: zwei Jahre.', cycle: ['fruehling', 'sommer', 'herbst', 'winter'], length: 8, gaps: [2, 5] },
+      { hint: 'Runde zwei: mehr Jahre.', cycle: ['fruehling', 'sommer', 'herbst', 'winter'], length: 12, gaps: [1, 10, 11] }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Cycle } = await import('@/components/molecules/games/GameCycle.vue')
+    const w = mount(Cycle, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  const SIGNS = ['Frühling', 'Sommer', 'Herbst', 'Winter']
+  const gap = (w: W, index: number) => w.find(`[data-drop="gap-${index}"]`)
+  /** Tap a sign (a press and a release without moving chooses it), then tap a gap. */
+  const put = async (w: W, sign: string, index: number) => {
+    const el = w.findAll('.cy-token')[SIGNS.indexOf(sign)]!.element
+    el.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 5, clientY: 5 }))
+    window.dispatchEvent(new MouseEvent('pointerup', { clientX: 5, clientY: 5 }))
+    await flushPromises()
+    await gap(w, index).trigger('click')
+    await flushPromises()
+  }
+
+  it('the goal is every gap of both rounds; the row has the places of two years, two of them are gaps; the tally stick has no notch yet', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(5)
+    expect(w.find('.cy-round').text()).toContain('Runde 1 von 2')
+    expect(w.findAll('.cy-place')).toHaveLength(8)
+    expect(w.findAll('.cy-place.gap')).toHaveLength(2)
+    expect(w.findAll('.cy-token')).toHaveLength(4)
+    expect(w.findAll('.cy-notch')).toHaveLength(2)
+    expect(w.findAll('.cy-notch.lit')).toHaveLength(0)
+    expect(w.find('.cy-years').text()).toBe('Jahre: 0 von 2')
+    expect(gap(w, 2).attributes('aria-label')).toBe('Lücke an Platz 3')
+  })
+
+  it('the right sign clicks into the gap (a tick, a part of the task); a wrong sign is a cross, a mistake, and nothing is placed', async () => {
+    const w = await open()
+    await put(w, 'Winter', 2)
+    expect(played).toContain('wrong')
+    expect(w.find('.cy-fb').text()).toContain('nicht die nächste Jahreszeit')
+    expect(gap(w, 2).classes()).not.toContain('filled')
+    expect(gap(w, 2).find('.gi').exists()).toBe(false)
+    expect(useTaskProgress().parts.value).toBe(0)
+    await put(w, 'Herbst', 2)
+    expect(played).toContain('snap')
+    expect(gap(w, 2).classes()).toContain('filled')
+    expect(gap(w, 2).attributes('aria-label')).toBe('Platz 3: Herbst')
+    expect(useTaskProgress().parts.value).toBe(1)
+  })
+
+  it('a year is complete when its row has no gap left: the tally stick gets a notch (year one has the first gap, year two the second one)', async () => {
+    const w = await open()
+    await put(w, 'Herbst', 2)
+    expect(w.findAll('.cy-notch.lit')).toHaveLength(1)
+    expect(w.find('.cy-years').text()).toBe('Jahre: 1 von 2')
+    await put(w, 'Sommer', 5)
+    expect(w.findAll('.cy-notch.lit')).toHaveLength(2)
+  })
+
+  it('a gap that is filled cannot be filled again, and tapping a gap without a chosen sign does nothing', async () => {
+    const w = await open()
+    await gap(w, 2).trigger('click')
+    expect(played).not.toContain('wrong')
+    await put(w, 'Herbst', 2)
+    await put(w, 'Winter', 2)
+    expect(played.filter((p) => p === 'wrong')).toHaveLength(0)
+    expect(useTaskProgress().parts.value).toBe(1)
+  })
+
+  it('round 2: a longer row with three gaps, two of them at the very end ("what comes next?"); all gaps filled: the end with the stars', async () => {
+    const w = await open()
+    await put(w, 'Herbst', 2)
+    await put(w, 'Sommer', 5)
+    await tick(1600)
+    expect(w.find('.cy-round').text()).toContain('Runde 2 von 2')
+    expect(w.findAll('.cy-place')).toHaveLength(12)
+    expect(w.findAll('.cy-place.gap')).toHaveLength(3)
+    await put(w, 'Sommer', 1)
+    await put(w, 'Herbst', 10)
+    await put(w, 'Winter', 11)
+    await tick(1100)
+    expect(useTaskProgress().parts.value).toBe(5)
+    expect(useTaskProgress().finished.value).toBe(true)
+    expect(w.text()).toContain('Die Jahre vergehen, sieben Jahre für Rahel!')
+    await w.find('.gd button').trigger('click')
+    expect(w.emitted('done')).toEqual([[3]])
+    expect(problems()).toEqual([])
+  })
+
+  it('stars follow the mistakes: two mistakes three stars, five two stars, six one star', async () => {
+    for (const [mistakes, stars] of [[2, 3], [3, 2], [5, 2], [6, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      for (let i = 0; i < mistakes; i++) await put(w, 'Winter', 2)
+      await put(w, 'Herbst', 2)
+      await put(w, 'Sommer', 5)
+      await tick(1600)
+      await put(w, 'Sommer', 1)
+      await put(w, 'Herbst', 10)
+      await put(w, 'Winter', 11)
+      await tick(1100)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${mistakes} mistakes`).toEqual([[stars]])
+      w.unmount()
+    }
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.cy-years').text()).toBe('Years: 0 of 2')
+    expect(gap(w, 2).attributes('aria-label')).toBe('Gap at place 3')
+    await put(w, 'Winter', 2)
+    expect(w.find('.cy-fb').text()).toContain('not the next season')
   })
 })

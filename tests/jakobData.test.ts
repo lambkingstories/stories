@@ -11,7 +11,7 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
 import { isSolved, scramble } from '@/utils/jakobGames'
-import { journeyFiles } from '@/utils/journeyFiles'
+import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 
 afterEach(() => setAdventureLanguage('de'))
 const released = jakob.stages.every((s) => !s.soon)
@@ -142,6 +142,23 @@ describe('Jakob: every stage has the game that was chosen', () => {
     expect(h.rounds[1]!.path!.length).toBeGreaterThanOrEqual(3)
     expect(h.background).toBe('images/abenteuer/jakob/etappe-bild-05.webp')
     expect(JSON.stringify(h)).not.toMatch(/gegner|kampf|feind/i)
+  })
+
+  it('5 seasons (when built): four signs, a row of two years and a row of seven years, the gaps lie inside the rows, two of them at the very end in round 2', () => {
+    const c = stage(5).task.cycle
+    if (!c) return
+    expect(c.tokens.map((t) => t.id)).toEqual(['fruehling', 'sommer', 'herbst', 'winter'])
+    expect(c.rounds.map((r) => r.length)).toEqual([8, 28])
+    for (const r of c.rounds) {
+      expect(r.cycle).toEqual(c.tokens.map((t) => t.id))
+      expect(r.length % r.cycle.length, 'whole years').toBe(0)
+      for (const g of r.gaps) expect(g >= 0 && g < r.length).toBe(true)
+      expect(new Set(r.gaps).size).toBe(r.gaps.length)
+    }
+    expect(c.rounds.map((r) => r.gaps.length)).toEqual([2, 4])
+    expect(c.rounds[1]!.gaps.slice(-2)).toEqual([26, 27])
+    expect(c.rounds[0]!.gaps.every((g) => g > 0 && g < 7)).toBe(true)
+    expect(c.background).toBe(stage(5).image)
   })
 
   it('7 guessing the herds (when built): round 1 compares herds that are clearly different, round 2 asks for the range that contains the number; the animals exist and stand in the meadow', () => {
@@ -305,6 +322,7 @@ describe.runIf(released)('Jakob: when the stages are released, every file exists
   it('all the files of the journey are there, none is too big, and the size of the pack is about what the data says', () => {
     let bytes = 0
     for (const f of journeyFiles(jakob)) {
+      if (notPaintedYet(f) && !existsSync(`public/${f}`)) continue
       expect(existsSync(`public/${f}`), `missing: ${f}`).toBe(true)
       const size = statSync(`public/${f}`).size
       expect(size, f).toBeLessThan(f.includes('karte-pano') ? 1_800_000 : 620_000)
