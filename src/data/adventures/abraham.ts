@@ -7,8 +7,8 @@
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/abraham/, images/abenteuer/spiele/abraham/<spiel>/, audio/abenteuer/abraham/.
  *
- * STAND: Etappen noch `soon` (nicht spielbar), bis die Bilder (Panorama, Etappenbilder, Medaille, Spielbilder) und die Vorlese-Aufnahmen eingebaut sind.
- * Zahlen, die aus Messdateien der Bilder kommen, sind mit PLATZHALTER markiert und werden beim Einbau durch die gemessenen ersetzt.
+ * STAND 20.10.2026: alle Bilder (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder), Messwerte und Vorlese-Aufnahmen (Deutsch und Englisch) sind eingebaut, die Etappen sind spielbar.
+ * Das Abenteuer ist aber nicht öffentlich: es ist hinter `comingSoon` und dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
 import type { BalanceGame, ConstellationGame, CountGroup, Journey, WaterGame } from '@/types/adventure'
 import { ABRAHAM_PATH } from './abrahamPath'
@@ -18,8 +18,8 @@ import { abrahamEn } from './en/abraham.en'
 const IMG = 'images/abenteuer/abraham/'
 const G = 'images/abenteuer/spiele/abraham/'
 const REC = 'audio/abenteuer/abraham/'
-/** Alle Etappen sind noch nicht spielbar; beim Einbau der Bilder und Töne auf `false` setzen. */
-const SOON = true
+/** `true` = die Etappen sind noch nicht spielbar (Gerüst); jetzt sind alle Bilder und Töne eingebaut. */
+const SOON = false
 
 /**
  * Etappe 1, "Kamele beladen": ein Kamel mit zwei Körben vor dem Etappenbild 1, Pakete in drei Gewichten (Bildauftrag A10). Jede Runde hat zwei Kamele; jedes ist lösbar
@@ -109,7 +109,7 @@ export const abraham: Journey = {
   title: 'Abraham',
   subtitle: 'Gott ruft, Gott hält Wort',
   age: '8-10',
-  downloadMb: 1, // beim Einbau neu zählen (der Test sagt die echte Größe)
+  downloadMb: 8, // 8,0 MB gezählt am 20.10.2026 (der Test sagt die echte Größe)
   medal: `${IMG}medaille.webp`, // Abraham und das Zelt unter dem Sternenhimmel (Ruhe, Verheißung)
   // Geschenk-Ausmalbild: Abraham und Sara vor dem Zelt unter dem Sternenhimmel, mit Schafen, friedlich
   gift: { title: 'Abraham und Sara vor dem Zelt unter dem Sternenhimmel', image: `${IMG}geschenk.webp` },
