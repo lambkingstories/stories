@@ -11,7 +11,7 @@
  * STAND 20.10.2026: alle Bilder der Etappen 1 bis 3, 6, 8 und 9 (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder) und die Messwerte sind eingebaut; Aufnahmen siehe `audio` der Etappen (eine Etappe ohne `audio` hat noch keine).
  * Das Abenteuer ist aber nicht öffentlich: es ist hinter `comingSoon` und dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { BalanceGame, BirdsGame, ConstellationGame, CountGroup, Journey, SilverGame, WaterGame } from '@/types/adventure'
+import type { BalanceGame, BirdsGame, CluesGame, ConstellationGame, CountGroup, Journey, SilverGame, WaterGame } from '@/types/adventure'
 import { ABRAHAM_PATH } from './abrahamPath'
 import { localize } from './localize'
 import { abrahamEn } from './en/abraham.en'
@@ -49,6 +49,50 @@ const VOEGEL: BirdsGame = {
         { target: [70, 74], birds: [{ from: [20, 10], shown: 0.4 }, { from: [55, 5], shown: 0.4 }, { from: [96, 24], shown: 0.4 }], decoy: { from: [8, 30], to: [30, 85], shown: 0.4 } },
         { target: [26, 66], birds: [{ from: [4, 12], shown: 0.4 }, { from: [34, 5], shown: 0.4 }, { from: [78, 14], shown: 0.4 }], decoy: { from: [92, 10], to: [70, 70], shown: 0.4 } }
       ]
+    }
+  ]
+}
+
+/**
+ * Etappe 11, "Wer kniet wo?": Decken in vier Farben und Mustern werden so auf kniende Kamele gelegt, dass alle Hinweiskarten stimmen (Bildauftrag A23; eigener Hintergrund `hinweise/brunnenplatz.webp`).
+ * Die Texte der Karten schreibt die App aus der Art des Hinweises (Platz 1 liegt am Brunnen). Runde 1 drei Kamele und drei Karten, Runde 2 vier Kamele und vier Karten; jede Runde hat genau eine
+ * Lösung (Test). Die Plätze der Kamele (Fußpunkt, Prozent des Bildes) und ihre Breite sind vorläufig geschätzt, bis die Datei `hinweise-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `hinweise/brunnenplatz.webp` 1200 × 675, `kamel-kniend.webp` 400 × 300, `decke-rot.webp`, `decke-blau.webp`, `decke-gelb.webp`,
+ * `decke-gruen.webp` je 220 × 140, `hinweiskarte.webp` 320 × 110 (alle außer dem Platz transparent).
+ */
+const HINWEISE: CluesGame = {
+  background: `${G}hinweise/brunnenplatz.webp`,
+  camel: `${G}hinweise/kamel-kniend.webp`,
+  card: `${G}hinweise/hinweiskarte.webp`,
+  blankets: [
+    { id: 'rot', image: `${G}hinweise/decke-rot.webp`, label: 'Rot', pattern: 'gestreift' },
+    { id: 'blau', image: `${G}hinweise/decke-blau.webp`, label: 'Blau', pattern: 'gepunktet' },
+    { id: 'gelb', image: `${G}hinweise/decke-gelb.webp`, label: 'Gelb', pattern: 'kariert' },
+    { id: 'gruen', image: `${G}hinweise/decke-gruen.webp`, label: 'Grün', pattern: 'gewellt' }
+  ],
+  slots: [[38, 84], [54, 84], [70, 84], [86, 84]],
+  camelWidth: 16,
+  rounds: [
+    {
+      hint: 'Lege die Decken so auf die Kamele, dass alle Hinweiskarten stimmen.',
+      blankets: ['rot', 'blau', 'gelb'],
+      clues: [
+        { kind: 'at', blanket: 'blau', slot: 1 },
+        { kind: 'before', a: 'rot', b: 'gelb' },
+        { kind: 'notAt', blanket: 'gelb', slot: 2 }
+      ],
+      solution: ['blau', 'rot', 'gelb']
+    },
+    {
+      hint: 'Jetzt vier Kamele und vier Karten. Denke in Ruhe nach.',
+      blankets: ['rot', 'blau', 'gelb', 'gruen'],
+      clues: [
+        { kind: 'at', blanket: 'gelb', slot: 1 },
+        { kind: 'before', a: 'blau', b: 'rot' },
+        { kind: 'next', a: 'rot', b: 'gruen' },
+        { kind: 'notAt', blanket: 'gruen', slot: 4 }
+      ],
+      solution: ['gelb', 'blau', 'gruen', 'rot']
     }
   ]
 }
@@ -405,7 +449,7 @@ export const abraham: Journey = {
         'Als die Karawane in Kanaan ankommt, ist Isaak am Abend auf dem Feld, um nachzudenken. Er blickt auf und sieht die Kamele kommen. Rebekka wird seine Frau, er hat sie lieb, und nach dem Tod seiner Mutter wird er wieder froh.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'hinweise', hint: 'Lege die Decken so auf die Kamele, dass alle Hinweiskarten stimmen.', clues: HINWEISE },
       questions: [
         { q: 'Wen schickt Abraham in das Land seiner Familie?', options: ['seinen ältesten Knecht', 'seinen Sohn Isaak', 'seinen Neffen Lot'], answer: 0 },
         { q: 'Woran erkennt der Knecht die richtige Frau?', options: ['Sie gibt auch den Kamelen zu trinken.', 'Sie trägt einen roten Schleier.', 'Sie singt am Brunnen.'], answer: 0 }

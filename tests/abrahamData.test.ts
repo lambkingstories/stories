@@ -10,7 +10,7 @@ import { ABRAHAM_PATH } from '@/data/adventures/abrahamPath'
 import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
-import { birdAngle, distToLine, lineEnd, onRay, solutions, total } from '@/utils/abrahamGames'
+import { birdAngle, cluesSolutions, distToLine, lineEnd, onRay, solutions, total } from '@/utils/abrahamGames'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 
 afterEach(() => setAdventureLanguage('de'))
@@ -106,7 +106,7 @@ describe('Abraham: every stage has the game that was chosen', () => {
 
   it('the games in the order of the plan; stage 9 is only the questions; at most two old mechanics and three new ones', () => {
     // PLATZHALTER (quiz) in the new stages 4, 5, 7, 10 and 11 until their games and pictures are built in
-    expect(abraham.stages.map((s) => s.task.kind)).toEqual(['waage', 'zaehlen', 'sternbild', 'voegel', 'quiz', 'giessen', 'quiz', 'puzzle', 'quiz', 'silber', 'quiz'])
+    expect(abraham.stages.map((s) => s.task.kind)).toEqual(['waage', 'zaehlen', 'sternbild', 'voegel', 'quiz', 'giessen', 'quiz', 'puzzle', 'quiz', 'silber', 'hinweise'])
     const kinds = abraham.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
     expect(new Set(kinds).size).toBe(kinds.length)
     // "old" = a game that a journey before this one (Josef, Noah, Adam und Eva, Babel) already had; the pouring game was built for Noah but never used there
@@ -216,6 +216,25 @@ describe('Abraham: every stage has the game that was chosen', () => {
       }
     }
     expect(g.bird).toHaveLength(2)
+  })
+
+  it('11 clues: three camels and three cards, then four and four; exactly one row makes all the cards true and it is the one written down; the slots lie in a row from the well', () => {
+    const g = stage(11).task.clues
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => [r.blankets.length, r.clues.length])).toEqual([[3, 3], [4, 4]])
+    for (const r of g.rounds) {
+      expect(cluesSolutions(r.blankets, r.clues)).toEqual([r.solution])
+      for (const id of r.blankets) expect(g.blankets.map((b) => b.id)).toContain(id)
+      for (const c of r.clues) {
+        const used = c.kind === 'at' || c.kind === 'notAt' ? [c.blanket] : [c.a, c.b]
+        for (const id of used) expect(r.blankets, `clue names ${id}`).toContain(id)
+      }
+    }
+    expect(g.slots.length).toBeGreaterThanOrEqual(4)
+    for (let i = 1; i < g.slots.length; i++) expect(g.slots[i]![0]).toBeGreaterThan(g.slots[i - 1]![0])
+    for (const [x, y] of g.slots) expect(x >= 0 && x <= 100 && y >= 0 && y <= 100).toBe(true)
+    for (const b of g.blankets) expect(b.pattern.length).toBeGreaterThan(2)
   })
 
   it('10 silver: three sizes of heaps with their worth in steps of 25, every round pays four hundred with at least one way and not by laying everything, round 1 shows the sum, round 2 not', () => {

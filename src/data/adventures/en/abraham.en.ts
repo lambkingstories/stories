@@ -179,7 +179,7 @@ export const abrahamEn: TextOverlay<Journey> = {
         'The servant thanks God and tells Rebekah’s family what has happened. Her father and her brother Laban say, “This comes from God.” And Rebekah says, “Yes, I will go with him.”',
         'When the caravan reaches Canaan, Isaac is out in the field that evening to think. He looks up and sees the camels coming. Rebekah becomes his wife, he loves her, and after the death of his mother he is happy again.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Put the blankets on the camels so that all the clue cards are true.', clues: { blankets: [{ label: 'Red', pattern: 'striped' }, { label: 'Blue', pattern: 'dotted' }, { label: 'Yellow', pattern: 'checked' }, { label: 'Green', pattern: 'wavy' }], rounds: [{ hint: 'Put the blankets on the camels so that all the clue cards are true.' }, { hint: 'Now four camels and four cards. Take your time to think.' }] } },
       questions: [
         { q: 'Whom does Abraham send to the land of his family?', options: ['his oldest servant', 'his son Isaac', 'his nephew Lot'] },
         { q: 'How does the servant recognize the right woman?', options: ['She gives the camels water to drink, too.', 'She wears a red veil.', 'She sings at the well.'] }

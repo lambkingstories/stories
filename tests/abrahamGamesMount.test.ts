@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { BalanceGame, BirdsGame, ConstellationGame, SilverGame } from '@/types/adventure'
+import type { BalanceGame, BirdsGame, CluesGame, ConstellationGame, SilverGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -606,5 +606,166 @@ describe('Wohin fliegen die Vögel? (birds)', () => {
     expect(w.find('.bd-tip').text()).toBe('Tip')
     await tapAt(w, 80, 80)
     expect(w.find('.bd-fb').text()).toContain('It is dry here')
+  })
+})
+
+// ---------------------------------------------------------------- who kneels where
+describe('Wer kniet wo? (clues)', () => {
+  const game: CluesGame = {
+    background: 'images/x/well.webp',
+    camel: 'images/x/camel.webp',
+    card: 'images/x/card.webp',
+    blankets: [
+      { id: 'rot', image: 'images/x/rot.webp', label: 'Rot', pattern: 'gestreift' },
+      { id: 'blau', image: 'images/x/blau.webp', label: 'Blau', pattern: 'gepunktet' },
+      { id: 'gelb', image: 'images/x/gelb.webp', label: 'Gelb', pattern: 'kariert' },
+      { id: 'gruen', image: 'images/x/gruen.webp', label: 'Grün', pattern: 'gewellt' }
+    ],
+    slots: [[38, 84], [54, 84], [70, 84], [86, 84]],
+    camelWidth: 16,
+    rounds: [
+      {
+        hint: 'Runde eins.',
+        blankets: ['rot', 'blau', 'gelb'],
+        clues: [
+          { kind: 'at', blanket: 'blau', slot: 1 },
+          { kind: 'before', a: 'rot', b: 'gelb' },
+          { kind: 'notAt', blanket: 'gelb', slot: 2 }
+        ],
+        solution: ['blau', 'rot', 'gelb']
+      },
+      {
+        hint: 'Runde zwei.',
+        blankets: ['rot', 'blau', 'gelb', 'gruen'],
+        clues: [
+          { kind: 'at', blanket: 'gelb', slot: 1 },
+          { kind: 'before', a: 'blau', b: 'rot' },
+          { kind: 'next', a: 'rot', b: 'gruen' },
+          { kind: 'notAt', blanket: 'gruen', slot: 4 }
+        ],
+        solution: ['gelb', 'blau', 'gruen', 'rot']
+      }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Clues } = await import('@/components/molecules/games/GameClues.vue')
+    const w = mount(Clues, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  const NAMES: Record<string, string> = { rot: 'Rot, gestreift', blau: 'Blau, gepunktet', gelb: 'Gelb, kariert', gruen: 'Grün, gewellt' }
+  /** Choose the blanket in the tray (a press and a release without moving), then tap the camel. */
+  const lay = async (w: W, blanket: string, camel: number) => {
+    const el = w.findAll('.cl-token').find((x) => x.attributes('aria-label') === NAMES[blanket])!.element
+    el.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 5, clientY: 5 }))
+    window.dispatchEvent(new MouseEvent('pointerup', { clientX: 5, clientY: 5 }))
+    await flushPromises()
+    await w.find(`[data-drop="camel-${camel}"]`).trigger('click')
+    await flushPromises()
+  }
+  const layRow = async (w: W, row: string[]) => {
+    for (const [i, b] of row.entries()) await lay(w, b, i)
+  }
+  const roundOne = async (w: W) => {
+    await layRow(w, ['blau', 'rot', 'gelb'])
+    await tick(2000)
+  }
+
+  it('the goal is every card of both rounds; three camels kneel in a row, three blankets wait with the name of the colour and the pattern, three cards', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(7)
+    expect(w.find('.cl-round').text()).toContain('Runde 1 von 2')
+    expect(w.findAll('.cl-camel')).toHaveLength(3)
+    expect(w.findAll('.cl-token .cl-name').map((x) => x.text())).toEqual(['Rot, gestreift', 'Blau, gepunktet', 'Gelb, kariert'])
+    expect(w.findAll('.cl-card')).toHaveLength(3)
+    expect(w.findAll('.cl-card .gm')).toHaveLength(0)
+  })
+
+  it('the app writes the cards from the kind of the clue', async () => {
+    const w = await open()
+    expect(w.findAll('.cl-text').map((x) => x.text())).toEqual(['Blau kniet am Brunnen.', 'Rot kniet näher am Brunnen als Gelb.', 'Gelb kniet nicht in der Mitte.'])
+  })
+
+  it('the cards show nothing while a camel has no blanket; when the last one is laid each card shows a tick or a cross', async () => {
+    const w = await open()
+    await lay(w, 'rot', 0)
+    await lay(w, 'blau', 1)
+    expect(w.findAll('.cl-card .gm')).toHaveLength(0)
+    expect(w.findAll('.cl-token')).toHaveLength(1)
+    await lay(w, 'gelb', 2)
+    expect(w.findAll('.cl-card .gm.good')).toHaveLength(2)
+    expect(w.findAll('.cl-card .gm.bad')).toHaveLength(1)
+    expect(w.findAll('.cl-card.no')).toHaveLength(1)
+  })
+
+  it('a full row with a cross is a mistake (dull sound), the ticks count as progress, and the blankets may be moved on', async () => {
+    const w = await open()
+    await layRow(w, ['rot', 'blau', 'gelb'])
+    expect(played).toContain('wrong')
+    expect(w.find('.cl-fb').text()).toContain('Eine Karte stimmt noch nicht')
+    expect(useTaskProgress().parts.value).toBe(2)
+    await w.find('[data-drop="camel-0"]').trigger('click')
+    expect(w.findAll('.cl-token')).toHaveLength(1)
+    expect(w.findAll('.cl-card .gm')).toHaveLength(0)
+  })
+
+  it('all cards true: the round is solved with a star; round 2 has four camels, four cards and four blankets', async () => {
+    const w = await open()
+    await layRow(w, ['blau', 'rot', 'gelb'])
+    expect(w.findAll('.cl-card .gm.good')).toHaveLength(3)
+    expect(played).toContain('star')
+    expect(useTaskProgress().parts.value).toBe(3)
+    await tick(2000)
+    expect(w.find('.cl-round').text()).toContain('Runde 2 von 2')
+    expect(w.findAll('.cl-camel')).toHaveLength(4)
+    expect(w.findAll('.cl-card')).toHaveLength(4)
+    expect(w.findAll('.cl-token')).toHaveLength(4)
+    expect(w.findAll('.cl-text').map((x) => x.text())[2]).toBe('Rot und Grün knien direkt nebeneinander.')
+    expect(w.findAll('.cl-text').map((x) => x.text())[3]).toBe('Grün kniet nicht am weitesten vom Brunnen.')
+  })
+
+  it('the tip takes a wrongly laid blanket off and counts as a tip', async () => {
+    const w = await open()
+    await layRow(w, ['rot', 'blau', 'gelb'])
+    await w.find('.cl-tip').trigger('click')
+    expect(w.findAll('.cl-token')).toHaveLength(1)
+    expect(w.find('.cl-fb').text()).toContain('Ich habe sie abgenommen')
+    expect(w.find('[data-drop="camel-0"]').attributes('aria-label')).toBe('Kamel auf Platz 1')
+  })
+
+  it('the whole game: the end with three stars; mistakes and tips together give the stars (up to three: three, up to seven: two, more: one)', async () => {
+    for (const [wrong, stars] of [[0, 3], [3, 3], [4, 2], [7, 2], [8, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      if (wrong) {
+        await layRow(w, ['rot', 'blau', 'gelb'])
+        for (let i = 1; i < wrong; i++) {
+          await w.find('[data-drop="camel-0"]').trigger('click')
+          await lay(w, 'rot', 0)
+        }
+        // the row is full and wrong now: lay it right
+        await w.find('[data-drop="camel-0"]').trigger('click')
+        await w.find('[data-drop="camel-1"]').trigger('click')
+        await w.find('[data-drop="camel-2"]').trigger('click')
+      }
+      await layRow(w, ['blau', 'rot', 'gelb'])
+      await tick(2000)
+      await layRow(w, ['gelb', 'blau', 'gruen', 'rot'])
+      await tick(1300)
+      expect(useTaskProgress().parts.value).toBe(7)
+      expect(useTaskProgress().finished.value).toBe(true)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${wrong} mistakes`).toEqual([[stars]])
+      w.unmount()
+    }
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.findAll('.cl-text')[0]!.text()).toContain('kneels at the well.')
+    expect(w.find('[data-drop="camel-0"]').attributes('aria-label')).toBe('Camel at place 1')
+    expect(w.find('.cl-tip').text()).toBe('Tip')
   })
 })
