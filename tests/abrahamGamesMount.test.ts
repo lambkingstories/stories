@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { BalanceGame, ConstellationGame } from '@/types/adventure'
+import type { BalanceGame, ConstellationGame, SilverGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -337,5 +337,136 @@ describe('Sternbild nachlegen (constellation)', () => {
     await tick(1800)
     expect(w.find('.cn-hint').text()).toContain('Look closely at the model')
     expect(btn(w, 'I have looked')).toBeDefined()
+  })
+})
+
+// ---------------------------------------------------------------- pay exactly
+describe('Passend bezahlen (silver)', () => {
+  const piece = (id: string, value: number) => ({ id, image: `images/x/${id}.webp`, value })
+  const game: SilverGame = {
+    background: 'images/x/gate.webp',
+    cloth: 'images/x/cloth.webp',
+    purse: 'images/x/purse.webp',
+    pieces: [piece('a1', 200), piece('a2', 100), piece('a3', 100), piece('a4', 50), piece('b1', 150), piece('b2', 125), piece('b3', 75), piece('b4', 50), piece('b5', 100)],
+    rounds: [
+      { hint: 'Runde eins.', price: 400, pieces: ['a1', 'a2', 'a3', 'a4'], showSum: true },
+      { hint: 'Runde zwei.', price: 400, pieces: ['b1', 'b2', 'b3', 'b4', 'b5'], showSum: false }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Silver } = await import('@/components/molecules/games/GameSilver.vue')
+    const w = mount(Silver, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  /** Put the pieces with these places in the tray (from the left) on the cloth with the Enter key. */
+  const lay = async (w: W, ...places: number[]) => {
+    // the places count in the tray as it is now: after each laid piece the rest moves up
+    for (const place of places) {
+      await w.findAll('.sv-tray .sv-piece')[place]!.trigger('keydown', { key: 'Enter' })
+      await flushPromises()
+    }
+  }
+  const pay = async (w: W) => {
+    await w.find('.sv-pay').trigger('click')
+    await flushPromises()
+  }
+
+  it('the goal is every round; the price is called, the sum is shown in round 1, all pieces wait in the tray with their worth', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(2)
+    expect(w.find('.sv-round').text()).toContain('Runde 1 von 2')
+    expect(w.find('.sv-price-text').text()).toBe('Preis: 400 Silberstücke')
+    expect(w.find('.sv-sum').text()).toBe('Auf dem Tuch: 0')
+    expect(w.findAll('.sv-tray .sv-piece')).toHaveLength(4)
+    expect(w.findAll('.sv-tray .sv-value').map((v) => v.text())).toEqual(['200', '100', '100', '50'])
+  })
+
+  it('a piece is chosen with a tap and laid with a tap on the cloth; a tap on a piece on the cloth takes it back', async () => {
+    const w = await open()
+    const el = w.findAll('.sv-tray .sv-piece')[0]!.element
+    el.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 5, clientY: 5 }))
+    window.dispatchEvent(new MouseEvent('pointerup', { clientX: 5, clientY: 5 }))
+    await flushPromises()
+    await w.find('.sv-cloth').trigger('click')
+    expect(w.findAll('.sv-laid .sv-piece')).toHaveLength(1)
+    expect(w.findAll('.sv-tray .sv-piece')).toHaveLength(3)
+    expect(w.find('.sv-sum').text()).toBe('Auf dem Tuch: 200')
+    await w.find('.sv-laid .sv-piece').trigger('click')
+    expect(w.findAll('.sv-laid .sv-piece')).toHaveLength(0)
+    expect(w.find('.sv-sum').text()).toBe('Auf dem Tuch: 0')
+  })
+
+  it('too little and too much are a cross with a sentence and a mistake, the pieces stay; paying with nothing on the cloth is no mistake', async () => {
+    const w = await open()
+    await pay(w)
+    expect(w.find('.sv-fb').text()).toContain('Lege Silberstücke')
+    expect(played).not.toContain('wrong')
+    await lay(w, 0, 0)
+    await pay(w)
+    expect(played).toContain('wrong')
+    expect(w.find('.sv-fb').text()).toBe('Es fehlt noch etwas.')
+    expect(w.findAll('.sv-laid .sv-piece')).toHaveLength(2)
+    await lay(w, 0, 0)
+    await pay(w)
+    expect(w.find('.sv-fb').text()).toBe('Das ist zu viel.')
+    expect(useTaskProgress().parts.value).toBe(0)
+  })
+
+  it('exactly four hundred is paid: the purse is given away, a tick, the next round has no sum and other pieces', async () => {
+    const w = await open()
+    await lay(w, 0, 0, 0)
+    expect(w.find('.sv-sum').text()).toBe('Auf dem Tuch: 400')
+    await pay(w)
+    expect(w.find('.sv-purse').classes()).toContain('gone')
+    expect(played).toContain('star')
+    expect(useTaskProgress().parts.value).toBe(1)
+    await tick(2000)
+    expect(w.find('.sv-round').text()).toContain('Runde 2 von 2')
+    expect(w.find('.sv-sum').exists()).toBe(false)
+    expect(w.findAll('.sv-tray .sv-piece')).toHaveLength(5)
+    expect(w.find('.sv-purse').classes()).not.toContain('gone')
+  })
+
+  it('the key B pays', async () => {
+    const w = await open()
+    await lay(w, 0, 0, 0)
+    await w.find('.sv').trigger('keydown', { key: 'b' })
+    expect(useTaskProgress().parts.value).toBe(1)
+  })
+
+  it('both rounds paid: the end; the stars follow the false payments (one three stars, three two stars, four one star)', async () => {
+    for (const [mistakes, stars] of [[0, 3], [1, 3], [2, 2], [3, 2], [4, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      for (let i = 0; i < mistakes; i++) {
+        await lay(w, 0)
+        await pay(w)
+        await w.find('.sv-laid .sv-piece').trigger('click')
+      }
+      await lay(w, 0, 0, 0)
+      await pay(w)
+      await tick(2000)
+      // round 2: 150 + 125 + 75 + 50 = 400 (always the first place, as the tray moves up)
+      await lay(w, 0, 0, 0, 0)
+      expect(w.find('.sv-sum').exists()).toBe(false)
+      await pay(w)
+      await tick(1300)
+      expect(useTaskProgress().parts.value).toBe(2)
+      expect(useTaskProgress().finished.value).toBe(true)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${mistakes} mistakes`).toEqual([[stars]])
+      w.unmount()
+    }
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.sv-price-text').text()).toBe('Price: 400 pieces of silver')
+    expect(w.find('.sv-pay').text()).toBe('Pay')
+    await lay(w, 0)
+    await pay(w)
+    expect(w.find('.sv-fb').text()).toBe('Something is still missing.')
   })
 })

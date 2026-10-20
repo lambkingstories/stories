@@ -11,7 +11,7 @@
  * STAND 20.10.2026: alle Bilder der Etappen 1 bis 3, 6, 8 und 9 (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder) und die Messwerte sind eingebaut; Aufnahmen siehe `audio` der Etappen (eine Etappe ohne `audio` hat noch keine).
  * Das Abenteuer ist aber nicht öffentlich: es ist hinter `comingSoon` und dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { BalanceGame, ConstellationGame, CountGroup, Journey, WaterGame } from '@/types/adventure'
+import type { BalanceGame, ConstellationGame, CountGroup, Journey, SilverGame, WaterGame } from '@/types/adventure'
 import { ABRAHAM_PATH } from './abrahamPath'
 import { localize } from './localize'
 import { abrahamEn } from './en/abraham.en'
@@ -21,6 +21,38 @@ const G = 'images/abenteuer/spiele/abraham/'
 const REC = 'audio/abenteuer/abraham/'
 /** `true` = die Etappen sind noch nicht spielbar (Gerüst); jetzt sind alle Bilder und Töne eingebaut. */
 const SOON = false
+
+/**
+ * Etappe 10, "Passend bezahlen": Silberstücke in drei Größen werden auf ein Tuch gelegt, bis es genau vierhundert sind (Bildauftrag A22; Hintergrund = das Etappenbild 10). Runde 1 mit sichtbarer
+ * Summe (200, 100, 100, 50, 50, 25, 25), Runde 2 ohne (150, 125, 100, 75, 75, 50, 25); jede Runde hat mindestens einen Weg, und alle Stücke zusammen sind mehr als vierhundert.
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `silber/tuch.webp` 720 × 300, `silber-klein.webp` 110 × 70, `silber-mittel.webp` 150 × 90, `silber-gross.webp` 200 × 120,
+ * `beutel.webp` 240 × 240, alle transparent.
+ */
+const SILBER: SilverGame = {
+  background: `${IMG}etappe-bild-05.webp`,
+  cloth: `${G}silber/tuch.webp`,
+  purse: `${G}silber/beutel.webp`,
+  pieces: [
+    { id: 'a-200', image: `${G}silber/silber-gross.webp`, value: 200 },
+    { id: 'a-100x', image: `${G}silber/silber-mittel.webp`, value: 100 },
+    { id: 'a-100y', image: `${G}silber/silber-mittel.webp`, value: 100 },
+    { id: 'a-50x', image: `${G}silber/silber-klein.webp`, value: 50 },
+    { id: 'a-50y', image: `${G}silber/silber-klein.webp`, value: 50 },
+    { id: 'a-25x', image: `${G}silber/silber-klein.webp`, value: 25 },
+    { id: 'a-25y', image: `${G}silber/silber-klein.webp`, value: 25 },
+    { id: 'b-150', image: `${G}silber/silber-gross.webp`, value: 150 },
+    { id: 'b-125', image: `${G}silber/silber-mittel.webp`, value: 125 },
+    { id: 'b-100', image: `${G}silber/silber-mittel.webp`, value: 100 },
+    { id: 'b-75x', image: `${G}silber/silber-mittel.webp`, value: 75 },
+    { id: 'b-75y', image: `${G}silber/silber-mittel.webp`, value: 75 },
+    { id: 'b-50', image: `${G}silber/silber-klein.webp`, value: 50 },
+    { id: 'b-25', image: `${G}silber/silber-klein.webp`, value: 25 }
+  ],
+  rounds: [
+    { hint: 'Bezahle das Land mit genau vierhundert Silberstücken. Die Summe auf dem Tuch hilft dir.', price: 400, pieces: ['a-200', 'a-100x', 'a-100y', 'a-50x', 'a-50y', 'a-25x', 'a-25y'], showSum: true },
+    { hint: 'Noch einmal vierhundert. Jetzt rechnest du selbst.', price: 400, pieces: ['b-150', 'b-125', 'b-100', 'b-75x', 'b-75y', 'b-50', 'b-25'], showSum: false }
+  ]
+}
 
 /**
  * Etappe 1, "Kamele beladen": ein Kamel mit zwei Körben vor dem Etappenbild 1, Pakete in drei Gewichten (Bildauftrag A10). Jede Runde hat zwei Kamele; jedes ist lösbar
@@ -110,7 +142,7 @@ export const abraham: Journey = {
   title: 'Abraham',
   subtitle: 'Gott ruft, Gott hält Wort',
   age: '8-10',
-  downloadMb: 10, // gut 9 MB nach der neuen Karte (vier Stücke zusammen 3,1 MB) am 20.10.2026 (der Test sagt die echte Größe)
+  downloadMb: 8, // 8,0 MB gezählt am 20.10.2026 (der Test sagt die echte Größe)
   medal: `${IMG}medaille.webp`, // Abraham und das Zelt unter dem Sternenhimmel (Ruhe, Verheißung)
   // Geschenk-Ausmalbild: Abraham und Sara vor dem Zelt unter dem Sternenhimmel, mit Schafen, friedlich
   gift: { title: 'Abraham und Sara vor dem Zelt unter dem Sternenhimmel', image: `${IMG}geschenk.webp` },
@@ -322,7 +354,7 @@ export const abraham: Journey = {
         'Nun gehören das Feld und die Höhle als Grab Abraham. Dort begräbt er Sara. Es ist das erste Stück Land, das Abraham in Kanaan besitzt, in dem Land, das Gott ihm und seinen Nachkommen versprochen hat.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'silber', hint: 'Bezahle das Land mit genau vierhundert Silberstücken.', silver: SILBER },
       questions: [
         { q: 'Wie bekommt Abraham das Land für Saras Grab?', options: ['Er bezahlt es mit Silber.', 'Er bekommt es geschenkt.', 'Er nimmt es sich einfach.'], answer: 0 },
         { q: 'Wozu braucht Abraham dieses Stück Land?', options: ['als Grab für Sara', 'als Weide für seine Herden', 'für ein neues Haus'], answer: 0 }

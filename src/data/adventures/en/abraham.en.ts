@@ -163,7 +163,7 @@ export const abrahamEn: TextOverlay<Journey> = {
         'Ephron wants to give it to him, together with the whole field. But Abraham does not want a gift; he wants to pay for the land. “Take my money,” he says. Then Ephron names the price: four hundred pieces of silver. Abraham weighs out the silver and gives it to him in front of all the witnesses.',
         'Now the field and the cave belong to Abraham as a grave. There he buries Sarah. It is the first piece of land that Abraham owns in Canaan, in the land that God promised to him and his descendants.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Pay for the land with exactly four hundred pieces of silver.', silver: { rounds: [{ hint: 'Pay for the land with exactly four hundred pieces of silver. The sum on the cloth helps you.' }, { hint: 'Four hundred once more. Now you reckon it yourself.' }] } },
       questions: [
         { q: 'How does Abraham get the land for Sarah’s grave?', options: ['He pays for it with silver.', 'He is given it as a gift.', 'He simply takes it.'] },
         { q: 'What does Abraham need this piece of land for?', options: ['as a grave for Sarah', 'as pasture for his herds', 'for a new house'] }
