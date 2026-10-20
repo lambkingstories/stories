@@ -29,11 +29,11 @@ export const babelEn: TextOverlay<Journey> = {
     {
       title: 'Bricks and Pitch',
       ref: 'Genesis 11:3',
-      audio: 'audio/abenteuer/babel/geschichte-02-en-v2.mp3',
+      audio: 'audio/abenteuer/babel/geschichte-02-en-v3.mp3',
       text: [
-        'In the plain of Shinar there are no big stones lying about, but there is plenty of clay. So the people have a good idea. “Come,” they say to one another, “let us shape bricks and bake them in the fire!”',
+        'In the plain of Shinar there are no big stones lying about, but there is plenty of clay. So an idea comes to the people. “Come,” they say to one another, “let us shape bricks and bake them in the fire!”',
         'Right away they set to work. They dig the clay out of the ground, knead it, and press it into wooden molds. First they let the bricks dry in the sun, then they bake them in the oven until they are hard and strong. Soon whole stacks of them lie in the plain.',
-        'From now on they build with bricks instead of stones. And instead of mortar they use pitch, which is black and sticky and holds the bricks firmly together. There is a great deal to do, but everyone lends a hand together, and because they understand one another, the work goes easily. Whatever one of them suggests, the others do at once.'
+        'From now on they build with bricks instead of stones. And instead of mortar they use pitch, which is black and sticky and holds the bricks firmly together. There is a great deal to do, but everyone pitches in together, and because they understand one another, the work goes easily.'
       ],
       task: { hint: 'Pass bricks and pitch from hand to hand to the stack.', chain: { rounds: [{ hint: 'Round 1: Tap the one who is holding something, and he passes it on.' }, { hint: 'Round 2: Now pots of pitch come, too, and one more person helps.' }] } },
       questions: [
@@ -44,10 +44,10 @@ export const babelEn: TextOverlay<Journey> = {
     {
       title: 'A City with a Tower',
       ref: 'Genesis 11:4',
-      audio: 'audio/abenteuer/babel/geschichte-03-en-v2.mp3',
+      audio: 'audio/abenteuer/babel/geschichte-03-en-v3.mp3',
       text: [
         'When the first houses stand, the people have a new plan. “Come,” they cry, “let us build ourselves a city and a tower whose top reaches up to the sky!”',
-        'They want to make a name for themselves, so that everyone talks about them and everyone sees how great and strong they are. And they do not want to be scattered; they want to stay together always. But after the flood God told the people to spread out over the earth. The people in Shinar have something else in mind.',
+        'They want to make a name for themselves, so that people everywhere talk about them, and they do not want to be scattered over all the earth, but to stay together. After the flood, God had told the people to fill the earth. But here in Shinar they have a different plan.',
         'Then the building begins. Day after day they carry bricks and stack them one on top of another, and step by step the tower grows higher. Around it houses and lanes appear, and anyone who passes by stops and looks up at the tower.'
       ],
       task: { hint: 'Place the steps of the tower piece by piece.', stack: { rounds: [{ hint: 'Round 1: Tap when the block is above the step.' }, { hint: 'Round 2: The steps get narrower.' }] } },
@@ -59,11 +59,11 @@ export const babelEn: TextOverlay<Journey> = {
     {
       title: 'God Sees the Building',
       ref: 'Genesis 11:5–6',
-      audio: 'audio/abenteuer/babel/geschichte-04-en-v2.mp3',
+      audio: 'audio/abenteuer/babel/geschichte-04-en-v3.mp3',
       text: [
-        'The tower already rises high above the roofs of the city, and the people are proud of their work. Then God comes down to look at the city and the tower that the people are building.',
-        'God sees that they are one people, and they all speak the same language. God also sees what they have in mind: to make a great name for themselves and never to part from one another. And this is only the beginning of what they will do. If they go on like this, soon nothing they set their minds to will be impossible for them.',
-        'Down in the city evening is coming. The people work on for a while and call out to one another, and none of them knows that God has come down to them.'
+        'The tower already rises high above the roofs of the city, and everywhere people are busy building. Then God comes down to look at the city and the tower that the people are building.',
+        'God sees that they are one people, and they all speak the same language. He also sees what they have in mind: to make a name for themselves and to stay together. And this is only the beginning of what they will do. If they go on like this, soon nothing they set their minds to will be impossible for them.',
+        'Down in the city evening is coming. The people work on for a while and call out to one another, and the tower stands tall in the last light of the day.'
       ],
       task: { hint: 'Wipe away the fog so that you can see the tower and the city.', wipe: { rounds: [{ hint: 'Round 1: Wipe the fog from the tower.' }, { hint: 'Round 2: Now the people.' }] } },
       questions: [
@@ -74,11 +74,11 @@ export const babelEn: TextOverlay<Journey> = {
     {
       title: 'Many Languages',
       ref: 'Genesis 11:7–8',
-      audio: 'audio/abenteuer/babel/geschichte-05-en-v2.mp3',
+      audio: 'audio/abenteuer/babel/geschichte-05-en-v3.mp3',
       text: [
         'Then God says, “I will go down and confuse their language, so that nobody understands anyone else.”',
         'And so it happens. A man calls something out to his neighbor, but the neighbor does not understand him, for he hears only strange words. The builders ask and point at the bricks, they shake their heads and ask again, but nobody grasps what the other means. Where everyone used to pull together, now each one speaks differently.',
-        'Now they can no longer plan together or build together. The people pack their bundles and set out on many different roads, for God scatters them from there over the whole earth. They never finish the city.'
+        'Now they can no longer plan together or build together. So they stop building the city, and it is never finished. The people pack their bundles and set out on many different roads, for God scatters them from there over the whole earth.'
       ],
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
@@ -93,8 +93,8 @@ export const babelEn: TextOverlay<Journey> = {
       audio: 'audio/abenteuer/babel/geschichte-06-en-v2.mp3',
       text: [
         'That is why the city is called Babel. The name reminds us of the word for “confuse,” because there God confused the language of all the people.',
-        'From there God spreads the people over the whole earth. They go apart on many roads, families with their children, with donkeys and camels and bundles, each group in its own direction.',
-        'Behind them the wide plain stays, with the city and the tower, which stands unfinished in the morning light. But that is not the end of the story. Out of the many families grow many nations, each with its own language, and so the earth fills with people, just as God had said after the flood.'
+        'From there God scatters the people into all the lands. Just what they wanted to prevent now happens: on many roads they go apart, families with their children, with donkeys and camels and bundles, each group in its own direction.',
+        'Behind them the wide plain stays, with the city and the tower, which stands unfinished in the morning light. But that is not the end of the story. Out of the many families grow many nations, each with its own language, and the earth fills with people.'
       ],
       task: { hint: 'Trace the roads with your finger.', trace: { rounds: [{ hint: 'Round 1: Trace the two roads.' }, { hint: 'Round 2: Now four roads in all directions.' }] } },
       questions: [

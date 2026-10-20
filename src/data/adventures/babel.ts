@@ -191,11 +191,11 @@ export const babel: Journey = {
       image: `${IMG}etappe-bild-02.webp`,
       title: 'Ziegel und Pech',
       ref: '1. Mose 11,3',
-      audio: `${REC}geschichte-02-v2.mp3`,
+      audio: `${REC}geschichte-02-v3.mp3`,
       text: [
-        'In der Ebene von Schinar liegen keine großen Steine herum, aber es gibt reichlich Lehm. Da haben die Menschen eine gute Idee. „Kommt“, sagen sie zueinander, „wir formen Ziegel und brennen sie im Feuer!“',
+        'In der Ebene von Schinar liegen keine großen Steine herum, aber es gibt reichlich Lehm. Da kommt den Menschen ein Einfall. „Kommt“, sagen sie zueinander, „wir formen Ziegel und brennen sie im Feuer!“',
         'Gleich gehen sie an die Arbeit. Sie graben den Lehm aus dem Boden, kneten ihn und drücken ihn in Formen aus Holz. Dann lassen sie die Ziegel erst in der Sonne trocknen und brennen sie anschließend im Ofen, bis sie hart und fest sind. Bald liegen ganze Stapel davon in der Ebene.',
-        'Von nun an bauen sie mit Ziegeln statt mit Steinen. Und statt Mörtel nehmen sie Pech, das schwarz und klebrig ist und die Ziegel fest zusammenhält. Es ist viel zu tun, aber alle packen gemeinsam mit an, und weil sie einander verstehen, geht ihnen die Arbeit leicht von der Hand. Was einer vorschlägt, das setzen die anderen sofort um.'
+        'Von nun an bauen sie mit Ziegeln statt mit Steinen. Und statt Mörtel nehmen sie Pech, das schwarz und klebrig ist und die Ziegel fest zusammenhält. Es ist viel zu tun, aber alle packen gemeinsam mit an, und weil sie einander verstehen, geht ihnen die Arbeit leicht von der Hand.'
       ],
       task: { kind: 'kette', hint: 'Reiche Ziegel und Pech von Hand zu Hand zum Stapel.', chain: KETTE },
       questions: [
@@ -209,10 +209,10 @@ export const babel: Journey = {
       image: `${IMG}etappe-bild-03.webp`,
       title: 'Eine Stadt mit einem Turm',
       ref: '1. Mose 11,4',
-      audio: `${REC}geschichte-03-v2.mp3`,
+      audio: `${REC}geschichte-03-v3.mp3`,
       text: [
         'Als die ersten Häuser stehen, haben die Menschen einen neuen Plan. „Kommt“, rufen sie, „wir bauen uns eine Stadt und einen Turm, dessen Spitze bis an den Himmel reicht!“',
-        'Sie wollen sich damit einen Namen machen, damit alle von ihnen sprechen und jeder sieht, wie groß und stark sie sind. Und sie wollen auf keinen Fall zerstreut werden, sondern für immer beisammenbleiben. Dabei hat Gott den Menschen nach der Flut gesagt, sie sollen sich über die Erde ausbreiten. Aber die Menschen in Schinar haben etwas anderes vor.',
+        'Sie wollen sich damit einen Namen machen, damit man überall von ihnen spricht, und sie wollen auf keinen Fall in alle Länder zerstreut werden, sondern beisammenbleiben. Nach der Flut hatte Gott den Menschen gesagt, sie sollten die Erde füllen. Hier in Schinar aber haben sie einen anderen Plan.',
         'Dann beginnt der Bau. Tag für Tag tragen sie Ziegel herbei und stapeln sie aufeinander, und Stufe um Stufe wächst der Turm in die Höhe. Rundherum entstehen Häuser und Gassen, und wer vorbeikommt, bleibt stehen und schaut zu dem Turm hinauf.'
       ],
       task: { kind: 'stapeln', hint: 'Setze die Stufen des Turms Stück für Stück.', stack: STAPELN },
@@ -227,11 +227,11 @@ export const babel: Journey = {
       image: `${IMG}etappe-bild-04.webp`,
       title: 'Gott sieht den Bau',
       ref: '1. Mose 11,5–6',
-      audio: `${REC}geschichte-04-v2.mp3`,
+      audio: `${REC}geschichte-04-v3.mp3`,
       text: [
-        'Der Turm ragt schon hoch über die Dächer der Stadt, und die Menschen sind stolz auf ihr Werk. Da kommt Gott herab, um sich die Stadt und den Turm anzusehen, die die Menschen bauen.',
-        'Gott sieht: Es ist ein einziges Volk, und alle sprechen dieselbe Sprache. Gott sieht auch, was sie vorhaben, nämlich sich einen großen Namen zu machen und niemals auseinanderzugehen. Und das ist erst der Anfang von dem, was sie tun. Wenn sie so weitermachen, wird ihnen bald nichts mehr unmöglich sein, was sie sich vornehmen.',
-        'Unten in der Stadt wird es Abend. Die Menschen arbeiten noch eine Weile und rufen einander zu, und keiner von ihnen ahnt, dass Gott zu ihnen herabgekommen ist.'
+        'Der Turm ragt schon hoch über die Dächer der Stadt, und überall wird eifrig gebaut. Da kommt Gott herab, um sich die Stadt und den Turm anzusehen, die die Menschen bauen.',
+        'Gott sieht: Es ist ein einziges Volk, und alle sprechen dieselbe Sprache. Er sieht auch, was sie vorhaben, nämlich sich einen Namen zu machen und beisammenzubleiben. Und das ist erst der Anfang von dem, was sie tun. Wenn sie so weitermachen, wird ihnen bald nichts mehr unmöglich sein, was sie sich vornehmen.',
+        'Unten in der Stadt wird es Abend. Die Menschen arbeiten noch eine Weile und rufen einander zu, und der Turm steht groß im letzten Licht des Tages.'
       ],
       task: { kind: 'wischen', hint: 'Wische den Nebel weg, damit man Turm und Stadt sieht.', wipe: WISCHEN },
       questions: [
@@ -245,11 +245,11 @@ export const babel: Journey = {
       image: `${IMG}etappe-bild-05.webp`,
       title: 'Viele Sprachen',
       ref: '1. Mose 11,7–8',
-      audio: `${REC}geschichte-05-v2.mp3`,
+      audio: `${REC}geschichte-05-v3.mp3`,
       text: [
         'Da sagt Gott: „Ich will hinabgehen und ihre Sprache verwirren, damit keiner mehr den anderen versteht.“',
         'Und so geschieht es. Ein Mann ruft seinem Nachbarn etwas zu, aber der versteht ihn nicht, denn er hört nur fremde Wörter. Die Bauleute fragen und zeigen auf die Ziegel, sie schütteln den Kopf und fragen noch einmal, aber keiner begreift, was der andere meint. Wo vorher alle an einem Strang gezogen haben, redet nun jeder anders.',
-        'Nun können sie nicht mehr gemeinsam planen und nicht mehr gemeinsam bauen. Die Menschen packen ihre Bündel und ziehen davon, auf vielen verschiedenen Wegen, denn Gott verteilt sie von dort über die ganze Erde. Die Stadt bauen sie nicht mehr fertig.'
+        'Nun können sie nicht mehr gemeinsam planen und nicht mehr gemeinsam bauen. So hören sie auf, an der Stadt zu bauen, und sie wird nicht mehr fertig. Die Menschen packen ihre Bündel und ziehen davon, auf vielen verschiedenen Wegen, denn Gott verteilt sie von dort über die ganze Erde.'
       ],
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
@@ -267,8 +267,8 @@ export const babel: Journey = {
       audio: `${REC}geschichte-06-v2.mp3`,
       text: [
         'Darum bekommt die Stadt den Namen Babel. Das erinnert an das Wort für „verwirren“, denn dort hat Gott die Sprache aller Menschen verwirrt.',
-        'Von dort aus verteilt Gott die Menschen über die ganze Erde. Auf vielen Wegen gehen sie auseinander, Familien mit ihren Kindern, mit Eseln und Kamelen und Bündeln, jede Gruppe in ihre eigene Richtung.',
-        'Hinter ihnen bleibt die weite Ebene zurück, mit der Stadt und dem Turm, der unfertig im Morgenlicht steht. Doch das ist nicht das Ende der Geschichte. Aus den vielen Familien werden viele Völker, jedes mit seiner eigenen Sprache, und so füllt sich die Erde mit Menschen, genau wie Gott es nach der Flut gesagt hat.'
+        'Von dort aus zerstreut Gott die Menschen in alle Länder. Genau das, was sie verhindern wollten, geschieht nun: Auf vielen Wegen gehen sie auseinander, Familien mit ihren Kindern, mit Eseln und Kamelen und Bündeln, jede Gruppe in ihre eigene Richtung.',
+        'Hinter ihnen bleibt die weite Ebene zurück, mit der Stadt und dem Turm, der unfertig im Morgenlicht steht. Doch das ist nicht das Ende der Geschichte. Aus den vielen Familien werden viele Völker, jedes mit seiner eigenen Sprache, und die Erde füllt sich mit Menschen.'
       ],
       task: { kind: 'spur', hint: 'Fahre die Wege mit dem Finger nach.', trace: SPUR },
       questions: [
