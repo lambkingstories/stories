@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise'
 
 export interface AdventureQuestion {
   q: string
@@ -773,6 +773,96 @@ export interface RingGame {
   rounds: RingRound[]
 }
 
+/** A bird of the birds game: where it starts in the sky (percent of the picture) and how much of the way to the meeting point is drawn (0.3 to 0.7). */
+export interface BirdsBird {
+  from: [number, number]
+  shown: number
+}
+/** A task of the birds game: the meeting point `target` of the flight paths on the ground, the birds that fly to it and, in round 2, a decoy bird whose path aims at `to` instead. */
+export interface BirdsTask {
+  target: [number, number]
+  birds: BirdsBird[]
+  decoy?: { from: [number, number]; to: [number, number]; shown: number }
+}
+export interface BirdsRound {
+  hint: string
+  tasks: BirdsTask[]
+}
+/**
+ * The birds game "Where do the birds fly?": the flight paths of the birds end in the air, the child taps where they would meet, there lies the spring. `bird` are the two wing
+ * positions, `spring` the picture that appears at the meeting point, `radius` the circle of a hit (percent of the width of the picture).
+ */
+export interface BirdsGame {
+  background: string
+  bird: [string, string]
+  spring: string
+  radius: number
+  rounds: BirdsRound[]
+}
+
+/** A round of the rings game: the turn of every ring in twelfths (1 to 11, never 0) and the pairs `[a, b]` where turning ring `a` turns ring `b` the other way. */
+export interface RingsRound {
+  hint: string
+  start: number[]
+  couple: [number, number][]
+}
+/** The rings game "The light through the rings": rings (outside to inside) are turned until the light shines through all gaps; the hub and the beam are pictures, too. */
+export interface RingsGame {
+  background: string
+  rings: string[]
+  hub: string
+  beam: string
+  rounds: RingsRound[]
+}
+
+/** A piece of silver of the silver game: its picture (small, middle or big heap) and its worth (a multiple of 25). */
+export interface SilverPiece {
+  id: string
+  image: string
+  value: number
+}
+/** A round of the silver game: the price, the pieces that lie ready (ids) and whether the sum on the cloth is shown. */
+export interface SilverRound {
+  hint: string
+  price: number
+  pieces: string[]
+  showSum: boolean
+}
+export interface SilverGame {
+  background: string
+  cloth: string
+  purse: string
+  pieces: SilverPiece[]
+  rounds: SilverRound[]
+}
+
+/** A blanket of the clues game: its picture, its colour name (the first word of the clue cards) and its pattern (written below it, for those who cannot tell the colours apart). */
+export interface CluesBlanket {
+  id: string
+  image: string
+  label: string
+  pattern: string
+}
+/** A clue card, written by the app: a blanket lies at a place (1 = at the well) or not, one lies nearer to the well than another, or two lie right next to each other. */
+export type Clue = { kind: 'at' | 'notAt'; blanket: string; slot: number } | { kind: 'before' | 'next'; a: string; b: string }
+export interface CluesRound {
+  hint: string
+  blankets: string[]
+  clues: Clue[]
+  /** The blanket at every place, from the well on. */
+  solution: string[]
+}
+/** The clues game "Who kneels where?": blankets are laid on the kneeling camels so that every clue card is true. `slots` are the feet of the camels (percent of the picture), `camelWidth` their width. */
+export interface CluesGame {
+  background: string
+  camel: string
+  card: string
+  blankets: CluesBlanket[]
+  slots: [number, number][]
+  camelWidth: number
+  rounds: CluesRound[]
+}
+
 /** A round of the constellation game: the stars of the model as points in the frame (0 to 100 each way), and whether the model stays in view. */
 export interface ConstellationRound {
   hint: string
@@ -869,6 +959,10 @@ export interface StageTask {
   cairn?: CairnGame
   relay?: RelayGame
   ring?: RingGame
+  birds?: BirdsGame
+  rings?: RingsGame
+  silver?: SilverGame
+  clues?: CluesGame
   constellation?: ConstellationGame
 }
 
