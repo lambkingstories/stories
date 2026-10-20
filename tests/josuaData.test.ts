@@ -12,6 +12,7 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
+import { solvable } from '@/utils/josuaGames'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => josua.stages[n - 1]!
@@ -106,7 +107,7 @@ describe('Josua: stories and questions', () => {
 
 describe('Josua: the placeholders until the games and pictures come', () => {
   it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(josua.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'abseilen', 'schritt', 'memory', 'quiz', 'quiz', 'quiz', 'quiz', 'lueckenvers'])
+    expect(josua.stages.map((s) => s.task.kind)).toEqual(['packen', 'quiz', 'abseilen', 'schritt', 'memory', 'quiz', 'quiz', 'quiz', 'quiz', 'lueckenvers'])
     for (const s of josua.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
@@ -157,6 +158,27 @@ describe('Josua: the placeholders until the games and pictures come', () => {
     const manH = (g.men[0]!.w * (560 / 160)) / (4 / 3)
     expect(g.ground - g.window[1], 'room for the man').toBeGreaterThan(manH)
     expect(g.window[0] >= 0 && g.window[0] <= 100).toBe(true)
+  })
+
+  it('1 pack: five things in 4 x 3 and seven in 5 x 3; the things are one or two cells big and every round can be packed with room for less than the basket; the basket lies in the picture', () => {
+    const g = stage(1).task.pack
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => [r.cols, r.rows, r.items.length])).toEqual([[4, 3, 5], [5, 3, 7]])
+    for (const i of g.items) {
+      expect(i.w >= 1 && i.w <= 2 && i.h >= 1 && i.h <= 2, i.id).toBe(true)
+    }
+    for (const r of g.rounds) {
+      const shapes = r.items.map((id) => g.items.find((i) => i.id === id)!)
+      expect(shapes.every(Boolean)).toBe(true)
+      expect(solvable(r.cols, r.rows, shapes), 'the round can be packed').toBe(true)
+      const area = shapes.reduce((n, s) => n + s.w * s.h, 0)
+      expect(area).toBeLessThan(r.cols * r.rows)
+    }
+    expect(g.rounds.map((r) => r.items.reduce((n, id) => n + g.items.find((i) => i.id === id)!.w * g.items.find((i) => i.id === id)!.h, 0))).toEqual([10, 14])
+    expect(g.area.x + g.area.w).toBeLessThanOrEqual(100)
+    expect(g.area.y + g.area.h).toBeLessThanOrEqual(100)
+    expect(g.background).toBe(stage(1).image)
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

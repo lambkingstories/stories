@@ -11,7 +11,7 @@
  * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit den ersten zehn Stationen (PLATZHALTER bis zum eigenen Panorama); Medaille und Geschenk sind ebenfalls die von Josef.
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme. Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { Journey, LowerGame, MemoryGame, StepGame, VerseGame } from '@/types/adventure'
+import type { Journey, LowerGame, MemoryGame, PackGame, StepGame, VerseGame } from '@/types/adventure'
 import { josef } from './josef'
 import { JOSUA_PATH } from './josuaPath'
 import { localize } from './localize'
@@ -20,6 +20,32 @@ import { josuaEn } from './en/josua.en'
 // PLATZHALTER bis zum eigenen Bild: die Etappenbilder von Josef (Ordner images/abenteuer/josef/); danach `images/abenteuer/josua/etappe-bild-NN.webp`
 const PLACEHOLDER = 'images/abenteuer/josef/'
 const G = 'images/abenteuer/spiele/josua/'
+
+/**
+ * Etappe 1, "Proviant packen": Dinge verschiedener Formen werden in das Raster eines Korbs gepackt, ein Tippen dreht sie (Bildauftrag JO10; Hintergrund = das Etappenbild). Ein Feld ist 96 Pixel. Runde 1: fünf Dinge
+ * in 4 × 3 Feldern (10 von 12), Runde 2: sieben Dinge in 5 × 3 (14 von 15); beide Runden sind lösbar (Test). Der Korb (`area`, Prozent des Etappenbildes) ist vorläufig geschätzt, bis die Datei
+ * `packen-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `packen/korb.webp` 960 × 480, `sack.webp` 192 × 192, `krug.webp` 96 × 192, `brote.webp` 192 × 96, `datteln.webp` 96 × 96, `feigen.webp` 96 × 96,
+ * `schlauch.webp` 96 × 192 (alle transparent).
+ */
+const PACKEN: PackGame = {
+  background: `${PLACEHOLDER}etappe-bild-01.webp`,
+  basket: `${G}packen/korb.webp`,
+  items: [
+    { id: 'sack', image: `${G}packen/sack.webp`, w: 2, h: 2 },
+    { id: 'krug-1', image: `${G}packen/krug.webp`, w: 1, h: 2 },
+    { id: 'krug-2', image: `${G}packen/krug.webp`, w: 1, h: 2 },
+    { id: 'brote', image: `${G}packen/brote.webp`, w: 2, h: 1 },
+    { id: 'datteln', image: `${G}packen/datteln.webp`, w: 1, h: 1 },
+    { id: 'feigen', image: `${G}packen/feigen.webp`, w: 1, h: 1 },
+    { id: 'schlauch', image: `${G}packen/schlauch.webp`, w: 1, h: 2 }
+  ],
+  area: { x: 26, y: 40, w: 48, h: 46 },
+  rounds: [
+    { hint: 'Packe den Vorrat in den Korb. Tippe ein Ding im Korb an, dann dreht es sich.', cols: 4, rows: 3, items: ['sack', 'krug-1', 'brote', 'datteln', 'feigen'] },
+    { hint: 'Jetzt mehr Vorrat und fast keine Lücke. Überlege gut, wie alles hineinpasst.', cols: 5, rows: 3, items: ['sack', 'krug-1', 'krug-2', 'brote', 'schlauch', 'datteln', 'feigen'] }
+  ]
+}
 
 /**
  * Etappe 3, "Am Seil herablassen": ein Mann hängt am Seil aus dem Fenster in der Stadtmauer und schwingt im Wind hin und her; ein Tippen, wenn er von der Mauer wegschwingt, lässt ihn einen Schritt tiefer
@@ -114,7 +140,7 @@ export const josua: Journey = {
         'Josua ruft die Amtleute des Volkes. „Geht durch das Lager“, sagt er, „und sagt allen: Macht euch Vorrat bereit, denn in drei Tagen zieht ihr über den Jordan.“ Da antworten die Männer: „Alles, was du uns aufträgst, wollen wir tun, und wohin du uns sendest, dahin gehen wir. Gott sei mit dir, wie er mit Mose war!“'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild; vorgesehen: Proviant packen (packen, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'packen', hint: 'Packe den Vorrat so in den Korb, dass alles hineinpasst.', pack: PACKEN },
       questions: [
         { q: 'Wer führt das Volk, nachdem Mose gestorben ist?', options: ['Josua', 'Kaleb', 'Aaron'], answer: 0 },
         { q: 'Was soll Josua nach Gottes Wort sein?', options: ['mutig und stark', 'schnell und leise', 'reich und berühmt'], answer: 0 }

@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { LowerGame, StepGame } from '@/types/adventure'
+import type { LowerGame, PackGame, StepGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -383,5 +383,172 @@ describe('Am Seil herablassen (lower)', () => {
     await tick(3000)
     await go(w)
     expect(w.find('.lw-fb').text()).toContain('He touches the wall')
+  })
+})
+
+// ---------------------------------------------------------------- pack the supplies
+describe('Proviant packen (pack)', () => {
+  const game: PackGame = {
+    background: 'images/x/camp.webp',
+    basket: 'images/x/basket.webp',
+    items: [
+      { id: 'sack', image: 'images/x/sack.webp', w: 2, h: 2 },
+      { id: 'krug-1', image: 'images/x/krug.webp', w: 1, h: 2 },
+      { id: 'krug-2', image: 'images/x/krug.webp', w: 1, h: 2 },
+      { id: 'brote', image: 'images/x/brote.webp', w: 2, h: 1 },
+      { id: 'datteln', image: 'images/x/datteln.webp', w: 1, h: 1 }
+    ],
+    area: { x: 26, y: 40, w: 48, h: 46 },
+    rounds: [
+      { hint: 'Runde eins.', cols: 4, rows: 3, items: ['sack', 'krug-1', 'brote'] },
+      { hint: 'Runde zwei.', cols: 4, rows: 3, items: ['sack', 'krug-1', 'krug-2', 'datteln'] }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Pack } = await import('@/components/molecules/games/GamePack.vue')
+    const w = mount(Pack, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  /** Choose the thing in the tray (a press and a release without moving), then tap the cell. */
+  const put = async (w: W, trayIndex: number, col: number, row: number) => {
+    const el = w.findAll('.pk-item')[trayIndex]!.element
+    el.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 5, clientY: 5 }))
+    window.dispatchEvent(new MouseEvent('pointerup', { clientX: 5, clientY: 5 }))
+    await flushPromises()
+    await w.find(`[data-drop="cell-${col}-${row}"]`).trigger('click')
+    await flushPromises()
+  }
+  const roundOne = async (w: W) => {
+    await put(w, 0, 0, 0)
+    await put(w, 0, 2, 0)
+    await put(w, 0, 2, 2)
+  }
+  const roundTwo = async (w: W) => {
+    await put(w, 0, 0, 0)
+    await put(w, 0, 2, 0)
+    await put(w, 0, 3, 0)
+    await put(w, 0, 0, 2)
+  }
+
+  it('the goal is every thing of both rounds; the basket has 4 x 3 cells, the things wait in the tray', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(7)
+    expect(w.find('.pk-round').text()).toContain('Runde 1 von 2')
+    expect(w.findAll('.pk-cell')).toHaveLength(12)
+    expect(w.findAll('.pk-item')).toHaveLength(3)
+    expect(w.find('.pk-count').text()).toBe('Gepackt: 0 von 3')
+  })
+
+  it('a thing put into the basket lies where it was put, with its size in cells; the tray has one less', async () => {
+    const w = await open()
+    await put(w, 0, 0, 0)
+    expect(w.findAll('.pk-thing')).toHaveLength(1)
+    const style = w.find('.pk-thing').attributes('style') ?? ''
+    expect(style).toContain('left: 0%')
+    expect(style).toContain('width: 50%')
+    expect(style).toContain('height: 66.666')
+    expect(w.findAll('.pk-item')).toHaveLength(2)
+    expect(played).toContain('tap')
+    expect(useTaskProgress().parts.value).toBe(1)
+  })
+
+  it('a thing that fits nowhere near the cell sinks back: a cross, a dull sound, a mistake', async () => {
+    const w = await open()
+    await put(w, 0, 0, 0)
+    played.length = 0
+    await put(w, 0, 0, 0)
+    expect(played).toContain('wrong')
+    expect(w.find('.pk-fb').text()).toContain('passt hier nicht')
+    expect(w.findAll('.pk-thing')).toHaveLength(1)
+    expect(w.find('.pk-mark').exists()).toBe(true)
+  })
+
+  it('a thing that would stick out is moved in; a long thing is turned when it only fits across', async () => {
+    const w = await open()
+    // the loaves (2 x 1) let go on the last column lie one cell to the left
+    await put(w, 2, 3, 0)
+    const style = w.find('.pk-thing').attributes('style') ?? ''
+    expect(style).toContain('left: 50%')
+    expect(style).toContain('width: 50%')
+    // the jug (1 x 2) let go on the last row is moved up to fit
+    await put(w, 1, 0, 2)
+    expect(w.findAll('.pk-thing')).toHaveLength(2)
+  })
+
+  it('a tap on a packed thing turns it a quarter when there is room, else it says so', async () => {
+    const w = await open()
+    await put(w, 1, 2, 0)
+    const jug = () => w.find('.pk-thing').attributes('style') ?? ''
+    expect(jug()).toContain('width: 25%')
+    expect(jug()).toContain('height: 66.666')
+    const el = w.find('.pk-thing').element
+    el.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 5, clientY: 5 }))
+    window.dispatchEvent(new MouseEvent('pointerup', { clientX: 5, clientY: 5 }))
+    await flushPromises()
+    expect(jug()).toContain('width: 50%')
+    expect(jug()).toContain('height: 33.333')
+  })
+
+  it('"Empty the basket" takes everything out again (no mistake)', async () => {
+    const w = await open()
+    await put(w, 0, 0, 0)
+    await w.findAll('.pk-actions button')[1]!.trigger('click')
+    expect(w.findAll('.pk-thing')).toHaveLength(0)
+    expect(w.findAll('.pk-item')).toHaveLength(3)
+    expect(played).not.toContain('wrong')
+  })
+
+  it('the tip shows a place for a thing from which the rest can still be packed; it counts as a tip and goes away', async () => {
+    const w = await open()
+    await w.findAll('.pk-actions button')[0]!.trigger('click')
+    expect(w.find('.pk-hintbox').exists()).toBe(true)
+    expect(w.find('.pk-fb').text()).toContain('Versuche es hiermit')
+    expect(w.findAll('.pk-item.hinted')).toHaveLength(1)
+    await tick(3600)
+    expect(w.find('.pk-hintbox').exists()).toBe(false)
+  })
+
+  it('everything in the basket: it shines with a star; after a while round 2 has four things', async () => {
+    const w = await open()
+    await roundOne(w)
+    expect(w.find('.pk-basket').classes()).toContain('full')
+    expect(played).toContain('star')
+    expect(useTaskProgress().parts.value).toBe(3)
+    await tick(2100)
+    expect(w.find('.pk-round').text()).toContain('Runde 2 von 2')
+    expect(w.findAll('.pk-item')).toHaveLength(4)
+    expect(w.findAll('.pk-thing')).toHaveLength(0)
+    expect(w.find('.pk-basket').classes()).not.toContain('full')
+  })
+
+  it('the whole game: the end with three stars; mistakes and tips together give the stars (up to three: three, up to eight: two, more: one)', async () => {
+    for (const [wrong, stars] of [[0, 3], [3, 3], [4, 2], [8, 2], [9, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      await put(w, 0, 0, 0)
+      for (let i = 0; i < wrong; i++) await put(w, 0, 0, 0)
+      await put(w, 0, 2, 0)
+      await put(w, 0, 2, 2)
+      await tick(2100)
+      await roundTwo(w)
+      await tick(1500)
+      expect(useTaskProgress().parts.value).toBe(7)
+      expect(useTaskProgress().finished.value).toBe(true)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${wrong} wrong`).toEqual([[stars]])
+      w.unmount()
+    }
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.pk-count').text()).toBe('Packed: 0 of 3')
+    expect(w.findAll('.pk-item')[0]!.attributes('aria-label')).toBe('Sack of grain')
+    await put(w, 0, 0, 0)
+    await put(w, 0, 0, 0)
+    expect(w.find('.pk-fb').text()).toBe('That does not fit here.')
   })
 })

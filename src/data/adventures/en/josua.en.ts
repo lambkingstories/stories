@@ -21,7 +21,7 @@ export const josuaEn: TextOverlay<Journey> = {
         'And then God says it once more: “Be strong and courageous! Keep everything Moses commanded you, and never let the book of the law leave your mouth. Think about it day and night, and what you do will succeed. Do not be afraid and do not lose heart, for God is with you wherever you go.”',
         'Joshua calls the officers of the people. “Go through the camp,” he says, “and tell everyone: Get your food ready, for in three days you will cross the Jordan.” The men answer, “Everything you command us we will do, and wherever you send us we will go. May God be with you as he was with Moses!”'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Pack the supplies into the basket so that everything fits in.', pack: { rounds: [{ hint: 'Pack the supplies into the basket. Tap a thing in the basket and it turns.' }, { hint: 'Now there are more supplies and almost no gap. Think carefully how everything fits.' }] } },
       questions: [
         { q: 'Who leads the people after Moses has died?', options: ['Joshua', 'Caleb', 'Aaron'] },
         { q: 'What should Joshua be, according to God’s word?', options: ['strong and courageous', 'quick and quiet', 'rich and famous'] }
