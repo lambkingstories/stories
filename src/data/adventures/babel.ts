@@ -6,8 +6,8 @@
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/babel/, images/abenteuer/spiele/babel/<spiel>/, audio/abenteuer/babel/.
  *
- * STAND: Etappen noch `soon` (nicht spielbar), bis die Bilder (Panorama, Etappenbilder, Medaille, Spielbilder) und die Vorlese-Aufnahmen eingebaut sind.
- * Zahlen, die aus Messdateien der Bilder kommen, sind mit PLATZHALTER markiert und werden beim Einbau durch die gemessenen ersetzt.
+ * STAND 20.10.2026: alle Bilder (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder), Messwerte und Vorlese-Aufnahmen (Deutsch und Englisch) sind eingebaut, die Etappen sind spielbar.
+ * Das Abenteuer ist aber nicht öffentlich: es ist hinter `comingSoon` und dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
 import type { ChainGame, Journey, MissingGame, StackGame, TraceGame, WipeGame } from '@/types/adventure'
 import { BABEL_PATH } from './babelPath'
@@ -17,8 +17,8 @@ import { babelEn } from './en/babel.en'
 const IMG = 'images/abenteuer/babel/'
 const G = 'images/abenteuer/spiele/babel/'
 const REC = 'audio/abenteuer/babel/'
-/** Alle Etappen sind noch nicht spielbar; beim Einbau der Bilder und Töne auf `false` setzen. */
-const SOON = true
+/** `true` = die Etappen sind noch nicht spielbar (Gerüst); jetzt sind alle Bilder und Töne eingebaut. */
+const SOON = false
 
 /**
  * Etappe 1, "Wer fehlt im Zug?": eine Reihe von Menschen vor dem Etappenbild 1, eine Staubwolke zieht vorbei, jemand fehlt (Bildauftrag B10).
@@ -146,7 +146,7 @@ export const babel: Journey = {
   title: 'Der Turm von Babel',
   subtitle: 'Eine Stadt und ein Turm',
   age: '8-10',
-  downloadMb: 1, // beim Einbau neu zählen (der Test sagt die echte Größe)
+  downloadMb: 7, // 6,9 MB gezählt am 20.10.2026 (der Test sagt die echte Größe)
   medal: `${IMG}medaille.webp`, // Der Turm (Stufenturm aus Lehmziegeln) in der Ebene im Morgenlicht
   // Geschenk-Ausmalbild: der Turm aus Ziegeln mit vielen Bauleuten bei Sonnenaufgang (unvollendet, friedlich)
   gift: { title: 'Der Turm aus Ziegeln', image: `${IMG}geschenk.webp` },
