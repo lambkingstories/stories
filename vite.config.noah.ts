@@ -36,6 +36,9 @@ export const BABEL_ONLY_DIRS = ['images/abenteuer/babel', 'images/abenteuer/spie
 /** The folders that belong to the journey "Abraham" (id `abraham`) alone, in the same three places as Adam and Eve. */
 export const ABRAHAM_ONLY_DIRS = ['images/abenteuer/abraham', 'images/abenteuer/spiele/abraham', 'audio/abenteuer/abraham']
 
+/** The folders that belong to the journey "Jakob" (id `jakob`) alone, in the same three places as Adam and Eve. */
+export const JAKOB_ONLY_DIRS = ['images/abenteuer/jakob', 'images/abenteuer/spiele/jakob', 'audio/abenteuer/jakob']
+
 function strip(outDir: string, dirs: string[]) {
   for (const dir of dirs) rmSync(resolve(outDir, dir), { recursive: true, force: true })
 }
@@ -58,4 +61,9 @@ export function stripBabelFiles(outDir: string) {
 /** Takes the folders of Abraham out of a finished build. */
 export function stripAbrahamFiles(outDir: string) {
   strip(outDir, ABRAHAM_ONLY_DIRS)
+}
+
+/** Takes the folders of Jakob out of a finished build. */
+export function stripJakobFiles(outDir: string) {
+  strip(outDir, JAKOB_ONLY_DIRS)
 }

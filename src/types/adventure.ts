@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten'
 
 export interface AdventureQuestion {
   q: string
@@ -588,6 +588,56 @@ export interface BalanceGame {
   rounds: BalanceRound[]
 }
 
+/** A round of the slide puzzle: the number of columns and rows of the tiles, how many moves the mixing makes from the finished picture, and the seed of the mixing (fixed, so that a round is the same every time and can be tested). */
+export interface SlideRound {
+  hint: string
+  cols: number
+  rows: number
+  moves: number
+  seed: number
+}
+/** The slide puzzle "Stairway": the picture is cut into tiles, one is missing, and a tile next to the gap is slid into it until the picture is whole again (at most two rounds). The tiles are cut by the app. */
+export interface SlideGame {
+  /** The picture (3:2, the stage picture). */
+  image: string
+  rounds: SlideRound[]
+}
+
+/** A round of the crank game: how many buckets are drawn from the well. */
+export interface CrankRound {
+  hint: string
+  buckets: number
+}
+/**
+ * The crank game: the finger turns the crank and the bucket rises out of the well; at the top it pours itself into the trough. Positions are percent of the picture
+ * (`crankAt` the middle of the crank, `bucketAt` the x of the rope and the y of the bucket when it is up and when it is down, `troughAt` x, y and the width of the trough).
+ */
+export interface CrankGame {
+  background: string
+  crank: string
+  bucket: string
+  troughEmpty: string
+  troughFull: string
+  crankAt: [number, number]
+  bucketAt: [number, number, number]
+  troughAt: [number, number, number]
+  rounds: CrankRound[]
+}
+
+/** A round of the holding game: how many seconds the light has to be held in all, and the way the light wanders (percent of the picture); without a way it stands still. */
+export interface HoldRound {
+  hint: string
+  seconds: number
+  path?: [number, number][]
+}
+/** The holding game: a soft light lies on the ground; as long as the finger holds it, the morning comes (nothing is lost when the finger lets go). `start` is where the light lies (percent of the picture). */
+export interface HoldGame {
+  background: string
+  spark: string
+  start: [number, number]
+  rounds: HoldRound[]
+}
+
 /** A round of the constellation game: the stars of the model as points in the frame (0 to 100 each way), and whether the model stays in view. */
 export interface ConstellationRound {
   hint: string
@@ -675,6 +725,9 @@ export interface StageTask {
   stack?: StackGame
   trace?: TraceGame
   balance?: BalanceGame
+  slide?: SlideGame
+  crank?: CrankGame
+  hold?: HoldGame
   constellation?: ConstellationGame
 }
 

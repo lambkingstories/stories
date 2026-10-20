@@ -12,17 +12,18 @@ export const comingSoon: { id: string; title: string }[] = [
   { id: 'adam-eva', title: 'Adam und Eva' },
   { id: 'noah', title: 'Noah' },
   { id: 'babel', title: 'Der Turm von Babel' },
-  { id: 'abraham', title: 'Abraham' }
+  { id: 'abraham', title: 'Abraham' },
+  { id: 'jakob', title: 'Jakob' }
 ]
 // the names of the announced adventures in English (shown when the app is English)
-localize(comingSoon, [{ title: 'Adam and Eve' }, { title: 'Noah' }, { title: 'The Tower of Babel' }, { title: 'Abraham' }])
+localize(comingSoon, [{ title: 'Adam and Eve' }, { title: 'Noah' }, { title: 'The Tower of Babel' }, { title: 'Abraham' }, { title: 'Jacob' }])
 
 /**
- * Noah, Adam and Eve, the Tower of Babel and Abraham are not public yet (texts and pictures are not released). A build that contains one of them
- * (`VITE_INCLUDE_NOAH=true`, `VITE_INCLUDE_ADAM=true`, `VITE_INCLUDE_BABEL=true`, `VITE_INCLUDE_ABRAHAM=true`, the hidden test build) does not show it to everybody: it shows only
- * on a device that has been unlocked once by opening the app with the unlock link (`/?noah=<code>`, `/?adam=<code>`, `/?babel=<code>`, `/?abraham=<code>`); the unlock is
- * kept on the device (`localStorage`), `?noah=off` / `?adam=off` / `?babel=off` / `?abraham=off` takes it away again. `VITE_SHOW_NOAH=true` / `VITE_SHOW_ADAM=true` /
- * `VITE_SHOW_BABEL=true` / `VITE_SHOW_ABRAHAM=true` (local `vite --mode noah` / `--mode adam` / `--mode babel` / `--mode abraham`) shows it always.
+ * Noah, Adam and Eve, the Tower of Babel, Abraham and Jacob are not public yet (texts and pictures are not released). A build that contains one of them
+ * (`VITE_INCLUDE_NOAH=true`, `VITE_INCLUDE_ADAM=true`, `VITE_INCLUDE_BABEL=true`, `VITE_INCLUDE_ABRAHAM=true`, `VITE_INCLUDE_JAKOB=true`, the hidden test build) does not show it to everybody: it shows only
+ * on a device that has been unlocked once by opening the app with the unlock link (`/?noah=<code>`, `/?adam=<code>`, `/?babel=<code>`, `/?abraham=<code>`, `/?jakob=<code>`); the unlock is
+ * kept on the device (`localStorage`), `?noah=off` / `?adam=off` / `?babel=off` / `?abraham=off` / `?jakob=off` takes it away again. `VITE_SHOW_NOAH=true` / `VITE_SHOW_ADAM=true` /
+ * `VITE_SHOW_BABEL=true` / `VITE_SHOW_ABRAHAM=true` / `VITE_SHOW_JAKOB=true` (local `vite --mode noah` / `--mode adam` / `--mode babel` / `--mode abraham` / `--mode jakob`) shows it always.
  * A normal build contains none of it: the conditions below are constants there, so the chunk with the data of the journey is left out (and the
  * folders of its pictures and recordings are taken out of the build, see `vite.config.noah.ts`). Only data of our own server is loaded, never
  * code from outside. This is a hiding place, not a lock.
@@ -35,6 +36,8 @@ export const BABEL_PREVIEW_KEY = 'lk-preview-babel'
 export const BABEL_UNLOCK_CODE = 'babel-vorschau-r7t3'
 export const ABRAHAM_PREVIEW_KEY = 'lk-preview-abraham'
 export const ABRAHAM_UNLOCK_CODE = 'abraham-vorschau-p6w2'
+export const JAKOB_PREVIEW_KEY = 'lk-preview-jakob'
+export const JAKOB_UNLOCK_CODE = 'jakob-vorschau-c8n5'
 
 /** A journey that is shown only on unlocked devices: the name of its link (`?<param>=<code>`), where the unlock is kept, and how it is loaded. */
 interface PreviewJourney {
@@ -81,6 +84,16 @@ function previewJourneys(): PreviewJourney[] {
       key: ABRAHAM_PREVIEW_KEY,
       always: import.meta.env.VITE_SHOW_ABRAHAM === 'true',
       load: async () => (await import('@/data/adventures/abraham')).abraham
+    })
+  }
+  if (import.meta.env.VITE_INCLUDE_JAKOB === 'true' || import.meta.env.VITE_SHOW_JAKOB === 'true') {
+    list.push({
+      id: 'jakob',
+      param: 'jakob',
+      code: JAKOB_UNLOCK_CODE,
+      key: JAKOB_PREVIEW_KEY,
+      always: import.meta.env.VITE_SHOW_JAKOB === 'true',
+      load: async () => (await import('@/data/adventures/jakob')).jakob
     })
   }
   if (import.meta.env.VITE_INCLUDE_NOAH === 'true' || import.meta.env.VITE_SHOW_NOAH === 'true') {
