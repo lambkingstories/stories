@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still'
 
 export interface AdventureQuestion {
   q: string
@@ -863,6 +863,145 @@ export interface CluesGame {
   rounds: CluesRound[]
 }
 
+/** A thing of the packing game: its picture and its size in cells of the basket (1 or 2 each way). */
+export interface PackItem {
+  id: string
+  image: string
+  w: number
+  h: number
+}
+/** A round of the packing game: the size of the grid in the basket and the things to pack (ids). */
+export interface PackRound {
+  hint: string
+  cols: number
+  rows: number
+  items: string[]
+}
+/** The packing game "Pack the supplies": things of different shapes are fitted into the grid of a basket (a tap on a packed thing turns it). `area` is the grid in percent of the picture. */
+export interface PackGame {
+  background: string
+  basket: string
+  items: PackItem[]
+  area: { x: number; y: number; w: number; h: number }
+  rounds: PackRound[]
+}
+
+/** A bundle of flax of the hiding game: its picture and its size in percent of the width of the roof (both ways). */
+export interface HideBundle {
+  id: string
+  image: string
+  w: number
+  h: number
+}
+/** A man who lies on the roof: his picture and his place (percent of the picture of the roof, the top left corner and the size). */
+export interface HideMan {
+  id: string
+  image: string
+  x: number
+  y: number
+  w: number
+  h: number
+}
+export interface HideRound {
+  hint: string
+  men: string[]
+  bundles: string[]
+}
+/** The hiding game "Under the flax": bundles of flax are laid over the men on the roof until nobody can be seen; then the messengers look up from far away and go on. */
+export interface HideGame {
+  background: string
+  messenger: string
+  men: HideMan[]
+  bundles: HideBundle[]
+  rounds: HideRound[]
+}
+
+/** A man on the rope of the lowering game: his picture (with the rope) and his width (percent of the picture). */
+export interface LowerMan {
+  id: string
+  image: string
+  w: number
+}
+/** A round of the lowering game: the man, the steps down, the time of one swing (seconds), the swing (degrees) and how far from the wall the rope has to swing to be free (degrees). */
+export interface LowerRound {
+  hint: string
+  man: string
+  steps: number
+  period: number
+  amplitude: number
+  threshold: number
+}
+/** The lowering game "Down the rope": the man swings on the rope; a tap while he swings away from the wall lets him down a step. `window` is where the rope hangs, `ground` the height of the ground (percent of the picture). */
+export interface LowerGame {
+  background: string
+  men: LowerMan[]
+  window: [number, number]
+  ground: number
+  rounds: LowerRound[]
+}
+
+/** A round of the step game: the beats a minute, the steps to take and how far from the beat a tap may be (seconds). */
+export interface StepRound {
+  hint: string
+  bpm: number
+  steps: number
+  tolerance: number
+}
+/** The step game "In step": the bearers walk along `path` (percent of the picture) one step at every beat the child taps in time; the footprints show the way. */
+export interface StepGame {
+  background: string
+  bearers: string
+  print: string
+  path: [number, number][]
+  rounds: StepRound[]
+}
+
+/** A round of the baking game: the dough balls to bake, the hot stones, and the seconds after which a flatbread is golden and after which it is too dark. */
+export interface BakeRound {
+  hint: string
+  dough: number
+  stones: number
+  goldenFrom: number
+  goldenTo: number
+}
+/** The baking game "Bake flatbreads": a flatbread on a hot stone is raw, then golden, then too dark; it is turned at the right time. Places in percent of the picture. */
+export interface BakeGame {
+  background: string
+  dough: string
+  raw: string
+  golden: string
+  dark: string
+  stack: string
+  stonesAt: [number, number][]
+  stackAt: [number, number]
+  rounds: BakeRound[]
+}
+
+/** A place at the side of the road for an animal of the hush game (percent of the picture, `w` its width). */
+export interface HushSpot {
+  id: string
+  animal: string
+  image: string
+  x: number
+  y: number
+  w: number
+}
+/** A round of the hush game: the animals to calm, the most clouds at once, the seconds until a cloud is loud, and the seed of the order in which they come. */
+export interface HushRound {
+  hint: string
+  calms: number
+  maxClouds: number
+  grow: number
+  seed: number
+}
+/** The hush game "Keep quiet": little clouds of noise grow over the animals at the side of the road; a tap calms the animal before the cloud is loud. */
+export interface HushGame {
+  background: string
+  clouds: [string, string, string]
+  spots: HushSpot[]
+  rounds: HushRound[]
+}
+
 /** A round of the constellation game: the stars of the model as points in the frame (0 to 100 each way), and whether the model stays in view. */
 export interface ConstellationRound {
   hint: string
@@ -963,6 +1102,12 @@ export interface StageTask {
   rings?: RingsGame
   silver?: SilverGame
   clues?: CluesGame
+  pack?: PackGame
+  hide?: HideGame
+  lower?: LowerGame
+  step?: StepGame
+  bake?: BakeGame
+  hush?: HushGame
   constellation?: ConstellationGame
 }
 
