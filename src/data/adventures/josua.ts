@@ -7,11 +7,11 @@
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/josua/, images/abenteuer/spiele/josua/<spiel>/, audio/abenteuer/josua/.
  *
- * STAND 20.10.2026 (Phase 2a, nur Daten und Platzhalter): Jede Etappe hat eine Quiz-Aufgabe (PLATZHALTER bis Spiel/Bild) und ein vorhandenes Etappenbild von Josef;
+ * STAND 21.10.2026: alle acht Spiele sind gebaut (die Bilder der Spiele fehlen noch, bis dahin stehen Platzhalter, siehe `NOT_PAINTED_YET` in `utils/journeyFiles.ts`); die Etappen 7 und 9 bleiben Quiz. Die Etappenbilder sind noch die von Josef;
  * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit den ersten zehn Stationen (PLATZHALTER bis zum eigenen Panorama); Medaille und Geschenk sind ebenfalls die von Josef.
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme. Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { BakeGame, HideGame, Journey, LowerGame, MemoryGame, PackGame, StepGame, VerseGame } from '@/types/adventure'
+import type { BakeGame, HideGame, HushGame, Journey, LowerGame, MemoryGame, PackGame, StepGame, VerseGame } from '@/types/adventure'
 import { josef } from './josef'
 import { JOSUA_PATH } from './josuaPath'
 import { localize } from './localize'
@@ -20,6 +20,30 @@ import { josuaEn } from './en/josua.en'
 // PLATZHALTER bis zum eigenen Bild: die Etappenbilder von Josef (Ordner images/abenteuer/josef/); danach `images/abenteuer/josua/etappe-bild-NN.webp`
 const PLACEHOLDER = 'images/abenteuer/josef/'
 const G = 'images/abenteuer/spiele/josua/'
+
+/**
+ * Etappe 8, "Ruhe bewahren": am Wegrand sitzen Tiere, über denen kleine Lärmwolken wachsen; ein Tippen beruhigt das Tier, bevor die Wolke laut ist (Bildauftrag JO16; Hintergrund = das Etappenbild 8).
+ * Sechs feste Plätze (Fußpunkt, Prozent des Bildes, Breite in Prozent). Runde 1 acht Beruhigungen, höchstens zwei Wolken zugleich, 4 Sekunden bis laut; Runde 2 zwölf, bis zu drei Wolken, 3 Sekunden. Die
+ * Reihenfolge der Wolken ist aus dem Startwert `seed` immer dieselbe. Die Plätze sind vorläufig geschätzt, bis die Datei `still-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `still/esel.webp`, `gans.webp`, `ziege.webp`, `lamm.webp`, `hahn.webp`, `karren-krug.webp` je 220 × 220, `wolke-1.webp`, `wolke-2.webp`,
+ * `wolke-3.webp` je 120 × 100 (alle transparent).
+ */
+const STILL: HushGame = {
+  background: `${PLACEHOLDER}etappe-bild-08.webp`,
+  clouds: [`${G}still/wolke-1.webp`, `${G}still/wolke-2.webp`, `${G}still/wolke-3.webp`],
+  spots: [
+    { id: 'platz-1', animal: 'esel', image: `${G}still/esel.webp`, x: 10, y: 86, w: 13 },
+    { id: 'platz-2', animal: 'gans', image: `${G}still/gans.webp`, x: 26, y: 92, w: 13 },
+    { id: 'platz-3', animal: 'ziege', image: `${G}still/ziege.webp`, x: 42, y: 88, w: 13 },
+    { id: 'platz-4', animal: 'lamm', image: `${G}still/lamm.webp`, x: 58, y: 93, w: 13 },
+    { id: 'platz-5', animal: 'hahn', image: `${G}still/hahn.webp`, x: 74, y: 87, w: 13 },
+    { id: 'platz-6', animal: 'karren', image: `${G}still/karren-krug.webp`, x: 90, y: 94, w: 13 }
+  ],
+  rounds: [
+    { hint: 'Das Volk geht still um die Stadt. Tippe ein Tier an, bevor seine Lärmwolke groß wird.', calms: 8, maxClouds: 2, grow: 4, seed: 11 },
+    { hint: 'Noch einmal, jetzt mit mehr Wolken und etwas schneller.', calms: 12, maxClouds: 3, grow: 3, seed: 23 }
+  ]
+}
 
 /**
  * Etappe 2, "Unter dem Flachs verstecken": die Männer liegen in Mäntel gewickelt auf dem Dach (Draufsicht), Flachsbündel werden darüber gelegt, bis nichts mehr herausschaut (Bildauftrag JO11; eigener Hintergrund
@@ -188,7 +212,7 @@ export const josua: Journey = {
         'Und dann sagt Gott es noch einmal: „Sei mutig und stark! Halte dich an alles, was Mose dir aufgetragen hat, und lass das Buch des Gesetzes nicht aus deinem Mund kommen. Denk Tag und Nacht darüber nach, dann wird dir gelingen, was du anpackst. Hab keine Angst und verzage nicht, denn Gott ist bei dir, wohin du auch gehst.“',
         'Josua ruft die Amtleute des Volkes. „Geht durch das Lager“, sagt er, „und sagt allen: Macht euch Vorrat bereit, denn in drei Tagen zieht ihr über den Jordan.“ Da antworten die Männer: „Alles, was du uns aufträgst, wollen wir tun, und wohin du uns sendest, dahin gehen wir. Gott sei mit dir, wie er mit Mose war!“'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild; vorgesehen: Proviant packen (packen, neu)
+      // Spiel: Proviant packen (packen, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'packen', hint: 'Packe den Vorrat so in den Korb, dass alles hineinpasst.', pack: PACKEN },
       questions: [
         { q: 'Wer führt das Volk, nachdem Mose gestorben ist?', options: ['Josua', 'Kaleb', 'Aaron'], answer: 0 },
@@ -206,7 +230,7 @@ export const josua: Journey = {
         'Rahab hat die beiden schon versteckt. Auf ihrem Flachdach liegen Stängel von Flachs zum Trocknen ausgebreitet, und darunter hat sie die Männer verborgen. „Ja, es sind Männer bei mir gewesen“, sagt sie zu den Boten, „aber ich weiß nicht, woher sie kamen. Als es dunkel wurde und das Stadttor geschlossen werden sollte, sind sie fortgegangen. Lauft ihnen schnell nach, dann holt ihr sie noch ein!“',
         'Die Boten des Königs machen sich auf den Weg zum Jordan, bis zu den Furten. Kaum sind sie aus dem Tor, wird es hinter ihnen verschlossen.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild; vorgesehen: Unter dem Flachs verstecken (verstecken, neu)
+      // Spiel: Unter dem Flachs verstecken (verstecken, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'verstecken', hint: 'Decke die Männer mit Flachsbündeln zu.', hide: VERSTECKEN },
       questions: [
         { q: 'Wohin schickt Josua die beiden Männer?', options: ['nach Jericho', 'nach Hebron', 'nach Ägypten'], answer: 0 },
@@ -224,7 +248,7 @@ export const josua: Journey = {
         'Rahabs Haus gehört zur Stadtmauer, und so lässt sie die beiden durch das Fenster an einem Seil hinab. „Geht ins Gebirge und versteckt euch drei Tage“, sagt sie, „bis die Verfolger zurück sind. Dann zieht weiter.“ Die Männer erklären ihr das Zeichen: „Binde diese rote Schnur in das Fenster, durch das du uns herabgelassen hast, und hole deine ganze Familie zu dir ins Haus. Wer in deinem Haus bleibt, dem geschieht nichts.“ „Es soll so sein“, sagt Rahab und bindet die rote Schnur ans Fenster.',
         'Drei Tage bleiben die Männer im Gebirge, und die Verfolger finden sie nicht. Dann kehren sie zu Josua zurück: „Gott hat uns das ganze Land gegeben. Die Menschen dort verzagen vor uns.“'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild; vorgesehen: Am Seil herablassen (abseilen, neu)
+      // Spiel: Am Seil herablassen (abseilen, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'abseilen', hint: 'Lass den Mann am Seil hinab, wenn er von der Mauer wegschwingt.', lower: ABSEILEN },
       questions: [
         { q: 'Was bindet Rahab als Zeichen an ihr Fenster?', options: ['eine rote Schnur', 'ein weißes Tuch', 'einen grünen Zweig'], answer: 0 },
@@ -241,7 +265,7 @@ export const josua: Journey = {
         'Der Jordan ist jetzt in der Erntezeit voll bis über die Ufer. Josua sagt zu den Priestern: „Nehmt die Lade und geht dem Volk voran.“ Und zum Volk: „Daran sollt ihr merken, dass Gott mitten unter euch ist: Wenn die Füße der Priester im Wasser stehen, bleibt das Wasser von oben stehen wie ein Wall.“',
         'Die Priester tragen die Lade bis ans Ufer und tauchen die Füße in das Wasser. Da geschieht es: Das Wasser, das von oben kommt, bleibt weit weg bei der Stadt Adam stehen und türmt sich auf. Das Wasser unten fließt zum Salzmeer ab, bis das Flussbett leer ist. Nun zieht das Volk gegenüber von Jericho hinüber, und die Priester stehen mit der Lade mitten im Jordan auf trockenem Boden, bis alle hindurch sind.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild; vorgesehen: Im Gleichschritt (schritt, neu)
+      // Spiel: Im Gleichschritt (schritt, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'schritt', hint: 'Tippe im Takt der Schritte.', step: SCHRITT },
       questions: [
         { q: 'Wer trägt die Lade des Bundes?', options: ['die Priester', 'die Kundschafter', 'die Kinder'], answer: 0 },
@@ -259,7 +283,7 @@ export const josua: Journey = {
         'Die Priester bleiben im Flussbett, bis alles getan ist, und das Volk eilt hinüber. Dann steigen sie auf Josuas Befehl aus dem Jordan herauf. Kaum betreten sie das Ufer, kehrt das Wasser zurück und fließt wieder über die Ufer wie zuvor.',
         'Es ist der zehnte Tag des ersten Monats, als das Volk bei Gilgal lagert, östlich von Jericho. Dort stellt Josua die zwölf Steine auf. „Wenn eure Kinder fragen, was sie bedeuten“, sagt er, „dann erzählt ihnen: Israel ist auf trockenem Boden durch den Jordan gegangen, so wie Gott es einst beim Schilfmeer getan hat. Alle Völker sollen sehen, wie mächtig Gott ist.“'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild; vorgesehen: Erinnerungs-Memory (memory, alt)
+      // Spiel: Erinnerungs-Memory (memory, alt); das Etappenbild ist noch das von Josef
       task: { kind: 'memory', hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.', memory: MEMORY },
       questions: [
         { q: 'Wo lagert das Volk, als Josua die Steine aufstellt?', options: ['in Gilgal', 'in Jericho', 'in Sichem'], answer: 0 },
@@ -276,7 +300,7 @@ export const josua: Journey = {
         'Am vierzehnten Tag des Monats feiert Israel in der Ebene bei Jericho das Passafest, so wie Gott es ihnen aufgetragen hat, zur Erinnerung an den Auszug aus Ägypten. Am Tag danach essen die Menschen zum ersten Mal vom Ertrag des Landes: ungesäuerte Brote und geröstete Körner.',
         'Und noch etwas ist neu. Viele Jahre lang hat Gott dem Volk in der Wüste jeden Morgen das Manna gegeben, das Brot, das vom Himmel fällt. Doch am Tag, an dem sie vom Getreide des Landes essen, hört das Manna auf. Nun ernten sie, was im Land Kanaan wächst, und davon werden sie in diesem Jahr satt.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild; vorgesehen: Fladen backen (backen, neu)
+      // Spiel: Fladen backen (backen, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'backen', hint: 'Backe Fladen und wende sie, wenn sie goldbraun sind.', bake: BACKEN },
       questions: [
         { q: 'Was hört auf, als das Volk vom Land isst?', options: ['das Manna', 'der Regen', 'der Wind'], answer: 0 },
@@ -293,7 +317,7 @@ export const josua: Journey = {
         'Da wirft sich Josua mit dem Gesicht zur Erde nieder und betet an. „Was sagt mein Herr seinem Diener?“, fragt er. Der Fürst antwortet: „Zieh deine Schuhe aus, denn der Ort, auf dem du stehst, ist heilig.“ Und Josua tut es.',
         'Jericho ist fest verschlossen, denn die Menschen haben Angst vor den Israeliten: Niemand kommt heraus, und niemand geht hinein. Doch Gott spricht zu Josua: „Sieh, ich habe Jericho in deine Hand gegeben. Sechs Tage lang sollt ihr einmal um die Stadt ziehen. Sieben Priester sollen sieben Posaunen aus Widderhörnern vor der Lade hertragen. Am siebten Tag sollt ihr siebenmal um die Stadt ziehen, und die Priester sollen die Posaunen blasen. Wenn der lange Ton erklingt, soll das ganze Volk laut rufen. Dann fällt die Mauer der Stadt, und ihr könnt hineinziehen.“'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild; vorgesehen: nur Quiz (bleibt Quiz)
+      // nur Quiz (ernst bzw. ruhig, nichts wird gespielt); das Etappenbild ist noch das von Josef
       task: { kind: 'quiz', hint: 'Diese Etappe ist ruhig und ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wer steht plötzlich vor Josua?', options: ['der Fürst über das Heer Gottes', 'ein Bote des Königs', 'ein Hirte aus Jericho'], answer: 0 },
@@ -311,8 +335,8 @@ export const josua: Journey = {
         'Aber Josua gibt noch eine Anweisung: „Ihr sollt nicht schreien, und kein Wort soll aus eurem Mund kommen, bis zu dem Tag, an dem ich sage: Ruft! Dann sollt ihr rufen.“',
         'Am ersten Tag bleibt es so, wie Gott gesagt hat. Die Priester blasen die Posaunen, die Lade wird einmal um die Stadt getragen, und das Volk folgt schweigend. Dann kehren alle ins Lager zurück und verbringen dort die Nacht. Am nächsten Morgen steht Josua früh auf, und noch einmal geht der Zug einmal um Jericho. So geschieht es sechs Tage lang. Die Tore von Jericho bleiben verschlossen.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild; vorgesehen: Ruhe bewahren (still, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      // Spiel: Ruhe bewahren (still, neu); das Etappenbild ist noch das von Josef
+      task: { kind: 'still', hint: 'Beruhige die Tiere, bevor es laut wird.', hush: STILL },
       questions: [
         { q: 'Wie viele Priester tragen Posaunen?', options: ['sieben', 'zwölf', 'drei'], answer: 0 },
         { q: 'Wie oft ziehen sie an den ersten sechs Tagen jeden Tag um die Stadt?', options: ['einmal', 'siebenmal', 'dreimal'], answer: 0 }
@@ -329,7 +353,7 @@ export const josua: Journey = {
         'Da ruft das Volk laut, die Posaunen schallen, und die Mauer der Stadt fällt ein. Das Volk zieht in die Stadt. Josua sagt zu den beiden Männern, die das Land erkundet haben: „Geht in Rahabs Haus und holt sie heraus, mit allen, die zu ihr gehören, so wie ihr es ihr geschworen habt.“ Die Männer führen Rahab, ihren Vater und ihre Mutter, ihre Brüder und alle ihre Angehörigen aus der Stadt in Sicherheit, vor das Lager Israels.',
         'Rahab lebt von nun an bei den Israeliten. Und Gott ist mit Josua, und sein Name wird im ganzen Land bekannt.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild; vorgesehen: nur Quiz (bleibt Quiz)
+      // nur Quiz (ernst bzw. ruhig, nichts wird gespielt); das Etappenbild ist noch das von Josef
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wie oft ziehen sie am siebten Tag um die Stadt?', options: ['siebenmal', 'einmal', 'zwölfmal'], answer: 0 },
@@ -348,7 +372,7 @@ export const josua: Journey = {
         'Das Volk antwortet: „Das sei ferne von uns, dass wir Gott verlassen! Er hat uns aus Ägypten geführt und auf unserem ganzen Weg beschützt. Wir wollen Gott dienen, denn er ist unser Gott.“',
         'An diesem Tag schließt Josua mit dem Volk einen Bund. Er schreibt die Worte in das Buch des Gesetzes Gottes und richtet unter der Eiche einen großen Stein auf. „Seht, dieser Stein soll Zeuge sein“, sagt er, „denn er hat alle Worte gehört, die Gott zu uns gesprochen hat.“ Dann schickt er das Volk heim. Nach diesen Ereignissen stirbt Josua im Alter von hundertzehn Jahren, und das Volk dient Gott, solange er und die Ältesten nach ihm leben.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild; vorgesehen: Lückenvers (lueckenvers, alt)
+      // Spiel: Lückenvers (lueckenvers, alt); das Etappenbild ist noch das von Josef
       task: { kind: 'lueckenvers', hint: 'Setze die fehlenden Wörter in den Satz.', verse: VERS },
       questions: [
         { q: 'Wo versammelt Josua das Volk?', options: ['in Sichem', 'in Jericho', 'in Gilgal'], answer: 0 },

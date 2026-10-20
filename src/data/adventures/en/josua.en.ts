@@ -123,7 +123,7 @@ export const josuaEn: TextOverlay<Journey> = {
         'But Joshua gives one more instruction: “You must not shout, and no word may come out of your mouth, until the day I say: Shout! Then you shall shout.”',
         'On the first day it is just as God has said. The priests blow the trumpets, the ark is carried once around the city, and the people follow in silence. Then everyone goes back to the camp and spends the night there. The next morning Joshua gets up early, and once more the procession goes once around Jericho. So it happens for six days. The gates of Jericho stay shut.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Calm the animals before it gets loud.', hush: { rounds: [{ hint: 'The people walk round the city in silence. Tap an animal before its cloud of noise gets big.' }, { hint: 'Once more, now with more clouds and a little quicker.' }] } },
       questions: [
         { q: 'How many priests carry trumpets?', options: ['seven', 'twelve', 'three'] },
         { q: 'How many times do they go around the city each day for the first six days?', options: ['once', 'seven times', 'three times'] }

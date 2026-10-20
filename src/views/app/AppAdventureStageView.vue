@@ -37,6 +37,7 @@ import GameConstellation from '@/components/molecules/games/GameConstellation.vu
 import GameSlide from '@/components/molecules/games/GameSlide.vue'
 import GameCrank from '@/components/molecules/games/GameCrank.vue'
 import GameHold from '@/components/molecules/games/GameHold.vue'
+import GameHush from '@/components/molecules/games/GameHush.vue'
 import GameHide from '@/components/molecules/games/GameHide.vue'
 import GameBake from '@/components/molecules/games/GameBake.vue'
 import GamePack from '@/components/molecules/games/GamePack.vue'
@@ -340,7 +341,7 @@ const hasPart = computed(() => partStars.value > 0 && !progress.finished.value)
 
 /** The games have a restart sign: a new key mounts the game afresh (round, mistakes and what was done begin again). */
 const gameKey = ref(0)
-const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide'] as const
+const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush'] as const
 const hasGame = computed(() => hasCountGame.value || GAME_FIELDS.some((f) => !!gameTask.value?.[f]))
 function restartGame() {
   progress.reset()
@@ -425,6 +426,7 @@ const gameKind = computed(() => {
   if (g?.slide) return 'slide'
   if (g?.crank) return 'crank'
   if (g?.hold) return 'hold'
+  if (g?.hush) return 'hush'
   if (g?.hide) return 'hide'
   if (g?.bake) return 'bake'
   if (g?.pack) return 'pack'
@@ -560,6 +562,7 @@ function openGift() {
         GameSlide(:key="gameKey" v-else-if="gameTask?.slide" :game="gameTask.slide" @done="taskDone")
         GameCrank(:key="gameKey" v-else-if="gameTask?.crank" :game="gameTask.crank" @done="taskDone")
         GameHold(:key="gameKey" v-else-if="gameTask?.hold" :game="gameTask.hold" @done="taskDone")
+        GameHush(:key="gameKey" v-else-if="gameTask?.hush" :game="gameTask.hush" @done="taskDone")
         GameHide(:key="gameKey" v-else-if="gameTask?.hide" :game="gameTask.hide" @done="taskDone")
         GameBake(:key="gameKey" v-else-if="gameTask?.bake" :game="gameTask.bake" @done="taskDone")
         GamePack(:key="gameKey" v-else-if="gameTask?.pack" :game="gameTask.pack" @done="taskDone")

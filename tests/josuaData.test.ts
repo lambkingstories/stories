@@ -1,6 +1,6 @@
 /**
  * The data of "Josua" (`josua.ts` and `en/josua.en.ts`), phase 2a: the stories and questions follow the rules of the adventures (texts of the draft
- * `D:/Claude/Abenteuer-Josua/ENTWURF_Josua.md`), every stage still has the quiz PLACEHOLDER and a picture of Josef until the games and the own pictures are built in, the map is the
+ * `D:/Claude/Abenteuer-Josua/ENTWURF_Josua.md`), every stage has the game of the plan (the stages 7 and 9 only the questions) and a picture of Josef until the own pictures are built in, the map is the
  * placeholder map of Josef (ten stations + exam), and the English file has the same shape. The own pictures and recordings are not there yet (`audio` is missing on purpose).
  */
 import { existsSync, statSync } from 'node:fs'
@@ -105,9 +105,9 @@ describe('Josua: stories and questions', () => {
   })
 })
 
-describe('Josua: the placeholders until the games and pictures come', () => {
-  it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(josua.stages.map((s) => s.task.kind)).toEqual(['packen', 'verstecken', 'abseilen', 'schritt', 'memory', 'backen', 'quiz', 'quiz', 'quiz', 'lueckenvers'])
+describe('Josua: the games, and the placeholders until the pictures come', () => {
+  it('every stage has the game of the plan; the stages 7 and 9 are only questions; two old mechanics at most (memory, verse)', () => {
+    expect(josua.stages.map((s) => s.task.kind)).toEqual(['packen', 'verstecken', 'abseilen', 'schritt', 'memory', 'backen', 'quiz', 'still', 'quiz', 'lueckenvers'])
     for (const s of josua.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
@@ -231,6 +231,50 @@ describe('Josua: the placeholders until the games and pictures come', () => {
       const area = r.bundles.reduce((n, id) => n + g.bundles.find((x) => x.id === id)!.w * g.bundles.find((x) => x.id === id)!.h, 0)
       expect(area).toBeLessThan(100 * 100 * H * 0.25)
     }
+  })
+
+  it('8 hush: eight calmings with at most two clouds and 4 seconds, then twelve with three and 3 seconds; six places at the side of the road, three cloud sizes, the animals are not in the middle of the picture', () => {
+    const g = stage(8).task.hush
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => [r.calms, r.maxClouds, r.grow])).toEqual([[8, 2, 4], [12, 3, 3]])
+    expect(g.spots).toHaveLength(6)
+    expect(g.clouds).toHaveLength(3)
+    expect(new Set(g.spots.map((s) => s.animal)).size).toBe(6)
+    for (const s of g.spots) {
+      expect(s.x >= 0 && s.x <= 100 && s.y >= 0 && s.y <= 100, s.id).toBe(true)
+      expect(s.y, 'at the side of the road, low in the picture').toBeGreaterThan(70)
+    }
+    // the places do not stand on each other
+    for (let i = 1; i < g.spots.length; i++) expect(g.spots[i]!.x - g.spots[i - 1]!.x).toBeGreaterThan(g.spots[i]!.w * 0.9)
+    // the most clouds at once are less than the places and less than the calmings of the round
+    for (const r of g.rounds) {
+      expect(r.maxClouds).toBeLessThan(g.spots.length)
+      expect(r.maxClouds).toBeLessThan(r.calms)
+    }
+  })
+
+  it('every game has at most two rounds, a hint for each round, and its goal fits the table "Stufen je Spiel"', () => {
+    const g = (n: number) => stage(n).task
+    const rounds = [g(1).pack!.rounds, g(2).hide!.rounds, g(3).lower!.rounds, g(4).step!.rounds, g(6).bake!.rounds, g(8).hush!.rounds, g(10).verse!.rounds]
+    for (const r of rounds) {
+      expect(r.length).toBeGreaterThanOrEqual(1)
+      expect(r.length).toBeLessThanOrEqual(2)
+      for (const x of r) expect(x.hint.length).toBeGreaterThan(8)
+    }
+    expect(g(1).pack!.rounds.reduce((n, r) => n + r.items.length, 0)).toBe(12)
+    expect(g(2).hide!.rounds.reduce((n, r) => n + r.men.length, 0)).toBe(3)
+    expect(g(3).lower!.rounds.reduce((n, r) => n + r.steps, 0)).toBe(11)
+    expect(g(4).step!.rounds.reduce((n, r) => n + r.steps, 0)).toBe(20)
+    expect(g(5).memory!.pairs.length).toBe(6)
+    expect(g(6).bake!.rounds.reduce((n, r) => n + r.dough, 0)).toBe(15)
+    expect(g(8).hush!.rounds.reduce((n, r) => n + r.calms, 0)).toBe(20)
+    expect(g(10).verse!.rounds.reduce((n, r) => n + r.answers.length, 0)).toBe(3)
+    const kinds = josua.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
+    expect(new Set(kinds).size).toBe(kinds.length)
+    expect(kinds.filter((k) => ['memory', 'lueckenvers'].includes(k))).toHaveLength(2)
+    expect(stage(7).task.kind).toBe('quiz')
+    expect(stage(9).task.kind).toBe('quiz')
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

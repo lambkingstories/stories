@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { BakeGame, HideGame, LowerGame, PackGame, StepGame } from '@/types/adventure'
+import type { BakeGame, HideGame, HushGame, LowerGame, PackGame, StepGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -884,5 +884,159 @@ describe('Unter dem Flachs verstecken (hide)', () => {
     expect(w.find('.hd-look').text()).toBe('The messengers come')
     await look(w)
     expect(w.find('.hd-fb').text()).toContain('Something is still looking out')
+  })
+})
+
+// ---------------------------------------------------------------- keep quiet
+describe('Ruhe bewahren (hush)', () => {
+  const spot = (n: number, animal: string) => ({ id: `platz-${n}`, animal, image: `images/x/${animal}.webp`, x: 10 + n * 15, y: 88, w: 13 })
+  const game: HushGame = {
+    background: 'images/x/road.webp',
+    clouds: ['images/x/w1.webp', 'images/x/w2.webp', 'images/x/w3.webp'],
+    spots: [spot(0, 'esel'), spot(1, 'gans'), spot(2, 'ziege'), spot(3, 'lamm'), spot(4, 'hahn'), spot(5, 'karren')],
+    rounds: [
+      { hint: 'Runde eins.', calms: 3, maxClouds: 2, grow: 3, seed: 5 },
+      { hint: 'Runde zwei.', calms: 4, maxClouds: 3, grow: 2, seed: 9 }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Hush } = await import('@/components/molecules/games/GameHush.vue')
+    const w = mount(Hush, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  const cloudy = (w: W) => w.findAll('.hs-spot').flatMap((s, i) => (s.classes().includes('cloudy') ? [i] : []))
+  /** Wait (a tenth of a second at a time) until a cloud has come up. */
+  const waitCloud = async (w: W) => {
+    for (let i = 0; i < 80 && cloudy(w).length === 0; i++) await tick(100)
+  }
+  const calmOne = async (w: W) => {
+    await waitCloud(w)
+    await w.findAll('.hs-spot')[cloudy(w)[0]!]!.trigger('click')
+    await flushPromises()
+  }
+  const wrongs = () => played.filter((p) => p === 'wrong').length
+
+  it('the goal is every animal of both rounds; six animals sit at the side of the road, no cloud yet; a tap on a quiet animal does nothing', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(7)
+    expect(w.find('.hs-round').text()).toContain('Runde 1 von 2')
+    expect(w.findAll('.hs-spot')).toHaveLength(6)
+    expect(w.findAll('.hs-cloud')).toHaveLength(0)
+    expect(w.find('.hs-count').text()).toBe('Beruhigt: 0 von 3')
+    await w.findAll('.hs-spot')[0]!.trigger('click')
+    expect(played).toHaveLength(0)
+  })
+
+  it('a small cloud comes up over an animal and grows through three sizes until it would be loud', async () => {
+    const w = await open()
+    await waitCloud(w)
+    expect(cloudy(w)).toHaveLength(1)
+    const first = cloudy(w)[0]!
+    // (a second cloud may come up meanwhile; this one is followed)
+    const level = () => w.findAll('.hs-spot')[first]!.find('.hs-cloud').classes()
+    expect(level()).toContain('level-1')
+    await tick(1200)
+    expect(level()).toContain('level-2')
+    await tick(1000)
+    expect(level()).toContain('level-3')
+    expect(w.findAll('.hs-spot')[first]!.attributes('aria-label')).toContain('Antippen beruhigt')
+  })
+
+  it('a tap before the cloud is loud calms the animal: the cloud melts, a tick, a soft tone, the point is counted', async () => {
+    const w = await open()
+    await calmOne(w)
+    expect(w.find('.hs-count').text()).toBe('Beruhigt: 1 von 3')
+    expect(played).toContain('tap')
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(w.find('.gm.good').exists()).toBe(true)
+    expect(wrongs()).toBe(0)
+  })
+
+  it('a cloud that has grown for the whole time is loud: a cross, a mistake, the cloud is gone and does not count; the game goes on', async () => {
+    const w = await open()
+    await waitCloud(w)
+    await tick(3500)
+    expect(wrongs()).toBeGreaterThanOrEqual(1)
+    expect(w.find('.hs-fb').text()).toContain('Zu laut')
+    expect(w.find('.gm.bad').exists()).toBe(true)
+    expect(useTaskProgress().parts.value).toBe(0)
+    expect(w.find('.hs-count').text()).toBe('Beruhigt: 0 von 3')
+    // another cloud comes
+    await waitCloud(w)
+    expect(cloudy(w).length).toBeGreaterThan(0)
+  })
+
+  it('never more clouds at once than the round allows (two in round 1)', async () => {
+    const w = await open()
+    let most = 0
+    for (let i = 0; i < 150; i++) {
+      await tick(100)
+      most = Math.max(most, cloudy(w).length)
+    }
+    expect(most).toBeLessThanOrEqual(2)
+    expect(most).toBeGreaterThanOrEqual(1)
+  })
+
+  it('the clouds come in the same order every time', async () => {
+    const order = async () => {
+      const w = await open()
+      const seen: number[] = []
+      for (let i = 0; i < 120; i++) {
+        await tick(100)
+        for (const c of cloudy(w)) if (!seen.includes(c)) seen.push(c)
+        if (seen.length >= 3) break
+      }
+      w.unmount()
+      return seen
+    }
+    const a = await order()
+    const b = await order()
+    expect(a.length).toBeGreaterThanOrEqual(2)
+    expect(b).toEqual(a)
+  })
+
+  it('three animals calmed end round 1; round 2 has four, up to three clouds and a shorter time', async () => {
+    const w = await open()
+    for (let i = 0; i < 3; i++) await calmOne(w)
+    expect(useTaskProgress().parts.value).toBe(3)
+    await tick(1900)
+    expect(w.find('.hs-round').text()).toContain('Runde 2 von 2')
+    expect(w.find('.hs-count').text()).toBe('Beruhigt: 0 von 4')
+  })
+
+  it('the whole game: the end with three stars when nothing got loud; the loud clouds give the stars (up to three: three, up to eight: two, more: one)', async () => {
+    const w = await open()
+    for (let i = 0; i < 3; i++) await calmOne(w)
+    await tick(1900)
+    for (let i = 0; i < 4; i++) await calmOne(w)
+    await tick(1100)
+    expect(useTaskProgress().parts.value).toBe(7)
+    expect(useTaskProgress().finished.value).toBe(true)
+    await w.find('.gd button').trigger('click')
+    expect(w.emitted('done')).toEqual([[3]])
+    // with loud clouds: the stars follow the number of cross sounds
+    useTaskProgress().reset()
+    played.length = 0
+    const v = await open()
+    for (let i = 0; i < 400 && wrongs() < 4; i++) await tick(100)
+    const loud = wrongs()
+    expect(loud).toBeGreaterThanOrEqual(4)
+    for (let i = 0; i < 3; i++) await calmOne(v)
+    await tick(1900)
+    for (let i = 0; i < 4; i++) await calmOne(v)
+    await tick(1100)
+    const total = wrongs()
+    await v.find('.gd button').trigger('click')
+    expect(v.emitted('done'), `${total} loud`).toEqual([[total <= 3 ? 3 : total <= 8 ? 2 : 1]])
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.hs-count').text()).toBe('Calmed: 0 of 3')
+    await waitCloud(w)
+    expect(w.findAll('.hs-spot')[cloudy(w)[0]!]!.attributes('aria-label')).toContain('Tap to calm')
   })
 })
