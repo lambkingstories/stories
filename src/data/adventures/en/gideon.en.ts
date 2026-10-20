@@ -17,9 +17,9 @@ export const gideonEn: TextOverlay<Journey> = {
       ref: 'Judges 4:1–16; 5:1–3, 31',
       text: [
         'When the judge Ehud has died, the Israelites forget God again. This time the people fall into the hand of Jabin, the king of the Canaanites, who rules in Hazor. His army commander Sisera has nine hundred iron chariots. For twenty years he oppresses the Israelites harshly, until at last they cry out to God.',
-        'In those days Deborah is judge in Israel, a prophetess who passes on God’s word. She sits under a palm tree in the hill country of Ephraim, between Ramah and Bethel. The Israelites come to her so that she may do justice among them.',
+        'In those days Deborah is judge in Israel, a prophetess who passes on God’s word. She sits under a palm tree in the hill country of Ephraim. The Israelites come to her so that she may do justice among them.',
         'One day Deborah has Barak called. “God has commanded you to go up to Mount Tabor with ten thousand men,” she says. “He will bring Sisera and his chariots to the Kishon brook and give him into your hand.” “If you go with me, I will go,” answers Barak, “but if you will not go with me, I will not go.” “I will go with you,” says Deborah.',
-        'When Sisera hears that Barak is on Mount Tabor, he gathers all his chariots. Then Deborah says, “Get up, this is the day! God goes out before you!” Barak comes down from the mountain with the ten thousand men. And God throws Sisera and his whole army into confusion. Sisera jumps down from his chariot and flees on foot. From that day on Jabin’s power grows smaller and smaller.',
+        'When Sisera hears that Barak is on Mount Tabor, he gathers all his chariots. Then Deborah says, “Get up, this is the day! God goes out before you!” Barak comes down from the mountain with the ten thousand men. And God throws Sisera and his whole army into confusion. Sisera jumps down from his chariot and flees on foot.',
         'Then Deborah and Barak sing a song of thanks: “Praise God that Israel is free again!” And the land has rest for forty years.'
       ],
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
@@ -94,10 +94,10 @@ export const gideonEn: TextOverlay<Journey> = {
       title: 'The Fleece on the Threshing Floor',
       ref: 'Judges 6:33–40',
       text: [
-        'Again the Midianites and the Amalekites and the people from the east come up. They make their camp in the valley of Jezreel. Then God’s Spirit fills Gideon. He blows the trumpet, a curved horn, and calls his family, and they come to him. He also sends messengers to all of Manasseh and to Asher, Zebulun and Naphtali. The men come up to meet him.',
+        'Again the Midianites and the Amalekites and the people from the east come up. They make their camp in the valley of Jezreel. Then God’s Spirit fills Gideon. He blows the trumpet, a curved horn, and calls his family, and they come to him. He also sends messengers to all of Manasseh and to Asher, Zebulun and Naphtali.',
         'But Gideon wants to know even more surely. “God,” he says, “you have said that you will save Israel by my hand. Then I will put a fleece of wool on the threshing floor. If in the morning there is dew only on the fleece and the ground around it is dry, then I will know that you are doing it.” The threshing floor is the firm open place where the grain is threshed.',
         'So it happens. When Gideon gets up early in the morning, the ground is dry. But the fleece is so wet that he can wring the dew out of it, a whole bowl full of water.',
-        'But Gideon asks once more, “Do not be angry with me for asking again. Just this one more time I want to try it with the fleece. This time let the fleece stay dry and let there be dew on all the ground around it.” And God does it that night. The fleece is dry, and on all the ground there is dew. Now Gideon knows that he can rely on God.'
+        'But Gideon asks once more, “Do not be angry with me for asking once more. This time let the fleece stay dry and let there be dew on all the ground around it.” And God does it that night. The fleece is dry, and on all the ground there is dew. Now Gideon knows that he can rely on God.'
       ],
       task: { hint: 'Listen carefully and answer the questions.' },
       questions: [
@@ -124,7 +124,7 @@ export const gideonEn: TextOverlay<Journey> = {
       ref: 'Judges 7:4–8',
       text: [
         '“Lead the men down to the water,” God says to Gideon. “There I will test them for you. Whoever is to go with you, I will tell you, and whoever is not to go with you stays here.” Gideon leads the men down to the brook.',
-        'At the bank God says, “Put together those who bring the water to their mouths with their hands. Put separately those who kneel down to drink.” Most of the men kneel down at the brook and drink like that. Only three hundred men scoop up the water with their hands and drink it from their hands.',
+        'At the bank God says, “Put those who kneel down to drink on one side, and those who bring the water to their mouths with their hands on the other.” Most of the men kneel down at the brook and drink like that. Only three hundred men scoop up the water with their hands and drink it from their hands.',
         '“With these three hundred I will save you and give the Midianites into your hands,” God says to Gideon. “Let all the others go home.”',
         'The three hundred take supplies and their trumpets with them. All the others Gideon sends home, each to his tent. Only the three hundred he keeps with him. Down in the valley lies the huge camp of the Midianites.'
       ],
@@ -153,9 +153,9 @@ export const gideonEn: TextOverlay<Journey> = {
       title: 'Jars, Torches and Trumpets',
       ref: 'Judges 7:16–22',
       text: [
-        'Gideon divides the three hundred men into three groups. To each man he gives a trumpet in one hand and an empty clay jar in the other, and in every jar there is a torch. “Watch me and do the same,” he says. “When I come to the edge of the camp, do what I do. And when I blow the trumpet, then you blow yours all around the whole camp and shout: For God and for Gideon!”',
+        'Gideon divides the three hundred men into three groups of one hundred each. To each man he gives a trumpet in one hand and an empty clay jar in the other, and in every jar there is a torch. “Watch me and do the same,” he says. “When I come to the edge of the camp, do what I do. And when I blow the trumpet, then you blow yours all around the whole camp and shout: For God and for Gideon!”',
         'In the middle of the night Gideon and his hundred men come to the edge of the camp. The Midianites have just posted their new guards. Then they blow the trumpets and smash the jars in their hands, and the two other groups do the same. All around the whole camp the torches blaze up in the darkness. The trumpets sound everywhere: “For God and for Gideon!”',
-        'The three hundred stay where they are, each at his place around the camp. The Midianites start up out of their sleep, run about and cry out. For God throws the whole camp into disorder. The army flees.'
+        'The three hundred stay where they are, each at his place around the camp. The Midianites jolt out of their sleep, run about and cry out. For God throws the whole camp into disorder. The army flees.'
       ],
       task: { hint: 'Listen carefully and answer the questions.' },
       questions: [
@@ -169,7 +169,7 @@ export const gideonEn: TextOverlay<Journey> = {
       text: [
         'After that night the Israelites call together the men of Naphtali, Asher and all of Manasseh, and they chase the fleeing Midianites. Gideon also sends messengers to the hill country of Ephraim: “Come down and take the fords of the Jordan before the Midianites reach them!” A ford is a shallow place where one can walk through a river.',
         'The men of Ephraim hurry down and take the fords. They also defeat two princes of the Midianites, Oreb and Zeeb. But when everything is over, they come to Gideon angrily. “Why did you not call us when you went to fight the Midianites?” they ask. They quarrel fiercely with him.',
-        'Gideon stays calm. “What have I done compared with you?” he says. “Is not the gleaning of Ephraim better than the whole grape harvest of my family? God has given the princes of the Midianites into your hands. How could I do what you have done?” The gleaning is what is left hanging on the vines after the harvest. When Gideon speaks like this, their anger settles.',
+        'Gideon stays calm. “What have I done compared with you?” he says. “Is not the gleaning of Ephraim better than the whole grape harvest of my family? God has given the princes of the Midianites into your hands. How could I do what you have done?” The gleaning is what is left hanging on the vines after the harvest. When Gideon speaks like this, their anger fades.',
         'Then Gideon crosses the Jordan with his three hundred men. They are tired, but they keep going until the Midianites are completely defeated.'
       ],
       task: { hint: 'Listen carefully and answer the questions.' },
@@ -184,7 +184,7 @@ export const gideonEn: TextOverlay<Journey> = {
       ref: 'Judges 8:22–28',
       text: [
         'After the victory the Israelites come to Gideon. “Be our ruler,” they say, “you and your son and your grandson. For you have saved us from the hand of the Midianites.”',
-        'But Gideon answers, “I will not be your lord, and my son shall not be your lord either. God shall be your Lord.” Only one thing he asks of them: each man is to give him the golden headbands he has taken from the enemy. The men spread out a cloak and throw their headbands on it. A great deal of gold comes together.',
+        'But Gideon answers, “I will not be your lord, and my son shall not be your lord either. God shall be your Lord.” Only one thing he asks of them: each man is to give him the golden earrings he has taken from the enemy. The men spread out a cloak and throw their earrings on it. A great deal of gold comes together.',
         'Gideon makes a priestly garment out of it and puts it in his town of Ophrah. But later the people worship this garment, and that becomes a mistake for Gideon and his house.',
         'The Midianites never lift up their heads again. The land has peace for forty years, as long as Gideon lives. And the altar in Ophrah that Gideon once built keeps its name: God is Peace.'
       ],

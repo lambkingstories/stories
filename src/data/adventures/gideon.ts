@@ -47,9 +47,9 @@ export const gideon: Journey = {
       ref: 'Richter 4,1–16; 5,1–3.31',
       text: [
         'Als der Richter Ehud gestorben ist, vergessen die Israeliten Gott wieder. Diesmal gerät das Volk in die Hand Jabins, des Königs der Kanaaniter, der in Hazor regiert. Sein Feldhauptmann Sisera hat neunhundert eiserne Wagen. Zwanzig Jahre lang drückt er die Israeliten hart, bis sie endlich zu Gott rufen.',
-        'In dieser Zeit ist Debora Richterin in Israel, eine Prophetin, die Gottes Wort weitergibt. Sie sitzt unter einer Palme im Bergland von Ephraim, zwischen Rama und Bethel. Die Israeliten kommen zu ihr, damit sie ihnen Recht spricht.',
+        'In dieser Zeit ist Debora Richterin in Israel, eine Prophetin, die Gottes Wort weitergibt. Sie sitzt unter einer Palme im Bergland von Ephraim. Die Israeliten kommen zu ihr, damit sie ihnen Recht spricht.',
         'Eines Tages lässt Debora den Barak rufen. „Gott hat dir geboten, mit zehntausend Männern auf den Berg Tabor zu ziehen“, sagt sie. „Er will Sisera mit seinen Wagen zum Bach Kison kommen lassen und ihn in deine Hand geben.“ „Wenn du mit mir gehst, gehe ich“, antwortet Barak, „wenn nicht, gehe ich nicht.“ „Ich gehe mit dir“, sagt Debora.',
-        'Als Sisera hört, dass Barak auf dem Tabor steht, ruft er alle seine Wagen zusammen. Da sagt Debora: „Auf, das ist der Tag! Gott zieht vor dir her!“ Barak steigt mit den zehntausend Männern den Berg hinab. Und Gott bringt Sisera und sein ganzes Heer in Verwirrung. Sisera springt von seinem Wagen und flieht zu Fuß. Von diesem Tag an wird Jabins Macht immer kleiner.',
+        'Als Sisera hört, dass Barak auf dem Tabor steht, ruft er alle seine Wagen zusammen. Da sagt Debora: „Auf, das ist der Tag! Gott zieht vor dir her!“ Barak steigt mit den zehntausend Männern den Berg hinab. Und Gott bringt Sisera und sein ganzes Heer in Verwirrung. Sisera springt von seinem Wagen und flieht zu Fuß.',
         'Da singen Debora und Barak ein Danklied: „Lobt Gott, dass Israel wieder frei ist!“ Und das Land hat vierzig Jahre Ruhe.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: nur Quiz (bleibt Quiz)
@@ -139,10 +139,10 @@ export const gideon: Journey = {
       title: 'Das Fell auf der Tenne',
       ref: 'Richter 6,33–40',
       text: [
-        'Wieder ziehen die Midianiter und Amalekiter und die Völker aus dem Osten herauf. Sie schlagen ihr Lager in der Ebene Jesreel auf. Da erfüllt Gottes Geist den Gideon. Er bläst die Posaune, ein gebogenes Horn, und ruft seine Familie, und sie kommen zu ihm. Er schickt auch Boten zu ganz Manasse und zu Asser, Sebulon und Naftali. Die Männer ziehen ihm entgegen.',
+        'Wieder ziehen die Midianiter und Amalekiter und die Völker aus dem Osten herauf. Sie schlagen ihr Lager in der Ebene Jesreel auf. Da erfüllt Gottes Geist den Gideon. Er bläst die Posaune, ein gebogenes Horn, und ruft seine Familie, und sie kommen zu ihm. Er schickt auch Boten zu ganz Manasse und zu Asser, Sebulon und Naftali.',
         'Aber Gideon möchte es noch genauer wissen. „Gott“, sagt er, „du hast gesagt, dass du Israel durch meine Hand retten willst. Dann lege ich ein Fell mit der Wolle auf die Tenne. Liegt am Morgen nur auf dem Fell Tau und ist der Boden ringsum trocken, dann weiß ich, dass du es tust.“ Die Tenne ist der feste Platz im Freien, auf dem das Korn gedroschen wird.',
         'So geschieht es. Als Gideon früh am Morgen aufsteht, ist der Boden trocken. Aber das Fell ist so nass, dass er den Tau auspressen kann, eine ganze Schale voll Wasser.',
-        'Doch Gideon bittet noch einmal: „Sei mir nicht böse, dass ich noch einmal frage. Nur noch dieses eine Mal will ich es mit dem Fell versuchen. Diesmal soll das Fell trocken bleiben und auf dem Boden ringsum Tau liegen.“ Und Gott tut es in dieser Nacht. Das Fell ist trocken, und auf der ganzen Erde liegt Tau. Nun weiß Gideon, dass er sich auf Gott verlassen kann.'
+        'Doch Gideon bittet noch einmal: „Sei mir nicht böse, dass ich noch einmal bitte. Diesmal soll das Fell trocken bleiben und auf dem Boden ringsum Tau liegen.“ Und Gott tut es in dieser Nacht. Das Fell ist trocken, und auf der ganzen Erde liegt Tau. Nun weiß Gideon, dass er sich auf Gott verlassen kann.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Die Nacht vergeht (tau, neu)
       task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
@@ -175,7 +175,7 @@ export const gideon: Journey = {
       ref: 'Richter 7,4–8',
       text: [
         '„Führe die Männer hinab ans Wasser“, sagt Gott zu Gideon. „Dort will ich sie für dich prüfen. Wer mit dir ziehen soll, den sage ich dir, und wer nicht mit dir ziehen soll, der bleibt hier.“ Gideon führt die Männer zum Bach hinunter.',
-        'Am Ufer sagt Gott: „Stelle die zusammen, die das Wasser mit der Hand zum Mund führen. Stelle besonders die, die sich zum Trinken auf die Knie niederlassen.“ Die meisten Männer knien am Bach nieder und trinken so. Nur dreihundert Männer schöpfen das Wasser mit der Hand und trinken es aus der Hand.',
+        'Am Ufer sagt Gott: „Stelle die, die sich zum Trinken auf die Knie niederlassen, auf die eine Seite und die, die das Wasser mit der Hand zum Mund führen, auf die andere.“ Die meisten Männer knien am Bach nieder und trinken so. Nur dreihundert Männer schöpfen das Wasser mit der Hand und trinken es aus der Hand.',
         '„Durch diese dreihundert will ich euch retten und die Midianiter in deine Hände geben“, sagt Gott zu Gideon. „Die anderen lass alle nach Hause gehen.“',
         'Die dreihundert nehmen Vorrat und ihre Posaunen mit. Alle anderen schickt Gideon heim, jeden in sein Zelt. Nur die dreihundert behält er bei sich. Unten in der Ebene liegt das riesige Lager der Midianiter.'
       ],
@@ -210,7 +210,7 @@ export const gideon: Journey = {
       title: 'Krüge, Fackeln und Posaunen',
       ref: 'Richter 7,16–22',
       text: [
-        'Gideon teilt die dreihundert Männer in drei Gruppen. Jedem gibt er eine Posaune in die eine Hand und einen leeren Tonkrug in die andere, und in jedem Krug steckt eine Fackel. „Seht auf mich und macht es genauso“, sagt er. „Wenn ich an den Rand des Lagers komme, tut ihr, was ich tue. Und wenn ich die Posaune blase, dann blast auch ihr rings um das ganze Lager und ruft: Für Gott und für Gideon!“',
+        'Gideon teilt die dreihundert Männer in drei Gruppen zu je hundert. Jedem gibt er eine Posaune in die eine Hand und einen leeren Tonkrug in die andere, und in jedem Krug steckt eine Fackel. „Seht auf mich und macht es genauso“, sagt er. „Wenn ich an den Rand des Lagers komme, tut ihr, was ich tue. Und wenn ich die Posaune blase, dann blast auch ihr rings um das ganze Lager und ruft: Für Gott und für Gideon!“',
         'Mitten in der Nacht kommen Gideon und seine hundert Männer an den Rand des Lagers. Gerade haben die Midianiter ihre Wachen neu aufgestellt. Da blasen sie die Posaunen und zerschlagen die Krüge in ihren Händen, und die beiden anderen Gruppen tun es ebenso. Rings um das ganze Lager leuchten die Fackeln in der Dunkelheit auf. Überall schallen die Posaunen: „Für Gott und für Gideon!“',
         'Die dreihundert bleiben, jeder an seinem Platz um das Lager herum, stehen. Die Midianiter schrecken aus dem Schlaf, laufen durcheinander und schreien. Denn Gott bringt das ganze Lager in Unordnung. Das Heer flieht.'
       ],
@@ -247,7 +247,7 @@ export const gideon: Journey = {
       ref: 'Richter 8,22–28',
       text: [
         'Nach dem Sieg kommen die Israeliten zu Gideon. „Sei unser Herrscher“, sagen sie, „du und dein Sohn und dein Enkel. Denn du hast uns aus der Hand der Midianiter gerettet.“',
-        'Aber Gideon antwortet: „Ich will nicht euer Herr sein, und mein Sohn soll es auch nicht sein. Gott soll euer Herr sein.“ Nur um eines bittet er sie: Jeder soll ihm die goldenen Stirnbänder geben, die er bei den Feinden erbeutet hat. Die Männer breiten einen Mantel aus und werfen ihre Stirnbänder darauf. Es kommt sehr viel Gold zusammen.',
+        'Aber Gideon antwortet: „Ich will nicht euer Herr sein, und mein Sohn soll es auch nicht sein. Gott soll euer Herr sein.“ Nur um eines bittet er sie: Jeder soll ihm die goldenen Ohrringe geben, die er bei den Feinden erbeutet hat. Die Männer breiten einen Mantel aus und werfen ihre Ohrringe darauf. Es kommt sehr viel Gold zusammen.',
         'Gideon macht daraus ein Priesterkleid und stellt es in seine Stadt Ophra. Später aber beten die Leute dieses Kleid an, und das wird für Gideon und sein Haus zu einem Fehler.',
         'Die Midianiter erheben ihren Kopf nicht mehr. Das Land hat vierzig Jahre Frieden, solange Gideon lebt. Und der Altar in Ophra, den Gideon einst gebaut hat, trägt weiter den Namen: Gott ist der Friede.'
       ],

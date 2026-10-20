@@ -19,7 +19,7 @@ const stage = (n: number) => gideon.stages[n - 1]!
 const FORBIDDEN = /\b(Messer|Speer|Pfeil|Blut|töten|erschlagen|erwürgen|Teufel|Hölle)\b/i
 
 describe('Gideon: stories and questions', () => {
-  it('twelve stages with 3 to 5 paragraphs of 60 to 260 words and the Bible passage under every one; no recording yet; the stage pictures are the ones of Josef (PLATZHALTER)', () => {
+  it('twelve stages with 3 to 5 paragraphs of 60 to 220 words and the Bible passage under every one; no recording yet; the stage pictures are the ones of Josef (PLATZHALTER)', () => {
     expect(gideon.id).toBe('gideon')
     expect(gideon.age).toBe('8-10')
     expect(gideon.title).toBe('Gideon')
@@ -45,7 +45,7 @@ describe('Gideon: stories and questions', () => {
       expect(s.text.length, `paragraphs ${s.id}`).toBeLessThanOrEqual(5)
       const words = s.text.join(' ').split(/\s+/).length
       expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(60)
-      expect(words, `words ${s.id}`).toBeLessThanOrEqual(260)
+      expect(words, `words ${s.id}`).toBeLessThanOrEqual(220)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
       expect(s.audio, `no recording yet, the device voice reads: ${s.id}`).toBeUndefined()
       expect(s.image, `stage ${s.id}`).toMatch(/^images\/abenteuer\/josef\/etappe-bild-\d\d(-v2)?\.webp$/)
