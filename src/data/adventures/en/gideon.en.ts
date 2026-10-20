@@ -53,7 +53,7 @@ export const gideonEn: TextOverlay<Journey> = {
         'But God turns to him. “Go in your strength and save Israel from the Midianites,” he says. “I am sending you!” “How can I do that?” asks Gideon. “My family is the least in Manasseh, and I am the smallest in my father’s house.” “I will be with you,” answers God, “and you will defeat the Midianites as if they were only one man.”',
         'Gideon listens and thinks. He wants to be quite sure that it really is God who is speaking to him.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Set the wind so that the chaff blows away.', winnow: { rounds: [{ hint: 'Set the wind. The light chaff should fly away, the heavy grains should stay.' }, { hint: 'Now a light gust blows, and the right wind is narrower. Take care of the grains.' }] } },
       questions: [
         { q: 'Where does Gideon thresh his wheat?', options: ['in a winepress', 'on the roof', 'by the river'] },
         { q: 'What does God say to Gideon?', options: ['“I will be with you.”', '“You must go alone.”', '“Go back to Egypt.”'] }

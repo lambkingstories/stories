@@ -11,7 +11,7 @@ import { GIDEON_PATH } from '@/data/adventures/gideonPath'
 import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
-import { inBox, tilesFor } from '@/utils/gideonGames'
+import { blow, inBox, makePieces, tilesFor } from '@/utils/gideonGames'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 
 afterEach(() => setAdventureLanguage('de'))
@@ -112,7 +112,7 @@ describe('Gideon: stories and questions', () => {
 
 describe('Gideon: the placeholders until the games and pictures come', () => {
   it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(gideon.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'quiz', 'wort', 'quiz', 'tau', 'quiz', 'wimmelbild', 'quiz', 'quiz', 'quiz', 'memory'])
+    expect(gideon.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'worfeln', 'wort', 'quiz', 'tau', 'quiz', 'wimmelbild', 'quiz', 'quiz', 'quiz', 'memory'])
     for (const s of gideon.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
@@ -171,6 +171,23 @@ describe('Gideon: the placeholders until the games and pictures come', () => {
     expect(g.fleeceBox.x + g.fleeceBox.w).toBeLessThanOrEqual(100)
     expect(g.fleeceBox.y + g.fleeceBox.h).toBeLessThanOrEqual(100)
     expect(g.rounds.reduce((n, r) => n + r.spots.length, 0)).toBe(13)
+  })
+
+  it('3 winnow: ten pieces of chaff, then twelve; the right wind gets narrower and a gust comes; eight grains each; the pieces can be told apart by their wind (grains never fly in the window); the tray lies in the picture', () => {
+    const g = stage(3).task.winnow
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => [r.chaff, r.grains, r.window, r.gust])).toEqual([[10, 8, [35, 75], 0], [12, 8, [45, 62], 5]])
+    expect(g.rounds[1]!.window[1] - g.rounds[1]!.window[0]).toBeLessThan(g.rounds[0]!.window[1] - g.rounds[0]!.window[0])
+    for (const r of g.rounds) {
+      const pieces = makePieces(r)
+      expect(blow(pieces, r.window[1] + r.gust).grains, 'no grain flies in the window').toEqual([])
+      expect(blow(pieces, r.window[1]).chaff).toHaveLength(r.chaff)
+      expect(blow(pieces, 100).grains.length).toBeGreaterThan(0)
+    }
+    expect(g.trayBox.x + g.trayBox.w).toBeLessThanOrEqual(100)
+    expect(g.trayBox.y + g.trayBox.h).toBeLessThanOrEqual(100)
+    expect(g.rounds.reduce((n, r) => n + r.chaff, 0)).toBe(22)
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

@@ -11,7 +11,7 @@
  * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit allen zwölf Stationen und dem Ziel (PLATZHALTER bis zum eigenen Panorama); Medaille und Geschenk sind ebenfalls die von Josef.
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme. Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { DewGame, FindGame, Journey, MemoryGame, WordGame } from '@/types/adventure'
+import type { DewGame, FindGame, Journey, MemoryGame, WinnowGame, WordGame } from '@/types/adventure'
 import { josef } from './josef'
 import { GIDEON_PATH } from './gideonPath'
 import { localize } from './localize'
@@ -90,6 +90,25 @@ const TAU: DewGame = {
   ]
 }
 
+/**
+ * Etappe 3, "Spreu im Wind": in der Worfelwanne liegen Körner und leichte Spreu, ein Regler stellt den Wind ein; die Spreu fliegt bei mittlerem Wind davon, bei zu starkem Wind auch Körner (Bildauftrag G11; Hintergrund =
+ * das Etappenbild 3). Runde 1 zehn Spreuteile und acht Körner, breiter richtiger Bereich (35 bis 75 %); Runde 2 zwölf Spreuteile, schmaler Bereich (45 bis 62 %) und eine Böe von 5 % (immer gleich). Die Wanne
+ * (`trayBox`, Prozent des Bildes) ist vorläufig geschätzt, bis die Datei `worfeln-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `worfeln/wanne.webp` 480 × 300, `korn.webp`, `spreu.webp` je 64 × 64, `regler-griff.webp` 120 × 120 (alle transparent).
+ */
+const WORFELN: WinnowGame = {
+  background: `${PLACEHOLDER}etappe-bild-03.webp`,
+  tray: `${G}worfeln/wanne.webp`,
+  grain: `${G}worfeln/korn.webp`,
+  chaffImage: `${G}worfeln/spreu.webp`,
+  handle: `${G}worfeln/regler-griff.webp`,
+  trayBox: { x: 20, y: 44, w: 48, h: 38 },
+  rounds: [
+    { hint: 'Stelle den Wind ein. Die leichte Spreu soll wegfliegen, die schweren Körner sollen liegen bleiben.', chaff: 10, grains: 8, window: [35, 75], gust: 0, seed: 31 },
+    { hint: 'Jetzt weht eine leichte Böe, und der richtige Wind ist enger. Gib acht auf die Körner.', chaff: 12, grains: 8, window: [45, 62], gust: 5, seed: 47 }
+  ]
+}
+
 export const gideon: Journey = {
   id: 'gideon',
   title: 'Gideon',
@@ -160,7 +179,7 @@ export const gideon: Journey = {
         'Gideon hört zu und denkt nach. Er möchte ganz sicher sein, dass wirklich Gott mit ihm spricht.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Spreu im Wind (worfeln, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'worfeln', hint: 'Stelle den Wind ein, damit die Spreu fortfliegt.', winnow: WORFELN },
       questions: [
         { q: 'Wo drischt Gideon seinen Weizen?', options: ['in einer Kelter', 'auf dem Dach', 'am Fluss'], answer: 0 },
         { q: 'Was sagt Gott zu Gideon?', options: ['„Ich will mit dir sein.“', '„Du musst allein gehen.“', '„Geh zurück nach Ägypten.“'], answer: 0 }

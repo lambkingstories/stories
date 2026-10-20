@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { DewGame, WordGame } from '@/types/adventure'
+import type { DewGame, WinnowGame, WordGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -363,5 +363,151 @@ describe('Die Nacht vergeht (dew)', () => {
     await morning(w)
     await tapField(w, 10, 10)
     expect(w.find('.dw-fb').text()).toBe('The ground is dry here. The dew lies on the fleece.')
+  })
+})
+
+// ---------------------------------------------------------------- chaff in the wind
+describe('Spreu im Wind (winnow)', () => {
+  const game: WinnowGame = {
+    background: 'images/x/press.webp',
+    tray: 'images/x/tray.webp',
+    grain: 'images/x/grain.webp',
+    chaffImage: 'images/x/chaff.webp',
+    handle: 'images/x/handle.webp',
+    trayBox: { x: 20, y: 44, w: 48, h: 38 },
+    rounds: [
+      { hint: 'Runde eins.', chaff: 3, grains: 5, window: [35, 75], gust: 0, seed: 1 },
+      { hint: 'Runde zwei.', chaff: 4, grains: 5, window: [45, 62], gust: 0, seed: 2 }
+    ]
+  }
+  // the slider is 300 pixels high: a wind of 50 is at the pixel 150 from the top
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, width: 400, height: 300, right: 400, bottom: 300, x: 0, y: 0, toJSON: () => ({}) })
+    const { default: Winnow } = await import('@/components/molecules/games/GameWinnow.vue')
+    const w = mount(Winnow, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  const setWind = async (w: W, wind: number) => {
+    w.find('.wn-track').element.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientY: (1 - wind / 100) * 300 }))
+    window.dispatchEvent(new MouseEvent('pointerup'))
+    await flushPromises()
+  }
+  const wind = (w: W) => Number(w.find('.wn-track').attributes('aria-valuenow'))
+  const pieces = (w: W) => w.findAll('.wn-piece:not(.flying)')
+
+  it('the goal is every piece of chaff of both rounds; three pieces of chaff and five grains lie in the tray, the wind is nothing', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(7)
+    expect(w.find('.wn-round').text()).toContain('Runde 1 von 2')
+    expect(pieces(w)).toHaveLength(8)
+    expect(w.findAll('.wn-piece.chaff')).toHaveLength(3)
+    expect(wind(w)).toBe(0)
+    expect(w.find('.wn-count').text()).toBe('Spreu fortgeweht: 0 von 3')
+  })
+
+  it('the keys and the finger set the wind in whole percent, between 0 and 100', async () => {
+    const w = await open()
+    await w.find('.wn-track').trigger('keydown', { key: 'ArrowUp' })
+    expect(wind(w)).toBe(5)
+    await w.find('.wn-track').trigger('keydown', { key: 'PageUp' })
+    expect(wind(w)).toBe(15)
+    await w.find('.wn-track').trigger('keydown', { key: 'ArrowDown' })
+    expect(wind(w)).toBe(10)
+    expect(w.find('.wn-wind').text()).toBe('Wind: 10 %')
+    await setWind(w, 50)
+    expect(wind(w)).toBe(50)
+    await w.find('.wn-track').trigger('keydown', { key: 'End' })
+    expect(wind(w)).toBe(100)
+    await w.find('.wn-track').trigger('keydown', { key: 'Home' })
+    expect(wind(w)).toBe(0)
+  })
+
+  it('with no wind nothing flies away, however long it takes', async () => {
+    const w = await open()
+    await tick(5000)
+    expect(pieces(w)).toHaveLength(8)
+    expect(played).toHaveLength(0)
+  })
+
+  it('a middle wind blows the chaff away (a tick for it), the grains stay; the round ends with a star when all the chaff is gone', async () => {
+    const w = await open()
+    await setWind(w, 75)
+    await tick(500)
+    expect(played).toContain('tap')
+    expect(played).not.toContain('wrong')
+    expect(useTaskProgress().parts.value).toBe(3)
+    expect(played).toContain('star')
+    expect(w.find('.wn-count').text()).toBe('Spreu fortgeweht: 3 von 3')
+  })
+
+  it('a weak wind blows only some of the chaff away, the stronger the more', async () => {
+    const w = await open()
+    await setWind(w, 55)
+    await tick(500)
+    const a = useTaskProgress().parts.value
+    expect(a).toBeGreaterThanOrEqual(0)
+    await setWind(w, 75)
+    await tick(500)
+    expect(useTaskProgress().parts.value).toBe(3)
+    expect(a).toBeLessThanOrEqual(3)
+  })
+
+  it('too strong a wind blows grains away, too: a cross, a dull sound, each lost grain is a mistake and stays lost; the game goes on', async () => {
+    const w = await open()
+    await setWind(w, 100)
+    await tick(500)
+    expect(played).toContain('wrong')
+    expect(w.find('.gm.bad').exists()).toBe(true)
+    expect(useTaskProgress().parts.value).toBe(3)
+    await tick(2000)
+    expect(w.find('.wn-round').text()).toContain('Runde 2 von 2')
+  })
+
+  it('round 2: the wind is back to nothing, four pieces of chaff, a narrow right wind: at the top of it no grain is lost', async () => {
+    const w = await open()
+    await setWind(w, 75)
+    await tick(2500)
+    expect(w.find('.wn-round').text()).toContain('Runde 2 von 2')
+    expect(wind(w)).toBe(0)
+    expect(w.findAll('.wn-piece.chaff')).toHaveLength(4)
+    played.length = 0
+    await setWind(w, 62)
+    for (let i = 0; i < 40 && useTaskProgress().parts.value < 7; i++) await tick(400)
+    expect(played).not.toContain('wrong')
+    expect(useTaskProgress().parts.value).toBe(7)
+  })
+
+  it('the end: three stars with no grain lost; each lost grain counts (more than eight lost: one star)', async () => {
+    const run = async (lostRounds: number) => {
+      useTaskProgress().reset()
+      played.length = 0
+      const w = await open()
+      await setWind(w, lostRounds >= 1 ? 100 : 75)
+      await tick(2500)
+      await setWind(w, lostRounds >= 2 ? 100 : 62)
+      for (let i = 0; i < 60 && !useTaskProgress().finished.value; i++) await tick(200)
+      expect(useTaskProgress().finished.value).toBe(true)
+      await w.find('.gd button').trigger('click')
+      const done = w.emitted('done')
+      w.unmount()
+      return done
+    }
+    expect(await run(0)).toEqual([[3]])
+    // five grains lost: two stars
+    expect(await run(1)).toEqual([[2]])
+    // ten grains lost: one star
+    expect(await run(2)).toEqual([[1]])
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.wn-count').text()).toBe('Chaff blown away: 0 of 3')
+    expect(w.find('.wn-track').attributes('aria-label')).toBe('Wind')
+    await setWind(w, 100)
+    await tick(500)
+    expect(w.find('.wn-fb').text()).toContain('some grains flew away')
   })
 })
