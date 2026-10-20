@@ -118,7 +118,7 @@ export const adamEvaEn: TextOverlay<Journey> = {
         'Eve looks at the tree. Its fruit looks good, and it is supposed to make you wise. She takes a piece of fruit and eats. She also gives some to Adam, who is with her, and he eats.',
         'Then the eyes of both are opened. They realize what they have done, and they are ashamed. They sew fig leaves together and make aprons out of them.'
       ],
-      task: { hint: '' },
+      task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'Who speaks to Eve?', options: ['the snake', 'Adam', 'a bird'] },
         { q: 'What did God say about the tree in the middle of the garden?', options: ['Do not eat from it, or you will die.', 'Eat a lot of it.', 'Plant another one.'] },

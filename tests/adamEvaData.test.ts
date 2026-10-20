@@ -313,6 +313,8 @@ describe('Adam und Eva: English', () => {
       if (s.task.verse) expect(s.task.verse.rounds.map((r) => r.words.length)).toEqual(de[i]!.verse)
     })
     expect(adamEva.title).toBe('Adam and Eve')
+    // the serious stage has its English line, too
+    expect(adamEva.stages[6].task.hint).toBe('This stage is serious. Listen carefully and answer the questions.')
     expect(adventureLanguage.value).toBe('en')
     for (const q of [...adamEva.stages.flatMap((s) => s.questions), ...adamEva.exam]) {
       expect(q.options, q.q).toHaveLength(3)

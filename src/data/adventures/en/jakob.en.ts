@@ -21,7 +21,7 @@ export const jakobEn: TextOverlay<Journey> = {
         'The two grow up and are very different. Esau becomes a hunter and likes to be outside in the fields. Jacob is quiet and stays near the tents. Isaac is especially fond of Esau, and Rebekah is especially fond of Jacob.',
         'One day Esau comes home tired and hungry. Jacob is just cooking a lentil stew. “Give me some of that red stew, quick!” says Esau. Jacob answers, “Then give me your birthright.” That is the special place of the oldest son in the family. Esau swears it to him, eats, and goes away. His birthright did not matter to him.'
       ],
-      task: { hint: 'Tap the animals and count them: sheep and goats.', question: 'How many animals are there together?' },
+      task: { hint: 'Tap the sheep and count them.' },
       questions: [
         { q: 'What are the twins of Isaac and Rebekah called?', options: ['Esau and Jacob', 'Isaac and Lot', 'Cain and Abel'] },
         { q: 'What does Esau give away for the lentil stew?', options: ['his birthright', 'his tent', 'his bow'] }

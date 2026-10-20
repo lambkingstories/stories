@@ -10,7 +10,7 @@
  * STAND: Etappen noch `soon` (nicht spielbar), bis die Bilder (Panorama, Etappenbilder, Medaille, Spielbilder) und die Vorlese-Aufnahmen eingebaut sind.
  * Zahlen, die aus Messdateien der Bilder kommen, sind mit PLATZHALTER markiert und werden beim Einbau durch die gemessenen ersetzt.
  */
-import type { CountGroup, CrankGame, HoldGame, Journey, SlideGame } from '@/types/adventure'
+import type { CrankGame, HoldGame, Journey, SlideGame } from '@/types/adventure'
 import { JAKOB_PATH } from './jakobPath'
 import { localize } from './localize'
 import { jakobEn } from './en/jakob.en'
@@ -22,13 +22,9 @@ const REC = 'audio/abenteuer/jakob/'
 const SOON = true
 
 /**
- * Etappe 1, "Zählen": die Schafe und Ziegen vor Jakobs Zelt (Etappenbild 1), alle zusammen gezählt. Das Zählspiel hat nur eine Szene (keine Runden).
- * Die Tiere sind die aus Noah (Kopien unter `zaehlen/`); es ist kein Bild neu zu malen.
+ * Etappe 1, "Zählen": Jakobs Schafe vor dem Zelt (Etappenbild 1), jedes angetippt und mitgezählt. Das Zählspiel hat nur eine Szene (keine Runden).
+ * Das Schaf ist das aus Noah (Kopie unter `zaehlen/`); es ist kein Bild neu zu malen.
  */
-const ZAEHLEN_GRUPPEN: CountGroup[] = [
-  { image: `${G}zaehlen/schaf.webp`, count: 6 },
-  { image: `${G}zaehlen/ziege.webp`, count: 5 }
-]
 
 /**
  * Etappe 3, "Treppe zusammenschieben": das Etappenbild 3 (Nachtlandschaft mit der Himmelsleiter) wird von der App in Kacheln geschnitten und gemischt (`scramble`, mit festem
@@ -106,7 +102,7 @@ export const jakob: Journey = {
         'Die beiden wachsen heran und sind sehr verschieden. Esau wird ein Jäger und ist am liebsten draußen auf dem Feld. Jakob ist ruhig und bleibt bei den Zelten. Isaak hat Esau besonders gern, und Rebekka hat Jakob besonders gern.',
         'Eines Tages kommt Esau müde und hungrig heim. Jakob kocht gerade ein Linsengericht. „Gib mir schnell von dem Roten da!“, sagt Esau. Jakob antwortet: „Dann gib mir dein Erstgeburtsrecht.“ Das ist der besondere Platz des Ältesten in der Familie. Esau schwört es ihm, isst und geht weg. Ihm war sein Erstgeburtsrecht nicht wichtig.'
       ],
-      task: { kind: 'zaehlen', hint: 'Tippe die Tiere an und zähle sie: Schafe und Ziegen.', count: 11, image: '', question: 'Wie viele Tiere sind es zusammen?', background: `${IMG}etappe-bild-01.webp`, groups: ZAEHLEN_GRUPPEN },
+      task: { kind: 'zaehlen', hint: 'Tippe die Schafe an und zähle sie.', count: 8, image: `${G}zaehlen/schaf.webp`, background: `${IMG}etappe-bild-01.webp` },
       questions: [
         { q: 'Wie heißen die Zwillinge von Isaak und Rebekka?', options: ['Esau und Jakob', 'Isaak und Lot', 'Kain und Abel'], answer: 0 },
         { q: 'Was gibt Esau für das Linsengericht her?', options: ['sein Erstgeburtsrecht', 'sein Zelt', 'seinen Bogen'], answer: 0 }

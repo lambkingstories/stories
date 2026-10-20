@@ -80,7 +80,7 @@ export const babelEn: TextOverlay<Journey> = {
         'And so it happens. A man calls something out to his neighbor, but the neighbor does not understand him. He hears strange words. The builders ask and point at the bricks, they shake their heads, but nobody understands anybody else.',
         'Now they can no longer plan together or build together. So God scatters the people from there over the whole earth. They pack their bundles and set out on many different roads. They do not finish the city.'
       ],
-      task: { hint: '' },
+      task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'What does God confuse?', options: ['their language', 'their roads', 'their bricks'] },
         { q: 'Where does God spread the people?', options: ['over the whole earth', 'into the city', 'onto the tower'] },

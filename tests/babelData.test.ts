@@ -310,6 +310,8 @@ describe('Babel: English', () => {
       expect(s.audio, `audio ${s.id}`).toBe(`audio/abenteuer/babel/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)
     })
     expect(babel.title).toBe('The Tower of Babel')
+    // the serious stage has its English line, too
+    expect(babel.stages[4].task.hint).toBe('This stage is serious. Listen carefully and answer the questions.')
     expect(adventureLanguage.value).toBe('en')
     for (const q of [...babel.stages.flatMap((s) => s.questions), ...babel.exam]) {
       expect(q.options, q.q).toHaveLength(3)

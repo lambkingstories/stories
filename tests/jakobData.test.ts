@@ -95,15 +95,15 @@ describe('Jakob: every stage has the game that was chosen', () => {
     expect(g(3).slide!.rounds).toHaveLength(2)
     expect(g(4).crank!.rounds.reduce((s, r) => s + r.buckets, 0)).toBe(4)
     expect(g(5).hold!.rounds.map((r) => r.seconds)).toEqual([10, 15])
-    expect(g(1).count).toBe(11)
-    expect(g(1).groups!.reduce((s, x) => s + x.count, 0)).toBe(11)
+    expect(g(1).count).toBe(8)
     expect(g(6).puzzle).toMatchObject({ cols: 2, rows: 3 })
   })
 
-  it('1 counting: sheep and goats of the flock, the question asks for all of them together, the background is the stage picture', () => {
+  it('1 counting: the sheep of the flock before the tent, counted in one scene (no rounds); the background is the stage picture', () => {
     const t = stage(1).task
-    expect(t.groups).toHaveLength(2)
-    expect(t.question).toMatch(/zusammen/)
+    expect(t.count).toBe(8)
+    expect(t.image).toBe('images/abenteuer/spiele/jakob/zaehlen/schaf.webp')
+    expect(t.groups).toBeUndefined()
     expect(t.background).toBe('images/abenteuer/jakob/etappe-bild-01.webp')
   })
 
@@ -227,7 +227,8 @@ describe('Jakob: English', () => {
       expect(q.answer).toBe(0)
       expect(q.q.trim().endsWith('?'), q.q).toBe(true)
     }
-    expect(stage(1).task.question).toBe('How many animals are there together?')
+    expect(stage(1).task.hint).toBe('Tap the sheep and count them.')
+    expect(stage(2).task.hint).toBe('This stage is serious. Listen carefully and answer the questions.')
   })
 })
 
