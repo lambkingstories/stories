@@ -16,17 +16,19 @@ import { journeyFiles } from '@/utils/journeyFiles'
 afterEach(() => setAdventureLanguage('de'))
 const released = jakob.stages.every((s) => !s.soon)
 const stage = (n: number) => jakob.stages[n - 1]!
+/** The number of the stage picture that each stage shows (the new stages borrow one until their own picture exists). */
+const PICTURE = [1, 2, 3, 4, 4, 1, 4, 6, 5, 5, 6, 3]
 /** Words that no text of the German data may use (stage 5 is a quiet, mysterious moment, not a fight scene; nothing violent). */
 const FORBIDDEN = /\b(Messer|Schwert|Pfeil|Blut|töten|erschlagen|Teufel|Hölle|Feind|Gegner)\b/i
 
 describe('Jakob: stories and questions', () => {
-  it('six stages with 3 to 5 paragraphs of 60 to 220 words, the Bible passage under every one, the recording and picture names of the plan', () => {
+  it('twelve stages with 3 to 5 paragraphs of 60 to 220 words, the Bible passage under every one, the recording and picture names of the plan', () => {
     expect(jakob.id).toBe('jakob')
     expect(jakob.age).toBe('8-10')
     expect(jakob.title).toBe('Jakob')
     expect(jakob.subtitle).toBe('Ein Weg mit Umwegen')
-    expect(jakob.stages.map((s) => s.id)).toEqual([1, 2, 3, 4, 5, 6])
-    expect(jakob.stages.map((s) => s.title)).toEqual(['Zwillinge', 'Der Segen', 'Die Himmelsleiter', 'Bei Laban', 'Der Kampf am Fluss', 'Wiedersehen'])
+    expect(jakob.stages.map((s) => s.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+    expect(jakob.stages.map((s) => s.title)).toEqual(['Zwillinge', 'Der Segen', 'Die Himmelsleiter', 'Am Brunnen', 'Sieben Jahre für Rahel', 'Die große Familie', 'Die Herden wachsen', 'Der Weg nach Hause', 'Engel und Geschenke', 'Der Kampf am Fluss', 'Wiedersehen', 'Zwölf Söhne'])
     for (const s of jakob.stages) {
       expect(s.ref, `stage ${s.id}`).toMatch(/^1\. Mose \d/)
       expect(s.text.length, `paragraphs ${s.id}`).toBeGreaterThanOrEqual(3)
@@ -35,13 +37,14 @@ describe('Jakob: stories and questions', () => {
       expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(60)
       expect(words, `words ${s.id}`).toBeLessThanOrEqual(220)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.audio, s.id.toString()).toBe(`audio/abenteuer/jakob/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`)
-      expect(s.image).toBe(`images/abenteuer/jakob/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
+      expect(s.audio, s.id.toString()).toBe(`audio/abenteuer/jakob/geschichte-${String(s.id).padStart(2, '0')}-v2.mp3`)
+      // stages 5 to 9 and 12 use an existing picture until their own picture is built in (PLATZHALTER)
+      expect(s.image).toBe(`images/abenteuer/jakob/etappe-bild-${String(PICTURE[s.id - 1]).padStart(2, '0')}.webp`)
     }
   })
 
   it('two questions per stage (three in the serious stage 2), three answers each, the right one first and the answers differ; the exam has six', () => {
-    expect(jakob.stages.map((s) => s.questions.length)).toEqual([2, 3, 2, 2, 2, 2])
+    expect(jakob.stages.map((s) => s.questions.length)).toEqual([2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2])
     for (const q of [...jakob.stages.flatMap((s) => s.questions), ...jakob.exam]) {
       expect(q.options, q.q).toHaveLength(3)
       expect(q.answer, q.q).toBe(0)
@@ -54,11 +57,11 @@ describe('Jakob: stories and questions', () => {
     expect(new Set(jakob.exam.map((q) => q.q)).size).toBe(6)
   })
 
-  it('stage 2 (the blessing) is serious and told calmly; stage 5 is a quiet moment: nobody is hurt and there is no enemy in the text', () => {
+  it('stage 2 (the blessing) is serious and told calmly; stage 10 is a quiet moment: nobody is hurt and there is no enemy in the text', () => {
     expect(stage(2).task.kind).toBe('quiz')
     expect(stage(2).task.hint).toContain('ernst')
     expect(stage(2).text.join(' ')).toMatch(/Das ist nicht wahr/)
-    const t5 = stage(5).text.join(' ')
+    const t5 = stage(10).text.join(' ')
     expect(t5).toMatch(/Israel/)
     expect(t5).not.toMatch(/schlägt|verletzt|Wunde/i)
   })
@@ -68,7 +71,7 @@ describe('Jakob: stories and questions', () => {
     expect(text[0]).not.toMatch(/wie viele (schafe|tiere|ziegen)/)
     expect(text[2]).not.toMatch(/wie viele (stufen|kacheln)/)
     expect(text[3]).not.toMatch(/wie viele eimer/)
-    expect(text[4]).not.toMatch(/was hält jakob fest|gegner/)
+    expect(text[9]).not.toMatch(/was hält jakob fest|gegner/)
   })
 })
 
@@ -77,7 +80,7 @@ describe('Jakob: every stage has the game that was chosen', () => {
   const NEW = ['reihenfolge', 'lichter', 'hueten', 'kanaele', 'lueckenvers', 'spiegeln', 'echo', 'saeen', 'fehlt', 'kette', 'stapeln', 'wischen', 'spur', 'waage', 'sternbild', 'giessen']
 
   it('the games in the order of the plan; stage 2 is only the questions; at most two old mechanics and three new ones', () => {
-    expect(jakob.stages.map((s) => s.task.kind)).toEqual(['zaehlen', 'quiz', 'schieben', 'kurbel', 'halten', 'puzzle'])
+    expect(jakob.stages.map((s) => s.task.kind)).toEqual(['zaehlen', 'quiz', 'schieben', 'kurbel', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'halten', 'puzzle', 'quiz'])
     const kinds = jakob.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
     expect(new Set(kinds).size).toBe(kinds.length)
     expect(kinds.filter((k) => OLD.includes(k)).sort()).toEqual(['puzzle', 'zaehlen'])
@@ -86,7 +89,7 @@ describe('Jakob: every stage has the game that was chosen', () => {
 
   it('every game has at most two rounds, a hint for each round; the goals fit the table "Stufen je Spiel"', () => {
     const g = (n: number) => stage(n).task
-    const rounds = [g(3).slide!.rounds, g(4).crank!.rounds, g(5).hold!.rounds]
+    const rounds = [g(3).slide!.rounds, g(4).crank!.rounds, g(10).hold!.rounds]
     for (const r of rounds) {
       expect(r.length).toBeGreaterThanOrEqual(1)
       expect(r.length).toBeLessThanOrEqual(2)
@@ -94,9 +97,9 @@ describe('Jakob: every stage has the game that was chosen', () => {
     }
     expect(g(3).slide!.rounds).toHaveLength(2)
     expect(g(4).crank!.rounds.reduce((s, r) => s + r.buckets, 0)).toBe(4)
-    expect(g(5).hold!.rounds.map((r) => r.seconds)).toEqual([10, 15])
+    expect(g(10).hold!.rounds.map((r) => r.seconds)).toEqual([10, 15])
     expect(g(1).count).toBe(8)
-    expect(g(6).puzzle).toMatchObject({ cols: 2, rows: 3 })
+    expect(g(11).puzzle).toMatchObject({ cols: 2, rows: 3 })
   })
 
   it('1 counting: the sheep of the flock before the tent, counted in one scene (no rounds); the background is the stage picture', () => {
@@ -130,8 +133,8 @@ describe('Jakob: every stage has the game that was chosen', () => {
     expect(c.background).toBe('images/abenteuer/jakob/etappe-bild-04.webp')
   })
 
-  it('5 morning light: the light lies inside the picture; in round 2 it wanders along a way of at least three points, in round 1 it stands still; there is no enemy', () => {
-    const h = stage(5).task.hold!
+  it('10 morning light: the light lies inside the picture; in round 2 it wanders along a way of at least three points, in round 1 it stands still; there is no enemy', () => {
+    const h = stage(10).task.hold!
     expect(h.start[0] >= 5 && h.start[0] <= 95 && h.start[1] >= 5 && h.start[1] <= 95).toBe(true)
     expect(h.rounds[0]!.path).toBeUndefined()
     expect(h.rounds[1]!.path!.length).toBeGreaterThanOrEqual(3)
@@ -201,7 +204,7 @@ describe('Jakob: the scaffold', () => {
       const own = journeyFiles(jakob).filter((f) => f.includes('jakob/'))
       expect(own.filter((f) => f.includes('spiele/') || f.startsWith('audio/'))).toEqual([])
     } else {
-      expect(open).toEqual([true, false, false, false, false, false])
+      expect(open).toEqual([true, false, false, false, false, false, false, false, false, false, false, false])
     }
     // the painted map and the way are there
     expect(jakob.map.images).toHaveLength(4)
@@ -248,7 +251,7 @@ describe('Jakob: English', () => {
       expect(s.task.hint, `hint ${s.id}`).not.toBe(de[i]!.hint)
       s.questions.forEach((q, k) => expect(q.q, `question ${s.id}.${k}`).not.toBe(de[i]!.q[k]))
       expect(s.ref, `ref ${s.id}`).toMatch(/^Genesis \d/)
-      expect(s.audio, `audio ${s.id}`).toBe(`audio/abenteuer/jakob/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)
+      expect(s.audio, `audio ${s.id}`).toBe(`audio/abenteuer/jakob/geschichte-${String(s.id).padStart(2, '0')}-en-v2.mp3`)
     })
     expect(jakob.title).toBe('Jacob')
     expect(jakob.subtitle).toBe('A Road with Detours')

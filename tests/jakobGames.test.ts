@@ -258,7 +258,7 @@ describe('holding the light', () => {
   })
 
   it('the data: ten seconds with the light standing still, then fifteen with a light that wanders along a way inside the picture', () => {
-    const h = jakob.stages[4]!.task.hold!
+    const h = jakob.stages[9]!.task.hold!
     expect(h.rounds.map((r) => r.seconds)).toEqual([10, 15])
     expect(h.rounds[0]!.path).toBeUndefined()
     const path = h.rounds[1]!.path!

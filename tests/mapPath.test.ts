@@ -25,7 +25,8 @@ describe.each([
   const S = spots.map((s) => ({ x: s.x * m.aspect, y: s.y, r: (s.d * m.aspect) / 2 }))
 
   it('has one stretch from every station to the next one (the last leads to the exam)', () => {
-    expect(m.path).toHaveLength(j.stages.length)
+    // Jakob has 12 stages since 20.10.2026 but still the old painted map with 6 stations until the new panorama is made; every station has its stretch
+    expect(m.path).toHaveLength(m.stages.length)
   })
 
   it('has at least ten beads between two medals', () => {

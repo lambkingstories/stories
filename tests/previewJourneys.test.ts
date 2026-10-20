@@ -323,7 +323,7 @@ describe('the hidden journey Jakob (id jakob)', () => {
     expect(window.location.search).toBe('')
     const again = await load()
     await again.loadPreviewJourneys()
-    expect(again.journeyById('jakob')?.stages.length).toBe(6)
+    expect(again.journeyById('jakob')?.stages.length).toBe(12)
   })
 
   it('a wrong code does not unlock it, ?jakob=off locks it again, and the five unlocks are independent', async () => {
