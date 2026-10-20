@@ -10,7 +10,8 @@ import { babel } from '@/data/adventures/babel'
 import { abraham } from '@/data/adventures/abraham'
 import { jakob } from '@/data/adventures/jakob'
 import { josua } from '@/data/adventures/josua'
-import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, JAKOB_ONLY_DIRS, JOSUA_ONLY_DIRS, NOAH_ONLY_DIRS, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripJakobFiles, stripJosuaFiles, stripNoahFiles } from '../vite.config.noah'
+import { gideon } from '@/data/adventures/gideon'
+import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, GIDEON_ONLY_DIRS, JAKOB_ONLY_DIRS, JOSUA_ONLY_DIRS, NOAH_ONLY_DIRS, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripGideonFiles, stripJakobFiles, stripJosuaFiles, stripNoahFiles } from '../vite.config.noah'
 
 const inNoahDir = (f: string) => NOAH_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
 
@@ -286,6 +287,49 @@ describe('a build without Josua ships nothing of it', () => {
       for (const f of josuaFiles) expect(existsSync(join(out, f)), f).toBe(false)
       for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
       expect(() => stripJosuaFiles(out)).not.toThrow()
+    } finally {
+      rmSync(out, { recursive: true, force: true })
+    }
+  })
+})
+
+const inGideonDir = (f: string) => GIDEON_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
+
+describe('a build without Gideon ships nothing of it', () => {
+  it('every file that only Gideon uses lies in a folder that the normal build removes (until its own pictures exist it uses the ones of Josef, so the list may be empty)', () => {
+    const others = new Set([...journeys, noah, adamEva, babel, abraham, jakob, josua].flatMap((j) => journeyFiles(j)))
+    const app = /^audio\/abenteuer\/(klang|musik)-/
+    const only = journeyFiles(gideon).filter((f) => !others.has(f) && !app.test(f))
+    const leaks = only.filter((f) => !inGideonDir(f))
+    expect(leaks, `files of Gideon outside the folders that are removed: ${leaks.join(', ')}`).toEqual([])
+  })
+
+  it('the folders of Gideon are only the three places that belong to it, none is on the lists of the others, and no folder with "gideon" in its name is missing', () => {
+    expect([...GIDEON_ONLY_DIRS].sort()).toEqual(['audio/abenteuer/gideon', 'images/abenteuer/gideon', 'images/abenteuer/spiele/gideon'])
+    for (const d of GIDEON_ONLY_DIRS) {
+      for (const list of [NOAH_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, ABRAHAM_ONLY_DIRS, JAKOB_ONLY_DIRS, JOSUA_ONLY_DIRS]) expect(list).not.toContain(d)
+    }
+    const found: string[] = []
+    for (const base of ['public/images/abenteuer', 'public/audio/abenteuer', 'public/images/abenteuer/spiele']) {
+      for (const n of readdirSync(base)) if (/gideon/i.test(n) && !n.includes('.')) found.push(`${base.replace('public/', '')}/${n}`)
+    }
+    for (const d of found) expect(GIDEON_ONLY_DIRS, d).toContain(d)
+    for (const j of [...journeys, noah, adamEva, babel, abraham, jakob, josua]) for (const f of journeyFiles(j)) expect(inGideonDir(f), `${j.id}: ${f}`).toBe(false)
+  })
+
+  it('removing takes the folders of Gideon out of a build and leaves everything else (the other journeys, the sounds)', () => {
+    const out = mkdtempSync(join(tmpdir(), 'lk-build-gideon-'))
+    try {
+      const gideonFiles = ['audio/abenteuer/gideon/geschichte-01-v1.mp3', 'images/abenteuer/gideon/etappe-bild-01.webp', 'images/abenteuer/spiele/gideon/hoehle/sack.webp']
+      const keep = ['images/abenteuer/josef/etappe-01.webp', 'audio/abenteuer/noah/geschichte-01.mp3', 'audio/abenteuer/josua/geschichte-01-v1.mp3', 'images/abenteuer/spiele/jakob/kurbel/eimer.webp', 'audio/abenteuer/klang-stern.mp3']
+      for (const f of [...gideonFiles, ...keep]) {
+        mkdirSync(join(out, f, '..'), { recursive: true })
+        writeFileSync(join(out, f), 'x')
+      }
+      stripGideonFiles(out)
+      for (const f of gideonFiles) expect(existsSync(join(out, f)), f).toBe(false)
+      for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
+      expect(() => stripGideonFiles(out)).not.toThrow()
     } finally {
       rmSync(out, { recursive: true, force: true })
     }
