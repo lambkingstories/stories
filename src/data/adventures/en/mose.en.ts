@@ -186,7 +186,7 @@ export const moseEn: TextOverlay<Journey> = {
         'Everyone is to gather only as much as he and his family can eat, one measure for each person in his tent, and it is enough for all. Nothing may be kept until the next morning. Only on the sixth day do they gather twice as much, for on the seventh day, the day of rest, nothing lies on the ground. The people call the bread manna and eat it for forty years.',
         'When they have no water again at Rephidim, Moses strikes a rock with his staff at God’s word, and water streams out, so that all the people can drink.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Gather as much manna every day as you need.', manna: { rounds: [{ hint: 'Every day you gather two full jars. Tap the grains and then “Enough”.' }, { hint: 'On the sixth day you gather twice as much. On the seventh day nothing lies on the ground.' }] } },
       questions: [
         { q: 'What do the people call the bread from heaven?', options: ['manna', 'honey bread', 'desert bread'] },
         { q: 'On which day do they gather twice as much?', options: ['on the sixth day', 'on the first day', 'on the day of rest'] }

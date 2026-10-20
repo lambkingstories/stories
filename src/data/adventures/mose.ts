@@ -12,7 +12,7 @@
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme (Liste der Aufnahmen: D:/Claude/Abenteuer-Mose/NEUAUFNAHME-Mose.md).
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { DiffGame, Journey, WordsGame } from '@/types/adventure'
+import type { DiffGame, Journey, MannaGame, WordsGame } from '@/types/adventure'
 import { josef } from './josef'
 import { MOSE_PATH } from './mosePath'
 import { localize } from './localize'
@@ -69,6 +69,24 @@ const UNTERSCHIED: DiffGame = {
         { image: `${G}unterschied/schlauch.webp`, x: 28, y: 28, w: 8 }
       ]
     }
+  ]
+}
+
+/**
+ * Etappe 12, "Manna sammeln": Tag für Tag werden Körnchen in Krüge gesammelt (vier Körnchen füllen einen Krug), an einem gewöhnlichen Tag zwei Krüge, am sechsten Tag vier, am siebten Tag ruht man (Bildauftrag M16;
+ * Hintergrund = das Etappenbild 12). Runde 1 drei gewöhnliche Tage, Runde 2 Tag 4 und 5 gewöhnlich, Tag 6 doppelt, Tag 7 Ruhetag. Der Boden mit den Körnchen (Prozent des Bildes) ist in der Komponente festgelegt.
+ * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `manna/koernchen-1.webp` bis `koernchen-3.webp` je 90 × 90, `krug-leer.webp`, `krug-voll.webp` je 220 × 220, `bewohner.webp` 260 × 260 (alle transparent).
+ */
+const MANNA: MannaGame = {
+  background: `${PLACEHOLDER}etappe-bild-12.webp`,
+  flakes: [`${G}manna/koernchen-1.webp`, `${G}manna/koernchen-2.webp`, `${G}manna/koernchen-3.webp`],
+  jar: `${G}manna/krug-leer.webp`,
+  jarFull: `${G}manna/krug-voll.webp`,
+  dwellers: `${G}manna/bewohner.webp`,
+  flakesPerJar: 4,
+  rounds: [
+    { hint: 'Jeden Tag sammelt ihr zwei Krüge voll. Tippe die Körnchen an und dann „Genug“.', days: [{ jars: 2 }, { jars: 2 }, { jars: 2 }] },
+    { hint: 'Am sechsten Tag sammelt ihr doppelt so viel. Am siebten Tag liegt nichts auf dem Boden.', days: [{ jars: 2 }, { jars: 2 }, { jars: 4 }, { jars: 0 }] }
   ]
 }
 
@@ -318,7 +336,7 @@ export const mose: Journey = {
         'Als sie in Refidim wieder kein Wasser haben, schlägt Mose auf Gottes Wort mit seinem Stab auf einen Felsen, und Wasser strömt heraus, sodass das ganze Volk trinken kann.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Manna sammeln (manna, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'manna', hint: 'Sammle jeden Tag so viel Manna, wie ihr braucht.', manna: MANNA },
       questions: [
         { q: 'Wie nennt das Volk das Brot vom Himmel?', options: ['Manna', 'Honigbrot', 'Wüstenbrot'], answer: 0 },
         { q: 'An welchem Tag sammeln sie das Doppelte?', options: ['am sechsten Tag', 'am ersten Tag', 'am Ruhetag'], answer: 0 }

@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { DiffGame, WordsGame } from '@/types/adventure'
+import type { DiffGame, MannaGame, WordsGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -310,5 +310,160 @@ describe('Unterschiede finden (diff)', () => {
     expect(w.find('.df-count').text()).toBe('Differences found: 0 of 2')
     await tapAt(w, 5, 5)
     expect(w.find('.df-fb').text()).toBe('Nothing new here. Look again.')
+  })
+})
+
+// ---------------------------------------------------------------- gather manna
+describe('Manna sammeln (manna)', () => {
+  const game: MannaGame = {
+    background: 'images/x/desert.webp',
+    flakes: ['images/x/f1.webp', 'images/x/f2.webp', 'images/x/f3.webp'],
+    jar: 'images/x/jar.webp',
+    jarFull: 'images/x/jar-full.webp',
+    dwellers: 'images/x/dwellers.webp',
+    flakesPerJar: 4,
+    rounds: [
+      { hint: 'Runde eins.', days: [{ jars: 1 }, { jars: 2 }] },
+      { hint: 'Runde zwei.', days: [{ jars: 2 }, { jars: 0 }] }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Manna } = await import('@/components/molecules/games/GameManna.vue')
+    const w = mount(Manna, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  const gather = async (w: W, n: number) => {
+    for (let i = 0; i < n; i++) {
+      await w.find('.mn-flake').trigger('click')
+      await flushPromises()
+    }
+  }
+  const enough = async (w: W) => {
+    await w.find('.mn-enough').trigger('click')
+    await flushPromises()
+  }
+  const fills = (w: W) => w.findAll('.mn-fill').map((x) => Number(x.text()))
+
+  it('the goal is every day of both rounds; day 1, three jars (two needed and a spare one), twelve grains on the ground, the button says "Enough"', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(4)
+    expect(w.find('.mn-day').text()).toBe('Tag 1')
+    expect(w.findAll('.mn-jar')).toHaveLength(3)
+    expect(w.findAll('.mn-flake')).toHaveLength(12)
+    expect(w.find('.mn-enough').text()).toBe('Genug')
+    expect(w.find('.mn-count').text()).toBe('Richtige Tage: 0 von 4')
+  })
+
+  it('a tapped grain goes into the next jar (a soft tone); four grains fill a jar, the next grain begins the next one', async () => {
+    const w = await open()
+    await gather(w, 1)
+    expect(played).toContain('bead')
+    expect(w.findAll('.mn-flake')).toHaveLength(11)
+    expect(fills(w)).toEqual([1, 0, 0])
+    await gather(w, 3)
+    expect(fills(w)).toEqual([4, 0, 0])
+    expect(w.findAll('.mn-jar')[0]!.classes()).toContain('full')
+    await gather(w, 2)
+    expect(fills(w)).toEqual([4, 2, 0])
+  })
+
+  it('"Enough" with the right amount: a tick, a star, the day counts; after a while day 2 begins with empty jars and new grains', async () => {
+    const w = await open()
+    await gather(w, 4)
+    await enough(w)
+    expect(played).toContain('star')
+    expect(w.find('.mn-fb').text()).toBe('Der Tag stimmt!')
+    expect(useTaskProgress().parts.value).toBe(1)
+    await tick(1600)
+    expect(w.find('.mn-day').text()).toBe('Tag 2')
+    expect(fills(w)).toEqual([0, 0, 0])
+    expect(w.findAll('.mn-flake')).toHaveLength(12)
+  })
+
+  it('too little or too much: a cross, a hint what is needed, a mistake; the day does not count yet', async () => {
+    const w = await open()
+    await enough(w)
+    expect(played).toContain('wrong')
+    expect(w.find('.mn-fb').text()).toBe('Heute brauchen wir einen Krug.')
+    await gather(w, 8)
+    await enough(w)
+    expect(w.find('.mn-fb').text()).toBe('Heute brauchen wir einen Krug.')
+    expect(useTaskProgress().parts.value).toBe(0)
+    expect(w.find('.mn-day').text()).toBe('Tag 1')
+  })
+
+  it('a tap on a jar empties it and the jars after it: the grains lie on the ground again; then the amount can be right', async () => {
+    const w = await open()
+    await gather(w, 8)
+    await w.findAll('.mn-jar')[1]!.trigger('click')
+    expect(fills(w)).toEqual([4, 0, 0])
+    expect(w.findAll('.mn-flake')).toHaveLength(8)
+    await enough(w)
+    expect(useTaskProgress().parts.value).toBe(1)
+  })
+
+  it('day 2 needs two jars; round 2: the day of rest has nothing on the ground and the button says "Day of rest"', async () => {
+    const w = await open()
+    await gather(w, 4)
+    await enough(w)
+    await tick(1600)
+    await gather(w, 8)
+    await enough(w)
+    expect(useTaskProgress().parts.value).toBe(2)
+    await tick(1600)
+    await tick(1500)
+    expect(w.find('.mn-round').text()).toContain('Runde 2 von 2')
+    expect(w.find('.mn-day').text()).toBe('Tag 3')
+    await gather(w, 8)
+    await enough(w)
+    await tick(1600)
+    expect(w.find('.mn-day').text()).toBe('Tag 4')
+    expect(w.findAll('.mn-flake')).toHaveLength(0)
+    expect(w.find('.mn-enough').text()).toBe('Ruhetag')
+    await enough(w)
+    expect(w.find('.mn-fb').text()).toContain('ruhen')
+    expect(useTaskProgress().parts.value).toBe(4)
+  })
+
+  it('the key G is "Enough"', async () => {
+    const w = await open()
+    await gather(w, 4)
+    await w.find('.mn').trigger('keydown', { key: 'g' })
+    expect(useTaskProgress().parts.value).toBe(1)
+  })
+
+  it('the whole game: the end with three stars; the wrong days give the stars (up to one: three, up to three: two, more: one)', async () => {
+    for (const [wrong, stars] of [[0, 3], [1, 3], [2, 2], [3, 2], [4, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      for (let i = 0; i < wrong; i++) await enough(w)
+      await gather(w, 4)
+      await enough(w)
+      await tick(1600)
+      await gather(w, 8)
+      await enough(w)
+      await tick(3200)
+      await gather(w, 8)
+      await enough(w)
+      await tick(1600)
+      await enough(w)
+      await tick(1600)
+      expect(useTaskProgress().parts.value).toBe(4)
+      expect(useTaskProgress().finished.value).toBe(true)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${wrong} wrong`).toEqual([[stars]])
+      w.unmount()
+    }
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.mn-day').text()).toBe('Day 1')
+    expect(w.find('.mn-enough').text()).toBe('Enough')
+    await enough(w)
+    expect(w.find('.mn-fb').text()).toBe('Today we need one jar.')
   })
 })

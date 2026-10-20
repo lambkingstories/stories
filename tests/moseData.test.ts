@@ -12,7 +12,7 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
-import { diffAt, distance, shuffle, wordsOf } from '@/utils/moseGames'
+import { dayOk, diffAt, distance, shuffle, wordsOf } from '@/utils/moseGames'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => mose.stages[n - 1]!
@@ -120,7 +120,7 @@ describe('Mose: stories and questions', () => {
 
 describe('Mose: the games, and the placeholders until the pictures come', () => {
   it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(mose.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'quiz', 'quiz', 'unterschied', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'worte', 'quiz', 'quiz'])
+    expect(mose.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'quiz', 'quiz', 'unterschied', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'manna', 'worte', 'quiz', 'quiz'])
     for (const s of mose.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
@@ -168,6 +168,25 @@ describe('Mose: the games, and the placeholders until the pictures come', () => 
     expect(new Set(g.rounds.flatMap((r) => r.items.map((it) => it.image))).size).toBe(10)
     expect(g.rounds[1]!.items.reduce((n, it) => n + it.w, 0) / 6).toBeLessThan(g.rounds[0]!.items.reduce((n, it) => n + it.w, 0) / 4)
     expect(g.rounds.reduce((n, r) => n + r.items.length, 0)).toBe(10)
+  })
+
+  it('12 manna: three usual days, then two usual, a double day and a day of rest; four grains fill a jar; the goal is seven days', () => {
+    const g = stage(12).task.manna
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => r.days.map((d) => d.jars))).toEqual([[2, 2, 2], [2, 2, 4, 0]])
+    expect(g.flakesPerJar).toBe(4)
+    expect(g.flakes).toHaveLength(3)
+    // the day of rest is the last day; the double day comes the day before; right and wrong collected amounts
+    const days = g.rounds.flatMap((r) => r.days)
+    expect(days).toHaveLength(7)
+    expect(days[6]!.jars).toBe(0)
+    expect(days[5]!.jars).toBe(2 * days[4]!.jars)
+    for (const d of days) {
+      expect(dayOk(d, d.jars * 4, 4)).toBe(true)
+      expect(dayOk(d, d.jars * 4 + 4, 4)).toBe(false)
+    }
+    expect(g.background).toBe(stage(12).image)
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {
