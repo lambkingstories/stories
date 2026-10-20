@@ -143,7 +143,7 @@ export const gideonEn: TextOverlay<Journey> = {
         'There Gideon hears one man telling another his dream, “I dreamed that a round loaf of barley bread rolled into our camp. It hit a tent, and the tent fell over and lay on the ground.” “That is nothing other than the sword of Gideon, the son of Joash, the Israelite,” answers the other. “God has given the Midianites and the whole army into his hand.”',
         'When Gideon hears this, he bows down and thanks God. Then he goes back to the camp of the Israelites and calls out, “Get up, God has given the camp of the Midianites into your hands!”'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Lead the two quietly down the slope from shadow to shadow.', sneak: { rounds: [{ hint: 'Lead Gideon and Purah from rock to rock. Wait in the shadow when a cone of light comes.' }, { hint: 'Now there are three watchers, and their light sways unevenly. Be patient in the shadow.' }] } },
       questions: [
         { q: 'Whom does Gideon take with him to the camp of the Midianites?', options: ['his servant Purah', 'his father Joash', 'Barak'] },
         { q: 'What does the Midianite dream about?', options: ['a loaf of barley bread', 'a sheep', 'a bridge'] }

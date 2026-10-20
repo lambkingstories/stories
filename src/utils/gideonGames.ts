@@ -247,6 +247,9 @@ export function lit(c: Cone, tMs: number, p: { x: number; y: number }, half = 13
   return diff <= half
 }
 
+/** How fast the pair walks along the way (percent of the width a second). */
+export const PAIR_SPEED = 35
+
 /** The length of a way (percent of the width). */
 export function wayLength(path: Cell[]): number {
   let sum = 0

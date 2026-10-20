@@ -1,6 +1,6 @@
 /**
  * The data of "Gideon" (`gideon.ts` and `en/gideon.en.ts`), phase 2a: the stories and questions follow the rules of the adventures (texts of the draft
- * `D:/Claude/Abenteuer-Gideon/ENTWURF_Gideon.md`), every stage still has the quiz PLACEHOLDER and a picture of Josef until the games and the own pictures are built in, the map is the
+ * `D:/Claude/Abenteuer-Gideon/ENTWURF_Gideon.md`), every stage has the game of the plan (the stages 1, 5 and 11 only the questions) and a picture of Josef until the own pictures are built in, the map is the
  * placeholder map of Josef (twelve stations + exam), and the English file has the same shape. The own pictures and recordings are not there yet (`audio` is missing on purpose).
  */
 import { existsSync, readFileSync, statSync } from 'node:fs'
@@ -11,7 +11,7 @@ import { GIDEON_PATH } from '@/data/adventures/gideonPath'
 import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
-import { blow, deadlock, inBox, isSolved, makePieces, pushesOf, solvable, tilesFor } from '@/utils/gideonGames'
+import { blow, deadlock, inBox, isSolved, lit, makePieces, PAIR_SPEED, pushesOf, SLOPE, solvable, stopParts, tilesFor, wayLength, wayPoint } from '@/utils/gideonGames'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 
 afterEach(() => setAdventureLanguage('de'))
@@ -110,9 +110,9 @@ describe('Gideon: stories and questions', () => {
   })
 })
 
-describe('Gideon: the placeholders until the games and pictures come', () => {
-  it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(gideon.stages.map((s) => s.task.kind)).toEqual(['quiz', 'hoehle', 'worfeln', 'wort', 'quiz', 'tau', 'weiche', 'wimmelbild', 'quiz', 'zeichen', 'quiz', 'memory'])
+describe('Gideon: the games, and the placeholders until the pictures come', () => {
+  it('every stage has the game of the plan; the stages 1, 5 and 11 are only questions; two old mechanics at most (hidden picture, memory), every other game is new', () => {
+    expect(gideon.stages.map((s) => s.task.kind)).toEqual(['quiz', 'hoehle', 'worfeln', 'wort', 'quiz', 'tau', 'weiche', 'wimmelbild', 'schleichen', 'zeichen', 'quiz', 'memory'])
     for (const s of gideon.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
@@ -242,6 +242,57 @@ describe('Gideon: the placeholders until the games and pictures come', () => {
     expect(g.area.x + g.area.w).toBeLessThanOrEqual(100)
     expect(g.area.y + g.area.h).toBeLessThanOrEqual(100)
     expect(g.rounds.reduce((n, r) => n + r.sacks.length, 0)).toBe(5)
+  })
+
+  it('9 sneak: three rocks in each round, two watchers and then three; the rocks lie on the way; and every stretch is free at some time for the whole walk (the cones leave a gap you can use)', () => {
+    const g = stage(9).task.sneak
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => [r.stops.length, r.watchers.length])).toEqual([[3, 2], [3, 3]])
+    const total = wayLength(g.path as [number, number][])
+    for (const [ri, r] of g.rounds.entries()) {
+      const parts = stopParts(g.path as [number, number][], r.stops as [number, number][])
+      expect(parts).toHaveLength(3)
+      // the rocks lie on the way (within three percent of the width) and in order
+      for (const [i, s] of r.stops.entries()) {
+        const q = wayPoint(g.path as [number, number][], parts[i]!)
+        expect(Math.hypot(q.x - s[0], (q.y - s[1]) * SLOPE), `rock ${i} of round ${ri + 1}`).toBeLessThan(3)
+      }
+      let from = 0
+      for (const [k, to] of parts.entries()) {
+        const seconds = ((to - from) * total) / PAIR_SPEED
+        // is there a start time (0 to 40 seconds) at which no cone lights any point of the stretch while the pair walks it?
+        let free = 0
+        for (let start = 0; start < 40000; start += 100) {
+          let ok = true
+          for (let tau = 0; tau <= seconds + 0.001 && ok; tau += 0.05) {
+            const p = wayPoint(g.path as [number, number][], from + ((to - from) * Math.min(tau, seconds)) / seconds)
+            if (r.watchers.some((w) => lit(w, start + tau * 1000, p, 13))) ok = false
+          }
+          if (ok) free++
+        }
+        // the free start times add up to at least two seconds in forty (so that a child has room to start), and not always (the light really comes)
+        expect(free, `stretch ${k + 1} of round ${ri + 1} has free times`).toBeGreaterThanOrEqual(20)
+        expect(free, `stretch ${k + 1} of round ${ri + 1} is not always free`).toBeLessThan(380)
+        from = to
+      }
+    }
+    expect(g.rounds.reduce((n, r) => n + r.stops.length, 0)).toBe(6)
+    expect(g.watcherImages.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('every game has at most two rounds, a hint for each round, and the kinds of the games are all different', () => {
+    const g = (n: number) => stage(n).task
+    const rounds = [g(2).cave!.rounds, g(3).winnow!.rounds, g(4).word!.rounds, g(6).dew!.rounds, g(7).swit!.rounds, g(9).sneak!.rounds, g(10).cue!.rounds]
+    for (const r of rounds) {
+      expect(r.length).toBeGreaterThanOrEqual(1)
+      expect(r.length).toBeLessThanOrEqual(2)
+      for (const x of r) expect(x.hint.length).toBeGreaterThan(8)
+    }
+    const kinds = gideon.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
+    expect(new Set(kinds).size).toBe(kinds.length)
+    expect(kinds.filter((k) => ['wimmelbild', 'memory'].includes(k))).toHaveLength(2)
+    for (const n of [1, 5, 11]) expect(stage(n).task.kind).toBe('quiz')
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

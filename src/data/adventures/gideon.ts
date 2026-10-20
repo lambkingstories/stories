@@ -7,11 +7,11 @@
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/gideon/, images/abenteuer/spiele/gideon/<spiel>/, audio/abenteuer/gideon/.
  *
- * STAND 20.10.2026 (Phase 2a, nur Daten und Platzhalter): Jede Etappe hat eine Quiz-Aufgabe (PLATZHALTER bis Spiel/Bild) und ein vorhandenes Etappenbild von Josef;
+ * STAND 21.10.2026: alle neun Spiele sind gebaut (die Bilder der Spiele fehlen noch, bis dahin stehen Platzhalter, siehe `NOT_PAINTED_YET` in `utils/journeyFiles.ts`); die Etappen 1, 5 und 11 bleiben Quiz. Die Etappenbilder sind noch die von Josef;
  * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit allen zwölf Stationen und dem Ziel (PLATZHALTER bis zum eigenen Panorama); Medaille und Geschenk sind ebenfalls die von Josef.
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme. Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { CaveGame, CueGame, DewGame, FindGame, Journey, MemoryGame, SwitchGame, WinnowGame, WordGame } from '@/types/adventure'
+import type { CaveGame, CueGame, DewGame, FindGame, Journey, MemoryGame, SneakGame, SwitchGame, WinnowGame, WordGame } from '@/types/adventure'
 import { josef } from './josef'
 import { GIDEON_PATH } from './gideonPath'
 import { localize } from './localize'
@@ -177,6 +177,38 @@ const HOEHLE: CaveGame = {
   ]
 }
 
+/**
+ * Etappe 9, "Leise den Hang hinab": Gideon und Pura werden auf einem Pfad von Schattenplatz zu Schattenplatz geführt, Wächter mit Laternen lassen Lichtkegel hin und her schwingen; im Schatten warten ist nie ein Fehler
+ * (Bildauftrag G15; eigener Hintergrund `schleichen/hang-nacht.webp`, 3:4). Runde 1 zwei Wächter und ruhige Schwünge, Runde 2 drei Wächter und ungleiche Schwünge; je drei Abschnitte. Die Lagen (Prozent des Bildes: Pfad,
+ * Schattenplätze, Wächter) sind vorläufig geschätzt, bis die Datei `schleichen-messung.json` der Spielbild-Sitzung da ist; die Daten sind so gewählt, dass jeder Abschnitt in jeder Runde zu bestimmten Zeiten frei ist (Test).
+ * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `schleichen/hang-nacht.webp` 900 × 1200, `paar.webp` 140 × 180, `waechter-a.webp`, `waechter-b.webp` je 140 × 200 (alle außer dem Hang transparent).
+ */
+const SCHLEICHEN: SneakGame = {
+  background: `${G}schleichen/hang-nacht.webp`,
+  pair: `${G}schleichen/paar.webp`,
+  watcherImages: [`${G}schleichen/waechter-a.webp`, `${G}schleichen/waechter-b.webp`],
+  path: [[30, 8], [62, 18], [34, 32], [68, 46], [32, 60], [62, 74], [46, 90]],
+  rounds: [
+    {
+      hint: 'Führe Gideon und Pura von Fels zu Fels. Warte im Schatten, wenn ein Lichtkegel kommt.',
+      stops: [[34, 32], [32, 60], [46, 90]],
+      watchers: [
+        { x: 88, y: 40, from: 150, to: 215, periodMs: 5200, reach: 42 },
+        { x: 10, y: 70, from: -40, to: 25, periodMs: 6400, reach: 42 }
+      ]
+    },
+    {
+      hint: 'Jetzt sind es drei Wächter, und ihr Licht schwingt unregelmäßig. Hab Geduld im Schatten.',
+      stops: [[62, 18], [32, 60], [46, 90]],
+      watchers: [
+        { x: 90, y: 28, from: 140, to: 215, periodMs: 4200, reach: 36 },
+        { x: 8, y: 52, from: -35, to: 30, periodMs: 5000, reach: 36 },
+        { x: 92, y: 80, from: 150, to: 225, periodMs: 6100, reach: 32 }
+      ]
+    }
+  ]
+}
+
 export const gideon: Journey = {
   id: 'gideon',
   title: 'Gideon',
@@ -209,7 +241,7 @@ export const gideon: Journey = {
         'Als Sisera hört, dass Barak auf dem Tabor steht, ruft er alle seine Wagen zusammen. Da sagt Debora: „Auf, das ist der Tag! Gott zieht vor dir her!“ Barak steigt mit den zehntausend Männern den Berg hinab. Und Gott bringt Sisera und sein ganzes Heer in Verwirrung. Sisera springt von seinem Wagen und flieht zu Fuß.',
         'Da singen Debora und Barak ein Danklied: „Lobt Gott, dass Israel wieder frei ist!“ Und das Land hat vierzig Jahre Ruhe.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: nur Quiz (bleibt Quiz)
+      // nur Quiz (ernst bzw. ruhig, nichts wird gespielt); das Etappenbild ist noch das von Josef
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Unter welchem Baum sitzt Debora?', options: ['unter einer Palme', 'unter einer Eiche', 'unter einer Zeder'], answer: 0 },
@@ -228,7 +260,7 @@ export const gideon: Journey = {
         'Die Israeliten verstecken sich in Felsspalten, in Höhlen und in Bergfestungen. Sie sind arm geworden und fühlen sich klein vor den Midianitern. Endlich rufen sie zu Gott um Hilfe.',
         'Gott hat ihr Rufen gehört. Er schickt einen Propheten zu ihnen. Der sagt: „So spricht Gott, der Gott Israels: Ich habe euch aus Ägypten geführt, aus dem Haus der Sklaven. Ich habe euch dieses Land gegeben. Ich habe zu euch gesagt: Ich bin euer Gott. Aber ihr habt nicht auf mich gehört.“'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Säcke in die Höhle schieben (hoehle, neu)
+      // Spiel: Säcke in die Höhle schieben (hoehle, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'hoehle', hint: 'Schiebe die Säcke in die Nischen der Höhle.', cave: HOEHLE },
       questions: [
         { q: 'Wie lange sind die Midianiter stärker als Israel?', options: ['sieben Jahre', 'zwanzig Jahre', 'vierzig Jahre'], answer: 0 },
@@ -246,7 +278,7 @@ export const gideon: Journey = {
         'Aber Gott wendet sich ihm zu. „Geh hin in deiner Kraft und rette Israel vor den Midianitern“, sagt er. „Ich habe dich gesandt!“ „Wie soll ich das tun?“, fragt Gideon. „Meine Familie ist die geringste in Manasse, und ich bin der Kleinste in meines Vaters Haus.“ „Ich will mit dir sein“, antwortet Gott, „und du wirst die Midianiter besiegen, als wären sie nur ein einziger Mann.“',
         'Gideon hört zu und denkt nach. Er möchte ganz sicher sein, dass wirklich Gott mit ihm spricht.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Spreu im Wind (worfeln, neu)
+      // Spiel: Spreu im Wind (worfeln, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'worfeln', hint: 'Stelle den Wind ein, damit die Spreu fortfliegt.', winnow: WORFELN },
       questions: [
         { q: 'Wo drischt Gideon seinen Weizen?', options: ['in einer Kelter', 'auf dem Dach', 'am Fluss'], answer: 0 },
@@ -264,7 +296,7 @@ export const gideon: Journey = {
         'Da berührt der Engel mit der Spitze seines Stabes das Fleisch und das Brot. Feuer fährt aus dem Felsen und verzehrt alles. Als Gideon wieder aufblickt, ist der Engel verschwunden. Gideon erschrickt. „Ach, mein Gott“, ruft er, „ich habe einen Engel Gottes von Angesicht gesehen!“',
         'Aber Gott spricht zu ihm: „Friede sei mit dir! Fürchte dich nicht, du wirst nicht sterben.“ Da baut Gideon dort einen Altar und nennt ihn: Gott ist der Friede. In Ophra bleibt er noch lange stehen.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Das Wort legen (wort, neu)
+      // Spiel: Das Wort legen (wort, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'wort', hint: 'Lege das Wort aus den Buchstaben.', word: WORT },
       questions: [
         { q: 'Was verzehrt das Fleisch und das Brot?', options: ['Feuer aus dem Felsen', 'ein starker Sturm', 'ein hungriger Hirte'], answer: 0 },
@@ -282,7 +314,7 @@ export const gideon: Journey = {
         'Am Morgen sehen die Leute der Stadt, dass der Altar Baals zerbrochen ist. Auf dem neuen Altar liegt ein Opfer. „Wer hat das getan?“, fragen sie, und bald wissen sie es: Es war Gideon, der Sohn des Joas. Sie sind so zornig, dass sie ihn bestrafen wollen. Vor Joas’ Haus rufen sie: „Gib deinen Sohn heraus!“',
         'Aber Joas stellt sich vor seinen Sohn. „Wollt ihr für Baal streiten?“, fragt er. „Wenn Baal ein Gott ist, dann soll er selbst für sich streiten, weil sein Altar zerbrochen ist.“ Seit diesem Tag nennt man Gideon auch Jerubbaal. Das heißt: Baal soll mit ihm streiten.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: nur Quiz (bleibt Quiz)
+      // nur Quiz (ernst bzw. ruhig, nichts wird gespielt); das Etappenbild ist noch das von Josef
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Zu welcher Zeit reißt Gideon den Altar des Baal nieder?', options: ['in der Nacht', 'am Mittag', 'zur Erntezeit'], answer: 0 },
@@ -301,7 +333,7 @@ export const gideon: Journey = {
         'So geschieht es. Als Gideon früh am Morgen aufsteht, ist der Boden trocken. Aber das Fell ist so nass, dass er den Tau auspressen kann, eine ganze Schale voll Wasser.',
         'Doch Gideon bittet noch einmal: „Sei mir nicht böse, dass ich noch einmal bitte. Diesmal soll das Fell trocken bleiben und auf dem Boden ringsum Tau liegen.“ Und Gott tut es in dieser Nacht. Das Fell ist trocken, und auf der ganzen Erde liegt Tau. Nun weiß Gideon, dass er sich auf Gott verlassen kann.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Die Nacht vergeht (tau, neu)
+      // Spiel: Die Nacht vergeht (tau, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'tau', hint: 'Lass die Nacht vergehen und finde den Tau.', dew: TAU },
       questions: [
         { q: 'Was legt Gideon auf die Tenne?', options: ['ein Fell mit Wolle', 'einen Mantel', 'einen Sack Mehl'], answer: 0 },
@@ -318,7 +350,7 @@ export const gideon: Journey = {
         'Da sagt Gott zu Gideon: „Du hast zu viele Männer bei dir. Wenn ich dir die Midianiter in die Hände gebe, könnte Israel sich rühmen und sagen: Das habe ich selbst geschafft.“ Darum soll Gideon vor allen ausrufen: „Wer sich fürchtet und Angst hat, darf umkehren und nach Hause gehen!“',
         'Und viele machen sich auf den Heimweg. Zweiundzwanzigtausend Männer kehren um. Nur zehntausend bleiben bei Gideon. Sie sehen den anderen nach, und im Lager wird es still. Aber Gott sagt zu Gideon: „Es sind immer noch zu viele.“'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Wer geht heim? (weiche, neu)
+      // Spiel: Wer geht heim? (weiche, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'weiche', hint: 'Stelle die Weiche, damit jeder Mann seinen Weg geht.', swit: WEICHE },
       questions: [
         { q: 'Wer darf nach Hause gehen?', options: ['wer Angst hat', 'wer müde ist', 'wer das älteste Zelt hat'], answer: 0 },
@@ -336,7 +368,7 @@ export const gideon: Journey = {
         '„Durch diese dreihundert will ich euch retten und die Midianiter in deine Hände geben“, sagt Gott zu Gideon. „Die anderen lass alle nach Hause gehen.“',
         'Die dreihundert nehmen Vorrat und ihre Posaunen mit. Alle anderen schickt Gideon heim, jeden in sein Zelt. Nur die dreihundert behält er bei sich. Unten in der Ebene liegt das riesige Lager der Midianiter.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Wimmelbild (wimmelbild, alt)
+      // Spiel: Wimmelbild (wimmelbild, alt); das Etappenbild ist noch das von Josef
       task: { kind: 'wimmelbild', hint: 'Finde die sechs Männer, die das Wasser mit der Hand zum Mund führen. Manche verstecken sich!', count: 6, find: WIMMEL },
       questions: [
         { q: 'Wie viele Männer behält Gideon bei sich?', options: ['dreihundert', 'zehntausend', 'zweiundzwanzigtausend'], answer: 0 },
@@ -354,8 +386,8 @@ export const gideon: Journey = {
         'Da hört Gideon, wie einer einem anderen seinen Traum erzählt: „Mir hat geträumt, ein rundes Gerstenbrot rollte in unser Lager. Es stieß an ein Zelt, und das Zelt stürzte um und lag am Boden.“ „Das ist nichts anderes als das Schwert Gideons, des Sohnes des Joas, des Israeliten“, antwortet der andere. „Gott hat die Midianiter und das ganze Heer in seine Hand gegeben.“',
         'Als Gideon das hört, verneigt er sich und dankt Gott. Dann geht er zurück ins Lager der Israeliten und ruft: „Auf, Gott hat das Lager der Midianiter in eure Hände gegeben!“'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Leise den Hang hinab (schleichen, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      // Spiel: Leise den Hang hinab (schleichen, neu); das Etappenbild ist noch das von Josef
+      task: { kind: 'schleichen', hint: 'Führe die beiden leise von Schatten zu Schatten den Hang hinab.', sneak: SCHLEICHEN },
       questions: [
         { q: 'Wen nimmt Gideon mit zum Lager der Midianiter?', options: ['seinen Diener Pura', 'seinen Vater Joas', 'Barak'], answer: 0 },
         { q: 'Wovon träumt der Midianiter?', options: ['von einem Gerstenbrot', 'von einem Schaf', 'von einer Brücke'], answer: 0 }
@@ -371,7 +403,7 @@ export const gideon: Journey = {
         'Mitten in der Nacht kommen Gideon und seine hundert Männer an den Rand des Lagers. Gerade haben die Midianiter ihre Wachen neu aufgestellt. Da blasen sie die Posaunen und zerschlagen die Krüge in ihren Händen, und die beiden anderen Gruppen tun es ebenso. Rings um das ganze Lager leuchten die Fackeln in der Dunkelheit auf. Überall schallen die Posaunen: „Für Gott und für Gideon!“',
         'Die dreihundert bleiben, jeder an seinem Platz um das Lager herum, stehen. Die Midianiter schrecken aus dem Schlaf, laufen durcheinander und schreien. Denn Gott bringt das ganze Lager in Unordnung. Das Heer flieht.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Auf Gideons Zeichen (zeichen, neu)
+      // Spiel: Auf Gideons Zeichen (zeichen, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'zeichen', hint: 'Warte auf das Horn und antworte dann der Reihe nach.', cue: ZEICHEN },
       questions: [
         { q: 'Was steckt in den Tonkrügen der Männer?', options: ['Fackeln', 'Brot', 'Wasser'], answer: 0 },
@@ -389,7 +421,7 @@ export const gideon: Journey = {
         'Gideon bleibt ruhig. „Was habe ich im Vergleich zu euch getan?“, sagt er. „Ist nicht schon die Nachlese von Ephraim besser als die ganze Weinernte meiner Familie? Gott hat die Fürsten der Midianiter in eure Hände gegeben. Wie hätte ich tun können, was ihr getan habt?“ Die Nachlese ist das, was nach der Ernte noch an den Reben hängt. Als Gideon so redet, legt sich ihr Zorn.',
         'Dann zieht Gideon mit seinen dreihundert Männern über den Jordan. Sie sind müde, aber sie bleiben dran, bis die Midianiter ganz besiegt sind.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: nur Quiz (bleibt Quiz)
+      // nur Quiz (ernst bzw. ruhig, nichts wird gespielt); das Etappenbild ist noch das von Josef
       task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wer kommt zornig zu Gideon?', options: ['die Männer von Ephraim', 'Barak', 'die Midianiter'], answer: 0 },
@@ -408,7 +440,7 @@ export const gideon: Journey = {
         'Gideon macht daraus ein Priesterkleid und stellt es in seine Stadt Ophra. Später aber beten die Leute dieses Kleid an, und das wird für Gideon und sein Haus zu einem Fehler.',
         'Die Midianiter erheben ihren Kopf nicht mehr. Das Land hat vierzig Jahre Frieden, solange Gideon lebt. Und der Altar in Ophra, den Gideon einst gebaut hat, trägt weiter den Namen: Gott ist der Friede.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Memory (memory, alt)
+      // Spiel: Memory (memory, alt); das Etappenbild ist noch das von Josef
       task: { kind: 'memory', hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.', memory: MEMORY },
       questions: [
         { q: 'Was antwortet Gideon, als sie ihn zum Herrscher machen wollen?', options: ['„Gott soll euer Herr sein.“', '„Ja, ich werde euer König.“', '„Mein Sohn soll es werden.“'], answer: 0 },

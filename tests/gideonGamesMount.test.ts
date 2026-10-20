@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { CaveGame, CueGame, DewGame, SwitchGame, WinnowGame, WordGame } from '@/types/adventure'
+import type { CaveGame, CueGame, DewGame, SneakGame, SwitchGame, WinnowGame, WordGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -951,5 +951,182 @@ describe('Säcke in die Höhle schieben (cave)', () => {
     expect(w.findAll('.cv-actions button')[0]!.text()).toBe('One step back')
     await w.findAll('.cv-actions button')[2]!.trigger('click')
     expect(w.find('.cv-fb').text()).toBe('Go to the right.')
+  })
+})
+
+// ---------------------------------------------------------------- quietly down the slope
+describe('Leise den Hang hinab (sneak)', () => {
+  const game: SneakGame = {
+    background: 'images/x/slope.webp',
+    pair: 'images/x/pair.webp',
+    watcherImages: ['images/x/wa.webp', 'images/x/wb.webp'],
+    // a straight path from the left to the right across the middle of the picture
+    path: [[10, 50], [90, 50]],
+    rounds: [
+      { hint: 'Runde eins.', stops: [[40, 50], [90, 50]], watchers: [] },
+      // one watcher above the path: his light points down at the start of every swing (the path is lit around x = 50 then) and swings away to the right
+      { hint: 'Runde zwei.', stops: [[30, 50], [90, 50]], watchers: [{ x: 50, y: 20, from: 90, to: 0, periodMs: 4000, reach: 30 }] }
+    ]
+  }
+  let t0 = 0
+  // the field is 300 x 400 pixels: a percent of the width is three pixels, a percent of the height four
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, width: 300, height: 400, right: 300, bottom: 400, x: 0, y: 0, toJSON: () => ({}) })
+    const { default: Sneak } = await import('@/components/molecules/games/GameSneak.vue')
+    t0 = Date.now()
+    const w = mount(Sneak, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  const goOn = async (w: W) => {
+    await w.find('.sn-go').trigger('click')
+    await flushPromises()
+  }
+  const pairX = (w: W) => Number(/left: ([\d.]+)%/.exec(w.find('.sn-pair').attributes('style') ?? '')![1])
+  /** Wait until the clock of the cone (milliseconds since the start, modulo one swing of 4000) is at this moment. */
+  const waitPhase = async (from: number) => {
+    for (let i = 0; i < 80 && !((Date.now() - t0) % 4000 >= from && (Date.now() - t0) % 4000 < from + 100); i++) await tick(50)
+  }
+  const roundOne = async (w: W) => {
+    await goOn(w)
+    await tick(1000)
+    await goOn(w)
+    await tick(1700)
+  }
+  /** Round 2: the first stretch is free of light; the second is walked when the light has swung away. */
+  const roundTwo = async (w: W) => {
+    await goOn(w)
+    await tick(800)
+    await waitPhase(1000)
+    await goOn(w)
+    await tick(2100)
+  }
+
+  it('the goal is every stretch of both rounds; the pair stands at the start, the rocks and the watchers are there', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(4)
+    expect(w.find('.sn-round').text()).toContain('Runde 1 von 2')
+    expect(w.findAll('.sn-rock')).toHaveLength(2)
+    expect(w.findAll('.sn-watcher')).toHaveLength(0)
+    expect(pairX(w)).toBe(10)
+    expect(w.find('.sn-count').text()).toBe('Schattenplätze erreicht: 0 von 2')
+    expect(w.find('.sn-go').classes()).toContain('ready')
+  })
+
+  it('"Go on" walks the pair to the next rock; arriving is a tick and a point; it waits there', async () => {
+    const w = await open()
+    await goOn(w)
+    await tick(300)
+    expect(pairX(w)).toBeGreaterThan(10)
+    expect(pairX(w)).toBeLessThan(40)
+    await tick(800)
+    expect(pairX(w)).toBe(40)
+    expect(played).toContain('snap')
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(w.find('.sn-count').text()).toBe('Schattenplätze erreicht: 1 von 2')
+    await tick(3000)
+    expect(pairX(w)).toBe(40)
+    expect(played).not.toContain('wrong')
+  })
+
+  it('a finger leads the pair along the path, never past the next rock, never back past the last one; letting go it stays', async () => {
+    const w = await open()
+    const field = w.find('.sn-field').element
+    field.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 270, clientY: 200 }))
+    await tick(1500)
+    // the finger is far to the right, but the next rock is at 40
+    expect(pairX(w)).toBe(40)
+    window.dispatchEvent(new MouseEvent('pointerup'))
+    await flushPromises()
+    field.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 3, clientY: 200 }))
+    await tick(1500)
+    expect(pairX(w)).toBe(40)
+    window.dispatchEvent(new MouseEvent('pointerup'))
+  })
+
+  it('both stretches walked: a star and the second round', async () => {
+    const w = await open()
+    await roundOne(w)
+    expect(useTaskProgress().parts.value).toBe(2)
+    expect(played).toContain('star')
+    await tick(2100)
+    expect(w.find('.sn-round').text()).toContain('Runde 2 von 2')
+    expect(w.findAll('.sn-watcher')).toHaveLength(1)
+    expect(pairX(w)).toBe(10)
+  })
+
+  it('a cone of light reaching the pair on the open path: the pair goes back to the last rock, a cross, a dull sound, one mistake; the watcher yawns', async () => {
+    const w = await open()
+    await roundOne(w)
+    await tick(2100)
+    await goOn(w)
+    await tick(800)
+    expect(pairX(w)).toBe(30)
+    // the light points down at the start of a swing; press "Go on" just before: the pair meets it at x = 45 to 55
+    await waitPhase(3000)
+    await goOn(w)
+    await tick(800)
+    expect(played).toContain('wrong')
+    expect(w.find('.sn-fb').text()).toContain('gähnt')
+    expect(pairX(w)).toBe(30)
+    expect(w.find('.gm.bad').exists()).toBe(true)
+    expect(useTaskProgress().parts.value).toBe(3)
+  })
+
+  it('waiting at a rock is never a mistake, however long the light sweeps over it', async () => {
+    const w = await open()
+    await roundOne(w)
+    await tick(2100)
+    await goOn(w)
+    await tick(800)
+    played.length = 0
+    await tick(12000)
+    expect(played).not.toContain('wrong')
+    expect(pairX(w)).toBe(30)
+  })
+
+  it('"Go on" glows when the way to the next rock is free just now and not when the light is on it', async () => {
+    const w = await open()
+    await roundOne(w)
+    await tick(2100)
+    await goOn(w)
+    await tick(800)
+    await waitPhase(1500)
+    expect(w.find('.sn-go').classes()).toContain('ready')
+    await waitPhase(100)
+    expect(w.find('.sn-go').classes()).not.toContain('ready')
+  })
+
+  it('the whole game: the end with three stars; the times the light caught the pair give the stars (up to three: three, up to seven: two, more: one)', async () => {
+    for (const [caught, stars] of [[0, 3], [3, 3], [4, 2], [7, 2], [8, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      await roundOne(w)
+      await tick(2100)
+      await goOn(w)
+      await tick(800)
+      for (let i = 0; i < caught; i++) {
+        await waitPhase(3000)
+        await goOn(w)
+        await tick(1000)
+      }
+      await waitPhase(1000)
+      await goOn(w)
+      await tick(2300)
+      expect(useTaskProgress().parts.value).toBe(4)
+      await tick(1600)
+      expect(useTaskProgress().finished.value).toBe(true)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${caught} caught`).toEqual([[stars]])
+      w.unmount()
+    }
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.sn-count').text()).toBe('Resting places reached: 0 of 2')
+    expect(w.find('.sn-go').text()).toBe('Go on: the way is free')
   })
 })
