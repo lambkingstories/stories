@@ -29,9 +29,26 @@ describe('Adam und Eva: stories and questions', () => {
       expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(60)
       expect(words, `words ${s.id}`).toBeLessThanOrEqual(220)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.audio, s.id.toString()).toBe(`audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-v${s.id === 5 ? 2 : 1}.mp3`)
+      expect(s.audio, s.id.toString()).toBe(`audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-v${s.id === 5 ? 3 : 2}.mp3`)
       expect(s.image).toBe(`images/abenteuer/adam-eva/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
     }
+  })
+
+  it('the stories flow like the ones of Noah and Josef: connected sentences and no run of very short sentences (German and English)', () => {
+    const sentences = (t: string) => t.split(/(?<=[.!?])["“”]?\s+/).filter(Boolean)
+    const check = (label: string, texts: string[]) => {
+      texts.forEach((text, i) => {
+        const list = sentences(text).map((x) => x.split(/\s+/).length)
+        const avg = list.reduce((a, b) => a + b, 0) / list.length
+        expect(avg, `${label} stage ${i + 1}: average sentence length`).toBeGreaterThanOrEqual(9)
+        for (let k = 0; k + 2 < list.length; k++) expect(Math.max(list[k]!, list[k + 1]!, list[k + 2]!), `${label} stage ${i + 1}: three short sentences in a row at ${k}`).toBeGreaterThan(5)
+      })
+    }
+    setAdventureLanguage('de')
+    check('German', adamEva.stages.map((st) => st.text.join(' ')))
+    setAdventureLanguage('en')
+    check('English', adamEva.stages.map((st) => st.text.join(' ')))
+    setAdventureLanguage('de')
   })
 
   it('two questions per stage (three in the serious stage 7), three answers each, the right one first and the answers differ; the exam has six', () => {
@@ -309,7 +326,7 @@ describe('Adam und Eva: English', () => {
       expect(s.task.hint, `hint ${s.id}`).not.toBe(de[i]!.hint)
       s.questions.forEach((q, k) => expect(q.q, `question ${s.id}.${k}`).not.toBe(de[i]!.q[k]))
       expect(s.ref, `ref ${s.id}`).toMatch(/^Genesis \d/)
-      expect(s.audio, `audio ${s.id}`).toBe(`audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-en-v${s.id === 5 ? 2 : 1}.mp3`)
+      expect(s.audio, `audio ${s.id}`).toBe(`audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-en-v${s.id === 5 ? 3 : 2}.mp3`)
       if (s.task.verse) expect(s.task.verse.rounds.map((r) => r.words.length)).toEqual(de[i]!.verse)
     })
     expect(adamEva.title).toBe('Adam and Eve')

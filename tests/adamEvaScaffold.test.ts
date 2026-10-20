@@ -52,7 +52,7 @@ describe('Adam und Eva: the scaffold', () => {
     // the pictures of the stages, the medal, the gift, the four pieces of the map and the four music pieces are always part of the pack
     for (const f of [...Array.from({ length: 9 }, (_, i) => `images/abenteuer/adam-eva/etappe-bild-${String(i + 1).padStart(2, '0')}.webp`), 'images/abenteuer/adam-eva/medaille.webp', 'images/abenteuer/adam-eva/geschenk.webp', ...[1, 2, 3, 4].map((n) => `images/abenteuer/adam-eva/karte-pano-${n}.webp`), ...['licht', 'garten', 'strom', 'abend'].map((m) => `audio/abenteuer/adam-eva/musik-${m}-v1.mp3`)]) expect(own, f).toContain(f)
     // the pictures of the games and the recordings are part of the pack only when the stages are released
-    expect(own.some((f) => f.includes('spiele/adam-eva/')) && own.some((f) => /geschichte-0\d-v1\.mp3$/.test(f))).toBe(adamEva.stages.every((s) => !s.soon))
+    expect(own.some((f) => f.includes('spiele/adam-eva/')) && own.some((f) => /geschichte-0\d-v\d\.mp3$/.test(f))).toBe(adamEva.stages.every((s) => !s.soon))
   })
 
   it('the English file has the same number of stages in the same order and shows when the app is English; German stays the default', () => {
