@@ -12,7 +12,7 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
-import { dayOk, diffAt, distance, noTriple, shuffle, wordsOf } from '@/utils/moseGames'
+import { dayOk, diffAt, distance, frontCells, frontCount, noTriple, shuffle, wordsOf } from '@/utils/moseGames'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => mose.stages[n - 1]!
@@ -120,7 +120,7 @@ describe('Mose: stories and questions', () => {
 
 describe('Mose: the games, and the placeholders until the pictures come', () => {
   it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(mose.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'quiz', 'quiz', 'unterschied', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'manna', 'worte', 'quiz', 'wolke'])
+    expect(mose.stages.map((s) => s.task.kind)).toEqual(['quiz', 'flechten', 'quiz', 'quiz', 'unterschied', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'manna', 'worte', 'quiz', 'wolke'])
     for (const s of mose.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
@@ -205,6 +205,18 @@ describe('Mose: the games, and the placeholders until the pictures come', () => 
     }
     expect(g.rounds[1]!.trials.every((t) => !t.distractors.includes('birds'))).toBe(true)
     expect(g.rounds.reduce((n, r) => n + r.trials.length, 0)).toBe(10)
+  })
+
+  it('2 weave: three rows of four stakes, then four rows of six; the cells to tap add up to 18; the second round alternates; the goal is 18', () => {
+    const g = stage(2).task.weave
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => [r.rows, r.stakes, r.pattern])).toEqual([[3, 4, 'same'], [4, 6, 'alternate']])
+    const counts = g.rounds.map((r) => frontCount(frontCells(r.rows, r.stakes, r.pattern)))
+    expect(counts).toEqual([6, 12])
+    expect(counts.reduce((a, b) => a + b, 0)).toBe(18)
+    expect(g.tiles.stake).not.toBe(g.tiles.front)
+    expect(g.background).toBe(stage(2).image)
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

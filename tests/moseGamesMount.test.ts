@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { CloudGame, DiffGame, MannaGame, WordsGame } from '@/types/adventure'
+import type { CloudGame, DiffGame, MannaGame, WeaveGame, WordsGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -616,5 +616,136 @@ describe('Der Wolke folgen (cloud)', () => {
     expect(w.findAll('.cd-answers button')[1]!.text()).toBe('Stay')
     await stay(w)
     expect(w.find('.cd-fb').text()).toContain('the people break up')
+  })
+})
+
+// ---------------------------------------------------------------- plait the little basket
+describe('Körbchen flechten (weave)', () => {
+  const game: WeaveGame = {
+    background: 'images/x/nile.webp',
+    tiles: { stake: 'images/x/stake.webp', front: 'images/x/front.webp', behind: 'images/x/behind.webp', active: 'images/x/glow.webp' },
+    done: 'images/x/basket.webp',
+    rounds: [
+      { hint: 'Runde eins.', stakes: 4, rows: 2, pattern: 'same' },
+      { hint: 'Runde zwei.', stakes: 4, rows: 2, pattern: 'alternate' }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Weave } = await import('@/components/molecules/games/GameWeave.vue')
+    const w = mount(Weave, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  /** The cell of a row (0 at the bottom, two rows in the test) and a stake (0 at the left); the top row comes first in the page. */
+  const cell = (w: W, row: number, stake: number) => w.findAll('button.wv-cell')[(1 - row) * 4 + stake]!
+  const tap = async (w: W, row: number, stake: number) => {
+    await cell(w, row, stake).trigger('click')
+    await flushPromises()
+  }
+  const roundOne = async (w: W) => {
+    for (const r of [0, 1]) {
+      await tap(w, r, 0)
+      await tap(w, r, 2)
+    }
+  }
+  const roundTwo = async (w: W) => {
+    await tap(w, 0, 0)
+    await tap(w, 0, 2)
+    await tap(w, 1, 1)
+    await tap(w, 1, 3)
+  }
+
+  it('the goal is every cell where the reed runs in front, of both rounds; eight cells, only the cells of the first row (the bottom one) can be tapped', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(8)
+    expect(w.find('.wv-round').text()).toContain('Runde 1 von 2')
+    expect(w.findAll('button.wv-cell')).toHaveLength(8)
+    expect(w.findAll('button.wv-cell.active')).toHaveLength(4)
+    expect(cell(w, 0, 0).attributes('disabled')).toBeUndefined()
+    expect(cell(w, 1, 0).attributes('disabled')).toBeDefined()
+    expect(w.find('.wv-count').text()).toBe('Reihen geflochten: 0 von 2')
+  })
+
+  it('a cell where the reed runs in front: a piece of reed lies in front of the stake, a tick, the point is counted', async () => {
+    const w = await open()
+    await tap(w, 0, 0)
+    expect(cell(w, 0, 0).find('.band.front').exists()).toBe(true)
+    expect(played).toContain('snap')
+    expect(useTaskProgress().parts.value).toBe(1)
+  })
+
+  it('a cell where the reed has to run behind: a cross, a dull sound, a mistake; nothing is set', async () => {
+    const w = await open()
+    await tap(w, 0, 1)
+    expect(played).toContain('wrong')
+    expect(w.find('.wv-fb').text()).toBe('Hier läuft das Rohr hinter dem Stab.')
+    expect(cell(w, 0, 1).find('.band').exists()).toBe(false)
+    expect(cell(w, 0, 1).find('.gm.bad').exists()).toBe(true)
+    expect(useTaskProgress().parts.value).toBe(0)
+  })
+
+  it('all the front cells of a row tapped: the reed lies behind the other stakes by itself and the next row glows', async () => {
+    const w = await open()
+    await tap(w, 0, 0)
+    await tap(w, 0, 2)
+    expect(cell(w, 0, 1).find('.band.behind').exists()).toBe(true)
+    expect(cell(w, 0, 3).find('.band.behind').exists()).toBe(true)
+    expect(cell(w, 0, 0).find('.band.front').exists()).toBe(true)
+    expect(cell(w, 1, 0).attributes('disabled')).toBeUndefined()
+    expect(cell(w, 0, 0).attributes('disabled')).toBeDefined()
+    expect(w.find('.wv-count').text()).toBe('Reihen geflochten: 1 von 2')
+  })
+
+  it('the tip is shut until three mistakes in a row; then it shows the next right cell (free)', async () => {
+    const w = await open()
+    expect(w.find('.wv-tip').attributes('disabled')).toBeDefined()
+    for (let i = 0; i < 3; i++) await tap(w, 0, 1)
+    expect(w.find('.wv-tip').attributes('disabled')).toBeUndefined()
+    await w.find('.wv-tip').trigger('click')
+    expect(cell(w, 0, 0).classes()).toContain('tip')
+    expect(w.find('.wv-fb').text()).toContain('vor dem Stab')
+  })
+
+  it('round 1 done: the basket is shown for a moment; round 2 begins with the rows the other way round', async () => {
+    const w = await open()
+    await roundOne(w)
+    expect(w.find('.wv-done').exists()).toBe(true)
+    expect(played).toContain('star')
+    expect(useTaskProgress().parts.value).toBe(4)
+    await tick(3100)
+    expect(w.find('.wv-round').text()).toContain('Runde 2 von 2')
+    expect(w.findAll('button.wv-cell.active')).toHaveLength(4)
+    // the second row begins the other way round: its front cells are the stakes 2 and 4
+    await tap(w, 0, 0)
+    await tap(w, 0, 2)
+    await tap(w, 1, 0)
+    expect(cell(w, 1, 0).find('.band').exists()).toBe(false)
+    expect(w.find('.wv-fb').text()).toContain('hinter')
+  })
+
+  it('the whole game: the end with three stars; the mistakes give the stars (up to two: three, up to five: two, more: one)', async () => {
+    for (const [wrong, stars] of [[0, 3], [2, 3], [3, 2], [5, 2], [6, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      for (let i = 0; i < wrong; i++) await tap(w, 0, 1)
+      await roundOne(w)
+      await tick(3100)
+      await roundTwo(w)
+      await tick(1800)
+      expect(useTaskProgress().parts.value).toBe(8)
+      expect(useTaskProgress().finished.value).toBe(true)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${wrong} wrong`).toEqual([[stars]])
+      w.unmount()
+    }
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.wv-count').text()).toBe('Rows plaited: 0 of 2')
+    await tap(w, 0, 1)
+    expect(w.find('.wv-fb').text()).toBe('Here the reed runs behind the stake.')
   })
 })

@@ -37,7 +37,7 @@ export const moseEn: TextOverlay<Journey> = {
         'Now the sister steps forward. “Shall I go and call an Israelite woman to nurse the child for you?” she asks. “Yes, go!” says the king’s daughter. The girl runs off and fetches the mother, and the king’s daughter says to her, “Take this child and raise him for me, and I will pay you.”',
         'When the boy has grown older, his mother brings him to Pharaoh’s daughter, and he becomes her son. She names him Moses, because she says, “I drew him out of the water.”'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Plait the little basket of reed.', weave: { rounds: [{ hint: 'The reed runs in front of the stakes and behind them in turn. Tap the cells where it runs in front of the stake.' }, { hint: 'Now every row begins the other way round than the one below. Look where the reed runs in front of the stake.' }] } },
       questions: [
         { q: 'What does the mother make the basket from?', options: ['reeds', 'wood', 'straw'] },
         { q: 'Who discovers the basket among the reeds?', options: ['Pharaoh’s daughter', 'Moses’ father', 'a fisherman'] }

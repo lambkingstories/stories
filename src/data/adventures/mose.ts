@@ -12,7 +12,7 @@
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme (Liste der Aufnahmen: D:/Claude/Abenteuer-Mose/NEUAUFNAHME-Mose.md).
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { CloudGame, DiffGame, Journey, MannaGame, WordsGame } from '@/types/adventure'
+import type { CloudGame, DiffGame, Journey, MannaGame, WeaveGame, WordsGame } from '@/types/adventure'
 import { josef } from './josef'
 import { MOSE_PATH } from './mosePath'
 import { localize } from './localize'
@@ -129,6 +129,21 @@ const WOLKE: CloudGame = {
   ]
 }
 
+/**
+ * Etappe 2, "Körbchen flechten": das Rohr läuft Reihe für Reihe abwechselnd vor und hinter den senkrechten Stäben; das Kind tippt die Felder, in denen es vor dem Stab läuft (Bildauftrag M10; Hintergrund = das Etappenbild 2,
+ * unscharf). Runde 1 drei Reihen, vier Stäbe, jede Reihe beginnt vor dem ersten Stab; Runde 2 vier Reihen, sechs Stäbe, jede Reihe beginnt andersherum als die darunter. Zusammen 6 + 12 = 18 Felder.
+ * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `flechten/stab.webp`, `rohr-vorn.webp`, `rohr-hinten.webp`, `reihe-aktiv.webp` je 192 × 192 (Kachel, transparent), `koerbchen-fertig.webp` 600 × 600.
+ */
+const FLECHTEN: WeaveGame = {
+  background: `${PLACEHOLDER}etappe-bild-02.webp`,
+  tiles: { stake: `${G}flechten/stab.webp`, front: `${G}flechten/rohr-vorn.webp`, behind: `${G}flechten/rohr-hinten.webp`, active: `${G}flechten/reihe-aktiv.webp` },
+  done: `${G}flechten/koerbchen-fertig.webp`,
+  rounds: [
+    { hint: 'Das Rohr läuft abwechselnd vor und hinter den Stäben. Tippe die Felder, in denen es vor dem Stab läuft.', stakes: 4, rows: 3, pattern: 'same' },
+    { hint: 'Jetzt beginnt jede Reihe andersherum als die darunter. Schau, wo das Rohr vor dem Stab läuft.', stakes: 6, rows: 4, pattern: 'alternate' }
+  ]
+}
+
 export const mose: Journey = {
   id: 'mose',
   title: 'Mose',
@@ -196,7 +211,7 @@ export const mose: Journey = {
         'Als der Junge größer geworden ist, bringt die Mutter ihn zur Tochter des Pharao, und er wird ihr Sohn. Sie nennt ihn Mose, denn sie sagt: „Ich habe ihn aus dem Wasser gezogen.“'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Körbchen flechten (flechten, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'flechten', hint: 'Flechte das Körbchen aus Schilfrohr.', weave: FLECHTEN },
       questions: [
         { q: 'Woraus macht die Mutter das Körbchen?', options: ['aus Schilfrohr', 'aus Holz', 'aus Stroh'], answer: 0 },
         { q: 'Wer entdeckt das Körbchen im Schilf?', options: ['die Tochter des Pharao', 'Moses Vater', 'ein Fischer'], answer: 0 }
