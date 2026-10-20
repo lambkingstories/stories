@@ -83,7 +83,7 @@ export const abrahamEn: TextOverlay<Journey> = {
         'Sarai receives a new name, too. “She shall be called Sarah,” says God. “I will bless her, and she will have a son. Nations shall come from her.”',
         'Abraham has to laugh, he is so surprised. “Can a man of a hundred still become a father?” he thinks, “and Sarah is ninety!” But God says, “Yes, Sarah will give you a son. You shall call him Isaac, and with him I will keep my covenant.”'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Turn the rings until the light shines through.', rings: { rounds: [{ hint: 'Turn each ring until its gap is at the top. Then the light shines through.' }, { hint: 'These rings are joined: when you turn the first one, the second one turns the other way with it.' }] } },
       questions: [
         { q: 'What new name does Abram receive?', options: ['Abraham', 'Isaac', 'Ishmael'] },
         { q: 'How old is Abram when God gives him the new name?', options: ['ninety-nine years old', 'seventy-five years old', 'twenty years old'] }

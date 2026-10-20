@@ -1,7 +1,6 @@
 /**
  * The data of "Abraham" (`abraham.ts` and `en/abraham.en.ts`): the stories and questions follow the rules of the adventures, the games are the ones the Leitung chose
- * (at most two old mechanics, three new ones; stage 9 is only questions; the stages 4, 5, 7, 10 and 11 of the extension to eleven stages hold a placeholder quiz
- * until their games and pictures are built in), the data of every game is complete and consistent, and the English file has the same shape. Until the stages are released (`soon`) none can be opened; once they are released the files that the data names must exist, too.
+ * (at most two old mechanics; stages 7 and 9 are only questions; the stages 4, 5, 10 and 11 of the extension to eleven stages hold the games birds, rings, silver and clues), the data of every game is complete and consistent, and the English file has the same shape. Until the stages are released (`soon`) none can be opened; once they are released the files that the data names must exist, too.
  */
 import { existsSync, statSync } from 'node:fs'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -10,7 +9,7 @@ import { ABRAHAM_PATH } from '@/data/adventures/abrahamPath'
 import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
-import { birdAngle, cluesSolutions, distToLine, lineEnd, onRay, solutions, total } from '@/utils/abrahamGames'
+import { birdAngle, cluesSolutions, distToLine, isAligned, lineEnd, onRay, ringsSolvable, solutions, total } from '@/utils/abrahamGames'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 
 afterEach(() => setAdventureLanguage('de'))
@@ -105,8 +104,8 @@ describe('Abraham: every stage has the game that was chosen', () => {
   const NEW = ['reihenfolge', 'lichter', 'hueten', 'kanaele', 'lueckenvers', 'spiegeln', 'echo', 'saeen', 'fehlt', 'kette', 'stapeln', 'wischen', 'spur']
 
   it('the games in the order of the plan; stage 9 is only the questions; at most two old mechanics and three new ones', () => {
-    // PLATZHALTER (quiz) in the new stages 4, 5, 7, 10 and 11 until their games and pictures are built in
-    expect(abraham.stages.map((s) => s.task.kind)).toEqual(['waage', 'zaehlen', 'sternbild', 'voegel', 'quiz', 'giessen', 'quiz', 'puzzle', 'quiz', 'silber', 'hinweise'])
+    // stages 7 and 9 are only questions; all the other new stages have their game
+    expect(abraham.stages.map((s) => s.task.kind)).toEqual(['waage', 'zaehlen', 'sternbild', 'voegel', 'ringe', 'giessen', 'quiz', 'puzzle', 'quiz', 'silber', 'hinweise'])
     const kinds = abraham.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
     expect(new Set(kinds).size).toBe(kinds.length)
     // "old" = a game that a journey before this one (Josef, Noah, Adam und Eva, Babel) already had; the pouring game was built for Noah but never used there
@@ -119,7 +118,7 @@ describe('Abraham: every stage has the game that was chosen', () => {
 
   it('every game has at most two rounds, a hint for each round, and its goal fits the table "Stufen je Spiel"', () => {
     const g = (n: number) => stage(n).task
-    const rounds = [g(1).balance!.rounds, g(3).constellation!.rounds, g(6).water!.rounds]
+    const rounds = [g(1).balance!.rounds, g(3).constellation!.rounds, g(6).water!.rounds, g(4).birds!.rounds, g(5).rings!.rounds, g(10).silver!.rounds, g(11).clues!.rounds]
     for (const r of rounds) {
       expect(r.length).toBeGreaterThanOrEqual(1)
       expect(r.length).toBeLessThanOrEqual(2)
@@ -131,6 +130,11 @@ describe('Abraham: every stage has the game that was chosen', () => {
     const w = g(6).water!
     const need = (id: string) => w.plants.find((p) => p.id === id)!.need
     expect(w.rounds.reduce((s, r) => s + r.plants.reduce((n, id) => n + need(id), 0), 0)).toBe(9)
+    // the goals of the four newer games: springs found, rings in the light, rounds paid, clue cards that are true
+    expect(g(4).birds!.rounds.reduce((n, r) => n + r.tasks.length, 0)).toBe(6)
+    expect(g(5).rings!.rounds.reduce((n, r) => n + r.start.length, 0)).toBe(7)
+    expect(g(10).silver!.rounds.length).toBe(2)
+    expect(g(11).clues!.rounds.reduce((n, r) => n + r.clues.length, 0)).toBe(7)
     expect(g(2).count).toBe(13)
     expect(g(2).groups!.reduce((s, x) => s + x.count, 0)).toBe(13)
     expect(g(8).puzzle).toMatchObject({ cols: 2, rows: 3 })
@@ -235,6 +239,28 @@ describe('Abraham: every stage has the game that was chosen', () => {
     for (let i = 1; i < g.slots.length; i++) expect(g.slots[i]![0]).toBeGreaterThan(g.slots[i - 1]![0])
     for (const [x, y] of g.slots) expect(x >= 0 && x <= 100 && y >= 0 && y <= 100).toBe(true)
     for (const b of g.blankets) expect(b.pattern.length).toBeGreaterThan(2)
+  })
+
+  it('5 rings: three rings alone, then four joined in pairs; every start is turned (1 to 11) and can be lined up; four ring pictures from outside to inside, the hub and the beam', () => {
+    const g = stage(5).task.rings
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => r.start.length)).toEqual([3, 4])
+    expect(g.rounds.map((r) => r.couple.length)).toEqual([0, 2])
+    expect(g.rings).toHaveLength(4)
+    for (const r of g.rounds) {
+      for (const s of r.start) {
+        expect(s).toBeGreaterThanOrEqual(1)
+        expect(s).toBeLessThanOrEqual(11)
+      }
+      expect(isAligned(r.start), 'never solved at the start').toBe(false)
+      expect(ringsSolvable(r.start, r.couple), 'solvable').toBe(true)
+      for (const [a, b] of r.couple) {
+        expect(a).toBeLessThan(b)
+        expect(b).toBeLessThan(r.start.length)
+      }
+    }
+    expect(g.background).toBe(stage(5).image)
   })
 
   it('10 silver: three sizes of heaps with their worth in steps of 25, every round pays four hundred with at least one way and not by laying everything, round 1 shows the sum, round 2 not', () => {

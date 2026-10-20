@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { BalanceGame, BirdsGame, CluesGame, ConstellationGame, SilverGame } from '@/types/adventure'
+import type { BalanceGame, BirdsGame, CluesGame, ConstellationGame, RingsGame, SilverGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -767,5 +767,171 @@ describe('Wer kniet wo? (clues)', () => {
     expect(w.findAll('.cl-text')[0]!.text()).toContain('kneels at the well.')
     expect(w.find('[data-drop="camel-0"]').attributes('aria-label')).toBe('Camel at place 1')
     expect(w.find('.cl-tip').text()).toBe('Tip')
+  })
+})
+
+// ---------------------------------------------------------------- the light through the rings
+describe('Das Licht durch die Ringe (rings)', () => {
+  const game: RingsGame = {
+    background: 'images/x/night.webp',
+    rings: ['images/x/r1.webp', 'images/x/r2.webp', 'images/x/r3.webp', 'images/x/r4.webp'],
+    hub: 'images/x/hub.webp',
+    beam: 'images/x/beam.webp',
+    rounds: [
+      { hint: 'Runde eins.', start: [3, 7, 5], couple: [] },
+      { hint: 'Runde zwei.', start: [4, 9, 2, 11], couple: [[0, 1], [2, 3]] }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, width: 400, height: 400, right: 400, bottom: 400, x: 0, y: 0, toJSON: () => ({}) })
+    const { default: Rings } = await import('@/components/molecules/games/GameRings.vue')
+    const w = mount(Rings, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  /** Press the arrow of a ring: 0 = left, 1 = right. */
+  const arrow = async (w: W, ring: number, side: 0 | 1, times = 1) => {
+    for (let i = 0; i < times; i++) {
+      await w.findAll('.rn-row')[ring]!.findAll('.rn-btn')[side]!.trigger('click')
+      await flushPromises()
+    }
+  }
+  const degrees = (w: W, ring: number) => Number(/rotate\((-?[\d.]+)deg\)/.exec(w.findAll('.rn-ring')[ring]!.attributes('style') ?? '')![1])
+  const solveOne = async (w: W) => {
+    await arrow(w, 0, 0, 3)
+    await arrow(w, 1, 1, 5)
+    await arrow(w, 2, 0, 5)
+  }
+  const solveTwo = async (w: W) => {
+    await arrow(w, 0, 0, 4)
+    await arrow(w, 1, 0, 1)
+    await arrow(w, 2, 0, 2)
+    await arrow(w, 3, 0, 1)
+  }
+
+  it('the goal is every ring of both rounds; three rings are turned, none stands right, no light yet', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(7)
+    expect(w.find('.rn-round').text()).toContain('Runde 1 von 2')
+    expect(w.findAll('.rn-ring')).toHaveLength(3)
+    expect(w.findAll('.rn-ring.right')).toHaveLength(0)
+    expect(w.find('.rn-beam').attributes('style')).toContain('opacity: 0')
+    expect(w.find('.rn-count').text()).toBe('Ringe im Licht: 0 von 3')
+    expect([0, 1, 2].map((i) => degrees(w, i))).toEqual([90, 210, 150])
+  })
+
+  it('the arrows turn a ring by a twelfth, either way, round the whole circle', async () => {
+    const w = await open()
+    await arrow(w, 0, 1)
+    expect(degrees(w, 0)).toBe(120)
+    await arrow(w, 0, 0, 2)
+    expect(degrees(w, 0)).toBe(60)
+    await arrow(w, 0, 0, 5)
+    expect(degrees(w, 0)).toBe(270)
+  })
+
+  it('a ring with its gap on top stands right: it glimmers, the beam of light grows, and the point is counted', async () => {
+    const w = await open()
+    await arrow(w, 0, 0, 3)
+    expect(w.findAll('.rn-ring')[0]!.classes()).toContain('right')
+    expect(w.findAll('.rn-ring')[0]!.attributes('aria-label')).toBe('Ring 1, steht richtig')
+    expect(w.find('.rn-beam').attributes('style')).toContain('opacity: 1')
+    expect(w.find('.rn-beam').attributes('style')).toContain('scaleY(0.3333')
+    expect(w.find('.rn-count').text()).toBe('Ringe im Licht: 1 von 3')
+    expect(useTaskProgress().parts.value).toBe(1)
+    // turning it away again takes no point back
+    await arrow(w, 0, 1)
+    expect(useTaskProgress().parts.value).toBe(1)
+  })
+
+  it('the arrow keys turn the ring that has the focus', async () => {
+    const w = await open()
+    await w.findAll('.rn-ring')[1]!.trigger('keydown', { key: 'ArrowRight' })
+    expect(degrees(w, 1)).toBe(240)
+    await w.findAll('.rn-ring')[1]!.trigger('keydown', { key: 'ArrowLeft' })
+    await w.findAll('.rn-ring')[1]!.trigger('keydown', { key: 'ArrowLeft' })
+    expect(degrees(w, 1)).toBe(180)
+  })
+
+  it('a finger turns a ring round the hub in whole twelfths: a third of a turn on is four steps', async () => {
+    const w = await open()
+    const ring = w.findAll('.rn-ring')[0]!.element
+    // the hub is at (200, 200); the finger goes down at the right and then round to the bottom (a quarter turn clockwise = three twelfths)
+    ring.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 380, clientY: 200 }))
+    for (const a of [10, 30, 50, 70, 90]) {
+      const rad = (a * Math.PI) / 180
+      window.dispatchEvent(new MouseEvent('pointermove', { clientX: 200 + 180 * Math.cos(rad), clientY: 200 + 180 * Math.sin(rad) }))
+    }
+    window.dispatchEvent(new MouseEvent('pointerup'))
+    await flushPromises()
+    expect(degrees(w, 0)).toBe(90 + 90)
+    // after the finger is up the ring is not dragged any more
+    window.dispatchEvent(new MouseEvent('pointermove', { clientX: 200, clientY: 20 }))
+    await flushPromises()
+    expect(degrees(w, 0)).toBe(180)
+  })
+
+  it('all rings right: the light shines all the way through; after a while round 2 begins with four rings that are joined', async () => {
+    const w = await open()
+    await solveOne(w)
+    expect(w.find('.rn-beam').attributes('style')).toContain('scaleY(1)')
+    expect(played).toContain('star')
+    expect(useTaskProgress().parts.value).toBe(3)
+    await tick(2100)
+    expect(w.find('.rn-round').text()).toContain('Runde 2 von 2')
+    expect(w.findAll('.rn-ring')).toHaveLength(4)
+    expect(w.findAll('.rn-gear')).toHaveLength(2)
+    expect(w.findAll('.rn-gear')[0]!.text()).toContain('Ring 2')
+  })
+
+  it('in round 2 turning the first ring of a pair turns the second the other way; turning the second does not move the first', async () => {
+    const w = await open()
+    await solveOne(w)
+    await tick(2100)
+    await arrow(w, 0, 1)
+    expect([degrees(w, 0), degrees(w, 1)]).toEqual([150, 240])
+    await arrow(w, 1, 1)
+    expect([degrees(w, 0), degrees(w, 1)]).toEqual([150, 270])
+  })
+
+  it('the tip shows the ring to turn next for three seconds; it counts as a tip; "Start again" puts the rings back', async () => {
+    const w = await open()
+    await w.findAll('.rn-actions button')[0]!.trigger('click')
+    expect(w.findAll('.rn-row.hint')).toHaveLength(1)
+    expect(w.find('.rn-fb').text()).toMatch(/Drehe jetzt Ring \d\./)
+    expect(w.findAll('.rn-actions button')[0]!.attributes('disabled')).toBeDefined()
+    await tick(3100)
+    expect(w.findAll('.rn-row.hint')).toHaveLength(0)
+    await arrow(w, 0, 1, 2)
+    await w.findAll('.rn-actions button')[1]!.trigger('click')
+    expect([0, 1, 2].map((i) => degrees(w, i))).toEqual([90, 210, 150])
+  })
+
+  it('the whole game: the end with three stars; tips and new starts together give the stars (up to one: three, up to three: two, more: one)', async () => {
+    for (const [help, stars] of [[0, 3], [1, 3], [2, 2], [3, 2], [4, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      for (let i = 0; i < help; i++) {
+        await w.findAll('.rn-actions button')[1]!.trigger('click')
+      }
+      await solveOne(w)
+      await tick(2100)
+      await solveTwo(w)
+      await tick(1500)
+      expect(useTaskProgress().parts.value).toBe(7)
+      expect(useTaskProgress().finished.value).toBe(true)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${help} helps`).toEqual([[stars]])
+      w.unmount()
+    }
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.rn-count').text()).toBe('Rings in the light: 0 of 3')
+    expect(w.findAll('.rn-btn')[1]!.attributes('aria-label')).toBe('Turn ring 1 to the right')
+    expect(w.findAll('.rn-actions button')[1]!.text()).toBe('Start again')
   })
 })

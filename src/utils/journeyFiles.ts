@@ -9,7 +9,7 @@ import { MUSIC_FILES, SFX_FILES } from '@/utils/sfxFiles'
  * The version of the downloaded packs: raise it whenever a picture or sound of the adventures is replaced, so that devices that have
  * the old files load them again (the packs are served from the device without asking the net).
  */
-export const PACK_VERSION = 51
+export const PACK_VERSION = 52
 
 /** The painted signs and buttons that every journey uses (everything in `public/images/abenteuer/ui`). */
 export const ADVENTURE_UI_FILES = [
@@ -55,6 +55,7 @@ function pathsIn(value: unknown, out: Set<string>) {
  * server does not have is no failure of the download. Take a folder out of this list when its pictures are delivered.
  */
 export const NOT_PAINTED_YET = [
+  'images/abenteuer/spiele/abraham/ringe/',
   'images/abenteuer/spiele/abraham/hinweise/',
   'images/abenteuer/spiele/abraham/voegel/',
   'images/abenteuer/spiele/abraham/silber/',

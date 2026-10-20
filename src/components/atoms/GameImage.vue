@@ -7,7 +7,7 @@
 import { computed, ref, watch } from 'vue'
 import { prependBaseUrl } from '@/utils/function'
 
-const props = withDefaults(defineProps<{ src: string; label?: string; colour?: string; ratio?: number; round?: boolean }>(), { label: '', colour: '#b9a77a', ratio: 1, round: false })
+const props = withDefaults(defineProps<{ src: string; label?: string; colour?: string; ratio?: number; round?: boolean; notch?: boolean }>(), { label: '', colour: '#b9a77a', ratio: 1, round: false, notch: false })
 const failed = ref(false)
 watch(() => props.src, () => (failed.value = false))
 const testBuild = import.meta.env.DEV || import.meta.env.VITE_LOCAL_TEST_BOOKS === 'true'
@@ -19,6 +19,7 @@ const showLabel = computed(() => testBuild && !!props.label)
     img(v-if="!failed" :src="prependBaseUrl(src)" alt="" draggable="false" @error="failed = true")
     span(v-else class="gi-stand" :class="{ round }" :style="{ background: colour, aspectRatio: String(ratio) }" aria-hidden="true")
       span(v-if="showLabel" class="gi-name") {{ label }}
+      span(v-if="notch" class="gi-notch")
 </template>
 
 <style scoped lang="sass">
@@ -33,6 +34,7 @@ const showLabel = computed(() => testBuild && !!props.label)
     height: auto
 
 .gi-stand
+  position: relative
   display: flex
   align-items: center
   justify-content: center
@@ -44,6 +46,17 @@ const showLabel = computed(() => testBuild && !!props.label)
 
   &.round
     border-radius: 50%
+
+// the gap at the top of a ring, so that a stand-in ring can be seen turning
+.gi-notch
+  position: absolute
+  top: 0
+  left: 50%
+  width: 11%
+  height: 7%
+  transform: translateX(-50%)
+  border-radius: 0 0 8px 8px
+  background: #2f2414
 
 .gi-name
   font-size: 16px

@@ -11,7 +11,7 @@
  * STAND 20.10.2026: alle Bilder der Etappen 1 bis 3, 6, 8 und 9 (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder) und die Messwerte sind eingebaut; Aufnahmen siehe `audio` der Etappen (eine Etappe ohne `audio` hat noch keine).
  * Das Abenteuer ist aber nicht öffentlich: es ist hinter `comingSoon` und dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { BalanceGame, BirdsGame, CluesGame, ConstellationGame, CountGroup, Journey, SilverGame, WaterGame } from '@/types/adventure'
+import type { BalanceGame, BirdsGame, CluesGame, ConstellationGame, CountGroup, Journey, RingsGame, SilverGame, WaterGame } from '@/types/adventure'
 import { ABRAHAM_PATH } from './abrahamPath'
 import { localize } from './localize'
 import { abrahamEn } from './en/abraham.en'
@@ -21,6 +21,24 @@ const G = 'images/abenteuer/spiele/abraham/'
 const REC = 'audio/abenteuer/abraham/'
 /** `true` = die Etappen sind noch nicht spielbar (Gerüst); jetzt sind alle Bilder und Töne eingebaut. */
 const SOON = false
+
+/**
+ * Etappe 5, "Das Licht durch die Ringe": Ringe liegen ineinander um eine Nabe mit goldenem Stern, jeder hat oben eine Lücke, wenn er richtig steht; das Kind dreht sie in Zwölfteln, bis das Licht durch
+ * alle Lücken scheint (Bildauftrag A21; Hintergrund = das Etappenbild 5, von der App abgedunkelt). Runde 1 drei Ringe, jeder allein; Runde 2 vier Ringe, paarweise gekoppelt (`couple`: wer den ersten
+ * dreht, dreht den zweiten gegenläufig mit). Die Startstellungen sind Zwölftel (1 bis 11, nie 0) und lösbar (Test per Breitensuche).
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `ringe/ring-1.webp` 900 × 900, `ring-2.webp` 740, `ring-3.webp` 580, `ring-4.webp` 420 (alle quadratisch, transparent, Lücke oben),
+ * `nabe.webp` 240 × 240, `strahl.webp` 260 × 520 (transparent).
+ */
+const RINGE: RingsGame = {
+  background: `${IMG}etappe-bild-03.webp`,
+  rings: [`${G}ringe/ring-1.webp`, `${G}ringe/ring-2.webp`, `${G}ringe/ring-3.webp`, `${G}ringe/ring-4.webp`],
+  hub: `${G}ringe/nabe.webp`,
+  beam: `${G}ringe/strahl.webp`,
+  rounds: [
+    { hint: 'Drehe jeden Ring, bis seine Lücke oben ist. Dann scheint das Licht hindurch.', start: [3, 7, 5], couple: [] },
+    { hint: 'Diese Ringe sind verbunden: Wer den ersten dreht, dreht den zweiten gegenläufig mit.', start: [4, 9, 2, 11], couple: [[0, 1], [2, 3]] }
+  ]
+}
 
 /**
  * Etappe 4, "Wohin fliegen die Vögel?": Vögel fliegen auf das Wasser in der Wüste zu, ihre gestrichelten Flugbahnen enden in der Luft; das Kind tippt dorthin, wo sie sich treffen (Bildauftrag A20;
@@ -332,7 +350,7 @@ export const abraham: Journey = {
         'Abraham muss lachen, so überrascht ist er. „Kann ein Mann mit hundert Jahren noch Vater werden?“, denkt er, „und Sara ist neunzig!“ Doch Gott sagt: „Ja, Sara wird dir einen Sohn schenken. Den sollst du Isaak nennen, und mit ihm will ich meinen Bund halten.“'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'ringe', hint: 'Drehe die Ringe, bis das Licht hindurchscheint.', rings: RINGE },
       questions: [
         { q: 'Welchen neuen Namen bekommt Abram?', options: ['Abraham', 'Isaak', 'Ismael'], answer: 0 },
         { q: 'Wie alt ist Abram, als Gott ihm den neuen Namen gibt?', options: ['neunundneunzig Jahre', 'fünfundsiebzig Jahre', 'zwanzig Jahre'], answer: 0 }
