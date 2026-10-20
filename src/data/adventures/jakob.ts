@@ -11,7 +11,7 @@
  * Davor: alle Bilder (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder), Messwerte und Vorlese-Aufnahmen (Deutsch und Englisch) sind eingebaut, die Etappen sind spielbar.
  * Das Abenteuer ist aber nicht öffentlich: es ist hinter `comingSoon` und dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { CairnGame, CrankGame, CycleGame, GuessGame, HoldGame, Journey, RingGame, SlideGame } from '@/types/adventure'
+import type { CairnGame, CatchGame, CrankGame, CycleGame, GuessGame, HoldGame, Journey, RingGame, SlideGame } from '@/types/adventure'
 import { JAKOB_PATH } from './jakobPath'
 import { localize } from './localize'
 import { jakobEn } from './en/jakob.en'
@@ -127,6 +127,23 @@ const KREIS: RingGame = {
   rounds: [
     { hint: 'Stelle die vier Söhne rund um den Altar, mit gleichem Abstand.', count: 4, tolerance: 25 },
     { hint: 'Jetzt alle zwölf Söhne. Sie stehen wie die Stunden einer Uhr.', count: 12, tolerance: 14 }
+  ]
+}
+
+/**
+ * Etappe 6, "Kinder zum Zelt rufen": die Kinder der Familie laufen auf der Wiese umher, ein Tippen schickt eines zum Zelt (Bildauftrag J21; Hintergrund = das Etappenbild, unten gesetzt).
+ * Runde 1 vier Kinder, langsam, Runde 2 sieben Kinder, schneller. Wiese `field` und Zelt `tent` (Prozent des Etappenbildes) sind vorläufig geschätzt, bis die Datei `fangen-messung.json`
+ * der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `fangen/kind-1.webp` bis `kind-4.webp`, je 120 × 180, transparent.
+ */
+const FANGEN: CatchGame = {
+  background: '',
+  kids: [1, 2, 3, 4].map((n) => ({ id: `kind-${n}`, image: `${G}fangen/kind-${n}.webp`, w: 7 })),
+  tent: [78, 50],
+  field: { x: 10, y: 58, w: 70, h: 32 },
+  rounds: [
+    { hint: 'Tippe die Kinder an. Jedes läuft zum Zelt.', kids: ['kind-1', 'kind-2', 'kind-3', 'kind-4'], speed: 0.04 },
+    { hint: 'Die Familie wächst. Rufe noch sieben Kinder zum Zelt.', kids: ['kind-1', 'kind-2', 'kind-3', 'kind-4', 'kind-1', 'kind-2', 'kind-3'], speed: 0.07 }
   ]
 }
 
@@ -309,7 +326,7 @@ export const jakob: Journey = {
         'Jakobs Zelt ist nun voller Kinder: elf Söhne und eine Tochter. Und der Jüngste von allen, Josef, ist der Sohn Rahels, die Jakob am meisten liebt.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'fangen', hint: 'Tippe die Kinder an, sie laufen zum Zelt.', catch: FANGEN },
       questions: [
         { q: 'Wie heißt Rahels erster Sohn?', options: ['Josef', 'Ruben', 'Juda'], answer: 0 },
         { q: 'Wem will Lea nach der Geburt von Juda danken?', options: ['Gott', 'Rahel', 'Jakob'], answer: 0 }
@@ -449,7 +466,7 @@ export const jakob: Journey = {
 // the game of a stage lies on the picture of the stage (it follows when the stage picture is replaced)
 for (const s of jakob.stages) {
   const t = s.task
-  for (const g of [t.guess, t.cycle, t.cairn, t.ring]) if (g) g.background = s.image
+  for (const g of [t.guess, t.cycle, t.cairn, t.ring, t.catch]) if (g) g.background = s.image
 }
 
 // the English texts (title, stories, questions, hints, recordings) lie over the German ones; the screens show them when the app is English

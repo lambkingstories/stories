@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { CairnGame, CycleGame, GuessGame, RingGame } from '@/types/adventure'
+import type { CairnGame, CatchGame, CycleGame, GuessGame, RingGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -570,5 +570,131 @@ describe('Zwölferkreis (ring)', () => {
     await w.findAll('.rg-token')[0]!.trigger('keydown', { key: 'Enter' })
     await w.find('.rg-field').trigger('click', spot(0, 0.1))
     expect(w.find('.rg-fb').text()).toContain('light ring')
+  })
+})
+
+// ---------------------------------------------------------------- the children at the tent
+describe('Kinder zum Zelt rufen (catch)', () => {
+  const game: CatchGame = {
+    background: 'images/x/camp.webp',
+    kids: [1, 2].map((n) => ({ id: `kind-${n}`, image: `images/x/kind-${n}.webp`, w: 7 })),
+    tent: [80, 50],
+    field: { x: 10, y: 58, w: 60, h: 32 },
+    rounds: [
+      { hint: 'Runde eins.', kids: ['kind-1', 'kind-2'], speed: 0.04 },
+      { hint: 'Runde zwei.', kids: ['kind-1', 'kind-2', 'kind-1'], speed: 0.07 }
+    ]
+  }
+  // the field is 300 x 200 pixels: a percent of the picture is three pixels (wide) and two pixels (high)
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, width: 300, height: 200, right: 300, bottom: 200, x: 0, y: 0, toJSON: () => ({}) })
+    const { default: Catch } = await import('@/components/molecules/games/GameCatch.vue')
+    const w = mount(Catch, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  /** The places of the children that walk about (feet, percent of the picture). */
+  const feet = (w: W) =>
+    w
+      .findAll('.ct-kid:not(.going)')
+      .map((k) => /left: ([\d.]+)%; top: ([\d.]+)%/.exec(k.attributes('style') ?? ''))
+      .map((m) => ({ x: Number(m![1]), y: Number(m![2]) }))
+  const press = async (w: W, x: number, y: number) => {
+    w.find('.ct-field').element.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: x * 3, clientY: y * 2 }))
+    await flushPromises()
+  }
+  /** Tap the middle of the child (a child is one and a half times as high as wide, 7 percent of the width). */
+  const tapKid = async (w: W, i = 0) => {
+    const f = feet(w)[i]!
+    await press(w, f.x, f.y - 7 * 1.125)
+  }
+
+  it('the goal is every child of both rounds; two children walk on the meadow, the tent counts none, no help button yet', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(5)
+    expect(w.find('.ct-round').text()).toContain('Runde 1 von 2')
+    expect(w.findAll('.ct-kid')).toHaveLength(2)
+    expect(w.find('.ct-tent').text()).toBe('0')
+    expect(w.find('.ct-count').text()).toBe('Kinder am Zelt: 0 von 2')
+    expect(w.find('.ct-all').exists()).toBe(false)
+  })
+
+  it('a tap on a child sends it to the tent: it runs, then the number at the tent grows and the tick sounds', async () => {
+    const w = await open()
+    await tapKid(w, 0)
+    expect(w.findAll('.ct-kid.going')).toHaveLength(1)
+    expect(w.find('.ct-kid.going').attributes('style')).toContain('left: 80%')
+    expect(useTaskProgress().parts.value).toBe(0)
+    await tick(800)
+    expect(w.findAll('.ct-kid')).toHaveLength(1)
+    expect(w.find('.ct-tent').text()).toBe('1')
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(played).toContain('snap')
+  })
+
+  it('a tap into the empty does nothing: no mistake, no sound, nobody runs', async () => {
+    const w = await open()
+    const far = feet(w).map((f) => f.x)
+    // the corner of the picture lies far from the meadow
+    await press(w, 2, 2)
+    expect(w.findAll('.ct-kid.going')).toHaveLength(0)
+    expect(played).toHaveLength(0)
+    expect(feet(w).map((f) => f.x)).toEqual(far)
+  })
+
+  it('the children walk about and stay on the meadow all the time', async () => {
+    const w = await open()
+    const before = feet(w)
+    let moved = false
+    for (let i = 0; i < 12; i++) {
+      await tick(1000)
+      for (const f of feet(w)) {
+        expect(f.x).toBeGreaterThanOrEqual(10)
+        expect(f.x).toBeLessThanOrEqual(70)
+        expect(f.y).toBeGreaterThanOrEqual(58)
+        expect(f.y).toBeLessThanOrEqual(90)
+      }
+      if (feet(w).some((f, k) => Math.hypot(f.x - before[k]!.x, f.y - before[k]!.y) > 1)) moved = true
+    }
+    expect(moved).toBe(true)
+  })
+
+  it('after twenty seconds without a tap "Call all" shows: all children come by themselves, one after the other', async () => {
+    const w = await open()
+    await tick(19000)
+    expect(w.find('.ct-all').exists()).toBe(false)
+    await tick(2000)
+    expect(w.find('.ct-all').exists()).toBe(true)
+    await w.find('.ct-all').trigger('click')
+    await tick(2000)
+    expect(useTaskProgress().parts.value).toBe(2)
+    await tick(1600)
+    expect(w.find('.ct-round').text()).toContain('Runde 2 von 2')
+    expect(w.find('.ct-all').exists()).toBe(false)
+  })
+
+  it('the Enter key calls the next child; round 2 has three children; all of them at the tent: the end with three stars', async () => {
+    const w = await open()
+    await w.find('.ct-field').trigger('keydown', { key: 'Enter' })
+    await w.find('.ct-field').trigger('keydown', { key: 'Enter' })
+    await tick(2300)
+    expect(w.find('.ct-round').text()).toContain('Runde 2 von 2')
+    expect(w.findAll('.ct-kid')).toHaveLength(3)
+    for (let i = 0; i < 3; i++) await w.find('.ct-field').trigger('keydown', { key: 'Enter' })
+    await tick(2200)
+    expect(useTaskProgress().parts.value).toBe(5)
+    expect(useTaskProgress().finished.value).toBe(true)
+    expect(w.text()).toContain('Die Familie wächst')
+    await w.find('.gd button').trigger('click')
+    expect(w.emitted('done')).toEqual([[3]])
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.ct-count').text()).toBe('Children at the tent: 0 of 2')
+    await tick(21000)
+    expect(w.find('.ct-all').text()).toBe('Call everyone')
   })
 })

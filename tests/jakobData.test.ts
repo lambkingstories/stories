@@ -190,6 +190,23 @@ describe('Jakob: every stage has the game that was chosen', () => {
     expect(g.background).toBe(stage(12).image)
   })
 
+  it('6 catch (when built): four children, then seven, the second round is faster, every child exists, meadow and tent lie inside the picture', () => {
+    const g = stage(6).task.catch
+    if (!g) return
+    expect(g.rounds.map((r) => r.kids.length)).toEqual([4, 7])
+    expect(g.rounds[1]!.speed).toBeGreaterThan(g.rounds[0]!.speed)
+    for (const r of g.rounds) {
+      expect(r.speed).toBeGreaterThanOrEqual(0.04)
+      expect(r.speed).toBeLessThanOrEqual(0.09)
+      for (const id of r.kids) expect(g.kids.map((k) => k.id)).toContain(id)
+    }
+    for (const k of g.kids) expect(k.w >= 6 && k.w <= 8, k.id).toBe(true)
+    expect(g.field.x + g.field.w).toBeLessThanOrEqual(100)
+    expect(g.field.y + g.field.h).toBeLessThanOrEqual(100)
+    expect(g.tent[0] >= 0 && g.tent[0] <= 100 && g.tent[1] >= 0 && g.tent[1] <= 100).toBe(true)
+    expect(g.background).toBe(stage(6).image)
+  })
+
   it('7 guessing the herds (when built): round 1 compares herds that are clearly different, round 2 asks for the range that contains the number; the animals exist and stand in the meadow', () => {
     const g = stage(7).task.guess
     if (!g) return

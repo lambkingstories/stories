@@ -103,7 +103,7 @@ export const jakobEn: TextOverlay<Journey> = {
         'Rachel waits and prays. At last God remembers her, and she has a son. “His name shall be Joseph,” she says, “which means: May he add. God has taken my shame away from me, and I ask him for one more son.”',
         'Jacob’s tent is now full of children: eleven sons and one daughter. And the youngest of all, Joseph, is the son of Rachel, whom Jacob loves the most.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Tap the children, they run to the tent.', catch: { rounds: [{ hint: 'Tap the children. Each one runs to the tent.' }, { hint: 'The family grows. Call seven more children to the tent.' }] } },
       questions: [
         { q: 'What is Rachel’s first son called?', options: ['Joseph', 'Reuben', 'Judah'] },
         { q: 'Whom does Leah want to thank after Judah is born?', options: ['God', 'Rachel', 'Jacob'] }
