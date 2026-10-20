@@ -197,23 +197,23 @@ const src = (p: string) => prependBaseUrl(p)
   flex-direction: column
   gap: 10px
 
+// the painted board is a light wood with its own rim and a see-through margin: the picture is stretched over the whole box and the text on it is dark
 .vs-board
-  padding: 16px 14px
-  border-radius: 12px
-  background-color: #c9995a
-  background-size: cover
+  padding: 26px 30px
+  background-color: transparent
+  background-size: 100% 100%
+  background-repeat: no-repeat
   background-position: center
-  border: 3px solid #7a5224
-  box-shadow: 0 4px 10px rgba(60, 40, 10, 0.5)
+  filter: drop-shadow(0 4px 6px rgba(60, 40, 10, 0.45))
 
 .vs-text
   margin: 0
-  color: #fff7e2
+  color: #3a2410
   font-family: 'Fraunces', serif
   font-weight: 700
   font-size: 1.15rem
   line-height: 2.1
-  text-shadow: 0 1px 2px rgba(40, 20, 0, 0.7)
+  text-shadow: 0 1px 0 rgba(255, 244, 214, 0.55)
 
 .vs-gap
   position: relative
@@ -223,9 +223,9 @@ const src = (p: string) => prependBaseUrl(p)
   margin: 0 4px
   padding: 0 12px
   vertical-align: middle
-  border: 2px dashed #fff7e2
+  border: 2px dashed #6b4a1e
   border-radius: 12px
-  background: rgba(255, 247, 226, 0.22)
+  background: rgba(255, 252, 235, 0.55)
   color: #2c4a1f
   font: inherit
   font-weight: 800
