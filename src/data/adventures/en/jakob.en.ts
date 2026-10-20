@@ -119,7 +119,7 @@ export const jakobEn: TextOverlay<Journey> = {
         'Laban’s sons grumble that Jacob has taken everything from their father, and Laban’s face is no longer as friendly as before. Then God says to Jacob, “Go back to the land of your fathers, to your family. I will be with you.”',
         'Jacob calls Rachel and Leah out into the field and tells them how often their father has changed his wages and how God has kept him safe all the same. “We will go with you,” both say. “Do what God has told you.”'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Compare the herds and guess how many animals there are.', guess: { rounds: [{ hint: 'Which herd is bigger? Tap it.' }, { hint: 'About how many animals are there? Choose what fits best.' }] } },
       questions: [
         { q: 'What does Jacob want to do after Joseph is born?', options: ['return to his homeland', 'build a new tent', 'stay with Laban'] },
         { q: 'What does God say to Jacob?', options: ['Go back to the land of your fathers.', 'Stay with Laban.', 'Build a city.'] }

@@ -11,7 +11,7 @@
  * Davor: alle Bilder (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder), Messwerte und Vorlese-Aufnahmen (Deutsch und Englisch) sind eingebaut, die Etappen sind spielbar.
  * Das Abenteuer ist aber nicht öffentlich: es ist hinter `comingSoon` und dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { CrankGame, HoldGame, Journey, SlideGame } from '@/types/adventure'
+import type { CrankGame, GuessGame, HoldGame, Journey, SlideGame } from '@/types/adventure'
 import { JAKOB_PATH } from './jakobPath'
 import { localize } from './localize'
 import { jakobEn } from './en/jakob.en'
@@ -70,6 +70,41 @@ const HALTEN: HoldGame = {
   rounds: [
     { hint: 'Lege den Finger auf das Licht und halte es.', seconds: 10 },
     { hint: 'Jetzt wandert das Licht am Ufer: geh mit.', seconds: 15, path: [[22, 89], [29, 92], [36, 94], [43, 95], [50, 95], [57, 95], [64, 94], [71, 93]] }
+  ]
+}
+
+/**
+ * Etappe 7, "Herden schätzen": zwei Herden auf der weiten Weide (Hintergrund = das Etappenbild der Etappe, unten gesetzt), Schaf, Ziege und Kamel aus Noah (Kopien unter `schaetzen/`, kein Bild
+ * neu zu malen). Runde 1 vergleicht (welche Herde ist größer), Runde 2 schätzt (aus drei Bereichen); die Tiere stehen nach festem `seed` (immer gleich). Die Weide `region` ist PLATZHALTER,
+ * bis die Messdatei des Etappenbildes da ist.
+ */
+const SCHAETZEN: GuessGame = {
+  background: '',
+  animals: [
+    { id: 'schaf', image: `${G}schaetzen/schaf.webp`, w: 6 },
+    { id: 'ziege', image: `${G}schaetzen/ziege.webp`, w: 6 },
+    { id: 'kamel', image: `${G}schaetzen/kamel.webp`, w: 8 }
+  ],
+  region: { x: 8, y: 52, w: 84, h: 40 },
+  rounds: [
+    {
+      hint: 'Welche Herde ist größer? Tippe auf sie.',
+      mode: 'compare',
+      tasks: [
+        { a: { animal: 'schaf', count: 12 }, b: { animal: 'ziege', count: 30 }, seed: 1 },
+        { a: { animal: 'ziege', count: 25 }, b: { animal: 'schaf', count: 14 }, seed: 2 },
+        { a: { animal: 'schaf', count: 40 }, b: { animal: 'kamel', count: 18 }, seed: 3 }
+      ]
+    },
+    {
+      hint: 'Wie viele Tiere sind es etwa? Wähle, was am besten passt.',
+      mode: 'range',
+      tasks: [
+        { a: { animal: 'schaf', count: 11 }, ranges: [[5, 15], [20, 40], [50, 70]], seed: 4 },
+        { a: { animal: 'ziege', count: 58 }, ranges: [[5, 15], [20, 40], [50, 70]], seed: 5 },
+        { a: { animal: 'schaf', count: 28 }, ranges: [[5, 15], [20, 40], [50, 70]], seed: 6 }
+      ]
+    }
   ]
 }
 
@@ -237,7 +272,7 @@ export const jakob: Journey = {
         'Jakob ruft Rahel und Lea aufs Feld und erzählt ihnen, wie oft ihr Vater seinen Lohn geändert hat und wie Gott ihn trotzdem bewahrt hat. „Wir gehen mit dir“, sagen beide. „Tu, was Gott dir gesagt hat.“'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'schaetzen', hint: 'Vergleiche die Herden und schätze, wie viele Tiere es sind.', guess: SCHAETZEN },
       questions: [
         { q: 'Was will Jakob nach der Geburt von Josef tun?', options: ['in seine Heimat zurückkehren', 'ein neues Zelt bauen', 'bei Laban bleiben'], answer: 0 },
         { q: 'Was sagt Gott zu Jakob?', options: ['Zieh zurück in das Land deiner Väter.', 'Bleibe bei Laban.', 'Baue eine Stadt.'], answer: 0 }
@@ -352,6 +387,12 @@ export const jakob: Journey = {
     { q: 'Was tut Esau, als er Jakob wiedersieht?', options: ['Er läuft ihm entgegen und umarmt ihn.', 'Er läuft weg.', 'Er schickt ihn fort.'], answer: 0 }
   ]
 
+}
+
+// the game of a stage lies on the picture of the stage (it follows when the stage picture is replaced)
+for (const s of jakob.stages) {
+  const t = s.task
+  for (const g of [t.guess]) if (g) g.background = s.image
 }
 
 // the English texts (title, stories, questions, hints, recordings) lie over the German ones; the screens show them when the app is English

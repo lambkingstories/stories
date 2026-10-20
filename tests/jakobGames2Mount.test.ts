@@ -1,0 +1,176 @@
+/**
+ * The six new games of "Jakob" (stages 5 to 9 and 12), each mounted with sample data and used: right and wrong moves, the rounds (at most two), the goal for the stars of
+ * "Go on" (`useTaskProgress`), the end with its stars, German and English words, and the stand-in for pictures that are not painted yet.
+ */
+import { flushPromises, mount } from '@vue/test-utils'
+import { createI18n } from 'vue-i18n'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import messages from '@/i18n/app'
+import useTaskProgress from '@/use/useTaskProgress'
+import type { GuessGame } from '@/types/adventure'
+
+const played: string[] = []
+vi.mock('@/use/useSfx', () => ({
+  default: () => ({
+    play: (n: string) => {
+      played.push(n)
+      return Promise.resolve()
+    },
+    preload: vi.fn(),
+    stopAll: vi.fn(),
+    lengthOf: () => 0,
+    enabled: { value: true },
+    setEnabled: vi.fn(),
+    toggle: vi.fn(),
+    playedSince: () => true
+  })
+}))
+
+const mk = (locale: 'de' | 'en') => createI18n({ legacy: false, locale, fallbackLocale: 'de', messages: messages as never, missingWarn: false, fallbackWarn: false })
+const opts = (locale: 'de' | 'en' = 'de') => ({ global: { plugins: [mk(locale)], stubs: { RouterLink: true } }, attachTo: document.body })
+
+let warnings: string[] = []
+beforeEach(() => {
+  played.length = 0
+  warnings = []
+  useTaskProgress().reset()
+  vi.useFakeTimers()
+  vi.spyOn(console, 'warn').mockImplementation((...a) => {
+    warnings.push(a.map(String).join(' '))
+  })
+  vi.spyOn(console, 'error').mockImplementation((...a) => {
+    warnings.push('ERROR ' + a.map(String).join(' '))
+  })
+})
+afterEach(() => {
+  vi.useRealTimers()
+  vi.restoreAllMocks()
+  document.body.innerHTML = ''
+})
+const problems = () => warnings.filter((w) => /not defined on instance|is not a function|Unhandled error|ERROR/.test(w))
+const tick = async (ms: number) => {
+  await vi.advanceTimersByTimeAsync(ms)
+  await flushPromises()
+}
+
+// ---------------------------------------------------------------- guessing the herds
+describe('Herden schätzen (guess)', () => {
+  const game: GuessGame = {
+    background: 'images/x/pasture.webp',
+    animals: [
+      { id: 'schaf', image: 'images/x/schaf.webp', w: 6 },
+      { id: 'ziege', image: 'images/x/ziege.webp', w: 6 }
+    ],
+    region: { x: 8, y: 52, w: 84, h: 40 },
+    rounds: [
+      {
+        hint: 'Runde eins: Welche Herde ist größer?',
+        mode: 'compare',
+        tasks: [
+          { a: { animal: 'schaf', count: 12 }, b: { animal: 'ziege', count: 30 }, seed: 1 },
+          { a: { animal: 'ziege', count: 25 }, b: { animal: 'schaf', count: 14 }, seed: 2 }
+        ]
+      },
+      {
+        hint: 'Runde zwei: Wie viele etwa?',
+        mode: 'range',
+        tasks: [{ a: { animal: 'schaf', count: 28 }, ranges: [[5, 15], [20, 40], [50, 70]], seed: 3 }]
+      }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Guess } = await import('@/components/molecules/games/GameGuess.vue')
+    const w = mount(Guess, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  const btn = (w: W, text: string) => w.findAll('.gs-choices button').find((b) => b.text() === text)!
+  const animals = (w: W) => w.findAll('.gs-animal').length
+
+  it('the goal is every task of both rounds; both herds stand on the meadow with as many animals as the data says', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(3)
+    expect(w.find('.gs-round').text()).toContain('Runde 1 von 2')
+    expect(animals(w)).toBe(12 + 30)
+    expect(w.find('.gs-hint').text()).toContain('Welche Herde ist größer')
+    expect(w.find('.gs-count').text()).toBe('Aufgaben: 0 von 3')
+    // the picture file is not there: a stand-in takes its place (no error, no empty hole)
+    expect(w.find('.gi').exists()).toBe(true)
+  })
+
+  it('the bigger herd is right (a tick, a part of the task) and the next task follows', async () => {
+    const w = await open()
+    await btn(w, 'Die rechte Herde').trigger('click')
+    expect(played).toContain('snap')
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(w.find('.gs-fb').text()).toBe('Richtig!')
+    expect(w.find('.gs-mark').exists()).toBe(true)
+    await tick(1100)
+    expect(animals(w)).toBe(25 + 14)
+    expect(w.find('.gs-count').text()).toBe('Aufgaben: 1 von 3')
+  })
+
+  it('the smaller herd is a cross and a mistake; the child looks again and may answer once more; nothing is lost', async () => {
+    const w = await open()
+    await btn(w, 'Die linke Herde').trigger('click')
+    expect(played).toContain('wrong')
+    expect(w.find('.gs-fb').text()).toBe('Schau noch einmal genau hin.')
+    expect(w.find('.gs-choices .wrong').exists()).toBe(true)
+    expect(useTaskProgress().parts.value).toBe(0)
+    await tick(1000)
+    expect(w.find('.gs-choices .wrong').exists()).toBe(false)
+    await btn(w, 'Die rechte Herde').trigger('click')
+    expect(useTaskProgress().parts.value).toBe(1)
+  })
+
+  it('round 2 asks for the range: three choices ("about ten, about thirty, about sixty"), one herd; the range with the number is right', async () => {
+    const w = await open()
+    await btn(w, 'Die rechte Herde').trigger('click')
+    await tick(1100)
+    await btn(w, 'Die linke Herde').trigger('click')
+    await tick(1100 + 1400)
+    expect(w.find('.gs-round').text()).toContain('Runde 2 von 2')
+    expect(animals(w)).toBe(28)
+    expect(w.findAll('.gs-choices button').map((b) => b.text())).toEqual(['etwa 10', 'etwa 30', 'etwa 60'])
+    await btn(w, 'etwa 60').trigger('click')
+    expect(played).toContain('wrong')
+    await tick(1000)
+    await btn(w, 'etwa 30').trigger('click')
+    await tick(1100)
+    expect(useTaskProgress().parts.value).toBe(3)
+    expect(useTaskProgress().finished.value).toBe(true)
+    expect(w.text()).toContain('Du hast die Herden gut geschätzt!')
+    await w.find('.gd button').trigger('click')
+    expect(w.emitted('done')).toEqual([[3]])
+    expect(problems()).toEqual([])
+  })
+
+  it('stars follow the mistakes: one mistake three stars, two or three two stars, four one star', async () => {
+    for (const [mistakes, stars] of [[0, 3], [1, 3], [2, 2], [3, 2], [4, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      for (let i = 0; i < mistakes; i++) {
+        await btn(w, 'Die linke Herde').trigger('click')
+        await tick(1000)
+      }
+      await btn(w, 'Die rechte Herde').trigger('click')
+      await tick(1100)
+      await btn(w, 'Die linke Herde').trigger('click')
+      await tick(1100 + 1400)
+      await btn(w, 'etwa 30').trigger('click')
+      await tick(1100)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${mistakes} mistakes`).toEqual([[stars]])
+      w.unmount()
+    }
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.gs-count').text()).toBe('Tasks: 0 of 3')
+    expect(w.findAll('.gs-choices button').map((b) => b.text())).toEqual(['The left herd', 'The right herd'])
+    await btn(w, 'The left herd').trigger('click')
+    expect(w.find('.gs-fb').text()).toBe('Look again, closely.')
+  })
+})

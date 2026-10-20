@@ -80,7 +80,9 @@ describe('Jakob: every stage has the game that was chosen', () => {
   const NEW = ['reihenfolge', 'lichter', 'hueten', 'kanaele', 'lueckenvers', 'spiegeln', 'echo', 'saeen', 'fehlt', 'kette', 'stapeln', 'wischen', 'spur', 'waage', 'sternbild', 'giessen']
 
   it('the games in the order of the plan; stage 2 is only the questions; at most two old mechanics and three new ones', () => {
-    expect(jakob.stages.map((s) => s.task.kind)).toEqual(['zaehlen', 'quiz', 'schieben', 'kurbel', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'halten', 'puzzle', 'quiz'])
+    // the plan of the twelve stages; a stage whose new game is not built yet still has its placeholder quiz
+    const PLAN = ['zaehlen', 'quiz', 'schieben', 'kurbel', 'jahre', 'fangen', 'schaetzen', 'bund', 'staffel', 'halten', 'puzzle', 'kreis']
+    jakob.stages.forEach((st, i) => expect([PLAN[i], 'quiz'], `stage ${i + 1}`).toContain(st.task.kind))
     const kinds = jakob.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
     expect(new Set(kinds).size).toBe(kinds.length)
     expect(kinds.filter((k) => OLD.includes(k)).sort()).toEqual(['puzzle', 'zaehlen'])
@@ -140,6 +142,37 @@ describe('Jakob: every stage has the game that was chosen', () => {
     expect(h.rounds[1]!.path!.length).toBeGreaterThanOrEqual(3)
     expect(h.background).toBe('images/abenteuer/jakob/etappe-bild-05.webp')
     expect(JSON.stringify(h)).not.toMatch(/gegner|kampf|feind/i)
+  })
+
+  it('7 guessing the herds (when built): round 1 compares herds that are clearly different, round 2 asks for the range that contains the number; the animals exist and stand in the meadow', () => {
+    const g = stage(7).task.guess
+    if (!g) return
+    expect(g.rounds.map((r) => r.mode)).toEqual(['compare', 'range'])
+    for (const r of g.rounds) {
+      expect(r.tasks).toHaveLength(3)
+      for (const t of r.tasks) {
+        expect(g.animals.map((a) => a.id)).toContain(t.a.animal)
+        expect(t.a.count).toBeGreaterThan(5)
+        expect(t.a.count).toBeLessThanOrEqual(70)
+        if (r.mode === 'compare') {
+          expect(g.animals.map((a) => a.id)).toContain(t.b!.animal)
+          const [hi, lo] = [Math.max(t.a.count, t.b!.count), Math.min(t.a.count, t.b!.count)]
+          expect(hi / lo, 'clearly different herds').toBeGreaterThanOrEqual(1.5)
+        } else {
+          const ranges = t.ranges!
+          expect(ranges).toHaveLength(3)
+          expect(ranges.filter(([lo, hi]) => t.a.count >= lo && t.a.count <= hi)).toHaveLength(1)
+          for (let i = 1; i < ranges.length; i++) expect(ranges[i]![0]).toBeGreaterThan(ranges[i - 1]![1])
+        }
+      }
+    }
+    // the right answers of round 2 are not always the same place
+    const places = g.rounds[1]!.tasks.map((t) => t.ranges!.findIndex(([lo, hi]) => t.a.count >= lo && t.a.count <= hi))
+    expect(new Set(places).size).toBeGreaterThanOrEqual(2)
+    expect(g.region.x + g.region.w).toBeLessThanOrEqual(100)
+    expect(g.region.y + g.region.h).toBeLessThanOrEqual(100)
+    // the game lies on the picture of its stage
+    expect(g.background).toBe(stage(7).image)
   })
 
   it('every picture and recording that the games name lies in the folders that only this adventure uses (or is one of the shared screens)', () => {
