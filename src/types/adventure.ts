@@ -1143,7 +1143,6 @@ export interface CueGame {
   front: CueGroup
   horn: string
   decoyImages: Record<string, string>
-  jar: string
   shards: string
   rounds: CueRound[]
 }

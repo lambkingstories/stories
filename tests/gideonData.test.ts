@@ -112,7 +112,7 @@ describe('Gideon: stories and questions', () => {
 
 describe('Gideon: the placeholders until the games and pictures come', () => {
   it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(gideon.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'worfeln', 'wort', 'quiz', 'tau', 'weiche', 'wimmelbild', 'quiz', 'quiz', 'quiz', 'memory'])
+    expect(gideon.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'worfeln', 'wort', 'quiz', 'tau', 'weiche', 'wimmelbild', 'quiz', 'zeichen', 'quiz', 'memory'])
     for (const s of gideon.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
@@ -205,6 +205,24 @@ describe('Gideon: the placeholders until the games and pictures come', () => {
     // the men queue up the path, which must stay inside the picture
     expect(g.fork[1] - 13 * (g.rounds[1]!.queue - 1)).toBeGreaterThan(0)
     expect(g.rounds.reduce((n, r) => n + r.men.length, 0)).toBe(14)
+  })
+
+  it('10 cue: three signals, then three with an owl and a gust that must not be answered; the waiting is a few seconds; the groups stand on both sides, Gideon in the middle; the goal is 6', () => {
+    const g = stage(10).task.cue
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => [r.signals, r.decoys])).toEqual([[3, []], [3, ['owl', 'wind']]])
+    for (const r of g.rounds) {
+      expect(r.waitMs[0]).toBeGreaterThanOrEqual(2000)
+      expect(r.waitMs[1]).toBeLessThanOrEqual(5000)
+      expect(r.waitMs[0]).toBeLessThan(r.waitMs[1])
+      for (const d of r.decoys) expect(Object.keys(g.decoyImages)).toContain(d)
+    }
+    expect(g.groups.map((x) => x.id)).toEqual(['links', 'rechts'])
+    expect(g.groups[0]!.x).toBeLessThan(g.leader.x)
+    expect(g.groups[1]!.x).toBeGreaterThan(g.leader.x)
+    // the answers: Gideon first, then the two groups; the signals are as many as the goal says
+    expect(g.rounds.reduce((n, r) => n + r.signals, 0)).toBe(6)
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

@@ -157,7 +157,7 @@ export const gideonEn: TextOverlay<Journey> = {
         'In the middle of the night Gideon and his hundred men come to the edge of the camp. The Midianites have just posted their new guards. Then they blow the trumpets and smash the jars in their hands, and the two other groups do the same. All around the whole camp the torches blaze up in the darkness. The trumpets sound everywhere: “For God and for Gideon!”',
         'The three hundred stay where they are, each at his place around the camp. The Midianites jolt out of their sleep, run about and cry out. For God throws the whole camp into disorder. The army flees.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Wait for the horn and then answer in order.', cue: { rounds: [{ hint: "Wait for the horn. Then tap Gideon's jar first, and after that the group on the left and the group on the right." }, { hint: 'Take care: An owl calls, the wind rustles. Those are no signs. Answer only to the horn.' }] } },
       questions: [
         { q: 'What is inside the clay jars of the men?', options: ['torches', 'bread', 'water'] },
         { q: 'What do the three hundred do while the army flees?', options: ['They stay at their places around the camp.', 'They run into the camp.', 'They sleep in their tents.'] }

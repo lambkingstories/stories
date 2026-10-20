@@ -11,7 +11,7 @@
  * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit allen zwölf Stationen und dem Ziel (PLATZHALTER bis zum eigenen Panorama); Medaille und Geschenk sind ebenfalls die von Josef.
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme. Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { DewGame, FindGame, Journey, MemoryGame, SwitchGame, WinnowGame, WordGame } from '@/types/adventure'
+import type { CueGame, DewGame, FindGame, Journey, MemoryGame, SwitchGame, WinnowGame, WordGame } from '@/types/adventure'
 import { josef } from './josef'
 import { GIDEON_PATH } from './gideonPath'
 import { localize } from './localize'
@@ -131,6 +131,30 @@ const WEICHE: SwitchGame = {
   rounds: [
     { hint: 'Die Männer kommen zur Gabelung. Wer ein Haus zeigt, will heim: stelle die Weiche nach rechts. Wer ein Horn zeigt, bleibt: stelle sie nach links.', men: ['home', 'stay', 'stay', 'home', 'home', 'stay'], queue: 1 },
     { hint: 'Jetzt kommen mehr Männer, und die Sprechblase verschwindet bald. Tippe den Mann an, dann ist sie wieder da.', men: ['stay', 'home', 'home', 'stay', 'home', 'stay', 'stay', 'home'], hideBubbleMs: 2000, queue: 2 }
+  ]
+}
+
+/**
+ * Etappe 10, "Auf Gideons Zeichen": das Kind wartet auf das Horn und antwortet dann zuerst mit Gideons Krug, danach mit den Gruppen links und rechts (Bildauftrag G16; eigener Hintergrund `zeichen/tal-nacht.webp`).
+ * Das Horn leuchtet auch (für Kinder ohne Ton). Runde 1 drei Zeichen; Runde 2 drei Zeichen und zwei falsche Zeichen (Eule, Windstoß), die nicht beantwortet werden dürfen. Die Gruppe `front` steht nur
+ * um Gideon herum. Lagen (Prozent des Bildes) sind vorläufig geschätzt, bis die Datei `zeichen-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `zeichen/tal-nacht.webp` 1200 × 900, `gruppe-links.webp`, `gruppe-rechts.webp`, `gruppe-vorn.webp` je 260 × 260, `gideon-krug.webp` 200 × 260,
+ * `horn.webp` 200 × 200, `eule.webp`, `wind.webp` je 140 × 140, `scherben.webp` 180 × 120 (alle außer dem Tal transparent).
+ */
+const ZEICHEN: CueGame = {
+  background: `${G}zeichen/tal-nacht.webp`,
+  groups: [
+    { id: 'links', image: `${G}zeichen/gruppe-links.webp`, x: 18, y: 80, jars: 3 },
+    { id: 'rechts', image: `${G}zeichen/gruppe-rechts.webp`, x: 82, y: 80, jars: 3 }
+  ],
+  leader: { id: 'gideon', image: `${G}zeichen/gideon-krug.webp`, x: 50, y: 74, jars: 1 },
+  front: { id: 'vorn', image: `${G}zeichen/gruppe-vorn.webp`, x: 50, y: 96, jars: 3 },
+  horn: `${G}zeichen/horn.webp`,
+  decoyImages: { owl: `${G}zeichen/eule.webp`, wind: `${G}zeichen/wind.webp` },
+  shards: `${G}zeichen/scherben.webp`,
+  rounds: [
+    { hint: 'Warte auf das Horn. Dann tippe zuerst Gideons Krug, danach die Gruppe links und die Gruppe rechts.', signals: 3, decoys: [], waitMs: [2000, 5000] },
+    { hint: 'Gib acht: Eine Eule ruft, der Wind rauscht. Das sind keine Zeichen. Antworte nur auf das Horn.', signals: 3, decoys: ['owl', 'wind'], waitMs: [2500, 5000] }
   ]
 }
 
@@ -329,7 +353,7 @@ export const gideon: Journey = {
         'Die dreihundert bleiben, jeder an seinem Platz um das Lager herum, stehen. Die Midianiter schrecken aus dem Schlaf, laufen durcheinander und schreien. Denn Gott bringt das ganze Lager in Unordnung. Das Heer flieht.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Auf Gideons Zeichen (zeichen, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'zeichen', hint: 'Warte auf das Horn und antworte dann der Reihe nach.', cue: ZEICHEN },
       questions: [
         { q: 'Was steckt in den Tonkrügen der Männer?', options: ['Fackeln', 'Brot', 'Wasser'], answer: 0 },
         { q: 'Was tun die dreihundert, während das Heer flieht?', options: ['Sie bleiben an ihrem Platz um das Lager.', 'Sie laufen ins Lager hinein.', 'Sie schlafen im Zelt.'], answer: 0 }

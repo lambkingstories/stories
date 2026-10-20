@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { DewGame, SwitchGame, WinnowGame, WordGame } from '@/types/adventure'
+import type { CueGame, DewGame, SwitchGame, WinnowGame, WordGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -634,5 +634,169 @@ describe('Wer geht heim? (switch)', () => {
     expect(w.find('.sw-count').text()).toBe('Let through: 0 of 3')
     expect(w.findAll('.sw-lever')[1]!.text()).toBe('Home (right)')
     expect(w.find('.sw-man').attributes('aria-label')).toContain('house')
+  })
+})
+
+// ---------------------------------------------------------------- on Gideon's sign
+describe('Auf Gideons Zeichen (cue)', () => {
+  const group = (id: string, x: number) => ({ id, image: `images/x/${id}.webp`, x, y: 80, jars: 3 })
+  const game: CueGame = {
+    background: 'images/x/valley.webp',
+    groups: [group('links', 18), group('rechts', 82)],
+    leader: { id: 'gideon', image: 'images/x/gideon.webp', x: 50, y: 74, jars: 1 },
+    front: group('vorn', 50),
+    horn: 'images/x/horn.webp',
+    decoyImages: { owl: 'images/x/owl.webp', wind: 'images/x/wind.webp' },
+    shards: 'images/x/shards.webp',
+    rounds: [
+      { hint: 'Runde eins.', signals: 2, decoys: [], waitMs: [2000, 3000] },
+      { hint: 'Runde zwei.', signals: 2, decoys: ['owl'], waitMs: [2000, 3000] }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Cue } = await import('@/components/molecules/games/GameCue.vue')
+    const w = mount(Cue, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  const lit = (w: W) => w.find('.cu-horn').classes().includes('lit')
+  /** Wait (a tenth of a second at a time) until the horn sounds. */
+  const waitHorn = async (w: W) => {
+    for (let i = 0; i < 80 && !lit(w); i++) await tick(100)
+  }
+  const tapCue = async (w: W, id: string) => {
+    await w.find(`[data-cue="${id}"]`).trigger('click')
+    await flushPromises()
+  }
+  /** One whole signal answered right: wait for the horn, Gideon, then the groups. */
+  const signal = async (w: W) => {
+    await waitHorn(w)
+    await tapCue(w, 'leader')
+    await tapCue(w, 'rechts')
+    await tapCue(w, 'links')
+  }
+
+  it('the goal is every signal of both rounds; the horn is dark, Gideon and the two groups stand ready, the men round Gideon only stand there', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(4)
+    expect(w.find('.cu-round').text()).toContain('Runde 1 von 2')
+    expect(lit(w)).toBe(false)
+    expect(w.findAll('[data-cue]')).toHaveLength(3)
+    expect(w.find('.cu-front').exists()).toBe(true)
+    expect(w.find('.cu-count').text()).toBe('Zeichen beantwortet: 0 von 2')
+  })
+
+  it('a tap while the child should wait is a "pst": the jars wobble, a cross, a dull sound, a mistake; the waiting begins anew', async () => {
+    const w = await open()
+    await tick(1500)
+    await tapCue(w, 'links')
+    expect(played).toContain('wrong')
+    expect(w.find('.cu-field').classes()).toContain('pst')
+    expect(w.find('.cu-fb').text()).toContain('Pst')
+    expect(w.find('.cu-mark').exists()).toBe(true)
+    // the wait began again: 1.9 seconds later the horn is still dark (the first wait would have ended)
+    await tick(1900)
+    expect(lit(w)).toBe(false)
+    await waitHorn(w)
+    expect(lit(w)).toBe(true)
+  })
+
+  it('a tap on the empty valley while waiting is too early as well', async () => {
+    const w = await open()
+    await w.find('.cu-field').trigger('click')
+    expect(played).toContain('wrong')
+  })
+
+  it('the horn sounds after the waiting time (between two and three seconds here), it shines and sounds', async () => {
+    const w = await open()
+    await tick(1900)
+    expect(lit(w)).toBe(false)
+    await tick(1200)
+    expect(lit(w)).toBe(true)
+    expect(played).toContain('fanfare')
+    expect(w.find('.cu-horn').attributes('aria-label')).toContain('leuchtet')
+  })
+
+  it('after the horn: a group before Gideon is only a friendly hint; Gideon first, then the groups in any order; the last one closes the ring', async () => {
+    const w = await open()
+    await waitHorn(w)
+    await tapCue(w, 'links')
+    expect(w.find('.cu-fb').text()).toContain('Erst Gideons Krug')
+    expect(played).not.toContain('wrong')
+    await tapCue(w, 'leader')
+    expect(w.find('.cu-leader').classes()).toContain('broken')
+    expect(w.findAll('.cu-shards')).toHaveLength(1)
+    await tapCue(w, 'rechts')
+    expect(w.find('.cu-field').classes()).not.toContain('shine')
+    await tapCue(w, 'links')
+    expect(w.find('.cu-field').classes()).toContain('shine')
+    expect(played).toContain('star')
+    expect(w.find('.cu-fb').text()).toContain('Ring ist geschlossen')
+    expect(useTaskProgress().parts.value).toBe(1)
+  })
+
+  it('a tap on the empty valley after the horn does nothing; after the ring the next signal begins with a dark horn', async () => {
+    const w = await open()
+    await waitHorn(w)
+    await w.find('.cu-field').trigger('click')
+    expect(played).not.toContain('wrong')
+    await tapCue(w, 'leader')
+    await tapCue(w, 'links')
+    await tapCue(w, 'rechts')
+    await tick(1800)
+    expect(lit(w)).toBe(false)
+    expect(w.findAll('.cu-shards')).toHaveLength(0)
+    expect(w.find('.cu-count').text()).toBe('Zeichen beantwortet: 1 von 2')
+  })
+
+  it('round 2: an owl calls while waiting (another picture and another sound); not answering it is right; the horn comes all the same', async () => {
+    const w = await open()
+    await signal(w)
+    await tick(1800)
+    await signal(w)
+    // the ring shines, then the round ends and the next one begins
+    await tick(3400)
+    expect(w.find('.cu-round').text()).toContain('Runde 2 von 2')
+    played.length = 0
+    let seen = false
+    for (let i = 0; i < 80 && !lit(w); i++) {
+      await tick(100)
+      if (w.find('.cu-decoy').exists()) seen = true
+    }
+    expect(seen).toBe(true)
+    expect(played).toContain('flip')
+    expect(played).not.toContain('wrong')
+    expect(lit(w)).toBe(true)
+  })
+
+  it('the whole game: the end with three stars; the mistakes give the stars (up to two: three, up to five: two, more: one)', async () => {
+    for (const [wrong, stars] of [[0, 3], [2, 3], [3, 2], [5, 2], [6, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      for (let i = 0; i < wrong; i++) await w.find('.cu-field').trigger('click')
+      await signal(w)
+      await tick(1800)
+      await signal(w)
+      await tick(3400)
+      await signal(w)
+      await tick(1800)
+      await signal(w)
+      await tick(1800)
+      expect(useTaskProgress().parts.value).toBe(4)
+      expect(useTaskProgress().finished.value).toBe(true)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${wrong} wrong`).toEqual([[stars]])
+      w.unmount()
+    }
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.cu-count').text()).toBe('Signs answered: 0 of 2')
+    expect(w.find('.cu-horn').attributes('aria-label')).toBe('The horn is dark. Wait.')
+    await w.find('.cu-field').trigger('click')
+    expect(w.find('.cu-fb').text()).toBe('Pst! Not yet. Wait for the horn.')
   })
 })
