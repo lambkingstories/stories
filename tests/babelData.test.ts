@@ -209,8 +209,42 @@ describe('Babel: every stage has its own new game (no game of Josef, Noah or Ada
   })
 })
 
+describe('Babel: die Karte', () => {
+  const m = babel.map
+  // the painted map is 4944 x 821 px (the height of the picture is the unit of the ring and of the lowest fifth)
+  const W = 4944
+  const H = 821
+  it('vier Stücke eines Bildes, jedes unter 1,8 MB; Stationen von links nach rechts, nicht zu tief und nicht zu dicht', () => {
+    expect(m.images).toEqual([1, 2, 3, 4].map((n) => `images/abenteuer/babel/karte-pano-${n}.webp`))
+    for (const f of m.images) expect(statSync(`public/${f}`).size / 1024, f).toBeLessThan(1800)
+    expect(m.widthPx).toBe(W)
+    expect(m.aspect).toBeCloseTo(W / H, 3)
+    expect(m.stages).toHaveLength(6)
+    const spots = [...m.stages, m.exam]
+    for (let i = 0; i < spots.length; i++) {
+      expect(spots[i]!.y, `Station ${i + 1} nicht hinter der Leiste`).toBeLessThanOrEqual(0.65)
+      expect(spots[i]!.d).toBeCloseTo(167 / W, 3)
+      if (i > 0) {
+        expect(spots[i]!.x, `Station ${i + 1} rechts von ${i}`).toBeGreaterThan(spots[i - 1]!.x)
+        // two rings (167 px) do not touch: at least 170 px apart
+        expect(Math.hypot((spots[i]!.x - spots[i - 1]!.x) * W, (spots[i]!.y - spots[i - 1]!.y) * H)).toBeGreaterThanOrEqual(170)
+      }
+    }
+  })
+  it('nichts liegt in den unteren 20 % der Karte; der Perlenweg hat eine Strecke je Etappe (die letzte führt zum Ziel) und alle Perlen liegen im Bild', () => {
+    for (const sp of [...m.stages, m.exam]) expect(sp.y * H, 'Ring-Mitte').toBeLessThanOrEqual(0.65 * H)
+    expect(m.path).toHaveLength(6)
+    for (const seg of m.path) {
+      for (const [x, y] of seg) {
+        expect(y * H, 'Perle').toBeLessThanOrEqual(0.8 * H)
+        expect(x > 0 && x < 1 && y > 0 && y < 1).toBe(true)
+      }
+    }
+  })
+})
+
 describe('Babel: the scaffold', () => {
-  it('the titles and passages of the plan, and "soon" until pictures and recordings are built in: no stage opens, nothing is downloaded, no map and no way yet', () => {
+  it('the titles and passages of the plan, and "soon" until pictures and recordings are built in: no stage opens, no game or recording is downloaded; the painted map and the way are there', () => {
     expect(babel.title).toBe('Der Turm von Babel')
     expect(babel.subtitle).toBe('Eine Stadt und ein Turm')
     expect(babel.stages.map((s) => [s.title, s.ref])).toEqual([
@@ -222,8 +256,8 @@ describe('Babel: the scaffold', () => {
       ['Der Name Babel', '1. Mose 11,9']
     ])
     expect(babel.gift.title).toBe('Der Turm aus Ziegeln')
-    expect(babel.map.images).toEqual([])
-    expect(BABEL_PATH).toEqual([])
+    expect(babel.map.images).toHaveLength(4)
+    expect(BABEL_PATH).toHaveLength(6)
     if (!released) {
       for (const s of babel.stages) expect(s.soon, `stage ${s.id}`).toBe(true)
       for (let i = 0; i < babel.stages.length; i++) expect(isStageOpen(babel, undefined, i), `stage ${i + 1}`).toBe(false)

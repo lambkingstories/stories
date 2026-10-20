@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { josef } from '../src/data/adventures/josef'
 import { noah } from '../src/data/adventures/noah'
 import { adamEva } from '../src/data/adventures/adamEva'
+import { babel } from '../src/data/adventures/babel'
 import type { Journey } from '../src/types/adventure'
 
 /** Rules for the dotted way on the maps (Anton, 19.10.2026): into every medal from the left, out of it on the right, always curved, 10 beads between two medals. */
@@ -10,7 +11,8 @@ const MIN_BEADS = 10
 describe.each([
   ['Josef', josef],
   ['Noah', noah],
-  ['Adam und Eva', adamEva]
+  ['Adam und Eva', adamEva],
+  ['Babel', babel]
 ] as [string, Journey][])('the dotted way of %s', (_name, j) => {
   const m = j.map
   const spots = [...m.stages, m.exam]

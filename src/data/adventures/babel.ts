@@ -142,13 +142,21 @@ export const babel: Journey = {
   medal: `${IMG}medaille.webp`, // Der Turm (Stufenturm aus Lehmziegeln) in der Ebene im Morgenlicht
   // Geschenk-Ausmalbild: der Turm aus Ziegeln mit vielen Bauleuten bei Sonnenaufgang (unvollendet, friedlich)
   gift: { title: 'Der Turm aus Ziegeln', image: `${IMG}geschenk.webp` },
-  // noch keine gemalte Karte (images leer): die Reise zeigt sich als Liste; Stationen und Perlenweg kommen mit dem Panorama
+  // die gemalte Karte (Panorama in vier Stücken, 4944 × 821 px) mit Stationen und Perlenweg aus fertig/messdaten.json und babelPath.ts
   map: {
-    images: [],
+    images: [1, 2, 3, 4].map((n) => `${IMG}karte-pano-${n}.webp`),
     ring: 'images/abenteuer/josef/medaillon-ring.webp',
-    aspect: 1,
-    stages: [],
-    exam: { x: 0, y: 0, d: 0 },
+    aspect: 4944 / 821,
+    widthPx: 4944,
+    stages: [
+      { x: 0.0526, y: 0.6456, d: 0.0339 },
+      { x: 0.1598, y: 0.6456, d: 0.0339 },
+      { x: 0.4025, y: 0.6456, d: 0.0339 },
+      { x: 0.4814, y: 0.6456, d: 0.0339 },
+      { x: 0.801, y: 0.6456, d: 0.0339 },
+      { x: 0.8778, y: 0.6456, d: 0.0339 }
+    ],
+    exam: { x: 0.9749, y: 0.6334, d: 0.0339 },
     path: BABEL_PATH
   },
   stages: [
