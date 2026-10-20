@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild'
 
 export interface AdventureQuestion {
   q: string
@@ -558,6 +558,55 @@ export interface TraceGame {
   rounds: TraceRound[]
 }
 
+/** A pack of the camel game: its picture, its weight (1 light, 2 middle, 3 heavy; the app shows it as dots on the pack) and a few words for screen readers. */
+export interface BalancePack {
+  id: string
+  image: string
+  weight: 1 | 2 | 3
+  label: string
+}
+/** A camel and the packs it has to carry (ids of `BalanceGame.packs`): they can be spread over the two baskets so that both sides weigh the same. */
+export interface BalanceCamel {
+  packs: string[]
+}
+export interface BalanceRound {
+  hint: string
+  camels: BalanceCamel[]
+}
+/**
+ * The camel game "Load the camels": packs are put into the two baskets of a camel; it leans to the heavier side and stands straight when both sides weigh the same
+ * (at most two rounds). `baskets` are the places where the baskets hang on the camel (percent of the picture, the middle of the basket's top edge).
+ */
+export interface BalanceGame {
+  /** The picture behind the camel (the stage picture, 3:2). */
+  background: string
+  camel: string
+  basket: string
+  packs: BalancePack[]
+  /** Where the left and the right basket hang (percent of the picture). */
+  baskets?: [[number, number], [number, number]]
+  rounds: BalanceRound[]
+}
+
+/** A round of the constellation game: the stars of the model as points in the frame (0 to 100 each way), and whether the model stays in view. */
+export interface ConstellationRound {
+  hint: string
+  targets: [number, number][]
+  showAlways: boolean
+}
+/**
+ * The constellation game: a model of stars is looked at and then laid again in an empty frame in the night sky (at most two rounds). `frame` is the empty
+ * frame as a part of the picture (percent of the picture); the model and everything else is drawn by the app.
+ */
+export interface ConstellationGame {
+  /** The picture of the night sky above the tent (the stage picture, 3:2). */
+  background: string
+  /** The picture of a star (a path below `public/`). */
+  star: string
+  frame: { x: number; y: number; w: number; h: number }
+  rounds: ConstellationRound[]
+}
+
 /** The tools and colours a picture of an adventure can ask for. */
 export type PaintToolName = 'pencil' | 'felt' | 'watercolor' | 'graphite' | 'chalk' | 'oil' | 'fill'
 export type PaintColor = 'yellow' | 'blue' | 'brown' | 'green' | 'red' | 'orange' | 'purple' | 'pink'
@@ -625,6 +674,8 @@ export interface StageTask {
   chain?: ChainGame
   stack?: StackGame
   trace?: TraceGame
+  balance?: BalanceGame
+  constellation?: ConstellationGame
 }
 
 export interface AdventureStage {

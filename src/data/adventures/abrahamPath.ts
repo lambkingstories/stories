@@ -1,0 +1,7 @@
+/**
+ * The beads of the dotted way on the map of "Abraham": one list per stretch between two stations (the last one leads to the exam),
+ * [x, y] is the middle of a bead as a share of the whole picture, counted from the top left. EMPTY until the map is painted (the way is measured
+ * on the finished picture). The rules are the same as for Noah, Josef, Adam and Eve and Babel: the way comes into every medal from the LEFT and leaves it
+ * on the RIGHT, it is always a smooth curve, at least 10 beads lie between two medals, and nothing lies in the lowest 20 % of the picture.
+ */
+export const ABRAHAM_PATH: [number, number][][] = []

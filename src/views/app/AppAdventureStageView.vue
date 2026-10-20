@@ -32,6 +32,8 @@ import GameWipe from '@/components/molecules/games/GameWipe.vue'
 import GameChain from '@/components/molecules/games/GameChain.vue'
 import GameStack from '@/components/molecules/games/GameStack.vue'
 import GameTrace from '@/components/molecules/games/GameTrace.vue'
+import GameBalance from '@/components/molecules/games/GameBalance.vue'
+import GameConstellation from '@/components/molecules/games/GameConstellation.vue'
 import GameHerd from '@/components/molecules/games/GameHerd.vue'
 import GamePuzzle from '@/components/molecules/games/GamePuzzle.vue'
 import GameShare from '@/components/molecules/games/GameShare.vue'
@@ -320,7 +322,7 @@ const hasPart = computed(() => partStars.value > 0 && !progress.finished.value)
 
 /** The games have a restart sign: a new key mounts the game afresh (round, mistakes and what was done begin again). */
 const gameKey = ref(0)
-const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace'] as const
+const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation'] as const
 const hasGame = computed(() => hasCountGame.value || GAME_FIELDS.some((f) => !!gameTask.value?.[f]))
 function restartGame() {
   progress.reset()
@@ -400,6 +402,8 @@ const gameKind = computed(() => {
   if (g?.chain) return 'chain'
   if (g?.stack) return 'stack'
   if (g?.trace) return 'trace'
+  if (g?.balance) return 'balance'
+  if (g?.constellation) return 'constellation'
   return undefined
 })
 watch(
@@ -515,6 +519,8 @@ function openGift() {
         GameChain(:key="gameKey" v-else-if="gameTask?.chain" :game="gameTask.chain" @done="taskDone")
         GameStack(:key="gameKey" v-else-if="gameTask?.stack" :game="gameTask.stack" @done="taskDone")
         GameTrace(:key="gameKey" v-else-if="gameTask?.trace" :game="gameTask.trace" @done="taskDone")
+        GameBalance(:key="gameKey" v-else-if="gameTask?.balance" :game="gameTask.balance" @done="taskDone")
+        GameConstellation(:key="gameKey" v-else-if="gameTask?.constellation" :game="gameTask.constellation" @done="taskDone")
         template(v-else-if="isPaint")
           img(:src="img(taskImage)" alt="" class="stage-paint" draggable="false")
           div(class="stage-actions")

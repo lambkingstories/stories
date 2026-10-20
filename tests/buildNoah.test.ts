@@ -7,7 +7,8 @@ import { noah } from '@/data/adventures/noah'
 import { journeyFiles } from '@/utils/journeyFiles'
 import { adamEva } from '@/data/adventures/adamEva'
 import { babel } from '@/data/adventures/babel'
-import { ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, NOAH_ONLY_DIRS, stripAdamFiles, stripBabelFiles, stripNoahFiles } from '../vite.config.noah'
+import { abraham } from '@/data/adventures/abraham'
+import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, NOAH_ONLY_DIRS, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripNoahFiles } from '../vite.config.noah'
 
 const inNoahDir = (f: string) => NOAH_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
 
@@ -150,6 +151,52 @@ describe('a build without Der Turm von Babel ships nothing of it', () => {
       for (const f of babelFiles) expect(existsSync(join(out, f)), f).toBe(false)
       for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
       expect(() => stripBabelFiles(out)).not.toThrow()
+    } finally {
+      rmSync(out, { recursive: true, force: true })
+    }
+  })
+})
+
+const inAbrahamDir = (f: string) => ABRAHAM_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
+
+describe('a build without Abraham ships nothing of it', () => {
+  it('every file that only Abraham uses lies in a folder that the normal build removes (the general music pieces, sounds and screens belong to the app)', () => {
+    const others = new Set([...journeys, noah, adamEva, babel].flatMap((j) => journeyFiles(j)))
+    const app = /^audio\/abenteuer\/(klang|musik)-/
+    const only = journeyFiles(abraham).filter((f) => !others.has(f) && !app.test(f))
+    expect(only.length).toBeGreaterThan(0)
+    const leaks = only.filter((f) => !inAbrahamDir(f))
+    expect(leaks, `files of Abraham outside the folders that are removed: ${leaks.join(', ')}`).toEqual([])
+  })
+
+  it('the folders of Abraham are only the three places that belong to it, none is on the lists of the others, and no folder with "abraham" in its name is missing', () => {
+    expect([...ABRAHAM_ONLY_DIRS].sort()).toEqual(['audio/abenteuer/abraham', 'images/abenteuer/abraham', 'images/abenteuer/spiele/abraham'])
+    for (const d of ABRAHAM_ONLY_DIRS) {
+      expect(NOAH_ONLY_DIRS).not.toContain(d)
+      expect(ADAM_ONLY_DIRS).not.toContain(d)
+      expect(BABEL_ONLY_DIRS).not.toContain(d)
+    }
+    const found: string[] = []
+    for (const base of ['public/images/abenteuer', 'public/audio/abenteuer', 'public/images/abenteuer/spiele']) {
+      for (const n of readdirSync(base)) if (/abraham/i.test(n) && !n.includes('.')) found.push(`${base.replace('public/', '')}/${n}`)
+    }
+    for (const d of found) expect(ABRAHAM_ONLY_DIRS, d).toContain(d)
+    for (const j of [...journeys, noah, adamEva, babel]) for (const f of journeyFiles(j)) expect(inAbrahamDir(f), `${j.id}: ${f}`).toBe(false)
+  })
+
+  it('removing takes the folders of Abraham out of a build and leaves everything else (the other journeys, the sounds)', () => {
+    const out = mkdtempSync(join(tmpdir(), 'lk-build-abraham-'))
+    try {
+      const abrahamFiles = ['audio/abenteuer/abraham/geschichte-01-v1.mp3', 'images/abenteuer/abraham/etappe-bild-01.webp', 'images/abenteuer/spiele/abraham/waage/korb.webp']
+      const keep = ['images/abenteuer/josef/etappe-01.webp', 'audio/abenteuer/noah/geschichte-01.mp3', 'audio/abenteuer/babel/geschichte-01-v1.mp3', 'images/abenteuer/spiele/adam-eva/echo/bluete-1.webp', 'audio/abenteuer/klang-stern.mp3']
+      for (const f of [...abrahamFiles, ...keep]) {
+        mkdirSync(join(out, f, '..'), { recursive: true })
+        writeFileSync(join(out, f), 'x')
+      }
+      stripAbrahamFiles(out)
+      for (const f of abrahamFiles) expect(existsSync(join(out, f)), f).toBe(false)
+      for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
+      expect(() => stripAbrahamFiles(out)).not.toThrow()
     } finally {
       rmSync(out, { recursive: true, force: true })
     }
