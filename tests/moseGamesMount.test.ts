@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { CloudGame, DiffGame, MannaGame, WeaveGame, WordsGame } from '@/types/adventure'
+import type { CloudGame, DiffGame, GlowGame, MannaGame, WeaveGame, WordsGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -747,5 +747,142 @@ describe('Körbchen flechten (weave)', () => {
     expect(w.find('.wv-count').text()).toBe('Rows plaited: 0 of 2')
     await tap(w, 0, 1)
     expect(w.find('.wv-fb').text()).toBe('Here the reed runs behind the stake.')
+  })
+})
+
+// ---------------------------------------------------------------- follow the glow
+describe('Dem Leuchten nachgehen (glow)', () => {
+  const game: GlowGame = {
+    walker: 'images/x/moses.webp',
+    bush: 'images/x/bush.webp',
+    rounds: [
+      { hint: 'Runde eins.', background: 'images/x/slope-1.webp', start: [10, 80], target: [70, 30], threshold: 7 },
+      { hint: 'Runde zwei.', background: 'images/x/slope-2.webp', start: [10, 80], target: [80, 40], threshold: 7, cover: 'images/x/rocks.webp' }
+    ]
+  }
+  // the slope is 400 x 300 pixels: a percent of the width is four pixels, a percent of the height three
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, width: 400, height: 300, right: 400, bottom: 300, x: 0, y: 0, toJSON: () => ({}) })
+    const { default: Glow } = await import('@/components/molecules/games/GameGlow.vue')
+    const w = mount(Glow, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  /** Put the finger down at this place (percent) and take it away again. */
+  const touch = async (w: W, x: number, y: number) => {
+    w.find('.gl-field').element.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: x * 4, clientY: y * 3 }))
+    window.dispatchEvent(new MouseEvent('pointerup'))
+    await flushPromises()
+  }
+  const percent = (w: W) => Number(/(\d+) %/.exec(w.find('.gl-field').attributes('aria-label') ?? '')![1])
+  const walkerX = (w: W) => Number(/left: ([\d.]+)%/.exec(w.find('.gl-walker').attributes('style') ?? '')![1])
+
+  it('the goal is the bush of every round; Moses stands at the start, the glow is faint, the bush is not found', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(2)
+    expect(w.find('.gl-round').text()).toContain('Runde 1 von 2')
+    expect(walkerX(w)).toBe(10)
+    expect(percent(w)).toBeLessThan(25)
+    expect(w.find('.gl-bush').classes()).not.toContain('there')
+    expect(w.find('.gl-cover').exists()).toBe(false)
+    expect(w.find('.gl-count').text()).toBe('Büsche gefunden: 0 von 2')
+  })
+
+  it('the nearer Moses comes the stronger the glow; far away it is faint again', async () => {
+    const w = await open()
+    await touch(w, 30, 60)
+    const a = percent(w)
+    await touch(w, 50, 45)
+    const b = percent(w)
+    await touch(w, 62, 36)
+    const c = percent(w)
+    expect(a).toBeLessThan(b)
+    expect(b).toBeLessThan(c)
+    await touch(w, 5, 95)
+    expect(percent(w)).toBeLessThan(a)
+    expect(played).toHaveLength(0)
+  })
+
+  it('near the bush Moses is there: he stops at the bush, the bush shines and stays green, a bright tone, the point is counted', async () => {
+    const w = await open()
+    await touch(w, 66, 32)
+    expect(w.find('.gl-bush').classes()).toContain('there')
+    expect(played).toContain('found')
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(w.find('.gl-fb').text()).toContain('bleibt grün')
+    expect(walkerX(w)).toBe(70)
+    // he stays: a further touch does not move him
+    await touch(w, 10, 10)
+    expect(walkerX(w)).toBe(70)
+  })
+
+  it('the arrow keys lead Moses a step', async () => {
+    const w = await open()
+    await w.find('.gl').trigger('keydown', { key: 'ArrowRight' })
+    expect(walkerX(w)).toBe(13)
+    await w.find('.gl').trigger('keydown', { key: 'ArrowLeft' })
+    await w.find('.gl').trigger('keydown', { key: 'ArrowLeft' })
+    expect(walkerX(w)).toBe(7)
+  })
+
+  it('round 2: the rocks stand in front of the bush; it is found all the same, and the game ends', async () => {
+    const w = await open()
+    await touch(w, 66, 32)
+    await tick(3000)
+    expect(w.find('.gl-round').text()).toContain('Runde 2 von 2')
+    expect(w.find('.gl-cover').exists()).toBe(true)
+    expect(walkerX(w)).toBe(10)
+    expect(w.find('.gl-bush').classes()).not.toContain('there')
+    await touch(w, 78, 42)
+    await tick(2000)
+    expect(useTaskProgress().parts.value).toBe(2)
+    expect(useTaskProgress().finished.value).toBe(true)
+  })
+
+  it('after twenty seconds without coming nearer the tip shows; it sends sparks towards the bush (a tip)', async () => {
+    const w = await open()
+    expect(w.find('.gl-tip').exists()).toBe(false)
+    await tick(19000)
+    expect(w.find('.gl-tip').exists()).toBe(false)
+    await tick(2000)
+    expect(w.find('.gl-tip').exists()).toBe(true)
+    await w.find('.gl-tip').trigger('click')
+    expect(w.findAll('.gl-spark').filter((s) => !s.attributes('style')?.includes('display: none'))).toHaveLength(3)
+    expect(w.find('.gl-fb').text()).toContain('Funken')
+    // coming nearer takes the tip away again
+    await touch(w, 40, 55)
+    await tick(500)
+    expect(w.find('.gl-tip').exists()).toBe(false)
+  })
+
+  it('the whole game: the end with three stars without a tip, two stars with one tip, one star with more', async () => {
+    for (const [tips, stars] of [[0, 3], [1, 2], [2, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      for (let i = 0; i < tips; i++) {
+        await tick(21000)
+        await w.find('.gl-tip').trigger('click')
+        await tick(4100)
+        await touch(w, 40, 55)
+        await touch(w, 10, 80)
+      }
+      await touch(w, 66, 32)
+      await tick(3000)
+      await touch(w, 78, 42)
+      await tick(2000)
+      expect(useTaskProgress().finished.value).toBe(true)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${tips} tips`).toEqual([[stars]])
+      w.unmount()
+    }
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.gl-count').text()).toBe('Bushes found: 0 of 2')
+    await touch(w, 66, 32)
+    expect(w.find('.gl-fb').text()).toBe('Moses is there: the bush shines and stays green.')
   })
 })

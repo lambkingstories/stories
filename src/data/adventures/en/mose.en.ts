@@ -68,7 +68,7 @@ export const moseEn: TextOverlay<Journey> = {
         '“I have seen how badly my people are doing in Egypt,” says God, “and I have heard their crying. I will rescue them and lead them to a good and spacious land. And I am sending you to Pharaoh, so that you lead my people out of Egypt.”',
         '“Who am I, that I could do this?” asks Moses. “I will be with you,” answers God. And when Moses wants to know what he should call God when he speaks to the people, God says, “I AM WHO I AM. Tell the Israelites: The God of your fathers has sent me to you.”'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Follow the glow.', glow: { rounds: [{ hint: 'Lead Moses over the slope with your finger. Something is glowing there. The closer you come, the brighter it gets.' }, { hint: 'Now rocks hide the light. Only the glow shines through. Follow the glow.' }] } },
       questions: [
         { q: 'What is the mountain of God called, where the bush burns?', options: ['Horeb', 'Carmel', 'Zion'] },
         { q: 'What does Moses have to take off?', options: ['his shoes', 'his cloak', 'his belt'] }

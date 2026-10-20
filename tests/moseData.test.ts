@@ -12,7 +12,7 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
-import { dayOk, diffAt, distance, frontCells, frontCount, noTriple, shuffle, wordsOf } from '@/utils/moseGames'
+import { dayOk, diffAt, distance, frontCells, frontCount, glow, noTriple, shuffle, wordsOf } from '@/utils/moseGames'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => mose.stages[n - 1]!
@@ -120,7 +120,7 @@ describe('Mose: stories and questions', () => {
 
 describe('Mose: the games, and the placeholders until the pictures come', () => {
   it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(mose.stages.map((s) => s.task.kind)).toEqual(['quiz', 'flechten', 'quiz', 'quiz', 'unterschied', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'manna', 'worte', 'quiz', 'wolke'])
+    expect(mose.stages.map((s) => s.task.kind)).toEqual(['quiz', 'flechten', 'quiz', 'leuchten', 'unterschied', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'manna', 'worte', 'quiz', 'wolke'])
     for (const s of mose.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
@@ -217,6 +217,21 @@ describe('Mose: the games, and the placeholders until the pictures come', () => 
     expect(counts.reduce((a, b) => a + b, 0)).toBe(18)
     expect(g.tiles.stake).not.toBe(g.tiles.front)
     expect(g.background).toBe(stage(2).image)
+  })
+
+  it('4 glow: two rounds with an open bush and a bush behind rocks; Moses does not start at the bush, the glow can be seen from the start, the threshold is seven percent; the goal is 2', () => {
+    const g = stage(4).task.glow
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => [r.threshold, Boolean(r.cover)])).toEqual([[7, false], [7, true]])
+    for (const r of g.rounds) {
+      const d = distance({ x: r.start[0], y: r.start[1] }, { x: r.target[0], y: r.target[1] })
+      expect(d, 'far from the bush at the start').toBeGreaterThan(40)
+      expect(glow(d, 90), 'a faint glow at the start').toBeGreaterThan(0.05)
+      for (const v of [...r.start, ...r.target]) expect(v >= 0 && v <= 100).toBe(true)
+    }
+    expect(g.rounds[0]!.background).not.toBe(g.rounds[1]!.background)
+    expect(g.rounds).toHaveLength(2)
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

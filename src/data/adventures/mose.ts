@@ -12,7 +12,7 @@
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme (Liste der Aufnahmen: D:/Claude/Abenteuer-Mose/NEUAUFNAHME-Mose.md).
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { CloudGame, DiffGame, Journey, MannaGame, WeaveGame, WordsGame } from '@/types/adventure'
+import type { CloudGame, DiffGame, GlowGame, Journey, MannaGame, WeaveGame, WordsGame } from '@/types/adventure'
 import { josef } from './josef'
 import { MOSE_PATH } from './mosePath'
 import { localize } from './localize'
@@ -144,6 +144,21 @@ const FLECHTEN: WeaveGame = {
   ]
 }
 
+/**
+ * Etappe 4, "Dem Leuchten nachgehen": Mose wird über einen dämmrigen Hang geführt, auf ein Leuchten zu, das heller wird, je näher er kommt; unter etwa 7 % der Bildbreite ist er da und der Busch leuchtet (Bildauftrag M11;
+ * eigene Hänge). Es gibt keinen Fehler; nach 20 Sekunden ohne Fortschritt zeigt ein Tipp Funken in Richtung des Busches (zählt als Tipp). Runde 1 der Busch steht offen am Hang, Runde 2 Felsen verdecken ihn und nur
+ * der Schein dringt durch. Gott ist nicht im Bild und spricht nicht im Spiel. Start und Busch (Prozent des Bildes) sind vorläufig geschätzt, bis die Datei `leuchten-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `leuchten/hang-offen.webp`, `hang-felsen.webp` je 1000 × 750 (ohne Busch), `busch.webp` 400 × 400, `mose.webp` 220 × 300, `felsen-vorn.webp` 1000 × 750 (transparent).
+ */
+const LEUCHTEN: GlowGame = {
+  walker: `${G}leuchten/mose.webp`,
+  bush: `${G}leuchten/busch.webp`,
+  rounds: [
+    { hint: 'Führe Mose mit dem Finger über den Hang. Dort leuchtet etwas. Je näher du kommst, desto heller wird es.', background: `${G}leuchten/hang-offen.webp`, start: [18, 76], target: [74, 36], threshold: 7 },
+    { hint: 'Jetzt verdecken Felsen das Licht. Nur der Schein dringt durch. Geh dem Leuchten nach.', background: `${G}leuchten/hang-felsen.webp`, start: [12, 78], target: [70, 28], threshold: 7, cover: `${G}leuchten/felsen-vorn.webp` }
+  ]
+}
+
 export const mose: Journey = {
   id: 'mose',
   title: 'Mose',
@@ -248,7 +263,7 @@ export const mose: Journey = {
         '„Wer bin ich, dass ich das tun könnte?“, fragt Mose. „Ich werde mit dir sein“, antwortet Gott. Und als Mose wissen will, wie er Gott dem Volk nennen soll, sagt Gott: „Ich werde sein, der ich sein werde. Sag den Israeliten: Der Gott eurer Väter hat mich zu euch gesandt.“'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Dem Leuchten nachgehen (leuchten, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'leuchten', hint: 'Geh dem Leuchten nach.', glow: LEUCHTEN },
       questions: [
         { q: 'Wie heißt der Berg Gottes, an dem der Busch brennt?', options: ['Horeb', 'Karmel', 'Zion'], answer: 0 },
         { q: 'Was soll Mose ausziehen?', options: ['seine Schuhe', 'seinen Mantel', 'seinen Gürtel'], answer: 0 }
