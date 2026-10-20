@@ -145,12 +145,12 @@ export const jakob: Journey = {
       image: `${IMG}etappe-bild-03.webp`,
       title: 'Die Himmelsleiter',
       ref: '1. Mose 28,10–22',
-      audio: `${REC}geschichte-03-v2.mp3`,
+      audio: `${REC}geschichte-03-v3.mp3`,
       text: [
-        'Jakob wandert viele Tage allein, weg von zu Hause. Als die Sonne untergeht, ist weit und breit kein Dach in Sicht. So sucht er sich einen Platz zwischen den Steinen, schiebt sich einen Stein unter den Kopf und schläft ein.',
-        'Da hat er einen Traum. Auf der Erde steht eine Treppe, deren oberes Ende bis in den Himmel reicht, und Engel Gottes steigen auf ihr hinauf und herab. In der Nacht leuchtet sie sanft.',
+        'Jakob wandert weit, weg von zu Hause. Als die Sonne untergeht, bleibt er für die Nacht an einem Ort zwischen Steinen. Er schiebt sich einen Stein unter den Kopf und schläft ein.',
+        'Da hat er einen Traum. Auf der Erde steht eine Treppe, deren oberes Ende bis in den Himmel reicht, und Engel Gottes steigen auf ihr hinauf und herab.',
         'Und oben spricht Gott zu ihm: „Ich bin der Gott deiner Väter Abraham und Isaak. Das Land, auf dem du liegst, will ich dir und deinen Nachkommen geben. Sie werden so zahlreich sein wie der Staub auf der Erde, und durch dich sollen alle Familien auf der Erde gesegnet werden. Sieh, ich bin bei dir und behüte dich, wohin du auch gehst. Ich bringe dich wieder in dieses Land zurück und verlasse dich nicht.“',
-        'Als Jakob aufwacht, ist er ganz still vor Staunen. „Gott ist an diesem Ort“, sagt er, „und ich habe es nicht gewusst!“ Gleich am Morgen stellt er den Stein, auf dem sein Kopf gelegen hat, als Zeichen auf und gießt Öl darüber. Den Ort nennt er Bethel, das heißt „Haus Gottes“. Dann zieht er weiter, nicht mehr so allein wie am Abend zuvor.'
+        'Als Jakob aufwacht, ist er ganz still vor Staunen. „Gott ist an diesem Ort“, sagt er, „und ich habe es nicht gewusst!“ Gleich am Morgen stellt er den Stein, auf dem sein Kopf gelegen hat, als Zeichen auf und gießt Öl darüber. Den Ort nennt er Bethel, das heißt „Haus Gottes“. Und er verspricht: „Wenn Gott bei mir bleibt und mich unterwegs behütet, dann soll er mein Gott sein.“ Dann zieht er weiter, nicht mehr so allein wie am Abend zuvor.'
       ],
       task: { kind: 'schieben', hint: 'Schiebe die Kacheln, bis die Treppe zum Himmel wieder ganz ist.', slide: SCHIEBEN },
       questions: [

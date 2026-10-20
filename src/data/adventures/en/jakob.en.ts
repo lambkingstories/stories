@@ -48,12 +48,12 @@ export const jakobEn: TextOverlay<Journey> = {
     {
       title: 'The Heavenly Stairway',
       ref: 'Genesis 28:10–22',
-      audio: 'audio/abenteuer/jakob/geschichte-03-en-v2.mp3',
+      audio: 'audio/abenteuer/jakob/geschichte-03-en-v3.mp3',
       text: [
-        'Jacob wanders alone for many days, away from home. When the sun goes down, there is no roof in sight far and wide. So he finds a place among the stones, pushes a stone under his head, and falls asleep.',
-        'Then he has a dream. A stairway stands on the earth, and its top reaches up to heaven, and angels of God go up and down on it. In the night it glows softly.',
+        'Jacob walks far, away from home. When the sun goes down, he stops for the night at a place among stones. He pushes a stone under his head and falls asleep.',
+        'Then he has a dream. A stairway stands on the earth, and its top reaches up to heaven, and angels of God go up and down on it.',
         'And at the top God speaks to him, “I am the God of your fathers Abraham and Isaac. The land you are lying on I will give to you and your descendants. They will be as many as the dust of the earth, and through you all the families of the earth will be blessed. Look, I am with you and watch over you wherever you go. I will bring you back to this land, and I will not leave you.”',
-        'When Jacob wakes up, he is quiet with wonder. “God is in this place,” he says, “and I did not know it!” Early in the morning he sets up the stone he slept on as a sign and pours oil over it. He calls the place Bethel, which means “house of God.” Then he travels on, no longer as alone as he was the evening before.'
+        'When Jacob wakes up, he is quiet with wonder. “God is in this place,” he says, “and I did not know it!” Early in the morning he sets up the stone he slept on as a sign and pours oil over it. He calls the place Bethel, which means “house of God.” And he promises, “If God stays with me and watches over me on my way, then he will be my God.” Then he travels on, no longer as alone as he was the evening before.'
       ],
       task: { hint: 'Slide the tiles until the stairway to heaven is whole again.', slide: { rounds: [{ hint: 'Round 1: Slide a tile into the free gap.' }, { hint: 'Round 2: Now there are more tiles.' }] } },
       questions: [

@@ -37,7 +37,7 @@ describe('Jakob: stories and questions', () => {
       expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(60)
       expect(words, `words ${s.id}`).toBeLessThanOrEqual(220)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.audio, s.id.toString()).toBe(`audio/abenteuer/jakob/geschichte-${String(s.id).padStart(2, '0')}-v2.mp3`)
+      expect(s.audio, s.id.toString()).toBe(`audio/abenteuer/jakob/geschichte-${String(s.id).padStart(2, '0')}-${s.id === 3 ? 'v3' : 'v2'}.mp3`)
       // stages 5 to 9 and 12 use an existing picture until their own picture is built in (PLATZHALTER)
       expect(s.image).toBe(`images/abenteuer/jakob/etappe-bild-${String(PICTURE[s.id - 1]).padStart(2, '0')}.webp`)
     }
@@ -251,7 +251,7 @@ describe('Jakob: English', () => {
       expect(s.task.hint, `hint ${s.id}`).not.toBe(de[i]!.hint)
       s.questions.forEach((q, k) => expect(q.q, `question ${s.id}.${k}`).not.toBe(de[i]!.q[k]))
       expect(s.ref, `ref ${s.id}`).toMatch(/^Genesis \d/)
-      expect(s.audio, `audio ${s.id}`).toBe(`audio/abenteuer/jakob/geschichte-${String(s.id).padStart(2, '0')}-en-v2.mp3`)
+      expect(s.audio, `audio ${s.id}`).toBe(`audio/abenteuer/jakob/geschichte-${String(s.id).padStart(2, '0')}-en-${s.id === 3 ? 'v3' : 'v2'}.mp3`)
     })
     expect(jakob.title).toBe('Jacob')
     expect(jakob.subtitle).toBe('A Road with Detours')
