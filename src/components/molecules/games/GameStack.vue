@@ -29,7 +29,7 @@ progress.setGoal(props.game.rounds.reduce((sum, r) => sum + r.layers, 0))
 
 const FPS = 30
 /** The height of a step in the picture (cqw: percent of the width of the picture) and how far below the picture's top the beam hangs. */
-const STEP_H = 11
+const STEP_H = 9
 const GROUND = 4
 const rounds = computed(() => props.game.rounds)
 const round = ref(0)
@@ -132,7 +132,7 @@ const stepStyle = (s: Step, i: number) => ({ left: `${s.left}%`, width: `${s.wid
 const blockStyle = computed(() => {
   const level = dropAt.value ? dropAt.value.level : steps.value.length
   const left = dropAt.value ? dropAt.value.left : blockLeft.value
-  const bottom = dropping.value ? GROUND + level * STEP_H : 56
+  const bottom = dropping.value ? GROUND + level * STEP_H : 50
   return { left: `${left}%`, width: `${blockWidth.value}%`, bottom: `${bottom}cqw`, height: `${STEP_H}cqw` }
 })
 </script>
