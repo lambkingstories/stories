@@ -167,7 +167,7 @@ describe('Babel: every stage has its own new game (no game of Josef, Noah or Ada
     expect(s.background).toBe('images/abenteuer/babel/etappe-bild-03.webp')
   })
 
-  it('4 wiping the fog: the tower first (upper middle), then the city (lower half); the parts lie inside the picture', () => {
+  it('4 wiping the fog: the tower first (upper middle), then the people in front (lower part); the parts lie inside the picture', () => {
     const w = stage(4).task.wipe!
     for (const r of w.rounds) {
       expect(r.region.x).toBeGreaterThanOrEqual(0)
@@ -177,7 +177,7 @@ describe('Babel: every stage has its own new game (no game of Josef, Noah or Ada
     }
     const [tower, city] = w.rounds.map((r) => r.region) as [typeof w.rounds[0]['region'], typeof w.rounds[0]['region']]
     expect(tower.y).toBeLessThan(city.y)
-    expect(tower.x + tower.w / 2).toBeCloseTo(50, 0)
+    expect(Math.abs(tower.x + tower.w / 2 - 50)).toBeLessThan(5)
     expect(city.y + city.h / 2).toBeGreaterThan(50)
     expect(w.background).toBe('images/abenteuer/babel/etappe-bild-04.webp')
   })

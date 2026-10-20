@@ -65,7 +65,7 @@ export const babelEn: TextOverlay<Journey> = {
         'God sees: They are one people, and they all speak the same language. This is only the beginning of what they will do. If they go on like this, nothing they plan to do will be impossible for them.',
         'Down in the city, evening is coming. The people go on working for a little while and call out to one another.'
       ],
-      task: { hint: 'Wipe away the fog so that you can see the tower and the city.', wipe: { rounds: [{ hint: 'Round 1: Wipe the fog from the tower.' }, { hint: 'Round 2: Now the city.' }] } },
+      task: { hint: 'Wipe away the fog so that you can see the tower and the city.', wipe: { rounds: [{ hint: 'Round 1: Wipe the fog from the tower.' }, { hint: 'Round 2: Now the people.' }] } },
       questions: [
         { q: 'Who comes down to see the city and the tower?', options: ['God', 'an angel', 'the king'] },
         { q: 'What does God see about the people?', options: ['They are one people and speak the same language.', 'They are quarreling.', 'They are already finished.'] }

@@ -99,13 +99,17 @@ const STAPELN: StackGame = {
   ]
 }
 
-/** Etappe 4, "Nebel wegwischen": Abendnebel über dem Etappenbild 4 (Bildauftrag B13); Runde 1 der Turm (obere Mitte), Runde 2 die Stadt (untere Hälfte). */
+/**
+ * Etappe 4, "Nebel wegwischen": Abendnebel über dem Etappenbild 4 (Bildauftrag B13); Runde 1 der Turm, Runde 2 die Menschen im Vordergrund (Prozent des Etappenbildes, am Bild gemessen:
+ * `wischen/wischen-messung.json`; die Stadt mit Gassen gibt es im Bild nicht). Der Nebel ist die voll deckende Fassung (`nebel-deckend`), die die Bild-Sitzung aus dem gemalten Nebel auf
+ * eine einfarbige warme Fläche gerechnet hat, weil der gemalte Nebel nur zu 96 % deckte.
+ */
 const WISCHEN: WipeGame = {
   background: `${IMG}etappe-bild-04.webp`,
-  mist: `${G}wischen/nebel.webp`,
+  mist: `${G}wischen/nebel-deckend.webp`,
   rounds: [
-    { hint: 'Wische den Nebel vom Turm.', region: { x: 28, y: 4, w: 44, h: 50 } },
-    { hint: 'Jetzt die Stadt.', region: { x: 4, y: 52, w: 92, h: 44 } }
+    { hint: 'Wische den Nebel vom Turm.', region: { x: 24, y: 5, w: 53, h: 50 } },
+    { hint: 'Jetzt die Menschen.', region: { x: 14, y: 40, w: 80, h: 58 } }
   ]
 }
 
