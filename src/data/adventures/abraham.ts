@@ -11,7 +11,7 @@
  * STAND 20.10.2026: alle Bilder der Etappen 1 bis 3, 6, 8 und 9 (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder) und die Messwerte sind eingebaut; Aufnahmen siehe `audio` der Etappen (eine Etappe ohne `audio` hat noch keine).
  * Das Abenteuer ist aber nicht öffentlich: es ist hinter `comingSoon` und dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { BalanceGame, ConstellationGame, CountGroup, Journey, SilverGame, WaterGame } from '@/types/adventure'
+import type { BalanceGame, BirdsGame, ConstellationGame, CountGroup, Journey, SilverGame, WaterGame } from '@/types/adventure'
 import { ABRAHAM_PATH } from './abrahamPath'
 import { localize } from './localize'
 import { abrahamEn } from './en/abraham.en'
@@ -21,6 +21,37 @@ const G = 'images/abenteuer/spiele/abraham/'
 const REC = 'audio/abenteuer/abraham/'
 /** `true` = die Etappen sind noch nicht spielbar (Gerüst); jetzt sind alle Bilder und Töne eingebaut. */
 const SOON = false
+
+/**
+ * Etappe 4, "Wohin fliegen die Vögel?": Vögel fliegen auf das Wasser in der Wüste zu, ihre gestrichelten Flugbahnen enden in der Luft; das Kind tippt dorthin, wo sie sich treffen (Bildauftrag A20;
+ * eigener Hintergrund `voegel/wueste.webp`, damit Hagar und der Brunnen des Etappenbildes nicht stören). Positionen in Prozent des Bildes (4 : 3). Runde 1: je zwei Vögel, die Bahnen
+ * zu 60 % gezeichnet; Runde 2: drei Vögel und ein Ablenker, der woandershin fliegt, die Bahnen zu 40 % gezeichnet. Treffpunkte in der unteren Hälfte, Startpunkte oben.
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `voegel/wueste.webp` 1200 × 900, `vogel-a.webp`, `vogel-b.webp` je 140 × 100 (transparent), `quelle.webp` 240 × 170 (transparent).
+ */
+const VOEGEL: BirdsGame = {
+  background: `${G}voegel/wueste.webp`,
+  bird: [`${G}voegel/vogel-a.webp`, `${G}voegel/vogel-b.webp`],
+  spring: `${G}voegel/quelle.webp`,
+  radius: 8,
+  rounds: [
+    {
+      hint: 'Die Vögel fliegen zum Wasser. Tippe dorthin, wo sich ihre Wege treffen.',
+      tasks: [
+        { target: [30, 72], birds: [{ from: [10, 12], shown: 0.6 }, { from: [58, 10], shown: 0.6 }] },
+        { target: [64, 76], birds: [{ from: [30, 10], shown: 0.6 }, { from: [92, 16], shown: 0.6 }] },
+        { target: [48, 68], birds: [{ from: [8, 22], shown: 0.6 }, { from: [80, 8], shown: 0.6 }] }
+      ]
+    },
+    {
+      hint: 'Jetzt fliegen mehr Vögel, und einer fliegt woandershin. Folge nur den Linien, die sich treffen.',
+      tasks: [
+        { target: [42, 70], birds: [{ from: [8, 12], shown: 0.4 }, { from: [46, 6], shown: 0.4 }, { from: [90, 20], shown: 0.4 }], decoy: { from: [70, 8], to: [88, 60], shown: 0.4 } },
+        { target: [70, 74], birds: [{ from: [20, 10], shown: 0.4 }, { from: [55, 5], shown: 0.4 }, { from: [96, 24], shown: 0.4 }], decoy: { from: [8, 30], to: [30, 85], shown: 0.4 } },
+        { target: [26, 66], birds: [{ from: [4, 12], shown: 0.4 }, { from: [34, 5], shown: 0.4 }, { from: [78, 14], shown: 0.4 }], decoy: { from: [92, 10], to: [70, 70], shown: 0.4 } }
+      ]
+    }
+  ]
+}
 
 /**
  * Etappe 10, "Passend bezahlen": Silberstücke in drei Größen werden auf ein Tuch gelegt, bis es genau vierhundert sind (Bildauftrag A22; Hintergrund = das Etappenbild 10). Runde 1 mit sichtbarer
@@ -238,7 +269,7 @@ export const abraham: Journey = {
         'Hagar ist tief bewegt. „Du bist ein Gott, der mich sieht“, sagt sie, denn nun weiß sie, dass Gott sie nicht vergessen hat. Von da an trägt der Brunnen einen besonderen Namen: Brunnen des Lebendigen, der mich sieht. Hagar geht zurück und bekommt ihren Sohn, und Abram nennt ihn Ismael.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'voegel', hint: 'Tippe dorthin, wo sich die Flugbahnen der Vögel treffen.', birds: VOEGEL },
       questions: [
         { q: 'Wo findet der Bote Gottes die flüchtige Hagar?', options: ['an einem Brunnen in der Wüste', 'in einem Zelt', 'auf einem hohen Berg'], answer: 0 },
         { q: 'Wie nennt Hagar Gott?', options: ['ein Gott, der mich sieht', 'ein Gott, der schläft', 'ein Gott, der weit weg wohnt'], answer: 0 }

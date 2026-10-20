@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { BalanceGame, ConstellationGame, SilverGame } from '@/types/adventure'
+import type { BalanceGame, BirdsGame, ConstellationGame, SilverGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -468,5 +468,143 @@ describe('Passend bezahlen (silver)', () => {
     await lay(w, 0)
     await pay(w)
     expect(w.find('.sv-fb').text()).toBe('Something is still missing.')
+  })
+})
+
+// ---------------------------------------------------------------- where do the birds fly
+describe('Wohin fliegen die Vögel? (birds)', () => {
+  const game: BirdsGame = {
+    background: 'images/x/desert.webp',
+    bird: ['images/x/a.webp', 'images/x/b.webp'],
+    spring: 'images/x/spring.webp',
+    radius: 8,
+    rounds: [
+      {
+        hint: 'Runde eins.',
+        tasks: [
+          { target: [30, 72.5], birds: [{ from: [10, 12], shown: 0.6 }, { from: [58, 10], shown: 0.6 }] },
+          { target: [60, 70], birds: [{ from: [30, 10], shown: 0.6 }, { from: [92, 16], shown: 0.6 }] }
+        ]
+      },
+      {
+        hint: 'Runde zwei.',
+        tasks: [{ target: [45, 75], birds: [{ from: [8, 12], shown: 0.4 }, { from: [46, 6], shown: 0.4 }, { from: [90, 20], shown: 0.4 }], decoy: { from: [70, 8], to: [88, 60], shown: 0.4 } }]
+      }
+    ]
+  }
+  const TARGETS: [number, number][] = [[30, 72.5], [60, 70], [45, 75]]
+  // the field is 400 x 300 pixels: a percent of the picture is four pixels (wide) and three pixels (high)
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, width: 400, height: 300, right: 400, bottom: 300, x: 0, y: 0, toJSON: () => ({}) })
+    const { default: Birds } = await import('@/components/molecules/games/GameBirds.vue')
+    const w = mount(Birds, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  const tapAt = async (w: W, x: number, y: number) => {
+    await w.find('.bd-field').trigger('click', { clientX: x * 4, clientY: y * 3 })
+    await flushPromises()
+  }
+  const find = async (w: W, task: number) => {
+    await tapAt(w, TARGETS[task]![0], TARGETS[task]![1])
+    await tick(1500)
+  }
+
+  it('the goal is every task of both rounds; two birds fly, each with a dashed path that ends in the air; no spring yet', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(3)
+    expect(w.find('.bd-round').text()).toContain('Runde 1 von 2')
+    expect(w.findAll('.bd-bird')).toHaveLength(2)
+    expect(w.findAll('.bd-path')).toHaveLength(2)
+    expect(w.findAll('.bd-path.pale')).toHaveLength(0)
+    expect(w.find('.bd-spring').exists()).toBe(false)
+    expect(w.find('.bd-count').text()).toBe('Quellen gefunden: 0 von 3')
+  })
+
+  it('a tap on the meeting point finds the spring (a tick) and the next task begins with new birds', async () => {
+    const w = await open()
+    await tapAt(w, 33, 70)
+    expect(w.find('.bd-spring').exists()).toBe(true)
+    expect(w.find('.bd-mark').exists()).toBe(true)
+    expect(played).toContain('snap')
+    expect(useTaskProgress().parts.value).toBe(1)
+    await tick(1500)
+    expect(w.find('.bd-spring').exists()).toBe(false)
+    expect(w.find('.bd-count').text()).toBe('Quellen gefunden: 1 von 3')
+    await tapAt(w, 60, 70)
+    expect(useTaskProgress().parts.value).toBe(2)
+  })
+
+  it('a tap beside it is a dry ring, a cross and a mistake; after two wrong taps the hint says what to do', async () => {
+    const w = await open()
+    await tapAt(w, 80, 80)
+    expect(played).toContain('wrong')
+    expect(w.find('.bd-dry').exists()).toBe(true)
+    expect(w.find('.bd-fb').text()).toContain('trocken')
+    await tick(900)
+    expect(w.find('.bd-dry').exists()).toBe(false)
+    await tapAt(w, 10, 50)
+    expect(w.find('.bd-fb').text()).toBe('Folge den Linien, bis sie sich treffen.')
+    expect(useTaskProgress().parts.value).toBe(0)
+  })
+
+  it('the tip draws the paths on to the meeting point, once for each task', async () => {
+    const w = await open()
+    await w.find('.bd-tip').trigger('click')
+    expect(w.findAll('.bd-path.pale')).toHaveLength(2)
+    expect(w.find('.bd-tip').attributes('disabled')).toBeDefined()
+    await find(w, 0)
+    expect(w.findAll('.bd-path.pale')).toHaveLength(0)
+    expect(w.find('.bd-tip').attributes('disabled')).toBeUndefined()
+  })
+
+  it('round 2: three birds and a decoy that flies somewhere else (its path has no tip on the way)', async () => {
+    const w = await open()
+    await find(w, 0)
+    await find(w, 1)
+    await tick(1600)
+    expect(w.find('.bd-round').text()).toContain('Runde 2 von 2')
+    expect(w.findAll('.bd-bird')).toHaveLength(4)
+    expect(w.findAll('.bd-path')).toHaveLength(4)
+    await w.find('.bd-tip').trigger('click')
+    expect(w.findAll('.bd-path.pale')).toHaveLength(3)
+  })
+
+  it('from the keyboard: arrow keys move a cross-hair, Enter taps there', async () => {
+    const w = await open()
+    expect(w.find('.bd-cross').exists()).toBe(false)
+    for (let i = 0; i < 8; i++) await w.find('.bd-field').trigger('keydown', { key: 'ArrowLeft' })
+    for (let i = 0; i < 9; i++) await w.find('.bd-field').trigger('keydown', { key: 'ArrowDown' })
+    expect(w.find('.bd-cross').exists()).toBe(true)
+    await w.find('.bd-field').trigger('keydown', { key: 'Enter' })
+    expect(useTaskProgress().parts.value).toBe(1)
+  })
+
+  it('the whole game: the end with three stars; mistakes and tips together give the stars (up to three: three, up to seven: two, more: one)', async () => {
+    for (const [wrong, stars] of [[0, 3], [3, 3], [4, 2], [7, 2], [8, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      for (let i = 0; i < wrong; i++) await tapAt(w, 90, 95)
+      await find(w, 0)
+      await find(w, 1)
+      await tick(1600)
+      await find(w, 2)
+      expect(useTaskProgress().parts.value).toBe(3)
+      expect(useTaskProgress().finished.value).toBe(true)
+      expect(w.text()).toContain('Wasser in der Wüste gefunden')
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${wrong} mistakes`).toEqual([[stars]])
+      w.unmount()
+    }
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.bd-count').text()).toBe('Springs found: 0 of 3')
+    expect(w.find('.bd-tip').text()).toBe('Tip')
+    await tapAt(w, 80, 80)
+    expect(w.find('.bd-fb').text()).toContain('It is dry here')
   })
 })

@@ -68,7 +68,7 @@ export const abrahamEn: TextOverlay<Journey> = {
         'But God has seen Hagar. A messenger of God finds her at the well and asks, “Hagar, where have you come from, and where are you going?” “I am running away from Sarai,” she answers. Then the messenger says, “Go back to her. You will have a son, and you are to name him Ishmael, which means: God hears. For God has heard how badly things are going for you.”',
         'Hagar is deeply moved. “You are a God who sees me,” she says, for now she knows that God has not forgotten her. From then on the well has a special name: the well of the Living One who sees me. Hagar goes back and has her son, and Abram names him Ishmael.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Tap where the flight paths of the birds meet.', birds: { rounds: [{ hint: 'The birds fly to the water. Tap where their paths meet.' }, { hint: 'Now more birds are flying, and one flies somewhere else. Follow only the lines that meet.' }] } },
       questions: [
         { q: 'Where does the messenger of God find Hagar when she has run away?', options: ['at a well in the desert', 'in a tent', 'on a high mountain'] },
         { q: 'What does Hagar call God?', options: ['a God who sees me', 'a God who sleeps', 'a God who lives far away'] }

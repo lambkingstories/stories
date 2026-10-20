@@ -10,7 +10,7 @@ import { ABRAHAM_PATH } from '@/data/adventures/abrahamPath'
 import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
-import { solutions, total } from '@/utils/abrahamGames'
+import { birdAngle, distToLine, lineEnd, onRay, solutions, total } from '@/utils/abrahamGames'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 
 afterEach(() => setAdventureLanguage('de'))
@@ -106,7 +106,7 @@ describe('Abraham: every stage has the game that was chosen', () => {
 
   it('the games in the order of the plan; stage 9 is only the questions; at most two old mechanics and three new ones', () => {
     // PLATZHALTER (quiz) in the new stages 4, 5, 7, 10 and 11 until their games and pictures are built in
-    expect(abraham.stages.map((s) => s.task.kind)).toEqual(['waage', 'zaehlen', 'sternbild', 'quiz', 'quiz', 'giessen', 'quiz', 'puzzle', 'quiz', 'silber', 'quiz'])
+    expect(abraham.stages.map((s) => s.task.kind)).toEqual(['waage', 'zaehlen', 'sternbild', 'voegel', 'quiz', 'giessen', 'quiz', 'puzzle', 'quiz', 'silber', 'quiz'])
     const kinds = abraham.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
     expect(new Set(kinds).size).toBe(kinds.length)
     // "old" = a game that a journey before this one (Josef, Noah, Adam und Eva, Babel) already had; the pouring game was built for Noah but never used there
@@ -187,6 +187,35 @@ describe('Abraham: every stage has the game that was chosen', () => {
     }
     expect(w.river.x + w.river.w).toBeLessThanOrEqual(100)
     expect(w.river.y + w.river.h).toBeLessThanOrEqual(100)
+  })
+
+  it('4 birds: two rounds of three tasks, the paths lie on the way to the meeting point and the meeting points lie in the lower half; the birds differ in direction, the decoy misses by far', () => {
+    const g = stage(4).task.birds
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => r.tasks.length)).toEqual([3, 3])
+    expect(g.rounds.map((r) => r.tasks.map((t) => t.birds.length))).toEqual([[2, 2, 2], [3, 3, 3]])
+    expect(g.rounds[0]!.tasks.some((t) => t.decoy)).toBe(false)
+    expect(g.rounds[1]!.tasks.every((t) => t.decoy)).toBe(true)
+    expect(g.radius).toBe(8)
+    for (const [ri, r] of g.rounds.entries()) {
+      for (const t of r.tasks) {
+        expect(t.target[1], 'meeting point in the lower half').toBeGreaterThan(50)
+        for (const b of t.birds) {
+          expect(b.from[1], 'bird starts in the sky').toBeLessThanOrEqual(35)
+          expect(b.shown).toBeGreaterThanOrEqual(0.3)
+          expect(b.shown).toBeLessThanOrEqual(0.7)
+          // a round 2 path is drawn to 40 % only
+          if (ri === 1) expect(b.shown).toBeLessThanOrEqual(0.4)
+          const end = lineEnd(b.from, t.target, b.shown)
+          expect(onRay(b.from, [end.x, end.y], t.target)).toBe(true)
+        }
+        const angles = t.birds.map((b) => birdAngle(t.target, b.from)).sort((a, b) => a - b)
+        for (let i = 1; i < angles.length; i++) expect(angles[i]! - angles[i - 1]!, 'the birds come from different directions').toBeGreaterThanOrEqual(25)
+        if (t.decoy) expect(distToLine(t.decoy.from, t.decoy.to, t.target), 'the decoy misses the meeting point').toBeGreaterThanOrEqual(15)
+      }
+    }
+    expect(g.bird).toHaveLength(2)
   })
 
   it('10 silver: three sizes of heaps with their worth in steps of 25, every round pays four hundred with at least one way and not by laying everything, round 1 shows the sum, round 2 not', () => {
