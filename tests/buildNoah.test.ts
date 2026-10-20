@@ -9,7 +9,8 @@ import { adamEva } from '@/data/adventures/adamEva'
 import { babel } from '@/data/adventures/babel'
 import { abraham } from '@/data/adventures/abraham'
 import { jakob } from '@/data/adventures/jakob'
-import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, JAKOB_ONLY_DIRS, NOAH_ONLY_DIRS, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripJakobFiles, stripNoahFiles } from '../vite.config.noah'
+import { josua } from '@/data/adventures/josua'
+import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, JAKOB_ONLY_DIRS, JOSUA_ONLY_DIRS, NOAH_ONLY_DIRS, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripJakobFiles, stripJosuaFiles, stripNoahFiles } from '../vite.config.noah'
 
 const inNoahDir = (f: string) => NOAH_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
 
@@ -242,6 +243,49 @@ describe('a build without Jakob ships nothing of it', () => {
       for (const f of jakobFiles) expect(existsSync(join(out, f)), f).toBe(false)
       for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
       expect(() => stripJakobFiles(out)).not.toThrow()
+    } finally {
+      rmSync(out, { recursive: true, force: true })
+    }
+  })
+})
+
+const inJosuaDir = (f: string) => JOSUA_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
+
+describe('a build without Josua ships nothing of it', () => {
+  it('every file that only Josua uses lies in a folder that the normal build removes (until its own pictures exist it uses the ones of Josef, so the list may be empty)', () => {
+    const others = new Set([...journeys, noah, adamEva, babel, abraham, jakob].flatMap((j) => journeyFiles(j)))
+    const app = /^audio\/abenteuer\/(klang|musik)-/
+    const only = journeyFiles(josua).filter((f) => !others.has(f) && !app.test(f))
+    const leaks = only.filter((f) => !inJosuaDir(f))
+    expect(leaks, `files of Josua outside the folders that are removed: ${leaks.join(', ')}`).toEqual([])
+  })
+
+  it('the folders of Josua are only the three places that belong to it, none is on the lists of the others, and no folder with "josua" in its name is missing', () => {
+    expect([...JOSUA_ONLY_DIRS].sort()).toEqual(['audio/abenteuer/josua', 'images/abenteuer/josua', 'images/abenteuer/spiele/josua'])
+    for (const d of JOSUA_ONLY_DIRS) {
+      for (const list of [NOAH_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, ABRAHAM_ONLY_DIRS, JAKOB_ONLY_DIRS]) expect(list).not.toContain(d)
+    }
+    const found: string[] = []
+    for (const base of ['public/images/abenteuer', 'public/audio/abenteuer', 'public/images/abenteuer/spiele']) {
+      for (const n of readdirSync(base)) if (/josua/i.test(n) && !n.includes('.')) found.push(`${base.replace('public/', '')}/${n}`)
+    }
+    for (const d of found) expect(JOSUA_ONLY_DIRS, d).toContain(d)
+    for (const j of [...journeys, noah, adamEva, babel, abraham, jakob]) for (const f of journeyFiles(j)) expect(inJosuaDir(f), `${j.id}: ${f}`).toBe(false)
+  })
+
+  it('removing takes the folders of Josua out of a build and leaves everything else (the other journeys, the sounds)', () => {
+    const out = mkdtempSync(join(tmpdir(), 'lk-build-josua-'))
+    try {
+      const josuaFiles = ['audio/abenteuer/josua/geschichte-01-v1.mp3', 'images/abenteuer/josua/etappe-bild-01.webp', 'images/abenteuer/spiele/josua/packen/korb.webp']
+      const keep = ['images/abenteuer/josef/etappe-01.webp', 'audio/abenteuer/noah/geschichte-01.mp3', 'audio/abenteuer/jakob/geschichte-01-v2.mp3', 'images/abenteuer/spiele/jakob/kurbel/eimer.webp', 'audio/abenteuer/klang-stern.mp3']
+      for (const f of [...josuaFiles, ...keep]) {
+        mkdirSync(join(out, f, '..'), { recursive: true })
+        writeFileSync(join(out, f), 'x')
+      }
+      stripJosuaFiles(out)
+      for (const f of josuaFiles) expect(existsSync(join(out, f)), f).toBe(false)
+      for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
+      expect(() => stripJosuaFiles(out)).not.toThrow()
     } finally {
       rmSync(out, { recursive: true, force: true })
     }
