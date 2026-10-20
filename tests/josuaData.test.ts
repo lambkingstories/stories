@@ -107,7 +107,7 @@ describe('Josua: stories and questions', () => {
 
 describe('Josua: the placeholders until the games and pictures come', () => {
   it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(josua.stages.map((s) => s.task.kind)).toEqual(['packen', 'quiz', 'abseilen', 'schritt', 'memory', 'quiz', 'quiz', 'quiz', 'quiz', 'lueckenvers'])
+    expect(josua.stages.map((s) => s.task.kind)).toEqual(['packen', 'quiz', 'abseilen', 'schritt', 'memory', 'backen', 'quiz', 'quiz', 'quiz', 'lueckenvers'])
     for (const s of josua.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
@@ -179,6 +179,22 @@ describe('Josua: the placeholders until the games and pictures come', () => {
     expect(g.area.x + g.area.w).toBeLessThanOrEqual(100)
     expect(g.area.y + g.area.h).toBeLessThanOrEqual(100)
     expect(g.background).toBe(stage(1).image)
+  })
+
+  it('6 bake: six flatbreads on three stones, then nine on five; the golden time gets shorter, every stone has a place, the stack lies in the picture', () => {
+    const g = stage(6).task.bake
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => [r.dough, r.stones, r.goldenFrom, r.goldenTo])).toEqual([[6, 3, 2.5, 6], [9, 5, 2.2, 5]])
+    expect(g.stonesAt.length).toBeGreaterThanOrEqual(5)
+    for (const [x, y] of [...g.stonesAt, g.stackAt]) expect(x >= 0 && x <= 100 && y >= 0 && y <= 100).toBe(true)
+    // the golden time is at least two seconds long in both rounds, the dark time comes after it
+    for (const r of g.rounds) {
+      expect(r.goldenTo - r.goldenFrom).toBeGreaterThanOrEqual(2.5)
+      expect(r.stones).toBeLessThanOrEqual(g.stonesAt.length)
+      expect(r.dough).toBeGreaterThan(r.stones)
+    }
+    expect(g.rounds[1]!.goldenTo - g.rounds[1]!.goldenFrom).toBeLessThan(g.rounds[0]!.goldenTo - g.rounds[0]!.goldenFrom)
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

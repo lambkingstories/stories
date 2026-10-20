@@ -11,7 +11,7 @@
  * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit den ersten zehn Stationen (PLATZHALTER bis zum eigenen Panorama); Medaille und Geschenk sind ebenfalls die von Josef.
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme. Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { Journey, LowerGame, MemoryGame, PackGame, StepGame, VerseGame } from '@/types/adventure'
+import type { BakeGame, Journey, LowerGame, MemoryGame, PackGame, StepGame, VerseGame } from '@/types/adventure'
 import { josef } from './josef'
 import { JOSUA_PATH } from './josuaPath'
 import { localize } from './localize'
@@ -20,6 +20,28 @@ import { josuaEn } from './en/josua.en'
 // PLATZHALTER bis zum eigenen Bild: die Etappenbilder von Josef (Ordner images/abenteuer/josef/); danach `images/abenteuer/josua/etappe-bild-NN.webp`
 const PLACEHOLDER = 'images/abenteuer/josef/'
 const G = 'images/abenteuer/spiele/josua/'
+
+/**
+ * Etappe 6, "Fladen backen": Teigkugeln werden auf heiße Steine gelegt, werden zum Fladen, sind eine Weile goldbraun (Antippen wendet sie) und werden dann zu dunkel (Bildauftrag JO15; eigener Hintergrund
+ * `backen/feuerstelle.webp`). Runde 1 sechs Fladen auf drei Steinen (golden von 2,5 bis 6,0 Sekunden), Runde 2 neun Fladen auf fünf Steinen (2,2 bis 5,0). Die Steine und der Stapel (Prozent des Bildes)
+ * sind vorläufig geschätzt, bis die Datei `backen-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `backen/feuerstelle.webp` 1200 × 900, `teig.webp` 120 × 120, `fladen-roh.webp`, `fladen-gold.webp`, `fladen-dunkel.webp` je 200 × 200,
+ * `stapel.webp` 260 × 200 (alle außer der Feuerstelle transparent).
+ */
+const BACKEN: BakeGame = {
+  background: `${G}backen/feuerstelle.webp`,
+  dough: `${G}backen/teig.webp`,
+  raw: `${G}backen/fladen-roh.webp`,
+  golden: `${G}backen/fladen-gold.webp`,
+  dark: `${G}backen/fladen-dunkel.webp`,
+  stack: `${G}backen/stapel.webp`,
+  stonesAt: [[26, 56], [46, 50], [66, 56], [36, 74], [56, 72]],
+  stackAt: [86, 70],
+  rounds: [
+    { hint: 'Lege Teig auf die heißen Steine. Wenn der Fladen goldbraun ist, tippe ihn an und wende ihn.', dough: 6, stones: 3, goldenFrom: 2.5, goldenTo: 6 },
+    { hint: 'Jetzt mehr Steine und mehr Fladen. Die Zeit ist etwas kürzer.', dough: 9, stones: 5, goldenFrom: 2.2, goldenTo: 5 }
+  ]
+}
 
 /**
  * Etappe 1, "Proviant packen": Dinge verschiedener Formen werden in das Raster eines Korbs gepackt, ein Tippen dreht sie (Bildauftrag JO10; Hintergrund = das Etappenbild). Ein Feld ist 96 Pixel. Runde 1: fünf Dinge
@@ -228,7 +250,7 @@ export const josua: Journey = {
         'Und noch etwas ist neu. Viele Jahre lang hat Gott dem Volk in der Wüste jeden Morgen das Manna gegeben, das Brot, das vom Himmel fällt. Doch am Tag, an dem sie vom Getreide des Landes essen, hört das Manna auf. Nun ernten sie, was im Land Kanaan wächst, und davon werden sie in diesem Jahr satt.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild; vorgesehen: Fladen backen (backen, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'backen', hint: 'Backe Fladen und wende sie, wenn sie goldbraun sind.', bake: BACKEN },
       questions: [
         { q: 'Was hört auf, als das Volk vom Land isst?', options: ['das Manna', 'der Regen', 'der Wind'], answer: 0 },
         { q: 'Was essen die Menschen vom Ertrag des Landes?', options: ['Fladenbrote und geröstete Körner', 'Fisch und Datteln', 'Honig und Milch'], answer: 0 }

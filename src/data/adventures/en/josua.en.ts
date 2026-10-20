@@ -94,7 +94,7 @@ export const josuaEn: TextOverlay<Journey> = {
         'On the fourteenth day of the month Israel keeps the Passover on the plain near Jericho, as God told them, in memory of the time they came out of Egypt. On the next day the people eat from the produce of the land for the first time: unleavened bread and roasted grain.',
         'And something else is new. For many years God gave the people manna in the desert every morning, the bread that falls from heaven. But on the day they eat the grain of the land, the manna stops. Now they harvest what grows in the land of Canaan, and from it they are fed this year.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Bake flatbreads and turn them when they are golden brown.', bake: { rounds: [{ hint: 'Put dough on the hot stones. When the flatbread is golden brown, tap it and turn it.' }, { hint: 'Now more stones and more flatbreads. The time is a little shorter.' }] } },
       questions: [
         { q: 'What stops when the people eat from the land?', options: ['the manna', 'the rain', 'the wind'] },
         { q: 'What do the people eat from the produce of the land?', options: ['flatbread and roasted grain', 'fish and dates', 'honey and milk'] }

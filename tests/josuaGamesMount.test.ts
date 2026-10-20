@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { LowerGame, PackGame, StepGame } from '@/types/adventure'
+import type { BakeGame, LowerGame, PackGame, StepGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -550,5 +550,162 @@ describe('Proviant packen (pack)', () => {
     await put(w, 0, 0, 0)
     await put(w, 0, 0, 0)
     expect(w.find('.pk-fb').text()).toBe('That does not fit here.')
+  })
+})
+
+// ---------------------------------------------------------------- bake flatbreads
+describe('Fladen backen (bake)', () => {
+  const game: BakeGame = {
+    background: 'images/x/fire.webp',
+    dough: 'images/x/dough.webp',
+    raw: 'images/x/raw.webp',
+    golden: 'images/x/golden.webp',
+    dark: 'images/x/dark.webp',
+    stack: 'images/x/stack.webp',
+    stonesAt: [[26, 56], [46, 50], [66, 56]],
+    stackAt: [86, 70],
+    rounds: [
+      { hint: 'Runde eins.', dough: 2, stones: 2, goldenFrom: 2, goldenTo: 5 },
+      { hint: 'Runde zwei.', dough: 3, stones: 3, goldenFrom: 1.5, goldenTo: 3 }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Bake } = await import('@/components/molecules/games/GameBake.vue')
+    const w = mount(Bake, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  /** Choose a ball of dough (a press and a release without moving), then tap the stone. */
+  const bake = async (w: W, stone: number) => {
+    const el = w.findAll('.bk-dough')[0]!.element
+    el.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, button: 0, clientX: 5, clientY: 5 }))
+    window.dispatchEvent(new MouseEvent('pointerup', { clientX: 5, clientY: 5 }))
+    await flushPromises()
+    await w.find(`[data-drop="stone-${stone}"]`).trigger('click')
+    await flushPromises()
+  }
+  const touch = async (w: W, stone: number) => {
+    await w.find(`[data-drop="stone-${stone}"]`).trigger('click')
+    await flushPromises()
+  }
+  const word = (w: W, stone: number) => w.find(`[data-drop="stone-${stone}"] .bk-word`).text()
+
+  it('the goal is every flatbread of both rounds; two stones, two balls of dough, nothing on the stones, an empty stack', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(5)
+    expect(w.find('.bk-round').text()).toContain('Runde 1 von 2')
+    expect(w.findAll('.bk-stone')).toHaveLength(2)
+    expect(w.findAll('.bk-dough')).toHaveLength(2)
+    expect(w.findAll('.bk-bread')).toHaveLength(0)
+    expect(w.find('.bk-stack-n').text()).toBe('0')
+    expect(w.find('.bk-count').text()).toBe('Fladen gewendet: 0 von 2')
+  })
+
+  it('dough on a stone is a raw flatbread; the state stands as a word under it; tapping a raw one only says not yet', async () => {
+    const w = await open()
+    await bake(w, 0)
+    expect(w.findAll('.bk-bread')).toHaveLength(1)
+    expect(w.findAll('.bk-dough')).toHaveLength(1)
+    expect(word(w, 0)).toBe('noch roh')
+    await touch(w, 0)
+    expect(w.find('.bk-fb').text()).toContain('Noch roh')
+    expect(w.findAll('.bk-bread')).toHaveLength(1)
+    expect(played).not.toContain('wrong')
+  })
+
+  it('a stone with a flatbread on it takes no more dough', async () => {
+    const w = await open()
+    await bake(w, 0)
+    await bake(w, 0)
+    expect(w.find('.bk-fb').text()).toContain('schon ein Fladen')
+    expect(w.findAll('.bk-dough')).toHaveLength(1)
+  })
+
+  it('golden after two seconds: a tick, the word "fertig"; a tap turns it onto the stack, the stone is free again', async () => {
+    const w = await open()
+    await bake(w, 0)
+    await tick(2200)
+    expect(word(w, 0)).toBe('fertig')
+    expect(w.find('[data-drop="stone-0"] .gm.good').exists()).toBe(true)
+    await touch(w, 0)
+    expect(w.findAll('.bk-bread')).toHaveLength(0)
+    expect(w.find('.bk-stack-n').text()).toBe('1')
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(played).toContain('snap')
+    expect(w.findAll('.bk-dough')).toHaveLength(1)
+  })
+
+  it('too long on the stone: too dark, a cross, a dull sound, one mistake; the dough comes back; a tap clears the stone', async () => {
+    const w = await open()
+    await bake(w, 0)
+    await tick(5500)
+    expect(word(w, 0)).toBe('zu dunkel')
+    expect(w.find('[data-drop="stone-0"] .gm.bad').exists()).toBe(true)
+    expect(played.filter((p) => p === 'wrong')).toHaveLength(1)
+    expect(w.find('.bk-fb').text()).toContain('zu dunkel')
+    // it is counted once, and the ball of dough is given back
+    await tick(3000)
+    expect(played.filter((p) => p === 'wrong')).toHaveLength(1)
+    expect(w.findAll('.bk-dough')).toHaveLength(2)
+    await touch(w, 0)
+    expect(w.findAll('.bk-bread')).toHaveLength(0)
+    expect(useTaskProgress().parts.value).toBe(0)
+  })
+
+  it('both flatbreads turned: round 2 has three stones and three flatbreads', async () => {
+    const w = await open()
+    await bake(w, 0)
+    await bake(w, 1)
+    await tick(2500)
+    await touch(w, 0)
+    await touch(w, 1)
+    expect(useTaskProgress().parts.value).toBe(2)
+    await tick(1900)
+    expect(w.find('.bk-round').text()).toContain('Runde 2 von 2')
+    expect(w.findAll('.bk-stone')).toHaveLength(3)
+    expect(w.findAll('.bk-dough')).toHaveLength(3)
+    expect(w.find('.bk-stack-n').text()).toBe('0')
+  })
+
+  it('the whole game: the end with three stars; the too dark flatbreads give the stars (one: three, up to four: two, more: one)', async () => {
+    for (const [burnt, stars] of [[0, 3], [1, 3], [2, 2], [4, 2], [5, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      for (let i = 0; i < burnt; i++) {
+        await bake(w, 0)
+        await tick(5500)
+        await touch(w, 0)
+      }
+      await bake(w, 0)
+      await bake(w, 1)
+      await tick(2500)
+      await touch(w, 0)
+      await touch(w, 1)
+      await tick(1900)
+      await bake(w, 0)
+      await bake(w, 1)
+      await bake(w, 2)
+      await tick(1700)
+      await touch(w, 0)
+      await touch(w, 1)
+      await touch(w, 2)
+      await tick(1100)
+      expect(useTaskProgress().parts.value).toBe(5)
+      expect(useTaskProgress().finished.value).toBe(true)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${burnt} dark`).toEqual([[stars]])
+      w.unmount()
+    }
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.bk-count').text()).toBe('Flatbreads turned: 0 of 2')
+    await bake(w, 0)
+    expect(word(w, 0)).toBe('still raw')
+    await tick(2200)
+    expect(word(w, 0)).toBe('ready')
   })
 })
