@@ -38,6 +38,8 @@ const furrows = computed<SowFurrow[]>(() => current.value.furrows.map((id) => pr
 
 /** The furrows that have a sprout, how far the sprout has grown (1 = just sown, 2 = grown) and the number of misses in a row. */
 const sown = reactive<Record<string, number>>({})
+/** Where along a furrow the seed fell (the sprout grows there; a long furrow of the field takes the sprout where the seed came down). */
+const sownAt = reactive<Record<string, number>>({})
 const mistakes = ref(0)
 const missRun = ref(0)
 const between = ref(false)
@@ -144,6 +146,8 @@ function land(at: Pt, k: number) {
 function sow(f: SowFurrow, at?: Pt) {
   if (sown[f.id] || between.value || finished.value) return
   sown[f.id] = 1
+  // the sprout stands where the seed fell, but not at the very end of a long furrow
+  sownAt[f.id] = at ? Math.min(f.x + f.w / 2 - 6, Math.max(f.x - f.w / 2 + 6, at.x)) : f.x
   missRun.value = 0
   progress.mark()
   play('sack')
@@ -169,6 +173,7 @@ function roundOver() {
     between.value = false
     round.value++
     for (const k of Object.keys(sown)) delete sown[k]
+    for (const k of Object.keys(sownAt)) delete sownAt[k]
     missRun.value = 0
     seed.value = null
     message.value = ''
@@ -183,7 +188,7 @@ function onFurrow(f: SowFurrow, e: MouseEvent) {
 const src = (p: string) => prependBaseUrl(p)
 const place = (p: Pt) => ({ left: `${p.x}%`, top: `${p.y}%` })
 const furrowBox = (f: SowFurrow) => ({ left: `${f.x}%`, top: `${f.y}%`, width: `${f.w}%`, height: `${f.h}%` })
-const sproutStyle = (f: SowFurrow) => ({ left: `${f.x}%`, top: `${f.y}%`, width: `${Math.max(8, f.w * 0.5)}%` })
+const sproutStyle = (f: SowFurrow) => ({ left: `${sownAt[f.id] ?? f.x}%`, top: `${f.y}%`, width: `${Math.min(14, Math.max(8, f.w * 0.5))}%` })
 const windLeaning = computed(() => (wind.value > 0.05 ? 'right' : wind.value < -0.05 ? 'left' : 'calm'))
 </script>
 

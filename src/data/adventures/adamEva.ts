@@ -167,7 +167,8 @@ const RUF: EchoGame = {
 
 /**
  * Etappe 9, "Säen": Samen im Bogen in die Furchen, in Runde 2 mit Wind (Bildauftrag 13). Die Furchen sind von vorn nach hinten sortiert (die vier nächsten
- * für Runde 1). PLATZHALTER: x, y, w, h kommen aus `saeen/acker-messung.json`.
+ * für Runde 1). x, y, w, h sind die Mitte und Größe der sechs langen Furchen aus `saeen/acker-messung.json` (am Bild geprüft); die hinteren drei sind nur 4 bis 5 % hoch,
+ * ihre Trefferfläche ist auf 7 % vergrößert (der Samen soll großzügig treffen). Ein Samen sät die Furche an der Stelle, wo er landet.
  */
 const SAEEN: SowGame = {
   field: `${G}saeen/acker.webp`,
@@ -176,12 +177,12 @@ const SAEEN: SowGame = {
   sprout: [`${G}saeen/sproessling-1.webp`, `${G}saeen/sproessling-2.webp`],
   vane: `${G}saeen/fahne.webp`,
   furrows: [
-    { id: 'f1', x: 30, y: 74, w: 34, h: 7 },
-    { id: 'f2', x: 70, y: 74, w: 34, h: 7 },
-    { id: 'f3', x: 30, y: 56, w: 32, h: 6 },
-    { id: 'f4', x: 70, y: 56, w: 32, h: 6 },
-    { id: 'f5', x: 30, y: 40, w: 30, h: 5 },
-    { id: 'f6', x: 70, y: 40, w: 30, h: 5 }
+    { id: 'f1', x: 50, y: 78.5, w: 90, h: 9 },
+    { id: 'f2', x: 50, y: 66.2, w: 91, h: 7.4 },
+    { id: 'f3', x: 50, y: 56.2, w: 91, h: 7 },
+    { id: 'f4', x: 50, y: 46.7, w: 90, h: 7 },
+    { id: 'f5', x: 50, y: 38.7, w: 89, h: 7 },
+    { id: 'f6', x: 50, y: 32.1, w: 87, h: 7 }
   ],
   rounds: [
     { hint: 'Runde 1: Die Furchen sind nah. Ziehe zurück und lass los.', furrows: ['f1', 'f2', 'f3', 'f4'], wind: 0 },
