@@ -7,12 +7,12 @@
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/mose/, images/abenteuer/spiele/mose/<spiel>/, audio/abenteuer/mose/.
  *
- * STAND 20.10.2026 (Phase 2a, nur Daten und Platzhalter): Jede Etappe hat eine Quiz-Aufgabe (PLATZHALTER bis Spiel/Bild) und ein vorhandenes Etappenbild von Josef;
+ * STAND 21.10.2026 (Phase 2a, Daten und Spiele; Bilder Platzhalter): Die zehn Spieletappen haben ihr Spiel, die ernsten Etappen 1, 3, 8, 9 und 14 bleiben Quiz; die Etappenbilder sind noch die von Josef;
  * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit fünfzehn Stationen und dem Ziel (PLATZHALTER bis zum eigenen Panorama); Medaille und Geschenk sind ebenfalls die von Josef.
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme (Liste der Aufnahmen: D:/Claude/Abenteuer-Mose/NEUAUFNAHME-Mose.md).
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { BeatGame, CloudGame, DiffGame, GlowGame, Journey, MannaGame, WeaveGame, WordsGame } from '@/types/adventure'
+import type { BeatGame, CloudGame, DiffGame, FindGame, GlowGame, Journey, MannaGame, PackGame, VerseGame, WeaveGame, WordsGame } from '@/types/adventure'
 import { josef } from './josef'
 import { MOSE_PATH } from './mosePath'
 import { localize } from './localize'
@@ -176,6 +176,76 @@ const TAKT: BeatGame = {
   ]
 }
 
+/**
+ * Etappe 6, "Lass mein Volk ziehen" (Lückenvers, alte Mechanik): zwei Sätze aus dem Text der Etappe; die Wörter sind kurze Blätter (`answers` zeigt auf die richtigen, Ablenkwörter stehen
+ * dabei). Runde 1: der Auftrag an den Pharao (2. Mose 5,1), zwei Lücken; Runde 2: Gottes Versprechen (6,6f), drei Lücken. Zusammen 2 + 3 = 5 Lücken. Tafel und Blatt sind die aus Adam und Eva, kopiert nach `lueckenvers/`.
+ * Hintergrund ist das Etappenbild 6 (keine neuen Bilder).
+ */
+const VERS: VerseGame = {
+  background: `${PLACEHOLDER}etappe-bild-06.webp`,
+  board: `${G}lueckenvers/tafel.webp`,
+  leaf: `${G}lueckenvers/blatt.webp`,
+  rounds: [
+    { hint: 'Runde 1: Ziehe das passende Blatt in die Lücke.', parts: ['Lass mein ', ' ziehen, damit es mir in der ', ' ein Fest feiert!'], words: ['Volk', 'Wüste', 'Land', 'Stadt'], answers: [0, 1] },
+    { hint: 'Runde 2: Gottes Versprechen. Jetzt fehlen drei Wörter.', parts: ['Ich will euch aus der schweren Arbeit ', ' und euch ', '. Ihr sollt mein Volk sein, und ich will euer ', ' sein.'], words: ['herausführen', 'retten', 'Gott', 'König', 'Hirte'], answers: [0, 1, 2] }
+  ]
+}
+
+/**
+ * Etappe 7, "Frösche im Haus" (Wimmelbild, alte Mechanik): in Pharaos Haus (Backstube mit Ofen und Backtrog, darunter die Schlafkammer) sitzen zehn kleine, freundliche Frösche, sechs davon halb hinter Dingen (Backtrog-Deckel,
+ * Ofentür, Krug, Kissen, Korb, Tuchbündel). Komisch und ruhig, ohne Ekel: kein toter Frosch, kein Gestank, kein Blut (Bildauftrag M13; eigene Szene `wimmel/szene.webp`). Die Lagen (Mitte der Unterkante und Breite, Prozent der
+ * Szene) sind vorläufig geschätzt, bis die Datei `wimmel-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `wimmel/szene.webp` 1100 × 1467, `frosch-01…10.webp` je ca. 140–190 breit (transparent), `decke-01…06.webp` je 330 breit (transparent).
+ */
+const WIMMEL: FindGame = {
+  labels: ['Frosch', 'Frosch', 'Frosch', 'Frosch', 'Frosch', 'Frosch', 'Frosch', 'Frosch', 'Frosch', 'Frosch'],
+  doneText: 'Du hast alle zehn Frösche gefunden!',
+  scene: `${G}wimmel/szene.webp`,
+  finds: [
+    { image: `${G}wimmel/frosch-01.webp`, x: 12, y: 20, w: 13 },
+    { image: `${G}wimmel/frosch-02.webp`, x: 46, y: 16, w: 13 },
+    { image: `${G}wimmel/frosch-03.webp`, x: 78, y: 24, w: 14 },
+    { image: `${G}wimmel/frosch-04.webp`, x: 30, y: 40, w: 13 },
+    { image: `${G}wimmel/frosch-05.webp`, x: 66, y: 44, w: 13 },
+    { image: `${G}wimmel/frosch-06.webp`, x: 14, y: 50, w: 13 },
+    { image: `${G}wimmel/frosch-07.webp`, x: 88, y: 58, w: 13 },
+    { image: `${G}wimmel/frosch-08.webp`, x: 40, y: 70, w: 13 },
+    { image: `${G}wimmel/frosch-09.webp`, x: 74, y: 82, w: 13 },
+    { image: `${G}wimmel/frosch-10.webp`, x: 20, y: 88, w: 13 }
+  ],
+  covers: [
+    { image: `${G}wimmel/decke-01.webp`, x: 66, y: 50, w: 28 },
+    { image: `${G}wimmel/decke-02.webp`, x: 14, y: 56, w: 24 },
+    { image: `${G}wimmel/decke-03.webp`, x: 88, y: 64, w: 24 },
+    { image: `${G}wimmel/decke-04.webp`, x: 40, y: 76, w: 28 },
+    { image: `${G}wimmel/decke-05.webp`, x: 74, y: 88, w: 28 },
+    { image: `${G}wimmel/decke-06.webp`, x: 20, y: 94, w: 28 }
+  ]
+}
+
+/**
+ * Etappe 10, "Der Auszug": Teig, Gefäße aus Silber und Gold und Kleider kommen in ein Tragetuch (2. Mose 12,34–36), Form und Platz statt Gewicht (Bildauftrag M14). Das Spiel ist das vorhandene "Packen" (Josua 1), hier nur Daten: ein Tuch
+ * statt des Korbs, ein Tippen dreht ein gelegtes Stück. Ein Feld ist 100 Pixel. Runde 1: 4 × 3 Felder mit drei Stücken (3 × 2, 2 × 2, 1 × 2); Runde 2: 5 × 4 Felder mit fünf Stücken (3 × 2, 2 × 2, 2 × 3, 1 × 2, 1 × 2); beide
+ * füllen das Tuch genau und sind lösbar (Test). Das Tuch (`area`, Prozent des Etappenbildes) ist vorläufig geschätzt, bis die Datei `packen-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `packen/tuch.webp` 900 × 675, `teigtrog.webp` 200 × 200, `silberkrug.webp`, `goldkrug.webp` je 100 × 200, `kleiderbuendel.webp` 300 × 200, `tuchbuendel.webp` 200 × 300 (alle transparent).
+ */
+const AUSZUG: PackGame = {
+  background: `${PLACEHOLDER}etappe-bild-10-v2.webp`,
+  basket: `${G}packen/tuch.webp`,
+  items: [
+    { id: 'kleiderbuendel', image: `${G}packen/kleiderbuendel.webp`, w: 3, h: 2, label: 'Kleiderbündel' },
+    { id: 'teigtrog', image: `${G}packen/teigtrog.webp`, w: 2, h: 2, label: 'Teigtrog' },
+    { id: 'tuchbuendel', image: `${G}packen/tuchbuendel.webp`, w: 2, h: 3, label: 'Tücherbündel' },
+    { id: 'silberkrug', image: `${G}packen/silberkrug.webp`, w: 1, h: 2, label: 'Silberkrug' },
+    { id: 'goldkrug', image: `${G}packen/goldkrug.webp`, w: 1, h: 2, label: 'Goldkrug' }
+  ],
+  area: { x: 20, y: 32, w: 60, h: 56 },
+  rounds: [
+    { hint: 'Packe das Tragetuch. Tippe ein Stück im Tuch an, dann dreht es sich.', cols: 4, rows: 3, items: ['kleiderbuendel', 'teigtrog', 'silberkrug'] },
+    { hint: 'Jetzt mehr Stücke und kein Platz übrig. Überlege gut, wie alles hineinpasst.', cols: 5, rows: 4, items: ['kleiderbuendel', 'teigtrog', 'tuchbuendel', 'silberkrug', 'goldkrug'] }
+  ]
+}
+
 export const mose: Journey = {
   id: 'mose',
   title: 'Mose',
@@ -222,7 +292,7 @@ export const mose: Journey = {
         'Da kommt in Ägypten ein neuer König auf den Thron, ein Pharao, der von Josef nichts mehr weiß. Er bekommt Angst vor dem Volk, das so groß und stark geworden ist, und zwingt die Israeliten zu schwerer Arbeit. Sie müssen Lehm kneten, Ziegel formen und für den König Vorratsstädte bauen, von früh bis spät. Doch je härter sie arbeiten müssen, desto mehr wird das Volk.',
         'Schließlich befiehlt der König den beiden Hebammen der Israeliten, Schifra und Pua, sie sollen die neugeborenen Jungen nicht am Leben lassen. Aber Schifra und Pua haben Ehrfurcht vor Gott und tun nicht, was der König sagt, sondern lassen die Kinder leben. Gott sieht es und schenkt den beiden Frauen viel Gutes, und das Volk wächst und wächst.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: nur Quiz (bleibt Quiz)
+      // Bleibt Quiz (ernste Etappe); das Etappenbild ist noch das von Josef (PLATZHALTER bis zum eigenen Bild)
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wie heißen die beiden Hebammen?', options: ['Schifra und Pua', 'Mirjam und Zippora', 'Sara und Rahel'], answer: 0 },
@@ -242,7 +312,7 @@ export const mose: Journey = {
         'Jetzt tritt die Schwester heran. „Soll ich eine Frau der Israeliten holen, die das Kind für dich stillt?“, fragt sie. „Ja, geh!“, sagt die Königstochter. Das Mädchen läuft los und holt die Mutter, und die Königstochter sagt zu ihr: „Nimm das Kind und zieh es für mich auf, ich werde dich dafür bezahlen.“',
         'Als der Junge größer geworden ist, bringt die Mutter ihn zur Tochter des Pharao, und er wird ihr Sohn. Sie nennt ihn Mose, denn sie sagt: „Ich habe ihn aus dem Wasser gezogen.“'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Körbchen flechten (flechten, neu)
+      // Spiel gebaut: Körbchen flechten (flechten, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'flechten', hint: 'Flechte das Körbchen aus Schilfrohr.', weave: FLECHTEN },
       questions: [
         { q: 'Woraus macht die Mutter das Körbchen?', options: ['aus Schilfrohr', 'aus Holz', 'aus Stroh'], answer: 0 },
@@ -260,7 +330,7 @@ export const mose: Journey = {
         'Der Priester von Midian, Jitro, hat sieben Töchter, die zum Brunnen kommen, um die Schafe ihres Vaters zu tränken. Doch Hirten kommen und jagen sie fort. Da steht Mose auf, hilft den Mädchen und tränkt ihre Schafe. „Wo ist der Mann?“, fragt Jitro, als sie davon erzählen. „Holt ihn zum Essen!“ Mose bleibt bei Jitro, heiratet seine Tochter Zippora, und als sie einen Sohn bekommen, nennt er ihn Gerschom, denn er sagt: „Ich bin ein Fremder in einem fremden Land.“',
         'Viele Jahre vergehen. In Ägypten stirbt der König, aber für die Israeliten wird die Arbeit nicht leichter, und sie seufzen und schreien zu Gott. Gott hört sie. Er denkt an das Versprechen, das er Abraham, Isaak und Jakob gegeben hat, und er sieht, wie es seinem Volk geht.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: nur Quiz (bleibt Quiz)
+      // Bleibt Quiz (ernste Etappe); das Etappenbild ist noch das von Josef (PLATZHALTER bis zum eigenen Bild)
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'In welches Land flieht Mose?', options: ['nach Midian', 'nach Kanaan', 'nach Babel'], answer: 0 },
@@ -279,7 +349,7 @@ export const mose: Journey = {
         '„Ich habe gesehen, wie schlecht es meinem Volk in Ägypten geht“, sagt Gott, „und ich habe sein Schreien gehört. Ich will es retten und in ein gutes, weites Land führen. Dich schicke ich zum Pharao, damit du mein Volk aus Ägypten herausführst.“',
         '„Wer bin ich, dass ich das tun könnte?“, fragt Mose. „Ich werde mit dir sein“, antwortet Gott. Und als Mose wissen will, wie er Gott dem Volk nennen soll, sagt Gott: „Ich werde sein, der ich sein werde. Sag den Israeliten: Der Gott eurer Väter hat mich zu euch gesandt.“'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Dem Leuchten nachgehen (leuchten, neu)
+      // Spiel gebaut: Dem Leuchten nachgehen (leuchten, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'leuchten', hint: 'Geh dem Leuchten nach.', glow: LEUCHTEN },
       questions: [
         { q: 'Wie heißt der Berg Gottes, an dem der Busch brennt?', options: ['Horeb', 'Karmel', 'Zion'], answer: 0 },
@@ -297,7 +367,7 @@ export const mose: Journey = {
         'Mose verabschiedet sich von Jitro, der zu ihm sagt: „Geh hin in Frieden.“ Dann setzt er Frau und Söhne auf einen Esel, nimmt den Stab Gottes in die Hand und zieht nach Ägypten. Am Berg Gottes begegnet er seinem Bruder Aaron, und die beiden fallen sich in die Arme.',
         'Gemeinsam rufen sie die Ältesten Israels zusammen. Aaron erzählt ihnen alles, was Gott zu Mose gesagt hat, und Mose zeigt die Zeichen. Da glauben die Israeliten ihnen, und als sie hören, dass Gott ihr Elend gesehen hat, verneigen sie sich und beten ihn an.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Unterschiede finden (unterschied, neu)
+      // Spiel gebaut: Unterschiede finden (unterschied, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'unterschied', hint: 'Finde, was im rechten Bild mehr ist.', diff: UNTERSCHIED },
       questions: [
         { q: 'Wozu wird Moses Stab auf der Erde?', options: ['zur Schlange', 'zum Baum', 'zum Seil'], answer: 0 },
@@ -315,8 +385,8 @@ export const mose: Journey = {
         'Mose geht zu Gott und fragt: „Warum hast du mich hergeschickt? Seit ich mit dem Pharao geredet habe, geht es dem Volk schlechter, und du hast es noch nicht gerettet.“ Doch Gott antwortet mit einem Versprechen: „Nun sollst du sehen, was ich mit dem Pharao tun werde. Ich will euch aus der schweren Arbeit herausführen und euch retten. Ihr sollt mein Volk sein, und ich will euer Gott sein.“',
         'Mose sagt es den Israeliten weiter, aber sie hören nicht auf ihn, so mutlos sind sie vor lauter Not. Gottes Zusage aber bleibt bestehen.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Lückenvers (lueckenvers, alt)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      // Spiel gebaut: Lückenvers (lueckenvers, alt); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
+      task: { kind: 'lueckenvers', hint: 'Setze die fehlenden Wörter in den Satz.', verse: VERS },
       questions: [
         { q: 'Was bekommen die Israeliten nach dem Besuch beim Pharao nicht mehr für ihre Ziegel?', options: ['Stroh', 'Wasser', 'Brot'], answer: 0 },
         { q: 'Was verspricht Gott seinem Volk?', options: ['Er will es retten und herausführen.', 'Er will es in Ägypten lassen.', 'Er will es vergessen.'], answer: 0 }
@@ -332,8 +402,8 @@ export const mose: Journey = {
         'Dann lässt Gott Frösche aus dem Fluss steigen. Sie hüpfen in die Häuser, in die Schlafkammern, auf die Betten, in die Backöfen und in die Backtröge, bis überall im Land Frösche sind. Da ruft der Pharao Mose und Aaron zu sich: „Bittet Gott, dass er die Frösche wegnimmt, dann lasse ich das Volk ziehen.“ „Wann soll es sein?“, fragt Mose. „Morgen“, sagt der Pharao. Und am nächsten Tag sind die Frösche aus den Häusern, den Höfen und von den Feldern weg.',
         'Aber als der Pharao merkt, dass es vorbei ist, bricht er sein Wort. So kommen Stechmücken über das Land und danach Ungeziefer, doch im Land Goschen, wo die Israeliten wohnen, gibt es keines. Gott unterscheidet zwischen den Ägyptern und seinem Volk. Auch dieses Mal verspricht der Pharao, das Volk ziehen zu lassen, wenn die Plage endet, und wieder hält er sich nicht daran.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Wimmelbild: Frösche (wimmelbild, alt)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      // Spiel gebaut: Wimmelbild: Frösche (wimmelbild, alt); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
+      task: { kind: 'wimmelbild', hint: 'Finde die zehn Frösche in Pharaos Haus. Manche verstecken sich!', count: 10, find: WIMMEL },
       questions: [
         { q: 'Was kommt aus dem Fluss und füllt die Häuser?', options: ['Frösche', 'Schlangen', 'Krebse'], answer: 0 },
         { q: 'In welchem Land gibt es kein Ungeziefer?', options: ['im Land Goschen', 'im Land Midian', 'im Land Kanaan'], answer: 0 }
@@ -350,7 +420,7 @@ export const mose: Journey = {
         'Danach kommen Heuschrecken, die alles Grüne auffressen, und als sie fort sind, liegt drei Tage lang dichte Finsternis über Ägypten, sodass niemand den anderen sehen kann. Nur bei den Israeliten ist es hell in ihren Wohnungen.',
         'Jetzt will der Pharao die Israeliten ziehen lassen, aber ohne ihre Tiere. „Nein“, sagt Mose, „unser Vieh geht mit uns, nicht einmal ein Huf bleibt zurück.“ Da antwortet der Pharao: „Geh weg von mir und komm mir nicht mehr unter die Augen!“ „Wie du sagst“, antwortet Mose. „Ich werde nicht mehr kommen.“'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: nur Quiz (bleibt Quiz)
+      // Bleibt Quiz (ernste Etappe); das Etappenbild ist noch das von Josef (PLATZHALTER bis zum eigenen Bild)
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wo hagelt es nicht?', options: ['im Land Goschen', 'am Nil', 'in der Wüste'], answer: 0 },
@@ -368,7 +438,7 @@ export const mose: Journey = {
         'Das Fleisch essen sie in dieser Nacht gebraten, dazu ungesäuertes Brot und bittere Kräuter. Und sie sollen dabei bereit zum Aufbruch sein: den Gürtel um die Hüften, die Schuhe an den Füßen und den Stab in der Hand. „Das ist das Passahfest“, sagt Gott, „denn wenn ich das Blut an der Tür sehe, gehe ich an eurem Haus vorüber.“ Mose sagt es den Ältesten, und das Volk verneigt sich und tut alles genau so.',
         'Um Mitternacht geschieht, was Gott angekündigt hat: In Ägypten sterben alle erstgeborenen Söhne, vom Sohn des Pharao bis zum Sohn des Gefangenen im Gefängnis. Ein großes Klagen erhebt sich im ganzen Land, denn in jedem Haus ist jemand gestorben. In den Häusern der Israeliten aber geht Gott vorüber. Noch in der Nacht ruft der Pharao Mose und Aaron: „Macht euch auf und zieht fort, ihr und alle Israeliten, und nehmt auch eure Schafe und Rinder mit!“'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: nur Quiz (bleibt Quiz)
+      // Bleibt Quiz (ernste Etappe); das Etappenbild ist noch das von Josef (PLATZHALTER bis zum eigenen Bild)
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Was streichen die Israeliten an ihre Türpfosten?', options: ['das Blut des Lammes', 'Lehm und Stroh', 'Öl und Farbe'], answer: 0 },
@@ -386,8 +456,8 @@ export const mose: Journey = {
         'So brechen sie in Ramses auf, ein ganzes Volk mit Kindern, Schafen und Rindern, und viele andere Menschen schließen sich ihnen an. Mose nimmt auch die Gebeine Josefs mit, denn Josef hatte die Israeliten vor langer Zeit schwören lassen: „Gott wird sich um euch kümmern. Dann nehmt meine Gebeine mit von hier.“',
         'Gott führt sie nicht auf dem kürzesten Weg, denn dort könnten sie in Kämpfe geraten und wieder nach Ägypten umkehren wollen. Er schickt sie auf einem Umweg durch die Wüste zum Schilfmeer. Und er selbst zieht vor ihnen her, am Tag in einer Wolkensäule, die ihnen den Weg zeigt, und in der Nacht in einer Feuersäule, die ihnen leuchtet. So können sie Tag und Nacht wandern, und die Säule weicht nie von ihnen.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Packen (packen, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      // Spiel gebaut: Packen (packen, vorhandene Mechanik aus Josua); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
+      task: { kind: 'packen', hint: 'Packe das Tragetuch für den Auszug.', pack: AUSZUG },
       questions: [
         { q: 'Was tragen die Israeliten in Tüchern auf den Schultern?', options: ['ungesäuerten Teig', 'frisches Brot', 'Datteln'], answer: 0 },
         { q: 'Wie zeigt Gott dem Volk den Weg?', options: ['mit einer Wolkensäule am Tag und einer Feuersäule in der Nacht', 'mit einem Stern', 'mit einem Hirten'], answer: 0 }
@@ -403,7 +473,7 @@ export const mose: Journey = {
         'In der Nacht stellt sich die Wolkensäule zwischen die Israeliten und die Ägypter. Auf Gottes Wort streckt Mose seine Hand über das Meer aus, und ein starker Wind teilt das Wasser. Mitten im Meer liegt trockener Boden, mit einer Wasserwand rechts und links, und die Israeliten ziehen hindurch, Familie für Familie. Als die Ägypter ihnen nachfolgen, strömt das Wasser zurück und bedeckt Wagen und Reiter. Von dem ganzen Heer folgt dem Volk niemand mehr.',
         'Die Israeliten aber sind gerettet. Sie glauben Gott und seinem Diener Mose und singen ein Danklied. Mirjam, die Schwester von Mose und Aaron, nimmt eine Pauke in die Hand, und alle Frauen folgen ihr mit Pauken und Tanz. „Singt Gott ein Lied“, ruft Mirjam, „denn er hat eine große Tat getan!“'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Mirjams Pauke (takt, neu)
+      // Spiel gebaut: Mirjams Pauke (takt, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'takt', hint: 'Spiele mit Mirjam auf der Pauke.', beat: TAKT },
       questions: [
         { q: 'Was tut Mose auf Gottes Wort am Meer?', options: ['Er streckt seine Hand über das Meer aus.', 'Er schlägt auf einen Felsen.', 'Er wirft seinen Mantel ins Wasser.'], answer: 0 },
@@ -421,7 +491,7 @@ export const mose: Journey = {
         'Jeder soll nur so viel sammeln, wie er und seine Leute essen können, ein Maß voll für jeden in seinem Zelt, und es reicht für alle. Nichts darf bis zum nächsten Morgen aufgehoben werden. Nur am sechsten Tag sammeln sie das Doppelte, denn am siebten Tag, dem Ruhetag, liegt nichts auf dem Boden. Das Volk nennt das Brot Manna und isst es vierzig Jahre lang.',
         'Als sie in Refidim wieder kein Wasser haben, schlägt Mose auf Gottes Wort mit seinem Stab auf einen Felsen, und Wasser strömt heraus, sodass das ganze Volk trinken kann.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Manna sammeln (manna, neu)
+      // Spiel gebaut: Manna sammeln (manna, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'manna', hint: 'Sammle jeden Tag so viel Manna, wie ihr braucht.', manna: MANNA },
       questions: [
         { q: 'Wie nennt das Volk das Brot vom Himmel?', options: ['Manna', 'Honigbrot', 'Wüstenbrot'], answer: 0 },
@@ -439,7 +509,7 @@ export const mose: Journey = {
         'Dann spricht Gott die zehn Gebote. „Ich bin dein Gott, der dich aus Ägypten befreit hat“, beginnt er. „Du sollst keine anderen Götter neben mir haben und dir kein Götterbild machen, um es anzubeten. Du sollst meinen Namen nicht missbrauchen. Halte den Ruhetag heilig. Ehre Vater und Mutter. Du sollst nicht töten, die Ehe nicht brechen, nicht stehlen und nicht lügen, wenn du über andere redest. Und du sollst nicht haben wollen, was deinem Nächsten gehört.“',
         'Das Volk sieht Donner und Blitz und den rauchenden Berg und weicht zurück. „Rede du mit uns“, bitten sie Mose, „aber Gott soll nicht mit uns reden, sonst sterben wir.“ „Fürchtet euch nicht“, sagt Mose. „Gott ist gekommen, damit ihr ihn achtet und nichts Böses tut.“ Dann geht er in das Dunkel hinein, wo Gott ist.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Worte ordnen (worte, neu)
+      // Spiel gebaut: Worte ordnen (worte, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'worte', hint: 'Lege die Wörter zu Gottes Worten zusammen.', words: WORTE },
       questions: [
         { q: 'Wie viele Gebote gibt Gott am Berg Sinai?', options: ['zehn', 'sieben', 'zwölf'], answer: 0 },
@@ -457,7 +527,7 @@ export const mose: Journey = {
         'Mose steigt mit den beiden Steintafeln den Berg hinab, die Gott selbst beschrieben hat. Als er das Kalb und den Tanz sieht, wird er so zornig, dass er die Tafeln zu Boden wirft, und sie zerbrechen. Das Volk muss die Folgen seines Tuns tragen, und es ist ein trauriger Tag in Israel.',
         'Am nächsten Morgen sagt Mose zum Volk: „Ihr habt eine große Schuld auf euch geladen. Ich will zu Gott hinaufgehen und bitten, dass er sie euch vergibt.“ Und er steigt noch einmal auf den Berg.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: nur Quiz (bleibt Quiz)
+      // Bleibt Quiz (ernste Etappe); das Etappenbild ist noch das von Josef (PLATZHALTER bis zum eigenen Bild)
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Woraus macht Aaron das Kalb?', options: ['aus goldenen Ohrringen', 'aus Holz', 'aus Lehm'], answer: 0 },
@@ -476,7 +546,7 @@ export const mose: Journey = {
         'Dann sagt Gott zu Mose: „Haue dir zwei neue Steintafeln!“ Früh am Morgen steigt Mose noch einmal auf den Berg. Da kommt Gott in der Wolke herab und ruft: „Gott, barmherzig und gnädig und geduldig und von großer Gnade und Treue!“ Mose verneigt sich tief und betet an. Vierzig Tage und Nächte bleibt er bei Gott, und als er herabkommt, glänzt sein Gesicht, weil er mit Gott geredet hat.',
         'Später baut das Volk auf Gottes Wort ein großes Zelt, das Zelt Gottes, mitten im Lager. Da bedeckt die Wolke das Zelt, und Gottes Herrlichkeit erfüllt es. Immer wenn sich die Wolke erhebt, bricht das Volk auf, und solange sie über dem Zelt bleibt, bleibt es stehen. So geht Gott mit seinem Volk, bei Tag und bei Nacht, auf dem ganzen Weg.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Der Wolke folgen (wolke, neu)
+      // Spiel gebaut: Der Wolke folgen (wolke, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'wolke', hint: 'Folge der Wolke: Breche auf, wenn sie sich hebt.', cloud: WOLKE },
       questions: [
         { q: 'Wie nennt Mose das Zelt vor dem Lager?', options: ['Zelt der Begegnung', 'Zelt des Pharao', 'Zelt der Hirten'], answer: 0 },

@@ -12,6 +12,7 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
+import { solvable } from '@/utils/josuaGames'
 import { dayOk, diffAt, distance, frontCells, frontCount, glow, noTriple, ringTimes, shuffle, wordsOf } from '@/utils/moseGames'
 
 afterEach(() => setAdventureLanguage('de'))
@@ -119,9 +120,16 @@ describe('Mose: stories and questions', () => {
 })
 
 describe('Mose: the games, and the placeholders until the pictures come', () => {
-  it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(mose.stages.map((s) => s.task.kind)).toEqual(['quiz', 'flechten', 'quiz', 'leuchten', 'unterschied', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'takt', 'manna', 'worte', 'quiz', 'wolke'])
+  it('the plan of the games: ten stages with a game, the five serious ones only quizzes; six new mechanics, one drum game; three old ones (verse, hidden pictures, packing) and no mechanic twice; at most two rounds each', () => {
+    expect(mose.stages.map((s) => s.task.kind)).toEqual(['quiz', 'flechten', 'quiz', 'leuchten', 'unterschied', 'lueckenvers', 'wimmelbild', 'quiz', 'quiz', 'packen', 'takt', 'manna', 'worte', 'quiz', 'wolke'])
     for (const s of mose.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
+    const games = mose.stages.filter((s) => s.task.kind !== 'quiz')
+    expect(games).toHaveLength(10)
+    expect(new Set(games.map((s) => s.task.kind)).size, 'no mechanic twice').toBe(10)
+    for (const s of games) {
+      const g = (s.task.weave ?? s.task.glow ?? s.task.diff ?? s.task.verse ?? s.task.pack ?? s.task.beat ?? s.task.manna ?? s.task.words ?? s.task.cloud) as { rounds: unknown[] } | undefined
+      if (s.task.kind !== 'wimmelbild') expect(g?.rounds.length, `rounds of stage ${s.id}`).toBeLessThanOrEqual(2)
+    }
   })
 
   it('13 words: three sentences in each round, all word for word in the text of the stage (also in English); the sentence of the quiz question is not used; the goal is 6', () => {
@@ -254,6 +262,64 @@ describe('Mose: the games, and the placeholders until the pictures come', () => 
     }
     expect(g.background).toBe(stage(11).image)
     expect(g.drum).not.toBe(g.ring)
+  })
+
+  it('6 verse: two rounds with two and three gaps (five in all); the right words are in the text of the stage; every round has a wrong word as well; the goal is 5', () => {
+    const g = stage(6).task.verse
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => r.answers.length)).toEqual([2, 3])
+    expect(g.rounds.reduce((sum, r) => sum + r.answers.length, 0)).toBe(5)
+    const text = stage(6).text.join(' ')
+    for (const r of g.rounds) {
+      expect(r.parts).toHaveLength(r.answers.length + 1)
+      expect(new Set(r.answers).size, 'every gap has its own word').toBe(r.answers.length)
+      for (const a of r.answers) {
+        expect(a).toBeLessThan(r.words.length)
+        expect(text, r.words[a]).toContain(r.words[a]!)
+      }
+      expect(r.words.length, 'a wrong word or two as well').toBeGreaterThan(r.answers.length)
+    }
+    expect(g.background).toBe(stage(6).image)
+  })
+
+  it('7 hidden frogs: ten finds, six covers, a label for each; all inside the picture; every cover hides a find', () => {
+    const f = stage(7).task.find
+    expect(f, 'the game is built').toBeDefined()
+    if (!f) return
+    expect(stage(7).task.count).toBe(10)
+    expect(f.finds).toHaveLength(10)
+    expect(f.covers).toHaveLength(6)
+    expect(f.labels).toHaveLength(10)
+    for (const t of [...f.finds, ...f.covers]) {
+      expect(t.x >= 0 && t.x <= 100 && t.y >= 0 && t.y <= 100).toBe(true)
+    }
+    // each cover stands just in front of a find (its middle is near the find's, a little lower)
+    for (const c of f.covers) {
+      const hides = f.finds.filter((t) => Math.abs(t.x - c.x) <= c.w / 2 && c.y - t.y >= 0 && c.y - t.y <= 10)
+      expect(hides.length, `cover at ${c.x}/${c.y}`).toBeGreaterThanOrEqual(1)
+    }
+    expect(new Set(f.finds.map((t) => t.image)).size, 'ten different frogs').toBe(10)
+  })
+
+  it('10 pack: two rounds fill the cloth exactly and can be packed; the pieces have names; the goal is 8', () => {
+    const p = stage(10).task.pack
+    expect(p, 'the game is built').toBeDefined()
+    if (!p) return
+    expect(p.rounds.map((r) => [r.cols, r.rows, r.items.length])).toEqual([[4, 3, 3], [5, 4, 5]])
+    expect(p.rounds.reduce((sum, r) => sum + r.items.length, 0)).toBe(8)
+    expect(new Set(p.items.map((i) => i.id)).size).toBe(p.items.length)
+    for (const i of p.items) expect(i.label, i.id).toBeTruthy()
+    for (const r of p.rounds) {
+      const shapes = r.items.map((id) => {
+        const it = p.items.find((i) => i.id === id)
+        expect(it, id).toBeDefined()
+        return { id, w: it!.w, h: it!.h }
+      })
+      expect(shapes.reduce((s, x) => s + x.w * x.h, 0), 'no cell left over').toBe(r.cols * r.rows)
+      expect(solvable(r.cols, r.rows, shapes), 'the round can be packed').toBe(true)
+    }
+    expect(p.background).toBe(stage(10).image)
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

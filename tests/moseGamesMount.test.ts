@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { BeatGame, CloudGame, DiffGame, GlowGame, MannaGame, WeaveGame, WordsGame } from '@/types/adventure'
+import type { BeatGame, CloudGame, DiffGame, GlowGame, MannaGame, PackGame, WeaveGame, WordsGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -1102,5 +1102,31 @@ describe('Mirjams Pauke (beat)', () => {
     await tick(1000)
     await w.find('.bt-drum').trigger('pointerdown')
     expect(w.find('.bt-fb').text()).toBe('There was no ring here. Wait until it reaches the drum.')
+  })
+})
+
+// ---------------------------------------------------------------- the packing game with named pieces
+describe('Das Tragetuch packen (pack with labels)', () => {
+  const game: PackGame = {
+    background: 'images/x/camp.webp',
+    basket: 'images/x/cloth.webp',
+    items: [
+      { id: 'kleiderbuendel', image: 'images/x/clothes.webp', w: 3, h: 2, label: 'Kleiderbündel' },
+      { id: 'teigtrog', image: 'images/x/dough.webp', w: 2, h: 2, label: 'Teigtrog' },
+      { id: 'silberkrug', image: 'images/x/silver.webp', w: 1, h: 2, label: 'Silberkrug' }
+    ],
+    area: { x: 20, y: 32, w: 60, h: 56 },
+    rounds: [{ hint: 'Runde eins.', cols: 4, rows: 3, items: ['kleiderbuendel', 'teigtrog', 'silberkrug'] }]
+  }
+
+  it('the pieces are called by their label (not by a name that the basket knows)', async () => {
+    const { default: Pack } = await import('@/components/molecules/games/GamePack.vue')
+    const w = mount(Pack, { ...opts('de'), props: { game } })
+    await flushPromises()
+    expect(useTaskProgress().goal.value).toBe(3)
+    const names = w.findAll('.pk-tray .pk-item').map((b) => b.attributes('aria-label'))
+    expect(names).toEqual(['Kleiderbündel', 'Teigtrog', 'Silberkrug'])
+    expect(w.html()).not.toContain('packName')
+    expect(problems()).toEqual([])
   })
 })

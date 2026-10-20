@@ -59,8 +59,8 @@ const stars = computed(() => mistakeStars(mistakes.value + tips.value, 3, 8))
 const itemOf = (id: string): PackItem | undefined => props.game.items.find((i) => i.id === id)
 const colourOf = (id: string) => COLOURS[Math.max(0, props.game.items.findIndex((i) => i.id === id)) % COLOURS.length]
 const baseOf = (id: string) => id.replace(/-\d+$/, '')
-/** What the thing is called (the ids `krug-1` and `krug-2` are two jugs). */
-const nameOf = (id: string) => t(`app.adventure.packName${baseOf(id).charAt(0).toUpperCase()}${baseOf(id).slice(1)}`)
+/** What the thing is called: the `label` of the thing when it has one, else the name of the basket (the ids `krug-1` and `krug-2` are two jugs). */
+const nameOf = (id: string) => itemOf(id)?.label ?? t(`app.adventure.packName${baseOf(id).charAt(0).toUpperCase()}${baseOf(id).slice(1)}`)
 
 /** The place for a thing with its top left cell near (col, row): as it is, else turned; the corner is moved in when the thing would stick out. */
 function find(id: string, col: number, row: number, prefer: boolean): PackPlace | null {

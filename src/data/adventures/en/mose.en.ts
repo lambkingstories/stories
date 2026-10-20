@@ -98,7 +98,7 @@ export const moseEn: TextOverlay<Journey> = {
         'Moses goes to God and asks, “Why did you send me here? Since I spoke to Pharaoh, things have gotten worse for the people, and you have not rescued them yet.” But God answers with a promise: “Now you will see what I will do to Pharaoh. I will lead you out of the hard labor and rescue you. You will be my people, and I will be your God.”',
         'Moses passes it on to the Israelites, but they do not listen to him, because they are so discouraged by all their trouble. But God’s promise remains.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Put the missing words into the sentence.', verse: { rounds: [{ hint: 'Round 1: Drag the right leaf into the gap.', parts: ['Let my ', ' go, so that they may hold a feast for me in the ', '!'], words: ['people', 'desert', 'land', 'city'] }, { hint: 'Round 2: God\'s promise. Now three words are missing.', parts: ['I will ', ' you out of the hard labor and ', ' you. You will be my people, and I will be your ', '.'], words: ['lead', 'rescue', 'God', 'king', 'shepherd'] }] } },
       questions: [
         { q: 'What do the Israelites no longer get for their bricks after the visit to Pharaoh?', options: ['straw', 'water', 'bread'] },
         { q: 'What does God promise his people?', options: ['He will rescue them and lead them out.', 'He will leave them in Egypt.', 'He will forget them.'] }
@@ -112,7 +112,7 @@ export const moseEn: TextOverlay<Journey> = {
         'Then God lets frogs come up out of the river. They hop into the houses, into the bedrooms, onto the beds, into the ovens and into the kneading bowls, until there are frogs everywhere in the land. Then Pharaoh calls Moses and Aaron to him: “Ask God to take the frogs away, and I will let the people go.” “When shall it be?” asks Moses. “Tomorrow,” says Pharaoh. And the next day the frogs are gone from the houses, the courtyards, and the fields.',
         'But when Pharaoh sees that it is over, he breaks his word. So gnats come over the land, and after them swarms of flies, but in the land of Goshen, where the Israelites live, there are none. God separates the Egyptians from his people. This time too Pharaoh promises to let the people go when the plague ends, and again he does not keep his promise.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Find the ten frogs in Pharaoh\'s house. Some of them are hiding!', find: { labels: ['Frog', 'Frog', 'Frog', 'Frog', 'Frog', 'Frog', 'Frog', 'Frog', 'Frog', 'Frog'], doneText: 'You found all ten frogs!' } },
       questions: [
         { q: 'What comes out of the river and fills the houses?', options: ['frogs', 'snakes', 'crabs'] },
         { q: 'In which land are there no flies?', options: ['in the land of Goshen', 'in the land of Midian', 'in the land of Canaan'] }
@@ -157,7 +157,7 @@ export const moseEn: TextOverlay<Journey> = {
         'So they set out from Rameses, a whole people with children, sheep and cattle, and many other people join them. Moses also takes the bones of Joseph with him, because Joseph had made the Israelites promise long ago: “God will take care of you. Then carry my bones up from here.”',
         'God does not lead them by the shortest way, for there they might get into battles and want to turn back to Egypt. He sends them on a detour through the desert toward the Red Sea. And he himself goes ahead of them, by day in a pillar of cloud that shows them the way, and by night in a pillar of fire that gives them light. So they can travel day and night, and the pillar never leaves them.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Pack the carrying cloth for the journey out.', pack: { items: [{ label: 'Bundle of clothes' }, { label: 'Dough trough' }, { label: 'Bundle of cloths' }, { label: 'Silver jug' }, { label: 'Gold jug' }], rounds: [{ hint: 'Pack the carrying cloth. Tap a piece on the cloth and it turns.' }, { hint: 'Now there are more pieces and no room to spare. Think carefully how everything fits.' }] } },
       questions: [
         { q: 'What do the Israelites carry in cloths on their shoulders?', options: ['dough without yeast', 'fresh bread', 'dates'] },
         { q: 'How does God show the people the way?', options: ['with a pillar of cloud by day and a pillar of fire by night', 'with a star', 'with a shepherd'] }
