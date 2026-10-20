@@ -33,7 +33,7 @@ describe('Babel: stories and questions', () => {
       expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(60)
       expect(words, `words ${s.id}`).toBeLessThanOrEqual(220)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.audio, s.id.toString()).toBe(`audio/abenteuer/babel/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`)
+      expect(s.audio, s.id.toString()).toBe(`audio/abenteuer/babel/geschichte-${String(s.id).padStart(2, '0')}-v2.mp3`)
       expect(s.image).toBe(`images/abenteuer/babel/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
     }
   })
@@ -346,7 +346,7 @@ describe('Babel: English', () => {
       expect(s.task.hint, `hint ${s.id}`).not.toBe(de[i]!.hint)
       s.questions.forEach((q, k) => expect(q.q, `question ${s.id}.${k}`).not.toBe(de[i]!.q[k]))
       expect(s.ref, `ref ${s.id}`).toMatch(/^Genesis 11:/)
-      expect(s.audio, `audio ${s.id}`).toBe(`audio/abenteuer/babel/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)
+      expect(s.audio, `audio ${s.id}`).toBe(`audio/abenteuer/babel/geschichte-${String(s.id).padStart(2, '0')}-en-v2.mp3`)
     })
     expect(babel.title).toBe('The Tower of Babel')
     // the serious stage has its English line, too
