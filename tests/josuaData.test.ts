@@ -106,7 +106,7 @@ describe('Josua: stories and questions', () => {
 
 describe('Josua: the placeholders until the games and pictures come', () => {
   it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(josua.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'quiz', 'quiz', 'memory', 'quiz', 'quiz', 'quiz', 'quiz', 'lueckenvers'])
+    expect(josua.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'quiz', 'schritt', 'memory', 'quiz', 'quiz', 'quiz', 'quiz', 'lueckenvers'])
     for (const s of josua.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
@@ -132,6 +132,16 @@ describe('Josua: the placeholders until the games and pictures come', () => {
     const text = stage(10).text.join(' ')
     for (const word of ['dienen', 'Zeuge', 'Worte']) expect(text, word).toContain(word)
     expect(v!.background).toBe(stage(10).image)
+  })
+
+  it('4 step: eight steps at 70 beats a minute, then twelve at 90; the second round is quicker and stricter; the path goes up the picture', () => {
+    const g = stage(4).task.step
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => [r.bpm, r.steps, r.tolerance])).toEqual([[70, 8, 0.3], [90, 12, 0.25]])
+    expect(g.path.length).toBeGreaterThanOrEqual(6)
+    for (let i = 1; i < g.path.length; i++) expect(g.path[i]![1], 'the path goes up').toBeLessThan(g.path[i - 1]![1])
+    for (const [x, y] of g.path) expect(x >= 0 && x <= 100 && y >= 0 && y <= 100).toBe(true)
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

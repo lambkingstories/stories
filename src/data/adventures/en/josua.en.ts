@@ -65,7 +65,7 @@ export const josuaEn: TextOverlay<Journey> = {
         'At this time of harvest the Jordan is full to overflowing. Joshua says to the priests, “Take up the ark and go ahead of the people.” And to the people he says, “This is how you will know that God is among you: when the feet of the priests stand in the water, the water from upstream will stand still like a wall.”',
         'The priests carry the ark to the bank and dip their feet into the water. And then it happens: the water coming from upstream stops far away near the city of Adam and piles up. The water below flows away to the Salt Sea until the riverbed is empty. Now the people cross opposite Jericho, and the priests stand with the ark in the middle of the Jordan on dry ground until everyone has passed through.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Tap in time with the steps.', step: { rounds: [{ hint: 'Tap in time with the steps, when the foot comes down.' }, { hint: 'Once more, a little faster.' }] } },
       questions: [
         { q: 'Who carries the ark of the covenant?', options: ['the priests', 'the spies', 'the children'] },
         { q: 'What happens to the water when the priests dip their feet in?', options: ['It stands still.', 'It turns warm.', 'It turns to ice.'] }

@@ -11,7 +11,7 @@
  * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit den ersten zehn Stationen (PLATZHALTER bis zum eigenen Panorama); Medaille und Geschenk sind ebenfalls die von Josef.
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme. Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { Journey, MemoryGame, VerseGame } from '@/types/adventure'
+import type { Journey, MemoryGame, StepGame, VerseGame } from '@/types/adventure'
 import { josef } from './josef'
 import { JOSUA_PATH } from './josuaPath'
 import { localize } from './localize'
@@ -20,6 +20,23 @@ import { josuaEn } from './en/josua.en'
 // PLATZHALTER bis zum eigenen Bild: die Etappenbilder von Josef (Ordner images/abenteuer/josef/); danach `images/abenteuer/josua/etappe-bild-NN.webp`
 const PLACEHOLDER = 'images/abenteuer/josef/'
 const G = 'images/abenteuer/spiele/josua/'
+
+/**
+ * Etappe 4, "Im Gleichschritt": die Priester tragen die Lade durch das trockene Flussbett, das Kind tippt im Takt der Schritte (Bildauftrag JO13; eigener Hintergrund `schritt/flussbett.webp`).
+ * Runde 1 acht Schritte bei 70 Schlägen je Minute (Toleranz 0,30 s), Runde 2 zwölf Schritte bei 90 (0,25 s). Der Kiesweg `path` (Prozent des Bildes, von unten nach oben) ist vorläufig
+ * geschätzt, bis die Datei `schritt-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `schritt/flussbett.webp` 1200 × 900, `lade-getragen.webp` 480 × 320, `fussspur.webp` 80 × 120 (die letzten beiden transparent).
+ */
+const SCHRITT: StepGame = {
+  background: `${G}schritt/flussbett.webp`,
+  bearers: `${G}schritt/lade-getragen.webp`,
+  print: `${G}schritt/fussspur.webp`,
+  path: [[50, 92], [48, 80], [52, 68], [48, 56], [51, 44], [50, 32]],
+  rounds: [
+    { hint: 'Tippe im Takt der Schritte, wenn der Fuß aufsetzt.', bpm: 70, steps: 8, tolerance: 0.3 },
+    { hint: 'Noch einmal, jetzt etwas schneller.', bpm: 90, steps: 12, tolerance: 0.25 }
+  ]
+}
 
 /** Etappe 10, "Lückenvers": zwei Sätze aus dem Text der Etappe; die Wörter sind kurze Blätter (das richtige zuerst, `answers` zeigt auf sie). Tafel und Blatt sind die aus Adam und Eva, kopiert. Hintergrund ist das Etappenbild 10. */
 const VERS: VerseGame = {
@@ -130,7 +147,7 @@ export const josua: Journey = {
         'Die Priester tragen die Lade bis ans Ufer und tauchen die Füße in das Wasser. Da geschieht es: Das Wasser, das von oben kommt, bleibt weit weg bei der Stadt Adam stehen und türmt sich auf. Das Wasser unten fließt zum Salzmeer ab, bis das Flussbett leer ist. Nun zieht das Volk gegenüber von Jericho hinüber, und die Priester stehen mit der Lade mitten im Jordan auf trockenem Boden, bis alle hindurch sind.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild; vorgesehen: Im Gleichschritt (schritt, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'schritt', hint: 'Tippe im Takt der Schritte.', step: SCHRITT },
       questions: [
         { q: 'Wer trägt die Lade des Bundes?', options: ['die Priester', 'die Kundschafter', 'die Kinder'], answer: 0 },
         { q: 'Was geschieht mit dem Wasser, als die Priester die Füße hineintauchen?', options: ['Es bleibt stehen.', 'Es wird warm.', 'Es wird zu Eis.'], answer: 0 }
