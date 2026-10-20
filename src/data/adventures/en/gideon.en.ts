@@ -113,7 +113,7 @@ export const gideonEn: TextOverlay<Journey> = {
         'Then God says to Gideon, “You have too many men with you. If I give the Midianites into your hands, Israel could boast and say: I saved myself.” So Gideon is to announce to everyone, “Whoever is afraid and trembling may turn back and go home!”',
         'And many set out for home. Twenty-two thousand men turn back. Only ten thousand stay with Gideon. They watch the others go, and the camp becomes quiet. But God says to Gideon, “There are still too many.”'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'Set the switch so that every man goes his way.', swit: { rounds: [{ hint: 'The men come to the fork. Whoever shows a house wants to go home: set the switch to the right. Whoever shows a horn stays: set it to the left.' }, { hint: 'Now more men come, and the bubble soon goes away. Tap the man and it is back.' }] } },
       questions: [
         { q: 'Who may go home?', options: ['whoever is afraid', 'whoever is tired', 'whoever has the oldest tent'] },
         { q: 'How many men stay with Gideon?', options: ['ten thousand', 'twenty-two thousand', 'nine hundred'] }

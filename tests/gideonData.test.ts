@@ -112,7 +112,7 @@ describe('Gideon: stories and questions', () => {
 
 describe('Gideon: the placeholders until the games and pictures come', () => {
   it('every stage has the quiz task for now (PLATZHALTER bis Spiel/Bild); the games of the plan are listed in the data file, not yet built', () => {
-    expect(gideon.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'worfeln', 'wort', 'quiz', 'tau', 'quiz', 'wimmelbild', 'quiz', 'quiz', 'quiz', 'memory'])
+    expect(gideon.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'worfeln', 'wort', 'quiz', 'tau', 'weiche', 'wimmelbild', 'quiz', 'quiz', 'quiz', 'memory'])
     for (const s of gideon.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
@@ -188,6 +188,23 @@ describe('Gideon: the placeholders until the games and pictures come', () => {
     expect(g.trayBox.x + g.trayBox.w).toBeLessThanOrEqual(100)
     expect(g.trayBox.y + g.trayBox.h).toBeLessThanOrEqual(100)
     expect(g.rounds.reduce((n, r) => n + r.chaff, 0)).toBe(22)
+  })
+
+  it('7 switch: six men, then eight with two waiting and a bubble that goes away; every round has men who go home and men who stay; the fork lies in the picture; the goal is 14', () => {
+    const g = stage(7).task.swit
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => [r.men.length, r.queue, r.hideBubbleMs ?? 0])).toEqual([[6, 1, 0], [8, 2, 2000]])
+    for (const r of g.rounds) {
+      expect(r.men.filter((m) => m === 'home').length).toBeGreaterThanOrEqual(2)
+      expect(r.men.filter((m) => m === 'stay').length).toBeGreaterThanOrEqual(2)
+      for (const m of r.men) expect(['home', 'stay']).toContain(m)
+    }
+    expect(g.men).toHaveLength(3)
+    expect(g.fork[0] >= 0 && g.fork[0] <= 100 && g.fork[1] >= 0 && g.fork[1] <= 100).toBe(true)
+    // the men queue up the path, which must stay inside the picture
+    expect(g.fork[1] - 13 * (g.rounds[1]!.queue - 1)).toBeGreaterThan(0)
+    expect(g.rounds.reduce((n, r) => n + r.men.length, 0)).toBe(14)
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

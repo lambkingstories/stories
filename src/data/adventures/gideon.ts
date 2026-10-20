@@ -11,7 +11,7 @@
  * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit allen zwölf Stationen und dem Ziel (PLATZHALTER bis zum eigenen Panorama); Medaille und Geschenk sind ebenfalls die von Josef.
  * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme. Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { DewGame, FindGame, Journey, MemoryGame, WinnowGame, WordGame } from '@/types/adventure'
+import type { DewGame, FindGame, Journey, MemoryGame, SwitchGame, WinnowGame, WordGame } from '@/types/adventure'
 import { josef } from './josef'
 import { GIDEON_PATH } from './gideonPath'
 import { localize } from './localize'
@@ -106,6 +106,31 @@ const WORFELN: WinnowGame = {
   rounds: [
     { hint: 'Stelle den Wind ein. Die leichte Spreu soll wegfliegen, die schweren Körner sollen liegen bleiben.', chaff: 10, grains: 8, window: [35, 75], gust: 0, seed: 31 },
     { hint: 'Jetzt weht eine leichte Böe, und der richtige Wind ist enger. Gib acht auf die Körner.', chaff: 12, grains: 8, window: [45, 62], gust: 5, seed: 47 }
+  ]
+}
+
+/**
+ * Etappe 7, "Wer geht heim?": die Männer kommen den Pfad herab und stehen an der Gabelung; eine Sprechblase zeigt ein Haus (will heim) oder ein Horn (bleibt); das Kind stellt die Weiche, links ins Lager, rechts heim
+ * (Bildauftrag G13; eigener Hintergrund `weiche/weiche.webp`). Die Zeichen sind eine Spielhilfe, keine Aussage der Bibel. Runde 1 sechs Männer, die Blase bleibt; Runde 2 acht Männer, zwei warten, die Blase geht nach
+ * zwei Sekunden (Antippen des Mannes zeigt sie wieder). Die Gabelung `fork` (Prozent des Bildes) ist vorläufig geschätzt, bis die Datei `weiche-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `weiche/weiche.webp` 900 × 1200, `mann-a.webp`, `mann-b.webp`, `mann-c.webp` je 140 × 220, `blase-haus.webp`, `blase-horn.webp` je 120 × 120,
+ * `hebel-links.webp`, `hebel-rechts.webp` je 200 × 200 (alle außer dem Hintergrund transparent).
+ */
+const WEICHE: SwitchGame = {
+  background: `${G}weiche/weiche.webp`,
+  men: [
+    { id: 'mann-a', image: `${G}weiche/mann-a.webp`, w: 14 },
+    { id: 'mann-b', image: `${G}weiche/mann-b.webp`, w: 14 },
+    { id: 'mann-c', image: `${G}weiche/mann-c.webp`, w: 14 }
+  ],
+  bubbleHome: `${G}weiche/blase-haus.webp`,
+  bubbleHorn: `${G}weiche/blase-horn.webp`,
+  leverLeft: `${G}weiche/hebel-links.webp`,
+  leverRight: `${G}weiche/hebel-rechts.webp`,
+  fork: [50, 62],
+  rounds: [
+    { hint: 'Die Männer kommen zur Gabelung. Wer ein Haus zeigt, will heim: stelle die Weiche nach rechts. Wer ein Horn zeigt, bleibt: stelle sie nach links.', men: ['home', 'stay', 'stay', 'home', 'home', 'stay'], queue: 1 },
+    { hint: 'Jetzt kommen mehr Männer, und die Sprechblase verschwindet bald. Tippe den Mann an, dann ist sie wieder da.', men: ['stay', 'home', 'home', 'stay', 'home', 'stay', 'stay', 'home'], hideBubbleMs: 2000, queue: 2 }
   ]
 }
 
@@ -251,7 +276,7 @@ export const gideon: Journey = {
         'Und viele machen sich auf den Heimweg. Zweiundzwanzigtausend Männer kehren um. Nur zehntausend bleiben bei Gideon. Sie sehen den anderen nach, und im Lager wird es still. Aber Gott sagt zu Gideon: „Es sind immer noch zu viele.“'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild von Josef; vorgesehen: Wer geht heim? (weiche, neu)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'weiche', hint: 'Stelle die Weiche, damit jeder Mann seinen Weg geht.', swit: WEICHE },
       questions: [
         { q: 'Wer darf nach Hause gehen?', options: ['wer Angst hat', 'wer müde ist', 'wer das älteste Zelt hat'], answer: 0 },
         { q: 'Wie viele Männer bleiben bei Gideon?', options: ['zehntausend', 'zweiundzwanzigtausend', 'neunhundert'], answer: 0 }

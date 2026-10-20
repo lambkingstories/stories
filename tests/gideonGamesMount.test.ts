@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { DewGame, WinnowGame, WordGame } from '@/types/adventure'
+import type { DewGame, SwitchGame, WinnowGame, WordGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -509,5 +509,130 @@ describe('Spreu im Wind (winnow)', () => {
     await setWind(w, 100)
     await tick(500)
     expect(w.find('.wn-fb').text()).toContain('some grains flew away')
+  })
+})
+
+// ---------------------------------------------------------------- who goes home
+describe('Wer geht heim? (switch)', () => {
+  const game: SwitchGame = {
+    background: 'images/x/fork.webp',
+    men: [
+      { id: 'a', image: 'images/x/a.webp', w: 14 },
+      { id: 'b', image: 'images/x/b.webp', w: 14 },
+      { id: 'c', image: 'images/x/c.webp', w: 14 }
+    ],
+    bubbleHome: 'images/x/house.webp',
+    bubbleHorn: 'images/x/horn.webp',
+    leverLeft: 'images/x/left.webp',
+    leverRight: 'images/x/right.webp',
+    fork: [50, 62],
+    rounds: [
+      { hint: 'Runde eins.', men: ['home', 'stay', 'home'], queue: 1 },
+      { hint: 'Runde zwei.', men: ['stay', 'home', 'stay', 'home'], hideBubbleMs: 2000, queue: 2 }
+    ]
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    const { default: Switch } = await import('@/components/molecules/games/GameSwitch.vue')
+    const w = mount(Switch, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  const pull = async (w: W, side: 'left' | 'right') => {
+    await w.findAll('.sw-lever')[side === 'left' ? 0 : 1]!.trigger('click')
+    await flushPromises()
+  }
+  /** The men are sent the way they want: the list is what the round says. */
+  const send = async (w: W, men: ('home' | 'stay')[]) => {
+    for (const m of men) {
+      await pull(w, m === 'home' ? 'right' : 'left')
+      await tick(800)
+    }
+  }
+
+  it('the goal is every man of both rounds; one man waits at the fork and shows a house, the levers are the two ways', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(7)
+    expect(w.find('.sw-round').text()).toContain('Runde 1 von 2')
+    expect(w.findAll('.sw-man')).toHaveLength(1)
+    expect(w.find('.sw-bubble').exists()).toBe(true)
+    expect(w.find('.sw-man').attributes('aria-label')).toContain('Haus')
+    expect(w.findAll('.sw-lever')).toHaveLength(2)
+    expect(w.find('.sw-count').text()).toBe('Durchgelassen: 0 von 3')
+  })
+
+  it('the wrong lever: the man shakes his head, a cross, a dull sound, a mistake; he stays and the bubble stays', async () => {
+    const w = await open()
+    await pull(w, 'left')
+    expect(played).toContain('wrong')
+    expect(w.find('.sw-man').classes()).toContain('shake')
+    expect(w.find('.sw-fb').text()).toContain('schüttelt freundlich den Kopf')
+    expect(w.find('.gm.bad').exists()).toBe(true)
+    expect(w.find('.sw-count').text()).toBe('Durchgelassen: 0 von 3')
+    expect(w.find('.sw-bubble').exists()).toBe(true)
+  })
+
+  it('the right lever: the man walks off (soft steps), the levers wait meanwhile; then the next man comes with a horn', async () => {
+    const w = await open()
+    await pull(w, 'right')
+    expect(played).toContain('caravan')
+    expect(w.find('.sw-man').classes()).toContain('away')
+    expect(w.find('.sw-man').classes()).toContain('right')
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(w.findAll('.sw-lever')[0]!.attributes('disabled')).toBeDefined()
+    await pull(w, 'left')
+    expect(played).not.toContain('wrong')
+    await tick(800)
+    expect(w.find('.sw-count').text()).toBe('Durchgelassen: 1 von 3')
+    expect(w.find('.sw-man').attributes('aria-label')).toContain('Horn')
+    expect(w.find('.sw-man').classes()).not.toContain('away')
+  })
+
+  it('the arrow keys set the switch, too', async () => {
+    const w = await open()
+    await w.find('.sw').trigger('keydown', { key: 'ArrowRight' })
+    expect(useTaskProgress().parts.value).toBe(1)
+    await tick(800)
+    await w.find('.sw').trigger('keydown', { key: 'ArrowRight' })
+    expect(w.find('.sw-fb').text()).toContain('Kopf')
+  })
+
+  it('round 2: two men wait, the bubble goes away after two seconds, a tap on the man shows it again (no mistake)', async () => {
+    const w = await open()
+    await send(w, ['home', 'stay', 'home'])
+    await tick(1800)
+    expect(w.find('.sw-round').text()).toContain('Runde 2 von 2')
+    expect(w.findAll('.sw-man')).toHaveLength(2)
+    expect(w.find('.sw-bubble').exists()).toBe(true)
+    await tick(2100)
+    expect(w.find('.sw-bubble').exists()).toBe(false)
+    await w.find('.sw-man').trigger('click')
+    expect(w.find('.sw-bubble').exists()).toBe(true)
+    expect(played).not.toContain('wrong')
+  })
+
+  it('the whole game: the end with three stars; the wrong levers give the stars (up to two: three, up to five: two, more: one)', async () => {
+    for (const [wrong, stars] of [[0, 3], [2, 3], [3, 2], [5, 2], [6, 1]] as const) {
+      useTaskProgress().reset()
+      const w = await open()
+      for (let i = 0; i < wrong; i++) await pull(w, 'left')
+      await send(w, ['home', 'stay', 'home'])
+      await tick(1800)
+      await send(w, ['stay', 'home', 'stay', 'home'])
+      await tick(1000)
+      expect(useTaskProgress().parts.value).toBe(7)
+      expect(useTaskProgress().finished.value).toBe(true)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${wrong} wrong`).toEqual([[stars]])
+      w.unmount()
+    }
+    expect(problems()).toEqual([])
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.find('.sw-count').text()).toBe('Let through: 0 of 3')
+    expect(w.findAll('.sw-lever')[1]!.text()).toBe('Home (right)')
+    expect(w.find('.sw-man').attributes('aria-label')).toContain('house')
   })
 })
