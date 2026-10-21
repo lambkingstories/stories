@@ -20,7 +20,7 @@ const stage = (n: number) => josua.stages[n - 1]!
 const FORBIDDEN = /\b(Messer|Schwert|Speer|Pfeil|Blut|töten|erschlagen|Teufel|Hölle)\b/i
 
 describe('Josua: stories and questions', () => {
-  it('ten stages with 3 to 5 paragraphs of 60 to 260 words and the Bible passage under every one; no recording yet; the stage pictures are the ones of Josef (PLATZHALTER)', () => {
+  it('ten stages with 3 or 4 paragraphs of 90 to 145 words (plan v3) and the Bible passage under every one; no recording yet; the stage pictures are the ones of Josef (PLATZHALTER)', () => {
     expect(josua.id).toBe('josua')
     expect(josua.age).toBe('8-10')
     expect(josua.title).toBe('Josua')
@@ -41,10 +41,15 @@ describe('Josua: stories and questions', () => {
     for (const s of josua.stages) {
       expect(s.ref, `stage ${s.id}`).toMatch(/^Josua \d/)
       expect(s.text.length, `paragraphs ${s.id}`).toBeGreaterThanOrEqual(3)
-      expect(s.text.length, `paragraphs ${s.id}`).toBeLessThanOrEqual(5)
-      const words = s.text.join(' ').split(/\s+/).length
-      expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(60)
-      expect(words, `words ${s.id}`).toBeLessThanOrEqual(260)
+      expect(s.text.length, `paragraphs ${s.id}`).toBeLessThanOrEqual(4)
+      const text = s.text.join(' ')
+      const words = text.split(/\s+/).length
+      expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(90)
+      expect(words, `words ${s.id}`).toBeLessThanOrEqual(145)
+      // short sentences like Noah and Josef (they have 9 to 10 words on average)
+      const sentences = text.split(/[.!?]+["“”„]?\s+/).filter((x) => x.trim()).length
+      expect(words / sentences, `words per sentence ${s.id}`).toBeGreaterThan(7)
+      expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
       expect(s.audio, `no recording yet, the device voice reads: ${s.id}`).toBeUndefined()
       expect(s.image, `stage ${s.id}`).toMatch(/^images\/abenteuer\/josef\/etappe-bild-\d\d\.webp$/)
