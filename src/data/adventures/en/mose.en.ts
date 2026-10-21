@@ -37,7 +37,7 @@ export const moseEn: TextOverlay<Journey> = {
         'Then Pharaoh’s daughter comes down to the Nile. She discovers the basket and opens it. The baby cries, and she feels sorry for him.',
         '“Shall I go and get a woman to nurse the child?” asks the sister. So the mother becomes the nurse. Later Pharaoh’s daughter takes the boy as her own and calls him Moses, for she drew him out of the water.'
       ],
-      task: { hint: 'Plait the little basket of reed.', weave: { rounds: [{ hint: 'The reed runs in front of the stakes and behind them in turn. Tap the cells where it runs in front of the stake.' }, { hint: 'Now every row begins the other way round than the one below. Look where the reed runs in front of the stake.' }] } },
+      task: { hint: 'Plait the little basket of reed.', weave: { rounds: [{ hint: 'Tap the cells where the reed runs in front of the stake.' }, { hint: 'Now every row begins the other way round.' }] } },
       questions: [
         { q: 'Where does the mother lay her baby?', options: ['in a basket among the reeds', 'in a boat', 'in a cave'] },
         { q: 'What does Pharaoh’s daughter call the boy?', options: ['Moses', 'Aaron', 'Gershom'] }
@@ -68,7 +68,7 @@ export const moseEn: TextOverlay<Journey> = {
         'A voice calls from the bush, “Moses, Moses! Take off your shoes, for the place where you stand is holy ground. I am the God of Abraham, Isaac, and Jacob.” Moses takes off his shoes and covers his face.',
         '“I have seen the misery of my people,” says God. “I am sending you to Pharaoh, so that you lead my people out of Egypt.” Moses doubts, “Who am I?” “I will be with you,” answers God.'
       ],
-      task: { hint: 'Follow the glow.', glow: { rounds: [{ hint: 'Lead Moses over the slope with your finger. Something is glowing there. The closer you come, the brighter it gets.' }, { hint: 'Now rocks hide the light. Only the glow shines through. Follow the glow.' }] } },
+      task: { hint: 'Follow the glow.', glow: { rounds: [{ hint: 'Lead Moses over the slope. Something is glowing there.' }, { hint: 'Now rocks hide the light.' }] } },
       questions: [
         { q: 'What is special about the bush?', options: ['It burns but is not burned up.', 'It grows in one night.', 'It is made of gold.'] },
         { q: 'What must Moses do because the ground is holy?', options: ['take off his shoes', 'hide', 'put out a fire'] }
@@ -83,7 +83,7 @@ export const moseEn: TextOverlay<Journey> = {
         'Moses sets out for Egypt with his family. At the mountain of God, Aaron comes to meet him, and the two brothers embrace.',
         'Together they call the elders of Israel. Aaron tells them what God has said. The elders believe them, and when they hear that God has seen their misery, they bow down and worship.'
       ],
-      task: { hint: 'Find what is more in the right picture.', diff: { rounds: [{ hint: 'The right camp has a few things more. Tap on the right what is missing on the left.' }, { hint: 'Once more, now there are more and smaller things.' }] } },
+      task: { hint: 'Find what is more in the right picture.', diff: { rounds: [{ hint: 'The right camp has a few things more. Tap what is missing on the left.' }, { hint: 'Once more, with smaller things.' }] } },
       questions: [
         { q: 'What does Moses say when God sends him?', options: ['“I am not good at speaking.”', '“I am too tired.”', '“I do not know the way.”'] },
         { q: 'Who is to speak for Moses?', options: ['his brother Aaron', 'Jethro', 'Joshua'] }
@@ -98,7 +98,7 @@ export const moseEn: TextOverlay<Journey> = {
         'Moses goes to God.',
         'But God says to Moses, “I will lead you out of the hard labor and rescue you. You will be my people, and I will be your God.” Moses tells it to the people, but in their distress they do not listen.'
       ],
-      task: { hint: 'Put the missing words into the sentence.', verse: { rounds: [{ hint: 'Round 1: Drag the right leaf into the gap.', parts: ['Let my ', ' go, so that they may hold a feast for me in the ', '!'], words: ['people', 'desert', 'land', 'city'] }, { hint: 'Round 2: God\'s promise. Now three words are missing.', parts: ['I will ', ' you out of the hard labor and ', ' you. You will be my people, and I will be your ', '.'], words: ['lead', 'rescue', 'God', 'king', 'shepherd'] }] } },
+      task: { hint: 'Put the missing words into the sentence.', verse: { rounds: [{ hint: 'Drag the right leaf into the gap.', parts: ['Let my ', ' go, so that they may hold a feast for me in the ', '!'], words: ['people', 'desert', 'land', 'city'] }, { hint: 'Now three words are missing.', parts: ['I will ', ' you out of the hard labor and ', ' you. You will be my people, and I will be your ', '.'], words: ['lead', 'rescue', 'God', 'king', 'shepherd'] }] } },
       questions: [
         { q: 'What do the Israelites now have to do themselves?', options: ['look for their straw for the bricks', 'fetch their water', 'build their tents'] },
         { q: 'What does God promise the people?', options: ['He will rescue them.', 'He will punish them.', 'He will forget them.'] }
@@ -113,7 +113,7 @@ export const moseEn: TextOverlay<Journey> = {
         'Then Pharaoh calls Moses, “Ask God to take the frogs away. Then I will let the people go.” Moses prays, and the frogs disappear from the houses.',
         'When Pharaoh sees that the plague is over, his heart becomes hard again. He does not keep his word and does not let the people go.'
       ],
-      task: { hint: 'Find the ten frogs in Pharaoh\'s house. Some of them are hiding!', find: { labels: ['Frog', 'Frog', 'Frog', 'Frog', 'Frog', 'Frog', 'Frog', 'Frog', 'Frog', 'Frog'], doneText: 'You found all ten frogs!' } },
+      task: { hint: 'Find the frogs in the bakery.', find: { labels: ['Frog', 'Frog', 'Frog', 'Frog', 'Frog', 'Frog', 'Frog'], doneText: 'You found all seven frogs!' } },
       questions: [
         { q: 'What happens first to the water in the Nile?', options: ['It turns to blood.', 'It turns to ice.', 'It dries up.'] },
         { q: 'What does Pharaoh promise when the frogs are gone?', options: ['He will let the people go.', 'He will reward Moses.', 'He will build a new palace.'] }
@@ -160,7 +160,7 @@ export const moseEn: TextOverlay<Journey> = {
         'Moses takes the bones of Joseph along. Joseph once asked his brothers for this: “God will take care of you. Then carry my bones with you.”',
         'God himself shows them the way. By day a pillar of cloud goes ahead of them, and by night a pillar of fire gives them light.'
       ],
-      task: { hint: 'Pack the carrying cloth for the journey out.', pack: { items: [{ label: 'Bundle of clothes' }, { label: 'Dough trough' }, { label: 'Bundle of cloths' }, { label: 'Silver jug' }, { label: 'Gold jug' }], rounds: [{ hint: 'Pack the carrying cloth. Tap a piece on the cloth and it turns.' }, { hint: 'Now there are more pieces and no room to spare. Think carefully how everything fits.' }] } },
+      task: { hint: 'Pack the carrying cloth for the journey out.', pack: { items: [{ label: 'Bundle of clothes' }, { label: 'Dough trough' }, { label: 'Bundle of cloths' }, { label: 'Silver jug' }, { label: 'Gold jug' }], rounds: [{ hint: 'Pack the carrying cloth, a tap turns a piece.' }, { hint: 'Now more pieces and no room to spare.' }] } },
       questions: [
         { q: 'Whose bones does Moses take along?', options: ['Joseph’s bones', 'Jacob’s bones', 'Abraham’s bones'] },
         { q: 'What shows the people the way?', options: ['a pillar of cloud by day and a pillar of fire by night', 'a star', 'a shepherd with a lantern'] }
@@ -175,7 +175,7 @@ export const moseEn: TextOverlay<Journey> = {
         'The pillar of cloud moves between the people and the army. Moses stretches his hand out over the sea, and a strong east wind parts the water. It stands like a wall on the right and on the left, and the people walk through on dry ground.',
         'Behind them the water falls back together. Of the whole army, no one follows the people anymore. On the other side Miriam, the sister of Moses and Aaron, beats the tambourine. “Sing to God!” she calls, and the women dance behind her.'
       ],
-      task: { hint: 'Play the drum with Miriam.', beat: { rounds: [{ hint: 'Golden rings draw in towards the drum. Tap the drum when a ring reaches it.' }, { hint: 'Now a ring is missing every now and then. Wait for the next one.' }] } },
+      task: { hint: 'Play the drum with Miriam.', beat: { rounds: [{ hint: 'Tap the drum when a ring reaches it.' }, { hint: 'Now a ring is missing every now and then.' }] } },
       questions: [
         { q: 'What does Moses say to the people at the sea?', options: ['“Do not be afraid!”', '“Run back!”', '“Build boats!”'] },
         { q: 'What parts the water?', options: ['a strong wind', 'a net', 'a golden staff'] }
@@ -190,7 +190,7 @@ export const moseEn: TextOverlay<Journey> = {
         'Everyone gathers as much as he needs, and there is enough for all. It tastes sweet, like bread with honey.',
         'God has said, “On the sixth day gather twice as much, for on the seventh day you rest.” And so it happens: on the sixth day there is twice as much, and on the seventh day there is nothing on the ground.'
       ],
-      task: { hint: 'Gather as much manna every day as you need.', manna: { rounds: [{ hint: 'Every day you gather two full jars. Tap the grains and then “Enough”.' }, { hint: 'On the sixth day you gather twice as much. On the seventh day nothing lies on the ground.' }] } },
+      task: { hint: 'Gather as much manna every day as you need.', manna: { rounds: [{ hint: 'Gather two full jars and then tap “Enough”.' }, { hint: 'On the sixth day you gather twice as much, on the seventh nothing lies on the ground.' }] } },
       questions: [
         { q: 'What lies on the ground in the morning?', options: ['something white like frost', 'snow', 'gold'] },
         { q: 'How much do the people gather on an ordinary day?', options: ['as much as they need', 'as much as they can carry', 'only one jar'] }
@@ -205,7 +205,7 @@ export const moseEn: TextOverlay<Journey> = {
         'First God says how people shall live with him: “You shall have no other gods before me. You shall not make an idol. You shall not misuse my name. Keep the day of rest holy.”',
         'Then God says how people shall live with one another: “Honor your father and your mother. You shall not murder. You shall not break your marriage promise or steal. You shall not lie, and you shall not want what belongs to someone else.”'
       ],
-      task: { hint: "Put the words together to make God's words.", words: { rounds: [{ hint: 'Lay the words in the strip in the right order.', sentences: ['You shall not murder.', 'Honor your father and your mother.', 'Keep the day of rest holy.'] }, { hint: "Now longer sentences. God's words from the story.", sentences: ['You shall have no other gods before me.', 'You shall not misuse my name.', 'I am your God, who freed you from Egypt.'] }] } },
+      task: { hint: "Put the words together to make God's words.", words: { rounds: [{ hint: 'Lay the words in the strip in the right order.', sentences: ['You shall not murder.', 'Honor your father and your mother.'] }, { hint: 'Now longer sentences.', sentences: ['You shall have no other gods before me.', 'I am your God, who freed you from Egypt.'] }] } },
       questions: [
         { q: 'What do the people answer God at the mountain?', options: ['“All that God has said we will do.”', '“We want to move on.”', '“We do not need this.”'] },
         { q: 'What lies on Mount Sinai?', options: ['a thick cloud', 'deep snow', 'a tent'] }
@@ -235,7 +235,7 @@ export const moseEn: TextOverlay<Journey> = {
         'Moses cuts two new stone tablets, and God writes his words on them. When Moses comes down from the mountain, his face shines.',
         'Later the cloud covers the holy tent that Moses has set up for God. When the cloud rises, the people set out; when it stays, the people stay. By day the cloud shows the way, and by night there is fire in it.'
       ],
-      task: { hint: 'Follow the cloud: break up when it rises.', cloud: { rounds: [{ hint: 'When the pillar of cloud rises, the people break up. When it stays, the people stay. Tap when you are sure.' }, { hint: 'Now it is night. The pillar of fire leads the people. Sparks fly, but they are no sign.' }] } },
+      task: { hint: 'Follow the cloud: break up when it rises.', cloud: { rounds: [{ hint: 'When the pillar rises, the people break up; when it stays, they stay.' }, { hint: 'Now it is night. Sparks are no sign.' }] } },
       questions: [
         { q: 'What shows the people the way?', options: ['the cloud over the tent', 'a bird', 'a shepherd’s staff'] },
         { q: 'Where is the tent in which God speaks with Moses?', options: ['outside the camp', 'in the middle of the camp', 'on Sinai'] }

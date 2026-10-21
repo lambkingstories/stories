@@ -121,7 +121,7 @@ const chipStyle = computed(() => ({ backgroundImage: `url(${src(props.game.chip)
 </script>
 
 <template lang="pug">
-  div(class="ww" :style="{ backgroundImage: `url(${src(game.background)})` }")
+  div(class="ww game-soft" :style="{ '--bg': `url(${src(game.background)})` }")
     template(v-if="!finished")
       p(v-if="rounds.length > 1" class="ww-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="ww-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}

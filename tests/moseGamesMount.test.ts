@@ -287,8 +287,8 @@ describe('Unterschiede finden (diff)', () => {
     expect(w.find('.df-count').text()).toBe('Unterschiede gefunden: 0 von 3')
   })
 
-  it('the whole game: the end with three stars; the empty taps give the stars (up to three: three, up to eight: two, more: one)', async () => {
-    for (const [wrong, stars] of [[0, 3], [3, 3], [4, 2], [8, 2], [9, 1]] as const) {
+  it('the whole game: the end with three stars; the empty taps give the stars (up to two: three, up to six: two, more: one)', async () => {
+    for (const [wrong, stars] of [[0, 3], [2, 3], [3, 2], [6, 2], [7, 1]] as const) {
       useTaskProgress().reset()
       const w = await open()
       for (let i = 0; i < wrong; i++) await tapAt(w, 5, 5)
@@ -1061,8 +1061,8 @@ describe('Mirjams Pauke (beat)', () => {
     expect(problems()).toEqual([])
   })
 
-  it('the stars follow the wrong taps: up to four three stars, up to ten two, more one', async () => {
-    for (const [wrong, stars] of [[4, 3], [5, 2], [11, 1]] as const) {
+  it('the stars follow the wrong taps: up to three three stars, up to seven two, more one', async () => {
+    for (const [wrong, stars] of [[3, 3], [4, 2], [8, 1]] as const) {
       useTaskProgress().reset()
       const w = await open()
       let r = await run(w)

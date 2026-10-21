@@ -219,7 +219,7 @@ const gridStyle = computed(() => ({ gridTemplateColumns: `repeat(${current.value
   background-color: #a9c2a0
   background-size: cover
   background-position: center
-  filter: blur(3px)
+  filter: blur(8px) brightness(0.7)
 
 .wv-grid
   position: relative

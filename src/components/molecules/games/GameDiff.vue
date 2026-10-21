@@ -48,7 +48,7 @@ const cross = ref<{ x: number; y: number; k: number } | null>(null)
 const panel = ref<HTMLElement | null>(null)
 let crossKey = 0
 const src = (p: string) => prependBaseUrl(p)
-const stars = computed(() => mistakeStars(misses.value, 3, 8))
+const stars = computed(() => mistakeStars(misses.value, 2, 6))
 
 function find(i: number) {
   if (between.value || finished.value || taken[i]) return

@@ -53,7 +53,7 @@ const message = ref('')
 const flash = ref<'good' | 'bad' | null>(null)
 const shine = ref(false)
 const src = (p: string) => prependBaseUrl(p)
-const stars = computed(() => mistakeStars(mistakes.value, 4, 10))
+const stars = computed(() => mistakeStars(mistakes.value, 3, 7))
 const still = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 const clock = ref(0)
@@ -177,7 +177,7 @@ const totalRings = computed(() => times.value.length)
     template(v-if="!finished")
       p(v-if="rounds.length > 1" class="bt-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="bt-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
-      div(class="bt-field" role="group" :aria-label="t('app.adventure.beatField', { n: countHit, total: totalRings })" :style="{ backgroundImage: `url(${src(game.background)})` }")
+      div(class="bt-field game-soft" role="group" :aria-label="t('app.adventure.beatField', { n: countHit, total: totalRings })" :style="{ '--bg': `url(${src(game.background)})` }")
         button(type="button" class="bt-drum" :class="{ shine }" :aria-label="t('app.adventure.beatDrum')" :disabled="phase !== 'play'" @pointerdown.prevent="tap")
           GameImage(:src="game.drum" colour="#c9895a" round)
           span(v-for="r in visible" :key="`${round}-${r.i}`" class="bt-ring" :class="{ missed: r.s.missed }" :style="{ transform: `translate(-50%, -50%) scale(${r.s.scale})`, opacity: String(r.s.opacity) }" aria-hidden="true")

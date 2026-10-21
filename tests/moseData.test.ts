@@ -138,11 +138,11 @@ describe('Mose: the games, and the placeholders until the pictures come', () => 
     }
   })
 
-  it('13 words: three sentences in each round, all word for word in the text of the stage (also in English); the sentence of the quiz question is not used; the goal is 6', () => {
+  it('13 words: two sentences in each round, all word for word in the text of the stage (also in English); the sentence of the quiz question is not used; the goal is 4', () => {
     const g = stage(13).task.words
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
-    expect(g.rounds.map((r) => r.sentences.length)).toEqual([3, 3])
+    expect(g.rounds.map((r) => r.sentences.length)).toEqual([2, 2])
     const check = () => {
       const text = stage(13).text.join(' ')
       for (const r of stage(13).task.words!.rounds) {
@@ -159,17 +159,17 @@ describe('Mose: the games, and the placeholders until the pictures come', () => 
     expect(g.rounds.flatMap((r) => r.sentences).join(' ')).not.toContain('Alles, was Gott gesagt hat')
     for (const r of g.rounds) for (const s of r.sentences) expect(shuffle(wordsOf(s), 1).join(' ')).not.toBe(wordsOf(s).join(' '))
     setAdventureLanguage('en')
-    expect(stage(13).task.words!.rounds.map((r) => r.sentences.length)).toEqual([3, 3])
+    expect(stage(13).task.words!.rounds.map((r) => r.sentences.length)).toEqual([2, 2])
     check()
     setAdventureLanguage('de')
     expect(g.background).toBe(stage(13).image)
   })
 
-  it('5 differences: four things, then six; every thing lies in the picture, the things are apart from each other (so that a tap belongs to one), the sprites differ; the goal is 10', () => {
+  it('5 differences: three things, then four; every thing lies in the picture, the things are apart from each other (so that a tap belongs to one), the sprites differ; the goal is 7', () => {
     const g = stage(5).task.diff
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
-    expect(g.rounds.map((r) => r.items.length)).toEqual([4, 6])
+    expect(g.rounds.map((r) => r.items.length)).toEqual([3, 4])
     expect(g.rounds[0]!.base).not.toBe(g.rounds[1]!.base)
     for (const r of g.rounds) {
       for (const [i, a] of r.items.entries()) {
@@ -179,23 +179,26 @@ describe('Mose: the games, and the placeholders until the pictures come', () => 
     }
     // a tap on the middle of a thing hits exactly this thing
     for (const r of g.rounds) r.items.forEach((it, i) => expect(diffAt(r.items, { x: it.x, y: it.y }, r.items.map(() => false))).toBe(i))
-    expect(new Set(g.rounds.flatMap((r) => r.items.map((it) => it.image))).size).toBe(10)
-    expect(g.rounds[1]!.items.reduce((n, it) => n + it.w, 0) / 6).toBeLessThan(g.rounds[0]!.items.reduce((n, it) => n + it.w, 0) / 4)
-    expect(g.rounds.reduce((n, r) => n + r.items.length, 0)).toBe(10)
+    expect(new Set(g.rounds.flatMap((r) => r.items.map((it) => it.image))).size).toBe(7)
+    expect(g.rounds[1]!.items.reduce((n, it) => n + it.w, 0) / 4).toBeLessThan(g.rounds[0]!.items.reduce((n, it) => n + it.w, 0) / 3)
+    expect(g.rounds.reduce((n, r) => n + r.items.length, 0)).toBe(7)
   })
 
-  it('12 manna: three usual days, then two usual, a double day and a day of rest; four grains fill a jar; the goal is seven days', () => {
+  it('12 manna: two usual days, then a usual one, a double day and a day of rest; four grains fill a jar; two pictures of grains; the goal is five days', () => {
     const g = stage(12).task.manna
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
-    expect(g.rounds.map((r) => r.days.map((d) => d.jars))).toEqual([[2, 2, 2], [2, 2, 4, 0]])
+    expect(g.rounds.map((r) => r.days.map((d) => d.jars))).toEqual([[2, 2], [2, 4, 0]])
     expect(g.flakesPerJar).toBe(4)
-    expect(g.flakes).toHaveLength(3)
+    expect(g.flakes).toHaveLength(2)
     // the day of rest is the last day; the double day comes the day before; right and wrong collected amounts
     const days = g.rounds.flatMap((r) => r.days)
-    expect(days).toHaveLength(7)
-    expect(days[6]!.jars).toBe(0)
-    expect(days[5]!.jars).toBe(2 * days[4]!.jars)
+    expect(days).toHaveLength(5)
+    expect(days[4]!.jars).toBe(0)
+    expect(days[3]!.jars).toBe(2 * days[2]!.jars)
+    // the text says it: twice as much on the sixth day, nothing on the ground on the seventh
+    expect(stage(12).text.join(' ')).toMatch(/doppelt/)
+    expect(stage(12).text.join(' ')).toMatch(/siebten Tag/)
     for (const d of days) {
       expect(dayOk(d, d.jars * 4, 4)).toBe(true)
       expect(dayOk(d, d.jars * 4 + 4, 4)).toBe(false)
@@ -203,32 +206,35 @@ describe('Mose: the games, and the placeholders until the pictures come', () => 
     expect(g.background).toBe(stage(12).image)
   })
 
-  it('15 cloud: five questions by day, five by night; never three times the same in a row; both answers occur in each round; the extras have pictures; the goal is 10', () => {
+  it('15 cloud: three questions by day, three by night; never three times the same in a row; both answers occur in each round; the extras have pictures (no smoke any more); the goal is 6', () => {
     const g = stage(15).task.cloud
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
-    expect(g.rounds.map((r) => [r.mode, r.trials.length])).toEqual([['day', 5], ['night', 5]])
+    expect(g.rounds.map((r) => [r.mode, r.trials.length])).toEqual([['day', 3], ['night', 3]])
     for (const r of g.rounds) {
       expect(noTriple(r.trials)).toBe(true)
       expect(r.trials.some((t) => t.pillar === 'rises')).toBe(true)
       expect(r.trials.some((t) => t.pillar === 'stays')).toBe(true)
+      expect(r.trials.some((t) => t.distractors.length > 0)).toBe(true)
       for (const t of r.trials) {
-        expect(t.distractors.length).toBeGreaterThanOrEqual(1)
         for (const d of t.distractors) expect(Object.keys(g.extras).concat('banner')).toContain(d)
       }
     }
     expect(g.rounds[1]!.trials.every((t) => !t.distractors.includes('birds'))).toBe(true)
-    expect(g.rounds.reduce((n, r) => n + r.trials.length, 0)).toBe(10)
+    expect(Object.keys(g.extras).sort()).toEqual(['birds', 'sparks'])
+    expect(g.rounds.reduce((n, r) => n + r.trials.length, 0)).toBe(6)
+    // the rule of the pillar stands in the text
+    expect(stage(15).text.join(' ')).toMatch(/Wolke/)
   })
 
-  it('2 weave: three rows of four stakes, then four rows of six; the cells to tap add up to 18; the second round alternates; the goal is 18', () => {
+  it('2 weave: three rows of four stakes, then four rows of five; the cells to tap add up to 16; the second round alternates; the goal is 16', () => {
     const g = stage(2).task.weave
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
-    expect(g.rounds.map((r) => [r.rows, r.stakes, r.pattern])).toEqual([[3, 4, 'same'], [4, 6, 'alternate']])
+    expect(g.rounds.map((r) => [r.rows, r.stakes, r.pattern])).toEqual([[3, 4, 'same'], [4, 5, 'alternate']])
     const counts = g.rounds.map((r) => frontCount(frontCells(r.rows, r.stakes, r.pattern)))
-    expect(counts).toEqual([6, 12])
-    expect(counts.reduce((a, b) => a + b, 0)).toBe(18)
+    expect(counts).toEqual([6, 10])
+    expect(counts.reduce((a, b) => a + b, 0)).toBe(16)
     expect(g.tiles.stake).not.toBe(g.tiles.front)
     expect(g.background).toBe(stage(2).image)
   })
@@ -244,15 +250,16 @@ describe('Mose: the games, and the placeholders until the pictures come', () => 
       expect(glow(d, 90), 'a faint glow at the start').toBeGreaterThan(0.05)
       for (const v of [...r.start, ...r.target]) expect(v >= 0 && v <= 100).toBe(true)
     }
-    expect(g.rounds[0]!.background).not.toBe(g.rounds[1]!.background)
+    // one slope for both rounds; the rocks lie over it in round 2 only
+    expect(g.rounds[0]!.background).toBe(g.rounds[1]!.background)
     expect(g.rounds).toHaveLength(2)
   })
 
-  it('11 beat: eight rings, then twelve with two pauses; 20 rings in all; the second round is a little quicker; the goal is 20', () => {
+  it('11 beat: six rings, then seven with two pauses (nine beats); 13 rings in all; the second round is a little quicker; the goal is 13', () => {
     const g = stage(11).task.beat
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
-    expect(g.rounds.map((r) => r.pattern.filter((p) => p === 1).length)).toEqual([8, 12])
+    expect(g.rounds.map((r) => r.pattern.filter((p) => p === 1).length)).toEqual([6, 7])
     expect(g.rounds.map((r) => r.pattern.filter((p) => p === 0).length)).toEqual([0, 2])
     expect(g.rounds[0]!.bpm).toBeLessThan(g.rounds[1]!.bpm)
     for (const r of g.rounds) {
@@ -287,16 +294,22 @@ describe('Mose: the games, and the placeholders until the pictures come', () => 
       expect(r.words.length, 'a wrong word or two as well').toBeGreaterThan(r.answers.length)
     }
     expect(g.background).toBe(stage(6).image)
+    // the stage picture has big figures: drawn soft behind the board
+    expect(g.soft).toBe(true)
   })
 
-  it('7 hidden frogs: ten finds, six covers, a label for each; all inside the picture; every cover hides a find', () => {
+  it('7 hidden frogs: seven finds, four covers, a label for each; three frog pictures and three cover pictures; all inside the picture; every cover hides a find', () => {
     const f = stage(7).task.find
     expect(f, 'the game is built').toBeDefined()
     if (!f) return
-    expect(stage(7).task.count).toBe(10)
-    expect(f.finds).toHaveLength(10)
-    expect(f.covers).toHaveLength(6)
-    expect(f.labels).toHaveLength(10)
+    expect(stage(7).task.count).toBe(7)
+    expect(f.finds).toHaveLength(7)
+    expect(f.covers).toHaveLength(4)
+    expect(f.labels).toHaveLength(7)
+    expect(new Set(f.covers.map((t) => t.image)).size).toBe(3)
+    // the text names the places of the frogs
+    expect(stage(7).text.join(' ')).toMatch(/Backstube/)
+    expect(stage(7).text.join(' ')).toMatch(/Schlafkammer/)
     for (const t of [...f.finds, ...f.covers]) {
       expect(t.x >= 0 && t.x <= 100 && t.y >= 0 && t.y <= 100).toBe(true)
     }
@@ -305,7 +318,7 @@ describe('Mose: the games, and the placeholders until the pictures come', () => 
       const hides = f.finds.filter((t) => Math.abs(t.x - c.x) <= c.w / 2 && c.y - t.y >= 0 && c.y - t.y <= 10)
       expect(hides.length, `cover at ${c.x}/${c.y}`).toBeGreaterThanOrEqual(1)
     }
-    expect(new Set(f.finds.map((t) => t.image)).size, 'ten different frogs').toBe(10)
+    expect(new Set(f.finds.map((t) => t.image)).size, 'three different frogs').toBe(3)
   })
 
   it('10 pack: two rounds fill the cloth exactly and can be packed; the pieces have names; the goal is 8', () => {
@@ -326,6 +339,9 @@ describe('Mose: the games, and the placeholders until the pictures come', () => 
       expect(solvable(r.cols, r.rows, shapes), 'the round can be packed').toBe(true)
     }
     expect(p.background).toBe(stage(10).image)
+    // the text names what is packed
+    const t10 = stage(10).text.join(' ')
+    for (const w of ['Teig', 'Silber', 'Gold', 'Kleider']) expect(t10, w).toContain(w)
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

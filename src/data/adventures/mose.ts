@@ -24,9 +24,8 @@ const PLACEHOLDER = 'images/abenteuer/josef/'
 const G = 'images/abenteuer/spiele/mose/'
 
 /**
- * Etappe 13, "Worte ordnen": die Wörter eines Satzes liegen in gemischter Folge auf Steinplättchen und werden der Reihe nach in den Satzstreifen gelegt (Bildauftrag M17; Hintergrund = das Etappenbild der Etappe,
- * Mischung immer gleich und nie in der richtigen Ordnung). Die Sätze stehen wörtlich im Text der Etappe; jede Sprache hat ihre eigenen Sätze (Runde 1 kurze, Runde 2 längere). Die Sätze der Frage der Etappe
- * ("Alles, was Gott gesagt hat, wollen wir tun.") sind hier nicht benutzt.
+ * Etappe 13, "Worte ordnen": die Wörter eines Satzes liegen in gemischter Folge auf Steinplättchen und werden der Reihe nach in den Satzstreifen gelegt (Bildauftrag M37; Hintergrund = das Etappenbild der Etappe,
+ * von der App weichgezeichnet, Mischung immer gleich und nie in der richtigen Ordnung). Plan v3: zwei Runden mit je zwei Sätzen, alle wörtlich im Text der Etappe (auch englisch); Runde 1 kurze, Runde 2 längere.
  * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `worte/stein.webp` 260 × 110 (leer, das Wort schreibt die App), `worte/streifen.webp` 900 × 160 (leer), beide transparent.
  */
 const WORTE: WordsGame = {
@@ -34,104 +33,96 @@ const WORTE: WordsGame = {
   chip: `${G}worte/stein.webp`,
   strip: `${G}worte/streifen.webp`,
   rounds: [
-    { hint: 'Lege die Wörter in der richtigen Reihenfolge in den Streifen.', sentences: ['Du sollst nicht töten.', 'Ehre Vater und Mutter.', 'Halte den Ruhetag heilig.'] },
-    { hint: 'Jetzt längere Sätze. Gottes Worte aus dem Text.', sentences: ['Du sollst keine anderen Götter neben mir haben.', 'Du sollst meinen Namen nicht missbrauchen.', 'Ich bin dein Gott, der dich aus Ägypten befreit hat.'] }
+    { hint: 'Lege die Wörter in der richtigen Reihenfolge in den Streifen.', sentences: ['Du sollst nicht töten.', 'Ehre Vater und Mutter.'] },
+    { hint: 'Jetzt längere Sätze.', sentences: ['Du sollst keine anderen Götter neben mir haben.', 'Ich bin dein Gott, der dich aus Ägypten befreit hat.'] }
   ]
 }
 
 /**
- * Etappe 5, "Unterschiede finden": zwei Bilder des Lagers am Berg Gottes, das rechte hat einige kleine Dinge mehr; das Kind tippt rechts, was links fehlt (Bildauftrag M12; zwei eigene Grundbilder). Runde 1 vier große
- * Dinge, Runde 2 sechs kleinere. Lagen (Mitte und Breite, Prozent des Bildes) sind vorläufig geschätzt, bis die Datei `unterschied-messung.json` der Spielbild-Sitzung da ist.
- * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `unterschied/lager-1.webp`, `lager-2.webp` je 900 × 675 (ohne die Zusatzdinge), zehn Sprites höchstens 160 px: `stab`, `krug`, `buendel`, `schaf`, `korb`,
- * `brot`, `decke`, `schuhe`, `vogel`, `schlauch` (transparent).
+ * Etappe 5, "Unterschiede finden": zwei Bilder des Lagers am Berg Gottes, das rechte hat einige kleine Dinge mehr; das Kind tippt rechts, was links fehlt (Bildauftrag M32; zwei eigene Grundbilder). Plan v3: Runde 1 drei
+ * große Dinge, Runde 2 vier kleinere (zusammen sieben, jedes Ding ein anderes Bild). Lagen (Mitte und Breite, Prozent des Bildes) sind vorläufig geschätzt, bis die Datei `unterschied-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `unterschied/lager-1.webp`, `lager-2.webp` je 900 × 675 (ohne die Zusatzdinge), sieben Sprites höchstens 160 px: `stab`, `krug`, `buendel`, `korb`,
+ * `brot`, `schuhe`, `vogel` (transparent).
  */
 const UNTERSCHIED: DiffGame = {
   rounds: [
     {
-      hint: 'Das rechte Lager hat ein paar Dinge mehr. Tippe rechts, was links fehlt.',
+      hint: 'Das rechte Lager hat ein paar Dinge mehr. Tippe, was links fehlt.',
       base: `${G}unterschied/lager-1.webp`,
       items: [
         { image: `${G}unterschied/stab.webp`, x: 22, y: 64, w: 12 },
         { image: `${G}unterschied/krug.webp`, x: 48, y: 74, w: 10 },
-        { image: `${G}unterschied/buendel.webp`, x: 76, y: 62, w: 12 },
-        { image: `${G}unterschied/schaf.webp`, x: 60, y: 36, w: 12 }
+        { image: `${G}unterschied/buendel.webp`, x: 76, y: 62, w: 12 }
       ]
     },
     {
-      hint: 'Noch einmal, jetzt sind es mehr und kleinere Dinge.',
+      hint: 'Noch einmal, mit kleineren Dingen.',
       base: `${G}unterschied/lager-2.webp`,
       items: [
         { image: `${G}unterschied/korb.webp`, x: 18, y: 70, w: 9 },
         { image: `${G}unterschied/brot.webp`, x: 36, y: 40, w: 8 },
-        { image: `${G}unterschied/decke.webp`, x: 50, y: 78, w: 10 },
         { image: `${G}unterschied/schuhe.webp`, x: 68, y: 54, w: 7 },
-        { image: `${G}unterschied/vogel.webp`, x: 84, y: 24, w: 8 },
-        { image: `${G}unterschied/schlauch.webp`, x: 28, y: 28, w: 8 }
+        { image: `${G}unterschied/vogel.webp`, x: 84, y: 24, w: 8 }
       ]
     }
   ]
 }
 
 /**
- * Etappe 12, "Manna sammeln": Tag für Tag werden Körnchen in Krüge gesammelt (vier Körnchen füllen einen Krug), an einem gewöhnlichen Tag zwei Krüge, am sechsten Tag vier, am siebten Tag ruht man (Bildauftrag M16;
- * Hintergrund = das Etappenbild 12). Runde 1 drei gewöhnliche Tage, Runde 2 Tag 4 und 5 gewöhnlich, Tag 6 doppelt, Tag 7 Ruhetag. Der Boden mit den Körnchen (Prozent des Bildes) ist in der Komponente festgelegt.
- * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `manna/koernchen-1.webp` bis `koernchen-3.webp` je 90 × 90, `krug-leer.webp`, `krug-voll.webp` je 220 × 220, `bewohner.webp` 260 × 260 (alle transparent).
+ * Etappe 12, "Manna sammeln": Tag für Tag werden Körnchen in Krüge gesammelt (vier Körnchen füllen einen Krug), an einem gewöhnlichen Tag zwei Krüge, am sechsten Tag vier, am siebten Tag ruht man (Bildauftrag M36;
+ * Hintergrund = das Etappenbild 12, von der App weichgezeichnet). Plan v3: Runde 1 zwei gewöhnliche Tage, Runde 2 ein gewöhnlicher Tag, der doppelte Tag und der Ruhetag (zusammen 5 Tage). Es gibt zwei Körnchenbilder.
+ * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `manna/koernchen-1.webp`, `koernchen-2.webp` je 90 × 90, `krug-leer.webp`, `krug-voll.webp` je 220 × 220, `bewohner.webp` 260 × 260 (alle transparent).
  */
 const MANNA: MannaGame = {
   background: `${PLACEHOLDER}etappe-bild-12.webp`,
-  flakes: [`${G}manna/koernchen-1.webp`, `${G}manna/koernchen-2.webp`, `${G}manna/koernchen-3.webp`],
+  flakes: [`${G}manna/koernchen-1.webp`, `${G}manna/koernchen-2.webp`],
   jar: `${G}manna/krug-leer.webp`,
   jarFull: `${G}manna/krug-voll.webp`,
   dwellers: `${G}manna/bewohner.webp`,
   flakesPerJar: 4,
   rounds: [
-    { hint: 'Jeden Tag sammelt ihr zwei Krüge voll. Tippe die Körnchen an und dann „Genug“.', days: [{ jars: 2 }, { jars: 2 }, { jars: 2 }] },
-    { hint: 'Am sechsten Tag sammelt ihr doppelt so viel. Am siebten Tag liegt nichts auf dem Boden.', days: [{ jars: 2 }, { jars: 2 }, { jars: 4 }, { jars: 0 }] }
+    { hint: 'Sammle zwei Krüge voll und tippe dann „Genug“.', days: [{ jars: 2 }, { jars: 2 }] },
+    { hint: 'Am sechsten Tag sammelst du doppelt, am siebten liegt nichts auf dem Boden.', days: [{ jars: 2 }, { jars: 4 }, { jars: 0 }] }
   ]
 }
 
 /**
  * Etappe 15, "Der Wolke folgen": die Säule hebt sich (das Volk bricht auf) oder bleibt (das Volk bleibt); ringsum treiben Dinge, die nichts damit zu tun haben; das Kind antwortet, wenn es sicher ist, die Szene
- * wiederholt sich, bis es antwortet (Bildauftrag M18; eigene Szenen für Tag und Nacht). Runde 1 fünf Fragen am Tag, Runde 2 fünf in der Nacht (Feuersäule als Lichtsäule, ohne Gesicht und ohne Gestalt). Eine falsch
- * beantwortete Frage kommt am Ende der Runde noch einmal. Nie dreimal dasselbe hintereinander (Test).
- * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `wolke/tag.webp`, `nacht.webp` je 1000 × 750 (ohne Säule), `saeule-tag.webp`, `saeule-nacht.webp` je 220 × 640 (transparent), `rauch.webp`, `vogel.webp`,
- * `funken.webp` (transparent).
+ * wiederholt sich, bis es antwortet (Bildauftrag M38; eigene Szenen für Tag und Nacht). Plan v3: Runde 1 drei Fragen am Tag (Vögel als Ablenkung), Runde 2 drei in der Nacht (Feuersäule als Lichtsäule, ohne Gesicht und ohne
+ * Gestalt; Funken als Ablenkung). Eine falsch beantwortete Frage kommt am Ende der Runde noch einmal. Nie dreimal dasselbe hintereinander (Test). Der Rauch entfällt.
+ * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `wolke/tag.webp`, `nacht.webp` je 1000 × 750 (ohne Säule), `saeule-tag.webp`, `saeule-nacht.webp` je 220 × 640 (transparent), `vogel.webp`, `funken.webp` (transparent).
  */
 const WOLKE: CloudGame = {
   dayScene: `${G}wolke/tag.webp`,
   nightScene: `${G}wolke/nacht.webp`,
   pillarDay: `${G}wolke/saeule-tag.webp`,
   pillarNight: `${G}wolke/saeule-nacht.webp`,
-  extras: { smoke: `${G}wolke/rauch.webp`, birds: `${G}wolke/vogel.webp`, sparks: `${G}wolke/funken.webp` },
+  extras: { birds: `${G}wolke/vogel.webp`, sparks: `${G}wolke/funken.webp` },
   rounds: [
     {
-      hint: 'Hebt sich die Wolkensäule, bricht das Volk auf. Bleibt sie stehen, bleibt das Volk. Tippe, wenn du sicher bist.',
+      hint: 'Hebt sich die Säule, bricht das Volk auf; bleibt sie stehen, bleibt es.',
       mode: 'day',
       trials: [
-        { pillar: 'rises', distractors: ['smoke', 'birds'] },
+        { pillar: 'rises', distractors: ['birds'] },
         { pillar: 'stays', distractors: ['birds'] },
-        { pillar: 'rises', distractors: ['smoke'] },
-        { pillar: 'stays', distractors: ['smoke', 'birds'] },
-        { pillar: 'stays', distractors: ['birds'] }
+        { pillar: 'rises', distractors: [] }
       ]
     },
     {
-      hint: 'Jetzt ist es Nacht. Die Feuersäule führt das Volk. Funken fliegen, aber das ist kein Zeichen.',
+      hint: 'Jetzt ist es Nacht, Funken sind kein Zeichen.',
       mode: 'night',
       trials: [
         { pillar: 'stays', distractors: ['sparks'] },
-        { pillar: 'rises', distractors: ['sparks'] },
-        { pillar: 'rises', distractors: ['sparks', 'smoke'] },
-        { pillar: 'stays', distractors: ['sparks'] },
-        { pillar: 'rises', distractors: ['smoke'] }
+        { pillar: 'stays', distractors: [] },
+        { pillar: 'rises', distractors: ['sparks'] }
       ]
     }
   ]
 }
 
 /**
- * Etappe 2, "Körbchen flechten": das Rohr läuft Reihe für Reihe abwechselnd vor und hinter den senkrechten Stäben; das Kind tippt die Felder, in denen es vor dem Stab läuft (Bildauftrag M10; Hintergrund = das Etappenbild 2,
- * unscharf). Runde 1 drei Reihen, vier Stäbe, jede Reihe beginnt vor dem ersten Stab; Runde 2 vier Reihen, sechs Stäbe, jede Reihe beginnt andersherum als die darunter. Zusammen 6 + 12 = 18 Felder.
+ * Etappe 2, "Körbchen flechten": das Rohr läuft Reihe für Reihe abwechselnd vor und hinter den senkrechten Stäben; das Kind tippt die Felder, in denen es vor dem Stab läuft (Bildauftrag M30; Hintergrund = das Etappenbild 2,
+ * von der App weichgezeichnet). Plan v3: Runde 1 drei Reihen, vier Stäbe, jede Reihe beginnt vor dem ersten Stab (6 Felder); Runde 2 vier Reihen, fünf Stäbe, jede Reihe beginnt andersherum als die darunter (10 Felder). Zusammen 16 Felder.
  * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `flechten/stab.webp`, `rohr-vorn.webp`, `rohr-hinten.webp`, `reihe-aktiv.webp` je 192 × 192 (Kachel, transparent), `koerbchen-fertig.webp` 600 × 600.
  */
 const FLECHTEN: WeaveGame = {
@@ -139,87 +130,84 @@ const FLECHTEN: WeaveGame = {
   tiles: { stake: `${G}flechten/stab.webp`, front: `${G}flechten/rohr-vorn.webp`, behind: `${G}flechten/rohr-hinten.webp`, active: `${G}flechten/reihe-aktiv.webp` },
   done: `${G}flechten/koerbchen-fertig.webp`,
   rounds: [
-    { hint: 'Das Rohr läuft abwechselnd vor und hinter den Stäben. Tippe die Felder, in denen es vor dem Stab läuft.', stakes: 4, rows: 3, pattern: 'same' },
-    { hint: 'Jetzt beginnt jede Reihe andersherum als die darunter. Schau, wo das Rohr vor dem Stab läuft.', stakes: 6, rows: 4, pattern: 'alternate' }
+    { hint: 'Tippe die Felder, in denen das Rohr vor dem Stab läuft.', stakes: 4, rows: 3, pattern: 'same' },
+    { hint: 'Jetzt beginnt jede Reihe andersherum.', stakes: 5, rows: 4, pattern: 'alternate' }
   ]
 }
 
 /**
- * Etappe 4, "Dem Leuchten nachgehen": Mose wird über einen dämmrigen Hang geführt, auf ein Leuchten zu, das heller wird, je näher er kommt; unter etwa 7 % der Bildbreite ist er da und der Busch leuchtet (Bildauftrag M11;
- * eigene Hänge). Es gibt keinen Fehler; nach 20 Sekunden ohne Fortschritt zeigt ein Tipp Funken in Richtung des Busches (zählt als Tipp). Runde 1 der Busch steht offen am Hang, Runde 2 Felsen verdecken ihn und nur
- * der Schein dringt durch. Gott ist nicht im Bild und spricht nicht im Spiel. Start und Busch (Prozent des Bildes) sind vorläufig geschätzt, bis die Datei `leuchten-messung.json` der Spielbild-Sitzung da ist.
- * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `leuchten/hang-offen.webp`, `hang-felsen.webp` je 1000 × 750 (ohne Busch), `busch.webp` 400 × 400, `mose.webp` 220 × 300, `felsen-vorn.webp` 1000 × 750 (transparent).
+ * Etappe 4, "Dem Leuchten nachgehen": Mose wird über einen dämmrigen Hang geführt, auf ein Leuchten zu, das heller wird, je näher er kommt; unter etwa 7 % der Bildbreite ist er da und der Busch leuchtet (Bildauftrag M31;
+ * ein Hang für beide Runden). Es gibt keinen Fehler; nach 20 Sekunden ohne Fortschritt zeigt ein Tipp Funken in Richtung des Busches (zählt als Tipp). Plan v3: Runde 1 der Busch steht offen am Hang, Runde 2 legt `felsen-vorn.webp`
+ * über denselben Hang und der Busch liegt hinter den Felsen, nur der Schein dringt durch die Lücken. Gott ist nicht im Bild und spricht nicht im Spiel. Start und Busch (Prozent des Bildes) sind vorläufig geschätzt, bis die Datei
+ * `leuchten-messung.json` der Spielbild-Sitzung da ist; das Ziel von Runde 2 muss nach dem fertigen Felsbild hinter einer Lücke liegen.
+ * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `leuchten/hang.webp` 1000 × 750 (ohne Busch), `busch.webp` 400 × 400, `mose.webp` 220 × 300, `felsen-vorn.webp` 1000 × 750 (transparent).
  */
 const LEUCHTEN: GlowGame = {
   walker: `${G}leuchten/mose.webp`,
   bush: `${G}leuchten/busch.webp`,
   rounds: [
-    { hint: 'Führe Mose mit dem Finger über den Hang. Dort leuchtet etwas. Je näher du kommst, desto heller wird es.', background: `${G}leuchten/hang-offen.webp`, start: [18, 76], target: [74, 36], threshold: 7 },
-    { hint: 'Jetzt verdecken Felsen das Licht. Nur der Schein dringt durch. Geh dem Leuchten nach.', background: `${G}leuchten/hang-felsen.webp`, start: [12, 78], target: [70, 28], threshold: 7, cover: `${G}leuchten/felsen-vorn.webp` }
+    { hint: 'Führe Mose über den Hang, dort leuchtet etwas.', background: `${G}leuchten/hang.webp`, start: [18, 76], target: [74, 36], threshold: 7 },
+    { hint: 'Jetzt verdecken Felsen das Licht.', background: `${G}leuchten/hang.webp`, start: [12, 78], target: [70, 28], threshold: 7, cover: `${G}leuchten/felsen-vorn.webp` }
   ]
 }
 
 /**
- * Etappe 11, "Mirjams Pauke": der Danktanz am Ufer (2. Mose 15,20f), nicht die Rettung; kein Heer, kein Wasser über Menschen (Bildauftrag M16). Goldene Ringe ziehen sich auf die Pauke zu, das Kind tippt, wenn ein Ring
+ * Etappe 11, "Mirjams Pauke": der Danktanz am Ufer (2. Mose 15,20f), nicht die Rettung; kein Heer, kein Wasser über Menschen (Bildauftrag M35). Goldene Ringe ziehen sich auf die Pauke zu, das Kind tippt, wenn ein Ring
  * sie erreicht (Fenster ± 0,25 s, `judge` in `utils/moseGames.ts`). Ein ausgelassener Ring verblasst ohne Fehler; ein Tipp ohne Ring in der Nähe ist ein Fehler. Kein Zeitdruck: die Runde endet, wenn der letzte Ring vorbei ist,
- * wer zu wenige trifft, darf es noch einmal versuchen. Runde 1: acht Ringe, 72 Schläge je Minute; Runde 2: zwölf Ringe, 80 Schläge, an zwei Stellen fehlt ein Ring (`0`). Zusammen 8 + 12 = 20 Ringe.
- * Der Hintergrund ist das Etappenbild 11. Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `takt/pauke.webp` 500 × 500 (transparent), `takt/ring.webp` 512 × 512 (transparent). Töne `pauke.mp3` und `pauke-dumpf.mp3`
- * sind noch nicht da (Ton-Agent); bis dahin klingen `bead` und `wrong`.
+ * wer zu wenige trifft, darf es noch einmal versuchen. Plan v3: Runde 1 sechs Ringe, 72 Schläge je Minute; Runde 2 neun Schläge mit zwei Pausen (sieben Ringe), 80 Schläge. Zusammen 6 + 7 = 13 Ringe.
+ * Der Hintergrund ist das Etappenbild 11, von der App weichgezeichnet. Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `takt/pauke.webp` 500 × 500 (transparent), `takt/ring.webp` 512 × 512 (transparent). Töne `pauke.mp3`
+ * und `pauke-dumpf.mp3` sind noch nicht da (Ton-Agent); bis dahin klingen `bead` und `wrong`.
  */
 const TAKT: BeatGame = {
   background: `${PLACEHOLDER}etappe-bild-11.webp`,
   drum: `${G}takt/pauke.webp`,
   ring: `${G}takt/ring.webp`,
   rounds: [
-    { hint: 'Goldene Ringe ziehen sich auf die Pauke zu. Tippe die Pauke, wenn ein Ring sie erreicht.', bpm: 72, pattern: [1, 1, 1, 1, 1, 1, 1, 1] },
-    { hint: 'Jetzt fehlt manchmal ein Ring im Takt. Warte, bis der nächste kommt.', bpm: 80, pattern: [1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1] }
+    { hint: 'Tippe die Pauke, wenn ein Ring sie erreicht.', bpm: 72, pattern: [1, 1, 1, 1, 1, 1] },
+    { hint: 'Jetzt fehlt manchmal ein Ring.', bpm: 80, pattern: [1, 1, 0, 1, 1, 1, 0, 1, 1] }
   ]
 }
 
 /**
  * Etappe 6, "Lass mein Volk ziehen" (Lückenvers, alte Mechanik): zwei Sätze aus dem Text der Etappe; die Wörter sind kurze Blätter (`answers` zeigt auf die richtigen, Ablenkwörter stehen
  * dabei). Runde 1: der Auftrag an den Pharao (2. Mose 5,1), zwei Lücken; Runde 2: Gottes Versprechen (6,6f), drei Lücken. Zusammen 2 + 3 = 5 Lücken. Tafel und Blatt sind die aus Adam und Eva, kopiert nach `lueckenvers/`.
- * Hintergrund ist das Etappenbild 6 (keine neuen Bilder).
+ * Hintergrund ist das Etappenbild 6, von der App weichgezeichnet (`soft`); keine neuen Bilder.
  */
 const VERS: VerseGame = {
   background: `${PLACEHOLDER}etappe-bild-06.webp`,
+  soft: true,
   board: `${G}lueckenvers/tafel.webp`,
   leaf: `${G}lueckenvers/blatt.webp`,
   rounds: [
-    { hint: 'Runde 1: Ziehe das passende Blatt in die Lücke.', parts: ['Lass mein ', ' ziehen, damit es mir in der ', ' ein Fest feiert!'], words: ['Volk', 'Wüste', 'Land', 'Stadt'], answers: [0, 1] },
-    { hint: 'Runde 2: Gottes Versprechen. Jetzt fehlen drei Wörter.', parts: ['Ich will euch aus der schweren Arbeit ', ' und euch ', '. Ihr sollt mein Volk sein, und ich will euer ', ' sein.'], words: ['herausführen', 'retten', 'Gott', 'König', 'Hirte'], answers: [0, 1, 2] }
+    { hint: 'Ziehe das passende Blatt in die Lücke.', parts: ['Lass mein ', ' ziehen, damit es mir in der ', ' ein Fest feiert!'], words: ['Volk', 'Wüste', 'Land', 'Stadt'], answers: [0, 1] },
+    { hint: 'Jetzt fehlen drei Wörter.', parts: ['Ich will euch aus der schweren Arbeit ', ' und euch ', '. Ihr sollt mein Volk sein, und ich will euer ', ' sein.'], words: ['herausführen', 'retten', 'Gott', 'König', 'Hirte'], answers: [0, 1, 2] }
   ]
 }
 
 /**
- * Etappe 7, "Frösche im Haus" (Wimmelbild, alte Mechanik): in Pharaos Haus (Backstube mit Ofen und Backtrog, darunter die Schlafkammer) sitzen zehn kleine, freundliche Frösche, sechs davon halb hinter Dingen (Backtrog-Deckel,
- * Ofentür, Krug, Kissen, Korb, Tuchbündel). Komisch und ruhig, ohne Ekel: kein toter Frosch, kein Gestank, kein Blut (Bildauftrag M13; eigene Szene `wimmel/szene.webp`). Die Lagen (Mitte der Unterkante und Breite, Prozent der
- * Szene) sind vorläufig geschätzt, bis die Datei `wimmel-messung.json` der Spielbild-Sitzung da ist.
- * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `wimmel/szene.webp` 1100 × 1467, `frosch-01…10.webp` je ca. 140–190 breit (transparent), `decke-01…06.webp` je 330 breit (transparent).
+ * Etappe 7, "Frösche in der Backstube" (Wimmelbild, alte Mechanik): in Pharaos Haus (Backstube mit Ofen und Backtrog, darunter die Schlafkammer) sitzen sieben kleine, freundliche Frösche, vier davon halb hinter Dingen
+ * (Verdecker). Komisch und ruhig, ohne Ekel: kein toter Frosch, kein Gestank, kein Blut (Bildauftrag M33; eigene Szene `wimmel/szene.webp`). Plan v3: drei Froschbilder und drei Verdeckerbilder, die sich wiederholen.
+ * Die Lagen (Mitte der Unterkante und Breite, Prozent der Szene) sind vorläufig geschätzt, bis die Datei `wimmel-messung.json` der Spielbild-Sitzung da ist.
+ * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `wimmel/szene.webp` 1100 × 1467, `frosch-a.webp`, `frosch-b.webp`, `frosch-c.webp` je ca. 140–190 breit (transparent), `decke-a.webp`, `decke-b.webp`, `decke-c.webp` je 330 breit (transparent).
  */
 const WIMMEL: FindGame = {
-  labels: ['Frosch', 'Frosch', 'Frosch', 'Frosch', 'Frosch', 'Frosch', 'Frosch', 'Frosch', 'Frosch', 'Frosch'],
-  doneText: 'Du hast alle zehn Frösche gefunden!',
+  labels: Array.from({ length: 7 }, () => 'Frosch'),
+  doneText: 'Du hast alle sieben Frösche gefunden!',
   scene: `${G}wimmel/szene.webp`,
   finds: [
-    { image: `${G}wimmel/frosch-01.webp`, x: 12, y: 20, w: 13 },
-    { image: `${G}wimmel/frosch-02.webp`, x: 46, y: 16, w: 13 },
-    { image: `${G}wimmel/frosch-03.webp`, x: 78, y: 24, w: 14 },
-    { image: `${G}wimmel/frosch-04.webp`, x: 30, y: 40, w: 13 },
-    { image: `${G}wimmel/frosch-05.webp`, x: 66, y: 44, w: 13 },
-    { image: `${G}wimmel/frosch-06.webp`, x: 14, y: 50, w: 13 },
-    { image: `${G}wimmel/frosch-07.webp`, x: 88, y: 58, w: 13 },
-    { image: `${G}wimmel/frosch-08.webp`, x: 40, y: 70, w: 13 },
-    { image: `${G}wimmel/frosch-09.webp`, x: 74, y: 82, w: 13 },
-    { image: `${G}wimmel/frosch-10.webp`, x: 20, y: 88, w: 13 }
+    { image: `${G}wimmel/frosch-a.webp`, x: 12, y: 20, w: 13 },
+    { image: `${G}wimmel/frosch-b.webp`, x: 78, y: 24, w: 14 },
+    { image: `${G}wimmel/frosch-c.webp`, x: 30, y: 40, w: 13 },
+    { image: `${G}wimmel/frosch-a.webp`, x: 66, y: 44, w: 13 },
+    { image: `${G}wimmel/frosch-b.webp`, x: 88, y: 58, w: 13 },
+    { image: `${G}wimmel/frosch-c.webp`, x: 40, y: 70, w: 13 },
+    { image: `${G}wimmel/frosch-a.webp`, x: 20, y: 88, w: 13 }
   ],
   covers: [
-    { image: `${G}wimmel/decke-01.webp`, x: 66, y: 50, w: 28 },
-    { image: `${G}wimmel/decke-02.webp`, x: 14, y: 56, w: 24 },
-    { image: `${G}wimmel/decke-03.webp`, x: 88, y: 64, w: 24 },
-    { image: `${G}wimmel/decke-04.webp`, x: 40, y: 76, w: 28 },
-    { image: `${G}wimmel/decke-05.webp`, x: 74, y: 88, w: 28 },
-    { image: `${G}wimmel/decke-06.webp`, x: 20, y: 94, w: 28 }
+    { image: `${G}wimmel/decke-a.webp`, x: 66, y: 50, w: 28 },
+    { image: `${G}wimmel/decke-b.webp`, x: 88, y: 64, w: 24 },
+    { image: `${G}wimmel/decke-c.webp`, x: 40, y: 76, w: 28 },
+    { image: `${G}wimmel/decke-a.webp`, x: 20, y: 94, w: 28 }
   ]
 }
 
@@ -241,8 +229,8 @@ const AUSZUG: PackGame = {
   ],
   area: { x: 20, y: 32, w: 60, h: 56 },
   rounds: [
-    { hint: 'Packe das Tragetuch. Tippe ein Stück im Tuch an, dann dreht es sich.', cols: 4, rows: 3, items: ['kleiderbuendel', 'teigtrog', 'silberkrug'] },
-    { hint: 'Jetzt mehr Stücke und kein Platz übrig. Überlege gut, wie alles hineinpasst.', cols: 5, rows: 4, items: ['kleiderbuendel', 'teigtrog', 'tuchbuendel', 'silberkrug', 'goldkrug'] }
+    { hint: 'Packe das Tragetuch, ein Tippen dreht ein Stück.', cols: 4, rows: 3, items: ['kleiderbuendel', 'teigtrog', 'silberkrug'] },
+    { hint: 'Jetzt mehr Stücke und kein Platz übrig.', cols: 5, rows: 4, items: ['kleiderbuendel', 'teigtrog', 'tuchbuendel', 'silberkrug', 'goldkrug'] }
   ]
 }
 
@@ -404,7 +392,7 @@ export const mose: Journey = {
         'Als der Pharao sieht, dass die Plage vorbei ist, wird er wieder hart. Er hält sein Wort nicht und lässt das Volk nicht ziehen.'
       ],
       // Spiel gebaut: Wimmelbild: Frösche (wimmelbild, alt); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
-      task: { kind: 'wimmelbild', hint: 'Finde die zehn Frösche in Pharaos Haus. Manche verstecken sich!', count: 10, find: WIMMEL },
+      task: { kind: 'wimmelbild', hint: 'Finde die Frösche in der Backstube.', count: 7, find: WIMMEL },
       questions: [
         { q: 'Was geschieht zuerst mit dem Wasser im Nil?', options: ['Es wird zu Blut.', 'Es wird zu Eis.', 'Es versiegt.'], answer: 0 },
         { q: 'Was verspricht der Pharao, wenn die Frösche weg sind?', options: ['Er will das Volk ziehen lassen.', 'Er will Mose belohnen.', 'Er will einen neuen Palast bauen.'], answer: 0 }
@@ -565,6 +553,17 @@ export const mose: Journey = {
     { q: 'Was antwortet das Volk Gott am Berg?', options: ['„Alles, was Gott gesagt hat, wollen wir tun.“', '„Wir wollen weiterziehen.“', '„Wir brauchen das nicht.“'], answer: 0 },
     { q: 'Was zeigt dem Volk den Weg?', options: ['die Wolke über dem Zelt', 'ein Vogel', 'ein Hirtenstab'], answer: 0 }
   ]
+}
+
+// the games that lie on a stage picture (drawn soft by the app) follow the picture of their stage
+for (const st of mose.stages) {
+  const t = st.task
+  if (t.weave) t.weave.background = st.image
+  if (t.verse) t.verse.background = st.image
+  if (t.pack) t.pack.background = st.image
+  if (t.beat) t.beat.background = st.image
+  if (t.manna) t.manna.background = st.image
+  if (t.words) t.words.background = st.image
 }
 
 // the English texts (title, stories, questions, hints) lie over the German ones; the screens show them when the app is English
