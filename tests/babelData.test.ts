@@ -38,8 +38,13 @@ describe('Babel: stories and questions', () => {
       expect(words / sentences, `words per sentence ${s.id}`).toBeGreaterThan(7)
       expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/babel/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`)
-      expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
+      if ([1, 4, 5, 6].includes(s.id)) {
+        // text changed in the Bibeltreue correction of 21.10.2026: no recording until the new one (NEUAUFNAHME-BIBELTREUE-2026-10-21.md), the device voice reads
+        expect(s.audio, `no German recording yet ${s.id}`).toBeUndefined()
+      } else {
+        expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/babel/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`)
+        expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
+      }
       expect(s.image).toBe(`images/abenteuer/babel/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
     }
   })

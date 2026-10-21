@@ -95,8 +95,8 @@ const STAPELN: StackGame = {
   block: `${G}stapeln/stufe.webp`,
   beam: `${G}stapeln/balken.webp`,
   rounds: [
-    { hint: 'Tippe, wenn der Block über der Stufe ist.', layers: 3, baseWidth: 52, shrink: 0.08, speed: 0.18 },
-    { hint: 'Die Stufen werden schmaler.', layers: 4, baseWidth: 36, shrink: 0.1, speed: 0.26 }
+    { hint: 'Tippe, wenn der Block über der Reihe ist.', layers: 3, baseWidth: 52, shrink: 0.08, speed: 0.18 },
+    { hint: 'Die Reihen werden schmaler.', layers: 4, baseWidth: 36, shrink: 0.1, speed: 0.26 }
   ]
 }
 
@@ -176,7 +176,7 @@ export const babel: Journey = {
       text: [
         'Nach der großen Flut hat Gott zu Noah und seinen Söhnen gesagt: „Füllt die Erde!“ Nun werden ihre Familien immer größer, und bald leben viele Menschen auf der Erde.',
         'Sie alle sprechen dieselbe Sprache. Wenn einer etwas ruft, versteht ihn jeder, und jedes Wort bedeutet für alle dasselbe.',
-        'Eines Tages ziehen sie gemeinsam nach Osten, Familien mit ihren Bündeln, in einem langen Zug. Sie reden miteinander, und keiner muss fragen, was der andere meint. Schließlich finden sie eine weite, flache Ebene im Land Sinear.',
+        'Eines Tages ziehen sie gemeinsam los, Familien mit ihren Bündeln, in einem langen Zug. Sie reden miteinander, und keiner muss fragen, was der andere meint. Schließlich finden sie eine weite, flache Ebene im Land Sinear.',
         'Hier ist Platz genug für alle. Sie lassen sich nieder und wohnen nebeneinander.'
       ],
       task: { kind: 'fehlt', hint: 'Schau gut hin: Wer fehlt im Zug?', missing: FEHLT },
@@ -215,7 +215,7 @@ export const babel: Journey = {
         'Sie fangen gleich an, alle helfen mit. Ziegel um Ziegel schleppen sie herbei. Es entstehen Häuser und Gassen, und Reihe um Reihe wächst der Turm in die Höhe.',
         'Immer wieder blicken die Menschen zu ihm hinauf. Er ist höher als alles andere in der Stadt, und man kann ihn schon von weitem sehen.'
       ],
-      task: { kind: 'stapeln', hint: 'Setze die Stufen des Turms Stück für Stück.', stack: STAPELN },
+      task: { kind: 'stapeln', hint: 'Setze die Ziegelreihen des Turms Stück für Stück.', stack: STAPELN },
       questions: [
         { q: 'Wie hoch soll der Turm reichen?', options: ['bis an den Himmel', 'bis zur Stadtmauer', 'bis zum Meer'], answer: 0 },
         { q: 'Was wollen sich die Menschen machen?', options: ['einen Namen', 'einen Schatz', 'einen Garten'], answer: 0 }
@@ -229,7 +229,7 @@ export const babel: Journey = {
       ref: '1. Mose 11,5–6',
       text: [
         'Der Turm wächst und wächst, höher als alle Häuser. Da kommt Gott herab, um zu sehen, was die Menschen bauen, die Stadt und den Turm.',
-        'Gott sieht die vielen Menschen, die miteinander arbeiten und sich gut verstehen. „Es ist ein Volk, und alle haben eine Sprache“, sagt er. „Das ist erst der Anfang. Nichts wird ihnen unmöglich sein, was sie sich vornehmen.“',
+        'Gott sieht die vielen Menschen, die miteinander arbeiten und sich gut verstehen. „Es ist ein Volk, und alle haben eine Sprache“, sagt er. „Das ist erst der Anfang. Sie werden nicht ablassen von dem, was sie sich vornehmen.“',
         'Unten in der Stadt wird es Abend, und die Sonne färbt den Turm golden. Die Bauleute rufen einander zu, und jeder versteht jedes Wort. Noch ein Weilchen arbeiten sie weiter.'
       ],
       task: { kind: 'wischen', hint: 'Wische den Nebel weg, damit man Turm und Stadt sieht.', wipe: WISCHEN },
@@ -248,12 +248,12 @@ export const babel: Journey = {
         'Da spricht Gott: „Auf, lasst uns hinabgehen und ihre Sprache verwirren, damit keiner mehr versteht, was der andere sagt.“',
         'Und so geschieht es. Ein Mann ruft seinem Nachbarn etwas zu, doch der schaut ihn nur ratlos an. Die Wörter klingen fremd, als kämen sie aus einem anderen Land.',
         'Die Bauleute zeigen auf die Ziegel, schütteln die Köpfe, fragen und deuten. Aber keiner versteht den anderen, so sehr sie sich auch bemühen.',
-        'Sie können nicht mehr gemeinsam planen. Der Bau hört auf, Werkzeug und Ziegel liegen still, und der Turm bleibt unfertig stehen.'
+        'Sie können nicht mehr gemeinsam planen. Die Arbeit gerät ins Stocken, und Werkzeug und Ziegel bleiben liegen, wo man sie hingelegt hat.'
       ],
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Was verwirrt Gott?', options: ['ihre Sprache', 'ihre Wege', 'ihre Ziegel'], answer: 0 },
-        { q: 'Was geschieht mit dem Bau?', options: ['Die Menschen hören auf zu bauen.', 'Die Menschen bauen schneller.', 'Die Menschen bauen einen zweiten Turm.'], answer: 0 }
+        { q: 'Was können die Bauleute jetzt nicht mehr?', options: ['gemeinsam planen', 'gehen', 'sehen'], answer: 0 }
       ],
       soon: SOON
     },
@@ -263,7 +263,7 @@ export const babel: Journey = {
       title: 'Der Name Babel',
       ref: '1. Mose 11,8–9',
       text: [
-        'Von dort aus zerstreut Gott die Menschen in alle Länder. Sie packen ihre Bündel und gehen auseinander, Familie für Familie, auf vielen Wegen in alle Richtungen. Manche winken einander noch zu.',
+        'Von dort aus zerstreut Gott die Menschen in alle Länder, und sie müssen aufhören, die Stadt zu bauen. Sie packen ihre Bündel und gehen auseinander, Familie für Familie, auf vielen Wegen in alle Richtungen. Manche winken einander noch zu.',
         'Hinter ihnen bleibt die Stadt zurück, und der Turm steht unfertig im Morgenlicht. Niemand baut mehr weiter.',
         'Darum heißt die Stadt Babel, das klingt wie das Wort für „Verwirrung“. Denn dort hat Gott die Sprache aller Menschen verwirrt.',
         'Aus den vielen Familien werden viele Völker. In allen Ländern der Erde leben nun Menschen, und jedes Volk spricht seine eigene Sprache.'
@@ -287,8 +287,11 @@ export const babel: Journey = {
 }
 
 // the German recordings of the stories (voice Achernar, text version 3 = files "-v3"); there are no English ones yet, so the English app reads with the voice of the device
+// Bibeltreue-Korrektur 21.10.2026: the texts of these stages were changed (see NEUAUFNAHME-BIBELTREUE-2026-10-21.md in the adventure folder), so the old recordings no longer match;
+// until they are recorded again the app reads them with the voice of the device. Take the number out of this list when the new file (-v4) is in `public/`.
+const TO_RERECORD = [1, 4, 5, 6]
 for (const s of babel.stages) {
-  const file = `audio/abenteuer/babel/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`
+  const file = TO_RERECORD.includes(s.id) ? undefined : `audio/abenteuer/babel/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 

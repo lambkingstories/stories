@@ -17,7 +17,7 @@ export const babelEn: TextOverlay<Journey> = {
       text: [
         'After the great flood God has said to Noah and his sons, “Fill the earth!” Now their families grow larger and larger, and soon many people live on the earth.',
         'They all speak the same language. When one person calls out, everyone understands, and every word means the same thing to all.',
-        'One day they set out together toward the east, families with their bundles, in a long line. They talk with one another, and nobody has to ask what the other means. At last they find a wide, flat plain in the land of Shinar.',
+        'One day they set out together, families with their bundles, in a long line. They talk with one another, and nobody has to ask what the other means. At last they find a wide, flat plain in the land of Shinar.',
         'There is room enough for everyone. They settle down and live side by side.'
       ],
       task: { hint: 'Look closely: Who is missing from the caravan?', missing: { people: [{ label: 'Man with a blue headscarf' }, { label: 'Woman with an ochre cloth and a water jug' }, { label: 'Boy with a red cloth' }, { label: 'Man with an olive-green cloth and a big bundle' }, { label: 'Woman in blue with a basket' }, { label: 'Young woman with a braid' }], rounds: [{ hint: 'Round 1: Four people are walking. Who is gone when the dust cloud has passed?' }, { hint: 'Round 2: Now two are missing.' }] } },
@@ -50,7 +50,7 @@ export const babelEn: TextOverlay<Journey> = {
         'They begin right away, and everyone helps. They carry brick after brick. Houses and lanes appear, and row by row the tower grows higher.',
         'Again and again the people look up at it. It is taller than anything else in the city, and you can already see it from far away.'
       ],
-      task: { hint: 'Place the steps of the tower piece by piece.', stack: { rounds: [{ hint: 'Round 1: Tap when the block is above the step.' }, { hint: 'Round 2: The steps get narrower.' }] } },
+      task: { hint: 'Place the rows of bricks of the tower piece by piece.', stack: { rounds: [{ hint: 'Round 1: Tap when the block is above the row.' }, { hint: 'Round 2: The rows get narrower.' }] } },
       questions: [
         { q: 'How high is the tower supposed to reach?', options: ['up to the sky', 'up to the city wall', 'up to the sea'] },
         { q: 'What do the people want to make for themselves?', options: ['a name', 'a treasure', 'a garden'] }
@@ -61,7 +61,7 @@ export const babelEn: TextOverlay<Journey> = {
       ref: 'Genesis 11:5–6',
       text: [
         'The tower grows and grows, taller than all the houses. Then God comes down to see what the people are building, the city and the tower.',
-        'God sees the many people working together and understanding one another well. “They are one people, and they all have one language,” he says. “This is only the beginning. Nothing will be impossible for them that they plan to do.”',
+        'God sees the many people working together and understanding one another well. “They are one people, and they all have one language,” he says. “This is only the beginning. They will not let go of what they plan to do.”',
         'Down in the city evening comes, and the sun turns the tower golden. The builders call to one another, and everyone understands every word. They keep working a little longer.'
       ],
       task: { hint: 'Wipe away the fog so that you can see the tower and the city.', wipe: { rounds: [{ hint: 'Round 1: Wipe the fog from the tower.' }, { hint: 'Round 2: Now the people.' }] } },
@@ -77,19 +77,19 @@ export const babelEn: TextOverlay<Journey> = {
         'Then God says, “Come, let us go down and confuse their language, so that no one understands what the other says.”',
         'And so it happens. A man calls something to his neighbor, but the neighbor only looks at him blankly. The words sound strange, as if they came from another country.',
         'The builders point at the bricks, shake their heads, ask, and gesture. But nobody understands anybody else, however hard they try.',
-        'They can no longer plan together. The building stops, tools and bricks lie still, and the tower stays unfinished.'
+        'They can no longer plan together. The work grinds to a halt, and tools and bricks stay where they were put down.'
       ],
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'What does God confuse?', options: ['their language', 'their roads', 'their bricks'] },
-        { q: 'What happens to the building?', options: ['The people stop building.', 'The people build faster.', 'The people build a second tower.'] }
+        { q: 'What can the builders no longer do?', options: ['plan together', 'walk', 'see'] }
       ]
     },
     {
       title: 'The Name Babel',
       ref: 'Genesis 11:8–9',
       text: [
-        'From there God scatters the people into all the countries. They pack their bundles and go apart, family by family, on many roads in every direction. Some still wave to one another.',
+        'From there God scatters the people into all the countries, and they have to stop building the city. They pack their bundles and go apart, family by family, on many roads in every direction. Some still wave to one another.',
         'Behind them the city stays, and the tower stands unfinished in the morning light. Nobody builds on.',
         'That is why the city is called Babel. It sounds like the word for “confusion,” because there God confused the language of all the people.',
         'From the many families grow many nations. People now live in all the countries, and each nation speaks its own language.'
