@@ -87,7 +87,7 @@ export const adamEvaEn: TextOverlay<Journey> = {
       ]
     },
     {
-      title: 'The Woman',
+      title: 'Eve',
       ref: 'Genesis 2:21–25',
       text: [
         'Then God lets a deep sleep fall on Adam. While Adam sleeps peacefully, God takes one of his ribs. He closes the place again and builds a woman out of the rib.',

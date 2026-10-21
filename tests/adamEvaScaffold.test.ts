@@ -21,7 +21,7 @@ const PLAN: [string, string][] = [
   ['Tiere und Menschen', '1. Mose 1,24 bis 2,3'],
   ['Der Garten Eden', '1. Mose 2,4–17'],
   ['Adam gibt den Tieren Namen', '1. Mose 2,18–20'],
-  ['Die Frau', '1. Mose 2,21–25'],
+  ['Eva', '1. Mose 2,21–25'],
   ['Die Schlange', '1. Mose 3,1–7'],
   ['Wo bist du?', '1. Mose 3,8–21'],
   ['Der Weg aus dem Garten', '1. Mose 3,22–24']
@@ -70,7 +70,7 @@ describe('Adam und Eva: the scaffold', () => {
     expect(adamEva.subtitle).toBe('The Garden of Eden')
     expect(adamEva.stages[0]!.title).toBe('In the Beginning')
     expect(adamEva.stages[8]!.ref).toBe('Genesis 3:22–24')
-    expect(adamEva.stages[5]!.title).toBe('The Woman')
+    expect(adamEva.stages[5]!.title).toBe('Eve')
     expect(adamEva.gift.title).toBe('Adam and Eve in the Garden with the Animals')
   })
 })

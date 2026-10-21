@@ -315,7 +315,7 @@ export const adamEva: Journey = {
     {
       id: 6,
       image: `${IMG}etappe-bild-06.webp`,
-      title: 'Die Frau',
+      title: 'Eva',
       ref: '1. Mose 2,21–25',
       text: [
         'Da lässt Gott einen tiefen Schlaf auf Adam fallen. Während Adam ruhig schläft, nimmt Gott eine seiner Rippen. Er verschließt die Stelle wieder und baut aus der Rippe eine Frau.',
