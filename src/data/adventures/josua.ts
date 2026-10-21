@@ -156,8 +156,8 @@ export const josua: Journey = {
   age: '8-10',
   downloadMb: 11, // etwa 10 bis 11 MB gerechnet am 21.10.2026 mit der neuen Karte v3 (vier Stücke zusammen 5,5 MB, ohne die noch fehlenden Bilder und Aufnahmen)
   medal: 'images/abenteuer/josua/medaille-v2.webp', // Die Posaune von Jericho (Widderhorn vor der Stadtmauer, Goldring)
-  // Geschenk-Ausmalbild: Die Posaunen von Jericho (sieben Priester mit Widderhörnern vor der ganzen Stadtmauer); PLATZHALTER bis eigenes Bild
-  gift: { title: 'Die Posaunen von Jericho', image: josef.gift.image },
+  // Geschenk-Ausmalbild: Die Posaunen von Jericho (sieben Priester mit Widderhörnern auf dem Weg zur Stadtmauer, Konturzeichnung)
+  gift: { title: 'Die Posaunen von Jericho', image: `${PICS}geschenk.webp` },
   // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v3 mit zehn Orten und dem Ziel) mit Stationen und Perlenweg aus josuaPath.ts
   map: {
     images: [1, 2, 3, 4].map((n) => `images/abenteuer/josua/karte-pano-v3-${n}.webp`),

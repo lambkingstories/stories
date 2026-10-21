@@ -300,11 +300,12 @@ describe('Josua: the games, and the placeholders until the pictures come', () =>
     for (const s of josua.stages) expect(existsSync(`public/${s.image}`), s.image).toBe(true)
   })
 
-  it('the medal is the own one of Josua; the gift is the one of Josef until its own comes and has its final title', () => {
+  it('the medal and the gift picture are the own ones of Josua; the gift has its final title', () => {
     expect(josua.medal).toBe('images/abenteuer/josua/medaille-v2.webp')
     expect(existsSync(`public/${josua.medal}`)).toBe(true)
     expect(josua.gift.title).toBe('Die Posaunen von Jericho')
-    expect(josua.gift.image).toBe(josef.gift.image)
+    expect(josua.gift.image).toBe('images/abenteuer/josua/geschenk.webp')
+    expect(existsSync(`public/${josua.gift.image}`)).toBe(true)
   })
 
   it('every file that the data names exists (the own stage pictures, the map and medal of Josef) and is small enough', () => {
