@@ -27,7 +27,7 @@ const G = 'images/abenteuer/spiele/mose/'
 /**
  * Etappe 13, "Worte ordnen": die Wörter eines Satzes liegen in gemischter Folge auf Steinplättchen und werden der Reihe nach in den Satzstreifen gelegt (Bildauftrag M37; Hintergrund = das Etappenbild der Etappe,
  * von der App weichgezeichnet, Mischung immer gleich und nie in der richtigen Ordnung). Plan v3: zwei Runden mit je zwei Sätzen, alle wörtlich im Text der Etappe (auch englisch); Runde 1 kurze, Runde 2 längere.
- * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `worte/stein.webp` 260 × 110 (leer, das Wort schreibt die App), `worte/streifen.webp` 900 × 160 (leer), beide transparent.
+ * Bilder (gemalt, 21.10.2026): `worte/stein.webp` 260 × 110 (leer, das Wort schreibt die App), `worte/streifen.webp` 900 × 160 (leer), beide transparent.
  */
 const WORTE: WordsGame = {
   background: `${PICS}etappe-bild-04.webp`,
@@ -72,7 +72,7 @@ const UNTERSCHIED: DiffGame = {
 /**
  * Etappe 12, "Manna sammeln": Tag für Tag werden Körnchen in Krüge gesammelt (vier Körnchen füllen einen Krug), an einem gewöhnlichen Tag zwei Krüge, am sechsten Tag vier, am siebten Tag ruht man (Bildauftrag M36;
  * Hintergrund = das Etappenbild 12, von der App weichgezeichnet). Plan v3: Runde 1 zwei gewöhnliche Tage, Runde 2 ein gewöhnlicher Tag, der doppelte Tag und der Ruhetag (zusammen 5 Tage). Es gibt zwei Körnchenbilder.
- * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `manna/koernchen-1.webp`, `koernchen-2.webp` je 90 × 90, `krug-leer.webp`, `krug-voll.webp` je 220 × 220, `bewohner.webp` 260 × 260 (alle transparent).
+ * Bilder (gemalt, 21.10.2026): `manna/koernchen-1.webp`, `koernchen-2.webp` je 90 × 90, `krug-leer.webp`, `krug-voll.webp` je 220 × 220, `bewohner.webp` 260 × 260 (alle transparent).
  */
 const MANNA: MannaGame = {
   background: `${PICS}etappe-bild-12.webp`,
@@ -91,7 +91,7 @@ const MANNA: MannaGame = {
  * Etappe 15, "Der Wolke folgen": die Säule hebt sich (das Volk bricht auf) oder bleibt (das Volk bleibt); ringsum treiben Dinge, die nichts damit zu tun haben; das Kind antwortet, wenn es sicher ist, die Szene
  * wiederholt sich, bis es antwortet (Bildauftrag M38; eigene Szenen für Tag und Nacht). Plan v3: Runde 1 drei Fragen am Tag (Vögel als Ablenkung), Runde 2 drei in der Nacht (Feuersäule als Lichtsäule, ohne Gesicht und ohne
  * Gestalt; Funken als Ablenkung). Eine falsch beantwortete Frage kommt am Ende der Runde noch einmal. Nie dreimal dasselbe hintereinander (Test). Der Rauch entfällt.
- * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `wolke/tag.webp`, `nacht.webp` je 1000 × 750 (ohne Säule), `saeule-tag.webp`, `saeule-nacht.webp` je 220 × 640 (transparent), `vogel.webp`, `funken.webp` (transparent).
+ * Bilder (gemalt, 21.10.2026): `wolke/tag.webp`, `nacht.webp` je 1000 × 750 (ohne Säule), `saeule-tag.webp`, `saeule-nacht.webp` je 220 × 640 (transparent), `vogel.webp`, `funken.webp` (transparent).
  */
 const WOLKE: CloudGame = {
   dayScene: `${G}wolke/tag.webp`,
@@ -155,7 +155,7 @@ const LEUCHTEN: GlowGame = {
  * Etappe 11, "Mirjams Pauke": der Danktanz am Ufer (2. Mose 15,20f), nicht die Rettung; kein Heer, kein Wasser über Menschen (Bildauftrag M35). Goldene Ringe ziehen sich auf die Pauke zu, das Kind tippt, wenn ein Ring
  * sie erreicht (Fenster ± 0,25 s, `judge` in `utils/moseGames.ts`). Ein ausgelassener Ring verblasst ohne Fehler; ein Tipp ohne Ring in der Nähe ist ein Fehler. Kein Zeitdruck: die Runde endet, wenn der letzte Ring vorbei ist,
  * wer zu wenige trifft, darf es noch einmal versuchen. Plan v3: Runde 1 sechs Ringe, 72 Schläge je Minute; Runde 2 neun Schläge mit zwei Pausen (sieben Ringe), 80 Schläge. Zusammen 6 + 7 = 13 Ringe.
- * Der Hintergrund ist das Etappenbild 11, von der App weichgezeichnet. Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `takt/pauke.webp` 500 × 500 (transparent), `takt/ring.webp` 512 × 512 (transparent). Töne `pauke.mp3`
+ * Der Hintergrund ist das Etappenbild 11, von der App weichgezeichnet. Bilder (gemalt, 21.10.2026): `takt/pauke.webp` 500 × 500 (transparent), `takt/ring.webp` 512 × 512 (transparent). Töne `pauke.mp3`
  * und `pauke-dumpf.mp3` sind noch nicht da (Ton-Agent); bis dahin klingen `bead` und `wrong`.
  */
 const TAKT: BeatGame = {
@@ -187,35 +187,35 @@ const VERS: VerseGame = {
 /**
  * Etappe 7, "Frösche in der Backstube" (Wimmelbild, alte Mechanik): in Pharaos Haus (Backstube mit Ofen und Backtrog, darunter die Schlafkammer) sitzen sieben kleine, freundliche Frösche, vier davon halb hinter Dingen
  * (Verdecker). Komisch und ruhig, ohne Ekel: kein toter Frosch, kein Gestank, kein Blut (Bildauftrag M33; eigene Szene `wimmel/szene.webp`). Plan v3: drei Froschbilder und drei Verdeckerbilder, die sich wiederholen.
- * Die Lagen (Mitte der Unterkante und Breite, Prozent der Szene) sind vorläufig geschätzt, bis die Datei `wimmel-messung.json` der Spielbild-Sitzung da ist.
- * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `wimmel/szene.webp` 1100 × 1467, `frosch-a.webp`, `frosch-b.webp`, `frosch-c.webp` je ca. 140–190 breit (transparent), `decke-a.webp`, `decke-b.webp`, `decke-c.webp` je 330 breit (transparent).
+ * Die Lagen (Mitte der Unterkante und Breite, Prozent der Szene) sind am gemalten Bild abgelesen (`wimmel-messung.json`; die vier Verdecker sind so weit nach unten gesetzt, dass jeder Frosch noch zu einem Drittel bis zur Hälfte herausschaut).
+ * Bilder (gemalt, 21.10.2026): `wimmel/szene.webp` 1100 × 1467, `frosch-a.webp`, `frosch-b.webp`, `frosch-c.webp` je ca. 140–190 breit (transparent), `decke-a.webp`, `decke-b.webp`, `decke-c.webp` je 330 breit (transparent).
  */
 const WIMMEL: FindGame = {
   labels: Array.from({ length: 7 }, () => 'Frosch'),
   doneText: 'Du hast alle sieben Frösche gefunden!',
   scene: `${G}wimmel/szene.webp`,
   finds: [
-    { image: `${G}wimmel/frosch-a.webp`, x: 12, y: 20, w: 13 },
-    { image: `${G}wimmel/frosch-b.webp`, x: 78, y: 24, w: 14 },
-    { image: `${G}wimmel/frosch-c.webp`, x: 30, y: 40, w: 13 },
-    { image: `${G}wimmel/frosch-a.webp`, x: 66, y: 44, w: 13 },
-    { image: `${G}wimmel/frosch-b.webp`, x: 88, y: 58, w: 13 },
-    { image: `${G}wimmel/frosch-c.webp`, x: 40, y: 70, w: 13 },
-    { image: `${G}wimmel/frosch-a.webp`, x: 20, y: 88, w: 13 }
+    { image: `${G}wimmel/frosch-a.webp`, x: 13, y: 25.5, w: 13 },
+    { image: `${G}wimmel/frosch-c.webp`, x: 47, y: 24.7, w: 13 },
+    { image: `${G}wimmel/frosch-b.webp`, x: 87, y: 35.7, w: 13 },
+    { image: `${G}wimmel/frosch-c.webp`, x: 65, y: 79, w: 13 },
+    { image: `${G}wimmel/frosch-a.webp`, x: 84, y: 91, w: 13 },
+    { image: `${G}wimmel/frosch-c.webp`, x: 25, y: 94, w: 13 },
+    { image: `${G}wimmel/frosch-a.webp`, x: 76, y: 55, w: 13 }
   ],
   covers: [
-    { image: `${G}wimmel/decke-a.webp`, x: 66, y: 50, w: 28 },
-    { image: `${G}wimmel/decke-b.webp`, x: 88, y: 64, w: 24 },
-    { image: `${G}wimmel/decke-c.webp`, x: 40, y: 76, w: 28 },
-    { image: `${G}wimmel/decke-a.webp`, x: 20, y: 94, w: 28 }
+    { image: `${G}wimmel/decke-a.webp`, x: 65, y: 83.5, w: 28 },
+    { image: `${G}wimmel/decke-c.webp`, x: 84, y: 95.5, w: 28 },
+    { image: `${G}wimmel/decke-b.webp`, x: 25, y: 98.5, w: 20 },
+    { image: `${G}wimmel/decke-b.webp`, x: 76, y: 60.5, w: 20 }
   ]
 }
 
 /**
  * Etappe 10, "Der Auszug": Teig, Gefäße aus Silber und Gold und Kleider kommen in ein Tragetuch (2. Mose 12,34–36), Form und Platz statt Gewicht (Bildauftrag M14). Das Spiel ist das vorhandene "Packen" (Josua 1), hier nur Daten: ein Tuch
  * statt des Korbs, ein Tippen dreht ein gelegtes Stück. Ein Feld ist 100 Pixel. Runde 1: 4 × 3 Felder mit drei Stücken (3 × 2, 2 × 2, 1 × 2); Runde 2: 5 × 4 Felder mit fünf Stücken (3 × 2, 2 × 2, 2 × 3, 1 × 2, 1 × 2); beide
- * füllen das Tuch genau und sind lösbar (Test). Das Tuch (`area`, Prozent des Etappenbildes) ist vorläufig geschätzt, bis die Datei `packen-messung.json` der Spielbild-Sitzung da ist.
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `packen/tuch.webp` 900 × 675, `teigtrog.webp` 200 × 200, `silberkrug.webp`, `goldkrug.webp` je 100 × 200, `kleiderbuendel.webp` 300 × 200, `tuchbuendel.webp` 200 × 300 (alle transparent).
+ * füllen das Tuch genau und sind lösbar (Test). Das Tuch (`area`, Prozent des Etappenbildes) ist das auf die Stoffmitte zugeschnittene Tuchbild (680 × 490, Seitenverhältnis 1,39), der Bereich füllt die Spielfläche entsprechend (Prozent der Spielfläche).
+ * Bilder (gemalt, 21.10.2026): `packen/tuch.webp` 900 × 675, `teigtrog.webp` 200 × 200, `silberkrug.webp`, `goldkrug.webp` je 100 × 200, `kleiderbuendel.webp` 300 × 200, `tuchbuendel.webp` 200 × 300 (alle transparent).
  */
 const AUSZUG: PackGame = {
   background: `${PICS}etappe-bild-10.webp`,
@@ -227,7 +227,7 @@ const AUSZUG: PackGame = {
     { id: 'silberkrug', image: `${G}packen/silberkrug.webp`, w: 1, h: 2, label: 'Silberkrug' },
     { id: 'goldkrug', image: `${G}packen/goldkrug.webp`, w: 1, h: 2, label: 'Goldkrug' }
   ],
-  area: { x: 20, y: 32, w: 60, h: 56 },
+  area: { x: 20, y: 26, w: 60, h: 64.8 },
   rounds: [
     { hint: 'Packe das Tragetuch, ein Tippen dreht ein Stück.', cols: 4, rows: 3, items: ['kleiderbuendel', 'teigtrog', 'silberkrug'] },
     { hint: 'Jetzt mehr Stücke und kein Platz übrig.', cols: 5, rows: 4, items: ['kleiderbuendel', 'teigtrog', 'tuchbuendel', 'silberkrug', 'goldkrug'] }

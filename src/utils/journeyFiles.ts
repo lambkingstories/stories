@@ -56,12 +56,6 @@ function pathsIn(value: unknown, out: Set<string>) {
  */
 export const NOT_PAINTED_YET = [
   'images/abenteuer/spiele/jakob/suppe/',
-  'images/abenteuer/spiele/mose/wimmel/',
-  'images/abenteuer/spiele/mose/packen/',
-  'images/abenteuer/spiele/mose/takt/',
-  'images/abenteuer/spiele/mose/wolke/',
-  'images/abenteuer/spiele/mose/manna/',
-  'images/abenteuer/spiele/mose/worte/',
 ]
 
 export const notPaintedYet = (path: string) => NOT_PAINTED_YET.some((p) => path.startsWith(p))
