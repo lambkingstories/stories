@@ -9,6 +9,7 @@ import {
   alignedCount,
   BIRDS_ASPECT,
   birdAngle,
+  blurAt,
   claim,
   clueHolds,
   cluesSolutions,
@@ -19,11 +20,13 @@ import {
   isAligned,
   isBalanced,
   isExact,
+  isSharp,
   lineEnd,
   matches,
   onRay,
   ringsSolvable,
   rotateRing,
+  sharpness,
   solutions,
   solveRings,
   solvable,
@@ -65,15 +68,15 @@ describe('camels: balance', () => {
     expect(tip([2, 2, 2], [null, null, null])).toBeNull()
   })
 
-  it('every camel of the data can be balanced, with three packs in round 1 and five in round 2', () => {
+  it('the camel of every round of the data can be balanced: one camel with three packs in round 1 and one with five in round 2', () => {
     const g = abraham.stages[0]!.task.balance!
     const weight = (id: string) => g.packs.find((p) => p.id === id)!.weight
     for (const r of g.rounds) {
-      expect(r.camels).toHaveLength(2)
+      expect(r.camels).toHaveLength(1)
       for (const c of r.camels) expect(solvable(c.packs.map(weight)), c.packs.join(',')).toBe(true)
     }
-    expect(g.rounds[0]!.camels.map((c) => c.packs.length)).toEqual([3, 3])
-    expect(g.rounds[1]!.camels.map((c) => c.packs.length)).toEqual([5, 5])
+    expect(g.rounds[0]!.camels.map((c) => c.packs.length)).toEqual([3])
+    expect(g.rounds[1]!.camels.map((c) => c.packs.length)).toEqual([5])
   })
 })
 
@@ -263,5 +266,34 @@ describe('clues', () => {
     expect(cluesSolutions(['rot', 'blau', 'gelb'], clues)).toEqual([['blau', 'rot', 'gelb']])
     // too few clues: more than one row
     expect(cluesSolutions(['rot', 'blau', 'gelb'], [{ kind: 'at', blanket: 'blau', slot: 1 }]).length).toBe(2)
+  })
+})
+
+describe('focus: the slider', () => {
+  it('the sharpness is 1 at the right place and falls to 0 half a slider away, on both sides', () => {
+    expect(sharpness(70, 70)).toBe(1)
+    expect(sharpness(20, 70)).toBe(0)
+    expect(sharpness(120, 70)).toBe(0)
+    expect(sharpness(45, 70)).toBeCloseTo(0.5, 5)
+    expect(sharpness(95, 70)).toBeCloseTo(0.5, 5)
+  })
+
+  it('the blur is nothing at the right place and grows to the strongest on both sides', () => {
+    expect(blurAt(30, 30)).toBe(0)
+    expect(blurAt(30, 30, 20)).toBe(0)
+    expect(blurAt(0, 30)).toBeGreaterThan(blurAt(10, 30))
+    expect(blurAt(10, 30)).toBeGreaterThan(blurAt(20, 30))
+    expect(blurAt(60, 30)).toBeCloseTo(blurAt(0, 30), 5)
+    expect(blurAt(100, 30)).toBe(16)
+    expect(blurAt(100, 30, 10)).toBe(10)
+  })
+
+  it('it clicks into place within eight percent of the slider (the border counts), not beyond', () => {
+    expect(isSharp(70, 70)).toBe(true)
+    expect(isSharp(62, 70)).toBe(true)
+    expect(isSharp(78, 70)).toBe(true)
+    expect(isSharp(61, 70)).toBe(false)
+    expect(isSharp(79, 70)).toBe(false)
+    expect(isSharp(50, 70, 25)).toBe(true)
   })
 })

@@ -80,7 +80,7 @@ export const NOT_PAINTED_YET = [
   'images/abenteuer/spiele/josua/schritt/',
   'images/abenteuer/spiele/josua/memory/',
   'images/abenteuer/spiele/abraham/ringe/',
-  'images/abenteuer/spiele/abraham/hinweise/',
+  'images/abenteuer/spiele/abraham/fokus/',
   'images/abenteuer/spiele/abraham/voegel/',
   'images/abenteuer/spiele/abraham/silber/',
   'images/abenteuer/spiele/jakob/jahre/',

@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke'
 
 export interface AdventureQuestion {
   q: string
@@ -811,7 +811,8 @@ export interface RingsGame {
   background: string
   rings: string[]
   hub: string
-  beam: string
+  /** The beam of light as a picture; the app paints a gradient when it is left out. */
+  beam?: string
   rounds: RingsRound[]
 }
 
@@ -831,9 +832,21 @@ export interface SilverRound {
 export interface SilverGame {
   background: string
   cloth: string
-  purse: string
+  /** The purse that is given away when the price is paid; left out in Abraham v3. */
+  purse?: string
   pieces: SilverPiece[]
   rounds: SilverRound[]
+}
+
+/** A round of the focus game: the picture that lies blurred and the place of the slider (percent of its length) where it is sharp. */
+export interface FocusRound {
+  hint: string
+  image: string
+  sharpAt: number
+}
+/** The focus game "Look into the distance": a slider is moved until a blurred picture is sharp (at most two rounds, no mistake is possible). */
+export interface FocusGame {
+  rounds: FocusRound[]
 }
 
 /** A blanket of the clues game: its picture, its colour name (the first word of the clue cards) and its pattern (written below it, for those who cannot tell the colours apart). */
@@ -1362,6 +1375,7 @@ export interface StageTask {
   rings?: RingsGame
   silver?: SilverGame
   clues?: CluesGame
+  focus?: FocusGame
   pack?: PackGame
   hide?: HideGame
   lower?: LowerGame

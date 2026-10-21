@@ -581,8 +581,8 @@ describe('Wohin fliegen die Vögel? (birds)', () => {
     expect(useTaskProgress().parts.value).toBe(1)
   })
 
-  it('the whole game: the end with three stars; mistakes and tips together give the stars (up to three: three, up to seven: two, more: one)', async () => {
-    for (const [wrong, stars] of [[0, 3], [3, 3], [4, 2], [7, 2], [8, 1]] as const) {
+  it('the whole game: the end with three stars; mistakes and tips together give the stars (up to two: three, up to five: two, more: one)', async () => {
+    for (const [wrong, stars] of [[0, 3], [2, 3], [3, 2], [5, 2], [6, 1]] as const) {
       useTaskProgress().reset()
       const w = await open()
       for (let i = 0; i < wrong; i++) await tapAt(w, 90, 95)

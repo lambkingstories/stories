@@ -3,7 +3,7 @@
  * Where do the birds fly? In the wide empty desert birds fly from the sky towards the water. Behind every bird a dashed flight path is drawn, but it ends in mid-air. The child taps the
  * place on the ground where the paths would meet: there lies the water (a little spring with reeds appears). A tap beside it is a dry ring in the sand, a cross and a mistake; after two
  * wrong taps in one task the hint "Follow the lines until they meet" shows (free). The "Tip" button draws the paths on to the meeting point (once for each task, it counts as a tip). In
- * round 2 a decoy bird flies somewhere else: its path does not meet the others. There is no clock. From the keyboard the arrow keys move a cross-hair and Enter confirms. The arithmetic
+ * round 2 three birds fly to each spring (plan v3: two tasks in each of two rounds, no decoy). There is no clock. From the keyboard the arrow keys move a cross-hair and Enter confirms. The arithmetic
  * is `lineEnd`, `hitTarget` and `birdAngle` in `utils/abrahamGames.ts`.
  */
 import { computed, onBeforeUnmount, ref } from 'vue'
@@ -54,7 +54,7 @@ const dry = ref<{ x: number; y: number } | null>(null)
 const mark = ref<'good' | 'bad' | null>(null)
 const cross = ref<{ x: number; y: number } | null>(null)
 const wing = ref(0)
-const stars = computed(() => mistakeStars(mistakes.value + tips.value, 3, 7))
+const stars = computed(() => mistakeStars(mistakes.value + tips.value, 2, 5))
 const src = (p: string) => prependBaseUrl(p)
 const still = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 

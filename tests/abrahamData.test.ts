@@ -1,6 +1,6 @@
 /**
- * The data of "Abraham" (`abraham.ts` and `en/abraham.en.ts`): the stories and questions follow the rules of the adventures, the games are the ones the Leitung chose
- * (at most two old mechanics; stages 7 and 9 are only questions; the stages 4, 5, 10 and 11 of the extension to eleven stages hold the games birds, rings, silver and clues), the data of every game is complete and consistent, and the English file has the same shape. Until the stages are released (`soon`) none can be opened; once they are released the files that the data names must exist, too.
+ * The data of "Abraham" (`abraham.ts` and `en/abraham.en.ts`), plan v3 of 21.10.2026 (twelve stages): the stories and questions follow the rules of the adventures (90 to 145 words, three or four paragraphs),
+ * the games are the ones of `SPIELE/ENTWURF-v3.md` (at most two rounds each, at most two old mechanics; stages 7, 9 and 11 are only questions), the data of every game is right, and the English texts fit the German ones.
  */
 import { existsSync, statSync } from 'node:fs'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -9,56 +9,59 @@ import { ABRAHAM_PATH } from '@/data/adventures/abrahamPath'
 import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
-import { birdAngle, cluesSolutions, distToLine, isAligned, lineEnd, onRay, ringsSolvable, solutions, total } from '@/utils/abrahamGames'
+import { birdAngle, blurAt, isAligned, isSharp, lineEnd, onRay, ringsSolvable, solutions, total } from '@/utils/abrahamGames'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 
 afterEach(() => setAdventureLanguage('de'))
 const released = abraham.stages.every((s) => !s.soon)
 const stage = (n: number) => abraham.stages[n - 1]!
-/** Words that no text of the German data may use (stage 6 is told calmly: no knife, no binding, no killing). */
-/** The version of the recording per stage: a stage revised again after the first rewrite has a newer file name. */
-const DE_V: Record<number, string> = { 6: 'v3' }
-const EN_V: Record<number, string> = { 1: 'v3', 3: 'v3', 6: 'v3' }
-/** The stages that have a recording so far (the new stages 4, 5, 7, 10, 11 and the extended stage 9 wait for the speech AI quota): the others have none. */
-const RECORDED = [1, 2, 3, 6, 8]
 /** The picture of every stage: the new stages use a picture of the others until they get their own. */
-const PICTURE: Record<number, string> = { 1: '01', 2: '02', 3: '03', 4: '02', 5: '03', 6: '04', 7: '04', 8: '05', 9: '06', 10: '05', 11: '01' }
+const PICTURE: Record<number, string> = { 1: '01', 2: '02', 3: '03', 4: '02', 5: '03', 6: '04', 7: '04', 8: '05', 9: '06', 10: '05', 11: '01', 12: '01' }
+/** Words that no text of the German data may use (the stories are told calmly: no knife, no binding, no killing). */
 const FORBIDDEN = /\b(Messer|Schwert|gefesselt|Fesseln|Fesselung|töten|getötet|schlachten|Blut|Teufel|Hölle)\b/i
 
 describe('Abraham: stories and questions', () => {
-  it('eleven stages with 3 to 5 paragraphs of 60 to 220 words, the Bible passage under every one, the recording and picture names of the plan', () => {
+  it('twelve stages with 3 or 4 paragraphs of 90 to 145 words, the Bible passage under every one, no recording yet (the app reads with the voice of the device), the picture names of the plan', () => {
     expect(abraham.id).toBe('abraham')
     expect(abraham.age).toBe('8-10')
     expect(abraham.title).toBe('Abraham')
     expect(abraham.subtitle).toBe('Gott ruft, Gott hält Wort')
-    expect(abraham.stages.map((s) => s.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+    expect(abraham.stages.map((s) => s.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
     expect(abraham.stages.map((s) => [s.title, s.ref])).toEqual([
-      ['Der Ruf', '1. Mose 12,1–9'],
+      ['Der Ruf', '1. Mose 11,27–12,4'],
       ['Abram und Lot', '1. Mose 13'],
-      ['Die Sterne', '1. Mose 15,1–6'],
+      ['Die Sterne', '1. Mose 15,1–7'],
       ['Hagar und der Brunnen', '1. Mose 16'],
-      ['Der Bund und die neuen Namen', '1. Mose 17,1–8.15–19'],
+      ['Der Bund und die neuen Namen', '1. Mose 17,1–19'],
       ['Besuch bei den Eichen', '1. Mose 18,1–15'],
       ['Abraham bittet für Sodom', '1. Mose 18,16–33'],
       ['Isaak', '1. Mose 21,1–7'],
       ['Gott sorgt', '1. Mose 22,1–19'],
       ['Saras Grab', '1. Mose 23'],
-      ['Eine Frau für Isaak', '1. Mose 24']
+      ['Der Knecht am Brunnen', '1. Mose 24,1–27'],
+      ['Isaak und Rebekka', '1. Mose 24,28–67']
     ])
     for (const s of abraham.stages) {
       expect(s.text.length, `paragraphs ${s.id}`).toBeGreaterThanOrEqual(3)
-      expect(s.text.length, `paragraphs ${s.id}`).toBeLessThanOrEqual(5)
-      const words = s.text.join(' ').split(/\s+/).length
-      expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(60)
-      expect(words, `words ${s.id}`).toBeLessThanOrEqual(220)
-      expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.audio, s.id.toString()).toBe(RECORDED.includes(s.id) ? `audio/abenteuer/abraham/geschichte-${String(s.id).padStart(2, '0')}-${DE_V[s.id] ?? 'v2'}.mp3` : undefined)
+      expect(s.text.length, `paragraphs ${s.id}`).toBeLessThanOrEqual(4)
+      const text = s.text.join(' ')
+      const words = text.split(/\s+/).length
+      expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(90)
+      expect(words, `words ${s.id}`).toBeLessThanOrEqual(145)
+      // short sentences like Noah and Josef (they have 9 to 10 words on average)
+      const sentences = text.split(/[.!?]+["“”„]?\s+/).filter((x) => x.trim()).length
+      expect(words / sentences, `words per sentence ${s.id}`).toBeGreaterThan(7)
+      expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
+      expect(text, `stage ${s.id}`).not.toMatch(FORBIDDEN)
+      expect(s.audio, `no recording yet ${s.id}`).toBeUndefined()
       expect(s.image).toBe(`images/abenteuer/abraham/etappe-bild-${PICTURE[s.id]}.webp`)
     }
+    const all = abraham.stages.flatMap((s) => s.text).join(' ')
+    expect(all.split(/\s+/).length / abraham.stages.length, 'about as long as Noah (117) and Josef (122)').toBeLessThan(135)
   })
 
-  it('two questions per stage (three in the serious stage 9), three answers each, the right one first and the answers differ; the exam has six', () => {
-    expect(abraham.stages.map((s) => s.questions.length)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2])
+  it('two questions per stage, three answers each, the right one first and the answers differ; the exam has six', () => {
+    expect(abraham.stages.map((s) => s.questions.length)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2])
     for (const q of [...abraham.stages.flatMap((s) => s.questions), ...abraham.exam]) {
       expect(q.options, q.q).toHaveLength(3)
       expect(q.answer, q.q).toBe(0)
@@ -96,9 +99,9 @@ describe('Abraham: stories and questions', () => {
     expect(text[1]).not.toMatch(/wie viele (schafe|tiere|ziegen)/)
     expect(text[2]).not.toMatch(/form|wie viele sterne/)
     expect(text[5]).not.toMatch(/wie viele krüge|schüssel/)
-    // the silver game shows the paying; the question asks who sold the field, not how it was paid
-    expect(text[9]).not.toMatch(/bezahl|silber/)
-    expect(abraham.stages[9]!.questions[0]!.options[0]).toBe('von Ephron')
+    // the silver game lets the child reckon four hundred; no question asks for the sum
+    expect(text[9]).not.toMatch(/vierhundert|wie viel|summe/)
+    expect(abraham.stages[9]!.questions.map((q) => q.options[0])).toEqual(['Er bezahlt sie mit Silber.', 'Ephron'])
   })
 })
 
@@ -106,44 +109,47 @@ describe('Abraham: every stage has the game that was chosen', () => {
   const OLD = ['zaehlen', 'puzzle', 'weg', 'ernten', 'memory', 'sortieren', 'wimmelbild', 'ausmalen', 'teilen', 'bauen', 'punkte', 'steuern']
   const NEW = ['reihenfolge', 'lichter', 'hueten', 'kanaele', 'lueckenvers', 'spiegeln', 'echo', 'saeen', 'fehlt', 'kette', 'stapeln', 'wischen', 'spur']
 
-  it('the games in the order of the plan; stage 9 is only the questions; at most two old mechanics and three new ones', () => {
-    // stages 7 and 9 are only questions; all the other new stages have their game
-    expect(abraham.stages.map((s) => s.task.kind)).toEqual(['waage', 'zaehlen', 'sternbild', 'voegel', 'ringe', 'giessen', 'quiz', 'puzzle', 'quiz', 'silber', 'hinweise'])
+  it('the games in the order of the plan; stages 7, 9 and 11 are only the questions (never two in a row); two old mechanics and seven new ones', () => {
+    // stages 7, 9 and 11 are only questions; all the other stages have their game
+    expect(abraham.stages.map((s) => s.task.kind)).toEqual(['waage', 'zaehlen', 'sternbild', 'voegel', 'ringe', 'giessen', 'quiz', 'puzzle', 'quiz', 'silber', 'quiz', 'fokus'])
     const kinds = abraham.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
     expect(new Set(kinds).size).toBe(kinds.length)
     // "old" = a game that a journey before this one (Josef, Noah, Adam und Eva, Babel) already had; the pouring game was built for Noah but never used there
     const old = kinds.filter((k) => OLD.includes(k))
     expect(old.sort()).toEqual(['puzzle', 'zaehlen'])
-    for (const k of ['waage', 'sternbild', 'giessen']) expect([...OLD, ...NEW], k).not.toContain(k)
-    expect(stage(9).task.kind).toBe('quiz')
-    expect(stage(9).task.hint).toContain('ernst')
+    for (const k of ['waage', 'sternbild', 'giessen', 'fokus']) expect([...OLD, ...NEW], k).not.toContain(k)
+    expect(kinds).toHaveLength(9)
+    for (const n of [7, 9, 11]) expect(stage(n).task.kind).toBe('quiz')
+    for (const n of [7, 9]) expect(stage(n).task.hint).toContain('ernst')
+    const kindList = abraham.stages.map((s) => s.task.kind)
+    kindList.forEach((k, i) => expect(k === 'quiz' && kindList[i + 1] === 'quiz', `two quizzes in a row at ${i + 1}`).toBe(false))
   })
 
   it('every game has at most two rounds, a hint for each round, and its goal fits the table "Stufen je Spiel"', () => {
     const g = (n: number) => stage(n).task
-    const rounds = [g(1).balance!.rounds, g(3).constellation!.rounds, g(6).water!.rounds, g(4).birds!.rounds, g(5).rings!.rounds, g(10).silver!.rounds, g(11).clues!.rounds]
+    const rounds = [g(1).balance!.rounds, g(3).constellation!.rounds, g(6).water!.rounds, g(4).birds!.rounds, g(5).rings!.rounds, g(10).silver!.rounds, g(12).focus!.rounds]
     for (const r of rounds) {
       expect(r.length).toBeGreaterThanOrEqual(1)
       expect(r.length).toBeLessThanOrEqual(2)
       for (const x of r) expect(x.hint.length).toBeGreaterThan(8)
     }
     // the goals (the number of right moves of all rounds)
-    expect(g(1).balance!.rounds.reduce((s, r) => s + r.camels.length, 0)).toBe(4)
+    expect(g(1).balance!.rounds.reduce((s, r) => s + r.camels.length, 0)).toBe(2)
     expect(g(3).constellation!.rounds.reduce((s, r) => s + r.targets.length, 0)).toBe(10)
     const w = g(6).water!
     const need = (id: string) => w.plants.find((p) => p.id === id)!.need
-    expect(w.rounds.reduce((s, r) => s + r.plants.reduce((n, id) => n + need(id), 0), 0)).toBe(9)
-    // the goals of the four newer games: springs found, rings in the light, rounds paid, clue cards that are true
-    expect(g(4).birds!.rounds.reduce((n, r) => n + r.tasks.length, 0)).toBe(6)
-    expect(g(5).rings!.rounds.reduce((n, r) => n + r.start.length, 0)).toBe(7)
+    expect(w.rounds.reduce((s, r) => s + r.plants.reduce((n, id) => n + need(id), 0), 0)).toBe(7)
+    // the goals of the newer games: springs found, rings in the light, rounds paid, pictures in focus
+    expect(g(4).birds!.rounds.reduce((n, r) => n + r.tasks.length, 0)).toBe(4)
+    expect(g(5).rings!.rounds.reduce((n, r) => n + r.start.length, 0)).toBe(5)
     expect(g(10).silver!.rounds.length).toBe(2)
-    expect(g(11).clues!.rounds.reduce((n, r) => n + r.clues.length, 0)).toBe(7)
+    expect(g(12).focus!.rounds.length).toBe(2)
     expect(g(2).count).toBe(13)
     expect(g(2).groups!.reduce((s, x) => s + x.count, 0)).toBe(13)
     expect(g(8).puzzle).toMatchObject({ cols: 2, rows: 3 })
   })
 
-  it('1 camels: ten packs in three weights with a picture and a name, round 1 three packs on each of two camels, round 2 five; the baskets hang left and right', () => {
+  it('1 camels: five packs in three weights with a picture and a name, one camel in each round (three packs, then five); the baskets hang left and right', () => {
     const b = stage(1).task.balance!
     const ids = b.packs.map((p) => p.id)
     expect(new Set(ids).size).toBe(ids.length)
@@ -157,6 +163,7 @@ describe('Abraham: every stage has the game that was chosen', () => {
       expect(new Set(c.packs).size, 'a pack twice on a camel').toBe(c.packs.length)
       for (const id of c.packs) expect(ids).toContain(id)
     }
+    expect(b.rounds.map((r) => r.camels.map((c) => c.packs.length))).toEqual([[3], [5]])
     expect(b.baskets![0][0]).toBeLessThan(b.baskets![1][0])
     expect(b.background).toBe('images/abenteuer/abraham/etappe-bild-01.webp')
   })
@@ -179,11 +186,11 @@ describe('Abraham: every stage has the game that was chosen', () => {
     expect(c.background).toBe('images/abenteuer/abraham/etappe-bild-03.webp')
   })
 
-  it('6 water for the guests: three bowls in each round that need one jug and then two; the well is a rectangle in the picture; the bowls lie inside it', () => {
+  it('6 water for the guests: three bowls that need one jug and then two deep bowls that need two; the well is a rectangle in the picture; the bowls lie inside it', () => {
     const w = stage(6).task.water!
     const ids = w.plants.map((p) => p.id)
     for (const r of w.rounds) for (const id of r.plants) expect(ids).toContain(id)
-    expect(w.rounds.map((r) => r.plants.length)).toEqual([3, 3])
+    expect(w.rounds.map((r) => r.plants.length)).toEqual([3, 2])
     expect(w.rounds[0]!.plants.every((id) => w.plants.find((p) => p.id === id)!.need === 1)).toBe(true)
     expect(w.rounds[1]!.plants.every((id) => w.plants.find((p) => p.id === id)!.need === 2)).toBe(true)
     for (const p of w.plants) {
@@ -196,14 +203,13 @@ describe('Abraham: every stage has the game that was chosen', () => {
     expect(w.river.y + w.river.h).toBeLessThanOrEqual(100)
   })
 
-  it('4 birds: two rounds of three tasks, the paths lie on the way to the meeting point and the meeting points lie in the lower half; the birds differ in direction, the decoy misses by far', () => {
+  it('4 birds: two rounds of two tasks (two birds, then three), no decoy; the paths lie on the way to the meeting point and the meeting points lie in the lower half; the birds differ in direction; one bird picture', () => {
     const g = stage(4).task.birds
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
-    expect(g.rounds.map((r) => r.tasks.length)).toEqual([3, 3])
-    expect(g.rounds.map((r) => r.tasks.map((t) => t.birds.length))).toEqual([[2, 2, 2], [3, 3, 3]])
-    expect(g.rounds[0]!.tasks.some((t) => t.decoy)).toBe(false)
-    expect(g.rounds[1]!.tasks.every((t) => t.decoy)).toBe(true)
+    expect(g.rounds.map((r) => r.tasks.length)).toEqual([2, 2])
+    expect(g.rounds.map((r) => r.tasks.map((t) => t.birds.length))).toEqual([[2, 2], [3, 3]])
+    expect(g.rounds.flatMap((r) => r.tasks).some((t) => t.decoy)).toBe(false)
     expect(g.radius).toBe(8)
     for (const [ri, r] of g.rounds.entries()) {
       for (const t of r.tasks) {
@@ -219,38 +225,19 @@ describe('Abraham: every stage has the game that was chosen', () => {
         }
         const angles = t.birds.map((b) => birdAngle(t.target, b.from)).sort((a, b) => a - b)
         for (let i = 1; i < angles.length; i++) expect(angles[i]! - angles[i - 1]!, 'the birds come from different directions').toBeGreaterThanOrEqual(25)
-        if (t.decoy) expect(distToLine(t.decoy.from, t.decoy.to, t.target), 'the decoy misses the meeting point').toBeGreaterThanOrEqual(15)
       }
     }
-    expect(g.bird).toHaveLength(2)
+    expect(new Set(g.bird).size, 'one picture of a bird').toBe(1)
   })
 
-  it('11 clues: three camels and three cards, then four and four; exactly one row makes all the cards true and it is the one written down; the slots lie in a row from the well', () => {
-    const g = stage(11).task.clues
-    expect(g, 'the game is built').toBeDefined()
-    if (!g) return
-    expect(g.rounds.map((r) => [r.blankets.length, r.clues.length])).toEqual([[3, 3], [4, 4]])
-    for (const r of g.rounds) {
-      expect(cluesSolutions(r.blankets, r.clues)).toEqual([r.solution])
-      for (const id of r.blankets) expect(g.blankets.map((b) => b.id)).toContain(id)
-      for (const c of r.clues) {
-        const used = c.kind === 'at' || c.kind === 'notAt' ? [c.blanket] : [c.a, c.b]
-        for (const id of used) expect(r.blankets, `clue names ${id}`).toContain(id)
-      }
-    }
-    expect(g.slots.length).toBeGreaterThanOrEqual(4)
-    for (let i = 1; i < g.slots.length; i++) expect(g.slots[i]![0]).toBeGreaterThan(g.slots[i - 1]![0])
-    for (const [x, y] of g.slots) expect(x >= 0 && x <= 100 && y >= 0 && y <= 100).toBe(true)
-    for (const b of g.blankets) expect(b.pattern.length).toBeGreaterThan(2)
-  })
-
-  it('5 rings: three rings alone, then four joined in pairs; every start is turned (1 to 11) and can be lined up; four ring pictures from outside to inside, the hub and the beam', () => {
+  it('5 rings: two rings, then three, none joined to another; every start is turned (1 to 11) and can be lined up; three ring pictures from outside to inside and the hub; the beam is painted by the app', () => {
     const g = stage(5).task.rings
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
-    expect(g.rounds.map((r) => r.start.length)).toEqual([3, 4])
-    expect(g.rounds.map((r) => r.couple.length)).toEqual([0, 2])
-    expect(g.rings).toHaveLength(4)
+    expect(g.rounds.map((r) => r.start.length)).toEqual([2, 3])
+    expect(g.rounds.map((r) => r.couple.length)).toEqual([0, 0])
+    expect(g.rings).toHaveLength(3)
+    expect(g.beam, 'no picture of the beam').toBeUndefined()
     for (const r of g.rounds) {
       for (const s of r.start) {
         expect(s).toBeGreaterThanOrEqual(1)
@@ -266,22 +253,44 @@ describe('Abraham: every stage has the game that was chosen', () => {
     expect(g.background).toBe(stage(5).image)
   })
 
-  it('10 silver: three sizes of heaps with their worth in steps of 25, every round pays four hundred with at least one way and not by laying everything, round 1 shows the sum, round 2 not', () => {
+  it('10 silver: one picture of a heap in three sizes (by the worth), every round pays four hundred with at least one way and not by laying everything, round 1 shows the sum, round 2 not and has only one way by worth', () => {
     const g = stage(10).task.silver
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
     expect(g.rounds.map((r) => [r.price, r.showSum])).toEqual([[400, true], [400, false]])
     for (const p of g.pieces) {
       expect(p.value % 25, p.id).toBe(0)
-      const size = /gross/.test(p.image) ? 'gross' : /mittel/.test(p.image) ? 'mittel' : 'klein'
-      expect(size, `${p.id} picture fits ${p.value}`).toBe(p.value <= 50 ? 'klein' : p.value <= 125 ? 'mittel' : 'gross')
+      expect(p.image, p.id).toBe('images/abenteuer/spiele/abraham/silber/silber-stueck.webp')
     }
+    expect(g.purse, 'no purse any more').toBeUndefined()
+    expect(g.rounds.map((r) => r.pieces.length)).toEqual([5, 5])
     for (const r of g.rounds) {
       const values = r.pieces.map((id) => g.pieces.find((p) => p.id === id)!.value)
       expect(solutions(values, r.price).length).toBeGreaterThan(0)
       expect(total(values)).toBeGreaterThan(r.price)
     }
+    // round 2: by worth there is exactly one way (150 + 100 + 75 + 75), so that the reckoning is clear
+    const second = g.rounds[1]!.pieces.map((id) => g.pieces.find((p) => p.id === id)!.value)
+    expect(new Set(solutions(second, 400).map((w) => w.map((i) => second[i]!).sort((a, b) => b - a).join('+')))).toEqual(new Set(['150+100+75+75']))
     expect(g.background).toBe(stage(10).image)
+  })
+
+  it('12 focus: two pictures, the slider is sharp at 70 % and then at 30 %; the places are far enough from the start and from each other; the blur grows on both sides', () => {
+    const g = stage(12).task.focus
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(g.rounds.map((r) => r.sharpAt)).toEqual([70, 30])
+    for (const r of g.rounds) {
+      expect(r.hint.length).toBeGreaterThan(8)
+      // the slider starts at 8 or 92: far from the right place, so that the picture is blurred at first
+      const start = r.sharpAt >= 50 ? 8 : 92
+      expect(isSharp(start, r.sharpAt), 'not sharp at the start').toBe(false)
+      expect(blurAt(start, r.sharpAt)).toBeGreaterThan(8)
+      expect(blurAt(r.sharpAt, r.sharpAt)).toBe(0)
+      expect(blurAt(r.sharpAt - 20, r.sharpAt)).toBeCloseTo(blurAt(r.sharpAt + 20, r.sharpAt), 5)
+    }
+    expect(g.rounds[0]!.image).not.toBe(g.rounds[1]!.image)
+    expect(stage(12).task.hint.split('.').length, 'the hint is one sentence').toBe(2)
   })
 
   it('every picture and recording that the games name lies in the folders that only this adventure uses (or is one of the shared screens)', () => {
@@ -311,7 +320,7 @@ describe('Abraham: die Karte', () => {
     for (const f of m.images) expect(statSync(`public/${f}`).size / 1024, f).toBeLessThan(1800)
     expect(m.widthPx).toBe(W)
     expect(m.aspect).toBeCloseTo(W / H, 3)
-    expect(m.stages).toHaveLength(11)
+    expect(m.stages).toHaveLength(12)
     const spots = [...m.stages, m.exam]
     for (let i = 0; i < spots.length; i++) {
       expect(spots[i]!.y, `Station ${i + 1} nicht hinter der Leiste`).toBeLessThanOrEqual(0.65)
@@ -325,7 +334,7 @@ describe('Abraham: die Karte', () => {
   })
   it('nichts liegt in den unteren 20 % der Karte; der Perlenweg hat eine Strecke je Etappe (die letzte führt zum Ziel) und alle Perlen liegen im Bild', () => {
     for (const sp of [...m.stages, m.exam]) expect(sp.y * H, 'Ring-Mitte').toBeLessThanOrEqual(0.65 * H)
-    expect(m.path).toHaveLength(11)
+    expect(m.path).toHaveLength(12)
     for (const seg of m.path) {
       for (const [x, y] of seg) {
         expect(y * H, 'Perle').toBeLessThanOrEqual(0.8 * H)
@@ -347,11 +356,11 @@ describe('Abraham: the scaffold', () => {
       const own = journeyFiles(abraham).filter((f) => f.includes('abraham/'))
       expect(own.filter((f) => f.includes('spiele/') || f.startsWith('audio/'))).toEqual([])
     } else {
-      expect(open).toEqual([true, false, false, false, false, false, false, false, false, false, false])
+      expect(open).toEqual([true, false, false, false, false, false, false, false, false, false, false, false])
     }
     // the painted map and the way are there
     expect(abraham.map.images).toHaveLength(4)
-    expect(ABRAHAM_PATH).toHaveLength(11)
+    expect(ABRAHAM_PATH).toHaveLength(12)
   })
 })
 
@@ -384,7 +393,7 @@ describe('Abraham: English', () => {
     for (const t of texts.filter((x) => !x.startsWith('audio/'))) expect(/[äöüßÄÖÜ]|\b(und|der|das|den|dem|nicht|ist|sind|ein|eine|einen)\b/.test(t), `German in: ${t}`).toBe(false)
   })
 
-  it('every German text of the stages has an English one that is different, with the recordings of the English voice and the English passages; the names follow the English Bible', () => {
+  it('every German text of the stages has an English one that is different, with the English passages; the names follow the English Bible', () => {
     setAdventureLanguage('de')
     const de = abraham.stages.map((s) => ({ title: s.title, text: [...s.text], hint: s.task.hint, q: s.questions.map((q) => q.q) }))
     setAdventureLanguage('en')
@@ -394,7 +403,7 @@ describe('Abraham: English', () => {
       expect(s.task.hint, `hint ${s.id}`).not.toBe(de[i]!.hint)
       s.questions.forEach((q, k) => expect(q.q, `question ${s.id}.${k}`).not.toBe(de[i]!.q[k]))
       expect(s.ref, `ref ${s.id}`).toMatch(/^Genesis \d/)
-      expect(s.audio, `audio ${s.id}`).toBe(RECORDED.includes(s.id) ? `audio/abenteuer/abraham/geschichte-${String(s.id).padStart(2, '0')}-en-${EN_V[s.id] ?? 'v2'}.mp3` : undefined)
+      expect(s.audio, `audio ${s.id}`).toBeUndefined()
     })
     expect(abraham.title).toBe('Abraham')
     expect(abraham.subtitle).toBe('God Calls, God Keeps His Word')
@@ -403,6 +412,7 @@ describe('Abraham: English', () => {
     expect(stage(8).text.join(' ')).toMatch(/Isaac/)
     expect(stage(4).text.join(' ')).toMatch(/Hagar/)
     expect(stage(11).text.join(' ')).toMatch(/Rebekah/)
+    expect(stage(12).text.join(' ')).toMatch(/Rebekah/)
     for (const q of [...abraham.stages.flatMap((s) => s.questions), ...abraham.exam]) {
       expect(q.options, q.q).toHaveLength(3)
       expect(q.answer).toBe(0)

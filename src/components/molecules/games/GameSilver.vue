@@ -32,9 +32,9 @@ progress.setGoal(props.game.rounds.length)
 
 /** The size of a heap in the picture: small (up to 50), middle (up to 125) or big; the width on the screen and the shape of the picture file. */
 const SIZES = [
-  { upTo: 50, width: 68, ratio: 110 / 70 },
-  { upTo: 125, width: 92, ratio: 150 / 90 },
-  { upTo: Infinity, width: 118, ratio: 200 / 120 }
+  { upTo: 50, width: 68, ratio: 3 / 2 },
+  { upTo: 125, width: 92, ratio: 3 / 2 },
+  { upTo: Infinity, width: 118, ratio: 3 / 2 }
 ]
 const sizeOf = (value: number) => SIZES.find((s) => value <= s.upTo)!
 
@@ -131,7 +131,7 @@ const label = (p: SilverPiece) => t('app.adventure.silverPiece', { n: p.value })
       p(class="sv-hint") {{ current.hint }}
       div(class="sv-field" :style="{ backgroundImage: `url(${src(game.background)})` }")
         div(class="sv-price")
-          span(class="sv-purse" :class="{ gone: paid }")
+          span(v-if="game.purse" class="sv-purse" :class="{ gone: paid }")
             GameImage(:src="game.purse" colour="#a9825a" round)
           span(class="sv-price-text") {{ t('app.adventure.silverPrice', { n: current.price }) }}
         p(v-if="current.showSum" class="sv-sum" role="status") {{ t('app.adventure.silverSum', { n: sum }) }}

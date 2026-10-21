@@ -1,54 +1,51 @@
 /**
- * Abenteuer "Abraham" (1. Mose 12; 13; 15; 16; 17; 18; 21; 22; 23; 24) für 8 bis 10 Jahre: 11 Etappen, Untertitel "Gott ruft, Gott hält Wort". Entstanden nach dem Skill "LambKing Abenteuer Skill".
- * Quelle der Texte: D:/Claude/Abenteuer-Abraham/ENTWURF_Abraham.md (Entwurf v1 der Text-Sitzung), Plan: ETAPPENPLAN.md. Die richtige Antwort steht in den Daten
- * IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
- * Spiele (Wahl der Leitung vom 20.10.2026, höchstens zwei alte Mechaniken): 1 Kamele beladen (neu), 2 Zählen (alt), 3 Sternbild nachlegen (neu), 6 Wasser für die Gäste
- * (neu im Einsatz: die gebaute Gieß-Mechanik), 8 Puzzle (alt), 9 nur Quiz. Die Etappen 4, 5, 7, 10 und 11 (Ausbau auf 11 Etappen, Etappenplan v2) haben bis zum Einbau
- * ihrer Spiele und Bilder eine Quiz-Aufgabe (PLATZHALTER) und ein vorhandenes Etappenbild; die Karte (6 Stationen) bleibt unverändert, wie bei Jakob.
+ * Abenteuer "Abraham" (1. Mose 11 bis 24) für 8 bis 10 Jahre: 12 Etappen (Plan v3 vom 21.10.2026), Untertitel "Gott ruft, Gott hält Wort". Entstanden nach dem Skill "LambKing Abenteuer Skill".
+ * Quelle der Texte: D:/Claude/Abenteuer-Abraham/ENTWURF_Abraham-v3.md (zweitgeprüft, 90 bis 145 Wörter je Etappe wie bei Noah und Josef), Plan: ETAPPENPLAN-v3.md, Spiele: SPIELE/ENTWURF-v3.md.
+ * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
+ * Spiele (höchstens zwei Runden je Spiel, höchstens zwei alte Mechaniken): 1 Kamele beladen, 2 Zählen (alt), 3 Sternbild, 4 Wohin fliegen die Vögel?, 5 Das Licht durch die Ringe, 6 Wasser für
+ * die Gäste, 8 Puzzle (alt), 10 Passend bezahlen, 12 Ins Weite schauen (Fokus-Regler); 7 Sodom, 9 Gott sorgt und 11 Der Knecht am Brunnen sind nur Quiz.
+ * Es gibt noch keine Aufnahmen zu den neuen Texten (`audio` fehlt: die App liest mit der Gerätestimme); die alten Aufnahmen liegen noch im Ordner, sind aber nicht mehr verlinkt.
+ * Die Etappenbilder sind noch die alten sechs (`etappe-bild-01..06`), die Karte hat 12 Platzhalter-Stationen auf der alten Karte mit elf Orten; beides ersetzen die neuen Bilder und das neue Panorama.
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/abraham/, images/abenteuer/spiele/abraham/<spiel>/, audio/abenteuer/abraham/.
  *
- * STAND 20.10.2026: alle Bilder der Etappen 1 bis 3, 6, 8 und 9 (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder) und die Messwerte sind eingebaut; Aufnahmen siehe `audio` der Etappen (eine Etappe ohne `audio` hat noch keine).
- * Das Abenteuer ist aber nicht öffentlich: es ist hinter `comingSoon` und dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
+ * Das Abenteuer ist nicht öffentlich: es ist hinter `comingSoon` und dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { BalanceGame, BirdsGame, CluesGame, ConstellationGame, CountGroup, Journey, RingsGame, SilverGame, WaterGame } from '@/types/adventure'
+import type { BalanceGame, BirdsGame, ConstellationGame, CountGroup, FocusGame, Journey, RingsGame, SilverGame, WaterGame } from '@/types/adventure'
 import { ABRAHAM_PATH } from './abrahamPath'
 import { localize } from './localize'
 import { abrahamEn } from './en/abraham.en'
 
 const IMG = 'images/abenteuer/abraham/'
 const G = 'images/abenteuer/spiele/abraham/'
-const REC = 'audio/abenteuer/abraham/'
-/** `true` = die Etappen sind noch nicht spielbar (Gerüst); jetzt sind alle Bilder und Töne eingebaut. */
+/** `true` = die Etappen sind noch nicht spielbar (Gerüst). */
 const SOON = false
 
 /**
  * Etappe 5, "Das Licht durch die Ringe": Ringe liegen ineinander um eine Nabe mit goldenem Stern, jeder hat oben eine Lücke, wenn er richtig steht; das Kind dreht sie in Zwölfteln, bis das Licht durch
- * alle Lücken scheint (Bildauftrag A21; Hintergrund = das Etappenbild 5, von der App abgedunkelt). Runde 1 drei Ringe, jeder allein; Runde 2 vier Ringe, paarweise gekoppelt (`couple`: wer den ersten
- * dreht, dreht den zweiten gegenläufig mit). Die Startstellungen sind Zwölftel (1 bis 11, nie 0) und lösbar (Test per Breitensuche).
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `ringe/ring-1.webp` 900 × 900, `ring-2.webp` 740, `ring-3.webp` 580, `ring-4.webp` 420 (alle quadratisch, transparent, Lücke oben),
- * `nabe.webp` 240 × 240, `strahl.webp` 260 × 520 (transparent).
+ * alle Lücken scheint (Bildauftrag A31; Hintergrund = das Etappenbild 5, von der App abgedunkelt). Plan v3: Runde 1 zwei Ringe, Runde 2 drei Ringe, jeder allein (keine Kopplung mehr), zusammen 5 Ringe.
+ * Der Strahl ist kein Bild, die App malt ihn als Farbverlauf. Die Startstellungen sind Zwölftel (1 bis 11, nie 0) und lösbar (Test).
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `ringe/ring-1.webp` 900 × 900, `ring-2.webp` 740, `ring-3.webp` 580 (alle quadratisch, transparent, Lücke oben), `nabe.webp` 240 × 240.
  */
 const RINGE: RingsGame = {
   background: `${IMG}etappe-bild-03.webp`,
-  rings: [`${G}ringe/ring-1.webp`, `${G}ringe/ring-2.webp`, `${G}ringe/ring-3.webp`, `${G}ringe/ring-4.webp`],
+  rings: [`${G}ringe/ring-1.webp`, `${G}ringe/ring-2.webp`, `${G}ringe/ring-3.webp`],
   hub: `${G}ringe/nabe.webp`,
-  beam: `${G}ringe/strahl.webp`,
   rounds: [
-    { hint: 'Drehe jeden Ring, bis seine Lücke oben ist. Dann scheint das Licht hindurch.', start: [3, 7, 5], couple: [] },
-    { hint: 'Diese Ringe sind verbunden: Wer den ersten dreht, dreht den zweiten gegenläufig mit.', start: [4, 9, 2, 11], couple: [[0, 1], [2, 3]] }
+    { hint: 'Drehe jeden Ring, bis seine Lücke oben ist. Dann scheint das Licht hindurch.', start: [3, 7], couple: [] },
+    { hint: 'Jetzt sind es drei Ringe. Drehe sie, bis das Licht hindurchscheint.', start: [4, 9, 2], couple: [] }
   ]
 }
 
 /**
- * Etappe 4, "Wohin fliegen die Vögel?": Vögel fliegen auf das Wasser in der Wüste zu, ihre gestrichelten Flugbahnen enden in der Luft; das Kind tippt dorthin, wo sie sich treffen (Bildauftrag A20;
- * eigener Hintergrund `voegel/wueste.webp`, damit Hagar und der Brunnen des Etappenbildes nicht stören). Positionen in Prozent des Bildes (4 : 3). Runde 1: je zwei Vögel, die Bahnen
- * zu 60 % gezeichnet; Runde 2: drei Vögel und ein Ablenker, der woandershin fliegt, die Bahnen zu 40 % gezeichnet. Treffpunkte in der unteren Hälfte, Startpunkte oben.
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `voegel/wueste.webp` 1200 × 900, `vogel-a.webp`, `vogel-b.webp` je 140 × 100 (transparent), `quelle.webp` 240 × 170 (transparent).
+ * Etappe 4, "Wohin fliegen die Vögel?": Vögel fliegen auf das Wasser in der Wüste zu, ihre gestrichelten Flugbahnen enden in der Luft; das Kind tippt dorthin, wo sie sich treffen (Bildauftrag A30;
+ * eigener Hintergrund `voegel/wueste.webp`, damit Hagar und der Brunnen des Etappenbildes nicht stören). Positionen in Prozent des Bildes (4 : 3). Plan v3: zwei Runden mit je zwei Aufgaben, kein Ablenker;
+ * Runde 1 je zwei Vögel (Bahnen zu 60 % gezeichnet), Runde 2 je drei Vögel (zu 40 %). Es gibt nur ein Vogelbild (beide Flügelstellungen zeigen es), zusammen 4 Quellen.
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `voegel/wueste.webp` 1200 × 900, `vogel.webp` 140 × 100 (transparent), `quelle.webp` 240 × 170 (transparent).
  */
 const VOEGEL: BirdsGame = {
   background: `${G}voegel/wueste.webp`,
-  bird: [`${G}voegel/vogel-a.webp`, `${G}voegel/vogel-b.webp`],
+  bird: [`${G}voegel/vogel.webp`, `${G}voegel/vogel.webp`],
   spring: `${G}voegel/quelle.webp`,
   radius: 8,
   rounds: [
@@ -56,100 +53,49 @@ const VOEGEL: BirdsGame = {
       hint: 'Die Vögel fliegen zum Wasser. Tippe dorthin, wo sich ihre Wege treffen.',
       tasks: [
         { target: [30, 72], birds: [{ from: [10, 12], shown: 0.6 }, { from: [58, 10], shown: 0.6 }] },
-        { target: [64, 76], birds: [{ from: [30, 10], shown: 0.6 }, { from: [92, 16], shown: 0.6 }] },
-        { target: [48, 68], birds: [{ from: [8, 22], shown: 0.6 }, { from: [80, 8], shown: 0.6 }] }
+        { target: [64, 76], birds: [{ from: [30, 10], shown: 0.6 }, { from: [92, 16], shown: 0.6 }] }
       ]
     },
     {
-      hint: 'Jetzt fliegen mehr Vögel, und einer fliegt woandershin. Folge nur den Linien, die sich treffen.',
+      hint: 'Jetzt fliegen drei Vögel zu jeder Quelle. Tippe dorthin, wo sich ihre Wege treffen.',
       tasks: [
-        { target: [42, 70], birds: [{ from: [8, 12], shown: 0.4 }, { from: [46, 6], shown: 0.4 }, { from: [90, 20], shown: 0.4 }], decoy: { from: [70, 8], to: [88, 60], shown: 0.4 } },
-        { target: [70, 74], birds: [{ from: [20, 10], shown: 0.4 }, { from: [55, 5], shown: 0.4 }, { from: [96, 24], shown: 0.4 }], decoy: { from: [8, 30], to: [30, 85], shown: 0.4 } },
-        { target: [26, 66], birds: [{ from: [4, 12], shown: 0.4 }, { from: [34, 5], shown: 0.4 }, { from: [78, 14], shown: 0.4 }], decoy: { from: [92, 10], to: [70, 70], shown: 0.4 } }
+        { target: [42, 70], birds: [{ from: [8, 12], shown: 0.4 }, { from: [46, 6], shown: 0.4 }, { from: [90, 20], shown: 0.4 }] },
+        { target: [70, 74], birds: [{ from: [20, 10], shown: 0.4 }, { from: [55, 5], shown: 0.4 }, { from: [96, 24], shown: 0.4 }] }
       ]
     }
   ]
 }
 
 /**
- * Etappe 11, "Wer kniet wo?": Decken in vier Farben und Mustern werden so auf kniende Kamele gelegt, dass alle Hinweiskarten stimmen (Bildauftrag A23; eigener Hintergrund `hinweise/brunnenplatz.webp`).
- * Die Texte der Karten schreibt die App aus der Art des Hinweises (Platz 1 liegt am Brunnen). Runde 1 drei Kamele und drei Karten, Runde 2 vier Kamele und vier Karten; jede Runde hat genau eine
- * Lösung (Test). Die Plätze der Kamele (Fußpunkt, Prozent des Bildes) und ihre Breite sind vorläufig geschätzt, bis die Datei `hinweise-messung.json` der Spielbild-Sitzung da ist.
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `hinweise/brunnenplatz.webp` 1200 × 675, `kamel-kniend.webp` 400 × 300, `decke-rot.webp`, `decke-blau.webp`, `decke-gelb.webp`,
- * `decke-gruen.webp` je 220 × 140, `hinweiskarte.webp` 320 × 110 (alle außer dem Platz transparent).
- */
-const HINWEISE: CluesGame = {
-  background: `${G}hinweise/brunnenplatz.webp`,
-  camel: `${G}hinweise/kamel-kniend.webp`,
-  card: `${G}hinweise/hinweiskarte.webp`,
-  blankets: [
-    { id: 'rot', image: `${G}hinweise/decke-rot.webp`, label: 'Rot', pattern: 'gestreift' },
-    { id: 'blau', image: `${G}hinweise/decke-blau.webp`, label: 'Blau', pattern: 'gepunktet' },
-    { id: 'gelb', image: `${G}hinweise/decke-gelb.webp`, label: 'Gelb', pattern: 'kariert' },
-    { id: 'gruen', image: `${G}hinweise/decke-gruen.webp`, label: 'Grün', pattern: 'gewellt' }
-  ],
-  slots: [[38, 84], [54, 84], [70, 84], [86, 84]],
-  camelWidth: 16,
-  rounds: [
-    {
-      hint: 'Lege die Decken so auf die Kamele, dass alle Hinweiskarten stimmen.',
-      blankets: ['rot', 'blau', 'gelb'],
-      clues: [
-        { kind: 'at', blanket: 'blau', slot: 1 },
-        { kind: 'before', a: 'rot', b: 'gelb' },
-        { kind: 'notAt', blanket: 'gelb', slot: 2 }
-      ],
-      solution: ['blau', 'rot', 'gelb']
-    },
-    {
-      hint: 'Jetzt vier Kamele und vier Karten. Denke in Ruhe nach.',
-      blankets: ['rot', 'blau', 'gelb', 'gruen'],
-      clues: [
-        { kind: 'at', blanket: 'gelb', slot: 1 },
-        { kind: 'before', a: 'blau', b: 'rot' },
-        { kind: 'next', a: 'rot', b: 'gruen' },
-        { kind: 'notAt', blanket: 'gruen', slot: 4 }
-      ],
-      solution: ['gelb', 'blau', 'gruen', 'rot']
-    }
-  ]
-}
-
-/**
- * Etappe 10, "Passend bezahlen": Silberstücke in drei Größen werden auf ein Tuch gelegt, bis es genau vierhundert sind (Bildauftrag A22; Hintergrund = das Etappenbild 10). Runde 1 mit sichtbarer
- * Summe (200, 100, 100, 50, 50, 25, 25), Runde 2 ohne (150, 125, 100, 75, 75, 50, 25); jede Runde hat mindestens einen Weg, und alle Stücke zusammen sind mehr als vierhundert.
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `silber/tuch.webp` 720 × 300, `silber-klein.webp` 110 × 70, `silber-mittel.webp` 150 × 90, `silber-gross.webp` 200 × 120,
- * `beutel.webp` 240 × 240, alle transparent.
+ * Etappe 10, "Passend bezahlen": Silberstücke in drei Größen werden auf ein Tuch gelegt, bis es genau vierhundert sind (Bildauftrag A32; Hintergrund = das Etappenbild 10). Plan v3: Runde 1 mit sichtbarer
+ * Summe (200, 100, 100, 50, 50), Runde 2 ohne (150, 100, 100, 75, 75; nach Werten gibt es nur eine Lösung: 150 + 100 + 75 + 75). Es gibt nur ein Stückbild, die App zeigt es in drei Größen
+ * (klein bis 50, mittel bis 125, groß darüber); der Beutel entfällt. Alle Stücke zusammen sind mehr als vierhundert.
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `silber/tuch.webp` 720 × 300 und `silber-stueck.webp` 150 × 100, beide transparent.
  */
 const SILBER: SilverGame = {
   background: `${IMG}etappe-bild-05.webp`,
   cloth: `${G}silber/tuch.webp`,
-  purse: `${G}silber/beutel.webp`,
   pieces: [
-    { id: 'a-200', image: `${G}silber/silber-gross.webp`, value: 200 },
-    { id: 'a-100x', image: `${G}silber/silber-mittel.webp`, value: 100 },
-    { id: 'a-100y', image: `${G}silber/silber-mittel.webp`, value: 100 },
-    { id: 'a-50x', image: `${G}silber/silber-klein.webp`, value: 50 },
-    { id: 'a-50y', image: `${G}silber/silber-klein.webp`, value: 50 },
-    { id: 'a-25x', image: `${G}silber/silber-klein.webp`, value: 25 },
-    { id: 'a-25y', image: `${G}silber/silber-klein.webp`, value: 25 },
-    { id: 'b-150', image: `${G}silber/silber-gross.webp`, value: 150 },
-    { id: 'b-125', image: `${G}silber/silber-mittel.webp`, value: 125 },
-    { id: 'b-100', image: `${G}silber/silber-mittel.webp`, value: 100 },
-    { id: 'b-75x', image: `${G}silber/silber-mittel.webp`, value: 75 },
-    { id: 'b-75y', image: `${G}silber/silber-mittel.webp`, value: 75 },
-    { id: 'b-50', image: `${G}silber/silber-klein.webp`, value: 50 },
-    { id: 'b-25', image: `${G}silber/silber-klein.webp`, value: 25 }
+    { id: 'a-200', image: `${G}silber/silber-stueck.webp`, value: 200 },
+    { id: 'a-100x', image: `${G}silber/silber-stueck.webp`, value: 100 },
+    { id: 'a-100y', image: `${G}silber/silber-stueck.webp`, value: 100 },
+    { id: 'a-50x', image: `${G}silber/silber-stueck.webp`, value: 50 },
+    { id: 'a-50y', image: `${G}silber/silber-stueck.webp`, value: 50 },
+    { id: 'b-150', image: `${G}silber/silber-stueck.webp`, value: 150 },
+    { id: 'b-100x', image: `${G}silber/silber-stueck.webp`, value: 100 },
+    { id: 'b-100y', image: `${G}silber/silber-stueck.webp`, value: 100 },
+    { id: 'b-75x', image: `${G}silber/silber-stueck.webp`, value: 75 },
+    { id: 'b-75y', image: `${G}silber/silber-stueck.webp`, value: 75 }
   ],
   rounds: [
-    { hint: 'Bezahle das Land mit genau vierhundert Silberstücken. Die Summe auf dem Tuch hilft dir.', price: 400, pieces: ['a-200', 'a-100x', 'a-100y', 'a-50x', 'a-50y', 'a-25x', 'a-25y'], showSum: true },
-    { hint: 'Noch einmal vierhundert. Jetzt rechnest du selbst.', price: 400, pieces: ['b-150', 'b-125', 'b-100', 'b-75x', 'b-75y', 'b-50', 'b-25'], showSum: false }
+    { hint: 'Lege Silberstücke auf das Tuch: genau vierhundert. Die Summe hilft dir.', price: 400, pieces: ['a-200', 'a-100x', 'a-100y', 'a-50x', 'a-50y'], showSum: true },
+    { hint: 'Noch einmal vierhundert. Jetzt rechnest du selbst.', price: 400, pieces: ['b-150', 'b-100x', 'b-100y', 'b-75x', 'b-75y'], showSum: false }
   ]
 }
 
 /**
- * Etappe 1, "Kamele beladen": ein Kamel mit zwei Körben vor dem Etappenbild 1, Pakete in drei Gewichten (Bildauftrag A10). Jede Runde hat zwei Kamele; jedes ist lösbar
- * (die Pakete eines Kamels lassen sich in zwei gleich schwere Hälften teilen). Das Kamel ist das aus Noah (Kopie unter `waage/`, Bildauftrag A10).
+ * Etappe 1, "Kamele beladen": ein Kamel mit zwei Körben vor dem Etappenbild 1, Pakete in drei Gewichten (Bildauftrag A10). Plan v3: jede Runde hat nur ein Kamel (vorher zwei); jedes ist lösbar
+ * (die Pakete lassen sich in zwei gleich schwere Hälften teilen): Runde 1 drei Pakete (1 + 2 | 3), Runde 2 fünf Pakete (zusammen 10, je 5). Das Kamel ist das aus Noah (Kopie unter `waage/`, Bildauftrag A10).
  * Die Körbe hängen an der Flanke des Kamels (`baskets`: Prozent des Kamelbildes, Oberkante des Korbs, nach dem Aussehen des Noah-Kamels gesetzt, am Handy zu prüfen).
  * Die Pakete haben drei verschieden große Bilder (das Gewicht ist an der Größe zu erkennen, die App skaliert sie nicht auf gleiche Größe).
  */
@@ -160,25 +106,14 @@ const WAAGE: BalanceGame = {
   baskets: [[28, 45], [64, 45]],
   packs: [
     { id: 'klein-1', image: `${G}waage/sack-klein.webp`, weight: 1, label: 'kleiner Sack' },
-    { id: 'klein-2', image: `${G}waage/sack-klein.webp`, weight: 1, label: 'kleiner Sack' },
-    { id: 'klein-3', image: `${G}waage/sack-klein.webp`, weight: 1, label: 'kleiner Sack' },
     { id: 'schlauch-1', image: `${G}waage/schlauch.webp`, weight: 2, label: 'Wasserschlauch' },
     { id: 'schlauch-2', image: `${G}waage/schlauch.webp`, weight: 2, label: 'Wasserschlauch' },
     { id: 'schlauch-3', image: `${G}waage/schlauch.webp`, weight: 2, label: 'Wasserschlauch' },
-    { id: 'schlauch-4', image: `${G}waage/schlauch.webp`, weight: 2, label: 'Wasserschlauch' },
-    { id: 'gross-1', image: `${G}waage/sack-gross.webp`, weight: 3, label: 'großer Sack' },
-    { id: 'gross-2', image: `${G}waage/sack-gross.webp`, weight: 3, label: 'großer Sack' },
-    { id: 'gross-3', image: `${G}waage/sack-gross.webp`, weight: 3, label: 'großer Sack' }
+    { id: 'gross-1', image: `${G}waage/sack-gross.webp`, weight: 3, label: 'großer Sack' }
   ],
   rounds: [
-    {
-      hint: 'Verteile die drei Pakete auf beide Seiten.',
-      camels: [{ packs: ['klein-1', 'schlauch-1', 'gross-1'] }, { packs: ['klein-2', 'klein-3', 'schlauch-2'] }]
-    },
-    {
-      hint: 'Jetzt sind es mehr und schwerere Pakete.',
-      camels: [{ packs: ['klein-1', 'schlauch-1', 'schlauch-2', 'gross-1', 'schlauch-3'] }, { packs: ['gross-2', 'gross-3', 'klein-2', 'schlauch-4', 'klein-3'] }]
-    }
+    { hint: 'Verteile die drei Pakete auf beide Seiten.', camels: [{ packs: ['klein-1', 'schlauch-1', 'gross-1'] }] },
+    { hint: 'Jetzt sind es mehr und schwerere Pakete.', camels: [{ packs: ['klein-1', 'schlauch-1', 'schlauch-2', 'gross-1', 'schlauch-3'] }] }
   ]
 }
 
@@ -207,8 +142,8 @@ const STERNBILD: ConstellationGame = {
 }
 
 /**
- * Etappe 4, "Wasser für die Gäste": Krug am Brunnen füllen, Waschschüsseln der drei Gäste füllen (Bildauftrag A11, gebaute Gieß-Mechanik). Runde 1 drei Schüsseln
- * mit einem Krug, Runde 2 drei tiefe Schüsseln mit zwei Krügen (andere Ids, gleiche Plätze).
+ * Etappe 6, "Wasser für die Gäste": Krug am Brunnen füllen, Waschschüsseln der Gäste füllen (Bildauftrag A11, gebaute Gieß-Mechanik). Plan v3: Runde 1 drei Schüsseln
+ * mit einem Krug, Runde 2 nur zwei tiefe Schüsseln mit je zwei Krügen (andere Ids, gleiche Plätze); zusammen 3 + 4 = 7 Krüge.
  * Der Brunnen (`river`: Ecke x, y, Breite, Höhe) und die drei Plätze der Schüsseln (Mitte x, Fußpunkt y, Breite; vor den drei Sitzplätzen) sind die Messwerte aus `giessen/eichen-messung.json`.
  */
 const GIESSEN: WaterGame = {
@@ -221,12 +156,23 @@ const GIESSEN: WaterGame = {
     { id: 'schuessel-2', small: `${G}giessen/schuessel.webp`, grown: `${G}giessen/schuessel-voll.webp`, label: 'Schüssel für den zweiten Gast', x: 66, y: 75, w: 18, need: 1 },
     { id: 'schuessel-3', small: `${G}giessen/schuessel.webp`, grown: `${G}giessen/schuessel-voll.webp`, label: 'Schüssel für den dritten Gast', x: 87, y: 75, w: 18, need: 1 },
     { id: 'tief-1', small: `${G}giessen/schuessel.webp`, grown: `${G}giessen/schuessel-voll.webp`, label: 'Tiefe Schüssel für den ersten Gast', x: 45, y: 75, w: 18, need: 2 },
-    { id: 'tief-2', small: `${G}giessen/schuessel.webp`, grown: `${G}giessen/schuessel-voll.webp`, label: 'Tiefe Schüssel für den zweiten Gast', x: 66, y: 75, w: 18, need: 2 },
-    { id: 'tief-3', small: `${G}giessen/schuessel.webp`, grown: `${G}giessen/schuessel-voll.webp`, label: 'Tiefe Schüssel für den dritten Gast', x: 87, y: 75, w: 18, need: 2 }
+    { id: 'tief-2', small: `${G}giessen/schuessel.webp`, grown: `${G}giessen/schuessel-voll.webp`, label: 'Tiefe Schüssel für den zweiten Gast', x: 66, y: 75, w: 18, need: 2 }
   ],
   rounds: [
     { hint: 'Jede Schüssel braucht einen Krug.', plants: ['schuessel-1', 'schuessel-2', 'schuessel-3'] },
-    { hint: 'Die tiefen Schüsseln brauchen zwei Krüge.', plants: ['tief-1', 'tief-2', 'tief-3'] }
+    { hint: 'Die tiefen Schüsseln brauchen zwei Krüge.', plants: ['tief-1', 'tief-2'] }
+  ]
+}
+
+/**
+ * Etappe 12, "Ins Weite schauen": ein Bild liegt zuerst unscharf da, das Kind schiebt einen Regler, bis es scharf ist (Bildauftrag A33; ein Fehler ist nicht möglich, kein Zeitdruck). Runde 1 die ferne
+ * Karawane im Abendfeld (scharf bei 70 % des Reglers), Runde 2 Rebekka auf dem Kamel nah (scharf bei 30 %). Das Bild ist 3 : 2; die App malt die Unschärfe, ein Rasten gilt innerhalb von 8 % der Reglerlänge.
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `fokus/ferne.webp` und `fokus/nahe.webp`, je 1200 × 800 (Vollbild).
+ */
+const FOKUS: FocusGame = {
+  rounds: [
+    { hint: 'Ziehe den Regler, bis das Bild scharf ist. Was kommt dort in der Ferne?', image: `${G}fokus/ferne.webp`, sharpAt: 70 },
+    { hint: 'Und jetzt ganz nah: Ziehe den Regler, bis das Bild scharf ist.', image: `${G}fokus/nahe.webp`, sharpAt: 30 }
   ]
 }
 
@@ -247,15 +193,16 @@ export const abraham: Journey = {
     widthPx: 9908,
     stages: [
       { x: 0.0202, y: 0.625, d: 0.0339 },
-      { x: 0.104, y: 0.5218, d: 0.0339 },
-      { x: 0.1877, y: 0.5825, d: 0.0339 },
-      { x: 0.2715, y: 0.6432, d: 0.0339 },
-      { x: 0.3553, y: 0.5825, d: 0.0339 },
-      { x: 0.4491, y: 0.5947, d: 0.0339 },
-      { x: 0.5349, y: 0.5825, d: 0.0339 },
-      { x: 0.6187, y: 0.5765, d: 0.0339 },
-      { x: 0.7025, y: 0.5825, d: 0.0339 },
-      { x: 0.7862, y: 0.6068, d: 0.0339 },
+      { x: 0.0975, y: 0.5312, d: 0.0339 },
+      { x: 0.1747, y: 0.5715, d: 0.0339 },
+      { x: 0.252, y: 0.6266, d: 0.0339 },
+      { x: 0.3292, y: 0.6046, d: 0.0339 },
+      { x: 0.4065, y: 0.5892, d: 0.0339 },
+      { x: 0.4837, y: 0.5892, d: 0.0339 },
+      { x: 0.561, y: 0.5803, d: 0.0339 },
+      { x: 0.6382, y: 0.5781, d: 0.0339 },
+      { x: 0.7155, y: 0.5869, d: 0.0339 },
+      { x: 0.7927, y: 0.6068, d: 0.0339 },
       { x: 0.87, y: 0.6068, d: 0.0339 }
     ],
     exam: { x: 0.974, y: 0.5158, d: 0.0339 },
@@ -266,18 +213,16 @@ export const abraham: Journey = {
       id: 1,
       image: `${IMG}etappe-bild-01.webp`,
       title: 'Der Ruf',
-      ref: '1. Mose 12,1–9',
-      audio: `${REC}geschichte-01-v2.mp3`,
+      ref: '1. Mose 11,27–12,4',
       text: [
-        'Nach dem Turm von Babel haben sich die Menschen über die ganze Erde verteilt, aber Gott hat sie nicht aus den Augen verloren. In der Stadt Haran wohnt ein Mann namens Abram mit seiner Frau Sarai, und gerade ihn ruft Gott, damit durch ihn etwas ganz Neues beginnt.',
-        'Eines Tages spricht Gott zu ihm: „Zieh fort aus deinem Land, weg von deiner Verwandtschaft und aus dem Haus deines Vaters, in das Land, das ich dir zeigen werde. Ich will dich zu einem großen Volk machen und dich segnen, und du sollst selbst ein Segen sein. Durch dich sollen alle Familien auf der Erde gesegnet werden.“',
-        'Abram fragt nicht lange nach dem Wohin. Er vertraut Gott und bricht auf, obwohl er schon fünfundsiebzig Jahre alt ist. Seine Frau Sarai geht mit ihm und sein Neffe Lot, dazu alle Leute, die zu ihnen gehören, und alles, was sie besitzen, nehmen sie mit.',
-        'So ziehen sie in das Land Kanaan hinein, bis zu den großen Bäumen bei Sichem. Dort spricht Gott zu Abram: „Dieses Land will ich deinen Nachkommen geben.“ Da baut Abram einen Altar, um Gott zu danken. Dann wandert er weiter zu den Bergen bei Bethel, schlägt sein Zelt auf, baut noch einen Altar und betet zu Gott.'
+        'Die Stadt Ur ist groß und alt. Ihre Häuser sind aus Lehmziegeln gebaut, und mitten in der Stadt ragt ein hoher Stufenturm in den Himmel. Hier wohnt Abram mit seiner Frau Sarai und seinem Neffen Lot. Ein Kind haben Abram und Sarai nicht.',
+        'Eines Tages spricht Gott zu Abram: „Zieh fort aus deinem Land und aus dem Haus deines Vaters. Geh in das Land, das ich dir zeigen will. Ich mache dich zu einem großen Volk und segne dich. Durch dich sollen alle Menschen gesegnet werden.“',
+        'Wohin Gott ihn führt, weiß Abram nicht. Aber er vertraut Gott. Er packt alles zusammen, was er besitzt. Fünfundsiebzig Jahre ist Abram alt, als er sich mit Sarai und Lot auf den Weg macht.'
       ],
       task: { kind: 'waage', hint: 'Lege die Pakete so in die Körbe, dass das Kamel gerade steht.', balance: WAAGE },
       questions: [
-        { q: 'Wohin soll Abram ziehen?', options: ['in das Land, das Gott ihm zeigt', 'zurück nach Hause', 'ans Meer'], answer: 0 },
-        { q: 'Wer zieht mit Abram und Sarai?', options: ['Lot', 'ein König', 'Isaak'], answer: 0 }
+        { q: 'Wohin soll Abram ziehen?', options: ['in das Land, das Gott ihm zeigt', 'zurück zu seinem Vater', 'ans Meer'], answer: 0 },
+        { q: 'Was verspricht Gott Abram?', options: ['Er macht ihn zu einem großen Volk und segnet ihn.', 'Er schenkt ihm eine Burg.', 'Er macht ihn zum König von Ur.'], answer: 0 }
       ],
       soon: SOON
     },
@@ -286,17 +231,16 @@ export const abraham: Journey = {
       image: `${IMG}etappe-bild-02.webp`,
       title: 'Abram und Lot',
       ref: '1. Mose 13',
-      audio: `${REC}geschichte-02-v2.mp3`,
       text: [
-        'Abram ist reich geworden, und auch Lot hat große Herden und viele Zelte. Doch das Land ist zu klein für sie beide. Schon bald gibt es Streit zwischen den Hirten von Abram und den Hirten von Lot.',
-        'Als Abram das hört, geht er zu Lot und sagt: „Es soll kein Streit sein zwischen dir und mir und zwischen unseren Hirten, denn wir gehören doch zu einer Familie. Das ganze Land liegt vor dir. Lass uns auseinandergehen. Such dir aus, wohin du ziehen willst, und ich gehe in die andere Richtung.“ Dabei ist Abram der Ältere, und trotzdem darf Lot zuerst wählen.',
-        'Lot schaut sich um. Er sieht die weite Ebene am Fluss Jordan, grün und gut bewässert, so schön wie ein Garten Gottes. Lot wählt diese Ebene und zieht mit seinen Herden nach Osten, und er schlägt seine Zelte in der Nähe der Stadt Sodom auf. Die Menschen in Sodom sind allerdings böse vor Gott.',
-        'Abram bleibt im Land Kanaan. Da sagt Gott zu ihm: „Schau dich um, nach Norden und Süden, nach Osten und Westen! Das ganze Land, das du siehst, will ich dir und deinen Nachkommen für immer geben. Sie werden so viele sein wie der Staub auf der Erde.“ Da zieht Abram weiter und stellt sein Zelt bei den großen Eichen von Mamre auf.'
+        'Abram ist reich geworden, und auch Lot hat viele Schafe, Rinder und Zelte. Doch das Land ist zu klein für beide Herden. Ihre Hirten fangen an zu streiten.',
+        'Da sagt Abram zu Lot: „Wir wollen keinen Streit, wir sind doch eine Familie. Such dir aus, wohin du ziehen willst. Gehst du nach links, gehe ich nach rechts.“',
+        'Lot schaut ins Tal hinab. Dort fließt der Jordan durch eine grüne Ebene, so schön wie ein Garten. Lot zieht mit seinen Herden dorthin. Abram bleibt im Land Kanaan.',
+        'Da spricht Gott zu Abram: „Sieh dich um, nach allen Seiten. Das ganze Land, das du siehst, will ich dir und deinen Nachkommen geben. Sie werden so zahlreich sein wie der Staub auf der Erde.“'
       ],
       task: { kind: 'zaehlen', hint: 'Tippe die Tiere an und zähle sie.', count: 13, image: '', question: 'Wie viele Tiere sind es zusammen?', background: `${IMG}etappe-bild-02.webp`, groups: ZAEHLEN_GRUPPEN },
       questions: [
         { q: 'Warum können Abram und Lot nicht zusammenbleiben?', options: ['Das Land ist für beide Herden zu klein.', 'Sie haben sich verirrt.', 'Es ist zu kalt.'], answer: 0 },
-        { q: 'Wer darf sich zuerst ein Land aussuchen?', options: ['Lot', 'Abram', 'die Hirten'], answer: 0 }
+        { q: 'Wer darf zuerst auswählen, wohin er zieht?', options: ['Lot', 'Abram', 'die Hirten'], answer: 0 }
       ],
       soon: SOON
     },
@@ -304,18 +248,17 @@ export const abraham: Journey = {
       id: 3,
       image: `${IMG}etappe-bild-03.webp`,
       title: 'Die Sterne',
-      ref: '1. Mose 15,1–6',
-      audio: `${REC}geschichte-03-v2.mp3`,
+      ref: '1. Mose 15,1–7',
       text: [
-        'Viele Jahre sind vergangen, und Abram und Sarai haben immer noch kein Kind. Eines Tages kommt Gottes Wort zu Abram: „Fürchte dich nicht, Abram! Ich bin dein Schutz, und ich werde dich reich belohnen.“',
-        'Abram antwortet traurig: „Herr, was willst du mir schon geben? Ich habe keinen Sohn. Wenn ich sterbe, wird einer meiner Knechte alles bekommen, was ich habe.“ Aber Gott sagt: „Nein, nicht dieser Knecht soll dein Erbe sein, sondern dein eigener Sohn.“',
-        'Dann führt Gott Abram hinaus unter den Nachthimmel. „Sieh zum Himmel“, sagt er, „und zähle die Sterne, wenn du es kannst!“ Abram schaut hinauf. Der Himmel funkelt von unzähligen Sternen. „So viele sollen deine Nachkommen sein“, sagt Gott.',
-        'Abram kann sie nicht zählen, so viele sind es. Doch er glaubt, was Gott ihm verspricht, obwohl er und Sarai alt sind und noch immer kein Kind haben. Und Gott rechnet ihm dieses Vertrauen als Gerechtigkeit an: In Gottes Augen steht Abram richtig vor ihm.'
+        'Abram und Sarai sind alt geworden, und sie haben immer noch kein Kind. Das macht Abram traurig. Da spricht Gott zu ihm: „Fürchte dich nicht, Abram! Ich beschütze dich und will dich reich beschenken.“',
+        '„Herr, was willst du mir schon geben?“, fragt Abram. „Ich habe keinen Sohn. Ein Knecht aus meinem Haus wird alles erben.“ „Nein“, sagt Gott, „dein eigener Sohn soll dein Erbe sein.“',
+        'Dann führt Gott ihn hinaus in die Nacht. „Sieh zum Himmel und zähle die Sterne, wenn du es kannst“, sagt er. „So viele Nachkommen sollst du haben.“ Abram schaut hinauf, doch es sind viel zu viele Sterne zum Zählen.',
+        'Abram glaubt Gott, und Gott sieht, dass Abram ihm vertraut. „Ich habe dich aus Ur geführt“, erinnert er ihn, „um dir dieses Land zu geben.“'
       ],
       task: { kind: 'sternbild', hint: 'Setze die Sterne so, wie du sie im Vorbild siehst.', constellation: STERNBILD },
       questions: [
         { q: 'Was soll Abram in der Nacht zählen?', options: ['die Sterne', 'die Schafe', 'die Zelte'], answer: 0 },
-        { q: 'Wie viele Nachkommen verspricht Gott Abram?', options: ['so viele wie Sterne am Himmel', 'nur einen', 'keinen'], answer: 0 }
+        { q: 'Wie viele Nachkommen verspricht Gott Abram?', options: ['so viele wie Sterne am Himmel', 'nur einen', 'zwölf'], answer: 0 }
       ],
       soon: SOON
     },
@@ -325,16 +268,15 @@ export const abraham: Journey = {
       title: 'Hagar und der Brunnen',
       ref: '1. Mose 16',
       text: [
-        'Viele Jahre sind seit Gottes Versprechen vergangen, und Abram und Sarai haben immer noch kein Kind. Sarai hat eine Magd aus Ägypten, die Hagar heißt. Weil Sarai selbst keine Kinder bekommen kann, gibt sie Hagar ihrem Mann, in der Hoffnung, dass Hagar ihm ein Kind schenkt.',
-        'Bald erwartet Hagar tatsächlich ein Kind. Doch zwischen den beiden Frauen gibt es Streit, und Hagar läuft in ihrer Not davon, mitten in die Wüste. Erschöpft setzt sie sich an einen Brunnen am Weg.',
-        'Aber Gott hat Hagar gesehen. Ein Bote Gottes findet sie am Brunnen und fragt: „Hagar, woher kommst du, und wohin gehst du?“ „Ich laufe vor Sarai davon“, antwortet sie. Da sagt der Bote: „Kehr zu ihr zurück. Du wirst einen Sohn bekommen, und du sollst ihn Ismael nennen, das bedeutet: Gott hört. Denn Gott hat gehört, wie schlecht es dir geht.“',
-        'Hagar ist tief bewegt. „Du bist ein Gott, der mich sieht“, sagt sie, denn nun weiß sie, dass Gott sie nicht vergessen hat. Von da an trägt der Brunnen einen besonderen Namen: Brunnen des Lebendigen, der mich sieht. Hagar geht zurück und bekommt ihren Sohn, und Abram nennt ihn Ismael.'
+        'Viele Jahre sind vergangen, und Sarai hat noch immer kein Kind. Sie hat eine Magd aus Ägypten, die Hagar heißt. „Vielleicht bekomme ich durch Hagar ein Kind“, sagt Sarai zu Abram, und er ist einverstanden. Bald erwartet Hagar ein Baby.',
+        'Doch zwischen den beiden Frauen gibt es Streit, und Hagar läuft davon, mitten in die Wüste. Erschöpft setzt sie sich an einen Brunnen.',
+        'Da spricht ein Bote Gottes sie an: „Hagar, woher kommst du, und wohin gehst du?“ „Ich laufe vor Sarai davon“, sagt sie. „Geh zurück“, sagt der Bote. „Du wirst einen Sohn bekommen. Nenne ihn Ismael, das heißt: Gott hört. Denn Gott hat gehört, wie traurig du bist.“',
+        'Hagar ist tief bewegt. „Du bist ein Gott, der mich sieht“, sagt sie, denn sie weiß jetzt: Gott hat sie nicht vergessen. Hagar geht zurück, und ihr Sohn wird geboren.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
-      task: { kind: 'voegel', hint: 'Tippe dorthin, wo sich die Flugbahnen der Vögel treffen.', birds: VOEGEL },
+      task: { kind: 'voegel', hint: 'Die Vögel fliegen zum Wasser. Tippe dorthin, wo sich ihre Wege treffen.', birds: VOEGEL },
       questions: [
-        { q: 'Wo findet der Bote Gottes die flüchtige Hagar?', options: ['an einem Brunnen in der Wüste', 'in einem Zelt', 'auf einem hohen Berg'], answer: 0 },
-        { q: 'Wie nennt Hagar Gott?', options: ['ein Gott, der mich sieht', 'ein Gott, der schläft', 'ein Gott, der weit weg wohnt'], answer: 0 }
+        { q: 'Wo setzt sich Hagar hin, als sie davongelaufen ist?', options: ['an einen Brunnen in der Wüste', 'unter eine Palme am Meer', 'auf einen hohen Berg'], answer: 0 },
+        { q: 'Was bedeutet der Name Ismael?', options: ['Gott hört', 'Gott lacht', 'Gott schenkt'], answer: 0 }
       ],
       soon: SOON
     },
@@ -342,18 +284,16 @@ export const abraham: Journey = {
       id: 5,
       image: `${IMG}etappe-bild-03.webp`,
       title: 'Der Bund und die neuen Namen',
-      ref: '1. Mose 17,1–8.15–19',
+      ref: '1. Mose 17,1–19',
       text: [
-        'Dreizehn Jahre später, Abram ist jetzt neunundneunzig Jahre alt, spricht Gott wieder zu ihm: „Ich bin der allmächtige Gott. Geh deinen Weg vor mir und lebe so, wie es mir gefällt. Ich will einen Bund mit dir schließen, ein festes Versprechen, und dich sehr zahlreich machen.“',
-        'Da wirft sich Abram vor Gott zu Boden. Gott sagt: „Du sollst nicht mehr Abram heißen, sondern Abraham, denn ich mache dich zum Vater vieler Völker. Mein Versprechen gilt für dich und alle deine Nachkommen, für immer: Ich will euer Gott sein, und das Land Kanaan soll euch gehören.“',
-        'Auch Sarai bekommt einen neuen Namen. „Sie soll Sara heißen“, sagt Gott. „Ich will sie segnen, und sie wird einen Sohn bekommen. Aus ihr sollen Völker werden.“',
-        'Abraham muss lachen, so überrascht ist er. „Kann ein Mann mit hundert Jahren noch Vater werden?“, denkt er, „und Sara ist neunzig!“ Doch Gott sagt: „Ja, Sara wird dir einen Sohn schenken. Den sollst du Isaak nennen, und mit ihm will ich meinen Bund halten.“'
+        'Abram ist neunundneunzig Jahre alt, als Gott wieder zu ihm spricht: „Ich schließe einen Bund mit dir, ein festes Versprechen. Ich will dein Gott sein und der Gott deiner Nachkommen, für immer. Du sollst der Vater vieler Völker werden.“ Da wirft sich Abram vor Gott zu Boden.',
+        '„Darum sollst du nicht mehr Abram heißen, sondern Abraham“, sagt Gott. „Das bedeutet: Vater vieler. Und Sarai soll Sara heißen. Ich will sie segnen, und sie wird dir einen Sohn schenken.“',
+        'Abraham muss lachen. „Ich bin fast hundert Jahre alt, und Sara ist neunzig“, denkt er. „Wie soll das gehen?“ Aber Gott sagt: „Doch, Sara bekommt einen Sohn. Den sollst du Isaak nennen.“'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
       task: { kind: 'ringe', hint: 'Drehe die Ringe, bis das Licht hindurchscheint.', rings: RINGE },
       questions: [
-        { q: 'Welchen neuen Namen bekommt Abram?', options: ['Abraham', 'Isaak', 'Ismael'], answer: 0 },
-        { q: 'Wie alt ist Abram, als Gott ihm den neuen Namen gibt?', options: ['neunundneunzig Jahre', 'fünfundsiebzig Jahre', 'zwanzig Jahre'], answer: 0 }
+        { q: 'Welchen neuen Namen gibt Gott dem Abram?', options: ['Abraham', 'Isaak', 'Ismael'], answer: 0 },
+        { q: 'Wie soll der Sohn heißen, den Sara bekommt?', options: ['Isaak', 'Lot', 'Ismael'], answer: 0 }
       ],
       soon: SOON
     },
@@ -362,18 +302,16 @@ export const abraham: Journey = {
       image: `${IMG}etappe-bild-04.webp`,
       title: 'Besuch bei den Eichen',
       ref: '1. Mose 18,1–15',
-      audio: `${REC}geschichte-06-v3.mp3`,
       text: [
-        'Inzwischen hat Gott Abram und Sarai neue Namen gegeben: Abram heißt jetzt Abraham, das bedeutet „Vater vieler“, und Sarai heißt Sara. Beide sind sehr alt geworden.',
-        'Es ist heißer Mittag. Abraham sitzt am Eingang seines Zeltes bei den großen Eichen von Mamre, als Gott ihn besucht. Er blickt auf und sieht auf einmal drei Männer vor sich stehen.',
-        'Sofort läuft er ihnen entgegen und verneigt sich tief. „Bleibt doch bei mir“, bittet er, „ich lasse Wasser bringen, damit ihr eure Füße waschen könnt, und ruht euch unter dem Baum aus. Ich hole auch einen Bissen Brot.“ Dann eilt er zu Sara ins Zelt: „Schnell, back Brot für unsere Gäste!“ Und er sucht ein junges Kalb aus.',
-        'Als alles bereit ist, stellt Abraham Brot, Butter, Milch und Fleisch vor die Männer. „Wo ist Sara, deine Frau?“, fragen sie. „Drinnen im Zelt“, antwortet er. Da sagt einer von ihnen: „In einem Jahr komme ich wieder zu dir, dann hat Sara einen Sohn.“',
-        'Sara steht hinter der Zelttür und hört es. Sie lacht leise: „Ich bin doch viel zu alt dafür!“ „Warum lacht Sara?“, fragt der Gast. „Ist für Gott irgendetwas zu schwer?“ Sara erschrickt: „Ich habe nicht gelacht.“ Doch er antwortet: „Doch, du hast gelacht.“'
+        'Es ist heiß am Mittag, und Abraham sitzt am Eingang seines Zeltes unter den großen Eichen von Mamre. Gott besucht ihn. Als Abraham aufblickt, stehen drei Männer vor ihm.',
+        'Abraham läuft ihnen entgegen und verneigt sich tief. „Bleibt bei mir“, sagt er. „Ruht euch unter dem Baum aus, ich hole Wasser für eure Füße und etwas zu essen.“ Schnell bittet er Sara, Brot zu backen.',
+        'Dann stellt Abraham Brot, Milch und Fleisch vor die Gäste. „Wo ist Sara, deine Frau?“, fragen sie. „Im Zelt“, sagt er. Da sagt einer: „In einem Jahr komme ich wieder, dann hat Sara einen Sohn.“',
+        'Sara steht hinter der Zelttür und hört es. Sie lacht leise: „Ich bin doch viel zu alt!“ Aber der Gast fragt: „Ist für Gott etwas zu schwer?“'
       ],
       task: { kind: 'giessen', hint: 'Fülle den Krug am Brunnen und gieße das Wasser in die Schüsseln der Gäste.', water: GIESSEN },
       questions: [
-        { q: 'Was stellt Abraham den Gästen vor?', options: ['Brot, Butter, Milch und Fleisch', 'Fisch und Datteln', 'nur Wasser'], answer: 0 },
-        { q: 'Was tut Sara, als sie hört, dass sie einen Sohn bekommt?', options: ['Sie lacht leise.', 'Sie weint.', 'Sie singt.'], answer: 0 }
+        { q: 'Was stellt Abraham den Gästen vor?', options: ['Brot, Milch und Fleisch', 'Fisch und Datteln', 'nur Wasser'], answer: 0 },
+        { q: 'Was tut Sara, als sie das Versprechen hört?', options: ['Sie lacht leise.', 'Sie weint.', 'Sie singt.'], answer: 0 }
       ],
       soon: SOON
     },
@@ -383,13 +321,12 @@ export const abraham: Journey = {
       title: 'Abraham bittet für Sodom',
       ref: '1. Mose 18,16–33',
       text: [
-        'Zwei der drei Männer machen sich auf den Weg nach Sodom, und Abraham begleitet sie ein Stück. Doch Gott selbst bleibt bei ihm stehen und sagt: „Aus Abraham soll ein großes Volk werden, und durch ihn sollen alle Völker gesegnet werden. Darum will ich ihm nicht verschweigen, was ich vorhabe. Ich habe gehört, wie schlimm es in Sodom zugeht, und will selbst nachsehen.“',
-        'Abraham tritt nahe an Gott heran und fragt mutig: „Willst du die Guten mit den Bösen verderben? Vielleicht leben fünfzig gute Menschen in der Stadt. Willst du ihnen nicht verzeihen?“ Gott antwortet: „Wenn ich in Sodom fünfzig gute Menschen finde, will ich die ganze Stadt verschonen.“',
-        'Aber Abraham fragt noch einmal, ganz vorsichtig: „Verzeih mir, dass ich so viel frage. Und wenn es nur fünfundvierzig sind? Oder vierzig? Oder dreißig? Oder zwanzig?“ Und jedes Mal antwortet Gott: „Dann will ich die Stadt auch um ihretwillen verschonen.“',
-        'Zuletzt fragt Abraham: „Und wenn es nur zehn gute Menschen sind?“ „Auch um der Zehn willen will ich die Stadt nicht verderben“, sagt Gott. Dann geht Gott weg, und Abraham kehrt heim in sein Zelt. Später denkt Gott an Abraham und bringt Lot in Sicherheit.'
+        'Die Männer stehen auf und gehen weiter, und Abraham begleitet sie ein Stück. Da sagt Gott: „Ich habe gehört, wie schlimm es in der Stadt Sodom zugeht. Ich will selbst nachsehen.“',
+        'Abraham tritt vor Gott und fragt mutig: „Willst du die guten Menschen mit den bösen bestrafen? Vielleicht gibt es fünfzig gute Menschen in der Stadt.“ „Dann verschone ich die ganze Stadt um der fünfzig willen“, sagt Gott.',
+        'Abraham fragt noch einmal, ganz bescheiden: „Und wenn es nur vierzig sind? Oder dreißig? Oder zwanzig?“ Jedes Mal antwortet Gott: „Auch ihretwegen verschone ich die Stadt.“ Zuletzt fragt Abraham: „Und wenn es nur zehn sind?“ „Auch um der zehn willen“, sagt Gott.',
+        'Dann geht Gott weg, und Abraham kehrt heim. Gott hat ihm zugehört, und später denkt er an Abraham und bringt Lot in Sicherheit.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wie viele gute Menschen reichen Gott zuletzt, um die Stadt zu verschonen?', options: ['zehn', 'fünfzig', 'hundert'], answer: 0 },
         { q: 'Wen bringt Gott in Sicherheit?', options: ['Lot', 'Hagar', 'Isaak'], answer: 0 }
@@ -401,17 +338,16 @@ export const abraham: Journey = {
       image: `${IMG}etappe-bild-05.webp`,
       title: 'Isaak',
       ref: '1. Mose 21,1–7',
-      audio: `${REC}geschichte-08-v2.mp3`,
       text: [
-        'Ein Jahr geht ins Land, und dann geschieht genau das, was Gott versprochen hat: Sara bekommt einen Sohn, zu der Zeit, die Gott genannt hat. Fünfundzwanzig Jahre sind vergangen, seit Abraham damals von Haran aufgebrochen ist, und nun ist er hundert Jahre alt.',
-        'Abraham gibt dem Kind den Namen, den Gott ihm genannt hat: Isaak. Das bedeutet „er lacht“, und besser könnte kein Name zu dieser Geschichte passen.',
-        'Sara hält ihren Sohn im Arm und sagt: „Gott hat mir ein Lachen geschenkt. Jeder, der davon hört, wird mit mir lachen.“ Und sie fügt hinzu: „Wer hätte Abraham je gesagt, dass Sara einmal ein Kind an ihrer Brust haben wird? Und nun habe ich ihm doch einen Sohn geboren, obwohl er schon so alt ist.“',
-        'Nun liegt ein Baby im Zelt, auf das die beiden so lange gewartet haben. Sara lacht, Abraham lacht, und beide wissen: Gott hat sein Wort gehalten.'
+        'Ein Jahr vergeht. Dann geschieht, was Gott versprochen hat: Sara bekommt einen Sohn, und Abraham ist hundert Jahre alt. Er nennt das Kind Isaak, so wie Gott es gesagt hat.',
+        'Isaak bedeutet: Er lacht. Besser kann kein Name passen, denn Sara hält ihr Baby im Arm und strahlt.',
+        '„Gott hat mir ein Lachen geschenkt“, sagt sie. „Alle, die davon hören, werden mit mir lachen. Wer hätte gedacht, dass ich noch ein Kind bekomme? Und jetzt habe ich Abraham einen Sohn geboren!“',
+        'Nun lacht Sara, und Abraham lacht auch. Sie haben so lange gewartet, und Gott hat sein Wort gehalten.'
       ],
       task: { kind: 'puzzle', hint: 'Setze das Familienbild zusammen.', puzzle: { image: `${G}puzzle/familie.webp`, cols: 2, rows: 3 } },
       questions: [
-        { q: 'Wie nennt Abraham seinen Sohn?', options: ['Isaak', 'Lot', 'Abram'], answer: 0 },
-        { q: 'Wie alt ist Abraham, als Isaak geboren wird?', options: ['hundert Jahre', 'fünfzig Jahre', 'zwanzig Jahre'], answer: 0 }
+        { q: 'Wie nennt Abraham seinen Sohn?', options: ['Isaak', 'Lot', 'Ismael'], answer: 0 },
+        { q: 'Was bedeutet der Name Isaak?', options: ['Er lacht.', 'Er läuft.', 'Er singt.'], answer: 0 }
       ],
       soon: SOON
     },
@@ -421,17 +357,15 @@ export const abraham: Journey = {
       title: 'Gott sorgt',
       ref: '1. Mose 22,1–19',
       text: [
-        'Isaak ist ein Junge geworden, da will Gott sehen, ob Abraham ihm ganz vertraut. „Abraham!“, ruft er. „Hier bin ich.“ „Nimm Isaak, deinen Sohn, den du so lieb hast, und geh mit ihm in das Land Morija. Dort sollst du ihn mir auf einem Berg opfern.“ Das ist eine schwere Prüfung, aber Abraham vertraut Gott.',
-        'Am nächsten Morgen lädt er Holz auf seinen Esel und geht mit Isaak und zwei Knechten los. Am dritten Tag sieht er den Berg und lässt die Knechte mit dem Esel zurück: „Der Junge und ich gehen hinauf, um zu beten, und dann kommen wir wieder zu euch.“',
-        'Auf dem Weg fragt Isaak: „Vater, wo ist das Tier für das Opfer?“ „Mein Sohn“, antwortet Abraham, „Gott wird selbst für das Opfertier sorgen.“',
-        'Oben baut Abraham einen Altar. Da ruft eine Stimme vom Himmel: „Abraham! Tu dem Jungen nichts! Jetzt weiß ich, dass du Gott vertraust.“ Abraham sieht einen Widder, der sich mit den Hörnern in einem Gebüsch verfangen hat. Den bringt er Gott als Opfer, an Isaaks Stelle. Isaak ist gerettet, und Abraham nennt den Ort „Gott sorgt“.',
-        'Noch einmal ruft die Stimme: „Weil du mir deinen Sohn nicht verweigert hast, will ich dich segnen. Deine Nachkommen sollen so zahlreich sein wie die Sterne, und durch sie sollen alle Völker gesegnet werden.“'
+        'Isaak ist ein Junge geworden. Da will Gott sehen, ob Abraham ihm ganz vertraut: „Nimm Isaak, deinen Sohn, den du liebst, und geh mit ihm in das Land Morija. Dort sollst du ihn mir auf einem Berg opfern.“',
+        'Am Morgen lädt Abraham Holz auf seinen Esel und geht mit Isaak und zwei Knechten los. Nach drei Tagen sieht er den Berg. „Bleibt hier“, sagt er zu den Knechten. „Der Junge und ich gehen hinauf und beten, dann kommen wir zurück.“',
+        'Isaak trägt das Holz. „Vater, wo ist das Opfertier?“, fragt er. „Mein Sohn“, sagt Abraham, „Gott wird selbst dafür sorgen.“',
+        'Oben ruft eine Stimme vom Himmel: „Abraham! Tu dem Jungen nichts! Jetzt weiß ich, dass du Gott vertraust.“ Da sieht Abraham einen Widder im Gebüsch und bringt ihn an Isaaks Stelle. Isaak ist gerettet. Und Gott verspricht: „Durch deine Nachkommen sollen alle Völker gesegnet werden.“'
       ],
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
-        { q: 'Was antwortet Abraham auf Isaaks Frage nach dem Opfertier?', options: ['Gott wird dafür sorgen.', 'Ich habe es vergessen.', 'Wir kaufen es unterwegs.'], answer: 0 },
-        { q: 'Was sieht Abraham im Gebüsch?', options: ['einen Widder', 'einen Hirsch', 'einen Esel'], answer: 0 },
-        { q: 'Was verspricht Gott Abraham zum Schluss?', options: ['Durch seine Nachkommen sollen alle Völker gesegnet werden.', 'Er soll König über Kanaan werden.', 'Er soll nach Ägypten ziehen.'], answer: 0 }
+        { q: 'Was antwortet Abraham auf Isaaks Frage nach dem Opfertier?', options: ['Gott wird dafür sorgen.', 'Wir kaufen eines unterwegs.', 'Ich habe es vergessen.'], answer: 0 },
+        { q: 'Was sieht Abraham im Gebüsch?', options: ['einen Widder', 'einen Hirsch', 'einen Esel'], answer: 0 }
       ],
       soon: SOON
     },
@@ -441,46 +375,61 @@ export const abraham: Journey = {
       title: 'Saras Grab',
       ref: '1. Mose 23',
       text: [
-        'Viele Jahre sind vergangen. Sara ist hundertsiebenundzwanzig Jahre alt, als sie in Hebron stirbt, und Abraham trauert um sie. Dann steht er auf und geht zu den Männern der Stadt: „Ich bin ein Fremder und Gast bei euch. Gebt mir ein Stück Land, damit ich meine Frau begraben kann.“',
-        'Die Männer antworten freundlich: „Du bist ein Mann, den Gott groß gemacht hat. Begrabe deine Frau in dem schönsten unserer Gräber, keiner von uns wird es dir verweigern.“ Abraham verneigt sich und bittet um die Höhle Machpela am Rand eines Feldes, die einem Mann namens Ephron gehört.',
-        'Ephron will sie ihm schenken, mit dem ganzen Feld. Aber Abraham will nichts geschenkt, er will das Land bezahlen. „Nimm mein Geld“, sagt er. Da nennt Ephron den Preis: vierhundert Silberstücke. Abraham wiegt das Silber ab und gibt es ihm, vor allen Zeugen.',
-        'Nun gehören das Feld und die Höhle als Grab Abraham. Dort begräbt er Sara. Es ist das erste Stück Land, das Abraham in Kanaan besitzt, in dem Land, das Gott ihm und seinen Nachkommen versprochen hat.'
+        'Sara ist gestorben, und Abraham weint um sie. Dann steht er auf und geht zu den Männern der Stadt Hebron.',
+        '„Ich bin fremd bei euch und besitze kein Stück Land“, sagt er. „Gebt mir einen Platz, wo ich Sara begraben kann.“ Die Männer antworten freundlich: „Du bist ein von Gott gesegneter Mann. Begrabe deine Frau in unserem schönsten Grab.“',
+        'Abraham verneigt sich und bittet um die Höhle Machpela am Rand eines Feldes. Sie gehört Ephron, und der will sie ihm schenken. Aber Abraham sagt: „Nein, ich will sie bezahlen.“ Vor allen Zeugen wiegt er vierhundert Silberstücke ab.',
+        'Nun gehört Abraham ein Stück Land in Kanaan: Feld, Bäume und Höhle. Dort begräbt er Sara. Es ist der erste Platz im versprochenen Land, der ihm gehört.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
-      task: { kind: 'silber', hint: 'Bezahle das Land mit genau vierhundert Silberstücken.', silver: SILBER },
+      task: { kind: 'silber', hint: 'Lege Silberstücke auf das Tuch: genau vierhundert.', silver: SILBER },
       questions: [
-        { q: 'Von wem kauft Abraham das Feld mit der Höhle?', options: ['von Ephron', 'von Lot', 'von Isaak'], answer: 0 },
-        { q: 'Wozu braucht Abraham dieses Stück Land?', options: ['als Grab für Sara', 'als Weide für seine Herden', 'für ein neues Haus'], answer: 0 }
+        { q: 'Wie bekommt Abraham die Höhle für Saras Grab?', options: ['Er bezahlt sie mit Silber.', 'Er bekommt sie geschenkt.', 'Er tauscht sie gegen Schafe.'], answer: 0 },
+        { q: 'Wem gehört die Höhle zuerst?', options: ['Ephron', 'Lot', 'Isaak'], answer: 0 }
       ],
       soon: SOON
     },
     {
       id: 11,
       image: `${IMG}etappe-bild-01.webp`,
-      title: 'Eine Frau für Isaak',
-      ref: '1. Mose 24',
+      title: 'Der Knecht am Brunnen',
+      ref: '1. Mose 24,1–27',
       text: [
-        'Abraham ist nun sehr alt, und Isaak soll eine Frau aus der eigenen Verwandtschaft bekommen. Darum schickt Abraham seinen ältesten Knecht mit zehn Kamelen in das ferne Land seiner Familie. „Gott wird seinen Boten vor dir hergehen lassen“, sagt er, „und du wirst dort eine Frau für meinen Sohn finden.“',
-        'Am Abend kommt der Knecht an einen Brunnen vor der Stadt, lässt die Kamele niederknien und betet: „Gott, hilf mir! Wenn ein Mädchen kommt und ich sie um einen Schluck Wasser bitte, und sie sagt: ‚Trink, ich will auch deine Kamele tränken‘, dann soll sie die Richtige sein.“',
-        'Er hat noch nicht zu Ende gebetet, da kommt Rebekka mit dem Krug auf der Schulter zum Brunnen. Sie reicht ihm zu trinken und sagt: „Ich schöpfe auch für deine Kamele, bis sie genug haben.“ Der Knecht schaut ihr still zu.',
-        'Der Knecht dankt Gott und erzählt Rebekkas Familie, was geschehen ist. Ihr Vater und ihr Bruder Laban sagen: „Das kommt von Gott.“ Und Rebekka sagt: „Ja, ich gehe mit.“',
-        'Als die Karawane in Kanaan ankommt, ist Isaak am Abend auf dem Feld, um nachzudenken. Er blickt auf und sieht die Kamele kommen. Rebekka wird seine Frau, er hat sie lieb, und nach dem Tod seiner Mutter wird er wieder froh.'
+        'Abraham ist alt, und Isaak ist erwachsen. Isaak soll eine Frau aus Abrahams Verwandtschaft bekommen. Darum ruft Abraham seinen ältesten Knecht: „Zieh in das Land meiner Familie. Gott wird dir den Weg zeigen.“',
+        'Der Knecht reist mit zehn Kamelen. Am Abend kommt er an einen Brunnen vor der Stadt und lässt die Tiere niederknien. Er betet: „Gott, hilf mir! Ich bitte ein Mädchen um Wasser. Wenn es sagt: Trink, ich gebe auch deinen Kamelen zu trinken – dann ist sie die Richtige.“',
+        'Da kommt Rebekka mit einem Krug auf der Schulter. Sie gibt dem Fremden zu trinken und sagt: „Ich schöpfe auch für deine Kamele, bis sie genug haben.“ Sie läuft hin und her zum Brunnen. Der Knecht schaut ihr still zu.',
+        'Er hat noch nicht zu Ende gebetet, da ist Gottes Antwort schon da. Der Knecht verneigt sich und dankt Gott.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
-      task: { kind: 'hinweise', hint: 'Lege die Decken so auf die Kamele, dass alle Hinweiskarten stimmen.', clues: HINWEISE },
+      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wen schickt Abraham in das Land seiner Familie?', options: ['seinen ältesten Knecht', 'seinen Sohn Isaak', 'seinen Neffen Lot'], answer: 0 },
         { q: 'Woran erkennt der Knecht die richtige Frau?', options: ['Sie gibt auch den Kamelen zu trinken.', 'Sie trägt einen roten Schleier.', 'Sie singt am Brunnen.'], answer: 0 }
       ],
       soon: SOON
+    },
+    {
+      id: 12,
+      image: `${IMG}etappe-bild-01.webp`,
+      title: 'Isaak und Rebekka',
+      ref: '1. Mose 24,28–67',
+      text: [
+        'Der Knecht geht mit Rebekka zu ihrer Familie und erzählt alles. Ihr Vater und ihr Bruder Laban sagen: „Das kommt von Gott.“ Am nächsten Morgen fragen sie Rebekka: „Willst du mit diesem Mann ziehen?“ „Ja“, sagt sie, „ich gehe.“',
+        'Rebekka setzt sich auf ein Kamel und reist in das Land Kanaan. Isaak ist an diesem Abend draußen auf dem Feld und betet. Er blickt auf und sieht Kamele kommen.',
+        'Auch Rebekka sieht ihn. „Wer ist der Mann dort auf dem Feld?“, fragt sie den Knecht. „Das ist mein Herr Isaak“, sagt er. Da verhüllt sich Rebekka mit ihrem Mantel.',
+        'Isaak führt Rebekka in das Zelt seiner Mutter Sara. Er hat sie lieb, und sie wird seine Frau. Nach dem Tod seiner Mutter ist er wieder getröstet.'
+      ],
+      task: { kind: 'fokus', hint: 'Ziehe den Regler, bis das Bild scharf ist.', focus: FOKUS },
+      questions: [
+        { q: 'Was antwortet Rebekka, als man sie fragt, ob sie mitziehen will?', options: ['Ja, ich gehe.', 'Nein, ich bleibe.', 'Ich weiß es nicht.'], answer: 0 },
+        { q: 'Was macht Isaak, als die Kamele kommen?', options: ['Er ist draußen auf dem Feld und betet.', 'Er schläft im Zelt.', 'Er hütet die Schafe.'], answer: 0 }
+      ],
+      soon: SOON
     }
   ],
   exam: [
-    { q: 'Wohin ruft Gott Abram?', options: ['in ein Land, das Gott ihm zeigt', 'zurück nach Haran', 'ans Meer'], answer: 0 },
-    { q: 'Wer wählt zuerst, als sich Abram und Lot trennen?', options: ['Lot', 'Abram', 'die Hirten'], answer: 0 },
-    { q: 'Wie viele Nachkommen verspricht Gott Abram in der Sternennacht?', options: ['so viele wie Sterne am Himmel', 'nur zwölf', 'so viele wie Schafe'], answer: 0 },
+    { q: 'Aus welcher Stadt ruft Gott Abram?', options: ['aus Ur', 'aus Babel', 'aus Ägypten'], answer: 0 },
+    { q: 'Wer darf zuerst auswählen, als sich Abram und Lot trennen?', options: ['Lot', 'Abram', 'die Hirten'], answer: 0 },
+    { q: 'Wie nennt Hagar Gott am Brunnen?', options: ['ein Gott, der mich sieht', 'ein Gott, der schläft', 'ein Gott, der weit weg wohnt'], answer: 0 },
     { q: 'Was tut Sara, als die Gäste ihr einen Sohn versprechen?', options: ['Sie lacht leise.', 'Sie weint.', 'Sie läuft weg.'], answer: 0 },
-    { q: 'Wie heißt der Sohn von Abraham und Sara?', options: ['Isaak', 'Lot', 'Eliezer'], answer: 0 },
+    { q: 'Wie viele gute Menschen reichen Gott, um Sodom zu verschonen?', options: ['zehn', 'fünfzig', 'hundert'], answer: 0 },
     { q: 'Wer sorgt für das Opfertier auf dem Berg?', options: ['Gott', 'Isaak', 'die Knechte'], answer: 0 }
   ]
 }

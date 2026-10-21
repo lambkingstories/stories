@@ -1,6 +1,6 @@
 /**
  * The small pure functions of the new games of "Abraham": the camel game (do the packs of a camel weigh the same on both sides, can they be spread so, which
- * pack is the next one to move) and the constellation game (which star of the model a star that was laid belongs to). The games only draw what these say;
+ * pack is the next one to move), the constellation game (which star of the model a star that was laid belongs to) and the focus slider. The games only draw what these say;
  * the tests use them directly.
  */
 import type { Clue } from '@/types/adventure'
@@ -226,3 +226,14 @@ export function cluesSolutions(blankets: string[], clues: Clue[]): string[][] {
   rec(blankets, [])
   return out
 }
+
+// ------------------------------------------------------------------ the focus slider
+
+/** How near the slider is to the right place: 1 at the place, 0 half the slider away (or more). */
+export const sharpness = (value: number, sharpAt: number): number => Math.max(0, 1 - Math.abs(value - sharpAt) / 50)
+
+/** The blur of the picture in pixels: none at the right place, growing to `max` on both sides. */
+export const blurAt = (value: number, sharpAt: number, max = 16): number => (1 - sharpness(value, sharpAt)) * max
+
+/** The slider is near enough to the right place for the picture to click into place (`tolerance` in percent of the length of the slider). */
+export const isSharp = (value: number, sharpAt: number, tolerance = 8): boolean => Math.abs(value - sharpAt) <= tolerance

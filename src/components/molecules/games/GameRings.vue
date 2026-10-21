@@ -2,8 +2,8 @@
 /**
  * The light through the rings: against the darkened picture lie rings inside each other round a hub with a golden star. Each ring has a gap at the top when it stands right; at the start
  * the rings are turned. The child turns a ring with a finger (drag round in a circle) or with the arrows next to it; each step is a twelfth of a turn. When a ring stands right its gap
- * glimmers and the beam of light grows from the hub outwards; when all stand right the light shines all the way through. Round 1: three rings, each alone. Round 2: four rings, joined in
- * pairs: turning the first of a pair turns the second the other way (a gear shows it). There is no mistake; "Tip" shows the ring to turn next (a tip), "Start again" puts the rings back (it
+ * glimmers and the beam of light grows from the hub outwards; when all stand right the light shines all the way through. Round 1: two rings, round 2: three rings, each alone (plan v3; a coupling of rings by `couple` is
+ * still possible in the data: turning the first of a pair turns the second the other way, a gear shows it). The beam is a picture or, without one, a gradient. There is no mistake; "Tip" shows the ring to turn next (a tip), "Start again" puts the rings back (it
  * counts like a tip). No clock. The turning is `rotateRing`, the shortest way `solveRings` in `utils/abrahamGames.ts`. From the keyboard: Tab chooses a ring, the arrow keys turn it.
  */
 import { computed, onBeforeUnmount, ref } from 'vue'
@@ -169,7 +169,8 @@ const ringLabel = (r: { i: number; right: boolean }) => t(r.right ? 'app.adventu
       p(class="rn-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
       div(ref="field" class="rn-field" role="group" :aria-label="t('app.adventure.ringsField', { n: aligned, total })" :style="{ backgroundImage: `url(${src(game.background)})` }")
         span(class="rn-beam" :style="beamStyle" aria-hidden="true")
-          GameImage(:src="game.beam" :ratio="260 / 520" colour="#ffe9a0")
+          GameImage(v-if="game.beam" :src="game.beam" :ratio="260 / 520" colour="#ffe9a0")
+          span(v-else class="rn-beam-grad")
         template(v-if="!between")
           span(
             v-for="r in rings"
@@ -256,6 +257,14 @@ const ringLabel = (r: { i: number; right: boolean }) => t(r.right ? 'app.adventu
   transition: transform 500ms ease, opacity 300ms ease
   pointer-events: none
   z-index: 1
+
+// the beam without a picture: a soft column of light that fades towards its tip
+.rn-beam-grad
+  display: block
+  width: 100%
+  aspect-ratio: 1 / 2
+  border-radius: 40% 40% 0 0
+  background: linear-gradient(to top, rgba(255, 233, 160, 0.95), rgba(255, 233, 160, 0))
 
 .rn-ring
   position: absolute
