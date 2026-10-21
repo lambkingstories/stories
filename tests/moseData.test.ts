@@ -22,7 +22,7 @@ const FORBIDDEN = /\b(Messer|Speer|Pfeil|Peitsche|Teufel|Hölle|erschlagen|erwü
 const QUIZ_STAGES = [1, 3, 8, 9, 14]
 
 describe('Mose: stories and questions', () => {
-  it('fifteen stages with 3 or 4 paragraphs of 90 to 145 words (plan v3) and the Bible passage under every one; no recording yet; the stage pictures are the ones of Josef (PLATZHALTER)', () => {
+  it('fifteen stages with 3 or 4 paragraphs of 90 to 145 words (plan v3) and the Bible passage under every one; the German recordings; the stage pictures are the ones of Josef (PLATZHALTER)', () => {
     expect(mose.id).toBe('mose')
     expect(mose.age).toBe('8-10')
     expect(mose.title).toBe('Mose')
@@ -58,7 +58,8 @@ describe('Mose: stories and questions', () => {
       expect(words / sentences, `words per sentence ${s.id}`).toBeGreaterThan(7)
       expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.audio, `no recording yet, the device voice reads: ${s.id}`).toBeUndefined()
+      expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/mose/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`)
+      expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
       expect(s.image, `stage ${s.id}`).toMatch(/^images\/abenteuer\/josef\/etappe-bild-\d\d(-v2)?\.webp$/)
     }
   })
@@ -389,7 +390,7 @@ describe('Mose: the lists for the recordings (NEUAUFNAHME-Mose.md) say exactly w
   const de = 'D:/Claude/Abenteuer-Mose/stories-mose-v3-de.json'
   const en = 'D:/Claude/Abenteuer-Mose/ENGLISCH/stories-mose-v3-en.json'
   // the lists lie outside the repository (they belong to the drafts); on another computer there is nothing to compare
-  it.runIf(existsSync(de) && existsSync(en))('German and English list (plan v3): fifteen entries, the same paragraphs as the data, no recording linked', () => {
+  it.runIf(existsSync(de) && existsSync(en))('German and English list (plan v3): fifteen entries, the same paragraphs as the data, the German recording linked', () => {
     const read = (f: string) => JSON.parse(readFileSync(f, 'utf-8')) as { n: number; text: string[]; audio: string }[]
     const overlay = englishTextsOf(mose) as any
     setAdventureLanguage('de')
@@ -401,7 +402,7 @@ describe('Mose: the lists for the recordings (NEUAUFNAHME-Mose.md) say exactly w
       expect(dl[i]!.n).toBe(s.id)
       expect(dl[i]!.text, `German list ${s.id}`).toEqual(s.text)
       expect(el[i]!.text, `English list ${s.id}`).toEqual(overlay.stages[i].text)
-      expect(s.audio).toBeUndefined()
+      expect(s.audio).toBe(`audio/abenteuer/mose/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`)
     })
   })
 })

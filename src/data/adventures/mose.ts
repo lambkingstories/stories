@@ -9,13 +9,14 @@
  *
  * STAND 21.10.2026 (Phase 2a, Daten und Spiele; Bilder Platzhalter): Die zehn Spieletappen haben ihr Spiel, die ernsten Etappen 1, 3, 8, 9 und 14 bleiben Quiz; die Etappenbilder sind noch die von Josef;
  * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit fünfzehn Stationen und dem Ziel (PLATZHALTER bis zum eigenen Panorama); Medaille und Geschenk sind ebenfalls die von Josef.
- * Vorlese-Aufnahmen gibt es noch nicht (`audio` fehlt): die App liest dann mit der Gerätestimme (Liste der Aufnahmen: D:/Claude/Abenteuer-Mose/NEUAUFNAHME-Mose.md).
+ * Deutsche Vorlese-Aufnahmen: geschichte-NN-v3.mp3 (Gemini, Stimme Achernar, 21.10.2026, nicht gehört); Englisch noch nicht, die englische App liest mit der Gerätestimme (Liste der Aufnahmen: D:/Claude/Abenteuer-Mose/NEUAUFNAHME-Mose.md).
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
 import type { BeatGame, CloudGame, DiffGame, FindGame, GlowGame, Journey, MannaGame, PackGame, VerseGame, WeaveGame, WordsGame } from '@/types/adventure'
 import { josef } from './josef'
 import { MOSE_PATH } from './mosePath'
 import { localize } from './localize'
+import { adventureLanguage } from '@/use/adventureLanguage'
 import { moseEn } from './en/mose.en'
 
 // PLATZHALTER bis zum eigenen Bild: die Etappenbilder von Josef (Ordner images/abenteuer/josef/); danach `images/abenteuer/mose/etappe-bild-NN.webp`
@@ -564,6 +565,12 @@ for (const st of mose.stages) {
   if (t.beat) t.beat.background = st.image
   if (t.manna) t.manna.background = st.image
   if (t.words) t.words.background = st.image
+}
+
+// the German recordings of the stories (voice Achernar, text version 3 = files "-v3"); there are no English ones yet, so the English app reads with the voice of the device
+for (const s of mose.stages) {
+  const file = `audio/abenteuer/mose/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`
+  Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 
 // the English texts (title, stories, questions, hints) lie over the German ones; the screens show them when the app is English
