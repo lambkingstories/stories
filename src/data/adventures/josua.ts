@@ -154,18 +154,29 @@ export const josua: Journey = {
   title: 'Josua',
   subtitle: 'Mut für das neue Land',
   age: '8-10',
-  downloadMb: 16, // PLATZHALTER: Größe mit den Bildern von Josef; wird mit den eigenen Bildern neu gemessen (der Test sagt die echte Größe)
+  downloadMb: 11, // etwa 10 bis 11 MB gerechnet am 21.10.2026 mit der neuen Karte v3 (vier Stücke zusammen 5,5 MB, ohne die noch fehlenden Bilder und Aufnahmen)
   medal: 'images/abenteuer/josua/medaille-v2.webp', // Die Posaune von Jericho (Widderhorn vor der Stadtmauer, Goldring)
   // Geschenk-Ausmalbild: Die Posaunen von Jericho (sieben Priester mit Widderhörnern vor der ganzen Stadtmauer); PLATZHALTER bis eigenes Bild
   gift: { title: 'Die Posaunen von Jericho', image: josef.gift.image },
-  // PLATZHALTER bis eigenes Bild: die Karte von Josef (vier Stücke, 9824 × 1632 px) mit den ersten zehn Stationen und dem Perlenweg dorthin; Station 11 von Josef ist das Ziel (Prüfung)
+  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v3 mit zehn Orten und dem Ziel) mit Stationen und Perlenweg aus josuaPath.ts
   map: {
-    images: josef.map.images,
+    images: [1, 2, 3, 4].map((n) => `images/abenteuer/josua/karte-pano-v3-${n}.webp`),
     ring: josef.map.ring,
-    aspect: josef.map.aspect,
-    widthPx: josef.map.widthPx,
-    stages: josef.map.stages.slice(0, 10),
-    exam: josef.map.stages[10]!,
+    aspect: 9908 / 1648,
+    widthPx: 9908,
+    stages: [
+      { x: 0.0888, y: 0.6493, d: 0.0339 },
+      { x: 0.1615, y: 0.6311, d: 0.0339 },
+      { x: 0.2321, y: 0.6371, d: 0.0339 },
+      { x: 0.3028, y: 0.6432, d: 0.0339 },
+      { x: 0.4289, y: 0.6432, d: 0.0339 },
+      { x: 0.5147, y: 0.6311, d: 0.0339 },
+      { x: 0.5904, y: 0.6432, d: 0.0339 },
+      { x: 0.7115, y: 0.6432, d: 0.0339 },
+      { x: 0.8478, y: 0.6432, d: 0.0339 },
+      { x: 0.9174, y: 0.6462, d: 0.0339 }
+    ],
+    exam: { x: 0.983, y: 0.6462, d: 0.0339 },
     path: JOSUA_PATH
   },
   stages: [

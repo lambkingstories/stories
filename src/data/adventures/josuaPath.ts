@@ -1,9 +1,29 @@
 /**
- * The beads of the dotted way on the map of Joshua: one list per stretch between two stations (the last one leads to the exam).
- * PLACEHOLDER until the own painted map is made (panorama 9908 x 1648, 10 stations + exam): for now the way is the one of Josef between its first eleven stations
- * (the ten stations of Joshua are the first ten of Josef's map, the exam is its eleventh), so the rules of the ways hold (into every medal from the left, out of it on the right,
- * curved, at least 10 beads between two medals). When the own map is there, this file is replaced by the generated list (`panorama_weg.py ... --ausgabe josuaPath.ts`).
+ * The beads of the dotted way on the one-piece map of Joshua: one list per stretch between two stations (the last one leads to the exam).
+ * [x, y] is the middle of a bead as a share of the whole picture (width 9908, height 1648), counted from the top left.
+ * Rules (Anton): the way comes into every medal from the LEFT and leaves it on the RIGHT (so the name and the button under the medal stay free),
+ * it is always a smooth curve (never straight), at least 10 beads lie between two medals, nothing lies in the lowest 20 % (y > 1318 px).
  */
-import { JOSEF_PATH } from './josefPath'
+export const JOSUA_PATH: [number, number][][] = [
 
-export const JOSUA_PATH: [number, number][][] = JOSEF_PATH.slice(0, 10)
+  // station 1 to 2
+  [[0.1084, 0.6493], [0.1104, 0.625], [0.1129, 0.6027], [0.1164, 0.5859], [0.1207, 0.5791], [0.1252, 0.582], [0.1294, 0.5909], [0.1335, 0.6025], [0.1374, 0.6156], [0.1413, 0.6291]],
+  // station 2 to 3
+  [[0.1811, 0.6311], [0.1836, 0.6535], [0.1864, 0.6747], [0.1896, 0.6933], [0.1937, 0.7047], [0.1981, 0.7048], [0.2022, 0.6939], [0.2059, 0.6784], [0.2092, 0.6598], [0.2122, 0.6396]],
+  // station 3 to 4
+  [[0.2517, 0.6371], [0.2547, 0.6171], [0.2581, 0.5993], [0.2618, 0.5841], [0.266, 0.5733], [0.2704, 0.5692], [0.2747, 0.5753], [0.2783, 0.5914], [0.2809, 0.6134], [0.2828, 0.638]],
+  // station 4 to 5
+  [[0.3224, 0.6432], [0.3266, 0.634], [0.3308, 0.6246], [0.3351, 0.6157], [0.3394, 0.6083], [0.3438, 0.6025], [0.3482, 0.598], [0.3527, 0.5951], [0.3572, 0.5941], [0.3617, 0.5948], [0.3662, 0.597], [0.3706, 0.6008], [0.3751, 0.6058], [0.3794, 0.6122], [0.3838, 0.6194], [0.3881, 0.6268], [0.3924, 0.634], [0.3968, 0.6399], [0.4013, 0.6438], [0.4058, 0.644]],
+  // station 5 to 6
+  [[0.4485, 0.6432], [0.453, 0.6472], [0.4574, 0.6511], [0.4619, 0.6555], [0.4663, 0.6605], [0.4707, 0.6664], [0.4751, 0.6642], [0.4793, 0.655], [0.4837, 0.6476], [0.488, 0.6411], [0.4924, 0.6349]],
+  // station 6 to 7
+  [[0.5343, 0.6311], [0.5387, 0.6356], [0.5429, 0.6464], [0.5469, 0.6588], [0.5509, 0.6706], [0.5551, 0.6799], [0.5596, 0.6833], [0.564, 0.6778], [0.5677, 0.6634], [0.5708, 0.6435]],
+  // station 7 to 8
+  [[0.61, 0.6432], [0.6144, 0.6364], [0.6187, 0.6293], [0.623, 0.6214], [0.6273, 0.6138], [0.6317, 0.6067], [0.6361, 0.6011], [0.6405, 0.5971], [0.645, 0.595], [0.6495, 0.5947], [0.654, 0.5959], [0.6585, 0.5985], [0.6629, 0.6021], [0.6674, 0.6068], [0.6718, 0.6123], [0.6762, 0.6182], [0.6805, 0.6248], [0.6849, 0.6318], [0.6892, 0.6389]],
+  // station 8 to 9
+  [[0.7311, 0.6432], [0.7354, 0.6351], [0.7397, 0.627], [0.744, 0.6192], [0.7484, 0.612], [0.7527, 0.6052], [0.7571, 0.5992], [0.7615, 0.5943], [0.766, 0.5905], [0.7705, 0.5882], [0.775, 0.5873], [0.7795, 0.5881], [0.7839, 0.5904], [0.7884, 0.5936], [0.7929, 0.5978], [0.7973, 0.6025], [0.8017, 0.6077], [0.8061, 0.6132], [0.8105, 0.6189], [0.8149, 0.6247], [0.8193, 0.6308], [0.8237, 0.6369], [0.8281, 0.643]],
+  // station 9 to 10
+  [[0.8674, 0.6432], [0.8703, 0.6639], [0.8734, 0.6834], [0.8769, 0.7002], [0.8809, 0.7128], [0.8853, 0.7178], [0.8896, 0.7104], [0.893, 0.6934], [0.8957, 0.6716], [0.8977, 0.6475]],
+  // station 10 to the exam
+  [[0.937, 0.6462], [0.9389, 0.6708], [0.941, 0.6946], [0.9436, 0.7167], [0.9469, 0.7354], [0.951, 0.7445], [0.9552, 0.7358], [0.9582, 0.7158], [0.9604, 0.6923], [0.9622, 0.6673]]
+]
