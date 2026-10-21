@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * "Lesen": the shelves. One row per series (the name on the left, "Alle" on the right); the books of the series stand on a
+ * "Lesen → Stories": the shelves (coloring books and printed store books are not here, they have their own areas). One row per series (the name on the left, "Alle" on the right); the books of the series stand on a
  * board and can be swiped sideways. A tap on a book opens it, a tap on the name or on "Alle" opens the whole series.
  * Publishers other than LambKing get their own shelf with the same look (a series of theirs is a row like any other).
  */
@@ -17,6 +17,8 @@ import useCatalogNames from '@/use/useCatalogNames'
 import type { ApiBook, Locale } from '@/types/apiBook'
 import { pickLocalizedImage } from '@/types/apiBook'
 import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
+import { booksOfArea } from '@/utils/readingAreas'
+import { goBackTo } from '@/utils/navBack'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
@@ -47,7 +49,8 @@ onBeforeUnmount(() => {
 })
 
 const lang = computed<Locale>(() => (locale.value === 'en' ? 'en' : 'de'))
-const allBooks = computed<ApiBook[]>(() => (apiBooks.state.all ?? []) as ApiBook[])
+// only the stories: coloring books are in "Malbücher", printed store books in "Books"
+const allBooks = computed<ApiBook[]>(() => booksOfArea((apiBooks.state.all ?? []) as ApiBook[], 'stories'))
 
 interface Shelf {
   seriesId: string
@@ -84,7 +87,8 @@ const shelves = computed<Shelf[]>(() => {
   for (const [sid, books] of groups) {
     const apiMeta = apiSeries.getById(sid)
     const legacyMeta = getSeries(sid)
-    const ofSeries = apiBooks.booksOfSeries(sid).length ? apiBooks.booksOfSeries(sid) : books
+    const inSeries = booksOfArea(apiBooks.booksOfSeries(sid), 'stories')
+    const ofSeries = inSeries.length ? inSeries : books
     const first = ofSeries[0]
     list.push({
       seriesId: sid,
@@ -123,6 +127,10 @@ function bookTitle(book: ApiBook): string {
   return book.localizations?.[lang.value]?.title || book.localizations?.de?.title || ''
 }
 
+function goBack() {
+  goBackTo(router, { name: 'app-read' })
+}
+
 function openSeries(seriesId: string) {
   void router.push({ name: 'app-series', params: { seriesId } })
 }
@@ -137,7 +145,10 @@ function openBook(bookId: string) {
     AppHeader
 
     main(class="read-body")
-      h1(class="read-title") {{ t('app.allBooks.title') }}
+      button(type="button" class="read-back lk-btn lk-btn--outline lk-btn--small" @click="goBack")
+        ZIconography(name="chevron-left" :size="20")
+        span {{ t('app.read.back') }}
+      h1(class="read-title") {{ t('app.read.storiesTitle') }}
       //- the question of the lamb is the search field: "Which book shall we read?" is typed over
       label(class="ask")
         LkCompanion(class="ask-lamb" pose="lesen" :size="64")
@@ -248,6 +259,15 @@ button
   display: flex
   flex-direction: column
   gap: 28px
+
+.read-back
+  align-self: flex-start
+  margin-bottom: -14px
+  gap: 4px
+  padding: 0 18px 0 10px
+
+  :deep(.z-icon-outline)
+    color: currentColor
 
 .read-title
   margin: 0

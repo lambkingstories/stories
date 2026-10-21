@@ -83,7 +83,7 @@ function openStore() {
 
 const bigButtons = computed(() => [
   { id: 'color', label: t('app.home.bigColor'), icon: 'brush' as const, route: 'app-coloring' },
-  { id: 'read', label: t('app.home.bigRead'), icon: 'series' as const, route: 'app-all-books' },
+  { id: 'read', label: t('app.home.bigRead'), icon: 'series' as const, route: 'app-read' },
   { id: 'adventure', label: t('app.home.bigAdventure'), icon: 'compass' as const, route: 'app-adventure' }
 ])
 

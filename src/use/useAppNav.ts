@@ -21,7 +21,10 @@ export interface AppNavItem {
 function routeToNav(name: string): AppNavId {
   if (name === 'app-main') return 'home'
   if (
-    name === 'app-all-books'
+    name === 'app-read'
+    || name === 'app-books'
+    || name === 'app-coloring-books'
+    || name === 'app-all-books'
     || name === 'app-book'
     || name === 'app-series'
     || name === 'app-all-new-books'
@@ -35,7 +38,7 @@ function routeToNav(name: string): AppNavId {
 
 const ROUTE_BY_NAV: Record<AppNavId, string> = {
   home: 'app-main',
-  series: 'app-all-books',
+  series: 'app-read',
   abenteuer: 'app-adventure',
   hoeren: 'app-hoeren',
   malen: 'app-coloring',

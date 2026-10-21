@@ -43,7 +43,7 @@ describe('the start page', () => {
       expect.stringContaining('Lesen'),
       expect.stringContaining('Abenteuer')
     ])
-    const routes = ['app-coloring', 'app-all-books', 'app-adventure']
+    const routes = ['app-coloring', 'app-read', 'app-adventure']
     for (let i = 0; i < big.length; i++) {
       push.mockClear()
       await big[i]!.trigger('click')

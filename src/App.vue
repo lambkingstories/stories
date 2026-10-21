@@ -49,6 +49,9 @@ const { navItems, activeNav, onNav } = useAppNav(t)
 // with the entering one.
 const NAV_ROUTES = new Set([
   'app-main',
+  'app-read',
+  'app-books',
+  'app-coloring-books',
   'app-all-books',
   'app-all-new-books',
   'app-series',

@@ -5,6 +5,9 @@ import useUser, { isWeb } from '@/use/useUser'
 
 // Lazy-load the secondary app routes as well — AppHomeView stays eager
 // because it's the landing route.
+const AppReadView = () => import('@/views/app/AppReadView.vue')
+const AppBooksView = () => import('@/views/app/AppBooksView.vue')
+const AppColoringBooksView = () => import('@/views/app/AppColoringBooksView.vue')
 const AppAllBooksView = () => import('@/views/app/AppAllBooksView.vue')
 const AppAllNewBooksView = () => import('@/views/app/AppAllNewBooksView.vue')
 const AppBookSeriesView = () => import('@/views/app/AppBookSeriesView.vue')
@@ -53,6 +56,10 @@ const routes: RouteRecordRaw[] = [
   { path: '/', name: 'main-menu', redirect: () => (welcomeSeen() ? '/app' : '/welcome') },
   { path: '/welcome', name: 'app-welcome', component: AppWelcomeView },
   { path: '/app', name: 'app-main', component: AppHomeView },
+  // "Lesen": the front door with three areas — Stories (all-books), Books (printed books of the store) and Malbücher
+  { path: '/app/read', name: 'app-read', component: AppReadView },
+  { path: '/app/books', name: 'app-books', component: AppBooksView },
+  { path: '/app/coloring-books', name: 'app-coloring-books', component: AppColoringBooksView },
   { path: '/app/all-books', name: 'app-all-books', component: AppAllBooksView },
   { path: '/app/new-books', name: 'app-all-new-books', component: AppAllNewBooksView },
   { path: '/app/series/:seriesId', name: 'app-series', component: AppBookSeriesView },
