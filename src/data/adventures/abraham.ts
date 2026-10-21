@@ -89,7 +89,7 @@ const SILBER: SilverGame = {
     { id: 'b-75y', image: `${G}silber/silber-stueck.webp`, value: 75 }
   ],
   rounds: [
-    { hint: 'Lege Silberstücke auf das Tuch: genau vierhundert. Die Summe hilft dir.', price: 400, pieces: ['a-200', 'a-100x', 'a-100y', 'a-50x', 'a-50y'], showSum: true },
+    { hint: 'Lege Silber auf das Tuch: genau vierhundert. Die Summe hilft dir.', price: 400, pieces: ['a-200', 'a-100x', 'a-100y', 'a-50x', 'a-50y'], showSum: true },
     { hint: 'Noch einmal vierhundert. Jetzt rechnest du selbst.', price: 400, pieces: ['b-150', 'b-100x', 'b-100y', 'b-75x', 'b-75y'], showSum: false }
   ]
 }
@@ -216,9 +216,9 @@ export const abraham: Journey = {
       title: 'Der Ruf',
       ref: '1. Mose 11,27–12,4',
       text: [
-        'Die Stadt Ur ist groß und alt. Ihre Häuser sind aus Lehmziegeln gebaut, und mitten in der Stadt ragt ein hoher Stufenturm in den Himmel. Hier wohnt Abram mit seiner Frau Sarai und seinem Neffen Lot. Ein Kind haben Abram und Sarai nicht.',
+        'Abram wohnt in der Stadt Ur, im Land der Chaldäer, mit seiner Frau Sarai und seinem Neffen Lot. Ein Kind haben Abram und Sarai nicht.',
         'Eines Tages spricht Gott zu Abram: „Zieh fort aus deinem Land und aus dem Haus deines Vaters. Geh in das Land, das ich dir zeigen will. Ich mache dich zu einem großen Volk und segne dich. Durch dich sollen alle Menschen gesegnet werden.“',
-        'Wohin Gott ihn führt, weiß Abram nicht. Aber er vertraut Gott. Er packt alles zusammen, was er besitzt. Fünfundsiebzig Jahre ist Abram alt, als er sich mit Sarai und Lot auf den Weg macht.'
+        'Wohin Gott ihn führt, weiß Abram nicht. Aber er vertraut Gott. Er packt alles zusammen, was er besitzt, und zieht mit Sarai und Lot los. Sein Vater Terach geht mit, bis nach Haran. Als Abram von dort weiterzieht, ist er fünfundsiebzig Jahre alt.'
       ],
       task: { kind: 'waage', hint: 'Lege die Pakete so in die Körbe, dass das Kamel gerade steht.', balance: WAAGE },
       questions: [
@@ -253,12 +253,12 @@ export const abraham: Journey = {
       text: [
         'Abram und Sarai sind alt geworden, und sie haben immer noch kein Kind. Das macht Abram traurig. Da spricht Gott zu ihm: „Fürchte dich nicht, Abram! Ich beschütze dich und will dich reich beschenken.“',
         '„Herr, was willst du mir schon geben?“, fragt Abram. „Ich habe keinen Sohn. Ein Knecht aus meinem Haus wird alles erben.“ „Nein“, sagt Gott, „dein eigener Sohn soll dein Erbe sein.“',
-        'Dann führt Gott ihn hinaus in die Nacht. „Sieh zum Himmel und zähle die Sterne, wenn du es kannst“, sagt er. „So viele Nachkommen sollst du haben.“ Abram schaut hinauf, doch es sind viel zu viele Sterne zum Zählen.',
-        'Abram glaubt Gott, und Gott sieht, dass Abram ihm vertraut. „Ich habe dich aus Ur geführt“, erinnert er ihn, „um dir dieses Land zu geben.“'
+        'Dann führt Gott ihn hinaus. „Sieh zum Himmel und zähle die Sterne, wenn du es kannst“, sagt er. „So viele Nachkommen sollst du haben.“ Abram schaut hinauf, doch es sind viel zu viele Sterne zum Zählen.',
+        'Abram glaubt Gott. Und Gott rechnet ihm das als Gerechtigkeit an: Weil Abram ihm vertraut, steht er richtig vor Gott. „Ich habe dich aus Ur geführt“, erinnert er ihn, „um dir dieses Land zu geben.“'
       ],
       task: { kind: 'sternbild', hint: 'Setze die Sterne so, wie du sie im Vorbild siehst.', constellation: STERNBILD },
       questions: [
-        { q: 'Was soll Abram in der Nacht zählen?', options: ['die Sterne', 'die Schafe', 'die Zelte'], answer: 0 },
+        { q: 'Was soll Abram zählen?', options: ['die Sterne', 'die Schafe', 'die Zelte'], answer: 0 },
         { q: 'Wie viele Nachkommen verspricht Gott Abram?', options: ['so viele wie Sterne am Himmel', 'nur einen', 'zwölf'], answer: 0 }
       ],
       soon: SOON
@@ -309,7 +309,7 @@ export const abraham: Journey = {
         'Dann stellt Abraham Brot, Milch und Fleisch vor die Gäste. „Wo ist Sara, deine Frau?“, fragen sie. „Im Zelt“, sagt er. Da sagt einer: „In einem Jahr komme ich wieder, dann hat Sara einen Sohn.“',
         'Sara steht hinter der Zelttür und hört es. Sie lacht leise: „Ich bin doch viel zu alt!“ Aber der Gast fragt: „Ist für Gott etwas zu schwer?“'
       ],
-      task: { kind: 'giessen', hint: 'Fülle den Krug am Brunnen und gieße das Wasser in die Schüsseln der Gäste.', water: GIESSEN },
+      task: { kind: 'giessen', hint: 'Hole Wasser und fülle die Schüsseln, damit sich die Gäste die Füße waschen können.', water: GIESSEN },
       questions: [
         { q: 'Was stellt Abraham den Gästen vor?', options: ['Brot, Milch und Fleisch', 'Fisch und Datteln', 'nur Wasser'], answer: 0 },
         { q: 'Was tut Sara, als sie das Versprechen hört?', options: ['Sie lacht leise.', 'Sie weint.', 'Sie singt.'], answer: 0 }
@@ -325,11 +325,11 @@ export const abraham: Journey = {
         'Die Männer stehen auf und gehen weiter, und Abraham begleitet sie ein Stück. Da sagt Gott: „Ich habe gehört, wie schlimm es in der Stadt Sodom zugeht. Ich will selbst nachsehen.“',
         'Abraham tritt vor Gott und fragt mutig: „Willst du die guten Menschen mit den bösen bestrafen? Vielleicht gibt es fünfzig gute Menschen in der Stadt.“ „Dann verschone ich die ganze Stadt um der fünfzig willen“, sagt Gott.',
         'Abraham fragt noch einmal, ganz bescheiden: „Und wenn es nur vierzig sind? Oder dreißig? Oder zwanzig?“ Jedes Mal antwortet Gott: „Auch ihretwegen verschone ich die Stadt.“ Zuletzt fragt Abraham: „Und wenn es nur zehn sind?“ „Auch um der zehn willen“, sagt Gott.',
-        'Dann geht Gott weg, und Abraham kehrt heim. Gott hat ihm zugehört, und später denkt er an Abraham und bringt Lot in Sicherheit.'
+        'Dann geht Gott weg, und Abraham kehrt heim. Später aber kommt Gottes Gericht über Sodom. Doch Gott denkt an Abraham und bringt Lot in Sicherheit.'
       ],
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
-        { q: 'Wie viele gute Menschen reichen Gott zuletzt, um die Stadt zu verschonen?', options: ['zehn', 'fünfzig', 'hundert'], answer: 0 },
+        { q: 'Um wie viele Gerechte bittet Abraham zuletzt?', options: ['zehn', 'fünfzig', 'hundert'], answer: 0 },
         { q: 'Wen bringt Gott in Sicherheit?', options: ['Lot', 'Hagar', 'Isaak'], answer: 0 }
       ],
       soon: SOON
@@ -343,7 +343,7 @@ export const abraham: Journey = {
         'Ein Jahr vergeht. Dann geschieht, was Gott versprochen hat: Sara bekommt einen Sohn, und Abraham ist hundert Jahre alt. Er nennt das Kind Isaak, so wie Gott es gesagt hat.',
         'Isaak bedeutet: Er lacht. Besser kann kein Name passen, denn Sara hält ihr Baby im Arm und strahlt.',
         '„Gott hat mir ein Lachen geschenkt“, sagt sie. „Alle, die davon hören, werden mit mir lachen. Wer hätte gedacht, dass ich noch ein Kind bekomme? Und jetzt habe ich Abraham einen Sohn geboren!“',
-        'Nun lacht Sara, und Abraham lacht auch. Sie haben so lange gewartet, und Gott hat sein Wort gehalten.'
+        'Nun lacht Sara vor Freude. Sie haben so lange gewartet, und Gott hat sein Wort gehalten.'
       ],
       task: { kind: 'puzzle', hint: 'Setze das Familienbild zusammen.', puzzle: { image: `${G}puzzle/familie.webp`, cols: 2, rows: 3 } },
       questions: [
@@ -359,9 +359,9 @@ export const abraham: Journey = {
       ref: '1. Mose 22,1–19',
       text: [
         'Isaak ist ein Junge geworden. Da will Gott sehen, ob Abraham ihm ganz vertraut: „Nimm Isaak, deinen Sohn, den du liebst, und geh mit ihm in das Land Morija. Dort sollst du ihn mir auf einem Berg opfern.“',
-        'Am Morgen lädt Abraham Holz auf seinen Esel und geht mit Isaak und zwei Knechten los. Nach drei Tagen sieht er den Berg. „Bleibt hier“, sagt er zu den Knechten. „Der Junge und ich gehen hinauf und beten, dann kommen wir zurück.“',
+        'Am Morgen lädt Abraham Holz auf seinen Esel und geht mit Isaak und zwei Knechten los. Am dritten Tag sieht er den Berg. „Bleibt hier“, sagt er. „Der Junge und ich gehen hinauf und beten, dann kommen wir zurück.“',
         'Isaak trägt das Holz. „Vater, wo ist das Opfertier?“, fragt er. „Mein Sohn“, sagt Abraham, „Gott wird selbst dafür sorgen.“',
-        'Oben ruft eine Stimme vom Himmel: „Abraham! Tu dem Jungen nichts! Jetzt weiß ich, dass du Gott vertraust.“ Da sieht Abraham einen Widder im Gebüsch und bringt ihn an Isaaks Stelle. Isaak ist gerettet. Und Gott verspricht: „Durch deine Nachkommen sollen alle Völker gesegnet werden.“'
+        'Oben ruft eine Stimme vom Himmel: „Abraham! Tu dem Jungen nichts! Jetzt weiß ich, dass du Gott ehrst und gehorchst.“ Da sieht Abraham einen Widder im Gebüsch und bringt ihn an Isaaks Stelle. Isaak ist gerettet. Und Gott verspricht: „Durch deine Nachkommen sollen alle Völker gesegnet werden.“'
       ],
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
@@ -377,11 +377,11 @@ export const abraham: Journey = {
       ref: '1. Mose 23',
       text: [
         'Sara ist gestorben, und Abraham weint um sie. Dann steht er auf und geht zu den Männern der Stadt Hebron.',
-        '„Ich bin fremd bei euch und besitze kein Stück Land“, sagt er. „Gebt mir einen Platz, wo ich Sara begraben kann.“ Die Männer antworten freundlich: „Du bist ein von Gott gesegneter Mann. Begrabe deine Frau in unserem schönsten Grab.“',
-        'Abraham verneigt sich und bittet um die Höhle Machpela am Rand eines Feldes. Sie gehört Ephron, und der will sie ihm schenken. Aber Abraham sagt: „Nein, ich will sie bezahlen.“ Vor allen Zeugen wiegt er vierhundert Silberstücke ab.',
-        'Nun gehört Abraham ein Stück Land in Kanaan: Feld, Bäume und Höhle. Dort begräbt er Sara. Es ist der erste Platz im versprochenen Land, der ihm gehört.'
+        '„Ich bin fremd bei euch und besitze kein Stück Land“, sagt er. „Gebt mir einen Platz, wo ich Sara begraben kann.“ Die Männer antworten freundlich: „Du bist ein Fürst Gottes unter uns. Begrabe deine Frau in unserem schönsten Grab.“',
+        'Abraham verneigt sich und bittet um die Höhle Machpela am Rand eines Feldes. Sie gehört Ephron, und der will sie ihm schenken. Aber Abraham sagt: „Nein, ich will sie bezahlen.“ Vor allen Zeugen wiegt er vierhundert Lot Silber ab, so wie man damals bezahlt.',
+        'Nun gehört Abraham ein Stück Land in Kanaan: Feld, Bäume und Höhle. Dort begräbt er Sara. Das Grab gehört nun Abraham und seiner Familie.'
       ],
-      task: { kind: 'silber', hint: 'Lege Silberstücke auf das Tuch: genau vierhundert.', silver: SILBER },
+      task: { kind: 'silber', hint: 'Lege Silber auf das Tuch: genau vierhundert.', silver: SILBER },
       questions: [
         { q: 'Wie bekommt Abraham die Höhle für Saras Grab?', options: ['Er bezahlt sie mit Silber.', 'Er bekommt sie geschenkt.', 'Er tauscht sie gegen Schafe.'], answer: 0 },
         { q: 'Wem gehört die Höhle zuerst?', options: ['Ephron', 'Lot', 'Isaak'], answer: 0 }
@@ -396,8 +396,8 @@ export const abraham: Journey = {
       text: [
         'Abraham ist alt, und Isaak ist erwachsen. Isaak soll eine Frau aus Abrahams Verwandtschaft bekommen. Darum ruft Abraham seinen ältesten Knecht: „Zieh in das Land meiner Familie. Gott wird dir den Weg zeigen.“',
         'Der Knecht reist mit zehn Kamelen. Am Abend kommt er an einen Brunnen vor der Stadt und lässt die Tiere niederknien. Er betet: „Gott, hilf mir! Ich bitte ein Mädchen um Wasser. Wenn es sagt: Trink, ich gebe auch deinen Kamelen zu trinken – dann ist sie die Richtige.“',
-        'Da kommt Rebekka mit einem Krug auf der Schulter. Sie gibt dem Fremden zu trinken und sagt: „Ich schöpfe auch für deine Kamele, bis sie genug haben.“ Sie läuft hin und her zum Brunnen. Der Knecht schaut ihr still zu.',
-        'Er hat noch nicht zu Ende gebetet, da ist Gottes Antwort schon da. Der Knecht verneigt sich und dankt Gott.'
+        'Da kommt Rebekka mit einem Krug auf der Schulter. Sie gibt dem Fremden zu trinken und sagt: „Ich schöpfe auch für deine Kamele, bis sie genug haben.“ Der Knecht schaut ihr still zu.',
+        'Dann fragt er sie: „Wessen Tochter bist du?“ „Bethuels Tochter, des Sohnes Nahors“, sagt sie. Nahor ist Abrahams Bruder! Da verneigt sich der Knecht und dankt Gott.'
       ],
       task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
       questions: [
@@ -430,14 +430,17 @@ export const abraham: Journey = {
     { q: 'Wer darf zuerst auswählen, als sich Abram und Lot trennen?', options: ['Lot', 'Abram', 'die Hirten'], answer: 0 },
     { q: 'Wie nennt Hagar Gott am Brunnen?', options: ['ein Gott, der mich sieht', 'ein Gott, der schläft', 'ein Gott, der weit weg wohnt'], answer: 0 },
     { q: 'Was tut Sara, als die Gäste ihr einen Sohn versprechen?', options: ['Sie lacht leise.', 'Sie weint.', 'Sie läuft weg.'], answer: 0 },
-    { q: 'Wie viele gute Menschen reichen Gott, um Sodom zu verschonen?', options: ['zehn', 'fünfzig', 'hundert'], answer: 0 },
+    { q: 'Um wie viele Gerechte bittet Abraham für Sodom zuletzt?', options: ['zehn', 'fünfzig', 'hundert'], answer: 0 },
     { q: 'Wer sorgt für das Opfertier auf dem Berg?', options: ['Gott', 'Isaak', 'die Knechte'], answer: 0 }
   ]
 }
 
-// the German recordings of the stories (voice Achernar, text version 3 = files "-v4"); there are no English ones yet, so the English app reads with the voice of the device
+// the German recordings of the stories (voice Achernar, text version 3 = files "-v4"); there are no English ones yet, so the English app reads with the voice of the device.
+// NEW RECORDING NEEDED (Bible check of 21.10.2026, see D:/Claude/Abenteuer-Abraham/NEUAUFNAHME-BIBELTREUE-2026-10-21.md): the texts of these stages changed, so the old recording is not played
+// (the app reads with the voice of the device) until the new one is made; then delete the number from this list and use the new file name.
+const NEW_RECORDING = [1, 3, 7, 8, 9, 10, 11]
 for (const s of abraham.stages) {
-  const file = `audio/abenteuer/abraham/geschichte-${String(s.id).padStart(2, '0')}-v4.mp3`
+  const file = NEW_RECORDING.includes(s.id) ? undefined : `audio/abenteuer/abraham/geschichte-${String(s.id).padStart(2, '0')}-v4.mp3`
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 

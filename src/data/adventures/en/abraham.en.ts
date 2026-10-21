@@ -15,9 +15,9 @@ export const abrahamEn: TextOverlay<Journey> = {
       title: 'The Call',
       ref: 'Genesis 11:27–12:4',
       text: [
-        'The city of Ur is big and old. Its houses are built of mud bricks, and in the middle of the city a tall stepped tower rises into the sky. Abram lives here with his wife Sarai and his nephew Lot. Abram and Sarai have no child.',
+        'Abram lives in the city of Ur, in the land of the Chaldeans, with his wife Sarai and his nephew Lot. Abram and Sarai have no child.',
         'One day God speaks to Abram: “Leave your country and your father’s house. Go to the land that I will show you. I will make you a great nation and bless you. Through you all people will be blessed.”',
-        'Where God is leading him, Abram does not know. But he trusts God. He packs up everything he owns. Abram is seventy-five years old when he sets out with Sarai and Lot.'
+        'Where God is leading him, Abram does not know. But he trusts God. He packs up everything he owns and sets out with Sarai and Lot. His father Terah goes with them as far as Haran. Abram is seventy-five years old when he leaves Haran.'
       ],
       task: { hint: 'Put the packs in the baskets so that the camel stands straight.', balance: { packs: [{ label: 'small sack' }, { label: 'water skin' }, { label: 'water skin' }, { label: 'water skin' }, { label: 'big sack' }], rounds: [{ hint: 'Round 1: Spread the three packs over both sides.' }, { hint: 'Round 2: Now there are more and heavier packs.' }] } },
       questions: [
@@ -46,12 +46,12 @@ export const abrahamEn: TextOverlay<Journey> = {
       text: [
         'Abram and Sarai have grown old, and they still have no child. That makes Abram sad. Then God speaks to him, “Do not be afraid, Abram! I will protect you and give you a great reward.”',
         '“Lord, what can you give me?” asks Abram. “I have no son. A servant of my household will inherit everything.” “No,” says God, “your own son will be your heir.”',
-        'Then God leads him outside into the night. “Look up at the sky and count the stars, if you can,” he says. “That is how many descendants you will have.” Abram looks up, but there are far too many stars to count.',
-        'Abram believes God, and God sees that Abram trusts him. “I brought you out of Ur,” he reminds him, “to give you this land.”'
+        'Then God leads him outside. “Look up at the sky and count the stars, if you can,” he says. “That is how many descendants you will have.” Abram looks up, but there are far too many stars to count.',
+        'Abram believes God. And God counts it to him as righteousness: because Abram trusts him, he stands right before God. “I brought you out of Ur,” he reminds him, “to give you this land.”'
       ],
       task: { hint: 'Place the stars the way you see them in the model.', constellation: { rounds: [{ hint: 'Round 1: The model stays visible: four stars.' }, { hint: 'Round 2: Look closely: The model disappears. Six stars.' }] } },
       questions: [
-        { q: 'What is Abram to count in the night?', options: ['the stars', 'the sheep', 'the tents'] },
+        { q: 'What is Abram to count?', options: ['the stars', 'the sheep', 'the tents'] },
         { q: 'How many descendants does God promise Abram?', options: ['as many as the stars in the sky', 'only one', 'twelve'] }
       ]
     },
@@ -93,7 +93,7 @@ export const abrahamEn: TextOverlay<Journey> = {
         'Then Abraham sets bread, milk, and meat in front of the guests. “Where is Sarah, your wife?” they ask. “In the tent,” he says. Then one of them says, “In a year I will come back, and Sarah will have a son.”',
         'Sarah is standing behind the tent door and hears it. She laughs quietly, “I am much too old!” But the guest asks, “Is anything too hard for God?”'
       ],
-      task: { hint: 'Fill the jug at the well and pour the water into the guests\' bowls.', water: { plants: [{ label: 'Bowl for the first guest' }, { label: 'Bowl for the second guest' }, { label: 'Bowl for the third guest' }, { label: 'Deep bowl for the first guest' }, { label: 'Deep bowl for the second guest' }], rounds: [{ hint: 'Round 1: Each bowl needs one jug.' }, { hint: 'Round 2: The deep bowls need two jugs.' }] } },
+      task: { hint: 'Fetch water and fill the bowls so that the guests can wash their feet.', water: { plants: [{ label: 'Bowl for the first guest' }, { label: 'Bowl for the second guest' }, { label: 'Bowl for the third guest' }, { label: 'Deep bowl for the first guest' }, { label: 'Deep bowl for the second guest' }], rounds: [{ hint: 'Round 1: Each bowl needs one jug.' }, { hint: 'Round 2: The deep bowls need two jugs.' }] } },
       questions: [
         { q: 'What does Abraham set before the guests?', options: ['bread, milk, and meat', 'fish and dates', 'only water'] },
         { q: 'What does Sarah do when she hears the promise?', options: ['She laughs quietly.', 'She cries.', 'She sings.'] }
@@ -106,11 +106,11 @@ export const abrahamEn: TextOverlay<Journey> = {
         'The men get up and go on, and Abraham walks with them a little way. Then God says, “I have heard how bad things are in the city of Sodom. I will go and see for myself.”',
         'Abraham steps up to God and asks boldly, “Will you punish the good people along with the wicked? Perhaps there are fifty good people in the city.” “Then I will spare the whole city for the sake of the fifty,” says God.',
         'Abraham asks once more, very humbly, “And if there are only forty? Or thirty? Or twenty?” Each time God answers, “I will spare the city for their sake, too.” At last Abraham asks, “And if there are only ten?” “Even for the sake of ten,” says God.',
-        'Then God goes away, and Abraham returns home. God has listened to him, and later God remembers Abraham and brings Lot to safety.'
+        'Then God goes away, and Abraham returns home. Later, however, God’s judgment comes over Sodom. But God remembers Abraham and brings Lot to safety.'
       ],
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
-        { q: 'How many good people are enough for God in the end to spare the city?', options: ['ten', 'fifty', 'a hundred'] },
+        { q: 'For how many righteous people does Abraham plead in the end?', options: ['ten', 'fifty', 'a hundred'] },
         { q: 'Whom does God bring to safety?', options: ['Lot', 'Hagar', 'Isaac'] }
       ]
     },
@@ -121,7 +121,7 @@ export const abrahamEn: TextOverlay<Journey> = {
         'A year goes by. Then what God promised happens: Sarah has a son, and Abraham is one hundred years old. He names the child Isaac, just as God told him.',
         'Isaac means: he laughs. No name could fit better, because Sarah holds her baby in her arms and beams.',
         '“God has given me laughter,” she says. “Everyone who hears about it will laugh with me. Who would have thought that I would have a child? And now I have borne Abraham a son!”',
-        'Now Sarah laughs, and Abraham laughs, too. They have waited so long, and God has kept his word.'
+        'Now Sarah laughs for joy. They have waited so long, and God has kept his word.'
       ],
       task: { hint: 'Put the family picture together.' },
       questions: [
@@ -134,9 +134,9 @@ export const abrahamEn: TextOverlay<Journey> = {
       ref: 'Genesis 22:1–19',
       text: [
         'Isaac has grown into a boy. Then God wants to see whether Abraham trusts him completely: “Take Isaac, your son, whom you love, and go with him to the land of Moriah. There, on a mountain, you are to offer him to me.”',
-        'In the morning Abraham loads wood onto his donkey and sets out with Isaac and two servants. After three days he sees the mountain. “Stay here,” he says to the servants. “The boy and I will go up and pray, and then we will come back.”',
+        'In the morning Abraham loads wood onto his donkey and sets out with Isaac and two servants. On the third day he sees the mountain. “Stay here,” he says to the servants. “The boy and I will go up and pray, and then we will come back.”',
         'Isaac carries the wood. “Father, where is the animal for the offering?” he asks. “My son,” says Abraham, “God himself will provide it.”',
-        'At the top a voice calls from heaven, “Abraham! Do not harm the boy! Now I know that you trust God.” Abraham sees a ram in a thicket and offers it in Isaac’s place. Isaac is safe. And God promises, “Through your descendants all nations will be blessed.”'
+        'At the top a voice calls from heaven, “Abraham! Do not harm the boy! Now I know that you honor God and obey him.” Abraham sees a ram in a thicket and offers it in Isaac’s place. Isaac is safe. And God promises, “Through your descendants all nations will be blessed.”'
       ],
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
@@ -149,11 +149,11 @@ export const abrahamEn: TextOverlay<Journey> = {
       ref: 'Genesis 23',
       text: [
         'Sarah has died, and Abraham weeps for her. Then he gets up and goes to the men of the city of Hebron.',
-        '“I am a stranger among you and own no piece of land,” he says. “Give me a place where I can bury Sarah.” The men answer kindly, “You are a man blessed by God. Bury your wife in our finest grave.”',
-        'Abraham bows and asks for the cave of Machpelah at the edge of a field. It belongs to Ephron, and he wants to give it to him as a gift. But Abraham says, “No, I want to pay for it.” In front of all the witnesses he weighs out four hundred pieces of silver.',
-        'Now Abraham owns a piece of land in Canaan: a field, trees, and a cave. There he buries Sarah. It is the first place in the promised land that belongs to him.'
+        '“I am a stranger among you and own no piece of land,” he says. “Give me a place where I can bury Sarah.” The men answer kindly, “You are a prince of God among us. Bury your wife in our finest grave.”',
+        'Abraham bows and asks for the cave of Machpelah at the edge of a field. It belongs to Ephron, and he wants to give it to him as a gift. But Abraham says, “No, I want to pay for it.” In front of all the witnesses he weighs out four hundred shekels of silver, the way people paid in those days.',
+        'Now Abraham owns a piece of land in Canaan: a field, trees, and a cave. There he buries Sarah. The grave now belongs to Abraham and his family.'
       ],
-      task: { hint: 'Lay pieces of silver on the cloth: exactly four hundred.', silver: { rounds: [{ hint: 'Lay pieces of silver on the cloth: exactly four hundred. The sum helps you.' }, { hint: 'Four hundred once more. Now you reckon it yourself.' }] } },
+      task: { hint: 'Lay silver on the cloth: exactly four hundred.', silver: { rounds: [{ hint: 'Lay silver on the cloth: exactly four hundred. The sum helps you.' }, { hint: 'Four hundred once more. Now you reckon it yourself.' }] } },
       questions: [
         { q: 'How does Abraham get the cave for Sarah’s grave?', options: ['He pays for it with silver.', 'He is given it as a gift.', 'He trades it for sheep.'] },
         { q: 'Who owns the cave at first?', options: ['Ephron', 'Lot', 'Isaac'] }
@@ -165,8 +165,8 @@ export const abrahamEn: TextOverlay<Journey> = {
       text: [
         'Abraham is old, and Isaac is grown up. Isaac is to have a wife from Abraham’s own relatives. So Abraham calls his oldest servant: “Go to the land of my family. God will show you the way.”',
         'The servant travels with ten camels. In the evening he comes to a well outside the town and lets the animals kneel down. He prays, “God, help me! I will ask a girl for water. If she says, ‘Drink, and I will give your camels water, too,’ then she is the right one.”',
-        'Then Rebekah comes with a jar on her shoulder. She gives the stranger a drink and says, “I will draw water for your camels, too, until they have had enough.” She hurries back and forth to the well. The servant watches her quietly.',
-        'He has not even finished praying when God’s answer is already there. The servant bows and thanks God.'
+        'Then Rebekah comes with a jar on her shoulder. She gives the stranger a drink and says, “I will draw water for your camels, too, until they have had enough.” The servant watches her quietly.',
+        'Then he asks her, “Whose daughter are you?” “Bethuel’s daughter, the son of Nahor,” she says. Nahor is Abraham’s brother! Then the servant bows and thanks God.'
       ],
       task: { hint: 'Listen carefully and answer the questions.' },
       questions: [
@@ -195,7 +195,7 @@ export const abrahamEn: TextOverlay<Journey> = {
     { q: 'Who gets to choose first when Abram and Lot part?', options: ['Lot', 'Abram', 'the shepherds'] },
     { q: 'What does Hagar call God at the well?', options: ['a God who sees me', 'a God who sleeps', 'a God who lives far away'] },
     { q: 'What does Sarah do when the guests promise her a son?', options: ['She laughs quietly.', 'She cries.', 'She runs away.'] },
-    { q: 'How many good people are enough for God to spare Sodom?', options: ['ten', 'fifty', 'a hundred'] },
+    { q: 'For how many righteous people does Abraham plead for Sodom in the end?', options: ['ten', 'fifty', 'a hundred'] },
     { q: 'Who provides the animal for the offering on the mountain?', options: ['God', 'Isaac', 'the servants'] }
   ]
 }
