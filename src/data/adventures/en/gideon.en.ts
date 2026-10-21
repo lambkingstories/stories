@@ -29,12 +29,12 @@ export const gideonEn: TextOverlay<Journey> = {
     },
     {
       title: 'The Midianites Come',
-      ref: 'Judges 6:1–6',
+      ref: 'Judges 6:1–10',
       text: [
         'Again the Israelites forget God. For seven years the Midianites are stronger than they are.',
         'Every year, when the grain is ripe, they come with their tents and their camels. They are as many as locusts, and nobody can count their camels.',
         'They eat the fields bare and leave the Israelites nothing to eat. Not a stalk is left on the fields to harvest.',
-        'The Israelites hide in caves and clefts of the rocks, and there they also hide the little that is left to them. They have become poor and are afraid. Then they cry out to God for help.'
+        'The Israelites hide in caves and clefts of the rocks and build themselves strongholds in the mountains. They have become poor and are afraid. Then they cry out to God for help. God sends them a prophet, “This is what God says: I led you out of Egypt, but you did not listen to my voice.”'
       ],
       task: { hint: 'Push the sacks into the niches of the cave.', cave: { rounds: [{ hint: 'Push the sacks into the glowing niches. You can only push, not pull.' }, { hint: 'Now three sacks. Think before you push.' }] } },
       questions: [
@@ -48,8 +48,8 @@ export const gideonEn: TextOverlay<Journey> = {
       text: [
         'In Ophrah stands a great oak. Nearby, in a winepress, a man named Gideon is secretly threshing wheat. A winepress is a basin in the rock where grapes are usually pressed. Here no Midianite sees him.',
         'Then an angel of God sits down under the oak. “God is with you, you mighty warrior!” he says to Gideon.',
-        'Gideon is astonished. “I am the smallest in my family,” he says, “and my family is the least.”',
-        '“I will be with you,” answers God. “Go, I have sent you to save my people.”'
+        'Gideon answers sadly, “If God is with us, why has all this happened to us? Where are the wonders our fathers told us about? God has left us.” But God says, “Go in this strength of yours and save Israel. I have sent you.”',
+        '“How can I do that?” asks Gideon. “I am the smallest in my family, and my family is the least.” “I will be with you,” answers God.'
       ],
       task: { hint: 'Set the wind so that the chaff blows away.', winnow: { rounds: [{ hint: 'Set the wind. The light chaff should fly away, the heavy grains should stay.' }, { hint: 'Now the right wind is narrower. Take care of the grains.' }] } },
       questions: [
@@ -122,7 +122,7 @@ export const gideonEn: TextOverlay<Journey> = {
       ref: 'Judges 7:4–8',
       text: [
         '“Lead the men down to the water,” God says to Gideon. “There I will test them for you.” Gideon leads them down to the brook.',
-        'Most of the men kneel down and drink. But a small group scoops up the water with their hands and brings it to their mouths.',
+        'Most of the men kneel down and drink. But a small group laps the water out of their hands, the way a dog laps, and brings it to their mouths.',
         '“With these three hundred men I will save you,” says God. “The others are to go home.”',
         'Gideon sends all the others home. Only the three hundred he keeps with him, and they take supplies and their trumpets along. Down in the valley lies the huge camp of the enemies.'
       ],
@@ -167,7 +167,7 @@ export const gideonEn: TextOverlay<Journey> = {
       ref: 'Judges 7:24 to 8:3',
       text: [
         'Gideon sends messengers to Ephraim, “Come down and take the fords of the Jordan, so that the enemies cannot cross!” A ford is a shallow place where one can walk through a river.',
-        'The men of Ephraim come and take the fords. Later, though, they come to Gideon angrily, “Why did you not call us when you went out against the enemies?” They quarrel fiercely with him.',
+        'The men of Ephraim come, take the fords, and catch two princes of the enemies, Oreb and Zeeb. Later, though, they come to Gideon angrily, “Why did you not call us when you went out against the enemies?” They quarrel fiercely with him.',
         'Gideon stays calm. “What have I done compared with you?” he says. “God has given the princes of the enemies into your hands. How could I do what you have done?”',
         'When Gideon speaks so kindly, their anger fades.'
       ],
@@ -179,12 +179,12 @@ export const gideonEn: TextOverlay<Journey> = {
     },
     {
       title: 'God Shall Be Your Lord',
-      ref: 'Judges 8:22–23, 28',
+      ref: 'Judges 8:22–28, 33–35',
       text: [
         'After the victory the Israelites come to Gideon. “Be our ruler,” they say, “you and your son and your grandson. You have saved us from the hand of the enemies.”',
         'Gideon shakes his head. “I will not be your lord,” he says, “and my son shall not be your lord either. God shall be your Lord.”',
-        'The enemies never lift up their heads again. The land is quiet for forty years, as long as Gideon lives.',
-        'Gideon is a man with faults. Later he has a priestly garment made of gold, and many Israelites worship it. And yet God was with him, as he had promised, “I will be with you.”'
+        'Gideon is a man with faults. He asks for the gold the enemies wore and has a priestly garment made from it. All Israel worships it, and it becomes a snare to Gideon and his house.',
+        'The enemies never lift up their heads again, and the land is quiet for forty years, as long as Gideon lives. When he has died, the people forget God again and run after Baal. And yet God was with Gideon, as he had promised, “I will be with you.”'
       ],
       task: { hint: 'Find the matching cards. Remember where each one lies.', memory: { pairs: [{ text: 'The palm tree: Deborah sits here and gives judgment.' }, { text: 'The winepress: Gideon secretly threshes wheat here.' }, { text: 'The fleece: First only the fleece is wet, then only the ground.' }, { text: 'The altar: God is Peace.' }, { text: 'The jar: A torch is inside.' }] } },
       questions: [

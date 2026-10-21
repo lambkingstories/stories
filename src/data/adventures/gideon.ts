@@ -262,12 +262,12 @@ export const gideon: Journey = {
       id: 2,
       image: `${PICS}etappe-bild-02.webp`,
       title: 'Die Midianiter kommen',
-      ref: 'Richter 6,1–6',
+      ref: 'Richter 6,1–10',
       text: [
         'Wieder vergessen die Israeliten Gott. Sieben Jahre lang sind die Midianiter stärker als sie.',
         'Jedes Jahr, wenn das Korn reif wird, kommen sie mit ihren Zelten und Kamelen. Es sind so viele wie Heuschrecken, und ihre Kamele kann niemand zählen.',
         'Sie fressen die Felder kahl und lassen den Israeliten nichts zu essen übrig. Auf den Äckern bleibt kein Halm zum Ernten.',
-        'Die Israeliten verstecken sich in Höhlen und Felsspalten, und dort verstecken sie auch das wenige, was ihnen bleibt. Sie sind arm geworden und haben Angst. Da schreien sie zu Gott um Hilfe.'
+        'Die Israeliten verstecken sich in Höhlen und Felsspalten und bauen sich Festungen in den Bergen. Sie sind arm geworden und haben Angst. Da schreien sie zu Gott um Hilfe. Gott schickt ihnen einen Propheten: „So spricht Gott: Ich habe euch aus Ägypten geführt, aber ihr habt nicht auf meine Stimme gehört.“'
       ],
       // Spiel: Säcke in die Höhle schieben (hoehle, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'hoehle', hint: 'Schiebe die Säcke in die Nischen der Höhle.', cave: HOEHLE },
@@ -284,8 +284,8 @@ export const gideon: Journey = {
       text: [
         'In Ophra steht eine große Eiche. In der Nähe drischt ein Mann namens Gideon in einer Kelter heimlich Weizen. Eine Kelter ist ein Becken im Fels, in dem man sonst Trauben presst. Hier sieht ihn kein Midianiter.',
         'Da setzt sich ein Engel Gottes unter die Eiche. „Gott ist mit dir, du starker Held!“, sagt er zu Gideon.',
-        'Gideon wundert sich. „Ich bin doch der Kleinste in meiner Familie“, sagt er, „und meine Familie ist die geringste.“',
-        '„Ich will mit dir sein“, antwortet Gott. „Geh hin, ich habe dich gesandt, mein Volk zu retten.“'
+        'Gideon antwortet traurig: „Wenn Gott mit uns ist, warum ist uns das alles passiert? Wo sind die Wunder, von denen unsere Väter erzählt haben? Gott hat uns verlassen.“ Aber Gott sagt: „Geh hin in dieser deiner Kraft und rette Israel. Ich habe dich gesandt.“',
+        '„Wie soll ich das tun?“, fragt Gideon. „Ich bin doch der Kleinste in meiner Familie, und meine Familie ist die geringste.“ „Ich will mit dir sein“, antwortet Gott.'
       ],
       // Spiel: Spreu im Wind (worfeln, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'worfeln', hint: 'Stelle den Wind ein, damit die Spreu fortfliegt.', winnow: WORFELN },
@@ -373,7 +373,7 @@ export const gideon: Journey = {
       ref: 'Richter 7,4–8',
       text: [
         '„Führe die Männer ans Wasser“, sagt Gott zu Gideon. „Dort will ich sie für dich prüfen.“ Gideon führt sie zum Bach hinunter.',
-        'Die meisten Männer knien nieder und trinken. Aber ein kleiner Trupp schöpft das Wasser mit der Hand und führt es zum Mund.',
+        'Die meisten Männer knien nieder und trinken. Aber ein kleiner Trupp leckt das Wasser aus der Hand, wie ein Hund es leckt, und führt es zum Mund.',
         '„Durch diese dreihundert Männer will ich euch retten“, sagt Gott. „Die anderen sollen nach Hause gehen.“',
         'Gideon schickt alle anderen heim. Nur die dreihundert behält er bei sich, und sie nehmen Vorrat und ihre Posaunen mit. Unten in der Ebene liegt das riesige Lager der Feinde.'
       ],
@@ -427,7 +427,7 @@ export const gideon: Journey = {
       ref: 'Richter 7,24 bis 8,3',
       text: [
         'Gideon schickt Boten nach Ephraim: „Kommt herab und besetzt die Furten am Jordan, damit die Feinde nicht hinüberkommen!“ Eine Furt ist eine flache Stelle, an der man durch den Fluss gehen kann.',
-        'Die Männer von Ephraim kommen und besetzen die Furten. Später aber kommen sie zornig zu Gideon: „Warum hast du uns nicht gerufen, als du gegen die Feinde gezogen bist?“ Sie streiten heftig mit ihm.',
+        'Die Männer von Ephraim kommen, besetzen die Furten und fangen zwei Fürsten der Feinde, Oreb und Seeb. Später aber kommen sie zornig zu Gideon: „Warum hast du uns nicht gerufen, als du gegen die Feinde gezogen bist?“ Sie streiten heftig mit ihm.',
         'Gideon bleibt ruhig. „Was habe ich im Vergleich zu euch getan?“, sagt er. „Gott hat die Fürsten der Feinde in eure Hände gegeben. Wie hätte ich tun können, was ihr getan habt?“',
         'Als Gideon so freundlich redet, legt sich ihr Zorn.'
       ],
@@ -442,12 +442,12 @@ export const gideon: Journey = {
       id: 12,
       image: `${PICS}etappe-bild-12.webp`,
       title: 'Gott soll euer Herr sein',
-      ref: 'Richter 8,22–23.28',
+      ref: 'Richter 8,22–28.33–35',
       text: [
         'Nach dem Sieg kommen die Israeliten zu Gideon. „Sei unser Herrscher“, sagen sie, „du und dein Sohn und dein Enkel. Du hast uns aus der Hand der Feinde gerettet.“',
         'Gideon schüttelt den Kopf. „Ich will nicht euer Herr sein“, sagt er, „und mein Sohn soll es auch nicht sein. Gott soll euer Herr sein.“',
-        'Die Feinde erheben ihren Kopf nicht mehr. Das Land ist still, vierzig Jahre lang, solange Gideon lebt.',
-        'Gideon ist ein Mensch mit Fehlern. Später lässt er aus Gold ein Priestergewand machen, und viele Israeliten beten es an. Und doch war Gott mit ihm, wie er es versprochen hat: „Ich will mit dir sein.“'
+        'Gideon ist ein Mensch mit Fehlern. Er bittet um das Gold, das die Feinde getragen haben, und lässt daraus ein Priestergewand machen. Ganz Israel betet es an, und das wird Gideon und seinem Haus zum Fall.',
+        'Die Feinde erheben ihren Kopf nicht mehr, und das Land ist still, vierzig Jahre lang, solange Gideon lebt. Als er gestorben ist, vergisst das Volk Gott wieder und läuft dem Baal nach. Und doch war Gott mit Gideon, wie er es versprochen hat: „Ich will mit dir sein.“'
       ],
       // Spiel: Memory (memory, alt); das Etappenbild ist noch das von Josef
       task: { kind: 'memory', hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.', memory: MEMORY },
@@ -474,9 +474,12 @@ for (const st of gideon.stages) {
 }
 
 // the German recordings of the stories (voice Achernar, text version 3 = files "-v3"); there are no English ones yet, so the English app reads with the voice of the device
+// Stages whose text was corrected for Bible faithfulness on 21.10.2026 (2: the prophet 6,7-10 and no stored food, 3: Gideon's complaint 6,13-15, 8: "like a dog" 7,5, 11: Oreb and Zeeb 7,25, 12: the golden garment 8,24-27 and the end 8,33-34)
+// have NO German recording until the new one is made (the app reads them with the voice of the device); list in `D:/Claude/Abenteuer-Gideon/NEUAUFNAHME-BIBELTREUE-2026-10-21.md`. Remove a number from this list when its new file is in.
+const WITHOUT_RECORDING = new Set([2, 3, 8, 11, 12])
 for (const s of gideon.stages) {
   const file = `audio/abenteuer/gideon/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`
-  Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
+  Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' || WITHOUT_RECORDING.has(s.id) ? undefined : file), enumerable: true, configurable: true })
 }
 
 // the background music of this adventure: three calm pieces made with Google's Lyria 3.5 (skill `lambking-abenteuer-skill`, ton.md); they follow one another at random
