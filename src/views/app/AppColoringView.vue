@@ -759,18 +759,18 @@ function setPaint(c: string, custom: boolean) {
     // not remembered in a private window
   }
 }
-/** Brush size on a 2–60 scale; the picture's width scales it, so it feels the same on every picture. */
-const brushSize = ref<number>(14)
+/** Brush size on a 2–60 scale (starts at the full 60); the picture's width scales it, so it feels the same on every picture. */
+const brushSize = ref<number>(60)
 /** The eraser has its own size and its own way of working, remembered between visits. */
 const ERASER_KEY = 'lk-coloring-eraser'
 const ERASER_SIZES = [6, 14, 26, 44]
 function readEraser(): { size: number; field: boolean } {
   try {
     const saved = JSON.parse(localStorage.getItem(ERASER_KEY) ?? 'null') as { size?: unknown; field?: unknown } | null
-    const size = typeof saved?.size === 'number' ? Math.round(Math.max(2, Math.min(60, saved.size))) : 14
+    const size = typeof saved?.size === 'number' ? Math.round(Math.max(2, Math.min(60, saved.size))) : 60
     return { size, field: saved?.field !== false }
   } catch {
-    return { size: 14, field: true }
+    return { size: 60, field: true }
   }
 }
 const eraserSaved = readEraser()
