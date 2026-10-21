@@ -324,11 +324,12 @@ describe('Gideon: the games, and the placeholders until the pictures come', () =
     for (const s of gideon.stages) expect(existsSync(`public/${s.image}`), s.image).toBe(true)
   })
 
-  it('the medal is the own one of Gideon; the gift is the one of Josef until its own comes and has its final title', () => {
+  it('the medal and the gift picture are the own ones of Gideon; the gift has its final title', () => {
     expect(gideon.medal).toBe('images/abenteuer/gideon/medaille-v2.webp')
     expect(existsSync(`public/${gideon.medal}`)).toBe(true)
     expect(gideon.gift.title).toBe('Die Nacht mit den Krügen und Fackeln')
-    expect(gideon.gift.image).toBe(josef.gift.image)
+    expect(gideon.gift.image).toBe('images/abenteuer/gideon/geschenk.webp')
+    expect(existsSync(`public/${gideon.gift.image}`)).toBe(true)
   })
 
   it('every file that the data names exists (the own stage pictures, the map and medal of Josef) and is small enough', () => {

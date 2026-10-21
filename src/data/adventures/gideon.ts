@@ -214,8 +214,8 @@ export const gideon: Journey = {
   age: '8-10',
   downloadMb: 16, // PLATZHALTER: Etappenbilder noch von Josef, die Karte ist eigen (vier Stücke zusammen 5,1 MB); wird mit den eigenen Bildern neu gemessen (der Test sagt die echte Größe)
   medal: 'images/abenteuer/gideon/medaille-v2.webp', // Der Krug mit dem Licht (Tonkrug mit Fackel, Horn, Lichterkette in der Nacht, Goldring)
-  // Geschenk-Ausmalbild: Die Nacht mit den Krügen und Fackeln (Männer mit Horn und Krug auf dem Hügel bei Nacht); PLATZHALTER bis eigenes Bild
-  gift: { title: 'Die Nacht mit den Krügen und Fackeln', image: josef.gift.image },
+  // Geschenk-Ausmalbild: Die Nacht mit den Krügen und Fackeln (Männer mit Horn und Krug auf dem Hügel bei Nacht) (Konturzeichnung)
+  gift: { title: 'Die Nacht mit den Krügen und Fackeln', image: `${PICS}geschenk.webp` },
   // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v3 mit zwölf Orten und dem Ziel) mit Stationen und Perlenweg aus gideonPath.ts
   map: {
     images: [1, 2, 3, 4].map((n) => `images/abenteuer/gideon/karte-pano-v3-${n}.webp`),
