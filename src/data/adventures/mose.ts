@@ -41,8 +41,8 @@ const WORTE: WordsGame = {
 
 /**
  * Etappe 5, "Unterschiede finden": zwei Bilder des Lagers am Berg Gottes, das rechte hat einige kleine Dinge mehr; das Kind tippt rechts, was links fehlt (Bildauftrag M32; zwei eigene Grundbilder). Plan v3: Runde 1 drei
- * große Dinge, Runde 2 vier kleinere (zusammen sieben, jedes Ding ein anderes Bild). Lagen (Mitte und Breite, Prozent des Bildes) sind vorläufig geschätzt, bis die Datei `unterschied-messung.json` der Spielbild-Sitzung da ist.
- * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `unterschied/lager-1.webp`, `lager-2.webp` je 900 × 675 (ohne die Zusatzdinge), sieben Sprites höchstens 160 px: `stab`, `krug`, `buendel`, `korb`,
+ * große Dinge, Runde 2 vier kleinere (zusammen sieben, jedes Ding ein anderes Bild). Lagen (Mitte und Breite, Prozent des Bildes) sind am gemalten Bild abgelesen und mit den Dingen zusammen angesehen (`unterschied-messung.json`; Runde 1 `lager-1`, Runde 2 `lager-2-b`).
+ * Bilder (gemalt, 21.10.2026): `unterschied/lager-1.webp`, `lager-2.webp` je 900 × 675 (ohne die Zusatzdinge), sieben Sprites höchstens 160 px: `stab`, `krug`, `buendel`, `korb`,
  * `brot`, `schuhe`, `vogel` (transparent).
  */
 const UNTERSCHIED: DiffGame = {
@@ -61,9 +61,9 @@ const UNTERSCHIED: DiffGame = {
       base: `${G}unterschied/lager-2.webp`,
       items: [
         { image: `${G}unterschied/korb.webp`, x: 18, y: 70, w: 9 },
-        { image: `${G}unterschied/brot.webp`, x: 36, y: 40, w: 8 },
+        { image: `${G}unterschied/brot.webp`, x: 36, y: 48, w: 8 },
         { image: `${G}unterschied/schuhe.webp`, x: 68, y: 54, w: 7 },
-        { image: `${G}unterschied/vogel.webp`, x: 84, y: 24, w: 8 }
+        { image: `${G}unterschied/vogel.webp`, x: 80, y: 68, w: 8 }
       ]
     }
   ]
@@ -124,7 +124,7 @@ const WOLKE: CloudGame = {
 /**
  * Etappe 2, "Körbchen flechten": das Rohr läuft Reihe für Reihe abwechselnd vor und hinter den senkrechten Stäben; das Kind tippt die Felder, in denen es vor dem Stab läuft (Bildauftrag M30; Hintergrund = das Etappenbild 2,
  * von der App weichgezeichnet). Plan v3: Runde 1 drei Reihen, vier Stäbe, jede Reihe beginnt vor dem ersten Stab (6 Felder); Runde 2 vier Reihen, fünf Stäbe, jede Reihe beginnt andersherum als die darunter (10 Felder). Zusammen 16 Felder.
- * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `flechten/stab.webp`, `rohr-vorn.webp`, `rohr-hinten.webp`, `reihe-aktiv.webp` je 192 × 192 (Kachel, transparent), `koerbchen-fertig.webp` 600 × 600.
+ * Bilder (gemalt, 21.10.2026): `flechten/stab.webp`, `rohr-vorn.webp`, `rohr-hinten.webp`, `reihe-aktiv.webp` je 192 × 192 (Kachel, transparent), `koerbchen-fertig.webp` 600 × 600.
  */
 const FLECHTEN: WeaveGame = {
   background: `${PICS}etappe-bild-02.webp`,
@@ -139,16 +139,15 @@ const FLECHTEN: WeaveGame = {
 /**
  * Etappe 4, "Dem Leuchten nachgehen": Mose wird über einen dämmrigen Hang geführt, auf ein Leuchten zu, das heller wird, je näher er kommt; unter etwa 7 % der Bildbreite ist er da und der Busch leuchtet (Bildauftrag M31;
  * ein Hang für beide Runden). Es gibt keinen Fehler; nach 20 Sekunden ohne Fortschritt zeigt ein Tipp Funken in Richtung des Busches (zählt als Tipp). Plan v3: Runde 1 der Busch steht offen am Hang, Runde 2 legt `felsen-vorn.webp`
- * über denselben Hang und der Busch liegt hinter den Felsen, nur der Schein dringt durch die Lücken. Gott ist nicht im Bild und spricht nicht im Spiel. Start und Busch (Prozent des Bildes) sind vorläufig geschätzt, bis die Datei
- * `leuchten-messung.json` der Spielbild-Sitzung da ist; das Ziel von Runde 2 muss nach dem fertigen Felsbild hinter einer Lücke liegen.
- * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `leuchten/hang.webp` 1000 × 750 (ohne Busch), `busch.webp` 400 × 400, `mose.webp` 220 × 300, `felsen-vorn.webp` 1000 × 750 (transparent).
+ * über denselben Hang und der Busch liegt hinter den Felsen, nur der Schein dringt durch die Lücken. Gott ist nicht im Bild und spricht nicht im Spiel. Start und Busch (Prozent des Bildes) sind am gemalten Bild abgelesen (`leuchten-messung.json`, Hang und Felsen Variante b): Runde 1 von links unten nach rechts oben, Runde 2 von rechts oben zum Busch hinter den Felsen (zwei Lücken, Alpha der Felsen dort 1 bis 2 von 255).
+ * Bilder (gemalt, 21.10.2026): `leuchten/hang.webp` 1000 × 750 (ohne Busch), `busch.webp` 400 × 400, `mose.webp` 220 × 300, `felsen-vorn.webp` 1000 × 750 (transparent).
  */
 const LEUCHTEN: GlowGame = {
   walker: `${G}leuchten/mose.webp`,
   bush: `${G}leuchten/busch.webp`,
   rounds: [
-    { hint: 'Führe Mose über den Hang, dort leuchtet etwas.', background: `${G}leuchten/hang.webp`, start: [18, 76], target: [74, 36], threshold: 7 },
-    { hint: 'Jetzt verdecken Felsen das Licht.', background: `${G}leuchten/hang.webp`, start: [12, 78], target: [70, 28], threshold: 7, cover: `${G}leuchten/felsen-vorn.webp` }
+    { hint: 'Führe Mose über den Hang, dort leuchtet etwas.', background: `${G}leuchten/hang.webp`, start: [18, 76], target: [74, 39], threshold: 7 },
+    { hint: 'Jetzt verdecken Felsen das Licht.', background: `${G}leuchten/hang.webp`, start: [78, 38], target: [34, 74], threshold: 7, cover: `${G}leuchten/felsen-vorn.webp` }
   ]
 }
 

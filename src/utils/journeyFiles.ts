@@ -59,11 +59,8 @@ export const NOT_PAINTED_YET = [
   'images/abenteuer/spiele/mose/wimmel/',
   'images/abenteuer/spiele/mose/packen/',
   'images/abenteuer/spiele/mose/takt/',
-  'images/abenteuer/spiele/mose/leuchten/',
-  'images/abenteuer/spiele/mose/flechten/',
   'images/abenteuer/spiele/mose/wolke/',
   'images/abenteuer/spiele/mose/manna/',
-  'images/abenteuer/spiele/mose/unterschied/',
   'images/abenteuer/spiele/mose/worte/',
 ]
 
