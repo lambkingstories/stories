@@ -75,8 +75,11 @@ describe('the start page', () => {
     const slides = wrapper.findAll('.hero-slide')
     expect(slides).toHaveLength(4)
     expect(wrapper.text()).toContain('Willkommen')
-    expect(slides[3]!.text()).toContain('Wir freuen uns auf die Partnerschaft mit „Reach Kids Ministries“')
-    expect(slides[3]!.text()).toContain('Reach Kids Ministries verkündet das Evangelium und hilft Bedürftigen durch praktische Nächstenliebe und christliche Kinderarbeit')
+    // the introducing line is small, the name stands alone as the title, without quotation marks
+    expect(slides[3]!.find('.hero-eyebrow').text()).toBe('Wir freuen uns auf die Partnerschaft mit')
+    expect(slides[3]!.find('.hero-title').text()).toBe('Reach Kids Ministries')
+    expect(slides[3]!.text()).not.toMatch(/[„“”"]/)
+    expect(slides[3]!.text()).toContain('Reach Kids Ministries verkündet das Evangelium und hilft Menschen durch praktische Nächstenliebe und christliche Kinderarbeit')
     expect(slides[3]!.find('button.hero-shop').exists()).toBe(true)
     expect(slides[3]!.find('img.hero-img').attributes('src')).toContain('reach-kids/wappen-slide.webp')
   })
