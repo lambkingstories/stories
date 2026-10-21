@@ -386,13 +386,13 @@ for (const st of josua.stages) {
   if (st.task.verse) st.task.verse.background = st.image
 }
 
-// the German recordings of the stories (voice Achernar, text version 3 = files "-v3"); there are no English ones yet, so the English app reads with the voice of the device
-// Stages whose text was corrected for Bible faithfulness on 21.10.2026 (1: Book of the Law, 3 and 9: the red rope, 7: "allein" removed, 8: the armed men, 9: the ban, 10: the grave of Joshua) have NO German recording until the new one
-// is made (the app reads them with the voice of the device); list in `D:/Claude/Abenteuer-Josua/NEUAUFNAHME-BIBELTREUE-2026-10-21.md`. Remove a number from this list when its new file is in.
-const WITHOUT_RECORDING = new Set([1, 3, 7, 8, 9, 10])
+// the German recordings of the stories (voice Achernar); there are no English ones yet, so the English app reads with the voice of the device
+// Stages whose text was corrected for Bible faithfulness on 21.10.2026 (1: Book of the Law, 3 and 9: the red rope, 7: "allein" removed, 8: the armed men, 9: the ban, 10: the grave of Joshua)
+// were recorded again as "-v4" (list in `D:/Claude/Abenteuer-Josua/NEUAUFNAHME-BIBELTREUE-2026-10-21.md`); the others are "-v3"
+const RECORDED_AGAIN = new Set([1, 3, 7, 8, 9, 10])
 for (const s of josua.stages) {
-  const file = `audio/abenteuer/josua/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`
-  Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' || WITHOUT_RECORDING.has(s.id) ? undefined : file), enumerable: true, configurable: true })
+  const file = `audio/abenteuer/josua/geschichte-${String(s.id).padStart(2, '0')}-${RECORDED_AGAIN.has(s.id) ? 'v4' : 'v3'}.mp3`
+  Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 
 // the background music of this adventure: three calm pieces made with Google's Lyria 3.5 (skill `lambking-abenteuer-skill`, ton.md); they follow one another at random
