@@ -212,18 +212,31 @@ export const gideon: Journey = {
   title: 'Gideon',
   subtitle: 'Der Kleinste und die Dreihundert',
   age: '8-10',
-  downloadMb: 16, // PLATZHALTER: Größe mit den Bildern von Josef; wird mit den eigenen Bildern neu gemessen (der Test sagt die echte Größe)
+  downloadMb: 16, // PLATZHALTER: Etappenbilder noch von Josef, die Karte ist eigen (vier Stücke zusammen 5,1 MB); wird mit den eigenen Bildern neu gemessen (der Test sagt die echte Größe)
   medal: 'images/abenteuer/gideon/medaille-v2.webp', // Der Krug mit dem Licht (Tonkrug mit Fackel, Horn, Lichterkette in der Nacht, Goldring)
   // Geschenk-Ausmalbild: Die Nacht mit den Krügen und Fackeln (Männer mit Horn und Krug auf dem Hügel bei Nacht); PLATZHALTER bis eigenes Bild
   gift: { title: 'Die Nacht mit den Krügen und Fackeln', image: josef.gift.image },
-  // PLATZHALTER bis eigenes Bild: die Karte von Josef (vier Stücke, 9824 × 1632 px) mit seinen zwölf Stationen, dem Ziel und dem Perlenweg dorthin
+  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v3 mit zwölf Orten und dem Ziel) mit Stationen und Perlenweg aus gideonPath.ts
   map: {
-    images: josef.map.images,
+    images: [1, 2, 3, 4].map((n) => `images/abenteuer/gideon/karte-pano-v3-${n}.webp`),
     ring: josef.map.ring,
-    aspect: josef.map.aspect,
-    widthPx: josef.map.widthPx,
-    stages: josef.map.stages,
-    exam: josef.map.exam,
+    aspect: 9908 / 1648,
+    widthPx: 9908,
+    stages: [
+      { x: 0.0787, y: 0.2002, d: 0.0339 },
+      { x: 0.1433, y: 0.2002, d: 0.0339 },
+      { x: 0.2119, y: 0.1517, d: 0.0339 },
+      { x: 0.2927, y: 0.6129, d: 0.0339 },
+      { x: 0.3532, y: 0.2549, d: 0.0339 },
+      { x: 0.4794, y: 0.6129, d: 0.0339 },
+      { x: 0.545, y: 0.3155, d: 0.0339 },
+      { x: 0.6389, y: 0.6371, d: 0.0339 },
+      { x: 0.6762, y: 0.3277, d: 0.0339 },
+      { x: 0.7418, y: 0.1396, d: 0.0339 },
+      { x: 0.8175, y: 0.2306, d: 0.0339 },
+      { x: 0.8882, y: 0.3398, d: 0.0339 }
+    ],
+    exam: { x: 0.983, y: 0.2731, d: 0.0339 },
     path: GIDEON_PATH
   },
   stages: [
