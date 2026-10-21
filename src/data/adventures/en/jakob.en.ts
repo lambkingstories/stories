@@ -15,10 +15,10 @@ export const jakobEn: TextOverlay<Journey> = {
       title: 'Twins',
       ref: 'Genesis 25:19–34',
       text: [
-        'Isaac and his wife Rebekah have twins. The first is red and hairy, and his name is Esau. The second holds on to his brother’s heel at birth, so they call him Jacob.',
+        'Isaac and his wife Rebekah have twins. Even before they are born God says to Rebekah, “The older will serve the younger.” The first is red and hairy, and his name is Esau. The second holds on to his brother’s heel at birth, so they call him Jacob.',
         'The two grow up. Esau becomes a hunter and loves to roam the fields. Jacob prefers to stay near the tents.',
         'One day Esau comes home tired and hungry. Jacob has just cooked red lentils. “Let me eat some of that red stew,” begs Esau, “I am starving!”',
-        'Jacob answers, “Then sell me your birthright today.” That is the special place of the oldest son in the family. “What good is it to me if I starve?” says Esau. He eats, gets up, and goes away. His birthright does not matter to him.'
+        'Jacob answers, “Then sell me your birthright today.” That is the special place of the oldest son in the family. “What good is it to me if I starve?” says Esau. He eats, gets up, and goes away. He thinks little of his birthright.'
       ],
       task: { hint: 'Cook the soup before Esau arrives: tap lentils, water and wood.', stew: { hint: 'Cook the soup before Esau arrives: tap lentils, water and wood.' } },
       questions: [
@@ -31,9 +31,9 @@ export const jakobEn: TextOverlay<Journey> = {
       ref: 'Genesis 27:1–45',
       text: [
         'Isaac has grown old and can hardly see. He calls Esau, “Go hunting and cook my favorite meal. Then I will bless you.”',
-        'But Rebekah has been listening. She helps Jacob dress up as Esau and sends him to his father with the food.',
+        'But Rebekah has been listening. She says to Jacob, “Do what I tell you.” Jacob is afraid of a curse, but she dresses him up as Esau and sends him to his father with the food.',
         '“Who are you?” asks Isaac. “I am Esau,” says Jacob. That is not true. Isaac feels his hands and wonders, “The voice is Jacob’s voice, but the hands are Esau’s hands.” Still, he blesses him: God shall give him much good.',
-        'When Esau comes home, he understands everything and weeps aloud. The blessing has already been given. Esau is sad and angry, and Jacob has to flee. Rebekah sends him to her brother Laban. Jacob packs his bundle and goes, far away from home.'
+        'When Esau comes home, he weeps aloud. The blessing has already been given. Esau is sad and angry, and Jacob has to flee. Rebekah sends him to her brother Laban, and Isaac blesses him once more as he leaves. Far away from home, Jacob’s journey begins.'
       ],
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
@@ -78,7 +78,7 @@ export const jakobEn: TextOverlay<Journey> = {
         'Jacob stays with Laban and helps with the herds. “You should not work for nothing,” says Laban. “What do you want as wages?”',
         'Jacob loves Rachel. “I will serve you seven years for Rachel,” he says. Laban agrees. The seven years seem to Jacob like only a few days, so much does he love her.',
         'Then they celebrate the wedding, but in the morning Jacob notices that Laban has deceived him. He has not given him Rachel but her older sister Leah. “Why have you done this?” asks Jacob. “In our country the older one marries first,” says Laban.',
-        '“Serve me another seven years,” says Laban, “then you will get Rachel, too.” Jacob agrees and stays.'
+        '“Finish this wedding week with Leah,” says Laban, “and I will give you Rachel, too. In return you will serve me another seven years.” Jacob agrees and stays.'
       ],
       task: { hint: 'Drag the seasons into the gaps, year after year.', cycle: { tokens: [{ label: 'Spring: a branch with blossoms' }, { label: 'Summer: a sun with ears of grain' }, { label: 'Autumn: falling leaves' }, { label: 'Winter: a rain cloud with drops' }], rounds: [{ hint: 'Two years go by. Which sign is missing?' }, { hint: 'The years go by. Fill in the missing signs, even at the end.' }] } },
       questions: [
@@ -92,7 +92,7 @@ export const jakobEn: TextOverlay<Journey> = {
       text: [
         'Jacob loves Rachel more than Leah. But God sees that Leah is sad, and he gives her a son. “God has seen my misery,” says Leah, and she names him Reuben.',
         'After that she has more sons, and at the fourth she cries, “Now I will thank God!” His name is Judah.',
-        'But Rachel has no child. That makes her sad, because her sister has so many. She waits and prays, year after year.',
+        'But Rachel has no child. She envies her sister, because Leah has so many. The maidservants Bilhah and Zilpah also give Jacob sons. But God does not forget Rachel.',
         'At last God gives her a son, too. “God has taken my shame away,” says Rachel happily, and she names him Joseph. Jacob’s tents are now full of children.'
       ],
       task: { hint: 'Tap the children, they run to the tent.', catch: { rounds: [{ hint: 'Tap the children. Each one runs to the tent.' }, { hint: 'The family grows. Call five more children.' }] } },
@@ -152,8 +152,8 @@ export const jakobEn: TextOverlay<Journey> = {
       text: [
         'In the night Jacob brings his family across the Jabbok River. He himself stays behind alone. Then a man wrestles with him until morning comes and touches his hip. From then on it hurts.',
         '“Let me go,” says the man, “the day is breaking.” “I will not let you go,” says Jacob, “unless you bless me!”',
-        '“You will no longer be called Jacob, but Israel,” says the man, “for you have struggled with God and with people and have not given up.” And he blesses him.',
-        'The sun rises. “I have seen God face to face,” says Jacob, “and I am still alive.” He walks on, limping, but he has a new name and God’s blessing.'
+        '“You will no longer be called Jacob, but Israel,” says the man, “for you have struggled with God and with people and have prevailed.” And he blesses him.',
+        'The sun rises. “I have seen God face to face,” says Jacob, “and my life is saved.” He walks on, limping, but he has a new name and God’s blessing.'
       ],
       task: { hint: 'Hold the light until morning comes.', hold: { rounds: [{ hint: 'Round 1: Put your finger on the light and hold it.' }, { hint: 'Round 2: Now the light moves along the bank: go with it.' }] } },
       questions: [
@@ -194,7 +194,7 @@ export const jakobEn: TextOverlay<Journey> = {
   ],
   exam: [
     { q: 'What does Esau give away for a plate of lentils?', options: ['his birthright', 'his tent', 'his bow'] },
-    { q: 'What does Jacob use as a pillow in Bethel?', options: ['a stone', 'a fur', 'a sack'] },
+    { q: 'What does Jacob use as a pillow on his way?', options: ['a stone', 'a fur', 'a sack'] },
     { q: 'Whom does Jacob meet at the well?', options: ['Rachel', 'Leah', 'Rebekah'] },
     { q: 'Who speaks to Laban in a dream?', options: ['God', 'Jacob', 'Isaac'] },
     { q: 'What new name does Jacob receive at the river?', options: ['Israel', 'Esau', 'Isaac'] },

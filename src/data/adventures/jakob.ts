@@ -230,8 +230,8 @@ export const jakob: Journey = {
   subtitle: 'Ein Weg mit Umwegen',
   age: '8-10',
   downloadMb: 14, // 13,6 MB gezählt am 21.10.2026 mit den zwölf neuen Etappenbildern und der Karte v3
-  medal: `${IMG}medaille.webp`, // Jakob und die Himmelsleiter (Treppe aus Steinen im Sternenlicht)
-  // Geschenk-Ausmalbild: Jakob und die Himmelsleiter im Traum (Treppe aus Steinen, Sterne, Tiere der Herde schlafend, friedlich)
+  medal: `${IMG}medaille.webp`, // Jakob und die Himmelsleiter (Treppe aus Steinen im Sternenlicht) (Bibeltreue 21.10.2026: das jetzige Bild zeigt Schafe neben Jakob, er ist aber allein; neues Bild nach BILDAUFTRAG-J40)
+  // Geschenk-Ausmalbild: Jakob und die Himmelsleiter im Traum (Treppe aus Steinen, Sterne, friedlich); das jetzige Bild zeigt Schafe und einen Hund, Jakob ist aber allein: neues Bild nach BILDAUFTRAG-J41
   gift: { title: 'Jakob und die Himmelsleiter im Traum', image: `${IMG}geschenk.webp` },
   // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v3 mit zwölf Orten und dem Ziel) mit Stationen und Perlenweg aus jakobPath.ts
   map: {
@@ -263,10 +263,10 @@ export const jakob: Journey = {
       title: 'Zwillinge',
       ref: '1. Mose 25,19–34',
       text: [
-        'Isaak und seine Frau Rebekka bekommen Zwillinge. Der Erste ist rot und behaart, er heißt Esau. Der Zweite hält bei der Geburt die Ferse seines Bruders fest, darum nennen sie ihn Jakob.',
+        'Isaak und seine Frau Rebekka bekommen Zwillinge. Schon vor der Geburt sagt Gott zu Rebekka: „Der Ältere wird dem Jüngeren dienen.“ Der Erste ist rot und behaart, er heißt Esau. Der Zweite hält bei der Geburt die Ferse seines Bruders fest, darum nennen sie ihn Jakob.',
         'Die beiden wachsen heran. Esau wird ein Jäger und streift gern über das Feld. Jakob bleibt lieber bei den Zelten.',
         'Eines Tages kommt Esau müde und hungrig heim. Jakob hat gerade rote Linsen gekocht. „Lass mich von dem roten Gericht essen“, bittet Esau, „ich verhungere!“',
-        'Jakob antwortet: „Dann verkaufe mir heute dein Erstgeburtsrecht.“ Das ist der besondere Platz des Ältesten in der Familie. „Was nützt es mir, wenn ich verhungere?“, sagt Esau. Er isst, steht auf und geht fort. Sein Vorrecht ist ihm nicht wichtig.'
+        'Jakob antwortet: „Dann verkaufe mir heute dein Erstgeburtsrecht.“ Das ist der besondere Platz des Ältesten in der Familie. „Was nützt es mir, wenn ich verhungere?“, sagt Esau. Er isst, steht auf und geht fort. Er achtet sein Erstgeburtsrecht gering.'
       ],
       task: { kind: 'suppe', hint: SUPPE.hint, stew: SUPPE },
       questions: [
@@ -282,9 +282,9 @@ export const jakob: Journey = {
       ref: '1. Mose 27,1–45',
       text: [
         'Isaak ist alt geworden und kann kaum noch sehen. Er ruft Esau: „Geh auf die Jagd und koche mir mein Lieblingsessen. Dann will ich dich segnen.“',
-        'Aber Rebekka hat zugehört. Sie hilft Jakob, sich als Esau zu verkleiden, und schickt ihn mit dem Essen zum Vater.',
+        'Aber Rebekka hat zugehört. Sie sagt zu Jakob: „Tu, was ich dir sage.“ Jakob hat Angst vor einem Fluch, doch sie verkleidet ihn als Esau und schickt ihn mit dem Essen zum Vater.',
         '„Wer bist du?“, fragt Isaak. „Ich bin Esau“, sagt Jakob. Das ist nicht wahr. Isaak tastet nach seinen Händen und wundert sich: „Die Stimme ist Jakobs Stimme, aber die Hände sind Esaus Hände.“ Doch er segnet ihn: Gott soll ihm viel Gutes schenken.',
-        'Als Esau heimkommt, versteht er alles und weint laut. Der Segen ist schon vergeben. Esau ist traurig und wütend, und Jakob muss fliehen. Rebekka schickt ihn zu ihrem Bruder Laban. Jakob packt sein Bündel und geht, weit weg von zu Hause.'
+        'Als Esau heimkommt, weint er laut. Der Segen ist schon vergeben. Esau ist traurig und wütend, und Jakob muss fliehen. Rebekka schickt ihn zu ihrem Bruder Laban, und Isaak segnet ihn zum Abschied noch einmal. Weit weg von zu Hause beginnt Jakobs Weg.'
       ],
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
@@ -300,11 +300,11 @@ export const jakob: Journey = {
       ref: '1. Mose 28,10–19',
       text: [
         'Jakob ist allein unterwegs. Als es dunkel wird, legt er sich draußen hin und schiebt sich einen Stein unter den Kopf.',
-        'Da träumt er von einer Treppe, die von der Erde bis in den Himmel reicht. Engel Gottes steigen auf ihr hinauf und herab.',
+        'Da träumt er von einer Leiter, die von der Erde bis in den Himmel reicht. Engel Gottes steigen auf ihr hinauf und herab.',
         'Und Gott spricht: „Ich bin der Gott deiner Väter Abraham und Isaak. Dieses Land will ich dir geben. Ich bin mit dir und will dich behüten, wohin du auch gehst. Ich bringe dich wieder heim und verlasse dich nicht.“',
         'Jakob wacht auf. „Wie heilig ist dieser Ort!“, ruft er. „Gott ist hier, und ich habe es nicht gewusst.“ Er stellt den Stein auf, der sein Kopfkissen war, und nennt den Ort Bethel, das heißt Haus Gottes.'
       ],
-      task: { kind: 'schieben', hint: 'Schiebe die Kacheln, bis die Treppe zum Himmel wieder ganz ist.', slide: SCHIEBEN },
+      task: { kind: 'schieben', hint: 'Schiebe die Kacheln, bis die Himmelsleiter wieder ganz ist.', slide: SCHIEBEN },
       questions: [
         { q: 'Was nimmt Jakob als Kopfkissen?', options: ['einen Stein', 'ein Fell', 'einen Sack'], answer: 0 },
         { q: 'Was sagt Gott zu Jakob?', options: ['„Ich bin mit dir.“', '„Geh zurück zu Esau.“', '„Bleib für immer hier.“'], answer: 0 }
@@ -338,7 +338,7 @@ export const jakob: Journey = {
         'Jakob bleibt bei Laban und hilft ihm bei den Herden. „Du sollst nicht umsonst arbeiten“, sagt Laban. „Was willst du als Lohn?“',
         'Jakob hat Rahel lieb. „Ich diene dir sieben Jahre für Rahel“, sagt er. Laban ist einverstanden. Die sieben Jahre vergehen Jakob wie wenige Tage, so lieb hat er sie.',
         'Dann feiern sie Hochzeit, doch am Morgen merkt Jakob, dass Laban ihn getäuscht hat. Er hat ihm nicht Rahel gegeben, sondern ihre ältere Schwester Lea. „Warum hast du das getan?“, fragt Jakob. „Bei uns heiratet die Ältere zuerst“, sagt Laban.',
-        '„Diene mir noch einmal sieben Jahre“, sagt Laban, „dann bekommst du auch Rahel.“ Jakob stimmt zu und bleibt.'
+        '„Feiere noch diese Woche mit Lea“, sagt Laban, „dann gebe ich dir auch Rahel. Dafür dienst du mir noch einmal sieben Jahre.“ Jakob stimmt zu und bleibt.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
       task: { kind: 'jahre', hint: 'Ziehe die Jahreszeiten in die Lücken, Jahr für Jahr.', cycle: JAHRE },
@@ -356,7 +356,7 @@ export const jakob: Journey = {
       text: [
         'Jakob hat Rahel lieber als Lea. Aber Gott sieht, dass Lea traurig ist, und schenkt ihr einen Sohn. „Gott hat mein Elend gesehen“, sagt Lea und nennt ihn Ruben.',
         'Danach bekommt sie noch mehr Söhne, und beim vierten ruft sie: „Jetzt will ich Gott danken!“ Er heißt Juda.',
-        'Rahel aber hat kein Kind. Das macht sie traurig, denn ihre Schwester hat so viele. Sie wartet und betet, Jahr um Jahr.',
+        'Rahel aber hat kein Kind. Sie beneidet ihre Schwester, denn Lea hat so viele. Auch die Mägde Bilha und Silpa schenken Jakob Söhne. Doch Gott vergisst Rahel nicht.',
         'Endlich schenkt Gott auch ihr einen Sohn. „Gott hat meine Schande von mir genommen“, sagt Rahel glücklich und nennt ihn Josef. Jakobs Zelte sind nun voller Kinder.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
@@ -432,8 +432,8 @@ export const jakob: Journey = {
       text: [
         'In der Nacht bringt Jakob seine Familie über den Fluss Jabbok. Er selbst bleibt allein zurück. Da ringt ein Mann mit ihm, bis der Morgen kommt, und berührt dabei seine Hüfte. Seitdem tut sie ihm weh.',
         '„Lass mich los“, sagt der Mann, „der Morgen bricht an.“ „Ich lasse dich nicht“, sagt Jakob, „du segnest mich denn!“',
-        '„Du sollst nicht mehr Jakob heißen, sondern Israel“, sagt der Mann, „denn du hast mit Gott und mit Menschen gerungen und nicht aufgegeben.“ Und er segnet ihn.',
-        'Die Sonne geht auf. „Ich habe Gott von Angesicht gesehen“, sagt Jakob, „und lebe noch.“ Er geht weiter und hinkt, aber er hat einen neuen Namen und Gottes Segen.'
+        '„Du sollst nicht mehr Jakob heißen, sondern Israel“, sagt der Mann, „denn du hast mit Gott und mit Menschen gekämpft und hast bestanden.“ Und er segnet ihn.',
+        'Die Sonne geht auf. „Ich habe Gott von Angesicht gesehen“, sagt Jakob, „und meine Seele ist gerettet.“ Er geht weiter und hinkt, aber er hat einen neuen Namen und Gottes Segen.'
       ],
       task: { kind: 'halten', hint: 'Halte das Licht fest, bis der Morgen kommt.', hold: HALTEN },
       questions: [
@@ -482,7 +482,7 @@ export const jakob: Journey = {
   ],
   exam: [
     { q: 'Was gibt Esau für einen Teller Linsen her?', options: ['sein Erstgeburtsrecht', 'sein Zelt', 'seinen Bogen'], answer: 0 },
-    { q: 'Was nimmt Jakob in Bethel als Kopfkissen?', options: ['einen Stein', 'ein Fell', 'einen Sack'], answer: 0 },
+    { q: 'Was nimmt Jakob unterwegs als Kopfkissen?', options: ['einen Stein', 'ein Fell', 'einen Sack'], answer: 0 },
     { q: 'Wen trifft Jakob am Brunnen?', options: ['Rahel', 'Lea', 'Rebekka'], answer: 0 },
     { q: 'Wer spricht im Traum zu Laban?', options: ['Gott', 'Jakob', 'Isaak'], answer: 0 },
     { q: 'Welchen neuen Namen bekommt Jakob am Fluss?', options: ['Israel', 'Esau', 'Isaak'], answer: 0 },
@@ -497,9 +497,12 @@ for (const s of jakob.stages) {
   for (const g of [t.guess, t.cycle, t.cairn, t.ring, t.catch, t.relay]) if (g) g.background = s.image
 }
 
-// the German recordings of the stories (voice Achernar, text version 3 = files "-v3"); there are no English ones yet, so the English app reads with the voice of the device
+// the German recordings of the stories (voice Achernar, text version 3 = files "-v3"); there are no English ones yet, so the English app reads with the voice of the device.
+// NEW RECORDING NEEDED (Bible check of 21.10.2026, see D:/Claude/Abenteuer-Jakob/NEUAUFNAHME-BIBELTREUE-2026-10-21.md): the texts of these stages changed, so the old recording is not played
+// (the app reads with the voice of the device) until the new one is made; then delete the number from this list and use the new file name.
+const NEW_RECORDING = [1, 2, 3, 5, 6, 10]
 for (const s of jakob.stages) {
-  const file = `audio/abenteuer/jakob/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`
+  const file = NEW_RECORDING.includes(s.id) ? undefined : `audio/abenteuer/jakob/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 
