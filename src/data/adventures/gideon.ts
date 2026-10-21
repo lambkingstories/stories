@@ -17,8 +17,8 @@ import { GIDEON_PATH } from './gideonPath'
 import { localize } from './localize'
 import { gideonEn } from './en/gideon.en'
 
-// PLATZHALTER bis zum eigenen Bild: die Etappenbilder von Josef (Ordner images/abenteuer/josef/); danach `images/abenteuer/gideon/etappe-bild-NN.webp`
-const PLACEHOLDER = 'images/abenteuer/josef/'
+// Etappenbilder (vorläufig Variante a der neuen Bilder; Anton wählt später a/b): `images/abenteuer/gideon/etappe-bild-NN.webp`, 960 × 640
+const PICS = 'images/abenteuer/gideon/'
 
 const G = 'images/abenteuer/spiele/gideon/'
 
@@ -27,7 +27,7 @@ const G = 'images/abenteuer/spiele/gideon/'
  * Hintergrund = das Etappenbild 4, von der App weichgezeichnet. Jede Sprache hat ihre eigenen Wörter und Hinweise (Runde 1 Friede / Peace, Runde 2 Felsen / Rock); beide Wörter stehen wörtlich im Text der Etappe.
  */
 const WORT: WordGame = {
-  background: `${PLACEHOLDER}etappe-bild-04.webp`,
+  background: `${PICS}etappe-bild-04.webp`,
   rounds: [
     { hint: 'Wie nennt Gideon den Altar? Gott ist der …', word: 'FRIEDE', extra: ['T'] },
     { hint: 'Worauf stellt Gideon das Essen? Auf den …', word: 'FELSEN', extra: ['A'] }
@@ -96,7 +96,7 @@ const TAU: DewGame = {
  * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `worfeln/wanne.webp` 480 × 300, `korn.webp`, `spreu.webp` je 64 × 64, `regler-griff.webp` 120 × 120 (alle transparent).
  */
 const WORFELN: WinnowGame = {
-  background: `${PLACEHOLDER}etappe-bild-03.webp`,
+  background: `${PICS}etappe-bild-03.webp`,
   tray: `${G}worfeln/wanne.webp`,
   grain: `${G}worfeln/korn.webp`,
   chaffImage: `${G}worfeln/spreu.webp`,
@@ -212,10 +212,10 @@ export const gideon: Journey = {
   subtitle: 'Der Kleinste und die Dreihundert',
   age: '8-10',
   downloadMb: 16, // PLATZHALTER: Größe mit den Bildern von Josef; wird mit den eigenen Bildern neu gemessen (der Test sagt die echte Größe)
-  medal: josef.medal, // PLATZHALTER bis "Der Krug mit dem Licht" (Tonkrug mit Fackel und gebogenem Horn)
-  // Geschenk-Ausmalbild: Die Nacht mit den Krügen und Fackeln (Männer mit Horn und Krug auf dem Hügel bei Nacht); PLATZHALTER bis zum eigenen Bild
+  medal: josef.medal, // PLATZHALTER bis eigenes Bild: "Der Krug mit dem Licht" (Tonkrug mit Fackel und gebogenem Horn)
+  // Geschenk-Ausmalbild: Die Nacht mit den Krügen und Fackeln (Männer mit Horn und Krug auf dem Hügel bei Nacht); PLATZHALTER bis eigenes Bild
   gift: { title: 'Die Nacht mit den Krügen und Fackeln', image: josef.gift.image },
-  // PLATZHALTER: die Karte von Josef (vier Stücke, 9824 × 1632 px) mit seinen zwölf Stationen, dem Ziel und dem Perlenweg dorthin
+  // PLATZHALTER bis eigenes Bild: die Karte von Josef (vier Stücke, 9824 × 1632 px) mit seinen zwölf Stationen, dem Ziel und dem Perlenweg dorthin
   map: {
     images: josef.map.images,
     ring: josef.map.ring,
@@ -228,7 +228,7 @@ export const gideon: Journey = {
   stages: [
     {
       id: 1,
-      image: `${PLACEHOLDER}etappe-bild-01.webp`,
+      image: `${PICS}etappe-bild-01.webp`,
       title: 'Debora und Barak',
       ref: 'Richter 4,1–10.14–15; 5,31',
       text: [
@@ -246,7 +246,7 @@ export const gideon: Journey = {
     },
     {
       id: 2,
-      image: `${PLACEHOLDER}etappe-bild-02.webp`,
+      image: `${PICS}etappe-bild-02.webp`,
       title: 'Die Midianiter kommen',
       ref: 'Richter 6,1–6',
       text: [
@@ -264,7 +264,7 @@ export const gideon: Journey = {
     },
     {
       id: 3,
-      image: `${PLACEHOLDER}etappe-bild-03.webp`,
+      image: `${PICS}etappe-bild-03.webp`,
       title: 'Gideon in der Kelter',
       ref: 'Richter 6,11–16',
       text: [
@@ -282,7 +282,7 @@ export const gideon: Journey = {
     },
     {
       id: 4,
-      image: `${PLACEHOLDER}etappe-bild-04.webp`,
+      image: `${PICS}etappe-bild-04.webp`,
       title: 'Feuer aus dem Fels',
       ref: 'Richter 6,17–24',
       text: [
@@ -300,7 +300,7 @@ export const gideon: Journey = {
     },
     {
       id: 5,
-      image: `${PLACEHOLDER}etappe-bild-05.webp`,
+      image: `${PICS}etappe-bild-05.webp`,
       title: 'Der Altar des Baal',
       ref: 'Richter 6,25–32',
       text: [
@@ -318,7 +318,7 @@ export const gideon: Journey = {
     },
     {
       id: 6,
-      image: `${PLACEHOLDER}etappe-bild-06.webp`,
+      image: `${PICS}etappe-bild-06.webp`,
       title: 'Das Fell auf der Tenne',
       ref: 'Richter 6,33–40',
       text: [
@@ -336,7 +336,7 @@ export const gideon: Journey = {
     },
     {
       id: 7,
-      image: `${PLACEHOLDER}etappe-bild-07.webp`,
+      image: `${PICS}etappe-bild-07.webp`,
       title: 'Zu viele Männer',
       ref: 'Richter 7,1–3',
       text: [
@@ -354,7 +354,7 @@ export const gideon: Journey = {
     },
     {
       id: 8,
-      image: `${PLACEHOLDER}etappe-bild-08.webp`,
+      image: `${PICS}etappe-bild-08.webp`,
       title: 'Am Wasser',
       ref: 'Richter 7,4–8',
       text: [
@@ -372,7 +372,7 @@ export const gideon: Journey = {
     },
     {
       id: 9,
-      image: `${PLACEHOLDER}etappe-bild-09.webp`,
+      image: `${PICS}etappe-bild-09.webp`,
       title: 'Der Traum im Lager',
       ref: 'Richter 7,9–15',
       text: [
@@ -390,7 +390,7 @@ export const gideon: Journey = {
     },
     {
       id: 10,
-      image: `${PLACEHOLDER}etappe-bild-10-v2.webp`,
+      image: `${PICS}etappe-bild-10.webp`,
       title: 'Krüge, Fackeln und Posaunen',
       ref: 'Richter 7,16–21',
       text: [
@@ -408,7 +408,7 @@ export const gideon: Journey = {
     },
     {
       id: 11,
-      image: `${PLACEHOLDER}etappe-bild-11.webp`,
+      image: `${PICS}etappe-bild-11.webp`,
       title: 'Ephraim und die Furten',
       ref: 'Richter 7,24 bis 8,3',
       text: [
@@ -426,7 +426,7 @@ export const gideon: Journey = {
     },
     {
       id: 12,
-      image: `${PLACEHOLDER}etappe-bild-12.webp`,
+      image: `${PICS}etappe-bild-12.webp`,
       title: 'Gott soll euer Herr sein',
       ref: 'Richter 8,22–23.28',
       text: [
