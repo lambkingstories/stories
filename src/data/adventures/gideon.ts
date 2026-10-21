@@ -64,10 +64,10 @@ const MEMORY: MemoryGame = {
   pairs: [
     { image: `${G}memory/karte-palme.webp`, text: 'Die Palme: Hier sitzt Debora und spricht Recht.' },
     { image: `${G}memory/karte-kelter.webp`, text: 'Die Kelter: Hier drischt Gideon heimlich Weizen.' },
-    { image: `${G}memory/karte-fell.webp`, text: 'Das Fell: Zweimal Tau, zweimal ein Zeichen.' },
+    { image: `${G}memory/karte-fell.webp`, text: 'Das Fell: Erst ist nur das Fell nass, dann nur der Boden.' },
     { image: `${G}memory/karte-altar.webp`, text: 'Der Altar: Gott ist der Friede.' },
     { image: `${G}memory/karte-krug.webp`, text: 'Der Krug: Darin steckt eine Fackel.' },
-    { image: `${G}memory/karte-horn.webp`, text: 'Das Horn: Es ruft die Dreihundert.' }
+    { image: `${G}memory/karte-horn.webp`, text: 'Die Posaune: Gideon ruft damit die Männer zusammen.' }
   ]
 }
 
@@ -233,50 +233,48 @@ export const gideon: Journey = {
       id: 1,
       image: `${PLACEHOLDER}etappe-bild-01.webp`,
       title: 'Debora und Barak',
-      ref: 'Richter 4,1–16; 5,1–3.31',
+      ref: 'Richter 4,1–10.14–15; 5,31',
       text: [
-        'Als der Richter Ehud gestorben ist, vergessen die Israeliten Gott wieder. Diesmal gerät das Volk in die Hand Jabins, des Königs der Kanaaniter, der in Hazor regiert. Sein Feldhauptmann Sisera hat neunhundert eiserne Wagen. Zwanzig Jahre lang drückt er die Israeliten hart, bis sie endlich zu Gott rufen.',
-        'In dieser Zeit ist Debora Richterin in Israel, eine Prophetin, die Gottes Wort weitergibt. Sie sitzt unter einer Palme im Bergland von Ephraim. Die Israeliten kommen zu ihr, damit sie ihnen Recht spricht.',
-        'Eines Tages lässt Debora den Barak rufen. „Gott hat dir geboten, mit zehntausend Männern auf den Berg Tabor zu ziehen“, sagt sie. „Er will Sisera mit seinen Wagen zum Bach Kison kommen lassen und ihn in deine Hand geben.“ „Wenn du mit mir gehst, gehe ich“, antwortet Barak, „wenn nicht, gehe ich nicht.“ „Ich gehe mit dir“, sagt Debora.',
-        'Als Sisera hört, dass Barak auf dem Tabor steht, ruft er alle seine Wagen zusammen. Da sagt Debora: „Auf, das ist der Tag! Gott zieht vor dir her!“ Barak steigt mit den zehntausend Männern den Berg hinab. Und Gott bringt Sisera und sein ganzes Heer in Verwirrung. Sisera springt von seinem Wagen und flieht zu Fuß.',
-        'Da singen Debora und Barak ein Danklied: „Lobt Gott, dass Israel wieder frei ist!“ Und das Land hat vierzig Jahre Ruhe.'
+        'Zwanzig Jahre lang bedrängt der König Jabin die Israeliten, bis sie zu Gott rufen.',
+        'In dieser Zeit ist Debora Richterin in Israel, eine Prophetin, die Gottes Wort weitergibt. Sie sitzt unter einer Palme, und die Leute kommen zu ihr, damit sie ihnen Recht spricht.',
+        'Eines Tages ruft Debora den Barak: „Hat Gott dir nicht gesagt: Geh mit zehntausend Männern auf den Berg Tabor?“ „Wenn du mit mir gehst, gehe ich“, antwortet Barak. „Ich gehe mit dir“, sagt Debora.',
+        'Auf dem Tabor ruft Debora: „Auf, das ist der Tag! Gott zieht vor dir her!“ Barak zieht hinab, und Gott bringt das Heer des Königs in Verwirrung. Es flieht. Danach hat das Land vierzig Jahre Ruhe.'
       ],
       // nur Quiz (ernst bzw. ruhig, nichts wird gespielt); das Etappenbild ist noch das von Josef
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Unter welchem Baum sitzt Debora?', options: ['unter einer Palme', 'unter einer Eiche', 'unter einer Zeder'], answer: 0 },
-        { q: 'Wie viele Männer soll Barak auf den Berg Tabor mitnehmen?', options: ['zehntausend', 'neunhundert', 'zwanzig'], answer: 0 },
-        { q: 'Was singen Debora und Barak am Ende?', options: ['ein Danklied an Gott', 'ein Schlaflied', 'ein Spottlied'], answer: 0 }
+        { q: 'Was sagt Barak zu Debora?', options: ['„Wenn du mit mir gehst, gehe ich.“', '„Ich gehe allein.“', '„Ich bleibe hier.“'], answer: 0 }
       ]
     },
     {
       id: 2,
       image: `${PLACEHOLDER}etappe-bild-02.webp`,
       title: 'Die Midianiter kommen',
-      ref: 'Richter 6,1–10',
+      ref: 'Richter 6,1–6',
       text: [
-        'Vierzig Jahre sind vergangen, seit Debora und Barak ihr Danklied gesungen haben. Wieder vergessen die Israeliten Gott. Sieben Jahre lang sind die Midianiter stärker als sie.',
-        'Jedes Jahr, wenn das Korn auf den Feldern reif wird, ziehen die Midianiter und Amalekiter und Leute aus dem Osten herauf. Sie bringen ihre Zelte und ihre Tiere mit, und ihre Kamele sind so viele, dass sie keiner zählen kann. Wie ein Schwarm Heuschrecken fallen sie ins Land ein und fressen alles ab, was gewachsen ist, bis hinunter nach Gaza. Sie lassen nichts übrig, nicht ein Schaf, nicht ein Rind, nicht einen Esel.',
-        'Die Israeliten verstecken sich in Felsspalten, in Höhlen und in Bergfestungen. Sie sind arm geworden und fühlen sich klein vor den Midianitern. Endlich rufen sie zu Gott um Hilfe.',
-        'Gott hat ihr Rufen gehört. Er schickt einen Propheten zu ihnen. Der sagt: „So spricht Gott, der Gott Israels: Ich habe euch aus Ägypten geführt, aus dem Haus der Sklaven. Ich habe euch dieses Land gegeben. Ich habe zu euch gesagt: Ich bin euer Gott. Aber ihr habt nicht auf mich gehört.“'
+        'Wieder vergessen die Israeliten Gott. Sieben Jahre lang sind die Midianiter stärker als sie.',
+        'Jedes Jahr, wenn das Korn reif wird, kommen sie mit ihren Zelten und Kamelen. Es sind so viele wie Heuschrecken, und ihre Kamele kann niemand zählen.',
+        'Sie fressen die Felder kahl und lassen den Israeliten nichts zu essen übrig. Auf den Äckern bleibt kein Halm zum Ernten.',
+        'Die Israeliten verstecken sich in Höhlen und Felsspalten, und dort verstecken sie auch das wenige, was ihnen bleibt. Sie sind arm geworden und haben Angst. Da schreien sie zu Gott um Hilfe.'
       ],
       // Spiel: Säcke in die Höhle schieben (hoehle, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'hoehle', hint: 'Schiebe die Säcke in die Nischen der Höhle.', cave: HOEHLE },
       questions: [
         { q: 'Wie lange sind die Midianiter stärker als Israel?', options: ['sieben Jahre', 'zwanzig Jahre', 'vierzig Jahre'], answer: 0 },
-        { q: 'Wohin verstecken sich die Israeliten?', options: ['in Höhlen und Felsspalten', 'in Zelten am Fluss', 'hinter hohen Stadtmauern'], answer: 0 }
+        { q: 'Womit sind die Midianiter vergleichbar?', options: ['mit einem Schwarm Heuschrecken', 'mit einer Schafherde', 'mit einem Fluss'], answer: 0 }
       ]
     },
     {
       id: 3,
       image: `${PLACEHOLDER}etappe-bild-03.webp`,
       title: 'Gideon in der Kelter',
-      ref: 'Richter 6,11–18',
+      ref: 'Richter 6,11–16',
       text: [
-        'In Ophra, im Land Manasse, steht eine große Eiche, die einem Mann namens Joas gehört. Sein Sohn Gideon drischt dort Weizen, und zwar in einer Kelter. Das ist ein Becken im Felsen, in dem man sonst Trauben presst. Hier sieht ihn kein Midianiter, und so bringt er das Korn in Sicherheit.',
-        'Da setzt sich ein Engel Gottes unter die Eiche. „Gott ist mit dir, du starker Held!“, sagt er zu Gideon. Gideon wundert sich. „Mein Herr“, antwortet er, „wenn Gott mit uns ist, warum ist uns dann das alles geschehen? Wo sind die Wunder, von denen unsere Väter erzählt haben? Jetzt hat Gott uns verlassen und den Midianitern ausgeliefert.“',
-        'Aber Gott wendet sich ihm zu. „Geh hin in deiner Kraft und rette Israel vor den Midianitern“, sagt er. „Ich habe dich gesandt!“ „Wie soll ich das tun?“, fragt Gideon. „Meine Familie ist die geringste in Manasse, und ich bin der Kleinste in meines Vaters Haus.“ „Ich will mit dir sein“, antwortet Gott, „und du wirst die Midianiter besiegen, als wären sie nur ein einziger Mann.“',
-        'Gideon hört zu und denkt nach. Er möchte ganz sicher sein, dass wirklich Gott mit ihm spricht.'
+        'In Ophra steht eine große Eiche. In der Nähe drischt ein Mann namens Gideon in einer Kelter heimlich Weizen. Eine Kelter ist ein Becken im Fels, in dem man sonst Trauben presst. Hier sieht ihn kein Midianiter.',
+        'Da setzt sich ein Engel Gottes unter die Eiche. „Gott ist mit dir, du starker Held!“, sagt er zu Gideon.',
+        'Gideon wundert sich. „Ich bin doch der Kleinste in meiner Familie“, sagt er, „und meine Familie ist die geringste.“',
+        '„Ich will mit dir sein“, antwortet Gott. „Geh hin, ich habe dich gesandt, mein Volk zu retten.“'
       ],
       // Spiel: Spreu im Wind (worfeln, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'worfeln', hint: 'Stelle den Wind ein, damit die Spreu fortfliegt.', winnow: WORFELN },
@@ -291,16 +289,16 @@ export const gideon: Journey = {
       title: 'Feuer aus dem Fels',
       ref: 'Richter 6,17–24',
       text: [
-        '„Wenn du mir gnädig bist“, bittet Gideon den Engel, „dann gib mir ein Zeichen, dass du es wirklich bist, der mit mir redet. Geh nicht weg, bis ich wiederkomme und dir eine Gabe bringe.“ „Ich bleibe, bis du zurückkommst“, antwortet der Engel.',
-        'Gideon geht und bereitet ein Ziegenböcklein zu. Aus einer großen Menge Mehl backt er ungesäuertes Brot. Das Fleisch legt er in einen Korb, die Brühe füllt er in einen Topf, und so bringt er alles zu der Eiche. „Leg das Fleisch und das Brot dort auf den Felsen“, sagt der Engel Gottes, „und gieß die Brühe aus.“ Gideon tut es.',
-        'Da berührt der Engel mit der Spitze seines Stabes das Fleisch und das Brot. Feuer fährt aus dem Felsen und verzehrt alles. Als Gideon wieder aufblickt, ist der Engel verschwunden. Gideon erschrickt. „Ach, mein Gott“, ruft er, „ich habe einen Engel Gottes von Angesicht gesehen!“',
-        'Aber Gott spricht zu ihm: „Friede sei mit dir! Fürchte dich nicht, du wirst nicht sterben.“ Da baut Gideon dort einen Altar und nennt ihn: Gott ist der Friede. In Ophra bleibt er noch lange stehen.'
+        'Gideon kann es kaum glauben. „Gib mir ein Zeichen, dass du es wirklich bist“, bittet er den Boten Gottes. „Geh nicht weg, bis ich dir etwas bringe.“',
+        'Er bereitet ein Essen zu, backt Brot dazu und bringt alles unter die Eiche. „Stell es dort auf den Felsen“, sagt der Bote.',
+        'Da fährt Feuer aus dem Felsen und verzehrt das Essen, und der Bote ist verschwunden. Gideon erschrickt.',
+        'Aber Gott spricht zu ihm: „Friede sei mit dir! Fürchte dich nicht.“ Da baut Gideon dort einen Altar und nennt ihn: Gott ist der Friede.'
       ],
       // Spiel: Das Wort legen (wort, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'wort', hint: 'Lege das Wort aus den Buchstaben.', word: WORT },
       questions: [
-        { q: 'Was verzehrt das Fleisch und das Brot?', options: ['Feuer aus dem Felsen', 'ein starker Sturm', 'ein hungriger Hirte'], answer: 0 },
-        { q: 'Was sagt Gott zu Gideon, nachdem der Engel verschwunden ist?', options: ['„Friede sei mit dir! Fürchte dich nicht.“', '„Geh sofort nach Hause.“', '„Bau eine Mauer.“'], answer: 0 }
+        { q: 'Was fährt aus dem Felsen?', options: ['Feuer', 'Wasser', 'ein Sturm'], answer: 0 },
+        { q: 'Was bittet Gideon zuerst von dem Boten?', options: ['ein Zeichen', 'etwas Mehl', 'ein Schwert'], answer: 0 }
       ]
     },
     {
@@ -309,17 +307,16 @@ export const gideon: Journey = {
       title: 'Der Altar des Baal',
       ref: 'Richter 6,25–32',
       text: [
-        'In derselben Nacht spricht Gott noch einmal zu Gideon. „Reiß den Altar nieder, den dein Vater für Baal gebaut hat“, sagt er, „und haue den Pfahl daneben um. Dann baue mir oben auf dem Felsen einen Altar.“ Baal ist ein Götze, den damals viele anbeten, obwohl er kein Gott ist.',
-        'Gideon nimmt zehn seiner Knechte mit und tut, was Gott ihm gesagt hat. Er fürchtet sich vor seiner Familie und vor den Leuten der Stadt. Darum tut er es nachts und nicht am Tag.',
-        'Am Morgen sehen die Leute der Stadt, dass der Altar Baals zerbrochen ist. Auf dem neuen Altar liegt ein Opfer. „Wer hat das getan?“, fragen sie, und bald wissen sie es: Es war Gideon, der Sohn des Joas. Sie sind so zornig, dass sie ihn bestrafen wollen. Vor Joas’ Haus rufen sie: „Gib deinen Sohn heraus!“',
-        'Aber Joas stellt sich vor seinen Sohn. „Wollt ihr für Baal streiten?“, fragt er. „Wenn Baal ein Gott ist, dann soll er selbst für sich streiten, weil sein Altar zerbrochen ist.“ Seit diesem Tag nennt man Gideon auch Jerubbaal. Das heißt: Baal soll mit ihm streiten.'
+        'In derselben Nacht spricht Gott zu Gideon: „Reiß den Altar nieder, den dein Vater für Baal gebaut hat. Baue mir stattdessen oben auf dem Felsen einen Altar.“ Baal ist ein Götze, den viele anbeten.',
+        'Gideon nimmt zehn seiner Knechte mit und tut, was Gott sagt. Weil er sich vor den Leuten der Stadt fürchtet, tut er es nachts.',
+        'Am Morgen sehen die Leute den zerstörten Altar und werden zornig. „Wer hat das getan?“, fragen sie, und bald wissen sie es. Sie rufen vor dem Haus von Gideons Vater Joas: „Gib deinen Sohn heraus!“',
+        'Aber Joas stellt sich vor seinen Sohn. „Wollt ihr für Baal streiten? Ist Baal ein Gott, soll er selbst für sich streiten!“ Seit diesem Tag heißt Gideon auch Jerubbaal.'
       ],
       // nur Quiz (ernst bzw. ruhig, nichts wird gespielt); das Etappenbild ist noch das von Josef
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
-        { q: 'Zu welcher Zeit reißt Gideon den Altar des Baal nieder?', options: ['in der Nacht', 'am Mittag', 'zur Erntezeit'], answer: 0 },
-        { q: 'Wer stellt sich vor Gideon?', options: ['sein Vater Joas', 'Barak', 'ein Prophet'], answer: 0 },
-        { q: 'Wie nennt man Gideon seit diesem Tag auch?', options: ['Jerubbaal', 'Sisera', 'Ehud'], answer: 0 }
+        { q: 'Wann reißt Gideon den Altar des Baal nieder?', options: ['in der Nacht', 'am Mittag', 'zur Erntezeit'], answer: 0 },
+        { q: 'Wer stellt sich vor Gideon?', options: ['sein Vater Joas', 'Barak', 'ein Prophet'], answer: 0 }
       ]
     },
     {
@@ -328,16 +325,16 @@ export const gideon: Journey = {
       title: 'Das Fell auf der Tenne',
       ref: 'Richter 6,33–40',
       text: [
-        'Wieder ziehen die Midianiter und Amalekiter und die Völker aus dem Osten herauf. Sie schlagen ihr Lager in der Ebene Jesreel auf. Da erfüllt Gottes Geist den Gideon. Er bläst die Posaune, ein gebogenes Horn, und ruft seine Familie, und sie kommen zu ihm. Er schickt auch Boten zu ganz Manasse und zu Asser, Sebulon und Naftali.',
-        'Aber Gideon möchte es noch genauer wissen. „Gott“, sagt er, „du hast gesagt, dass du Israel durch meine Hand retten willst. Dann lege ich ein Fell mit der Wolle auf die Tenne. Liegt am Morgen nur auf dem Fell Tau und ist der Boden ringsum trocken, dann weiß ich, dass du es tust.“ Die Tenne ist der feste Platz im Freien, auf dem das Korn gedroschen wird.',
-        'So geschieht es. Als Gideon früh am Morgen aufsteht, ist der Boden trocken. Aber das Fell ist so nass, dass er den Tau auspressen kann, eine ganze Schale voll Wasser.',
-        'Doch Gideon bittet noch einmal: „Sei mir nicht böse, dass ich noch einmal bitte. Diesmal soll das Fell trocken bleiben und auf dem Boden ringsum Tau liegen.“ Und Gott tut es in dieser Nacht. Das Fell ist trocken, und auf der ganzen Erde liegt Tau. Nun weiß Gideon, dass er sich auf Gott verlassen kann.'
+        'Wieder lagern die Midianiter in der Ebene Jesreel. Da erfüllt Gottes Geist den Gideon mit Mut. Er bläst die Posaune und ruft die Männer seiner Familie und seines Stammes zusammen.',
+        'Aber Gideon möchte es noch genauer wissen. „Ich lege ein Fell auf die Tenne, den festen Platz, auf dem das Korn gedroschen wird“, sagt er zu Gott. „Ist morgen früh nur das Fell nass und der Boden ringsum trocken, dann weiß ich, dass du mir hilfst.“',
+        'So geschieht es. Am Morgen ist das Fell so nass, dass Gideon eine ganze Schale voll Wasser auswringt, aber der Boden ringsum ist trocken.',
+        'Gideon bittet noch einmal: „Sei mir nicht böse. Diesmal soll nur das Fell trocken bleiben und der Boden nass sein.“ Und Gott tut es auch in dieser Nacht.'
       ],
       // Spiel: Die Nacht vergeht (tau, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'tau', hint: 'Lass die Nacht vergehen und finde den Tau.', dew: TAU },
       questions: [
-        { q: 'Was legt Gideon auf die Tenne?', options: ['ein Fell mit Wolle', 'einen Mantel', 'einen Sack Mehl'], answer: 0 },
-        { q: 'Worum bittet Gideon Gott ein zweites Mal?', options: ['dass das Fell trocken bleibt und der Boden nass wird', 'dass es regnet', 'dass das Fell verschwindet'], answer: 0 }
+        { q: 'Was legt Gideon auf die Tenne?', options: ['ein Fell', 'einen Mantel', 'einen Sack Mehl'], answer: 0 },
+        { q: 'Worum bittet Gideon beim zweiten Mal?', options: ['dass das Fell trocken bleibt und der Boden nass wird', 'dass es regnet', 'dass das Fell verschwindet'], answer: 0 }
       ]
     },
     {
@@ -346,15 +343,16 @@ export const gideon: Journey = {
       title: 'Zu viele Männer',
       ref: 'Richter 7,1–3',
       text: [
-        'Früh am Morgen bricht Gideon mit allen Männern auf, die zu ihm gekommen sind. Sie lagern an der Quelle Harod. Unten in der Ebene, nördlich von ihnen, liegt das Lager der Midianiter am Fuß des Hügels More.',
-        'Da sagt Gott zu Gideon: „Du hast zu viele Männer bei dir. Wenn ich dir die Midianiter in die Hände gebe, könnte Israel sich rühmen und sagen: Das habe ich selbst geschafft.“ Darum soll Gideon vor allen ausrufen: „Wer sich fürchtet und Angst hat, darf umkehren und nach Hause gehen!“',
-        'Und viele machen sich auf den Heimweg. Zweiundzwanzigtausend Männer kehren um. Nur zehntausend bleiben bei Gideon. Sie sehen den anderen nach, und im Lager wird es still. Aber Gott sagt zu Gideon: „Es sind immer noch zu viele.“'
+        'Früh am Morgen lagert Gideon mit allen Männern, die auf seinen Ruf gekommen sind, an der Quelle Harod. Unten in der Ebene liegen die Feinde.',
+        'Da sagt Gott: „Du hast zu viele Männer bei dir. Sonst sagt das Volk später: Wir haben uns selbst geholfen.“',
+        'Darum soll Gideon ausrufen: „Wer Angst hat, darf nach Hause gehen!“',
+        'Zweiundzwanzigtausend Männer gehen heim. Nur zehntausend bleiben bei Gideon. Sie sehen den anderen nach, wie sie über die Hügel ziehen. Im Lager wird es still. Aber Gott sagt: „Es sind immer noch zu viele.“'
       ],
       // Spiel: Wer geht heim? (weiche, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'weiche', hint: 'Stelle die Weiche, damit jeder Mann seinen Weg geht.', swit: WEICHE },
       questions: [
-        { q: 'Wer darf nach Hause gehen?', options: ['wer Angst hat', 'wer müde ist', 'wer das älteste Zelt hat'], answer: 0 },
-        { q: 'Wie viele Männer bleiben bei Gideon?', options: ['zehntausend', 'zweiundzwanzigtausend', 'neunhundert'], answer: 0 }
+        { q: 'Was sagt Gott über die Männer?', options: ['Sie sind zu viele.', 'Sie sind zu müde.', 'Sie sind zu laut.'], answer: 0 },
+        { q: 'Wie viele Männer bleiben zuerst bei Gideon?', options: ['zehntausend', 'zweiundzwanzigtausend', 'neunhundert'], answer: 0 }
       ]
     },
     {
@@ -363,16 +361,16 @@ export const gideon: Journey = {
       title: 'Am Wasser',
       ref: 'Richter 7,4–8',
       text: [
-        '„Führe die Männer hinab ans Wasser“, sagt Gott zu Gideon. „Dort will ich sie für dich prüfen. Wer mit dir ziehen soll, den sage ich dir, und wer nicht mit dir ziehen soll, der bleibt hier.“ Gideon führt die Männer zum Bach hinunter.',
-        'Am Ufer sagt Gott: „Stelle die, die sich zum Trinken auf die Knie niederlassen, auf die eine Seite und die, die das Wasser mit der Hand zum Mund führen, auf die andere.“ Die meisten Männer knien am Bach nieder und trinken so. Nur dreihundert Männer schöpfen das Wasser mit der Hand und trinken es aus der Hand.',
-        '„Durch diese dreihundert will ich euch retten und die Midianiter in deine Hände geben“, sagt Gott zu Gideon. „Die anderen lass alle nach Hause gehen.“',
-        'Die dreihundert nehmen Vorrat und ihre Posaunen mit. Alle anderen schickt Gideon heim, jeden in sein Zelt. Nur die dreihundert behält er bei sich. Unten in der Ebene liegt das riesige Lager der Midianiter.'
+        '„Führe die Männer ans Wasser“, sagt Gott zu Gideon. „Dort will ich sie für dich prüfen.“ Gideon führt sie zum Bach hinunter.',
+        'Die meisten Männer knien nieder und trinken. Aber ein kleiner Trupp schöpft das Wasser mit der Hand und führt es zum Mund.',
+        '„Durch diese dreihundert Männer will ich euch retten“, sagt Gott. „Die anderen sollen nach Hause gehen.“',
+        'Gideon schickt alle anderen heim. Nur die dreihundert behält er bei sich, und sie nehmen Vorrat und ihre Posaunen mit. Unten in der Ebene liegt das riesige Lager der Feinde.'
       ],
       // Spiel: Wimmelbild (wimmelbild, alt); das Etappenbild ist noch das von Josef
       task: { kind: 'wimmelbild', hint: 'Finde die sechs Männer, die das Wasser mit der Hand zum Mund führen. Manche verstecken sich!', count: 6, find: WIMMEL },
       questions: [
         { q: 'Wie viele Männer behält Gideon bei sich?', options: ['dreihundert', 'zehntausend', 'zweiundzwanzigtausend'], answer: 0 },
-        { q: 'Was tun die meisten Männer am Bach?', options: ['Sie knien nieder und trinken.', 'Sie waschen ihre Füße.', 'Sie füllen ihre Krüge.'], answer: 0 }
+        { q: 'Was tun die dreihundert Männer am Bach?', options: ['Sie schöpfen das Wasser mit der Hand.', 'Sie knien nieder und trinken.', 'Sie füllen ihre Krüge.'], answer: 0 }
       ]
     },
     {
@@ -381,77 +379,77 @@ export const gideon: Journey = {
       title: 'Der Traum im Lager',
       ref: 'Richter 7,9–15',
       text: [
-        'In derselben Nacht sagt Gott zu Gideon: „Steh auf und geh hinab zum Lager, denn ich habe es in deine Hände gegeben. Wenn du dich fürchtest, nimm deinen Diener Pura mit und hör dir an, was die Midianiter reden. Dann werden deine Hände stark sein.“',
-        'Gideon und Pura gehen den Hang hinab, bis vorn an die Wachposten. Unten im Tal liegen die Midianiter und Amalekiter und alle Völker aus dem Osten wie ein Schwarm Heuschrecken. Ihre Kamele sind so viele wie der Sand am Meer.',
-        'Da hört Gideon, wie einer einem anderen seinen Traum erzählt: „Mir hat geträumt, ein rundes Gerstenbrot rollte in unser Lager. Es stieß an ein Zelt, und das Zelt stürzte um und lag am Boden.“ „Das ist nichts anderes als das Schwert Gideons, des Sohnes des Joas, des Israeliten“, antwortet der andere. „Gott hat die Midianiter und das ganze Heer in seine Hand gegeben.“',
-        'Als Gideon das hört, verneigt er sich und dankt Gott. Dann geht er zurück ins Lager der Israeliten und ruft: „Auf, Gott hat das Lager der Midianiter in eure Hände gegeben!“'
+        'In derselben Nacht sagt Gott zu Gideon: „Geh hinab zum Lager der Feinde! Wenn du dich fürchtest, nimm deinen Diener Pura mit.“',
+        'Leise gehen die beiden den Hang hinab. Unten im Tal liegen so viele Feinde mit ihren Kamelen wie Heuschrecken.',
+        'Da hört Gideon, wie ein Mann einem anderen seinen Traum erzählt: „Ich träumte, ein rundes Gerstenbrot rollte ins Lager und warf ein Zelt um.“ „Das ist nichts anderes als Gideon, der Sohn des Joas“, antwortet der andere. „Gott hat das ganze Lager in seine Hand gegeben.“',
+        'Gideon verneigt sich und dankt Gott. Dann geht er zurück zu seinen Männern: „Auf, Gott hat das Lager der Feinde in eure Hände gegeben!“'
       ],
       // Spiel: Leise den Hang hinab (schleichen, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'schleichen', hint: 'Führe die beiden leise von Schatten zu Schatten den Hang hinab.', sneak: SCHLEICHEN },
       questions: [
-        { q: 'Wen nimmt Gideon mit zum Lager der Midianiter?', options: ['seinen Diener Pura', 'seinen Vater Joas', 'Barak'], answer: 0 },
-        { q: 'Wovon träumt der Midianiter?', options: ['von einem Gerstenbrot', 'von einem Schaf', 'von einer Brücke'], answer: 0 }
+        { q: 'Wen nimmt Gideon mit zum Lager der Feinde?', options: ['seinen Diener Pura', 'seinen Vater Joas', 'Barak'], answer: 0 },
+        { q: 'Wovon träumt der Mann im Lager?', options: ['von einem rollenden Gerstenbrot', 'von einem Schaf', 'von einer Brücke'], answer: 0 }
       ]
     },
     {
       id: 10,
       image: `${PLACEHOLDER}etappe-bild-10-v2.webp`,
       title: 'Krüge, Fackeln und Posaunen',
-      ref: 'Richter 7,16–22',
+      ref: 'Richter 7,16–21',
       text: [
-        'Gideon teilt die dreihundert Männer in drei Gruppen zu je hundert. Jedem gibt er eine Posaune in die eine Hand und einen leeren Tonkrug in die andere, und in jedem Krug steckt eine Fackel. „Seht auf mich und macht es genauso“, sagt er. „Wenn ich an den Rand des Lagers komme, tut ihr, was ich tue. Und wenn ich die Posaune blase, dann blast auch ihr rings um das ganze Lager und ruft: Für Gott und für Gideon!“',
-        'Mitten in der Nacht kommen Gideon und seine hundert Männer an den Rand des Lagers. Gerade haben die Midianiter ihre Wachen neu aufgestellt. Da blasen sie die Posaunen und zerschlagen die Krüge in ihren Händen, und die beiden anderen Gruppen tun es ebenso. Rings um das ganze Lager leuchten die Fackeln in der Dunkelheit auf. Überall schallen die Posaunen: „Für Gott und für Gideon!“',
-        'Die dreihundert bleiben, jeder an seinem Platz um das Lager herum, stehen. Die Midianiter schrecken aus dem Schlaf, laufen durcheinander und schreien. Denn Gott bringt das ganze Lager in Unordnung. Das Heer flieht.'
+        'Gideon teilt die dreihundert Männer in drei Gruppen zu je hundert. Jeder bekommt eine Posaune und einen leeren Krug, und in jedem Krug steckt eine Fackel.',
+        '„Seht auf mich und macht es genauso“, sagt Gideon. „Wenn ich die Posaune blase, blast ihr auch und ruft: Für Gott und für Gideon!“',
+        'Mitten in der Nacht stellen sich die Männer rings um das Lager der Feinde auf. Gideon bläst die Posaune, und alle zerschlagen ihre Krüge. Plötzlich leuchten die Fackeln in der Dunkelheit, und überall schallen die Posaunen: „Für Gott und für Gideon!“',
+        'Die dreihundert bleiben an ihrem Platz stehen. Die Feinde schrecken aus dem Schlaf, laufen durcheinander und schreien. Das ganze Heer erschrickt und flieht.'
       ],
       // Spiel: Auf Gideons Zeichen (zeichen, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'zeichen', hint: 'Warte auf das Horn und antworte dann der Reihe nach.', cue: ZEICHEN },
       questions: [
-        { q: 'Was steckt in den Tonkrügen der Männer?', options: ['Fackeln', 'Brot', 'Wasser'], answer: 0 },
-        { q: 'Was tun die dreihundert, während das Heer flieht?', options: ['Sie bleiben an ihrem Platz um das Lager.', 'Sie laufen ins Lager hinein.', 'Sie schlafen im Zelt.'], answer: 0 }
+        { q: 'Was steckt in den Krügen der Männer?', options: ['Fackeln', 'Brot', 'Wasser'], answer: 0 },
+        { q: 'In wie viele Gruppen teilt Gideon die dreihundert Männer?', options: ['in drei', 'in zwei', 'in zwölf'], answer: 0 }
       ]
     },
     {
       id: 11,
       image: `${PLACEHOLDER}etappe-bild-11.webp`,
       title: 'Ephraim und die Furten',
-      ref: 'Richter 7,23–8,3; 8,4',
+      ref: 'Richter 7,24 bis 8,3',
       text: [
-        'Nach dieser Nacht rufen die Israeliten die Männer von Naftali, Asser und ganz Manasse zusammen, und sie ziehen den fliehenden Midianitern nach. Gideon schickt auch Boten ins Bergland Ephraim: „Kommt herab und besetzt die Furten am Jordan, bevor die Midianiter sie erreichen!“ Eine Furt ist eine flache Stelle, an der man durch den Fluss gehen kann.',
-        'Die Männer von Ephraim eilen herbei und besetzen die Furten. Sie besiegen auch zwei Fürsten der Midianiter, Oreb und Seeb. Doch als alles vorbei ist, kommen sie zornig zu Gideon. „Warum hast du uns nicht gerufen, als du gegen die Midianiter gezogen bist?“, fragen sie. Sie streiten heftig mit ihm.',
-        'Gideon bleibt ruhig. „Was habe ich im Vergleich zu euch getan?“, sagt er. „Ist nicht schon die Nachlese von Ephraim besser als die ganze Weinernte meiner Familie? Gott hat die Fürsten der Midianiter in eure Hände gegeben. Wie hätte ich tun können, was ihr getan habt?“ Die Nachlese ist das, was nach der Ernte noch an den Reben hängt. Als Gideon so redet, legt sich ihr Zorn.',
-        'Dann zieht Gideon mit seinen dreihundert Männern über den Jordan. Sie sind müde, aber sie bleiben dran, bis die Midianiter ganz besiegt sind.'
+        'Gideon schickt Boten nach Ephraim: „Kommt herab und besetzt die Furten am Jordan, damit die Feinde nicht hinüberkommen!“ Eine Furt ist eine flache Stelle, an der man durch den Fluss gehen kann.',
+        'Die Männer von Ephraim kommen und besetzen die Furten. Später aber kommen sie zornig zu Gideon: „Warum hast du uns nicht gerufen, als du gegen die Feinde gezogen bist?“ Sie streiten heftig mit ihm.',
+        'Gideon bleibt ruhig. „Was habe ich im Vergleich zu euch getan?“, sagt er. „Gott hat die Fürsten der Feinde in eure Hände gegeben. Wie hätte ich tun können, was ihr getan habt?“',
+        'Als Gideon so freundlich redet, legt sich ihr Zorn.'
       ],
       // nur Quiz (ernst bzw. ruhig, nichts wird gespielt); das Etappenbild ist noch das von Josef
       task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
       questions: [
-        { q: 'Wer kommt zornig zu Gideon?', options: ['die Männer von Ephraim', 'Barak', 'die Midianiter'], answer: 0 },
-        { q: 'Wie antwortet Gideon den Männern von Ephraim?', options: ['ruhig und freundlich', 'mit lauten Worten', 'gar nicht'], answer: 0 },
-        { q: 'Was nennt Gideon besser als die ganze Weinernte seiner Familie?', options: ['die Nachlese von Ephraim', 'die Ähren vom Feld', 'das Wasser vom Bach'], answer: 0 }
+        { q: 'Wer kommt zornig zu Gideon?', options: ['die Männer von Ephraim', 'Barak', 'die Feinde'], answer: 0 },
+        { q: 'Wie antwortet Gideon den Männern von Ephraim?', options: ['ruhig und freundlich', 'mit lauten Worten', 'gar nicht'], answer: 0 }
       ]
     },
     {
       id: 12,
       image: `${PLACEHOLDER}etappe-bild-12.webp`,
       title: 'Gott soll euer Herr sein',
-      ref: 'Richter 8,22–28',
+      ref: 'Richter 8,22–23.28',
       text: [
-        'Nach dem Sieg kommen die Israeliten zu Gideon. „Sei unser Herrscher“, sagen sie, „du und dein Sohn und dein Enkel. Denn du hast uns aus der Hand der Midianiter gerettet.“',
-        'Aber Gideon antwortet: „Ich will nicht euer Herr sein, und mein Sohn soll es auch nicht sein. Gott soll euer Herr sein.“ Nur um eines bittet er sie: Jeder soll ihm die goldenen Ohrringe geben, die er bei den Feinden erbeutet hat. Die Männer breiten einen Mantel aus und werfen ihre Ohrringe darauf. Es kommt sehr viel Gold zusammen.',
-        'Gideon macht daraus ein Priesterkleid und stellt es in seine Stadt Ophra. Später aber beten die Leute dieses Kleid an, und das wird für Gideon und sein Haus zu einem Fehler.',
-        'Die Midianiter erheben ihren Kopf nicht mehr. Das Land hat vierzig Jahre Frieden, solange Gideon lebt. Und der Altar in Ophra, den Gideon einst gebaut hat, trägt weiter den Namen: Gott ist der Friede.'
+        'Nach dem Sieg kommen die Israeliten zu Gideon. „Sei unser Herrscher“, sagen sie, „du und dein Sohn und dein Enkel. Du hast uns aus der Hand der Feinde gerettet.“',
+        'Gideon schüttelt den Kopf. „Ich will nicht euer Herr sein“, sagt er, „und mein Sohn soll es auch nicht sein. Gott soll euer Herr sein.“',
+        'Die Feinde erheben ihren Kopf nicht mehr. Das Land ist still, vierzig Jahre lang, solange Gideon lebt.',
+        'Gideon ist ein Mensch mit Fehlern. Später lässt er aus Gold ein Priestergewand machen, und viele Israeliten beten es an. Und doch war Gott mit ihm, wie er es versprochen hat: „Ich will mit dir sein.“'
       ],
       // Spiel: Memory (memory, alt); das Etappenbild ist noch das von Josef
       task: { kind: 'memory', hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.', memory: MEMORY },
       questions: [
         { q: 'Was antwortet Gideon, als sie ihn zum Herrscher machen wollen?', options: ['„Gott soll euer Herr sein.“', '„Ja, ich werde euer König.“', '„Mein Sohn soll es werden.“'], answer: 0 },
-        { q: 'Wie lange hat das Land Frieden, solange Gideon lebt?', options: ['vierzig Jahre', 'sieben Jahre', 'zwanzig Jahre'], answer: 0 }
+        { q: 'Wie lange ist das Land still, solange Gideon lebt?', options: ['vierzig Jahre', 'sieben Jahre', 'zwanzig Jahre'], answer: 0 }
       ]
     }
   ],
   exam: [
-    { q: 'Wer ist Richterin in Israel, als Barak auf den Berg Tabor zieht?', options: ['Debora', 'Pura', 'Joas'], answer: 0 },
+    { q: 'Unter welchem Baum sitzt Debora?', options: ['unter einer Palme', 'unter einer Eiche', 'unter einer Zeder'], answer: 0 },
     { q: 'Wo drischt Gideon heimlich seinen Weizen?', options: ['in einer Kelter', 'auf dem Dach', 'am Fluss'], answer: 0 },
-    { q: 'Was legt Gideon auf die Tenne, um ein Zeichen zu bekommen?', options: ['ein Fell mit Wolle', 'einen Mantel', 'einen Sack Mehl'], answer: 0 },
+    { q: 'Was legt Gideon auf die Tenne, um ein Zeichen zu bekommen?', options: ['ein Fell', 'einen Mantel', 'einen Sack Mehl'], answer: 0 },
     { q: 'Wie viele Männer behält Gideon bei sich?', options: ['dreihundert', 'zehntausend', 'zweiundzwanzigtausend'], answer: 0 },
     { q: 'Was steckt in den Krügen der Männer?', options: ['Fackeln', 'Brot', 'Wasser'], answer: 0 },
     { q: 'Was antwortet Gideon, als sie ihn zum Herrscher machen wollen?', options: ['„Gott soll euer Herr sein.“', '„Ja, ich werde euer König.“', '„Mein Sohn soll es werden.“'], answer: 0 }

@@ -20,7 +20,7 @@ const stage = (n: number) => gideon.stages[n - 1]!
 const FORBIDDEN = /\b(Messer|Speer|Pfeil|Blut|töten|erschlagen|erwürgen|Teufel|Hölle)\b/i
 
 describe('Gideon: stories and questions', () => {
-  it('twelve stages with 3 to 5 paragraphs of 60 to 220 words and the Bible passage under every one; no recording yet; the stage pictures are the ones of Josef (PLATZHALTER)', () => {
+  it('twelve stages with 3 or 4 paragraphs of 90 to 145 words (plan v3) and the Bible passage under every one; no recording yet; the stage pictures are the ones of Josef (PLATZHALTER)', () => {
     expect(gideon.id).toBe('gideon')
     expect(gideon.age).toBe('8-10')
     expect(gideon.title).toBe('Gideon')
@@ -43,10 +43,15 @@ describe('Gideon: stories and questions', () => {
     for (const s of gideon.stages) {
       expect(s.ref, `stage ${s.id}`).toMatch(/^Richter \d/)
       expect(s.text.length, `paragraphs ${s.id}`).toBeGreaterThanOrEqual(3)
-      expect(s.text.length, `paragraphs ${s.id}`).toBeLessThanOrEqual(5)
-      const words = s.text.join(' ').split(/\s+/).length
-      expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(60)
-      expect(words, `words ${s.id}`).toBeLessThanOrEqual(220)
+      expect(s.text.length, `paragraphs ${s.id}`).toBeLessThanOrEqual(4)
+      const text = s.text.join(' ')
+      const words = text.split(/\s+/).length
+      expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(90)
+      expect(words, `words ${s.id}`).toBeLessThanOrEqual(145)
+      // short sentences like Noah and Josef (they have 9 to 10 words on average)
+      const sentences = text.split(/[.!?]+["“”„]?\s+/).filter((x) => x.trim()).length
+      expect(words / sentences, `words per sentence ${s.id}`).toBeGreaterThan(7)
+      expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
       expect(s.audio, `no recording yet, the device voice reads: ${s.id}`).toBeUndefined()
       expect(s.image, `stage ${s.id}`).toMatch(/^images\/abenteuer\/josef\/etappe-bild-\d\d(-v2)?\.webp$/)
@@ -54,8 +59,8 @@ describe('Gideon: stories and questions', () => {
     expect(new Set(gideon.stages.map((s) => s.image)).size).toBe(12)
   })
 
-  it('two questions per stage (three in the stages 1, 5 and 11), three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
-    expect(gideon.stages.map((s) => s.questions.length)).toEqual([3, 2, 2, 2, 3, 2, 2, 2, 2, 2, 3, 2])
+  it('two questions per stage, three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
+    expect(gideon.stages.map((s) => s.questions.length)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2])
     for (const q of [...gideon.stages.flatMap((s) => s.questions), ...gideon.exam]) {
       expect(q.options, q.q).toHaveLength(3)
       expect(q.answer, q.q).toBe(0)
@@ -99,7 +104,7 @@ describe('Gideon: stories and questions', () => {
     const all = gideon.stages.map((s) => s.text.join(' ')).join(' ')
     expect(all).not.toMatch(/der Herr\b|dem Herrn\b|\bHERR\b/)
     expect(stage(3).text.join(' ')).toMatch(/Engel Gottes/)
-    expect(stage(4).text.join(' ')).toMatch(/Feuer fährt aus dem Felsen/)
+    expect(stage(4).text.join(' ')).toMatch(/Feuer aus dem Felsen/)
   })
 
   it('the questions do not ask what a game of the stage will show (the word, the dew, the men who drink from the hand)', () => {
@@ -151,7 +156,7 @@ describe('Gideon: the games, and the placeholders until the pictures come', () =
     expect(m, 'the game is built').toBeDefined()
     expect(m!.pairs).toHaveLength(6)
     const told = gideon.stages.map((s) => s.text.join(' ')).join(' ')
-    for (const word of ['Palme', 'Kelter', 'Fell', 'Altar', 'Fackel', 'Horn', 'Friede', 'Debora', 'Weizen']) expect(told, word).toContain(word)
+    for (const word of ['Palme', 'Kelter', 'Fell', 'Altar', 'Fackel', 'Posaune', 'Friede', 'Debora', 'Weizen']) expect(told, word).toContain(word)
     expect(m!.back).toMatch(/spiele\/gideon\/memory\//)
     expect(stage(8).task.kind).toBe('wimmelbild')
     expect(stage(12).task.kind).toBe('memory')
@@ -336,11 +341,11 @@ describe('Gideon: die Karte (Platzhalter von Josef)', () => {
   })
 })
 
-describe('Gideon: the lists for the recordings (NEUAUFNAHME-Gideon.md) say exactly what the data says', () => {
-  const de = 'D:/Claude/Abenteuer-Gideon/stories-gideon-de.json'
-  const en = 'D:/Claude/Abenteuer-Gideon/ENGLISCH/stories-gideon-en.json'
+describe('Gideon: the lists of the writing session (stories-gideon-v3-*.json) say exactly what the data says', () => {
+  const de = 'D:/Claude/Abenteuer-Gideon/stories-gideon-v3-de.json'
+  const en = 'D:/Claude/Abenteuer-Gideon/ENGLISCH/stories-gideon-v3-en.json'
   // the lists lie outside the repository (they belong to the drafts); on another computer there is nothing to compare
-  it.runIf(existsSync(de) && existsSync(en))('German and English list: twelve entries, the same paragraphs as the data, the recording names of the plan', () => {
+  it.runIf(existsSync(de) && existsSync(en))('German and English list (plan v3): twelve entries, the same paragraphs as the data, no recording linked', () => {
     const read = (f: string) => JSON.parse(readFileSync(f, 'utf-8')) as { n: number; text: string[]; audio: string }[]
     const overlay = englishTextsOf(gideon) as any
     setAdventureLanguage('de')
@@ -351,9 +356,9 @@ describe('Gideon: the lists for the recordings (NEUAUFNAHME-Gideon.md) say exact
     gideon.stages.forEach((s, i) => {
       expect(dl[i]!.n).toBe(s.id)
       expect(dl[i]!.text, `German list ${s.id}`).toEqual(s.text)
-      expect(dl[i]!.audio).toBe(`audio/abenteuer/gideon/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`)
       expect(el[i]!.text, `English list ${s.id}`).toEqual(overlay.stages[i].text)
-      expect(el[i]!.audio).toBe(`audio/abenteuer/gideon/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)
+      // no recording is linked to the new texts yet
+      expect(s.audio).toBeUndefined()
     })
   })
 })
