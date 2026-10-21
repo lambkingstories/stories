@@ -65,7 +65,7 @@ const VERSTECKEN: HideGame = {
     { id: 'klein-1', image: `${G}verstecken/flachs.webp`, w: 15, h: 9.2 }
   ],
   rounds: [
-    { hint: 'Rahab versteckt den Mann unter dem Flachs. Lege die Bündel über ihn.', men: ['mann-a'], bundles: ['gross-1', 'gross-2', 'klein-1'] },
+    { hint: 'Rahab versteckt die beiden Männer unter dem Flachs. Fang mit dem ersten an und lege die Bündel über ihn.', men: ['mann-a'], bundles: ['gross-1', 'gross-2', 'klein-1'] },
     { hint: 'Jetzt liegen zwei Männer auf dem Dach. Tippe ein Bündel an, dann dreht es sich.', men: ['mann-a', 'mann-b'], bundles: ['gross-1', 'gross-2', 'gross-3', 'mittel-1', 'klein-1'] }
   ]
 }
@@ -124,9 +124,9 @@ const VERS: VerseGame = {
 const MEMORY: MemoryGame = {
   back: `${G}memory/rueck.webp`,
   pairs: [
-    { image: `${G}memory/karte-buch.webp`, text: 'Die Schriftrolle: Gott spricht zu Josua: „Sei mutig und stark! Ich bin mit dir.“' },
+    { image: `${G}memory/karte-buch.webp`, text: 'Die Schriftrolle: Das Buch des Gesetzes. Josua soll Tag und Nacht daran denken.' },
     { image: `${G}memory/karte-flachs.webp`, text: 'Das Flachsbündel: Darunter hat Rahab die Männer versteckt.' },
-    { image: `${G}memory/karte-schnur.webp`, text: 'Die rote Schnur am Fenster: Wer im Haus bleibt, dem geschieht nichts.' },
+    { image: `${G}memory/karte-schnur.webp`, text: 'Das rote Seil am Fenster: Wer im Haus bleibt, dem geschieht nichts.' },
     { image: `${G}memory/karte-lade.webp`, text: 'Die Lade des Bundes: Die Priester tragen sie voran in den Jordan.' },
     { image: `${G}memory/karte-stein.webp`, text: 'Der Stein: Zwölf Steine erinnern an den Weg durch den Jordan.' }
   ]
@@ -146,7 +146,7 @@ const JORDAN: CrossGame = {
   middle: [54, 46],
   groups: [[13, 38], [13, 48], [13, 58]],
   farBank: [94, 42],
-  rounds: [{ hint: 'Ziehe die goldene Truhe ins Wasser.' }, { hint: 'Jetzt geht das Volk hinüber. Tippe die Gruppen an.' }]
+  rounds: [{ hint: 'Führe die Priester mit der goldenen Truhe ins Wasser.' }, { hint: 'Jetzt geht das Volk hinüber. Tippe die Gruppen an.' }]
 }
 
 export const josua: Journey = {
@@ -188,7 +188,7 @@ export const josua: Journey = {
       text: [
         'Mose, der Diener Gottes, ist gestorben. Das Volk Israel steht am Fluss Jordan, und auf der anderen Seite liegt das Land, das Gott ihm versprochen hat.',
         'Da spricht Gott zu Josua, dem neuen Anführer: „Mein Diener Mose ist gestorben. Nun führe du das Volk in das Land, das ich ihm gebe.“',
-        'Und Gott verspricht: „Ich bin mit dir, wie ich mit Mose war. Sei mutig und stark! Fürchte dich nicht, denn ich verlasse dich nie.“',
+        'Und Gott verspricht: „Ich bin mit dir, wie ich mit Mose war. Sei mutig und stark! Fürchte dich nicht, denn ich verlasse dich nie.“ Er mahnt ihn: „Denke Tag und Nacht an das Buch des Gesetzes und tu, was darin steht. Dann wird dir alles gelingen.“',
         'Josua ruft die Hauptleute: „Geht durch das Lager und sagt dem Volk: Macht Vorrat bereit! In drei Tagen ziehen wir über den Jordan.“'
       ],
       // Spiel: Proviant packen (packen, neu); das Etappenbild ist noch das von Josef
@@ -219,19 +219,19 @@ export const josua: Journey = {
     {
       id: 3,
       image: `${PICS}etappe-bild-03.webp`,
-      title: 'Die rote Schnur',
+      title: 'Das rote Seil',
       ref: 'Josua 2,8–24',
       text: [
         'Am Abend steigt Rahab zu den Männern auf das Dach. „Euer Gott ist Gott oben im Himmel und unten auf der Erde“, sagt sie. „Ich weiß, dass er euch dieses Land gibt. Bitte verschont auch meine Familie!“',
-        'Die Männer versprechen es. Rahab lässt sie an einem Seil aus dem Fenster hinab, denn ihr Haus steht in der Stadtmauer. „Versteckt euch drei Tage im Gebirge“, rät sie.',
-        '„Binde eine rote Schnur in dein Fenster“, sagen die Männer, „und hole deine Familie in dein Haus. Wer drinnen bleibt, dem geschieht nichts.“',
-        'Rahab bindet die rote Schnur ins Fenster. Die Männer verstecken sich im Gebirge und gehen dann zurück zu Josua.'
+        'Die Männer versprechen es. Rahab lässt sie an einem roten Seil aus dem Fenster hinab, denn ihr Haus steht in der Stadtmauer. „Versteckt euch drei Tage im Gebirge“, rät sie.',
+        '„Knüpfe dieses rote Seil in dein Fenster“, sagen die Männer, „und hole deine Familie in dein Haus. Wer drinnen bleibt, dem geschieht nichts.“',
+        'Rahab knüpft das rote Seil ins Fenster. Die Männer verstecken sich im Gebirge und gehen dann zurück zu Josua.'
       ],
       // Spiel: Am Seil herablassen (abseilen, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'abseilen', hint: 'Lass den Mann am Seil hinab, wenn er von der Mauer wegschwingt.', lower: ABSEILEN },
       questions: [
         { q: 'Was sagt Rahab über Gott?', options: ['Er ist Gott im Himmel und auf der Erde.', 'Er wohnt nur in Jericho.', 'Er ist weit weg.'], answer: 0 },
-        { q: 'Was bindet Rahab ins Fenster?', options: ['eine rote Schnur', 'ein weißes Tuch', 'eine Laterne'], answer: 0 }
+        { q: 'Was knüpft Rahab ins Fenster?', options: ['ein rotes Seil', 'ein weißes Tuch', 'eine Laterne'], answer: 0 }
       ]
     },
     {
@@ -294,7 +294,7 @@ export const josua: Journey = {
       title: 'Heiliger Boden',
       ref: 'Josua 5,13 bis 6,5',
       text: [
-        'Josua ist allein draußen vor der Stadt Jericho. Da steht plötzlich ein Mann vor ihm. „Gehörst du zu uns oder zu unseren Feinden?“, fragt Josua.',
+        'Josua ist bei der Stadt Jericho. Er hebt die Augen, da steht ein Mann vor ihm. „Gehörst du zu uns oder zu unseren Feinden?“, fragt Josua.',
         '„Weder noch“, antwortet der Mann. „Ich bin der Fürst über das Heer Gottes.“ Da wirft sich Josua mit dem Gesicht zur Erde nieder und fragt: „Was befiehlt mir mein Herr?“',
         'Der Fürst sagt: „Zieh deine Schuhe aus, denn der Ort, auf dem du stehst, ist heilig.“ Und Josua zieht seine Schuhe aus.',
         'Dann sagt Gott Josua seinen Plan für Jericho. Sechs Tage lang soll das Volk einmal um die Stadt gehen, am siebten Tag siebenmal, und sieben Priester sollen dabei Posaunen blasen.'
@@ -312,7 +312,7 @@ export const josua: Journey = {
       title: 'Rund um die Stadt',
       ref: 'Josua 6,6–14',
       text: [
-        'Am nächsten Morgen ordnet Josua den Zug. Die hohen Mauern von Jericho ragen vor ihnen auf. Sieben Priester gehen mit Posaunen voran, dahinter tragen andere die goldene Truhe, und das Volk folgt.',
+        'Josua ordnet den Zug. Die Mauern von Jericho ragen vor ihnen auf. Zuerst gehen die Männer des Heeres, dahinter sieben Priester mit Posaunen. Danach tragen andere Priester die goldene Truhe, und das Volk folgt.',
         '„Ihr sollt keinen Laut machen“, sagt Josua. „Erst wenn ich sage: Ruft!, dürft ihr rufen.“',
         'Nur die Posaunen schallen, und man hört die Schritte der vielen Menschen. Sie gehen schweigend einmal rund um die Stadt, dann kehren sie ins Lager zurück.',
         'So geht es sechs Tage lang. Jeden Morgen derselbe Weg, jeden Abend zurück ins Lager. Jericho bleibt verschlossen.'
@@ -320,7 +320,7 @@ export const josua: Journey = {
       // Spiel: Ruhe bewahren (still, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'still', hint: 'Beruhige die Tiere, bevor es laut wird.', hush: STILL },
       questions: [
-        { q: 'Wie viele Priester gehen mit Posaunen voran?', options: ['sieben', 'zwölf', 'drei'], answer: 0 },
+        { q: 'Wie viele Priester gehen mit Posaunen vor der Truhe her?', options: ['sieben', 'zwölf', 'drei'], answer: 0 },
         { q: 'Wann dürfen die Menschen rufen?', options: ['wenn Josua „Ruft!“ sagt', 'sobald sie die Mauer sehen', 'am ersten Abend'], answer: 0 }
       ]
     },
@@ -330,10 +330,10 @@ export const josua: Journey = {
       title: 'Die Mauer fällt',
       ref: 'Josua 6,15–25',
       text: [
-        'Am siebten Tag stehen alle früh auf. Siebenmal gehen sie um die Stadt, Priester, goldene Truhe und Volk.',
-        'Beim siebten Mal ruft Josua: „Ruft! Gott hat euch die Stadt gegeben!“ Die Posaunen schallen, und das Volk ruft laut.',
+        'Am siebten Tag stehen alle früh auf. Siebenmal gehen sie um die Stadt, voran die Männer des Heeres, dann Priester, goldene Truhe und Volk.',
+        'Beim siebten Mal ruft Josua: „Ruft! Gott hat euch die Stadt gegeben! Sie gehört Gott. Nur Rahab und alle in ihrem Haus sollen am Leben bleiben.“ Die Posaunen schallen, und das Volk ruft laut.',
         'Da stürzt die Mauer ein. Die Stadt Jericho ist gefallen.',
-        'Josua erinnert die Kundschafter an ihr Versprechen: „Führt Rahab und ihre Familie aus dem Haus mit der roten Schnur, wie ihr es geschworen habt.“ So bleiben Rahab und alle, die zu ihr gehören, am Leben. Sie wohnt von nun an mitten unter dem Volk Israel.'
+        'Josua erinnert die Kundschafter an ihr Versprechen: „Führt Rahab und ihre Familie aus dem Haus mit dem roten Seil, wie ihr es geschworen habt.“ So bleiben Rahab und alle, die zu ihr gehören, am Leben. Sie wohnt von nun an mitten unter dem Volk Israel.'
       ],
       // nur Quiz (ernst bzw. ruhig, nichts wird gespielt); das Etappenbild ist noch das von Josef
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
@@ -346,12 +346,12 @@ export const josua: Journey = {
       id: 10,
       image: `${PICS}etappe-bild-10.webp`,
       title: 'Der Stein unter der Eiche',
-      ref: 'Josua 24,1.14–29',
+      ref: 'Josua 24,1.14–32',
       text: [
         'Viele Jahre später ist Josua alt geworden. Er ruft das ganze Volk nach Sichem zusammen.',
         '„Erwählt euch heute, wem ihr dienen wollt“, sagt Josua. „Ich aber und mein Haus, wir wollen Gott dienen.“',
         'Das Volk antwortet: „Wir wollen auch Gott dienen, denn er hat uns aus Ägypten geführt und uns bis hierher begleitet.“',
-        'Da nimmt Josua einen großen Stein und stellt ihn unter der Eiche auf. „Dieser Stein soll Zeuge sein, denn er hat alle Worte gehört, die Gott zu uns gesprochen hat.“ Dann schickt er das Volk heim. Danach stirbt Josua, hundertzehn Jahre alt. In Sichem begraben die Israeliten auch die Gebeine Josefs, die sie damals aus Ägypten mitgebracht haben.'
+        'Da nimmt Josua einen großen Stein und stellt ihn unter der Eiche auf. „Dieser Stein soll Zeuge sein, denn er hat alle Worte gehört, die Gott zu uns gesprochen hat.“ Dann schickt er das Volk heim. Danach stirbt Josua, hundertzehn Jahre alt, und man begräbt ihn in seinem eigenen Land auf dem Gebirge Ephraim. In Sichem aber begraben die Israeliten die Gebeine Josefs, die sie damals aus Ägypten mitgebracht haben.'
       ],
       // Spiel: Lückenvers (lueckenvers, alt); das Etappenbild ist noch das von Josef
       task: { kind: 'lueckenvers', hint: 'Setze die fehlenden Wörter in den Satz.', verse: VERS },
@@ -363,7 +363,7 @@ export const josua: Journey = {
   ],
   exam: [
     { q: 'Was sagt Gott zu Josua am Anfang?', options: ['„Ich bin mit dir.“', '„Geh allein.“', '„Kehre um.“'], answer: 0 },
-    { q: 'Was bindet Rahab ins Fenster?', options: ['eine rote Schnur', 'ein weißes Tuch', 'eine Laterne'], answer: 0 },
+    { q: 'Was knüpft Rahab ins Fenster?', options: ['ein rotes Seil', 'ein weißes Tuch', 'eine Laterne'], answer: 0 },
     { q: 'Was geschieht, als die Füße der Priester ins Wasser kommen?', options: ['Das Wasser bleibt stehen.', 'Das Wasser steigt.', 'Der Fluss wird breiter.'], answer: 0 },
     { q: 'Was tragen die zwölf Männer aus dem Fluss?', options: ['Steine', 'Krüge', 'Zweige'], answer: 0 },
     { q: 'Was soll Josua tun, weil der Ort heilig ist?', options: ['seine Schuhe ausziehen', 'sich verstecken', 'ein Feuer anzünden'], answer: 0 },
@@ -378,9 +378,12 @@ for (const st of josua.stages) {
 }
 
 // the German recordings of the stories (voice Achernar, text version 3 = files "-v3"); there are no English ones yet, so the English app reads with the voice of the device
+// Stages whose text was corrected for Bible faithfulness on 21.10.2026 (1: Book of the Law, 3 and 9: the red rope, 7: "allein" removed, 8: the armed men, 9: the ban, 10: the grave of Joshua) have NO German recording until the new one
+// is made (the app reads them with the voice of the device); list in `D:/Claude/Abenteuer-Josua/NEUAUFNAHME-BIBELTREUE-2026-10-21.md`. Remove a number from this list when its new file is in.
+const WITHOUT_RECORDING = new Set([1, 3, 7, 8, 9, 10])
 for (const s of josua.stages) {
   const file = `audio/abenteuer/josua/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`
-  Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
+  Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' || WITHOUT_RECORDING.has(s.id) ? undefined : file), enumerable: true, configurable: true })
 }
 
 // the background music of this adventure: three calm pieces made with Google's Lyria 3.5 (skill `lambking-abenteuer-skill`, ton.md); they follow one another at random

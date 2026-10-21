@@ -17,6 +17,8 @@ import { covered, groupLanding } from '@/utils/josuaGames'
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => josua.stages[n - 1]!
 /** Words that no text of the German data may use (the fall of Jericho is told without fighting and without anything that is hurt). */
+/** Stages whose text was corrected for Bible faithfulness on 21.10.2026 and wait for a new recording (see `NEUAUFNAHME-BIBELTREUE-2026-10-21.md`). */
+const WITHOUT_RECORDING = [1, 3, 7, 8, 9, 10]
 const FORBIDDEN = /\b(Messer|Schwert|Speer|Pfeil|Blut|töten|erschlagen|Teufel|Hölle)\b/i
 
 describe('Josua: stories and questions', () => {
@@ -29,7 +31,7 @@ describe('Josua: stories and questions', () => {
     expect(josua.stages.map((s) => s.title)).toEqual([
       'Ein neuer Anführer',
       'Zwei Kundschafter',
-      'Die rote Schnur',
+      'Das rote Seil',
       'Der Jordan',
       'Zwölf Steine',
       'Brot aus dem neuen Land',
@@ -51,8 +53,13 @@ describe('Josua: stories and questions', () => {
       expect(words / sentences, `words per sentence ${s.id}`).toBeGreaterThan(7)
       expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/josua/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`)
-      expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
+      // the stages with a text corrected on 21.10.2026 (Bible faithfulness) have no German recording until the new one is made (the app then reads with the voice of the device)
+      if (WITHOUT_RECORDING.includes(s.id)) {
+        expect(s.audio, `no German recording yet: ${s.id}`).toBeUndefined()
+      } else {
+        expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/josua/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`)
+        expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
+      }
       expect(s.image, `stage ${s.id}`).toBe(`images/abenteuer/josua/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
     }
     expect(new Set(josua.stages.map((s) => s.image)).size).toBe(10)
@@ -123,7 +130,7 @@ describe('Josua: the games, and the placeholders until the pictures come', () =>
     expect(m, 'the game is built').toBeDefined()
     expect(m!.pairs).toHaveLength(5)
     const told = josua.stages.slice(0, 5).map((x) => x.text.join(' ')).join(' ')
-    for (const word of ['mutig und stark', 'Flachs', 'Schnur', 'Lade', 'Steine']) expect(told, word).toContain(word)
+    for (const word of ['mutig und stark', 'Flachs', 'Seil', 'Lade', 'Steine']) expect(told, word).toContain(word)
     for (const p of m!.pairs) expect(p.text.length).toBeGreaterThan(20)
     expect(stage(5).task.memory!.back).toMatch(/spiele\/josua\/memory\//)
     const v = stage(10).task.verse

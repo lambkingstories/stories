@@ -18,7 +18,7 @@ export const josuaEn: TextOverlay<Journey> = {
       text: [
         'Moses, the servant of God, has died. The people of Israel stand at the Jordan River, and on the other side lies the land God promised them.',
         'Then God speaks to Joshua, the new leader, “My servant Moses is dead. Now lead the people into the land I am giving them.”',
-        'And God promises, “I will be with you, as I was with Moses. Be strong and courageous! Do not be afraid, for I will never leave you.”',
+        'And God promises, “I will be with you, as I was with Moses. Be strong and courageous! Do not be afraid, for I will never leave you.” He urges him, “Think about the Book of the Law day and night, and do what is written in it. Then everything will go well for you.”',
         'Joshua calls the officers, “Go through the camp and tell the people: Get your supplies ready! In three days we cross the Jordan.”'
       ],
       task: { hint: 'This stage is calm. Listen carefully and answer the questions.' },
@@ -36,25 +36,25 @@ export const josuaEn: TextOverlay<Journey> = {
         'But the king of Jericho hears about it. He sends messengers to Rahab, “Hand over the men!”',
         'Rahab has long since hidden the two on the roof, under stalks of flax. She tells the messengers that the men have already gone. So the messengers run off, and the city gate shuts behind them.'
       ],
-      task: { hint: 'Cover the men with bundles of flax.', hide: { rounds: [{ hint: 'Rahab hides the man under the flax. Lay the bundles over him.' }, { hint: 'Now two men lie on the roof. Tap a bundle and it turns.' }] } },
+      task: { hint: 'Cover the men with bundles of flax.', hide: { rounds: [{ hint: 'Rahab hides the two men under the flax. Start with the first one and lay the bundles over him.' }, { hint: 'Now two men lie on the roof. Tap a bundle and it turns.' }] } },
       questions: [
         { q: 'Where does Joshua send two men?', options: ['to Jericho', 'to Egypt', 'to Mount Sinai'] },
         { q: 'Who has the men searched for?', options: ['the king of Jericho', 'Rahab', 'Joshua'] }
       ]
     },
     {
-      title: 'The Red Cord',
+      title: 'The Red Rope',
       ref: 'Joshua 2:8–24',
       text: [
         'In the evening Rahab climbs up to the men on the roof. “Your God is God in heaven above and on the earth below,” she says. “I know that he is giving you this land. Please spare my family, too!”',
-        'The men promise it. Rahab lets them down by a rope through the window, for her house stands in the city wall. “Hide in the hills for three days,” she advises.',
-        '“Tie a red cord in your window,” say the men, “and bring your family into your house. Whoever stays inside will be safe.”',
-        'Rahab ties the red cord in the window. The men hide in the hills and then go back to Joshua.'
+        'The men promise it. Rahab lets them down by a red rope through the window, for her house stands in the city wall. “Hide in the hills for three days,” she advises.',
+        '“Tie this red rope in your window,” say the men, “and bring your family into your house. Whoever stays inside will be safe.”',
+        'Rahab ties the red rope in the window. The men hide in the hills and then go back to Joshua.'
       ],
       task: { hint: 'Let the man down the rope when he swings away from the wall.', lower: { rounds: [{ hint: 'Tap when the man swings away from the wall. Then he goes down a step.' }, { hint: 'The second man comes, the wind is stronger.' }] } },
       questions: [
         { q: 'What does Rahab say about God?', options: ['He is God in heaven and on earth.', 'He lives only in Jericho.', 'He is far away.'] },
-        { q: 'What does Rahab tie in the window?', options: ['a red cord', 'a white cloth', 'a lantern'] }
+        { q: 'What does Rahab tie in the window?', options: ['a red rope', 'a white cloth', 'a lantern'] }
       ]
     },
     {
@@ -66,7 +66,7 @@ export const josuaEn: TextOverlay<Journey> = {
         'The priests go ahead with the ark. As soon as their feet touch the water, the river stops flowing. The water stands up high, and below it the riverbed becomes dry.',
         'The priests stay standing in the middle of the Jordan, and all the people cross over on dry ground until everyone is on the other side.'
       ],
-      task: { hint: 'Bring the ark and the people through the Jordan.', cross: { rounds: [{ hint: 'Pull the golden chest into the water.' }, { hint: 'Now the people cross. Tap the groups.' }] } },
+      task: { hint: 'Bring the ark and the people through the Jordan.', cross: { rounds: [{ hint: 'Lead the priests with the golden chest into the water.' }, { hint: 'Now the people cross. Tap the groups.' }] } },
       questions: [
         { q: 'Who carries the golden chest ahead?', options: ['the priests', 'the spies', 'the children'] },
         { q: 'What happens when the feet of the priests touch the water?', options: ['The water stands still.', 'The water rises.', 'The river grows wider.'] }
@@ -81,7 +81,7 @@ export const josuaEn: TextOverlay<Journey> = {
         'There Joshua sets up the twelve stones. “When your children ask you someday: What are these stones for?, then tell them,” he says.',
         '“God made the water of the Jordan stand still until we were across. These stones shall always remind us.”'
       ],
-      task: { hint: 'Find the matching cards. Remember where each one lies.', memory: { pairs: [{ text: 'The scroll: God speaks to Joshua, “Be strong and courageous! I will be with you.”' }, { text: 'The bundle of flax: Rahab hid the men under it.' }, { text: 'The red cord at the window: Whoever stays inside the house will be safe.' }, { text: 'The ark of the covenant: The priests carry it ahead into the Jordan.' }, { text: 'The stone: Twelve stones remind us of the way through the Jordan.' }] } },
+      task: { hint: 'Find the matching cards. Remember where each one lies.', memory: { pairs: [{ text: 'The scroll: The Book of the Law. Joshua is to think about it day and night.' }, { text: 'The bundle of flax: Rahab hid the men under it.' }, { text: 'The red rope at the window: Whoever stays inside the house will be safe.' }, { text: 'The ark of the covenant: The priests carry it ahead into the Jordan.' }, { text: 'The stone: Twelve stones remind us of the way through the Jordan.' }] } },
       questions: [
         { q: 'What do the twelve men carry out of the river?', options: ['stones', 'jars', 'branches'] },
         { q: 'What are the stones to remind us of?', options: ['that God made the Jordan stand still', 'that it is harvest time', 'that Jericho has a wall'] }
@@ -106,7 +106,7 @@ export const josuaEn: TextOverlay<Journey> = {
       title: 'Holy Ground',
       ref: 'Joshua 5:13 to 6:5',
       text: [
-        'Joshua is alone outside the city of Jericho. Suddenly a man stands before him. “Are you for us or for our enemies?” asks Joshua.',
+        'Joshua is near the city of Jericho. He lifts his eyes, and a man stands before him. “Are you for us or for our enemies?” asks Joshua.',
         '“Neither,” answers the man. “I am the commander of God’s army.” Then Joshua falls to the ground on his face and asks, “What does my lord command?”',
         'The commander says, “Take off your sandals, for the place where you are standing is holy.” And Joshua takes off his sandals.',
         'Then God tells Joshua his plan for Jericho. For six days the people are to walk once around the city, on the seventh day seven times, and seven priests are to blow trumpets.'
@@ -121,14 +121,14 @@ export const josuaEn: TextOverlay<Journey> = {
       title: 'Around the City',
       ref: 'Joshua 6:6–14',
       text: [
-        'The next morning Joshua puts the procession in order. The high walls of Jericho tower ahead of them. Seven priests go first with trumpets, behind them others carry the golden chest, and the people follow.',
+        'Joshua puts the procession in order. The walls of Jericho tower ahead of them. First go the men of the army, behind them seven priests with trumpets. Then other priests carry the golden chest, and the people follow.',
         '“You shall not make a sound,” says Joshua. “Only when I say: Shout!, may you shout.”',
         'Only the trumpets sound, and you can hear the steps of the many people. They walk in silence once around the city, then return to the camp.',
         'So it goes for six days. Every morning the same way, every evening back to the camp. Jericho stays shut.'
       ],
       task: { hint: 'Calm the animals before it gets loud.', hush: { rounds: [{ hint: 'The people walk round the city in silence. Tap an animal before its cloud of noise gets big.' }, { hint: 'Once more, with more animals.' }] } },
       questions: [
-        { q: 'How many priests go first with trumpets?', options: ['seven', 'twelve', 'three'] },
+        { q: 'How many priests go ahead of the chest with trumpets?', options: ['seven', 'twelve', 'three'] },
         { q: 'When may the people shout?', options: ['when Joshua says “Shout!”', 'as soon as they see the wall', 'on the first evening'] }
       ]
     },
@@ -136,10 +136,10 @@ export const josuaEn: TextOverlay<Journey> = {
       title: 'The Wall Falls',
       ref: 'Joshua 6:15–25',
       text: [
-        'On the seventh day everyone gets up early. They walk around the city seven times, priests, golden chest, and people.',
+        'On the seventh day everyone gets up early. They walk around the city seven times, the men of the army first, then priests, golden chest, and people.',
         'The seventh time Joshua calls, “Shout! God has given you the city!” The trumpets sound, and the people shout loudly.',
         'Then the wall collapses. The city of Jericho has fallen.',
-        'Joshua reminds the spies of their promise, “Bring Rahab and her family out of the house with the red cord, as you swore.” So Rahab and all who belong to her stay alive. From then on she lives among the people of Israel.'
+        'Joshua reminds the spies of their promise, “Bring Rahab and her family out of the house with the red rope, as you swore.” So Rahab and all who belong to her stay alive. From then on she lives among the people of Israel.'
       ],
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
@@ -149,12 +149,12 @@ export const josuaEn: TextOverlay<Journey> = {
     },
     {
       title: 'The Stone under the Oak',
-      ref: 'Joshua 24:1, 14–29',
+      ref: 'Joshua 24:1, 14–32',
       text: [
         'Many years later Joshua has grown old. He calls all the people together at Shechem.',
         '“Choose today whom you will serve,” says Joshua. “But as for me and my house, we will serve God.”',
         'The people answer, “We want to serve God, too, for he brought us out of Egypt and has been with us until now.”',
-        'Then Joshua takes a large stone and sets it up under the oak. “This stone shall be a witness, for it has heard all the words God has spoken to us.” Then he sends the people home. Afterward Joshua dies, one hundred and ten years old. At Shechem the Israelites also bury the bones of Joseph, which they had brought out of Egypt.'
+        'Then Joshua takes a large stone and sets it up under the oak. “This stone shall be a witness, for it has heard all the words God has spoken to us.” Then he sends the people home. Afterward Joshua dies, one hundred and ten years old, and they bury him in his own land in the hills of Ephraim. At Shechem, however, the Israelites bury the bones of Joseph, which they had brought out of Egypt.'
       ],
       task: { hint: 'Put the missing words into the sentence.', verse: { rounds: [{ hint: 'Drag the right leaf into the gap.', parts: ['As for me and my household, we will ', ' God.'], words: ['serve', 'forget', 'leave'] }, { hint: 'Now two words are missing.', parts: ['This stone shall be a ', ' for it has heard all the ', ' that God has spoken to us.'], words: ['witness', 'words', 'sign', 'stones'] }] } },
       questions: [
@@ -165,7 +165,7 @@ export const josuaEn: TextOverlay<Journey> = {
   ],
   exam: [
     { q: 'What does God say to Joshua at the beginning?', options: ['“I will be with you.”', '“Go alone.”', '“Turn back.”'] },
-    { q: 'What does Rahab tie in the window?', options: ['a red cord', 'a white cloth', 'a lantern'] },
+    { q: 'What does Rahab tie in the window?', options: ['a red rope', 'a white cloth', 'a lantern'] },
     { q: 'What happens when the feet of the priests touch the water?', options: ['The water stands still.', 'The water rises.', 'The river grows wider.'] },
     { q: 'What do the twelve men carry out of the river?', options: ['stones', 'jars', 'branches'] },
     { q: 'What is Joshua to do because the place is holy?', options: ['take off his sandals', 'hide', 'light a fire'] },
