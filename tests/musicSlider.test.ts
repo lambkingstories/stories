@@ -148,4 +148,31 @@ describe('the music slider', () => {
     await settle()
     expect(sources.length).toBe(0)
   })
+
+  it('the slider still stops the music after the view that started it is gone (the watcher must not die with that view)', async () => {
+    const { defineComponent, h, onMounted } = await import('vue')
+    const { mount } = await import('@vue/test-utils')
+    const { music, settings } = await setup()
+    settings.setMusicVolume(0.4)
+    // the music is asked for in `onMounted`, as the map of an adventure does
+    const Map = defineComponent({
+      setup() {
+        onMounted(() => music.playMap(['audio/abenteuer/noah/musik-a.mp3', 'audio/abenteuer/noah/musik-b.mp3']))
+        return () => h('div')
+      }
+    })
+    const view = mount(Map)
+    await settle()
+    expect(sources.length).toBeGreaterThan(0)
+
+    // the child leaves the map (another view, the first one is unmounted) while the music goes on
+    view.unmount()
+    await Promise.resolve()
+    expect(sources.some((s) => !s.stopped)).toBe(true)
+
+    settings.setMusicVolume(0)
+    await Promise.resolve()
+    expect(sources.every((s) => s.stopped)).toBe(true)
+    expect(gains[0]!.connected).toBe(false)
+  })
 })

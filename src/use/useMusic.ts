@@ -7,7 +7,7 @@
  * own cannot be looped without a gap). The volume is the music slider of the sound window (0 = off); the music fades in and out and
  * rests while the app is not in view.
  */
-import { watch } from 'vue'
+import { effectScope, watch } from 'vue'
 import useSoundSettings from '@/use/useSoundSettings'
 import { prependBaseUrl } from '@/utils/function'
 import { MAP_MUSIC, moodOfGame, pickGameMusic, type MusicPiece } from '@/utils/sfxFiles'
@@ -229,8 +229,10 @@ function playlist(r: Running, firstBuf: AudioBuffer) {
 function hook() {
   if (hooked || typeof window === 'undefined') return
   hooked = true
-  // the slider: live volume; at 0 the music stops, above 0 it comes back
-  watch(
+  // the slider: live volume; at 0 the music stops, above 0 it comes back. The watcher lives in its own detached scope: made inside a
+  // component (the first `start` comes from `onMounted`), it would be stopped with that component, and after the first change of view
+  // the slider would no longer reach the music.
+  effectScope(true).run(() => watch(
     () => musicVolume.value,
     (v) => {
       if (v <= 0 && running) {
@@ -241,7 +243,7 @@ function hook() {
         running.gain.gain.setTargetAtTime(v * SCALE, ctx.currentTime, 0.08)
       } else if (v > 0 && wanted && !running) void begin(wanted)
     }
-  )
+  ))
   document.addEventListener('visibilitychange', () => {
     if (!ctx) return
     if (document.hidden) void ctx.suspend()
