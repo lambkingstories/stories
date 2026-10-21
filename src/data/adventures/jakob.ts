@@ -85,7 +85,7 @@ const KURBEL: CrankGame = {
 }
 
 /**
- * Etappe 5, "Morgenrot halten": das Flussufer bei Nacht (Etappenbild 10; VORLÄUFIG noch das alte Flussufer-Bild, bis Codex das neue „Ringen am Fluss“ malt (J05d); danach Lage und Weg des Lichts neu messen; von der App abgedunkelt und aufgehellt) mit einem sanften Licht (Bildauftrag J11); kein Gegner, keine Gestalt.
+ * Etappe 5, "Morgenrot halten": das Flussufer bei Nacht (Etappenbild 10, „Ringen am Fluss“, J05d, 21.10.2026; Lage und Weg des Lichts sind noch am alten Flussufer-Bild gemessen und am neuen Bild zu prüfen; von der App abgedunkelt und aufgehellt) mit einem sanften Licht (Bildauftrag J11); kein Gegner, keine Gestalt.
  * Runde 1 bleibt das Licht stehen (10 Sekunden Halten), Runde 2 wandert es das Ufer entlang (15 Sekunden). Lage und Weg des Lichts sind die Messwerte aus `halten/halten-messung.json` (Prozent des alten Etappenbildes, im Ufersand vor Jakobs Füßen, von links nach rechts).
  */
 const HALTEN: HoldGame = {
@@ -229,7 +229,7 @@ export const jakob: Journey = {
   title: 'Jakob',
   subtitle: 'Ein Weg mit Umwegen',
   age: '8-10',
-  downloadMb: 14, // 13,6 MB gezählt am 21.10.2026 mit den neuen Etappenbildern und der Karte v3 (zwei Etappenbilder sind noch die alten bis zu den neuen von Codex)
+  downloadMb: 14, // 13,6 MB gezählt am 21.10.2026 mit den zwölf neuen Etappenbildern und der Karte v3
   medal: `${IMG}medaille.webp`, // Jakob und die Himmelsleiter (Treppe aus Steinen im Sternenlicht)
   // Geschenk-Ausmalbild: Jakob und die Himmelsleiter im Traum (Treppe aus Steinen, Sterne, Tiere der Herde schlafend, friedlich)
   gift: { title: 'Jakob und die Himmelsleiter im Traum', image: `${IMG}geschenk.webp` },
