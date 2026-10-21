@@ -22,7 +22,7 @@ const PICTURE = [1, 2, 3, 4, 4, 1, 4, 6, 5, 5, 6, 3]
 const FORBIDDEN = /\b(Messer|Schwert|Pfeil|Blut|töten|erschlagen|Teufel|Hölle|Feind|Gegner)\b/i
 
 describe('Jakob: stories and questions', () => {
-  it('twelve stages with 3 or 4 paragraphs of 90 to 145 words (plan v3), the Bible passage under every one, no recording yet (the app reads with the voice of the device), the picture names of the plan', () => {
+  it('twelve stages with 3 or 4 paragraphs of 90 to 145 words (plan v3), the Bible passage under every one, the German recording of every story, the picture names of the plan', () => {
     expect(jakob.id).toBe('jakob')
     expect(jakob.age).toBe('8-10')
     expect(jakob.title).toBe('Jakob')
@@ -42,7 +42,8 @@ describe('Jakob: stories and questions', () => {
       expect(words / sentences, `words per sentence ${s.id}`).toBeGreaterThan(7)
       expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.audio, `no recording yet ${s.id}`).toBeUndefined()
+      expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/jakob/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`)
+      expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
       // stages 5 to 9 and 12 use an existing picture until their own picture is built in (PLATZHALTER)
       expect(s.image).toBe(`images/abenteuer/jakob/etappe-bild-${String(PICTURE[s.id - 1]).padStart(2, '0')}.webp`)
     }
@@ -392,7 +393,7 @@ describe('Jakob: English', () => {
       expect(s.task.hint, `hint ${s.id}`).not.toBe(de[i]!.hint)
       s.questions.forEach((q, k) => expect(q.q, `question ${s.id}.${k}`).not.toBe(de[i]!.q[k]))
       expect(s.ref, `ref ${s.id}`).toMatch(/^Genesis \d/)
-      expect(s.audio, `audio ${s.id}`).toBeUndefined()
+      expect(s.audio, `no English recording yet: ${s.id}`).toBeUndefined()
     })
     expect(jakob.title).toBe('Jacob')
     expect(jakob.subtitle).toBe('A Road with Detours')

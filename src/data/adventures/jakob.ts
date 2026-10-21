@@ -1,7 +1,7 @@
 /**
  * Abenteuer "Jakob" (1. Mose 25,19–34; 27; 28,10–22; 29–31; 32; 33,1–11; 35; 37,1–4) für 8 bis 10 Jahre: 12 Etappen (Ausbau am 20.10.2026, 1. Mose 25 bis 37), Untertitel "Ein Weg mit Umwegen". Entstanden nach dem Skill "LambKing Abenteuer Skill".
  * Quelle der Texte: D:/Claude/Abenteuer-Jakob/ENTWURF_Jakob-v3.md (zweitgeprüft, 90 bis 145 Wörter je Etappe wie bei Noah und Josef, eingebaut am 21.10.2026), Plan: ETAPPENPLAN-v3.md.
- * Es gibt noch keine Aufnahmen zu den neuen Texten (`audio` fehlt: die App liest mit der Gerätestimme); die alten Aufnahmen liegen noch im Ordner, sind aber nicht mehr verlinkt.
+ * Deutsche Aufnahmen zu den neuen Texten: geschichte-NN-v3.mp3 (Gemini, Stimme Achernar, 21.10.2026, nicht gehört); Englisch noch nicht (die englische App liest mit der Gerätestimme).
  * Die Spielaufgaben der Etappen sind noch die von vor v3 (die Spiele folgen nach SPIELE/ENTWURF-v3.md). Die richtige Antwort steht in den Daten
  * IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
  * Spiele (Wahl der Leitung vom 20.10.2026, höchstens zwei alte Mechaniken): 1 Zählen (alt), 2 nur Quiz, 3 Treppe zusammenschieben (neu), 4 Brunnen kurbeln (neu),
@@ -16,6 +16,7 @@
 import type { CairnGame, CatchGame, CrankGame, CycleGame, GuessGame, HoldGame, Journey, RelayGame, RingGame, SlideGame } from '@/types/adventure'
 import { JAKOB_PATH } from './jakobPath'
 import { localize } from './localize'
+import { adventureLanguage } from '@/use/adventureLanguage'
 import { jakobEn } from './en/jakob.en'
 
 const IMG = 'images/abenteuer/jakob/'
@@ -471,6 +472,12 @@ export const jakob: Journey = {
 for (const s of jakob.stages) {
   const t = s.task
   for (const g of [t.guess, t.cycle, t.cairn, t.ring, t.catch, t.relay]) if (g) g.background = s.image
+}
+
+// the German recordings of the stories (voice Achernar, text version 3 = files "-v3"); there are no English ones yet, so the English app reads with the voice of the device
+for (const s of jakob.stages) {
+  const file = `audio/abenteuer/jakob/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`
+  Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 
 // the English texts (title, stories, questions, hints, recordings) lie over the German ones; the screens show them when the app is English
