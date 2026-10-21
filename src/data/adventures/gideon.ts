@@ -36,8 +36,8 @@ const WORT: WordGame = {
 }
 
 /**
- * Etappe 8, "Am Wasser" (Wimmelbild, alte Mechanik): am Bachufer knien viele Männer, fünf davon führen das Wasser mit der Hand zum Mund; einige stehen halb hinter Schilf und Busch (Bildauftrag G34; eigene Szene
- * `wimmel/wasser-szene.webp`). Plan v3: zwei Männerbilder, die sich abwechseln, und zwei Deckungsbilder an drei Plätzen. Die Lagen (Mitte der Unterkante und Breite, Prozent der Szene) sind am gemalten Bild abgelesen (`wimmel-messung.json`, die Männer als Fußpunkte umgerechnet auf die Unterkante der Datei; die drei Deckungen halbieren drei Männer).
+ * Etappe 8, "Am Wasser" (Wimmelbild, alte Mechanik): am Bachufer knien zehn Männer und trinken mit dem Mund direkt aus dem Wasser (Richter 7,5, neu gemalt 21.10.2026, Szene b), und fünf andere führen das Wasser mit der Hand zum Mund; einige stehen halb hinter Schilf und Busch (Bildauftrag G34; eigene Szene
+ * `wimmel/wasser-szene.webp`). Plan v3: zwei Männerbilder, die sich abwechseln, und zwei Deckungsbilder an drei Plätzen. Die Lagen (Mitte der Unterkante und Breite, Prozent der Szene) sind am gemalten Bild abgelesen (`wimmel-messung-G34b.json` als Vorschlag, an der Szene mit den Sprites zusammen neu gesetzt: Männer frei auf Sand, nicht an den knienden; die Männer als Fußpunkte umgerechnet auf die Unterkante der Datei; die drei Deckungen halbieren drei Männer).
  * Bilder (gemalt, 21.10.2026): `wimmel/wasser-szene.webp` 1100 × 1467, `finde-a.webp`, `finde-b.webp` je ca. 140 × 220, `deck-schilf.webp`, `deck-busch.webp` je 330 × 260.
  */
 const WIMMEL: FindGame = {
@@ -45,16 +45,16 @@ const WIMMEL: FindGame = {
   doneText: 'Du hast alle fünf Männer gefunden, die das Wasser mit der Hand zum Mund führen!',
   scene: `${G}wimmel/wasser-szene.webp`,
   finds: [
-    { image: `${G}wimmel/finde-a.webp`, x: 19.5, y: 31.3, w: 12.7 },
-    { image: `${G}wimmel/finde-b.webp`, x: 87.5, y: 38.1, w: 12.7 },
-    { image: `${G}wimmel/finde-a.webp`, x: 57, y: 50.5, w: 12.7 },
-    { image: `${G}wimmel/finde-b.webp`, x: 84.5, y: 65.1, w: 12.7 },
-    { image: `${G}wimmel/finde-a.webp`, x: 29.5, y: 90.6, w: 12.7 }
+    { image: `${G}wimmel/finde-a.webp`, x: 19, y: 25.8, w: 12.7 },
+    { image: `${G}wimmel/finde-b.webp`, x: 89.5, y: 33.5, w: 12.7 },
+    { image: `${G}wimmel/finde-a.webp`, x: 15.4, y: 51.7, w: 12.7 },
+    { image: `${G}wimmel/finde-b.webp`, x: 90.8, y: 64.5, w: 12.7 },
+    { image: `${G}wimmel/finde-a.webp`, x: 34.9, y: 81.4, w: 12.7 }
   ],
   covers: [
-    { image: `${G}wimmel/deck-schilf.webp`, x: 20, y: 32.8, w: 23 },
-    { image: `${G}wimmel/deck-schilf.webp`, x: 57.5, y: 52, w: 20 },
-    { image: `${G}wimmel/deck-busch.webp`, x: 85, y: 68, w: 23 }
+    { image: `${G}wimmel/deck-schilf.webp`, x: 19, y: 27.3, w: 23 },
+    { image: `${G}wimmel/deck-schilf.webp`, x: 15.4, y: 53.2, w: 20 },
+    { image: `${G}wimmel/deck-busch.webp`, x: 34.9, y: 82.9, w: 23 }
   ]
 }
 
