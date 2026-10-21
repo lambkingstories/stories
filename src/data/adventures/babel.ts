@@ -146,25 +146,25 @@ export const babel: Journey = {
   title: 'Der Turm von Babel',
   subtitle: 'Eine Stadt und ein Turm',
   age: '8-10',
-  downloadMb: 11, // gut 10,5 MB gezählt nach der neuen Karte (vier Stücke zusammen 4,7 MB) am 20.10.2026 (der Test sagt die echte Größe)
+  downloadMb: 10, // gut 10 MB gerechnet am 21.10.2026 mit der neuen Karte v3 (vier Stücke zusammen 4,2 MB) (der Test sagt die echte Größe)
   medal: `${IMG}medaille.webp`, // Der Turm (Stufenturm aus Lehmziegeln) in der Ebene im Morgenlicht
   // Geschenk-Ausmalbild: der Turm aus Ziegeln mit vielen Bauleuten bei Sonnenaufgang (unvollendet, friedlich)
   gift: { title: 'Der Turm aus Ziegeln', image: `${IMG}geschenk.webp` },
-  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v2) mit Stationen und Perlenweg aus fertig/messdaten.json und babelPath.ts
+  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v3 mit sechs Orten und dem Ziel) mit Stationen und Perlenweg aus babelPath.ts
   map: {
-    images: [1, 2, 3, 4].map((n) => `${IMG}karte-pano-v2-${n}.webp`),
+    images: [1, 2, 3, 4].map((n) => `${IMG}karte-pano-v3-${n}.webp`),
     ring: 'images/abenteuer/josef/medaillon-ring.webp',
     aspect: 9908 / 1648,
     widthPx: 9908,
     stages: [
-      { x: 0.1262, y: 0.5218, d: 0.0339 },
-      { x: 0.2442, y: 0.5461, d: 0.0339 },
-      { x: 0.3987, y: 0.54, d: 0.0339 },
-      { x: 0.5702, y: 0.6129, d: 0.0339 },
-      { x: 0.7418, y: 0.5461, d: 0.0339 },
-      { x: 0.8528, y: 0.534, d: 0.0339 }
+      { x: 0.0706, y: 0.6371, d: 0.0339 },
+      { x: 0.2321, y: 0.6371, d: 0.0339 },
+      { x: 0.3936, y: 0.6371, d: 0.0339 },
+      { x: 0.5178, y: 0.6493, d: 0.0339 },
+      { x: 0.7065, y: 0.6493, d: 0.0339 },
+      { x: 0.8125, y: 0.6432, d: 0.0339 }
     ],
-    exam: { x: 0.9538, y: 0.534, d: 0.0339 },
+    exam: { x: 0.974, y: 0.6432, d: 0.0339 },
     path: BABEL_PATH
   },
   stages: [

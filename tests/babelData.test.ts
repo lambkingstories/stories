@@ -260,7 +260,7 @@ describe('Babel: die Karte', () => {
   const W = 9908
   const H = 1648
   it('vier Stücke eines Bildes, jedes unter 1,8 MB; Stationen von links nach rechts, nicht zu tief und nicht zu dicht', () => {
-    expect(m.images).toEqual([1, 2, 3, 4].map((n) => `images/abenteuer/babel/karte-pano-v2-${n}.webp`))
+    expect(m.images).toEqual([1, 2, 3, 4].map((n) => `images/abenteuer/babel/karte-pano-v3-${n}.webp`))
     for (const f of m.images) expect(statSync(`public/${f}`).size / 1024, f).toBeLessThan(1800)
     expect(m.widthPx).toBe(W)
     expect(m.aspect).toBeCloseTo(W / H, 3)
