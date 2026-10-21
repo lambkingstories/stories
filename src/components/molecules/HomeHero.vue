@@ -82,7 +82,7 @@ onBeforeUnmount(() => {
             decoding="async"
             loading="eager"
           )
-        div(class="hero-copy")
+        div(:class="['hero-copy', { 'has-lamb': i === 0 }]")
           LkCompanion(v-if="i === 0" class="hero-lamb" pose="sitzen" :size="84")
           h2(class="hero-title") {{ s.title }}
           p(v-if="s.slogan" class="hero-slogan") {{ s.slogan }}
@@ -249,6 +249,13 @@ onBeforeUnmount(() => {
     justify-content: center
     padding: 24px 28px 44px
     gap: 10px
+
+    // the card ends at its upper edge here, so the lamb sits inside the card and the text starts below it
+    &.has-lamb
+      padding-top: 108px
+
+  .hero-lamb
+    top: 14px
 
   .hero-title
     font-size: 2rem

@@ -68,11 +68,16 @@ describe('the start page', () => {
     expect(warnings.filter((w) => /not defined on instance|is not a function|ERROR/.test(w))).toEqual([])
   })
 
-  it('the welcome iPad has three slides', async () => {
+  it('the welcome iPad has four slides, the fourth one is the partnership with REACH Ministries and has a link button', async () => {
     const { default: Home } = await import('@/views/app/AppHomeView.vue')
     const wrapper = mount(Home, { global: { plugins: [i18n], stubs: { RouterLink: true } }, attachTo: document.body })
     await flushPromises()
-    expect(wrapper.findAll('.hero-slide')).toHaveLength(3)
+    const slides = wrapper.findAll('.hero-slide')
+    expect(slides).toHaveLength(4)
     expect(wrapper.text()).toContain('Willkommen')
+    expect(slides[3]!.text()).toContain('Wir freuen uns auf die Partnerschaft mit „Reach Kids Ministries“')
+    expect(slides[3]!.text()).toContain('Reach Kids Ministries verkündet das Evangelium und hilft Bedürftigen durch praktische Nächstenliebe und christliche Kinderarbeit')
+    expect(slides[3]!.find('button.hero-shop').exists()).toBe(true)
+    expect(slides[3]!.find('img.hero-img').attributes('src')).toContain('reach-kids/wappen-slide.webp')
   })
 })
