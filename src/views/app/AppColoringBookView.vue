@@ -20,6 +20,7 @@ import { cacheUrlToBlobUrl } from '@/use/useBookCache'
 import { allowedPages, freePageCount } from '@/use/useBookAccess'
 import usePremium from '@/use/usePremium'
 import { pickLocalizedImage } from '@/types/apiBook'
+import { openExternal } from '@/utils/openExternal'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
@@ -30,6 +31,8 @@ const { showUpsell } = usePremium()
 const bookId = computed(() => String(route.params.bookId))
 const title = ref('')
 const shopLink = ref('')
+/** Where the printed book is sold (Amazon) in the language of the app; empty when there is none for this language. */
+const printedLink = ref('')
 /** The number of free pictures of this book, when it has its own (see the AdminUI). */
 const ownFree = ref<number | null>(null)
 const pages = ref<ColoringBookPage[]>([])
@@ -199,6 +202,7 @@ async function start() {
     pages.value = list
     ownFree.value = (book as ApiBook).freePages ?? null
     shopLink.value = pickLocalizedImage((book as ApiBook).etsyLink, locale.value === 'en' ? 'en' : 'de')
+    printedLink.value = (book as ApiBook).etsyLink?.[locale.value === 'en' ? 'en' : 'de'] ?? ''
     // Back from the editor the page that was painted last is open (or the one named in the address);
     // a new book starts at page one.
     const wanted = Number(route.query.p)
@@ -292,6 +296,8 @@ watch(bookId, () => {
         button(type="button" class="bk-primary" @click="paint") {{ pageLocked ? t('app.coloring.unlockBook') : current ? t('app.coloring.continuePaint') : t('app.coloring.startPaint') }}
         button(v-if="current" type="button" class="bk-secondary" @click="confirming = true") {{ t('app.coloring.resetPage') }}
 
+      button(v-if="printedLink" type="button" class="bk-printed" @click="openExternal(printedLink)") {{ t('app.coloring.printedAt') }} ›
+
       nav(ref="strip" class="bk-strip" :aria-label="t('app.coloring.books')")
         button(
           v-for="(p, i) in pages"
@@ -383,6 +389,18 @@ $glass: rgba(252, 251, 248, 0.88)
   font-size: 0.8rem
   font-weight: 600
   color: $muted
+
+.bk-printed
+  min-height: 44px
+  padding: 0 18px
+  border: 1px solid rgba(20, 24, 32, 0.12)
+  border-radius: 12px
+  background: $glass
+  color: $accent
+  font-family: inherit
+  font-weight: 700
+  font-size: 0.95rem
+  cursor: pointer
 
 .bk-note
   margin: 40px 0

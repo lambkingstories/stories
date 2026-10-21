@@ -31,6 +31,12 @@ const BACKEND_ID: Record<string, string> = {
   noah: 'ba-03-noah-die-arche-und-der-regenbogen'
 }
 
+/** Where the printed book is sold (from the shop page lambking.store). */
+const AMAZON: Record<string, string> = {
+  schoepfung: 'https://www.amazon.de/dp/B0HMX9J4Q9',
+  noah: 'https://www.amazon.de/dp/B0HN1375XN'
+}
+
 const DESCRIPTIONS: Record<string, { short: string; long: string }> = {
   schoepfung: {
     short: '36 Bilder zum Ausmalen: Gott erschafft die Welt, vom ersten Licht bis zum Garten Eden.',
@@ -57,6 +63,7 @@ function toBook(folder: string, b: BookData, volume: number): ApiBook {
     badges: ['ab 5 Jahren', 'Ausmalen'],
     previewImage: { de: cover, en: cover },
     coverImage: { de: cover, en: cover },
+    etsyLink: { de: AMAZON[folder] ?? '', en: '' },
     attachments: [],
     localizations: {
       de: {
