@@ -18,7 +18,7 @@ import { localize } from './localize'
 import { adventureLanguage } from '@/use/adventureLanguage'
 import { josuaEn } from './en/josua.en'
 
-// Etappenbilder (von Anton gewählt: 7 Variante b, die anderen a; 1, 3 und 9 vorläufig neu eingebaut, 4 und 8 folgen mit der Lade): `images/abenteuer/josua/etappe-bild-NN.webp`, 960 × 640
+// Etappenbilder (von Anton gewählt: 7 Variante b, die anderen a; 1, 3, 4, 8 und 9 vorläufig neu eingebaut): `images/abenteuer/josua/etappe-bild-NN.webp`, 960 × 640
 const PICS = 'images/abenteuer/josua/'
 const G = 'images/abenteuer/spiele/josua/'
 
