@@ -64,7 +64,6 @@ export const NOT_PAINTED_YET = [
   'images/abenteuer/spiele/mose/manna/',
   'images/abenteuer/spiele/mose/unterschied/',
   'images/abenteuer/spiele/mose/worte/',
-  'images/abenteuer/spiele/gideon/memory/',
 ]
 
 export const notPaintedYet = (path: string) => NOT_PAINTED_YET.some((p) => path.startsWith(p))
