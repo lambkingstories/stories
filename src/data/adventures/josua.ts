@@ -17,8 +17,8 @@ import { JOSUA_PATH } from './josuaPath'
 import { localize } from './localize'
 import { josuaEn } from './en/josua.en'
 
-// PLATZHALTER bis zum eigenen Bild: die Etappenbilder von Josef (Ordner images/abenteuer/josef/); danach `images/abenteuer/josua/etappe-bild-NN.webp`
-const PLACEHOLDER = 'images/abenteuer/josef/'
+// Etappenbilder (vorläufig Variante a der neuen Bilder; Anton wählt später a/b): `images/abenteuer/josua/etappe-bild-NN.webp`, 960 × 640
+const PICS = 'images/abenteuer/josua/'
 const G = 'images/abenteuer/spiele/josua/'
 
 /**
@@ -28,7 +28,7 @@ const G = 'images/abenteuer/spiele/josua/'
  * Bilder (gemalt, 21.10.2026): `still/kamel.webp`, `gans.webp`, `ziege.webp`, `lamm.webp` je 220 × 220, `wolke.webp` 120 × 100 (alle transparent).
  */
 const STILL: HushGame = {
-  background: `${PLACEHOLDER}etappe-bild-08.webp`,
+  background: `${PICS}etappe-bild-08.webp`,
   clouds: [`${G}still/wolke.webp`, `${G}still/wolke.webp`, `${G}still/wolke.webp`],
   spots: [
     { id: 'platz-1', animal: 'kamel', image: `${G}still/kamel.webp`, x: 15, y: 90, w: 14 },
@@ -109,7 +109,7 @@ const ABSEILEN: LowerGame = {
 
 /** Etappe 10, "Lückenvers": zwei Sätze aus dem Text der Etappe; die Wörter sind kurze Blätter (das richtige zuerst, `answers` zeigt auf sie). Tafel und Blatt sind die aus Adam und Eva, kopiert. Hintergrund ist das Etappenbild 10, von der App weichgezeichnet (`soft`). */
 const VERS: VerseGame = {
-  background: `${PLACEHOLDER}etappe-bild-11.webp`,
+  background: `${PICS}etappe-bild-10.webp`,
   soft: true,
   board: `${G}lueckenvers/tafel.webp`,
   leaf: `${G}lueckenvers/blatt.webp`,
@@ -154,10 +154,10 @@ export const josua: Journey = {
   subtitle: 'Mut für das neue Land',
   age: '8-10',
   downloadMb: 16, // PLATZHALTER: Größe mit den Bildern von Josef; wird mit den eigenen Bildern neu gemessen (der Test sagt die echte Größe)
-  medal: josef.medal, // PLATZHALTER bis "Die Posaune von Jericho" (Widderhorn vor der Stadtmauer)
-  // Geschenk-Ausmalbild: Die Posaunen von Jericho (sieben Priester mit Widderhörnern vor der ganzen Stadtmauer); PLATZHALTER bis zum eigenen Bild
+  medal: josef.medal, // PLATZHALTER bis eigenes Bild: "Die Posaune von Jericho" (Widderhorn vor der Stadtmauer)
+  // Geschenk-Ausmalbild: Die Posaunen von Jericho (sieben Priester mit Widderhörnern vor der ganzen Stadtmauer); PLATZHALTER bis eigenes Bild
   gift: { title: 'Die Posaunen von Jericho', image: josef.gift.image },
-  // PLATZHALTER: die Karte von Josef (vier Stücke, 9824 × 1632 px) mit den ersten zehn Stationen und dem Perlenweg dorthin; Station 11 von Josef ist das Ziel (Prüfung)
+  // PLATZHALTER bis eigenes Bild: die Karte von Josef (vier Stücke, 9824 × 1632 px) mit den ersten zehn Stationen und dem Perlenweg dorthin; Station 11 von Josef ist das Ziel (Prüfung)
   map: {
     images: josef.map.images,
     ring: josef.map.ring,
@@ -170,7 +170,7 @@ export const josua: Journey = {
   stages: [
     {
       id: 1,
-      image: `${PLACEHOLDER}etappe-bild-01.webp`,
+      image: `${PICS}etappe-bild-01.webp`,
       title: 'Ein neuer Anführer',
       ref: 'Josua 1,1–11',
       text: [
@@ -188,7 +188,7 @@ export const josua: Journey = {
     },
     {
       id: 2,
-      image: `${PLACEHOLDER}etappe-bild-02.webp`,
+      image: `${PICS}etappe-bild-02.webp`,
       title: 'Zwei Kundschafter',
       ref: 'Josua 2,1–7',
       text: [
@@ -206,7 +206,7 @@ export const josua: Journey = {
     },
     {
       id: 3,
-      image: `${PLACEHOLDER}etappe-bild-03.webp`,
+      image: `${PICS}etappe-bild-03.webp`,
       title: 'Die rote Schnur',
       ref: 'Josua 2,8–24',
       text: [
@@ -224,7 +224,7 @@ export const josua: Journey = {
     },
     {
       id: 4,
-      image: `${PLACEHOLDER}etappe-bild-04.webp`,
+      image: `${PICS}etappe-bild-04.webp`,
       title: 'Der Jordan',
       ref: 'Josua 3,1–17',
       text: [
@@ -242,7 +242,7 @@ export const josua: Journey = {
     },
     {
       id: 5,
-      image: `${PLACEHOLDER}etappe-bild-05.webp`,
+      image: `${PICS}etappe-bild-05.webp`,
       title: 'Zwölf Steine',
       ref: 'Josua 4,1–24',
       text: [
@@ -260,7 +260,7 @@ export const josua: Journey = {
     },
     {
       id: 6,
-      image: `${PLACEHOLDER}etappe-bild-06.webp`,
+      image: `${PICS}etappe-bild-06.webp`,
       title: 'Brot aus dem neuen Land',
       ref: 'Josua 5,1.10–12',
       text: [
@@ -278,7 +278,7 @@ export const josua: Journey = {
     },
     {
       id: 7,
-      image: `${PLACEHOLDER}etappe-bild-07.webp`,
+      image: `${PICS}etappe-bild-07.webp`,
       title: 'Heiliger Boden',
       ref: 'Josua 5,13 bis 6,5',
       text: [
@@ -296,7 +296,7 @@ export const josua: Journey = {
     },
     {
       id: 8,
-      image: `${PLACEHOLDER}etappe-bild-08.webp`,
+      image: `${PICS}etappe-bild-08.webp`,
       title: 'Rund um die Stadt',
       ref: 'Josua 6,6–14',
       text: [
@@ -314,7 +314,7 @@ export const josua: Journey = {
     },
     {
       id: 9,
-      image: `${PLACEHOLDER}etappe-bild-09.webp`,
+      image: `${PICS}etappe-bild-09.webp`,
       title: 'Die Mauer fällt',
       ref: 'Josua 6,15–25',
       text: [
@@ -332,7 +332,7 @@ export const josua: Journey = {
     },
     {
       id: 10,
-      image: `${PLACEHOLDER}etappe-bild-11.webp`,
+      image: `${PICS}etappe-bild-10.webp`,
       title: 'Der Stein unter der Eiche',
       ref: 'Josua 24,1.14–29',
       text: [

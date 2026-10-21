@@ -52,7 +52,7 @@ describe('Josua: stories and questions', () => {
       expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
       expect(s.audio, `no recording yet, the device voice reads: ${s.id}`).toBeUndefined()
-      expect(s.image, `stage ${s.id}`).toMatch(/^images\/abenteuer\/josef\/etappe-bild-\d\d\.webp$/)
+      expect(s.image, `stage ${s.id}`).toBe(`images/abenteuer/josua/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
     }
     expect(new Set(josua.stages.map((s) => s.image)).size).toBe(10)
   })
@@ -293,13 +293,19 @@ describe('Josua: the games, and the placeholders until the pictures come', () =>
     expect(open).toEqual([true, false, false, false, false, false, false, false, false, false])
   })
 
+  it('no stage picture and no game background is a picture of Josef any more (only map, medal and gift are placeholders)', () => {
+    const names = JSON.stringify(josua.stages.map((s) => [s.image, s.task]))
+    expect(names).not.toContain('abenteuer/josef/')
+    for (const s of josua.stages) expect(existsSync(`public/${s.image}`), s.image).toBe(true)
+  })
+
   it('medal and gift are the ones of Josef until its own come; the gift has its final title', () => {
     expect(josua.medal).toBe(josef.medal)
     expect(josua.gift.title).toBe('Die Posaunen von Jericho')
     expect(josua.gift.image).toBe(josef.gift.image)
   })
 
-  it('every file that the data names exists (the pictures of Josef, the map, the medal) and is small enough', () => {
+  it('every file that the data names exists (the own stage pictures, the map and medal of Josef) and is small enough', () => {
     let bytes = 0
     for (const f of journeyFiles(josua)) {
       if (notPaintedYet(f) && !existsSync(`public/${f}`)) continue
