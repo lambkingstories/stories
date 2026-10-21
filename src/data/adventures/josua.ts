@@ -154,7 +154,7 @@ export const josua: Journey = {
   title: 'Josua',
   subtitle: 'Mut für das neue Land',
   age: '8-10',
-  downloadMb: 11, // etwa 10 bis 11 MB gerechnet am 21.10.2026 mit der neuen Karte v3 (vier Stücke zusammen 5,5 MB, ohne die noch fehlenden Bilder und Aufnahmen)
+  downloadMb: 13, // gemessen am 21.10.2026 mit den eigenen Etappenbildern (Variante a), der Karte v3 und den gemalten Spielbildern; ohne die noch fehlenden Aufnahmen
   medal: 'images/abenteuer/josua/medaille-v2.webp', // Die Posaune von Jericho (Widderhorn vor der Stadtmauer, Goldring)
   // Geschenk-Ausmalbild: Die Posaunen von Jericho (sieben Priester mit Widderhörnern auf dem Weg zur Stadtmauer, Konturzeichnung)
   gift: { title: 'Die Posaunen von Jericho', image: `${PICS}geschenk.webp` },
