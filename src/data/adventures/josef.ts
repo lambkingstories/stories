@@ -1,7 +1,7 @@
 /**
  * Adventure "Josef" for 5 to 8 years: twelve stages, retold from 1. Mose 37–50 (draft v1, read and approved by Anton on
- * 14.10.2026; source file `D:/Claude/Abenteuer-Josef/Josef_Reise_5-8_Entwurf_v1.md`). The Bible passages 42–44 and 46–47 are still
- * to be checked. In the data the right answer of a question is listed first (`answer: 0`); the options are shuffled when shown.
+ * 14.10.2026; source file `D:/Claude/Abenteuer-Josef/Josef_Reise_5-8_Entwurf_v1.md`). All passages, including 42–44 and 46–47, were checked against
+ * Luther 1912 on 21.10.2026 (`D:/Claude/Abenteuer-Josef/PRUEFBERICHT-BIBELTREUE-2026-10-21.md`; open suggestions for Anton are in the report). In the data the right answer of a question is listed first (`answer: 0`); the options are shuffled when shown.
  */
 import type { Journey, PaintJob, PaintZone } from '@/types/adventure'
 import { JOSEF_PATH } from './josefPath'
