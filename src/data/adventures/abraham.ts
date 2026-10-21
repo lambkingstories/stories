@@ -435,12 +435,11 @@ export const abraham: Journey = {
   ]
 }
 
-// the German recordings of the stories (voice Achernar, text version 3 = files "-v4"); there are no English ones yet, so the English app reads with the voice of the device.
-// NEW RECORDING NEEDED (Bible check of 21.10.2026, see D:/Claude/Abenteuer-Abraham/NEUAUFNAHME-BIBELTREUE-2026-10-21.md): the texts of these stages changed, so the old recording is not played
-// (the app reads with the voice of the device) until the new one is made; then delete the number from this list and use the new file name.
-const NEW_RECORDING = [1, 3, 7, 8, 9, 10, 11]
+// the German recordings of the stories (voice Achernar); there are no English ones yet, so the English app reads with the voice of the device.
+// The stages whose text changed in the Bible check of 21.10.2026 (see D:/Claude/Abenteuer-Abraham/NEUAUFNAHME-BIBELTREUE-2026-10-21.md) were recorded again as "-v5"; the others are "-v4".
+const RECORDED_AGAIN = [1, 3, 7, 8, 9, 10, 11]
 for (const s of abraham.stages) {
-  const file = NEW_RECORDING.includes(s.id) ? undefined : `audio/abenteuer/abraham/geschichte-${String(s.id).padStart(2, '0')}-v4.mp3`
+  const file = `audio/abenteuer/abraham/geschichte-${String(s.id).padStart(2, '0')}-${RECORDED_AGAIN.includes(s.id) ? 'v5' : 'v4'}.mp3`
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 

@@ -18,7 +18,7 @@ const stage = (n: number) => abraham.stages[n - 1]!
 /** The picture of every stage: the new stages use a picture of the others until they get their own. */
 const PICTURE: Record<number, string> = { 1: '01', 2: '02', 3: '03', 4: '04', 5: '05', 6: '06', 7: '07', 8: '08', 9: '09', 10: '10', 11: '11', 12: '12' }
 /** Stages whose text was corrected in the Bible check of 21.10.2026 and wait for a new recording (see NEUAUFNAHME-BIBELTREUE-2026-10-21.md). */
-const NEW_RECORDING = [1, 3, 7, 8, 9, 10, 11]
+const RECORDED_AGAIN = [1, 3, 7, 8, 9, 10, 11]
 
 /** Words that no text of the German data may use (the stories are told calmly: no knife, no binding, no killing). */
 const FORBIDDEN = /\b(Messer|Schwert|gefesselt|Fesseln|Fesselung|töten|getötet|schlachten|Blut|Teufel|Hölle)\b/i
@@ -56,13 +56,9 @@ describe('Abraham: stories and questions', () => {
       expect(words / sentences, `words per sentence ${s.id}`).toBeGreaterThan(7)
       expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(text, `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      // Bible check 21.10.2026: the stages whose text changed have no recording until the new one is made (the app then reads with the voice of the device)
-      if (NEW_RECORDING.includes(s.id)) {
-        expect(s.audio, `no recording yet ${s.id}`).toBeUndefined()
-      } else {
-        expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/abraham/geschichte-${String(s.id).padStart(2, '0')}-v4.mp3`)
-        expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
-      }
+      // Bible check 21.10.2026: the stages whose text changed were recorded again ("-v5")
+      expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/abraham/geschichte-${String(s.id).padStart(2, '0')}-${RECORDED_AGAIN.includes(s.id) ? 'v5' : 'v4'}.mp3`)
+      expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
       expect(s.image).toBe(`images/abenteuer/abraham/etappe-bild-${PICTURE[s.id]}.webp`)
     }
     const all = abraham.stages.flatMap((s) => s.text).join(' ')
