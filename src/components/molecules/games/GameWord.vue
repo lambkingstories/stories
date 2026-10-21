@@ -114,7 +114,7 @@ const free = computed(() => tiles.value.map((letter, i) => ({ letter, i, id: `t$
 </script>
 
 <template lang="pug">
-  div(class="wd" :style="{ backgroundImage: `linear-gradient(rgba(25, 18, 40, 0.5), rgba(25, 18, 40, 0.5)), url(${src(game.background)})` }")
+  div(class="wd game-soft" :style="{ '--bg': `url(${src(game.background)})` }")
     template(v-if="!finished")
       p(v-if="rounds.length > 1" class="wd-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="wd-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}

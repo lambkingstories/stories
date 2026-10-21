@@ -47,7 +47,7 @@ const finished = ref(false)
 const message = ref('')
 const flash = ref<'good' | 'bad' | null>(null)
 const src = (p: string) => prependBaseUrl(p)
-const stars = computed(() => mistakeStars(mistakes.value, 2, 5))
+const stars = computed(() => mistakeStars(mistakes.value, 2, 4))
 
 const total = computed(() => current.value.men.length)
 const waiting = computed(() => Array.from({ length: current.value.queue }, (_, k) => front.value + k).filter((n) => n < total.value))
@@ -164,7 +164,7 @@ const bubbleLabel = (n: number) => t(wants(n) === 'home' ? 'app.adventure.switch
       p(class="sw-fb" role="status") {{ message }}
       div(class="sw-levers")
         button(type="button" class="sw-lever" :disabled="between || !!walking" @click="set('left')")
-          GameImage(:src="game.leverLeft" colour="#a9774e" round class="sw-lever-img")
+          GameImage(:src="game.leverLeft ?? game.leverRight" colour="#a9774e" round class="sw-lever-img" :class="{ mirror: !game.leverLeft }")
           span {{ t('app.adventure.switchLeft') }}
         button(type="button" class="sw-lever" :disabled="between || !!walking" @click="set('right')")
           GameImage(:src="game.leverRight" colour="#7f8f5f" round class="sw-lever-img")
@@ -292,6 +292,10 @@ const bubbleLabel = (n: number) => t(wants(n) === 'home' ? 'app.adventure.switch
 
 .sw-lever-img
   width: 44px
+
+  // one picture for both levers: the left one is the right one turned round
+  &.mirror
+    transform: scaleX(-1)
 
 .sw-count
   margin: 0

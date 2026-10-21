@@ -36,7 +36,7 @@ export const gideonEn: TextOverlay<Journey> = {
         'They eat the fields bare and leave the Israelites nothing to eat. Not a stalk is left on the fields to harvest.',
         'The Israelites hide in caves and clefts of the rocks, and there they also hide the little that is left to them. They have become poor and are afraid. Then they cry out to God for help.'
       ],
-      task: { hint: 'Push the sacks into the niches of the cave.', cave: { rounds: [{ hint: 'Push the sacks into the glowing niches. You can only push, not pull.' }, { hint: 'Now three sacks, and a rock stands in the middle. Think before you push.' }] } },
+      task: { hint: 'Push the sacks into the niches of the cave.', cave: { rounds: [{ hint: 'Push the sacks into the glowing niches. You can only push, not pull.' }, { hint: 'Now three sacks. Think before you push.' }] } },
       questions: [
         { q: 'How long are the Midianites stronger than Israel?', options: ['seven years', 'twenty years', 'forty years'] },
         { q: 'What are the Midianites compared to?', options: ['a swarm of locusts', 'a flock of sheep', 'a river'] }
@@ -51,7 +51,7 @@ export const gideonEn: TextOverlay<Journey> = {
         'Gideon is astonished. “I am the smallest in my family,” he says, “and my family is the least.”',
         '“I will be with you,” answers God. “Go, I have sent you to save my people.”'
       ],
-      task: { hint: 'Set the wind so that the chaff blows away.', winnow: { rounds: [{ hint: 'Set the wind. The light chaff should fly away, the heavy grains should stay.' }, { hint: 'Now a light gust blows, and the right wind is narrower. Take care of the grains.' }] } },
+      task: { hint: 'Set the wind so that the chaff blows away.', winnow: { rounds: [{ hint: 'Set the wind. The light chaff should fly away, the heavy grains should stay.' }, { hint: 'Now the right wind is narrower. Take care of the grains.' }] } },
       questions: [
         { q: 'Where does Gideon thresh his wheat?', options: ['in a winepress', 'on the roof', 'by the river'] },
         { q: 'What does God say to Gideon?', options: ['“I will be with you.”', '“You must go alone.”', '“Go back to Egypt.”'] }
@@ -66,7 +66,7 @@ export const gideonEn: TextOverlay<Journey> = {
         'Then fire comes up out of the rock and consumes the meal, and the messenger has vanished. Gideon is frightened.',
         'But God speaks to him, “Peace be with you! Do not be afraid.” Then Gideon builds an altar there and calls it: God is Peace.'
       ],
-      task: { hint: 'Lay the word with the letters.', word: { rounds: [{ hint: 'What does Gideon call the altar? God is …', word: 'PEACE', extra: ['T', 'L'] }, { hint: 'Where does Gideon lay the bread and the meat? On the …', word: 'ROCK', extra: ['A', 'M'] }] } },
+      task: { hint: 'Lay the word with the letters.', word: { rounds: [{ hint: 'What does Gideon call the altar? God is …', word: 'PEACE', extra: ['T'] }, { hint: 'Where does Gideon set the meal? On the …', word: 'ROCK', extra: ['A'] }] } },
       questions: [
         { q: 'What comes out of the rock?', options: ['fire', 'water', 'a storm'] },
         { q: 'What does Gideon ask the messenger for first?', options: ['a sign', 'some flour', 'a sword'] }
@@ -111,7 +111,7 @@ export const gideonEn: TextOverlay<Journey> = {
         'So Gideon is to announce, “Whoever is afraid may go home!”',
         'Twenty-two thousand men go home. Only ten thousand stay with Gideon. They watch the others go over the hills. The camp grows quiet. But God says, “There are still too many.”'
       ],
-      task: { hint: 'Set the switch so that every man goes his way.', swit: { rounds: [{ hint: 'The men come to the fork. Whoever shows a house wants to go home: set the switch to the right. Whoever shows a horn stays: set it to the left.' }, { hint: 'Now more men come, and the bubble soon goes away. Tap the man and it is back.' }] } },
+      task: { hint: 'Set the switch so that every man goes his way.', swit: { rounds: [{ hint: 'Whoever shows a house wants to go home: set the switch to the right. Whoever shows a horn stays: set it to the left.' }, { hint: 'Now the bubble soon goes away. Tap the man and it is back.' }] } },
       questions: [
         { q: 'What does God say about the men?', options: ['There are too many.', 'They are too tired.', 'They are too loud.'] },
         { q: 'How many men stay with Gideon at first?', options: ['ten thousand', 'twenty-two thousand', 'nine hundred'] }
@@ -126,10 +126,10 @@ export const gideonEn: TextOverlay<Journey> = {
         '“With these three hundred men I will save you,” says God. “The others are to go home.”',
         'Gideon sends all the others home. Only the three hundred he keeps with him, and they take supplies and their trumpets along. Down in the valley lies the huge camp of the enemies.'
       ],
-      task: { hint: 'Find the six men who scoop the water to their mouths with their hands. Some of them are hiding!', find: { labels: ['Man at the stream scooping the water to his mouth with his hand', 'Man at the stream scooping the water to his mouth with his hand', 'Man at the stream scooping the water to his mouth with his hand', 'Man at the stream scooping the water to his mouth with his hand', 'Man at the stream scooping the water to his mouth with his hand', 'Man at the stream scooping the water to his mouth with his hand'], doneText: 'You found all six men who scoop the water to their mouths with their hands!' } },
+      task: { hint: 'Find the men who scoop the water to their mouths with their hands. Some of them are hiding!', find: { labels: ['Man at the stream scooping the water to his mouth with his hand', 'Man at the stream scooping the water to his mouth with his hand', 'Man at the stream scooping the water to his mouth with his hand', 'Man at the stream scooping the water to his mouth with his hand', 'Man at the stream scooping the water to his mouth with his hand'], doneText: 'You found all five men who scoop the water to their mouths with their hands!' } },
       questions: [
         { q: 'How many men does Gideon keep with him?', options: ['three hundred', 'ten thousand', 'twenty-two thousand'] },
-        { q: 'What do the three hundred men do at the brook?', options: ['They scoop up the water with their hands.', 'They kneel down and drink.', 'They fill their jars.'] }
+        { q: 'What do the three hundred men take along?', options: ['supplies and their trumpets', 'tents and herds', 'bread and wine'] }
       ]
     },
     {
@@ -156,7 +156,7 @@ export const gideonEn: TextOverlay<Journey> = {
         'In the middle of the night the men take their places all around the camp of the enemies. Gideon blows the trumpet, and everyone smashes his jar. Suddenly the torches blaze up in the darkness, and the trumpets sound everywhere: “For God and for Gideon!”',
         'The three hundred stay at their places. The enemies jolt out of their sleep, run about, and cry out. The whole army is terrified and flees.'
       ],
-      task: { hint: 'Wait for the horn and then answer in order.', cue: { rounds: [{ hint: "Wait for the horn. Then tap Gideon's jar first, and after that the group on the left and the group on the right." }, { hint: 'Take care: An owl calls, the wind rustles. Those are no signs. Answer only to the horn.' }] } },
+      task: { hint: 'Wait for the horn and then answer in order.', cue: { rounds: [{ hint: "Wait for the horn. Then tap Gideon's jar, and after that the groups on the left and on the right." }, { hint: 'Take care: An owl calls. That is no sign. Answer only to the horn.' }] } },
       questions: [
         { q: 'What is inside the jars of the men?', options: ['torches', 'bread', 'water'] },
         { q: 'Into how many groups does Gideon divide the three hundred men?', options: ['three', 'two', 'twelve'] }
@@ -171,7 +171,7 @@ export const gideonEn: TextOverlay<Journey> = {
         'Gideon stays calm. “What have I done compared with you?” he says. “God has given the princes of the enemies into your hands. How could I do what you have done?”',
         'When Gideon speaks so kindly, their anger fades.'
       ],
-      task: { hint: 'Listen carefully and answer the questions.' },
+      task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'Who comes angrily to Gideon?', options: ['the men of Ephraim', 'Barak', 'the enemies'] },
         { q: 'How does Gideon answer the men of Ephraim?', options: ['calmly and kindly', 'with loud words', 'not at all'] }
@@ -186,7 +186,7 @@ export const gideonEn: TextOverlay<Journey> = {
         'The enemies never lift up their heads again. The land is quiet for forty years, as long as Gideon lives.',
         'Gideon is a man with faults. Later he has a priestly garment made of gold, and many Israelites worship it. And yet God was with him, as he had promised, “I will be with you.”'
       ],
-      task: { hint: 'Find the matching cards. Remember where each one lies.', memory: { pairs: [{ text: 'The palm tree: Deborah sits here and gives judgment.' }, { text: 'The winepress: Gideon secretly threshes wheat here.' }, { text: 'The fleece: First only the fleece is wet, then only the ground.' }, { text: 'The altar: God is Peace.' }, { text: 'The jar: A torch is inside.' }, { text: 'The trumpet: Gideon calls the men together with it.' }] } },
+      task: { hint: 'Find the matching cards. Remember where each one lies.', memory: { pairs: [{ text: 'The palm tree: Deborah sits here and gives judgment.' }, { text: 'The winepress: Gideon secretly threshes wheat here.' }, { text: 'The fleece: First only the fleece is wet, then only the ground.' }, { text: 'The altar: God is Peace.' }, { text: 'The jar: A torch is inside.' }] } },
       questions: [
         { q: 'What does Gideon answer when they want to make him ruler?', options: ['“God shall be your Lord.”', '“Yes, I will be your king.”', '“My son shall be it.”'] },
         { q: 'How long is the land quiet as long as Gideon lives?', options: ['forty years', 'seven years', 'twenty years'] }

@@ -56,7 +56,7 @@ const message = ref('')
 const flash = ref<'good' | 'bad' | null>(null)
 const field = ref<HTMLElement | null>(null)
 const src = (p: string) => prependBaseUrl(p)
-const stars = computed(() => mistakeStars(mistakes.value, 3, 7))
+const stars = computed(() => mistakeStars(mistakes.value, 2, 6))
 const total = computed(() => wayLength(props.game.path))
 
 const next = computed(() => nextShadow(parts.value, base.value))

@@ -87,9 +87,10 @@ describe('Gideon: stories and questions', () => {
     }
   })
 
-  it('the serious stages (1, 5) say so in the hint and are only quizzes; the war of Debora and the altar of Baal are told without fighting', () => {
+  it('the serious stages (1, 5, 11) say so in the hint and are only quizzes; the war of Debora and the altar of Baal are told without fighting', () => {
     expect(stage(1).task.hint).toContain('ernst')
     expect(stage(5).task.hint).toContain('ernst')
+    expect(stage(11).task.hint).toContain('ernst')
     expect(stage(1).task.kind).toBe('quiz')
     expect(stage(5).task.kind).toBe('quiz')
     const t1 = stage(1).text.join(' ')
@@ -121,18 +122,18 @@ describe('Gideon: the games, and the placeholders until the pictures come', () =
     for (const s of gideon.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
-  it('4 word: two words from the text (FRIEDE and FELSEN), two extra letters each that are not in the word; the English words are PEACE and ROCK; the goal comes from the letters', () => {
+  it('4 word: two words from the text (FRIEDE and FELSEN), one extra letter each that is not in the word; the English words are PEACE and ROCK; the goal comes from the letters', () => {
     const g = stage(4).task.word
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
     expect(g.rounds.map((r) => r.word)).toEqual(['FRIEDE', 'FELSEN'])
     for (const r of g.rounds) {
       expect(r.word).toBe(r.word.toUpperCase())
-      expect(r.extra).toHaveLength(2)
+      expect(r.extra).toHaveLength(1)
       for (const l of r.extra) expect(r.word, `extra ${l}`).not.toContain(l)
       expect(stage(4).text.join(' ').toUpperCase()).toContain(r.word)
       const tiles = tilesFor(r.word, r.extra)
-      expect(tiles).toHaveLength(r.word.length + 2)
+      expect(tiles).toHaveLength(r.word.length + 1)
     }
     expect(g.rounds.reduce((n, r) => n + r.word.length, 0)).toBe(12)
     setAdventureLanguage('en')
@@ -141,32 +142,34 @@ describe('Gideon: the games, and the placeholders until the pictures come', () =
     setAdventureLanguage('de')
   })
 
-  it('8 hidden picture: six men and three covers, every man lies on the scene and at least half of them are partly hidden; 12 memory: six pairs with a sentence that is true to the text', () => {
+  it('8 hidden picture: five men and three covers (two pictures), every man lies on the scene and at least half of them are partly hidden; 12 memory: five pairs with a sentence that is true to the text', () => {
     const f = stage(8).task.find
     expect(f, 'the game is built').toBeDefined()
-    expect(stage(8).task.count).toBe(6)
-    expect(f!.finds).toHaveLength(6)
+    expect(stage(8).task.count).toBe(5)
+    expect(f!.finds).toHaveLength(5)
     expect(f!.covers).toHaveLength(3)
-    expect(f!.labels).toHaveLength(6)
+    expect(new Set(f!.covers.map((c) => c.image)).size).toBe(2)
+    expect(new Set(f!.finds.map((c) => c.image)).size).toBe(2)
+    expect(f!.labels).toHaveLength(5)
     for (const t of [...f!.finds, ...f!.covers]) expect(t.x >= 0 && t.x <= 100 && t.y >= 0 && t.y <= 100).toBe(true)
     // a cover hides a man when it stands in front of him: near in the width and its bottom edge a little lower
     const hidden = f!.finds.filter((m) => f!.covers.some((c) => Math.abs(c.x - m.x) < c.w / 2 && c.y >= m.y && c.y - m.y < 12))
     expect(hidden.length).toBeGreaterThanOrEqual(3)
     const m = stage(12).task.memory
     expect(m, 'the game is built').toBeDefined()
-    expect(m!.pairs).toHaveLength(6)
+    expect(m!.pairs).toHaveLength(5)
     const told = gideon.stages.map((s) => s.text.join(' ')).join(' ')
-    for (const word of ['Palme', 'Kelter', 'Fell', 'Altar', 'Fackel', 'Posaune', 'Friede', 'Debora', 'Weizen']) expect(told, word).toContain(word)
+    for (const word of ['Palme', 'Kelter', 'Fell', 'Altar', 'Fackel', 'Friede', 'Debora', 'Weizen']) expect(told, word).toContain(word)
     expect(m!.back).toMatch(/spiele\/gideon\/memory\//)
     expect(stage(8).task.kind).toBe('wimmelbild')
     expect(stage(12).task.kind).toBe('memory')
   })
 
-  it('6 dew: the first night five drops on the fleece, the second eight drops on the ground round it; the fleece lies on the floor; the goal is 13', () => {
+  it('6 dew: the first night four drops on the fleece, the second six drops on the ground round it; the fleece lies on the floor; the goal is 10', () => {
     const g = stage(6).task.dew
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
-    expect(g.rounds.map((r) => [r.wet, r.spots.length])).toEqual([['fleece', 5], ['ground', 8]])
+    expect(g.rounds.map((r) => [r.wet, r.spots.length])).toEqual([['fleece', 4], ['ground', 6]])
     for (const r of g.rounds) {
       for (const [x, y] of r.spots) {
         expect(x >= 0 && x <= 100 && y >= 0 && y <= 100).toBe(true)
@@ -175,14 +178,14 @@ describe('Gideon: the games, and the placeholders until the pictures come', () =
     }
     expect(g.fleeceBox.x + g.fleeceBox.w).toBeLessThanOrEqual(100)
     expect(g.fleeceBox.y + g.fleeceBox.h).toBeLessThanOrEqual(100)
-    expect(g.rounds.reduce((n, r) => n + r.spots.length, 0)).toBe(13)
+    expect(g.rounds.reduce((n, r) => n + r.spots.length, 0)).toBe(10)
   })
 
-  it('3 winnow: ten pieces of chaff, then twelve; the right wind gets narrower and a gust comes; eight grains each; the pieces can be told apart by their wind (grains never fly in the window); the tray lies in the picture', () => {
+  it('3 winnow: eight pieces of chaff, then ten; the right wind gets narrower and no gust comes; six grains each; the pieces can be told apart by their wind (grains never fly in the window); the tray lies in the picture', () => {
     const g = stage(3).task.winnow
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
-    expect(g.rounds.map((r) => [r.chaff, r.grains, r.window, r.gust])).toEqual([[10, 8, [35, 75], 0], [12, 8, [45, 62], 5]])
+    expect(g.rounds.map((r) => [r.chaff, r.grains, r.window, r.gust])).toEqual([[8, 6, [35, 75], 0], [10, 6, [42, 64], 0]])
     expect(g.rounds[1]!.window[1] - g.rounds[1]!.window[0]).toBeLessThan(g.rounds[0]!.window[1] - g.rounds[0]!.window[0])
     for (const r of g.rounds) {
       const pieces = makePieces(r)
@@ -192,31 +195,34 @@ describe('Gideon: the games, and the placeholders until the pictures come', () =
     }
     expect(g.trayBox.x + g.trayBox.w).toBeLessThanOrEqual(100)
     expect(g.trayBox.y + g.trayBox.h).toBeLessThanOrEqual(100)
-    expect(g.rounds.reduce((n, r) => n + r.chaff, 0)).toBe(22)
+    expect(g.rounds.reduce((n, r) => n + r.chaff, 0)).toBe(18)
   })
 
-  it('7 switch: six men, then eight with two waiting and a bubble that goes away; every round has men who go home and men who stay; the fork lies in the picture; the goal is 14', () => {
+  it('7 switch: five men, then six with two waiting and a bubble that goes away; every round has men who go home and men who stay; the fork lies in the picture; the goal is 11', () => {
     const g = stage(7).task.swit
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
-    expect(g.rounds.map((r) => [r.men.length, r.queue, r.hideBubbleMs ?? 0])).toEqual([[6, 1, 0], [8, 2, 2000]])
+    expect(g.rounds.map((r) => [r.men.length, r.queue, r.hideBubbleMs ?? 0])).toEqual([[5, 1, 0], [6, 2, 2000]])
     for (const r of g.rounds) {
       expect(r.men.filter((m) => m === 'home').length).toBeGreaterThanOrEqual(2)
       expect(r.men.filter((m) => m === 'stay').length).toBeGreaterThanOrEqual(2)
       for (const m of r.men) expect(['home', 'stay']).toContain(m)
     }
-    expect(g.men).toHaveLength(3)
+    expect(g.men).toHaveLength(2)
+    // one lever picture for both sides: the left one is the right one turned round
+    expect(g.leverLeft).toBeUndefined()
+    expect(g.leverRight).toContain('hebel.webp')
     expect(g.fork[0] >= 0 && g.fork[0] <= 100 && g.fork[1] >= 0 && g.fork[1] <= 100).toBe(true)
     // the men queue up the path, which must stay inside the picture
     expect(g.fork[1] - 13 * (g.rounds[1]!.queue - 1)).toBeGreaterThan(0)
-    expect(g.rounds.reduce((n, r) => n + r.men.length, 0)).toBe(14)
+    expect(g.rounds.reduce((n, r) => n + r.men.length, 0)).toBe(11)
   })
 
-  it('10 cue: three signals, then three with an owl and a gust that must not be answered; the waiting is a few seconds; the groups stand on both sides, Gideon in the middle; the goal is 6', () => {
+  it('10 cue: two signals, then three with an owl (twice) that must not be answered; the waiting is a few seconds; the groups stand on both sides, Gideon in the middle; the goal is 5', () => {
     const g = stage(10).task.cue
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
-    expect(g.rounds.map((r) => [r.signals, r.decoys])).toEqual([[3, []], [3, ['owl', 'wind']]])
+    expect(g.rounds.map((r) => [r.signals, r.decoys])).toEqual([[2, []], [3, ['owl', 'owl']]])
     for (const r of g.rounds) {
       expect(r.waitMs[0]).toBeGreaterThanOrEqual(2000)
       expect(r.waitMs[1]).toBeLessThanOrEqual(5000)
@@ -227,15 +233,18 @@ describe('Gideon: the games, and the placeholders until the pictures come', () =
     expect(g.groups[0]!.x).toBeLessThan(g.leader.x)
     expect(g.groups[1]!.x).toBeGreaterThan(g.leader.x)
     // the answers: Gideon first, then the two groups; the signals are as many as the goal says
-    expect(g.rounds.reduce((n, r) => n + r.signals, 0)).toBe(6)
+    expect(g.rounds.reduce((n, r) => n + r.signals, 0)).toBe(5)
+    // the three groups are one picture; no picture of the wind any more
+    expect(new Set([...g.groups.map((x) => x.image), g.front.image]).size).toBe(1)
+    expect(Object.keys(g.decoyImages)).toEqual(['owl'])
   })
 
-  it('2 cave: two sacks in 5 x 4, then three in 6 x 5 with rock in the middle; both puzzles can be solved (6 and 12 pushes); nobody starts on a niche or in a dead end; the goal is 5', () => {
+  it('2 cave: two sacks, then three, both in 5 x 4 without rock; both puzzles can be solved (3 and 5 pushes, 8 and 12 steps); nobody starts on a niche or in a dead end; the goal is 5', () => {
     const g = stage(2).task.cave
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
-    expect(g.rounds.map((r) => [r.cols, r.rows, r.sacks.length, r.niches.length])).toEqual([[5, 4, 2, 2], [6, 5, 3, 3]])
-    expect(g.rounds.map((r) => pushesOf(r, { man: r.man, sacks: r.sacks }))).toEqual([6, 12])
+    expect(g.rounds.map((r) => [r.cols, r.rows, r.sacks.length, r.niches.length])).toEqual([[5, 4, 2, 2], [5, 4, 3, 3]])
+    expect(g.rounds.map((r) => pushesOf(r, { man: r.man, sacks: r.sacks }))).toEqual([3, 5])
     for (const r of g.rounds) {
       expect(solvable(r)).toBe(true)
       const start = { man: r.man, sacks: r.sacks }
@@ -246,18 +255,20 @@ describe('Gideon: the games, and the placeholders until the pictures come', () =
     }
     expect(g.area.x + g.area.w).toBeLessThanOrEqual(100)
     expect(g.area.y + g.area.h).toBeLessThanOrEqual(100)
+    expect(g.rounds.every((r) => r.walls.length === 0)).toBe(true)
+    expect(g.wall).toBeUndefined()
     expect(g.rounds.reduce((n, r) => n + r.sacks.length, 0)).toBe(5)
   })
 
-  it('9 sneak: three rocks in each round, two watchers and then three; the rocks lie on the way; and every stretch is free at some time for the whole walk (the cones leave a gap you can use)', () => {
+  it('9 sneak: two rocks with two watchers, then three rocks with three watchers; the rocks lie on the way; and every stretch is free at some time for the whole walk (the cones leave a gap you can use)', () => {
     const g = stage(9).task.sneak
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
-    expect(g.rounds.map((r) => [r.stops.length, r.watchers.length])).toEqual([[3, 2], [3, 3]])
+    expect(g.rounds.map((r) => [r.stops.length, r.watchers.length])).toEqual([[2, 2], [3, 3]])
     const total = wayLength(g.path as [number, number][])
     for (const [ri, r] of g.rounds.entries()) {
       const parts = stopParts(g.path as [number, number][], r.stops as [number, number][])
-      expect(parts).toHaveLength(3)
+      expect(parts).toHaveLength(r.stops.length)
       // the rocks lie on the way (within three percent of the width) and in order
       for (const [i, s] of r.stops.entries()) {
         const q = wayPoint(g.path as [number, number][], parts[i]!)
@@ -282,7 +293,7 @@ describe('Gideon: the games, and the placeholders until the pictures come', () =
         from = to
       }
     }
-    expect(g.rounds.reduce((n, r) => n + r.stops.length, 0)).toBe(6)
+    expect(g.rounds.reduce((n, r) => n + r.stops.length, 0)).toBe(5)
     expect(g.watcherImages.length).toBeGreaterThanOrEqual(2)
   })
 

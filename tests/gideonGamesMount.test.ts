@@ -182,11 +182,11 @@ describe('Wimmelbild and Memory with pictures that are not painted yet', () => {
     const { default: Find } = await import('@/components/molecules/games/GameFind.vue')
     const w = mount(Find, { ...opts(), props: { game: gideon.stages[7]!.task.find! } })
     await flushPromises()
-    expect(w.findAll('img')).toHaveLength(10)
+    expect(w.findAll('img')).toHaveLength(9)
     for (const img of w.findAll('img')) await img.trigger('error')
     await flushPromises()
     expect(w.findAll('img')).toHaveLength(0)
-    expect(w.findAll('.fd-stand')).toHaveLength(6)
+    expect(w.findAll('.fd-stand')).toHaveLength(5)
     expect(w.findAll('.fd-cover-stand')).toHaveLength(3)
     await w.findAll('.fd-thing')[0]!.trigger('click')
     expect(w.find('.fd-count').text()).toContain('1')
@@ -199,11 +199,11 @@ describe('Wimmelbild and Memory with pictures that are not painted yet', () => {
     const { default: Memory } = await import('@/components/molecules/games/GameMemory.vue')
     const w = mount(Memory, { ...opts(), props: { game: gideon.stages[11]!.task.memory! } })
     await flushPromises()
-    expect(w.findAll('.mem-card')).toHaveLength(12)
+    expect(w.findAll('.mem-card')).toHaveLength(10)
     for (const img of w.findAll('img.mem-face')) await img.trigger('error')
     await flushPromises()
-    expect(w.findAll('.mem-stand.mem-front')).toHaveLength(12)
-    expect(new Set(w.findAll('.mem-stand.mem-front').map((x) => x.attributes('style'))).size).toBe(6)
+    expect(w.findAll('.mem-stand.mem-front')).toHaveLength(10)
+    expect(new Set(w.findAll('.mem-stand.mem-front').map((x) => x.attributes('style'))).size).toBe(5)
   })
 })
 
@@ -337,8 +337,8 @@ describe('Die Nacht vergeht (dew)', () => {
     expect(w.find('.dw-fb').text()).toContain('Fell trocken')
   })
 
-  it('the whole game: the end with three stars; the taps on dry places give the stars (up to two: three, up to six: two, more: one)', async () => {
-    for (const [wrong, stars] of [[0, 3], [2, 3], [3, 2], [6, 2], [7, 1]] as const) {
+  it('the whole game: the end with three stars; the taps on dry places give the stars (up to two: three, up to five: two, more: one)', async () => {
+    for (const [wrong, stars] of [[0, 3], [2, 3], [3, 2], [5, 2], [6, 1]] as const) {
       useTaskProgress().reset()
       const w = await open()
       await morning(w)
@@ -611,8 +611,8 @@ describe('Wer geht heim? (switch)', () => {
     expect(played).not.toContain('wrong')
   })
 
-  it('the whole game: the end with three stars; the wrong levers give the stars (up to two: three, up to five: two, more: one)', async () => {
-    for (const [wrong, stars] of [[0, 3], [2, 3], [3, 2], [5, 2], [6, 1]] as const) {
+  it('the whole game: the end with three stars; the wrong levers give the stars (up to two: three, up to four: two, more: one)', async () => {
+    for (const [wrong, stars] of [[0, 3], [2, 3], [3, 2], [4, 2], [5, 1]] as const) {
       useTaskProgress().reset()
       const w = await open()
       for (let i = 0; i < wrong; i++) await pull(w, 'left')
@@ -1098,8 +1098,8 @@ describe('Leise den Hang hinab (sneak)', () => {
     expect(w.find('.sn-go').classes()).not.toContain('ready')
   })
 
-  it('the whole game: the end with three stars; the times the light caught the pair give the stars (up to three: three, up to seven: two, more: one)', async () => {
-    for (const [caught, stars] of [[0, 3], [3, 3], [4, 2], [7, 2], [8, 1]] as const) {
+  it('the whole game: the end with three stars; the times the light caught the pair give the stars (up to two: three, up to six: two, more: one)', async () => {
+    for (const [caught, stars] of [[0, 3], [2, 3], [3, 2], [6, 2], [7, 1]] as const) {
       useTaskProgress().reset()
       const w = await open()
       await roundOne(w)

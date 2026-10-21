@@ -1061,7 +1061,8 @@ export interface CaveGame {
   man: string
   sack: string
   niche: string
-  wall: string
+  /** The picture of a rock in the cave; left out when no round has rocks. */
+  wall?: string
   area: { x: number; y: number; w: number; h: number }
   rounds: CaveLevel[]
 }
@@ -1134,7 +1135,8 @@ export interface SwitchGame {
   men: SwitchMan[]
   bubbleHome: string
   bubbleHorn: string
-  leverLeft: string
+  /** The left lever; the right lever turned round when left out (one picture for both). */
+  leverLeft?: string
   leverRight: string
   fork: [number, number]
   rounds: SwitchRound[]

@@ -50,7 +50,7 @@ const field = ref<HTMLElement | null>(null)
 const track = ref<HTMLElement | null>(null)
 let dryKey = 0
 const src = (p: string) => prependBaseUrl(p)
-const stars = computed(() => mistakeStars(misses.value, 2, 6))
+const stars = computed(() => mistakeStars(misses.value, 2, 5))
 const morning = computed(() => sky.value >= MORNING)
 const count = computed(() => Object.keys(found).length)
 

@@ -225,7 +225,7 @@ const homeAt = (c: [number, number]) => level.value.niches.some((n) => n[0] === 
           @pointerup="pointerUp"
         )
           span(v-for="(w, i) in level.walls" :key="`w-${round}-${i}`" class="cv-cell" :style="at(w)" aria-hidden="true")
-            GameImage(:src="game.wall" colour="#6d5f50")
+            GameImage(:src="game.wall ?? ''" colour="#6d5f50")
           span(v-for="(n, i) in level.niches" :key="`n-${round}-${i}`" class="cv-cell niche" :style="at(n)" aria-hidden="true")
             GameImage(:src="game.niche" colour="#f2d98a" round)
           span(
