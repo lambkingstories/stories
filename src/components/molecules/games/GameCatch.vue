@@ -234,12 +234,12 @@ const showAll = computed(() => idle.value >= IDLE_SECONDS && walkers.value.some(
   background-position: center
   touch-action: manipulation
 
-// the picture of the tent: its foot stands at the place of the tent
+// the picture of the tent (bigger than a child): the lower edge of the tent stands at the place of the tent
 .ct-tent-pic
   position: absolute
   display: block
-  width: 16%
-  transform: translate(-50%, -88%)
+  width: 23%
+  transform: translate(-50%, -100%)
   pointer-events: none
 
 // the number at the tent
