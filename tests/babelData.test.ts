@@ -20,7 +20,7 @@ const stage = (n: number) => babel.stages[n - 1]!
 const FORBIDDEN = /\b(Strafe|Fluch|Zorn|Teufel|Dämon|Hölle|Blut|tot|Tod)\b/i
 
 describe('Babel: stories and questions', () => {
-  it('six stages with 3 to 5 paragraphs of 60 to 220 words, the Bible passage under every one, the recording and picture names of the plan', () => {
+  it('six stages with 3 or 4 paragraphs of 90 to 145 words (plan v3), the Bible passage under every one, no recording yet (the app reads with the voice of the device), the picture names of the plan', () => {
     expect(babel.id).toBe('babel')
     expect(babel.age).toBe('8-10')
     expect(babel.stages).toHaveLength(6)
@@ -28,18 +28,23 @@ describe('Babel: stories and questions', () => {
     for (const s of babel.stages) {
       expect(s.ref, `stage ${s.id}`).toMatch(/^1\. Mose 11,/)
       expect(s.text.length, `paragraphs ${s.id}`).toBeGreaterThanOrEqual(3)
-      expect(s.text.length, `paragraphs ${s.id}`).toBeLessThanOrEqual(5)
-      const words = s.text.join(' ').split(/\s+/).length
-      expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(60)
-      expect(words, `words ${s.id}`).toBeLessThanOrEqual(220)
+      expect(s.text.length, `paragraphs ${s.id}`).toBeLessThanOrEqual(4)
+      const text = s.text.join(' ')
+      const words = text.split(/\s+/).length
+      expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(90)
+      expect(words, `words ${s.id}`).toBeLessThanOrEqual(145)
+      // short sentences like Noah and Josef (they have 9 to 10 words on average)
+      const sentences = text.split(/[.!?]+["“”„]?\s+/).filter((x) => x.trim()).length
+      expect(words / sentences, `words per sentence ${s.id}`).toBeGreaterThan(7)
+      expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.audio, s.id.toString()).toBe(`audio/abenteuer/babel/geschichte-${String(s.id).padStart(2, '0')}-v${s.id === 1 || s.id === 6 ? 2 : 3}.mp3`)
+      expect(s.audio, `no recording yet ${s.id}`).toBeUndefined()
       expect(s.image).toBe(`images/abenteuer/babel/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
     }
   })
 
-  it('two questions per stage (three in the serious stage 5), three answers each, the right one first and the answers differ; the exam has six', () => {
-    expect(babel.stages.map((s) => s.questions.length)).toEqual([2, 2, 2, 2, 3, 2])
+  it('two questions per stage, three answers each, the right one first and the answers differ; the exam has six', () => {
+    expect(babel.stages.map((s) => s.questions.length)).toEqual([2, 2, 2, 2, 2, 2])
     for (const q of [...babel.stages.flatMap((s) => s.questions), ...babel.exam]) {
       expect(q.options, q.q).toHaveLength(3)
       expect(q.answer, q.q).toBe(0)
@@ -84,11 +89,11 @@ describe('Babel: every stage has its own new game (no game of Josef, Noah or Ada
       for (const x of r) expect(x.hint.length).toBeGreaterThan(8)
     }
     // the goals (the number of right moves of all rounds)
-    expect(g(1).missing!.rounds.reduce((s, r) => s + r.tasks.reduce((n, t) => n + t.gone.length, 0), 0)).toBe(9)
-    expect(g(2).chain!.rounds.reduce((s, r) => s + r.items.length, 0)).toBe(12)
-    expect(g(3).stack!.rounds.reduce((s, r) => s + r.layers, 0)).toBe(8)
+    expect(g(1).missing!.rounds.reduce((s, r) => s + r.tasks.reduce((n, t) => n + t.gone.length, 0), 0)).toBe(6)
+    expect(g(2).chain!.rounds.reduce((s, r) => s + r.items.length, 0)).toBe(10)
+    expect(g(3).stack!.rounds.reduce((s, r) => s + r.layers, 0)).toBe(7)
     expect(g(4).wipe!.rounds).toHaveLength(2)
-    expect(g(6).trace!.rounds.reduce((s, r) => s + r.paths.length, 0)).toBe(6)
+    expect(g(6).trace!.rounds.reduce((s, r) => s + r.paths.length, 0)).toBe(5)
   })
 
   it('1 who is missing: every task is valid, round 1 has four people and one gone, round 2 six people and two gone; the places are enough', () => {
@@ -97,7 +102,7 @@ describe('Babel: every stage has its own new game (no game of Josef, Noah or Ada
     for (const p of m.people) expect(p.label.length).toBeGreaterThan(5)
     expect(new Set(m.people.map((p) => p.id)).size).toBe(6)
     for (const r of m.rounds) for (const t of r.tasks) expect(() => buildTask(m.people, t), JSON.stringify(t)).not.toThrow()
-    expect(m.rounds.map((r) => r.tasks.length)).toEqual([3, 3])
+    expect(m.rounds.map((r) => r.tasks.length)).toEqual([2, 2])
     for (const t of m.rounds[0]!.tasks) {
       expect(t.row).toHaveLength(4)
       expect(t.gone).toHaveLength(1)
@@ -120,18 +125,18 @@ describe('Babel: every stage has its own new game (no game of Josef, Noah or Ada
     // only one child, smaller than the grown-ups
     expect(m.people.filter((p) => (p.scale ?? 1) < 1)).toHaveLength(1)
     // the same people are not gone every time
-    expect(new Set(m.rounds.flatMap((r) => r.tasks.flatMap((t) => t.gone))).size).toBeGreaterThanOrEqual(5)
+    expect(new Set(m.rounds.flatMap((r) => r.tasks.flatMap((t) => t.gone))).size).toBeGreaterThanOrEqual(4)
     expect(m.background).toBe('images/abenteuer/babel/etappe-bild-01.webp')
   })
 
-  it('2 brick chain: a place for every builder, round 1 only bricks, round 2 a mixture with pitch, one more builder', () => {
+  it('2 brick chain: a place for every builder, round 1 four bricks, round 2 six things (bricks and pots of pitch mixed), one more builder', () => {
     const c = stage(2).task.chain!
     for (const r of c.rounds) expect(r.slots).toHaveLength(r.people)
     expect(c.rounds.map((r) => r.people)).toEqual([3, 4])
-    expect(c.rounds.map((r) => r.items.length)).toEqual([4, 8])
+    expect(c.rounds.map((r) => r.items.length)).toEqual([4, 6])
     expect(c.rounds[0]!.items.every((i) => i === 'brick')).toBe(true)
-    expect(c.rounds[1]!.items.filter((i) => i === 'pitch')).toHaveLength(4)
-    expect(c.rounds[1]!.items.filter((i) => i === 'brick')).toHaveLength(4)
+    expect(c.rounds[1]!.items.filter((i) => i === 'pitch')).toHaveLength(3)
+    expect(c.rounds[1]!.items.filter((i) => i === 'brick')).toHaveLength(3)
     // the builders stand in a row from left to right, side by side without touching (16 % wide), and the stack lies to the right of the last one
     for (const r of c.rounds) {
       const xs = r.slots.map((s) => s[0])
@@ -151,9 +156,9 @@ describe('Babel: every stage has its own new game (no game of Josef, Noah or Ada
     expect(c.background).toBe('images/abenteuer/babel/etappe-bild-02.webp')
   })
 
-  it('3 stepped tower: four steps in each round, every step narrower than the one below, the block always fits on the picture, the second round is narrower and quicker', () => {
+  it('3 stepped tower: three steps in round 1 and four in round 2, every step narrower than the one below, the block always fits on the picture, the second round is narrower and quicker', () => {
     const s = stage(3).task.stack!
-    expect(s.rounds.map((r) => r.layers)).toEqual([4, 4])
+    expect(s.rounds.map((r) => r.layers)).toEqual([3, 4])
     for (const r of s.rounds) {
       const w = stepWidths(r.baseWidth, r.shrink, r.layers)
       expect(w).toEqual([...w].sort((a, b) => b - a))
@@ -182,9 +187,9 @@ describe('Babel: every stage has its own new game (no game of Josef, Noah or Ada
     expect(w.background).toBe('images/abenteuer/babel/etappe-bild-04.webp')
   })
 
-  it('6 following the roads: two roads, then four with other goals; every road starts at the tower, leads outwards and its length is worth walking', () => {
+  it('6 following the roads: two roads, then three with other goals (the river road is gone); every road starts at the tower, leads outwards and its length is worth walking', () => {
     const t = stage(6).task.trace!
-    expect(t.rounds.map((r) => r.paths.length)).toEqual([2, 4])
+    expect(t.rounds.map((r) => r.paths.length)).toEqual([2, 3])
     const goals = new Set(['berge', 'fluss', 'palmen', 'huegel'])
     for (const r of t.rounds) {
       expect(new Set(r.paths.map((p) => p.goal)).size).toBe(r.paths.length)
@@ -292,7 +297,7 @@ describe('Babel: the scaffold', () => {
       ['Eine Stadt mit einem Turm', '1. Mose 11,4'],
       ['Gott sieht den Bau', '1. Mose 11,5–6'],
       ['Viele Sprachen', '1. Mose 11,7–8'],
-      ['Der Name Babel', '1. Mose 11,9']
+      ['Der Name Babel', '1. Mose 11,8–9']
     ])
     expect(babel.gift.title).toBe('Der Turm aus Ziegeln')
     expect(babel.map.images).toHaveLength(4)
@@ -336,7 +341,7 @@ describe('Babel: English', () => {
     for (const t of texts.filter((x) => !x.startsWith('audio/'))) expect(/[äöüßÄÖÜ]|\b(und|der|das|den|dem|nicht|ist|sind|ein|eine|einen)\b/.test(t), `German in: ${t}`).toBe(false)
   })
 
-  it('every German text of the stages has an English one that is different, with the recordings of the English voice and the English passages', () => {
+  it('every German text of the stages has an English one that is different, with the English passages', () => {
     setAdventureLanguage('de')
     const de = babel.stages.map((s) => ({ title: s.title, text: [...s.text], hint: s.task.hint, q: s.questions.map((q) => q.q) }))
     setAdventureLanguage('en')
@@ -346,7 +351,7 @@ describe('Babel: English', () => {
       expect(s.task.hint, `hint ${s.id}`).not.toBe(de[i]!.hint)
       s.questions.forEach((q, k) => expect(q.q, `question ${s.id}.${k}`).not.toBe(de[i]!.q[k]))
       expect(s.ref, `ref ${s.id}`).toMatch(/^Genesis 11:/)
-      expect(s.audio, `audio ${s.id}`).toBe(`audio/abenteuer/babel/geschichte-${String(s.id).padStart(2, '0')}-en-v${s.id === 1 || s.id === 6 ? 2 : 3}.mp3`)
+      expect(s.audio, `audio ${s.id}`).toBeUndefined()
     })
     expect(babel.title).toBe('The Tower of Babel')
     // the serious stage has its English line, too
