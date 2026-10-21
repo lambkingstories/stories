@@ -441,5 +441,12 @@ for (const s of abraham.stages) {
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 
+// the background music of this adventure: three calm pieces made with Google's Lyria 3.5 (skill `lambking-abenteuer-skill`, ton.md); they follow one another at random
+abraham.music = [
+  'audio/abenteuer/abraham/musik-wueste-v1.mp3',
+  'audio/abenteuer/abraham/musik-sterne-v1.mp3',
+  'audio/abenteuer/abraham/musik-aufbruch-v1.mp3'
+]
+
 // the English texts (title, stories, questions, hints, recordings) lie over the German ones; the screens show them when the app is English
 localize(abraham, abrahamEn)
