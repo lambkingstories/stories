@@ -20,7 +20,7 @@ const stage = (n: number) => josua.stages[n - 1]!
 const FORBIDDEN = /\b(Messer|Schwert|Speer|Pfeil|Blut|töten|erschlagen|Teufel|Hölle)\b/i
 
 describe('Josua: stories and questions', () => {
-  it('ten stages with 3 or 4 paragraphs of 90 to 145 words (plan v3) and the Bible passage under every one; no recording yet; the stage pictures are the ones of Josef (PLATZHALTER)', () => {
+  it('ten stages with 3 or 4 paragraphs of 90 to 145 words (plan v3) and the Bible passage under every one; the German recordings; the stage pictures are the ones of Josef (PLATZHALTER)', () => {
     expect(josua.id).toBe('josua')
     expect(josua.age).toBe('8-10')
     expect(josua.title).toBe('Josua')
@@ -51,7 +51,8 @@ describe('Josua: stories and questions', () => {
       expect(words / sentences, `words per sentence ${s.id}`).toBeGreaterThan(7)
       expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.audio, `no recording yet, the device voice reads: ${s.id}`).toBeUndefined()
+      expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/josua/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`)
+      expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
       expect(s.image, `stage ${s.id}`).toBe(`images/abenteuer/josua/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
     }
     expect(new Set(josua.stages.map((s) => s.image)).size).toBe(10)
