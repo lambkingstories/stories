@@ -976,21 +976,31 @@ export interface LowerMan {
   image: string
   w: number
 }
-/** A round of the lowering game: the man, the steps down, the time of one swing (seconds), the swing (degrees) and how far from the wall the rope has to swing to be free (degrees). */
+/** A round of the lowering game: the man, how long he needs down the rope while it is held (ms), how often the guard comes and the pause between two passes (ms). */
 export interface LowerRound {
   hint: string
   man: string
-  steps: number
-  period: number
-  amplitude: number
-  threshold: number
+  descentMs: number
+  passes: number
+  gapMs: number
 }
-/** The lowering game "Down the rope": the man swings on the rope; a tap while he swings away from the wall lets him down a step. `window` is where the rope hangs, `ground` the height of the ground (percent of the picture). */
+/**
+ * The lowering game "The red rope": the child holds the rope (finger on the picture, the button, or Enter and the space key) and the man goes down; when it lets go he stops. At the foot of the wall a guard with a torch
+ * walks by (a small figure with a circle of light, drawn by the app); while he is near the sign says "Wait", and holding in his light lets the man be seen: he climbs back to the last of the four red knots (no loss, no restart).
+ * `window` is where the rope hangs and `ground` the height of the ground, `road` the height of the road the guard walks on (percent of the picture), `guardSpeed` percent of the width a second, `lightRadius` the radius of the light
+ * and `warnLead` how far before the light "Wait" shows (percent of the width), `knots` the red knots on the rope.
+ */
 export interface LowerGame {
   background: string
   men: LowerMan[]
+  guard: string
   window: [number, number]
   ground: number
+  road: number
+  guardSpeed: number
+  lightRadius: number
+  warnLead: number
+  knots: number
   rounds: LowerRound[]
 }
 

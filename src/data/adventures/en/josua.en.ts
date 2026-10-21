@@ -51,7 +51,7 @@ export const josuaEn: TextOverlay<Journey> = {
         '“Tie this red rope in your window,” say the men, “and bring your family into your house. Whoever stays inside will be safe.”',
         'Rahab ties the red rope in the window. The men hide in the hills and then go back to Joshua.'
       ],
-      task: { hint: 'Let the man down the rope when he swings away from the wall.', lower: { rounds: [{ hint: 'Tap when the man swings away from the wall. Then he goes down a step.' }, { hint: 'The second man comes, the wind is stronger.' }] } },
+      task: { hint: 'Let the men down on the red rope, but only when no guard is near.', lower: { rounds: [{ hint: 'Hold the rope and the man goes down. Let go when the guard comes.' }, { hint: 'The second man climbs down, and the guard comes twice.' }] } },
       questions: [
         { q: 'What does Rahab say about God?', options: ['He is God in heaven and on earth.', 'He lives only in Jericho.', 'He is far away.'] },
         { q: 'What does Rahab tie in the window?', options: ['a red rope', 'a white cloth', 'a lantern'] }

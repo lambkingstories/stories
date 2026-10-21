@@ -1,17 +1,23 @@
 /**
- * The pure functions of the new games of "Josua" (`utils/josuaGames.ts`): the supplies in the basket, the flax over the men, the swing of the rope, the beats of the bearers, the flatbreads
+ * The pure functions of the new games of "Josua" (`utils/josuaGames.ts`): the supplies in the basket, the flax over the men, the red rope and the guard, the beats of the bearers, the flatbreads
  * and the clouds of noise.
  */
 import { describe, expect, it } from 'vitest'
 import {
-  angle,
   bakeState,
   cloudLevel,
   covered,
   coveredFraction,
+  fastestFinishMs,
+  firstSeenMs,
   fits,
   gridOf,
-  isFree,
+  guardState,
+  guardX,
+  lastKnot,
+  lowerStart,
+  lowerStep,
+  passMs,
   isLoud,
   judge,
   nearestBeat,
@@ -23,6 +29,7 @@ import {
   tipSpot,
   turnRect
 } from '@/utils/josuaGames'
+import type { RopeRules } from '@/utils/josuaGames'
 
 const sack = { id: 'sack', w: 2, h: 2 }
 const krug = { id: 'krug', w: 1, h: 2 }
@@ -111,93 +118,117 @@ describe('flax over the men', () => {
   })
 })
 
-describe('rope', () => {
-  it('swings to and fro in one period: nothing at the start, the most at a quarter, the other way at three quarters', () => {
-    expect(angle(0, 12, 3.4)).toBeCloseTo(0, 6)
-    expect(angle(0.85, 12, 3.4)).toBeCloseTo(12, 6)
-    expect(angle(2.55, 12, 3.4)).toBeCloseTo(-12, 6)
-    expect(angle(3.4, 12, 3.4)).toBeCloseTo(0, 6)
+describe('the red rope and the guard', () => {
+  // the numbers of the draft: the rope at 20.2 percent, the guard 12 percent of the width a second, light 16, wait 24 before it
+  const base = { windowX: 20.2, guardSpeed: 12, lightRadius: 16, warnLead: 24, knots: 4, gapMs: 1500 }
+  const r1: RopeRules = { ...base, descentMs: 8000, passes: 1 }
+  const r2: RopeRules = { ...base, descentMs: 15000, passes: 2 }
+
+  it('a pass of the guard takes 11.3 seconds; round 2 has two passes with a pause of 1.5 seconds, and nobody walks before, between or after', () => {
+    expect(passMs(r1)).toBeCloseTo(11333.3, 0)
+    expect(guardX(0, r1)).toBe(118)
+    expect(guardX(5000, r1)).toBeCloseTo(58, 6)
+    expect(guardX(passMs(r1) + 10, r1)).toBeNull()
+    expect(guardX(-5, r1)).toBeNull()
+    expect(guardX(passMs(r2) + 500, r2)).toBeNull()
+    expect(guardX(passMs(r2) + 1500 + 1000, r2)).toBeCloseTo(118 - 12, 6)
+    expect(guardX(passMs(r2) * 2 + 1500 + 10, r2)).toBeNull()
   })
 
-  it('free only when the rope swings away from the wall beyond the threshold', () => {
-    expect(isFree(5, 2)).toBe(true)
-    expect(isFree(2, 2)).toBe(false)
-    expect(isFree(-8, 2)).toBe(false)
-    expect(isFree(0, 2)).toBe(false)
+  it('"wait" comes 2 seconds before the light reaches the rope, the light is the danger for 2.7 seconds, then it is free again (round 1: 4.8 / 6.8 / 9.5 seconds)', () => {
+    const at = (ms: number) => guardState(guardX(ms, r1), r1)
+    expect(at(0)).toBe('far')
+    expect(at(4700)).toBe('far')
+    expect(at(4900)).toBe('warn')
+    expect(at(6700)).toBe('warn')
+    expect(at(6900)).toBe('danger')
+    expect(at(9400)).toBe('danger')
+    expect(at(9600)).toBe('far')
+    expect(at(passMs(r1) + 100)).toBe('far')
+    // two seconds from "wait" to "danger" (24 percent at 12 percent a second)
+    expect((r1.warnLead / r1.guardSpeed) * 1000).toBe(2000)
+    // the danger is the light: 2 x 16 percent at 12 percent a second = 2.67 seconds
+    expect(((2 * r1.lightRadius) / r1.guardSpeed) * 1000).toBeCloseTo(2667, 0)
   })
 
-  it('the free part of a swing is a good part (round 1 a little under a half, round 2 a little shorter), so that a tap has a fair chance', () => {
-    const share = (amp: number, period: number, threshold: number) => {
-      let free = 0
-      for (let i = 0; i < 1000; i++) if (isFree(angle((i / 1000) * period, amp, period), threshold)) free++
-      return free / 1000
+  it('round 2: both passes are told apart (4.8 / 6.8 / 9.5 and 17.6 / 19.6 / 22.3 seconds)', () => {
+    const second = passMs(r2) + 1500
+    const at = (ms: number) => guardState(guardX(ms, r2), r2)
+    expect([at(4900), at(6900), at(9600)]).toEqual(['warn', 'danger', 'far'])
+    expect([at(10500), at(12000)]).toEqual(['far', 'far'])
+    expect([at(second + 4900), at(second + 6900), at(second + 9600)]).toEqual(['warn', 'danger', 'far'])
+    expect(second / 1000 + 4.82).toBeCloseTo(17.65, 1)
+  })
+
+  it('the man is pulled back to the last of the four knots (at 0, 25, 50 and 75 percent of the way)', () => {
+    expect([0, 0.1, 0.25, 0.3, 0.5, 0.74, 0.75, 0.99, 1].map((y) => lastKnot(y, 4))).toEqual([0, 0, 0.25, 0.25, 0.5, 0.5, 0.75, 0.75, 1])
+    expect(lastKnot(0.6, 0)).toBe(0)
+  })
+
+  it('holding lets the man down evenly, letting go stops him; waiting is never a mistake', () => {
+    let s = lowerStart()
+    for (let i = 0; i < 40; i++) s = lowerStep(s, 100, true, r1).state
+    expect(s.y).toBeCloseTo(0.5, 6)
+    const held = s.y
+    for (let i = 0; i < 20; i++) {
+      const r = lowerStep(s, 100, false, r1)
+      expect(r.event).toBeNull()
+      s = r.state
     }
-    expect(share(12, 3.4, 2)).toBeGreaterThan(0.4)
-    expect(share(12, 3.4, 2)).toBeLessThan(0.5)
-    expect(share(14, 2.8, 4)).toBeGreaterThan(0.35)
-    expect(share(14, 2.8, 4)).toBeLessThan(share(12, 3.4, 2))
-  })
-})
-
-describe('beats', () => {
-  it('beats come at an even distance: 70 a minute are 0.857 seconds apart', () => {
-    const beats = schedule(70, 4, 2)
-    expect(beats).toHaveLength(4)
-    expect(beats[0]).toBe(2)
-    expect(beats[1]! - beats[0]!).toBeCloseTo(60 / 70, 9)
-    expect(beats[3]! - beats[2]!).toBeCloseTo(60 / 70, 9)
-    expect(schedule(90, 3, 0).map((b) => Math.round(b * 1000))).toEqual([0, 667, 1333])
+    expect(s.y).toBe(held)
+    expect(s.t).toBeCloseTo(6000, 6)
   })
 
-  it('a tap is in time within the tolerance, before or after the beat', () => {
-    expect(judge(5.2, 5, 0.3)).toBe(true)
-    expect(judge(4.75, 5, 0.3)).toBe(true)
-    expect(judge(5.4, 5, 0.3)).toBe(false)
-    expect(judge(4.5, 5, 0.25)).toBe(false)
-    expect(judge(5.3, 5, 0.3)).toBe(true)
-  })
-
-  it('the nearest beat to a time; never before the first one', () => {
-    expect(nearestBeat(0, 60, 2)).toBe(2)
-    expect(nearestBeat(2.4, 60, 2)).toBe(2)
-    expect(nearestBeat(2.6, 60, 2)).toBe(3)
-    expect(nearestBeat(10.2, 60, 2)).toBe(10)
-  })
-})
-
-describe('flatbread', () => {
-  it('raw before the window, golden in it (the ends count), too dark after', () => {
-    expect(bakeState(0, 2.5, 6)).toBe('roh')
-    expect(bakeState(2.49, 2.5, 6)).toBe('roh')
-    expect(bakeState(2.5, 2.5, 6)).toBe('golden')
-    expect(bakeState(6, 2.5, 6)).toBe('golden')
-    expect(bakeState(6.01, 2.5, 6)).toBe('dunkel')
-  })
-})
-
-describe('clouds of noise', () => {
-  it('the next cloud is always the same for the same seed and number, at one of the places, after a short wait', () => {
-    for (let n = 0; n < 40; n++) {
-      const a = nextSpawn(3, n, 6)
-      expect(nextSpawn(3, n, 6)).toEqual(a)
-      expect(a.spot).toBeGreaterThanOrEqual(0)
-      expect(a.spot).toBeLessThan(6)
-      expect(a.wait).toBeGreaterThanOrEqual(0.8)
-      expect(a.wait).toBeLessThanOrEqual(2.4)
+  it('holding while the guard is in the light: he is seen, falls back to the last knot and the lock of 0.8 seconds counts nothing; the time goes on', () => {
+    // wait for the light without holding, then hold
+    let s = { t: 6800, y: 0.6, lock: 0 }
+    const seen = lowerStep(s, 100, true, r1)
+    expect(seen.event).toBe('gesehen')
+    expect(seen.state.y).toBe(0.5)
+    expect(seen.state.lock).toBe(800)
+    expect(seen.state.t).toBe(6900)
+    s = seen.state
+    // still holding: nothing counts for 0.8 seconds (the guard is still in the light, but no second mistake)
+    for (let i = 0; i < 8; i++) {
+      const r = lowerStep(s, 100, true, r1)
+      expect(r.event).toBeNull()
+      expect(r.state.y).toBe(0.5)
+      s = r.state
     }
-    const spots = new Set(Array.from({ length: 40 }, (_, n) => nextSpawn(3, n, 6).spot))
-    expect(spots.size).toBeGreaterThanOrEqual(4)
-    expect(Array.from({ length: 10 }, (_, n) => nextSpawn(3, n, 6))).not.toEqual(Array.from({ length: 10 }, (_, n) => nextSpawn(4, n, 6)))
+    // after the lock the guard is still there: seen again
+    expect(lowerStep(s, 100, true, r1).event).toBe('gesehen')
+    // letting go in the light is never a mistake
+    expect(lowerStep({ t: 7000, y: 0.6, lock: 0 }, 100, false, r1).event).toBeNull()
   })
 
-  it('a cloud grows through three sizes and is loud when the time is over', () => {
-    expect(cloudLevel(0, 4)).toBe(1)
-    expect(cloudLevel(1.2, 4)).toBe(1)
-    expect(cloudLevel(1.4, 4)).toBe(2)
-    expect(cloudLevel(2.6, 4)).toBe(2)
-    expect(cloudLevel(2.7, 4)).toBe(3)
-    expect(cloudLevel(10, 4)).toBe(3)
-    expect(isLoud(3.9, 4)).toBe(false)
-    expect(isLoud(4, 4)).toBe(true)
+  it('at the ground he is down', () => {
+    const r = lowerStep({ t: 20000, y: 0.999, lock: 0 }, 100, true, r1)
+    expect(r.event).toBe('unten')
+    expect(r.state.y).toBe(1)
+  })
+
+  it('every round can be won by right play in at most 30 seconds, and cannot be won without waiting', () => {
+    const f1 = fastestFinishMs(r1)!
+    const f2 = fastestFinishMs(r2)!
+    expect(f1).toBeGreaterThan(12500)
+    expect(f1).toBeLessThan(13000)
+    expect(f2).toBeGreaterThan(24000)
+    expect(f2).toBeLessThan(25000)
+    expect(f1).toBeLessThanOrEqual(30000)
+    expect(f2).toBeLessThanOrEqual(30000)
+    // a player who never lets go is seen when the light comes (6.8 seconds), long before he can be down
+    const seen1 = firstSeenMs(r1)!
+    expect(seen1).toBeGreaterThanOrEqual(6800)
+    expect(seen1).toBeLessThan(7000)
+    expect(seen1).toBeGreaterThan(4800 + 1000)
+    expect(firstSeenMs(r2)!).toBeLessThan(7000)
+    // 8 seconds of going down do not fit before the light (6.8 seconds): waiting is needed; in round 2 the second pause is forced (the man is not down before the second pass, at 17.6 seconds)
+    expect(r1.descentMs).toBeGreaterThan(6800)
+    expect(f2).toBeGreaterThan(17600)
+  })
+
+  it('a faster guard or a shorter rope stays winnable (the check is not a trick of these numbers)', () => {
+    expect(fastestFinishMs({ ...r1, guardSpeed: 18 })).not.toBeNull()
+    expect(fastestFinishMs({ ...r1, descentMs: 3000 })).toBeLessThan(3100)
   })
 })

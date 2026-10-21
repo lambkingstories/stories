@@ -1,5 +1,5 @@
 /**
- * The new games of "Josua" (`packen`, `verstecken`, `abseilen`, `schritt`, `backen`, `still`, and the shared memory with its stand-ins): each is mounted with sample data and used: right and
+ * The new games of "Josua" (`packen`, `verstecken`, `abseilen` (the red rope), `schritt`, `backen`, `still`, and the shared memory with its stand-ins): each is mounted with sample data and used: right and
  * wrong moves, the rounds (at most two), the goal for the stars of "Go on" (`useTaskProgress`), the end with its stars, German and English words.
  */
 import { flushPromises, mount } from '@vue/test-utils'
@@ -255,19 +255,25 @@ describe('Im Gleichschritt (step)', () => {
   })
 })
 
-// ---------------------------------------------------------------- down the rope
-describe('Am Seil herablassen (lower)', () => {
+// ---------------------------------------------------------------- the red rope
+describe('Das rote Seil (lower)', () => {
   const game: LowerGame = {
     background: 'images/x/wall.webp',
     men: [
       { id: 'a', image: 'images/x/a.webp', w: 16 },
       { id: 'b', image: 'images/x/b.webp', w: 16 }
     ],
-    window: [38, 14],
-    ground: 92,
+    guard: 'images/x/wache.webp',
+    window: [20.2, 13.5],
+    ground: 91,
+    road: 94,
+    guardSpeed: 12,
+    lightRadius: 16,
+    warnLead: 24,
+    knots: 4,
     rounds: [
-      { hint: 'Runde eins.', man: 'a', steps: 2, period: 4, amplitude: 10, threshold: 2 },
-      { hint: 'Runde zwei.', man: 'b', steps: 3, period: 4, amplitude: 10, threshold: 2 }
+      { hint: 'Runde eins.', man: 'a', descentMs: 8000, passes: 1, gapMs: 1500 },
+      { hint: 'Runde zwei.', man: 'b', descentMs: 15000, passes: 2, gapMs: 1500 }
     ]
   }
   const open = async (locale: 'de' | 'en' = 'de') => {
@@ -277,112 +283,252 @@ describe('Am Seil herablassen (lower)', () => {
     return w
   }
   type W = Awaited<ReturnType<typeof open>>
-  const isFreeNow = (w: W) => w.find('.lw-rope').classes().includes('free')
-  /** Wait (in steps of a tenth of a second) until the rope swings away from the wall, or until it swings towards it. */
-  const waitFor = async (w: W, free: boolean) => {
-    for (let i = 0; i < 80 && isFreeNow(w) !== free; i++) await tick(100)
-  }
-  const go = async (w: W) => {
-    await w.find('.lw-go').trigger('click')
+  const press = async (w: W) => {
+    await w.find('.lw-field').trigger('pointerdown')
     await flushPromises()
   }
-  const turnOf = (w: W) => Number(/rotate\((-?[\d.]+)deg\)/.exec(w.find('.lw-rope').attributes('style') ?? '')![1])
+  const lift = async (w: W) => {
+    await w.find('.lw-field').trigger('pointerup')
+    await flushPromises()
+  }
   const dropOf = (w: W) => Number(/height: ([\d.]+)%/.exec(w.find('.lw-line').attributes('style') ?? '')![1])
-
-  it('the goal is every step of both rounds; the man hangs at the window, nothing is down yet', async () => {
-    const w = await open()
-    expect(useTaskProgress().goal.value).toBe(5)
-    expect(w.find('.lw-round').text()).toContain('Runde 1 von 2')
-    expect(w.find('.lw-count').text()).toBe('Schritte hinab: 0 von 2')
-    expect(dropOf(w)).toBe(0)
-  })
-
-  it('the rope swings round the window: away from the wall it is turned to the right; the arrow and the green rope show when it is free', async () => {
-    const w = await open()
-    await tick(1000)
-    expect(turnOf(w)).toBeCloseTo(-10, 0)
-    expect(isFreeNow(w)).toBe(true)
-    expect(w.find('.lw-arrow').exists()).toBe(true)
-    await tick(2000)
-    expect(turnOf(w)).toBeCloseTo(10, 0)
-    expect(isFreeNow(w)).toBe(false)
-    expect(w.find('.lw-arrow').exists()).toBe(false)
-  })
-
-  it('a tap while he swings away lets him down a step; a second tap in the same moment is ignored, a later one in the same swing works', async () => {
-    const w = await open()
-    await tick(1000)
-    await go(w)
-    expect(useTaskProgress().parts.value).toBe(1)
-    expect(played).toContain('tap')
-    expect(dropOf(w)).toBeGreaterThan(0)
-    await go(w)
-    expect(useTaskProgress().parts.value).toBe(1)
-    expect(played).not.toContain('wrong')
-  })
-
-  it('a tap while he swings towards the wall: a cross, a dull sound, a mistake, he stays where he is', async () => {
-    const w = await open()
-    await tick(3000)
-    await go(w)
-    expect(played).toContain('wrong')
-    expect(w.find('.lw-fb').text()).toContain('Mauer')
-    expect(w.find('.lw-mark').exists()).toBe(true)
-    expect(dropOf(w)).toBe(0)
-    expect(useTaskProgress().parts.value).toBe(0)
-  })
-
-  it('two steps end round 1; round 2 has the other man and three steps', async () => {
-    const w = await open()
-    for (let i = 0; i < 2; i++) {
-      await waitFor(w, true)
-      await go(w)
-      await tick(600)
+  const sign = (w: W) => w.find('.lw-sign').text()
+  const waiting = (w: W) => w.find('.lw-sign').classes().includes('wait')
+  const wrongs = () => played.filter((n) => n === 'wrong').length
+  /** The place of the man as a part of the way down (the way down is `room`, not the whole height of the rope). */
+  const room = 91 - 13.5 - (16 * (560 / 160)) / (4 / 3)
+  const part = (w: W) => (dropOf(w) / 100) * ((91 - 13.5) / room)
+  /** Right play: hold when the sign says go, let go when it says wait, until the man is down (the message says so) or the time is up. */
+  const playRound = async (w: W, limitMs = 40000) => {
+    for (let ms = 0; ms < limitMs; ms += 100) {
+      if (w.find('.lw-fb').text() === 'Der Mann ist unten!') break
+      if (waiting(w)) await lift(w)
+      else await press(w)
+      await tick(100)
     }
-    expect(useTaskProgress().parts.value).toBe(2)
+    await lift(w)
+  }
+
+  it('the goal is every man down; the man hangs at the window, the sign says go, no guard walks before the first hold', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(2)
+    expect(w.find('.lw-round').text()).toContain('Runde 1 von 2')
+    expect(w.find('.lw-hint').text()).toBe('Runde eins.')
+    expect(dropOf(w)).toBe(0)
+    expect(sign(w)).toBe('▼ Weiter')
+    expect(w.find('.lw-guard').exists()).toBe(false)
+    expect(w.findAll('.lw-knot')).toHaveLength(4)
+    expect(w.find('.lw-sr').attributes('aria-live')).toBe('polite')
+    await tick(3000)
+    expect(dropOf(w)).toBe(0)
+    expect(w.find('.lw-guard').exists()).toBe(false)
+  })
+
+  it('holding the rope lets the man down evenly and the guard starts to walk; letting go stops the man, the guard walks on', async () => {
+    const w = await open()
+    await press(w)
+    await tick(1000)
+    expect(w.find('.lw-guard').exists()).toBe(true)
+    const a = dropOf(w)
+    expect(a).toBeGreaterThan(0)
+    expect(part(w)).toBeCloseTo(1000 / 8000, 1)
+    const x0 = /left: ([\d.]+)%/.exec(w.find('.lw-guard').attributes('style')!)![1]
+    await lift(w)
+    await tick(1000)
+    expect(dropOf(w)).toBe(a)
+    const x1 = /left: ([\d.]+)%/.exec(w.find('.lw-guard').attributes('style')!)![1]
+    expect(Number(x1)).toBeLessThan(Number(x0) - 5)
+    expect(w.find('.lw-go').classes()).not.toContain('on')
+  })
+
+  it('the sign says wait about two seconds before the light (4.8 s), with a dashed rope and a spoken note; it says go again when the guard has passed (9.5 s)', async () => {
+    const w = await open()
+    await press(w)
+    await tick(4000)
+    await lift(w)
+    expect(waiting(w)).toBe(false)
+    expect(w.find('.lw-line').classes()).not.toContain('dashed')
+    await tick(1000)
+    expect(sign(w)).toBe('✋ Warte')
+    expect(waiting(w)).toBe(true)
+    expect(w.find('.lw-line').classes()).toContain('dashed')
+    expect(w.find('.lw-light').classes()).toContain('near')
+    expect(w.find('.lw-sr').text()).toBe('Warte, eine Wache kommt.')
+    await tick(4700)
+    expect(sign(w)).toBe('▼ Weiter')
+    expect(w.find('.lw-line').classes()).not.toContain('dashed')
+    expect(w.find('.lw-sr').text()).toBe('Jetzt weiter.')
+  })
+
+  it('waiting is never a mistake: whoever lets go at "wait" and holds again at "go" is never seen, no cross, no dull sound', async () => {
+    const w = await open()
+    await press(w)
+    await tick(4500)
+    await lift(w)
+    await tick(5200)
+    expect(sign(w)).toBe('▼ Weiter')
+    expect(wrongs()).toBe(0)
+    expect(w.find('.lw-mark').exists()).toBe(false)
+    await press(w)
+    await tick(500)
+    expect(dropOf(w)).toBeGreaterThan(0)
+    expect(wrongs()).toBe(0)
+  })
+
+  it('whoever holds when the guard is in the light is seen: a cross, a dull sound, a kind sentence, the man climbs back to the last knot; nothing is lost and the round goes on', async () => {
+    const w = await open()
+    await press(w)
+    await tick(6700)
+    // 6.7 s of 8 s: 84 percent of the way, a little before the light
+    expect(part(w)).toBeCloseTo(0.84, 1)
+    expect(wrongs()).toBe(0)
+    await tick(250)
+    expect(wrongs()).toBe(1)
+    expect(w.find('.lw-fb').text()).toBe('Pst! Die Wache schaut herüber. Er klettert ein Stück zurück.')
+    expect(w.find('.lw-mark').exists()).toBe(true)
+    expect(part(w)).toBeCloseTo(0.75, 2)
+    expect(useTaskProgress().parts.value).toBe(0)
+    expect(w.find('.lw-round').text()).toContain('Runde 1 von 2')
+    await lift(w)
+    // the guard has passed: free again, and the man goes on from the knot
+    await tick(3000)
+    expect(sign(w)).toBe('▼ Weiter')
+    await press(w)
+    await tick(500)
+    expect(part(w)).toBeGreaterThan(0.75)
+  })
+
+  it('right play brings the first man down in about 13 seconds: a tick, the number of men down, then round 2 with the other man and two passes of the guard', async () => {
+    const w = await open()
+    await playRound(w)
+    expect(wrongs()).toBe(0)
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(w.find('.lw-fb').text()).toBe('Der Mann ist unten!')
+    expect(played).toContain('snap')
+    expect(w.find('.lw-field').attributes('aria-label')).toContain('1 von 2 Männern unten')
     await tick(1900)
     expect(w.find('.lw-round').text()).toContain('Runde 2 von 2')
-    expect(w.find('.lw-count').text()).toBe('Schritte hinab: 0 von 3')
+    expect(w.find('.lw-hint').text()).toBe('Runde zwei.')
     expect(dropOf(w)).toBe(0)
+    expect(w.find('.lw-guard').exists()).toBe(false)
+    expect(sign(w)).toBe('▼ Weiter')
   })
 
-  it('the whole game: the end with three stars; the mistakes give the stars (up to two: three, up to four: two, more: one)', async () => {
-    for (const [wrong, stars] of [[0, 3], [2, 3], [3, 2], [4, 2], [5, 1]] as const) {
+  it('the whole game: both men down, the end with its stars; seen 0 or 1 times three stars, up to three times two, then one', async () => {
+    for (const [seen, stars] of [[0, 3], [1, 3], [2, 2], [3, 2], [4, 1]] as const) {
+      played.length = 0
       useTaskProgress().reset()
       const w = await open()
-      for (let i = 0; i < wrong; i++) {
-        await waitFor(w, false)
-        await go(w)
-        await tick(100)
+      if (seen) {
+        await press(w)
+        for (let i = 0; i < 100 && wrongs() < seen; i++) await tick(100)
+        await lift(w)
+        expect(wrongs()).toBe(seen)
       }
-      for (let i = 0; i < 2; i++) {
-        await waitFor(w, true)
-        await go(w)
-        await tick(600)
-      }
+      await playRound(w)
       await tick(1900)
-      for (let i = 0; i < 3; i++) {
-        await waitFor(w, true)
-        await go(w)
-        await tick(600)
-      }
+      await playRound(w)
       await tick(1100)
-      expect(useTaskProgress().parts.value).toBe(5)
+      expect(useTaskProgress().parts.value, `${seen} seen`).toBe(2)
       expect(useTaskProgress().finished.value).toBe(true)
+      expect(w.find('.gd').text()).toContain('Beide Männer sind sicher unten.')
       await w.find('.gd button').trigger('click')
-      expect(w.emitted('done'), `${wrong} mistakes`).toEqual([[stars]])
+      expect(w.emitted('done'), `${seen} seen`).toEqual([[stars]])
+      expect(played).toContain('star')
       w.unmount()
     }
     expect(problems()).toEqual([])
   })
 
+  it('for those who cannot hold: a single click on the button lets the rope down until the next click; keys held down do the same; the focus lost lets go', async () => {
+    const w = await open()
+    await w.find('.lw-go').trigger('click')
+    expect(w.find('.lw-go').classes()).toContain('on')
+    await tick(1000)
+    expect(part(w)).toBeCloseTo(0.125, 1)
+    await w.find('.lw-go').trigger('click')
+    expect(w.find('.lw-go').classes()).not.toContain('on')
+    const a = dropOf(w)
+    await tick(500)
+    expect(dropOf(w)).toBe(a)
+    // a key held down
+    await w.find('.lw').trigger('keydown', { key: ' ' })
+    await tick(1000)
+    expect(dropOf(w)).toBeGreaterThan(a)
+    await w.find('.lw').trigger('keyup', { key: ' ' })
+    const b = dropOf(w)
+    await tick(500)
+    expect(dropOf(w)).toBe(b)
+    await w.find('.lw').trigger('keydown', { key: 'Enter' })
+    await tick(300)
+    expect(dropOf(w)).toBeGreaterThan(b)
+    // the window loses the focus: let go
+    window.dispatchEvent(new Event('blur'))
+    await flushPromises()
+    const c = dropOf(w)
+    await tick(500)
+    expect(dropOf(w)).toBe(c)
+    expect(w.find('.lw-go').classes()).not.toContain('on')
+  })
+
+  it('a switched-on rope that is held while the guard is in the light lets the man be seen and then lets go by itself (the child decides again)', async () => {
+    const w = await open()
+    await w.find('.lw-go').trigger('click')
+    await tick(7000)
+    expect(wrongs()).toBe(1)
+    expect(w.find('.lw-go').classes()).not.toContain('on')
+    await tick(3000)
+    expect(wrongs()).toBe(1)
+  })
+
+  it('a long stop does not jump: the clock never counts more than a tenth of a second in one tick', async () => {
+    const w = await open()
+    await press(w)
+    await tick(100)
+    const a = dropOf(w)
+    // the device sleeps for a minute: one tick, not a minute
+    vi.setSystemTime(Date.now() + 60000)
+    await tick(40)
+    expect(dropOf(w)).toBeLessThan(a + 3)
+    expect(wrongs()).toBe(0)
+    expect(w.find('.gd').exists()).toBe(false)
+  })
+
+  it('with reduced motion the guard walks in steps of half a second', async () => {
+    const old = window.matchMedia
+    window.matchMedia = ((q: string) => ({ matches: /reduce/.test(q), media: q, addEventListener: () => undefined, removeEventListener: () => undefined, addListener: () => undefined, removeListener: () => undefined, onchange: null, dispatchEvent: () => false })) as never
+    try {
+      const w = await open()
+      await press(w)
+      await tick(100)
+      const left = () => /left: ([\d.]+)%/.exec(w.find('.lw-guard').attributes('style')!)![1]
+      const first = left()
+      await tick(300)
+      expect(left()).toBe(first)
+      await tick(300)
+      expect(Number(left())).toBeLessThan(Number(first))
+    } finally {
+      window.matchMedia = old
+    }
+  })
+
   it('speaks English', async () => {
     const w = await open('en')
-    expect(w.find('.lw-count').text()).toBe('Steps down: 0 of 2')
-    expect(w.find('.lw-go').text()).toBe('Let down')
-    await tick(3000)
-    await go(w)
-    expect(w.find('.lw-fb').text()).toContain('He touches the wall')
+    expect(w.find('.lw-go').text()).toBe('Let the rope down (hold)')
+    expect(sign(w)).toBe('▼ Go')
+    await press(w)
+    await tick(5000)
+    await lift(w)
+    expect(sign(w)).toBe('✋ Wait')
+    expect(w.find('.lw-sr').text()).toBe('Wait, a guard is coming.')
+    await tick(5000)
+    expect(w.find('.lw-sr').text()).toBe('Go on now.')
+    expect(w.find('.lw-field').attributes('aria-label')).toBe('The city wall with the red rope: 0 of 2 men are down')
+    w.unmount()
+    const v = await open('en')
+    await press(v)
+    await tick(7000)
+    expect(v.find('.lw-fb').text()).toBe('Shh! The guard is looking. He climbs back a little.')
   })
 })
 

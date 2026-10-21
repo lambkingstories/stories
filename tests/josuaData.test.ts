@@ -12,6 +12,7 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
+import { fastestFinishMs, firstSeenMs } from '@/utils/josuaGames'
 import { covered, groupLanding } from '@/utils/josuaGames'
 
 afterEach(() => setAdventureLanguage('de'))
@@ -173,19 +174,29 @@ describe('Josua: the games, and the placeholders until the pictures come', () =>
     expect(g.background).toBe('images/abenteuer/spiele/josua/jordan/fluss.webp')
   })
 
-  it('3 lower: four steps with a calm wind, then five with a stronger one; the swing is wider than the free threshold; the rope hangs from a window above the ground and the man fits in between', () => {
+  it('3 lower (the red rope): two rounds for two men, one pass of the guard and then two; the numbers of the draft; the rope hangs from a window above the ground and the man fits in between; every round can be won and not without waiting', () => {
     const g = stage(3).task.lower
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
-    expect(g.rounds.map((r) => [r.steps, r.period, r.amplitude, r.threshold])).toEqual([[4, 3.4, 12, 2], [5, 2.8, 14, 4]])
-    for (const r of g.rounds) {
-      expect(r.amplitude).toBeGreaterThan(r.threshold)
-      expect(g.men.map((m) => m.id)).toContain(r.man)
-    }
+    expect(stage(3).task.hint).toBe('Lass die Männer am roten Seil hinab, aber nur, wenn keine Wache da ist.')
+    expect(g.rounds.map((r) => [r.man, r.descentMs, r.passes, r.gapMs])).toEqual([['a', 8000, 1, 1500], ['b', 15000, 2, 1500]])
+    expect(g.rounds.map((r) => r.hint)).toEqual(['Halte das Seil gedrückt, dann sinkt der Mann. Lass los, wenn die Wache kommt.', 'Der zweite Mann klettert hinab, und die Wache kommt zweimal.'])
+    for (const r of g.rounds) expect(g.men.map((m) => m.id)).toContain(r.man)
     expect(new Set(g.rounds.map((r) => r.man)).size).toBe(2)
+    expect([g.window, g.ground, g.road, g.guardSpeed, g.lightRadius, g.warnLead, g.knots]).toEqual([[20.2, 13.5], 91, 94, 12, 16, 24, 4])
     const manH = (g.men[0]!.w * (560 / 160)) / (4 / 3)
     expect(g.ground - g.window[1], 'room for the man').toBeGreaterThan(manH)
+    expect(g.road, 'the road lies below the ground line of the rope').toBeGreaterThan(g.ground)
     expect(g.window[0] >= 0 && g.window[0] <= 100).toBe(true)
+    // the guard has a picture (not painted yet: tolerated by the download test)
+    expect(g.guard).toBe('images/abenteuer/spiele/josua/abseilen/wache.webp')
+    expect(notPaintedYet(g.guard)).toBe(true)
+    // right play wins each round in at most 30 seconds; holding all the time is seen before the man can be down
+    for (const r of g.rounds) {
+      const rules = { windowX: g.window[0], guardSpeed: g.guardSpeed, lightRadius: g.lightRadius, warnLead: g.warnLead, knots: g.knots, descentMs: r.descentMs, passes: r.passes, gapMs: r.gapMs }
+      expect(fastestFinishMs(rules)!).toBeLessThanOrEqual(30000)
+      expect(firstSeenMs(rules)!).toBeGreaterThan(0)
+    }
   })
 
   it('1 quiz: the first stage has no game (the packing game is the one of Mose)', () => {
@@ -281,7 +292,7 @@ describe('Josua: the games, and the placeholders until the pictures come', () =>
       for (const x of r) expect(x.hint.length).toBeGreaterThan(8)
     }
     expect(g(2).hide!.rounds.reduce((n, r) => n + r.men.length, 0)).toBe(3)
-    expect(g(3).lower!.rounds.reduce((n, r) => n + r.steps, 0)).toBe(9)
+    expect(g(3).lower!.rounds.length).toBe(2)
     expect(1 + g(4).cross!.groups.length).toBe(4)
     expect(g(5).memory!.pairs.length).toBe(5)
     expect(g(6).bake!.rounds.reduce((n, r) => n + r.dough, 0)).toBe(10)

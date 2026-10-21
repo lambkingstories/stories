@@ -1,6 +1,6 @@
 /**
  * The small pure functions of the new games of "Josua" (`utils/josuaGames.ts`): packing things into a basket (fits, turning, solvable, the tip), the flax over the men on the
- * roof (what is covered and what still looks out), the swing of the rope, the beats of the bearers, the state of a flatbread and the clouds of noise over the animals. The games
+ * roof (what is covered and what still looks out), the red rope and the guard, the beats of the bearers, the state of a flatbread and the clouds of noise over the animals. The games
  * draw and time only what these say; the tests use them directly.
  */
 import { seeded } from '@/utils/jakobGames'
@@ -126,13 +126,109 @@ export function coveredFraction(man: Rect, bundles: Rect[], cell = CELL): number
 /** The man is hidden when at least 96 % of him is covered. */
 export const covered = (man: Rect, bundles: Rect[], need = 0.96, cell = CELL): boolean => coveredFraction(man, bundles, cell) >= need
 
-// ------------------------------------------------------------------ the rope
+// ------------------------------------------------------------------ the red rope and the guard
 
-/** The swing of the rope in degrees at the time t (seconds): positive is away from the wall. */
-export const angle = (t: number, amplitude: number, period: number): number => amplitude * Math.sin((2 * Math.PI * t) / period)
+/** What the game needs to know of the rope and the guard (a part of `LowerGame` and `LowerRound`; the tests use plain numbers). */
+export interface RopeRules {
+  /** where the rope hangs (percent of the width) */
+  windowX: number
+  /** how fast the guard walks (percent of the width a second) */
+  guardSpeed: number
+  /** the radius of the circle of light round the torch (percent of the width) */
+  lightRadius: number
+  /** how far before the light the sign says "wait" (percent of the width) */
+  warnLead: number
+  /** the red knots on the rope, where the man is pulled back to */
+  knots: number
+  /** how long the man needs to go down while he is held (ms), how often the guard comes, and the pause between two passes (ms) */
+  descentMs: number
+  passes: number
+  gapMs: number
+}
 
-/** The rope swings away from the wall far enough: this is the moment to let the man down. */
-export const isFree = (a: number, threshold: number): boolean => a > threshold
+/** The guard walks from this far right of the picture to this far left of it (percent of the width). */
+export const GUARD_FROM = 118
+export const GUARD_TO = -18
+/** After the man was seen, holding counts for nothing for this long (ms). */
+export const SEEN_LOCK_MS = 800
+
+/** How long one pass of the guard takes (ms). */
+export const passMs = (r: Pick<RopeRules, 'guardSpeed'>): number => ((GUARD_FROM - GUARD_TO) / r.guardSpeed) * 1000
+
+/** Where the guard walks at the time t (ms since the first hold): `null` when no pass is on (between two passes, and after the last one). The first pass starts at once. */
+export function guardX(t: number, r: RopeRules): number | null {
+  if (t < 0) return null
+  const one = passMs(r)
+  const k = Math.floor(t / (one + r.gapMs))
+  if (k >= r.passes) return null
+  const inPass = t - k * (one + r.gapMs)
+  if (inPass > one) return null
+  return GUARD_FROM - (r.guardSpeed * inPass) / 1000
+}
+
+export type GuardState = 'far' | 'warn' | 'danger'
+
+/** `danger`: the guard is in the light on the rope (the man must not move); `warn`: he comes, let go now (the lead gives about two seconds); `far`: all is free. */
+export function guardState(x: number | null, r: RopeRules): GuardState {
+  if (x === null) return 'far'
+  if (Math.abs(x - r.windowX) <= r.lightRadius) return 'danger'
+  if (x > r.windowX + r.lightRadius && x <= r.windowX + r.lightRadius + r.warnLead) return 'warn'
+  return 'far'
+}
+
+/** The last red knot at or above the place `y` (0 to 1 of the way down): the man is pulled back to it. */
+export const lastKnot = (y: number, knots: number): number => (knots > 0 ? Math.floor(y * knots + 1e-9) / knots : 0)
+
+export interface LowerState {
+  /** ms since the first hold */
+  t: number
+  /** the way down, 0 (at the window) to 1 (on the ground) */
+  y: number
+  /** ms that holding counts for nothing (after the man was seen) */
+  lock: number
+}
+
+export type LowerEvent = 'gesehen' | 'unten' | null
+
+export const lowerStart = (): LowerState => ({ t: 0, y: 0, lock: 0 })
+
+/**
+ * One step of the game: time goes on by `dt` ms; when the rope is held (and not locked) the man goes down; when it is held while the guard is in the light he is seen and falls back to the
+ * last knot (with a lock of 0.8 s); at the ground he is down. Waiting is never a mistake.
+ */
+export function lowerStep(s: LowerState, dt: number, holding: boolean, r: RopeRules): { state: LowerState; event: LowerEvent } {
+  const t = s.t + dt
+  const lock = Math.max(0, s.lock - dt)
+  if (!holding || s.lock > 0) return { state: { t, y: s.y, lock }, event: null }
+  if (guardState(guardX(t, r), r) === 'danger') return { state: { t, y: lastKnot(s.y, r.knots), lock: SEEN_LOCK_MS }, event: 'gesehen' }
+  const y = Math.min(1, s.y + dt / r.descentMs)
+  return { state: { t, y, lock }, event: y >= 1 ? 'unten' : null }
+}
+
+/** The shortest time (ms) in which a player who holds whenever the guard is not coming (never in "warn" or "danger") brings the man down; `null` when he never gets there. */
+export function fastestFinishMs(r: RopeRules, step = 10, limit = 120000): number | null {
+  let s = lowerStart()
+  for (let i = 0; i < limit / step; i++) {
+    const hold = guardState(guardX(s.t + step, r), r) === 'far'
+    const next = lowerStep(s, step, hold, r)
+    if (next.event === 'gesehen') return null
+    s = next.state
+    if (next.event === 'unten') return s.t
+  }
+  return null
+}
+
+/** A player who never lets go: the time (ms) at which he is seen for the first time, or `null` when he gets down (and so is not seen). */
+export function firstSeenMs(r: RopeRules, step = 10, limit = 120000): number | null {
+  let s = lowerStart()
+  for (let i = 0; i < limit / step; i++) {
+    const next = lowerStep(s, step, true, r)
+    s = next.state
+    if (next.event === 'gesehen') return s.t
+    if (next.event === 'unten') return null
+  }
+  return null
+}
 
 // ------------------------------------------------------------------ the beats
 

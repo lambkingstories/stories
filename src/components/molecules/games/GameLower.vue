@@ -1,18 +1,22 @@
 <script setup lang="ts">
 /**
- * Down the rope: from the window in the high wall of the city a rope hangs, and a man hangs on it. The wind swings him slowly to and fro. A tap (on the picture, the button "Let down", or
- * Enter and the space key) while he swings away from the wall lets him down one step. If he swings towards the wall he touches it gently: a cross, a dull sound, a mistake, and he stays
- * where he is. While the rope is free a little arrow "away from the wall" shows (the rope does not only turn green). Round 1: one man, five steps, calm wind; round 2: another man,
- * six steps, a stronger wind (a shorter free time). Nobody falls and nothing is lost. The swing is `angle` and `isFree` in `utils/josuaGames.ts`.
+ * The red rope (Josua, stage 3): from the window in the high wall of the city a red rope hangs, and a man hangs on it. The child holds the rope (a finger on the picture, the button "Let the rope down", or
+ * the Enter and the space key held down) and the man goes down; when it lets go he stops. At the foot of the wall a guard with a torch walks by from right to left: a small figure with a circle of warm light that
+ * the app draws. While he comes (about two seconds before his light reaches the rope) and while he is near, a big sign says "Wait" (never only a colour: also the dashed rope and a spoken note); when it says
+ * "Go" the rope is free. Whoever holds while the guard is in the light lets the man be seen: the rope jerks, a cross, a dull sound, and he climbs back up to the last of the four red knots; nothing is lost, no round
+ * starts again, and he can go on at once when the guard is far. Waiting is never a mistake. Two rounds because two men go down: round 1 one pass of the guard, round 2 two. A single click on the button (no pointer, an
+ * aid for those who cannot hold) switches between "let down" and "stop". Losing the focus lets go. With reduced motion the guard walks in steps every half second and the man in steps of five percent.
+ * The rules (where the guard is, when it is "wait", the step of the game) are `guardX`, `guardState`, `lowerStep` and `lastKnot` in `utils/josuaGames.ts`; the clock never jumps more than 100 ms in one tick.
  */
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AdvButton from '@/components/atoms/AdvButton.vue'
 import GameImage from '@/components/atoms/GameImage.vue'
 import GameMark from '@/components/atoms/GameMark.vue'
 import GameDone from '@/components/molecules/games/GameDone.vue'
 import useTimers from '@/use/useTimers'
-import { angle, isFree } from '@/utils/josuaGames'
+import { guardState, guardX, lowerStart, lowerStep } from '@/utils/josuaGames'
+import type { LowerState, RopeRules } from '@/utils/josuaGames'
 import { mistakeStars } from '@/utils/adventureScore'
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
@@ -25,14 +29,20 @@ const { t } = useI18n({ useScope: 'global' })
 const { play } = useSfx()
 const { later } = useTimers()
 const progress = useTaskProgress()
-// the whole task: every step down of every round
-progress.setGoal(props.game.rounds.reduce((sum, r) => sum + r.steps, 0))
+// the whole task: every man down
+progress.setGoal(props.game.rounds.length)
 
 /** The picture of the man is 160 x 560 pixels; the field is 3 : 4, so a width of the picture is three quarters of that in height. */
 const MAN_RATIO = 560 / 160
 const FIELD_ASPECT = 4 / 3
-/** Nothing counts for this long (ms) after a step down, so that one free swing is one step. */
-const LOCK_MS = 500
+/** One tick of the clock (ms), the longest step of time one tick may count (ms), and how long a hold by hand or key counts as the cause of the next click (ms). */
+const TICK = 33
+const MAX_DT = 100
+const INPUT_MS = 400
+/** The width of the guard (percent of the width of the field) and the height of his torch above his feet (percent of the height). */
+const GUARD_W = 12
+const TORCH_UP = 9
+const still = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 const rounds = computed(() => props.game.rounds)
 const round = ref(0)
@@ -42,29 +52,80 @@ const man = computed<LowerMan | undefined>(() => props.game.men.find((m) => m.id
 const manW = computed(() => man.value?.w ?? 16)
 /** The height of the man in percent of the height of the field. */
 const manH = computed(() => (manW.value * MAN_RATIO) / FIELD_ASPECT)
-/** From the window to the ground, in percent of the height of the field. */
+/** From the window to the ground, in percent of the height of the field, and how far down the man can go. */
 const span = computed(() => props.game.ground - props.game.window[1])
-/** How far down the man can go (percent of the height of the field). */
 const room = computed(() => Math.max(0, span.value - manH.value))
+const rules = computed<RopeRules>(() => ({
+  windowX: props.game.window[0],
+  guardSpeed: props.game.guardSpeed,
+  lightRadius: props.game.lightRadius,
+  warnLead: props.game.warnLead,
+  knots: props.game.knots,
+  descentMs: current.value.descentMs,
+  passes: current.value.passes,
+  gapMs: current.value.gapMs
+}))
 
-const down = ref(0)
-const mistakes = ref(0)
-const busy = ref(false)
-const between = ref(false)
-const finished = ref(false)
+const phase = ref<'ready' | 'play' | 'down' | 'finished'>('ready')
+const st = ref<LowerState>(lowerStart())
+const sources = ref<Set<string>>(new Set())
+const holding = computed(() => sources.value.size > 0)
+const downCount = ref(0)
+const seen = ref(0)
+const jerk = ref(false)
 const message = ref('')
+const announce = ref('')
 const flash = ref<'good' | 'bad' | null>(null)
-const touching = ref(false)
 const src = (p: string) => prependBaseUrl(p)
-const stars = computed(() => mistakeStars(mistakes.value, 2, 4))
+const stars = computed(() => mistakeStars(seen.value, 1, 3))
+let last = 0
+let lastInput = 0
 
-// the swing: the time since the start of the game in seconds
-const t0 = Date.now()
-const time = ref(0)
-const timer = window.setInterval(() => (time.value = (Date.now() - t0) / 1000), 33)
-onBeforeUnmount(() => window.clearInterval(timer))
-const swing = computed(() => angle(time.value, current.value.amplitude, current.value.period))
-const free = computed(() => isFree(swing.value, current.value.threshold))
+/** Where the guard walks now (real time) and whether the sign says wait. */
+const realX = computed(() => (phase.value === 'play' ? guardX(st.value.t, rules.value) : null))
+const state = computed(() => guardState(realX.value, rules.value))
+const waiting = computed(() => phase.value === 'play' && state.value !== 'far')
+/** What is drawn: with reduced motion in steps. */
+const shownX = computed(() => {
+  if (phase.value !== 'play') return null
+  return still ? guardX(Math.floor(st.value.t / 500) * 500, rules.value) : realX.value
+})
+const shownY = computed(() => (still ? Math.floor(st.value.y * 20) / 20 : st.value.y))
+const dropPercent = computed(() => (span.value ? ((shownY.value * room.value) / span.value) * 100 : 0))
+const knotTops = computed(() => Array.from({ length: Math.max(0, props.game.knots) }, (_, k) => (span.value ? (((k / props.game.knots) * room.value) / span.value) * 100 : 0)))
+
+const timer = window.setInterval(tick, TICK)
+function release() {
+  sources.value = new Set()
+}
+const onWindowUp = () => {
+  if (sources.value.has('pointer')) setSource('pointer', false)
+}
+window.addEventListener('pointerup', onWindowUp)
+window.addEventListener('pointercancel', onWindowUp)
+window.addEventListener('blur', release)
+onBeforeUnmount(() => {
+  window.clearInterval(timer)
+  window.removeEventListener('pointerup', onWindowUp)
+  window.removeEventListener('pointercancel', onWindowUp)
+  window.removeEventListener('blur', release)
+})
+
+function setSource(name: string, on: boolean) {
+  const next = new Set(sources.value)
+  if (on) next.add(name)
+  else next.delete(name)
+  sources.value = next
+  // the first hold of a round lets the guard start
+  if (on && phase.value === 'ready') begin()
+}
+
+function begin() {
+  st.value = lowerStart()
+  last = Date.now()
+  phase.value = 'play'
+  message.value = ''
+}
 
 function flashOn(kind: 'good' | 'bad') {
   flash.value = kind
@@ -73,82 +134,154 @@ function flashOn(kind: 'good' | 'bad') {
   }, 700)
 }
 
-function lower() {
-  if (busy.value || between.value || finished.value) return
-  if (!free.value) {
-    mistakes.value++
-    play('wrong')
-    flashOn('bad')
-    message.value = t('app.adventure.lowerWall')
-    touching.value = true
-    later(() => {
-      touching.value = false
-    }, 600)
-    return
-  }
-  down.value++
-  busy.value = true
-  progress.mark()
-  play('tap')
-  message.value = ''
-  flashOn('good')
-  later(() => {
-    busy.value = false
-  }, LOCK_MS)
-  if (down.value >= current.value.steps) roundOver()
+function tick() {
+  if (phase.value !== 'play') return
+  const now = Date.now()
+  const dt = Math.min(MAX_DT, Math.max(0, now - last))
+  last = now
+  if (!dt) return
+  const r = lowerStep(st.value, dt, holding.value, rules.value)
+  st.value = r.state
+  if (r.event === 'gesehen') wasSeen()
+  else if (r.event === 'unten') arrived()
 }
 
-function roundOver() {
+/** Held while the guard looks: the man climbs back to the last knot (the state already has it), the rest is feedback. */
+function wasSeen() {
+  seen.value++
+  // a held switch (the aid) is let go: the child has to decide again
+  if (sources.value.has('toggle')) setSource('toggle', false)
+  play('wrong')
+  flashOn('bad')
+  message.value = t('app.adventure.lowerSeen')
+  jerk.value = true
+  later(() => {
+    jerk.value = false
+  }, 600)
+}
+
+function arrived() {
+  phase.value = 'down'
+  downCount.value++
+  progress.mark()
+  play('snap')
+  flashOn('good')
+  message.value = t('app.adventure.lowerDown')
+  announce.value = ''
   if (lastRound.value) {
     later(() => {
-      finished.value = true
+      phase.value = 'finished'
       play('star')
     }, 1000)
     return
   }
-  between.value = true
-  message.value = t('app.adventure.gameNext')
   later(() => {
     round.value++
-    down.value = 0
-    between.value = false
+    st.value = lowerStart()
+    release()
     message.value = ''
+    phase.value = 'ready'
   }, 1800)
 }
 
-function key(e: KeyboardEvent) {
-  if ((e.key !== 'Enter' && e.key !== ' ') || (e.target as HTMLElement | null)?.tagName === 'BUTTON') return
+// the spoken note when the sign changes
+watch(waiting, (w) => {
+  if (phase.value !== 'play') return
+  announce.value = t(w ? 'app.adventure.lowerAnnounceWait' : 'app.adventure.lowerAnnounceGo')
+})
+
+function pointerDown(e: PointerEvent) {
+  lastInput = Date.now()
+  setSource('pointer', true)
+  const el = e.currentTarget as HTMLElement | null
+  try {
+    el?.setPointerCapture?.(e.pointerId)
+  } catch {
+    // a pointer that is gone: the window listener lets go
+  }
+}
+
+function pointerUp() {
+  lastInput = Date.now()
+  setSource('pointer', false)
+}
+
+function buttonDown() {
+  lastInput = Date.now()
+  setSource('pointer', true)
+}
+
+/** A click without a pointer or key before it: an aid for those who cannot hold; it switches between "let down" and "stop". */
+function toggle() {
+  if (Date.now() - lastInput < INPUT_MS) return
+  setSource('toggle', !sources.value.has('toggle'))
+}
+
+function keyDown(e: KeyboardEvent) {
+  if (e.key !== 'Enter' && e.key !== ' ') return
   e.preventDefault()
-  lower()
+  lastInput = Date.now()
+  if (!e.repeat) setSource('key', true)
+}
+
+function keyUp(e: KeyboardEvent) {
+  if (e.key !== 'Enter' && e.key !== ' ') return
+  e.preventDefault()
+  lastInput = Date.now()
+  setSource('key', false)
 }
 
 const ropeStyle = computed(() => ({
   left: `${props.game.window[0]}%`,
   top: `${props.game.window[1]}%`,
   width: `${manW.value}%`,
-  height: `${span.value}%`,
-  transform: `translateX(-50%) rotate(${-swing.value}deg)`
+  height: `${span.value}%`
 }))
-const dropPercent = computed(() => (span.value ? ((current.value.steps ? (down.value / current.value.steps) * room.value : 0) / span.value) * 100 : 0))
 const lineStyle = computed(() => ({ height: `${dropPercent.value}%` }))
 const manStyle = computed(() => ({ top: `${dropPercent.value}%` }))
+const guardStyle = computed(() => ({ left: `${shownX.value ?? 0}%`, top: `${props.game.road}%`, width: `${GUARD_W}%` }))
+const lightStyle = computed(() => ({ left: `${shownX.value ?? 0}%`, top: `${props.game.road - TORCH_UP}%`, width: `${props.game.lightRadius * 2}%` }))
 </script>
 
 <template lang="pug">
-  div(class="lw" tabindex="-1" @keydown="key")
-    template(v-if="!finished")
+  div(class="lw" tabindex="-1" @keydown="keyDown" @keyup="keyUp")
+    template(v-if="phase !== 'finished'")
       p(v-if="rounds.length > 1" class="lw-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
-      p(class="lw-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
-      div(class="lw-field" role="group" :aria-label="t('app.adventure.lowerField', { n: down, total: current.steps })" :style="{ backgroundImage: `url(${src(game.background)})` }" @pointerdown="lower")
-        div(class="lw-rope" :class="{ free, touching }" :style="ropeStyle" aria-hidden="true")
-          span(class="lw-line" :style="lineStyle")
-          span(class="lw-man" :style="manStyle")
+      p(class="lw-hint") {{ current.hint }}
+      div(
+        class="lw-field"
+        :class="{ holding }"
+        role="group"
+        :aria-label="t('app.adventure.lowerField', { n: downCount, total: rounds.length })"
+        :style="{ backgroundImage: `url(${src(game.background)})` }"
+        @pointerdown.prevent="pointerDown"
+        @pointerup="pointerUp"
+        @pointercancel="pointerUp"
+        @lostpointercapture="pointerUp"
+      )
+        span(class="lw-night" aria-hidden="true")
+        div(class="lw-rope" :class="{ jerk }" :style="ropeStyle" aria-hidden="true")
+          span(class="lw-line" :class="{ dashed: waiting }" :style="lineStyle")
+          span(v-for="(top, k) in knotTops" :key="k" class="lw-knot" :style="{ top: `${top}%` }")
+          span(class="lw-man" :class="{ seen: jerk }" :style="manStyle")
             GameImage(:src="man ? man.image : ''" :ratio="160 / 560" colour="#c9895a")
-        span(v-if="free && !between" class="lw-arrow" aria-hidden="true") →
+        template(v-if="shownX !== null")
+          span(class="lw-light" :class="{ near: waiting }" :style="lightStyle" aria-hidden="true")
+          span(class="lw-guard" :style="guardStyle" aria-hidden="true")
+            GameImage(:src="game.guard" :ratio="140 / 220" colour="#2b2236")
+        span(v-if="phase === 'play' || phase === 'ready'" class="lw-sign" :class="{ wait: waiting }" aria-hidden="true") {{ waiting ? t('app.adventure.lowerWait') : t('app.adventure.lowerGo') }}
         GameMark(v-if="flash" :kind="flash" class="lw-mark")
       p(class="lw-fb" role="status") {{ message }}
-      AdvButton(tone="gold" class="lw-go" :disabled="between" @click.stop="lower") {{ t('app.adventure.lowerButton') }}
-      p(class="lw-count") {{ t('app.adventure.lowerCount', { n: down, total: current.steps }) }}
+      p(class="lw-sr" aria-live="polite") {{ announce }}
+      AdvButton(
+        tone="gold"
+        class="lw-go"
+        :class="{ on: holding }"
+        :disabled="phase === 'down'"
+        @pointerdown="buttonDown"
+        @pointerup="pointerUp"
+        @click.stop="toggle"
+      ) {{ t('app.adventure.lowerHold') }}
     GameDone(v-else :stars="stars" :text="t('app.adventure.lowerDone')" @next="emit('done', stars)")
 </template>
 
@@ -194,57 +327,111 @@ const manStyle = computed(() => ({ top: `${dropPercent.value}%` }))
   overflow: hidden
   border-radius: 14px
   border: 3px solid #d4a83e
-  background-color: #cbb994
+  background-color: #6d6a7c
   background-size: cover
   background-position: center
-  touch-action: manipulation
+  // the finger stays on the picture: no scrolling, no zoom
+  touch-action: none
+  user-select: none
+  -webkit-user-select: none
+  cursor: pointer
 
-// the rope turns about the window; the line is the rope above the man (the picture of the man has its own piece of rope)
-.lw-rope
+// the night: a blue layer over the wall
+.lw-night
   position: absolute
-  transform-origin: 50% 0
+  inset: 0
+  background: rgba(20, 30, 72, 0.45)
   pointer-events: none
 
-  &.touching .lw-man
-    filter: drop-shadow(0 0 6px rgba(200, 50, 50, 0.95))
+// the rope hangs from the window; the line is the red rope above the man (the picture of the man has its own piece of rope)
+.lw-rope
+  position: absolute
+  pointer-events: none
+
+  &.jerk
+    animation: lw-jerk 400ms ease-in-out
 
 .lw-line
   position: absolute
   left: 50%
   top: 0
-  width: 4px
-  margin-left: -2px
-  background: #8a2f2a
+  width: 5px
+  margin-left: -2.5px
+  background: #c0302a
   border-radius: 2px
-  transition: height 400ms ease
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5)
 
-.lw-rope.free .lw-line
-  background: #2fae54
-  box-shadow: 0 0 6px rgba(60, 200, 90, 0.9)
+  // "wait": the rope is dashed (not only a colour)
+  &.dashed
+    background: repeating-linear-gradient(to bottom, #c0302a 0, #c0302a 8px, transparent 8px, transparent 14px)
+    box-shadow: none
+
+// the four red knots where the man is pulled back to
+.lw-knot
+  position: absolute
+  left: 50%
+  width: 12px
+  height: 12px
+  margin: -2px 0 0 -6px
+  border-radius: 50%
+  background: #8a1f1a
+  border: 2px solid #ffd2cf
 
 .lw-man
   position: absolute
   left: 0
   width: 100%
-  transition: top 400ms ease
+  transition: top 150ms linear
 
-// the arrow "away from the wall": the rope is free
-.lw-arrow
+  &.seen
+    transition: top 600ms ease
+    filter: drop-shadow(0 0 6px rgba(240, 200, 120, 0.95))
+
+// the torch light: a warm circle; it glows brighter when the guard is near
+.lw-light
   position: absolute
-  top: 6px
+  aspect-ratio: 1
+  transform: translate(-50%, -50%)
+  border-radius: 50%
+  background: radial-gradient(circle, rgba(255, 214, 130, 0.7) 0%, rgba(255, 170, 70, 0.35) 45%, rgba(255, 150, 50, 0) 72%)
+  mix-blend-mode: screen
+  pointer-events: none
+  transition: left 80ms linear
+  animation: lw-flicker 900ms ease-in-out infinite alternate
+
+  &.near
+    background: radial-gradient(circle, rgba(255, 230, 150, 0.9) 0%, rgba(255, 180, 80, 0.5) 50%, rgba(255, 150, 50, 0) 75%)
+
+.lw-guard
+  position: absolute
+  display: block
+  transform: translate(-50%, -100%)
+  pointer-events: none
+  transition: left 80ms linear
+
+// the big sign: "go" or "wait", with a symbol and a word
+.lw-sign
+  position: absolute
+  top: 8px
   left: 50%
-  padding: 0 12px
   transform: translateX(-50%)
+  padding: 4px 18px
   border-radius: 999px
-  background: rgba(255, 246, 220, 0.94)
-  font-size: 1.4rem
+  border: 3px solid #fff
+  background: #2f7d3f
+  color: #fff
   font-weight: 900
-  color: #1f7a3a
+  font-size: 1.3rem
+  white-space: nowrap
   z-index: 5
+  pointer-events: none
+
+  &.wait
+    background: #b8860b
 
 .lw-mark
   position: absolute
-  top: 8px
+  top: 52px
   right: 8px
   z-index: 6
 
@@ -262,17 +449,46 @@ const manStyle = computed(() => ({ top: `${dropPercent.value}%` }))
   &:empty
     display: none
 
+// said to the screen reader only
+.lw-sr
+  position: absolute
+  width: 1px
+  height: 1px
+  margin: -1px
+  padding: 0
+  overflow: hidden
+  clip: rect(0 0 0 0)
+  white-space: nowrap
+  border: 0
+
 .lw-go
   align-self: center
   min-height: 60px
+  touch-action: none
+  user-select: none
+  -webkit-user-select: none
 
-.lw-count
-  margin: 0
-  text-align: center
-  font-weight: 800
-  color: #5f4f35
+  &.on
+    outline: 4px solid #1f5fa8
+    outline-offset: 2px
+
+@keyframes lw-jerk
+  0%, 100%
+    margin-left: 0
+  25%
+    margin-left: -5px
+  75%
+    margin-left: 5px
+
+@keyframes lw-flicker
+  from
+    opacity: 0.85
+  to
+    opacity: 1
 
 @media (prefers-reduced-motion: reduce)
-  .lw-line, .lw-man
+  .lw-man, .lw-light, .lw-guard
     transition: none
+  .lw-light, .lw-rope.jerk
+    animation: none
 </style>

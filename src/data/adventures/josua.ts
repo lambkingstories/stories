@@ -89,10 +89,13 @@ const BACKEN: BakeGame = {
 }
 
 /**
- * Etappe 3, "Am Seil herablassen": ein Mann hängt am Seil aus dem Fenster in der Stadtmauer und schwingt im Wind hin und her; ein Tippen, wenn er von der Mauer wegschwingt, lässt ihn einen Schritt tiefer
- * (Bildauftrag JO31; eigener Hintergrund `abseilen/mauer.webp`, die Mauer steht links). Plan v3: Runde 1 ein Mann, vier Schritte, ruhiger Wind (3,4 s je Schwung, 12°, frei ab 2°); Runde 2 der zweite Mann, fünf Schritte,
- * stärkerer Wind (2,8 s, 14°, frei ab 4°). Fenster und Boden (Prozent des Bildes) sind am gemalten Bild abgelesen (`abseilen-messung.json`).
- * Bilder (gemalt, 21.10.2026): `abseilen/mauer.webp` 900 × 1200, `mann-am-seil-a.webp`, `mann-am-seil-b.webp` je 160 × 560 (transparent, das Seil gehört zum Bild).
+ * Etappe 3, "Das rote Seil" (neu gebaut nach SPIELE/ENTWURF-abseilen-v4.md; ersetzt das Schwingen, das Anton nicht verstanden hat): das Kind hält das Seil gedrückt, dann sinkt der Mann am roten Seil aus dem
+ * Fenster in der Stadtmauer; lässt es los, hält er an. Unten auf der Straße geht eine Wache mit Fackel von rechts nach links vorbei (kleine Gestalt mit Lichtkreis, den die App malt); solange sie kommt oder da ist, steht
+ * "✋ Warte" auf dem Schild. Wer in ihrem Licht hält, lässt den Mann sehen: er klettert bis zum letzten von vier roten Knoten zurück (kein Verlust, kein Neustart). Zwei Runden, weil zwei Männer hinabsteigen
+ * (Josua 2,1): Runde 1 acht Sekunden Abstieg und eine Wache, Runde 2 fünfzehn Sekunden und die Wache kommt zweimal. Die Wache geht mit 12 % der Breite je Sekunde, ihr Licht reicht 16 % weit, "Warte" schon 24 % davor
+ * (etwa zwei Sekunden Vorlauf). Fenster und Boden (Prozent des Bildes) sind am gemalten Bild abgelesen (`abseilen-messung.json`), die Straße `road` (94) ist aus dem Entwurf und am Bild mit der Wache neu zu messen.
+ * Dass eine Wache Patrouille geht, steht nicht in der Bibel (Spielspannung, gemeldet). Bilder: `abseilen/mauer.webp` 900 × 1200, `mann-am-seil-a.webp`, `mann-am-seil-b.webp` je 160 × 560 (gemalt, 21.10.2026);
+ * NEU `abseilen/wache.webp` 140 × 220 (Fackelträger als Silhouette, Auftrag JO36, noch nicht gemalt: bis dahin ein Platzhalter, `NOT_PAINTED_YET`).
  */
 const ABSEILEN: LowerGame = {
   background: `${G}abseilen/mauer.webp`,
@@ -100,11 +103,17 @@ const ABSEILEN: LowerGame = {
     { id: 'a', image: `${G}abseilen/mann-am-seil-a.webp`, w: 16 },
     { id: 'b', image: `${G}abseilen/mann-am-seil-b.webp`, w: 16 }
   ],
+  guard: `${G}abseilen/wache.webp`,
   window: [20.2, 13.5],
   ground: 91,
+  road: 94,
+  guardSpeed: 12,
+  lightRadius: 16,
+  warnLead: 24,
+  knots: 4,
   rounds: [
-    { hint: 'Tippe, wenn der Mann von der Mauer wegschwingt. Dann sinkt er einen Schritt.', man: 'a', steps: 4, period: 3.4, amplitude: 12, threshold: 2 },
-    { hint: 'Der zweite Mann kommt, der Wind ist stärker.', man: 'b', steps: 5, period: 2.8, amplitude: 14, threshold: 4 }
+    { hint: 'Halte das Seil gedrückt, dann sinkt der Mann. Lass los, wenn die Wache kommt.', man: 'a', descentMs: 8000, passes: 1, gapMs: 1500 },
+    { hint: 'Der zweite Mann klettert hinab, und die Wache kommt zweimal.', man: 'b', descentMs: 15000, passes: 2, gapMs: 1500 }
   ]
 }
 
@@ -227,8 +236,8 @@ export const josua: Journey = {
         '„Knüpfe dieses rote Seil in dein Fenster“, sagen die Männer, „und hole deine Familie in dein Haus. Wer drinnen bleibt, dem geschieht nichts.“',
         'Rahab knüpft das rote Seil ins Fenster. Die Männer verstecken sich im Gebirge und gehen dann zurück zu Josua.'
       ],
-      // Spiel: Am Seil herablassen (abseilen, neu); das Etappenbild ist noch das von Josef
-      task: { kind: 'abseilen', hint: 'Lass den Mann am Seil hinab, wenn er von der Mauer wegschwingt.', lower: ABSEILEN },
+      // Spiel: Das rote Seil (abseilen, neu gebaut): Seil gedrückt halten, bei der Wache loslassen
+      task: { kind: 'abseilen', hint: 'Lass die Männer am roten Seil hinab, aber nur, wenn keine Wache da ist.', lower: ABSEILEN },
       questions: [
         { q: 'Was sagt Rahab über Gott?', options: ['Er ist Gott im Himmel und auf der Erde.', 'Er wohnt nur in Jericho.', 'Er ist weit weg.'], answer: 0 },
         { q: 'Was knüpft Rahab ins Fenster?', options: ['ein rotes Seil', 'ein weißes Tuch', 'eine Laterne'], answer: 0 }
