@@ -188,9 +188,10 @@ describe('Josua: the games, and the placeholders until the pictures come', () =>
     expect(g.ground - g.window[1], 'room for the man').toBeGreaterThan(manH)
     expect(g.road, 'the road lies below the ground line of the rope').toBeGreaterThan(g.ground)
     expect(g.window[0] >= 0 && g.window[0] <= 100).toBe(true)
-    // the guard has a picture (not painted yet: tolerated by the download test)
+    // the guard has his painted picture (140 x 220, transparent), no longer a stand-in
     expect(g.guard).toBe('images/abenteuer/spiele/josua/abseilen/wache.webp')
-    expect(notPaintedYet(g.guard)).toBe(true)
+    expect(notPaintedYet(g.guard)).toBe(false)
+    expect(existsSync(`public/${g.guard}`)).toBe(true)
     // right play wins each round in at most 30 seconds; holding all the time is seen before the man can be down
     for (const r of g.rounds) {
       const rules = { windowX: g.window[0], guardSpeed: g.guardSpeed, lightRadius: g.lightRadius, warnLead: g.warnLead, knots: g.knots, descentMs: r.descentMs, passes: r.passes, gapMs: r.gapMs }

@@ -93,9 +93,9 @@ const BACKEN: BakeGame = {
  * Fenster in der Stadtmauer; lässt es los, hält er an. Unten auf der Straße geht eine Wache mit Fackel von rechts nach links vorbei (kleine Gestalt mit Lichtkreis, den die App malt); solange sie kommt oder da ist, steht
  * "✋ Warte" auf dem Schild. Wer in ihrem Licht hält, lässt den Mann sehen: er klettert bis zum letzten von vier roten Knoten zurück (kein Verlust, kein Neustart). Zwei Runden, weil zwei Männer hinabsteigen
  * (Josua 2,1): Runde 1 acht Sekunden Abstieg und eine Wache, Runde 2 fünfzehn Sekunden und die Wache kommt zweimal. Die Wache geht mit 12 % der Breite je Sekunde, ihr Licht reicht 16 % weit, "Warte" schon 24 % davor
- * (etwa zwei Sekunden Vorlauf). Fenster und Boden (Prozent des Bildes) sind am gemalten Bild abgelesen (`abseilen-messung.json`), die Straße `road` (94) ist aus dem Entwurf und am Bild mit der Wache neu zu messen.
- * Dass eine Wache Patrouille geht, steht nicht in der Bibel (Spielspannung, gemeldet). Bilder: `abseilen/mauer.webp` 900 × 1200, `mann-am-seil-a.webp`, `mann-am-seil-b.webp` je 160 × 560 (gemalt, 21.10.2026);
- * NEU `abseilen/wache.webp` 140 × 220 (Fackelträger als Silhouette, Auftrag JO36, noch nicht gemalt: bis dahin ein Platzhalter, `NOT_PAINTED_YET`).
+ * (etwa zwei Sekunden Vorlauf). Fenster und Boden (Prozent des Bildes) sind am gemalten Bild abgelesen (`abseilen-messung.json`); die Straße `road` (94) ist der Fuß der Wache auf dem Wegrand des Bildes (am Zusammenbau geprüft).
+ * Dass eine Wache Patrouille geht, steht nicht in der Bibel (Spielspannung, gemeldet). Bilder (gemalt, 21.10.2026): `abseilen/mauer.webp` 900 × 1200, `mann-am-seil-a.webp`, `mann-am-seil-b.webp` je 160 × 560,
+ * `abseilen/wache.webp` 140 × 220 (Fackelträger als Silhouette mit Kapuzenmantel, nach links gehend, Auftrag JO36 v2; die Fackel brennt bei x 10, y 35 des Bildes, die App malt dort den Lichtkreis).
  */
 const ABSEILEN: LowerGame = {
   background: `${G}abseilen/mauer.webp`,

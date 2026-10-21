@@ -39,9 +39,13 @@ const FIELD_ASPECT = 4 / 3
 const TICK = 33
 const MAX_DT = 100
 const INPUT_MS = 400
-/** The width of the guard (percent of the width of the field) and the height of his torch above his feet (percent of the height). */
+/**
+ * The width of the guard (percent of the width of the field), the height of his torch above his feet (percent of the height of the field) and how far left of the middle of the figure the torch is (percent of the width):
+ * measured on `wache.webp` (140 x 220, the flame at about x 10, y 35). The rules count the place of the TORCH (the light), so the figure is drawn that much to the right of it.
+ */
 const GUARD_W = 12
-const TORCH_UP = 9
+const TORCH_UP = 11.5
+const TORCH_DX = 5
 const still = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 const rounds = computed(() => props.game.rounds)
@@ -239,7 +243,7 @@ const ropeStyle = computed(() => ({
 }))
 const lineStyle = computed(() => ({ height: `${dropPercent.value}%` }))
 const manStyle = computed(() => ({ top: `${dropPercent.value}%` }))
-const guardStyle = computed(() => ({ left: `${shownX.value ?? 0}%`, top: `${props.game.road}%`, width: `${GUARD_W}%` }))
+const guardStyle = computed(() => ({ left: `${(shownX.value ?? 0) + TORCH_DX}%`, top: `${props.game.road}%`, width: `${GUARD_W}%` }))
 const lightStyle = computed(() => ({ left: `${shownX.value ?? 0}%`, top: `${props.game.road - TORCH_UP}%`, width: `${props.game.lightRadius * 2}%` }))
 </script>
 
