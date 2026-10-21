@@ -52,8 +52,8 @@ describe('Josua: stories and questions', () => {
     expect(new Set(josua.stages.map((s) => s.image)).size).toBe(10)
   })
 
-  it('two questions per stage (three in the stages 7 and 9), three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
-    expect(josua.stages.map((s) => s.questions.length)).toEqual([2, 2, 2, 2, 2, 2, 3, 2, 3, 2])
+  it('two questions per stage, three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
+    expect(josua.stages.map((s) => s.questions.length)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2])
     for (const q of [...josua.stages.flatMap((s) => s.questions), ...josua.exam]) {
       expect(q.options, q.q).toHaveLength(3)
       expect(q.answer, q.q).toBe(0)
@@ -73,8 +73,9 @@ describe('Josua: stories and questions', () => {
       const text = s.text.join(' ').toLowerCase()
       for (const q of s.questions) {
         const words = q.options[0]!.toLowerCase().replace(/[.,!?„“]/g, '').split(/\s+/).filter((w) => w.length >= 4 && !STOP.has(w))
-        // at least one word of the right answer (cut to its first five letters, for endings) lies in the text
-        const hit = words.some((w) => text.includes(w.slice(0, 5)))
+        // at least one word of the right answer (cut to its first five letters, for endings) lies in the text; an answer of only short words ("Ich bin mit dir.") must stand there as a whole
+        const whole = q.options[0]!.toLowerCase().replace(/[.,!?„“]/g, '')
+        const hit = words.length ? words.some((w) => text.includes(w.slice(0, 5))) : text.includes(whole)
         expect(hit, `stage ${s.id}: "${q.q}" -> "${q.options[0]}"`).toBe(true)
       }
     }
@@ -116,7 +117,7 @@ describe('Josua: the games, and the placeholders until the pictures come', () =>
     expect(m, 'the game is built').toBeDefined()
     expect(m!.pairs).toHaveLength(6)
     const told = josua.stages.slice(0, 5).map((x) => x.text.join(' ')).join(' ')
-    for (const word of ['Buch des Gesetzes', 'Flachs', 'Schnur', 'Seil', 'Lade', 'Steine']) expect(told, word).toContain(word)
+    for (const word of ['mutig und stark', 'Flachs', 'Schnur', 'Seil', 'Lade', 'Steine']) expect(told, word).toContain(word)
     for (const p of m!.pairs) expect(p.text.length).toBeGreaterThan(20)
     expect(stage(5).task.memory!.back).toMatch(/spiele\/josua\/memory\//)
     const v = stage(10).task.verse

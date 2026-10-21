@@ -172,9 +172,9 @@ const VERS: VerseGame = {
 const MEMORY: MemoryGame = {
   back: `${G}memory/rueck.webp`,
   pairs: [
-    { image: `${G}memory/karte-buch.webp`, text: 'Die Schriftrolle: Gott sagt Josua, er soll das Buch des Gesetzes nicht aus seinem Mund lassen.' },
+    { image: `${G}memory/karte-buch.webp`, text: 'Die Schriftrolle: Gott spricht zu Josua: „Sei mutig und stark! Ich bin mit dir.“' },
     { image: `${G}memory/karte-flachs.webp`, text: 'Das Flachsbündel: Darunter hat Rahab die Männer versteckt.' },
-    { image: `${G}memory/karte-schnur.webp`, text: 'Die rote Schnur am Fenster: Sie ist das Zeichen für Rahabs Haus.' },
+    { image: `${G}memory/karte-schnur.webp`, text: 'Die rote Schnur am Fenster: Wer im Haus bleibt, dem geschieht nichts.' },
     { image: `${G}memory/karte-seil.webp`, text: 'Das Seil: An ihm lässt Rahab die Männer aus dem Fenster hinab.' },
     { image: `${G}memory/karte-lade.webp`, text: 'Die Lade des Bundes: Die Priester tragen sie voran in den Jordan.' },
     { image: `${G}memory/karte-stein.webp`, text: 'Der Stein: Zwölf Steine erinnern an den Weg durch den Jordan.' }
@@ -205,18 +205,18 @@ export const josua: Journey = {
       id: 1,
       image: `${PLACEHOLDER}etappe-bild-01.webp`,
       title: 'Ein neuer Anführer',
-      ref: 'Josua 1,1–18',
+      ref: 'Josua 1,1–11',
       text: [
-        'Vierzig Jahre lang hat Mose das Volk Israel geführt, und nun ist er gestorben. Die Israeliten lagern bei Schittim, einer weiten Ebene östlich des Jordan, und nur noch ein Fluss trennt sie von dem Land, das Gott ihnen versprochen hat. Der neue Anführer heißt Josua, der Mose lange gedient hat.',
-        'Zu ihm spricht Gott: „Mose, mein Diener, ist gestorben. Mach dich nun auf, du und das ganze Volk, und zieht über den Jordan in das Land, das ich euch gebe. Wohin ihr eure Füße setzt, das schenke ich euch. Solange du lebst, wird niemand dir standhalten. Wie ich mit Mose war, so will ich mit dir sein, ich lasse dich nicht fallen und verlasse dich nicht.“',
-        'Und dann sagt Gott es noch einmal: „Sei mutig und stark! Halte dich an alles, was Mose dir aufgetragen hat, und lass das Buch des Gesetzes nicht aus deinem Mund kommen. Denk Tag und Nacht darüber nach, dann wird dir gelingen, was du anpackst. Hab keine Angst und verzage nicht, denn Gott ist bei dir, wohin du auch gehst.“',
-        'Josua ruft die Amtleute des Volkes. „Geht durch das Lager“, sagt er, „und sagt allen: Macht euch Vorrat bereit, denn in drei Tagen zieht ihr über den Jordan.“ Da antworten die Männer: „Alles, was du uns aufträgst, wollen wir tun, und wohin du uns sendest, dahin gehen wir. Gott sei mit dir, wie er mit Mose war!“'
+        'Mose, der Diener Gottes, ist gestorben. Das Volk Israel steht am Fluss Jordan, und auf der anderen Seite liegt das Land, das Gott ihm versprochen hat.',
+        'Da spricht Gott zu Josua, dem neuen Anführer: „Mein Diener Mose ist gestorben. Nun führe du das Volk in das Land, das ich ihm gebe.“',
+        'Und Gott verspricht: „Ich bin mit dir, wie ich mit Mose war. Sei mutig und stark! Fürchte dich nicht, denn ich verlasse dich nie.“',
+        'Josua ruft die Hauptleute: „Geht durch das Lager und sagt dem Volk: Macht Vorrat bereit! In drei Tagen ziehen wir über den Jordan.“'
       ],
       // Spiel: Proviant packen (packen, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'packen', hint: 'Packe den Vorrat so in den Korb, dass alles hineinpasst.', pack: PACKEN },
       questions: [
-        { q: 'Wer führt das Volk, nachdem Mose gestorben ist?', options: ['Josua', 'Kaleb', 'Aaron'], answer: 0 },
-        { q: 'Was soll Josua nach Gottes Wort sein?', options: ['mutig und stark', 'schnell und leise', 'reich und berühmt'], answer: 0 }
+        { q: 'Was sagt Gott zu Josua?', options: ['„Ich bin mit dir.“', '„Geh allein.“', '„Kehre um.“'], answer: 0 },
+        { q: 'Wer führt das Volk nach Moses Tod?', options: ['Josua', 'Aaron', 'Barak'], answer: 0 }
       ]
     },
     {
@@ -225,16 +225,16 @@ export const josua: Journey = {
       title: 'Zwei Kundschafter',
       ref: 'Josua 2,1–7',
       text: [
-        'Von Schittim aus schickt Josua heimlich zwei Männer los. „Seht euch das Land an“, sagt er, „und besonders die Stadt Jericho.“ Die beiden machen sich auf den Weg. Jericho ist eine Stadt mit einer starken Mauer, und sie kommen in das Haus einer Frau namens Rahab, das an der Stadtmauer steht. Dort bleiben sie über Nacht.',
-        'Aber jemand hat sie gesehen. Dem König von Jericho wird gemeldet: „Heute Nacht sind Männer von den Israeliten gekommen, um das Land auszukundschaften.“ Sofort schickt der König Boten zu Rahab. „Gib die Männer heraus, die zu dir ins Haus gekommen sind!“',
-        'Rahab hat die beiden schon versteckt. Auf ihrem Flachdach liegen Stängel von Flachs zum Trocknen ausgebreitet, und darunter hat sie die Männer verborgen. „Ja, es sind Männer bei mir gewesen“, sagt sie zu den Boten, „aber ich weiß nicht, woher sie kamen. Als es dunkel wurde und das Stadttor geschlossen werden sollte, sind sie fortgegangen. Lauft ihnen schnell nach, dann holt ihr sie noch ein!“',
-        'Die Boten des Königs machen sich auf den Weg zum Jordan, bis zu den Furten. Kaum sind sie aus dem Tor, wird es hinter ihnen verschlossen.'
+        'Von Schittim aus schickt Josua heimlich zwei Männer los. Niemand soll es merken. Sie sollen sich die Stadt Jericho ansehen, die hinter einer hohen Mauer liegt.',
+        'Die Kundschafter kommen in das Haus einer Frau namens Rahab. Es steht in der Stadtmauer.',
+        'Aber der König von Jericho hört davon. Er schickt Boten zu Rahab: „Gib die Männer heraus!“',
+        'Rahab hat die beiden längst auf dem Dach versteckt, unter Stängeln von Flachs. Sie sagt den Boten, die Männer seien schon fortgegangen. Da laufen die Boten los, und hinter ihnen schließt sich das Stadttor.'
       ],
       // Spiel: Unter dem Flachs verstecken (verstecken, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'verstecken', hint: 'Decke die Männer mit Flachsbündeln zu.', hide: VERSTECKEN },
       questions: [
-        { q: 'Wohin schickt Josua die beiden Männer?', options: ['nach Jericho', 'nach Hebron', 'nach Ägypten'], answer: 0 },
-        { q: 'Wo versteckt Rahab die Männer?', options: ['auf dem Dach unter Flachs', 'im Keller unter Säcken', 'in einem Brunnen'], answer: 0 }
+        { q: 'Wohin schickt Josua zwei Männer?', options: ['nach Jericho', 'nach Ägypten', 'zum Berg Sinai'], answer: 0 },
+        { q: 'Wer lässt die Männer suchen?', options: ['der König von Jericho', 'Rahab', 'Josua'], answer: 0 }
       ]
     },
     {
@@ -243,16 +243,16 @@ export const josua: Journey = {
       title: 'Die rote Schnur',
       ref: 'Josua 2,8–24',
       text: [
-        'Am Abend, bevor sich die Männer schlafen legen, steigt Rahab zu ihnen aufs Dach. „Ich weiß, dass Gott euch dieses Land gegeben hat“, sagt sie. „Alle Menschen hier haben Angst vor euch. Wir haben gehört, wie Gott das Wasser vor euch trocken gemacht hat, als ihr aus Ägypten gezogen seid. Euer Gott ist Gott oben im Himmel und unten auf der Erde.“ Dann bittet sie: „Schwört mir bei Gott, dass ihr auch meiner Familie Gutes tut, meinem Vater und meiner Mutter, meinen Brüdern und Schwestern, und rettet uns das Leben. Und gebt mir ein sicheres Zeichen.“',
-        '„Unser Leben für das eure“, versprechen die Männer, „wenn du nicht verrätst, was wir hier tun. Wenn Gott uns das Land gibt, werden wir freundlich und treu an dir handeln.“',
-        'Rahabs Haus gehört zur Stadtmauer, und so lässt sie die beiden durch das Fenster an einem Seil hinab. „Geht ins Gebirge und versteckt euch drei Tage“, sagt sie, „bis die Verfolger zurück sind. Dann zieht weiter.“ Die Männer erklären ihr das Zeichen: „Binde diese rote Schnur in das Fenster, durch das du uns herabgelassen hast, und hole deine ganze Familie zu dir ins Haus. Wer in deinem Haus bleibt, dem geschieht nichts.“ „Es soll so sein“, sagt Rahab und bindet die rote Schnur ans Fenster.',
-        'Drei Tage bleiben die Männer im Gebirge, und die Verfolger finden sie nicht. Dann kehren sie zu Josua zurück: „Gott hat uns das ganze Land gegeben. Die Menschen dort verzagen vor uns.“'
+        'Am Abend steigt Rahab zu den Männern auf das Dach. „Euer Gott ist Gott oben im Himmel und unten auf der Erde“, sagt sie. „Ich weiß, dass er euch dieses Land gibt. Bitte verschont auch meine Familie!“',
+        'Die Männer versprechen es. Rahab lässt sie an einem Seil aus dem Fenster hinab, denn ihr Haus steht in der Stadtmauer. „Versteckt euch drei Tage im Gebirge“, rät sie.',
+        '„Binde eine rote Schnur in dein Fenster“, sagen die Männer, „und hole deine Familie in dein Haus. Wer drinnen bleibt, dem geschieht nichts.“',
+        'Rahab bindet die rote Schnur ins Fenster. Die Männer verstecken sich im Gebirge und gehen dann zurück zu Josua.'
       ],
       // Spiel: Am Seil herablassen (abseilen, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'abseilen', hint: 'Lass den Mann am Seil hinab, wenn er von der Mauer wegschwingt.', lower: ABSEILEN },
       questions: [
-        { q: 'Was bindet Rahab als Zeichen an ihr Fenster?', options: ['eine rote Schnur', 'ein weißes Tuch', 'einen grünen Zweig'], answer: 0 },
-        { q: 'Wie lange sollen sich die Männer im Gebirge verstecken?', options: ['drei Tage', 'sieben Tage', 'eine Nacht'], answer: 0 }
+        { q: 'Was sagt Rahab über Gott?', options: ['Er ist Gott im Himmel und auf der Erde.', 'Er wohnt nur in Jericho.', 'Er ist weit weg.'], answer: 0 },
+        { q: 'Was bindet Rahab ins Fenster?', options: ['eine rote Schnur', 'ein weißes Tuch', 'eine Laterne'], answer: 0 }
       ]
     },
     {
@@ -261,15 +261,16 @@ export const josua: Journey = {
       title: 'Der Jordan',
       ref: 'Josua 3,1–17',
       text: [
-        'Früh am Morgen bricht Josua mit dem ganzen Volk von Schittim auf, und sie schlagen ihr Lager am Jordan auf. Drei Tage später gehen die Amtleute durch die Reihen und rufen: „Wenn ihr seht, dass die Priester die Lade des Bundes tragen, dann brecht auf und folgt ihr! Haltet aber einen weiten Abstand von etwa zweitausend Ellen, denn ihr seid diesen Weg noch nie gegangen.“ Die Lade ist die goldene Truhe, die das Volk schon durch die Wüste begleitet hat. Josua sagt zum Volk: „Macht euch bereit, denn morgen wird Gott Wunder unter euch tun.“',
-        'Der Jordan ist jetzt in der Erntezeit voll bis über die Ufer. Josua sagt zu den Priestern: „Nehmt die Lade und geht dem Volk voran.“ Und zum Volk: „Daran sollt ihr merken, dass Gott mitten unter euch ist: Wenn die Füße der Priester im Wasser stehen, bleibt das Wasser von oben stehen wie ein Wall.“',
-        'Die Priester tragen die Lade bis ans Ufer und tauchen die Füße in das Wasser. Da geschieht es: Das Wasser, das von oben kommt, bleibt weit weg bei der Stadt Adam stehen und türmt sich auf. Das Wasser unten fließt zum Salzmeer ab, bis das Flussbett leer ist. Nun zieht das Volk gegenüber von Jericho hinüber, und die Priester stehen mit der Lade mitten im Jordan auf trockenem Boden, bis alle hindurch sind.'
+        'Nun steht das Volk am Jordan. Es ist Erntezeit, und der Fluss ist so voll, dass er über die Ufer tritt.',
+        '„Seht auf die goldene Truhe, die Lade des Bundes“, sagt Josua. „Priester tragen sie vor euch her. Daran merkt ihr, dass ein lebendiger Gott unter euch ist.“',
+        'Die Priester gehen mit der Lade voran. Sobald ihre Füße das Wasser berühren, hört der Fluss auf zu fließen. Das Wasser bleibt oben stehen, und unten wird das Flussbett trocken.',
+        'Die Priester bleiben mitten im Jordan stehen, und das ganze Volk geht trocken hindurch, bis alle drüben sind.'
       ],
       // Spiel: Im Gleichschritt (schritt, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'schritt', hint: 'Tippe im Takt der Schritte.', step: SCHRITT },
       questions: [
-        { q: 'Wer trägt die Lade des Bundes?', options: ['die Priester', 'die Kundschafter', 'die Kinder'], answer: 0 },
-        { q: 'Was geschieht mit dem Wasser, als die Priester die Füße hineintauchen?', options: ['Es bleibt stehen.', 'Es wird warm.', 'Es wird zu Eis.'], answer: 0 }
+        { q: 'Wer trägt die goldene Truhe voran?', options: ['die Priester', 'die Kundschafter', 'die Kinder'], answer: 0 },
+        { q: 'Was geschieht, als die Füße der Priester ins Wasser kommen?', options: ['Das Wasser bleibt stehen.', 'Das Wasser steigt.', 'Der Fluss wird breiter.'], answer: 0 }
       ]
     },
     {
@@ -278,16 +279,16 @@ export const josua: Journey = {
       title: 'Zwölf Steine',
       ref: 'Josua 4,1–24',
       text: [
-        'Als das ganze Volk hinübergezogen ist, spricht Gott zu Josua: „Wähle zwölf Männer aus, aus jedem Stamm einen. Sie sollen aus dem Jordan zwölf Steine nehmen, von dem Platz, wo die Priester gestanden haben, und sie dorthin bringen, wo ihr heute Nacht lagert.“ Josua ruft die zwölf Männer: „Geht in den Fluss vor die Lade, und jeder von euch hebt einen Stein auf die Schulter, einen für jeden Stamm Israels.“',
-        '„Die Steine sollen ein Zeichen unter euch sein“, sagt er. „Wenn eure Kinder euch eines Tages fragen: Was bedeuten diese Steine?, dann antwortet: Das Wasser des Jordan floss nicht mehr, als die Lade des Bundes hindurchgetragen wurde. Darum sollen diese Steine für immer daran erinnern.“ Die Männer tun es. Josua selbst richtet auch zwölf Steine mitten im Jordan auf, dort, wo die Priester gestanden haben.',
-        'Die Priester bleiben im Flussbett, bis alles getan ist, und das Volk eilt hinüber. Dann steigen sie auf Josuas Befehl aus dem Jordan herauf. Kaum betreten sie das Ufer, kehrt das Wasser zurück und fließt wieder über die Ufer wie zuvor.',
-        'Es ist der zehnte Tag des ersten Monats, als das Volk bei Gilgal lagert, östlich von Jericho. Dort stellt Josua die zwölf Steine auf. „Wenn eure Kinder fragen, was sie bedeuten“, sagt er, „dann erzählt ihnen: Israel ist auf trockenem Boden durch den Jordan gegangen, so wie Gott es einst beim Schilfmeer getan hat. Alle Völker sollen sehen, wie mächtig Gott ist.“'
+        'Als alle drüben sind, sagt Gott zu Josua: „Wähle zwölf Männer aus, aus jedem Stamm einen. Jeder soll einen Stein aus dem Flussbett holen.“',
+        'Die zwölf Männer steigen in den Jordan und heben jeder einen Stein auf die Schulter. Sie tragen die Steine bis nach Gilgal, wo das Volk sein Lager aufschlägt.',
+        'Dort stellt Josua die zwölf Steine auf. „Wenn eure Kinder euch einmal fragen: Was sollen diese Steine?, dann erzählt es ihnen“, sagt er.',
+        '„Gott hat das Wasser des Jordan stillstehen lassen, bis wir hindurch waren. Diese Steine sollen uns immer daran erinnern.“'
       ],
       // Spiel: Erinnerungs-Memory (memory, alt); das Etappenbild ist noch das von Josef
       task: { kind: 'memory', hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.', memory: MEMORY },
       questions: [
-        { q: 'Wo lagert das Volk, als Josua die Steine aufstellt?', options: ['in Gilgal', 'in Jericho', 'in Sichem'], answer: 0 },
-        { q: 'Was sollen die Eltern antworten, wenn die Kinder nach den Steinen fragen?', options: ['Das Wasser des Jordan floss nicht mehr.', 'Wir haben sie für ein Haus gesammelt.', 'Gott hat sie uns geschenkt.'], answer: 0 }
+        { q: 'Was tragen die zwölf Männer aus dem Fluss?', options: ['Steine', 'Krüge', 'Zweige'], answer: 0 },
+        { q: 'Woran sollen die Steine erinnern?', options: ['dass Gott den Jordan stillstehen ließ', 'dass es Erntezeit ist', 'dass Jericho eine Mauer hat'], answer: 0 }
       ]
     },
     {
@@ -296,33 +297,34 @@ export const josua: Journey = {
       title: 'Brot aus dem neuen Land',
       ref: 'Josua 5,1.10–12',
       text: [
-        'Die Könige im Land Kanaan haben gehört, dass Gott den Jordan vor den Israeliten trocken gemacht hat, und ihnen sinkt der Mut. Das Volk aber bleibt in Gilgal.',
-        'Am vierzehnten Tag des Monats feiert Israel in der Ebene bei Jericho das Passafest, so wie Gott es ihnen aufgetragen hat, zur Erinnerung an den Auszug aus Ägypten. Am Tag danach essen die Menschen zum ersten Mal vom Ertrag des Landes: ungesäuerte Brote und geröstete Körner.',
-        'Und noch etwas ist neu. Viele Jahre lang hat Gott dem Volk in der Wüste jeden Morgen das Manna gegeben, das Brot, das vom Himmel fällt. Doch am Tag, an dem sie vom Getreide des Landes essen, hört das Manna auf. Nun ernten sie, was im Land Kanaan wächst, und davon werden sie in diesem Jahr satt.'
+        'Die Könige im Land hören, dass Gott den Jordan für Israel trocken gelegt hat, und sie verlieren den Mut. Das Volk aber feiert im Lager bei Gilgal am Abend das Passahfest. Es erinnert daran, wie Gott sein Volk aus Ägypten geführt hat.',
+        'Am nächsten Tag essen die Menschen zum ersten Mal vom Getreide des Landes. Sie backen ungesäuertes Brot und rösten Körner.',
+        'Und am nächsten Morgen kommt kein Manna mehr. Lange Zeit hat Gott sein Volk in der Wüste mit Manna satt gemacht.',
+        'Jetzt wächst das Getreide im eigenen Land. Das Volk ist angekommen.'
       ],
       // Spiel: Fladen backen (backen, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'backen', hint: 'Backe Fladen und wende sie, wenn sie goldbraun sind.', bake: BACKEN },
       questions: [
-        { q: 'Was hört auf, als das Volk vom Land isst?', options: ['das Manna', 'der Regen', 'der Wind'], answer: 0 },
-        { q: 'Was essen die Menschen vom Ertrag des Landes?', options: ['Fladenbrote und geröstete Körner', 'Fisch und Datteln', 'Honig und Milch'], answer: 0 }
+        { q: 'Wo feiert das Volk das Passahfest?', options: ['in Gilgal', 'in Jericho', 'in Ägypten'], answer: 0 },
+        { q: 'Was hört am Morgen auf?', options: ['das Manna', 'der Regen', 'das Singen'], answer: 0 }
       ]
     },
     {
       id: 7,
       image: `${PLACEHOLDER}etappe-bild-07.webp`,
       title: 'Heiliger Boden',
-      ref: 'Josua 5,13–6,5',
+      ref: 'Josua 5,13 bis 6,5',
       text: [
-        'Josua ist in der Nähe von Jericho. Als er aufschaut, steht ein Mann vor ihm. Josua geht auf ihn zu und fragt: „Gehörst du zu uns oder zu unseren Feinden?“ „Weder noch“, antwortet der Mann. „Ich bin der Fürst über das Heer Gottes, und jetzt bin ich gekommen.“',
-        'Da wirft sich Josua mit dem Gesicht zur Erde nieder und betet an. „Was sagt mein Herr seinem Diener?“, fragt er. Der Fürst antwortet: „Zieh deine Schuhe aus, denn der Ort, auf dem du stehst, ist heilig.“ Und Josua tut es.',
-        'Jericho ist fest verschlossen, denn die Menschen haben Angst vor den Israeliten: Niemand kommt heraus, und niemand geht hinein. Doch Gott spricht zu Josua: „Sieh, ich habe Jericho in deine Hand gegeben. Sechs Tage lang sollt ihr einmal um die Stadt ziehen. Sieben Priester sollen sieben Posaunen aus Widderhörnern vor der Lade hertragen. Am siebten Tag sollt ihr siebenmal um die Stadt ziehen, und die Priester sollen die Posaunen blasen. Wenn der lange Ton erklingt, soll das ganze Volk laut rufen. Dann fällt die Mauer der Stadt, und ihr könnt hineinziehen.“'
+        'Josua ist allein draußen vor der Stadt Jericho. Da steht plötzlich ein Mann vor ihm. „Gehörst du zu uns oder zu unseren Feinden?“, fragt Josua.',
+        '„Weder noch“, antwortet der Mann. „Ich bin der Fürst über das Heer Gottes.“ Da wirft sich Josua mit dem Gesicht zur Erde nieder und fragt: „Was befiehlt mir mein Herr?“',
+        'Der Fürst sagt: „Zieh deine Schuhe aus, denn der Ort, auf dem du stehst, ist heilig.“ Und Josua zieht seine Schuhe aus.',
+        'Dann sagt Gott Josua seinen Plan für Jericho. Sechs Tage lang soll das Volk einmal um die Stadt gehen, am siebten Tag siebenmal, und sieben Priester sollen dabei Posaunen blasen.'
       ],
       // nur Quiz (ernst bzw. ruhig, nichts wird gespielt); das Etappenbild ist noch das von Josef
       task: { kind: 'quiz', hint: 'Diese Etappe ist ruhig und ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
-        { q: 'Wer steht plötzlich vor Josua?', options: ['der Fürst über das Heer Gottes', 'ein Bote des Königs', 'ein Hirte aus Jericho'], answer: 0 },
-        { q: 'Was soll Josua ausziehen?', options: ['seine Schuhe', 'seinen Mantel', 'seinen Gürtel'], answer: 0 },
-        { q: 'Was ist mit Jericho?', options: ['Die Stadt ist fest verschlossen.', 'Die Tore stehen weit offen.', 'Die Stadt ist leer.'], answer: 0 }
+        { q: 'Was soll Josua tun, weil der Ort heilig ist?', options: ['seine Schuhe ausziehen', 'sich verstecken', 'ein Feuer anzünden'], answer: 0 },
+        { q: 'Was soll das Volk sechs Tage lang tun?', options: ['einmal am Tag um die Stadt gehen', 'die Stadt belagern', 'im Lager bleiben'], answer: 0 }
       ]
     },
     {
@@ -331,62 +333,62 @@ export const josua: Journey = {
       title: 'Rund um die Stadt',
       ref: 'Josua 6,6–14',
       text: [
-        'Josua ruft die Priester zusammen und sagt ihnen, was Gott aufgetragen hat: „Tragt die Lade des Bundes. Sieben Priester sollen sieben Posaunen aus Widderhörnern nehmen und vor der Lade hergehen.“ Zum Volk sagt er: „Zieht los und geht um die Stadt.“ Vorn gehen die Männer des Heeres, dann die sieben Priester mit den Posaunen, hinter ihnen wird die Lade getragen, und zuletzt kommt das ganze Volk.',
-        'Aber Josua gibt noch eine Anweisung: „Ihr sollt nicht schreien, und kein Wort soll aus eurem Mund kommen, bis zu dem Tag, an dem ich sage: Ruft! Dann sollt ihr rufen.“',
-        'Am ersten Tag bleibt es so, wie Gott gesagt hat. Die Priester blasen die Posaunen, die Lade wird einmal um die Stadt getragen, und das Volk folgt schweigend. Dann kehren alle ins Lager zurück und verbringen dort die Nacht. Am nächsten Morgen steht Josua früh auf, und noch einmal geht der Zug einmal um Jericho. So geschieht es sechs Tage lang. Die Tore von Jericho bleiben verschlossen.'
+        'Am nächsten Morgen ordnet Josua den Zug. Die hohen Mauern von Jericho ragen vor ihnen auf. Sieben Priester gehen mit Posaunen voran, dahinter tragen andere die goldene Truhe, und das Volk folgt.',
+        '„Ihr sollt keinen Laut machen“, sagt Josua. „Erst wenn ich sage: Ruft!, dürft ihr rufen.“',
+        'Nur die Posaunen schallen, und man hört die Schritte der vielen Menschen. Sie gehen schweigend einmal rund um die Stadt, dann kehren sie ins Lager zurück.',
+        'So geht es sechs Tage lang. Jeden Morgen derselbe Weg, jeden Abend zurück ins Lager. Jericho bleibt verschlossen.'
       ],
       // Spiel: Ruhe bewahren (still, neu); das Etappenbild ist noch das von Josef
       task: { kind: 'still', hint: 'Beruhige die Tiere, bevor es laut wird.', hush: STILL },
       questions: [
-        { q: 'Wie viele Priester tragen Posaunen?', options: ['sieben', 'zwölf', 'drei'], answer: 0 },
-        { q: 'Wie oft ziehen sie an den ersten sechs Tagen jeden Tag um die Stadt?', options: ['einmal', 'siebenmal', 'dreimal'], answer: 0 }
+        { q: 'Wie viele Priester gehen mit Posaunen voran?', options: ['sieben', 'zwölf', 'drei'], answer: 0 },
+        { q: 'Wann dürfen die Menschen rufen?', options: ['wenn Josua „Ruft!“ sagt', 'sobald sie die Mauer sehen', 'am ersten Abend'], answer: 0 }
       ]
     },
     {
       id: 9,
       image: `${PLACEHOLDER}etappe-bild-09.webp`,
       title: 'Die Mauer fällt',
-      ref: 'Josua 6,15–27',
+      ref: 'Josua 6,15–25',
       text: [
-        'Am siebten Tag stehen sie bei Tagesanbruch auf und ziehen auf dieselbe Weise um die Stadt, doch heute siebenmal. Beim siebten Mal blasen die Priester die Posaunen, und Josua ruft dem Volk zu: „Macht ein Geschrei! Denn Gott hat euch die Stadt gegeben.“',
-        'Er sagt auch, was nicht vergessen werden darf: „Rahab und alle, die in ihrem Haus sind, sollen am Leben bleiben, denn sie hat die Männer versteckt, die wir ausgesandt haben.“',
-        'Da ruft das Volk laut, die Posaunen schallen, und die Mauer der Stadt fällt ein. Das Volk zieht in die Stadt. Josua sagt zu den beiden Männern, die das Land erkundet haben: „Geht in Rahabs Haus und holt sie heraus, mit allen, die zu ihr gehören, so wie ihr es ihr geschworen habt.“ Die Männer führen Rahab, ihren Vater und ihre Mutter, ihre Brüder und alle ihre Angehörigen aus der Stadt in Sicherheit, vor das Lager Israels.',
-        'Rahab lebt von nun an bei den Israeliten. Und Gott ist mit Josua, und sein Name wird im ganzen Land bekannt.'
+        'Am siebten Tag stehen alle früh auf. Siebenmal gehen sie um die Stadt, Priester, goldene Truhe und Volk.',
+        'Beim siebten Mal ruft Josua: „Ruft! Gott hat euch die Stadt gegeben!“ Die Posaunen schallen, und das Volk ruft laut.',
+        'Da stürzt die Mauer ein. Die Stadt Jericho ist gefallen.',
+        'Josua erinnert die Kundschafter an ihr Versprechen: „Führt Rahab und ihre Familie aus dem Haus mit der roten Schnur, wie ihr es geschworen habt.“ So bleiben Rahab und alle, die zu ihr gehören, am Leben. Sie wohnt von nun an mitten unter dem Volk Israel.'
       ],
       // nur Quiz (ernst bzw. ruhig, nichts wird gespielt); das Etappenbild ist noch das von Josef
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
-        { q: 'Wie oft ziehen sie am siebten Tag um die Stadt?', options: ['siebenmal', 'einmal', 'zwölfmal'], answer: 0 },
-        { q: 'Was geschieht mit der Mauer, als das Volk ruft?', options: ['Sie fällt ein.', 'Sie bleibt stehen.', 'Sie wird abgetragen.'], answer: 0 },
-        { q: 'Wer soll am Leben bleiben?', options: ['Rahab und alle in ihrem Haus', 'nur die Priester', 'niemand'], answer: 0 }
+        { q: 'Was geschieht mit der Mauer von Jericho?', options: ['Sie stürzt ein.', 'Sie wird bemalt.', 'Sie wächst weiter.'], answer: 0 },
+        { q: 'Wer bleibt mit ihrer Familie am Leben?', options: ['Rahab', 'Barak', 'Debora'], answer: 0 }
       ]
     },
     {
       id: 10,
       image: `${PLACEHOLDER}etappe-bild-11.webp`,
       title: 'Der Stein unter der Eiche',
-      ref: 'Josua 24 (gekürzt)',
+      ref: 'Josua 24,1.14–29',
       text: [
-        'Viele Jahre sind vergangen. Das Volk Israel wohnt im Land, das Gott ihm gegeben hat, und Josua ist alt geworden. Er ruft alle Stämme nach Sichem, ihre Ältesten, Anführer, Richter und Amtleute, und sie stellen sich vor Gott.',
-        'Josua erinnert sie, was Gott für sie getan hat: wie er Abraham in dieses Land geführt, das Volk aus Ägypten befreit und durch das Meer geleitet hat, wie er sie in der Wüste getragen und ihnen schließlich dieses Land gegeben hat. „Ihr wohnt in Städten, die ihr nicht gebaut habt, und esst von Weinbergen und Ölbäumen, die ihr nicht gepflanzt habt“, sagt Josua. „Darum dient Gott aufrichtig und treu. Und wenn es euch nicht gefällt, ihm zu dienen, dann entscheidet heute, wem ihr dienen wollt. Ich aber und mein Haus, wir wollen Gott dienen.“',
-        'Das Volk antwortet: „Das sei ferne von uns, dass wir Gott verlassen! Er hat uns aus Ägypten geführt und auf unserem ganzen Weg beschützt. Wir wollen Gott dienen, denn er ist unser Gott.“',
-        'An diesem Tag schließt Josua mit dem Volk einen Bund. Er schreibt die Worte in das Buch des Gesetzes Gottes und richtet unter der Eiche einen großen Stein auf. „Seht, dieser Stein soll Zeuge sein“, sagt er, „denn er hat alle Worte gehört, die Gott zu uns gesprochen hat.“ Dann schickt er das Volk heim. Nach diesen Ereignissen stirbt Josua im Alter von hundertzehn Jahren, und das Volk dient Gott, solange er und die Ältesten nach ihm leben.'
+        'Viele Jahre später ist Josua alt geworden. Er ruft das ganze Volk nach Sichem zusammen.',
+        '„Erwählt euch heute, wem ihr dienen wollt“, sagt Josua. „Ich aber und mein Haus, wir wollen Gott dienen.“',
+        'Das Volk antwortet: „Wir wollen auch Gott dienen, denn er hat uns aus Ägypten geführt und uns bis hierher begleitet.“',
+        'Da nimmt Josua einen großen Stein und stellt ihn unter der Eiche auf. „Dieser Stein soll Zeuge sein, denn er hat alle Worte gehört, die Gott zu uns gesprochen hat.“ Dann schickt er das Volk heim. Danach stirbt Josua, hundertzehn Jahre alt. In Sichem begraben die Israeliten auch die Gebeine Josefs, die sie damals aus Ägypten mitgebracht haben.'
       ],
       // Spiel: Lückenvers (lueckenvers, alt); das Etappenbild ist noch das von Josef
       task: { kind: 'lueckenvers', hint: 'Setze die fehlenden Wörter in den Satz.', verse: VERS },
       questions: [
-        { q: 'Wo versammelt Josua das Volk?', options: ['in Sichem', 'in Jericho', 'in Gilgal'], answer: 0 },
-        { q: 'Was richtet Josua unter der Eiche auf?', options: ['einen großen Stein', 'ein Zelt', 'einen Altar mit Feuer'], answer: 0 }
+        { q: 'Was sagt Josua über sich und sein Haus?', options: ['Sie wollen Gott dienen.', 'Sie wollen fortziehen.', 'Sie wollen Könige werden.'], answer: 0 },
+        { q: 'Was stellt Josua unter der Eiche auf?', options: ['einen großen Stein', 'ein Zelt', 'einen Altar mit Feuer'], answer: 0 }
       ]
     }
   ],
   exam: [
-    { q: 'Wer führt das Volk Israel nach Mose?', options: ['Josua', 'Kaleb', 'Aaron'], answer: 0 },
-    { q: 'Wo versteckt Rahab die beiden Männer?', options: ['auf dem Dach unter Flachs', 'im Keller unter Säcken', 'in einem Brunnen'], answer: 0 },
-    { q: 'Was geschieht mit dem Wasser des Jordan, als die Priester die Füße hineintauchen?', options: ['Es bleibt stehen.', 'Es wird warm.', 'Es wird zu Eis.'], answer: 0 },
-    { q: 'Wie viele Steine nimmt das Volk aus dem Jordan mit?', options: ['zwölf', 'sieben', 'vierzig'], answer: 0 },
-    { q: 'Wie oft ziehen sie am siebten Tag um Jericho?', options: ['siebenmal', 'einmal', 'zwölfmal'], answer: 0 },
-    { q: 'Wer soll in Jericho am Leben bleiben?', options: ['Rahab und alle in ihrem Haus', 'nur die Priester', 'niemand'], answer: 0 }
+    { q: 'Was sagt Gott zu Josua am Anfang?', options: ['„Ich bin mit dir.“', '„Geh allein.“', '„Kehre um.“'], answer: 0 },
+    { q: 'Was bindet Rahab ins Fenster?', options: ['eine rote Schnur', 'ein weißes Tuch', 'eine Laterne'], answer: 0 },
+    { q: 'Was geschieht, als die Füße der Priester ins Wasser kommen?', options: ['Das Wasser bleibt stehen.', 'Das Wasser steigt.', 'Der Fluss wird breiter.'], answer: 0 },
+    { q: 'Was tragen die zwölf Männer aus dem Fluss?', options: ['Steine', 'Krüge', 'Zweige'], answer: 0 },
+    { q: 'Was soll Josua tun, weil der Ort heilig ist?', options: ['seine Schuhe ausziehen', 'sich verstecken', 'ein Feuer anzünden'], answer: 0 },
+    { q: 'Was sagt Josua über sich und sein Haus?', options: ['Sie wollen Gott dienen.', 'Sie wollen fortziehen.', 'Sie wollen Könige werden.'], answer: 0 }
   ]
 }
 
