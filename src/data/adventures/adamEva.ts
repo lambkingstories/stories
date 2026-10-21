@@ -267,7 +267,7 @@ export const adamEva: Journey = {
       text: [
         'Am sechsten Tag soll auch das Land voller Leben sein. Gott spricht, und es entstehen das Vieh, die wilden Tiere und alles, was am Boden kriecht. Gott sieht, dass es gut ist.',
         'Dann sagt Gott: „Lasst uns Menschen machen als unser Bild!“ Und er schafft den Menschen, als Mann und als Frau.',
-        'Gott segnet sie und vertraut ihnen die Erde an. Zu essen gibt er ihnen die Pflanzen mit Samen und die Bäume mit Früchten.',
+        'Gott segnet sie und sagt: „Seid fruchtbar und füllt die Erde! Herrscht über die Fische im Meer, über die Vögel am Himmel und über alle Tiere!“ Zu essen gibt er ihnen die Pflanzen mit Samen und die Bäume mit Früchten.',
         'Gott sieht alles an, was er gemacht hat: Es ist sehr gut. Am siebten Tag ruht Gott von seiner Arbeit. Er segnet diesen Tag und macht ihn zu einem besonderen Tag.'
       ],
       task: { kind: 'hueten', hint: 'Führe die Herde mit dem Finger sanft zum Ruheplatz.', herd: HUETEN },
@@ -337,8 +337,8 @@ export const adamEva: Journey = {
       ref: '1. Mose 3,1–7',
       text: [
         'Im Garten lebt auch die Schlange, listiger als alle anderen Tiere. Sie fragt die Frau: „Sollte Gott wirklich gesagt haben: Ihr dürft von keinem Baum im Garten essen?“',
-        '„Wir dürfen von den Früchten der Bäume essen“, antwortet die Frau. „Nur von dem Baum in der Mitte hat Gott gesagt: Esst nicht davon, rührt ihn nicht an, sonst müsst ihr sterben.“ Doch die Schlange sagt: „Ihr werdet nicht sterben. Gott weiß, dass euch die Augen aufgehen, wenn ihr davon esst.“',
-        'Die Frau sieht den Baum an. Seine Früchte sehen schön aus, und klug sollen sie auch machen. Sie nimmt eine Frucht, isst und gibt auch Adam davon, der bei ihr ist.',
+        '„Wir dürfen von den Früchten der Bäume essen“, antwortet die Frau. „Nur von dem Baum in der Mitte hat Gott gesagt: Esst nicht davon, rührt ihn nicht an, sonst müsst ihr sterben.“ Doch die Schlange sagt: „Ihr werdet nicht sterben. Gott weiß: Wenn ihr davon esst, gehen euch die Augen auf, und ihr werdet sein wie Gott und wissen, was gut und böse ist.“',
+        'Die Frau sieht den Baum an. Seine Früchte sehen schön aus, und klug sollen sie auch machen. Sie nimmt eine Frucht, isst und gibt auch Adam davon, der bei ihr ist. Und auch er isst.',
         'Da gehen den beiden die Augen auf. Sie merken, dass sie nackt sind. Sie flechten Feigenblätter zusammen.'
       ],
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
@@ -354,14 +354,14 @@ export const adamEva: Journey = {
       title: 'Wo bist du?',
       ref: '1. Mose 3,8–21',
       text: [
-        'Am Abend weht ein kühler Wind durch den Garten. Adam und seine Frau hören Gott im Garten gehen und verstecken sich zwischen den Bäumen.',
+        'Als der Tag kühl geworden ist, weht ein Wind durch den Garten. Adam und seine Frau hören Gott im Garten gehen und verstecken sich zwischen den Bäumen.',
         '„Adam, wo bist du?“, ruft Gott. „Ich habe dich gehört und mich gefürchtet“, antwortet Adam. „Darum habe ich mich versteckt.“',
-        'Gott fragt, ob Adam von dem verbotenen Baum gegessen hat. Adam sagt, die Frau habe ihm davon gegeben, und die Frau sagt, die Schlange habe sie getäuscht. Weil Adam gegessen hat, sagt Gott, wird die Arbeit auf dem Acker nun mühsam.',
+        'Gott fragt, ob Adam von dem verbotenen Baum gegessen hat. Adam sagt, die Frau habe ihm davon gegeben, und die Frau sagt, die Schlange habe sie getäuscht. Zur Schlange sagt Gott: „Einer von den Nachkommen der Frau wird dir den Kopf zertreten.“ Weil Adam gegessen hat, sagt Gott, wird die Arbeit auf dem Acker nun mühsam, bis er wieder zu Erde wird, von der er genommen ist.',
         'Adam nennt seine Frau Eva, denn sie wird die Mutter aller sein, die leben. Und Gott macht Adam und Eva Kleider aus Fell und zieht sie ihnen an.'
       ],
       task: { kind: 'echo', hint: 'Hör oder schau gut zu und antworte mit denselben Blüten.', echo: RUF },
       questions: [
-        { q: 'Wann hören Adam und seine Frau Gott im Garten?', options: ['am Abend', 'am Morgen', 'mitten in der Nacht'], answer: 0 },
+        { q: 'Wen hören Adam und seine Frau im Garten gehen?', options: ['Gott', 'die Schlange', 'einen Engel'], answer: 0 },
         { q: 'Was macht Gott für Adam und Eva?', options: ['Kleider aus Fell', 'ein Haus aus Holz', 'einen neuen Garten'], answer: 0 }
       ],
       soon: SOON
@@ -404,8 +404,11 @@ adamEva.music = [
 ]
 
 // the German recordings of the stories (voice Achernar, text version 3 = files "-v3"); there are no English ones yet, so the English app reads with the voice of the device
+// Bibeltreue-Korrektur 21.10.2026: the texts of these stages were changed (see NEUAUFNAHME-BIBELTREUE-2026-10-21.md in the adventure folder), so the old recordings no longer match;
+// until they are recorded again the app reads them with the voice of the device. Take the number out of this list when the new file (-v4) is in `public/`.
+const TO_RERECORD = [3, 7, 8]
 for (const s of adamEva.stages) {
-  const file = `audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`
+  const file = TO_RERECORD.includes(s.id) ? undefined : `audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 

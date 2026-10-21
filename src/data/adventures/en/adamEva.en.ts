@@ -48,7 +48,7 @@ export const adamEvaEn: TextOverlay<Journey> = {
       text: [
         'On the sixth day the land is to be full of life, too. God speaks, and the cattle, the wild animals, and everything that crawls on the ground appear. God sees that it is good.',
         'Then God says, “Let us make people in our image!” And he creates human beings, as man and as woman.',
-        'God blesses them and trusts the earth to their care. For food he gives them the plants with seeds and the trees with fruit.',
+        'God blesses them and says, “Be fruitful and fill the earth! Rule over the fish in the sea, over the birds in the sky, and over all the animals!” For food he gives them the plants with seeds and the trees with fruit.',
         'God looks at everything he has made: It is very good. On the seventh day God rests from his work. He blesses this day and makes it a special day.'
       ],
       task: { hint: 'Lead the herd gently with your finger to the resting place.', herd: { rounds: [{ hint: 'Round 1: Drag the lead animal to the resting place. The others follow it.', leader: { label: 'Sheep' }, followers: [{ label: 'Sheep' }, { label: 'Sheep' }, { label: 'Sheep' }] }, { hint: 'Round 2: Now a pond is in the way. Drag the lead animal around the pond to the watering place.', leader: { label: 'Stag' }, followers: [{ label: 'Doe' }, { label: 'Goat' }, { label: 'Sheep' }, { label: 'Stag' }] }] } },
@@ -106,8 +106,8 @@ export const adamEvaEn: TextOverlay<Journey> = {
       ref: 'Genesis 3:1–7',
       text: [
         'In the garden lives the snake, too, more cunning than all the other animals. It asks the woman, “Did God really say: You may not eat from any tree in the garden?”',
-        '“We may eat the fruit of the trees,” answers the woman. “Only about the tree in the middle God said: Do not eat from it, do not touch it, or you will die.” But the snake says, “You will not die. God knows that your eyes will be opened when you eat from it.”',
-        'The woman looks at the tree. Its fruit looks beautiful, and it is supposed to make you wise. She takes a piece of fruit, eats, and gives some to Adam, who is with her.',
+        '“We may eat the fruit of the trees,” answers the woman. “Only about the tree in the middle God said: Do not eat from it, do not touch it, or you will die.” But the snake says, “You will not die. God knows: when you eat from it, your eyes will be opened, and you will be like God and know what is good and evil.”',
+        'The woman looks at the tree. Its fruit looks beautiful, and it is supposed to make you wise. She takes a piece of fruit, eats, and gives some to Adam, who is with her. And he eats, too.',
         'Then the eyes of both are opened. They realize that they are naked. They sew fig leaves together.'
       ],
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
@@ -120,14 +120,14 @@ export const adamEvaEn: TextOverlay<Journey> = {
       title: 'Where Are You?',
       ref: 'Genesis 3:8–21',
       text: [
-        'In the evening a cool wind blows through the garden. Adam and his wife hear God walking in the garden and hide among the trees.',
+        'When the day has turned cool, a wind blows through the garden. Adam and his wife hear God walking in the garden and hide among the trees.',
         '“Adam, where are you?” calls God. “I heard you and I was afraid,” answers Adam. “That is why I hid.”',
-        'God asks whether Adam has eaten from the forbidden tree. Adam says the woman gave him some, and the woman says the snake tricked her. Because Adam has eaten, says God, work in the field will now be hard.',
+        'God asks whether Adam has eaten from the forbidden tree. Adam says the woman gave him some, and the woman says the snake tricked her. To the snake God says, “One of the woman’s descendants will crush your head.” Because Adam has eaten, says God, work in the field will now be hard, until he returns to the earth he was taken from.',
         'Adam calls his wife Eve, because she will be the mother of all who live. And God makes clothes of animal skin for Adam and Eve and dresses them.'
       ],
       task: { hint: 'Listen or look closely and answer with the same blossoms.', echo: { rounds: [{ hint: 'Round 1: Listen or look closely: The call lights up, too. Tap the blossoms in the same order.' }, { hint: 'Round 2: The call is longer. You can listen to it and watch it again at any time.' }] } },
       questions: [
-        { q: 'When do Adam and his wife hear God in the garden?', options: ['in the evening', 'in the morning', 'in the middle of the night'] },
+        { q: 'Whom do Adam and his wife hear walking in the garden?', options: ['God', 'the snake', 'an angel'] },
         { q: 'What does God make for Adam and Eve?', options: ['clothes of animal skin', 'a house of wood', 'a new garden'] }
       ]
     },
