@@ -59,6 +59,15 @@ jobs:
       VITE_APP_DEBUG: "false"
       VITE_DEBUG_CONSOLE: "false"
       VITE_APP_TITLE: LambKing Stories
+      # Test build: all adventures not public yet are shown. Remove all VITE_SHOW_* lines before a store build.
+      VITE_SHOW_NOAH: "true"
+      VITE_SHOW_ADAM: "true"
+      VITE_SHOW_BABEL: "true"
+      VITE_SHOW_ABRAHAM: "true"
+      VITE_SHOW_JAKOB: "true"
+      VITE_SHOW_JOSUA: "true"
+      VITE_SHOW_GIDEON: "true"
+      VITE_SHOW_MOSE: "true"
       VITE_CLIENT_KEY: tauri-key-public-1111
       VITE_API_BASE_URL: ${{ vars.API_BASE_URL || 'https://lbs-be.onrender.com' }}
 

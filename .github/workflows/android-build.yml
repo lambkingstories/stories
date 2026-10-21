@@ -2,7 +2,7 @@ name: Android Build & Sign
 
 # Builds the signed Play Store bundle (.aab) and an installable .apk.
 # Upload the .aab by hand in the Play Console (Test and release -> Closed testing).
-# Last build request: 2026-10-20 (music slider fix, coloring book import, redesign with the Noah adventure).
+# Last build request: 2026-10-22 (test build with all new adventures: Adam und Eva, Babel, Abraham, Jakob, Josua, Gideon, Mose).
 #
 # Needs the repository secrets ANDROID_KEYSTORE_BASE64 (the release keystore,
 # base64) and ANDROID_KEYSTORE_PASSWORD (store = key password; alias `lambking`).
@@ -40,6 +40,15 @@ jobs:
       # Test build: the adventure Noah is not public yet and is always shown here, so it can be tried on a phone.
       # Remove this line before a build that goes to the stores (a normal build leaves Noah out completely).
       VITE_SHOW_NOAH: "true"
+      # Test build: the new adventures (Adam und Eva, Babel, Abraham, Jakob, Josua, Gideon, Mose) are not public yet either.
+      # Remove all VITE_SHOW_* lines before a build that goes to the stores.
+      VITE_SHOW_ADAM: "true"
+      VITE_SHOW_BABEL: "true"
+      VITE_SHOW_ABRAHAM: "true"
+      VITE_SHOW_JAKOB: "true"
+      VITE_SHOW_JOSUA: "true"
+      VITE_SHOW_GIDEON: "true"
+      VITE_SHOW_MOSE: "true"
       VITE_CLIENT_KEY: tauri-key-public-1111
       VITE_API_BASE_URL: ${{ vars.API_BASE_URL || 'https://lbs-be.onrender.com' }}
 
