@@ -4,7 +4,7 @@
  * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
  * Spiele (höchstens zwei Runden je Spiel, höchstens zwei alte Mechaniken): 1 Kamele beladen, 2 Zählen (alt), 3 Sternbild, 4 Wohin fliegen die Vögel?, 5 Das Licht durch die Ringe, 6 Wasser für
  * die Gäste, 8 Puzzle (alt), 10 Passend bezahlen, 12 Ins Weite schauen (Fokus-Regler); 7 Sodom, 9 Gott sorgt und 11 Der Knecht am Brunnen sind nur Quiz.
- * Es gibt noch keine Aufnahmen zu den neuen Texten (`audio` fehlt: die App liest mit der Gerätestimme); die alten Aufnahmen liegen noch im Ordner, sind aber nicht mehr verlinkt.
+ * Deutsche Aufnahmen zu den neuen Texten: geschichte-NN-v4.mp3 (Gemini, Stimme Achernar, 21.10.2026, nicht gehört); Englisch noch nicht (die englische App liest mit der Gerätestimme).
  * Die Etappenbilder sind noch die alten sechs (`etappe-bild-01..06`), die Karte hat 12 Platzhalter-Stationen auf der alten Karte mit elf Orten; beides ersetzen die neuen Bilder und das neue Panorama.
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/abraham/, images/abenteuer/spiele/abraham/<spiel>/, audio/abenteuer/abraham/.
@@ -14,6 +14,7 @@
 import type { BalanceGame, BirdsGame, ConstellationGame, CountGroup, FocusGame, Journey, RingsGame, SilverGame, WaterGame } from '@/types/adventure'
 import { ABRAHAM_PATH } from './abrahamPath'
 import { localize } from './localize'
+import { adventureLanguage } from '@/use/adventureLanguage'
 import { abrahamEn } from './en/abraham.en'
 
 const IMG = 'images/abenteuer/abraham/'
@@ -432,6 +433,12 @@ export const abraham: Journey = {
     { q: 'Wie viele gute Menschen reichen Gott, um Sodom zu verschonen?', options: ['zehn', 'fünfzig', 'hundert'], answer: 0 },
     { q: 'Wer sorgt für das Opfertier auf dem Berg?', options: ['Gott', 'Isaak', 'die Knechte'], answer: 0 }
   ]
+}
+
+// the German recordings of the stories (voice Achernar, text version 3 = files "-v4"); there are no English ones yet, so the English app reads with the voice of the device
+for (const s of abraham.stages) {
+  const file = `audio/abenteuer/abraham/geschichte-${String(s.id).padStart(2, '0')}-v4.mp3`
+  Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 
 // the English texts (title, stories, questions, hints, recordings) lie over the German ones; the screens show them when the app is English

@@ -21,7 +21,7 @@ const PICTURE: Record<number, string> = { 1: '01', 2: '02', 3: '03', 4: '02', 5:
 const FORBIDDEN = /\b(Messer|Schwert|gefesselt|Fesseln|Fesselung|töten|getötet|schlachten|Blut|Teufel|Hölle)\b/i
 
 describe('Abraham: stories and questions', () => {
-  it('twelve stages with 3 or 4 paragraphs of 90 to 145 words, the Bible passage under every one, no recording yet (the app reads with the voice of the device), the picture names of the plan', () => {
+  it('twelve stages with 3 or 4 paragraphs of 90 to 145 words, the Bible passage under every one, the German recording of every story, the picture names of the plan', () => {
     expect(abraham.id).toBe('abraham')
     expect(abraham.age).toBe('8-10')
     expect(abraham.title).toBe('Abraham')
@@ -53,7 +53,8 @@ describe('Abraham: stories and questions', () => {
       expect(words / sentences, `words per sentence ${s.id}`).toBeGreaterThan(7)
       expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(text, `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.audio, `no recording yet ${s.id}`).toBeUndefined()
+      expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/abraham/geschichte-${String(s.id).padStart(2, '0')}-v4.mp3`)
+      expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
       expect(s.image).toBe(`images/abenteuer/abraham/etappe-bild-${PICTURE[s.id]}.webp`)
     }
     const all = abraham.stages.flatMap((s) => s.text).join(' ')
@@ -403,7 +404,7 @@ describe('Abraham: English', () => {
       expect(s.task.hint, `hint ${s.id}`).not.toBe(de[i]!.hint)
       s.questions.forEach((q, k) => expect(q.q, `question ${s.id}.${k}`).not.toBe(de[i]!.q[k]))
       expect(s.ref, `ref ${s.id}`).toMatch(/^Genesis \d/)
-      expect(s.audio, `audio ${s.id}`).toBeUndefined()
+      expect(s.audio, `no English recording yet: ${s.id}`).toBeUndefined()
     })
     expect(abraham.title).toBe('Abraham')
     expect(abraham.subtitle).toBe('God Calls, God Keeps His Word')
