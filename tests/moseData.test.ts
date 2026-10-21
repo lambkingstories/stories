@@ -351,11 +351,12 @@ describe('Mose: the games, and the placeholders until the pictures come', () => 
     expect(open).toEqual([true, ...Array(14).fill(false)])
   })
 
-  it('the medal is the own one of Mose; the gift is the one of Josef until its own comes and has its final title', () => {
+  it('the medal and the gift picture are the own ones of Mose; the gift has its final title', () => {
     expect(mose.medal).toBe('images/abenteuer/mose/medaille-v2.webp')
     expect(existsSync(`public/${mose.medal}`)).toBe(true)
     expect(mose.gift.title).toBe('Der Weg durch das Meer')
-    expect(mose.gift.image).toBe(josef.gift.image)
+    expect(mose.gift.image).toBe('images/abenteuer/mose/geschenk.webp')
+    expect(existsSync(`public/${mose.gift.image}`)).toBe(true)
   })
 
   it('every file that the data names exists (the pictures of Josef, the map, the medal) and is small enough', () => {
