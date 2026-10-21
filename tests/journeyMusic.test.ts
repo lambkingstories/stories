@@ -1,13 +1,23 @@
 import { existsSync, statSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { journeyById } from '@/data/adventures'
+import { abraham } from '@/data/adventures/abraham'
+import { adamEva } from '@/data/adventures/adameva'
+import { babel } from '@/data/adventures/babel'
+import { gideon } from '@/data/adventures/gideon'
+import { jakob } from '@/data/adventures/jakob'
 import { josef } from '@/data/adventures/josef'
+import { josua } from '@/data/adventures/josua'
+import { mose } from '@/data/adventures/mose'
 import { noah } from '@/data/adventures/noah'
 import { journeyFiles } from '@/utils/journeyFiles'
 import { MUSIC_FILES } from '@/utils/sfxFiles'
 
+// every adventure has its own music: at least three pieces (Anton, 21.10.2026), so that one hears more than one piece
+const ALL = [josef, noah, adamEva, abraham, jakob, babel, josua, gideon, mose]
+
 describe('the music of the journeys', () => {
-  for (const j of [josef, noah]) {
+  for (const j of ALL) {
     it(`${j.id} has its own pieces: files exist, are in the pack, and the general pieces stay out`, () => {
       expect(j.music!.length).toBeGreaterThanOrEqual(3)
       expect(new Set(j.music).size).toBe(j.music!.length)
@@ -21,8 +31,9 @@ describe('the music of the journeys', () => {
     })
   }
 
-  it('different journeys have different music', () => {
-    expect(josef.music!.filter((m) => noah.music!.includes(m))).toEqual([])
+  it('different adventures have different music (no file twice)', () => {
+    const all = ALL.flatMap((j) => j.music!)
+    expect(new Set(all).size).toBe(all.length)
   })
 
   it('a journey without its own music gets the general pieces in its pack', () => {
