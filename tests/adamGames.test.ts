@@ -695,7 +695,7 @@ describe('Kanäle drehen (channels)', () => {
     ),
     rounds: [
       { hint: 'Drehe die Stücke, bis das Wasser die Pflanzen erreicht.', grid: CHANNEL_GRID_1 },
-      { hint: 'Der Strom teilt sich in vier Arme.', grid: CHANNEL_GRID_2 }
+      { hint: 'Der Strom teilt sich in drei Arme.', grid: CHANNEL_GRID_2 }
     ]
   }
   const open = async (locale: 'de' | 'en' = 'de') => {
@@ -733,7 +733,7 @@ describe('Kanäle drehen (channels)', () => {
   it('both gardens can be solved, nothing reaches a plant at the start, the plants are garden plants (no tree of life or of knowledge), two rounds at most', () => {
     expect(game.rounds.length).toBeLessThanOrEqual(2)
     const goalIds = game.rounds.flatMap((r) => r.grid.flat().filter((t) => t.kind === 'goal').map((t) => t.goal!))
-    expect(goalIds).toEqual(['feige', 'dattel', 'feige', 'wein', 'dattel', 'granatapfel'])
+    expect(goalIds).toEqual(['feige', 'dattel', 'feige', 'dattel', 'wein'])
     expect(goalIds.every((g) => game.goals[g])).toBe(true)
     expect(Object.keys(game.goals).join(' ')).not.toMatch(/leben|erkenntnis|apfel$/i)
     for (const r of game.rounds) {
@@ -743,7 +743,7 @@ describe('Kanäle drehen (channels)', () => {
       const solved = r.grid.map((row, i) => row.map((t, c) => ({ ...t, rot: sol![i]![c]! })))
       expect(flow(solved).reached.length).toBe(goalsOf(r.grid))
     }
-    expect(game.rounds.map((r) => goalsOf(r.grid))).toEqual([2, 4])
+    expect(game.rounds.map((r) => goalsOf(r.grid))).toEqual([2, 3])
     // no cross in the pictures, and the search is quick
     expect(JSON.stringify([CHANNEL_GRID_1, CHANNEL_GRID_2])).not.toContain('cross')
     const t0 = Date.now()
@@ -751,11 +751,11 @@ describe('Kanäle drehen (channels)', () => {
     expect(Date.now() - t0).toBeLessThan(500)
   })
 
-  it('round 1: a 4 x 3 garden; the goal is the number of plants (2 + 4 = 6); only turnable pieces can be tapped', async () => {
+  it('round 1: a 4 x 3 garden; the goal is the number of plants (2 + 3 = 5); only turnable pieces can be tapped', async () => {
     const w = await open()
     expect(w.findAll('.ch-tile')).toHaveLength(12)
     expect(w.find('.ch-round').text()).toContain('Runde 1 von 2')
-    expect(useTaskProgress().goal.value).toBe(6)
+    expect(useTaskProgress().goal.value).toBe(5)
     expect(tile(w, 1, 0, 4).attributes('disabled')).toBeDefined()
     expect(tile(w, 1, 0, 4).attributes('aria-label')).toBe('Der Strom')
     expect(tile(w, 1, 1, 4).attributes('aria-label')).toBe('Kanalstück, Reihe 2, Spalte 2: drehen')
@@ -794,7 +794,7 @@ describe('Kanäle drehen (channels)', () => {
     expect(tile(w, 1, 3, 4).find('.ch-plant').attributes('src')).toContain('ziel-dattel-bluete')
   })
 
-  it('all the way through: round 2 is a 5 x 4 garden with four plants; with no hint it is three stars; hints take stars (one: two, two: one); no mistakes exist', async () => {
+  it('all the way through: round 2 is a 4 x 3 garden with three plants; with no hint it is three stars; hints take stars (one: two, two: one); no mistakes exist', async () => {
     for (const [hints, stars] of [[0, 3], [1, 2], [2, 1]] as const) {
       useTaskProgress().reset()
       const w = await open()
@@ -805,10 +805,10 @@ describe('Kanäle drehen (channels)', () => {
       await solveRound(w, CHANNEL_GRID_1)
       await tick(2200)
       expect(w.find('.ch-round').text()).toContain('Runde 2 von 2')
-      expect(w.findAll('.ch-tile')).toHaveLength(20)
+      expect(w.findAll('.ch-tile')).toHaveLength(12)
       await solveRound(w, CHANNEL_GRID_2)
       await tick(1800)
-      expect(useTaskProgress().parts.value, `${hints} hints`).toBe(6)
+      expect(useTaskProgress().parts.value, `${hints} hints`).toBe(5)
       expect(useTaskProgress().finished.value).toBe(true)
       expect(w.text()).toContain('Der Strom bewässert den ganzen Garten!')
       await w.find('.gd button').trigger('click')
@@ -827,8 +827,8 @@ describe('Kanäle drehen (channels)', () => {
     expect(w.find('.ch-tile.hint').exists()).toBe(false)
   })
 
-  it('the steps of "Go on" for 6 plants: 2 plants one star, 4 plants two stars', () => {
-    expect([1, 2, 3, 4, 5].map((d) => partialStars(d, 6))).toEqual([0, 1, 1, 2, 2])
+  it('the steps of "Go on" for 5 plants: 2 plants one star, 4 plants two stars (3 plants are still one)', () => {
+    expect([1, 2, 3, 4].map((d) => partialStars(d, 5))).toEqual([0, 1, 1, 2])
   })
 
   it('English: the words of the game', async () => {

@@ -1,12 +1,13 @@
 /**
  * Abenteuer "Adam und Eva" (1. Mose 1–3) für 8 bis 10 Jahre: 9 Etappen, Untertitel "Der Garten Eden". Entstanden nach dem Skill "LambKing Abenteuer Skill".
- * Quelle der Texte: D:/Claude/Abenteuer-Adam-Eva/ENTWURF_Adam-Eva.md (Entwurf v1 der Text-Sitzung), Plan: ETAPPENPLAN.md. Die richtige Antwort steht in den
- * Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
+ * Quelle der Texte: D:/Claude/Abenteuer-Adam-Eva/ENTWURF_Adam-Eva-v3.md (zweitgeprüft, 90 bis 145 Wörter je Etappe wie bei Noah und Josef, eingebaut am 21.10.2026), Plan: ETAPPENPLAN-v3.md.
+ * Es gibt noch keine Aufnahmen zu den neuen Texten (`audio` fehlt: die App liest mit der Gerätestimme); die alten Aufnahmen liegen noch im Ordner, sind aber nicht mehr verlinkt.
+ * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen. Jedes Spiel hat höchstens zwei Runden (Plan v3).
  * Kein Spiel dieses Abenteuers kommt in Josef oder Noah vor (Anton, 20.10.2026): jede Etappe hat ein eigenes, neues Spiel, Etappe 7 ist nur Quiz.
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/adam-eva/, images/abenteuer/spiele/adam-eva/<spiel>/, audio/abenteuer/adam-eva/.
  *
- * STAND 20.10.2026: alle Bilder (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder), Messwerte, Vorlese-Aufnahmen (Deutsch und Englisch) und Musik sind eingebaut, die Etappen sind spielbar.
+ * STAND 21.10.2026: alle Bilder (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder), Messwerte und Musik sind eingebaut, die Etappen sind spielbar. Die Etappenbilder 3 und 4 werden neu gemalt; die Spiele 3 und 4 liegen auf eigenen Szenenbildern und bleiben davon unberührt.
  * Das Abenteuer ist aber nicht öffentlich: es ist hinter `comingSoon` und dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
 import type { ChannelGame, EchoGame, HerdGame, Journey, LightGame, MirrorGame, OrderGame, SowGame, VerseGame } from '@/types/adventure'
@@ -17,7 +18,6 @@ import { adamEvaEn } from './en/adamEva.en'
 
 const IMG = 'images/abenteuer/adam-eva/'
 const G = 'images/abenteuer/spiele/adam-eva/'
-const REC = 'audio/abenteuer/adam-eva/'
 /** `true` = die Etappen sind noch nicht spielbar (Gerüst); jetzt sind alle Bilder und Töne eingebaut. */
 const SOON = false
 
@@ -56,7 +56,7 @@ const LICHTER: LightGame = {
       together: 3,
       spots: [
         { x: 9.3, y: 17.4, w: 8 }, { x: 39.7, y: 19.4, w: 8 }, { x: 64.5, y: 22.4, w: 8 }, { x: 12.0, y: 34.0, w: 8 },
-        { x: 37.5, y: 32.8, w: 8 }, { x: 61.9, y: 35.1, w: 8 }, { x: 26.6, y: 39.8, w: 8 }, { x: 79.7, y: 40.8, w: 8 }
+        { x: 37.5, y: 32.8, w: 8 }, { x: 61.9, y: 35.1, w: 8 }
       ]
     }
   ]
@@ -98,7 +98,7 @@ const HUETEN: HerdGame = {
   ]
 }
 
-/** Etappe 4, "Kanäle drehen": zwei Gärten (4 x 3 und 5 x 4), siehe `adamEvaChannels.ts`; die Kacheln und Pflanzen kommen aus Bildauftrag 11. */
+/** Etappe 4, "Kanäle drehen": zwei Gärten (beide 4 x 3, mit zwei und mit drei Pflanzen), siehe `adamEvaChannels.ts`; die Kacheln und Pflanzen kommen aus Bildauftrag 11. */
 const KANAELE: ChannelGame = {
   tiles: {
     straight: `${G}kanaele/gerade.webp`,
@@ -122,7 +122,7 @@ const KANAELE: ChannelGame = {
   },
   rounds: [
     { hint: 'Runde 1: Tippe ein Kanalstück an, um es zu drehen. Leite das Wasser zu den Bäumen.', grid: CHANNEL_GRID_1 },
-    { hint: 'Runde 2: Der Strom teilt sich. Leite das Wasser zu allen vier Bäumen.', grid: CHANNEL_GRID_2 }
+    { hint: 'Runde 2: Der Strom teilt sich. Leite das Wasser zu allen drei Bäumen.', grid: CHANNEL_GRID_2 }
   ]
 }
 
@@ -137,7 +137,7 @@ const VERS: VerseGame = {
   ]
 }
 
-/** Etappe 6, "Spiegeln": links ein Muster aus Blütensteinen, rechts wird es gespiegelt ergänzt (6 und 12 Steine). Hintergrund ist das Etappenbild 6. */
+/** Etappe 6, "Spiegeln": links ein Muster aus Blütensteinen, rechts wird es gespiegelt ergänzt (6 und 9 Steine). Hintergrund ist das Etappenbild 6. */
 const SPIEGELN: MirrorGame = {
   background: `${IMG}etappe-bild-06.webp`,
   empty: `${G}spiegeln/leer.webp`,
@@ -148,7 +148,7 @@ const SPIEGELN: MirrorGame = {
   ],
   rounds: [
     { hint: 'Runde 1: Setze die Blüten so, dass beide Hälften gleich aussehen.', cols: 2, rows: 3, left: [['rot', 'gelb'], ['gelb', 'gelb'], ['rot', 'rot']] },
-    { hint: 'Runde 2: Das Muster ist größer und hat mehr Farben.', cols: 3, rows: 4, left: [['rot', 'gelb', 'blau'], ['blau', 'rot', 'gelb'], ['gelb', 'blau', 'rot'], ['rot', 'rot', 'blau']] }
+    { hint: 'Runde 2: Das Muster ist größer und hat mehr Farben.', cols: 3, rows: 3, left: [['rot', 'gelb', 'blau'], ['blau', 'rot', 'gelb'], ['gelb', 'blau', 'rot']] }
   ]
 }
 
@@ -162,8 +162,8 @@ const RUF: EchoGame = {
     { id: 'bluete-4', image: `${G}echo/bluete-4.webp`, rate: 1.4983 }
   ],
   rounds: [
-    { hint: 'Runde 1: Höre oder schau gut zu: Der Ruf leuchtet auch. Tippe die Blüten in derselben Reihenfolge an.', calls: [[0, 1, 2], [2, 1, 3], [1, 3, 0, 2]] },
-    { hint: 'Runde 2: Der Ruf ist länger. Du kannst ihn jederzeit noch einmal hören und sehen.', calls: [[0, 2, 1, 3], [3, 1, 2, 0, 2], [1, 0, 3, 2, 1, 3]] }
+    { hint: 'Runde 1: Höre oder schau gut zu: Der Ruf leuchtet auch. Tippe die Blüten in derselben Reihenfolge an.', calls: [[0, 1, 2], [1, 3, 0, 2]] },
+    { hint: 'Runde 2: Der Ruf ist länger. Du kannst ihn jederzeit noch einmal hören und sehen.', calls: [[0, 2, 1, 3], [3, 1, 2, 0, 2]] }
   ]
 }
 
@@ -187,8 +187,8 @@ const SAEEN: SowGame = {
     { id: 'f6', x: 50, y: 32.1, w: 87, h: 7 }
   ],
   rounds: [
-    { hint: 'Runde 1: Die Furchen sind nah. Ziehe zurück und lass los.', furrows: ['f1', 'f2', 'f3', 'f4'], wind: 0 },
-    { hint: 'Runde 2: Die Furchen sind weiter weg, und ein leichter Wind weht.', furrows: ['f1', 'f2', 'f3', 'f4', 'f5', 'f6'], wind: 0.4 }
+    { hint: 'Runde 1: Die Furchen sind nah. Ziehe zurück und lass los.', furrows: ['f1', 'f2', 'f3'], wind: 0 },
+    { hint: 'Runde 2: Eine Furche mehr, und ein leichter Wind weht.', furrows: ['f1', 'f2', 'f3', 'f4'], wind: 0.2 }
   ]
 }
 
@@ -227,12 +227,11 @@ export const adamEva: Journey = {
       image: `${IMG}etappe-bild-01.webp`,
       title: 'Am Anfang',
       ref: '1. Mose 1,1–13',
-      audio: `${REC}geschichte-01-v3.mp3`,
       text: [
-        'Ganz am Anfang schafft Gott Himmel und Erde. Die Erde ist leer und öde, Finsternis liegt über dem Wasser, und Gottes Geist schwebt darüber. Da spricht Gott: „Es werde Licht!“ Und es wird Licht.',
-        'Gott sieht, dass das Licht gut ist. Er trennt es von der Finsternis und gibt beiden einen Namen: Das Licht nennt er Tag, und die Finsternis nennt er Nacht. Dann wird es Abend, und es wird Morgen. Das ist der erste Tag.',
-        'Am zweiten Tag spricht Gott noch einmal. Zwischen dem Wasser unten und dem Wasser oben spannt er eine weite Wölbung aus und nennt sie Himmel. Wieder wird es Abend und Morgen: der zweite Tag.',
-        'Am dritten Tag lässt Gott das Wasser sich an einem Ort sammeln, und trockenes Land wird sichtbar. Das Land nennt er Erde und das Wasser Meer. Dann spricht er: „Die Erde soll grün werden!“ Da wächst Gras, da wachsen Kräuter mit Samen und Bäume mit Früchten, jedes nach seiner Art. Gott sieht es an, und es ist gut.'
+        'Ganz am Anfang schafft Gott Himmel und Erde. Die Erde ist leer und öde, und Finsternis liegt über dem Wasser.',
+        'Da spricht Gott: „Es werde Licht!“ Und es wird Licht. Gott nennt das Licht Tag und die Finsternis Nacht. Es wird Abend und Morgen: der erste Tag.',
+        'Am zweiten Tag spannt Gott eine weite Wölbung aus und nennt sie Himmel. Wieder wird es Abend und Morgen.',
+        'Am dritten Tag sammelt Gott das Wasser an einem Ort, und trockenes Land wird sichtbar. „Die Erde soll grün werden!“, spricht er. Da wachsen Gras und Kräuter und Bäume mit Früchten, und Gott sieht, dass es gut ist.'
       ],
       task: { kind: 'reihenfolge', hint: 'Lege die Bilder in die Reihenfolge der Geschichte.', order: ORDER },
       questions: [
@@ -246,17 +245,16 @@ export const adamEva: Journey = {
       image: `${IMG}etappe-bild-02.webp`,
       title: 'Sonne, Mond und Sterne',
       ref: '1. Mose 1,14–23',
-      audio: `${REC}geschichte-02-v2.mp3`,
       text: [
-        'Am vierten Tag spricht Gott: „Am Himmel sollen Lichter leuchten! Sie sollen den Tag von der Nacht trennen und die Zeiten anzeigen, die Tage und die Jahre.“',
-        'Und so geschieht es: Gott macht zwei große Lichter, die Sonne für den Tag und den Mond für die Nacht, und dazu die Sterne. Er setzt sie an den Himmel, damit sie auf die Erde leuchten, und er sieht, dass es gut ist. Dann wird es Abend und Morgen: der vierte Tag.',
-        'Am fünften Tag soll das Wasser von Leben wimmeln, und in der Luft sollen Vögel fliegen. Gott macht die großen Meerestiere und alles, was sich im Wasser regt, und dazu alle Vögel, jedes nach seiner Art. Er sieht sie an, und es ist gut.',
-        'Und Gott segnet sie. Sie sollen viele werden und das Meer füllen, und auch die Vögel sollen sich auf der Erde vermehren. Dann wird es Abend und Morgen: der fünfte Tag.'
+        'Am vierten Tag spricht Gott: „Am Himmel sollen Lichter leuchten! Sie sollen den Tag von der Nacht trennen und die Zeiten anzeigen.“',
+        'Und so geschieht es. Gott macht zwei große Lichter, die Sonne für den Tag und den Mond für die Nacht, und dazu die Sterne. Er sieht, dass es gut ist.',
+        'Am fünften Tag spricht Gott: „Das Wasser soll von Leben wimmeln, und Vögel sollen fliegen!“ Da gibt es große Meerestiere und kleine Fische und Vögel in der Luft.',
+        'Gott segnet sie: „Seid fruchtbar und werdet viele!“ Dann wird es Abend und Morgen: der fünfte Tag.'
       ],
       task: { kind: 'lichter', hint: 'Tippe die Lichter am Himmel an, bis er strahlt.', lights: LICHTER },
       questions: [
         { q: 'Wofür sind die Lichter am Himmel da?', options: ['Sie trennen Tag und Nacht.', 'Sie wärmen die Tiere.', 'Sie bewässern den Garten.'], answer: 0 },
-        { q: 'Was sagt Gott zu den Tieren im Wasser und in der Luft?', options: ['Sie sollen viele werden.', 'Sie sollen still sein.', 'Sie sollen weiterziehen.'], answer: 0 }
+        { q: 'Was sagt Gott zu den Tieren im Wasser und in der Luft?', options: ['„Seid fruchtbar und werdet viele!“', '„Seid still!“', '„Zieht weiter!“'], answer: 0 }
       ],
       soon: SOON
     },
@@ -264,14 +262,12 @@ export const adamEva: Journey = {
       id: 3,
       image: `${IMG}etappe-bild-03.webp`,
       title: 'Tiere und Menschen',
-      ref: '1. Mose 1,24–2,3',
-      audio: `${REC}geschichte-03-v2.mp3`,
+      ref: '1. Mose 1,24 bis 2,3',
       text: [
-        'Am sechsten Tag soll auch das Land voller Leben sein. Gott spricht, und es entstehen das Vieh, die wilden Tiere und alles, was am Boden kriecht, jedes nach seiner Art. Gott sieht sie an, und es ist gut.',
-        'Dann spricht Gott: „Ich will Menschen machen, die mir ähnlich sind.“ Und er schafft den Menschen als sein Bild, als Mann und als Frau.',
-        'Gott segnet sie. Sie sollen viele werden und die Erde füllen, und er vertraut ihnen die Erde und alle Tiere an. Zu essen gibt er ihnen die Pflanzen mit Samen und die Bäume mit Früchten, und den Tieren gibt er das grüne Kraut.',
-        'Gott sieht alles an, was er gemacht hat, und es ist sehr gut. Dann wird es Abend und Morgen: der sechste Tag.',
-        'So sind Himmel und Erde mit allem, was darin lebt, fertig. Am siebten Tag ruht Gott von seiner Arbeit. Er segnet diesen Tag und macht ihn zu einem besonderen Tag.'
+        'Am sechsten Tag soll auch das Land voller Leben sein. Gott spricht, und es entstehen das Vieh, die wilden Tiere und alles, was am Boden kriecht. Gott sieht, dass es gut ist.',
+        'Dann sagt Gott: „Lasst uns Menschen machen als unser Bild!“ Und er schafft den Menschen, als Mann und als Frau.',
+        'Gott segnet sie und vertraut ihnen die Erde an. Zu essen gibt er ihnen die Pflanzen mit Samen und die Bäume mit Früchten.',
+        'Gott sieht alles an, was er gemacht hat: Es ist sehr gut. Am siebten Tag ruht Gott von seiner Arbeit. Er segnet diesen Tag und macht ihn zu einem besonderen Tag.'
       ],
       task: { kind: 'hueten', hint: 'Führe die Herde mit dem Finger sanft zum Ruheplatz.', herd: HUETEN },
       questions: [
@@ -285,16 +281,14 @@ export const adamEva: Journey = {
       image: `${IMG}etappe-bild-04.webp`,
       title: 'Der Garten Eden',
       ref: '1. Mose 2,4–17',
-      audio: `${REC}geschichte-04-v2.mp3`,
       text: [
-        'Nun erzählt die Bibel noch einmal genauer, wie es mit dem Menschen anfing. Gott nimmt Erde vom Boden und formt daraus einen Menschen: Adam. Dann haucht er ihm seinen Atem in die Nase, und Adam beginnt zu leben.',
-        'Im Osten legt Gott einen Garten an, den Garten Eden, und setzt Adam hinein. Er lässt Bäume aus dem Boden wachsen, die schön anzusehen sind und von denen man gut essen kann. In der Mitte des Gartens aber stehen zwei besondere Bäume: der Baum des Lebens und der Baum der Erkenntnis von Gut und Böse.',
-        'In Eden entspringt ein Strom, der den Garten bewässert. Von dort teilt er sich in vier Flüsse.',
-        'Adam soll den Garten bearbeiten und auf ihn aufpassen. Und Gott sagt zu ihm: „Du darfst von allen Bäumen im Garten essen. Nur vom Baum der Erkenntnis von Gut und Böse darfst du nicht essen, denn wenn du davon isst, musst du sterben.“'
+        'Nun erzählt die Bibel noch einmal, wie es mit dem Menschen anfing. Gott nimmt Erde und formt daraus Adam. Dann haucht er ihm Atem in die Nase, und Adam beginnt zu leben.',
+        'Im Osten legt Gott einen Garten an, den Garten Eden. Dort wachsen Bäume mit schönen Früchten. Ein Strom, der in Eden entspringt, bewässert den Garten. In der Mitte stehen zwei besondere Bäume: der Baum des Lebens und der Baum der Erkenntnis von Gut und Böse.',
+        'Gott setzt Adam in den Garten, damit er ihn pflegt. „Du darfst von allen Bäumen essen“, sagt Gott. „Nur vom Baum der Erkenntnis nicht, denn wenn du davon isst, musst du sterben.“'
       ],
       task: { kind: 'kanaele', hint: 'Drehe die Kanalstücke, bis das Wasser zu den Bäumen fließt.', channels: KANAELE },
       questions: [
-        { q: 'Woraus formt Gott den Menschen?', options: ['aus Erde', 'aus Wasser', 'aus Holz'], answer: 0 },
+        { q: 'Woraus formt Gott Adam?', options: ['aus Erde', 'aus Wasser', 'aus Holz'], answer: 0 },
         { q: 'Von welchem Baum darf Adam nicht essen?', options: ['vom Baum der Erkenntnis', 'vom Baum des Lebens', 'von den Feigenbäumen'], answer: 0 }
       ],
       soon: SOON
@@ -304,11 +298,11 @@ export const adamEva: Journey = {
       image: `${IMG}etappe-bild-05.webp`,
       title: 'Adam gibt den Tieren Namen',
       ref: '1. Mose 2,18–20',
-      audio: `${REC}geschichte-05-v3.mp3`,
       text: [
         'Adam lebt im Garten und hat alles, was er braucht. Und doch sagt Gott: „Es ist nicht gut, dass der Mensch allein ist. Ich will ihm eine Hilfe machen, die zu ihm passt.“',
-        'Gott hat alle Tiere des Feldes und alle Vögel des Himmels gemacht. Nun will er sehen, wie Adam sie nennt, und so, wie Adam jedes Tier nennt, so soll es heißen.',
-        'Adam gibt dem Vieh, den Vögeln und den wilden Tieren Namen. Er sieht sich die Tiere an und findet für jedes einen Namen. Aber unter ihnen ist keines, das wirklich zu ihm passt und ihm eine Hilfe sein kann.'
+        'Gott hat alle Tiere des Feldes und alle Vögel des Himmels gemacht. Nun führt er sie zu Adam und will sehen, wie Adam sie nennt.',
+        'Adam gibt dem Vieh, den Vögeln und den wilden Tieren Namen. Er sieht sich jedes Tier an und findet einen Namen dafür.',
+        'Aber unter all den Tieren ist keines, das wirklich zu ihm passt und ihm eine Hilfe sein kann. Adam ist noch allein.'
       ],
       task: { kind: 'lueckenvers', hint: 'Setze die fehlenden Wörter in den Satz.', verse: VERS },
       questions: [
@@ -320,13 +314,13 @@ export const adamEva: Journey = {
     {
       id: 6,
       image: `${IMG}etappe-bild-06.webp`,
-      title: 'Eva',
+      title: 'Die Frau',
       ref: '1. Mose 2,21–25',
-      audio: `${REC}geschichte-06-v2.mp3`,
       text: [
-        'Da lässt Gott einen tiefen Schlaf auf Adam fallen. Während Adam ruhig schläft, nimmt Gott eine seiner Rippen und verschließt die Stelle wieder. Aus der Rippe baut er eine Frau.',
-        'Dann bringt Gott die Frau zu Adam, und Adam freut sich: „Endlich! Sie gehört zu mir wie ein Stück von mir selbst.“ Adam wird sie bald Eva nennen.',
-        'Darum verlässt ein Mann später Vater und Mutter und hält sich zu seiner Frau, und die beiden gehören zusammen. So ist es auch bei Adam und Eva: Sie sind gern beieinander, und sie schämen sich nicht voreinander.'
+        'Da lässt Gott einen tiefen Schlaf auf Adam fallen. Während Adam ruhig schläft, nimmt Gott eine seiner Rippen. Er verschließt die Stelle wieder und baut aus der Rippe eine Frau.',
+        'Dann führt Gott die Frau zu Adam, und Adam freut sich: „Das ist Bein von meinem Bein und Fleisch von meinem Fleisch!“ Nun ist er nicht mehr allein.',
+        'Darum verlässt ein Mann später Vater und Mutter und hält sich zu seiner Frau, und die beiden gehören zusammen.',
+        'Adam und die Frau sind gern beieinander. Sie sind nackt, und sie schämen sich nicht voreinander.'
       ],
       task: { kind: 'spiegeln', hint: 'Ergänze die andere Seite, so dass beide Seiten zusammenpassen.', mirror: SPIEGELN },
       questions: [
@@ -340,18 +334,15 @@ export const adamEva: Journey = {
       image: `${IMG}etappe-bild-07.webp`,
       title: 'Die Schlange',
       ref: '1. Mose 3,1–7',
-      audio: `${REC}geschichte-07-v2.mp3`,
       text: [
-        'Im Garten lebt auch die Schlange, klüger und listiger als alle anderen Tiere. Eines Tages spricht sie Eva an: „Hat Gott wirklich gesagt, ihr dürft von keinem Baum im Garten essen?“',
-        'Eva antwortet: „Wir dürfen von den Früchten der Bäume essen. Nur von dem Baum in der Mitte des Gartens hat Gott gesagt: Esst nicht davon, rührt ihn nicht an, sonst müsst ihr sterben.“',
-        'Doch die Schlange sagt: „Nein, ihr werdet nicht sterben. Gott weiß, dass euch die Augen aufgehen, sobald ihr davon esst. Dann seid ihr wie Gott und wisst, was gut und böse ist.“',
-        'Eva sieht den Baum an. Seine Früchte sehen gut aus, und klug sollen sie auch machen. Da nimmt sie eine Frucht und isst, und sie gibt auch Adam davon, der bei ihr ist, und er isst.',
-        'Im selben Augenblick gehen den beiden die Augen auf. Sie merken, dass sie nackt sind, und sie schämen sich. Darum flechten sie Feigenblätter zusammen und machen sich Schürzen daraus.'
+        'Im Garten lebt auch die Schlange, listiger als alle anderen Tiere. Sie fragt die Frau: „Sollte Gott wirklich gesagt haben: Ihr dürft von keinem Baum im Garten essen?“',
+        '„Wir dürfen von den Früchten der Bäume essen“, antwortet die Frau. „Nur von dem Baum in der Mitte hat Gott gesagt: Esst nicht davon, rührt ihn nicht an, sonst müsst ihr sterben.“ Doch die Schlange sagt: „Ihr werdet nicht sterben. Gott weiß, dass euch die Augen aufgehen, wenn ihr davon esst.“',
+        'Die Frau sieht den Baum an. Seine Früchte sehen schön aus, und klug sollen sie auch machen. Sie nimmt eine Frucht, isst und gibt auch Adam davon, der bei ihr ist.',
+        'Da gehen den beiden die Augen auf. Sie merken, dass sie nackt sind. Sie flechten Feigenblätter zusammen.'
       ],
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
-        { q: 'Wer spricht Eva an?', options: ['die Schlange', 'Adam', 'ein Vogel'], answer: 0 },
-        { q: 'Was hat Gott über den Baum in der Mitte des Gartens gesagt?', options: ['Esst nicht davon, sonst müsst ihr sterben.', 'Esst viel davon.', 'Pflanzt noch einen.'], answer: 0 },
+        { q: 'Wer spricht die Frau im Garten an?', options: ['die Schlange', 'Adam', 'ein Vogel'], answer: 0 },
         { q: 'Was tun die beiden, nachdem ihnen die Augen aufgegangen sind?', options: ['Sie flechten Feigenblätter zusammen.', 'Sie bauen ein Boot.', 'Sie pflücken Datteln.'], answer: 0 }
       ],
       soon: SOON
@@ -361,18 +352,16 @@ export const adamEva: Journey = {
       image: `${IMG}etappe-bild-08.webp`,
       title: 'Wo bist du?',
       ref: '1. Mose 3,8–21',
-      audio: `${REC}geschichte-08-v2.mp3`,
       text: [
-        'Am Abend, als ein kühler Wind durch den Garten weht, hören Adam und Eva Gott im Garten gehen. Da verstecken sie sich zwischen den Bäumen.',
-        'Aber Gott ruft: „Adam, wo bist du?“ Adam antwortet: „Ich habe dich gehört und mich gefürchtet. Darum habe ich mich versteckt.“',
-        'Gott fragt, ob Adam von dem Baum gegessen hat, von dem er nicht essen sollte. Adam sagt: „Die Frau, die du mir gegeben hast, gab mir davon, und ich habe gegessen.“ Und Eva sagt: „Die Schlange hat mich getäuscht.“ So schieben beide die Schuld auf einen anderen.',
-        'Dann sagt Gott ihnen, was nun anders wird: Das Leben wird schwerer. Adam muss hart arbeiten, damit der Acker ihm Brot gibt, und auf dem Acker wachsen Dornen und Disteln. Auch für Eva wird es mühsam. Die Welt ist nicht mehr so heil wie im Garten.',
-        'Aber Gott lässt die beiden nicht allein. Adam nennt seine Frau Eva, denn sie wird die Mutter aller Menschen sein. Und Gott macht Adam und Eva Kleider aus Fell und zieht sie ihnen an. So sorgt er für sie.'
+        'Am Abend weht ein kühler Wind durch den Garten. Adam und seine Frau hören Gott im Garten gehen und verstecken sich zwischen den Bäumen.',
+        '„Adam, wo bist du?“, ruft Gott. „Ich habe dich gehört und mich gefürchtet“, antwortet Adam. „Darum habe ich mich versteckt.“',
+        'Gott fragt, ob Adam von dem verbotenen Baum gegessen hat. Adam sagt, die Frau habe ihm davon gegeben, und die Frau sagt, die Schlange habe sie getäuscht. Weil Adam gegessen hat, sagt Gott, wird die Arbeit auf dem Acker nun mühsam.',
+        'Adam nennt seine Frau Eva, denn sie wird die Mutter aller sein, die leben. Und Gott macht Adam und Eva Kleider aus Fell und zieht sie ihnen an.'
       ],
       task: { kind: 'echo', hint: 'Hör oder schau gut zu und antworte mit denselben Blüten.', echo: RUF },
       questions: [
-        { q: 'Wann hören Adam und Eva Gott im Garten?', options: ['am Abend', 'am Morgen', 'mitten in der Nacht'], answer: 0 },
-        { q: 'Was sagt Gott über das Leben, das jetzt kommt?', options: ['Es wird schwerer.', 'Es wird leichter.', 'Es bleibt wie im Garten.'], answer: 0 }
+        { q: 'Wann hören Adam und seine Frau Gott im Garten?', options: ['am Abend', 'am Morgen', 'mitten in der Nacht'], answer: 0 },
+        { q: 'Was macht Gott für Adam und Eva?', options: ['Kleider aus Fell', 'ein Haus aus Holz', 'einen neuen Garten'], answer: 0 }
       ],
       soon: SOON
     },
@@ -380,12 +369,12 @@ export const adamEva: Journey = {
       id: 9,
       image: `${IMG}etappe-bild-09.webp`,
       title: 'Der Weg aus dem Garten',
-      ref: '1. Mose 3,22–24; 4,1',
-      audio: `${REC}geschichte-09-v2.mp3`,
+      ref: '1. Mose 3,22–24',
       text: [
-        'Nun ist nicht mehr alles wie vorher. Gott sagt: „Nun weiß der Mensch, was gut und böse ist. Er soll nicht auch noch vom Baum des Lebens essen und für immer leben.“',
-        'Darum schickt Gott Adam und Eva aus dem Garten Eden hinaus. Draußen sollen sie den Boden bearbeiten, aus dem Adam genommen ist. Still gehen die beiden den Weg hinaus, und der Garten bleibt hinter ihnen zurück. Im Osten des Gartens stellt Gott Cherubim auf, mächtige Engel, und ein flammendes Schwert, das sich hin und her bewegt. Sie bewachen den Weg zum Baum des Lebens.',
-        'Aber Adam und Eva sind nicht allein. Gott hat ihnen Kleider aus Fell gemacht, und er hilft ihnen auch draußen. Später bekommt Eva einen Sohn und nennt ihn Kain. „Ich habe einen Sohn bekommen“, sagt sie, „mit Gottes Hilfe.“'
+        'Gott sagt: „Nun weiß der Mensch, was gut und böse ist. Er soll nicht auch noch vom Baum des Lebens essen und für immer leben.“',
+        'So schickt Gott Adam und Eva aus dem Garten Eden hinaus. Draußen sollen sie den Boden bearbeiten, aus dem Adam genommen ist.',
+        'Im Osten des Gartens stellt Gott Cherubim auf. Sie bewachen mit einem flammenden Schwert den Weg zum Baum des Lebens.',
+        'Still gehen Adam und Eva den Weg hinaus. Sie tragen die Kleider aus Fell, die Gott ihnen gemacht hat. Der Garten bleibt hinter ihnen zurück, und vor ihnen liegt das weite Land.'
       ],
       task: { kind: 'saeen', hint: 'Ziehe den Samenbeutel zurück und lass los. Die Samen fallen in die Furchen.', sow: SAEEN },
       questions: [

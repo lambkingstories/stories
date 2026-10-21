@@ -18,13 +18,13 @@ afterEach(() => {
 const PLAN: [string, string][] = [
   ['Am Anfang', '1. Mose 1,1–13'],
   ['Sonne, Mond und Sterne', '1. Mose 1,14–23'],
-  ['Tiere und Menschen', '1. Mose 1,24–2,3'],
+  ['Tiere und Menschen', '1. Mose 1,24 bis 2,3'],
   ['Der Garten Eden', '1. Mose 2,4–17'],
   ['Adam gibt den Tieren Namen', '1. Mose 2,18–20'],
-  ['Eva', '1. Mose 2,21–25'],
+  ['Die Frau', '1. Mose 2,21–25'],
   ['Die Schlange', '1. Mose 3,1–7'],
   ['Wo bist du?', '1. Mose 3,8–21'],
-  ['Der Weg aus dem Garten', '1. Mose 3,22–24; 4,1']
+  ['Der Weg aus dem Garten', '1. Mose 3,22–24']
 ]
 
 describe('Adam und Eva: the scaffold', () => {
@@ -52,21 +52,24 @@ describe('Adam und Eva: the scaffold', () => {
     // the pictures of the stages, the medal, the gift, the four pieces of the map and the four music pieces are always part of the pack
     for (const f of [...Array.from({ length: 9 }, (_, i) => `images/abenteuer/adam-eva/etappe-bild-${String(i + 1).padStart(2, '0')}.webp`), 'images/abenteuer/adam-eva/medaille.webp', 'images/abenteuer/adam-eva/geschenk.webp', ...[1, 2, 3, 4].map((n) => `images/abenteuer/adam-eva/karte-pano-v2-${n}.webp`), ...['licht', 'garten', 'strom', 'abend'].map((m) => `audio/abenteuer/adam-eva/musik-${m}-v1.mp3`)]) expect(own, f).toContain(f)
     // the pictures of the games and the recordings are part of the pack only when the stages are released
-    expect(own.some((f) => f.includes('spiele/adam-eva/')) && own.some((f) => /geschichte-0\d-v\d\.mp3$/.test(f))).toBe(adamEva.stages.every((s) => !s.soon))
+    expect(own.some((f) => f.includes('spiele/adam-eva/'))).toBe(adamEva.stages.every((s) => !s.soon))
+    // no recording is linked to the new texts yet (the old files lie in the folder, but nothing names them)
+    expect(own.some((f) => /geschichte-0\d-(en-)?v\d\.mp3$/.test(f))).toBe(false)
   })
 
   it('the English file has the same number of stages in the same order and shows when the app is English; German stays the default', () => {
     const en = adamEvaEn.stages!
     expect(en).toHaveLength(adamEva.stages.length)
     expect(en.map((s) => s.ref)).toEqual([
-      'Genesis 1:1–13', 'Genesis 1:14–23', 'Genesis 1:24–2:3', 'Genesis 2:4–17', 'Genesis 2:18–20', 'Genesis 2:21–25', 'Genesis 3:1–7', 'Genesis 3:8–21', 'Genesis 3:22–24; 4:1'
+      'Genesis 1:1–13', 'Genesis 1:14–23', 'Genesis 1:24 to 2:3', 'Genesis 2:4–17', 'Genesis 2:18–20', 'Genesis 2:21–25', 'Genesis 3:1–7', 'Genesis 3:8–21', 'Genesis 3:22–24'
     ])
     expect(adamEva.title).toBe('Adam und Eva')
     adventureLanguage.value = 'en'
     expect(adamEva.title).toBe('Adam and Eve')
     expect(adamEva.subtitle).toBe('The Garden of Eden')
     expect(adamEva.stages[0]!.title).toBe('In the Beginning')
-    expect(adamEva.stages[8]!.ref).toBe('Genesis 3:22–24; 4:1')
+    expect(adamEva.stages[8]!.ref).toBe('Genesis 3:22–24')
+    expect(adamEva.stages[5]!.title).toBe('The Woman')
     expect(adamEva.gift.title).toBe('Adam and Eve in the Garden with the Animals')
   })
 })

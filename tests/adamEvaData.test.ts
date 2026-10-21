@@ -11,7 +11,7 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { flow, goalsOf, solve } from '@/utils/channels'
 import { journeyFiles } from '@/utils/journeyFiles'
-/** The version of each recording. Second check 20.10.2026: only stage 1 (German) is re-recorded; the changed sentences of the stages 4, 6, 7, 8, 9 (German) and 1, 3, 4, 6, 7, 8, 9 (English) wait for the daily quota of the speech model (`D:/Claude/Abenteuer-Adam-Eva/NEUAUFNAHME-v3.md`). */
+/** (Not used any more: the new texts have no recordings yet.) The version of each recording. Second check 20.10.2026: only stage 1 (German) is re-recorded; the changed sentences of the stages 4, 6, 7, 8, 9 (German) and 1, 3, 4, 6, 7, 8, 9 (English) wait for the daily quota of the speech model (`D:/Claude/Abenteuer-Adam-Eva/NEUAUFNAHME-v3.md`). */
 const DE_VERSION = [3, 2, 2, 2, 3, 2, 2, 2, 2]
 const EN_VERSION = [2, 2, 2, 2, 3, 2, 2, 2, 2]
 
@@ -22,17 +22,17 @@ const stage = (n: number) => adamEva.stages[n - 1]!
 const FORBIDDEN = /\b(Apfel|Äpfel|Teufel|Dämon|Hölle|Blut|tot geschlagen)\b/i
 
 describe('Adam und Eva: stories and questions', () => {
-  it('nine stages with 3 to 5 paragraphs of 60 to 220 words, and the Bible passage under every one', () => {
+  it('nine stages with 3 or 4 paragraphs of 90 to 145 words (plan v3), the Bible passage under every one, no recording yet (the app reads with the voice of the device)', () => {
     expect(adamEva.stages).toHaveLength(9)
     for (const s of adamEva.stages) {
       expect(s.ref, `stage ${s.id}`).toMatch(/^1\. Mose \d/)
       expect(s.text.length, `paragraphs ${s.id}`).toBeGreaterThanOrEqual(3)
-      expect(s.text.length, `paragraphs ${s.id}`).toBeLessThanOrEqual(5)
+      expect(s.text.length, `paragraphs ${s.id}`).toBeLessThanOrEqual(4)
       const words = s.text.join(' ').split(/\s+/).length
-      expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(60)
-      expect(words, `words ${s.id}`).toBeLessThanOrEqual(220)
+      expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(90)
+      expect(words, `words ${s.id}`).toBeLessThanOrEqual(145)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.audio, s.id.toString()).toBe(`audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-v${DE_VERSION[s.id - 1]}.mp3`)
+      expect(s.audio, `no recording yet ${s.id}`).toBeUndefined()
       expect(s.image).toBe(`images/abenteuer/adam-eva/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
     }
   })
@@ -54,8 +54,8 @@ describe('Adam und Eva: stories and questions', () => {
     setAdventureLanguage('de')
   })
 
-  it('two questions per stage (three in the serious stage 7), three answers each, the right one first and the answers differ; the exam has six', () => {
-    expect(adamEva.stages.map((s) => s.questions.length)).toEqual([2, 2, 2, 2, 2, 2, 3, 2, 2])
+  it('two questions per stage, three answers each, the right one first and the answers differ; the exam has six', () => {
+    expect(adamEva.stages.map((s) => s.questions.length)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2])
     for (const q of [...adamEva.stages.flatMap((s) => s.questions), ...adamEva.exam]) {
       expect(q.options, q.q).toHaveLength(3)
       expect(q.answer, q.q).toBe(0)
@@ -102,13 +102,13 @@ describe('Adam und Eva: every stage has its own new game (no game of Josef or No
     }
     // the goals (the number of right moves of all rounds), see the table "Stufen je Spiel" in the skill
     expect(g(1).order!.rounds.reduce((s, r) => s + r.cards.length, 0)).toBe(7)
-    expect(g(2).lights!.rounds.reduce((s, r) => s + r.spots.length, 0)).toBe(14)
+    expect(g(2).lights!.rounds.reduce((s, r) => s + r.spots.length, 0)).toBe(12)
     expect(g(3).herd!.rounds).toHaveLength(2)
-    expect(g(4).channels!.rounds.reduce((s, r) => s + goalsOf(r.grid), 0)).toBe(6)
+    expect(g(4).channels!.rounds.reduce((s, r) => s + goalsOf(r.grid), 0)).toBe(5)
     expect(g(5).verse!.rounds.reduce((s, r) => s + r.answers.length, 0)).toBe(3)
-    expect(g(6).mirror!.rounds.reduce((s, r) => s + r.cols * r.rows, 0)).toBe(18)
-    expect(g(8).echo!.rounds.reduce((s, r) => s + r.calls.length, 0)).toBe(6)
-    expect(g(9).sow!.rounds.reduce((s, r) => s + r.furrows.length, 0)).toBe(10)
+    expect(g(6).mirror!.rounds.reduce((s, r) => s + r.cols * r.rows, 0)).toBe(15)
+    expect(g(8).echo!.rounds.reduce((s, r) => s + r.calls.length, 0)).toBe(4)
+    expect(g(9).sow!.rounds.reduce((s, r) => s + r.furrows.length, 0)).toBe(7)
   })
 
   it('1 order: the cards exist, the first round has dots and three cards, the second four cards without dots; every round is in the order of the story', () => {
@@ -124,9 +124,9 @@ describe('Adam und Eva: every stage has its own new game (no game of Josef or No
     expect(o.cards.map((c) => c.image)).toEqual([1, 2, 3, 4].map((n) => `images/abenteuer/spiele/adam-eva/reihenfolge/schritt-${n}.webp`))
   })
 
-  it('2 lights: six lights one after the other, then eight with two or three at once; all inside the picture and not on top of each other', () => {
+  it('2 lights: six lights one after the other, then six more with three at once; all inside the picture and not on top of each other', () => {
     const l = stage(2).task.lights!
-    expect(l.rounds.map((r) => r.spots.length)).toEqual([6, 8])
+    expect(l.rounds.map((r) => r.spots.length)).toEqual([6, 6])
     expect(l.rounds[0]!.together).toBe(1)
     expect(l.rounds[1]!.together).toBeGreaterThanOrEqual(2)
     expect(l.rounds[1]!.together).toBeLessThanOrEqual(3)
@@ -157,7 +157,7 @@ describe('Adam und Eva: every stage has its own new game (no game of Josef or No
     expect(pond.r).toBeGreaterThan(5)
   })
 
-  it('4 channels: both gardens can be solved and nothing is wet at the start; four plants that are garden plants, all with their pictures', () => {
+  it('4 channels: both gardens (4 x 3, with two and with three plants) can be solved and nothing is wet at the start; garden plants, all with their pictures', () => {
     const c = stage(4).task.channels!
     expect(c.rounds.map((r) => r.grid)).toEqual([CHANNEL_GRID_1, CHANNEL_GRID_2])
     for (const r of c.rounds) {
@@ -165,6 +165,7 @@ describe('Adam und Eva: every stage has its own new game (no game of Josef or No
       const sol = solve(r.grid)
       expect(sol).toBeTruthy()
     }
+    expect(c.rounds.map((r) => [r.grid.length, r.grid[0]!.length, goalsOf(r.grid)])).toEqual([[3, 4, 2], [3, 4, 3]])
     expect(Object.keys(c.goals).sort()).toEqual(['dattel', 'feige', 'granatapfel', 'wein'])
     for (const r of c.rounds) for (const t of r.grid.flat()) if (t.kind === 'goal') expect(c.goals[t.goal!], t.goal).toBeTruthy()
     expect(Object.entries(c.goals).map(([id, g]) => `${id} ${g.label}`).join(' ')).not.toMatch(/leben|erkenntnis|apfel$/i)
@@ -191,7 +192,7 @@ describe('Adam und Eva: every stage has its own new game (no game of Josef or No
     expect(v.background).toBe('images/abenteuer/adam-eva/etappe-bild-05.webp')
   })
 
-  it('6 mirror: complete rectangles of stones that exist, two colours first and then three', () => {
+  it('6 mirror: complete rectangles of stones that exist (2 x 3, then 3 x 3), two colours first and then three', () => {
     const m = stage(6).task.mirror!
     const ids = m.stones.map((s) => s.id)
     for (const r of m.rounds) {
@@ -201,30 +202,30 @@ describe('Adam und Eva: every stage has its own new game (no game of Josef or No
         for (const id of row) expect(ids).toContain(id)
       }
     }
+    expect(m.rounds.map((r) => [r.cols, r.rows])).toEqual([[2, 3], [3, 3]])
     expect(new Set(m.rounds[0]!.left.flat()).size).toBe(2)
     expect(new Set(m.rounds[1]!.left.flat()).size).toBe(3)
     expect(m.background).toBe('images/abenteuer/adam-eva/etappe-bild-06.webp')
   })
 
-  it('8 call and answer: four blossoms with four different tones, calls of 3 to 4 and then 4 to 6 blossoms, all of them valid', () => {
+  it('8 call and answer: four blossoms with four different tones, two calls of 3 and 4 blossoms, then two of 4 and 5, all of them valid', () => {
     const e = stage(8).task.echo!
     expect(e.notes).toHaveLength(4)
     expect(new Set(e.notes.map((n) => n.rate)).size).toBe(4)
-    for (const r of e.rounds[0]!.calls) expect(r.length >= 3 && r.length <= 4, JSON.stringify(r)).toBe(true)
-    for (const r of e.rounds[1]!.calls) expect(r.length >= 4 && r.length <= 6, JSON.stringify(r)).toBe(true)
+    expect(e.rounds.map((r) => r.calls.map((c) => c.length))).toEqual([[3, 4], [4, 5]])
     for (const c of e.rounds.flatMap((r) => r.calls)) for (const i of c) expect(i >= 0 && i < 4).toBe(true)
     // a call is not just one blossom again and again
     for (const c of e.rounds.flatMap((r) => r.calls)) expect(new Set(c).size).toBeGreaterThan(1)
     expect(e.background).toBe('images/abenteuer/adam-eva/etappe-bild-08.webp')
   })
 
-  it('9 sowing: six furrows from the front to the back, four of them in round 1 (the near ones), all six and a light wind in round 2', () => {
+  it('9 sowing: six furrows from the front to the back, three of them in round 1 (the near ones), four and a light wind in round 2', () => {
     const s = stage(9).task.sow!
     expect(s.furrows).toHaveLength(6)
     const ids = s.furrows.map((f) => f.id)
     for (const r of s.rounds) for (const id of r.furrows) expect(ids).toContain(id)
-    expect(s.rounds[0]!.furrows).toEqual(ids.slice(0, 4))
-    expect(s.rounds[1]!.furrows).toEqual(ids)
+    expect(s.rounds[0]!.furrows).toEqual(ids.slice(0, 3))
+    expect(s.rounds[1]!.furrows).toEqual(ids.slice(0, 4))
     expect(s.rounds[0]!.wind).toBe(0)
     expect(Math.abs(s.rounds[1]!.wind)).toBeGreaterThan(0)
     expect(Math.abs(s.rounds[1]!.wind)).toBeLessThanOrEqual(0.5)
@@ -329,7 +330,7 @@ describe('Adam und Eva: English', () => {
       expect(s.task.hint, `hint ${s.id}`).not.toBe(de[i]!.hint)
       s.questions.forEach((q, k) => expect(q.q, `question ${s.id}.${k}`).not.toBe(de[i]!.q[k]))
       expect(s.ref, `ref ${s.id}`).toMatch(/^Genesis \d/)
-      expect(s.audio, `audio ${s.id}`).toBe(`audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-en-v${EN_VERSION[s.id - 1]}.mp3`)
+      expect(s.audio, `audio ${s.id}`).toBeUndefined()
       if (s.task.verse) expect(s.task.verse.rounds.map((r) => r.words.length)).toEqual(de[i]!.verse)
     })
     expect(adamEva.title).toBe('Adam and Eve')
