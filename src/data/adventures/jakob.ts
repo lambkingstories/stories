@@ -85,11 +85,11 @@ const KURBEL: CrankGame = {
 }
 
 /**
- * Etappe 5, "Morgenrot halten": das Flussufer bei Nacht (Etappenbild 5, von der App abgedunkelt und aufgehellt) mit einem sanften Licht (Bildauftrag J11); kein Gegner, keine Gestalt.
- * Runde 1 bleibt das Licht stehen (10 Sekunden Halten), Runde 2 wandert es das Ufer entlang (15 Sekunden). Lage und Weg des Lichts sind die Messwerte aus `halten/halten-messung.json` (Prozent des Etappenbildes 5, im Ufersand vor Jakobs Füßen, von links nach rechts).
+ * Etappe 5, "Morgenrot halten": das Flussufer bei Nacht (Etappenbild 10; VORLÄUFIG noch das alte Flussufer-Bild, bis Codex das neue „Ringen am Fluss“ malt (J05d); danach Lage und Weg des Lichts neu messen; von der App abgedunkelt und aufgehellt) mit einem sanften Licht (Bildauftrag J11); kein Gegner, keine Gestalt.
+ * Runde 1 bleibt das Licht stehen (10 Sekunden Halten), Runde 2 wandert es das Ufer entlang (15 Sekunden). Lage und Weg des Lichts sind die Messwerte aus `halten/halten-messung.json` (Prozent des alten Etappenbildes, im Ufersand vor Jakobs Füßen, von links nach rechts).
  */
 const HALTEN: HoldGame = {
-  background: `${IMG}etappe-bild-05.webp`,
+  background: `${IMG}etappe-bild-10.webp`,
   spark: `${G}halten/funke.webp`,
   start: [22, 89],
   rounds: [
@@ -229,7 +229,7 @@ export const jakob: Journey = {
   title: 'Jakob',
   subtitle: 'Ein Weg mit Umwegen',
   age: '8-10',
-  downloadMb: 13, // etwa 12,7 MB gezählt am 21.10.2026 mit der neuen Karte v3, vier Kartenstücke zusammen 5,4 MB (der Test sagt die echte Größe)
+  downloadMb: 14, // 13,6 MB gezählt am 21.10.2026 mit den neuen Etappenbildern und der Karte v3 (zwei Etappenbilder sind noch die alten bis zu den neuen von Codex)
   medal: `${IMG}medaille.webp`, // Jakob und die Himmelsleiter (Treppe aus Steinen im Sternenlicht)
   // Geschenk-Ausmalbild: Jakob und die Himmelsleiter im Traum (Treppe aus Steinen, Sterne, Tiere der Herde schlafend, friedlich)
   gift: { title: 'Jakob und die Himmelsleiter im Traum', image: `${IMG}geschenk.webp` },
@@ -331,7 +331,7 @@ export const jakob: Journey = {
     },
     {
       id: 5,
-      image: `${IMG}etappe-bild-04.webp`,
+      image: `${IMG}etappe-bild-05.webp`,
       title: 'Sieben Jahre für Rahel',
       ref: '1. Mose 29,15–30',
       text: [
@@ -350,7 +350,7 @@ export const jakob: Journey = {
     },
     {
       id: 6,
-      image: `${IMG}etappe-bild-01.webp`,
+      image: `${IMG}etappe-bild-06.webp`,
       title: 'Die große Familie',
       ref: '1. Mose 29,31 bis 30,24',
       text: [
@@ -369,7 +369,7 @@ export const jakob: Journey = {
     },
     {
       id: 7,
-      image: `${IMG}etappe-bild-04.webp`,
+      image: `${IMG}etappe-bild-07.webp`,
       title: 'Die Herden wachsen',
       ref: '1. Mose 30,25 bis 31,16',
       text: [
@@ -388,7 +388,7 @@ export const jakob: Journey = {
     },
     {
       id: 8,
-      image: `${IMG}etappe-bild-06.webp`,
+      image: `${IMG}etappe-bild-08.webp`,
       title: 'Der Weg nach Hause',
       ref: '1. Mose 31,17–55',
       text: [
@@ -407,7 +407,7 @@ export const jakob: Journey = {
     },
     {
       id: 9,
-      image: `${IMG}etappe-bild-05.webp`,
+      image: `${IMG}etappe-bild-09.webp`,
       title: 'Engel und Geschenke',
       ref: '1. Mose 32,1–21',
       text: [
@@ -426,7 +426,7 @@ export const jakob: Journey = {
     },
     {
       id: 10,
-      image: `${IMG}etappe-bild-05.webp`,
+      image: `${IMG}etappe-bild-10.webp`,
       title: 'Der Kampf am Fluss',
       ref: '1. Mose 32,23–32',
       text: [
@@ -444,7 +444,7 @@ export const jakob: Journey = {
     },
     {
       id: 11,
-      image: `${IMG}etappe-bild-06.webp`,
+      image: `${IMG}etappe-bild-11.webp`,
       title: 'Wiedersehen',
       ref: '1. Mose 33,1–11',
       text: [
@@ -462,7 +462,7 @@ export const jakob: Journey = {
     },
     {
       id: 12,
-      image: `${IMG}etappe-bild-03.webp`,
+      image: `${IMG}etappe-bild-12.webp`,
       title: 'Zwölf Söhne',
       ref: '1. Mose 35,1–18; 35,22–26; 37,1–4',
       text: [

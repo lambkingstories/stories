@@ -17,7 +17,7 @@ afterEach(() => setAdventureLanguage('de'))
 const released = jakob.stages.every((s) => !s.soon)
 const stage = (n: number) => jakob.stages[n - 1]!
 /** The number of the stage picture that each stage shows (the new stages borrow one until their own picture exists). */
-const PICTURE = [1, 2, 3, 4, 4, 1, 4, 6, 5, 5, 6, 3]
+const PICTURE = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 /** Words that no text of the German data may use (stage 5 is a quiet, mysterious moment, not a fight scene; nothing violent). */
 const FORBIDDEN = /\b(Messer|Schwert|Pfeil|Blut|töten|erschlagen|Teufel|Hölle|Feind|Gegner)\b/i
 
@@ -192,7 +192,7 @@ describe('Jakob: every stage has the game that was chosen', () => {
     expect(h.start[0] >= 5 && h.start[0] <= 95 && h.start[1] >= 5 && h.start[1] <= 95).toBe(true)
     expect(h.rounds[0]!.path).toBeUndefined()
     expect(h.rounds[1]!.path!.length).toBeGreaterThanOrEqual(3)
-    expect(h.background).toBe('images/abenteuer/jakob/etappe-bild-05.webp')
+    expect(h.background).toBe('images/abenteuer/jakob/etappe-bild-10.webp')
     expect(JSON.stringify(h)).not.toMatch(/gegner|kampf|feind/i)
   })
 
