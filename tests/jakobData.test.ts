@@ -22,7 +22,7 @@ const PICTURE = [1, 2, 3, 4, 4, 1, 4, 6, 5, 5, 6, 3]
 const FORBIDDEN = /\b(Messer|Schwert|Pfeil|Blut|töten|erschlagen|Teufel|Hölle|Feind|Gegner)\b/i
 
 describe('Jakob: stories and questions', () => {
-  it('twelve stages with 3 to 5 paragraphs of 60 to 220 words, the Bible passage under every one, the recording and picture names of the plan', () => {
+  it('twelve stages with 3 or 4 paragraphs of 90 to 145 words (plan v3), the Bible passage under every one, no recording yet (the app reads with the voice of the device), the picture names of the plan', () => {
     expect(jakob.id).toBe('jakob')
     expect(jakob.age).toBe('8-10')
     expect(jakob.title).toBe('Jakob')
@@ -32,19 +32,24 @@ describe('Jakob: stories and questions', () => {
     for (const s of jakob.stages) {
       expect(s.ref, `stage ${s.id}`).toMatch(/^1\. Mose \d/)
       expect(s.text.length, `paragraphs ${s.id}`).toBeGreaterThanOrEqual(3)
-      expect(s.text.length, `paragraphs ${s.id}`).toBeLessThanOrEqual(5)
-      const words = s.text.join(' ').split(/\s+/).length
-      expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(60)
-      expect(words, `words ${s.id}`).toBeLessThanOrEqual(220)
+      expect(s.text.length, `paragraphs ${s.id}`).toBeLessThanOrEqual(4)
+      const text = s.text.join(' ')
+      const words = text.split(/\s+/).length
+      expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(90)
+      expect(words, `words ${s.id}`).toBeLessThanOrEqual(145)
+      // short sentences like Noah and Josef (they have 9 to 10 words on average)
+      const sentences = text.split(/[.!?]+["“”„]?\s+/).filter((x) => x.trim()).length
+      expect(words / sentences, `words per sentence ${s.id}`).toBeGreaterThan(7)
+      expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.audio, s.id.toString()).toBe(`audio/abenteuer/jakob/geschichte-${String(s.id).padStart(2, '0')}-${s.id === 3 ? 'v3' : 'v2'}.mp3`)
+      expect(s.audio, `no recording yet ${s.id}`).toBeUndefined()
       // stages 5 to 9 and 12 use an existing picture until their own picture is built in (PLATZHALTER)
       expect(s.image).toBe(`images/abenteuer/jakob/etappe-bild-${String(PICTURE[s.id - 1]).padStart(2, '0')}.webp`)
     }
   })
 
-  it('two questions per stage (three in the serious stage 2), three answers each, the right one first and the answers differ; the exam has six', () => {
-    expect(jakob.stages.map((s) => s.questions.length)).toEqual([2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2])
+  it('two questions per stage, three answers each, the right one first and the answers differ; the exam has six', () => {
+    expect(jakob.stages.map((s) => s.questions.length)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2])
     for (const q of [...jakob.stages.flatMap((s) => s.questions), ...jakob.exam]) {
       expect(q.options, q.q).toHaveLength(3)
       expect(q.answer, q.q).toBe(0)
@@ -52,7 +57,8 @@ describe('Jakob: stories and questions', () => {
       expect(q.q.trim().endsWith('?'), q.q).toBe(true)
     }
     expect(jakob.exam).toHaveLength(6)
-    const asked = jakob.stages.flatMap((s) => s.questions.map((q) => q.q))
+    // nothing is asked twice with the same answer; "Was sagt Gott zu Jakob?" is asked in stage 3 and in stage 7 (the answers differ and each question is shown only in its own stage)
+    const asked = jakob.stages.flatMap((s) => s.questions.map((q) => `${q.q} ${q.options[0]}`))
     expect(new Set(asked).size).toBe(asked.length)
     expect(new Set(jakob.exam.map((q) => q.q)).size).toBe(6)
   })
@@ -366,7 +372,7 @@ describe('Jakob: English', () => {
       expect(s.task.hint, `hint ${s.id}`).not.toBe(de[i]!.hint)
       s.questions.forEach((q, k) => expect(q.q, `question ${s.id}.${k}`).not.toBe(de[i]!.q[k]))
       expect(s.ref, `ref ${s.id}`).toMatch(/^Genesis \d/)
-      expect(s.audio, `audio ${s.id}`).toBe(`audio/abenteuer/jakob/geschichte-${String(s.id).padStart(2, '0')}-en-${s.id === 3 ? 'v3' : 'v2'}.mp3`)
+      expect(s.audio, `audio ${s.id}`).toBeUndefined()
     })
     expect(jakob.title).toBe('Jacob')
     expect(jakob.subtitle).toBe('A Road with Detours')

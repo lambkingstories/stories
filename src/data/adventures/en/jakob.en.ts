@@ -14,158 +14,146 @@ export const jakobEn: TextOverlay<Journey> = {
     {
       title: 'Twins',
       ref: 'Genesis 25:19–34',
-      audio: 'audio/abenteuer/jakob/geschichte-01-en-v2.mp3',
       text: [
-        'Isaac, the son Abraham waited for so long, has grown up and married Rebekah. The two of them also have to wait a long time for a child, and Isaac prays to God. God hears him, and Rebekah gives birth to twins.',
-        'Even at birth you can see how different the two boys are. The first comes out reddish and covered with hair like a fur coat, and they name him Esau. Right behind him comes his brother, holding on to the heel of the firstborn, and they name him Jacob.',
-        'The boys grow up. Esau becomes a hunter who likes best to be out in the fields, and Jacob stays quietly near the tents. Isaac is especially fond of Esau, and Rebekah is especially fond of Jacob.',
-        'One day Esau comes home from hunting, tired and hungry, and Jacob has just cooked a lentil stew. “Give me some of that red stew, quick, I am worn out!” begs Esau. “You can have it,” says Jacob, “if you give me your birthright.” That is the special place of the oldest son in the family. “I am dying of hunger,” cries Esau, “what good is it to me?” He swears it to Jacob, eats and drinks, and goes away. His birthright does not matter to him.'
+        'Isaac and his wife Rebekah have twins. The first is red and hairy, and his name is Esau. The second holds on to his brother’s heel at birth, so they call him Jacob.',
+        'The two grow up. Esau becomes a hunter and loves to roam the fields. Jacob prefers to stay near the tents.',
+        'One day Esau comes home tired and hungry. Jacob has just cooked red lentils. “Let me eat some of that red stew,” begs Esau, “I am starving!”',
+        'Jacob answers, “Then sell me your birthright today.” That is the special place of the oldest son in the family. “What good is it to me if I starve?” says Esau. He eats, gets up, and goes away. His birthright does not matter to him.'
       ],
       task: { hint: 'Tap the sheep and count them.' },
       questions: [
-        { q: 'What are the twins of Isaac and Rebekah called?', options: ['Esau and Jacob', 'Isaac and Lot', 'Cain and Abel'] },
-        { q: 'What does Esau give away for the lentil stew?', options: ['his birthright', 'his tent', 'his bow'] }
+        { q: 'What does Esau give away for the lentil stew?', options: ['his birthright', 'his tent', 'his bow'] },
+        { q: 'What has Jacob cooked?', options: ['red lentils', 'a fish', 'a millet porridge'] }
       ]
     },
     {
       title: 'The Blessing',
       ref: 'Genesis 27:1–45',
-      audio: 'audio/abenteuer/jakob/geschichte-02-en-v2.mp3',
       text: [
-        'Isaac has grown old, and his eyes are so weak that he can hardly see anything. One day he calls Esau to him, “My son, go hunting and prepare my favorite meal for me. Then I will bless you before I die.”',
-        'Rebekah has heard it. She says to Jacob, “Get the blessing in Esau’s place! I will cook the meal, and you bring it to your father.” Jacob hesitates, because his father might recognize him. But Rebekah ties goatskin around his hands and neck so that he is as rough as Esau, and he puts on Esau’s clothes.',
-        'So Jacob comes to his father. “Who are you, my son?” asks Isaac. “I am Esau, your oldest,” answers Jacob. That is not true. Isaac wonders about the voice, but the hands feel like Esau’s hands. So he blesses him.',
-        'Hardly has Jacob left when Esau comes with the meal. When Isaac realizes what has happened, he is shocked, and Esau cries out in pain, “Bless me, too, Father!” But the blessing has already been given. Esau is so angry that Rebekah becomes afraid for Jacob and sends him to her brother Laban in Haran, far away.',
-        'Jacob packs his bundle and goes. He has deceived his father, and that has consequences: He has to leave his home.'
+        'Isaac has grown old and can hardly see. He calls Esau, “Go hunting and cook my favorite meal. Then I will bless you.”',
+        'But Rebekah has been listening. She helps Jacob dress up as Esau and sends him to his father with the food.',
+        '“Who are you?” asks Isaac. “I am Esau,” says Jacob. That is not true. Isaac feels his hands and wonders, “The voice is Jacob’s voice, but the hands are Esau’s hands.” Still, he blesses him: God shall give him much good.',
+        'When Esau comes home, he understands everything and weeps aloud. The blessing has already been given. Esau is sad and angry, and Jacob has to flee. Rebekah sends him to her brother Laban. Jacob packs his bundle and goes, far away from home.'
       ],
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
-        { q: 'Who is old and can hardly see?', options: ['Isaac', 'Laban', 'Esau'] },
-        { q: 'What does Jacob put on his hands and neck?', options: ['goatskin', 'flour', 'clay'] },
-        { q: 'Where does Rebekah send Jacob?', options: ['to her brother Laban', 'to Esau', 'to the sea'] }
+        { q: 'Who can hardly see?', options: ['Isaac', 'Laban', 'Esau'] },
+        { q: 'Where does Jacob have to go afterward?', options: ['to Laban', 'to Esau', 'to the sea'] }
       ]
     },
     {
       title: 'The Heavenly Stairway',
-      ref: 'Genesis 28:10–22',
-      audio: 'audio/abenteuer/jakob/geschichte-03-en-v3.mp3',
+      ref: 'Genesis 28:10–19',
       text: [
-        'Jacob walks far, away from home. When the sun goes down, he stops for the night at a place among stones. He pushes a stone under his head and falls asleep.',
-        'Then he has a dream. A stairway stands on the earth, and its top reaches up to heaven, and angels of God go up and down on it.',
-        'And at the top God speaks to him, “I am the God of your fathers Abraham and Isaac. The land you are lying on I will give to you and your descendants. They will be as many as the dust of the earth, and through you all the families of the earth will be blessed. Look, I am with you and watch over you wherever you go. I will bring you back to this land, and I will not leave you.”',
-        'When Jacob wakes up, he is quiet with wonder. “God is in this place,” he says, “and I did not know it!” Early in the morning he sets up the stone he slept on as a sign and pours oil over it. He calls the place Bethel, which means “house of God.” And he promises, “If God stays with me and watches over me on my way, then he will be my God.” Then he travels on, no longer as alone as he was the evening before.'
+        'Jacob is traveling alone. When it gets dark, he lies down outside and pushes a stone under his head.',
+        'Then he dreams of a stairway that reaches from the earth up to heaven. Angels of God go up and down on it.',
+        'And God speaks, “I am the God of your fathers Abraham and Isaac. I will give you this land. I am with you and will watch over you wherever you go. I will bring you back home and will not leave you.”',
+        'Jacob wakes up. “How holy this place is!” he cries. “God is here, and I did not know it.” He sets up the stone that was his pillow and calls the place Bethel, which means House of God.'
       ],
       task: { hint: 'Slide the tiles until the stairway to heaven is whole again.', slide: { rounds: [{ hint: 'Round 1: Slide a tile into the free gap.' }, { hint: 'Round 2: Now there are more tiles.' }] } },
       questions: [
         { q: 'What does Jacob use as a pillow?', options: ['a stone', 'a fur', 'a sack'] },
-        { q: 'What does Jacob call the place?', options: ['Bethel', 'Haran', 'Mamre'] }
+        { q: 'What does God say to Jacob?', options: ['“I am with you.”', '“Go back to Esau.”', '“Stay here forever.”'] }
       ]
     },
     {
       title: 'At the Well',
       ref: 'Genesis 29:1–14',
-      audio: 'audio/abenteuer/jakob/geschichte-04-en-v2.mp3',
       text: [
-        'After many days Jacob reaches the land of his relatives. In an open field he sees a well with a large stone over its opening, and shepherds are waiting beside it with their flocks. “Where are you from?” asks Jacob. “From Haran.” “Do you know Laban?” “We know him. And here comes his daughter Rachel with the sheep!”',
-        'The shepherds water their animals only when all the flocks have arrived and they can roll away the heavy stone together. But when Jacob sees Rachel with her father’s sheep, he steps forward, rolls the stone from the well all by himself, and waters her sheep.',
-        'Then he tells Rachel who he is: a relative, the son of Rebekah, her father’s sister. He weeps aloud for joy. Rachel runs home and tells her father everything.',
-        'Laban hurries to meet Jacob, throws his arms around him, and takes him into his house. Jacob tells him what has happened, and Laban says, “You truly belong to my family!” After the long journey, Jacob has found a place where he can stay.'
+        'Jacob reaches the land of his relatives. In a field lies a well with a heavy stone over it, and shepherds are waiting there with their sheep. “We can only roll the stone away when all the flocks are here,” they say.',
+        'Then Rachel comes with the sheep of her father Laban. Jacob pushes the stone from the well all by himself and waters her sheep.',
+        'Then he tells her who he is: “I am your relative, the son of Rebekah.” He kisses her in greeting and weeps for joy. Rachel runs home and tells her father.',
+        'Laban comes running, hugs Jacob, and takes him into his house. After the long journey, Jacob has found a place where he may stay.'
       ],
       task: { hint: 'Turn the crank in a circle with your finger.', crank: { rounds: [{ hint: 'Round 1: Fetch a bucket of water for the sheep.' }, { hint: 'Round 2: Now the whole flock is drinking: three buckets.' }] } },
       questions: [
-        { q: 'What lies over the well that Jacob finds?', options: ['a large stone', 'a wooden lid', 'a cloth'] },
-        { q: 'Whom does Jacob meet at the well?', options: ['Rachel', 'Leah', 'Rebekah'] }
+        { q: 'What lies over the well that Jacob finds?', options: ['a heavy stone', 'a wooden lid', 'a cloth'] },
+        { q: 'Who comes to the well with the sheep?', options: ['Rachel', 'Leah', 'Rebekah'] }
       ]
     },
     {
       title: 'Seven Years for Rachel',
       ref: 'Genesis 29:15–30',
-      audio: 'audio/abenteuer/jakob/geschichte-05-en-v2.mp3',
       text: [
-        'Jacob has been staying with Laban for a month when Laban says, “You are my relative, and you should not work for me for nothing. Tell me, what should your wages be?” Laban has two daughters, Leah, the older, and Rachel, the younger. Jacob loves Rachel with all his heart.',
-        '“I will serve you seven years,” he says, “if I may marry Rachel.” Laban agrees. Jacob works for seven years, and because he loves Rachel so much, they seem to him like only a few days.',
-        'Then Laban invites all the people to the wedding feast. But in the evening he brings not Rachel to Jacob but his older daughter Leah, and Jacob does not notice until morning. It is a bitter surprise. “Why have you done this?” he asks Laban. “In our country we do not give the younger daughter before the older,” answers Laban.',
-        '“Finish the wedding week with Leah,” he says, “then you will get Rachel, too, if you work for me another seven years.” Jacob agrees, and after the week Rachel becomes his wife as well. So he stays with Laban another seven years.'
+        'Jacob stays with Laban and helps with the herds. “You should not work for nothing,” says Laban. “What do you want as wages?”',
+        'Jacob loves Rachel. “I will serve you seven years for Rachel,” he says. Laban agrees. The seven years seem to Jacob like only a few days, so much does he love her.',
+        'Then they celebrate the wedding, but in the morning Jacob notices that Laban has deceived him. He has not given him Rachel but her older sister Leah. “Why have you done this?” asks Jacob. “In our country the older one marries first,” says Laban.',
+        '“Serve me another seven years,” says Laban, “then you will get Rachel, too.” Jacob agrees and stays.'
       ],
       task: { hint: 'Drag the seasons into the gaps, year after year.', cycle: { tokens: [{ label: 'Spring: a branch with blossoms' }, { label: 'Summer: a sun with ears of grain' }, { label: 'Autumn: falling leaves' }, { label: 'Winter: a rain cloud with drops' }], rounds: [{ hint: 'Two years go by. Which sign is missing in the gap?' }, { hint: 'Seven years go by. Fill in the missing signs, even at the end of the row.' }] } },
       questions: [
-        { q: 'How many years does Jacob work for Rachel at first?', options: ['seven', 'two', 'twenty'] },
-        { q: 'Whom does Laban bring to Jacob on the wedding evening?', options: ['Leah', 'Rachel', 'Rebekah'] }
+        { q: 'How many years does Jacob serve for Rachel at first?', options: ['seven', 'two', 'twenty'] },
+        { q: 'Whom does Jacob marry first?', options: ['Leah', 'Rachel', 'Rebekah'] }
       ]
     },
     {
       title: 'The Big Family',
       ref: 'Genesis 29:31 to 30:24',
-      audio: 'audio/abenteuer/jakob/geschichte-06-en-v2.mp3',
       text: [
-        'Jacob loves Rachel more than Leah, but God sees that Leah is loved less, and he gives her a son. She names him Reuben, for she says, “God has seen my misery.” Then she has Simeon and Levi, and when her fourth son is born, she cries, “Now I will thank God!” So she names him Judah.',
-        'But Rachel has no child, and that makes her sad, because her sister has so many sons. Her maid Bilhah and Leah’s maid Zilpah also have sons: Dan, Naphtali, Gad, and Asher. Besides these come Leah’s sons Issachar and Zebulun and a daughter, Dinah.',
-        'Rachel waits and prays. At last God remembers her, and she has a son. “His name shall be Joseph,” she says, “which means: May he add. God has taken my shame away from me, and I ask him for one more son.”',
-        'Jacob’s tent is now full of children: eleven sons and one daughter. And the youngest of all, Joseph, is the son of Rachel, whom Jacob loves the most.'
+        'Jacob loves Rachel more than Leah. But God sees that Leah is sad, and he gives her a son. “God has seen my misery,” says Leah, and she names him Reuben.',
+        'After that she has more sons, and at the fourth she cries, “Now I will thank God!” His name is Judah.',
+        'But Rachel has no child. That makes her sad, because her sister has so many. She waits and prays, year after year.',
+        'At last God gives her a son, too. “God has taken my shame away,” says Rachel happily, and she names him Joseph. Jacob’s tents are now full of children.'
       ],
       task: { hint: 'Tap the children, they run to the tent.', catch: { rounds: [{ hint: 'Tap the children. Each one runs to the tent.' }, { hint: 'The family grows. Call seven more children to the tent.' }] } },
       questions: [
-        { q: 'What is Rachel’s first son called?', options: ['Joseph', 'Reuben', 'Judah'] },
-        { q: 'Whom does Leah want to thank after Judah is born?', options: ['God', 'Rachel', 'Jacob'] }
+        { q: 'What does Leah cry when Judah is born?', options: ['“Now I will thank God!”', '“Now I will sleep!”', '“I want to leave!”'] },
+        { q: 'What is Rachel’s son called?', options: ['Joseph', 'Reuben', 'Judah'] }
       ]
     },
     {
       title: 'The Herds Grow',
       ref: 'Genesis 30:25 to 31:16',
-      audio: 'audio/abenteuer/jakob/geschichte-07-en-v2.mp3',
       text: [
-        'When Joseph is born, Jacob says to Laban, “Let me go home to my own land now with my family. You know how faithfully I have served you.” But Laban does not want to let him go, “I have noticed that God blesses me because of you. Tell me what I should give you as wages.”',
-        'Jacob asks for the speckled and dark animals of the herd as his wages, and Laban agrees. But God blesses Jacob, and his herds grow larger and larger. He owns sheep, goats, camels, and donkeys, and many servants.',
-        'Laban’s sons grumble that Jacob has taken everything from their father, and Laban’s face is no longer as friendly as before. Then God says to Jacob, “Go back to the land of your fathers, to your family. I will be with you.”',
-        'Jacob calls Rachel and Leah out into the field and tells them how often their father has changed his wages and how God has kept him safe all the same. “We will go with you,” both say. “Do what God has told you.”'
+        'Jacob works for Laban for many years, and God blesses him. He becomes very rich, and his herds of sheep, goats, and camels grow larger and larger.',
+        '“Let me go home,” he asks Laban. But Laban does not want to let him go, for he has noticed that God blesses him because of Jacob. Jacob sees it, too: soon Laban does not look friendly anymore.',
+        'Then God speaks to Jacob, “Go back to the land of your fathers. I will be with you.”',
+        'Jacob calls Rachel and Leah out into the field and tells them. “Do everything God has told you,” the two say. So Jacob gets ready.'
       ],
       task: { hint: 'Compare the herds and guess how many animals there are.', guess: { rounds: [{ hint: 'Which herd is bigger? Tap it.' }, { hint: 'About how many animals are there? Choose what fits best.' }] } },
       questions: [
-        { q: 'What does Jacob want to do after Joseph is born?', options: ['return to his homeland', 'build a new tent', 'stay with Laban'] },
-        { q: 'What does God say to Jacob?', options: ['Go back to the land of your fathers.', 'Stay with Laban.', 'Build a city.'] }
+        { q: 'What does Jacob ask Laban?', options: ['to let him go home', 'to give him more sheep', 'to build him a tent'] },
+        { q: 'What does God say to Jacob?', options: ['“Go back to the land of your fathers.”', '“Stay with Laban.”', '“Build a city.”'] }
       ]
     },
     {
       title: 'The Way Home',
       ref: 'Genesis 31:17–55',
-      audio: 'audio/abenteuer/jakob/geschichte-08-en-v2.mp3',
       text: [
-        'Jacob sets out. He puts his wives and children on the camels, gathers his herds, and takes with him everything he has gained. Laban has just gone off to shear his sheep, and so Jacob leaves in secret, across the river toward the mountains of Gilead.',
-        'On the third day Laban finds out. At once he chases after Jacob with his men, for seven days, until he catches up with him in the mountains. But the night before, God has spoken to Laban in a dream, “Be careful not to speak harshly to Jacob!”',
-        '“Why did you run away in secret?” asks Laban. “I would have sent you off with music, and I would have liked to kiss my grandchildren and daughters goodbye.” Jacob reminds him of the twenty years in which he worked for him day and night, in heat and in frost. “If God had not been with me,” he says, “you would have sent me away empty-handed.”',
-        'Then Laban gives in. The two make peace. Jacob sets up a large stone, and the others gather stones into a heap, on which they eat together. The heap is to be a witness and is called Mizpah, which means “watchtower,” because Laban says, “May God keep watch between you and me when we are out of each other’s sight.” The next morning Laban kisses his grandchildren and daughters and goes home.'
+        'Jacob loads his wives and children onto the camels, gathers the herds, and sets out in secret. Laban is far away with his sheep just then.',
+        'After seven days Laban catches up with him in the hills. But the night before, God has spoken to Laban in a dream, “Be careful not to speak harshly to Jacob!”',
+        '“Why did you leave in secret?” asks Laban. “I served you for twenty years,” says Jacob. “If God had not been with me, you would have sent me away empty-handed.”',
+        'Then the two make peace. They pile up stones into a heap and eat beside it. “This heap shall be a witness between you and me,” says Laban. The next morning he kisses his daughters and grandchildren, blesses them, and goes home.'
       ],
       task: { hint: "Push Jacob's and Laban's stones to the middle together.", cairn: { rounds: [{ hint: 'Push both stones to the middle together. Tap left and right in turn, or use two fingers.' }, { hint: 'Once more, with longer ways. The heap grows higher.' }] } },
       questions: [
         { q: 'Who speaks to Laban in a dream?', options: ['God', 'Jacob', 'Isaac'] },
-        { q: 'What does the heap of stones between Jacob and Laban stand for?', options: ['their peace', 'a house', 'a grave'] }
+        { q: 'What does the heap of stones between Jacob and Laban stand for?', options: ['It is to be a witness of their peace.', 'It is a house for Laban.', 'It is a grave.'] }
       ]
     },
     {
       title: 'Angels and Gifts',
       ref: 'Genesis 32:1–21',
-      audio: 'audio/abenteuer/jakob/geschichte-09-en-v2.mp3',
       text: [
-        'Laban is gone, and Jacob travels on. On the way, angels of God meet him. “This is God’s camp!” cries Jacob, and he names the place Mahanaim, which means “two camps.”',
-        'But soon the worry comes back, for ahead of him lies the land of his brother Esau. Jacob sends messengers ahead, “Your servant Jacob sends you greetings. I stayed with Laban a long time, but now I have sheep, cattle, donkeys, and servants, and I hope you will welcome me kindly.” The messengers return, “Esau is coming to meet you, with four hundred men.”',
-        'Jacob becomes very afraid. He divides his people and herds into two camps, so that at least one can escape if Esau attacks the other. Then he prays, “God of my fathers, you said to me: Go home, I will do you good. I am too small for all you have given me. I crossed the Jordan with only my staff, and now I have two camps. Save me from my brother!”',
-        'Then Jacob chooses a gift for Esau from his herds: goats, sheep, camels, cows, and donkeys, each kind as a herd of its own. His servants are to drive them toward Esau one by one, with space between them. “I will make peace with him through the gift,” Jacob thinks, “maybe then he will welcome me kindly.”'
+        'Jacob travels on. Angels of God meet him. “This is God’s camp!” he cries.',
+        'Then the messengers he sent ahead to his brother return, “Esau is coming to meet you, with four hundred men.” Jacob is very afraid.',
+        'He prays, “God, you said you would do me good. I am too small for all you have given me. Save me from the hand of my brother!”',
+        'Then Jacob picks out gifts for Esau: herds of goats, sheep, and camels. His servants are to drive them ahead of him. “Leave space between one herd and the next,” he says. Maybe Esau will be friendly when he sees the gifts.'
       ],
       task: { hint: 'Send the herds off with room between them.', relay: { rounds: [{ hint: 'Send the herds off one after the other. Leave room between them.' }, { hint: 'Five more herds. The room may be a little narrower now.' }] } },
       questions: [
         { q: 'Whom does Jacob meet on the way?', options: ['angels of God', 'robbers', 'shepherds'] },
-        { q: 'What does Jacob send ahead to meet Esau?', options: ['animals as a gift', 'a letter', 'a sword'] }
+        { q: 'What does Jacob do when he hears about Esau’s men?', options: ['He prays to God.', 'He runs away.', 'He builds a wall.'] }
       ]
     },
     {
       title: 'Wrestling at the River',
       ref: 'Genesis 32:22–32',
-      audio: 'audio/abenteuer/jakob/geschichte-10-en-v2.mp3',
       text: [
-        'The gifts go ahead, and Jacob stays in the camp that night. In the middle of the night he gets up, takes his wives, his children, and everything he has, and brings them safely across the ford of the Jabbok River. He himself stays behind alone on the other side.',
-        'Then a man comes and wrestles with him until daybreak. The man touches Jacob’s hip, and from then on it hurts him.',
-        'When dawn comes, the man says, “Let me go, the day is breaking!” But Jacob holds on, “I will not let you go unless you bless me.” “What is your name?” asks the man. “Jacob.” “You will no longer be called Jacob, but Israel, for you have struggled with God and with people and have not given up.” And he blesses him there.',
-        'Jacob names the place Peniel, which means “face of God.” “I have seen God face to face,” he says, “and I am still alive.” As the sun rises, he travels on, limping. But he has a new name and God’s blessing.'
+        'In the night Jacob brings his family across the Jabbok River. He himself stays behind alone. Then a man wrestles with him until morning comes and touches his hip. From then on it hurts.',
+        '“Let me go,” says the man, “the day is breaking.” “I will not let you go,” says Jacob, “unless you bless me!”',
+        '“You will no longer be called Jacob, but Israel,” says the man, “for you have struggled with God and with people and have not given up.” And he blesses him.',
+        'The sun rises. “I have seen God face to face,” says Jacob, “and I am still alive.” He walks on, limping, but he has a new name and God’s blessing.'
       ],
       task: { hint: 'Hold the light until morning comes.', hold: { rounds: [{ hint: 'Round 1: Put your finger on the light and hold it.' }, { hint: 'Round 2: Now the light moves along the bank: go with it.' }] } },
       questions: [
@@ -176,28 +164,26 @@ export const jakobEn: TextOverlay<Journey> = {
     {
       title: 'Reunion',
       ref: 'Genesis 33:1–11',
-      audio: 'audio/abenteuer/jakob/geschichte-11-en-v2.mp3',
       text: [
-        'When Jacob looks up, he sees Esau coming, with four hundred men. He arranges his family: the maids with their children in front, then Leah with hers, and Rachel with Joseph at the very back. He himself goes ahead of them all and bows down to the ground seven times as he comes closer to his brother.',
-        'But Esau runs to meet him! He hugs him, throws his arms around his neck, and kisses him, and both weep for joy.',
-        '“Who are these with you?” asks Esau when he sees the women and children. “They are the children God has given me,” answers Jacob. They all come forward and bow.',
-        '“What are all these herds I met?” asks Esau. “They are a gift for you,” says Jacob. “I have enough, my brother, keep what is yours.” But Jacob pleads, “Please take it! Seeing your face is like seeing the face of God, you have welcomed me so kindly.” Then Esau accepts the gift. The quarrel of the brothers has turned into peace.'
+        'In the morning Jacob sees Esau coming, with four hundred men. He walks ahead of everyone alone and bows low.',
+        'But Esau runs to meet him! He hugs Jacob, throws his arms around his neck, and kisses him. Both weep for joy.',
+        '“Who are these with you?” asks Esau when he sees the women and children. “The children God has given me,” says Jacob.',
+        'Then Jacob offers him his herds as a gift. “I have enough, my brother,” says Esau. But Jacob pleads, “Please take it! Seeing your face is like seeing the face of God, you are so kind to me.” Then Esau accepts the gift. The quarrel of the brothers is over.'
       ],
       task: { hint: 'Put the picture of the reunion together.' },
       questions: [
         { q: 'What does Esau do when he sees Jacob?', options: ['He runs to him and hugs him.', 'He runs away.', 'He sends him away.'] },
-        { q: 'What does Jacob bring his brother?', options: ['animals as a gift', 'a sword', 'a tent'] }
+        { q: 'What does Jacob offer his brother?', options: ['his herds as a gift', 'his tent', 'his staff'] }
       ]
     },
     {
       title: 'Twelve Sons',
-      ref: 'Genesis 35:1–20; 35:22–26; 37:1–4',
-      audio: 'audio/abenteuer/jakob/geschichte-12-en-v2.mp3',
+      ref: 'Genesis 35:1–18; 35:22–26; 37:1–4',
       text: [
-        'God says to Jacob, “Go to Bethel and build an altar there.” Jacob sets out with his whole family, and in Bethel, where he once slept alone on a stone, he builds the altar. God speaks to him once more, “Your name is Jacob, but you shall be called Israel. Many nations will come from you, and the land I gave to Abraham and Isaac I will give to you and your descendants.” Jacob sets up a stone again and pours oil over it.',
-        'Then they travel on. Shortly before Ephrath, Rachel’s second son is born, Benjamin, and Rachel dies. Jacob is very sad and sets up a stone on her grave.',
-        'Now Jacob has twelve sons: Reuben, Simeon, Levi, Judah, Issachar, and Zebulun, Joseph and Benjamin, Dan and Naphtali, Gad and Asher. From them the people of Israel will come, who carry their father’s new name.',
-        'Jacob lives in the land of Canaan, where his father lived as a stranger. Joseph, the son of his old age, is the dearest to him, and he has a colorful robe made for him. When the brothers see that their father loves Joseph more than them, they become angry with him and can no longer speak a friendly word to him. Here a new story begins, the story of Joseph.'
+        'God says to Jacob, “Go to Bethel and build an altar there.” Jacob goes there with his whole family and builds the altar. God speaks to him once more, “You shall be called Israel.”',
+        'On the way Benjamin is born, and his mother Rachel dies. Jacob is very sad and sets up a stone on her grave.',
+        'Now Jacob has twelve sons, and from them a great people shall come, as God promised. He loves Joseph best, the son of his old age.',
+        'Joseph is seventeen years old and tends the sheep with his brothers. Jacob loves him so much that he has a colorful robe made for him.'
       ],
       task: { hint: 'Place the twelve sons evenly round the altar.', ring: { rounds: [{ hint: 'Place the four sons round the altar, with the same gap between them.' }, { hint: 'Now all twelve sons. They stand like the hours of a clock.' }] } },
       questions: [
@@ -207,12 +193,12 @@ export const jakobEn: TextOverlay<Journey> = {
     }
   ],
   exam: [
-    { q: 'What are the twins of Isaac and Rebekah called?', options: ['Esau and Jacob', 'Isaac and Lot', 'Cain and Abel'] },
-    { q: 'What does Jacob put on his hands so that his father takes him for Esau?', options: ['goatskin', 'flour', 'clay'] },
-    { q: 'What does Jacob use as a pillow in the night?', options: ['a stone', 'a fur', 'a sack'] },
-    { q: 'How many sons does Jacob have in the end?', options: ['twelve', 'seven', 'three'] },
-    { q: 'What is Jacob called after that night at the river?', options: ['Israel', 'Esau', 'Isaac'] },
-    { q: 'What does Esau do when he sees Jacob again?', options: ['He runs to him and hugs him.', 'He runs away.', 'He sends him away.'] }
+    { q: 'What does Esau give away for a plate of lentils?', options: ['his birthright', 'his tent', 'his bow'] },
+    { q: 'What does Jacob use as a pillow in Bethel?', options: ['a stone', 'a fur', 'a sack'] },
+    { q: 'Whom does Jacob meet at the well?', options: ['Rachel', 'Leah', 'Rebekah'] },
+    { q: 'Who speaks to Laban in a dream?', options: ['God', 'Jacob', 'Isaac'] },
+    { q: 'What new name does Jacob receive at the river?', options: ['Israel', 'Esau', 'Isaac'] },
+    { q: 'Which son does Jacob love best?', options: ['Joseph', 'Benjamin', 'Reuben'] }
   ]
 
 }

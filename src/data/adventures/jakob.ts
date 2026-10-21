@@ -1,6 +1,8 @@
 /**
  * Abenteuer "Jakob" (1. Mose 25,19–34; 27; 28,10–22; 29–31; 32; 33,1–11; 35; 37,1–4) für 8 bis 10 Jahre: 12 Etappen (Ausbau am 20.10.2026, 1. Mose 25 bis 37), Untertitel "Ein Weg mit Umwegen". Entstanden nach dem Skill "LambKing Abenteuer Skill".
- * Quelle der Texte: D:/Claude/Abenteuer-Jakob/ENTWURF_Jakob_v2.md (Text-Sitzung, 20.10.2026), Plan: ETAPPENPLAN-v2-12-Etappen.md. Die richtige Antwort steht in den Daten
+ * Quelle der Texte: D:/Claude/Abenteuer-Jakob/ENTWURF_Jakob-v3.md (zweitgeprüft, 90 bis 145 Wörter je Etappe wie bei Noah und Josef, eingebaut am 21.10.2026), Plan: ETAPPENPLAN-v3.md.
+ * Es gibt noch keine Aufnahmen zu den neuen Texten (`audio` fehlt: die App liest mit der Gerätestimme); die alten Aufnahmen liegen noch im Ordner, sind aber nicht mehr verlinkt.
+ * Die Spielaufgaben der Etappen sind noch die von vor v3 (die Spiele folgen nach SPIELE/ENTWURF-v3.md). Die richtige Antwort steht in den Daten
  * IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
  * Spiele (Wahl der Leitung vom 20.10.2026, höchstens zwei alte Mechaniken): 1 Zählen (alt), 2 nur Quiz, 3 Treppe zusammenschieben (neu), 4 Brunnen kurbeln (neu),
  * 5 Morgenrot halten (neu), 6 Puzzle (alt).
@@ -8,7 +10,7 @@
  * images/abenteuer/jakob/, images/abenteuer/spiele/jakob/<spiel>/, audio/abenteuer/jakob/.
  *
  * STAND 20.10.2026 (Ausbau auf 12 Etappen): Die Etappen 5 bis 9 und 12 haben bis zum Einbau ihrer Spiele und Bilder eine Quiz-Aufgabe (PLATZHALTER) und ein vorhandenes Etappenbild; die Karte (6 Stationen) bleibt unverändert.
- * Davor: alle Bilder (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder), Messwerte und Vorlese-Aufnahmen (Deutsch und Englisch) sind eingebaut, die Etappen sind spielbar.
+ * Davor: alle Bilder (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder) und Messwerte sind eingebaut, die Etappen sind spielbar.
  * Das Abenteuer ist aber nicht öffentlich: es ist hinter `comingSoon` und dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
 import type { CairnGame, CatchGame, CrankGame, CycleGame, GuessGame, HoldGame, Journey, RelayGame, RingGame, SlideGame } from '@/types/adventure'
@@ -18,7 +20,6 @@ import { jakobEn } from './en/jakob.en'
 
 const IMG = 'images/abenteuer/jakob/'
 const G = 'images/abenteuer/spiele/jakob/'
-const REC = 'audio/abenteuer/jakob/'
 /** `true` = die Etappen sind noch nicht spielbar (Gerüst); jetzt sind alle Bilder und Töne eingebaut. */
 const SOON = false
 
@@ -207,7 +208,7 @@ export const jakob: Journey = {
   title: 'Jakob',
   subtitle: 'Ein Weg mit Umwegen',
   age: '8-10',
-  downloadMb: 13, // etwa 13 MB nach der neuen Karte (vier Stücke zusammen 4,8 MB) am 20.10.2026 (der Test sagt die echte Größe)
+  downloadMb: 9, // etwa 9 MB ohne die alten Aufnahmen (neu gemessen am 21.10.2026, vier Kartenstücke zusammen 4,8 MB) (der Test sagt die echte Größe)
   medal: `${IMG}medaille.webp`, // Jakob und die Himmelsleiter (Treppe aus Steinen im Sternenlicht)
   // Geschenk-Ausmalbild: Jakob und die Himmelsleiter im Traum (Treppe aus Steinen, Sterne, Tiere der Herde schlafend, friedlich)
   gift: { title: 'Jakob und die Himmelsleiter im Traum', image: `${IMG}geschenk.webp` },
@@ -240,17 +241,16 @@ export const jakob: Journey = {
       image: `${IMG}etappe-bild-01.webp`,
       title: 'Zwillinge',
       ref: '1. Mose 25,19–34',
-      audio: `${REC}geschichte-01-v2.mp3`,
       text: [
-        'Isaak, auf den Abraham einst so lange gewartet hat, ist erwachsen geworden und hat Rebekka geheiratet. Auch die beiden müssen lange auf ein Kind warten, und Isaak betet zu Gott. Gott erhört ihn, und Rebekka bekommt Zwillinge.',
-        'Schon bei der Geburt ist zu sehen, wie verschieden die beiden Jungen sind. Der Erste kommt rötlich zur Welt, über und über behaart wie ein Pelz, und sie nennen ihn Esau. Gleich hinter ihm kommt sein Bruder, der mit der Hand die Ferse des Erstgeborenen umklammert, und ihn nennen sie Jakob.',
-        'Die Jungen wachsen heran. Esau wird ein Jäger, der am liebsten draußen auf dem Feld ist, und Jakob bleibt ruhig bei den Zelten. Isaak hat Esau besonders gern, Rebekka dagegen Jakob.',
-        'Eines Tages kommt Esau müde und hungrig von der Jagd heim, und Jakob hat gerade ein Linsengericht gekocht. „Gib mir schnell etwas von dem Roten da, ich bin völlig erschöpft!“, bittet Esau. „Das bekommst du“, sagt Jakob, „wenn du mir dein Erstgeburtsrecht gibst.“ Das ist der besondere Platz des Ältesten in der Familie. „Ich komme ja um vor Hunger“, ruft Esau, „was nützt es mir da?“ Er schwört es Jakob, isst und trinkt und geht davon. Ihm ist sein Erstgeburtsrecht nicht wichtig.'
+        'Isaak und seine Frau Rebekka bekommen Zwillinge. Der Erste ist rot und behaart, er heißt Esau. Der Zweite hält bei der Geburt die Ferse seines Bruders fest, darum nennen sie ihn Jakob.',
+        'Die beiden wachsen heran. Esau wird ein Jäger und streift gern über das Feld. Jakob bleibt lieber bei den Zelten.',
+        'Eines Tages kommt Esau müde und hungrig heim. Jakob hat gerade rote Linsen gekocht. „Lass mich von dem roten Gericht essen“, bittet Esau, „ich verhungere!“',
+        'Jakob antwortet: „Dann verkaufe mir heute dein Erstgeburtsrecht.“ Das ist der besondere Platz des Ältesten in der Familie. „Was nützt es mir, wenn ich verhungere?“, sagt Esau. Er isst, steht auf und geht fort. Sein Vorrecht ist ihm nicht wichtig.'
       ],
       task: { kind: 'zaehlen', hint: 'Tippe die Schafe an und zähle sie.', count: 8, image: `${G}zaehlen/schaf.webp`, background: `${IMG}etappe-bild-01.webp` },
       questions: [
-        { q: 'Wie heißen die Zwillinge von Isaak und Rebekka?', options: ['Esau und Jakob', 'Isaak und Lot', 'Kain und Abel'], answer: 0 },
-        { q: 'Was gibt Esau für das Linsengericht her?', options: ['sein Erstgeburtsrecht', 'sein Zelt', 'seinen Bogen'], answer: 0 }
+        { q: 'Was gibt Esau für das Linsengericht her?', options: ['sein Erstgeburtsrecht', 'sein Zelt', 'seinen Bogen'], answer: 0 },
+        { q: 'Was hat Jakob gekocht?', options: ['rote Linsen', 'einen Fisch', 'einen Brei aus Hirse'], answer: 0 }
       ],
       soon: SOON
     },
@@ -258,20 +258,17 @@ export const jakob: Journey = {
       id: 2,
       image: `${IMG}etappe-bild-02.webp`,
       title: 'Der Segen',
-      ref: '1. Mose 27,1–45 (gekürzt)',
-      audio: `${REC}geschichte-02-v2.mp3`,
+      ref: '1. Mose 27,1–45',
       text: [
-        'Isaak ist alt geworden, und seine Augen sind so schwach, dass er kaum noch etwas sehen kann. Eines Tages ruft er Esau zu sich: „Mein Sohn, geh auf die Jagd und bereite mir mein Lieblingsessen zu. Dann will ich dich segnen, bevor ich sterbe.“',
-        'Rebekka hat es gehört. Sie sagt zu Jakob: „Hol du dir den Segen an Esaus Stelle! Ich koche das Essen, und du bringst es deinem Vater.“ Jakob zögert, denn sein Vater könnte ihn erkennen. Doch Rebekka bindet ihm Ziegenfell um Hände und Hals, damit er so rau ist wie Esau, und er zieht Esaus Kleider an.',
-        'So tritt Jakob vor seinen Vater. „Wer bist du, mein Sohn?“, fragt Isaak. „Ich bin Esau, dein Ältester“, antwortet Jakob. Das ist nicht wahr. Isaak wundert sich über die Stimme, aber die Hände fühlen sich an wie Esaus Hände. Da segnet er ihn.',
-        'Kaum ist Jakob gegangen, kommt Esau mit dem Essen. Als Isaak merkt, was geschehen ist, erschrickt er sehr, und Esau ruft voller Schmerz: „Segne mich auch, Vater!“ Aber der Segen ist schon vergeben. Esau ist so zornig, dass Rebekka Angst um Jakob bekommt und ihn zu ihrem Bruder Laban nach Haran schickt, weit weg.',
-        'Jakob packt sein Bündel und geht. Er hat seinen Vater getäuscht, und das hat Folgen: Er muss sein Zuhause verlassen.'
+        'Isaak ist alt geworden und kann kaum noch sehen. Er ruft Esau: „Geh auf die Jagd und koche mir mein Lieblingsessen. Dann will ich dich segnen.“',
+        'Aber Rebekka hat zugehört. Sie hilft Jakob, sich als Esau zu verkleiden, und schickt ihn mit dem Essen zum Vater.',
+        '„Wer bist du?“, fragt Isaak. „Ich bin Esau“, sagt Jakob. Das ist nicht wahr. Isaak tastet nach seinen Händen und wundert sich: „Die Stimme ist Jakobs Stimme, aber die Hände sind Esaus Hände.“ Doch er segnet ihn: Gott soll ihm viel Gutes schenken.',
+        'Als Esau heimkommt, versteht er alles und weint laut. Der Segen ist schon vergeben. Esau ist traurig und wütend, und Jakob muss fliehen. Rebekka schickt ihn zu ihrem Bruder Laban. Jakob packt sein Bündel und geht, weit weg von zu Hause.'
       ],
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
-        { q: 'Wer ist alt und kann kaum noch sehen?', options: ['Isaak', 'Laban', 'Esau'], answer: 0 },
-        { q: 'Was legt sich Jakob auf Hände und Hals?', options: ['Ziegenfell', 'Mehl', 'Lehm'], answer: 0 },
-        { q: 'Wohin schickt Rebekka Jakob?', options: ['zu ihrem Bruder Laban', 'zu Esau', 'ans Meer'], answer: 0 }
+        { q: 'Wer kann kaum noch sehen?', options: ['Isaak', 'Laban', 'Esau'], answer: 0 },
+        { q: 'Wohin muss Jakob danach gehen?', options: ['zu Laban', 'zu Esau', 'ans Meer'], answer: 0 }
       ],
       soon: SOON
     },
@@ -279,18 +276,17 @@ export const jakob: Journey = {
       id: 3,
       image: `${IMG}etappe-bild-03.webp`,
       title: 'Die Himmelsleiter',
-      ref: '1. Mose 28,10–22',
-      audio: `${REC}geschichte-03-v3.mp3`,
+      ref: '1. Mose 28,10–19',
       text: [
-        'Jakob wandert weit, weg von zu Hause. Als die Sonne untergeht, bleibt er für die Nacht an einem Ort zwischen Steinen. Er schiebt sich einen Stein unter den Kopf und schläft ein.',
-        'Da hat er einen Traum. Auf der Erde steht eine Treppe, deren oberes Ende bis in den Himmel reicht, und Engel Gottes steigen auf ihr hinauf und herab.',
-        'Und oben spricht Gott zu ihm: „Ich bin der Gott deiner Väter Abraham und Isaak. Das Land, auf dem du liegst, will ich dir und deinen Nachkommen geben. Sie werden so zahlreich sein wie der Staub auf der Erde, und durch dich sollen alle Familien auf der Erde gesegnet werden. Sieh, ich bin bei dir und behüte dich, wohin du auch gehst. Ich bringe dich wieder in dieses Land zurück und verlasse dich nicht.“',
-        'Als Jakob aufwacht, ist er ganz still vor Staunen. „Gott ist an diesem Ort“, sagt er, „und ich habe es nicht gewusst!“ Gleich am Morgen stellt er den Stein, auf dem sein Kopf gelegen hat, als Zeichen auf und gießt Öl darüber. Den Ort nennt er Bethel, das heißt „Haus Gottes“. Und er verspricht: „Wenn Gott bei mir bleibt und mich unterwegs behütet, dann soll er mein Gott sein.“ Dann zieht er weiter, nicht mehr so allein wie am Abend zuvor.'
+        'Jakob ist allein unterwegs. Als es dunkel wird, legt er sich draußen hin und schiebt sich einen Stein unter den Kopf.',
+        'Da träumt er von einer Treppe, die von der Erde bis in den Himmel reicht. Engel Gottes steigen auf ihr hinauf und herab.',
+        'Und Gott spricht: „Ich bin der Gott deiner Väter Abraham und Isaak. Dieses Land will ich dir geben. Ich bin mit dir und will dich behüten, wohin du auch gehst. Ich bringe dich wieder heim und verlasse dich nicht.“',
+        'Jakob wacht auf. „Wie heilig ist dieser Ort!“, ruft er. „Gott ist hier, und ich habe es nicht gewusst.“ Er stellt den Stein auf, der sein Kopfkissen war, und nennt den Ort Bethel, das heißt Haus Gottes.'
       ],
       task: { kind: 'schieben', hint: 'Schiebe die Kacheln, bis die Treppe zum Himmel wieder ganz ist.', slide: SCHIEBEN },
       questions: [
         { q: 'Was nimmt Jakob als Kopfkissen?', options: ['einen Stein', 'ein Fell', 'einen Sack'], answer: 0 },
-        { q: 'Wie nennt Jakob den Ort?', options: ['Bethel', 'Haran', 'Mamre'], answer: 0 }
+        { q: 'Was sagt Gott zu Jakob?', options: ['„Ich bin mit dir.“', '„Geh zurück zu Esau.“', '„Bleib für immer hier.“'], answer: 0 }
       ],
       soon: SOON
     },
@@ -299,17 +295,16 @@ export const jakob: Journey = {
       image: `${IMG}etappe-bild-04.webp`,
       title: 'Am Brunnen',
       ref: '1. Mose 29,1–14',
-      audio: `${REC}geschichte-04-v2.mp3`,
       text: [
-        'Nach vielen Tagen erreicht Jakob das Land seiner Verwandten. Auf freiem Feld sieht er einen Brunnen, über dessen Öffnung ein großer Stein liegt, und daneben warten Hirten mit ihren Herden. „Woher seid ihr?“, fragt Jakob. „Aus Haran.“ „Kennt ihr Laban?“ „Den kennen wir. Und da kommt seine Tochter Rahel mit den Schafen!“',
-        'Die Hirten tränken ihre Tiere erst, wenn alle Herden da sind und sie gemeinsam den schweren Stein wegrollen. Doch als Jakob Rahel mit den Schafen ihres Vaters sieht, tritt er vor, wälzt den Stein allein vom Brunnen und tränkt ihre Schafe.',
-        'Dann sagt er Rahel, wer er ist: ein Verwandter, der Sohn von Rebekka, der Schwester ihres Vaters. Vor Freude weint er laut. Rahel läuft nach Hause und erzählt alles ihrem Vater.',
-        'Laban kommt Jakob eilig entgegen, schließt ihn in die Arme und nimmt ihn mit in sein Haus. Jakob berichtet, was geschehen ist, und Laban sagt: „Du gehörst wirklich zu meiner Familie!“ Nach der langen Wanderung hat Jakob einen Ort gefunden, an dem er bleiben darf.'
+        'Jakob erreicht das Land seiner Verwandten. Auf einem Feld liegt ein Brunnen mit einem schweren Stein, und Hirten warten dort mit ihren Schafen. „Wir können den Stein erst wegrollen, wenn alle Herden da sind“, sagen sie.',
+        'Da kommt Rahel mit den Schafen ihres Vaters Laban. Jakob stemmt den Stein ganz allein vom Brunnen und tränkt ihre Schafe.',
+        'Dann sagt er ihr, wer er ist: „Ich bin dein Verwandter, der Sohn von Rebekka.“ Er küsst sie zur Begrüßung und weint vor Freude. Rahel läuft heim und erzählt es ihrem Vater.',
+        'Laban kommt gelaufen, umarmt Jakob und nimmt ihn mit in sein Haus. Nach der langen Wanderung hat Jakob einen Ort gefunden, an dem er bleiben darf.'
       ],
       task: { kind: 'kurbel', hint: 'Drehe die Kurbel mit dem Finger im Kreis.', crank: KURBEL },
       questions: [
-        { q: 'Was liegt über dem Brunnen, den Jakob findet?', options: ['ein großer Stein', 'ein Holzdeckel', 'ein Tuch'], answer: 0 },
-        { q: 'Wen trifft Jakob am Brunnen?', options: ['Rahel', 'Lea', 'Rebekka'], answer: 0 }
+        { q: 'Was liegt auf dem Brunnen, den Jakob findet?', options: ['ein schwerer Stein', 'ein Holzdeckel', 'ein Tuch'], answer: 0 },
+        { q: 'Wer kommt mit den Schafen zum Brunnen?', options: ['Rahel', 'Lea', 'Rebekka'], answer: 0 }
       ],
       soon: SOON
     },
@@ -318,18 +313,17 @@ export const jakob: Journey = {
       image: `${IMG}etappe-bild-04.webp`,
       title: 'Sieben Jahre für Rahel',
       ref: '1. Mose 29,15–30',
-      audio: `${REC}geschichte-05-v2.mp3`,
       text: [
-        'Einen Monat lang ist Jakob bei Laban zu Gast, da sagt Laban: „Du bist mein Verwandter und sollst nicht umsonst für mich arbeiten. Sag mir, was soll dein Lohn sein?“ Laban hat zwei Töchter, Lea, die ältere, und Rahel, die jüngere. Rahel hat Jakob von Herzen lieb.',
-        '„Ich will dir sieben Jahre dienen“, sagt er, „wenn ich dafür Rahel heiraten darf.“ Laban ist einverstanden. Jakob arbeitet sieben Jahre lang, und weil er Rahel so lieb hat, kommen sie ihm vor wie wenige Tage.',
-        'Dann lädt Laban alle Leute zum Hochzeitsfest ein. Am Abend aber führt er nicht Rahel zu Jakob, sondern seine ältere Tochter Lea, und Jakob merkt es erst am Morgen. Es ist eine bittere Überraschung. „Warum hast du das getan?“, fragt er Laban. „Bei uns gibt man die jüngere Tochter nicht vor der älteren her“, antwortet Laban.',
-        '„Feiere erst die Hochzeitswoche mit Lea zu Ende“, sagt er, „dann bekommst du auch Rahel, wenn du noch einmal sieben Jahre für mich arbeitest.“ Jakob ist einverstanden, und nach der Woche wird auch Rahel seine Frau. So bleibt er noch weitere sieben Jahre bei Laban.'
+        'Jakob bleibt bei Laban und hilft ihm bei den Herden. „Du sollst nicht umsonst arbeiten“, sagt Laban. „Was willst du als Lohn?“',
+        'Jakob hat Rahel lieb. „Ich diene dir sieben Jahre für Rahel“, sagt er. Laban ist einverstanden. Die sieben Jahre vergehen Jakob wie wenige Tage, so lieb hat er sie.',
+        'Dann feiern sie Hochzeit, doch am Morgen merkt Jakob, dass Laban ihn getäuscht hat. Er hat ihm nicht Rahel gegeben, sondern ihre ältere Schwester Lea. „Warum hast du das getan?“, fragt Jakob. „Bei uns heiratet die Ältere zuerst“, sagt Laban.',
+        '„Diene mir noch einmal sieben Jahre“, sagt Laban, „dann bekommst du auch Rahel.“ Jakob stimmt zu und bleibt.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
       task: { kind: 'jahre', hint: 'Ziehe die Jahreszeiten in die Lücken, Jahr für Jahr.', cycle: JAHRE },
       questions: [
-        { q: 'Wie viele Jahre arbeitet Jakob zuerst für Rahel?', options: ['sieben', 'zwei', 'zwanzig'], answer: 0 },
-        { q: 'Wen führt Laban am Hochzeitsabend zu Jakob?', options: ['Lea', 'Rahel', 'Rebekka'], answer: 0 }
+        { q: 'Wie viele Jahre dient Jakob zuerst für Rahel?', options: ['sieben', 'zwei', 'zwanzig'], answer: 0 },
+        { q: 'Wen bekommt Jakob zuerst zur Frau?', options: ['Lea', 'Rahel', 'Rebekka'], answer: 0 }
       ],
       soon: SOON
     },
@@ -338,18 +332,17 @@ export const jakob: Journey = {
       image: `${IMG}etappe-bild-01.webp`,
       title: 'Die große Familie',
       ref: '1. Mose 29,31 bis 30,24',
-      audio: `${REC}geschichte-06-v2.mp3`,
       text: [
-        'Jakob hat Rahel lieber als Lea, doch Gott sieht, dass Lea weniger geliebt wird, und schenkt ihr einen Sohn. Sie nennt ihn Ruben, denn sie sagt: „Gott hat mein Elend gesehen.“ Dann bekommt sie Simeon und Levi, und als ihr vierter Sohn geboren wird, ruft sie: „Jetzt will ich Gott danken!“ Deshalb nennt sie ihn Juda.',
-        'Rahel aber hat kein Kind, und das macht sie traurig, weil ihre Schwester so viele Söhne hat. Auch ihre Magd Bilha und Leas Magd Silpa bekommen Söhne: Dan, Naftali, Gad und Asser. Dazu kommen Leas Söhne Issachar und Sebulon und eine Tochter, Dina.',
-        'Rahel wartet und betet. Schließlich denkt Gott an sie, und sie bekommt einen Sohn. „Er soll Josef heißen“, sagt sie, „das bedeutet: Er füge hinzu. Gott hat meine Schande von mir genommen, und ich bitte ihn um noch einen Sohn.“',
-        'Jakobs Zelt ist nun voller Kinder: elf Söhne und eine Tochter. Und der Jüngste von allen, Josef, ist der Sohn Rahels, die Jakob am meisten liebt.'
+        'Jakob hat Rahel lieber als Lea. Aber Gott sieht, dass Lea traurig ist, und schenkt ihr einen Sohn. „Gott hat mein Elend gesehen“, sagt Lea und nennt ihn Ruben.',
+        'Danach bekommt sie noch mehr Söhne, und beim vierten ruft sie: „Jetzt will ich Gott danken!“ Er heißt Juda.',
+        'Rahel aber hat kein Kind. Das macht sie traurig, denn ihre Schwester hat so viele. Sie wartet und betet, Jahr um Jahr.',
+        'Endlich schenkt Gott auch ihr einen Sohn. „Gott hat meine Schande von mir genommen“, sagt Rahel glücklich und nennt ihn Josef. Jakobs Zelte sind nun voller Kinder.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
       task: { kind: 'fangen', hint: 'Tippe die Kinder an, sie laufen zum Zelt.', catch: FANGEN },
       questions: [
-        { q: 'Wie heißt Rahels erster Sohn?', options: ['Josef', 'Ruben', 'Juda'], answer: 0 },
-        { q: 'Wem will Lea nach der Geburt von Juda danken?', options: ['Gott', 'Rahel', 'Jakob'], answer: 0 }
+        { q: 'Was ruft Lea, als Juda geboren wird?', options: ['„Jetzt will ich Gott danken!“', '„Nun will ich schlafen!“', '„Ich will fortgehen!“'], answer: 0 },
+        { q: 'Wie heißt Rahels Sohn?', options: ['Josef', 'Ruben', 'Juda'], answer: 0 }
       ],
       soon: SOON
     },
@@ -358,18 +351,17 @@ export const jakob: Journey = {
       image: `${IMG}etappe-bild-04.webp`,
       title: 'Die Herden wachsen',
       ref: '1. Mose 30,25 bis 31,16',
-      audio: `${REC}geschichte-07-v2.mp3`,
       text: [
-        'Als Josef geboren ist, sagt Jakob zu Laban: „Lass mich jetzt mit meiner Familie in meine Heimat ziehen. Du weißt, wie treu ich dir gedient habe.“ Aber Laban will ihn nicht gehen lassen: „Ich habe gemerkt, dass Gott mich um deinetwillen segnet. Sag, was ich dir als Lohn geben soll.“',
-        'Jakob bittet um die gesprenkelten und dunklen Tiere der Herde als Lohn, und Laban ist einverstanden. Gott aber segnet Jakob, und seine Herden werden immer größer. Er besitzt Schafe, Ziegen, Kamele und Esel und viele Knechte.',
-        'Labans Söhne murren, Jakob habe ihrem Vater alles genommen, und Labans Gesicht ist nicht mehr so freundlich wie früher. Da spricht Gott zu Jakob: „Zieh zurück in das Land deiner Väter, zu deiner Familie. Ich werde bei dir sein.“',
-        'Jakob ruft Rahel und Lea aufs Feld und erzählt ihnen, wie oft ihr Vater seinen Lohn geändert hat und wie Gott ihn trotzdem bewahrt hat. „Wir gehen mit dir“, sagen beide. „Tu, was Gott dir gesagt hat.“'
+        'Jakob arbeitet viele Jahre bei Laban, und Gott segnet ihn. Er wird sehr reich, und seine Herden mit Schafen, Ziegen und Kamelen werden immer größer.',
+        '„Lass mich heimziehen“, bittet er Laban. Doch Laban will ihn nicht gehen lassen, denn er hat gemerkt: Gott segnet ihn wegen Jakob. Jakob sieht es: Bald schaut Laban nicht mehr freundlich.',
+        'Da spricht Gott zu Jakob: „Zieh wieder in das Land deiner Väter. Ich will mit dir sein.“',
+        'Jakob ruft Rahel und Lea aufs Feld und erzählt es ihnen. „Tu alles, was Gott dir gesagt hat“, sagen die beiden. Da macht sich Jakob bereit.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
       task: { kind: 'schaetzen', hint: 'Vergleiche die Herden und schätze, wie viele Tiere es sind.', guess: SCHAETZEN },
       questions: [
-        { q: 'Was will Jakob nach der Geburt von Josef tun?', options: ['in seine Heimat zurückkehren', 'ein neues Zelt bauen', 'bei Laban bleiben'], answer: 0 },
-        { q: 'Was sagt Gott zu Jakob?', options: ['Zieh zurück in das Land deiner Väter.', 'Bleibe bei Laban.', 'Baue eine Stadt.'], answer: 0 }
+        { q: 'Was bittet Jakob den Laban?', options: ['ihn heimziehen zu lassen', 'ihm mehr Schafe zu geben', 'ihm ein Zelt zu bauen'], answer: 0 },
+        { q: 'Was sagt Gott zu Jakob?', options: ['„Zieh wieder in das Land deiner Väter.“', '„Bleibe bei Laban.“', '„Baue eine Stadt.“'], answer: 0 }
       ],
       soon: SOON
     },
@@ -378,18 +370,17 @@ export const jakob: Journey = {
       image: `${IMG}etappe-bild-06.webp`,
       title: 'Der Weg nach Hause',
       ref: '1. Mose 31,17–55',
-      audio: `${REC}geschichte-08-v2.mp3`,
       text: [
-        'Jakob macht sich auf. Er setzt seine Frauen und Kinder auf die Kamele, treibt seine Herden zusammen und nimmt alles mit, was er sich erworben hat. Laban ist gerade zum Scheren seiner Schafe fort, und so zieht Jakob heimlich los, über den Fluss auf das Gebirge Gilead zu.',
-        'Am dritten Tag erfährt Laban davon. Sofort jagt er mit seinen Männern hinter Jakob her, sieben Tage lang, bis er ihn im Gebirge einholt. Doch in der Nacht zuvor hat Gott im Traum zu Laban gesprochen: „Hüte dich, hart mit Jakob zu reden!“',
-        '„Warum bist du heimlich weggelaufen?“, fragt Laban. „Ich hätte dich mit Musik gehen lassen, und meine Enkel und Töchter hätte ich gern zum Abschied geküsst.“ Jakob erinnert ihn an die zwanzig Jahre, in denen er Tag und Nacht für ihn gearbeitet hat, bei Hitze und bei Frost. „Wäre Gott nicht bei mir gewesen“, sagt er, „du hättest mich mit leeren Händen fortgeschickt.“',
-        'Da lenkt Laban ein. Die beiden schließen Frieden. Jakob stellt einen großen Stein auf, und die anderen sammeln Steine zu einem Haufen, auf dem sie gemeinsam essen. Der Haufen soll Zeuge sein und heißt Mizpa, das bedeutet „Warte“, denn Laban sagt: „Gott sei Wächter zwischen mir und dir, wenn wir einander nicht sehen.“ Am nächsten Morgen küsst Laban seine Enkel und Töchter und kehrt heim.'
+        'Jakob lädt seine Frauen und Kinder auf die Kamele, treibt die Herden zusammen und zieht heimlich los. Laban ist gerade weit weg bei seinen Schafen.',
+        'Nach sieben Tagen holt Laban ihn im Bergland ein. Aber in der Nacht davor hat Gott im Traum zu Laban gesprochen: „Hüte dich, hart mit Jakob zu reden!“',
+        '„Warum bist du heimlich fortgegangen?“, fragt Laban. „Zwanzig Jahre habe ich dir gedient“, sagt Jakob. „Wäre Gott nicht bei mir gewesen, du hättest mich mit leeren Händen fortgeschickt.“',
+        'Dann schließen die beiden Frieden. Sie legen Steine zu einem Haufen auf und essen daneben. „Dieser Haufen sei Zeuge zwischen mir und dir“, sagt Laban. Am nächsten Morgen küsst er seine Töchter und Enkel, segnet sie und zieht heim.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
       task: { kind: 'bund', hint: 'Schiebe die Steine von Jakob und Laban gemeinsam in die Mitte.', cairn: BUND },
       questions: [
         { q: 'Wer spricht im Traum zu Laban?', options: ['Gott', 'Jakob', 'Isaak'], answer: 0 },
-        { q: 'Wofür steht der Steinhaufen zwischen Jakob und Laban?', options: ['für ihren Frieden', 'für ein Haus', 'für ein Grab'], answer: 0 }
+        { q: 'Wofür steht der Steinhaufen zwischen Jakob und Laban?', options: ['Er soll Zeuge ihres Friedens sein.', 'Er ist ein Haus für Laban.', 'Er ist ein Grab.'], answer: 0 }
       ],
       soon: SOON
     },
@@ -398,18 +389,17 @@ export const jakob: Journey = {
       image: `${IMG}etappe-bild-05.webp`,
       title: 'Engel und Geschenke',
       ref: '1. Mose 32,1–21',
-      audio: `${REC}geschichte-09-v2.mp3`,
       text: [
-        'Laban ist fort, und Jakob zieht weiter. Da begegnen ihm unterwegs Engel Gottes. „Das ist ein Lager Gottes!“, ruft Jakob und nennt den Ort Mahanajim, das heißt „zwei Lager“.',
-        'Doch bald kehrt die Sorge zurück, denn vor ihm liegt das Land seines Bruders Esau. Jakob schickt Boten voraus: „Dein Knecht Jakob lässt dich grüßen. Ich war lange bei Laban, aber jetzt habe ich Schafe, Rinder, Esel und Knechte, und ich hoffe, dass du mich freundlich aufnimmst.“ Die Boten kommen zurück: „Esau zieht dir entgegen, mit vierhundert Männern.“',
-        'Jakob bekommt große Angst. Er teilt seine Leute und Herden in zwei Lager, damit wenigstens eines davonkommen kann, wenn Esau das andere angreift. Dann betet er: „Gott meiner Väter, du hast zu mir gesagt: Zieh heim, ich will dir Gutes tun. Ich bin zu klein für alles, was du mir geschenkt hast. Nur mit meinem Stab bin ich damals über den Jordan gegangen, und nun habe ich zwei Lager. Rette mich vor meinem Bruder!“',
-        'Dann sucht Jakob aus seinen Herden ein Geschenk für Esau aus: Ziegen, Schafe, Kamele, Kühe und Esel, jede Art als eigene Herde. Seine Knechte sollen sie einzeln und mit Abstand Esau entgegentreiben. „Ich will ihn mit dem Geschenk versöhnen“, denkt Jakob, „vielleicht nimmt er mich dann freundlich auf.“'
+        'Jakob zieht weiter. Da begegnen ihm Engel Gottes. „Hier ist Gottes Lager!“, ruft er.',
+        'Dann kommen Boten, die er zu seinem Bruder vorausgeschickt hat: „Esau zieht dir entgegen, mit vierhundert Männern.“ Jakob fürchtet sich sehr.',
+        'Er betet: „Gott, du hast gesagt, du willst mir Gutes tun. Ich bin zu klein für alles, was du mir geschenkt hast. Errette mich von der Hand meines Bruders!“',
+        'Dann sucht Jakob Geschenke für Esau aus: Herden von Ziegen, Schafen und Kamelen. Seine Knechte sollen sie vor ihm hertreiben. „Lasst Raum zwischen einer Herde und der anderen“, sagt er. Vielleicht wird Esau freundlich sein, wenn er die Geschenke sieht.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
       task: { kind: 'staffel', hint: 'Schicke die Herden mit Abstand los.', relay: STAFFEL },
       questions: [
-        { q: 'Wem begegnet Jakob auf dem Weg?', options: ['Engeln Gottes', 'Räubern', 'Hirten'], answer: 0 },
-        { q: 'Was schickt Jakob Esau entgegen?', options: ['Tiere als Geschenk', 'einen Brief', 'ein Schwert'], answer: 0 }
+        { q: 'Wem begegnet Jakob unterwegs?', options: ['Engeln Gottes', 'Räubern', 'Hirten'], answer: 0 },
+        { q: 'Was tut Jakob, als er von Esaus Männern hört?', options: ['Er betet zu Gott.', 'Er läuft davon.', 'Er baut eine Mauer.'], answer: 0 }
       ],
       soon: SOON
     },
@@ -418,12 +408,11 @@ export const jakob: Journey = {
       image: `${IMG}etappe-bild-05.webp`,
       title: 'Der Kampf am Fluss',
       ref: '1. Mose 32,23–32',
-      audio: `${REC}geschichte-10-v2.mp3`,
       text: [
-        'Die Geschenke ziehen voraus, und Jakob bleibt die Nacht im Lager. Mitten in der Nacht steht er auf, nimmt seine Frauen, seine Kinder und alles, was er hat, und bringt sie sicher durch die Furt des Flusses Jabbok. Er selbst bleibt allein auf der anderen Seite zurück.',
-        'Da kommt ein Mann und ringt mit ihm, bis der Morgen anbricht. Der Mann berührt Jakobs Hüfte, und von da an tut sie ihm weh.',
-        'Als die Morgenröte kommt, sagt der Mann: „Lass mich los, der Morgen bricht an!“ Aber Jakob hält fest: „Ich lasse dich nicht, es sei denn, du segnest mich.“ „Wie heißt du?“, fragt der Mann. „Jakob.“ „Du sollst nicht mehr Jakob heißen, sondern Israel, denn du hast mit Gott und mit Menschen gerungen und nicht aufgegeben.“ Und er segnet ihn dort.',
-        'Jakob nennt den Ort Pnuël, das heißt „Gottes Angesicht“. „Ich habe Gott von Angesicht gesehen“, sagt er, „und bin am Leben geblieben.“ Als die Sonne aufgeht, zieht er weiter, und er hinkt. Aber er hat einen neuen Namen und Gottes Segen.'
+        'In der Nacht bringt Jakob seine Familie über den Fluss Jabbok. Er selbst bleibt allein zurück. Da ringt ein Mann mit ihm, bis der Morgen kommt, und berührt dabei seine Hüfte. Seitdem tut sie ihm weh.',
+        '„Lass mich los“, sagt der Mann, „der Morgen bricht an.“ „Ich lasse dich nicht“, sagt Jakob, „du segnest mich denn!“',
+        '„Du sollst nicht mehr Jakob heißen, sondern Israel“, sagt der Mann, „denn du hast mit Gott und mit Menschen gerungen und nicht aufgegeben.“ Und er segnet ihn.',
+        'Die Sonne geht auf. „Ich habe Gott von Angesicht gesehen“, sagt Jakob, „und lebe noch.“ Er geht weiter und hinkt, aber er hat einen neuen Namen und Gottes Segen.'
       ],
       task: { kind: 'halten', hint: 'Halte das Licht fest, bis der Morgen kommt.', hold: HALTEN },
       questions: [
@@ -437,17 +426,16 @@ export const jakob: Journey = {
       image: `${IMG}etappe-bild-06.webp`,
       title: 'Wiedersehen',
       ref: '1. Mose 33,1–11',
-      audio: `${REC}geschichte-11-v2.mp3`,
       text: [
-        'Als Jakob aufblickt, sieht er Esau kommen, mit vierhundert Männern. Er ordnet seine Familie: vorn die Mägde mit ihren Kindern, dann Lea mit ihren, ganz hinten Rahel mit Josef. Er selbst geht allen voran und verneigt sich siebenmal bis zur Erde, je näher er seinem Bruder kommt.',
-        'Da läuft Esau ihm entgegen! Er umarmt ihn, fällt ihm um den Hals und küsst ihn, und beide weinen vor Freude.',
-        '„Wer sind die da bei dir?“, fragt Esau, als er die Frauen und Kinder sieht. „Das sind die Kinder, die Gott mir geschenkt hat“, antwortet Jakob. Alle kommen heran und verneigen sich.',
-        '„Was sollen all die Herden, denen ich begegnet bin?“, fragt Esau. „Sie sind ein Geschenk für dich“, sagt Jakob. „Ich habe genug, mein Bruder, behalte, was dir gehört.“ Aber Jakob bittet: „Nimm es doch! Dein Gesicht zu sehen ist, als sähe ich Gottes Gesicht, so freundlich hast du mich aufgenommen.“ Da nimmt Esau das Geschenk an. Aus dem Streit der Brüder ist Frieden geworden.'
+        'Am Morgen sieht Jakob Esau kommen, mit vierhundert Männern. Er geht ihm allein voran und verneigt sich tief.',
+        'Da läuft Esau ihm entgegen! Er umarmt Jakob, fällt ihm um den Hals und küsst ihn. Beide weinen vor Freude.',
+        '„Wer sind die da bei dir?“, fragt Esau, als er die Frauen und Kinder sieht. „Die Kinder, die Gott mir geschenkt hat“, sagt Jakob.',
+        'Dann bietet Jakob ihm seine Herden als Geschenk an. „Ich habe genug, mein Bruder“, sagt Esau. Aber Jakob bittet: „Nimm es doch! Dein Gesicht zu sehen ist, als sähe ich Gottes Gesicht, so freundlich bist du zu mir.“ Da nimmt Esau das Geschenk an. Der Streit der Brüder ist vorbei.'
       ],
       task: { kind: 'puzzle', hint: 'Setze das Bild vom Wiedersehen zusammen.', puzzle: { image: `${G}puzzle/wiedersehen.webp`, cols: 2, rows: 3 } },
       questions: [
         { q: 'Was tut Esau, als er Jakob sieht?', options: ['Er läuft ihm entgegen und umarmt ihn.', 'Er läuft weg.', 'Er schickt ihn fort.'], answer: 0 },
-        { q: 'Was bringt Jakob seinem Bruder mit?', options: ['Tiere als Geschenk', 'ein Schwert', 'ein Zelt'], answer: 0 }
+        { q: 'Was bietet Jakob seinem Bruder an?', options: ['seine Herden als Geschenk', 'sein Zelt', 'seinen Stab'], answer: 0 }
       ],
       soon: SOON
     },
@@ -455,13 +443,12 @@ export const jakob: Journey = {
       id: 12,
       image: `${IMG}etappe-bild-03.webp`,
       title: 'Zwölf Söhne',
-      ref: '1. Mose 35,1–20; 35,22–26; 37,1–4',
-      audio: `${REC}geschichte-12-v2.mp3`,
+      ref: '1. Mose 35,1–18; 35,22–26; 37,1–4',
       text: [
-        'Gott sagt zu Jakob: „Zieh nach Bethel und baue dort einen Altar.“ Jakob macht sich mit seiner ganzen Familie auf, und in Bethel, wo er einst allein auf dem Stein geschlafen hat, baut er den Altar. Gott spricht noch einmal zu ihm: „Du heißt Jakob, aber du sollst Israel heißen. Aus dir sollen viele Völker kommen, und das Land, das ich Abraham und Isaak gegeben habe, will ich dir und deinen Nachkommen geben.“ Jakob richtet wieder einen Stein auf und gießt Öl darüber.',
-        'Dann ziehen sie weiter. Kurz vor Efrata wird Rahels zweiter Sohn geboren, Benjamin, und Rahel stirbt dabei. Jakob ist sehr traurig und stellt einen Stein auf ihr Grab.',
-        'Nun hat Jakob zwölf Söhne: Ruben, Simeon, Levi, Juda, Issachar und Sebulon, Josef und Benjamin, Dan und Naftali, Gad und Asser. Aus ihnen soll das Volk Israel werden, das den neuen Namen seines Vaters trägt.',
-        'Jakob lebt im Land Kanaan, wo schon sein Vater als Fremder gewohnt hat. Josef, der Sohn seines Alters, ist ihm der liebste, und er lässt ihm einen bunten Rock machen. Als die Brüder sehen, dass der Vater Josef mehr liebt als sie, werden sie böse auf ihn und können kein freundliches Wort mehr mit ihm reden. Hier beginnt eine neue Geschichte, die von Josef.'
+        'Gott sagt zu Jakob: „Zieh nach Bethel und baue dort einen Altar.“ Jakob zieht mit seiner ganzen Familie hin und baut dort den Altar. Gott spricht noch einmal zu ihm: „Du sollst Israel heißen.“',
+        'Auf dem Weg wird Benjamin geboren, und seine Mutter Rahel stirbt dabei. Jakob ist sehr traurig und stellt einen Stein auf ihr Grab.',
+        'Nun hat Jakob zwölf Söhne, und aus ihnen soll ein großes Volk werden, wie Gott es versprochen hat. Am liebsten hat er Josef, den Sohn seines Alters.',
+        'Josef ist siebzehn Jahre alt und hütet mit seinen Brüdern die Schafe. Jakob hat ihn so lieb, dass er ihm einen bunten Rock machen lässt.'
       ],
       // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
       task: { kind: 'kreis', hint: 'Stelle die zwölf Söhne gleichmäßig um den Altar.', ring: KREIS },
@@ -473,12 +460,12 @@ export const jakob: Journey = {
     }
   ],
   exam: [
-    { q: 'Wie heißen die Zwillinge von Isaak und Rebekka?', options: ['Esau und Jakob', 'Isaak und Lot', 'Kain und Abel'], answer: 0 },
-    { q: 'Was legt sich Jakob auf die Hände, damit der Vater ihn für Esau hält?', options: ['Ziegenfell', 'Mehl', 'Lehm'], answer: 0 },
-    { q: 'Was nimmt Jakob in der Nacht als Kopfkissen?', options: ['einen Stein', 'ein Fell', 'einen Sack'], answer: 0 },
-    { q: 'Wie viele Söhne hat Jakob am Ende?', options: ['zwölf', 'sieben', 'drei'], answer: 0 },
-    { q: 'Wie heißt Jakob nach dieser Nacht am Fluss?', options: ['Israel', 'Esau', 'Isaak'], answer: 0 },
-    { q: 'Was tut Esau, als er Jakob wiedersieht?', options: ['Er läuft ihm entgegen und umarmt ihn.', 'Er läuft weg.', 'Er schickt ihn fort.'], answer: 0 }
+    { q: 'Was gibt Esau für einen Teller Linsen her?', options: ['sein Erstgeburtsrecht', 'sein Zelt', 'seinen Bogen'], answer: 0 },
+    { q: 'Was nimmt Jakob in Bethel als Kopfkissen?', options: ['einen Stein', 'ein Fell', 'einen Sack'], answer: 0 },
+    { q: 'Wen trifft Jakob am Brunnen?', options: ['Rahel', 'Lea', 'Rebekka'], answer: 0 },
+    { q: 'Wer spricht im Traum zu Laban?', options: ['Gott', 'Jakob', 'Isaak'], answer: 0 },
+    { q: 'Welchen neuen Namen bekommt Jakob am Fluss?', options: ['Israel', 'Esau', 'Isaak'], answer: 0 },
+    { q: 'Welchen Sohn hat Jakob am liebsten?', options: ['Josef', 'Benjamin', 'Ruben'], answer: 0 }
   ]
 
 }
