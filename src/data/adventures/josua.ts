@@ -23,15 +23,15 @@ const G = 'images/abenteuer/spiele/josua/'
 
 /**
  * Etappe 8, "Ruhe bewahren": am Wegrand sitzen vier Tiere, über denen kleine Lärmwolken wachsen; ein Tippen beruhigt das Tier, bevor die Wolke laut ist (Bildauftrag JO35; Hintergrund = das Etappenbild 8, von der App
- * weichgezeichnet). Plan v3: vier feste Plätze (Fußpunkt und Breite in Bildschirm-Prozent am unteren Rand) mit Esel, Gans, Ziege, Lamm. Runde 1 fünf Beruhigungen, höchstens zwei Wolken zugleich, 4 Sekunden bis laut;
+ * weichgezeichnet). Plan v3: vier feste Plätze (Fußpunkt und Breite in Bildschirm-Prozent am unteren Rand) mit Kamel (Ersatz für den Esel: der Generator hat den Esel abgelehnt), Gans, Ziege, Lamm. Runde 1 fünf Beruhigungen, höchstens zwei Wolken zugleich, 4 Sekunden bis laut;
  * Runde 2 acht, höchstens zwei Wolken, 3 Sekunden. Es gibt nur ein Wolkenbild, die App zeigt es in drei Größen. Die Reihenfolge der Wolken ist aus dem Startwert `seed` immer dieselbe.
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `still/esel.webp`, `gans.webp`, `ziege.webp`, `lamm.webp` je 220 × 220, `wolke.webp` 120 × 100 (alle transparent).
+ * Bilder (gemalt, 21.10.2026): `still/kamel.webp`, `gans.webp`, `ziege.webp`, `lamm.webp` je 220 × 220, `wolke.webp` 120 × 100 (alle transparent).
  */
 const STILL: HushGame = {
   background: `${PLACEHOLDER}etappe-bild-08.webp`,
   clouds: [`${G}still/wolke.webp`, `${G}still/wolke.webp`, `${G}still/wolke.webp`],
   spots: [
-    { id: 'platz-1', animal: 'esel', image: `${G}still/esel.webp`, x: 15, y: 90, w: 14 },
+    { id: 'platz-1', animal: 'kamel', image: `${G}still/kamel.webp`, x: 15, y: 90, w: 14 },
     { id: 'platz-2', animal: 'gans', image: `${G}still/gans.webp`, x: 38, y: 90, w: 14 },
     { id: 'platz-3', animal: 'ziege', image: `${G}still/ziege.webp`, x: 62, y: 90, w: 14 },
     { id: 'platz-4', animal: 'lamm', image: `${G}still/lamm.webp`, x: 85, y: 90, w: 14 }
@@ -46,8 +46,8 @@ const STILL: HushGame = {
  * Etappe 2, "Unter dem Flachs verstecken": die Männer liegen in Mäntel gewickelt auf dem Dach (Draufsicht), Flachsbündel werden darüber gelegt, bis nichts mehr herausschaut (Bildauftrag JO30; eigener Hintergrund
  * `verstecken/dach.webp`, 3:4). Die Größen der Bündel sind in Prozent der Dachbreite (in beide Richtungen), die Männer in Prozent des Bildes. Plan v3: es gibt nur ein Flachsbild (`flachs.webp`), die App zeigt es in
  * drei Größen (groß 30 %, mittel 21,7 %, klein 15 %). Runde 1 ein Mann, drei Bündel (zwei große, ein kleines), Runde 2 zwei Männer, fünf Bündel (drei große, ein mittleres, ein kleines). Beide Runden sind lösbar (Test).
- * Die Lage der Männer ist vorläufig geschätzt, bis die Datei `verstecken-messung.json` der Spielbild-Sitzung da ist.
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `verstecken/dach.webp` 900 × 1200, `mann-a.webp`, `mann-b.webp` je 360 × 150, `flachs.webp` 360 × 130, `boten.webp` 220 × 160 (alle außer dem Dach transparent).
+ * Die Lage der Männer ist am gemalten Dach angesehen (die Männer liegen frei auf der leeren Fläche, es gibt keine Messdatei).
+ * Bilder (gemalt, 21.10.2026): `verstecken/dach.webp` 900 × 1200, `mann-a.webp`, `mann-b.webp` je 360 × 150, `flachs.webp` 360 × 130, `boten.webp` 220 × 160 (alle außer dem Dach transparent).
  */
 const VERSTECKEN: HideGame = {
   background: `${G}verstecken/dach.webp`,
@@ -72,16 +72,15 @@ const VERSTECKEN: HideGame = {
 /**
  * Etappe 6, "Fladen backen": Teigkugeln werden auf heiße Steine gelegt, werden zum Fladen, sind eine Weile goldbraun (Antippen wendet sie) und werden dann zu dunkel (Bildauftrag JO34; eigener Hintergrund
  * `backen/feuerstelle.webp`). Plan v3: Runde 1 vier Fladen auf drei Steinen (golden von 2,5 bis 6,0 Sekunden), Runde 2 sechs Fladen auf vier Steinen (2,2 bis 5,0). Die Kugel in der Schale ist der rohe Fladen
- * (`dough` fehlt), die gewendeten zählt die App an einer festen Stelle (kein Stapelbild). Die vier Steine (Prozent des Bildes) sind vorläufig geschätzt, bis die Datei `backen-messung.json` der
- * Spielbild-Sitzung da ist.
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `backen/feuerstelle.webp` 1200 × 900, `fladen-roh.webp`, `fladen-gold.webp`, `fladen-dunkel.webp` je 200 × 200 (die drei transparent).
+ * (`dough` fehlt), die gewendeten zählt die App an einer festen Stelle (kein Stapelbild). Die vier Steine (Prozent des Bildes) sind am gemalten Bild abgelesen (`backen-messung.json`, Variante a: hinten links, hinten rechts, vorne links, vorne rechts).
+ * Bilder (gemalt, 21.10.2026): `backen/feuerstelle.webp` 1200 × 900, `fladen-roh.webp`, `fladen-gold.webp`, `fladen-dunkel.webp` je 200 × 200 (die drei transparent).
  */
 const BACKEN: BakeGame = {
   background: `${G}backen/feuerstelle.webp`,
   raw: `${G}backen/fladen-roh.webp`,
   golden: `${G}backen/fladen-gold.webp`,
   dark: `${G}backen/fladen-dunkel.webp`,
-  stonesAt: [[26, 56], [50, 50], [74, 56], [50, 74]],
+  stonesAt: [[37.9, 46.8], [63.1, 47], [35.8, 60], [65.4, 60.3]],
   rounds: [
     { hint: 'Lege Teig auf die heißen Steine. Wende den Fladen, wenn er goldbraun ist.', dough: 4, stones: 3, goldenFrom: 2.5, goldenTo: 6 },
     { hint: 'Jetzt mehr Steine und mehr Fladen.', dough: 6, stones: 4, goldenFrom: 2.2, goldenTo: 5 }
@@ -91,8 +90,8 @@ const BACKEN: BakeGame = {
 /**
  * Etappe 3, "Am Seil herablassen": ein Mann hängt am Seil aus dem Fenster in der Stadtmauer und schwingt im Wind hin und her; ein Tippen, wenn er von der Mauer wegschwingt, lässt ihn einen Schritt tiefer
  * (Bildauftrag JO31; eigener Hintergrund `abseilen/mauer.webp`, die Mauer steht links). Plan v3: Runde 1 ein Mann, vier Schritte, ruhiger Wind (3,4 s je Schwung, 12°, frei ab 2°); Runde 2 der zweite Mann, fünf Schritte,
- * stärkerer Wind (2,8 s, 14°, frei ab 4°). Fenster und Boden (Prozent des Bildes) sind vorläufig geschätzt, bis die Datei `abseilen-messung.json` der Spielbild-Sitzung da ist.
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `abseilen/mauer.webp` 900 × 1200, `mann-am-seil-a.webp`, `mann-am-seil-b.webp` je 160 × 560 (transparent, das Seil gehört zum Bild).
+ * stärkerer Wind (2,8 s, 14°, frei ab 4°). Fenster und Boden (Prozent des Bildes) sind am gemalten Bild abgelesen (`abseilen-messung.json`).
+ * Bilder (gemalt, 21.10.2026): `abseilen/mauer.webp` 900 × 1200, `mann-am-seil-a.webp`, `mann-am-seil-b.webp` je 160 × 560 (transparent, das Seil gehört zum Bild).
  */
 const ABSEILEN: LowerGame = {
   background: `${G}abseilen/mauer.webp`,
@@ -100,8 +99,8 @@ const ABSEILEN: LowerGame = {
     { id: 'a', image: `${G}abseilen/mann-am-seil-a.webp`, w: 16 },
     { id: 'b', image: `${G}abseilen/mann-am-seil-b.webp`, w: 16 }
   ],
-  window: [38, 14],
-  ground: 92,
+  window: [20.2, 13.5],
+  ground: 91,
   rounds: [
     { hint: 'Tippe, wenn der Mann von der Mauer wegschwingt. Dann sinkt er einen Schritt.', man: 'a', steps: 4, period: 3.4, amplitude: 12, threshold: 2 },
     { hint: 'Der zweite Mann kommt, der Wind ist stärker.', man: 'b', steps: 5, period: 2.8, amplitude: 14, threshold: 4 }
@@ -120,7 +119,7 @@ const VERS: VerseGame = {
   ]
 }
 
-/** Etappe 5, "Erinnerungs-Memory": fünf Paare aus den Etappen 1 bis 5 (das Seil entfällt); zu jedem Treffer ein Satz aus dem Text. Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `memory/karte-*.webp` und `rueck.webp`, je 256 × 256 (Bildauftrag JO33). */
+/** Etappe 5, "Erinnerungs-Memory": fünf Paare aus den Etappen 1 bis 5 (das Seil entfällt); zu jedem Treffer ein Satz aus dem Text. Bilder (gemalt, 21.10.2026): `memory/karte-*.webp` und `rueck.webp`, je 256 × 256 (Bildauftrag JO33). */
 const MEMORY: MemoryGame = {
   back: `${G}memory/rueck.webp`,
   pairs: [
@@ -135,17 +134,17 @@ const MEMORY: MemoryGame = {
 /**
  * Etappe 4, "Durch den Jordan": die goldene Truhe mit den Priestern steht am linken Ufer, das Kind zieht sie in die Flussmitte (Runde 1), je weiter sie kommt, desto trockener wird das Flussbett; danach schickt
  * jedes Antippen eine von drei Gruppen des Volkes über das trockene Bett ans andere Ufer (Runde 2). Kein Fehler, kein Zeitdruck (Bildauftrag JO32; eigene Szene `jordan/fluss.webp`). Alle Orte sind Prozent des Bildes
- * und vorläufig geschätzt, bis die Datei `jordan-messung.json` der Spielbild-Sitzung da ist: Truhe `start` und `middle`, die wartenden Gruppen `groups`, die Landung `farBank`.
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `jordan/fluss.webp` 1200 × 900, `lade.webp` 360 × 300, `volk.webp` 360 × 280 (die zwei transparent).
+ * und am gemalten Bild abgelesen und mit den Sprites zusammen angesehen (`jordan-messung-b.json`, Landung leicht nach rechts verschoben, damit alle drei Gruppen auf dem Gras landen): Truhe `start` und `middle`, die wartenden Gruppen `groups`, die Landung `farBank`.
+ * Bilder (gemalt, 21.10.2026): `jordan/fluss.webp` 1200 × 900, `lade.webp` 360 × 300, `volk.webp` 360 × 280 (die zwei transparent).
  */
 const JORDAN: CrossGame = {
   background: `${G}jordan/fluss.webp`,
   chest: `${G}jordan/lade.webp`,
   group: `${G}jordan/volk.webp`,
-  start: [14, 66],
-  middle: [50, 64],
-  groups: [[10, 78], [18, 86], [10, 94]],
-  farBank: [88, 70],
+  start: [18, 46],
+  middle: [54, 46],
+  groups: [[13, 38], [13, 48], [13, 58]],
+  farBank: [94, 42],
   rounds: [{ hint: 'Ziehe die goldene Truhe ins Wasser.' }, { hint: 'Jetzt geht das Volk hinüber. Tippe die Gruppen an.' }]
 }
 
