@@ -20,7 +20,7 @@ const stage = (n: number) => gideon.stages[n - 1]!
 const FORBIDDEN = /\b(Messer|Speer|Pfeil|Blut|töten|erschlagen|erwürgen|Teufel|Hölle)\b/i
 
 describe('Gideon: stories and questions', () => {
-  it('twelve stages with 3 or 4 paragraphs of 90 to 145 words (plan v3) and the Bible passage under every one; no recording yet; the stage pictures are the ones of Josef (PLATZHALTER)', () => {
+  it('twelve stages with 3 or 4 paragraphs of 90 to 145 words (plan v3) and the Bible passage under every one; the German recordings; the stage pictures are the ones of Josef (PLATZHALTER)', () => {
     expect(gideon.id).toBe('gideon')
     expect(gideon.age).toBe('8-10')
     expect(gideon.title).toBe('Gideon')
@@ -53,7 +53,8 @@ describe('Gideon: stories and questions', () => {
       expect(words / sentences, `words per sentence ${s.id}`).toBeGreaterThan(7)
       expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.audio, `no recording yet, the device voice reads: ${s.id}`).toBeUndefined()
+      expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/gideon/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`)
+      expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
       expect(s.image, `stage ${s.id}`).toBe(`images/abenteuer/gideon/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
     }
     expect(new Set(gideon.stages.map((s) => s.image)).size).toBe(12)
@@ -362,7 +363,7 @@ describe('Gideon: the lists of the writing session (stories-gideon-v3-*.json) sa
   const de = 'D:/Claude/Abenteuer-Gideon/stories-gideon-v3-de.json'
   const en = 'D:/Claude/Abenteuer-Gideon/ENGLISCH/stories-gideon-v3-en.json'
   // the lists lie outside the repository (they belong to the drafts); on another computer there is nothing to compare
-  it.runIf(existsSync(de) && existsSync(en))('German and English list (plan v3): twelve entries, the same paragraphs as the data, no recording linked', () => {
+  it.runIf(existsSync(de) && existsSync(en))('German and English list (plan v3): twelve entries, the same paragraphs as the data, the German recording linked', () => {
     const read = (f: string) => JSON.parse(readFileSync(f, 'utf-8')) as { n: number; text: string[]; audio: string }[]
     const overlay = englishTextsOf(gideon) as any
     setAdventureLanguage('de')
@@ -374,8 +375,8 @@ describe('Gideon: the lists of the writing session (stories-gideon-v3-*.json) sa
       expect(dl[i]!.n).toBe(s.id)
       expect(dl[i]!.text, `German list ${s.id}`).toEqual(s.text)
       expect(el[i]!.text, `English list ${s.id}`).toEqual(overlay.stages[i].text)
-      // no recording is linked to the new texts yet
-      expect(s.audio).toBeUndefined()
+      // the German recording of the new text is linked (the English list has none yet)
+      expect(s.audio).toBe(`audio/abenteuer/gideon/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`)
     })
   })
 })
