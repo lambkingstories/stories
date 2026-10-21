@@ -1,7 +1,7 @@
 /**
  * Abenteuer "Der Turm von Babel" (1. Mose 11,1–9) für 8 bis 10 Jahre: 6 Etappen, Untertitel "Eine Stadt und ein Turm". Entstanden nach dem Skill "LambKing Abenteuer Skill".
  * Quelle der Texte: D:/Claude/Abenteuer-Babel/ENTWURF_Babel-v3.md (zweitgeprüft, 90 bis 145 Wörter je Etappe wie bei Noah und Josef, eingebaut am 21.10.2026), Plan: ETAPPENPLAN-v3.md.
- * Es gibt noch keine Aufnahmen zu den neuen Texten (`audio` fehlt: die App liest mit der Gerätestimme); die alten Aufnahmen liegen noch im Ordner, sind aber nicht mehr verlinkt.
+ * Deutsche Aufnahmen zu den neuen Texten: geschichte-NN-v3.mp3 (Gemini, Stimme Achernar, 21.10.2026, nicht gehört); Englisch noch nicht (die englische App liest mit der Gerätestimme).
  * Die richtige Antwort steht in den Daten
  * IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
  * Alle fünf Spiele dieses Abenteuers sind neu (keines in Josef, Noah oder Adam und Eva), Etappe 5 ist nur Quiz; jedes Spiel hat höchstens zwei Runden.
@@ -14,6 +14,7 @@
 import type { ChainGame, Journey, MissingGame, StackGame, TraceGame, WipeGame } from '@/types/adventure'
 import { BABEL_PATH } from './babelPath'
 import { localize } from './localize'
+import { adventureLanguage } from '@/use/adventureLanguage'
 import { babelEn } from './en/babel.en'
 
 const IMG = 'images/abenteuer/babel/'
@@ -283,6 +284,12 @@ export const babel: Journey = {
     { q: 'Was geschieht, als Gott die Sprache verwirrt?', options: ['Die Menschen verstehen einander nicht mehr.', 'Die Menschen werden still.', 'Die Menschen bauen schneller.'], answer: 0 },
     { q: 'Wie heißt die Stadt am Ende?', options: ['Babel', 'Eden', 'Ur'], answer: 0 }
   ]
+}
+
+// the German recordings of the stories (voice Achernar, text version 3 = files "-v3"); there are no English ones yet, so the English app reads with the voice of the device
+for (const s of babel.stages) {
+  const file = `audio/abenteuer/babel/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`
+  Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 
 // the English texts (title, stories, questions, hints, recordings) lie over the German ones; the screens show them when the app is English

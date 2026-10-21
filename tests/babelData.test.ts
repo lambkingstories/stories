@@ -20,7 +20,7 @@ const stage = (n: number) => babel.stages[n - 1]!
 const FORBIDDEN = /\b(Strafe|Fluch|Zorn|Teufel|Dämon|Hölle|Blut|tot|Tod)\b/i
 
 describe('Babel: stories and questions', () => {
-  it('six stages with 3 or 4 paragraphs of 90 to 145 words (plan v3), the Bible passage under every one, no recording yet (the app reads with the voice of the device), the picture names of the plan', () => {
+  it('six stages with 3 or 4 paragraphs of 90 to 145 words (plan v3), the Bible passage under every one, the German recording of every story, the picture names of the plan', () => {
     expect(babel.id).toBe('babel')
     expect(babel.age).toBe('8-10')
     expect(babel.stages).toHaveLength(6)
@@ -38,7 +38,8 @@ describe('Babel: stories and questions', () => {
       expect(words / sentences, `words per sentence ${s.id}`).toBeGreaterThan(7)
       expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.audio, `no recording yet ${s.id}`).toBeUndefined()
+      expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/babel/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`)
+      expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
       expect(s.image).toBe(`images/abenteuer/babel/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
     }
   })
@@ -351,7 +352,7 @@ describe('Babel: English', () => {
       expect(s.task.hint, `hint ${s.id}`).not.toBe(de[i]!.hint)
       s.questions.forEach((q, k) => expect(q.q, `question ${s.id}.${k}`).not.toBe(de[i]!.q[k]))
       expect(s.ref, `ref ${s.id}`).toMatch(/^Genesis 11:/)
-      expect(s.audio, `audio ${s.id}`).toBeUndefined()
+      expect(s.audio, `no English recording yet: ${s.id}`).toBeUndefined()
     })
     expect(babel.title).toBe('The Tower of Babel')
     // the serious stage has its English line, too
