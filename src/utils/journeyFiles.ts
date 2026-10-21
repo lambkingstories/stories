@@ -78,11 +78,6 @@ export const NOT_PAINTED_YET = [
   'images/abenteuer/spiele/josua/jordan/',
   'images/abenteuer/spiele/josua/abseilen/',
   'images/abenteuer/spiele/josua/memory/',
-  'images/abenteuer/spiele/jakob/jahre/',
-  'images/abenteuer/spiele/jakob/bund/',
-  'images/abenteuer/spiele/jakob/kreis/',
-  'images/abenteuer/spiele/jakob/fangen/',
-  'images/abenteuer/spiele/jakob/kurbel/brunnen.webp'
 ]
 
 export const notPaintedYet = (path: string) => NOT_PAINTED_YET.some((p) => path.startsWith(p))

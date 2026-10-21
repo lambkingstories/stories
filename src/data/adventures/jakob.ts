@@ -42,8 +42,8 @@ const SCHIEBEN: SlideGame = {
 
 /**
  * Etappe 4, "Brunnen kurbeln": der Brunnen mit einer Kurbel, einem Eimer am Seil und einem Trog (Bildaufträge J10 und J34). Plan v3: Runde 1 ein Eimer, Runde 2 zwei. Der Hintergrund ist die eigene Szene
- * `kurbel/brunnen.webp` (Auftrag J34, noch nicht gemalt: bis dahin ist die Fläche einfarbig). Die Plätze (Kurbelmitte, Seil x und Eimer oben/unten, Trog Mitte x, y und Breite; Prozent der Szene) sind
- * die Messwerte vom alten Etappenbild 4 und werden mit `kurbel-messung.json` zu J34 neu gesetzt. Die Sprites `kurbel`, `eimer`, `trog-leer`, `trog-voll` sind die aus J10.
+ * `kurbel/brunnen.webp` (Auftrag J34, gemalt am 21.10.2026). Die Plätze (Kurbelmitte, Seil x und Eimer oben/unten, Trog Mitte x, y und Breite; Prozent der Szene) sind am gemalten Bild
+ * abgelesen und mit den Sprites zusammen angesehen (`kurbel-messung-j34-b.json`; Kurbel am linken Pfosten, Eimer unter der Rolle, Trog auf dem freien Boden rechts). Die Sprites `kurbel`, `eimer`, `trog-leer`, `trog-voll` sind die aus J10.
  */
 const KURBEL: CrankGame = {
   background: `${G}kurbel/brunnen.webp`,
@@ -51,9 +51,9 @@ const KURBEL: CrankGame = {
   bucket: `${G}kurbel/eimer.webp`,
   troughEmpty: `${G}kurbel/trog-leer.webp`,
   troughFull: `${G}kurbel/trog-voll.webp`,
-  crankAt: [44, 82],
-  bucketAt: [59, 63, 75],
-  troughAt: [73.5, 88.4, 23],
+  crankAt: [8.5, 36],
+  bucketAt: [27.5, 34, 46],
+  troughAt: [75, 76, 32],
   rounds: [
     { hint: 'Hole einen Eimer Wasser für die Schafe.', buckets: 1 },
     { hint: 'Jetzt brauchen die Schafe zwei Eimer.', buckets: 2 }
@@ -78,7 +78,7 @@ const HALTEN: HoldGame = {
  * Etappe 5, "Jahreszeiten fortsetzen": eine Reihe von Plätzen, in der die vier Zeichen der Jahreszeiten Jahr für Jahr wiederkehren, einige Plätze sind leer (Bildauftrag J30; Hintergrund = das
  * Etappenbild, von der App weichgezeichnet). Ein Jahr ist eine Reihe von vier Plätzen. Plan v3: Runde 1 zwei Jahre (8 Plätze) mit zwei Lücken in der Mitte, Runde 2 drei Jahre (12 Plätze) mit drei Lücken,
  * die letzte am Ende der Reihe. Zusammen 5 Lücken.
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `jahre/fruehling.webp`, `sommer.webp`, `herbst.webp`, `winter.webp`, je 160 × 160, transparent.
+ * Bilder (gemalt, 21.10.2026): `jahre/fruehling.webp`, `sommer.webp`, `herbst.webp`, `winter.webp`, je 160 × 160, transparent.
  */
 const JAHRE: CycleGame = {
   background: '',
@@ -98,7 +98,7 @@ const JAHRE: CycleGame = {
  * Etappe 8, "Steinhaufen zu zweit": Jakob und Laban schieben ihre großen Steine gemeinsam in die Mitte, dort legt sich ein kleiner Stein auf den Haufen (Bildauftrag J32; Hintergrund = das Etappenbild,
  * von der App weichgezeichnet). Plan v3: Runde 1 zwei Steine mit drei Schritten, Runde 2 vier Steine mit drei Schritten. Der kleine Stein ist der große auf die Hälfte verkleinert (kein eigenes Bild).
  * Mitte und Startplätze sind Bildschirm-Prozent der Spielfläche.
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `bund/stein-links.webp`, `stein-rechts.webp` je 220 × 180, transparent.
+ * Bilder (gemalt, 21.10.2026): `bund/stein-links.webp`, `stein-rechts.webp` je 220 × 180, transparent.
  */
 const BUND: CairnGame = {
   background: '',
@@ -117,7 +117,7 @@ const BUND: CairnGame = {
  * Etappe 12, "Zwölferkreis": die Söhne werden auf die Plätze rund um den Altar gestellt (Bildauftrag J33; Hintergrund = das Etappenbild, von der App weichgezeichnet). Plan v3: die Plätze sind als blasse
  * Ringe zu sehen (wie die Stunden einer Uhr, der erste oben), jeder Sohn rastet am nächsten freien Platz ein. Runde 1 vier Söhne (jeder dritte Platz), Runde 2 zwölf. Mitte und Radius sind Bildschirm-Prozent
  * der Spielfläche (der Radius der Breite). Die zwei Söhne `sohn-a` und `sohn-b` werden wechselnd mehrfach benutzt.
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `kreis/sohn-a.webp`, `sohn-b.webp` je 100 × 160, `kreis/altar.webp` 260 × 200, transparent.
+ * Bilder (gemalt, 21.10.2026): `kreis/sohn-a.webp`, `sohn-b.webp` je 100 × 160, `kreis/altar.webp` 260 × 200, transparent.
  */
 const KREIS: RingGame = {
   background: '',
@@ -134,7 +134,7 @@ const KREIS: RingGame = {
 /**
  * Etappe 6, "Kinder zum Zelt rufen": die Kinder der Familie laufen auf der Wiese umher, ein Tippen schickt eines zum Zelt (Bildauftrag J31; Hintergrund = das Etappenbild, von der App weichgezeichnet).
  * Plan v3: Runde 1 drei Kinder, Runde 2 fünf Kinder (die drei Bilder wechseln sich ab), beide langsam. Das Zelt steht am rechten Rand der Spielfläche, die Wiese ist das untere Drittel (Bildschirm-Prozent).
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `fangen/kind-1.webp` bis `kind-3.webp`, je 120 × 180, und `fangen/zelt.webp`, transparent.
+ * Bilder (gemalt, 21.10.2026): `fangen/kind-1.webp` bis `kind-3.webp`, je 120 × 180, und `fangen/zelt.webp`, transparent.
  */
 const FANGEN: CatchGame = {
   background: '',
