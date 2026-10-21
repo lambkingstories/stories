@@ -25,7 +25,7 @@ const SOON = false
  * Etappe 5, "Das Licht durch die Ringe": Ringe liegen ineinander um eine Nabe mit goldenem Stern, jeder hat oben eine Lücke, wenn er richtig steht; das Kind dreht sie in Zwölfteln, bis das Licht durch
  * alle Lücken scheint (Bildauftrag A31; Hintergrund = das Etappenbild 5, von der App abgedunkelt). Plan v3: Runde 1 zwei Ringe, Runde 2 drei Ringe, jeder allein (keine Kopplung mehr), zusammen 5 Ringe.
  * Der Strahl ist kein Bild, die App malt ihn als Farbverlauf. Die Startstellungen sind Zwölftel (1 bis 11, nie 0) und lösbar (Test).
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `ringe/ring-1.webp` 900 × 900, `ring-2.webp` 740, `ring-3.webp` 580 (alle quadratisch, transparent, Lücke oben), `nabe.webp` 240 × 240.
+ * Bilder (gemalt, 21.10.2026): `ringe/ring-1.webp` 900 × 900, `ring-2.webp` 740, `ring-3.webp` 580 (alle quadratisch, transparent, Lücke oben), `nabe.webp` 240 × 240.
  */
 const RINGE: RingsGame = {
   background: `${IMG}etappe-bild-03.webp`,
@@ -41,7 +41,7 @@ const RINGE: RingsGame = {
  * Etappe 4, "Wohin fliegen die Vögel?": Vögel fliegen auf das Wasser in der Wüste zu, ihre gestrichelten Flugbahnen enden in der Luft; das Kind tippt dorthin, wo sie sich treffen (Bildauftrag A30;
  * eigener Hintergrund `voegel/wueste.webp`, damit Hagar und der Brunnen des Etappenbildes nicht stören). Positionen in Prozent des Bildes (4 : 3). Plan v3: zwei Runden mit je zwei Aufgaben, kein Ablenker;
  * Runde 1 je zwei Vögel (Bahnen zu 60 % gezeichnet), Runde 2 je drei Vögel (zu 40 %). Es gibt nur ein Vogelbild (beide Flügelstellungen zeigen es), zusammen 4 Quellen.
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `voegel/wueste.webp` 1200 × 900, `vogel.webp` 140 × 100 (transparent), `quelle.webp` 240 × 170 (transparent).
+ * Bilder (gemalt, 21.10.2026): `voegel/wueste.webp` 1200 × 900, `vogel.webp` 140 × 100 (transparent), `quelle.webp` 240 × 170 (transparent).
  */
 const VOEGEL: BirdsGame = {
   background: `${G}voegel/wueste.webp`,
@@ -70,7 +70,7 @@ const VOEGEL: BirdsGame = {
  * Etappe 10, "Passend bezahlen": Silberstücke in drei Größen werden auf ein Tuch gelegt, bis es genau vierhundert sind (Bildauftrag A32; Hintergrund = das Etappenbild 10). Plan v3: Runde 1 mit sichtbarer
  * Summe (200, 100, 100, 50, 50), Runde 2 ohne (150, 100, 100, 75, 75; nach Werten gibt es nur eine Lösung: 150 + 100 + 75 + 75). Es gibt nur ein Stückbild, die App zeigt es in drei Größen
  * (klein bis 50, mittel bis 125, groß darüber); der Beutel entfällt. Alle Stücke zusammen sind mehr als vierhundert.
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `silber/tuch.webp` 720 × 300 und `silber-stueck.webp` 150 × 100, beide transparent.
+ * Bilder (gemalt, 21.10.2026): `silber/tuch.webp` 720 × 300 und `silber-stueck.webp` 150 × 100, beide transparent.
  */
 const SILBER: SilverGame = {
   background: `${IMG}etappe-bild-05.webp`,
@@ -167,7 +167,7 @@ const GIESSEN: WaterGame = {
 /**
  * Etappe 12, "Ins Weite schauen": ein Bild liegt zuerst unscharf da, das Kind schiebt einen Regler, bis es scharf ist (Bildauftrag A33; ein Fehler ist nicht möglich, kein Zeitdruck). Runde 1 die ferne
  * Karawane im Abendfeld (scharf bei 70 % des Reglers), Runde 2 Rebekka auf dem Kamel nah (scharf bei 30 %). Das Bild ist 3 : 2; die App malt die Unschärfe, ein Rasten gilt innerhalb von 8 % der Reglerlänge.
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `fokus/ferne.webp` und `fokus/nahe.webp`, je 1200 × 800 (Vollbild).
+ * Bilder (gemalt, 21.10.2026): `fokus/ferne.webp` und `fokus/nahe.webp`, je 1200 × 800 (Vollbild).
  */
 const FOKUS: FocusGame = {
   rounds: [
