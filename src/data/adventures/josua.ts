@@ -383,5 +383,12 @@ for (const s of josua.stages) {
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 
+// the background music of this adventure: three calm pieces made with Google's Lyria 3.5 (skill `lambking-abenteuer-skill`, ton.md); they follow one another at random
+josua.music = [
+  'audio/abenteuer/josua/musik-mut-v1.mp3',
+  'audio/abenteuer/josua/musik-jordan-v1.mp3',
+  'audio/abenteuer/josua/musik-mauer-v1.mp3'
+]
+
 // the English texts (title, stories, questions, hints) lie over the German ones; the screens show them when the app is English
 localize(josua, josuaEn)
