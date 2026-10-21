@@ -135,8 +135,8 @@ describe('Jakob: every stage has the game that was chosen', () => {
     expect(files).toHaveLength(12)
     expect(new Set(files).size).toBe(12)
     for (const f of files) expect(f, f).toMatch(/^images\/abenteuer\/spiele\/jakob\/suppe\/[a-z-]+\.webp$/)
-    expect(g.potAt).toEqual([50, 66])
-    expect(Object.values(g.sources).map((x) => x.at)).toEqual([[18, 88], [50, 90], [82, 88]])
+    expect(g.potAt).toEqual([50.5, 54.5])
+    expect(Object.values(g.sources).map((x) => x.at)).toEqual([[18, 89], [50, 90], [82, 89]])
     expect(g.walkMs).toBe(32000)
     expect(g.slowerMs).toBe(6000)
     expect(g.maxWalkMs).toBe(50000)
@@ -150,8 +150,8 @@ describe('Jakob: every stage has the game that was chosen', () => {
       expect(y).toBeLessThan(100)
     }
     expect(g.path[0]![1]).toBeLessThan(g.path[g.path.length - 1]![1])
-    // the pictures are not painted yet: the folder is tolerated by the download test
-    expect(notPaintedYet(g.scene)).toBe(true)
+    // the pictures are painted (21.10.2026): the folder is no longer tolerated as missing
+    expect(notPaintedYet(g.scene)).toBe(false)
   })
 
   it('1 stew: the text of the stage says that Jacob cooked red lentils; the second question is about the text (the heel), not about the game', () => {

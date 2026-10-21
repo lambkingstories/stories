@@ -28,8 +28,8 @@ const SOON = false
  * Etappe 1, "Die Suppe kochen, bevor Esau kommt" (ersetzt das Zählen; Entwurf SPIELE/ENTWURF-linsensuppe.md, Bildauftrag J35): ein Topf steht auf dem Feuerplatz vor Isaaks Zelt, oben auf dem Weg von den Feldern erscheint
  * der kleine Esau und geht in etwa 32 Sekunden zum Zelt; das Kind tippt Linsen, Wasser und zweimal Holz an (oder zieht sie auf den Topf), in freier Reihenfolge, bis die Suppe dampft. Eine Runde, kein Fehler, nichts geht verloren:
  * ist Esau zuerst da, beginnt alles nach zwei Sekunden von vorn, und Esau geht dann sechs Sekunden langsamer (höchstens 50). Dass die Suppe fertig sein soll, bevor Esau kommt, ist eine Spielidee (steht nicht in der Bibel).
- * Bilder (J35, noch nicht gemalt, 21.10.2026): `suppe/szene.webp` (3 : 4, ohne Figuren), `topf-leer`, `topf-linsen`, `topf-wasser`, `topf-suppe`, `scheite`, `flamme`, `dampf`, `linsenschale`, `wasserkrug`, `holz`, `esau` (alle
- * außer der Szene transparent). Bis sie da sind, zeigt das Spiel einfarbige Platzhalter (`GameImage`, Ordner in `NOT_PAINTED_YET`). VORLÄUFIGE Lagen (Prozent der Szene): Topf, Quellen und Esaus Weg nach dem Entwurf; am fertigen Bild zu messen.
+ * Bilder (J35, gemalt, 21.10.2026, Szene a): `suppe/szene.webp` (3 : 4, ohne Figuren), `topf-leer`, `topf-linsen`, `topf-wasser`, `topf-suppe`, `scheite`, `flamme`, `dampf`, `linsenschale`, `wasserkrug`, `holz`, `esau` (alle
+ * außer der Szene transparent). Lagen (Prozent der Szene) am gemalten Bild: der Weg ist der abgelesene Linienzug von den Feldern bis zum Zeltmund, die Quellen liegen auf freiem Boden unten, der Topf (Mitte des Bildes, die Steine des Topfes stehen im Steinring des Feuerplatzes) mit Scheiten und Flamme darunter. Die vier Topfbilder sind um 0 bis 3 Pixel gegeneinander verschoben (ausgerichtet an den Steinen), nicht pixelgleich.
  */
 const SUPPE: StewGame = {
   hint: 'Koche die Suppe, bevor Esau da ist: tippe Linsen, Wasser und Holz an.',
@@ -39,13 +39,13 @@ const SUPPE: StewGame = {
   flame: `${G}suppe/flamme.webp`,
   steam: `${G}suppe/dampf.webp`,
   sources: {
-    bowl: { image: `${G}suppe/linsenschale.webp`, at: [18, 88] },
+    bowl: { image: `${G}suppe/linsenschale.webp`, at: [18, 89] },
     jug: { image: `${G}suppe/wasserkrug.webp`, at: [50, 90] },
-    wood: { image: `${G}suppe/holz.webp`, at: [82, 88] }
+    wood: { image: `${G}suppe/holz.webp`, at: [82, 89] }
   },
   esau: `${G}suppe/esau.webp`,
-  potAt: [50, 66],
-  path: [[82, 10], [72, 17], [76, 26], [64, 33], [54, 39], [42, 45], [32, 52]],
+  potAt: [50.5, 54.5],
+  path: [[85.3, 6.9], [83.5, 10], [81.6, 12.2], [80.1, 14.3], [84, 17], [87.2, 20], [88.4, 23], [86.9, 25.3], [83.3, 28], [77.9, 30.1], [72.2, 32.4], [68.6, 34.6], [67.4, 36.7], [70.1, 39.5], [72, 41.9], [70.2, 44.4], [66.6, 47], [63, 49], [59.4, 50.8], [55.4, 52.4], [50.7, 53.9], [45.3, 55.2], [38.7, 55.7], [32.7, 55.2], [27.5, 53.7]],
   walkMs: 32000,
   slowerMs: 6000,
   maxWalkMs: 50000,

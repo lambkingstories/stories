@@ -55,7 +55,6 @@ function pathsIn(value: unknown, out: Set<string>) {
  * server does not have is no failure of the download. Take a folder out of this list when its pictures are delivered.
  */
 export const NOT_PAINTED_YET = [
-  'images/abenteuer/spiele/jakob/suppe/',
 ]
 
 export const notPaintedYet = (path: string) => NOT_PAINTED_YET.some((p) => path.startsWith(p))
