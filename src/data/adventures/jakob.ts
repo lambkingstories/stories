@@ -497,12 +497,11 @@ for (const s of jakob.stages) {
   for (const g of [t.guess, t.cycle, t.cairn, t.ring, t.catch, t.relay]) if (g) g.background = s.image
 }
 
-// the German recordings of the stories (voice Achernar, text version 3 = files "-v3"); there are no English ones yet, so the English app reads with the voice of the device.
-// NEW RECORDING NEEDED (Bible check of 21.10.2026, see D:/Claude/Abenteuer-Jakob/NEUAUFNAHME-BIBELTREUE-2026-10-21.md): the texts of these stages changed, so the old recording is not played
-// (the app reads with the voice of the device) until the new one is made; then delete the number from this list and use the new file name.
-const NEW_RECORDING = [1, 2, 3, 5, 6, 10]
+// the German recordings of the stories (voice Achernar); there are no English ones yet, so the English app reads with the voice of the device.
+// The stages whose text changed in the Bible check of 21.10.2026 (see D:/Claude/Abenteuer-Jakob/NEUAUFNAHME-BIBELTREUE-2026-10-21.md) were recorded again as "-v4"; the others are "-v3".
+const RECORDED_AGAIN = [1, 2, 3, 5, 6, 10]
 for (const s of jakob.stages) {
-  const file = NEW_RECORDING.includes(s.id) ? undefined : `audio/abenteuer/jakob/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`
+  const file = `audio/abenteuer/jakob/geschichte-${String(s.id).padStart(2, '0')}-${RECORDED_AGAIN.includes(s.id) ? 'v4' : 'v3'}.mp3`
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 

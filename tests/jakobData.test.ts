@@ -18,8 +18,8 @@ const released = jakob.stages.every((s) => !s.soon)
 const stage = (n: number) => jakob.stages[n - 1]!
 /** The number of the stage picture that each stage shows (the new stages borrow one until their own picture exists). */
 const PICTURE = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-/** Stages whose text was corrected in the Bible check of 21.10.2026 and wait for a new recording (see NEUAUFNAHME-BIBELTREUE-2026-10-21.md). */
-const NEW_RECORDING = [1, 2, 3, 5, 6, 10]
+/** Stages whose text was corrected in the Bible check of 21.10.2026 and were recorded again (see NEUAUFNAHME-BIBELTREUE-2026-10-21.md). */
+const RECORDED_AGAIN = [1, 2, 3, 5, 6, 10]
 
 /** Words that no text of the German data may use (stage 5 is a quiet, mysterious moment, not a fight scene; nothing violent). */
 const FORBIDDEN = /\b(Messer|Schwert|Pfeil|Blut|töten|erschlagen|Teufel|Hölle|Feind|Gegner)\b/i
@@ -45,13 +45,9 @@ describe('Jakob: stories and questions', () => {
       expect(words / sentences, `words per sentence ${s.id}`).toBeGreaterThan(7)
       expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      // Bible check 21.10.2026: the stages whose text changed have no recording until the new one is made (the app then reads with the voice of the device)
-      if (NEW_RECORDING.includes(s.id)) {
-        expect(s.audio, `no recording yet ${s.id}`).toBeUndefined()
-      } else {
-        expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/jakob/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`)
-        expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
-      }
+      // Bible check 21.10.2026: the stages whose text changed were recorded again ("-v4")
+      expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/jakob/geschichte-${String(s.id).padStart(2, '0')}-${RECORDED_AGAIN.includes(s.id) ? 'v4' : 'v3'}.mp3`)
+      expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
       // stages 5 to 9 and 12 use an existing picture until their own picture is built in (PLATZHALTER)
       expect(s.image).toBe(`images/abenteuer/jakob/etappe-bild-${String(PICTURE[s.id - 1]).padStart(2, '0')}.webp`)
     }
