@@ -155,7 +155,7 @@ export const josua: Journey = {
   subtitle: 'Mut für das neue Land',
   age: '8-10',
   downloadMb: 16, // PLATZHALTER: Größe mit den Bildern von Josef; wird mit den eigenen Bildern neu gemessen (der Test sagt die echte Größe)
-  medal: josef.medal, // PLATZHALTER bis eigenes Bild: "Die Posaune von Jericho" (Widderhorn vor der Stadtmauer)
+  medal: 'images/abenteuer/josua/medaille-v2.webp', // Die Posaune von Jericho (Widderhorn vor der Stadtmauer, Goldring)
   // Geschenk-Ausmalbild: Die Posaunen von Jericho (sieben Priester mit Widderhörnern vor der ganzen Stadtmauer); PLATZHALTER bis eigenes Bild
   gift: { title: 'Die Posaunen von Jericho', image: josef.gift.image },
   // PLATZHALTER bis eigenes Bild: die Karte von Josef (vier Stücke, 9824 × 1632 px) mit den ersten zehn Stationen und dem Perlenweg dorthin; Station 11 von Josef ist das Ziel (Prüfung)

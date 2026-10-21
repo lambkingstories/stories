@@ -300,8 +300,9 @@ describe('Josua: the games, and the placeholders until the pictures come', () =>
     for (const s of josua.stages) expect(existsSync(`public/${s.image}`), s.image).toBe(true)
   })
 
-  it('medal and gift are the ones of Josef until its own come; the gift has its final title', () => {
-    expect(josua.medal).toBe(josef.medal)
+  it('the medal is the own one of Josua; the gift is the one of Josef until its own comes and has its final title', () => {
+    expect(josua.medal).toBe('images/abenteuer/josua/medaille-v2.webp')
+    expect(existsSync(`public/${josua.medal}`)).toBe(true)
     expect(josua.gift.title).toBe('Die Posaunen von Jericho')
     expect(josua.gift.image).toBe(josef.gift.image)
   })
