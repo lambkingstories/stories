@@ -292,5 +292,12 @@ for (const s of babel.stages) {
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 
+// the background music of this adventure: three calm pieces made with Google's Lyria 3.5 (skill `lambking-abenteuer-skill`, ton.md); they follow one another at random
+babel.music = [
+  'audio/abenteuer/babel/musik-lehm-v1.mp3',
+  'audio/abenteuer/babel/musik-turm-v1.mp3',
+  'audio/abenteuer/babel/musik-werkstatt-v1.mp3'
+]
+
 // the English texts (title, stories, questions, hints, recordings) lie over the German ones; the screens show them when the app is English
 localize(babel, babelEn)
