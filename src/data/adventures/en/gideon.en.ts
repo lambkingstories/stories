@@ -138,7 +138,7 @@ export const gideonEn: TextOverlay<Journey> = {
       text: [
         'On the same night God says to Gideon, “Go down to the camp of the enemies! If you are afraid, take your servant Purah with you.”',
         'Quietly the two go down the slope. Down in the valley lie as many enemies with their camels as locusts.',
-        'Then Gideon hears one man telling another his dream, “I dreamed that a round loaf of barley bread rolled into the camp and knocked a tent over.” “That is nothing other than Gideon, the son of Joash,” the other answers. “God has given the whole camp into his hand.”',
+        'Then Gideon hears one man telling another his dream. “I dreamed that a round loaf of barley bread rolled into the camp and knocked a tent over.” “That is nothing other than the sword of Gideon, the son of Joash,” the other answers. “God has given the whole camp into his hand.”',
         'Gideon bows down and thanks God. Then he goes back to his men, “Get up, God has given the camp of the enemies into your hands!”'
       ],
       task: { hint: 'Lead the two quietly down the slope from shadow to shadow.', sneak: { rounds: [{ hint: 'Lead Gideon and Purah from rock to rock. Wait in the shadow when a cone of light comes.' }, { hint: 'Now there are three watchers, and their light sways unevenly. Be patient in the shadow.' }] } },
@@ -153,7 +153,7 @@ export const gideonEn: TextOverlay<Journey> = {
       text: [
         'Gideon divides the three hundred men into three groups of one hundred. Each man gets a trumpet and an empty jar, and in every jar there is a torch.',
         '“Watch me and do the same,” says Gideon. “When I blow the trumpet, you blow yours, too, and shout: For God and for Gideon!”',
-        'In the middle of the night the men take their places all around the camp of the enemies. Gideon blows the trumpet, and everyone smashes his jar. Suddenly the torches blaze up in the darkness, and the trumpets sound everywhere: “For God and for Gideon!”',
+        'In the middle of the night the men take their places all around the camp of the enemies. Gideon blows the trumpet, and everyone smashes his jar. Suddenly the torches blaze up in the darkness, and the trumpets sound everywhere: “The sword of God and of Gideon!”',
         'The three hundred stay at their places. The enemies jolt out of their sleep, run about, and cry out. The whole army is terrified and flees.'
       ],
       task: { hint: 'Wait for the horn and then answer in order.', cue: { rounds: [{ hint: "Wait for the horn. Then tap Gideon's jar, and after that the groups on the left and on the right." }, { hint: 'Take care: An owl calls. That is no sign. Answer only to the horn.' }] } },

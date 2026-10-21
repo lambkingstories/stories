@@ -392,7 +392,7 @@ export const gideon: Journey = {
       text: [
         'In derselben Nacht sagt Gott zu Gideon: „Geh hinab zum Lager der Feinde! Wenn du dich fürchtest, nimm deinen Diener Pura mit.“',
         'Leise gehen die beiden den Hang hinab. Unten im Tal liegen so viele Feinde mit ihren Kamelen wie Heuschrecken.',
-        'Da hört Gideon, wie ein Mann einem anderen seinen Traum erzählt: „Ich träumte, ein rundes Gerstenbrot rollte ins Lager und warf ein Zelt um.“ „Das ist nichts anderes als Gideon, der Sohn des Joas“, antwortet der andere. „Gott hat das ganze Lager in seine Hand gegeben.“',
+        'Da hört Gideon, wie ein Mann einem anderen seinen Traum erzählt. „Ich träumte, ein rundes Gerstenbrot rollte ins Lager und warf ein Zelt um.“ „Das ist nichts anderes als das Schwert Gideons, des Sohnes des Joas“, antwortet der andere. „Gott hat das ganze Lager in seine Hand gegeben.“',
         'Gideon verneigt sich und dankt Gott. Dann geht er zurück zu seinen Männern: „Auf, Gott hat das Lager der Feinde in eure Hände gegeben!“'
       ],
       // Spiel: Leise den Hang hinab (schleichen, neu); das Etappenbild ist noch das von Josef
@@ -410,7 +410,7 @@ export const gideon: Journey = {
       text: [
         'Gideon teilt die dreihundert Männer in drei Gruppen zu je hundert. Jeder bekommt eine Posaune und einen leeren Krug, und in jedem Krug steckt eine Fackel.',
         '„Seht auf mich und macht es genauso“, sagt Gideon. „Wenn ich die Posaune blase, blast ihr auch und ruft: Für Gott und für Gideon!“',
-        'Mitten in der Nacht stellen sich die Männer rings um das Lager der Feinde auf. Gideon bläst die Posaune, und alle zerschlagen ihre Krüge. Plötzlich leuchten die Fackeln in der Dunkelheit, und überall schallen die Posaunen: „Für Gott und für Gideon!“',
+        'Mitten in der Nacht stellen sich die Männer rings um das Lager der Feinde auf. Gideon bläst die Posaune, und alle zerschlagen ihre Krüge. Plötzlich leuchten die Fackeln in der Dunkelheit, und überall schallen die Posaunen: „Das Schwert Gottes und Gideons!“',
         'Die dreihundert bleiben an ihrem Platz stehen. Die Feinde schrecken aus dem Schlaf, laufen durcheinander und schreien. Das ganze Heer erschrickt und flieht.'
       ],
       // Spiel: Auf Gideons Zeichen (zeichen, neu); das Etappenbild ist noch das von Josef
@@ -474,9 +474,9 @@ for (const st of gideon.stages) {
 }
 
 // the German recordings of the stories (voice Achernar, text version 3 = files "-v3"); there are no English ones yet, so the English app reads with the voice of the device
-// Stages whose text was corrected for Bible faithfulness on 21.10.2026 (2: the prophet 6,7-10 and no stored food, 3: Gideon's complaint 6,13-15, 8: "like a dog" 7,5, 11: Oreb and Zeeb 7,25, 12: the golden garment 8,24-27 and the end 8,33-34)
+// Stages whose text was corrected for Bible faithfulness on 21.10.2026 (2: the prophet 6,7-10 and no stored food, 3: Gideon's complaint 6,13-15, 8: "like a dog" 7,5, 9 and 10: "das Schwert Gideons" 7,14 and the cry 7,20, 11: Oreb and Zeeb 7,25, 12: the golden garment 8,24-27 and the end 8,33-34)
 // have NO German recording until the new one is made (the app reads them with the voice of the device); list in `D:/Claude/Abenteuer-Gideon/NEUAUFNAHME-BIBELTREUE-2026-10-21.md`. Remove a number from this list when its new file is in.
-const WITHOUT_RECORDING = new Set([2, 3, 8, 11, 12])
+const WITHOUT_RECORDING = new Set([2, 3, 8, 9, 10, 11, 12])
 for (const s of gideon.stages) {
   const file = `audio/abenteuer/gideon/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' || WITHOUT_RECORDING.has(s.id) ? undefined : file), enumerable: true, configurable: true })

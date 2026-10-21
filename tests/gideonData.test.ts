@@ -18,7 +18,7 @@ afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => gideon.stages[n - 1]!
 /** Words that no text of the German data may use (the night with the jars is told without fighting; the dream of the Midianite says "Schwert" in the Bible, so that one word is allowed). */
 /** Stages whose text was corrected for Bible faithfulness on 21.10.2026 and wait for a new recording (see `NEUAUFNAHME-BIBELTREUE-2026-10-21.md`). */
-const WITHOUT_RECORDING = [2, 3, 8, 11, 12]
+const WITHOUT_RECORDING = [2, 3, 8, 9, 10, 11, 12]
 const FORBIDDEN = /\b(Messer|Speer|Pfeil|Blut|töten|erschlagen|erwürgen|Teufel|Hölle)\b/i
 
 describe('Gideon: stories and questions', () => {
