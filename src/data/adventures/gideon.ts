@@ -37,29 +37,28 @@ const WORT: WordGame = {
 
 /**
  * Etappe 8, "Am Wasser" (Wimmelbild, alte Mechanik): am Bachufer knien viele Männer, fünf davon führen das Wasser mit der Hand zum Mund; einige stehen halb hinter Schilf und Busch (Bildauftrag G34; eigene Szene
- * `wimmel/wasser-szene.webp`). Plan v3: zwei Männerbilder, die sich abwechseln, und zwei Deckungsbilder an drei Plätzen. Die Lagen (Mitte der Unterkante und Breite, Prozent der Szene) sind vorläufig geschätzt, bis die Datei
- * `wimmel-messung.json` der Spielbild-Sitzung da ist.
- * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `wimmel/wasser-szene.webp` 1100 × 1467, `finde-a.webp`, `finde-b.webp` je ca. 140 × 220, `deck-schilf.webp`, `deck-busch.webp` je 330 × 260.
+ * `wimmel/wasser-szene.webp`). Plan v3: zwei Männerbilder, die sich abwechseln, und zwei Deckungsbilder an drei Plätzen. Die Lagen (Mitte der Unterkante und Breite, Prozent der Szene) sind am gemalten Bild abgelesen (`wimmel-messung.json`, die Männer als Fußpunkte umgerechnet auf die Unterkante der Datei; die drei Deckungen halbieren drei Männer).
+ * Bilder (gemalt, 21.10.2026): `wimmel/wasser-szene.webp` 1100 × 1467, `finde-a.webp`, `finde-b.webp` je ca. 140 × 220, `deck-schilf.webp`, `deck-busch.webp` je 330 × 260.
  */
 const WIMMEL: FindGame = {
   labels: Array.from({ length: 5 }, () => 'Mann am Bach, der das Wasser mit der Hand zum Mund führt'),
   doneText: 'Du hast alle fünf Männer gefunden, die das Wasser mit der Hand zum Mund führen!',
   scene: `${G}wimmel/wasser-szene.webp`,
   finds: [
-    { image: `${G}wimmel/finde-a.webp`, x: 18, y: 40, w: 12 },
-    { image: `${G}wimmel/finde-b.webp`, x: 72, y: 36, w: 12 },
-    { image: `${G}wimmel/finde-a.webp`, x: 42, y: 58, w: 12 },
-    { image: `${G}wimmel/finde-b.webp`, x: 80, y: 62, w: 12 },
-    { image: `${G}wimmel/finde-a.webp`, x: 24, y: 78, w: 12 }
+    { image: `${G}wimmel/finde-a.webp`, x: 19.5, y: 31.3, w: 12.7 },
+    { image: `${G}wimmel/finde-b.webp`, x: 87.5, y: 38.1, w: 12.7 },
+    { image: `${G}wimmel/finde-a.webp`, x: 57, y: 50.5, w: 12.7 },
+    { image: `${G}wimmel/finde-b.webp`, x: 84.5, y: 65.1, w: 12.7 },
+    { image: `${G}wimmel/finde-a.webp`, x: 29.5, y: 90.6, w: 12.7 }
   ],
   covers: [
-    { image: `${G}wimmel/deck-schilf.webp`, x: 18, y: 46, w: 26 },
-    { image: `${G}wimmel/deck-busch.webp`, x: 80, y: 68, w: 28 },
-    { image: `${G}wimmel/deck-schilf.webp`, x: 24, y: 84, w: 26 }
+    { image: `${G}wimmel/deck-schilf.webp`, x: 20, y: 32.8, w: 23 },
+    { image: `${G}wimmel/deck-schilf.webp`, x: 57.5, y: 52, w: 20 },
+    { image: `${G}wimmel/deck-busch.webp`, x: 85, y: 68, w: 23 }
   ]
 }
 
-/** Etappe 12, "Rückblick" (Memory, alte Mechanik): fünf Paare aus den Etappen des Abenteuers (das Horn entfällt, es kommt im Zeichen-Spiel vor), zu jedem Treffer ein Satz aus dem Text. Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `memory/karte-*.webp` und `rueck.webp`, je 256 × 256 (Bildauftrag G37). */
+/** Etappe 12, "Rückblick" (Memory, alte Mechanik): fünf Paare aus den Etappen des Abenteuers (das Horn entfällt, es kommt im Zeichen-Spiel vor), zu jedem Treffer ein Satz aus dem Text. Bilder (gemalt, 21.10.2026): `memory/karte-*.webp` und `rueck.webp`, je 256 × 256 (Bildauftrag G37). */
 const MEMORY: MemoryGame = {
   back: `${G}memory/rueck.webp`,
   pairs: [
@@ -74,8 +73,8 @@ const MEMORY: MemoryGame = {
 /**
  * Etappe 6, "Die Nacht vergeht": der Mond wird am Regler vom Abend zum Morgen gezogen, der Himmel tönt sich dabei; am Morgen funkelt der Tau, den das Kind antippt (Bildauftrag G32; eigener Hintergrund
  * `tau/tenne.webp`, neutral beleuchtet). Plan v3: Runde 1 "die erste Nacht": Tau nur auf dem Fell (vier Tropfen), Runde 2 "die zweite Nacht": Tau nur auf dem Boden ringsum (sechs Tropfen). Fellrechteck und Tropfen
- * (Prozent der Tenne) sind vorläufig geschätzt, bis die Datei `tau-messung.json` der Spielbild-Sitzung da ist.
- * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `tau/tenne.webp` 1200 × 900, `fell.webp` 420 × 300, `schale.webp` 240 × 160, `mond.webp`, `sonne.webp` je 120 × 120 (alle außer der Tenne transparent).
+ * (Prozent der Tenne) sind am gemalten Bild abgelesen (`tau-messung.json`, Variante a bzw. b, mit den Sprites zusammen angesehen).
+ * Bilder (gemalt, 21.10.2026): `tau/tenne.webp` 1200 × 900, `fell.webp` 420 × 300, `schale.webp` 240 × 160, `mond.webp`, `sonne.webp` je 120 × 120 (alle außer der Tenne transparent).
  */
 const TAU: DewGame = {
   background: `${G}tau/tenne.webp`,
@@ -83,18 +82,18 @@ const TAU: DewGame = {
   bowl: `${G}tau/schale.webp`,
   moon: `${G}tau/mond.webp`,
   sun: `${G}tau/sonne.webp`,
-  fleeceBox: { x: 30, y: 34, w: 40, h: 34 },
+  fleeceBox: { x: 30, y: 34, w: 40, h: 38.1 },
   rounds: [
-    { hint: 'Die erste Nacht: Ziehe den Mond bis zum Morgen. Dann liegt Tau auf dem Fell. Tippe die Tropfen an.', wet: 'fleece', spots: [[37, 42], [46, 38], [55, 44], [40, 56]] },
-    { hint: 'Die zweite Nacht: Diesmal ist das Fell trocken. Wo liegt der Tau jetzt?', wet: 'ground', spots: [[12, 28], [20, 66], [50, 84], [66, 80], [88, 38], [72, 22]] }
+    { hint: 'Die erste Nacht: Ziehe den Mond bis zum Morgen. Dann liegt Tau auf dem Fell. Tippe die Tropfen an.', wet: 'fleece', spots: [[42, 48], [52, 46], [59, 54], [46, 61]] },
+    { hint: 'Die zweite Nacht: Diesmal ist das Fell trocken. Wo liegt der Tau jetzt?', wet: 'ground', spots: [[22, 43], [22, 64], [44, 75.5], [65, 74.5], [79, 46], [70, 30]] }
   ]
 }
 
 /**
  * Etappe 3, "Spreu im Wind": in der Worfelwanne liegen Körner und leichte Spreu, ein Regler stellt den Wind ein; die Spreu fliegt bei mittlerem Wind davon, bei zu starkem Wind auch Körner (Bildauftrag G31; Hintergrund =
  * das Etappenbild 3, von der App weichgezeichnet). Plan v3: Runde 1 acht Spreuteile und sechs Körner, breiter richtiger Bereich (35 bis 75 %); Runde 2 zehn Spreuteile, sechs Körner, schmalerer Bereich (42 bis 64 %), keine Böe.
- * Die Wanne (`trayBox`, Bildschirm-Prozent) ist vorläufig geschätzt, bis die Datei `worfeln-messung.json` der Spielbild-Sitzung da ist.
- * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `worfeln/wanne.webp` 480 × 300, `korn.webp`, `spreu.webp` je 64 × 64, `regler-griff.webp` 120 × 120 (alle transparent).
+ * Die Wanne (`trayBox`, Bildschirm-Prozent) ist am gemalten Bild abgelesen (`worfeln-messung.json`).
+ * Bilder (gemalt, 21.10.2026): `worfeln/wanne.webp` 480 × 300, `korn.webp`, `spreu.webp` je 64 × 64, `regler-griff.webp` 120 × 120 (alle transparent).
  */
 const WORFELN: WinnowGame = {
   background: `${PICS}etappe-bild-03.webp`,
@@ -102,7 +101,7 @@ const WORFELN: WinnowGame = {
   grain: `${G}worfeln/korn.webp`,
   chaffImage: `${G}worfeln/spreu.webp`,
   handle: `${G}worfeln/regler-griff.webp`,
-  trayBox: { x: 20, y: 44, w: 48, h: 38 },
+  trayBox: { x: 23.75, y: 44, w: 40.5, h: 38 },
   rounds: [
     { hint: 'Stelle den Wind ein. Die leichte Spreu soll wegfliegen, die schweren Körner sollen liegen bleiben.', chaff: 8, grains: 6, window: [35, 75], gust: 0, seed: 31 },
     { hint: 'Jetzt ist der richtige Wind enger. Gib acht auf die Körner.', chaff: 10, grains: 6, window: [42, 64], gust: 0, seed: 47 }
@@ -113,8 +112,8 @@ const WORFELN: WinnowGame = {
  * Etappe 7, "Wer geht heim?": die Männer kommen den Pfad herab und stehen an der Gabelung; eine Sprechblase zeigt ein Haus (will heim) oder ein Horn (bleibt); das Kind stellt die Weiche, links ins Lager, rechts heim
  * (Bildauftrag G33; eigener Hintergrund `weiche/weiche.webp`). Die Zeichen sind eine Spielhilfe, keine Aussage der Bibel. Plan v3: zwei Männerbilder, die sich abwechseln, und ein Hebelbild (der linke Hebel ist das
  * rechte gespiegelt). Runde 1 fünf Männer, die Blase bleibt; Runde 2 sechs Männer, zwei warten, die Blase geht nach zwei Sekunden (Antippen des Mannes zeigt sie wieder). Die Gabelung `fork` (Prozent des Bildes) ist
- * vorläufig geschätzt, bis die Datei `weiche-messung.json` der Spielbild-Sitzung da ist.
- * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `weiche/weiche.webp` 900 × 1200, `mann-a.webp`, `mann-b.webp` je 140 × 220, `blase-haus.webp`, `blase-horn.webp` je 120 × 120, `hebel.webp` 200 × 200
+ * am gemalten Bild abgelesen (`weiche-messung.json`) und mit den Männern zusammen angesehen.
+ * Bilder (gemalt, 21.10.2026): `weiche/weiche.webp` 900 × 1200, `mann-a.webp`, `mann-b.webp` je 140 × 220, `blase-haus.webp`, `blase-horn.webp` je 120 × 120, `hebel.webp` 200 × 200
  * (alle außer dem Hintergrund transparent).
  */
 const WEICHE: SwitchGame = {
@@ -126,7 +125,7 @@ const WEICHE: SwitchGame = {
   bubbleHome: `${G}weiche/blase-haus.webp`,
   bubbleHorn: `${G}weiche/blase-horn.webp`,
   leverRight: `${G}weiche/hebel.webp`,
-  fork: [50, 62],
+  fork: [50, 66.7],
   rounds: [
     { hint: 'Wer ein Haus zeigt, will heim: Weiche nach rechts. Wer ein Horn zeigt, bleibt: Weiche nach links.', men: ['home', 'stay', 'stay', 'home', 'home'], queue: 1 },
     { hint: 'Jetzt verschwindet die Sprechblase bald. Tippe den Mann an, dann ist sie wieder da.', men: ['stay', 'home', 'home', 'stay', 'home', 'stay'], hideBubbleMs: 2000, queue: 2 }
@@ -136,8 +135,8 @@ const WEICHE: SwitchGame = {
 /**
  * Etappe 10, "Auf Gideons Zeichen": das Kind wartet auf das Horn und antwortet dann zuerst mit Gideons Krug, danach mit den Gruppen links und rechts (Bildauftrag G36; eigener Hintergrund `zeichen/tal-nacht.webp`).
  * Das Horn leuchtet auch (für Kinder ohne Ton). Plan v3: Runde 1 zwei Zeichen; Runde 2 drei Zeichen und zwei falsche Zeichen (die Eule, zweimal), die nicht beantwortet werden dürfen. Die drei Gruppen sind ein Bild
- * (`gruppe.webp`) an drei Plätzen. Lagen (Prozent des Bildes) sind vorläufig geschätzt, bis die Datei `zeichen-messung.json` der Spielbild-Sitzung da ist.
- * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `zeichen/tal-nacht.webp` 1200 × 900, `gruppe.webp` 260 × 260, `gideon-krug.webp` 200 × 260, `horn.webp` 200 × 200, `eule.webp` 140 × 140,
+ * (`gruppe.webp`) an drei Plätzen. Lagen (Prozent des Bildes) sind am gemalten Bild abgelesen (`zeichen-messung.json`, Variante a bzw. b, mit den Sprites zusammen angesehen).
+ * Bilder (gemalt, 21.10.2026): `zeichen/tal-nacht.webp` 1200 × 900, `gruppe.webp` 260 × 260, `gideon-krug.webp` 200 × 260, `horn.webp` 200 × 200, `eule.webp` 140 × 140,
  * `scherben.webp` 180 × 120 (alle außer dem Tal transparent).
  */
 const ZEICHEN: CueGame = {
@@ -160,15 +159,15 @@ const ZEICHEN: CueGame = {
 /**
  * Etappe 2, "Säcke in die Höhle schieben": der Grundriss einer Höhle von oben; ein kleiner Mann schiebt Kornsäcke in die Nischen (nur schieben, nie ziehen, ein Sack zur Zeit; Bildauftrag G30; eigener Hintergrund
  * `hoehle/hoehle-plan.webp`). Plan v3: beide Runden 5 × 4 ohne Felsen; Runde 1 zwei Säcke (acht Schritte, drei Schiebungen), Runde 2 drei Säcke (zwölf Schritte, fünf Schiebungen); beide Rätsel sind lösbar (Breitensuche
- * im Test). Plätze sind (Spalte, Zeile). Der Bereich `area` (Prozent des Bildes) für das Raster ist vorläufig geschätzt, bis die Datei `hoehle-messung.json` der Spielbild-Sitzung da ist.
- * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `hoehle/hoehle-plan.webp` 900 × 1200, `sack.webp`, `nische.webp` je 120 × 120, `mann.webp` 120 × 160 (alle außer dem Plan transparent).
+ * im Test). Plätze sind (Spalte, Zeile). Der Bereich `area` (Prozent des Bildes) für das Raster ist am gemalten Bild abgelesen (`hoehle-messung.json`).
+ * Bilder (gemalt, 21.10.2026): `hoehle/hoehle-plan.webp` 900 × 1200, `sack.webp`, `nische.webp` je 120 × 120, `mann.webp` 120 × 160 (alle außer dem Plan transparent).
  */
 const HOEHLE: CaveGame = {
   background: `${G}hoehle/hoehle-plan.webp`,
   man: `${G}hoehle/mann.webp`,
   sack: `${G}hoehle/sack.webp`,
   niche: `${G}hoehle/nische.webp`,
-  area: { x: 12, y: 30, w: 76, h: 50 },
+  area: { x: 16.7, y: 30, w: 66.7, h: 40 },
   rounds: [
     { hint: 'Schiebe die Säcke in die leuchtenden Nischen. Du kannst nur schieben, nicht ziehen.', cols: 5, rows: 4, walls: [], niches: [[2, 0], [4, 0]], sacks: [[2, 1], [3, 1]], man: [4, 3] },
     { hint: 'Jetzt drei Säcke. Überlege, bevor du schiebst.', cols: 5, rows: 4, walls: [], niches: [[4, 2], [1, 3], [3, 0]], sacks: [[1, 2], [1, 1], [3, 2]], man: [2, 2] }
@@ -178,30 +177,31 @@ const HOEHLE: CaveGame = {
 /**
  * Etappe 9, "Leise den Hang hinab": Gideon und Pura werden auf einem Pfad von Schattenplatz zu Schattenplatz geführt, Wächter mit Laternen lassen Lichtkegel hin und her schwingen; im Schatten warten ist nie ein Fehler
  * (Bildauftrag G35; eigener Hintergrund `schleichen/hang-nacht.webp`, 3:4). Plan v3: Runde 1 zwei Wächter, ruhige Schwünge und zwei Felsen; Runde 2 drei Wächter, ungleiche Schwünge und drei Felsen. Es gibt nur ein Wächterbild. Die Lagen (Prozent des Bildes: Pfad,
- * Schattenplätze, Wächter) sind vorläufig geschätzt, bis die Datei `schleichen-messung.json` der Spielbild-Sitzung da ist; die Daten sind so gewählt, dass jeder Abschnitt in jeder Runde zu bestimmten Zeiten frei ist (Test).
- * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `schleichen/hang-nacht.webp` 900 × 1200, `paar.webp` 140 × 180, `waechter.webp` 140 × 200 (alle außer dem Hang transparent).
+ * Schattenplätze, Wächter) sind am gemalten Bild abgelesen (`schleichen-messung.json`, Variante a bzw. b, mit den Sprites zusammen angesehen); die Daten sind so gewählt, dass jeder Abschnitt in jeder Runde zu bestimmten Zeiten frei ist (Test).
+ * Bilder (gemalt, 21.10.2026): `schleichen/hang-nacht.webp` 900 × 1200, `paar.webp` 140 × 180, `waechter.webp` 140 × 200 (alle außer dem Hang transparent).
  */
 const SCHLEICHEN: SneakGame = {
   background: `${G}schleichen/hang-nacht.webp`,
   pair: `${G}schleichen/paar.webp`,
-  watcherImages: [`${G}schleichen/waechter.webp`, `${G}schleichen/waechter.webp`],
-  path: [[30, 8], [62, 18], [34, 32], [68, 46], [32, 60], [62, 74], [46, 90]],
+  watcherImages: [`${G}schleichen/waechter.webp`, `${G}schleichen/waechter-b.webp`],
+  // der gemalte Pfad (am Bild mit dem Pfad verglichen), die Felsen stehen am Pfad: Runde 1 am dritten und am Ende, Runde 2 am ersten, am vierten und am Ende
+  path: [[6.8, 9.0], [12.0, 13.6], [16.7, 18.0], [22.6, 20.1], [28.5, 21.2], [33.9, 22.7], [37.1, 25.8], [32.9, 28.8], [34.1, 31.0], [38.7, 34.4], [44.0, 36.1], [49.2, 37.8], [52.0, 41.1], [49.8, 44.1], [44.6, 46.0], [39.3, 47.9], [37.4, 50.8], [39.5, 53.0], [43.8, 56.1], [48.9, 58.3], [54.4, 59.9], [59.9, 61.4], [65.1, 63.6], [70.3, 65.8], [74.0, 67.8], [75.5, 72.0], [71.5, 76.3], [66.8, 79.7], [66.5, 83.7], [68.0, 87.5], [71.3, 90.2]],
   rounds: [
     {
       hint: 'Führe Gideon und Pura von Fels zu Fels. Warte im Schatten, wenn ein Lichtkegel kommt.',
-      stops: [[68, 46], [46, 90]],
+      stops: [[38.7, 34.4], [71.3, 90.2]],
       watchers: [
-        { x: 88, y: 40, from: 150, to: 215, periodMs: 5200, reach: 42 },
-        { x: 10, y: 70, from: -40, to: 25, periodMs: 6400, reach: 42 }
+        { x: 12, y: 62, from: -14, to: 41, periodMs: 6400, reach: 46 },
+        { x: 15, y: 45, from: -141, to: -71, periodMs: 5000, reach: 38 }
       ]
     },
     {
       hint: 'Jetzt sind es drei Wächter, und ihr Licht schwingt unregelmäßig. Hab Geduld im Schatten.',
-      stops: [[34, 32], [32, 60], [46, 90]],
+      stops: [[37, 25.9], [55.1, 60.1], [71.3, 90.2]],
       watchers: [
-        { x: 90, y: 28, from: 140, to: 215, periodMs: 4200, reach: 36 },
-        { x: 8, y: 52, from: -35, to: 30, periodMs: 5000, reach: 36 },
-        { x: 92, y: 80, from: 150, to: 225, periodMs: 6100, reach: 32 }
+        { x: 84, y: 60, from: 163, to: 203, periodMs: 5200, reach: 34 },
+        { x: 86, y: 80, from: -156, to: -86, periodMs: 5200, reach: 46 },
+        { x: 15, y: 45, from: -131, to: -61, periodMs: 4200, reach: 34 }
       ]
     }
   ]

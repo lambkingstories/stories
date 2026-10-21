@@ -64,13 +64,6 @@ export const NOT_PAINTED_YET = [
   'images/abenteuer/spiele/mose/manna/',
   'images/abenteuer/spiele/mose/unterschied/',
   'images/abenteuer/spiele/mose/worte/',
-  'images/abenteuer/spiele/gideon/schleichen/',
-  'images/abenteuer/spiele/gideon/hoehle/',
-  'images/abenteuer/spiele/gideon/zeichen/',
-  'images/abenteuer/spiele/gideon/weiche/',
-  'images/abenteuer/spiele/gideon/worfeln/',
-  'images/abenteuer/spiele/gideon/tau/',
-  'images/abenteuer/spiele/gideon/wimmel/',
   'images/abenteuer/spiele/gideon/memory/',
 ]
 
