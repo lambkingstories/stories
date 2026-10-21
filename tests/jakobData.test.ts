@@ -83,16 +83,17 @@ describe('Jakob: stories and questions', () => {
 })
 
 describe('Jakob: every stage has the game that was chosen', () => {
-  const OLD = ['zaehlen', 'puzzle', 'weg', 'ernten', 'memory', 'sortieren', 'wimmelbild', 'ausmalen', 'teilen', 'bauen', 'punkte', 'steuern']
+  const OLD = ['puzzle', 'weg', 'ernten', 'memory', 'sortieren', 'wimmelbild', 'ausmalen', 'teilen', 'bauen', 'punkte', 'steuern']
   const NEW = ['reihenfolge', 'lichter', 'hueten', 'kanaele', 'lueckenvers', 'spiegeln', 'echo', 'saeen', 'fehlt', 'kette', 'stapeln', 'wischen', 'spur', 'waage', 'sternbild', 'giessen']
 
-  it('the games in the order of the plan; stage 2 is only the questions; two old mechanics and nine new ones', () => {
+  it('the games in the order of the plan; stage 2 is only the questions; one old mechanic (the puzzle) and the rest new; no counting game any more', () => {
     // the plan of the twelve stages: all the new games are built
-    const PLAN = ['zaehlen', 'quiz', 'schieben', 'kurbel', 'jahre', 'fangen', 'schaetzen', 'bund', 'staffel', 'halten', 'puzzle', 'kreis']
+    const PLAN = ['suppe', 'quiz', 'schieben', 'kurbel', 'jahre', 'fangen', 'schaetzen', 'bund', 'staffel', 'halten', 'puzzle', 'kreis']
     expect(jakob.stages.map((st) => st.task.kind)).toEqual(PLAN)
     const kinds = jakob.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
     expect(new Set(kinds).size).toBe(kinds.length)
-    expect(kinds.filter((k) => OLD.includes(k)).sort()).toEqual(['puzzle', 'zaehlen'])
+    expect(kinds.filter((k) => OLD.includes(k)).sort()).toEqual(['puzzle'])
+    expect(kinds).not.toContain('zaehlen')
     for (const k of ['schieben', 'kurbel', 'halten']) expect([...OLD, ...NEW], k).not.toContain(k)
   })
 
@@ -119,16 +120,46 @@ describe('Jakob: every stage has the game that was chosen', () => {
     expect(g(9).relay!.rounds.reduce((s, r) => s + r.herds.length, 0)).toBe(7)
     expect(g(12).ring!.rounds.reduce((s, r) => s + r.count, 0)).toBe(16)
     expect(g(10).hold!.rounds.map((r) => r.seconds)).toEqual([10, 15])
-    expect(g(1).count).toBe(8)
+    expect(g(1).stew).toBeDefined()
     expect(g(11).puzzle).toMatchObject({ cols: 2, rows: 3 })
   })
 
-  it('1 counting: the sheep of the flock before the tent, counted in one scene (no rounds); the background is the stage picture', () => {
+  it('1 stew: one round (no rounds field), a hint in one sentence, the scene and the pictures under suppe/, the pot at the middle, Esau walks 32 s, six seconds slower each time up to 50 s', () => {
     const t = stage(1).task
-    expect(t.count).toBe(8)
-    expect(t.image).toBe('images/abenteuer/spiele/jakob/zaehlen/schaf.webp')
-    expect(t.groups).toBeUndefined()
-    expect(t.background).toBe('images/abenteuer/jakob/etappe-bild-01.webp')
+    const g = t.stew!
+    expect(t.kind).toBe('suppe')
+    expect(t.hint).toBe(g.hint)
+    expect(g.hint).toBe('Koche die Suppe, bevor Esau da ist: tippe Linsen, Wasser und Holz an.')
+    expect(g.hint.split(/[.!?]/).filter((x) => x.trim())).toHaveLength(1)
+    const files = [g.scene, ...Object.values(g.pot), g.logs, g.flame, g.steam, g.esau, ...Object.values(g.sources).map((x) => x.image)]
+    expect(files).toHaveLength(12)
+    expect(new Set(files).size).toBe(12)
+    for (const f of files) expect(f, f).toMatch(/^images\/abenteuer\/spiele\/jakob\/suppe\/[a-z-]+\.webp$/)
+    expect(g.potAt).toEqual([50, 66])
+    expect(Object.values(g.sources).map((x) => x.at)).toEqual([[18, 88], [50, 90], [82, 88]])
+    expect(g.walkMs).toBe(32000)
+    expect(g.slowerMs).toBe(6000)
+    expect(g.maxWalkMs).toBe(50000)
+    expect(g.simmerMs).toBe(2500)
+    // the way goes from the fields at the top right to the tent: always inside the scene, further down and to the left
+    expect(g.path.length).toBeGreaterThanOrEqual(5)
+    for (const [x, y] of g.path) {
+      expect(x).toBeGreaterThan(0)
+      expect(x).toBeLessThan(100)
+      expect(y).toBeGreaterThan(0)
+      expect(y).toBeLessThan(100)
+    }
+    expect(g.path[0]![1]).toBeLessThan(g.path[g.path.length - 1]![1])
+    // the pictures are not painted yet: the folder is tolerated by the download test
+    expect(notPaintedYet(g.scene)).toBe(true)
+  })
+
+  it('1 stew: the text of the stage says that Jacob cooked red lentils; the second question is about the text (the heel), not about the game', () => {
+    expect(stage(1).text.join(' ')).toContain('rote Linsen gekocht')
+    expect(stage(1).questions[1]!.q).toBe('Was hält Jakob bei der Geburt fest?')
+    expect(stage(1).questions[1]!.options[0]).toBe('die Ferse seines Bruders')
+    expect(stage(1).text.join(' ')).toContain('die Ferse seines Bruders fest')
+    expect(stage(1).questions.map((q) => q.q).join(' ')).not.toContain('gekocht')
   })
 
   it('3 stairway: the picture is the stage picture; round 1 is 2 x 2 tiles, round 2 3 x 2; both rounds are mixed, never finished, and round 2 has more tiles and more moves', () => {
@@ -405,7 +436,8 @@ describe('Jakob: English', () => {
       expect(q.answer).toBe(0)
       expect(q.q.trim().endsWith('?'), q.q).toBe(true)
     }
-    expect(stage(1).task.hint).toBe('Tap the sheep and count them.')
+    expect(stage(1).task.hint).toBe('Cook the soup before Esau arrives: tap lentils, water and wood.')
+    expect(stage(1).task.stew!.hint).toBe(stage(1).task.hint)
     expect(stage(2).task.hint).toBe('This stage is serious. Listen carefully and answer the questions.')
   })
 })

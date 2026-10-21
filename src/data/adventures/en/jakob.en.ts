@@ -20,10 +20,10 @@ export const jakobEn: TextOverlay<Journey> = {
         'One day Esau comes home tired and hungry. Jacob has just cooked red lentils. “Let me eat some of that red stew,” begs Esau, “I am starving!”',
         'Jacob answers, “Then sell me your birthright today.” That is the special place of the oldest son in the family. “What good is it to me if I starve?” says Esau. He eats, gets up, and goes away. His birthright does not matter to him.'
       ],
-      task: { hint: 'Tap the sheep and count them.' },
+      task: { hint: 'Cook the soup before Esau arrives: tap lentils, water and wood.', stew: { hint: 'Cook the soup before Esau arrives: tap lentils, water and wood.' } },
       questions: [
         { q: 'What does Esau give away for the lentil stew?', options: ['his birthright', 'his tent', 'his bow'] },
-        { q: 'What has Jacob cooked?', options: ['red lentils', 'a fish', 'a millet porridge'] }
+        { q: 'What does Jacob hold on to at birth?', options: ['his brother’s heel', 'his father’s hand', 'his mother’s staff'] }
       ]
     },
     {

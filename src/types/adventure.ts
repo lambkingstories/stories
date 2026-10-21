@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe'
 
 export interface AdventureQuestion {
   q: string
@@ -719,6 +719,38 @@ export interface GuessGame {
   rounds: GuessRound[]
 }
 
+/** One of the three things next to the pot of the stew game: its picture and where it lies (middle of the picture, percent of the scene). */
+export interface StewSource {
+  image: string
+  at: [number, number]
+}
+
+/**
+ * The stew game "Cook the soup before Esau comes": a pot stands on the fireplace in front of the tent; far away on the road Esau appears and walks to the tent. The child taps (or drags
+ * to the pot) lentils, water and wood, in any order, until the soup steams. One round, nothing is lost, a try that is too slow starts again by itself, and Esau walks a little slower each time.
+ * The pot has four pictures at the same place (empty, lentils, water, soup); two logs make the fire grow (the one picture of the flame is shown 1.6 times as big). All places are percent of the scene.
+ */
+export interface StewGame {
+  hint: string
+  /** the scene (3 : 4), without figures */
+  scene: string
+  pot: { empty: string; lentils: string; water: string; soup: string }
+  logs: string
+  flame: string
+  steam: string
+  sources: { bowl: StewSource; jug: StewSource; wood: StewSource }
+  esau: string
+  /** the middle of the pot */
+  potAt: [number, number]
+  /** Esau's way from the fields to the tent (the feet) */
+  path: [number, number][]
+  /** how long Esau walks the first time, how much longer each new try, the longest, and how long the soup simmers (ms) */
+  walkMs: number
+  slowerMs: number
+  maxWalkMs: number
+  simmerMs: number
+}
+
 /** A round of the cairn game: how many stones are brought to the heap and how many steps each side has to go to the middle. */
 export interface CairnRound {
   hint: string
@@ -1398,6 +1430,7 @@ export interface StageTask {
   cycle?: CycleGame
   catch?: CatchGame
   guess?: GuessGame
+  stew?: StewGame
   cairn?: CairnGame
   relay?: RelayGame
   ring?: RingGame

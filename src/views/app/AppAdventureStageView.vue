@@ -37,6 +37,7 @@ import GameConstellation from '@/components/molecules/games/GameConstellation.vu
 import GameSlide from '@/components/molecules/games/GameSlide.vue'
 import GameCrank from '@/components/molecules/games/GameCrank.vue'
 import GameHold from '@/components/molecules/games/GameHold.vue'
+import GameStew from '@/components/molecules/games/GameStew.vue'
 import GameCross from '@/components/molecules/games/GameCross.vue'
 import GameFocus from '@/components/molecules/games/GameFocus.vue'
 import GameBeat from '@/components/molecules/games/GameBeat.vue'
@@ -357,7 +358,7 @@ const hasPart = computed(() => partStars.value > 0 && !progress.finished.value)
 
 /** The games have a restart sign: a new key mounts the game afresh (round, mistakes and what was done begin again). */
 const gameKey = ref(0)
-const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross'] as const
+const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew'] as const
 const hasGame = computed(() => hasCountGame.value || GAME_FIELDS.some((f) => !!gameTask.value?.[f]))
 function restartGame() {
   progress.reset()
@@ -442,6 +443,7 @@ const gameKind = computed(() => {
   if (g?.slide) return 'slide'
   if (g?.crank) return 'crank'
   if (g?.hold) return 'hold'
+  if (g?.stew) return 'stew'
   if (g?.cross) return 'cross'
   if (g?.focus) return 'focus'
   if (g?.beat) return 'beat'
@@ -594,6 +596,7 @@ function openGift() {
         GameSlide(:key="gameKey" v-else-if="gameTask?.slide" :game="gameTask.slide" @done="taskDone")
         GameCrank(:key="gameKey" v-else-if="gameTask?.crank" :game="gameTask.crank" @done="taskDone")
         GameHold(:key="gameKey" v-else-if="gameTask?.hold" :game="gameTask.hold" @done="taskDone")
+        GameStew(:key="gameKey" v-else-if="gameTask?.stew" :game="gameTask.stew" @done="taskDone")
         GameCross(:key="gameKey" v-else-if="gameTask?.cross" :game="gameTask.cross" @done="taskDone")
         GameFocus(:key="gameKey" v-else-if="gameTask?.focus" :game="gameTask.focus" @done="taskDone")
         GameBeat(:key="gameKey" v-else-if="gameTask?.beat" :game="gameTask.beat" @done="taskDone")

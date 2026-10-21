@@ -4,7 +4,7 @@
  * Deutsche Aufnahmen zu den neuen Texten: geschichte-NN-v3.mp3 (Gemini, Stimme Achernar, 21.10.2026, nicht gehört); Englisch noch nicht (die englische App liest mit der Gerätestimme).
  * Die Spielaufgaben der Etappen sind noch die von vor v3 (die Spiele folgen nach SPIELE/ENTWURF-v3.md). Die richtige Antwort steht in den Daten
  * IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
- * Spiele (Wahl der Leitung vom 20.10.2026, höchstens zwei alte Mechaniken): 1 Zählen (alt), 2 nur Quiz, 3 Treppe zusammenschieben (neu), 4 Brunnen kurbeln (neu),
+ * Spiele (Wahl der Leitung vom 20.10.2026, höchstens zwei alte Mechaniken): 1 Die Suppe kochen, bevor Esau kommt (neu), 2 nur Quiz, 3 Treppe zusammenschieben (neu), 4 Brunnen kurbeln (neu),
  * 5 Morgenrot halten (neu), 6 Puzzle (alt).
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/jakob/, images/abenteuer/spiele/jakob/<spiel>/, audio/abenteuer/jakob/.
@@ -13,7 +13,7 @@
  * Davor: alle Bilder (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder) und Messwerte sind eingebaut, die Etappen sind spielbar.
  * Das Abenteuer ist aber nicht öffentlich: es ist hinter `comingSoon` und dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { CairnGame, CatchGame, CrankGame, CycleGame, GuessGame, HoldGame, Journey, RelayGame, RingGame, SlideGame } from '@/types/adventure'
+import type { CairnGame, CatchGame, CrankGame, CycleGame, GuessGame, HoldGame, Journey, RelayGame, RingGame, SlideGame, StewGame } from '@/types/adventure'
 import { JAKOB_PATH } from './jakobPath'
 import { localize } from './localize'
 import { adventureLanguage } from '@/use/adventureLanguage'
@@ -25,9 +25,32 @@ const G = 'images/abenteuer/spiele/jakob/'
 const SOON = false
 
 /**
- * Etappe 1, "Zählen": Jakobs Schafe vor dem Zelt (Etappenbild 1), jedes angetippt und mitgezählt. Das Zählspiel hat nur eine Szene (keine Runden).
- * Das Schaf ist das aus Noah (Kopie unter `zaehlen/`); es ist kein Bild neu zu malen.
+ * Etappe 1, "Die Suppe kochen, bevor Esau kommt" (ersetzt das Zählen; Entwurf SPIELE/ENTWURF-linsensuppe.md, Bildauftrag J35): ein Topf steht auf dem Feuerplatz vor Isaaks Zelt, oben auf dem Weg von den Feldern erscheint
+ * der kleine Esau und geht in etwa 32 Sekunden zum Zelt; das Kind tippt Linsen, Wasser und zweimal Holz an (oder zieht sie auf den Topf), in freier Reihenfolge, bis die Suppe dampft. Eine Runde, kein Fehler, nichts geht verloren:
+ * ist Esau zuerst da, beginnt alles nach zwei Sekunden von vorn, und Esau geht dann sechs Sekunden langsamer (höchstens 50). Dass die Suppe fertig sein soll, bevor Esau kommt, ist eine Spielidee (steht nicht in der Bibel).
+ * Bilder (J35, noch nicht gemalt, 21.10.2026): `suppe/szene.webp` (3 : 4, ohne Figuren), `topf-leer`, `topf-linsen`, `topf-wasser`, `topf-suppe`, `scheite`, `flamme`, `dampf`, `linsenschale`, `wasserkrug`, `holz`, `esau` (alle
+ * außer der Szene transparent). Bis sie da sind, zeigt das Spiel einfarbige Platzhalter (`GameImage`, Ordner in `NOT_PAINTED_YET`). VORLÄUFIGE Lagen (Prozent der Szene): Topf, Quellen und Esaus Weg nach dem Entwurf; am fertigen Bild zu messen.
  */
+const SUPPE: StewGame = {
+  hint: 'Koche die Suppe, bevor Esau da ist: tippe Linsen, Wasser und Holz an.',
+  scene: `${G}suppe/szene.webp`,
+  pot: { empty: `${G}suppe/topf-leer.webp`, lentils: `${G}suppe/topf-linsen.webp`, water: `${G}suppe/topf-wasser.webp`, soup: `${G}suppe/topf-suppe.webp` },
+  logs: `${G}suppe/scheite.webp`,
+  flame: `${G}suppe/flamme.webp`,
+  steam: `${G}suppe/dampf.webp`,
+  sources: {
+    bowl: { image: `${G}suppe/linsenschale.webp`, at: [18, 88] },
+    jug: { image: `${G}suppe/wasserkrug.webp`, at: [50, 90] },
+    wood: { image: `${G}suppe/holz.webp`, at: [82, 88] }
+  },
+  esau: `${G}suppe/esau.webp`,
+  potAt: [50, 66],
+  path: [[82, 10], [72, 17], [76, 26], [64, 33], [54, 39], [42, 45], [32, 52]],
+  walkMs: 32000,
+  slowerMs: 6000,
+  maxWalkMs: 50000,
+  simmerMs: 2500
+}
 
 /**
  * Etappe 3, "Treppe zusammenschieben": das Etappenbild 3 (Nachtlandschaft mit der Himmelsleiter) wird von der App in Kacheln geschnitten und gemischt (`scramble`, mit festem
@@ -245,10 +268,10 @@ export const jakob: Journey = {
         'Eines Tages kommt Esau müde und hungrig heim. Jakob hat gerade rote Linsen gekocht. „Lass mich von dem roten Gericht essen“, bittet Esau, „ich verhungere!“',
         'Jakob antwortet: „Dann verkaufe mir heute dein Erstgeburtsrecht.“ Das ist der besondere Platz des Ältesten in der Familie. „Was nützt es mir, wenn ich verhungere?“, sagt Esau. Er isst, steht auf und geht fort. Sein Vorrecht ist ihm nicht wichtig.'
       ],
-      task: { kind: 'zaehlen', hint: 'Tippe die Schafe an und zähle sie.', count: 8, image: `${G}zaehlen/schaf.webp`, background: `${IMG}etappe-bild-01.webp` },
+      task: { kind: 'suppe', hint: SUPPE.hint, stew: SUPPE },
       questions: [
         { q: 'Was gibt Esau für das Linsengericht her?', options: ['sein Erstgeburtsrecht', 'sein Zelt', 'seinen Bogen'], answer: 0 },
-        { q: 'Was hat Jakob gekocht?', options: ['rote Linsen', 'einen Fisch', 'einen Brei aus Hirse'], answer: 0 }
+        { q: 'Was hält Jakob bei der Geburt fest?', options: ['die Ferse seines Bruders', 'die Hand seines Vaters', 'den Stab seiner Mutter'], answer: 0 }
       ],
       soon: SOON
     },

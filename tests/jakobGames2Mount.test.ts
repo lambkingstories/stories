@@ -7,7 +7,7 @@ import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import useTaskProgress from '@/use/useTaskProgress'
-import type { CairnGame, CatchGame, CycleGame, GuessGame, RelayGame, RingGame } from '@/types/adventure'
+import type { CairnGame, CatchGame, CycleGame, GuessGame, RelayGame, RingGame, StewGame } from '@/types/adventure'
 
 const played: string[] = []
 vi.mock('@/use/useSfx', () => ({
@@ -837,5 +837,259 @@ describe('Herden mit Abstand losschicken (relay)', () => {
     await go(w)
     await go(w)
     expect(w.find('.rl-fb').text()).toContain('Too close')
+  })
+})
+
+// ---------------------------------------------------------------- the stew (stage 1)
+describe('Die Suppe kochen, bevor Esau kommt (stew)', () => {
+  const game: StewGame = {
+    hint: 'Koche die Suppe.',
+    scene: 'images/x/szene.webp',
+    pot: { empty: 'images/x/topf-leer.webp', lentils: 'images/x/topf-linsen.webp', water: 'images/x/topf-wasser.webp', soup: 'images/x/topf-suppe.webp' },
+    logs: 'images/x/scheite.webp',
+    flame: 'images/x/flamme.webp',
+    steam: 'images/x/dampf.webp',
+    sources: { bowl: { image: 'images/x/schale.webp', at: [18, 88] }, jug: { image: 'images/x/krug.webp', at: [50, 90] }, wood: { image: 'images/x/holz.webp', at: [82, 88] } },
+    esau: 'images/x/esau.webp',
+    potAt: [50, 66],
+    path: [[82, 10], [32, 52]],
+    walkMs: 32000,
+    slowerMs: 6000,
+    maxWalkMs: 50000,
+    simmerMs: 2500
+  }
+  const open = async (locale: 'de' | 'en' = 'de') => {
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, width: 300, height: 400, right: 300, bottom: 400, x: 0, y: 0, toJSON: () => ({}) })
+    const { default: Stew } = await import('@/components/molecules/games/GameStew.vue')
+    const w = mount(Stew, { ...opts(locale), props: { game } })
+    await flushPromises()
+    return w
+  }
+  type W = Awaited<ReturnType<typeof open>>
+  const src = (w: W, i: number) => w.findAll('.st-src')[i]!
+  const tap = async (w: W, i: number) => {
+    await src(w, i).trigger('click')
+    await flushPromises()
+  }
+  /** Lentils, water and the wood twice. */
+  const cook = async (w: W) => {
+    for (const i of [0, 1, 2, 2]) await tap(w, i)
+  }
+  const potPicture = (w: W) => w.find('.st-pot img').attributes('src')
+  const esauX = (w: W) => Number(/left: ([\d.]+)%/.exec(w.find('.st-esau').attributes('style') ?? '')![1])
+
+  it('one soup is the goal; hint, scene, pot, three sources with names, no counter, no hourglass; Esau stands far away at the start of the road', async () => {
+    const w = await open()
+    expect(useTaskProgress().goal.value).toBe(1)
+    expect(w.find('.st-hint').text()).toBe('Koche die Suppe.')
+    expect(w.findAll('.st-src').map((b) => b.attributes('aria-label'))).toEqual(['Linsenschale', 'Wasserkrug', 'Holzstapel'])
+    expect(potPicture(w)).toContain('topf-leer')
+    expect(w.find('.st-logs').exists()).toBe(false)
+    expect(w.find('.st-flame').exists()).toBe(false)
+    expect(w.find('.st-esau').attributes('style')).toContain('left: 82%')
+    expect(w.find('.st-esau').attributes('style')).toContain('scale(0.55)')
+    expect(w.find('.st-fb').text()).toBe('')
+    expect(w.text()).not.toMatch(/\d+ von \d+/)
+    expect(problems()).toEqual([])
+  })
+
+  it('a tap puts a thing into the pot: lentils, water, then the soup; a tick shows the source is used; the first log is a small flame, the second a big one', async () => {
+    const w = await open()
+    await tap(w, 0)
+    expect(potPicture(w)).toContain('topf-linsen')
+    expect(src(w, 0).find('.gm').exists()).toBe(true)
+    expect(src(w, 0).classes()).toContain('spent')
+    await tap(w, 1)
+    expect(potPicture(w)).toContain('topf-suppe')
+    await tap(w, 2)
+    expect(w.find('.st-logs').exists()).toBe(true)
+    expect(w.find('.st-flame').classes()).not.toContain('big')
+    expect(src(w, 2).find('.gm').exists()).toBe(false)
+    expect(w.findAll('.st-dot.on')).toHaveLength(1)
+    await tap(w, 2)
+    expect(w.find('.st-flame').classes()).toContain('big')
+    expect(w.findAll('.st-dot.on')).toHaveLength(2)
+    expect(played.filter((n) => n === 'snap')).toHaveLength(4)
+  })
+
+  it('any order is fine: the wood first, the water, the lentils last; the soup cooks only when all four things are there', async () => {
+    const w = await open()
+    for (const i of [2, 2, 1]) await tap(w, i)
+    expect(w.find('.st-steam').exists()).toBe(false)
+    await tap(w, 0)
+    expect(w.find('.st-steam').exists()).toBe(true)
+  })
+
+  it('a thing that is already in the pot only shakes softly and says so: no mistake, nothing else changes', async () => {
+    const w = await open()
+    await tap(w, 0)
+    played.length = 0
+    await tap(w, 0)
+    expect(w.find('.st-fb').text()).toBe('Das ist schon im Topf.')
+    expect(src(w, 0).classes()).toContain('wiggle')
+    expect(potPicture(w)).toContain('topf-linsen')
+    expect(played).toEqual([])
+    await tick(600)
+    expect(src(w, 0).classes()).not.toContain('wiggle')
+    await tap(w, 1)
+    expect(w.find('.st-fb').text()).toBe('')
+  })
+
+  it('when all is there the soup simmers for two and a half seconds, then "The soup is ready" with three stars; the one star of the goal counts', async () => {
+    const w = await open()
+    await cook(w)
+    expect(w.find('.st-steam').exists()).toBe(true)
+    expect(useTaskProgress().parts.value).toBe(0)
+    await tick(2000)
+    expect(w.find('.gd').exists()).toBe(false)
+    await tick(600)
+    expect(w.find('.gd').exists()).toBe(true)
+    expect(w.find('.gd').text()).toContain('Die Suppe ist fertig!')
+    expect(useTaskProgress().parts.value).toBe(1)
+    expect(played).toContain('star')
+    await w.find('.gd button').trigger('click')
+    expect(w.emitted('done')).toEqual([[3]])
+    expect(problems()).toEqual([])
+  })
+
+  it('Esau walks on his own: after half of the time he is further down the road; the sources still work while he walks', async () => {
+    const w = await open()
+    const x0 = esauX(w)
+    await tick(16000)
+    const x1 = esauX(w)
+    expect(x1).toBeLessThan(x0)
+    expect(x1).toBeCloseTo(57, 0)
+    expect(w.find('.st-esau').attributes('style')).toContain('scale(0.775)')
+    await tap(w, 0)
+    expect(potPicture(w)).toContain('topf-linsen')
+  })
+
+  it('a screen reader hears how far Esau is (a third, two thirds, nearly there) in a polite live region', async () => {
+    const w = await open()
+    expect(w.find('.st-sr').attributes('aria-live')).toBe('polite')
+    expect(w.find('.st-sr').text()).toBe('')
+    await tick(11000)
+    expect(w.find('.st-sr').text()).toBe('Esau ist noch weit weg.')
+    await tick(11000)
+    expect(w.find('.st-sr').text()).toBe('Esau kommt näher.')
+    await tick(7000)
+    expect(w.find('.st-sr').text()).toBe('Esau ist fast da.')
+  })
+
+  it('Esau is at the tent first: a kind sentence, after two seconds everything starts again (pot empty, Esau at the top), and the next try is six seconds longer', async () => {
+    const w = await open()
+    await tap(w, 0)
+    await tick(32000)
+    expect(w.find('.st-fb').text()).toBe('Esau wartet hungrig. Versuche es noch einmal.')
+    expect(w.find('.gd').exists()).toBe(false)
+    // nothing is taken while the sentence stands
+    await tap(w, 1)
+    expect(potPicture(w)).toContain('topf-linsen')
+    await tick(2000)
+    expect(w.find('.st-fb').text()).toBe('')
+    expect(potPicture(w)).toContain('topf-leer')
+    expect(src(w, 0).classes()).not.toContain('spent')
+    expect(esauX(w)).toBe(82)
+    // the second try: still walking after 32 seconds, at the tent after 38
+    await tick(32000)
+    expect(w.find('.st-fb').text()).toBe('')
+    await tick(6000)
+    expect(w.find('.st-fb').text()).toContain('Esau wartet')
+    expect(useTaskProgress().parts.value).toBe(0)
+  })
+
+  it('the stars: no restart or one restart 3 stars, up to three restarts 2 stars, then 1; the walk never gets longer than 50 seconds', async () => {
+    for (const [restarts, stars] of [[0, 3], [1, 3], [2, 2], [3, 2], [4, 1]] as const) {
+      const w = await open()
+      const waits = [32000, 38000, 44000, 50000]
+      for (let r = 0; r < restarts; r++) await tick(waits[Math.min(r, 3)]! + 2000)
+      await cook(w)
+      await tick(2500)
+      await w.find('.gd button').trigger('click')
+      expect(w.emitted('done'), `${restarts} restarts`).toEqual([[stars]])
+      w.unmount()
+      useTaskProgress().reset()
+    }
+  })
+
+  it('a drag of a source onto the pot does the same as a tap, and the click after it is not used a second time; a drag into the empty does nothing', async () => {
+    const w = await open()
+    const el = src(w, 0).element
+    const fire = (type: string, x: number, y: number) => (type === 'pointerdown' ? el : window).dispatchEvent(new MouseEvent(type, { bubbles: true, clientX: x, clientY: y }))
+    // far outside the pot (the pot is the whole mocked box of 300 x 400)
+    fire('pointerdown', 50, 350)
+    fire('pointermove', 900, 900)
+    await flushPromises()
+    expect(src(w, 0).attributes('style')).toContain('translate(calc(-50% + 850px)')
+    fire('pointerup', 900, 900)
+    await flushPromises()
+    expect(potPicture(w)).toContain('topf-leer')
+    await tick(10)
+    // onto the pot
+    fire('pointerdown', 50, 350)
+    fire('pointermove', 150, 200)
+    fire('pointerup', 150, 200)
+    await flushPromises()
+    expect(potPicture(w)).toContain('topf-linsen')
+    // the click that follows a drag does not count as a second use (no "already in the pot")
+    await src(w, 0).trigger('click')
+    expect(w.find('.st-fb').text()).toBe('')
+    await tick(10)
+    await src(w, 0).trigger('click')
+    expect(w.find('.st-fb').text()).toBe('Das ist schon im Topf.')
+    expect(played.filter((n) => n === 'snap')).toHaveLength(1)
+  })
+
+  it('a short move is only a tap (the click uses the thing once)', async () => {
+    const w = await open()
+    const el = src(w, 1).element
+    el.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, clientX: 10, clientY: 10 }))
+    window.dispatchEvent(new MouseEvent('pointermove', { clientX: 14, clientY: 12 }))
+    window.dispatchEvent(new MouseEvent('pointerup', { clientX: 14, clientY: 12 }))
+    await src(w, 1).trigger('click')
+    expect(potPicture(w)).toContain('topf-wasser')
+    expect(played.filter((n) => n === 'snap')).toHaveLength(1)
+  })
+
+  it('the sources are buttons: the keyboard (Tab, Enter) works with the clicks; the spent one is marked, not disabled', async () => {
+    const w = await open()
+    expect(w.findAll('button.st-src')).toHaveLength(3)
+    await tap(w, 1)
+    expect(src(w, 1).attributes('aria-disabled')).toBe('true')
+    expect(src(w, 1).attributes('disabled')).toBeUndefined()
+    expect(src(w, 0).attributes('aria-disabled')).toBeUndefined()
+  })
+
+  it('with reduced motion Esau jumps in six steps and the steam does not move', async () => {
+    const old = window.matchMedia
+    window.matchMedia = ((q: string) => ({ matches: /reduce/.test(q), media: q, addEventListener: () => undefined, removeEventListener: () => undefined, addListener: () => undefined, removeListener: () => undefined, onchange: null, dispatchEvent: () => false })) as never
+    try {
+      const w = await open()
+      expect(w.find('.st-esau').classes()).toContain('still')
+      await tick(2000)
+      expect(esauX(w)).toBe(82)
+      await tick(4000)
+      expect(esauX(w)).toBeLessThan(82)
+      await cook(w)
+      expect(w.find('.st-steam').classes()).toContain('still')
+    } finally {
+      window.matchMedia = old
+    }
+  })
+
+  it('speaks English', async () => {
+    const w = await open('en')
+    expect(w.findAll('.st-src').map((b) => b.attributes('aria-label'))).toEqual(['Bowl of lentils', 'Water jug', 'Pile of wood'])
+    await tap(w, 0)
+    await tap(w, 0)
+    expect(w.find('.st-fb').text()).toBe('That is already in the pot.')
+    await tick(11000)
+    expect(w.find('.st-sr').text()).toBe('Esau is still far away.')
+    await tick(21000)
+    expect(w.find('.st-fb').text()).toBe('Esau is waiting, hungry. Try once more.')
+    await tick(2000)
+    await cook(w)
+    await tick(2500)
+    expect(w.find('.gd').text()).toContain('The soup is ready!')
   })
 })

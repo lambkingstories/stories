@@ -4,6 +4,8 @@
  */
 import { describe, expect, it } from 'vitest'
 import { seeded } from '@/utils/jakobGames'
+import { esauAt, esauSaid, esauScale, fireSize, potKey, stepped, stewAdd, stewCan, stewReady, stewStart, walkDuration } from '@/utils/jakobStew'
+import type { StewSourceId, StewState } from '@/utils/jakobStew'
 import {
   advance,
   arrived,
@@ -240,5 +242,92 @@ describe('ring of the twelve sons', () => {
     expect(below.x).toBeCloseTo(50, 6)
     expect(below.y).toBeCloseTo(50 + 20 / (2 / 3), 6)
     expect(snapToRing({ x: 50, y: 50 + 20 / (2 / 3) }, c, 20).distance).toBeCloseTo(0, 6)
+  })
+})
+
+// ------------------------------------------------------------------ the stew (stage 1)
+
+describe('the stew of Jacob (stage 1)', () => {
+  const ORDER: StewSourceId[] = ['bowl', 'jug', 'wood', 'wood']
+  const permutations = <T>(xs: T[]): T[][] => (xs.length <= 1 ? [xs] : xs.flatMap((x, i) => permutations([...xs.slice(0, i), ...xs.slice(i + 1)]).map((p) => [x, ...p])))
+  const run = (ids: StewSourceId[]): StewState => ids.reduce((s, id) => stewAdd(s, id), stewStart())
+
+  it('every order of the four things leads to the same finished state: lentils, water, two logs', () => {
+    for (const p of permutations(ORDER)) {
+      const s = run(p)
+      expect(s).toEqual({ bowl: 1, jug: 1, wood: 2 })
+      expect(stewReady(s)).toBe(true)
+    }
+    // the first steps of a permutation are not ready yet
+    expect(permutations(ORDER).length).toBe(24)
+  })
+
+  it('the wood needs two logs; lentils and water once; a spent source does nothing', () => {
+    expect(stewReady(run(['bowl', 'jug', 'wood']))).toBe(false)
+    expect(stewReady(run(['bowl', 'wood', 'wood']))).toBe(false)
+    expect(stewReady(run(['jug', 'wood', 'wood']))).toBe(false)
+    expect(stewReady(stewStart())).toBe(false)
+    const s = run(['bowl', 'jug', 'wood', 'wood'])
+    expect(stewCan(s, 'bowl')).toBe(false)
+    expect(stewCan(s, 'wood')).toBe(false)
+    expect(stewAdd(s, 'wood')).toBe(s)
+    expect(stewAdd(s, 'bowl')).toBe(s)
+    expect(stewCan(run(['wood']), 'wood')).toBe(true)
+  })
+
+  it('the pot shows what is in it: empty, lentils, water, then the soup; the fire is none, small or big', () => {
+    expect(potKey(stewStart())).toBe('empty')
+    expect(potKey(run(['bowl']))).toBe('lentils')
+    expect(potKey(run(['jug']))).toBe('water')
+    expect(potKey(run(['bowl', 'jug']))).toBe('soup')
+    expect(potKey(run(['wood', 'wood']))).toBe('empty')
+    expect([0, 1, 2].map((n) => fireSize({ bowl: 0, jug: 0, wood: n }))).toEqual([0, 1, 2])
+  })
+
+  const PATH: [number, number][] = [[82, 10], [72, 17], [76, 26], [64, 33], [54, 39], [42, 45], [32, 52]]
+  it('Esau goes along the line by its length: at the start on the first point, at the end on the last, and he only goes forward', () => {
+    expect(esauAt(PATH, 0)).toEqual({ x: 82, y: 10 })
+    expect(esauAt(PATH, 1)).toEqual({ x: 32, y: 52 })
+    expect(esauAt(PATH, -1)).toEqual({ x: 82, y: 10 })
+    expect(esauAt(PATH, 2)).toEqual({ x: 32, y: 52 })
+    let last = Infinity
+    let lastY = -Infinity
+    for (let i = 0; i <= 100; i++) {
+      const p = esauAt(PATH, i / 100)
+      expect(p.y).toBeGreaterThanOrEqual(lastY - 1e-9)
+      lastY = p.y
+      last = p.x
+    }
+    expect(last).toBeCloseTo(32, 6)
+    // by length: half the way is half the length of the line, not the middle point
+    const parts = PATH.slice(1).map((p, i) => Math.hypot(p[0] - PATH[i]![0], p[1] - PATH[i]![1]))
+    const half = esauAt(PATH, 0.5)
+    let rest = (parts.reduce((a, b) => a + b, 0)) / 2
+    let k = 0
+    while (rest > parts[k]!) rest -= parts[k++]!
+    const f = rest / parts[k]!
+    expect(half.x).toBeCloseTo(PATH[k]![0] + (PATH[k + 1]![0] - PATH[k]![0]) * f, 6)
+    expect(esauAt([[10, 10]], 0.5)).toEqual({ x: 10, y: 10 })
+    expect(esauAt([], 0.5)).toEqual({ x: 0, y: 0 })
+  })
+
+  it('Esau grows from 55 percent to 100 percent; with reduced motion he jumps in six steps', () => {
+    expect(esauScale(0)).toBeCloseTo(0.55, 6)
+    expect(esauScale(1)).toBeCloseTo(1, 6)
+    expect(esauScale(0.5)).toBeCloseTo(0.775, 6)
+    expect(esauScale(3)).toBe(1)
+    expect([0, 0.1, 0.17, 0.5, 0.99, 1].map((p) => stepped(p))).toEqual([0, 0, 1 / 6, 3 / 6, 5 / 6, 1])
+  })
+
+  it('the first time Esau walks 32 seconds, six seconds slower after each new start, never more than 50 seconds', () => {
+    const d = (r: number) => walkDuration(r, 32000, 6000, 50000)
+    expect([0, 1, 2, 3].map(d)).toEqual([32000, 38000, 44000, 50000])
+    expect(d(4)).toBe(50000)
+    expect(d(40)).toBe(50000)
+    expect(d(-1)).toBe(32000)
+  })
+
+  it('the screen reader hears how far he is: a third, two thirds, nearly there', () => {
+    expect([0, 0.2, 0.34, 0.5, 0.67, 0.8, 0.9, 1].map(esauSaid)).toEqual([null, null, 'far', 'far', 'near', 'near', 'almost', 'almost'])
   })
 })
