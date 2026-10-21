@@ -22,7 +22,7 @@ const stage = (n: number) => adamEva.stages[n - 1]!
 const FORBIDDEN = /\b(Apfel|Äpfel|Teufel|Dämon|Hölle|Blut|tot geschlagen)\b/i
 
 describe('Adam und Eva: stories and questions', () => {
-  it('nine stages with 3 or 4 paragraphs of 90 to 145 words (plan v3), the Bible passage under every one, no recording yet (the app reads with the voice of the device)', () => {
+  it('nine stages with 3 or 4 paragraphs of 90 to 145 words (plan v3), the Bible passage under every one, the German recording of every story', () => {
     expect(adamEva.stages).toHaveLength(9)
     for (const s of adamEva.stages) {
       expect(s.ref, `stage ${s.id}`).toMatch(/^1\. Mose \d/)
@@ -32,7 +32,8 @@ describe('Adam und Eva: stories and questions', () => {
       expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(90)
       expect(words, `words ${s.id}`).toBeLessThanOrEqual(145)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.audio, `no recording yet ${s.id}`).toBeUndefined()
+      expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`)
+      expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
       expect(s.image).toBe(`images/abenteuer/adam-eva/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
     }
   })
@@ -330,7 +331,7 @@ describe('Adam und Eva: English', () => {
       expect(s.task.hint, `hint ${s.id}`).not.toBe(de[i]!.hint)
       s.questions.forEach((q, k) => expect(q.q, `question ${s.id}.${k}`).not.toBe(de[i]!.q[k]))
       expect(s.ref, `ref ${s.id}`).toMatch(/^Genesis \d/)
-      expect(s.audio, `audio ${s.id}`).toBeUndefined()
+      expect(s.audio, `no English recording yet: ${s.id}`).toBeUndefined()
       if (s.task.verse) expect(s.task.verse.rounds.map((r) => r.words.length)).toEqual(de[i]!.verse)
     })
     expect(adamEva.title).toBe('Adam and Eve')

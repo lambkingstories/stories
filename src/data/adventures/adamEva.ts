@@ -1,7 +1,7 @@
 /**
  * Abenteuer "Adam und Eva" (1. Mose 1–3) für 8 bis 10 Jahre: 9 Etappen, Untertitel "Der Garten Eden". Entstanden nach dem Skill "LambKing Abenteuer Skill".
  * Quelle der Texte: D:/Claude/Abenteuer-Adam-Eva/ENTWURF_Adam-Eva-v3.md (zweitgeprüft, 90 bis 145 Wörter je Etappe wie bei Noah und Josef, eingebaut am 21.10.2026), Plan: ETAPPENPLAN-v3.md.
- * Es gibt noch keine Aufnahmen zu den neuen Texten (`audio` fehlt: die App liest mit der Gerätestimme); die alten Aufnahmen liegen noch im Ordner, sind aber nicht mehr verlinkt.
+ * Deutsche Aufnahmen zu den neuen Texten: geschichte-NN-v3.mp3 (Gemini, Stimme Achernar, 21.10.2026, nicht gehört); Englisch noch nicht (die englische App liest mit der Gerätestimme).
  * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen. Jedes Spiel hat höchstens zwei Runden (Plan v3).
  * Kein Spiel dieses Abenteuers kommt in Josef oder Noah vor (Anton, 20.10.2026): jede Etappe hat ein eigenes, neues Spiel, Etappe 7 ist nur Quiz.
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
@@ -14,6 +14,7 @@ import type { ChannelGame, EchoGame, HerdGame, Journey, LightGame, MirrorGame, O
 import { ADAM_EVA_PATH } from './adamEvaPath'
 import { CHANNEL_GRID_1, CHANNEL_GRID_2 } from './adamEvaChannels'
 import { localize } from './localize'
+import { adventureLanguage } from '@/use/adventureLanguage'
 import { adamEvaEn } from './en/adamEva.en'
 
 const IMG = 'images/abenteuer/adam-eva/'
@@ -401,6 +402,12 @@ adamEva.music = [
   'audio/abenteuer/adam-eva/musik-strom-v1.mp3',
   'audio/abenteuer/adam-eva/musik-abend-v1.mp3'
 ]
+
+// the German recordings of the stories (voice Achernar, text version 3 = files "-v3"); there are no English ones yet, so the English app reads with the voice of the device
+for (const s of adamEva.stages) {
+  const file = `audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`
+  Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
+}
 
 // the English texts (title, stories, questions, hints, recordings) lie over the German ones; the screens show them when the app is English
 localize(adamEva, adamEvaEn)
