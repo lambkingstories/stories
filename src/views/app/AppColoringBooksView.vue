@@ -37,6 +37,8 @@ interface Card {
   bookId: string
   title: string
   cover: string
+  /** For the order: the import gives the volumes rising dates, so Band 1 comes before Band 2. */
+  released: number
   total: number
   done: number
 }
@@ -56,11 +58,12 @@ const cards = computed<Card[]>(() => {
       bookId: book.bookId,
       title: cleanTitle(title),
       cover: withPlaceholder(pickLocalizedImage(book.previewImage, lang.value)),
+      released: Date.parse(book.releaseDate) || 0,
       total: pages.length,
       done: pages.filter((p) => painted.has(pageArtworkId(p.url, 1))).length
     })
   }
-  return list.sort((a, b) => a.bookId.localeCompare(b.bookId))
+  return list.sort((a, b) => a.released - b.released || a.bookId.localeCompare(b.bookId))
 })
 
 function goBack() {
