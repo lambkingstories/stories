@@ -3,7 +3,7 @@
  * Bake flatbreads: at the camp fire in Gilgal flat stones lie hot in the embers, and balls of dough wait. The child drags a ball onto a free stone (or taps the ball and then the stone): it
  * becomes a pale raw flatbread. After a few seconds it is golden (a tick shows it, and the text under it says "ready"): a tap turns it and puts it on the stack. A tap on a raw one only
  * says "not yet". If it lies too long it gets too dark (a cross, a dull sound, a mistake); a tap clears the stone, and the dough is given back, so the number of flatbreads to turn always
- * comes true. Round 1: six flatbreads on three stones, round 2: nine on five stones, a little quicker. Putting the dough on a stone has no clock. The state is `bakeState` in
+ * comes true. Plan v3: round 1 four flatbreads on three stones, round 2 six on four stones, a little quicker; the ball of dough is the raw flatbread and the number of the turned ones stands at a fixed place. Putting the dough on a stone has no clock. The state is `bakeState` in
  * `utils/josuaGames.ts`; the state always stands as a word under the flatbread, too, not only as a colour.
  */
 import { computed, onBeforeUnmount, reactive, ref } from 'vue'
@@ -52,7 +52,7 @@ const finished = ref(false)
 const message = ref('')
 const flash = ref<number | null>(null)
 const src = (p: string) => prependBaseUrl(p)
-const stars = computed(() => mistakeStars(mistakes.value, 1, 4))
+const stars = computed(() => mistakeStars(mistakes.value, 1, 3))
 
 const now = ref(Date.now())
 const timer = window.setInterval(() => {
@@ -147,6 +147,8 @@ const labelOf = (i: number) => t(`app.adventure.bake${stateOf(i) === 'roh' ? 'St
 const imageOf = (i: number) => (stateOf(i) === 'roh' ? props.game.raw : stateOf(i) === 'golden' ? props.game.golden : props.game.dark)
 const colourOf = (i: number) => (stateOf(i) === 'roh' ? '#efe2c0' : stateOf(i) === 'golden' ? '#d9a441' : '#5b3a22')
 const tray = computed(() => Array.from({ length: Math.max(0, doughLeft.value) }, (_, k) => `dough-${k}`))
+/** Where the number of the turned flatbreads stands when the data names no place of a stack (percent of the picture). */
+const STACK_AT: [number, number] = [88, 12]
 const at = (p: [number, number]) => ({ left: `${p[0]}%`, top: `${p[1]}%` })
 </script>
 
@@ -175,9 +177,10 @@ const at = (p: [number, number]) => ({ left: `${p[0]}%`, top: `${p[1]}%` })
               span(class="bk-word") {{ labelOf(i) }}
               GameMark(v-if="stateOf(i) === 'golden'" kind="good" class="bk-mark")
               GameMark(v-else-if="stateOf(i) === 'dunkel'" kind="bad" class="bk-mark")
-        span(class="bk-stack" :style="at(game.stackAt)" aria-hidden="true")
+        span(v-if="game.stack" class="bk-stack" :style="at(game.stackAt ?? STACK_AT)" aria-hidden="true")
           GameImage(:src="game.stack" :ratio="260 / 200" colour="#b88f55")
           span(class="bk-stack-n") {{ turned }}
+        span(v-else class="bk-turned" :style="at(game.stackAt ?? STACK_AT)" aria-hidden="true") {{ turned }}
       p(class="bk-fb" role="status") {{ message }}
       div(class="bk-tray" role="group" :aria-label="t('app.adventure.bakeTray')")
         div(
@@ -192,7 +195,7 @@ const at = (p: [number, number]) => ({ left: `${p[0]}%`, top: `${p[1]}%` })
           @pointerdown="down($event, id)"
           @keydown.enter.space.prevent="toggleSelect(id)"
         )
-          GameImage(:src="game.dough" colour="#f3e6c4" round)
+          GameImage(:src="game.dough ?? game.raw" colour="#f3e6c4" round)
       p(class="bk-count") {{ t('app.adventure.bakeCount', { n: turned, total: current.dough }) }}
     GameDone(v-else :stars="stars" :text="t('app.adventure.bakeDone')" @next="emit('done', stars)")
 </template>
@@ -286,6 +289,20 @@ const at = (p: [number, number]) => ({ left: `${p[0]}%`, top: `${p[1]}%` })
   display: block
   width: 17%
   transform: translate(-50%, -50%)
+  pointer-events: none
+
+.bk-turned
+  position: absolute
+  display: block
+  transform: translate(-50%, -50%)
+  min-width: 36px
+  padding: 2px 10px
+  border-radius: 999px
+  background: rgba(255, 246, 220, 0.95)
+  border: 3px solid #d4a83e
+  font-weight: 800
+  text-align: center
+  color: #3f321b
   pointer-events: none
 
 .bk-stack-n

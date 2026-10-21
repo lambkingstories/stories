@@ -120,7 +120,7 @@ const src = (p: string) => prependBaseUrl(p)
 </script>
 
 <template lang="pug">
-  div(class="vs" :style="{ backgroundImage: `url(${src(game.background)})` }")
+  div(class="vs" :class="{ 'game-soft': game.soft }" :style="game.soft ? { '--bg': `url(${src(game.background)})` } : { backgroundImage: `url(${src(game.background)})` }")
     template(v-if="!finished")
       p(v-if="rounds.length > 1" class="vs-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="vs-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}

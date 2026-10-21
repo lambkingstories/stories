@@ -168,3 +168,23 @@ export const cloudLevel = (age: number, grow: number): 1 | 2 | 3 => (age >= (gro
 
 /** The cloud is loud: it has grown for the whole time. */
 export const isLoud = (age: number, grow: number): boolean => age >= grow
+
+// ------------------------------------------------------------------ through the Jordan
+
+/** Where the chest is when `share` (0 to 1) of the way from the bank to the middle of the river is done (percent of the picture). */
+export function crossAt(start: [number, number], middle: [number, number], share: number): { x: number; y: number } {
+  const f = Math.min(1, Math.max(0, share))
+  return { x: start[0] + (middle[0] - start[0]) * f, y: start[1] + (middle[1] - start[1]) * f }
+}
+
+/** The share of the way that a finger at `x` (percent of the width) means: the left bank is 0, the middle of the river 1; outside the way it stops at the ends. */
+export function crossShare(start: [number, number], middle: [number, number], x: number): number {
+  const span = middle[0] - start[0]
+  if (span === 0) return 0
+  return Math.min(1, Math.max(0, (x - start[0]) / span))
+}
+
+/** Where group `i` stands on the far bank: the groups stand side by side, a little apart in depth (percent of the picture). */
+export function groupLanding(farBank: [number, number], i: number): { x: number; y: number } {
+  return { x: farBank[0] - i * 7, y: farBank[1] + (i - 1) * 5 }
+}

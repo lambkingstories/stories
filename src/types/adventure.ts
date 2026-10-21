@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan'
 
 export interface AdventureQuestion {
   q: string
@@ -329,6 +329,8 @@ export interface VerseRound {
 export interface VerseGame {
   /** The picture behind the board (the stage picture, 3:2 or 3:4), the wooden board under the sentence, and the leaf that carries a word. */
   background: string
+  /** The picture is drawn soft (blur) and a little darker behind the board; for a stage picture with big figures. */
+  soft?: boolean
   board: string
   leaf: string
   rounds: VerseRound[]
@@ -987,14 +989,35 @@ export interface BakeRound {
 /** The baking game "Bake flatbreads": a flatbread on a hot stone is raw, then golden, then too dark; it is turned at the right time. Places in percent of the picture. */
 export interface BakeGame {
   background: string
-  dough: string
+  /** The ball of dough in the tray; the raw flatbread when left out. */
+  dough?: string
   raw: string
   golden: string
   dark: string
-  stack: string
+  /** The stack of turned flatbreads and its place; only the number of them, at a fixed place, when left out. */
+  stack?: string
   stonesAt: [number, number][]
-  stackAt: [number, number]
+  stackAt?: [number, number]
   rounds: BakeRound[]
+}
+
+/** A round of the crossing game: only the hint (the two rounds are fixed: the chest into the river, then the groups over). */
+export interface CrossRound {
+  hint: string
+}
+/**
+ * The crossing game "Through the Jordan": the golden chest is pulled into the middle of the river, then the groups of the people are sent over the dry bed. All places are percent of the picture:
+ * the chest starts at `start` and clicks into place at `middle`, the groups wait at `groups`, and they land on the far bank near `farBank`.
+ */
+export interface CrossGame {
+  background: string
+  chest: string
+  group: string
+  start: [number, number]
+  middle: [number, number]
+  groups: [number, number][]
+  farBank: [number, number]
+  rounds: CrossRound[]
 }
 
 /** A place at the side of the road for an animal of the hush game (percent of the picture, `w` its width). */
@@ -1400,6 +1423,7 @@ export interface StageTask {
   beat?: BeatGame
   manna?: MannaGame
   words?: WordsGame
+  cross?: CrossGame
   cloud?: CloudGame
   constellation?: ConstellationGame
 }

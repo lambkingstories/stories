@@ -3,7 +3,7 @@
  * Keep quiet: round the city the people walk in silence. At the side of the road sit a donkey, a goose, a goat, a lamb, a cock and a cart with a jug that would like to make a noise. Over one of them
  * a small cloud of noise comes up and slowly grows (small, middle, big). A tap on the animal before the cloud is big calms it: the cloud melts away (a tick, a soft tone). If the cloud has grown for
  * the whole time it is loud: a quiet "baa", the procession stumbles (a cross, a mistake) and the cloud is gone; that animal does not count and another cloud comes. The game never ends early. The
- * animals sit fixed in six places. Round 1: eight calmings, two clouds at most at the same time, 4 seconds to loud; round 2: twelve, up to three clouds, 3 seconds. The order in which the clouds come is
+ * animals sit fixed in four places (plan v3). Round 1: five calmings, two clouds at most at the same time, 4 seconds to loud; round 2: eight, two clouds at most, 3 seconds. The field lies on the soft stage picture. The order in which the clouds come is
  * always the same (`nextSpawn`), their size `cloudLevel`, when they are loud `isLoud`, all in `utils/josuaGames.ts`. From the keyboard: Tab to the animals, Enter calms.
  */
 import { computed, onBeforeUnmount, reactive, ref } from 'vue'
@@ -50,7 +50,7 @@ const finished = ref(false)
 const message = ref('')
 const flash = ref<{ spot: number; kind: 'good' | 'bad' } | null>(null)
 const src = (p: string) => prependBaseUrl(p)
-const stars = computed(() => mistakeStars(mistakes.value, 3, 8))
+const stars = computed(() => mistakeStars(mistakes.value, 2, 5))
 
 const now = ref(Date.now())
 function startRound() {
@@ -148,7 +148,7 @@ const nameOf = (id: string) => t(`app.adventure.hushName${id.charAt(0).toUpperCa
     template(v-if="!finished")
       p(v-if="rounds.length > 1" class="hs-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="hs-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
-      div(class="hs-field" role="group" :aria-label="t('app.adventure.hushField', { n: calmed, total: current.calms })" :style="{ backgroundImage: `url(${src(game.background)})` }")
+      div(class="hs-field game-soft" role="group" :aria-label="t('app.adventure.hushField', { n: calmed, total: current.calms })" :style="{ '--bg': `url(${src(game.background)})` }")
         template(v-if="!between")
           button(
             v-for="(s, i) in game.spots"

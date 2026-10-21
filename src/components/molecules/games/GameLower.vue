@@ -56,7 +56,7 @@ const message = ref('')
 const flash = ref<'good' | 'bad' | null>(null)
 const touching = ref(false)
 const src = (p: string) => prependBaseUrl(p)
-const stars = computed(() => mistakeStars(mistakes.value, 2, 5))
+const stars = computed(() => mistakeStars(mistakes.value, 2, 4))
 
 // the swing: the time since the start of the game in seconds
 const t0 = Date.now()

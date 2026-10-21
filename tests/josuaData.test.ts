@@ -12,7 +12,7 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
 import { isStageOpen } from '@/utils/adventureScore'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
-import { covered, solvable } from '@/utils/josuaGames'
+import { covered, groupLanding } from '@/utils/josuaGames'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => josua.stages[n - 1]!
@@ -112,17 +112,17 @@ describe('Josua: stories and questions', () => {
 })
 
 describe('Josua: the games, and the placeholders until the pictures come', () => {
-  it('every stage has the game of the plan; the stages 7 and 9 are only questions; two old mechanics at most (memory, verse)', () => {
-    expect(josua.stages.map((s) => s.task.kind)).toEqual(['packen', 'verstecken', 'abseilen', 'schritt', 'memory', 'backen', 'quiz', 'still', 'quiz', 'lueckenvers'])
+  it('every stage has the game of the plan; the stages 1, 7 and 9 are only questions (never two in a row); two old mechanics (memory, verse), five new games', () => {
+    expect(josua.stages.map((s) => s.task.kind)).toEqual(['quiz', 'verstecken', 'abseilen', 'jordan', 'memory', 'backen', 'quiz', 'still', 'quiz', 'lueckenvers'])
     for (const s of josua.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
-  it('5 memory: six pairs from the stages 1 to 5, each with a sentence that is true to the text; 10 verse: two sentences from the text with the right words first', () => {
+  it('5 memory: five pairs from the stages 1 to 5, each with a sentence that is true to the text; 10 verse: two sentences from the text with the right words first', () => {
     const m = stage(5).task.memory
     expect(m, 'the game is built').toBeDefined()
-    expect(m!.pairs).toHaveLength(6)
+    expect(m!.pairs).toHaveLength(5)
     const told = josua.stages.slice(0, 5).map((x) => x.text.join(' ')).join(' ')
-    for (const word of ['mutig und stark', 'Flachs', 'Schnur', 'Seil', 'Lade', 'Steine']) expect(told, word).toContain(word)
+    for (const word of ['mutig und stark', 'Flachs', 'Schnur', 'Lade', 'Steine']) expect(told, word).toContain(word)
     for (const p of m!.pairs) expect(p.text.length).toBeGreaterThan(20)
     expect(stage(5).task.memory!.back).toMatch(/spiele\/josua\/memory\//)
     const v = stage(10).task.verse
@@ -139,23 +139,37 @@ describe('Josua: the games, and the placeholders until the pictures come', () =>
     const text = stage(10).text.join(' ')
     for (const word of ['dienen', 'Zeuge', 'Worte']) expect(text, word).toContain(word)
     expect(v!.background).toBe(stage(10).image)
+    // the stage picture has big figures: the app draws it soft behind the board
+    expect(v!.soft).toBe(true)
   })
 
-  it('4 step: eight steps at 70 beats a minute, then twelve at 90; the second round is quicker and stricter; the path goes up the picture', () => {
-    const g = stage(4).task.step
+  it('4 cross: the chest starts on the left bank and goes to the middle of the river, three groups wait on the left and land on the far bank; all places lie in the picture; two hints', () => {
+    const g = stage(4).task.cross
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
-    expect(g.rounds.map((r) => [r.bpm, r.steps, r.tolerance])).toEqual([[70, 8, 0.3], [90, 12, 0.25]])
-    expect(g.path.length).toBeGreaterThanOrEqual(6)
-    for (let i = 1; i < g.path.length; i++) expect(g.path[i]![1], 'the path goes up').toBeLessThan(g.path[i - 1]![1])
-    for (const [x, y] of g.path) expect(x >= 0 && x <= 100 && y >= 0 && y <= 100).toBe(true)
+    expect(g.rounds).toHaveLength(2)
+    for (const r of g.rounds) expect(r.hint.length).toBeGreaterThan(8)
+    expect(g.start[0]).toBeLessThan(g.middle[0])
+    expect(g.middle[0]).toBeLessThan(g.farBank[0])
+    expect(g.groups).toHaveLength(3)
+    const inside = (p: [number, number]) => p[0] >= 0 && p[0] <= 100 && p[1] >= 0 && p[1] <= 100
+    for (const p of [g.start, g.middle, g.farBank, ...g.groups]) expect(inside(p), JSON.stringify(p)).toBe(true)
+    // the groups wait on the left bank (left of the middle), the far bank is on the right
+    for (const p of g.groups) expect(p[0]).toBeLessThan(g.middle[0])
+    // every landing place lies inside the picture and on the right of the middle
+    g.groups.forEach((_, i) => {
+      const l = groupLanding(g.farBank, i)
+      expect(l.x >= 0 && l.x <= 100 && l.y >= 0 && l.y <= 100).toBe(true)
+      expect(l.x).toBeGreaterThan(g.middle[0])
+    })
+    expect(g.background).toBe('images/abenteuer/spiele/josua/jordan/fluss.webp')
   })
 
-  it('3 lower: five steps with a calm wind, then six with a stronger one; the swing is wider than the free threshold; the rope hangs from a window above the ground and the man fits in between', () => {
+  it('3 lower: four steps with a calm wind, then five with a stronger one; the swing is wider than the free threshold; the rope hangs from a window above the ground and the man fits in between', () => {
     const g = stage(3).task.lower
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
-    expect(g.rounds.map((r) => [r.steps, r.period, r.amplitude, r.threshold])).toEqual([[5, 3.4, 12, 2], [6, 2.8, 14, 4]])
+    expect(g.rounds.map((r) => [r.steps, r.period, r.amplitude, r.threshold])).toEqual([[4, 3.4, 12, 2], [5, 2.8, 14, 4]])
     for (const r of g.rounds) {
       expect(r.amplitude).toBeGreaterThan(r.threshold)
       expect(g.men.map((m) => m.id)).toContain(r.man)
@@ -166,34 +180,22 @@ describe('Josua: the games, and the placeholders until the pictures come', () =>
     expect(g.window[0] >= 0 && g.window[0] <= 100).toBe(true)
   })
 
-  it('1 pack: five things in 4 x 3 and seven in 5 x 3; the things are one or two cells big and every round can be packed with room for less than the basket; the basket lies in the picture', () => {
-    const g = stage(1).task.pack
-    expect(g, 'the game is built').toBeDefined()
-    if (!g) return
-    expect(g.rounds.map((r) => [r.cols, r.rows, r.items.length])).toEqual([[4, 3, 5], [5, 3, 7]])
-    for (const i of g.items) {
-      expect(i.w >= 1 && i.w <= 2 && i.h >= 1 && i.h <= 2, i.id).toBe(true)
-    }
-    for (const r of g.rounds) {
-      const shapes = r.items.map((id) => g.items.find((i) => i.id === id)!)
-      expect(shapes.every(Boolean)).toBe(true)
-      expect(solvable(r.cols, r.rows, shapes), 'the round can be packed').toBe(true)
-      const area = shapes.reduce((n, s) => n + s.w * s.h, 0)
-      expect(area).toBeLessThan(r.cols * r.rows)
-    }
-    expect(g.rounds.map((r) => r.items.reduce((n, id) => n + g.items.find((i) => i.id === id)!.w * g.items.find((i) => i.id === id)!.h, 0))).toEqual([10, 14])
-    expect(g.area.x + g.area.w).toBeLessThanOrEqual(100)
-    expect(g.area.y + g.area.h).toBeLessThanOrEqual(100)
-    expect(g.background).toBe(stage(1).image)
+  it('1 quiz: the first stage has no game (the packing game is the one of Mose)', () => {
+    expect(stage(1).task.kind).toBe('quiz')
+    expect(stage(1).task.pack).toBeUndefined()
+    expect(stage(1).task.hint).toContain('ruhig')
   })
 
-  it('6 bake: six flatbreads on three stones, then nine on five; the golden time gets shorter, every stone has a place, the stack lies in the picture', () => {
+  it('6 bake: four flatbreads on three stones, then six on four; the golden time gets shorter, every stone has a place; the ball of dough and the stack have no picture of their own', () => {
     const g = stage(6).task.bake
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
-    expect(g.rounds.map((r) => [r.dough, r.stones, r.goldenFrom, r.goldenTo])).toEqual([[6, 3, 2.5, 6], [9, 5, 2.2, 5]])
-    expect(g.stonesAt.length).toBeGreaterThanOrEqual(5)
-    for (const [x, y] of [...g.stonesAt, g.stackAt]) expect(x >= 0 && x <= 100 && y >= 0 && y <= 100).toBe(true)
+    expect(g.rounds.map((r) => [r.dough, r.stones, r.goldenFrom, r.goldenTo])).toEqual([[4, 3, 2.5, 6], [6, 4, 2.2, 5]])
+    expect(g.stonesAt).toHaveLength(4)
+    for (const [x, y] of g.stonesAt) expect(x >= 0 && x <= 100 && y >= 0 && y <= 100).toBe(true)
+    expect(g.dough).toBeUndefined()
+    expect(g.stack).toBeUndefined()
+    expect(g.stackAt).toBeUndefined()
     // the golden time is at least two seconds long in both rounds, the dark time comes after it
     for (const r of g.rounds) {
       expect(r.goldenTo - r.goldenFrom).toBeGreaterThanOrEqual(2.5)
@@ -239,14 +241,16 @@ describe('Josua: the games, and the placeholders until the pictures come', () =>
     }
   })
 
-  it('8 hush: eight calmings with at most two clouds and 4 seconds, then twelve with three and 3 seconds; six places at the side of the road, three cloud sizes, the animals are not in the middle of the picture', () => {
+  it('8 hush: five calmings with at most two clouds and 4 seconds, then eight with two and 3 seconds; four places at the side of the road, one cloud picture for three sizes, the animals are not in the middle of the picture', () => {
     const g = stage(8).task.hush
     expect(g, 'the game is built').toBeDefined()
     if (!g) return
-    expect(g.rounds.map((r) => [r.calms, r.maxClouds, r.grow])).toEqual([[8, 2, 4], [12, 3, 3]])
-    expect(g.spots).toHaveLength(6)
+    expect(g.rounds.map((r) => [r.calms, r.maxClouds, r.grow])).toEqual([[5, 2, 4], [8, 2, 3]])
+    expect(g.spots).toHaveLength(4)
     expect(g.clouds).toHaveLength(3)
-    expect(new Set(g.spots.map((s) => s.animal)).size).toBe(6)
+    expect(new Set(g.clouds).size, 'one picture of a cloud').toBe(1)
+    expect(new Set(g.spots.map((s) => s.animal)).size).toBe(4)
+    expect(g.background).toBe(stage(8).image)
     for (const s of g.spots) {
       expect(s.x >= 0 && s.x <= 100 && s.y >= 0 && s.y <= 100, s.id).toBe(true)
       expect(s.y, 'at the side of the road, low in the picture').toBeGreaterThan(70)
@@ -262,25 +266,25 @@ describe('Josua: the games, and the placeholders until the pictures come', () =>
 
   it('every game has at most two rounds, a hint for each round, and its goal fits the table "Stufen je Spiel"', () => {
     const g = (n: number) => stage(n).task
-    const rounds = [g(1).pack!.rounds, g(2).hide!.rounds, g(3).lower!.rounds, g(4).step!.rounds, g(6).bake!.rounds, g(8).hush!.rounds, g(10).verse!.rounds]
+    const rounds = [g(2).hide!.rounds, g(3).lower!.rounds, g(4).cross!.rounds, g(6).bake!.rounds, g(8).hush!.rounds, g(10).verse!.rounds]
     for (const r of rounds) {
       expect(r.length).toBeGreaterThanOrEqual(1)
       expect(r.length).toBeLessThanOrEqual(2)
       for (const x of r) expect(x.hint.length).toBeGreaterThan(8)
     }
-    expect(g(1).pack!.rounds.reduce((n, r) => n + r.items.length, 0)).toBe(12)
     expect(g(2).hide!.rounds.reduce((n, r) => n + r.men.length, 0)).toBe(3)
-    expect(g(3).lower!.rounds.reduce((n, r) => n + r.steps, 0)).toBe(11)
-    expect(g(4).step!.rounds.reduce((n, r) => n + r.steps, 0)).toBe(20)
-    expect(g(5).memory!.pairs.length).toBe(6)
-    expect(g(6).bake!.rounds.reduce((n, r) => n + r.dough, 0)).toBe(15)
-    expect(g(8).hush!.rounds.reduce((n, r) => n + r.calms, 0)).toBe(20)
+    expect(g(3).lower!.rounds.reduce((n, r) => n + r.steps, 0)).toBe(9)
+    expect(1 + g(4).cross!.groups.length).toBe(4)
+    expect(g(5).memory!.pairs.length).toBe(5)
+    expect(g(6).bake!.rounds.reduce((n, r) => n + r.dough, 0)).toBe(10)
+    expect(g(8).hush!.rounds.reduce((n, r) => n + r.calms, 0)).toBe(13)
     expect(g(10).verse!.rounds.reduce((n, r) => n + r.answers.length, 0)).toBe(3)
     const kinds = josua.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
     expect(new Set(kinds).size).toBe(kinds.length)
     expect(kinds.filter((k) => ['memory', 'lueckenvers'].includes(k))).toHaveLength(2)
-    expect(stage(7).task.kind).toBe('quiz')
-    expect(stage(9).task.kind).toBe('quiz')
+    for (const n of [1, 7, 9]) expect(stage(n).task.kind).toBe('quiz')
+    const kindList = josua.stages.map((s) => s.task.kind)
+    kindList.forEach((k, i) => expect(k === 'quiz' && kindList[i + 1] === 'quiz', `two quizzes in a row at ${i + 1}`).toBe(false))
   })
 
   it('no stage is "soon": the first stage is open at the start, the others open one after the other', () => {

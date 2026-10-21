@@ -62,16 +62,16 @@ describe('Memory with cards that are not painted yet', () => {
     const { default: Memory } = await import('@/components/molecules/games/GameMemory.vue')
     const w = mount(Memory, { ...opts(), props: { game: josua.stages[4]!.task.memory! } })
     await flushPromises()
-    expect(w.findAll('.mem-card')).toHaveLength(12)
-    expect(w.findAll('img.mem-face')).toHaveLength(24)
+    expect(w.findAll('.mem-card')).toHaveLength(10)
+    expect(w.findAll('img.mem-face')).toHaveLength(20)
     for (const img of w.findAll('img.mem-face')) await img.trigger('error')
     await flushPromises()
     expect(w.findAll('img.mem-face')).toHaveLength(0)
-    expect(w.findAll('.mem-stand.mem-front')).toHaveLength(12)
-    expect(w.findAll('.mem-stand.back')).toHaveLength(12)
+    expect(w.findAll('.mem-stand.mem-front')).toHaveLength(10)
+    expect(w.findAll('.mem-stand.back')).toHaveLength(10)
     // two cards of one pair have the same colour
     const colours = w.findAll('.mem-stand.mem-front').map((x) => x.attributes('style'))
-    expect(new Set(colours).size).toBe(6)
+    expect(new Set(colours).size).toBe(5)
     await w.findAll('.mem-card')[0]!.trigger('click')
     expect(w.findAll('.mem-card.up')).toHaveLength(1)
     expect(problems()).toEqual([])
@@ -346,8 +346,8 @@ describe('Am Seil herablassen (lower)', () => {
     expect(dropOf(w)).toBe(0)
   })
 
-  it('the whole game: the end with three stars; the mistakes give the stars (up to two: three, up to five: two, more: one)', async () => {
-    for (const [wrong, stars] of [[0, 3], [2, 3], [3, 2], [5, 2], [6, 1]] as const) {
+  it('the whole game: the end with three stars; the mistakes give the stars (up to two: three, up to four: two, more: one)', async () => {
+    for (const [wrong, stars] of [[0, 3], [2, 3], [3, 2], [4, 2], [5, 1]] as const) {
       useTaskProgress().reset()
       const w = await open()
       for (let i = 0; i < wrong; i++) {
@@ -668,8 +668,8 @@ describe('Fladen backen (bake)', () => {
     expect(w.find('.bk-stack-n').text()).toBe('0')
   })
 
-  it('the whole game: the end with three stars; the too dark flatbreads give the stars (one: three, up to four: two, more: one)', async () => {
-    for (const [burnt, stars] of [[0, 3], [1, 3], [2, 2], [4, 2], [5, 1]] as const) {
+  it('the whole game: the end with three stars; the too dark flatbreads give the stars (one: three, up to three: two, more: one)', async () => {
+    for (const [burnt, stars] of [[0, 3], [1, 3], [2, 2], [3, 2], [4, 1]] as const) {
       useTaskProgress().reset()
       const w = await open()
       for (let i = 0; i < burnt; i++) {
