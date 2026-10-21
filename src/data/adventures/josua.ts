@@ -136,13 +136,13 @@ const MEMORY: MemoryGame = {
  * Etappe 4, "Durch den Jordan": die goldene Truhe mit den Priestern steht am linken Ufer, das Kind zieht sie in die Flussmitte (Runde 1), je weiter sie kommt, desto trockener wird das Flussbett; danach schickt
  * jedes Antippen eine von drei Gruppen des Volkes über das trockene Bett ans andere Ufer (Runde 2). Kein Fehler, kein Zeitdruck (Bildauftrag JO32; eigene Szene `jordan/fluss.webp`). Alle Orte sind Prozent des Bildes
  * und am gemalten Bild abgelesen und mit den Sprites zusammen angesehen (`jordan-messung-b.json`, Landung leicht nach rechts verschoben, damit alle drei Gruppen auf dem Gras landen): Truhe `start` und `middle`, die wartenden Gruppen `groups`, die Landung `farBank`.
- * Bilder (gemalt, 21.10.2026): `jordan/fluss.webp` 1200 × 900, `lade.webp` 360 × 300, `volk.webp` 360 × 280 (die zwei transparent).
+ * Bilder (gemalt, 21.10.2026): `jordan/fluss.webp` 1200 × 900, `lade.webp` 480 × 320 (vier Priester, zwei goldene Cherubim auf dem Deckel, JO32b), `volk.webp` 360 × 280 (die zwei transparent).
  */
 const JORDAN: CrossGame = {
   background: `${G}jordan/fluss.webp`,
   chest: `${G}jordan/lade.webp`,
   group: `${G}jordan/volk.webp`,
-  start: [18, 46],
+  start: [26, 46],
   middle: [54, 46],
   groups: [[13, 38], [13, 48], [13, 58]],
   farBank: [94, 42],
