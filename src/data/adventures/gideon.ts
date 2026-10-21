@@ -213,7 +213,7 @@ export const gideon: Journey = {
   subtitle: 'Der Kleinste und die Dreihundert',
   age: '8-10',
   downloadMb: 16, // PLATZHALTER: Größe mit den Bildern von Josef; wird mit den eigenen Bildern neu gemessen (der Test sagt die echte Größe)
-  medal: josef.medal, // PLATZHALTER bis eigenes Bild: "Der Krug mit dem Licht" (Tonkrug mit Fackel und gebogenem Horn)
+  medal: 'images/abenteuer/gideon/medaille-v2.webp', // Der Krug mit dem Licht (Tonkrug mit Fackel, Horn, Lichterkette in der Nacht, Goldring)
   // Geschenk-Ausmalbild: Die Nacht mit den Krügen und Fackeln (Männer mit Horn und Krug auf dem Hügel bei Nacht); PLATZHALTER bis eigenes Bild
   gift: { title: 'Die Nacht mit den Krügen und Fackeln', image: josef.gift.image },
   // PLATZHALTER bis eigenes Bild: die Karte von Josef (vier Stücke, 9824 × 1632 px) mit seinen zwölf Stationen, dem Ziel und dem Perlenweg dorthin
