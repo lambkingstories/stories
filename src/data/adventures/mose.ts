@@ -241,7 +241,7 @@ export const mose: Journey = {
   subtitle: 'Der Weg in die Freiheit',
   age: '8-10',
   downloadMb: 16, // PLATZHALTER: Etappenbilder noch von Josef, die Karte ist eigen (vier Stücke zusammen 4,9 MB); wird mit den eigenen Bildern neu gemessen (der Test sagt die echte Größe)
-  medal: josef.medal, // PLATZHALTER bis "Der brennende Dornbusch" (Busch mit Flamme aus Licht, Sandalen und Hirtenstab)
+  medal: 'images/abenteuer/mose/medaille-v2.webp', // Der brennende Dornbusch (Busch mit Flamme aus Licht, Sandalen und Hirtenstab, Goldring)
   // Geschenk-Ausmalbild: Der Weg durch das Meer (Mose mit erhobenem Stab, zwei Wasserwände, trockener Weg, Volk, Wolkensäule); PLATZHALTER bis zum eigenen Bild
   gift: { title: 'Der Weg durch das Meer', image: josef.gift.image },
   // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v3 mit fünfzehn Orten und dem Ziel) mit Stationen und Perlenweg aus mosePath.ts
