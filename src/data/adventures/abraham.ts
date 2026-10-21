@@ -5,7 +5,7 @@
  * Spiele (höchstens zwei Runden je Spiel, höchstens zwei alte Mechaniken): 1 Kamele beladen, 2 Zählen (alt), 3 Sternbild, 4 Wohin fliegen die Vögel?, 5 Das Licht durch die Ringe, 6 Wasser für
  * die Gäste, 8 Puzzle (alt), 10 Passend bezahlen, 12 Ins Weite schauen (Fokus-Regler); 7 Sodom, 9 Gott sorgt und 11 Der Knecht am Brunnen sind nur Quiz.
  * Deutsche Aufnahmen zu den neuen Texten: geschichte-NN-v4.mp3 (Gemini, Stimme Achernar, 21.10.2026, nicht gehört); Englisch noch nicht (die englische App liest mit der Gerätestimme).
- * Die Etappenbilder sind noch die alten sechs (`etappe-bild-01..06`), die Karte hat 12 Platzhalter-Stationen auf der alten Karte mit elf Orten; beides ersetzen die neuen Bilder und das neue Panorama.
+ * Die Etappenbilder sind die neuen zwölf (`etappe-bild-01..12`, 960 × 640; von Anton gewählt: 8, 9 und 10 Variante b, die anderen a) (Etappe n zeigt `etappe-bild-NN`); die Karte ist das Panorama v3.
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/abraham/, images/abenteuer/spiele/abraham/<spiel>/, audio/abenteuer/abraham/.
  *
@@ -29,7 +29,7 @@ const SOON = false
  * Bilder (gemalt, 21.10.2026): `ringe/ring-1.webp` 900 × 900, `ring-2.webp` 740, `ring-3.webp` 580 (alle quadratisch, transparent, Lücke oben), `nabe.webp` 240 × 240.
  */
 const RINGE: RingsGame = {
-  background: `${IMG}etappe-bild-03.webp`,
+  background: `${IMG}etappe-bild-05.webp`,
   rings: [`${G}ringe/ring-1.webp`, `${G}ringe/ring-2.webp`, `${G}ringe/ring-3.webp`],
   hub: `${G}ringe/nabe.webp`,
   rounds: [
@@ -74,7 +74,7 @@ const VOEGEL: BirdsGame = {
  * Bilder (gemalt, 21.10.2026): `silber/tuch.webp` 720 × 300 und `silber-stueck.webp` 150 × 100, beide transparent.
  */
 const SILBER: SilverGame = {
-  background: `${IMG}etappe-bild-05.webp`,
+  background: `${IMG}etappe-bild-10.webp`,
   cloth: `${G}silber/tuch.webp`,
   pieces: [
     { id: 'a-200', image: `${G}silber/silber-stueck.webp`, value: 200 },
@@ -182,7 +182,7 @@ export const abraham: Journey = {
   title: 'Abraham',
   subtitle: 'Gott ruft, Gott hält Wort',
   age: '8-10',
-  downloadMb: 11, // 11,2 MB gezählt am 21.10.2026 mit der neuen Karte v3 (der Test sagt die echte Größe)
+  downloadMb: 15, // 14,7 MB gezählt am 21.10.2026 mit den zwölf neuen Etappenbildern und der Karte v3 (der Test sagt die echte Größe)
   medal: `${IMG}medaille.webp`, // Abraham und das Zelt unter dem Sternenhimmel (Ruhe, Verheißung)
   // Geschenk-Ausmalbild: Abraham und Sara vor dem Zelt unter dem Sternenhimmel, mit Schafen, friedlich
   gift: { title: 'Abraham und Sara vor dem Zelt unter dem Sternenhimmel', image: `${IMG}geschenk.webp` },
@@ -265,7 +265,7 @@ export const abraham: Journey = {
     },
     {
       id: 4,
-      image: `${IMG}etappe-bild-02.webp`,
+      image: `${IMG}etappe-bild-04.webp`,
       title: 'Hagar und der Brunnen',
       ref: '1. Mose 16',
       text: [
@@ -283,7 +283,7 @@ export const abraham: Journey = {
     },
     {
       id: 5,
-      image: `${IMG}etappe-bild-03.webp`,
+      image: `${IMG}etappe-bild-05.webp`,
       title: 'Der Bund und die neuen Namen',
       ref: '1. Mose 17,1–19',
       text: [
@@ -300,7 +300,7 @@ export const abraham: Journey = {
     },
     {
       id: 6,
-      image: `${IMG}etappe-bild-04.webp`,
+      image: `${IMG}etappe-bild-06.webp`,
       title: 'Besuch bei den Eichen',
       ref: '1. Mose 18,1–15',
       text: [
@@ -318,7 +318,7 @@ export const abraham: Journey = {
     },
     {
       id: 7,
-      image: `${IMG}etappe-bild-04.webp`,
+      image: `${IMG}etappe-bild-07.webp`,
       title: 'Abraham bittet für Sodom',
       ref: '1. Mose 18,16–33',
       text: [
@@ -336,7 +336,7 @@ export const abraham: Journey = {
     },
     {
       id: 8,
-      image: `${IMG}etappe-bild-05.webp`,
+      image: `${IMG}etappe-bild-08.webp`,
       title: 'Isaak',
       ref: '1. Mose 21,1–7',
       text: [
@@ -354,7 +354,7 @@ export const abraham: Journey = {
     },
     {
       id: 9,
-      image: `${IMG}etappe-bild-06.webp`,
+      image: `${IMG}etappe-bild-09.webp`,
       title: 'Gott sorgt',
       ref: '1. Mose 22,1–19',
       text: [
@@ -372,7 +372,7 @@ export const abraham: Journey = {
     },
     {
       id: 10,
-      image: `${IMG}etappe-bild-05.webp`,
+      image: `${IMG}etappe-bild-10.webp`,
       title: 'Saras Grab',
       ref: '1. Mose 23',
       text: [
@@ -390,7 +390,7 @@ export const abraham: Journey = {
     },
     {
       id: 11,
-      image: `${IMG}etappe-bild-01.webp`,
+      image: `${IMG}etappe-bild-11.webp`,
       title: 'Der Knecht am Brunnen',
       ref: '1. Mose 24,1–27',
       text: [
@@ -408,7 +408,7 @@ export const abraham: Journey = {
     },
     {
       id: 12,
-      image: `${IMG}etappe-bild-01.webp`,
+      image: `${IMG}etappe-bild-12.webp`,
       title: 'Isaak und Rebekka',
       ref: '1. Mose 24,28–67',
       text: [

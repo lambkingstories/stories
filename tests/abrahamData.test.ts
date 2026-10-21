@@ -16,7 +16,7 @@ afterEach(() => setAdventureLanguage('de'))
 const released = abraham.stages.every((s) => !s.soon)
 const stage = (n: number) => abraham.stages[n - 1]!
 /** The picture of every stage: the new stages use a picture of the others until they get their own. */
-const PICTURE: Record<number, string> = { 1: '01', 2: '02', 3: '03', 4: '02', 5: '03', 6: '04', 7: '04', 8: '05', 9: '06', 10: '05', 11: '01', 12: '01' }
+const PICTURE: Record<number, string> = { 1: '01', 2: '02', 3: '03', 4: '04', 5: '05', 6: '06', 7: '07', 8: '08', 9: '09', 10: '10', 11: '11', 12: '12' }
 /** Words that no text of the German data may use (the stories are told calmly: no knife, no binding, no killing). */
 const FORBIDDEN = /\b(Messer|Schwert|gefesselt|Fesseln|Fesselung|töten|getötet|schlachten|Blut|Teufel|Hölle)\b/i
 
