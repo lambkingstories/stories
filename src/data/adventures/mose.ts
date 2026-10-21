@@ -8,7 +8,7 @@
  * images/abenteuer/mose/, images/abenteuer/spiele/mose/<spiel>/, audio/abenteuer/mose/.
  *
  * STAND 21.10.2026 (Phase 2a, Daten und Spiele; Bilder Platzhalter): Die zehn Spieletappen haben ihr Spiel, die ernsten Etappen 1, 3, 8, 9 und 14 bleiben Quiz; die Etappenbilder sind noch die von Josef;
- * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit fünfzehn Stationen und dem Ziel (PLATZHALTER bis zum eigenen Panorama); Medaille und Geschenk sind ebenfalls die von Josef.
+ * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit fünfzehn Stationen und dem Ziel (PLATZHALTER bis eigenes Bild: das eigene Panorama); Medaille und Geschenk sind die eigenen von Mose.
  * Deutsche Vorlese-Aufnahmen: geschichte-NN-v3.mp3 (Gemini, Stimme Achernar, 21.10.2026, nicht gehört); Englisch noch nicht, die englische App liest mit der Gerätestimme (Liste der Aufnahmen: D:/Claude/Abenteuer-Mose/NEUAUFNAHME-Mose.md).
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
@@ -19,8 +19,8 @@ import { localize } from './localize'
 import { adventureLanguage } from '@/use/adventureLanguage'
 import { moseEn } from './en/mose.en'
 
-// PLATZHALTER bis zum eigenen Bild: die Etappenbilder von Josef (Ordner images/abenteuer/josef/); danach `images/abenteuer/mose/etappe-bild-NN.webp`
-const PLACEHOLDER = 'images/abenteuer/josef/'
+// Etappenbilder (vorläufig Variante a der neuen Bilder; Anton wählt später a/b): `images/abenteuer/mose/etappe-bild-NN.webp`, 960 × 640
+const PICS = 'images/abenteuer/mose/'
 
 const G = 'images/abenteuer/spiele/mose/'
 
@@ -30,7 +30,7 @@ const G = 'images/abenteuer/spiele/mose/'
  * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `worte/stein.webp` 260 × 110 (leer, das Wort schreibt die App), `worte/streifen.webp` 900 × 160 (leer), beide transparent.
  */
 const WORTE: WordsGame = {
-  background: `${PLACEHOLDER}etappe-bild-04.webp`,
+  background: `${PICS}etappe-bild-04.webp`,
   chip: `${G}worte/stein.webp`,
   strip: `${G}worte/streifen.webp`,
   rounds: [
@@ -75,7 +75,7 @@ const UNTERSCHIED: DiffGame = {
  * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `manna/koernchen-1.webp`, `koernchen-2.webp` je 90 × 90, `krug-leer.webp`, `krug-voll.webp` je 220 × 220, `bewohner.webp` 260 × 260 (alle transparent).
  */
 const MANNA: MannaGame = {
-  background: `${PLACEHOLDER}etappe-bild-12.webp`,
+  background: `${PICS}etappe-bild-12.webp`,
   flakes: [`${G}manna/koernchen-1.webp`, `${G}manna/koernchen-2.webp`],
   jar: `${G}manna/krug-leer.webp`,
   jarFull: `${G}manna/krug-voll.webp`,
@@ -127,7 +127,7 @@ const WOLKE: CloudGame = {
  * Bilder (noch nicht gemalt, bis dahin stehen Platzhalter): `flechten/stab.webp`, `rohr-vorn.webp`, `rohr-hinten.webp`, `reihe-aktiv.webp` je 192 × 192 (Kachel, transparent), `koerbchen-fertig.webp` 600 × 600.
  */
 const FLECHTEN: WeaveGame = {
-  background: `${PLACEHOLDER}etappe-bild-02.webp`,
+  background: `${PICS}etappe-bild-02.webp`,
   tiles: { stake: `${G}flechten/stab.webp`, front: `${G}flechten/rohr-vorn.webp`, behind: `${G}flechten/rohr-hinten.webp`, active: `${G}flechten/reihe-aktiv.webp` },
   done: `${G}flechten/koerbchen-fertig.webp`,
   rounds: [
@@ -160,7 +160,7 @@ const LEUCHTEN: GlowGame = {
  * und `pauke-dumpf.mp3` sind noch nicht da (Ton-Agent); bis dahin klingen `bead` und `wrong`.
  */
 const TAKT: BeatGame = {
-  background: `${PLACEHOLDER}etappe-bild-11.webp`,
+  background: `${PICS}etappe-bild-11.webp`,
   drum: `${G}takt/pauke.webp`,
   ring: `${G}takt/ring.webp`,
   rounds: [
@@ -175,7 +175,7 @@ const TAKT: BeatGame = {
  * Hintergrund ist das Etappenbild 6, von der App weichgezeichnet (`soft`); keine neuen Bilder.
  */
 const VERS: VerseGame = {
-  background: `${PLACEHOLDER}etappe-bild-06.webp`,
+  background: `${PICS}etappe-bild-06.webp`,
   soft: true,
   board: `${G}lueckenvers/tafel.webp`,
   leaf: `${G}lueckenvers/blatt.webp`,
@@ -219,7 +219,7 @@ const WIMMEL: FindGame = {
  * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `packen/tuch.webp` 900 × 675, `teigtrog.webp` 200 × 200, `silberkrug.webp`, `goldkrug.webp` je 100 × 200, `kleiderbuendel.webp` 300 × 200, `tuchbuendel.webp` 200 × 300 (alle transparent).
  */
 const AUSZUG: PackGame = {
-  background: `${PLACEHOLDER}etappe-bild-10-v2.webp`,
+  background: `${PICS}etappe-bild-10.webp`,
   basket: `${G}packen/tuch.webp`,
   items: [
     { id: 'kleiderbuendel', image: `${G}packen/kleiderbuendel.webp`, w: 3, h: 2, label: 'Kleiderbündel' },
@@ -240,7 +240,7 @@ export const mose: Journey = {
   title: 'Mose',
   subtitle: 'Der Weg in die Freiheit',
   age: '8-10',
-  downloadMb: 16, // PLATZHALTER: Etappenbilder noch von Josef, die Karte ist eigen (vier Stücke zusammen 4,9 MB); wird mit den eigenen Bildern neu gemessen (der Test sagt die echte Größe)
+  downloadMb: 13, // gemessen am 21.10.2026 mit den eigenen Etappenbildern (Variante a) und der eigenen Karte; ohne die noch fehlenden Aufnahmen
   medal: 'images/abenteuer/mose/medaille-v2.webp', // Der brennende Dornbusch (Busch mit Flamme aus Licht, Sandalen und Hirtenstab, Goldring)
   // Geschenk-Ausmalbild: Der Weg durch das Meer (Mose mit erhobenem Stab, zwei Wasserwände, trockener Weg, Volk, Wolkensäule, Familie mit Kindern, Esel und Lamm, Konturzeichnung)
   gift: { title: 'Der Weg durch das Meer', image: 'images/abenteuer/mose/geschenk.webp' },
@@ -273,7 +273,7 @@ export const mose: Journey = {
   stages: [
     {
       id: 1,
-      image: `${PLACEHOLDER}etappe-bild-01.webp`,
+      image: `${PICS}etappe-bild-01.webp`,
       title: 'Schifra und Pua',
       ref: '2. Mose 1,1–21',
       text: [
@@ -282,7 +282,7 @@ export const mose: Journey = {
         'Da befiehlt der Pharao den Hebammen Schifra und Pua: „Wenn ein Junge geboren wird, lasst ihn nicht am Leben!“',
         'Aber Schifra und Pua fürchten Gott. Sie tun nicht, was der Pharao sagt, und lassen die Jungen leben. Dafür segnet Gott die beiden Frauen.'
       ],
-      // Bleibt Quiz (ernste Etappe); das Etappenbild ist noch das von Josef (PLATZHALTER bis zum eigenen Bild)
+      // Bleibt Quiz (ernste Etappe)
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wie heißen die zwei Hebammen?', options: ['Schifra und Pua', 'Sara und Hagar', 'Lea und Rahel'], answer: 0 },
@@ -292,7 +292,7 @@ export const mose: Journey = {
     },
     {
       id: 2,
-      image: `${PLACEHOLDER}etappe-bild-02.webp`,
+      image: `${PICS}etappe-bild-02.webp`,
       title: 'Das Körbchen im Schilf',
       ref: '2. Mose 2,1–10',
       text: [
@@ -310,7 +310,7 @@ export const mose: Journey = {
     },
     {
       id: 3,
-      image: `${PLACEHOLDER}etappe-bild-03.webp`,
+      image: `${PICS}etappe-bild-03.webp`,
       title: 'Flucht nach Midian',
       ref: '2. Mose 2,11–25',
       text: [
@@ -319,7 +319,7 @@ export const mose: Journey = {
         'Sieben Töchter des Priesters Jitro kommen, um die Schafe ihres Vaters zu tränken. Hirten wollen sie vertreiben, aber Mose hilft ihnen. Jitro lädt Mose ein. Mose bleibt bei ihnen und heiratet Jitros Tochter Zippora.',
         'Weit weg in Ägypten stöhnen die Israeliten unter ihrer Arbeit und schreien zu Gott. Gott hört ihr Schreien und denkt an sein Versprechen an Abraham, Isaak und Jakob.'
       ],
-      // Bleibt Quiz (ernste Etappe); das Etappenbild ist noch das von Josef (PLATZHALTER bis zum eigenen Bild)
+      // Bleibt Quiz (ernste Etappe)
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wohin flieht Mose?', options: ['nach Midian', 'nach Babel', 'nach Kanaan'], answer: 0 },
@@ -329,7 +329,7 @@ export const mose: Journey = {
     },
     {
       id: 4,
-      image: `${PLACEHOLDER}etappe-bild-04.webp`,
+      image: `${PICS}etappe-bild-04.webp`,
       title: 'Der brennende Dornbusch',
       ref: '2. Mose 3,1–15',
       text: [
@@ -347,7 +347,7 @@ export const mose: Journey = {
     },
     {
       id: 5,
-      image: `${PLACEHOLDER}etappe-bild-05.webp`,
+      image: `${PICS}etappe-bild-05.webp`,
       title: 'Mose und Aaron',
       ref: '2. Mose 4,1–31',
       text: [
@@ -365,7 +365,7 @@ export const mose: Journey = {
     },
     {
       id: 6,
-      image: `${PLACEHOLDER}etappe-bild-06.webp`,
+      image: `${PICS}etappe-bild-06.webp`,
       title: 'Lass mein Volk ziehen',
       ref: '2. Mose 5,1 bis 6,9',
       text: [
@@ -383,7 +383,7 @@ export const mose: Journey = {
     },
     {
       id: 7,
-      image: `${PLACEHOLDER}etappe-bild-07.webp`,
+      image: `${PICS}etappe-bild-07.webp`,
       title: 'Die Frösche',
       ref: '2. Mose 7,14 bis 8,15',
       text: [
@@ -401,7 +401,7 @@ export const mose: Journey = {
     },
     {
       id: 8,
-      image: `${PLACEHOLDER}etappe-bild-08.webp`,
+      image: `${PICS}etappe-bild-08.webp`,
       title: 'Finsternis und Licht',
       ref: '2. Mose 9,1 bis 10,29',
       text: [
@@ -410,7 +410,7 @@ export const mose: Journey = {
         'Drei Tage lang sehen die Ägypter einander nicht. Niemand steht von seinem Platz auf.',
         'Aber bei den Israeliten ist es hell in ihren Wohnungen. Der Pharao will das Volk trotzdem nicht ziehen lassen.'
       ],
-      // Bleibt Quiz (ernste Etappe); das Etappenbild ist noch das von Josef (PLATZHALTER bis zum eigenen Bild)
+      // Bleibt Quiz (ernste Etappe)
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wie lange ist es finster in Ägypten?', options: ['drei Tage', 'sieben Tage', 'eine Nacht'], answer: 0 },
@@ -420,7 +420,7 @@ export const mose: Journey = {
     },
     {
       id: 9,
-      image: `${PLACEHOLDER}etappe-bild-09.webp`,
+      image: `${PICS}etappe-bild-09.webp`,
       title: 'Die Nacht des Passah',
       ref: '2. Mose 11,1 bis 12,32',
       text: [
@@ -429,7 +429,7 @@ export const mose: Journey = {
         'Gott hat gesagt: „Wenn ich das Blut vom Lamm an euren Türen sehe, gehe ich an euch vorüber.“ In der Nacht sterben in Ägypten alle Erstgeborenen, und ein großes Klagen geht durch das Land. Bei den Israeliten aber bleibt es still.',
         'Noch in derselben Nacht ruft der Pharao Mose und Aaron. „Zieht fort, ihr und alle Israeliten!“, sagt er.'
       ],
-      // Bleibt Quiz (ernste Etappe); das Etappenbild ist noch das von Josef (PLATZHALTER bis zum eigenen Bild)
+      // Bleibt Quiz (ernste Etappe)
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wie essen die Israeliten das Passahmahl?', options: ['reisefertig', 'schlafend', 'tanzend'], answer: 0 },
@@ -439,7 +439,7 @@ export const mose: Journey = {
     },
     {
       id: 10,
-      image: `${PLACEHOLDER}etappe-bild-10-v2.webp`,
+      image: `${PICS}etappe-bild-10.webp`,
       title: 'Der Auszug',
       ref: '2. Mose 12,33 bis 13,22',
       text: [
@@ -457,7 +457,7 @@ export const mose: Journey = {
     },
     {
       id: 11,
-      image: `${PLACEHOLDER}etappe-bild-11.webp`,
+      image: `${PICS}etappe-bild-11.webp`,
       title: 'Das Wunder am Meer',
       ref: '2. Mose 14,1 bis 15,21',
       text: [
@@ -475,7 +475,7 @@ export const mose: Journey = {
     },
     {
       id: 12,
-      image: `${PLACEHOLDER}etappe-bild-12.webp`,
+      image: `${PICS}etappe-bild-12.webp`,
       title: 'Brot vom Himmel',
       ref: '2. Mose 15,22 bis 16,36',
       text: [
@@ -493,7 +493,7 @@ export const mose: Journey = {
     },
     {
       id: 13,
-      image: `${PLACEHOLDER}etappe-bild-04.webp`,
+      image: `${PICS}etappe-bild-13.webp`,
       title: 'Die zehn Gebote',
       ref: '2. Mose 19,1 bis 20,21',
       text: [
@@ -511,7 +511,7 @@ export const mose: Journey = {
     },
     {
       id: 14,
-      image: `${PLACEHOLDER}etappe-bild-09.webp`,
+      image: `${PICS}etappe-bild-14.webp`,
       title: 'Das goldene Kalb',
       ref: '2. Mose 32,1–34 (gekürzt)',
       text: [
@@ -520,7 +520,7 @@ export const mose: Journey = {
         'Gott sagt es Mose, und Mose bittet für das Volk. Er geht mit den zwei Steintafeln den Berg hinab, sieht das Kalb und wird zornig. Er zerbricht die Tafeln.',
         'Am nächsten Tag geht Mose wieder zu Gott und bittet: „Vergib ihnen!“ Gott hört auf Mose und führt sein Volk weiter.'
       ],
-      // Bleibt Quiz (ernste Etappe); das Etappenbild ist noch das von Josef (PLATZHALTER bis zum eigenen Bild)
+      // Bleibt Quiz (ernste Etappe)
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Was macht Aaron aus dem Gold?', options: ['ein Kalb', 'eine Krone', 'ein Zelt'], answer: 0 },
@@ -529,7 +529,7 @@ export const mose: Journey = {
     },
     {
       id: 15,
-      image: `${PLACEHOLDER}etappe-bild-12.webp`,
+      image: `${PICS}etappe-bild-15.webp`,
       title: 'Gott geht mit',
       ref: '2. Mose 33,7–17; 34,1–4.29; 40,34–38',
       text: [

@@ -60,7 +60,7 @@ describe('Mose: stories and questions', () => {
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
       expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/mose/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`)
       expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
-      expect(s.image, `stage ${s.id}`).toMatch(/^images\/abenteuer\/josef\/etappe-bild-\d\d(-v2)?\.webp$/)
+      expect(s.image, `stage ${s.id}`).toBe(`images/abenteuer/mose/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
     }
   })
 
@@ -359,7 +359,13 @@ describe('Mose: the games, and the placeholders until the pictures come', () => 
     expect(existsSync(`public/${mose.gift.image}`)).toBe(true)
   })
 
-  it('every file that the data names exists (the pictures of Josef, the map, the medal) and is small enough', () => {
+  it('no stage picture and no game background is a picture of Josef any more (only the ring of the map is)', () => {
+    const names = JSON.stringify(mose.stages.map((s) => [s.image, s.task]))
+    expect(names).not.toContain('abenteuer/josef/')
+    for (const s of mose.stages) expect(existsSync(`public/${s.image}`), s.image).toBe(true)
+  })
+
+  it('every file that the data names exists (own stage pictures, map and medal) and is small enough', () => {
     let bytes = 0
     for (const f of journeyFiles(mose)) {
       if (notPaintedYet(f) && !existsSync(`public/${f}`)) continue
