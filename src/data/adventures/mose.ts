@@ -334,8 +334,8 @@ export const mose: Journey = {
       text: [
         'Mose hütet die Schafe seines Schwiegervaters Jitro. Er führt sie durch die Wüste bis zum Berg Horeb.',
         'Da sieht er einen Busch, der brennt, aber nicht verbrennt. „Das muss ich mir ansehen“, denkt Mose und geht näher.',
-        'Aus dem Busch ruft eine Stimme: „Mose, Mose! Zieh deine Schuhe aus, denn der Ort, auf dem du stehst, ist heiliger Boden. Ich bin der Gott Abrahams, Isaaks und Jakobs.“ Mose zieht die Schuhe aus und verhüllt sein Gesicht.',
-        '„Ich habe das Elend meines Volkes gesehen“, sagt Gott. „Ich sende dich zum Pharao, damit du mein Volk aus Ägypten führst.“ Mose zweifelt: „Wer bin ich?“ „Ich will mit dir sein“, antwortet Gott.'
+        'Aus dem Busch ruft eine Stimme: „Mose, Mose! Zieh deine Schuhe aus, denn der Ort, auf dem du stehst, ist heiliger Boden. Ich bin der Gott Abrahams, Isaaks und Jakobs.“ Da verhüllt Mose sein Gesicht, denn er fürchtet sich, Gott anzuschauen.',
+        '„Ich habe das Elend meines Volkes gesehen“, sagt Gott. „Ich sende dich zum Pharao, damit du mein Volk aus Ägypten führst.“ Mose zweifelt: „Wer bin ich?“ „Ich will mit dir sein“, antwortet Gott. Mose fragt: „Was soll ich dem Volk sagen, wie du heißt?“ Gott antwortet: „ICH WERDE SEIN, DER ICH SEIN WERDE.“'
       ],
       // Spiel gebaut: Dem Leuchten nachgehen (leuchten, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'leuchten', hint: 'Geh dem Leuchten nach.', glow: LEUCHTEN },
@@ -350,8 +350,8 @@ export const mose: Journey = {
       title: 'Mose und Aaron',
       ref: '2. Mose 4,1–31',
       text: [
-        'Mose zweifelt. „Ich kann nicht gut reden“, sagt er zu Gott. „Schick lieber einen anderen!“',
-        '„Wer hat den Menschen den Mund gemacht?“, fragt Gott. „Ich will mit deinem Mund sein und dir sagen, was du reden sollst. Und dein Bruder Aaron soll für dich sprechen.“',
+        'Mose zweifelt: „Die Leute werden mir nicht glauben.“ Da zeigt Gott ihm ein Zeichen. Der Stab in Moses Hand wird zur Schlange und dann wieder zum Stab.',
+        '„Ich kann nicht gut reden“, sagt Mose. „Wer hat den Menschen den Mund gemacht?“, fragt Gott. „Ich will mit deinem Mund sein und dir sagen, was du reden sollst.“ Aber Mose bittet: „Schick lieber einen anderen!“ Da wird Gott zornig. „Dein Bruder Aaron kann gut reden. Er soll für dich sprechen.“',
         'Mose zieht mit seiner Familie nach Ägypten. Am Berg Gottes kommt ihm Aaron entgegen, und die beiden Brüder umarmen sich.',
         'Gemeinsam rufen sie die Ältesten Israels zusammen. Aaron erzählt, was Gott gesagt hat. Die Ältesten glauben ihnen, und als sie hören, dass Gott ihr Elend gesehen hat, fallen sie nieder und beten an.'
       ],
@@ -388,7 +388,7 @@ export const mose: Journey = {
       text: [
         'Zuerst wird das Wasser im Nil zu Blut. Aber der Pharao bleibt hart und lässt das Volk nicht ziehen.',
         'Dann kommen Frösche aus dem Nil. Sie hüpfen in die Häuser, in die Backstube und in die Schlafkammer, bis überall Frösche sind.',
-        'Da ruft der Pharao Mose: „Bitte Gott, dass er die Frösche wegnimmt. Dann lasse ich das Volk ziehen.“ Mose betet, und die Frösche verschwinden aus den Häusern.',
+        'Da ruft der Pharao Mose: „Bitte Gott, dass er die Frösche wegnimmt. Dann lasse ich das Volk ziehen.“ Mose betet, und Gott tut, worum er bittet: Die Frösche sterben in den Häusern, in den Höfen und auf den Feldern.',
         'Als der Pharao sieht, dass die Plage vorbei ist, wird er wieder hart. Er hält sein Wort nicht und lässt das Volk nicht ziehen.'
       ],
       // Spiel gebaut: Wimmelbild: Frösche (wimmelbild, alt); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
@@ -425,7 +425,7 @@ export const mose: Journey = {
       text: [
         'Gott sagt zu Mose: „Noch eine Plage schicke ich über Ägypten. Danach lässt der Pharao euer Volk ziehen.“ Mose sagt den Israeliten, wie sie sich vorbereiten sollen.',
         'Am Abend essen die Familien das Passahmahl mit Lamm und Fladenbrot. Dabei sind sie reisefertig. Sie tragen Gürtel um die Hüften und Schuhe an den Füßen und halten den Stab in der Hand.',
-        'Gott hat gesagt: „Wenn ich das Blut vom Lamm an euren Türen sehe, gehe ich an euch vorüber.“ In der Nacht sterben in Ägypten alle Erstgeborenen, und ein großes Klagen geht durch das Land. Bei den Israeliten aber bleibt es still.',
+        'Jede Familie streicht Blut vom Lamm an die Türpfosten und oben an die Schwelle. Gott hat gesagt: „Wenn ich das Blut sehe, gehe ich an euch vorüber.“ In der Nacht sterben in Ägypten alle Erstgeborenen, und ein großes Klagen geht durch das Land. Bei den Israeliten aber bleibt es still.',
         'Noch in derselben Nacht ruft der Pharao Mose und Aaron. „Zieht fort, ihr und alle Israeliten!“, sagt er.'
       ],
       // Bleibt Quiz (ernste Etappe)
@@ -463,7 +463,7 @@ export const mose: Journey = {
         'Das Volk steht am Meer, und hinter ihm kommt das Heer des Pharao. Die Israeliten haben Angst.',
         '„Fürchtet euch nicht!“, ruft Mose. „Steht fest und seht zu! Gott wird für euch streiten, und ihr werdet still sein.“',
         'Die Wolkensäule stellt sich zwischen das Volk und das Heer. Mose streckt seine Hand über das Meer aus, und ein starker Ostwind teilt das Wasser. Rechts und links steht es wie eine Mauer, und das Volk geht trocken mitten hindurch.',
-        'Hinter ihnen fällt das Wasser wieder zusammen. Von dem ganzen Heer folgt dem Volk niemand mehr. Auf der anderen Seite schlägt Mirjam, die Schwester von Mose und Aaron, die Pauke. „Singt Gott ein Lied!“, ruft sie, und die Frauen tanzen hinter ihr her.'
+        'Das Heer des Pharao jagt dem Volk ins Meer nach. Da fällt das Wasser wieder zusammen und bedeckt die Wagen und die Reiter, und keiner von ihnen bleibt übrig. Auf der anderen Seite schlägt Mirjam, die Schwester von Mose und Aaron, die Pauke. „Singt Gott ein Lied!“, ruft sie, und die Frauen tanzen hinter ihr her.'
       ],
       // Spiel gebaut: Mirjams Pauke (takt, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'takt', hint: 'Spiele mit Mirjam auf der Pauke.', beat: TAKT },
@@ -497,9 +497,9 @@ export const mose: Journey = {
       ref: '2. Mose 19,1 bis 20,21',
       text: [
         'Das Volk kommt zum Berg Sinai. Gott sagt: „Hört ihr auf mich, so sollt ihr mein Eigentum sein.“ „Alles, was Gott gesagt hat, wollen wir tun“, antwortet das Volk.',
-        'Eine dichte Wolke liegt auf dem Berg, es donnert, und eine Posaune klingt. Das Volk bleibt in der Ferne, und Gott spricht: „Ich bin dein Gott, der dich aus Ägypten befreit hat.“',
+        'Eine dichte Wolke liegt auf dem Berg, es donnert, und eine Posaune klingt. Das Volk steht unten am Berg, und Gott spricht: „Ich bin dein Gott, der dich aus Ägypten befreit hat.“',
         'Zuerst sagt Gott, wie die Menschen mit ihm leben sollen: „Du sollst keine anderen Götter neben mir haben. Du sollst dir kein Bild machen. Du sollst meinen Namen nicht missbrauchen. Halte den Ruhetag heilig.“',
-        'Dann sagt Gott, wie die Menschen miteinander leben sollen: „Ehre Vater und Mutter. Du sollst nicht töten. Du sollst die Ehe nicht brechen und nicht stehlen. Du sollst nicht lügen und nicht begehren, was einem anderen gehört.“'
+        'Dann sagt Gott, wie die Menschen miteinander leben sollen: „Ehre Vater und Mutter. Du sollst nicht töten. Du sollst die Ehe nicht brechen und nicht stehlen. Du sollst nichts Falsches über deinen Nächsten sagen und nicht begehren, was einem anderen gehört.“ Das Volk bekommt Angst und tritt zurück.'
       ],
       // Spiel gebaut: Worte ordnen (worte, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'worte', hint: 'Lege die Wörter zu Gottes Worten zusammen.', words: WORTE },
@@ -517,7 +517,7 @@ export const mose: Journey = {
         'Das Volk hat Gott versprochen, zu tun, was er sagt. Doch Mose bleibt lange auf dem Berg, und die Menschen werden ungeduldig. „Mach uns Götter, die vor uns hergehen!“, bitten sie Aaron.',
         'Aaron sammelt ihren Goldschmuck ein und macht daraus ein goldenes Kalb. „Das sind deine Götter“, sagen die Menschen. Sie feiern ein Fest vor dem Kalb.',
         'Gott sagt es Mose, und Mose bittet für das Volk. Er geht mit den zwei Steintafeln den Berg hinab, sieht das Kalb und wird zornig. Er zerbricht die Tafeln.',
-        'Am nächsten Tag geht Mose wieder zu Gott und bittet: „Vergib ihnen!“ Gott hört auf Mose und führt sein Volk weiter.'
+        'Am nächsten Tag geht Mose wieder zu Gott und bittet: „Vergib ihnen!“ Gott hört auf Mose und führt sein Volk weiter. Aber die Sünde bleibt nicht ohne Folgen: Gott straft das Volk, weil es das Kalb gemacht hat.'
       ],
       // Bleibt Quiz (ernste Etappe)
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
@@ -534,7 +534,7 @@ export const mose: Journey = {
       text: [
         'Mose baut außerhalb des Lagers ein Zelt auf. Wenn er hineingeht, steht die Wolkensäule am Eingang, und Gott spricht mit ihm wie ein Freund mit seinem Freund. Die Menschen stehen vor ihren Zelten, sehen zu und verneigen sich.',
         '„Mein Angesicht soll vorangehen“, verspricht Gott. „Ich will dich leiten.“',
-        'Mose haut zwei neue Steintafeln zurecht, und Gott schreibt seine Worte darauf. Als Mose vom Berg kommt, leuchtet sein Gesicht.',
+        'Mose haut zwei neue Steintafeln zurecht, und Gott schreibt seine Worte darauf. Da ruft Gott seinen Namen aus: „Barmherzig und gnädig und geduldig und von großer Gnade und Treue!“ Als Mose vom Berg kommt, leuchtet sein Gesicht.',
         'Später bedeckt die Wolke das heilige Zelt, das Mose für Gott aufgerichtet hat. Hebt sich die Wolke, bricht das Volk auf; bleibt sie stehen, bleibt das Volk. Am Tag zeigt die Wolke den Weg, und in der Nacht leuchtet Feuer in ihr.'
       ],
       // Spiel gebaut: Der Wolke folgen (wolke, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
@@ -567,9 +567,12 @@ for (const st of mose.stages) {
 }
 
 // the German recordings of the stories (voice Achernar, text version 3 = files "-v3"); there are no English ones yet, so the English app reads with the voice of the device
+// BIBELTREUE 21.10.2026: the texts of these stages were changed after the check against the Bible (Luther 1912), so the old recording no longer fits: no `audio` until the re-recording
+// (the list: D:/Claude/Abenteuer-Mose/NEUAUFNAHME-BIBELTREUE-2026-10-21.md; then new files "-v4" and the stage leaves this list); the app reads with the voice of the device meanwhile
+export const MOSE_TO_RERECORD: readonly number[] = [4, 5, 7, 9, 11, 13, 14, 15]
 for (const s of mose.stages) {
   const file = `audio/abenteuer/mose/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`
-  Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
+  Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' || MOSE_TO_RERECORD.includes(s.id) ? undefined : file), enumerable: true, configurable: true })
 }
 
 // the background music of this adventure: three calm pieces made with Google's Lyria 3.5 (skill `lambking-abenteuer-skill`, ton.md); they follow one another at random

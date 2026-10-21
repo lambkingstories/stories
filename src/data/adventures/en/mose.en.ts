@@ -65,8 +65,8 @@ export const moseEn: TextOverlay<Journey> = {
       text: [
         'Moses tends the sheep of his father-in-law Jethro. He leads them through the desert to the mountain Horeb.',
         'There he sees a bush that is burning but is not burned up. “I must go and look at this,” thinks Moses, and he steps closer.',
-        'A voice calls from the bush, “Moses, Moses! Take off your shoes, for the place where you stand is holy ground. I am the God of Abraham, Isaac, and Jacob.” Moses takes off his shoes and covers his face.',
-        '“I have seen the misery of my people,” says God. “I am sending you to Pharaoh, so that you lead my people out of Egypt.” Moses doubts, “Who am I?” “I will be with you,” answers God.'
+        'A voice calls from the bush, “Moses, Moses! Take off your shoes, for the place where you stand is holy ground. I am the God of Abraham, Isaac, and Jacob.” Then Moses covers his face, because he is afraid to look at God.',
+        '“I have seen the misery of my people,” says God. “I am sending you to Pharaoh, so that you lead my people out of Egypt.” Moses doubts, “Who am I?” “I will be with you,” answers God. Moses asks, “What shall I tell the people your name is?” God answers, “I AM WHO I AM.”'
       ],
       task: { hint: 'Follow the glow.', glow: { rounds: [{ hint: 'Lead Moses over the slope. Something is glowing there.' }, { hint: 'Now rocks hide the light.' }] } },
       questions: [
@@ -78,8 +78,8 @@ export const moseEn: TextOverlay<Journey> = {
       title: 'Moses and Aaron',
       ref: 'Exodus 4:1–31',
       text: [
-        'Moses doubts. “I am not good at speaking,” he says to God. “Please send someone else!”',
-        '“Who made the human mouth?” asks God. “I will be with your mouth and tell you what to say. And your brother Aaron shall speak for you.”',
+        'Moses doubts, “The people will not believe me.” Then God shows him a sign. The staff in the hand of Moses turns into a snake and then back into a staff.',
+        '“I am not good at speaking,” says Moses. “Who made the human mouth?” asks God. “I will be with your mouth and tell you what to say.” But Moses pleads, “Please send someone else!” Then God becomes angry. “Your brother Aaron speaks well. He shall speak for you.”',
         'Moses sets out for Egypt with his family. At the mountain of God, Aaron comes to meet him, and the two brothers embrace.',
         'Together they call the elders of Israel. Aaron tells them what God has said. The elders believe them, and when they hear that God has seen their misery, they bow down and worship.'
       ],
@@ -110,7 +110,7 @@ export const moseEn: TextOverlay<Journey> = {
       text: [
         'First the water in the Nile turns to blood. But Pharaoh’s heart stays hard, and he does not let the people go.',
         'Then frogs come out of the Nile. They hop into the houses, into the bakery and into the bedroom, until there are frogs everywhere.',
-        'Then Pharaoh calls Moses, “Ask God to take the frogs away. Then I will let the people go.” Moses prays, and the frogs disappear from the houses.',
+        'Then Pharaoh calls Moses, “Ask God to take the frogs away. Then I will let the people go.” Moses prays, and God does what he asks: The frogs die in the houses, in the courtyards, and in the fields.',
         'When Pharaoh sees that the plague is over, his heart becomes hard again. He does not keep his word and does not let the people go.'
       ],
       task: { hint: 'Find the frogs in the bakery.', find: { labels: ['Frog', 'Frog', 'Frog', 'Frog', 'Frog', 'Frog', 'Frog'], doneText: 'You found all seven frogs!' } },
@@ -141,7 +141,7 @@ export const moseEn: TextOverlay<Journey> = {
       text: [
         'God says to Moses, “I will bring one more plague on Egypt. After that Pharaoh will let your people go.” Moses tells the Israelites how to get ready.',
         'In the evening the families eat the Passover meal with lamb and flatbread. They are ready for the journey. They wear belts around their waists and shoes on their feet and hold their staffs in their hands.',
-        'God has said, “When I see the blood of the lamb on your doors, I will pass over you.” In the night all the firstborn in Egypt die, and a great wailing goes through the land. Among the Israelites, however, all stays quiet.',
+        'Every family smears some of the blood of the lamb on the doorposts and on the beam above the door. God has said, “When I see the blood, I will pass over you.” In the night all the firstborn in Egypt die, and a great wailing goes through the land. Among the Israelites, however, all stays quiet.',
         'Still in the same night Pharaoh calls Moses and Aaron. “Leave, you and all the Israelites!” he says.'
       ],
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
@@ -173,7 +173,7 @@ export const moseEn: TextOverlay<Journey> = {
         'The people stand at the sea, and behind them comes Pharaoh’s army. The Israelites are afraid.',
         '“Do not be afraid!” calls Moses. “Stand firm and watch! God will fight for you, and you will be still.”',
         'The pillar of cloud moves between the people and the army. Moses stretches his hand out over the sea, and a strong east wind parts the water. It stands like a wall on the right and on the left, and the people walk through on dry ground.',
-        'Behind them the water falls back together. Of the whole army, no one follows the people anymore. On the other side Miriam, the sister of Moses and Aaron, beats the tambourine. “Sing to God!” she calls, and the women dance behind her.'
+        'Pharaoh’s army chases the people into the sea. Then the water falls back together and covers the chariots and the horsemen, and not one of them is left. On the other side Miriam, the sister of Moses and Aaron, beats the tambourine. “Sing to God!” she calls, and the women dance behind her.'
       ],
       task: { hint: 'Play the drum with Miriam.', beat: { rounds: [{ hint: 'Tap the drum when a ring reaches it.' }, { hint: 'Now a ring is missing every now and then.' }] } },
       questions: [
@@ -201,9 +201,9 @@ export const moseEn: TextOverlay<Journey> = {
       ref: 'Exodus 19:1 to 20:21',
       text: [
         'The people come to Mount Sinai. God says, “If you listen to me, you shall be my own possession.” “All that God has said we will do,” answers the people.',
-        'A thick cloud lies on the mountain, there is thunder, and a trumpet sounds. The people stay at a distance, and God speaks, “I am your God, who freed you from Egypt.”',
+        'A thick cloud lies on the mountain, there is thunder, and a trumpet sounds. The people stand at the foot of the mountain, and God speaks, “I am your God, who freed you from Egypt.”',
         'First God says how people shall live with him: “You shall have no other gods before me. You shall not make an idol. You shall not misuse my name. Keep the day of rest holy.”',
-        'Then God says how people shall live with one another: “Honor your father and your mother. You shall not murder. You shall not break your marriage promise or steal. You shall not lie, and you shall not want what belongs to someone else.”'
+        'Then God says how people shall live with one another: “Honor your father and your mother. You shall not murder. You shall not break your marriage promise or steal. You shall not say anything false about your neighbor, and you shall not want what belongs to someone else.” The people become afraid and step back.'
       ],
       task: { hint: "Put the words together to make God's words.", words: { rounds: [{ hint: 'Lay the words in the strip in the right order.', sentences: ['You shall not murder.', 'Honor your father and your mother.'] }, { hint: 'Now longer sentences.', sentences: ['You shall have no other gods before me.', 'I am your God, who freed you from Egypt.'] }] } },
       questions: [
@@ -218,7 +218,7 @@ export const moseEn: TextOverlay<Journey> = {
         'The people have promised God to do what he says. But Moses stays on the mountain a long time, and the people grow impatient. “Make us gods who will go before us!” they ask Aaron.',
         'Aaron collects their gold jewelry and makes a golden calf from it. “These are your gods,” the people say. They hold a feast in front of the calf.',
         'God tells Moses, and Moses pleads for the people. He goes down the mountain with the two stone tablets, sees the calf, and grows angry. He breaks the tablets.',
-        'The next day Moses goes up to God again and pleads, “Forgive them!” God listens to Moses and leads his people on.'
+        'The next day Moses goes up to God again and pleads, “Forgive them!” God listens to Moses and leads his people on. But sin does not go without consequences: God punishes the people for making the calf.'
       ],
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
@@ -232,7 +232,7 @@ export const moseEn: TextOverlay<Journey> = {
       text: [
         'Moses pitches a tent outside the camp. When he goes in, the pillar of cloud stands at the entrance, and God speaks with him as a friend speaks with his friend. The people stand in front of their tents, watch, and bow.',
         '“My presence will go with you,” promises God. “I will give you rest.”',
-        'Moses cuts two new stone tablets, and God writes his words on them. When Moses comes down from the mountain, his face shines.',
+        'Moses cuts two new stone tablets, and God writes his words on them. Then God calls out his name: “Merciful and gracious, slow to anger, and full of love and faithfulness!” When Moses comes down from the mountain, his face shines.',
         'Later the cloud covers the holy tent that Moses has set up for God. When the cloud rises, the people set out; when it stays, the people stay. By day the cloud shows the way, and by night there is fire in it.'
       ],
       task: { hint: 'Follow the cloud: break up when it rises.', cloud: { rounds: [{ hint: 'When the pillar rises, the people break up; when it stays, they stay.' }, { hint: 'Now it is night. Sparks are no sign.' }] } },
