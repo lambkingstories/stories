@@ -230,7 +230,7 @@ export const jakob: Journey = {
   subtitle: 'Ein Weg mit Umwegen',
   age: '8-10',
   downloadMb: 14, // 13,6 MB gezählt am 21.10.2026 mit den zwölf neuen Etappenbildern und der Karte v3
-  medal: `${IMG}medaille.webp`, // Jakob und die Himmelsleiter (Treppe aus Steinen im Sternenlicht) (Bibeltreue 21.10.2026: das jetzige Bild zeigt Schafe neben Jakob, er ist aber allein; neues Bild nach BILDAUFTRAG-J40)
+  medal: `${IMG}medaille-v2.webp`, // Jakob allein am Stein mit dem Stab und die Himmelsleiter (Leiter nach Luther 1912, Sternennacht, Goldring)
   // Geschenk-Ausmalbild: Jakob und die Himmelsleiter im Traum (Treppe aus Steinen, Sterne, friedlich); das jetzige Bild zeigt Schafe und einen Hund, Jakob ist aber allein: neues Bild nach BILDAUFTRAG-J41
   gift: { title: 'Jakob und die Himmelsleiter im Traum', image: `${IMG}geschenk.webp` },
   // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v3 mit zwölf Orten und dem Ziel) mit Stationen und Perlenweg aus jakobPath.ts
