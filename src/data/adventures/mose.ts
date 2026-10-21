@@ -240,34 +240,34 @@ export const mose: Journey = {
   title: 'Mose',
   subtitle: 'Der Weg in die Freiheit',
   age: '8-10',
-  downloadMb: 16, // PLATZHALTER: Größe mit den Bildern von Josef; wird mit den eigenen Bildern neu gemessen (der Test sagt die echte Größe)
+  downloadMb: 16, // PLATZHALTER: Etappenbilder noch von Josef, die Karte ist eigen (vier Stücke zusammen 4,9 MB); wird mit den eigenen Bildern neu gemessen (der Test sagt die echte Größe)
   medal: josef.medal, // PLATZHALTER bis "Der brennende Dornbusch" (Busch mit Flamme aus Licht, Sandalen und Hirtenstab)
   // Geschenk-Ausmalbild: Der Weg durch das Meer (Mose mit erhobenem Stab, zwei Wasserwände, trockener Weg, Volk, Wolkensäule); PLATZHALTER bis zum eigenen Bild
   gift: { title: 'Der Weg durch das Meer', image: josef.gift.image },
-  // PLATZHALTER: die Karte von Josef (vier Stücke, 9824 × 1632 px) mit fünfzehn Stationen, dem Ziel und dem Perlenweg dorthin
+  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v3 mit fünfzehn Orten und dem Ziel) mit Stationen und Perlenweg aus mosePath.ts
   map: {
-    images: josef.map.images,
+    images: [1, 2, 3, 4].map((n) => `images/abenteuer/mose/karte-pano-v3-${n}.webp`),
     ring: josef.map.ring,
-    aspect: josef.map.aspect,
-    widthPx: josef.map.widthPx,
+    aspect: 9908 / 1648,
+    widthPx: 9908,
     stages: [
-      { x: 0.0450, y: 0.42, d: 0.0342 },
-      { x: 0.1063, y: 0.58, d: 0.0342 },
-      { x: 0.1676, y: 0.42, d: 0.0342 },
-      { x: 0.2289, y: 0.58, d: 0.0342 },
-      { x: 0.2902, y: 0.42, d: 0.0342 },
-      { x: 0.3515, y: 0.58, d: 0.0342 },
-      { x: 0.4128, y: 0.42, d: 0.0342 },
-      { x: 0.4741, y: 0.58, d: 0.0342 },
-      { x: 0.5354, y: 0.42, d: 0.0342 },
-      { x: 0.5967, y: 0.58, d: 0.0342 },
-      { x: 0.6580, y: 0.42, d: 0.0342 },
-      { x: 0.7193, y: 0.58, d: 0.0342 },
-      { x: 0.7806, y: 0.42, d: 0.0342 },
-      { x: 0.8419, y: 0.58, d: 0.0342 },
-      { x: 0.9032, y: 0.42, d: 0.0342 }
+      { x: 0.0303, y: 0.6432, d: 0.0339 },
+      { x: 0.0959, y: 0.6432, d: 0.0339 },
+      { x: 0.1615, y: 0.6432, d: 0.0339 },
+      { x: 0.2271, y: 0.6432, d: 0.0339 },
+      { x: 0.2856, y: 0.6432, d: 0.0339 },
+      { x: 0.3482, y: 0.6432, d: 0.0339 },
+      { x: 0.4138, y: 0.6432, d: 0.0339 },
+      { x: 0.4774, y: 0.6432, d: 0.0339 },
+      { x: 0.541, y: 0.6432, d: 0.0339 },
+      { x: 0.6046, y: 0.6432, d: 0.0339 },
+      { x: 0.6914, y: 0.6432, d: 0.0339 },
+      { x: 0.7519, y: 0.6432, d: 0.0339 },
+      { x: 0.8125, y: 0.6432, d: 0.0339 },
+      { x: 0.873, y: 0.6432, d: 0.0339 },
+      { x: 0.9285, y: 0.6432, d: 0.0339 }
     ],
-    exam: { x: 0.9645, y: 0.58, d: 0.0342 },
+    exam: { x: 0.983, y: 0.6371, d: 0.0339 },
     path: MOSE_PATH
   },
   stages: [
