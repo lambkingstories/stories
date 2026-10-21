@@ -3,7 +3,7 @@
  * Call the children to the tent: on the meadow in front of the big camp walk the children of the family and play. A tap on a child sends it merrily to the tent (the number at the tent
  * grows by one). Whoever is not tapped just walks on: nobody is lost, nothing runs out, tapping an empty place does nothing, so there is no mistake and the end always gives three
  * stars. The tap circle is generous (at least 64 pixels across). Whoever cannot aim gets the button "Call all" after twenty seconds without a tap (the children then come by themselves);
- * the Enter key calls the next child. With reduced motion the children stand still. Round 1: four slow children, round 2: seven faster ones that cross each other. The walking and the
+ * the Enter key calls the next child. With reduced motion the children stand still. Plan v3: round 1 three children, round 2 five, both slow (the tent has its own picture at the right edge). The walking and the
  * tap circle are `stepKids` and `hit` in `utils/jakobGames2.ts`.
  */
 import { computed, onBeforeUnmount, ref } from 'vue'
@@ -170,14 +170,16 @@ const showAll = computed(() => idle.value >= IDLE_SECONDS && walkers.value.some(
       p(class="ct-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
       div(
         ref="field"
-        class="ct-field"
+        class="ct-field game-soft"
         role="group"
         tabindex="0"
         :aria-label="t('app.adventure.catchField', { n: inTent, total: current.kids.length })"
-        :style="{ backgroundImage: `url(${src(game.background)})` }"
+        :style="{ '--bg': `url(${src(game.background)})` }"
         @pointerdown="tap"
         @keydown.enter.space.prevent="callNext"
       )
+        span(v-if="game.tentImage" class="ct-tent-pic" :style="{ left: `${game.tent[0]}%`, top: `${game.tent[1]}%` }" aria-hidden="true")
+          GameImage(:src="game.tentImage" :ratio="1" colour="#b59a6a")
         span(class="ct-tent" :style="{ left: `${game.tent[0]}%`, top: `${game.tent[1]}%` }" aria-hidden="true") {{ inTent }}
         template(v-if="!between")
           span(v-for="w in visible" :key="`${round}-${w.n}`" class="ct-kid" :class="{ going: w.state === 'go', still }" :style="style(w)" aria-hidden="true")
@@ -231,6 +233,14 @@ const showAll = computed(() => idle.value >= IDLE_SECONDS && walkers.value.some(
   background-size: cover
   background-position: center
   touch-action: manipulation
+
+// the picture of the tent: its foot stands at the place of the tent
+.ct-tent-pic
+  position: absolute
+  display: block
+  width: 16%
+  transform: translate(-50%, -88%)
+  pointer-events: none
 
 // the number at the tent
 .ct-tent

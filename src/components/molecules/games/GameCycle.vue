@@ -47,7 +47,7 @@ const finished = ref(false)
 const message = ref('')
 const flash = ref<{ index: number; kind: 'good' | 'bad' } | null>(null)
 const wobble = ref<string | null>(null)
-const stars = computed(() => mistakeStars(mistakes.value, 2, 5))
+const stars = computed(() => mistakeStars(mistakes.value, 2, 4))
 const src = (p: string) => prependBaseUrl(p)
 
 /** The sign that lies in a gap ('' while it is empty). */
@@ -118,7 +118,7 @@ const { dragging, selected, down, tapPlace, toggleSelect, dragStyle } = useDragD
       div(class="cy-stick" role="img" :aria-label="t('app.adventure.cycleYears', { n: doneYears, total: years })")
         span(v-for="y in years" :key="y" class="cy-notch" :class="{ lit: yearDone(y) }")
         span(class="cy-years") {{ t('app.adventure.cycleYears', { n: doneYears, total: years }) }}
-      div(class="cy-field" role="group" :aria-label="t('app.adventure.cycleField')" :style="{ backgroundImage: `url(${src(game.background)})` }")
+      div(class="cy-field game-soft" role="group" :aria-label="t('app.adventure.cycleField')" :style="{ '--bg': `url(${src(game.background)})` }")
         div(class="cy-row" :style="{ gridTemplateColumns: `repeat(${cols}, 1fr)` }")
           template(v-for="place in row" :key="`${round}-${place.index}`")
             div(

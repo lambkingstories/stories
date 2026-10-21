@@ -232,6 +232,26 @@ export function ringSlots(angles: number[], count: number): number[] {
   return Array.from({ length: count }, (_, i) => norm(turn + i * step))
 }
 
+/** The places of the sons round the altar: `count` places like the hours of a clock, the first one at the top (270 degrees, y goes down). */
+export function ringPlaces(count: number): number[] {
+  const step = 360 / count
+  return Array.from({ length: count }, (_, i) => norm(270 + i * step))
+}
+
+/** The free place that is nearest to an angle (degrees); `undefined` when no place is free. */
+export function nearestFree(free: number[], angle: number): number | undefined {
+  let best: number | undefined
+  let bestD = Infinity
+  for (const a of free) {
+    const d = Math.abs(diff(a, angle))
+    if (d < bestD) {
+      best = a
+      bestD = d
+    }
+  }
+  return best
+}
+
 export function fitsRing(angles: number[], count: number, tolerance: number): boolean {
   if (angles.length === 0) return true
   if (angles.length > count) return false

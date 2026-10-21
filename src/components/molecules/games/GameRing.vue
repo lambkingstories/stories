@@ -1,18 +1,17 @@
 <script setup lang="ts">
 /**
- * The twelve sons round the altar: under the big tree at Bethel stands the altar of stones, round it lies a light ring on the ground, and the sons wait below. The child drags them onto
- * the ring (or taps a son and then the place on the ring) and stands them evenly, so that the gap between neighbours is the same all round. The app snaps every son to the ring. If
- * the son is put so that the ring cannot become even any more (`fitsRing`), he lights red with a cross and goes back (a mistake). Round 1: four sons (generous), round 2: twelve sons
- * like the hours of a clock. The help button shows the right places for three seconds (a tip, it counts like a mistake). There is no clock. The arithmetic is in `utils/jakobGames2.ts`.
+ * The twelve sons round the altar: under the big tree at Bethel stands the altar of stones, round it lie the places of the sons as pale rings on the ground (plan v3: the places are seen, like
+ * the hours of a clock, the first one at the top), and the sons wait below. The child drags a son onto the ring (or taps a son and then the ring) and he snaps to the nearest free place; so
+ * the ring is always even and there is no mistake. Round 1: four places (every third of the twelve), round 2: all twelve. The help button lets the next free place glow for three seconds (a tip,
+ * the end gives `mistakeStars(tips, 1, 4)`). There is no clock. The places are `ringPlaces` and `nearestFree` in `utils/jakobGames2.ts`.
  */
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import GameImage from '@/components/atoms/GameImage.vue'
-import GameMark from '@/components/atoms/GameMark.vue'
 import GameDone from '@/components/molecules/games/GameDone.vue'
 import useTimers from '@/use/useTimers'
 import { useDragDrop, type DropPoint } from '@/use/useDragDrop'
-import { fitsRing, PIC, ringSlots, snapToRing } from '@/utils/jakobGames2'
+import { nearestFree, PIC, ringPlaces, snapToRing } from '@/utils/jakobGames2'
 import { mistakeStars } from '@/utils/adventureScore'
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
@@ -39,22 +38,22 @@ const rounds = computed(() => props.game.rounds)
 const round = ref(0)
 const current = computed(() => rounds.value[Math.min(round.value, rounds.value.length - 1)]!)
 const lastRound = computed(() => round.value >= rounds.value.length - 1)
-const step = computed(() => 360 / current.value.count)
+/** The places of the sons: `count` places like the hours of a clock, the first one at the top. */
+const places = computed(() => ringPlaces(current.value.count))
 
 /** The sons that stand on the ring: which of them (0 to count - 1) and at which angle. */
 const placed = ref<{ id: number; angle: number }[]>([])
-const mistakes = ref(0)
 const tips = ref(0)
 const between = ref(false)
 const finished = ref(false)
 const message = ref('')
 const field = ref<HTMLElement | null>(null)
-const ghost = ref<{ angle: number; id: number } | null>(null)
 const help = ref<number[] | null>(null)
-const stars = computed(() => mistakeStars(mistakes.value + tips.value, 3, 8))
+const stars = computed(() => mistakeStars(tips.value, 1, 4))
 const src = (p: string) => prependBaseUrl(p)
 
 const angles = computed(() => placed.value.map((p) => p.angle))
+const freePlaces = computed(() => places.value.filter((a) => !angles.value.some((b) => Math.abs(((a - b + 540) % 360) - 180) < 1)))
 const waiting = computed(() => Array.from({ length: current.value.count }, (_, i) => i).filter((i) => !placed.value.some((p) => p.id === i)))
 const tokenOf = (id: number) => props.game.tokens[id % props.game.tokens.length] ?? ''
 const tunicOf = (id: number) => TUNICS[id % TUNICS.length]
@@ -71,7 +70,7 @@ const figureStyle = (angle: number) => {
 }
 const helpStyle = (angle: number) => {
   const p = onRing(angle)
-  return { left: `${p.x}%`, top: `${p.y}%`, width: `${FIGURE * 0.6}%` }
+  return { left: `${p.x}%`, top: `${p.y}%`, width: `${FIGURE * 0.7}%` }
 }
 
 /** Where, in percent of the picture, a point of the screen lies. */
@@ -82,7 +81,7 @@ function pointOf(at: DropPoint) {
 }
 
 function drop(tokenId: string, _target: string, at?: DropPoint) {
-  if (between.value || finished.value || ghost.value) return
+  if (between.value || finished.value) return
   const id = Number(tokenId.replace('son-', ''))
   if (placed.value.some((p) => p.id === id)) return
   let angle: number
@@ -94,32 +93,21 @@ function drop(tokenId: string, _target: string, at?: DropPoint) {
       message.value = t('app.adventure.ringOff')
       return
     }
-    angle = s.angle
+    // the son snaps to the nearest free place
+    const free = nearestFree(freePlaces.value, s.angle)
+    if (free === undefined) return
+    angle = free
   } else {
-    // from the keyboard: the son goes to the next free place of the ring
-    const free = ringSlots(angles.value, current.value.count).find((a) => !angles.value.some((b) => Math.abs(((a - b + 540) % 360) - 180) < step.value / 3))
+    // from the keyboard: the son goes to the next free place (in the order of the clock)
+    const free = freePlaces.value[0]
     if (free === undefined) return
     angle = free
   }
-  if (angles.value.some((a) => Math.abs(((angle - a + 540) % 360) - 180) < step.value / 3)) {
-    message.value = t('app.adventure.ringTaken')
-    return
-  }
-  if (fitsRing([...angles.value, angle], current.value.count, current.value.tolerance)) {
-    placed.value = [...placed.value, { id, angle }]
-    progress.mark()
-    play('snap')
-    message.value = ''
-    if (placed.value.length >= current.value.count) roundOver()
-    return
-  }
-  mistakes.value++
-  play('wrong')
-  message.value = t('app.adventure.ringWrong')
-  ghost.value = { angle, id }
-  later(() => {
-    ghost.value = null
-  }, 900)
+  placed.value = [...placed.value, { id, angle }]
+  progress.mark()
+  play('snap')
+  message.value = ''
+  if (placed.value.length >= current.value.count) roundOver()
 }
 
 function roundOver() {
@@ -143,7 +131,7 @@ function roundOver() {
 function showHelp() {
   if (help.value || between.value || finished.value) return
   tips.value++
-  help.value = ringSlots(angles.value, current.value.count)
+  help.value = freePlaces.value.slice(0, 1)
   later(() => {
     help.value = null
   }, 3000)
@@ -159,13 +147,13 @@ const { dragging, selected, down, tapPlace, toggleSelect, dragStyle } = useDragD
       p(class="rg-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
       div(
         ref="field"
-        class="rg-field"
+        class="rg-field game-soft"
         :class="{ ready: selected !== null }"
         data-drop="ring"
         role="group"
         tabindex="0"
         :aria-label="t('app.adventure.ringField', { n: placed.length, total: current.count })"
-        :style="{ backgroundImage: `url(${src(game.background)})` }"
+        :style="{ '--bg': `url(${src(game.background)})` }"
         @click="tapPlace('ring', { x: $event.clientX, y: $event.clientY })"
         @keydown.enter.space.prevent="tapPlace('ring')"
       )
@@ -173,13 +161,10 @@ const { dragging, selected, down, tapPlace, toggleSelect, dragStyle } = useDragD
           circle(:cx="game.centre[0]" :cy="game.centre[1] / 1.5" :r="game.radius")
         span(class="rg-altar" :style="{ left: `${game.centre[0]}%`, top: `${game.centre[1]}%` }")
           GameImage(:src="game.altar" :ratio="260 / 200" colour="#a79c85")
-        template(v-if="help")
-          span(v-for="(a, i) in help" :key="`h-${i}`" class="rg-help" :style="helpStyle(a)")
+        template(v-if="!between")
+          span(v-for="a in freePlaces" :key="`p-${round}-${a}`" class="rg-place" :class="{ glow: help && help.includes(a) }" :style="helpStyle(a)" aria-hidden="true")
         span(v-for="p in placed" :key="`${round}-${p.id}`" class="rg-son" :style="figureStyle(p.angle)" role="img" :aria-label="t('app.adventure.ringSon', { n: p.id + 1 })")
           GameImage(:src="tokenOf(p.id)" :ratio="100 / 160" :colour="tunicOf(p.id)")
-        span(v-if="ghost" class="rg-son bad" :style="figureStyle(ghost.angle)" aria-hidden="true")
-          GameImage(:src="tokenOf(ghost.id)" :ratio="100 / 160" :colour="tunicOf(ghost.id)")
-          GameMark(kind="bad" class="rg-mark")
       p(class="rg-fb" role="status") {{ message }}
       div(class="rg-tray" role="group" :aria-label="t('app.adventure.ringTray')")
         div(
@@ -276,23 +261,21 @@ const { dragging, selected, down, tapPlace, toggleSelect, dragStyle } = useDragD
   transform: translate(-50%, -88%)
   pointer-events: none
 
-  &.bad
-    filter: drop-shadow(0 0 5px rgba(220, 40, 40, 0.95))
-
-.rg-mark
-  position: absolute
-  top: -10px
-  right: -14px
-
-.rg-help
+// a free place of a son: a pale ring on the ground; the help lets one glow
+.rg-place
   position: absolute
   display: block
   aspect-ratio: 1
   transform: translate(-50%, -50%)
   border-radius: 50%
-  border: 3px dashed rgba(255, 214, 90, 0.95)
-  background: rgba(255, 246, 200, 0.45)
+  border: 3px dashed rgba(255, 246, 220, 0.85)
+  background: rgba(255, 246, 200, 0.28)
   pointer-events: none
+
+  &.glow
+    border-color: rgba(255, 214, 90, 1)
+    background: rgba(255, 224, 120, 0.6)
+    box-shadow: 0 0 14px 4px rgba(255, 214, 90, 0.9)
 
 .rg-fb
   margin: 0

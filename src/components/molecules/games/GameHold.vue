@@ -139,10 +139,10 @@ function lift() {
       p(class="hd-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
       div(
         ref="fieldEl"
-        class="hd-field"
+        class="hd-field game-soft soft-only"
         role="group"
         :aria-label="t('app.adventure.holdField')"
-        :style="{ backgroundImage: `url(${src(game.background)})` }"
+        :style="{ '--bg': `url(${src(game.background)})` }"
         @pointerdown="down"
         @pointermove="move"
         @pointerup="lift"

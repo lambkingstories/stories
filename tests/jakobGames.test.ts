@@ -212,8 +212,8 @@ describe('crank', () => {
     expect(crankStep(s).turned).toBe(FULL)
   })
 
-  it('the data: one bucket, then three', () => {
-    expect(jakob.stages[3]!.task.crank!.rounds.map((r) => r.buckets)).toEqual([1, 3])
+  it('the data: one bucket, then two', () => {
+    expect(jakob.stages[3]!.task.crank!.rounds.map((r) => r.buckets)).toEqual([1, 2])
   })
 })
 

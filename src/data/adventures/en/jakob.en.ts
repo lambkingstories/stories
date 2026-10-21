@@ -65,7 +65,7 @@ export const jakobEn: TextOverlay<Journey> = {
         'Then he tells her who he is: “I am your relative, the son of Rebekah.” He kisses her in greeting and weeps for joy. Rachel runs home and tells her father.',
         'Laban comes running, hugs Jacob, and takes him into his house. After the long journey, Jacob has found a place where he may stay.'
       ],
-      task: { hint: 'Turn the crank in a circle with your finger.', crank: { rounds: [{ hint: 'Round 1: Fetch a bucket of water for the sheep.' }, { hint: 'Round 2: Now the whole flock is drinking: three buckets.' }] } },
+      task: { hint: 'Turn the crank in a circle with your finger.', crank: { rounds: [{ hint: 'Round 1: Fetch a bucket of water for the sheep.' }, { hint: 'Round 2: Now the sheep need two buckets.' }] } },
       questions: [
         { q: 'What lies over the well that Jacob finds?', options: ['a heavy stone', 'a wooden lid', 'a cloth'] },
         { q: 'Who comes to the well with the sheep?', options: ['Rachel', 'Leah', 'Rebekah'] }
@@ -80,7 +80,7 @@ export const jakobEn: TextOverlay<Journey> = {
         'Then they celebrate the wedding, but in the morning Jacob notices that Laban has deceived him. He has not given him Rachel but her older sister Leah. “Why have you done this?” asks Jacob. “In our country the older one marries first,” says Laban.',
         '“Serve me another seven years,” says Laban, “then you will get Rachel, too.” Jacob agrees and stays.'
       ],
-      task: { hint: 'Drag the seasons into the gaps, year after year.', cycle: { tokens: [{ label: 'Spring: a branch with blossoms' }, { label: 'Summer: a sun with ears of grain' }, { label: 'Autumn: falling leaves' }, { label: 'Winter: a rain cloud with drops' }], rounds: [{ hint: 'Two years go by. Which sign is missing in the gap?' }, { hint: 'Seven years go by. Fill in the missing signs, even at the end of the row.' }] } },
+      task: { hint: 'Drag the seasons into the gaps, year after year.', cycle: { tokens: [{ label: 'Spring: a branch with blossoms' }, { label: 'Summer: a sun with ears of grain' }, { label: 'Autumn: falling leaves' }, { label: 'Winter: a rain cloud with drops' }], rounds: [{ hint: 'Two years go by. Which sign is missing?' }, { hint: 'The years go by. Fill in the missing signs, even at the end.' }] } },
       questions: [
         { q: 'How many years does Jacob serve for Rachel at first?', options: ['seven', 'two', 'twenty'] },
         { q: 'Whom does Jacob marry first?', options: ['Leah', 'Rachel', 'Rebekah'] }
@@ -95,7 +95,7 @@ export const jakobEn: TextOverlay<Journey> = {
         'But Rachel has no child. That makes her sad, because her sister has so many. She waits and prays, year after year.',
         'At last God gives her a son, too. “God has taken my shame away,” says Rachel happily, and she names him Joseph. Jacob’s tents are now full of children.'
       ],
-      task: { hint: 'Tap the children, they run to the tent.', catch: { rounds: [{ hint: 'Tap the children. Each one runs to the tent.' }, { hint: 'The family grows. Call seven more children to the tent.' }] } },
+      task: { hint: 'Tap the children, they run to the tent.', catch: { rounds: [{ hint: 'Tap the children. Each one runs to the tent.' }, { hint: 'The family grows. Call five more children.' }] } },
       questions: [
         { q: 'What does Leah cry when Judah is born?', options: ['“Now I will thank God!”', '“Now I will sleep!”', '“I want to leave!”'] },
         { q: 'What is Rachel’s son called?', options: ['Joseph', 'Reuben', 'Judah'] }
@@ -125,7 +125,7 @@ export const jakobEn: TextOverlay<Journey> = {
         '“Why did you leave in secret?” asks Laban. “I served you for twenty years,” says Jacob. “If God had not been with me, you would have sent me away empty-handed.”',
         'Then the two make peace. They pile up stones into a heap and eat beside it. “This heap shall be a witness between you and me,” says Laban. The next morning he kisses his daughters and grandchildren, blesses them, and goes home.'
       ],
-      task: { hint: "Push Jacob's and Laban's stones to the middle together.", cairn: { rounds: [{ hint: 'Push both stones to the middle together. Tap left and right in turn, or use two fingers.' }, { hint: 'Once more, with longer ways. The heap grows higher.' }] } },
+      task: { hint: "Push Jacob's and Laban's stones to the middle together.", cairn: { rounds: [{ hint: 'Push both stones to the middle together. Tap left and right in turn.' }, { hint: 'Once more, now with four stones.' }] } },
       questions: [
         { q: 'Who speaks to Laban in a dream?', options: ['God', 'Jacob', 'Isaac'] },
         { q: 'What does the heap of stones between Jacob and Laban stand for?', options: ['It is to be a witness of their peace.', 'It is a house for Laban.', 'It is a grave.'] }
@@ -140,7 +140,7 @@ export const jakobEn: TextOverlay<Journey> = {
         'He prays, “God, you said you would do me good. I am too small for all you have given me. Save me from the hand of my brother!”',
         'Then Jacob picks out gifts for Esau: herds of goats, sheep, and camels. His servants are to drive them ahead of him. “Leave space between one herd and the next,” he says. Maybe Esau will be friendly when he sees the gifts.'
       ],
-      task: { hint: 'Send the herds off with room between them.', relay: { rounds: [{ hint: 'Send the herds off one after the other. Leave room between them.' }, { hint: 'Five more herds. The room may be a little narrower now.' }] } },
+      task: { hint: 'Send the herds off with room between them.', relay: { rounds: [{ hint: 'Send the herds off one after the other. Leave room between them.' }, { hint: 'Four more herds. The room may be a little narrower now.' }] } },
       questions: [
         { q: 'Whom does Jacob meet on the way?', options: ['angels of God', 'robbers', 'shepherds'] },
         { q: 'What does Jacob do when he hears about Esau’s men?', options: ['He prays to God.', 'He runs away.', 'He builds a wall.'] }
@@ -185,7 +185,7 @@ export const jakobEn: TextOverlay<Journey> = {
         'Now Jacob has twelve sons, and from them a great people shall come, as God promised. He loves Joseph best, the son of his old age.',
         'Joseph is seventeen years old and tends the sheep with his brothers. Jacob loves him so much that he has a colorful robe made for him.'
       ],
-      task: { hint: 'Place the twelve sons evenly round the altar.', ring: { rounds: [{ hint: 'Place the four sons round the altar, with the same gap between them.' }, { hint: 'Now all twelve sons. They stand like the hours of a clock.' }] } },
+      task: { hint: 'Place the twelve sons evenly round the altar.', ring: { rounds: [{ hint: 'Place the four sons on the places round the altar.' }, { hint: 'Now all twelve. Each one has his place.' }] } },
       questions: [
         { q: 'Where does Jacob go at God’s word?', options: ['to Bethel', 'to Haran', 'to Egypt'] },
         { q: 'Which son does Jacob love best?', options: ['Joseph', 'Benjamin', 'Reuben'] }

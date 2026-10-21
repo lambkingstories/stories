@@ -30,23 +30,23 @@ const SOON = false
 
 /**
  * Etappe 3, "Treppe zusammenschieben": das Etappenbild 3 (Nachtlandschaft mit der Himmelsleiter) wird von der App in Kacheln geschnitten und gemischt (`scramble`, mit festem
- * `seed`), eine Kachel fehlt. Runde 1 3 × 2, Runde 2 4 × 3 Kacheln. Es ist kein Spielbild neu zu malen.
+ * `seed`), eine Kachel fehlt. Plan v3: Runde 1 2 × 2 (drei Kacheln), Runde 2 3 × 2 (fünf Kacheln). Es ist kein Spielbild neu zu malen; das Bild ist das Etappenbild und folgt, wenn es ersetzt wird.
  */
 const SCHIEBEN: SlideGame = {
   image: `${IMG}etappe-bild-03.webp`,
   rounds: [
-    { hint: 'Schiebe eine Kachel in die freie Lücke.', cols: 3, rows: 2, moves: 24, seed: 7 },
-    { hint: 'Jetzt sind es mehr Kacheln.', cols: 4, rows: 3, moves: 80, seed: 11 }
+    { hint: 'Schiebe eine Kachel in die freie Lücke.', cols: 2, rows: 2, moves: 8, seed: 7 },
+    { hint: 'Jetzt sind es mehr Kacheln.', cols: 3, rows: 2, moves: 14, seed: 11 }
   ]
 }
 
 /**
- * Etappe 4, "Brunnen kurbeln": der Brunnen im Etappenbild 4 mit einer Kurbel, einem Eimer am Seil und einem Trog (Bildauftrag J10). Runde 1 ein Eimer, Runde 2 drei.
- * Die Plätze (Kurbelmitte, Seil x und Eimer oben/unten, Trog Mitte x, y und Breite; Prozent des Etappenbildes 4) sind die Messwerte aus `kurbel/kurbel-messung.json`; der Trog (dort als linke Kante x 62, Unterkante y 97,
- * Breite 23, Höhe 2:1 gemessen) ist auf seine Mitte umgerechnet: x 62 + 11,5, y 97 - 8,6. Der Trog steht am Fuß der rechten Brunnenwand (die Lage links aus dem Bildlauf lag auf den Schafsköpfen).
+ * Etappe 4, "Brunnen kurbeln": der Brunnen mit einer Kurbel, einem Eimer am Seil und einem Trog (Bildaufträge J10 und J34). Plan v3: Runde 1 ein Eimer, Runde 2 zwei. Der Hintergrund ist die eigene Szene
+ * `kurbel/brunnen.webp` (Auftrag J34, noch nicht gemalt: bis dahin ist die Fläche einfarbig). Die Plätze (Kurbelmitte, Seil x und Eimer oben/unten, Trog Mitte x, y und Breite; Prozent der Szene) sind
+ * die Messwerte vom alten Etappenbild 4 und werden mit `kurbel-messung.json` zu J34 neu gesetzt. Die Sprites `kurbel`, `eimer`, `trog-leer`, `trog-voll` sind die aus J10.
  */
 const KURBEL: CrankGame = {
-  background: `${IMG}etappe-bild-04.webp`,
+  background: `${G}kurbel/brunnen.webp`,
   crank: `${G}kurbel/kurbel.webp`,
   bucket: `${G}kurbel/eimer.webp`,
   troughEmpty: `${G}kurbel/trog-leer.webp`,
@@ -56,7 +56,7 @@ const KURBEL: CrankGame = {
   troughAt: [73.5, 88.4, 23],
   rounds: [
     { hint: 'Hole einen Eimer Wasser für die Schafe.', buckets: 1 },
-    { hint: 'Jetzt trinkt die ganze Herde: drei Eimer.', buckets: 3 }
+    { hint: 'Jetzt brauchen die Schafe zwei Eimer.', buckets: 2 }
   ]
 }
 
@@ -75,8 +75,9 @@ const HALTEN: HoldGame = {
 }
 
 /**
- * Etappe 5, "Jahreszeiten fortsetzen": eine Reihe von Plätzen, in der die vier Zeichen der Jahreszeiten Jahr für Jahr wiederkehren, einige Plätze sind leer (Bildauftrag J20; Hintergrund = das
- * Etappenbild, unten gesetzt). Ein Jahr ist eine Reihe von vier Plätzen. Runde 1 zwei Jahre mit zwei Lücken in der Mitte, Runde 2 sieben Jahre mit vier Lücken, zwei davon am Ende.
+ * Etappe 5, "Jahreszeiten fortsetzen": eine Reihe von Plätzen, in der die vier Zeichen der Jahreszeiten Jahr für Jahr wiederkehren, einige Plätze sind leer (Bildauftrag J30; Hintergrund = das
+ * Etappenbild, von der App weichgezeichnet). Ein Jahr ist eine Reihe von vier Plätzen. Plan v3: Runde 1 zwei Jahre (8 Plätze) mit zwei Lücken in der Mitte, Runde 2 drei Jahre (12 Plätze) mit drei Lücken,
+ * die letzte am Ende der Reihe. Zusammen 5 Lücken.
  * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `jahre/fruehling.webp`, `sommer.webp`, `herbst.webp`, `winter.webp`, je 160 × 160, transparent.
  */
 const JAHRE: CycleGame = {
@@ -88,89 +89,87 @@ const JAHRE: CycleGame = {
     { id: 'winter', image: `${G}jahre/winter.webp`, label: 'Winter: eine Regenwolke mit Tropfen' }
   ],
   rounds: [
-    { hint: 'Zwei Jahre vergehen. Welches Zeichen fehlt in der Lücke?', cycle: ['fruehling', 'sommer', 'herbst', 'winter'], length: 8, gaps: [2, 5] },
-    { hint: 'Sieben Jahre vergehen. Setze die fehlenden Zeichen ein, auch am Ende der Reihe.', cycle: ['fruehling', 'sommer', 'herbst', 'winter'], length: 28, gaps: [10, 17, 26, 27] }
+    { hint: 'Zwei Jahre vergehen. Welches Zeichen fehlt?', cycle: ['fruehling', 'sommer', 'herbst', 'winter'], length: 8, gaps: [2, 5] },
+    { hint: 'Die Jahre vergehen. Setze die fehlenden Zeichen ein, auch am Ende.', cycle: ['fruehling', 'sommer', 'herbst', 'winter'], length: 12, gaps: [6, 9, 11] }
   ]
 }
 
 /**
- * Etappe 8, "Steinhaufen zu zweit": Jakob und Laban schieben ihre großen Steine gemeinsam in die Mitte, dort legt sich ein kleiner Stein auf den Haufen (Bildauftrag J23; Hintergrund =
- * das Etappenbild, unten gesetzt). Runde 1 drei Steine mit drei Schritten, Runde 2 fünf Steine mit fünf Schritten. Mitte und Startplätze (Prozent des Etappenbildes) sind vorläufig
- * geschätzt, bis die Datei `bund-messung.json` der Spielbild-Sitzung da ist.
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `bund/stein-links.webp`, `stein-rechts.webp` je 220 × 180, `stein-klein.webp` 110 × 90, transparent.
+ * Etappe 8, "Steinhaufen zu zweit": Jakob und Laban schieben ihre großen Steine gemeinsam in die Mitte, dort legt sich ein kleiner Stein auf den Haufen (Bildauftrag J32; Hintergrund = das Etappenbild,
+ * von der App weichgezeichnet). Plan v3: Runde 1 zwei Steine mit drei Schritten, Runde 2 vier Steine mit drei Schritten. Der kleine Stein ist der große auf die Hälfte verkleinert (kein eigenes Bild).
+ * Mitte und Startplätze sind Bildschirm-Prozent der Spielfläche.
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `bund/stein-links.webp`, `stein-rechts.webp` je 220 × 180, transparent.
  */
 const BUND: CairnGame = {
   background: '',
   stoneLeft: `${G}bund/stein-links.webp`,
   stoneRight: `${G}bund/stein-rechts.webp`,
-  stoneSmall: `${G}bund/stein-klein.webp`,
   centre: [50, 72],
   leftStart: [14, 66],
   rightStart: [86, 66],
   rounds: [
-    { hint: 'Schiebt die beiden Steine zusammen in die Mitte. Tippe abwechselnd links und rechts, oder nimm zwei Finger.', stones: 3, steps: 3 },
-    { hint: 'Noch einmal, jetzt mit längeren Wegen. Der Haufen wird höher.', stones: 5, steps: 5 }
+    { hint: 'Schiebt die beiden Steine zusammen in die Mitte. Tippe abwechselnd links und rechts.', stones: 2, steps: 3 },
+    { hint: 'Noch einmal, jetzt mit vier Steinen.', stones: 4, steps: 3 }
   ]
 }
 
 /**
- * Etappe 12, "Zwölferkreis": die Söhne werden gleichmäßig auf einen hellen Kreis um den Altar gestellt (Bildauftrag J25; Hintergrund = das Etappenbild, unten gesetzt). Runde 1 vier Söhne
- * (Toleranz 25 Grad), Runde 2 zwölf Söhne wie die Stunden einer Uhr (Toleranz 14 Grad). Mitte und Radius (Prozent des Etappenbildes, der Radius der Breite) sind vorläufig geschätzt, bis die
- * Datei `kreis-messung.json` der Spielbild-Sitzung da ist.
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `kreis/sohn-a.webp`, `sohn-b.webp`, `sohn-c.webp` je 100 × 160, `kreis/altar.webp` 260 × 200, transparent.
+ * Etappe 12, "Zwölferkreis": die Söhne werden auf die Plätze rund um den Altar gestellt (Bildauftrag J33; Hintergrund = das Etappenbild, von der App weichgezeichnet). Plan v3: die Plätze sind als blasse
+ * Ringe zu sehen (wie die Stunden einer Uhr, der erste oben), jeder Sohn rastet am nächsten freien Platz ein. Runde 1 vier Söhne (jeder dritte Platz), Runde 2 zwölf. Mitte und Radius sind Bildschirm-Prozent
+ * der Spielfläche (der Radius der Breite). Die zwei Söhne `sohn-a` und `sohn-b` werden wechselnd mehrfach benutzt.
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `kreis/sohn-a.webp`, `sohn-b.webp` je 100 × 160, `kreis/altar.webp` 260 × 200, transparent.
  */
 const KREIS: RingGame = {
   background: '',
   altar: `${G}kreis/altar.webp`,
-  tokens: [`${G}kreis/sohn-a.webp`, `${G}kreis/sohn-b.webp`, `${G}kreis/sohn-c.webp`],
+  tokens: [`${G}kreis/sohn-a.webp`, `${G}kreis/sohn-b.webp`],
   centre: [50, 58],
   radius: 22,
   rounds: [
-    { hint: 'Stelle die vier Söhne rund um den Altar, mit gleichem Abstand.', count: 4, tolerance: 25 },
-    { hint: 'Jetzt alle zwölf Söhne. Sie stehen wie die Stunden einer Uhr.', count: 12, tolerance: 14 }
+    { hint: 'Stelle die vier Söhne auf die Plätze rund um den Altar.', count: 4, tolerance: 30 },
+    { hint: 'Jetzt alle zwölf. Jeder hat seinen Platz.', count: 12, tolerance: 26 }
   ]
 }
 
 /**
- * Etappe 6, "Kinder zum Zelt rufen": die Kinder der Familie laufen auf der Wiese umher, ein Tippen schickt eines zum Zelt (Bildauftrag J21; Hintergrund = das Etappenbild, unten gesetzt).
- * Runde 1 vier Kinder, langsam, Runde 2 sieben Kinder, schneller. Wiese `field` und Zelt `tent` (Prozent des Etappenbildes) sind vorläufig geschätzt, bis die Datei `fangen-messung.json`
- * der Spielbild-Sitzung da ist.
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `fangen/kind-1.webp` bis `kind-4.webp`, je 120 × 180, transparent.
+ * Etappe 6, "Kinder zum Zelt rufen": die Kinder der Familie laufen auf der Wiese umher, ein Tippen schickt eines zum Zelt (Bildauftrag J31; Hintergrund = das Etappenbild, von der App weichgezeichnet).
+ * Plan v3: Runde 1 drei Kinder, Runde 2 fünf Kinder (die drei Bilder wechseln sich ab), beide langsam. Das Zelt steht am rechten Rand der Spielfläche, die Wiese ist das untere Drittel (Bildschirm-Prozent).
+ * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `fangen/kind-1.webp` bis `kind-3.webp`, je 120 × 180, und `fangen/zelt.webp`, transparent.
  */
 const FANGEN: CatchGame = {
   background: '',
-  kids: [1, 2, 3, 4].map((n) => ({ id: `kind-${n}`, image: `${G}fangen/kind-${n}.webp`, w: 7 })),
-  tent: [78, 50],
-  field: { x: 10, y: 58, w: 70, h: 32 },
+  kids: [1, 2, 3].map((n) => ({ id: `kind-${n}`, image: `${G}fangen/kind-${n}.webp`, w: 7 })),
+  tent: [88, 58],
+  tentImage: `${G}fangen/zelt.webp`,
+  field: { x: 6, y: 62, w: 70, h: 30 },
   rounds: [
-    { hint: 'Tippe die Kinder an. Jedes läuft zum Zelt.', kids: ['kind-1', 'kind-2', 'kind-3', 'kind-4'], speed: 0.04 },
-    { hint: 'Die Familie wächst. Rufe noch sieben Kinder zum Zelt.', kids: ['kind-1', 'kind-2', 'kind-3', 'kind-4', 'kind-1', 'kind-2', 'kind-3'], speed: 0.07 }
+    { hint: 'Tippe die Kinder an. Jedes läuft zum Zelt.', kids: ['kind-1', 'kind-2', 'kind-3'], speed: 0.04 },
+    { hint: 'Die Familie wächst. Rufe noch fünf Kinder.', kids: ['kind-1', 'kind-2', 'kind-3', 'kind-1', 'kind-2'], speed: 0.04 }
   ]
 }
 
 /**
- * Etappe 9, "Herden mit Abstand losschicken": die Herden ziehen als Geschenke voraus, zwischen zwei Herden soll Raum bleiben (Bildauftrag J24; Hintergrund = das Etappenbild, unten gesetzt).
- * Runde 1 drei Herden, weites Band (25 % der Straße), langsam; Runde 2 fünf Herden, engeres Band (18 %), etwas schneller. Die Straße `road` (Prozent des Etappenbildes) ist vorläufig
- * geschätzt, bis die Datei `staffel-messung.json` der Spielbild-Sitzung da ist.
- * Bilder (noch nicht gemalt, bis dahin steht ein Platzhalter): `staffel/herde-ziegen.webp`, `herde-schafe.webp`, `herde-kamele.webp`, je 260 × 160, transparent.
+ * Etappe 9, "Herden mit Abstand losschicken": die Herden ziehen als Geschenke voraus, zwischen zwei Herden soll Raum bleiben (Hintergrund = das Etappenbild, von der App weichgezeichnet). Plan v3:
+ * Runde 1 drei Herden (Ziegen, Schafe, Kamele), Runde 2 vier (Ziegen, Schafe, Kamele, Ziegen); Band 25 % und 20 % der Straße, Tempo 0,10 und 0,12. Eine Herde ist ein Trupp aus drei Tieren
+ * (`copies: 3`) mit dem vorhandenen Tierbild aus `schaetzen/`; die Straße `road` (Bildschirm-Prozent) malt die App als weiche Linie. Es ist kein Bild neu zu malen.
  */
 const STAFFEL: RelayGame = {
   background: '',
   herds: [
-    { id: 'ziegen', image: `${G}staffel/herde-ziegen.webp`, w: 16 },
-    { id: 'schafe', image: `${G}staffel/herde-schafe.webp`, w: 16 },
-    { id: 'kamele', image: `${G}staffel/herde-kamele.webp`, w: 16 }
+    { id: 'ziegen', image: `${G}schaetzen/ziege.webp`, w: 16, copies: 3 },
+    { id: 'schafe', image: `${G}schaetzen/schaf.webp`, w: 16, copies: 3 },
+    { id: 'kamele', image: `${G}schaetzen/kamel.webp`, w: 18, copies: 3 }
   ],
   road: [[6, 88], [28, 82], [48, 80], [66, 72], [82, 64], [94, 58]],
   rounds: [
     { hint: 'Schicke die Herden nacheinander los. Lass Raum zwischen ihnen.', herds: ['ziegen', 'schafe', 'kamele'], minGap: 25, speed: 0.1 },
-    { hint: 'Noch fünf Herden. Der Raum darf jetzt etwas enger sein.', herds: ['ziegen', 'schafe', 'kamele', 'ziegen', 'schafe'], minGap: 18, speed: 0.14 }
+    { hint: 'Noch vier Herden. Der Raum darf etwas enger sein.', herds: ['ziegen', 'schafe', 'kamele', 'ziegen'], minGap: 20, speed: 0.12 }
   ]
 }
 
 /**
  * Etappe 7, "Herden schätzen": zwei Herden auf der weiten Weide (Hintergrund = das Etappenbild der Etappe, unten gesetzt), Schaf, Ziege und Kamel aus Noah (Kopien unter `schaetzen/`, kein Bild
- * neu zu malen). Runde 1 vergleicht (welche Herde ist größer), Runde 2 schätzt (aus drei Bereichen); die Tiere stehen nach festem `seed` (immer gleich). Die Weide `region` ist PLATZHALTER,
+ * neu zu malen). Plan v3: Runde 1 vergleicht zweimal (welche Herde ist größer), Runde 2 schätzt zweimal (aus drei Bereichen); zusammen 4 Aufgaben; die Tiere stehen nach festem `seed` (immer gleich). Die Weide `region` ist PLATZHALTER,
  * bis die Messdatei des Etappenbildes da ist.
  */
 const SCHAETZEN: GuessGame = {
@@ -187,8 +186,7 @@ const SCHAETZEN: GuessGame = {
       mode: 'compare',
       tasks: [
         { a: { animal: 'schaf', count: 12 }, b: { animal: 'ziege', count: 30 }, seed: 1 },
-        { a: { animal: 'ziege', count: 25 }, b: { animal: 'schaf', count: 14 }, seed: 2 },
-        { a: { animal: 'schaf', count: 40 }, b: { animal: 'kamel', count: 18 }, seed: 3 }
+        { a: { animal: 'ziege', count: 25 }, b: { animal: 'schaf', count: 14 }, seed: 2 }
       ]
     },
     {
@@ -196,8 +194,7 @@ const SCHAETZEN: GuessGame = {
       mode: 'range',
       tasks: [
         { a: { animal: 'schaf', count: 11 }, ranges: [[5, 15], [20, 40], [50, 70]], seed: 4 },
-        { a: { animal: 'ziege', count: 58 }, ranges: [[5, 15], [20, 40], [50, 70]], seed: 5 },
-        { a: { animal: 'schaf', count: 28 }, ranges: [[5, 15], [20, 40], [50, 70]], seed: 6 }
+        { a: { animal: 'ziege', count: 58 }, ranges: [[5, 15], [20, 40], [50, 70]], seed: 5 }
       ]
     }
   ]

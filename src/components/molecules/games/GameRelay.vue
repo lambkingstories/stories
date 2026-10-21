@@ -121,6 +121,16 @@ const style = (herd: string, pos: number) => {
   const p = at(pos)
   return { left: `${p.x}%`, top: `${p.y}%`, width: `${herdOf(herd)?.w ?? 15}%`, zIndex: String(Math.round(p.y)) }
 }
+/** A herd is a troop of `copies` animals side by side (the same picture, a little apart): the numbers 0 to copies - 1. */
+const copiesOf = (herd: string) => Array.from({ length: herdOf(herd)?.copies ?? 1 }, (_, i) => i)
+const copyStyle = (herd: string, c: number) => {
+  const n = herdOf(herd)?.copies ?? 1
+  if (n <= 1) return { left: '0%', width: '100%', bottom: '0%' }
+  // the animals share the width of the herd, each half as wide as the herd, the middle ones a little higher
+  return { left: `${(c * 50) / (n - 1)}%`, width: '50%', bottom: `${c % 2 === 1 ? 14 : 0}%` }
+}
+/** The road as a soft line (drawn by the app). */
+const roadPoints = computed(() => props.game.road.map(([x, y]) => `${x},${y / 1.5}`).join(' '))
 const flashStyle = computed(() => {
   const p = at(0)
   return { left: `${p.x}%`, top: `${p.y}%` }
@@ -144,14 +154,18 @@ const band = computed(() => {
     template(v-if="!finished")
       p(v-if="rounds.length > 1" class="rl-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="rl-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
-      div(class="rl-field" role="group" :aria-label="t('app.adventure.relayField', { n: sent.length, total: current.herds.length })" :style="{ backgroundImage: `url(${src(game.background)})` }")
+      div(class="rl-field game-soft" role="group" :aria-label="t('app.adventure.relayField', { n: sent.length, total: current.herds.length })" :style="{ '--bg': `url(${src(game.background)})` }")
+        svg(class="rl-road" viewBox="0 0 100 66.667" preserveAspectRatio="none" aria-hidden="true")
+          polyline(:points="roadPoints")
         svg(class="rl-band" viewBox="0 0 100 66.667" preserveAspectRatio="none" aria-hidden="true")
           polyline(v-if="band" :points="band")
         template(v-if="!between")
           span(v-if="nextId" :key="`${round}-wait`" class="rl-herd waiting" :style="style(nextId, 0)" aria-hidden="true")
-            GameImage(:src="herdOf(nextId)?.image ?? ''" :ratio="260 / 160" :colour="colourOf(nextId)")
+            span(v-for="c in copiesOf(nextId)" :key="c" class="rl-copy" :style="copyStyle(nextId, c)")
+              GameImage(:src="herdOf(nextId)?.image ?? ''" :ratio="1" :colour="colourOf(nextId)" round)
           span(v-for="s in walking" :key="`${round}-${s.n}`" class="rl-herd" :style="style(s.id, s.pos)" aria-hidden="true")
-            GameImage(:src="herdOf(s.id)?.image ?? ''" :ratio="260 / 160" :colour="colourOf(s.id)")
+            span(v-for="c in copiesOf(s.id)" :key="c" class="rl-copy" :style="copyStyle(s.id, c)")
+              GameImage(:src="herdOf(s.id)?.image ?? ''" :ratio="1" :colour="colourOf(s.id)" round)
         GameMark(v-if="flash" :kind="flash" class="rl-mark" :style="flashStyle")
       p(class="rl-fb" role="status") {{ message }}
       AdvButton(tone="gold" class="rl-go" :disabled="between || !waiting.length" @click="go") {{ t('app.adventure.relayGo') }}
@@ -219,11 +233,32 @@ const band = computed(() => {
     vector-effect: non-scaling-stroke
 
 // a herd stands with its feet on the road
+// the road: a soft light line under the herds
+.rl-road
+  position: absolute
+  inset: 0
+  width: 100%
+  height: 100%
+  pointer-events: none
+
+  polyline
+    fill: none
+    stroke: rgba(255, 244, 205, 0.4)
+    stroke-width: 22
+    stroke-linecap: round
+    stroke-linejoin: round
+    vector-effect: non-scaling-stroke
+
 .rl-herd
   position: absolute
   display: block
+  aspect-ratio: 5 / 3
   transform: translate(-50%, -100%)
   pointer-events: none
+
+.rl-copy
+  position: absolute
+  display: block
 
   &.waiting
     filter: drop-shadow(0 0 4px rgba(255, 214, 90, 0.95))

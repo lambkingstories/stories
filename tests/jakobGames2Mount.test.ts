@@ -142,12 +142,13 @@ describe('Herden schätzen (guess)', () => {
     expect(useTaskProgress().finished.value).toBe(true)
     expect(w.text()).toContain('Du hast die Herden gut geschätzt!')
     await w.find('.gd button').trigger('click')
-    expect(w.emitted('done')).toEqual([[3]])
+    // one wrong answer on the way: two stars (no mistake would be three)
+    expect(w.emitted('done')).toEqual([[2]])
     expect(problems()).toEqual([])
   })
 
-  it('stars follow the mistakes: one mistake three stars, two or three two stars, four one star', async () => {
-    for (const [mistakes, stars] of [[0, 3], [1, 3], [2, 2], [3, 2], [4, 1]] as const) {
+  it('stars follow the mistakes: no mistake three stars, one or two two stars, three one star', async () => {
+    for (const [mistakes, stars] of [[0, 3], [1, 2], [2, 2], [3, 1]] as const) {
       useTaskProgress().reset()
       const w = await open()
       for (let i = 0; i < mistakes; i++) {
@@ -272,8 +273,8 @@ describe('Jahreszeiten fortsetzen (cycle)', () => {
     expect(problems()).toEqual([])
   })
 
-  it('stars follow the mistakes: two mistakes three stars, five two stars, six one star', async () => {
-    for (const [mistakes, stars] of [[2, 3], [3, 2], [5, 2], [6, 1]] as const) {
+  it('stars follow the mistakes: two mistakes three stars, four two stars, five one star', async () => {
+    for (const [mistakes, stars] of [[2, 3], [3, 2], [4, 2], [5, 1]] as const) {
       useTaskProgress().reset()
       const w = await open()
       for (let i = 0; i < mistakes; i++) await put(w, 'Winter', 2)
@@ -485,32 +486,32 @@ describe('Zwölferkreis (ring)', () => {
     expect(w.findAll('.rg-token')).toHaveLength(4)
   })
 
-  it('a son who spoils the even gaps lights red with a cross and goes back (a mistake); a place that is taken is no mistake', async () => {
+  it('a son let go between two places snaps to the nearest free place; a taken place is not used, he goes to the next free one; nothing is a mistake', async () => {
     const w = await open()
     await put(w, 0, 270)
     await put(w, 1, 40)
-    expect(played).toContain('wrong')
-    expect(w.find('.rg-son.bad').exists()).toBe(true)
+    // 40 degrees lies nearest to the place at 0 degrees (right of the altar): 72 % from the left
     expect(w.findAll('.rg-son')).toHaveLength(2)
-    await tick(1000)
-    expect(w.find('.rg-son.bad').exists()).toBe(false)
-    expect(w.findAll('.rg-son')).toHaveLength(1)
-    expect(w.findAll('.rg-token')).toHaveLength(3)
-    played.length = 0
-    await put(w, 1, 275)
+    expect(w.findAll('.rg-son')[1]!.attributes('style')).toContain('left: 72%')
+    await put(w, 2, 275)
+    // 275 degrees is the place at the top, but it is taken: the nearest free place is the one at 180 degrees (28 % from the left)
+    expect(w.findAll('.rg-son')).toHaveLength(3)
+    expect(w.findAll('.rg-son')[2]!.attributes('style')).toContain('left: 28%')
     expect(played).not.toContain('wrong')
-    expect(w.find('.rg-fb').text()).toContain('schon ein Sohn')
-    expect(w.findAll('.rg-son')).toHaveLength(1)
+    expect(w.findAll('.rg-token')).toHaveLength(1)
   })
 
-  it('the help shows the right places for three seconds (four marks, one at a time)', async () => {
+  it('the free places are seen as pale rings (four in round 1, fewer as the sons stand); the help lets the next free one glow for three seconds', async () => {
     const w = await open()
+    expect(w.findAll('.rg-place')).toHaveLength(4)
     await put(w, 0, 270)
+    expect(w.findAll('.rg-place')).toHaveLength(3)
+    expect(w.findAll('.rg-place.glow')).toHaveLength(0)
     await w.find('.rg-btn').trigger('click')
-    expect(w.findAll('.rg-help')).toHaveLength(4)
+    expect(w.findAll('.rg-place.glow')).toHaveLength(1)
     expect(w.find('.rg-btn').attributes('disabled')).toBeDefined()
     await tick(3100)
-    expect(w.findAll('.rg-help')).toHaveLength(0)
+    expect(w.findAll('.rg-place.glow')).toHaveLength(0)
     expect(w.find('.rg-btn').attributes('disabled')).toBeUndefined()
   })
 
@@ -542,23 +543,20 @@ describe('Zwölferkreis (ring)', () => {
     expect(problems()).toEqual([])
   })
 
-  it('stars follow mistakes and tips together: up to three three stars, up to eight two stars, more one star', async () => {
-    for (const [mistakes, stars] of [[3, 3], [4, 2], [8, 2], [9, 1]] as const) {
+  it('stars follow the helps: one help three stars, up to four two stars, more one star', async () => {
+    for (const [helps, stars] of [[0, 3], [1, 3], [2, 2], [4, 2], [5, 1]] as const) {
       useTaskProgress().reset()
       const w = await open()
-      await put(w, 0, 270)
-      for (let i = 0; i < mistakes; i++) {
-        await put(w, 1, 40)
-        await tick(1000)
+      for (let i = 0; i < helps; i++) {
+        await w.find('.rg-btn').trigger('click')
+        await tick(3100)
       }
-      await put(w, 1, 0)
-      await put(w, 2, 90)
-      await put(w, 3, 180)
+      await roundOne(w)
       await tick(1600)
       await roundTwo(w)
       await tick(1100)
       await w.find('.gd button').trigger('click')
-      expect(w.emitted('done'), `${mistakes} mistakes`).toEqual([[stars]])
+      expect(w.emitted('done'), `${helps} helps`).toEqual([[stars]])
       w.unmount()
     }
   })

@@ -120,3 +120,22 @@ html[native-dark-active] .game-ui-immune
     transform: translateY(-15px) scale(1.06)
   63.5%, 84.5%
     transform: translateY(-7px) scale(1.03)
+
+// 4. The play field of a game that lies on a stage picture (Jakob v3): the picture is soft (blur 8 px) and a little darker (30 %), so that the figures of the game
+// do not run over the faces of the stage picture. The field sets the picture as `--bg`; `.soft-only` leaves out the darkening (the game darkens it by itself).
+.game-soft
+  position: relative
+  isolation: isolate
+  overflow: hidden
+
+  &::before
+    content: ''
+    position: absolute
+    inset: -14px
+    z-index: -1
+    background: var(--bg) center / cover no-repeat
+    filter: blur(8px) brightness(0.7)
+    pointer-events: none
+
+  &.soft-only::before
+    filter: blur(8px)

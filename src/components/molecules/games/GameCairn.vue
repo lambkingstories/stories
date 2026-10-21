@@ -130,16 +130,16 @@ function key(e: KeyboardEvent) {
       p(v-if="rounds.length > 1" class="ca-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="ca-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
       div(
-        class="ca-field"
+        class="ca-field game-soft"
         :class="{ lit: placed >= current.stones }"
         role="group"
         tabindex="0"
         :aria-label="t('app.adventure.cairnField', { n: placed, total: current.stones })"
-        :style="{ backgroundImage: `url(${src(game.background)})` }"
+        :style="{ '--bg': `url(${src(game.background)})` }"
         @keydown="key"
       )
         span(v-for="i in placed" :key="`${round}-${i}`" class="ca-small" :style="heapStyle(i - 1)")
-          GameImage(:src="game.stoneSmall" :ratio="110 / 90" round colour="#9a9488")
+          GameImage(:src="game.stoneSmall ?? game.stoneLeft" :ratio="game.stoneSmall ? 110 / 90 : 220 / 180" round colour="#9a9488")
         span(
           v-if="!between"
           class="ca-big left"

@@ -682,6 +682,8 @@ export interface CatchGame {
   background: string
   kids: CatchKid[]
   tent: [number, number]
+  /** The picture of the tent that stands at `tent` (the number of the children inside lies on it); only the number when left out. */
+  tentImage?: string
   field: { x: number; y: number; w: number; h: number }
   rounds: CatchRound[]
 }
@@ -729,7 +731,8 @@ export interface CairnGame {
   background: string
   stoneLeft: string
   stoneRight: string
-  stoneSmall: string
+  /** The small stone that lies on the heap; the big stone at half the size when left out. */
+  stoneSmall?: string
   centre: [number, number]
   leftStart: [number, number]
   rightStart: [number, number]
@@ -741,6 +744,8 @@ export interface RelayHerd {
   id: string
   image: string
   w: number
+  /** A herd is a troop of this many animals of the picture side by side (1 when left out). */
+  copies?: number
 }
 /** A round of the relay game: the herds in the order they wait (ids), the room that has to stay between two herds (percent of the length of the road), and how fast a herd goes (road lengths a second). */
 export interface RelayRound {

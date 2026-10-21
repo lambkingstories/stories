@@ -43,7 +43,7 @@ const solved = ref(false)
 const message = ref('')
 const wrongPick = ref<string | null>(null)
 const rightPick = ref<string | null>(null)
-const stars = computed(() => mistakeStars(mistakes.value, 1, 3))
+const stars = computed(() => mistakeStars(mistakes.value, 0, 2))
 
 const animalOf = (id: string): GuessAnimal | undefined => props.game.animals.find((a) => a.id === id)
 const region = computed(() => props.game.region)
@@ -134,7 +134,7 @@ const total = computed(() => rounds.value.reduce((n, r) => n + r.tasks.length, 0
     template(v-if="!finished")
       p(v-if="rounds.length > 1" class="gs-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="gs-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
-      div(class="gs-field" role="group" :aria-label="t('app.adventure.guessField')" :style="{ backgroundImage: `url(${src(game.background)})` }")
+      div(class="gs-field game-soft" role="group" :aria-label="t('app.adventure.guessField')" :style="{ '--bg': `url(${src(game.background)})` }")
         template(v-if="!between")
           span(v-for="s in herdA" :key="s.key" class="gs-animal" :style="s.style")
             GameImage(:src="s.image" :ratio="1.2")
