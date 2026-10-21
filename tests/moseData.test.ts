@@ -22,44 +22,49 @@ const FORBIDDEN = /\b(Messer|Speer|Pfeil|Peitsche|Teufel|Hölle|erschlagen|erwü
 const QUIZ_STAGES = [1, 3, 8, 9, 14]
 
 describe('Mose: stories and questions', () => {
-  it('fifteen stages with 3 to 5 paragraphs of 60 to 260 words and the Bible passage under every one; no recording yet; the stage pictures are the ones of Josef (PLATZHALTER)', () => {
+  it('fifteen stages with 3 or 4 paragraphs of 90 to 145 words (plan v3) and the Bible passage under every one; no recording yet; the stage pictures are the ones of Josef (PLATZHALTER)', () => {
     expect(mose.id).toBe('mose')
     expect(mose.age).toBe('8-10')
     expect(mose.title).toBe('Mose')
     expect(mose.subtitle).toBe('Der Weg in die Freiheit')
     expect(mose.stages.map((s) => s.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
     expect(mose.stages.map((s) => s.title)).toEqual([
-      'Das Volk in Ägypten',
+      'Schifra und Pua',
       'Das Körbchen im Schilf',
       'Flucht nach Midian',
       'Der brennende Dornbusch',
       'Mose und Aaron',
       'Lass mein Volk ziehen',
-      'Die ersten Plagen',
-      'Hagel, Heuschrecken und Finsternis',
+      'Die Frösche',
+      'Finsternis und Licht',
       'Die Nacht des Passah',
       'Der Auszug',
       'Das Wunder am Meer',
       'Brot vom Himmel',
-      'Gottes Wort am Berg Sinai',
+      'Die zehn Gebote',
       'Das goldene Kalb',
       'Gott geht mit'
     ])
     for (const s of mose.stages) {
       expect(s.ref, `stage ${s.id}`).toMatch(/^2\. Mose \d/)
       expect(s.text.length, `paragraphs ${s.id}`).toBeGreaterThanOrEqual(3)
-      expect(s.text.length, `paragraphs ${s.id}`).toBeLessThanOrEqual(5)
-      const words = s.text.join(' ').split(/\s+/).length
-      expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(60)
-      expect(words, `words ${s.id}`).toBeLessThanOrEqual(260)
+      expect(s.text.length, `paragraphs ${s.id}`).toBeLessThanOrEqual(4)
+      const text = s.text.join(' ')
+      const words = text.split(/\s+/).length
+      expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(90)
+      expect(words, `words ${s.id}`).toBeLessThanOrEqual(145)
+      // short sentences like Noah and Josef (they have 9 to 10 words on average)
+      const sentences = text.split(/[.!?]+["“”„]?\s+/).filter((x) => x.trim()).length
+      expect(words / sentences, `words per sentence ${s.id}`).toBeGreaterThan(7)
+      expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
       expect(s.audio, `no recording yet, the device voice reads: ${s.id}`).toBeUndefined()
       expect(s.image, `stage ${s.id}`).toMatch(/^images\/abenteuer\/josef\/etappe-bild-\d\d(-v2)?\.webp$/)
     }
   })
 
-  it('two questions per stage (three in the serious stages 1, 3, 8, 9 and 14), three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
-    expect(mose.stages.map((s) => s.questions.length)).toEqual([3, 2, 3, 2, 2, 2, 2, 3, 3, 2, 2, 2, 2, 3, 2])
+  it('two questions per stage (three in the serious stages 1, 3, 8 and 9), three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
+    expect(mose.stages.map((s) => s.questions.length)).toEqual([3, 2, 3, 2, 2, 2, 2, 3, 3, 2, 2, 2, 2, 2, 2])
     for (const q of [...mose.stages.flatMap((s) => s.questions), ...mose.exam]) {
       expect(q.options, q.q).toHaveLength(3)
       expect(q.answer, q.q).toBe(0)
@@ -68,7 +73,8 @@ describe('Mose: stories and questions', () => {
       expect(q.q.split(/\s+/).length, q.q).toBeLessThanOrEqual(14)
     }
     expect(mose.exam).toHaveLength(6)
-    const asked = mose.stages.flatMap((s) => s.questions.map((q) => q.q))
+    // nothing is asked twice with the same answer (a question may come back in another stage with other answers; each is shown only in its own stage)
+    const asked = mose.stages.flatMap((s) => s.questions.map((q) => `${q.q} ${q.options[0]}`))
     expect(new Set(asked).size).toBe(asked.length)
     expect(new Set(mose.exam.map((q) => q.q)).size).toBe(6)
   })
@@ -92,12 +98,12 @@ describe('Mose: stories and questions', () => {
       expect(stage(n).task.kind, `kind ${n}`).toBe('quiz')
     }
     // the death of the Egyptian: one sober sentence, without "im Zorn" (the Bible does not say it)
-    expect(stage(3).text.join(' ')).toMatch(/schlägt den Ägypter, sodass der Mann stirbt/)
+    expect(stage(3).text.join(' ')).toMatch(/erschlägt den Ägypter und versteckt ihn/)
     expect(stage(3).text.join(' ')).not.toMatch(/Zorn/)
     // the Passover night: the firstborn die, nothing is painted out
     const t9 = stage(9).text.join(' ')
     expect(t9).toMatch(/Passah/)
-    expect(t9).toMatch(/erstgeborenen Söhne/)
+    expect(t9).toMatch(/alle Erstgeborenen/)
     // the golden calf: told in a few sentences, without the judgement of the Levites
     const t14 = stage(14).text.join(' ')
     expect(t14).toMatch(/Kalb/)
@@ -364,10 +370,10 @@ describe('Mose: die Karte (Platzhalter von Josef)', () => {
 })
 
 describe('Mose: the lists for the recordings (NEUAUFNAHME-Mose.md) say exactly what the data says', () => {
-  const de = 'D:/Claude/Abenteuer-Mose/stories-mose-de.json'
-  const en = 'D:/Claude/Abenteuer-Mose/ENGLISCH/stories-mose-en.json'
+  const de = 'D:/Claude/Abenteuer-Mose/stories-mose-v3-de.json'
+  const en = 'D:/Claude/Abenteuer-Mose/ENGLISCH/stories-mose-v3-en.json'
   // the lists lie outside the repository (they belong to the drafts); on another computer there is nothing to compare
-  it.runIf(existsSync(de) && existsSync(en))('German and English list: fifteen entries, the same paragraphs as the data, the recording names of the plan', () => {
+  it.runIf(existsSync(de) && existsSync(en))('German and English list (plan v3): fifteen entries, the same paragraphs as the data, no recording linked', () => {
     const read = (f: string) => JSON.parse(readFileSync(f, 'utf-8')) as { n: number; text: string[]; audio: string }[]
     const overlay = englishTextsOf(mose) as any
     setAdventureLanguage('de')
@@ -378,9 +384,8 @@ describe('Mose: the lists for the recordings (NEUAUFNAHME-Mose.md) say exactly w
     mose.stages.forEach((s, i) => {
       expect(dl[i]!.n).toBe(s.id)
       expect(dl[i]!.text, `German list ${s.id}`).toEqual(s.text)
-      expect(dl[i]!.audio).toBe(`audio/abenteuer/mose/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`)
       expect(el[i]!.text, `English list ${s.id}`).toEqual(overlay.stages[i].text)
-      expect(el[i]!.audio).toBe(`audio/abenteuer/mose/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)
+      expect(s.audio).toBeUndefined()
     })
   })
 })
@@ -428,7 +433,7 @@ describe('Mose: English', () => {
     expect(adventureLanguage.value).toBe('en')
     expect(stage(1).text.join(' ')).toMatch(/Shiphrah and Puah/)
     expect(stage(3).text.join(' ')).toMatch(/Jethro/)
-    expect(stage(11).text.join(' ')).toMatch(/Red Sea/)
+    expect(stage(11).text.join(' ')).toMatch(/sea/i)
     expect(stage(11).text.join(' ')).toMatch(/Miriam/)
     for (const q of [...mose.stages.flatMap((s) => s.questions), ...mose.exam]) {
       expect(q.options, q.q).toHaveLength(3)

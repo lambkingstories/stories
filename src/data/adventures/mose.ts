@@ -285,19 +285,20 @@ export const mose: Journey = {
     {
       id: 1,
       image: `${PLACEHOLDER}etappe-bild-01.webp`,
-      title: 'Das Volk in Ägypten',
-      ref: '2. Mose 1,1–22',
+      title: 'Schifra und Pua',
+      ref: '2. Mose 1,1–21',
       text: [
-        'Viele Jahre sind vergangen, seit Jakob und seine Söhne nach Ägypten gezogen sind. Josef, der ihnen damals geholfen hat, ist längst gestorben, und aus der Familie Jakobs ist ein großes Volk geworden, das Volk Israel. So viele Menschen leben nun im Land Goschen, dass es von ihnen voll ist.',
-        'Da kommt in Ägypten ein neuer König auf den Thron, ein Pharao, der von Josef nichts mehr weiß. Er bekommt Angst vor dem Volk, das so groß und stark geworden ist, und zwingt die Israeliten zu schwerer Arbeit. Sie müssen Lehm kneten, Ziegel formen und für den König Vorratsstädte bauen, von früh bis spät. Doch je härter sie arbeiten müssen, desto mehr wird das Volk.',
-        'Schließlich befiehlt der König den beiden Hebammen der Israeliten, Schifra und Pua, sie sollen die neugeborenen Jungen nicht am Leben lassen. Aber Schifra und Pua haben Ehrfurcht vor Gott und tun nicht, was der König sagt, sondern lassen die Kinder leben. Gott sieht es und schenkt den beiden Frauen viel Gutes, und das Volk wächst und wächst.'
+        'Die Nachkommen Jakobs leben in Ägypten, und es werden immer mehr. Da kommt ein neuer König an die Macht, der Pharao. Er kennt Josef nicht und hat Angst vor dem großen Volk.',
+        'Darum macht der Pharao die Israeliten zu Arbeitern. Sie müssen aus Lehm Ziegel formen und für ihn bauen. Die Arbeit ist schwer, aber das Volk wächst trotzdem weiter.',
+        'Da befiehlt der Pharao den Hebammen Schifra und Pua: „Wenn ein Junge geboren wird, lasst ihn nicht am Leben!“',
+        'Aber Schifra und Pua fürchten Gott. Sie tun nicht, was der Pharao sagt, und lassen die Jungen leben. Dafür segnet Gott die beiden Frauen.'
       ],
       // Bleibt Quiz (ernste Etappe); das Etappenbild ist noch das von Josef (PLATZHALTER bis zum eigenen Bild)
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
-        { q: 'Wie heißen die beiden Hebammen?', options: ['Schifra und Pua', 'Mirjam und Zippora', 'Sara und Rahel'], answer: 0 },
-        { q: 'Was müssen die Israeliten für den König formen?', options: ['Ziegel', 'Schwerter', 'Krüge'], answer: 0 },
-        { q: 'Warum tun Schifra und Pua nicht, was der König sagt?', options: ['Sie haben Ehrfurcht vor Gott.', 'Sie haben keine Zeit.', 'Sie kennen den Befehl nicht.'], answer: 0 }
+        { q: 'Wie heißen die zwei Hebammen?', options: ['Schifra und Pua', 'Sara und Hagar', 'Lea und Rahel'], answer: 0 },
+        { q: 'Warum tun die Hebammen nicht, was der Pharao sagt?', options: ['Sie fürchten Gott.', 'Sie haben keine Zeit.', 'Sie kennen den Pharao nicht.'], answer: 0 },
+        { q: 'Was müssen die Israeliten für den Pharao machen?', options: ['Ziegel formen', 'Schiffe bauen', 'Brunnen graben'], answer: 0 }
       ]
     },
     {
@@ -306,17 +307,16 @@ export const mose: Journey = {
       title: 'Das Körbchen im Schilf',
       ref: '2. Mose 2,1–10',
       text: [
-        'Der König gibt nicht nach, und bald soll jeder neugeborene Junge der Israeliten in den Nil geworfen werden. In dieser Zeit bekommt eine Frau aus dem Stamm Levi einen Sohn, und weil er so ein schönes Kind ist, versteckt sie ihn drei Monate lang.',
-        'Als sie ihn nicht länger verbergen kann, macht sie ein Körbchen aus Schilfrohr und dichtet es mit Erdharz und Pech ab. Sie legt das Kind hinein und stellt das Körbchen ins Schilf am Ufer des Nils. Seine Schwester bleibt in einiger Entfernung stehen, um zu sehen, was mit ihm geschieht.',
-        'Da kommt die Tochter des Pharao zum Baden an den Fluss, und ihre Dienerinnen gehen am Ufer entlang. Sie entdeckt das Körbchen im Schilf und lässt es holen. Als sie es öffnet, sieht sie das weinende Kind, und es tut ihr leid. „Das ist eines von den Kindern der Israeliten“, sagt sie.',
-        'Jetzt tritt die Schwester heran. „Soll ich eine Frau der Israeliten holen, die das Kind für dich stillt?“, fragt sie. „Ja, geh!“, sagt die Königstochter. Das Mädchen läuft los und holt die Mutter, und die Königstochter sagt zu ihr: „Nimm das Kind und zieh es für mich auf, ich werde dich dafür bezahlen.“',
-        'Als der Junge größer geworden ist, bringt die Mutter ihn zur Tochter des Pharao, und er wird ihr Sohn. Sie nennt ihn Mose, denn sie sagt: „Ich habe ihn aus dem Wasser gezogen.“'
+        'Der Pharao hat befohlen, alle neugeborenen Jungen der Israeliten in den Nil zu werfen. Eine Mutter versteckt ihr Baby drei Monate lang.',
+        'Dann kann sie es nicht länger verstecken. Sie legt das Baby in ein Körbchen aus Schilf und stellt es ins Schilf am Ufer. Seine Schwester bleibt in der Nähe und schaut zu.',
+        'Da kommt die Tochter des Pharao zum Nil. Sie entdeckt das Körbchen und öffnet es. Das Baby weint, und sie hat Mitleid.',
+        '„Soll ich eine Frau holen, die das Kind stillt?“, fragt die Schwester. So wird die Mutter die Amme. Später nimmt die Tochter des Pharao den Jungen zu sich und nennt ihn Mose, denn sie hat ihn aus dem Wasser gezogen.'
       ],
       // Spiel gebaut: Körbchen flechten (flechten, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'flechten', hint: 'Flechte das Körbchen aus Schilfrohr.', weave: FLECHTEN },
       questions: [
-        { q: 'Woraus macht die Mutter das Körbchen?', options: ['aus Schilfrohr', 'aus Holz', 'aus Stroh'], answer: 0 },
-        { q: 'Wer entdeckt das Körbchen im Schilf?', options: ['die Tochter des Pharao', 'Moses Vater', 'ein Fischer'], answer: 0 }
+        { q: 'Wo legt die Mutter ihr Baby hin?', options: ['in ein Körbchen im Schilf', 'in ein Boot', 'in eine Höhle'], answer: 0 },
+        { q: 'Wie nennt die Tochter des Pharao den Jungen?', options: ['Mose', 'Aaron', 'Gerschom'], answer: 0 }
       ]
     },
     {
@@ -325,17 +325,17 @@ export const mose: Journey = {
       title: 'Flucht nach Midian',
       ref: '2. Mose 2,11–25',
       text: [
-        'Mose ist am Hof des Pharao groß geworden. Eines Tages geht er zu seinem Volk hinaus und sieht, wie schwer die Israeliten arbeiten müssen. Da erlebt er, wie ein Ägypter einen Israeliten schlägt, und Mose schlägt den Ägypter, sodass der Mann stirbt. Bald spricht es sich herum, und als der Pharao davon hört, will er Mose bestrafen.',
-        'Da flieht Mose weit weg in das Land Midian und setzt sich dort an einen Brunnen.',
-        'Der Priester von Midian, Jitro, hat sieben Töchter, die zum Brunnen kommen, um die Schafe ihres Vaters zu tränken. Doch Hirten kommen und jagen sie fort. Da steht Mose auf, hilft den Mädchen und tränkt ihre Schafe. „Wo ist der Mann?“, fragt Jitro, als sie davon erzählen. „Holt ihn zum Essen!“ Mose bleibt bei Jitro, heiratet seine Tochter Zippora, und als sie einen Sohn bekommen, nennt er ihn Gerschom, denn er sagt: „Ich bin ein Fremder in einem fremden Land.“',
-        'Viele Jahre vergehen. In Ägypten stirbt der König, aber für die Israeliten wird die Arbeit nicht leichter, und sie seufzen und schreien zu Gott. Gott hört sie. Er denkt an das Versprechen, das er Abraham, Isaak und Jakob gegeben hat, und er sieht, wie es seinem Volk geht.'
+        'Mose wächst am Hof des Pharao auf. Als er groß ist, sieht er, wie schwer sein Volk arbeiten muss. Da schlägt ein Ägypter einen Israeliten. Mose erschlägt den Ägypter und versteckt ihn im Sand.',
+        'Der Pharao erfährt davon und will Mose ergreifen. Da flieht Mose in das Land Midian und setzt sich dort an einen Brunnen.',
+        'Sieben Töchter des Priesters Jitro kommen, um die Schafe ihres Vaters zu tränken. Hirten wollen sie vertreiben, aber Mose hilft ihnen. Jitro lädt Mose ein. Mose bleibt bei ihnen und heiratet Jitros Tochter Zippora.',
+        'Weit weg in Ägypten stöhnen die Israeliten unter ihrer Arbeit und schreien zu Gott. Gott hört ihr Schreien und denkt an sein Versprechen an Abraham, Isaak und Jakob.'
       ],
       // Bleibt Quiz (ernste Etappe); das Etappenbild ist noch das von Josef (PLATZHALTER bis zum eigenen Bild)
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
-        { q: 'In welches Land flieht Mose?', options: ['nach Midian', 'nach Kanaan', 'nach Babel'], answer: 0 },
-        { q: 'Wie nennt Mose seinen Sohn?', options: ['Gerschom', 'Aaron', 'Jitro'], answer: 0 },
-        { q: 'Wer hört das Schreien der Israeliten?', options: ['Gott', 'der Pharao', 'Jitro'], answer: 0 }
+        { q: 'Wohin flieht Mose?', options: ['nach Midian', 'nach Babel', 'nach Kanaan'], answer: 0 },
+        { q: 'Was hört Gott in Ägypten?', options: ['das Schreien seines Volkes', 'ein Lied der Hirten', 'das Rauschen des Nils'], answer: 0 },
+        { q: 'Wie viele Töchter des Priesters kommen zum Brunnen?', options: ['sieben', 'zwei', 'zwölf'], answer: 0 }
       ]
     },
     {
@@ -344,16 +344,16 @@ export const mose: Journey = {
       title: 'Der brennende Dornbusch',
       ref: '2. Mose 3,1–15',
       text: [
-        'Mose ist inzwischen ein alter Mann geworden und hütet die Schafe seines Schwiegervaters Jitro. Eines Tages treibt er die Herde weit hinter die Wüste, bis an den Berg Gottes, der Horeb heißt. Dort sieht er einen Busch, der in Flammen steht und doch nicht verbrennt.',
-        '„Das muss ich mir ansehen“, sagt Mose. „Warum verbrennt der Busch nicht?“ Als er näher kommt, ruft Gott aus dem Busch: „Mose, Mose!“ „Hier bin ich“, antwortet er. „Komm nicht näher“, sagt Gott. „Zieh deine Schuhe aus, denn der Ort, an dem du stehst, ist heiliger Boden. Ich bin der Gott deines Vaters, der Gott Abrahams, Isaaks und Jakobs.“ Da verhüllt Mose sein Gesicht, denn er fürchtet sich, Gott anzusehen.',
-        '„Ich habe gesehen, wie schlecht es meinem Volk in Ägypten geht“, sagt Gott, „und ich habe sein Schreien gehört. Ich will es retten und in ein gutes, weites Land führen. Dich schicke ich zum Pharao, damit du mein Volk aus Ägypten herausführst.“',
-        '„Wer bin ich, dass ich das tun könnte?“, fragt Mose. „Ich werde mit dir sein“, antwortet Gott. Und als Mose wissen will, wie er Gott dem Volk nennen soll, sagt Gott: „Ich werde sein, der ich sein werde. Sag den Israeliten: Der Gott eurer Väter hat mich zu euch gesandt.“'
+        'Mose hütet die Schafe seines Schwiegervaters Jitro. Er führt sie durch die Wüste bis zum Berg Horeb.',
+        'Da sieht er einen Busch, der brennt, aber nicht verbrennt. „Das muss ich mir ansehen“, denkt Mose und geht näher.',
+        'Aus dem Busch ruft eine Stimme: „Mose, Mose! Zieh deine Schuhe aus, denn der Ort, auf dem du stehst, ist heiliger Boden. Ich bin der Gott Abrahams, Isaaks und Jakobs.“ Mose zieht die Schuhe aus und verhüllt sein Gesicht.',
+        '„Ich habe das Elend meines Volkes gesehen“, sagt Gott. „Ich sende dich zum Pharao, damit du mein Volk aus Ägypten führst.“ Mose zweifelt: „Wer bin ich?“ „Ich will mit dir sein“, antwortet Gott.'
       ],
       // Spiel gebaut: Dem Leuchten nachgehen (leuchten, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'leuchten', hint: 'Geh dem Leuchten nach.', glow: LEUCHTEN },
       questions: [
-        { q: 'Wie heißt der Berg Gottes, an dem der Busch brennt?', options: ['Horeb', 'Karmel', 'Zion'], answer: 0 },
-        { q: 'Was soll Mose ausziehen?', options: ['seine Schuhe', 'seinen Mantel', 'seinen Gürtel'], answer: 0 }
+        { q: 'Was ist mit dem Busch besonders?', options: ['Er brennt, aber verbrennt nicht.', 'Er wächst in einer Nacht.', 'Er ist aus Gold.'], answer: 0 },
+        { q: 'Was soll Mose tun, weil der Boden heilig ist?', options: ['seine Schuhe ausziehen', 'sich verstecken', 'ein Feuer löschen'], answer: 0 }
       ]
     },
     {
@@ -362,205 +362,208 @@ export const mose: Journey = {
       title: 'Mose und Aaron',
       ref: '2. Mose 4,1–31',
       text: [
-        'Mose hat Angst, dass die Israeliten ihm nicht glauben werden. „Was hast du in der Hand?“, fragt Gott. „Einen Stab“, sagt Mose. „Wirf ihn auf die Erde!“ Als Mose es tut, wird der Stab zu einer Schlange, und Mose weicht zurück. Doch auf Gottes Wort packt er sie am Schwanz, und sie wird wieder zum Stab. „So sollen sie glauben, dass ich dir erschienen bin“, sagt Gott.',
-        'Aber Mose wehrt sich noch immer. „Ich kann nicht gut reden“, sagt er. „Bitte schick einen anderen!“ „Wer hat dem Menschen den Mund gemacht?“, antwortet Gott. „Ich will mit deinem Mund sein und dich lehren, was du sagen sollst. Und dein Bruder Aaron kommt dir schon entgegen; er kann gut reden und wird sich freuen, dich zu sehen.“',
-        'Mose verabschiedet sich von Jitro, der zu ihm sagt: „Geh hin in Frieden.“ Dann setzt er Frau und Söhne auf einen Esel, nimmt den Stab Gottes in die Hand und zieht nach Ägypten. Am Berg Gottes begegnet er seinem Bruder Aaron, und die beiden fallen sich in die Arme.',
-        'Gemeinsam rufen sie die Ältesten Israels zusammen. Aaron erzählt ihnen alles, was Gott zu Mose gesagt hat, und Mose zeigt die Zeichen. Da glauben die Israeliten ihnen, und als sie hören, dass Gott ihr Elend gesehen hat, verneigen sie sich und beten ihn an.'
+        'Mose zweifelt. „Ich kann nicht gut reden“, sagt er zu Gott. „Schick lieber einen anderen!“',
+        '„Wer hat den Menschen den Mund gemacht?“, fragt Gott. „Ich will mit deinem Mund sein und dir sagen, was du reden sollst. Und dein Bruder Aaron soll für dich sprechen.“',
+        'Mose zieht mit seiner Familie nach Ägypten. Am Berg Gottes kommt ihm Aaron entgegen, und die beiden Brüder umarmen sich.',
+        'Gemeinsam rufen sie die Ältesten Israels zusammen. Aaron erzählt, was Gott gesagt hat. Die Ältesten glauben ihnen, und als sie hören, dass Gott ihr Elend gesehen hat, fallen sie nieder und beten an.'
       ],
       // Spiel gebaut: Unterschiede finden (unterschied, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'unterschied', hint: 'Finde, was im rechten Bild mehr ist.', diff: UNTERSCHIED },
       questions: [
-        { q: 'Wozu wird Moses Stab auf der Erde?', options: ['zur Schlange', 'zum Baum', 'zum Seil'], answer: 0 },
-        { q: 'Wer geht Mose entgegen und soll für ihn reden?', options: ['Aaron', 'Jitro', 'Gerschom'], answer: 0 }
+        { q: 'Was sagt Mose, als Gott ihn sendet?', options: ['„Ich kann nicht gut reden.“', '„Ich bin zu müde.“', '„Ich kenne den Weg nicht.“'], answer: 0 },
+        { q: 'Wer soll für Mose sprechen?', options: ['sein Bruder Aaron', 'Jitro', 'Josua'], answer: 0 }
       ]
     },
     {
       id: 6,
       image: `${PLACEHOLDER}etappe-bild-06.webp`,
       title: 'Lass mein Volk ziehen',
-      ref: '2. Mose 5,1–6,9',
+      ref: '2. Mose 5,1 bis 6,9',
       text: [
-        'Nun gehen Mose und Aaron zum Pharao. „So spricht der Gott Israels“, sagen sie. „Lass mein Volk ziehen, damit es mir in der Wüste ein Fest feiert!“ Aber der Pharao antwortet: „Wer ist dieser Gott, auf dessen Stimme ich hören soll? Ich kenne ihn nicht, und Israel lasse ich nicht ziehen.“',
-        'Noch am selben Tag macht er den Israeliten die Arbeit noch schwerer. Sie bekommen kein Stroh mehr für ihre Ziegel und müssen es sich selbst auf den Feldern zusammensuchen, und doch sollen sie jeden Tag gleich viele Ziegel liefern. Die Israeliten klagen, und manche geben Mose und Aaron die Schuld, dass nun alles schlimmer geworden ist.',
-        'Mose geht zu Gott und fragt: „Warum hast du mich hergeschickt? Seit ich mit dem Pharao geredet habe, geht es dem Volk schlechter, und du hast es noch nicht gerettet.“ Doch Gott antwortet mit einem Versprechen: „Nun sollst du sehen, was ich mit dem Pharao tun werde. Ich will euch aus der schweren Arbeit herausführen und euch retten. Ihr sollt mein Volk sein, und ich will euer Gott sein.“',
-        'Mose sagt es den Israeliten weiter, aber sie hören nicht auf ihn, so mutlos sind sie vor lauter Not. Gottes Zusage aber bleibt bestehen.'
+        'Mose und Aaron gehen zum Pharao. „So spricht Gott: Lass mein Volk ziehen, damit es mir in der Wüste ein Fest feiert!“',
+        'Der Pharao wird hart: „Wer ist Gott? Ich kenne ihn nicht. Ich lasse Israel nicht ziehen!“ Und er macht die Arbeit noch schwerer: Die Israeliten müssen jetzt ihr Stroh für die Ziegel selbst suchen. Die Menschen sind mutlos.',
+        'Mose geht zu Gott.',
+        'Aber Gott sagt zu Mose: „Ich will euch aus der schweren Arbeit herausführen und euch retten. Ihr sollt mein Volk sein, und ich will euer Gott sein.“ Mose erzählt es dem Volk, doch vor lauter Not hören sie nicht zu.'
       ],
       // Spiel gebaut: Lückenvers (lueckenvers, alt); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'lueckenvers', hint: 'Setze die fehlenden Wörter in den Satz.', verse: VERS },
       questions: [
-        { q: 'Was bekommen die Israeliten nach dem Besuch beim Pharao nicht mehr für ihre Ziegel?', options: ['Stroh', 'Wasser', 'Brot'], answer: 0 },
-        { q: 'Was verspricht Gott seinem Volk?', options: ['Er will es retten und herausführen.', 'Er will es in Ägypten lassen.', 'Er will es vergessen.'], answer: 0 }
+        { q: 'Was müssen die Israeliten jetzt selbst tun?', options: ['ihr Stroh für die Ziegel suchen', 'ihr Wasser holen', 'ihre Zelte bauen'], answer: 0 },
+        { q: 'Was verspricht Gott dem Volk?', options: ['Er will es retten.', 'Er will es bestrafen.', 'Er will es vergessen.'], answer: 0 }
       ]
     },
     {
       id: 7,
       image: `${PLACEHOLDER}etappe-bild-07.webp`,
-      title: 'Die ersten Plagen',
-      ref: '2. Mose 7,14–8,32',
+      title: 'Die Frösche',
+      ref: '2. Mose 7,14 bis 8,15',
       text: [
-        'Immer wieder gehen Mose und Aaron zum Pharao, und immer wieder sagen sie: „Lass das Volk ziehen!“ Doch der Pharao bleibt bei seinem Nein. Da schickt Gott Zeichen über Ägypten, die man Plagen nennt. Zuerst verwandelt sich das Wasser im Nil in Blut, sodass die Ägypter nicht mehr daraus trinken können.',
-        'Dann lässt Gott Frösche aus dem Fluss steigen. Sie hüpfen in die Häuser, in die Schlafkammern, auf die Betten, in die Backöfen und in die Backtröge, bis überall im Land Frösche sind. Da ruft der Pharao Mose und Aaron zu sich: „Bittet Gott, dass er die Frösche wegnimmt, dann lasse ich das Volk ziehen.“ „Wann soll es sein?“, fragt Mose. „Morgen“, sagt der Pharao. Und am nächsten Tag sind die Frösche aus den Häusern, den Höfen und von den Feldern weg.',
-        'Aber als der Pharao merkt, dass es vorbei ist, bricht er sein Wort. So kommen Stechmücken über das Land und danach Ungeziefer, doch im Land Goschen, wo die Israeliten wohnen, gibt es keines. Gott unterscheidet zwischen den Ägyptern und seinem Volk. Auch dieses Mal verspricht der Pharao, das Volk ziehen zu lassen, wenn die Plage endet, und wieder hält er sich nicht daran.'
+        'Zuerst wird das Wasser im Nil zu Blut. Aber der Pharao bleibt hart und lässt das Volk nicht ziehen.',
+        'Dann kommen Frösche aus dem Nil. Sie hüpfen in die Häuser, in die Backstube und in die Schlafkammer, bis überall Frösche sind.',
+        'Da ruft der Pharao Mose: „Bitte Gott, dass er die Frösche wegnimmt. Dann lasse ich das Volk ziehen.“ Mose betet, und die Frösche verschwinden aus den Häusern.',
+        'Als der Pharao sieht, dass die Plage vorbei ist, wird er wieder hart. Er hält sein Wort nicht und lässt das Volk nicht ziehen.'
       ],
       // Spiel gebaut: Wimmelbild: Frösche (wimmelbild, alt); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'wimmelbild', hint: 'Finde die zehn Frösche in Pharaos Haus. Manche verstecken sich!', count: 10, find: WIMMEL },
       questions: [
-        { q: 'Was kommt aus dem Fluss und füllt die Häuser?', options: ['Frösche', 'Schlangen', 'Krebse'], answer: 0 },
-        { q: 'In welchem Land gibt es kein Ungeziefer?', options: ['im Land Goschen', 'im Land Midian', 'im Land Kanaan'], answer: 0 }
+        { q: 'Was geschieht zuerst mit dem Wasser im Nil?', options: ['Es wird zu Blut.', 'Es wird zu Eis.', 'Es versiegt.'], answer: 0 },
+        { q: 'Was verspricht der Pharao, wenn die Frösche weg sind?', options: ['Er will das Volk ziehen lassen.', 'Er will Mose belohnen.', 'Er will einen neuen Palast bauen.'], answer: 0 }
       ]
     },
     {
       id: 8,
       image: `${PLACEHOLDER}etappe-bild-08.webp`,
-      title: 'Hagel, Heuschrecken und Finsternis',
-      ref: '2. Mose 9,1–10,29',
+      title: 'Finsternis und Licht',
+      ref: '2. Mose 9,1 bis 10,29',
       text: [
-        'Nun werden die Plagen immer schwerer. Eine Seuche trifft das Vieh der Ägypter, aber von den Tieren der Israeliten stirbt kein einziges.',
-        'Dann kündigt Mose einen Hagel an, wie es ihn in Ägypten noch nie gegeben hat, und rät, Menschen und Tiere in die Häuser zu holen. Wer auf Gottes Wort hört, bringt seine Leute und sein Vieh in Sicherheit. Der Hagel zerschlägt die Felder, aber im Land Goschen hagelt es nicht. „Dieses Mal habe ich Unrecht getan“, sagt der Pharao. „Bittet Gott, dass er aufhört, dann lasse ich euch ziehen.“ Mose breitet die Hände aus, und der Hagel hört auf. Doch der Pharao bleibt trotzdem hart.',
-        'Danach kommen Heuschrecken, die alles Grüne auffressen, und als sie fort sind, liegt drei Tage lang dichte Finsternis über Ägypten, sodass niemand den anderen sehen kann. Nur bei den Israeliten ist es hell in ihren Wohnungen.',
-        'Jetzt will der Pharao die Israeliten ziehen lassen, aber ohne ihre Tiere. „Nein“, sagt Mose, „unser Vieh geht mit uns, nicht einmal ein Huf bleibt zurück.“ Da antwortet der Pharao: „Geh weg von mir und komm mir nicht mehr unter die Augen!“ „Wie du sagst“, antwortet Mose. „Ich werde nicht mehr kommen.“'
+        'Danach kommen noch mehr Plagen über das Land. Ein schwerer Hagel zerstört die Ernte und trifft Menschen und Tiere, die draußen sind. Heuschrecken fressen, was übrig bleibt. Doch der Pharao bleibt hart.',
+        'Dann spricht Gott zu Mose: „Strecke deine Hand zum Himmel aus!“ Mose tut es, und es wird finster in ganz Ägypten. Die Dunkelheit ist so dicht, dass man sie fast greifen kann.',
+        'Drei Tage lang sehen die Ägypter einander nicht. Niemand steht von seinem Platz auf.',
+        'Aber bei den Israeliten ist es hell in ihren Wohnungen. Der Pharao will das Volk trotzdem nicht ziehen lassen.'
       ],
       // Bleibt Quiz (ernste Etappe); das Etappenbild ist noch das von Josef (PLATZHALTER bis zum eigenen Bild)
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
-        { q: 'Wo hagelt es nicht?', options: ['im Land Goschen', 'am Nil', 'in der Wüste'], answer: 0 },
-        { q: 'Wie lange liegt Finsternis über Ägypten?', options: ['drei Tage', 'sieben Tage', 'einen Tag'], answer: 0 },
-        { q: 'Was sagt Mose über das Vieh der Israeliten?', options: ['Es geht mit uns, kein Huf bleibt zurück.', 'Wir lassen es hier.', 'Wir verkaufen es.'], answer: 0 }
+        { q: 'Wie lange ist es finster in Ägypten?', options: ['drei Tage', 'sieben Tage', 'eine Nacht'], answer: 0 },
+        { q: 'Wo ist es hell?', options: ['bei den Israeliten', 'im Palast des Pharao', 'auf dem Berg'], answer: 0 },
+        { q: 'Was tut Mose, bevor es finster wird?', options: ['Er streckt seine Hand zum Himmel aus.', 'Er baut ein Haus.', 'Er singt ein Lied.'], answer: 0 }
       ]
     },
     {
       id: 9,
       image: `${PLACEHOLDER}etappe-bild-09.webp`,
       title: 'Die Nacht des Passah',
-      ref: '2. Mose 11,1–12,32',
+      ref: '2. Mose 11,1 bis 12,32',
       text: [
-        'Noch eine letzte Plage kündigt Gott an, die schwerste von allen. Danach wird der Pharao das Volk ziehen lassen. Aber Gott sagt Mose auch, wie sich die Israeliten auf diese Nacht vorbereiten sollen: Jede Familie soll ein einjähriges Lamm ohne Fehler nehmen und es am Abend schlachten. Mit seinem Blut sollen sie die beiden Türpfosten und den Balken über der Tür bestreichen.',
-        'Das Fleisch essen sie in dieser Nacht gebraten, dazu ungesäuertes Brot und bittere Kräuter. Und sie sollen dabei bereit zum Aufbruch sein: den Gürtel um die Hüften, die Schuhe an den Füßen und den Stab in der Hand. „Das ist das Passahfest“, sagt Gott, „denn wenn ich das Blut an der Tür sehe, gehe ich an eurem Haus vorüber.“ Mose sagt es den Ältesten, und das Volk verneigt sich und tut alles genau so.',
-        'Um Mitternacht geschieht, was Gott angekündigt hat: In Ägypten sterben alle erstgeborenen Söhne, vom Sohn des Pharao bis zum Sohn des Gefangenen im Gefängnis. Ein großes Klagen erhebt sich im ganzen Land, denn in jedem Haus ist jemand gestorben. In den Häusern der Israeliten aber geht Gott vorüber. Noch in der Nacht ruft der Pharao Mose und Aaron: „Macht euch auf und zieht fort, ihr und alle Israeliten, und nehmt auch eure Schafe und Rinder mit!“'
+        'Gott sagt zu Mose: „Noch eine Plage schicke ich über Ägypten. Danach lässt der Pharao euer Volk ziehen.“ Mose sagt den Israeliten, wie sie sich vorbereiten sollen.',
+        'Am Abend essen die Familien das Passahmahl mit Lamm und Fladenbrot. Dabei sind sie reisefertig. Sie tragen Gürtel um die Hüften und Schuhe an den Füßen und halten den Stab in der Hand.',
+        'Gott hat gesagt: „Wenn ich das Blut vom Lamm an euren Türen sehe, gehe ich an euch vorüber.“ In der Nacht sterben in Ägypten alle Erstgeborenen, und ein großes Klagen geht durch das Land. Bei den Israeliten aber bleibt es still.',
+        'Noch in derselben Nacht ruft der Pharao Mose und Aaron. „Zieht fort, ihr und alle Israeliten!“, sagt er.'
       ],
       // Bleibt Quiz (ernste Etappe); das Etappenbild ist noch das von Josef (PLATZHALTER bis zum eigenen Bild)
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
-        { q: 'Was streichen die Israeliten an ihre Türpfosten?', options: ['das Blut des Lammes', 'Lehm und Stroh', 'Öl und Farbe'], answer: 0 },
-        { q: 'Wozu sollen die Israeliten beim Essen bereit sein?', options: ['zum Aufbruch', 'zum Schlafen', 'zum Kampf'], answer: 0 },
-        { q: 'Wen ruft der Pharao in der Nacht zu sich?', options: ['Mose und Aaron', 'Mirjam und Zippora', 'Schifra und Pua'], answer: 0 }
+        { q: 'Wie essen die Israeliten das Passahmahl?', options: ['reisefertig', 'schlafend', 'tanzend'], answer: 0 },
+        { q: 'Was sagt Gott zu den Häusern der Israeliten?', options: ['Ich gehe an euch vorüber.', 'Ich zerstöre sie.', 'Ich sehe sie nicht.'], answer: 0 },
+        { q: 'Was sagt der Pharao zuletzt?', options: ['„Zieht fort!“', '„Bleibt hier!“', '„Kommt morgen wieder!“'], answer: 0 }
       ]
     },
     {
       id: 10,
       image: `${PLACEHOLDER}etappe-bild-10-v2.webp`,
       title: 'Der Auszug',
-      ref: '2. Mose 12,33–13,22',
+      ref: '2. Mose 12,33 bis 13,22',
       text: [
-        'Die Ägypter drängen die Israeliten, so schnell wie möglich das Land zu verlassen, denn sie sagen: „Sonst sterben wir alle.“ Die Israeliten haben keine Zeit mehr, ihr Brot zu säuern. Sie binden den ungesäuerten Teig in ihre Tücher und tragen ihn auf den Schultern. Als sie ihre Nachbarn um Gefäße aus Silber und Gold und um Kleider bitten, geben die Ägypter ihnen alles.',
-        'So brechen sie in Ramses auf, ein ganzes Volk mit Kindern, Schafen und Rindern, und viele andere Menschen schließen sich ihnen an. Mose nimmt auch die Gebeine Josefs mit, denn Josef hatte die Israeliten vor langer Zeit schwören lassen: „Gott wird sich um euch kümmern. Dann nehmt meine Gebeine mit von hier.“',
-        'Gott führt sie nicht auf dem kürzesten Weg, denn dort könnten sie in Kämpfe geraten und wieder nach Ägypten umkehren wollen. Er schickt sie auf einem Umweg durch die Wüste zum Schilfmeer. Und er selbst zieht vor ihnen her, am Tag in einer Wolkensäule, die ihnen den Weg zeigt, und in der Nacht in einer Feuersäule, die ihnen leuchtet. So können sie Tag und Nacht wandern, und die Säule weicht nie von ihnen.'
+        'Die Ägypter drängen das Volk zur Eile. Die Israeliten packen ihren Teig noch ungesäuert in Tücher. So tragen sie ihn auf der Schulter.',
+        'Die Ägypter schenken ihnen Silber- und Goldgefäße und Kleider. So ziehen die Israeliten aus Ägypten fort, sehr viele, mit ihren Schafen und Rindern.',
+        'Mose nimmt die Gebeine Josefs mit. Das hat Josef einst von seinen Brüdern gewünscht: „Gott wird sich euer annehmen. Dann nehmt meine Gebeine mit.“',
+        'Gott selbst zeigt ihnen den Weg. Am Tag geht eine Wolkensäule vor ihnen her, und in der Nacht leuchtet ihnen eine Feuersäule.'
       ],
       // Spiel gebaut: Packen (packen, vorhandene Mechanik aus Josua); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'packen', hint: 'Packe das Tragetuch für den Auszug.', pack: AUSZUG },
       questions: [
-        { q: 'Was tragen die Israeliten in Tüchern auf den Schultern?', options: ['ungesäuerten Teig', 'frisches Brot', 'Datteln'], answer: 0 },
-        { q: 'Wie zeigt Gott dem Volk den Weg?', options: ['mit einer Wolkensäule am Tag und einer Feuersäule in der Nacht', 'mit einem Stern', 'mit einem Hirten'], answer: 0 }
+        { q: 'Wessen Gebeine nimmt Mose mit?', options: ['die Gebeine Josefs', 'die Gebeine Jakobs', 'die Gebeine Abrahams'], answer: 0 },
+        { q: 'Was zeigt dem Volk den Weg?', options: ['eine Wolkensäule am Tag und eine Feuersäule bei Nacht', 'ein Stern', 'ein Hirte mit einer Laterne'], answer: 0 }
       ]
     },
     {
       id: 11,
       image: `${PLACEHOLDER}etappe-bild-11.webp`,
       title: 'Das Wunder am Meer',
-      ref: '2. Mose 14,1–15,21',
+      ref: '2. Mose 14,1 bis 15,21',
       text: [
-        'Gott führt die Israeliten bis ans Schilfmeer, und dort schlagen sie ihr Lager auf. Der Pharao aber bereut, dass er sie hat ziehen lassen. Mit seinen Streitwagen jagt er ihnen nach, und als die Israeliten das Heer hinter sich sehen, bekommen sie große Angst. Vor ihnen liegt das Meer, hinter ihnen kommen die Verfolger. „Fürchtet euch nicht“, sagt Mose. „Bleibt stehen und seht, wie Gott euch heute rettet. Er wird für euch kämpfen.“',
-        'In der Nacht stellt sich die Wolkensäule zwischen die Israeliten und die Ägypter. Auf Gottes Wort streckt Mose seine Hand über das Meer aus, und ein starker Wind teilt das Wasser. Mitten im Meer liegt trockener Boden, mit einer Wasserwand rechts und links, und die Israeliten ziehen hindurch, Familie für Familie. Als die Ägypter ihnen nachfolgen, strömt das Wasser zurück und bedeckt Wagen und Reiter. Von dem ganzen Heer folgt dem Volk niemand mehr.',
-        'Die Israeliten aber sind gerettet. Sie glauben Gott und seinem Diener Mose und singen ein Danklied. Mirjam, die Schwester von Mose und Aaron, nimmt eine Pauke in die Hand, und alle Frauen folgen ihr mit Pauken und Tanz. „Singt Gott ein Lied“, ruft Mirjam, „denn er hat eine große Tat getan!“'
+        'Das Volk steht am Meer, und hinter ihm kommt das Heer des Pharao. Die Israeliten haben Angst.',
+        '„Fürchtet euch nicht!“, ruft Mose. „Steht fest und seht zu! Gott wird für euch streiten, und ihr werdet still sein.“',
+        'Die Wolkensäule stellt sich zwischen das Volk und das Heer. Mose streckt seine Hand über das Meer aus, und ein starker Ostwind teilt das Wasser. Rechts und links steht es wie eine Mauer, und das Volk geht trocken mitten hindurch.',
+        'Hinter ihnen fällt das Wasser wieder zusammen. Von dem ganzen Heer folgt dem Volk niemand mehr. Auf der anderen Seite schlägt Mirjam, die Schwester von Mose und Aaron, die Pauke. „Singt Gott ein Lied!“, ruft sie, und die Frauen tanzen hinter ihr her.'
       ],
       // Spiel gebaut: Mirjams Pauke (takt, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'takt', hint: 'Spiele mit Mirjam auf der Pauke.', beat: TAKT },
       questions: [
-        { q: 'Was tut Mose auf Gottes Wort am Meer?', options: ['Er streckt seine Hand über das Meer aus.', 'Er schlägt auf einen Felsen.', 'Er wirft seinen Mantel ins Wasser.'], answer: 0 },
-        { q: 'Wer nimmt nach der Rettung eine Pauke in die Hand?', options: ['Mirjam', 'Zippora', 'Schifra'], answer: 0 }
+        { q: 'Was sagt Mose zum Volk am Meer?', options: ['„Fürchtet euch nicht!“', '„Lauft zurück!“', '„Baut Boote!“'], answer: 0 },
+        { q: 'Was teilt das Wasser?', options: ['ein starker Wind', 'ein Netz', 'ein Stab aus Gold'], answer: 0 }
       ]
     },
     {
       id: 12,
       image: `${PLACEHOLDER}etappe-bild-12.webp`,
       title: 'Brot vom Himmel',
-      ref: '2. Mose 15,22–17,7',
+      ref: '2. Mose 15,22 bis 16,36',
       text: [
-        'Nach dem Wunder am Meer wandern die Israeliten drei Tage durch die Wüste und finden kein Wasser. In Mara ist das Wasser so bitter, dass sie es nicht trinken können, und das Volk murrt gegen Mose. Mose ruft zu Gott, und Gott zeigt ihm ein Stück Holz; als er es ins Wasser wirft, wird es süß.',
-        'Später, in der Wüste Sin, wird das Essen knapp, und wieder murren die Israeliten. „Gott hat gehört, wie ihr murrt“, sagt Mose, „und er will euch satt machen.“ Am Abend fliegen Wachteln ins Lager, und am Morgen liegt rund um die Zelte etwas Feines, Weißes auf dem Boden, wie Reif. „Was ist das?“, fragen die Leute. „Das ist das Brot, das Gott euch gibt“, sagt Mose.',
-        'Jeder soll nur so viel sammeln, wie er und seine Leute essen können, ein Maß voll für jeden in seinem Zelt, und es reicht für alle. Nichts darf bis zum nächsten Morgen aufgehoben werden. Nur am sechsten Tag sammeln sie das Doppelte, denn am siebten Tag, dem Ruhetag, liegt nichts auf dem Boden. Das Volk nennt das Brot Manna und isst es vierzig Jahre lang.',
-        'Als sie in Refidim wieder kein Wasser haben, schlägt Mose auf Gottes Wort mit seinem Stab auf einen Felsen, und Wasser strömt heraus, sodass das ganze Volk trinken kann.'
+        'In der Wüste bekommt das Volk Hunger, und die Menschen murren. Da sagt Gott zu Mose: „Ich will euch Brot vom Himmel regnen lassen.“',
+        'Am Morgen liegt etwas Weißes wie Reif auf dem Boden, lauter kleine Körner. „Was ist das?“, fragen die Menschen. „Das ist das Brot, das Gott euch gibt“, sagt Mose. Sie nennen es Manna.',
+        'Jeder sammelt, so viel er braucht, und es reicht für alle. Es schmeckt süß wie Brot mit Honig.',
+        'Gott hat gesagt: „Sammelt am sechsten Tag doppelt, denn am siebten Tag ruht ihr.“ Und so geschieht es: Es gibt am sechsten Tag doppelt so viel, und am siebten Tag liegt nichts auf dem Boden.'
       ],
       // Spiel gebaut: Manna sammeln (manna, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'manna', hint: 'Sammle jeden Tag so viel Manna, wie ihr braucht.', manna: MANNA },
       questions: [
-        { q: 'Wie nennt das Volk das Brot vom Himmel?', options: ['Manna', 'Honigbrot', 'Wüstenbrot'], answer: 0 },
-        { q: 'An welchem Tag sammeln sie das Doppelte?', options: ['am sechsten Tag', 'am ersten Tag', 'am Ruhetag'], answer: 0 }
+        { q: 'Was liegt am Morgen auf dem Boden?', options: ['etwas Weißes wie Reif', 'Schnee', 'Gold'], answer: 0 },
+        { q: 'Wie viel sammeln die Menschen an einem gewöhnlichen Tag?', options: ['so viel, wie sie brauchen', 'so viel sie tragen können', 'nur einen Krug voll'], answer: 0 }
       ]
     },
     {
       id: 13,
       image: `${PLACEHOLDER}etappe-bild-04.webp`,
-      title: 'Gottes Wort am Berg Sinai',
-      ref: '2. Mose 19,1–20,21',
+      title: 'Die zehn Gebote',
+      ref: '2. Mose 19,1 bis 20,21',
       text: [
-        'Drei Monate nach dem Auszug erreichen die Israeliten die Wüste Sinai und schlagen ihr Lager gegenüber dem Berg auf. Mose steigt hinauf, und Gott lässt dem Volk sagen: „Ihr habt gesehen, wie ich euch wie auf Adlerflügeln getragen habe. Wenn ihr auf meine Stimme hört, sollt ihr mein besonderes Volk sein.“ Das ganze Volk antwortet: „Alles, was Gott gesagt hat, wollen wir tun.“',
-        'Zwei Tage lang bereiten sich die Israeliten vor und waschen ihre Kleider. Am dritten Morgen liegt eine dichte Wolke auf dem Berg, es donnert und blitzt, und ein lauter Posaunenton erschallt. Mose führt das Volk bis an den Fuß des Berges, doch es muss davor stehen bleiben, denn Gott hat eine Grenze um den Berg gesetzt.',
-        'Dann spricht Gott die zehn Gebote. „Ich bin dein Gott, der dich aus Ägypten befreit hat“, beginnt er. „Du sollst keine anderen Götter neben mir haben und dir kein Götterbild machen, um es anzubeten. Du sollst meinen Namen nicht missbrauchen. Halte den Ruhetag heilig. Ehre Vater und Mutter. Du sollst nicht töten, die Ehe nicht brechen, nicht stehlen und nicht lügen, wenn du über andere redest. Und du sollst nicht haben wollen, was deinem Nächsten gehört.“',
-        'Das Volk sieht Donner und Blitz und den rauchenden Berg und weicht zurück. „Rede du mit uns“, bitten sie Mose, „aber Gott soll nicht mit uns reden, sonst sterben wir.“ „Fürchtet euch nicht“, sagt Mose. „Gott ist gekommen, damit ihr ihn achtet und nichts Böses tut.“ Dann geht er in das Dunkel hinein, wo Gott ist.'
+        'Das Volk kommt zum Berg Sinai. Gott sagt: „Hört ihr auf mich, so sollt ihr mein Eigentum sein.“ „Alles, was Gott gesagt hat, wollen wir tun“, antwortet das Volk.',
+        'Eine dichte Wolke liegt auf dem Berg, es donnert, und eine Posaune klingt. Das Volk bleibt in der Ferne, und Gott spricht: „Ich bin dein Gott, der dich aus Ägypten befreit hat.“',
+        'Zuerst sagt Gott, wie die Menschen mit ihm leben sollen: „Du sollst keine anderen Götter neben mir haben. Du sollst dir kein Bild machen. Du sollst meinen Namen nicht missbrauchen. Halte den Ruhetag heilig.“',
+        'Dann sagt Gott, wie die Menschen miteinander leben sollen: „Ehre Vater und Mutter. Du sollst nicht töten. Du sollst die Ehe nicht brechen und nicht stehlen. Du sollst nicht lügen und nicht begehren, was einem anderen gehört.“'
       ],
       // Spiel gebaut: Worte ordnen (worte, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'worte', hint: 'Lege die Wörter zu Gottes Worten zusammen.', words: WORTE },
       questions: [
-        { q: 'Wie viele Gebote gibt Gott am Berg Sinai?', options: ['zehn', 'sieben', 'zwölf'], answer: 0 },
-        { q: 'Was antwortet das Volk auf Gottes Angebot?', options: ['Alles, was Gott gesagt hat, wollen wir tun.', 'Wir wollen es uns überlegen.', 'Wir wollen lieber zurück.'], answer: 0 }
+        { q: 'Was antwortet das Volk Gott am Berg?', options: ['„Alles, was Gott gesagt hat, wollen wir tun.“', '„Wir wollen weiterziehen.“', '„Wir brauchen das nicht.“'], answer: 0 },
+        { q: 'Was liegt auf dem Berg Sinai?', options: ['eine dichte Wolke', 'tiefer Schnee', 'ein Zelt'], answer: 0 }
       ]
     },
     {
       id: 14,
       image: `${PLACEHOLDER}etappe-bild-09.webp`,
       title: 'Das goldene Kalb',
-      ref: '2. Mose 32,1–35',
+      ref: '2. Mose 32,1–34 (gekürzt)',
       text: [
-        'Mose ist schon lange oben auf dem Berg bei Gott, und unten im Lager wird das Volk unruhig. „Wir wissen nicht, was mit Mose geschehen ist“, sagen die Leute zu Aaron. „Mach uns einen Gott, der vor uns hergeht!“ Aaron bittet sie um ihre goldenen Ohrringe, schmilzt sie ein und gießt daraus ein Kalb aus Gold. „Das ist dein Gott, Israel, der dich aus Ägypten geführt hat“, rufen die Leute und feiern ein Fest vor dem Standbild.',
-        'Gott sieht es und sagt zu Mose: „Geh hinab! Dein Volk hat sich ein Kalb gemacht und betet es an.“ Dabei hat das Volk doch versprochen, alles zu tun, was Gott sagt. Gott ist zornig auf sein Volk. Da bittet Mose für die Israeliten: „Denk an Abraham, Isaak und Jakob, denen du versprochen hast, dass ihre Nachkommen so zahlreich werden wie die Sterne am Himmel!“ Und Gott lenkt ein.',
-        'Mose steigt mit den beiden Steintafeln den Berg hinab, die Gott selbst beschrieben hat. Als er das Kalb und den Tanz sieht, wird er so zornig, dass er die Tafeln zu Boden wirft, und sie zerbrechen. Das Volk muss die Folgen seines Tuns tragen, und es ist ein trauriger Tag in Israel.',
-        'Am nächsten Morgen sagt Mose zum Volk: „Ihr habt eine große Schuld auf euch geladen. Ich will zu Gott hinaufgehen und bitten, dass er sie euch vergibt.“ Und er steigt noch einmal auf den Berg.'
+        'Das Volk hat Gott versprochen, zu tun, was er sagt. Doch Mose bleibt lange auf dem Berg, und die Menschen werden ungeduldig. „Mach uns Götter, die vor uns hergehen!“, bitten sie Aaron.',
+        'Aaron sammelt ihren Goldschmuck ein und macht daraus ein goldenes Kalb. „Das sind deine Götter“, sagen die Menschen. Sie feiern ein Fest vor dem Kalb.',
+        'Gott sagt es Mose, und Mose bittet für das Volk. Er geht mit den zwei Steintafeln den Berg hinab, sieht das Kalb und wird zornig. Er zerbricht die Tafeln.',
+        'Am nächsten Tag geht Mose wieder zu Gott und bittet: „Vergib ihnen!“ Gott hört auf Mose und führt sein Volk weiter.'
       ],
       // Bleibt Quiz (ernste Etappe); das Etappenbild ist noch das von Josef (PLATZHALTER bis zum eigenen Bild)
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
-        { q: 'Woraus macht Aaron das Kalb?', options: ['aus goldenen Ohrringen', 'aus Holz', 'aus Lehm'], answer: 0 },
-        { q: 'Was geschieht mit den Steintafeln?', options: ['Mose wirft sie zu Boden, und sie zerbrechen.', 'Aaron versteckt sie.', 'Das Volk trägt sie ins Lager.'], answer: 0 },
-        { q: 'Was will Mose für das Volk tun?', options: ['Gott um Vergebung bitten', 'Gott verlassen', 'das Lager verlassen'], answer: 0 }
+        { q: 'Was macht Aaron aus dem Gold?', options: ['ein Kalb', 'eine Krone', 'ein Zelt'], answer: 0 },
+        { q: 'Was bittet Mose für das Volk?', options: ['dass Gott ihnen vergibt', 'dass Gott sie bestraft', 'dass Gott sie verlässt'], answer: 0 }
       ]
     },
     {
       id: 15,
       image: `${PLACEHOLDER}etappe-bild-12.webp`,
       title: 'Gott geht mit',
-      ref: '2. Mose 33,7–34,35 und 40,34–38',
+      ref: '2. Mose 33,7–17; 34,1–4.29; 40,34–38',
       text: [
-        'Doch Gott verlässt sein Volk nicht. Mose schlägt ein Zelt außerhalb des Lagers auf, das Zelt der Begegnung, und wer Gott etwas fragen will, geht dorthin. Immer wenn Mose zum Zelt geht, steht das ganze Volk auf und sieht ihm nach, jeder vor der Tür seines eigenen Zeltes. Wenn Mose hineingeht, kommt die Wolkensäule herab und bleibt am Eingang stehen, und Gott spricht mit Mose, wie ein Mann mit seinem Freund spricht.',
-        '„Wenn du nicht mit uns gehst“, sagt Mose, „dann lass uns nicht von hier fortziehen.“ „Ich will tun, worum du mich bittest“, antwortet Gott. „Ich gehe mit euch.“',
-        'Dann sagt Gott zu Mose: „Haue dir zwei neue Steintafeln!“ Früh am Morgen steigt Mose noch einmal auf den Berg. Da kommt Gott in der Wolke herab und ruft: „Gott, barmherzig und gnädig und geduldig und von großer Gnade und Treue!“ Mose verneigt sich tief und betet an. Vierzig Tage und Nächte bleibt er bei Gott, und als er herabkommt, glänzt sein Gesicht, weil er mit Gott geredet hat.',
-        'Später baut das Volk auf Gottes Wort ein großes Zelt, das Zelt Gottes, mitten im Lager. Da bedeckt die Wolke das Zelt, und Gottes Herrlichkeit erfüllt es. Immer wenn sich die Wolke erhebt, bricht das Volk auf, und solange sie über dem Zelt bleibt, bleibt es stehen. So geht Gott mit seinem Volk, bei Tag und bei Nacht, auf dem ganzen Weg.'
+        'Mose baut außerhalb des Lagers ein Zelt auf. Wenn er hineingeht, steht die Wolkensäule am Eingang, und Gott spricht mit ihm wie ein Freund mit seinem Freund. Die Menschen stehen vor ihren Zelten, sehen zu und verneigen sich.',
+        '„Mein Angesicht soll vorangehen“, verspricht Gott. „Ich will dich leiten.“',
+        'Mose haut zwei neue Steintafeln zurecht, und Gott schreibt seine Worte darauf. Als Mose vom Berg kommt, leuchtet sein Gesicht.',
+        'Später bedeckt die Wolke das heilige Zelt, das Mose für Gott aufgerichtet hat. Hebt sich die Wolke, bricht das Volk auf; bleibt sie stehen, bleibt das Volk. Am Tag zeigt die Wolke den Weg, und in der Nacht leuchtet Feuer in ihr.'
       ],
       // Spiel gebaut: Der Wolke folgen (wolke, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'wolke', hint: 'Folge der Wolke: Breche auf, wenn sie sich hebt.', cloud: WOLKE },
       questions: [
-        { q: 'Wie nennt Mose das Zelt vor dem Lager?', options: ['Zelt der Begegnung', 'Zelt des Pharao', 'Zelt der Hirten'], answer: 0 },
-        { q: 'Was geschieht mit Moses Gesicht, nachdem er mit Gott geredet hat?', options: ['Es glänzt.', 'Es wird blass.', 'Es wird älter.'], answer: 0 }
+        { q: 'Was zeigt dem Volk den Weg?', options: ['die Wolke über dem Zelt', 'ein Vogel', 'ein Hirtenstab'], answer: 0 },
+        { q: 'Wo steht das Zelt, in dem Gott mit Mose spricht?', options: ['außerhalb des Lagers', 'mitten im Lager', 'auf dem Sinai'], answer: 0 }
       ]
     }
   ],
   exam: [
-    { q: 'Wie heißen die beiden Hebammen, die die Jungen am Leben lassen?', options: ['Schifra und Pua', 'Mirjam und Zippora', 'Sara und Rahel'], answer: 0 },
-    { q: 'Woraus macht die Mutter das Körbchen für Mose?', options: ['aus Schilfrohr', 'aus Holz', 'aus Stroh'], answer: 0 },
-    { q: 'Was sieht Mose am Berg Horeb?', options: ['einen Busch, der brennt und nicht verbrennt', 'einen Baum ohne Blätter', 'einen Fluss aus Gold'], answer: 0 },
-    { q: 'Wie lange liegt Finsternis über Ägypten?', options: ['drei Tage', 'sieben Tage', 'einen Tag'], answer: 0 },
-    { q: 'Was geschieht mit dem Wasser des Meeres, als Mose seine Hand ausstreckt?', options: ['Es teilt sich, und das Volk geht hindurch.', 'Es wird zu Eis.', 'Es verschwindet für immer.'], answer: 0 },
-    { q: 'Wie viele Gebote gibt Gott am Berg Sinai?', options: ['zehn', 'sieben', 'zwölf'], answer: 0 }
+    { q: 'Wie heißen die zwei Hebammen?', options: ['Schifra und Pua', 'Sara und Hagar', 'Lea und Rahel'], answer: 0 },
+    { q: 'Wo legt die Mutter ihr Baby hin?', options: ['in ein Körbchen im Schilf', 'in ein Boot', 'in eine Höhle'], answer: 0 },
+    { q: 'Was ist mit dem Busch besonders, den Mose sieht?', options: ['Er brennt, aber verbrennt nicht.', 'Er wächst in einer Nacht.', 'Er ist aus Gold.'], answer: 0 },
+    { q: 'Was teilt das Wasser am Meer?', options: ['ein starker Wind', 'ein Netz', 'ein Stab aus Gold'], answer: 0 },
+    { q: 'Was antwortet das Volk Gott am Berg?', options: ['„Alles, was Gott gesagt hat, wollen wir tun.“', '„Wir wollen weiterziehen.“', '„Wir brauchen das nicht.“'], answer: 0 },
+    { q: 'Was zeigt dem Volk den Weg?', options: ['die Wolke über dem Zelt', 'ein Vogel', 'ein Hirtenstab'], answer: 0 }
   ]
 }
 
