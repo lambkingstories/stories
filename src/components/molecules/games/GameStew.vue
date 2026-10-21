@@ -7,14 +7,14 @@
  * With reduced motion Esau jumps in six steps and nothing flies. The rules are `stewAdd`, `stewReady`, `potKey`, `esauAt` and `walkDuration` in `utils/jakobStew.ts`. Stars: `mistakeStars(restarts, 1, 3)`.
  * The places of the pictures are percent of the scene (`potAt`, `sources`, `path`); the size of the pot, the logs, the flame, the steam and Esau are set here (CSS) and are to be measured on the painted pictures.
  */
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import GameImage from '@/components/atoms/GameImage.vue'
 import GameMark from '@/components/atoms/GameMark.vue'
 import GameDone from '@/components/molecules/games/GameDone.vue'
 import useTimers from '@/use/useTimers'
 import { esauAt, esauSaid, esauScale, fireSize, potKey, stepped, stewAdd, stewCan, stewReady, stewStart, walkDuration, STEW_NEED } from '@/utils/jakobStew'
-import type { StewSourceId } from '@/utils/jakobStew'
+import type { PotKey, StewSourceId } from '@/utils/jakobStew'
 import { mistakeStars } from '@/utils/adventureScore'
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
@@ -32,6 +32,8 @@ progress.setGoal(1)
 /** One step of Esau's clock (ms) and how far a drag must go before it counts as a drag (pixels). */
 const TICK = 250
 const DRAG = 12
+/** How long the picture of the pot fades into the next one (ms): the four pictures are painted at slightly different angles, so a hard switch would make the rim jump. */
+const FADE_MS = 250
 const SOURCES: StewSourceId[] = ['bowl', 'jug', 'wood']
 const still = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -58,6 +60,20 @@ const stars = computed(() => mistakeStars(restarts.value, 1, 3))
 const key = computed(() => potKey(state.value))
 const fire = computed(() => fireSize(state.value))
 const ready = computed(() => stewReady(state.value))
+/** While a new picture of the pot fades in, the old one stays under it (the pot never disappears); with reduced motion the picture is switched at once. */
+const underKey = ref<PotKey | null>(null)
+let fadeToken = 0
+watch(key, (_, old) => {
+  const token = ++fadeToken
+  if (still) {
+    underKey.value = null
+    return
+  }
+  underKey.value = old
+  later(() => {
+    if (token === fadeToken) underKey.value = null
+  }, FADE_MS)
+})
 
 const timer = window.setInterval(tick, TICK)
 onBeforeUnmount(() => {
@@ -186,7 +202,8 @@ const esauStyle = computed(() => ({ ...at([esau.value.x, esau.value.y]), transfo
         span(v-if="fire > 0" class="st-flame" :class="{ big: fire === 2, still }" :style="{ left: `${game.potAt[0]}%`, top: `${game.potAt[1] + 14}%` }" aria-hidden="true")
           GameImage(:src="game.flame" :ratio="0.8" colour="#f08a2a")
         span(ref="potEl" class="st-pot" :style="at(game.potAt)" aria-hidden="true")
-          GameImage(:src="game.pot[key]" :ratio="1" colour="#7a6f66" round)
+          GameImage(v-if="underKey" :key="`under-${underKey}`" :src="game.pot[underKey]" :ratio="1" colour="#7a6f66" round class="st-pot-under")
+          GameImage(:key="key" :src="game.pot[key]" :ratio="1" colour="#7a6f66" round :class="{ 'st-pot-fade': !!underKey }")
         span(v-if="phase === 'simmer'" class="st-steam" :class="{ still }" :style="{ left: `${game.potAt[0]}%`, top: `${game.potAt[1] - 12}%` }" aria-hidden="true")
           GameImage(:src="game.steam" :ratio="1" colour="#ffffff" round)
         span(class="st-esau" :class="{ still }" :style="esauStyle" aria-hidden="true")
@@ -290,6 +307,16 @@ const esauStyle = computed(() => ({ ...at([esau.value.x, esau.value.y]), transfo
   transform: translate(-50%, -50%)
   z-index: 3
   pointer-events: none
+
+.st-pot-under
+  position: absolute
+  left: 0
+  top: 0
+
+// the new picture fades in over the old one
+.st-pot-fade
+  position: relative
+  animation: st-fade-in 250ms ease-out
 
 .st-steam
   position: absolute
@@ -396,6 +423,12 @@ const esauStyle = computed(() => ({ ...at([esau.value.x, esau.value.y]), transfo
   white-space: nowrap
   border: 0
 
+@keyframes st-fade-in
+  from
+    opacity: 0
+  to
+    opacity: 1
+
 @keyframes st-rise
   0%
     opacity: 0.3
@@ -415,7 +448,7 @@ const esauStyle = computed(() => ({ ...at([esau.value.x, esau.value.y]), transfo
     margin-left: 5px
 
 @media (prefers-reduced-motion: reduce)
-  .st-steam, .st-src.wiggle
+  .st-steam, .st-src.wiggle, .st-pot-fade
     animation: none
   .st-esau, .st-flame
     transition: none

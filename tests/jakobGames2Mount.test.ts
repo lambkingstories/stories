@@ -875,7 +875,8 @@ describe('Die Suppe kochen, bevor Esau kommt (stew)', () => {
   const cook = async (w: W) => {
     for (const i of [0, 1, 2, 2]) await tap(w, i)
   }
-  const potPicture = (w: W) => w.find('.st-pot img').attributes('src')
+  // the picture that is on top (while a new one fades in, the old one lies under it)
+  const potPicture = (w: W) => w.findAll('.st-pot img').at(-1)!.attributes('src')
   const esauX = (w: W) => Number(/left: ([\d.]+)%/.exec(w.find('.st-esau').attributes('style') ?? '')![1])
 
   it('one soup is the goal; hint, scene, pot, three sources with names, no counter, no hourglass; Esau stands far away at the start of the road', async () => {
@@ -910,6 +911,43 @@ describe('Die Suppe kochen, bevor Esau kommt (stew)', () => {
     expect(w.find('.st-flame').classes()).toContain('big')
     expect(w.findAll('.st-dot.on')).toHaveLength(2)
     expect(played.filter((n) => n === 'snap')).toHaveLength(4)
+  })
+
+  it('the pictures of the pot fade into each other: the new one comes over the old one (the pot never disappears), after 250 ms only the new one is there', async () => {
+    const w = await open()
+    expect(w.findAll('.st-pot img')).toHaveLength(1)
+    await tap(w, 0)
+    const imgs = w.findAll('.st-pot img')
+    expect(imgs).toHaveLength(2)
+    expect(imgs[0]!.attributes('src')).toContain('topf-leer')
+    expect(imgs[1]!.attributes('src')).toContain('topf-linsen')
+    expect(w.find('.st-pot-under').exists()).toBe(true)
+    expect(w.find('.st-pot-fade').exists()).toBe(true)
+    await tick(200)
+    expect(w.findAll('.st-pot img')).toHaveLength(2)
+    await tick(100)
+    expect(w.findAll('.st-pot img')).toHaveLength(1)
+    expect(w.find('.st-pot img').attributes('src')).toContain('topf-linsen')
+    expect(w.find('.st-pot-under').exists()).toBe(false)
+    expect(w.find('.st-pot-fade').exists()).toBe(false)
+  })
+
+  it('a second change during the fade keeps one old picture under the new one and ends with only the newest; a thing that changes nothing in the pot (wood) does not fade', async () => {
+    const w = await open()
+    await tap(w, 0)
+    await tick(100)
+    await tap(w, 1)
+    expect(w.findAll('.st-pot img')).toHaveLength(2)
+    expect(w.findAll('.st-pot img')[0]!.attributes('src')).toContain('topf-linsen')
+    expect(w.findAll('.st-pot img')[1]!.attributes('src')).toContain('topf-suppe')
+    // the first timer must not take the old picture away early
+    await tick(200)
+    expect(w.findAll('.st-pot img')).toHaveLength(2)
+    await tick(100)
+    expect(w.findAll('.st-pot img')).toHaveLength(1)
+    expect(w.find('.st-pot img').attributes('src')).toContain('topf-suppe')
+    await tap(w, 2)
+    expect(w.findAll('.st-pot img')).toHaveLength(1)
   })
 
   it('any order is fine: the wood first, the water, the lentils last; the soup cooks only when all four things are there', async () => {
@@ -1066,6 +1104,9 @@ describe('Die Suppe kochen, bevor Esau kommt (stew)', () => {
     try {
       const w = await open()
       expect(w.find('.st-esau').classes()).toContain('still')
+      await tap(w, 0)
+      expect(w.findAll('.st-pot img')).toHaveLength(1)
+      expect(w.find('.st-pot img').attributes('src')).toContain('topf-linsen')
       await tick(2000)
       expect(esauX(w)).toBe(82)
       await tick(4000)
