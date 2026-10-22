@@ -402,7 +402,7 @@ describe('Gideon: English', () => {
       const deQ = s.questions.map((q) => q.options.length)
       expect(e.text, `paragraphs ${s.id}`).toHaveLength(dePar)
       expect(e.questions.map((q: any) => q.options.length), `answers ${s.id}`).toEqual(deQ)
-      expect(e.audio, `no English recording yet: ${s.id}`).toBeUndefined()
+      expect(e.audio, `English recording ${s.id}`).toBe(`audio/abenteuer/gideon/geschichte-${String(s.id).padStart(2, '0')}-en-v4.mp3`)
     })
     expect(overlay.exam).toHaveLength(6)
     const texts: string[] = []

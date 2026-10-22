@@ -2,7 +2,7 @@
  * English texts of the adventure "Gideon" (8 to 10 years): the same shape as `../gideon.ts`, only the words. Laid over the German data by
  * `localize()`; the right answer is the first option, exactly as in the German data. Names and wording follow the public-domain World English Bible and King James Version
  * (Deborah, Barak, Sisera, Gideon, Joash, Ophrah, Purah, Jezreel, Harod, Oreb and Zeeb, Jerubbaal); the stories are retold in our own words, "God" everywhere. The source as a readable file: D:/Claude/Abenteuer-Gideon/ENGLISCH/.
- * There are no English recordings yet (no `audio`): the app then reads with the voice of the device.
+ * English recordings: geschichte-NN-en-v4.mp3 (voice Achernar), set at the end of this file.
  */
 import type { Journey } from '@/types/adventure'
 import type { TextOverlay } from '../localize'
@@ -202,3 +202,8 @@ export const gideonEn: TextOverlay<Journey> = {
     { q: 'What does Gideon answer when they want to make him ruler?', options: ['“God shall be your Lord.”', '“Yes, I will be your king.”', '“My son shall be it.”'] }
   ]
 }
+
+// the English recordings of the stories (voice Achernar, Gemini, 22.10.2026): geschichte-NN-en-v4.mp3, one per stage in the order of the stages
+gideonEn.stages!.forEach((s, i) => {
+  s.audio = `audio/abenteuer/gideon/geschichte-${String(i + 1).padStart(2, '0')}-en-v4.mp3`
+})
