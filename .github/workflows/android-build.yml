@@ -2,7 +2,7 @@ name: Android Build & Sign
 
 # Builds the signed Play Store bundle (.aab) and an installable .apk.
 # Upload the .aab by hand in the Play Console (Test and release -> Closed testing).
-# Last build request: 2026-10-22 (all recordings German and English, new Joshua Jordan picture, Jonah and Daniel, test build with all new adventures).
+# Last build request: 2026-10-22 (Anton's stage pictures built in, new Daniel pictures 4 to 6, Joshua Jordan).
 #
 # Needs the repository secrets ANDROID_KEYSTORE_BASE64 (the release keystore,
 # base64) and ANDROID_KEYSTORE_PASSWORD (store = key password; alias `lambking`).
