@@ -53,8 +53,9 @@ describe('Adam und Eva: the scaffold', () => {
     for (const f of [...Array.from({ length: 9 }, (_, i) => `images/abenteuer/adam-eva/etappe-bild-${String(i + 1).padStart(2, '0')}.webp`), 'images/abenteuer/adam-eva/medaille.webp', 'images/abenteuer/adam-eva/geschenk.webp', ...[1, 2, 3, 4].map((n) => `images/abenteuer/adam-eva/karte-pano-v3-${n}.webp`), ...['licht', 'garten', 'strom', 'abend'].map((m) => `audio/abenteuer/adam-eva/musik-${m}-v1.mp3`)]) expect(own, f).toContain(f)
     // the pictures of the games and the recordings are part of the pack only when the stages are released
     expect(own.some((f) => f.includes('spiele/adam-eva/'))).toBe(adamEva.stages.every((s) => !s.soon))
-    // the six German recordings of the unchanged texts are linked (files "-v3"; stages 3, 7 and 8 wait for new recordings after the Bibeltreue correction of 21.10.2026), no English one yet (the English app reads with the voice of the device)
+    // the nine German recordings are linked (files "-v3"; stages 3, 7 and 8 were recorded again after the Bibeltreue correction of 21.10.2026 as "-v4"); the English ones belong to the English pack, not to the German one
     expect(own.filter((f) => /geschichte-0\d-v3\.mp3$/.test(f))).toHaveLength(6)
+    expect(own.filter((f) => /geschichte-0\d-v4\.mp3$/.test(f))).toHaveLength(3)
     expect(own.some((f) => /geschichte-0\d-en-v\d\.mp3$/.test(f))).toBe(false)
   })
 
