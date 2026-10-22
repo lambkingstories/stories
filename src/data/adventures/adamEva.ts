@@ -403,12 +403,11 @@ adamEva.music = [
   'audio/abenteuer/adam-eva/musik-abend-v1.mp3'
 ]
 
-// the German recordings of the stories (voice Achernar, text version 3 = files "-v3"); there are no English ones yet, so the English app reads with the voice of the device
-// Bibeltreue-Korrektur 21.10.2026: the texts of these stages were changed (see NEUAUFNAHME-BIBELTREUE-2026-10-21.md in the adventure folder), so the old recordings no longer match;
-// until they are recorded again the app reads them with the voice of the device. Take the number out of this list when the new file (-v4) is in `public/`.
-const TO_RERECORD = [3, 7, 8]
+// the German recordings of the stories (voice Achernar); there are no English ones yet, so the English app reads with the voice of the device
+// Bibeltreue-Korrektur 21.10.2026: the texts of these stages were changed (see NEUAUFNAHME-BIBELTREUE-2026-10-21.md in the adventure folder) and recorded again as "-v4"; the others are "-v3".
+const RECORDED_AGAIN = [3, 7, 8]
 for (const s of adamEva.stages) {
-  const file = TO_RERECORD.includes(s.id) ? undefined : `audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`
+  const file = `audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-${RECORDED_AGAIN.includes(s.id) ? 'v4' : 'v3'}.mp3`
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 

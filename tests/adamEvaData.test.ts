@@ -32,13 +32,9 @@ describe('Adam und Eva: stories and questions', () => {
       expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(90)
       expect(words, `words ${s.id}`).toBeLessThanOrEqual(145)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      if ([3, 7, 8].includes(s.id)) {
-        // text changed in the Bibeltreue correction of 21.10.2026: no recording until the new one (NEUAUFNAHME-BIBELTREUE-2026-10-21.md), the device voice reads
-        expect(s.audio, `no German recording yet ${s.id}`).toBeUndefined()
-      } else {
-        expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`)
-        expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
-      }
+      // text changed in the Bibeltreue correction of 21.10.2026 (NEUAUFNAHME-BIBELTREUE-2026-10-21.md): recorded again as "-v4"
+      expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-${[3, 7, 8].includes(s.id) ? 'v4' : 'v3'}.mp3`)
+      expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
       expect(s.image).toBe(`images/abenteuer/adam-eva/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
     }
   })
