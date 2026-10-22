@@ -183,7 +183,7 @@ export const abraham: Journey = {
   subtitle: 'Gott ruft, Gott hält Wort',
   age: '8-10',
   downloadMb: 15, // 14,7 MB gezählt am 21.10.2026 mit den zwölf neuen Etappenbildern und der Karte v3 (der Test sagt die echte Größe)
-  medal: `${IMG}medaille.webp`, // Abraham und das Zelt unter dem Sternenhimmel (Ruhe, Verheißung)
+  medal: `${IMG}medaille-v3.webp`, // Abraham und das Zelt unter dem Sternenhimmel (Ruhe, Verheißung)
   // Geschenk-Ausmalbild: Abraham und Sara vor dem Zelt unter dem Sternenhimmel, mit Schafen, friedlich
   gift: { title: 'Abraham und Sara vor dem Zelt unter dem Sternenhimmel', image: `${IMG}geschenk.webp` },
   // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v3 mit zwölf Orten und dem Ziel) mit Stationen und Perlenweg aus abrahamPath.ts

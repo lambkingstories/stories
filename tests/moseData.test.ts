@@ -353,7 +353,7 @@ describe('Mose: the games, and the placeholders until the pictures come', () => 
   })
 
   it('the medal and the gift picture are the own ones of Mose; the gift has its final title', () => {
-    expect(mose.medal).toBe('images/abenteuer/mose/medaille-v2.webp')
+    expect(mose.medal).toBe('images/abenteuer/mose/medaille-v3.webp')
     expect(existsSync(`public/${mose.medal}`)).toBe(true)
     expect(mose.gift.title).toBe('Der Weg durch das Meer')
     expect(mose.gift.image).toBe('images/abenteuer/mose/geschenk.webp')

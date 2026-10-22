@@ -147,7 +147,7 @@ export const babel: Journey = {
   subtitle: 'Eine Stadt und ein Turm',
   age: '8-10',
   downloadMb: 10, // gut 10 MB gerechnet am 21.10.2026 mit der neuen Karte v3 (vier Stücke zusammen 4,2 MB) (der Test sagt die echte Größe)
-  medal: `${IMG}medaille.webp`, // Der Turm (Stufenturm aus Lehmziegeln) in der Ebene im Morgenlicht
+  medal: `${IMG}medaille-v3.webp`, // Der Turm (Stufenturm aus Lehmziegeln) in der Ebene im Morgenlicht
   // Geschenk-Ausmalbild: der Turm aus Ziegeln mit vielen Bauleuten bei Sonnenaufgang (unvollendet, friedlich)
   gift: { title: 'Der Turm aus Ziegeln', image: `${IMG}geschenk.webp` },
   // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v3 mit sechs Orten und dem Ziel) mit Stationen und Perlenweg aus babelPath.ts

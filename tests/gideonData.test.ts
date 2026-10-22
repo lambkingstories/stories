@@ -328,7 +328,7 @@ describe('Gideon: the games, and the placeholders until the pictures come', () =
   })
 
   it('the medal and the gift picture are the own ones of Gideon; the gift has its final title', () => {
-    expect(gideon.medal).toBe('images/abenteuer/gideon/medaille-v2.webp')
+    expect(gideon.medal).toBe('images/abenteuer/gideon/medaille-v3.webp')
     expect(existsSync(`public/${gideon.medal}`)).toBe(true)
     expect(gideon.gift.title).toBe('Die Nacht mit den Krügen und Fackeln')
     expect(gideon.gift.image).toBe('images/abenteuer/gideon/geschenk.webp')

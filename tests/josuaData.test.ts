@@ -316,7 +316,7 @@ describe('Josua: the games, and the placeholders until the pictures come', () =>
   })
 
   it('the medal and the gift picture are the own ones of Josua; the gift has its final title', () => {
-    expect(josua.medal).toBe('images/abenteuer/josua/medaille-v2.webp')
+    expect(josua.medal).toBe('images/abenteuer/josua/medaille-v3.webp')
     expect(existsSync(`public/${josua.medal}`)).toBe(true)
     expect(josua.gift.title).toBe('Die Posaunen von Jericho')
     expect(josua.gift.image).toBe('images/abenteuer/josua/geschenk.webp')

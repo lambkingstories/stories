@@ -199,7 +199,7 @@ export const adamEva: Journey = {
   subtitle: 'Der Garten Eden',
   age: '8-10',
   downloadMb: 15, // gut 14 MB gezählt nach der neuen Karte (vier Stücke zusammen 5,6 MB) am 20.10.2026 (der Test sagt die echte Größe)
-  medal: `${IMG}medaille.webp`, // Der Garten Eden (Lichtung mit Strom, Bäumen und warmem Morgenlicht, ohne Menschen)
+  medal: `${IMG}medaille-v3.webp`, // Der Garten Eden (Lichtung mit Strom, Bäumen und warmem Morgenlicht, ohne Menschen)
   // Geschenk-Ausmalbild: Adam und Eva im Garten mit den Tieren, im Hintergrund der Baum des Lebens (nur Geschenk, nicht mehr Aufgabe der Etappe 9)
   gift: { title: 'Adam und Eva im Garten', image: `${IMG}geschenk.webp` },
   // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v3) mit Stationen und Perlenweg aus adamEvaPath.ts

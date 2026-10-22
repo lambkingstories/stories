@@ -213,7 +213,7 @@ export const gideon: Journey = {
   subtitle: 'Der Kleinste und die Dreihundert',
   age: '8-10',
   downloadMb: 12, // gemessen am 21.10.2026 mit den eigenen Etappenbildern (Variante a) und der eigenen Karte; ohne die noch fehlenden Aufnahmen
-  medal: 'images/abenteuer/gideon/medaille-v2.webp', // Der Krug mit dem Licht (Tonkrug mit Fackel, Horn, Lichterkette in der Nacht, Goldring)
+  medal: 'images/abenteuer/gideon/medaille-v3.webp', // Der Krug mit dem Licht (Tonkrug mit Fackel, Horn, Lichterkette in der Nacht, Goldring)
   // Geschenk-Ausmalbild: Die Nacht mit den Krügen und Fackeln (Männer mit Horn und Krug auf dem Hügel bei Nacht) (Konturzeichnung)
   gift: { title: 'Die Nacht mit den Krügen und Fackeln', image: `${PICS}geschenk.webp` },
   // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v3 mit zwölf Orten und dem Ziel) mit Stationen und Perlenweg aus gideonPath.ts

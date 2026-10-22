@@ -12,7 +12,8 @@ import ZIconography from '@/components/atoms/ZIconography.vue'
 import AppHeader from '@/components/molecules/AppHeader.vue'
 import AdvDialog from '@/components/molecules/AdvDialog.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
-import { comingSoon, journeys } from '@/data/adventures'
+import { journeys } from '@/data/adventures'
+import { groupByEpoch } from '@/data/adventures/timeline'
 import useAdventure from '@/use/useAdventure'
 import useButtonSounds from '@/use/useButtonSounds'
 import { deleteArtwork, pageArtworkId } from '@/use/useArtworks'
@@ -52,6 +53,19 @@ const items = computed(() =>
 )
 
 const pack = useJourneyPack()
+
+// the time line of the Bible: one group per epoch, the adventures that are not built stand closed in their place
+const groups = computed(() => groupByEpoch(items.value))
+
+// the adventure to go on with: the first one that was begun and is not finished (in the order of the time line)
+const goOn = computed(() => {
+  for (const g of groups.value) for (const e of g.entries) if (e.item && e.item.begun && e.item.doneCount < e.item.total) return e.item
+  return null
+})
+
+function jumpTo(id: string) {
+  document.getElementById(`epoch-${id}`)?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' })
+}
 
 // the window of the journey that was tapped
 const detailId = ref('')
@@ -154,21 +168,38 @@ async function doDelete() {
             span(class="stars-fill" :style="{ width: Math.round(starShare * 100) + '%' }")
         span(class="stars-count") {{ starTotal }} / {{ starMax }}
 
-      //- all journeys as small emblems: a tap opens the journey's window, which can be closed again
-      section(class="lk-panel emblems")
-        div(class="emblem-grid")
-          button(v-for="it in items" :key="it.journey.id" type="button" class="emblem" @click="detailId = it.journey.id")
-            span(class="emblem-art")
-              img(:src="prependBaseUrl(it.journey.medal)" alt="" draggable="false")
-              img(v-if="it.medal" :src="ui(`pokal-${it.medal === 'silver' ? 'silber' : it.medal}`)" alt="" class="emblem-cup" draggable="false")
-            span(class="emblem-name") {{ it.journey.title }}
-            AdventureStars(:stars="it.stars" :size="18")
-          div(v-for="c in comingSoon" :key="c.id" class="emblem is-closed")
-            span(class="emblem-art")
-              img(:src="ui('coin-locked')" alt="" draggable="false")
-              img(:src="ui('lock')" alt="" class="emblem-lock" draggable="false")
-            span(class="emblem-name") {{ c.title }}
-            span(class="emblem-soon") {{ t('app.adventure.soonLabel') }}
+      //- the time line of the Bible: a band of epochs to jump to, the adventure to go on with, and a numbered grid for every epoch
+      div(class="chips" role="navigation" :aria-label="t('app.adventure.timelineLabel')")
+        button(v-for="g in groups" :key="g.epoch.id" type="button" class="chip" @click="jumpTo(g.epoch.id)") {{ g.title }}
+
+      button(v-if="goOn" type="button" class="go-on" @click="detailId = goOn.journey.id")
+        img(:src="prependBaseUrl(goOn.journey.medal)" alt="" draggable="false" class="go-on-art")
+        span(class="go-on-body")
+          span(class="go-on-kicker") {{ t('app.adventure.continueJourney') }}
+          span(class="go-on-title") {{ goOn.journey.title }}
+          span(class="go-on-bar" aria-hidden="true")
+            span(class="go-on-fill" :style="{ width: Math.round((goOn.doneCount / goOn.total) * 100) + '%' }")
+          span(class="go-on-chap") {{ t('app.adventure.chapterOf', { n: Math.min(goOn.doneCount + 1, goOn.total), total: goOn.total }) }}
+
+      section(v-for="g in groups" :key="g.epoch.id" :id="`epoch-${g.epoch.id}`" class="epoch")
+        h2(class="epoch-title") {{ g.title }}
+          small(class="epoch-sub") {{ g.sub }}
+        div(class="tile-grid")
+          template(v-for="e in g.entries" :key="e.id")
+            button(v-if="e.item" type="button" class="tile" @click="detailId = e.item.journey.id")
+              span(class="tile-no") {{ e.nr }}
+              span(class="tile-art")
+                img(:src="prependBaseUrl(e.item.journey.medal)" alt="" draggable="false")
+                img(v-if="e.item.medal" :src="ui(`pokal-${e.item.medal === 'silver' ? 'silber' : e.item.medal}`)" alt="" class="tile-cup" draggable="false")
+              span(class="tile-name") {{ e.title }}
+              AdventureStars(:stars="e.item.stars" :size="16")
+            div(v-else class="tile is-closed")
+              span(class="tile-no") {{ e.nr }}
+              span(class="tile-art")
+                img(:src="ui('coin-locked')" alt="" draggable="false")
+                img(:src="ui('lock')" alt="" class="tile-lock" draggable="false")
+              span(class="tile-name") {{ e.title }}
+              span(class="tile-soon") {{ t('app.adventure.soonLabel') }}
 
     //- the window of one journey
     AdvDialog(v-if="detail" :title="detail.journey.title" @close="detailId = ''")
@@ -312,22 +343,130 @@ $ink: var(--lk-text)
   font-size: 1.1rem
   font-variant-numeric: tabular-nums
 
-.emblems
-  padding: 18px 14px
+.chips
+  display: flex
+  gap: 8px
+  overflow-x: auto
+  margin: 0 -16px
+  padding: 4px 16px 8px
+  position: sticky
+  top: 0
+  z-index: 3
+  background: var(--lk-bg)
+  scrollbar-width: none
 
-.emblem-grid
+  &::-webkit-scrollbar
+    display: none
+
+.chip
+  flex: 0 0 auto
+  padding: 8px 14px
+  border: 1px solid var(--lk-line)
+  border-radius: 999px
+  background: var(--lk-surface)
+  color: $ink
+  font: inherit
+  font-size: 0.9rem
+  font-weight: 700
+  white-space: nowrap
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+  touch-action: manipulation
+
+  &:active
+    transform: scale(0.96)
+
+.go-on
+  display: flex
+  align-items: center
+  gap: 14px
+  width: 100%
+  padding: 12px 16px
+  border: 1px solid #e8cf86
+  border-radius: var(--lk-r-group)
+  background: linear-gradient(135deg, #fff3cf, #fde6a8)
+  color: #3a2a18
+  font: inherit
+  text-align: left
+  cursor: pointer
+  box-shadow: var(--lk-shadow)
+  -webkit-tap-highlight-color: transparent
+  touch-action: manipulation
+
+  &:active
+    transform: scale(0.98)
+
+.go-on-art
+  flex: 0 0 auto
+  width: 84px
+  height: 84px
+  object-fit: contain
+  filter: drop-shadow(0 6px 8px rgba(60, 40, 10, 0.35))
+
+.go-on-body
+  flex: 1
+  min-width: 0
+  display: flex
+  flex-direction: column
+  gap: 4px
+
+.go-on-kicker
+  font-size: 0.85rem
+  font-weight: 800
+  color: #8a3a1a
+
+.go-on-title
+  font-size: 1.3rem
+  font-weight: 800
+  line-height: 1.15
+
+.go-on-bar
+  display: block
+  height: 8px
+  border-radius: 999px
+  background: #f2e2b0
+  overflow: hidden
+
+.go-on-fill
+  display: block
+  height: 100%
+  border-radius: 999px
+  background: #c9962a
+
+.go-on-chap
+  font-size: 0.85rem
+  color: #6b5a3f
+
+.epoch
+  scroll-margin-top: 56px
+
+.epoch-title
+  margin: 6px 4px 10px
+  font-size: 1.2rem
+  font-weight: 800
+
+.epoch-sub
+  margin-left: 8px
+  font-size: 0.8rem
+  font-weight: 600
+  color: var(--lk-muted)
+
+.tile-grid
   display: grid
   grid-template-columns: repeat(3, minmax(0, 1fr))
-  gap: 18px 10px
+  gap: 10px
 
-.emblem
+.tile
+  position: relative
   display: flex
   flex-direction: column
   align-items: center
   gap: 5px
-  padding: 0
-  border: 0
-  background: transparent
+  padding: 14px 4px 10px
+  border: 1px solid var(--lk-line)
+  border-radius: var(--lk-r-group)
+  background: var(--lk-surface)
+  box-shadow: var(--lk-shadow)
   font: inherit
   color: inherit
   text-align: center
@@ -340,28 +479,41 @@ $ink: var(--lk-text)
 
   &.is-closed
     cursor: default
-    opacity: 0.85
+    opacity: 0.8
 
-.emblem-art
+.tile-no
+  position: absolute
+  left: 6px
+  top: 6px
+  min-width: 22px
+  padding: 1px 6px
+  border-radius: 999px
+  background: var(--lk-track)
+  color: var(--lk-muted)
+  font-size: 0.72rem
+  font-weight: 800
+  line-height: 1.4
+
+.tile-art
   position: relative
   display: block
-  width: 88%
-  max-width: 120px
+  width: 82%
+  max-width: 110px
 
   img
     display: block
     width: 100%
     height: auto
-    filter: drop-shadow(0 8px 10px rgba(60, 40, 10, 0.4))
+    filter: drop-shadow(0 6px 8px rgba(60, 40, 10, 0.35))
 
-.emblem-art .emblem-cup
+.tile-art .tile-cup
   position: absolute
   right: -12%
   bottom: -6%
   width: 40%
   pointer-events: none
 
-.emblem-art .emblem-lock
+.tile-art .tile-lock
   position: absolute
   left: 50%
   top: 50%
@@ -369,13 +521,13 @@ $ink: var(--lk-text)
   transform: translate(-50%, -50%)
   filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.35))
 
-.emblem-name
+.tile-name
   font-weight: 800
-  font-size: 0.95rem
+  font-size: 0.85rem
   line-height: 1.15
 
-.emblem-soon
-  font-size: 0.8rem
+.tile-soon
+  font-size: 0.75rem
   color: var(--lk-muted)
 
 .journey-title
