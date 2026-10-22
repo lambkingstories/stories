@@ -589,3 +589,53 @@ describe('the hidden journey Jona (id jona)', () => {
     expect(m.journeys.filter((j) => j.id === 'jona')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Daniel (id daniel)', () => {
+  it('a normal build (without Daniel) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_DANIEL', 'false')
+    open('?daniel=daniel-vorschau-m3k6')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('daniel')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_DANIEL', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?daniel=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.DANIEL_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?daniel=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_DANIEL', 'true')
+    const first = await load()
+    open(`?daniel=${first.DANIEL_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.DANIEL_UNLOCK_CODE).toBe('daniel-vorschau-m3k6')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'daniel'])
+    expect(localStorage.getItem('lk-preview-daniel')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('daniel')?.stages.length).toBe(9)
+    open('?daniel=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-daniel')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_DANIEL) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_DANIEL', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'daniel')).toHaveLength(1)
+  })
+})

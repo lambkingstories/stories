@@ -1,4 +1,4 @@
-import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles } from './vite.config.noah'
+import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles } from './vite.config.noah'
 import { fileURLToPath, URL } from 'node:url'
 import { resolve, dirname } from 'node:path'
 import { rmSync } from 'node:fs'
@@ -94,6 +94,10 @@ export default defineConfig(({ mode }) => {
       // The same for "Jona" (`VITE_INCLUDE_JONA=true` / `vite --mode jona`).
       if (env.VITE_SHOW_JONA !== 'true' && env.VITE_INCLUDE_JONA !== 'true') {
         stripJonaFiles(outDir)
+      }
+      // The same for "Daniel" (`VITE_INCLUDE_DANIEL=true` / `vite --mode daniel`).
+      if (env.VITE_SHOW_DANIEL !== 'true' && env.VITE_INCLUDE_DANIEL !== 'true') {
+        stripDanielFiles(outDir)
       }
     }
   }

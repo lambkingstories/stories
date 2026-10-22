@@ -20,9 +20,9 @@ localize(comingSoon, [{ title: 'Adam and Eve' }, { title: 'Noah' }, { title: 'Th
 
 /**
  * Noah, Adam and Eve, the Tower of Babel, Abraham and Jacob are not public yet (texts and pictures are not released). A build that contains one of them
- * (`VITE_INCLUDE_NOAH=true`, `VITE_INCLUDE_ADAM=true`, `VITE_INCLUDE_BABEL=true`, `VITE_INCLUDE_ABRAHAM=true`, `VITE_INCLUDE_JAKOB=true`, `VITE_INCLUDE_JOSUA=true`, `VITE_INCLUDE_GIDEON=true`, `VITE_INCLUDE_MOSE=true`, `VITE_INCLUDE_JONA=true`, the hidden test build) does not show it to everybody: it shows only
- * on a device that has been unlocked once by opening the app with the unlock link (`/?noah=<code>`, `/?adam=<code>`, `/?babel=<code>`, `/?abraham=<code>`, `/?jakob=<code>`, `/?josua=<code>`, `/?gideon=<code>`, `/?mose=<code>`, `/?jona=<code>`); the unlock is
- * kept on the device (`localStorage`), `?noah=off` / `?adam=off` / `?babel=off` / `?abraham=off` / `?jakob=off` / `?josua=off` / `?gideon=off` / `?mose=off` / `?jona=off` takes it away again. `VITE_SHOW_NOAH=true` / `VITE_SHOW_ADAM=true` /
+ * (`VITE_INCLUDE_NOAH=true`, `VITE_INCLUDE_ADAM=true`, `VITE_INCLUDE_BABEL=true`, `VITE_INCLUDE_ABRAHAM=true`, `VITE_INCLUDE_JAKOB=true`, `VITE_INCLUDE_JOSUA=true`, `VITE_INCLUDE_GIDEON=true`, `VITE_INCLUDE_MOSE=true`, `VITE_INCLUDE_JONA=true`, `VITE_INCLUDE_DANIEL=true`, the hidden test build) does not show it to everybody: it shows only
+ * on a device that has been unlocked once by opening the app with the unlock link (`/?noah=<code>`, `/?adam=<code>`, `/?babel=<code>`, `/?abraham=<code>`, `/?jakob=<code>`, `/?josua=<code>`, `/?gideon=<code>`, `/?mose=<code>`, `/?jona=<code>`, `/?daniel=<code>`); the unlock is
+ * kept on the device (`localStorage`), `?noah=off` / `?adam=off` / `?babel=off` / `?abraham=off` / `?jakob=off` / `?josua=off` / `?gideon=off` / `?mose=off` / `?jona=off` / `?daniel=off` takes it away again. `VITE_SHOW_NOAH=true` / `VITE_SHOW_ADAM=true` /
  * `VITE_SHOW_BABEL=true` / `VITE_SHOW_ABRAHAM=true` / `VITE_SHOW_JAKOB=true` / `VITE_SHOW_JOSUA=true` / `VITE_SHOW_GIDEON=true` / `VITE_SHOW_MOSE=true` (local `vite --mode noah` / `--mode adam` / `--mode babel` / `--mode abraham` / `--mode jakob`) shows it always.
  * A normal build contains none of it: the conditions below are constants there, so the chunk with the data of the journey is left out (and the
  * folders of its pictures and recordings are taken out of the build, see `vite.config.noah.ts`). Only data of our own server is loaded, never
@@ -46,6 +46,8 @@ export const MOSE_PREVIEW_KEY = 'lk-preview-mose'
 export const MOSE_UNLOCK_CODE = 'mose-vorschau-q4t8'
 export const JONA_PREVIEW_KEY = 'lk-preview-jona'
 export const JONA_UNLOCK_CODE = 'jona-vorschau-h5v9'
+export const DANIEL_PREVIEW_KEY = 'lk-preview-daniel'
+export const DANIEL_UNLOCK_CODE = 'daniel-vorschau-m3k6'
 
 /** A journey that is shown only on unlocked devices: the name of its link (`?<param>=<code>`), where the unlock is kept, and how it is loaded. */
 interface PreviewJourney {
@@ -142,6 +144,16 @@ function previewJourneys(): PreviewJourney[] {
       key: JONA_PREVIEW_KEY,
       always: import.meta.env.VITE_SHOW_JONA === 'true',
       load: async () => (await import('@/data/adventures/jona')).jona
+    })
+  }
+  if (import.meta.env.VITE_INCLUDE_DANIEL === 'true' || import.meta.env.VITE_SHOW_DANIEL === 'true') {
+    list.push({
+      id: 'daniel',
+      param: 'daniel',
+      code: DANIEL_UNLOCK_CODE,
+      key: DANIEL_PREVIEW_KEY,
+      always: import.meta.env.VITE_SHOW_DANIEL === 'true',
+      load: async () => (await import('@/data/adventures/daniel')).daniel
     })
   }
   if (import.meta.env.VITE_INCLUDE_NOAH === 'true' || import.meta.env.VITE_SHOW_NOAH === 'true') {

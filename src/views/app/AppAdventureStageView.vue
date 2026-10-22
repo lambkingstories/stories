@@ -57,6 +57,10 @@ import GameOverboard from '@/components/molecules/games/GameOverboard.vue'
 import GameShore from '@/components/molecules/games/GameShore.vue'
 import GameSacks from '@/components/molecules/games/GameSacks.vue'
 import GameShade from '@/components/molecules/games/GameShade.vue'
+import GameDays from '@/components/molecules/games/GameDays.vue'
+import GameStatue from '@/components/molecules/games/GameStatue.vue'
+import GameLamp from '@/components/molecules/games/GameLamp.vue'
+import GameHours from '@/components/molecules/games/GameHours.vue'
 import GameWord from '@/components/molecules/games/GameWord.vue'
 import GameHush from '@/components/molecules/games/GameHush.vue'
 import GameHide from '@/components/molecules/games/GameHide.vue'
@@ -362,7 +366,7 @@ const hasPart = computed(() => partStars.value > 0 && !progress.finished.value)
 
 /** The games have a restart sign: a new key mounts the game afresh (round, mistakes and what was done begin again). */
 const gameKey = ref(0)
-const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew', 'overboard', 'shore', 'sacks', 'shade'] as const
+const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew', 'overboard', 'shore', 'sacks', 'shade', 'days', 'statue', 'lamp', 'hours'] as const
 const hasGame = computed(() => hasCountGame.value || GAME_FIELDS.some((f) => !!gameTask.value?.[f]))
 function restartGame() {
   progress.reset()
@@ -484,6 +488,10 @@ const gameKind = computed(() => {
   if (g?.shore) return 'shore'
   if (g?.sacks) return 'sacks'
   if (g?.shade) return 'shade'
+  if (g?.days) return 'days'
+  if (g?.statue) return 'statue'
+  if (g?.lamp) return 'lamp'
+  if (g?.hours) return 'hours'
   return undefined
 })
 watch(
@@ -641,6 +649,10 @@ function openGift() {
         GameShore(:key="gameKey" v-else-if="gameTask?.shore" :game="gameTask.shore" @done="taskDone")
         GameSacks(:key="gameKey" v-else-if="gameTask?.sacks" :game="gameTask.sacks" @done="taskDone")
         GameShade(:key="gameKey" v-else-if="gameTask?.shade" :game="gameTask.shade" @done="taskDone")
+        GameDays(:key="gameKey" v-else-if="gameTask?.days" :game="gameTask.days" @done="taskDone")
+        GameStatue(:key="gameKey" v-else-if="gameTask?.statue" :game="gameTask.statue" @done="taskDone")
+        GameLamp(:key="gameKey" v-else-if="gameTask?.lamp" :game="gameTask.lamp" @done="taskDone")
+        GameHours(:key="gameKey" v-else-if="gameTask?.hours" :game="gameTask.hours" @done="taskDone")
         template(v-else-if="isPaint")
           img(:src="img(taskImage)" alt="" class="stage-paint" draggable="false")
           div(class="stage-actions")

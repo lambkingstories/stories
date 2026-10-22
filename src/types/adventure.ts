@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten'
 
 export interface AdventureQuestion {
   q: string
@@ -1485,6 +1485,105 @@ export interface ShadeGame {
   rounds: ShadeRound[]
 }
 
+/** A dish of the days game: what it is (vegetables and water are Daniel's food, meat and sweets are the king's), its picture. */
+export interface DaysDish {
+  id: string
+  kind: 'veg' | 'water' | 'meat' | 'sweet'
+  image: string
+}
+/** The game "Ten days": every day four dishes stand on the table; the child taps the two that Daniel eats (vegetables and water), not the king's food. */
+export interface DaysGame {
+  background: string
+  /** All the dishes (two or more of every kind); every day takes one of each kind. */
+  dishes: DaysDish[]
+  /** How many days the test lasts (ten). */
+  days: number
+  /** The strip of the table where the dishes stand: top and height (percent of the picture) and the width of a dish (percent). */
+  table: { y: number; h: number; w: number }
+  /** How many seconds a day lasts: days 1 to 3, days 4 to 7, days 8 to 10. */
+  limits: [number, number, number]
+}
+
+/** A disc of the statue: its picture, its real size and place in the finished statue (the middle and the width in percent of the picture), and how much bigger it is drawn while it waits (a finger needs more than a head). */
+export interface StatuePiece {
+  id: string
+  image: string
+  /** The name on the label of the first round. */
+  label: string
+  w: number
+  at: { x: number; y: number }
+  /** The disc is drawn this many times bigger while it waits at the side. */
+  wait: number
+}
+/** A place of the statue (middle and size in percent of the picture); the discs snap to it. */
+export interface StatueSlot {
+  x: number
+  y: number
+  w: number
+  h: number
+}
+export interface StatueRound {
+  hint: string
+  /** The labels with the names of the metals are on the discs in this round. */
+  labels: boolean
+  /** Where each disc waits in this round (middle, percent of the picture), one for every piece in the order of `StatueGame.pieces`. */
+  homes: { x: number; y: number }[]
+}
+/** The game "The statue": the five discs of the dream are put in their places, then the stone rolls and the statue falls to dust. */
+export interface StatueGame {
+  background: string
+  /** The pieces from the head (index 0) to the feet (index 4). */
+  pieces: StatuePiece[]
+  /** The places from the head to the feet (the chest place is the body only: the arms hang beside the belly and the legs). */
+  slots: StatueSlot[]
+  stone: string
+  mountain: string
+  rounds: StatueRound[]
+}
+
+/** A sign on the wall: where it shines (middle, percent of the picture) and its picture (golden on black, blended with `screen`). */
+export interface LampSign {
+  image: string
+  x: number
+  y: number
+  w: number
+}
+export interface LampRound {
+  hint: string
+  /** The radius of the circle of light (percent of the picture width). */
+  radius: number
+  /** The flame flickers (the circle breathes) and goes out when the lamp is moved too fast. */
+  flicker: boolean
+  signs: LampSign[]
+}
+/** The game "The light on the wall": the lamp is pulled over the dark wall; the glowing signs show only in its light. */
+export interface LampGame {
+  background: string
+  lamp: string
+  /** The width of the lamp (percent of the picture). */
+  lampW: number
+  rounds: LampRound[]
+}
+
+/** A round of the hours game: how long a day takes (seconds), how many days, and how many seconds around a prayer time count. */
+export interface HoursRound {
+  hint: string
+  dayMs: number
+  days: number
+  windowMs: number
+}
+/** The game "Three times a day": the sun crosses the sky and the child taps Daniel at the three golden marks. */
+export interface HoursGame {
+  /** The opening of the window in the frame (percent of the picture): the sun crosses the sky inside it. */
+  window: { x: number; y: number; w: number; h: number }
+  sky: string
+  frame: string
+  standing: string
+  kneeling: string
+  sun: string
+  rounds: HoursRound[]
+}
+
 export interface StageTask {
   kind: TaskKind
   /** One line that says what to do. */
@@ -1573,6 +1672,10 @@ export interface StageTask {
   shore?: ShoreGame
   sacks?: SacksGame
   shade?: ShadeGame
+  days?: DaysGame
+  statue?: StatueGame
+  lamp?: LampGame
+  hours?: HoursGame
 }
 
 export interface AdventureStage {
