@@ -332,7 +332,7 @@ describe('Adam und Eva: English', () => {
       expect(s.task.hint, `hint ${s.id}`).not.toBe(de[i]!.hint)
       s.questions.forEach((q, k) => expect(q.q, `question ${s.id}.${k}`).not.toBe(de[i]!.q[k]))
       expect(s.ref, `ref ${s.id}`).toMatch(/^Genesis \d/)
-      expect(s.audio, `no English recording yet: ${s.id}`).toBeUndefined()
+      expect(s.audio, `English recording ${s.id}`).toBe(`audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-en-v4.mp3`)
       if (s.task.verse) expect(s.task.verse.rounds.map((r) => r.words.length)).toEqual(de[i]!.verse)
     })
     expect(adamEva.title).toBe('Adam and Eve')
