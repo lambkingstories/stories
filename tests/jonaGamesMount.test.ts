@@ -330,9 +330,13 @@ describe('Schatten halten (shade)', () => {
     expect(w.find('.sd-fb').text()).toContain('Jona sitzt im Schatten')
   })
 
-  it('in the sun the heat rises and says so; when it is full Jonah gets a sunstroke (a mistake, the game goes on)', async () => {
+  it('nothing moves until the child touches the roof; then in the sun the heat rises and says so; when it is full Jonah gets a sunstroke (a mistake, the game goes on)', async () => {
     const w = await open(base(1))
     expect(w.find('.sd-fb').text()).toContain('Jona sitzt in der Sonne')
+    await tick(5000)
+    expect(Number(w.findAll('.sd-track')[0]!.attributes('aria-valuenow'))).toBe(0)
+    expect(played).not.toContain('wrong')
+    await w.find('.sd-roof').trigger('keydown', { key: 'ArrowLeft' })
     await tick(2000)
     expect(Number(w.findAll('.sd-track')[0]!.attributes('aria-valuenow'))).toBeGreaterThan(40)
     await tick(2200)
@@ -357,8 +361,10 @@ describe('Schatten halten (shade)', () => {
 
   it('the whole game: both rounds in the shade, the end with three stars', async () => {
     const w = await open(base(100))
+    await w.find('.sd-roof').trigger('keydown', { key: 'ArrowLeft' })
     await tick(1500)
     await tick(2300)
+    await w.find('.sd-roof').trigger('keydown', { key: 'ArrowLeft' })
     await tick(1500)
     await tick(1600)
     expect(useTaskProgress().parts.value).toBe(10)

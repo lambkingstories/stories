@@ -45,6 +45,8 @@ const between = ref(false)
 const finished = ref(false)
 const message = ref('')
 const stroke = ref(false)
+/** The sun begins to move when the child touches the roof for the first time (so nobody gets a sunstroke while still looking). */
+const started = ref(false)
 const field = ref<HTMLElement | null>(null)
 const src = (p: string) => prependBaseUrl(p)
 const stars = computed(() => mistakeStars(strokes.value, 2, 5))
@@ -61,7 +63,7 @@ const timer = window.setInterval(() => {
   const nowMs = Date.now()
   const dt = Math.min(250, nowMs - last)
   last = nowMs
-  if (between.value || finished.value) return
+  if (!started.value || between.value || finished.value) return
   roundMs.value += dt
   heat.value = heatStep(heat.value, dt, shaded.value)
   if (shaded.value) {
@@ -106,6 +108,7 @@ function roundOver() {
     heat.value = 0
     marked = 0
     last = Date.now()
+    started.value = false
     between.value = false
     message.value = ''
   }, 2200)
@@ -128,6 +131,7 @@ function stopDrag() {
 function startDrag(e: PointerEvent) {
   if (e.button > 0) return
   e.preventDefault()
+  started.value = true
   fromPointer(e)
   window.addEventListener('pointermove', fromPointer)
   window.addEventListener('pointerup', stopDrag)
@@ -138,6 +142,7 @@ function key(e: KeyboardEvent) {
   const d = { ArrowLeft: [-KEY_STEP, 0], ArrowRight: [KEY_STEP, 0], ArrowUp: [0, -KEY_STEP], ArrowDown: [0, KEY_STEP] }[e.key as 'ArrowLeft']
   if (!d) return
   e.preventDefault()
+  started.value = true
   roof.value = { x: Math.min(96, Math.max(4, roof.value.x + d[0]!)), y: Math.min(80, Math.max(2, roof.value.y + d[1]!)) }
 }
 
