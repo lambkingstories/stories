@@ -110,3 +110,8 @@ export const babelEn: TextOverlay<Journey> = {
     { q: 'What is the city called in the end?', options: ['Babel', 'Eden', 'Ur'] }
   ]
 }
+
+// the English recordings of the stories (voice Achernar, Gemini, 22.10.2026): geschichte-NN-en-v4.mp3, one per stage in the order of the stages
+babelEn.stages!.forEach((s, i) => {
+  s.audio = `audio/abenteuer/babel/geschichte-${String(i + 1).padStart(2, '0')}-en-v4.mp3`
+})
