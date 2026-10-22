@@ -97,7 +97,7 @@ function pour(p: WaterPlant) {
     mistakes.value++
     play('wrong')
     flashOn(p.id, 'bad')
-    message.value = t('app.adventure.waterFillFirst')
+    message.value = props.game.texts?.fillFirst ?? t('app.adventure.waterFillFirst')
     wiggle(p.id)
     return
   }
@@ -105,7 +105,7 @@ function pour(p: WaterPlant) {
     mistakes.value++
     play('wrong')
     flashOn(p.id, 'bad')
-    message.value = t('app.adventure.waterEnough')
+    message.value = props.game.texts?.enough ?? t('app.adventure.waterEnough')
     wiggle(p.id)
     return
   }
@@ -114,7 +114,7 @@ function pour(p: WaterPlant) {
   progress.mark()
   play('right')
   flashOn(p.id, 'good')
-  message.value = isGrown(p) ? t('app.adventure.fbRight') : t('app.adventure.waterOnceMore')
+  message.value = isGrown(p) ? t('app.adventure.fbRight') : props.game.texts?.once ?? t('app.adventure.waterOnceMore')
   if (plants.value.every(isGrown)) roundOver()
 }
 
@@ -154,7 +154,7 @@ const riverStyle = computed(() => {
           data-drop="river"
           role="button"
           tabindex="0"
-          :aria-label="t('app.adventure.waterRiver')"
+          :aria-label="game.texts?.river ?? t('app.adventure.waterRiver')"
           @click="tapOn('river')"
           @keydown.enter.space.prevent="tapOn('river')"
         )
@@ -190,7 +190,7 @@ const riverStyle = computed(() => {
           img(:src="src(game.jugEmpty)" alt="" draggable="false")
           img(:src="src(game.jugFull)" alt="" draggable="false" class="wt-jug-full" :class="{ on: jugFull }")
       p(class="wt-fb" role="status") {{ message }}
-    GameDone(v-else :stars="stars" :text="t('app.adventure.waterDone')" @next="emit('done', stars)")
+    GameDone(v-else :stars="stars" :text="game.texts?.done ?? t('app.adventure.waterDone')" @next="emit('done', stars)")
 </template>
 
 <style scoped lang="sass">

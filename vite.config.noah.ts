@@ -107,3 +107,11 @@ export function stripJonaFiles(outDir: string) {
 export function stripDanielFiles(outDir: string) {
   strip(outDir, DANIEL_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Elia" (id `elia`) alone, in the same three places as Adam and Eva. */
+export const ELIA_ONLY_DIRS = ['images/abenteuer/elia', 'images/abenteuer/spiele/elia', 'audio/abenteuer/elia']
+
+/** Takes the folders of Elia out of a finished build. */
+export function stripEliaFiles(outDir: string) {
+  strip(outDir, ELIA_ONLY_DIRS)
+}

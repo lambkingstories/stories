@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen'
 
 export interface AdventureQuestion {
   q: string
@@ -293,6 +293,8 @@ export interface WaterGame {
   river: { x: number; y: number; w: number; h: number }
   jugEmpty: string
   jugFull: string
+  /** Own words for the messages of the game (the standard words are about a stream and a garden), e.g. when oil is poured: the name of the place to fill, "fill first", "enough", "one more", the end. */
+  texts?: { river?: string; fillFirst?: string; enough?: string; once?: string; done?: string }
   plants: WaterPlant[]
   rounds: WaterRound[]
 }
@@ -1584,6 +1586,115 @@ export interface HoursGame {
   rounds: HoursRound[]
 }
 
+/** What a raven carries in the ravens game: bread and meat are food (right to tap), the twig and nothing are not. */
+export type RavenKind = 'bread' | 'meat' | 'twig' | 'empty'
+/** One raven of a round: what it carries, how high it flies (percent of the picture height), when it enters (ms after the start of the round) and how long it takes to cross the picture. */
+export interface RavenFlight {
+  kind: RavenKind
+  y: number
+  at: number
+  dur: number
+}
+export interface RavensRound {
+  hint: string
+  flights: RavenFlight[]
+}
+/** The game "Ravens coming in": the ravens fly across the valley of the brook Cherith; the child taps those that bring bread or meat, they land at Elijah's rock; a tap on a raven with a twig or with nothing is a mistake. */
+export interface RavensGame {
+  background: string
+  /** The flying raven for each kind (a sprite that flies to the left). */
+  ravens: Record<RavenKind, string>
+  /** The food that lies on the rock after a raven has been tapped. */
+  food: { bread: string; meat: string }
+  /** The rock beside Elijah: the middle of the first piece of food, the step to the next one, and the width of a piece (percent of the picture). */
+  rock: { x: number; y: number; step: number; w: number }
+  /** The width of a raven (percent of the picture width). */
+  ravenW: number
+  rounds: RavensRound[]
+}
+
+/** A prophet that waits in the yard of the caves game. */
+export interface CavesProphet {
+  id: string
+  image: string
+  /** Read out for screen readers. */
+  label: string
+}
+/** A cave mouth: the place where a prophet is put (percent of the picture). */
+export interface CavesCave {
+  x: number
+  y: number
+  w: number
+  h: number
+}
+export interface CavesRound {
+  hint: string
+  /** How many prophets this round has (the first ones of `CavesGame.prophets`); an even number. */
+  count: number
+}
+/** The game "In two caves": the prophets wait in the yard, the child brings each one into one of the two caves; both caves must get the same number. */
+export interface CavesGame {
+  background: string
+  prophets: CavesProphet[]
+  /** The left and the right cave. */
+  caves: [CavesCave, CavesCave]
+  /** The yard where the prophets wait: the left and right end of the row (percent of the picture width), the feet line (percent of the height) of the first row, the distance to a second row, and the width of a prophet. */
+  yard: { x0: number; x1: number; y: number; row: number; w: number }
+  rounds: CavesRound[]
+}
+
+/** A cloud of the rain game: how high it drifts (percent of the picture height), when it enters (ms) and how long it takes to cross the picture. */
+export interface RainCloud {
+  y: number
+  at: number
+  dur: number
+}
+export interface RainRound {
+  hint: string
+  /** `grow`: one tiny cloud rises from the sea, two taps make it rain; `pass`: several clouds drift across, each must be tapped once. */
+  mode: 'grow' | 'pass'
+  clouds: RainCloud[]
+}
+/** The game "Clouds that bring rain": the dry mountain turns green with every cloud that rains. */
+export interface RainGame {
+  dry: string
+  green: string
+  /** The cloud in three sizes: tiny (like a hand), medium, big and heavy. */
+  clouds: [string, string, string]
+  /** The widths of the three sizes (percent of the picture width). */
+  cloudW: [number, number, number]
+  drops: string
+  /** Where the tiny cloud rises from the sea (the middle, percent of the picture). */
+  sea: { x: number; y: number }
+  rounds: RainRound[]
+}
+
+/** What is loud in the whisper game. */
+export type LoudKind = 'wind' | 'quake' | 'fire'
+export interface WhisperRound {
+  hint: string
+  /** The loud things in the order they come. */
+  order: LoudKind[]
+  /** How long each loud thing lasts, the pause between two, and the stillness before the quiet sound comes (ms). */
+  loudMs: number
+  gapMs: number
+  silenceMs: number
+}
+/** The game "The still small sound": wind, earthquake and fire come one after the other, God is not in them; the child must not tap them and taps only the quiet sound at the end. */
+export interface WhisperGame {
+  background: string
+  /** Elijah standing and listening, and Elijah with the cloak over his face (sprites). */
+  standing: string
+  veiled: string
+  /** The cave mouth where Elijah stands: the middle of his feet (percent of the picture) and his width. */
+  elia: { x: number; y: number; w: number }
+  wind: string
+  fire: string
+  cracks: string
+  feather: string
+  rounds: WhisperRound[]
+}
+
 export interface StageTask {
   kind: TaskKind
   /** One line that says what to do. */
@@ -1676,6 +1787,10 @@ export interface StageTask {
   statue?: StatueGame
   lamp?: LampGame
   hours?: HoursGame
+  ravens?: RavensGame
+  caves?: CavesGame
+  rain?: RainGame
+  whisper?: WhisperGame
 }
 
 export interface AdventureStage {
