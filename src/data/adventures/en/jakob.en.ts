@@ -202,3 +202,8 @@ export const jakobEn: TextOverlay<Journey> = {
   ]
 
 }
+
+// the English recordings of the stories (voice Achernar, Gemini, 22.10.2026): geschichte-NN-en-v4.mp3, one per stage in the order of the stages
+jakobEn.stages!.forEach((s, i) => {
+  s.audio = `audio/abenteuer/jakob/geschichte-${String(i + 1).padStart(2, '0')}-en-v4.mp3`
+})
