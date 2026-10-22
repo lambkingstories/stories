@@ -2,7 +2,7 @@
  * English texts of the adventure "Moses" (8 to 10 years): the same shape as `../mose.ts`, only the words. Laid over the German data by
  * `localize()`; the right answer is the first option, exactly as in the German data. Names and wording follow the public-domain World English Bible
  * (Moses, Aaron, Miriam, Jethro, Zipporah, Gershom, Shiphrah, Puah, Goshen, Horeb, Sinai, Red Sea); the stories are retold in our own words, "God" everywhere. The source as a readable file: D:/Claude/Abenteuer-Mose/ENGLISCH/Mose_English_Texte.md.
- * There are no English recordings yet (no `audio`): the app then reads with the voice of the device.
+ * English recordings: geschichte-NN-en-v4.mp3 (voice Achernar), set at the end of this file.
  */
 import type { Journey } from '@/types/adventure'
 import type { TextOverlay } from '../localize'
@@ -251,3 +251,8 @@ export const moseEn: TextOverlay<Journey> = {
     { q: 'What shows the people the way?', options: ['the cloud over the tent', 'a bird', 'a shepherd’s staff'] }
   ]
 }
+
+// the English recordings of the stories (voice Achernar, Gemini, 22.10.2026): geschichte-NN-en-v4.mp3, one per stage in the order of the stages
+moseEn.stages!.forEach((s, i) => {
+  s.audio = `audio/abenteuer/mose/geschichte-${String(i + 1).padStart(2, '0')}-en-v4.mp3`
+})
