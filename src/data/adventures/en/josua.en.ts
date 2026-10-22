@@ -2,7 +2,7 @@
  * English texts of the adventure "Joshua" (8 to 10 years): the same shape as `../josua.ts`, only the words. Laid over the German data by
  * `localize()`; the right answer is the first option, exactly as in the German data. Names and wording follow the public-domain World English Bible
  * (Joshua, Rahab, Jericho, Shittim, Jordan, Gilgal, Shechem); the stories are retold in our own words, "God" everywhere. The source as a readable file: D:/Claude/Abenteuer-Josua/ENGLISCH/.
- * There are no English recordings yet (no `audio`): the app then reads with the voice of the device.
+ * English recordings: geschichte-NN-en-v4.mp3 (voice Achernar), set at the end of this file.
  */
 import type { Journey } from '@/types/adventure'
 import type { TextOverlay } from '../localize'
@@ -172,3 +172,8 @@ export const josuaEn: TextOverlay<Journey> = {
     { q: 'What does Joshua say about himself and his house?', options: ['They will serve God.', 'They will move away.', 'They will become kings.'] }
   ]
 }
+
+// the English recordings of the stories (voice Achernar, Gemini, 22.10.2026): geschichte-NN-en-v4.mp3, one per stage in the order of the stages
+josuaEn.stages!.forEach((s, i) => {
+  s.audio = `audio/abenteuer/josua/geschichte-${String(i + 1).padStart(2, '0')}-en-v4.mp3`
+})
