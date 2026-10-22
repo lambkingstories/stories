@@ -566,13 +566,13 @@ for (const st of mose.stages) {
   if (t.words) t.words.background = st.image
 }
 
-// the German recordings of the stories (voice Achernar, text version 3 = files "-v3"); there are no English ones yet, so the English app reads with the voice of the device
-// BIBELTREUE 21.10.2026: the texts of these stages were changed after the check against the Bible (Luther 1912), so the old recording no longer fits: no `audio` until the re-recording
-// (the list: D:/Claude/Abenteuer-Mose/NEUAUFNAHME-BIBELTREUE-2026-10-21.md; then new files "-v4" and the stage leaves this list); the app reads with the voice of the device meanwhile
-export const MOSE_TO_RERECORD: readonly number[] = [4, 5, 7, 9, 11, 13, 14, 15]
+// the German recordings of the stories (voice Achernar); there are no English ones yet, so the English app reads with the voice of the device
+// BIBELTREUE 21.10.2026: the texts of these stages were changed after the check against the Bible (Luther 1912) and recorded again as "-v4"; the others are "-v3"
+// (the list: D:/Claude/Abenteuer-Mose/NEUAUFNAHME-BIBELTREUE-2026-10-21.md)
+export const MOSE_RECORDED_AGAIN: readonly number[] = [4, 5, 7, 9, 11, 13, 14, 15]
 for (const s of mose.stages) {
-  const file = `audio/abenteuer/mose/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`
-  Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' || MOSE_TO_RERECORD.includes(s.id) ? undefined : file), enumerable: true, configurable: true })
+  const file = `audio/abenteuer/mose/geschichte-${String(s.id).padStart(2, '0')}-${MOSE_RECORDED_AGAIN.includes(s.id) ? 'v4' : 'v3'}.mp3`
+  Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 
 // the background music of this adventure: three calm pieces made with Google's Lyria 3.5 (skill `lambking-abenteuer-skill`, ton.md); they follow one another at random

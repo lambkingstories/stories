@@ -6,7 +6,7 @@
 import { existsSync, readFileSync, statSync } from 'node:fs'
 import { afterEach, describe, expect, it } from 'vitest'
 import { josef } from '@/data/adventures/josef'
-import { mose, MOSE_TO_RERECORD } from '@/data/adventures/mose'
+import { mose, MOSE_RECORDED_AGAIN } from '@/data/adventures/mose'
 import { MOSE_PATH } from '@/data/adventures/mosePath'
 import { englishTextsOf } from '@/data/adventures/localize'
 import { adventureLanguage, setAdventureLanguage } from '@/use/adventureLanguage'
@@ -58,13 +58,9 @@ describe('Mose: stories and questions', () => {
       expect(words / sentences, `words per sentence ${s.id}`).toBeGreaterThan(7)
       expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      if (MOSE_TO_RERECORD.includes(s.id)) {
-        // text changed after the check against the Bible (21.10.2026): no recording until the new one (list NEUAUFNAHME-BIBELTREUE-2026-10-21.md)
-        expect(s.audio, `no recording until the new one ${s.id}`).toBeUndefined()
-      } else {
-        expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/mose/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`)
-        expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
-      }
+      // text changed after the check against the Bible (21.10.2026, list NEUAUFNAHME-BIBELTREUE-2026-10-21.md): recorded again as "-v4"
+      expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/mose/geschichte-${String(s.id).padStart(2, '0')}-${MOSE_RECORDED_AGAIN.includes(s.id) ? 'v4' : 'v3'}.mp3`)
+      expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
       expect(s.image, `stage ${s.id}`).toBe(`images/abenteuer/mose/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
     }
   })
@@ -418,7 +414,7 @@ describe('Mose: the lists for the recordings (NEUAUFNAHME-Mose.md) say exactly w
       expect(dl[i]!.n).toBe(s.id)
       expect(dl[i]!.text, `German list ${s.id}`).toEqual(s.text)
       expect(el[i]!.text, `English list ${s.id}`).toEqual(overlay.stages[i].text)
-      expect(s.audio).toBe(MOSE_TO_RERECORD.includes(s.id) ? undefined : `audio/abenteuer/mose/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`)
+      expect(s.audio).toBe(`audio/abenteuer/mose/geschichte-${String(s.id).padStart(2, '0')}-${MOSE_RECORDED_AGAIN.includes(s.id) ? 'v4' : 'v3'}.mp3`)
     })
   })
 })
