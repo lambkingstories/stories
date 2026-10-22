@@ -473,13 +473,13 @@ for (const st of gideon.stages) {
   if (st.task.word) st.task.word.background = st.image
 }
 
-// the German recordings of the stories (voice Achernar, text version 3 = files "-v3"); there are no English ones yet, so the English app reads with the voice of the device
+// the German recordings of the stories (voice Achernar); there are no English ones yet, so the English app reads with the voice of the device
 // Stages whose text was corrected for Bible faithfulness on 21.10.2026 (2: the prophet 6,7-10 and no stored food, 3: Gideon's complaint 6,13-15, 8: "like a dog" 7,5, 9 and 10: "das Schwert Gideons" 7,14 and the cry 7,20, 11: Oreb and Zeeb 7,25, 12: the golden garment 8,24-27 and the end 8,33-34)
-// have NO German recording until the new one is made (the app reads them with the voice of the device); list in `D:/Claude/Abenteuer-Gideon/NEUAUFNAHME-BIBELTREUE-2026-10-21.md`. Remove a number from this list when its new file is in.
-const WITHOUT_RECORDING = new Set([2, 3, 8, 9, 10, 11, 12])
+// were recorded again as "-v4" (list in `D:/Claude/Abenteuer-Gideon/NEUAUFNAHME-BIBELTREUE-2026-10-21.md`); the others are "-v3".
+const RECORDED_AGAIN = new Set([2, 3, 8, 9, 10, 11, 12])
 for (const s of gideon.stages) {
-  const file = `audio/abenteuer/gideon/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`
-  Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' || WITHOUT_RECORDING.has(s.id) ? undefined : file), enumerable: true, configurable: true })
+  const file = `audio/abenteuer/gideon/geschichte-${String(s.id).padStart(2, '0')}-${RECORDED_AGAIN.has(s.id) ? 'v4' : 'v3'}.mp3`
+  Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 
 // the background music of this adventure: three calm pieces made with Google's Lyria 3.5 (skill `lambking-abenteuer-skill`, ton.md); they follow one another at random

@@ -18,7 +18,7 @@ afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => gideon.stages[n - 1]!
 /** Words that no text of the German data may use (the night with the jars is told without fighting; the dream of the Midianite says "Schwert" in the Bible, so that one word is allowed). */
 /** Stages whose text was corrected for Bible faithfulness on 21.10.2026 and wait for a new recording (see `NEUAUFNAHME-BIBELTREUE-2026-10-21.md`). */
-const WITHOUT_RECORDING = [2, 3, 8, 9, 10, 11, 12]
+const RECORDED_AGAIN = [2, 3, 8, 9, 10, 11, 12]
 const FORBIDDEN = /\b(Messer|Speer|Pfeil|Blut|töten|erschlagen|erwürgen|Teufel|Hölle)\b/i
 
 describe('Gideon: stories and questions', () => {
@@ -55,13 +55,9 @@ describe('Gideon: stories and questions', () => {
       expect(words / sentences, `words per sentence ${s.id}`).toBeGreaterThan(7)
       expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      // the stages with a text corrected on 21.10.2026 (Bible faithfulness) have no German recording until the new one is made (the app then reads with the voice of the device)
-      if (WITHOUT_RECORDING.includes(s.id)) {
-        expect(s.audio, `no German recording yet: ${s.id}`).toBeUndefined()
-      } else {
-        expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/gideon/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`)
-        expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
-      }
+      // the stages with a text corrected on 21.10.2026 (Bible faithfulness) were recorded again ("-v4")
+      expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/gideon/geschichte-${String(s.id).padStart(2, '0')}-${RECORDED_AGAIN.includes(s.id) ? 'v4' : 'v3'}.mp3`)
+      expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
       expect(s.image, `stage ${s.id}`).toBe(`images/abenteuer/gideon/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
     }
     expect(new Set(gideon.stages.map((s) => s.image)).size).toBe(12)
@@ -388,7 +384,7 @@ describe('Gideon: the lists of the writing session (stories-gideon-v3-*.json) sa
       expect(dl[i]!.text, `German list ${s.id}`).toEqual(s.text)
       expect(el[i]!.text, `English list ${s.id}`).toEqual(overlay.stages[i].text)
       // the German recording of the new text is linked (the English list has none yet); not for the stages that wait for a new recording
-      if (!WITHOUT_RECORDING.includes(s.id)) expect(s.audio).toBe(`audio/abenteuer/gideon/geschichte-${String(s.id).padStart(2, '0')}-v3.mp3`)
+      expect(s.audio).toBe(`audio/abenteuer/gideon/geschichte-${String(s.id).padStart(2, '0')}-${RECORDED_AGAIN.includes(s.id) ? 'v4' : 'v3'}.mp3`)
     })
   })
 })
