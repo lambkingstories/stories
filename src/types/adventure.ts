@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten'
 
 export interface AdventureQuestion {
   q: string
@@ -1387,6 +1387,104 @@ export interface PaintJob {
   hint: string
 }
 
+/** A kind of cargo of the overboard game: its picture and its width (percent of the picture). */
+export interface OverboardKind {
+  id: string
+  image: string
+  w: number
+}
+/** A piece of cargo: its kind, where it lies on the deck (percent of the picture), how far it slides to and fro (percent) and how long a slide takes (ms). */
+export interface OverboardPiece {
+  kind: string
+  x: number
+  amp: number
+  periodMs: number
+  phase?: number
+}
+export interface OverboardRound {
+  hint: string
+  pieces: OverboardPiece[]
+}
+/** The game "Cargo overboard": the cargo of the ship slides to and fro in the storm; the child taps each piece to throw it into the sea. `deck` is the strip of the deck (percent of the picture). */
+export interface OverboardGame {
+  background: string
+  ship: string
+  /** The ship: its place (middle of the lower edge, percent of the picture) and width (percent). */
+  shipBox: { x: number; y: number; w: number }
+  /** The deck strip on which the cargo slides: top, height (percent of the picture). */
+  deck: { y: number; h: number }
+  kinds: OverboardKind[]
+  rounds: OverboardRound[]
+}
+
+/** A shell lies on the beach at this place (percent of the beach picture); `kind` is the index of its picture. */
+export interface ShoreShell {
+  x: number
+  y: number
+  kind: number
+}
+/** A round of the shore game: how long a wave takes to come and go (ms), how far up the beach it reaches (percent from the top) and where it starts (percent from the top), and the shells. */
+export interface ShoreRound {
+  hint: string
+  periodMs: number
+  /** The highest place of the wave front (percent from the top of the beach; smaller = higher up). */
+  high: number
+  /** The lowest place of the wave front (percent from the top; the sea lies below). */
+  low: number
+  shells: ShoreShell[]
+}
+/** The game "Shells before the wave": the wave runs up the beach and back; the child collects the shells on the dry sand before the wave washes them away. */
+export interface ShoreGame {
+  background: string
+  /** The pictures of the kinds of shells (the index is `ShoreShell.kind`). */
+  shells: string[]
+  bucket: string
+  foam: string
+  rounds: ShoreRound[]
+}
+
+/** A figure of the sacks game: who it is (a child, a grown-up, an animal), its two pictures (in its clothes, in the sack) and its place and width (percent of the street). */
+export interface SacksFigure {
+  id: string
+  who: 'child' | 'adult' | 'animal'
+  image: string
+  imageSack: string
+  x: number
+  y: number
+  w: number
+}
+export interface SacksRound {
+  hint: string
+  figures: SacksFigure[]
+}
+/** The game "Sacks for great and small": small sacks for the children, big sacks for the grown-ups and the animals. */
+export interface SacksGame {
+  background: string
+  sackSmall: string
+  sackBig: string
+  rounds: SacksRound[]
+}
+
+/** A round of the shade game: how long Jonah has to sit in the shade (seconds), how long the sun takes for its way (seconds) and how wide the shade is (percent of the picture width). */
+export interface ShadeRound {
+  hint: string
+  seconds: number
+  sunSeconds: number
+  tolerance: number
+}
+/** The game "Keep the shade": the sun travels over the sky; the child pulls the leafy roof of the castor-oil plant between the sun and Jonah. */
+export interface ShadeGame {
+  background: string
+  jonah: string
+  roof: string
+  sun: string
+  /** Where Jonah sits (his middle, percent of the picture) and how wide he is (percent). */
+  jonahBox: { x: number; y: number; w: number }
+  /** The width of the roof (percent of the picture). */
+  roofW: number
+  rounds: ShadeRound[]
+}
+
 export interface StageTask {
   kind: TaskKind
   /** One line that says what to do. */
@@ -1471,6 +1569,10 @@ export interface StageTask {
   cross?: CrossGame
   cloud?: CloudGame
   constellation?: ConstellationGame
+  overboard?: OverboardGame
+  shore?: ShoreGame
+  sacks?: SacksGame
+  shade?: ShadeGame
 }
 
 export interface AdventureStage {

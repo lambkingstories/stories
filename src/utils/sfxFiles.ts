@@ -65,6 +65,7 @@ export const GAME_MUSIC: MusicPiece[] = [
 /** Which mood fits which game: quiet looking and remembering, steady building and sorting, quick flying and dots. */
 const GAME_MOOD: Record<string, Mood> = {
   find: 'ruhig', memory: 'ruhig', share: 'ruhig', count: 'ruhig', stones: 'ruhig', order: 'ruhig', water: 'ruhig', lights: 'ruhig', verse: 'ruhig', echo: 'ruhig', channels: 'mittel', mirror: 'ruhig', sow: 'mittel', herd: 'ruhig', missing: 'ruhig', wipe: 'ruhig', chain: 'mittel', stack: 'mittel', trace: 'ruhig', balance: 'mittel', constellation: 'ruhig', slide: 'ruhig', crank: 'mittel', hold: 'ruhig', stew: 'ruhig', cross: 'ruhig', focus: 'ruhig', beat: 'ruhig', glow: 'ruhig', weave: 'ruhig', cloud: 'ruhig', manna: 'ruhig', diff: 'ruhig', words: 'ruhig', sneak: 'ruhig', cave: 'ruhig', cue: 'ruhig', swit: 'ruhig', winnow: 'ruhig', dew: 'ruhig', word: 'ruhig', hush: 'ruhig', hide: 'ruhig', bake: 'ruhig', pack: 'ruhig', lower: 'ruhig', step: 'ruhig', rings: 'ruhig', clues: 'ruhig', birds: 'ruhig', silver: 'ruhig', relay: 'ruhig', catch: 'ruhig', ring: 'ruhig', cairn: 'ruhig', cycle: 'ruhig', guess: 'ruhig',
+  overboard: 'mittel', shore: 'ruhig', sacks: 'ruhig', shade: 'ruhig',
   puzzle: 'mittel', sort: 'mittel', harvest: 'mittel', build: 'mittel', way: 'mittel',
   fly: 'lebhaft', dots: 'lebhaft'
 }

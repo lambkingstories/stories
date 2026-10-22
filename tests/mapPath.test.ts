@@ -8,6 +8,7 @@ import { jakob } from '../src/data/adventures/jakob'
 import { josua } from '../src/data/adventures/josua'
 import { gideon } from '../src/data/adventures/gideon'
 import { mose } from '../src/data/adventures/mose'
+import { jona } from '../src/data/adventures/jona'
 import type { Journey } from '../src/types/adventure'
 
 /** Rules for the dotted way on the maps (Anton, 19.10.2026): into every medal from the left, out of it on the right, always curved, 10 beads between two medals. */
@@ -22,7 +23,8 @@ describe.each([
   ['Jakob', jakob],
   ['Josua', josua],
   ['Gideon', gideon],
-  ['Mose', mose]
+  ['Mose', mose],
+  ['Jona', jona]
 ] as [string, Journey][])('the dotted way of %s', (_name, j) => {
   const m = j.map
   const spots = [...m.stages, m.exam]

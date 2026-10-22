@@ -539,3 +539,53 @@ describe('the hidden journey Mose (id mose)', () => {
     expect(m.journeys.filter((j) => j.id === 'mose')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Jona (id jona)', () => {
+  it('a normal build (without Jona) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_JONA', 'false')
+    open('?jona=jona-vorschau-h5v9')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('jona')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_JONA', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?jona=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.JONA_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?jona=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_JONA', 'true')
+    const first = await load()
+    open(`?jona=${first.JONA_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.JONA_UNLOCK_CODE).toBe('jona-vorschau-h5v9')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'jona'])
+    expect(localStorage.getItem('lk-preview-jona')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('jona')?.stages.length).toBe(9)
+    open('?jona=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-jona')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_JONA) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_JONA', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'jona')).toHaveLength(1)
+  })
+})

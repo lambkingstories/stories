@@ -9,12 +9,13 @@ import { jakob } from '@/data/adventures/jakob'
 import { josef } from '@/data/adventures/josef'
 import { josua } from '@/data/adventures/josua'
 import { mose } from '@/data/adventures/mose'
+import { jona } from '@/data/adventures/jona'
 import { noah } from '@/data/adventures/noah'
 import { journeyFiles } from '@/utils/journeyFiles'
 import { MUSIC_FILES } from '@/utils/sfxFiles'
 
 // every adventure has its own music: at least three pieces (Anton, 21.10.2026), so that one hears more than one piece
-const ALL = [josef, noah, adamEva, abraham, jakob, babel, josua, gideon, mose]
+const ALL = [josef, noah, adamEva, abraham, jakob, babel, josua, gideon, mose, jona]
 
 describe('the music of the journeys', () => {
   for (const j of ALL) {

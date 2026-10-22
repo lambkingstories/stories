@@ -12,7 +12,8 @@ import { jakob } from '@/data/adventures/jakob'
 import { josua } from '@/data/adventures/josua'
 import { gideon } from '@/data/adventures/gideon'
 import { mose } from '@/data/adventures/mose'
-import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, GIDEON_ONLY_DIRS, JAKOB_ONLY_DIRS, JOSUA_ONLY_DIRS, MOSE_ONLY_DIRS, NOAH_ONLY_DIRS, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripGideonFiles, stripJakobFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles } from '../vite.config.noah'
+import { jona } from '@/data/adventures/jona'
+import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, GIDEON_ONLY_DIRS, JAKOB_ONLY_DIRS, JONA_ONLY_DIRS, JOSUA_ONLY_DIRS, MOSE_ONLY_DIRS, NOAH_ONLY_DIRS, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles } from '../vite.config.noah'
 
 const inNoahDir = (f: string) => NOAH_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
 
@@ -374,6 +375,49 @@ describe('a build without Mose ships nothing of it', () => {
       for (const f of moseFiles) expect(existsSync(join(out, f)), f).toBe(false)
       for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
       expect(() => stripMoseFiles(out)).not.toThrow()
+    } finally {
+      rmSync(out, { recursive: true, force: true })
+    }
+  })
+})
+
+const inJonaDir = (f: string) => JONA_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
+
+describe('a build without Jona ships nothing of it', () => {
+  it('every file that only Jona uses lies in a folder that the normal build removes', () => {
+    const others = new Set([...journeys, noah, adamEva, babel, abraham, jakob, josua, gideon, mose].flatMap((j) => journeyFiles(j)))
+    const app = /^audio\/abenteuer\/(klang|musik)-/
+    const only = journeyFiles(jona).filter((f) => !others.has(f) && !app.test(f))
+    const leaks = only.filter((f) => !inJonaDir(f))
+    expect(leaks, `files of Jona outside the folders that are removed: ${leaks.join(', ')}`).toEqual([])
+  })
+
+  it('the folders of Jona are only the three places that belong to it, none is on the lists of the others, and no folder with "jona" in its name is missing', () => {
+    expect([...JONA_ONLY_DIRS].sort()).toEqual(['audio/abenteuer/jona', 'images/abenteuer/jona', 'images/abenteuer/spiele/jona'])
+    for (const d of JONA_ONLY_DIRS) {
+      for (const list of [NOAH_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, ABRAHAM_ONLY_DIRS, JAKOB_ONLY_DIRS, JOSUA_ONLY_DIRS, GIDEON_ONLY_DIRS, MOSE_ONLY_DIRS]) expect(list).not.toContain(d)
+    }
+    const found: string[] = []
+    for (const base of ['public/images/abenteuer', 'public/audio/abenteuer', 'public/images/abenteuer/spiele']) {
+      for (const n of readdirSync(base)) if (/jona/i.test(n) && !n.includes('.')) found.push(`${base.replace('public/', '')}/${n}`)
+    }
+    for (const d of found) expect(JONA_ONLY_DIRS, d).toContain(d)
+    for (const j of [...journeys, noah, adamEva, babel, abraham, jakob, josua, gideon, mose]) for (const f of journeyFiles(j)) expect(inJonaDir(f), `${j.id}: ${f}`).toBe(false)
+  })
+
+  it('removing takes the folders of Jona out of a build and leaves everything else (the other journeys, the sounds)', () => {
+    const out = mkdtempSync(join(tmpdir(), 'lk-build-jona-'))
+    try {
+      const jonaFiles = ['audio/abenteuer/jona/geschichte-01-v1.mp3', 'images/abenteuer/jona/etappe-bild-01.webp', 'images/abenteuer/spiele/jona/bord/schiff.webp']
+      const keep = ['images/abenteuer/josef/etappe-01.webp', 'audio/abenteuer/noah/geschichte-01.mp3', 'audio/abenteuer/mose/geschichte-01-v1.mp3', 'images/abenteuer/spiele/jakob/kurbel/eimer.webp', 'audio/abenteuer/klang-stern.mp3']
+      for (const f of [...jonaFiles, ...keep]) {
+        mkdirSync(join(out, f, '..'), { recursive: true })
+        writeFileSync(join(out, f), 'x')
+      }
+      stripJonaFiles(out)
+      for (const f of jonaFiles) expect(existsSync(join(out, f)), f).toBe(false)
+      for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
+      expect(() => stripJonaFiles(out)).not.toThrow()
     } finally {
       rmSync(out, { recursive: true, force: true })
     }
