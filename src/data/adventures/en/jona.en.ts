@@ -2,7 +2,7 @@
  * English texts of the adventure "Jonah" (8 to 10 years): the same shape as `../jona.ts`, only the words. Laid over the German data by
  * `localize()`; the right answer is the first option, exactly as in the German data. Names and wording follow the public-domain King James Version and World English Bible
  * (Jonah, Amittai, Joppa, Tarshish, Nineveh); the stories are retold in our own words, "God" everywhere. The source as a readable file: D:/Claude/Abenteuer-Jona/ENGLISCH/Jona_English_Texte.md.
- * There are no English recordings yet (no `audio`): the app then reads with the voice of the device.
+ * English recordings: geschichte-NN-en-v1.mp3 (voice Achernar), set at the end of this file.
  */
 import type { Journey } from '@/types/adventure'
 import type { TextOverlay } from '../localize'
@@ -176,3 +176,8 @@ export const jonaEn: TextOverlay<Journey> = {
     { q: 'What does God say about Nineveh at the end?', options: ['It should make him sorry: so many people and animals.', 'The city should go under.', 'The city should belong to Jonah.'] }
   ]
 }
+
+// the English recordings of the stories (voice Achernar, Gemini, 24.10.2026): geschichte-NN-en-v1.mp3, one per stage in the order of the stages
+jonaEn.stages!.forEach((s, i) => {
+  s.audio = `audio/abenteuer/jona/geschichte-${String(i + 1).padStart(2, '0')}-en-v1.mp3`
+})

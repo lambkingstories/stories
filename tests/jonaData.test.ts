@@ -216,7 +216,7 @@ describe('Jona: map, files, English', () => {
   })
 
   it('every file of the adventure exists in `public/` (the pictures of the games that are not painted yet are on the list `NOT_PAINTED_YET`)', () => {
-    const missing = journeyFiles(jona).filter((f) => !existsSync(`public/${f}`) && !notPaintedYet(f) && !/^audio\/abenteuer\/jona\//.test(f))
+    const missing = journeyFiles(jona).filter((f) => !existsSync(`public/${f}`) && !notPaintedYet(f))
     expect(missing).toEqual([])
   })
 
@@ -234,6 +234,12 @@ describe('Jona: map, files, English', () => {
     expect(stage(1).title).toBe('The Call and the Escape')
     expect(stage(9).text.at(-1)).toMatch(/Nineveh/)
     expect(stage(2).task.overboard!.rounds[0]!.hint).toContain('Tap')
-    expect(stage(1).audio).toBeUndefined()
+    // the English recordings are linked (the German ones are checked in German mode)
+    for (let n = 1; n <= 9; n++) expect(stage(n).audio, `English recording ${n}`).toBe(`audio/abenteuer/jona/geschichte-${String(n).padStart(2, '0')}-en-v1.mp3`)
+    setAdventureLanguage('de')
+    for (let n = 1; n <= 9; n++) {
+      expect(stage(n).audio, `German recording ${n}`).toBe(`audio/abenteuer/jona/geschichte-${String(n).padStart(2, '0')}-v1.mp3`)
+      expect(existsSync(`public/${stage(n).audio}`), `file ${stage(n).audio}`).toBe(true)
+    }
   })
 })
