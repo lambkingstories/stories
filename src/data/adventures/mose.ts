@@ -243,30 +243,30 @@ export const mose: Journey = {
   medal: 'images/abenteuer/mose/medaille-v3.webp', // Der brennende Dornbusch (Busch mit Flamme aus Licht, Sandalen und Hirtenstab, Goldring)
   // Geschenk-Ausmalbild: Der Weg durch das Meer (Mose mit erhobenem Stab, zwei Wasserwände, trockener Weg, Familie mit Kindern, Esel und Lamm, Wolkensäule hinter dem Volk, Konturzeichnung im Querformat 1536 × 1024)
   gift: { title: 'Der Weg durch das Meer', image: 'images/abenteuer/mose/geschenk.webp' },
-  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v3 mit fünfzehn Orten und dem Ziel) mit Stationen und Perlenweg aus mosePath.ts
+  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, erzählendes Panorama v4 (23.10.2026) mit fünfzehn Orten und dem Ziel) mit Stationen und Perlenweg aus mosePath.ts
   map: {
-    images: [1, 2, 3, 4].map((n) => `images/abenteuer/mose/karte-pano-v3-${n}.webp`),
+    images: [1, 2, 3, 4].map((n) => `images/abenteuer/mose/karte-pano-v4-${n}.webp`),
     ring: josef.map.ring,
     aspect: 9908 / 1648,
     widthPx: 9908,
     stages: [
-      { x: 0.0505, y: 0.6311, d: 0.0339 },
-      { x: 0.109, y: 0.2427, d: 0.0339 },
-      { x: 0.1716, y: 0.625, d: 0.0339 },
-      { x: 0.2422, y: 0.2549, d: 0.0339 },
-      { x: 0.2725, y: 0.6432, d: 0.0339 },
-      { x: 0.3734, y: 0.3641, d: 0.0339 },
-      { x: 0.4289, y: 0.6189, d: 0.0339 },
-      { x: 0.5046, y: 0.1396, d: 0.0339 },
-      { x: 0.5501, y: 0.6311, d: 0.0339 },
-      { x: 0.6258, y: 0.1517, d: 0.0339 },
-      { x: 0.6762, y: 0.6068, d: 0.0339 },
-      { x: 0.7822, y: 0.6493, d: 0.0339 },
-      { x: 0.8579, y: 0.1942, d: 0.0339 },
-      { x: 0.9084, y: 0.6311, d: 0.0339 },
-      { x: 0.9487, y: 0.6432, d: 0.0339 }
+      { x: 0.0807, y: 0.6432, d: 0.0339 },
+      { x: 0.1342, y: 0.2609, d: 0.0339 },
+      { x: 0.217, y: 0.3944, d: 0.0339 },
+      { x: 0.2634, y: 0.2306, d: 0.0339 },
+      { x: 0.3553, y: 0.5765, d: 0.0339 },
+      { x: 0.4582, y: 0.3459, d: 0.0339 },
+      { x: 0.5147, y: 0.6432, d: 0.0339 },
+      { x: 0.5612, y: 0.2913, d: 0.0339 },
+      { x: 0.6358, y: 0.6311, d: 0.0339 },
+      { x: 0.6984, y: 0.4854, d: 0.0339 },
+      { x: 0.7711, y: 0.2427, d: 0.0339 },
+      { x: 0.8044, y: 0.5825, d: 0.0339 },
+      { x: 0.866, y: 0.182, d: 0.0339 },
+      { x: 0.9124, y: 0.4854, d: 0.0339 },
+      { x: 0.9669, y: 0.6068, d: 0.0339 }
     ],
-    exam: { x: 0.9881, y: 0.3762, d: 0.0339 },
+    exam: { x: 0.9881, y: 0.2549, d: 0.0339 },
     path: MOSE_PATH
   },
   stages: [

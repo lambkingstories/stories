@@ -181,22 +181,22 @@ export const daniel: Journey = {
   gift: { title: 'Daniel und die Löwen', image: `${PICS}geschenk.webp` },
   // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, OpenAI-Bildmodell gpt-image-2.5-sunburst, Qualität max, mit neun Orten und dem Ziel) mit Stationen und Perlenweg aus danielPath.ts
   map: {
-    images: [1, 2, 3, 4].map((n) => `images/abenteuer/daniel/karte-pano-v1-${n}.webp`),
+    images: [1, 2, 3, 4].map((n) => `images/abenteuer/daniel/karte-pano-v4-${n}.webp`),
     ring: josef.map.ring,
     aspect: 9908 / 1648,
     widthPx: 9908,
     stages: [
-      { x: 0.0767, y: 0.6432, d: 0.0339 },
-      { x: 0.1968, y: 0.6432, d: 0.0339 },
-      { x: 0.2927, y: 0.6462, d: 0.0339 },
-      { x: 0.4390, y: 0.6481, d: 0.0339 },
-      { x: 0.5198, y: 0.6462, d: 0.0339 },
-      { x: 0.5854, y: 0.6481, d: 0.0339 },
-      { x: 0.7317, y: 0.6462, d: 0.0339 },
-      { x: 0.8160, y: 0.6462, d: 0.0339 },
-      { x: 0.9003, y: 0.6481, d: 0.0339 }
+      { x: 0.0706, y: 0.6481, d: 0.0339 },
+      { x: 0.1191, y: 0.6481, d: 0.0339 },
+      { x: 0.2352, y: 0.6481, d: 0.0339 },
+      { x: 0.4744, y: 0.6432, d: 0.0339 },
+      { x: 0.5551, y: 0.2913, d: 0.0339 },
+      { x: 0.651, y: 0.5461, d: 0.0339 },
+      { x: 0.7216, y: 0.5825, d: 0.0339 },
+      { x: 0.8377, y: 0.3883, d: 0.0339 },
+      { x: 0.9336, y: 0.2852, d: 0.0339 }
     ],
-    exam: { x: 0.9588, y: 0.6432, d: 0.0339 },
+    exam: { x: 0.9861, y: 0.2852, d: 0.0339 },
     path: DANIEL_PATH
   },
   stages: [

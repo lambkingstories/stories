@@ -381,8 +381,8 @@ describe('Mose: the games, and the placeholders until the pictures come', () => 
 
 describe('Mose: die Karte', () => {
   const m = mose.map
-  it('vier Stücke eines Bildes (eigene Karte v3), jedes unter 1,8 MB; fünfzehn Stationen von links nach rechts plus Ziel, nicht zu tief; der Perlenweg hat eine Strecke je Station (die letzte führt zum Ziel)', () => {
-    expect(m.images).toEqual([1, 2, 3, 4].map((n) => `images/abenteuer/mose/karte-pano-v3-${n}.webp`))
+  it('vier Stücke eines Bildes (erzählende Karte v4), jedes unter 1,8 MB; fünfzehn Stationen von links nach rechts plus Ziel, nicht zu tief; der Perlenweg hat eine Strecke je Station (die letzte führt zum Ziel)', () => {
+    expect(m.images).toEqual([1, 2, 3, 4].map((n) => `images/abenteuer/mose/karte-pano-v4-${n}.webp`))
     for (const f of m.images) expect(statSync(`public/${f}`).size / 1024, f).toBeLessThan(1800)
     expect(m.widthPx).toBe(9908)
     expect(m.aspect).toBeCloseTo(9908 / 1648, 3)

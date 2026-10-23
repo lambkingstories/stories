@@ -181,22 +181,22 @@ export const jona: Journey = {
   gift: { title: 'Jona und der große Fisch', image: `${PICS}geschenk.webp` },
   // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, OpenAI-Bildmodell gpt-image-2.5-sunburst, Qualität max, mit neun Orten und dem Ziel) mit Stationen und Perlenweg aus jonaPath.ts
   map: {
-    images: [1, 2, 3, 4].map((n) => `images/abenteuer/jona/karte-pano-v1-${n}.webp`),
+    images: [1, 2, 3, 4].map((n) => `images/abenteuer/jona/karte-pano-v4-${n}.webp`),
     ring: josef.map.ring,
     aspect: 9908 / 1648,
     widthPx: 9908,
     stages: [
-      { x: 0.1161, y: 0.6311, d: 0.0339 },
-      { x: 0.2019, y: 0.6068, d: 0.0339 },
-      { x: 0.2877, y: 0.619, d: 0.0339 },
-      { x: 0.3916, y: 0.6068, d: 0.0339 },
-      { x: 0.4764, y: 0.6129, d: 0.0339 },
-      { x: 0.6005, y: 0.6311, d: 0.0339 },
-      { x: 0.7338, y: 0.5886, d: 0.0339 },
-      { x: 0.8175, y: 0.6068, d: 0.0339 },
-      { x: 0.9013, y: 0.6129, d: 0.0339 }
+      { x: 0.0959, y: 0.6068, d: 0.0339 },
+      { x: 0.1716, y: 0.6371, d: 0.0339 },
+      { x: 0.3361, y: 0.4733, d: 0.0339 },
+      { x: 0.4239, y: 0.6311, d: 0.0339 },
+      { x: 0.5248, y: 0.2609, d: 0.0339 },
+      { x: 0.6399, y: 0.534, d: 0.0339 },
+      { x: 0.8034, y: 0.6462, d: 0.0339 },
+      { x: 0.8841, y: 0.625, d: 0.0339 },
+      { x: 0.9538, y: 0.3398, d: 0.0339 }
     ],
-    exam: { x: 0.979, y: 0.6068, d: 0.0339 },
+    exam: { x: 0.9881, y: 0.6068, d: 0.0339 },
     path: JONA_PATH
   },
   stages: [
