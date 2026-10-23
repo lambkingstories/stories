@@ -180,22 +180,22 @@ export const elia: Journey = {
   gift: { title: 'Elia und die Raben', image: `${PICS}geschenk.webp` },
   // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, OpenAI-Bildmodell gpt-image-2.5-sunburst, Qualität max, mit neun Orten und dem Ziel) mit Stationen und Perlenweg aus eliaPath.ts
   map: {
-    images: [1, 2, 3, 4].map((n) => `images/abenteuer/elia/karte-pano-v1-${n}.webp`),
+    images: [1, 2, 3, 4].map((n) => `images/abenteuer/elia/karte-pano-v2-${n}.webp`),
     ring: josef.map.ring,
     aspect: 9908 / 1648,
     widthPx: 9908,
     stages: [
-      { x: 0.0888, y: 0.6432, d: 0.0339 },
-      { x: 0.1968, y: 0.6432, d: 0.0339 },
-      { x: 0.2927, y: 0.6432, d: 0.0339 },
-      { x: 0.4239, y: 0.6462, d: 0.0339 },
-      { x: 0.5046, y: 0.6462, d: 0.0339 },
-      { x: 0.5652, y: 0.6462, d: 0.0339 },
-      { x: 0.7317, y: 0.6462, d: 0.0339 },
-      { x: 0.8160, y: 0.6462, d: 0.0339 },
-      { x: 0.8730, y: 0.6462, d: 0.0339 }
+      { x: 0.0454, y: 0.6250, d: 0.0339 },
+      { x: 0.1262, y: 0.3519, d: 0.0339 },
+      { x: 0.2473, y: 0.1820, d: 0.0339 },
+      { x: 0.3926, y: 0.6432, d: 0.0339 },
+      { x: 0.5046, y: 0.6432, d: 0.0339 },
+      { x: 0.6046, y: 0.6432, d: 0.0339 },
+      { x: 0.6803, y: 0.3155, d: 0.0339 },
+      { x: 0.7812, y: 0.6462, d: 0.0339 },
+      { x: 0.8781, y: 0.3034, d: 0.0339 }
     ],
-    exam: { x: 0.9740, y: 0.6432, d: 0.0339 },
+    exam: { x: 0.9649, y: 0.2791, d: 0.0339 },
     path: ELIA_PATH
   },
   stages: [
