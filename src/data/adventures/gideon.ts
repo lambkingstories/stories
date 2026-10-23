@@ -216,27 +216,27 @@ export const gideon: Journey = {
   medal: 'images/abenteuer/gideon/medaille-v3.webp', // Der Krug mit dem Licht (Tonkrug mit Fackel, Horn, Lichterkette in der Nacht, Goldring)
   // Geschenk-Ausmalbild: Die Nacht mit den Krügen und Fackeln (Männer mit Horn und Krug auf dem Hügel bei Nacht) (Konturzeichnung)
   gift: { title: 'Die Nacht mit den Krügen und Fackeln', image: `${PICS}geschenk.webp` },
-  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v3 mit zwölf Orten und dem Ziel) mit Stationen und Perlenweg aus gideonPath.ts
+  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, erzählendes Panorama v4 (OpenAI-Bildmodell gpt-image-2.5-sunburst, 23.10.2026) mit zwölf Orten und dem Ziel) mit Stationen und Perlenweg aus gideonPath.ts
   map: {
-    images: [1, 2, 3, 4].map((n) => `images/abenteuer/gideon/karte-pano-v3-${n}.webp`),
+    images: [1, 2, 3, 4].map((n) => `images/abenteuer/gideon/karte-pano-v4-${n}.webp`),
     ring: josef.map.ring,
     aspect: 9908 / 1648,
     widthPx: 9908,
     stages: [
-      { x: 0.0787, y: 0.2002, d: 0.0339 },
-      { x: 0.1433, y: 0.2002, d: 0.0339 },
-      { x: 0.2119, y: 0.1517, d: 0.0339 },
-      { x: 0.2927, y: 0.6129, d: 0.0339 },
-      { x: 0.3532, y: 0.2549, d: 0.0339 },
-      { x: 0.4794, y: 0.6129, d: 0.0339 },
-      { x: 0.545, y: 0.3155, d: 0.0339 },
-      { x: 0.6389, y: 0.6371, d: 0.0339 },
-      { x: 0.6762, y: 0.3277, d: 0.0339 },
-      { x: 0.7418, y: 0.1396, d: 0.0339 },
-      { x: 0.8175, y: 0.2306, d: 0.0339 },
-      { x: 0.8882, y: 0.3398, d: 0.0339 }
+      { x: 0.0888, y: 0.3277, d: 0.0339 },
+      { x: 0.1514, y: 0.5461, d: 0.0339 },
+      { x: 0.2069, y: 0.1578, d: 0.0339 },
+      { x: 0.3109, y: 0.2609, d: 0.0339 },
+      { x: 0.3593, y: 0.4248, d: 0.0339 },
+      { x: 0.4118, y: 0.6493, d: 0.0339 },
+      { x: 0.5026, y: 0.2306, d: 0.0339 },
+      { x: 0.6106, y: 0.3034, d: 0.0339 },
+      { x: 0.6712, y: 0.2002, d: 0.0339 },
+      { x: 0.7923, y: 0.1396, d: 0.0339 },
+      { x: 0.8781, y: 0.3277, d: 0.0339 },
+      { x: 0.9255, y: 0.3155, d: 0.0339 }
     ],
-    exam: { x: 0.983, y: 0.2731, d: 0.0339 },
+    exam: { x: 0.9830, y: 0.2852, d: 0.0339 },
     path: GIDEON_PATH
   },
   stages: [

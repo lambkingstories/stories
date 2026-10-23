@@ -233,27 +233,27 @@ export const jakob: Journey = {
   medal: `${IMG}medaille-v3.webp`, // Jakob allein am Stein mit dem Stab und die Himmelsleiter (Leiter nach Luther 1912, Sternennacht, Goldring)
   // Geschenk-Ausmalbild: Jakob und die Himmelsleiter im Traum (Treppe aus Steinen, Sterne, friedlich); das jetzige Bild zeigt Schafe und einen Hund, Jakob ist aber allein: neues Bild nach BILDAUFTRAG-J41
   gift: { title: 'Jakob und die Himmelsleiter im Traum', image: `${IMG}geschenk.webp` },
-  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v3 mit zwölf Orten und dem Ziel) mit Stationen und Perlenweg aus jakobPath.ts
+  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, erzählendes Panorama v4 (OpenAI-Bildmodell gpt-image-2.5-sunburst, 23.10.2026) mit zwölf Orten und dem Ziel) mit Stationen und Perlenweg aus jakobPath.ts
   map: {
-    images: [1, 2, 3, 4].map((n) => `${IMG}karte-pano-v3-${n}.webp`),
+    images: [1, 2, 3, 4].map((n) => `${IMG}karte-pano-v4-${n}.webp`),
     ring: 'images/abenteuer/josef/medaillon-ring.webp',
     aspect: 9908 / 1648,
     widthPx: 9908,
     stages: [
-      { x: 0.0232, y: 0.6311, d: 0.0339 },
-      { x: 0.1009, y: 0.6189, d: 0.0339 },
-      { x: 0.1716, y: 0.5158, d: 0.0339 },
-      { x: 0.2352, y: 0.6311, d: 0.0339 },
-      { x: 0.323, y: 0.6129, d: 0.0339 },
-      { x: 0.437, y: 0.2184, d: 0.0339 },
-      { x: 0.4703, y: 0.6493, d: 0.0339 },
-      { x: 0.5904, y: 0.3277, d: 0.0339 },
-      { x: 0.6712, y: 0.3034, d: 0.0339 },
-      { x: 0.7065, y: 0.6129, d: 0.0339 },
-      { x: 0.8377, y: 0.2913, d: 0.0339 },
-      { x: 0.9104, y: 0.6311, d: 0.0339 }
+      { x: 0.1009, y: 0.6462, d: 0.0339 },
+      { x: 0.1514, y: 0.3762, d: 0.0339 },
+      { x: 0.2392, y: 0.6432, d: 0.0339 },
+      { x: 0.3644, y: 0.5279, d: 0.0339 },
+      { x: 0.4249, y: 0.3095, d: 0.0339 },
+      { x: 0.4855, y: 0.3641, d: 0.0339 },
+      { x: 0.5379, y: 0.3277, d: 0.0339 },
+      { x: 0.5955, y: 0.1820, d: 0.0339 },
+      { x: 0.6863, y: 0.2549, d: 0.0339 },
+      { x: 0.7721, y: 0.3034, d: 0.0339 },
+      { x: 0.8781, y: 0.3155, d: 0.0339 },
+      { x: 0.9275, y: 0.2306, d: 0.0339 }
     ],
-    exam: { x: 0.9841, y: 0.3762, d: 0.0339 },
+    exam: { x: 0.9830, y: 0.2002, d: 0.0339 },
     path: JAKOB_PATH
   },
   stages: [
