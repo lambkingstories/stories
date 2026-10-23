@@ -373,11 +373,10 @@ for (const st of daniel.stages) {
   if (st.task.verse) st.task.verse.background = st.image ?? st.task.verse.background
 }
 
-// the German recordings of the stories (voice Achernar, files "geschichte-NN-v1.mp3"); until they are made the app reads with the voice of the device. Remove a number from this list when its file is in.
-const WITHOUT_RECORDING = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9])
+// the German recordings of the stories (voice Achernar, Gemini, files "geschichte-NN-v1.mp3"); the English ones are linked in `en/daniel.en.ts` ("-en-v1")
 for (const s of daniel.stages) {
   const file = `audio/abenteuer/daniel/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`
-  Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' || WITHOUT_RECORDING.has(s.id) ? undefined : file), enumerable: true, configurable: true })
+  Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 
 // the background music of this adventure: three calm pieces made with Google's Lyria 3.5 (Babylon, trust, peace); they follow one another at random

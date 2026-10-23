@@ -239,7 +239,7 @@ describe('Daniel: map, files, English', () => {
   })
 
   it('every file of the adventure exists in `public/` (the pictures of the games that are not painted yet are on the list `NOT_PAINTED_YET`)', () => {
-    const missing = journeyFiles(daniel).filter((f) => !existsSync(`public/${f}`) && !notPaintedYet(f) && !/^audio\/abenteuer\/daniel\/geschichte/.test(f))
+    const missing = journeyFiles(daniel).filter((f) => !existsSync(`public/${f}`) && !notPaintedYet(f))
     expect(missing).toEqual([])
   })
 
@@ -271,6 +271,12 @@ describe('Daniel: map, files, English', () => {
     expect(stage(9).text.at(-1)).toMatch(/living God/)
     expect(stage(2).task.hint).toContain('vegetables')
     expect(stage(8).task.hours!.rounds[0]!.hint).toContain('golden mark')
-    expect(stage(1).audio).toBeUndefined()
+    // the English recordings are linked (the German ones are checked in German mode)
+    for (let n = 1; n <= 9; n++) expect(stage(n).audio, `English recording ${n}`).toBe(`audio/abenteuer/daniel/geschichte-${String(n).padStart(2, '0')}-en-v1.mp3`)
+    setAdventureLanguage('de')
+    for (let n = 1; n <= 9; n++) {
+      expect(stage(n).audio, `German recording ${n}`).toBe(`audio/abenteuer/daniel/geschichte-${String(n).padStart(2, '0')}-v1.mp3`)
+      expect(existsSync(`public/${stage(n).audio}`), `file ${stage(n).audio}`).toBe(true)
+    }
   })
 })

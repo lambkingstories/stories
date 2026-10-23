@@ -2,7 +2,7 @@
  * English texts of the adventure "Daniel" (8 to 10 years): the same shape as `../daniel.ts`, only the words. Laid over the German data by
  * `localize()`; the right answer is the first option, exactly as in the German data. Names and wording follow the public-domain King James Version and World English Bible
  * (Daniel, Nebuchadnezzar, Belteshazzar, Shadrach, Meshach, Abednego, Belshazzar, Darius); the stories are retold in our own words, "God" everywhere. The source as a readable file: D:/Claude/Abenteuer-Daniel/ENGLISCH/Daniel_English_Texte.md.
- * There are no English recordings yet (no `audio`): the app then reads with the voice of the device.
+ * English recordings: geschichte-NN-en-v1.mp3 (voice Achernar), set at the end of this file.
  * Generated from the readable file by D:/Claude/Abenteuer-Daniel/tools/texte_in_ts.py.
  */
 import type { Journey } from '@/types/adventure'
@@ -176,3 +176,8 @@ export const danielEn: TextOverlay<Journey> = {
     { q: 'Who shuts the lions’ mouths?', options: ['an angel of God', 'Daniel', 'the king'] }
   ]
 }
+
+// the English recordings of the stories (voice Achernar, Gemini, 24.10.2026): geschichte-NN-en-v1.mp3, one per stage in the order of the stages
+danielEn.stages!.forEach((s, i) => {
+  s.audio = `audio/abenteuer/daniel/geschichte-${String(i + 1).padStart(2, '0')}-en-v1.mp3`
+})
