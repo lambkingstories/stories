@@ -375,7 +375,7 @@ for (const st of elia.stages) {
 }
 
 // the German recordings of the stories (voice Achernar, files "geschichte-NN-v1.mp3"); until they are made the app reads with the voice of the device. Remove a number from this list when its file is in.
-const WITHOUT_RECORDING = new Set([8, 9])
+const WITHOUT_RECORDING = new Set([9])
 for (const s of elia.stages) {
   const file = `audio/abenteuer/elia/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' || WITHOUT_RECORDING.has(s.id) ? undefined : file), enumerable: true, configurable: true })
