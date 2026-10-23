@@ -267,7 +267,7 @@ describe('Elia: map, files, English', () => {
     expect(elia.downloadMb!, `downloadMb (measured ${mb.toFixed(1)} MB)`).toBeLessThan(mb * 1.25)
   })
 
-  it('the English file has the same shape: the same number of stages, paragraphs, questions and answers; the German recording is not read in English', () => {
+  it('the English file has the same shape: the same number of stages, paragraphs, questions and answers; each language has its own recording', () => {
     const en = englishTextsOf(elia) as { stages: { text: string[]; questions: { options: string[] }[]; task?: { hint?: string } }[]; exam: { options: string[] }[]; title: string }
     expect(en.title).toBe('Elijah')
     expect(en.stages).toHaveLength(9)
@@ -282,6 +282,9 @@ describe('Elia: map, files, English', () => {
     expect(stage(9).text.at(-1)).toMatch(/spirit of Elijah/)
     expect(stage(1).task.hint).toContain('ravens')
     expect(stage(8).task.whisper!.rounds[0]!.hint).toContain('quiet sound')
-    expect(stage(1).audio).toBeUndefined()
+    // the English recordings are their own files, never the German ones
+    for (const s of elia.stages) expect(s.audio, `stage ${s.id}`).toBe(`audio/abenteuer/elia/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)
+    setAdventureLanguage('de')
+    for (const s of elia.stages) expect(s.audio, `stage ${s.id}`).toBe(`audio/abenteuer/elia/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`)
   })
 })

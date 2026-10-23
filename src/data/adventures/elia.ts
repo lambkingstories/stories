@@ -174,7 +174,7 @@ export const elia: Journey = {
   title: 'Elia',
   subtitle: 'Das Feuer, der Regen und das stille Sausen',
   age: '8-10',
-  downloadMb: 12, // vorläufig; nach dem Bau messen (der Test sagt die echte Größe)
+  downloadMb: 15, // gemessen 14,9 MB mit allen Aufnahmen (deutsch und englisch)
   medal: `${PICS}medaille-v3.webp`, // Medaille (Antons Wahl auf der Auswahlseite; bis dahin Entwurf 1)
   // Geschenk-Ausmalbild: Die Geschichte von Elia in einem Bild (Konturzeichnung)
   gift: { title: 'Elia und die Raben', image: `${PICS}geschenk.webp` },
@@ -375,7 +375,7 @@ for (const st of elia.stages) {
 }
 
 // the German recordings of the stories (voice Achernar, files "geschichte-NN-v1.mp3"); until they are made the app reads with the voice of the device. Remove a number from this list when its file is in.
-const WITHOUT_RECORDING = new Set([9])
+const WITHOUT_RECORDING = new Set([])
 for (const s of elia.stages) {
   const file = `audio/abenteuer/elia/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' || WITHOUT_RECORDING.has(s.id) ? undefined : file), enumerable: true, configurable: true })
