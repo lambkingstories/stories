@@ -50,7 +50,7 @@ describe('Adam und Eva: the scaffold', () => {
     const shared = /^(images\/abenteuer\/ui\/|audio\/abenteuer\/(klang|musik)-|images\/abenteuer\/josef\/medaillon-ring)/
     expect(files.filter((f) => !own.includes(f) && !shared.test(f))).toEqual([])
     // the pictures of the stages, the medal, the gift, the four pieces of the map and the four music pieces are always part of the pack
-    for (const f of [...Array.from({ length: 9 }, (_, i) => `images/abenteuer/adam-eva/etappe-bild-${String(i + 1).padStart(2, '0')}.webp`), 'images/abenteuer/adam-eva/medaille-v3.webp', 'images/abenteuer/adam-eva/geschenk.webp', ...[1, 2, 3, 4].map((n) => `images/abenteuer/adam-eva/karte-pano-v3-${n}.webp`), ...['licht', 'garten', 'strom', 'abend'].map((m) => `audio/abenteuer/adam-eva/musik-${m}-v1.mp3`)]) expect(own, f).toContain(f)
+    for (const f of [...Array.from({ length: 9 }, (_, i) => `images/abenteuer/adam-eva/etappe-bild-${String(i + 1).padStart(2, '0')}.webp`), 'images/abenteuer/adam-eva/medaille-v3.webp', 'images/abenteuer/adam-eva/geschenk.webp', ...[1, 2, 3, 4].map((n) => `images/abenteuer/adam-eva/karte-pano-v4-${n}.webp`), ...['licht', 'garten', 'strom', 'abend'].map((m) => `audio/abenteuer/adam-eva/musik-${m}-v1.mp3`)]) expect(own, f).toContain(f)
     // the pictures of the games and the recordings are part of the pack only when the stages are released
     expect(own.some((f) => f.includes('spiele/adam-eva/'))).toBe(adamEva.stages.every((s) => !s.soon))
     // the nine German recordings are linked (files "-v3"; stages 3, 7 and 8 were recorded again after the Bibeltreue correction of 21.10.2026 as "-v4"); the English ones belong to the English pack, not to the German one

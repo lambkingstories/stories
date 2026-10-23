@@ -202,24 +202,24 @@ export const adamEva: Journey = {
   medal: `${IMG}medaille-v3.webp`, // Der Garten Eden (Lichtung mit Strom, Bäumen und warmem Morgenlicht, ohne Menschen)
   // Geschenk-Ausmalbild: Adam und Eva im Garten mit den Tieren, im Hintergrund der Baum des Lebens (nur Geschenk, nicht mehr Aufgabe der Etappe 9)
   gift: { title: 'Adam und Eva im Garten', image: `${IMG}geschenk.webp` },
-  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v3) mit Stationen und Perlenweg aus adamEvaPath.ts
+  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, erzählendes Panorama v4, 23.10.2026) mit Stationen und Perlenweg aus adamEvaPath.ts
   map: {
-    images: [1, 2, 3, 4].map((n) => `${IMG}karte-pano-v3-${n}.webp`),
+    images: [1, 2, 3, 4].map((n) => `${IMG}karte-pano-v4-${n}.webp`),
     ring: 'images/abenteuer/josef/medaillon-ring.webp',
     aspect: 9908 / 1648,
     widthPx: 9908,
     stages: [
-      { x: 0.0454, y: 0.6129, d: 0.0339 },
-      { x: 0.114, y: 0.2609, d: 0.0339 },
-      { x: 0.3331, y: 0.2002, d: 0.0339 },
-      { x: 0.4602, y: 0.6311, d: 0.0339 },
-      { x: 0.5349, y: 0.2549, d: 0.0339 },
-      { x: 0.6207, y: 0.3398, d: 0.0339 },
-      { x: 0.8074, y: 0.2549, d: 0.0339 },
-      { x: 0.8377, y: 0.6189, d: 0.0339 },
-      { x: 0.8912, y: 0.182, d: 0.0339 }
+      { x: 0.0404, y: 0.6493, d: 0.0339 },
+      { x: 0.1110, y: 0.5218, d: 0.0339 },
+      { x: 0.2069, y: 0.6432, d: 0.0339 },
+      { x: 0.3674, y: 0.6311, d: 0.0339 },
+      { x: 0.4945, y: 0.4436, d: 0.0339 },
+      { x: 0.6389, y: 0.6402, d: 0.0339 },
+      { x: 0.7721, y: 0.6432, d: 0.0339 },
+      { x: 0.8407, y: 0.3944, d: 0.0339 },
+      { x: 0.9140, y: 0.3307, d: 0.0339 }
     ],
-    exam: { x: 0.9871, y: 0.2609, d: 0.0339 },
+    exam: { x: 0.9820, y: 0.3277, d: 0.0339 },
     path: ADAM_EVA_PATH
   },
   stages: [
