@@ -272,10 +272,12 @@ describe('Daniel: map, files, English', () => {
     expect(stage(2).task.hint).toContain('vegetables')
     expect(stage(8).task.hours!.rounds[0]!.hint).toContain('golden mark')
     // the English recordings are linked (the German ones are checked in German mode)
-    for (let n = 1; n <= 9; n++) expect(stage(n).audio, `English recording ${n}`).toBe(`audio/abenteuer/daniel/geschichte-${String(n).padStart(2, '0')}-en-v1.mp3`)
+    // stages 1, 5 and 8 were recorded again after the Bible check of 24.10.2026 ("-v2")
+    const version = (n: number) => ([1, 5, 8].includes(n) ? 'v2' : 'v1')
+    for (let n = 1; n <= 9; n++) expect(stage(n).audio, `English recording ${n}`).toBe(`audio/abenteuer/daniel/geschichte-${String(n).padStart(2, '0')}-en-${version(n)}.mp3`)
     setAdventureLanguage('de')
     for (let n = 1; n <= 9; n++) {
-      expect(stage(n).audio, `German recording ${n}`).toBe(`audio/abenteuer/daniel/geschichte-${String(n).padStart(2, '0')}-v1.mp3`)
+      expect(stage(n).audio, `German recording ${n}`).toBe(`audio/abenteuer/daniel/geschichte-${String(n).padStart(2, '0')}-${version(n)}.mp3`)
       expect(existsSync(`public/${stage(n).audio}`), `file ${stage(n).audio}`).toBe(true)
     }
   })

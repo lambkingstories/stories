@@ -17,7 +17,7 @@ export const danielEn: TextOverlay<Journey> = {
       title: 'Daniel at the King’s Court',
       ref: 'Daniel 1:1–7',
       text: [
-        'King Nebuchadnezzar of Babylon marches against Jerusalem. He takes many vessels from the house of God. In the treasury of his city he sets them up.',
+        'King Nebuchadnezzar of Babylon marches against Jerusalem. He takes some vessels from the house of God. In the treasury of his god he sets them up.',
         'Then he gives an order: Young men from the people of Israel are to come to his court. They are to be healthy and wise. They are to learn the writing and the language of the Babylonians. For three years they are fed from the king’s table, and after that they are to serve him.',
         'Among them are Daniel, Hananiah, Mishael and Azariah from the tribe of Judah. The chief of the officials gives them new names. Daniel is now called Belteshazzar, and the other three are called Shadrach, Meshach and Abednego.'
       ],
@@ -75,7 +75,7 @@ export const danielEn: TextOverlay<Journey> = {
         hint: 'Drag each metal to its place on the statue.',
         statue: {
           pieces: [{ label: 'Gold' }, { label: 'Silver' }, { label: 'Bronze' }, { label: 'Iron' }, { label: 'Iron and clay' }],
-          rounds: [{ hint: 'Put the statue from the dream together: the best at the top, the weakest at the bottom.' }, { hint: 'Once more, now without names. Where does each disc belong?' }]
+          rounds: [{ hint: 'Put the statue together the way the king saw it in the dream.' }, { hint: 'Once more, now without names. Where does each disc belong?' }]
         }
       },
       questions: [
@@ -89,7 +89,7 @@ export const danielEn: TextOverlay<Journey> = {
       text: [
         'King Nebuchadnezzar has a huge image made of gold, sixty cubits high. He sets it up on the plain of Dura, and all the great men of the land are to come to its dedication.',
         'A herald calls: “As soon as you hear the music of trumpets, harps and many other instruments, you must fall down and worship the golden image! Whoever does not will be thrown into a blazing furnace.”',
-        'The music sounds, and everyone falls down. Only Shadrach, Meshach and Abednego stay standing. Some men report them to the king.',
+        'The music sounds, and everyone falls down. But Shadrach, Meshach and Abednego stay standing. Some men report them to the king.',
         'The king has the three called before him. “Will you not worship my image?” he asks. They answer: “Our God can save us from the fire. And if he does not, we will still not worship your image.”'
       ],
       task: {
@@ -137,7 +137,7 @@ export const danielEn: TextOverlay<Journey> = {
       title: 'Daniel Prays',
       ref: 'Daniel 6:1–13',
       text: [
-        'Now Darius is king. He sets Daniel over the whole kingdom, because Daniel is faithful and has an excellent spirit. That annoys the other high officials. They look for something to say against Daniel, but they find nothing.',
+        'Now Darius is king. He plans to set Daniel over the whole kingdom, because Daniel is faithful and has an excellent spirit. That annoys the other high officials. They look for something to say against Daniel, but they find nothing.',
         'Then they say to the king: “Whoever prays to any god or any man for the next thirty days, except to you, shall be thrown into the pit of lions.” Darius signs the order.',
         'Daniel hears about it. He goes home, to his room with the windows open toward Jerusalem. Three times a day he kneels down, prays and gives thanks to his God, just as he has always done.',
         'The men watch him and find him praying. At once they go to the king and accuse Daniel.'
@@ -177,7 +177,8 @@ export const danielEn: TextOverlay<Journey> = {
   ]
 }
 
-// the English recordings of the stories (voice Achernar, Gemini, 24.10.2026): geschichte-NN-en-v1.mp3, one per stage in the order of the stages
+// the English recordings of the stories (voice Achernar, Gemini, 24.10.2026): geschichte-NN-en-v1.mp3, one per stage in the order of the stages; stages 1, 5 and 8 were recorded again after the Bible check as "-en-v2"
+const RECORDED_AGAIN = [1, 5, 8]
 danielEn.stages!.forEach((s, i) => {
-  s.audio = `audio/abenteuer/daniel/geschichte-${String(i + 1).padStart(2, '0')}-en-v1.mp3`
+  s.audio = `audio/abenteuer/daniel/geschichte-${String(i + 1).padStart(2, '0')}-en-${RECORDED_AGAIN.includes(i + 1) ? 'v2' : 'v1'}.mp3`
 })

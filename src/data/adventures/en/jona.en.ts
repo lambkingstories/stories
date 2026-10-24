@@ -173,7 +173,7 @@ export const jonaEn: TextOverlay<Journey> = {
     { q: 'What happens when Jonah is thrown into the sea?', options: ['The sea becomes calm.', 'The storm gets stronger.', 'The ship goes down.'] },
     { q: 'How long is Jonah in the belly of the fish?', options: ['three days and three nights', 'one day and one night', 'seven days'] },
     { q: 'What do the people of Nineveh do when they hear Jonah?', options: ['They believe God and put on sackcloth.', 'They chase Jonah away.', 'They build a wall.'] },
-    { q: 'What does God say about Nineveh at the end?', options: ['It should make him sorry: so many people and animals.', 'The city should go under.', 'The city should belong to Jonah.'] }
+    { q: 'What does God say about Nineveh at the end?', options: ['He should pity it: so many people and animals.', 'The city should go under.', 'The city should belong to Jonah.'] }
   ]
 }
 

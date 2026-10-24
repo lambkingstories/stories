@@ -351,8 +351,8 @@ export const jona: Journey = {
       text: [
         'Gott lässt über Jona einen Rizinus wachsen. Die großen Blätter geben Schatten für seinen Kopf, und Jona freut sich sehr darüber.',
         'Aber am nächsten Morgen schickt Gott einen Wurm, der sticht die Pflanze, und sie verdorrt. Dann schickt Gott einen heißen Ostwind, und die Sonne sticht Jona auf den Kopf, bis er matt wird. Wieder ist er zornig.',
-        '„Dich jammert der Rizinus“, sagt Gott, „für den du nicht gearbeitet hast. In einer Nacht ist er gewachsen, in einer Nacht ist er verdorrt.“',
-        '„Und mich sollte Ninive nicht jammern, diese große Stadt? Mehr als hundertzwanzigtausend Menschen leben dort, und viele Tiere.“'
+        '„Dir tut der Rizinus leid“, sagt Gott, „für den du nicht gearbeitet hast. In einer Nacht ist er gewachsen, in einer Nacht ist er verdorrt.“',
+        '„Und mir sollte Ninive nicht leidtun, diese große Stadt? Mehr als hundertzwanzigtausend Menschen leben dort, und viele Tiere.“'
       ],
       // Spiel: Schatten halten (schatten, neu)
       task: { kind: 'schatten', hint: 'Ziehe das Blätterdach so über Jona, dass die Sonne ihn nicht trifft.', shade: SCHATTEN },
@@ -368,7 +368,7 @@ export const jona: Journey = {
     { q: 'Was geschieht, als Jona ins Meer geworfen wird?', options: ['Das Meer wird still.', 'Der Sturm wird stärker.', 'Das Schiff geht unter.'], answer: 0 },
     { q: 'Wie lange ist Jona im Bauch des Fisches?', options: ['drei Tage und drei Nächte', 'einen Tag und eine Nacht', 'sieben Tage'], answer: 0 },
     { q: 'Was tun die Menschen von Ninive, als sie Jona hören?', options: ['Sie glauben an Gott und ziehen Säcke an.', 'Sie jagen Jona fort.', 'Sie bauen eine Mauer.'], answer: 0 },
-    { q: 'Was sagt Gott zum Schluss über Ninive?', options: ['Die Stadt soll ihn jammern, so viele Menschen und Tiere.', 'Die Stadt soll untergehen.', 'Die Stadt soll Jona gehören.'], answer: 0 }
+    { q: 'Was sagt Gott zum Schluss über Ninive?', options: ['Die Stadt soll ihm leidtun, so viele Menschen und Tiere.', 'Die Stadt soll untergehen.', 'Die Stadt soll Jona gehören.'], answer: 0 }
   ]
 }
 
@@ -378,8 +378,10 @@ for (const st of jona.stages) {
 }
 
 // the German recordings of the stories (voice Achernar, Gemini, files "geschichte-NN-v1.mp3"); the English ones are linked in `en/jona.en.ts` ("-en-v1")
+// Stage 9 changed in the Bible check of 24.10.2026 ("Dir tut der Rizinus leid", see D:/Claude/Abenteuer-Jona/NEUAUFNAHME-BIBELTREUE-2026-10-24.md) and was recorded again as "-v2".
+const RECORDED_AGAIN = [9]
 for (const s of jona.stages) {
-  const file = `audio/abenteuer/jona/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`
+  const file = `audio/abenteuer/jona/geschichte-${String(s.id).padStart(2, '0')}-${RECORDED_AGAIN.includes(s.id) ? 'v2' : 'v1'}.mp3`
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 

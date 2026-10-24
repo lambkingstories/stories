@@ -83,7 +83,7 @@ const STANDBILD: StatueGame = {
   mountain: `${G}standbild/berg.webp`,
   rounds: [
     {
-      hint: 'Setze das Standbild aus dem Traum zusammen: oben das Beste, unten das Schwächste.',
+      hint: 'Setze das Standbild so zusammen, wie der König es im Traum gesehen hat.',
       labels: true,
       homes: [{ x: 85, y: 13 }, { x: 15, y: 28 }, { x: 85, y: 50 }, { x: 15, y: 74 }, { x: 78, y: 83 }]
     },
@@ -96,7 +96,7 @@ const STANDBILD: StatueGame = {
 }
 
 /**
- * Etappe 5, "Wimmelbild" (alte Mechanik): die Ebene Dura im Hochformat; Sadrach, Mesach und Abed-Nego, die drei Männer, die stehen bleiben, sind zu finden; sie stehen halb hinter einem Zelt, einem Krug und einem Dornbusch,
+ * Etappe 5, "Wimmelbild" (alte Mechanik): das Tal Dura im Hochformat; Sadrach, Mesach und Abed-Nego, die drei Männer, die stehen bleiben, sind zu finden; sie stehen halb hinter einem Zelt, einem Krug und einem Dornbusch,
  * dazu stehen Verdecker (Palme, Knieende, Hornbläser, Harfner, Säule) nur zum Verwirren da. Bilder (Bildauftrag D34 und D35): `wimmel/szene.webp` 1100 × 1467 (3:4), `sadrach/mesach/abednego.webp` (aus einem Bogen, Maßstab erhalten), `verdecker-1..8.webp`.
  * x/y = Mitte der Füße, w = Breite, in Prozent der Szene.
  */
@@ -206,7 +206,7 @@ export const daniel: Journey = {
       title: 'Daniel am Hof des Königs',
       ref: 'Daniel 1,1–7',
       text: [
-        'Der König Nebukadnezar von Babel zieht gegen Jerusalem. Er nimmt viele Gefäße aus dem Haus Gottes mit. In der Schatzkammer seiner Stadt stellt er sie auf.',
+        'Der König Nebukadnezar von Babel zieht gegen Jerusalem. Er nimmt einige Gefäße aus dem Haus Gottes mit. In der Schatzkammer seines Gottes stellt er sie auf.',
         'Dann gibt er einen Befehl: Junge Männer aus dem Volk Israel sollen an seinen Hof kommen. Sie sollen gesund und klug sein. Sie sollen die Schrift und die Sprache der Babylonier lernen. Drei Jahre lang werden sie von des Königs Tisch ernährt, danach sollen sie ihm dienen.',
         'Unter ihnen sind Daniel, Hananja, Misael und Asarja aus dem Stamm Juda. Der oberste Kämmerer gibt ihnen neue Namen. Daniel heißt nun Beltsazar, und die anderen drei heißen Sadrach, Mesach und Abed-Nego.'
       ],
@@ -274,15 +274,15 @@ export const daniel: Journey = {
       title: 'Das goldene Bild',
       ref: 'Daniel 3,1–18',
       text: [
-        'Der König Nebukadnezar lässt ein riesiges Bild aus Gold machen, sechzig Ellen hoch. Er stellt es in der Ebene Dura auf, und alle hohen Herren des Landes sollen zur Einweihung kommen.',
+        'Der König Nebukadnezar lässt ein riesiges Bild aus Gold machen, sechzig Ellen hoch. Er stellt es im Tal Dura auf, und alle hohen Herren des Landes sollen zur Einweihung kommen.',
         'Ein Herold ruft: „Sobald ihr die Musik von Posaunen, Harfen und vielen anderen Instrumenten hört, sollt ihr euch niederwerfen und das goldene Bild anbeten! Wer es nicht tut, wird in einen glühenden Ofen geworfen.“',
-        'Die Musik erklingt, und alle fallen nieder. Nur Sadrach, Mesach und Abed-Nego bleiben stehen. Einige Männer verraten sie beim König.',
+        'Die Musik erklingt, und alle fallen nieder. Aber Sadrach, Mesach und Abed-Nego bleiben stehen. Einige Männer verraten sie beim König.',
         'Der König lässt die drei zu sich rufen. „Wollt ihr mein Bild nicht anbeten?“, fragt er. Sie antworten: „Unser Gott kann uns aus dem Feuer retten. Und wenn er es nicht tut, beten wir dein Bild trotzdem nicht an.“'
       ],
       // Spiel: Wimmelbild (wimmelbild, alt 2 von 2)
       task: { kind: 'wimmelbild', hint: 'Finde die drei Männer, die stehen bleiben.', count: 3, find: WIMMEL },
       questions: [
-        { q: 'Wie heißt die Ebene, in der das Bild steht?', options: ['Dura', 'Babel', 'Jerusalem'], answer: 0 },
+        { q: 'Wie heißt das Tal, in dem das Bild steht?', options: ['Dura', 'Babel', 'Jerusalem'], answer: 0 },
         { q: 'Was sagen die drei Freunde zum König?', options: ['„Wir beten dein Bild nicht an.“', '„Wir beten dein Bild an.“', '„Wir gehen fort.“'], answer: 0 }
       ]
     },
@@ -327,7 +327,7 @@ export const daniel: Journey = {
       title: 'Daniel betet',
       ref: 'Daniel 6,1–13',
       text: [
-        'Jetzt ist Darius König. Er setzt Daniel über das ganze Reich, weil Daniel treu ist und einen hohen Geist hat. Das ärgert die anderen hohen Herren. Sie suchen etwas, das sie gegen Daniel sagen können, aber sie finden nichts.',
+        'Jetzt ist Darius König. Er will Daniel über das ganze Reich setzen, weil Daniel treu ist und einen hohen Geist hat. Das ärgert die anderen hohen Herren. Sie suchen etwas, das sie gegen Daniel sagen können, aber sie finden nichts.',
         'Da sagen sie zum König: „Wer in den nächsten dreißig Tagen zu einem Gott oder einem Menschen betet, nur nicht zu dir, soll zu den Löwen in die Grube geworfen werden.“ Darius unterschreibt das Gebot.',
         'Daniel hört davon. Er geht nach Hause, in sein Zimmer mit den offenen Fenstern nach Jerusalem. Dreimal am Tag kniet er nieder, betet und dankt seinem Gott, so wie er es immer getan hat.',
         'Die Männer beobachten ihn und finden ihn betend. Sofort gehen sie zum König und verklagen Daniel.'
@@ -374,8 +374,10 @@ for (const st of daniel.stages) {
 }
 
 // the German recordings of the stories (voice Achernar, Gemini, files "geschichte-NN-v1.mp3"); the English ones are linked in `en/daniel.en.ts` ("-en-v1")
+// Stages 1, 5 and 8 changed in the Bible check of 24.10.2026 (see D:/Claude/Abenteuer-Daniel/NEUAUFNAHME-BIBELTREUE-2026-10-24.md) and were recorded again as "-v2".
+const RECORDED_AGAIN = [1, 5, 8]
 for (const s of daniel.stages) {
-  const file = `audio/abenteuer/daniel/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`
+  const file = `audio/abenteuer/daniel/geschichte-${String(s.id).padStart(2, '0')}-${RECORDED_AGAIN.includes(s.id) ? 'v2' : 'v1'}.mp3`
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 

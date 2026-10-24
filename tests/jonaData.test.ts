@@ -93,7 +93,7 @@ describe('Jona: stories and questions', () => {
     }
     const kinds = jona.stages.map((s) => s.task.kind)
     for (let i = 1; i < kinds.length; i++) expect(kinds[i] === 'quiz' && kinds[i - 1] === 'quiz', `two quizzes in a row at ${i + 1}`).toBe(false)
-    expect(stage(9).text.at(-1)).toMatch(/Ninive nicht jammern, diese große Stadt\?.*viele Tiere\.“$/)
+    expect(stage(9).text.at(-1)).toMatch(/Ninive nicht leidtun, diese große Stadt\?.*viele Tiere\.“$/)
     // the death wish of Jonah (4,3.8.9) is left out; nothing is shown of the throw into the sea
     expect(stage(8).text.join(' ')).not.toMatch(/lieber/)
     expect(stage(4).text.join(' ')).toMatch(/werfen ihn ins Meer/)
@@ -238,7 +238,8 @@ describe('Jona: map, files, English', () => {
     for (let n = 1; n <= 9; n++) expect(stage(n).audio, `English recording ${n}`).toBe(`audio/abenteuer/jona/geschichte-${String(n).padStart(2, '0')}-en-v1.mp3`)
     setAdventureLanguage('de')
     for (let n = 1; n <= 9; n++) {
-      expect(stage(n).audio, `German recording ${n}`).toBe(`audio/abenteuer/jona/geschichte-${String(n).padStart(2, '0')}-v1.mp3`)
+      // stage 9 was recorded again after the Bible check of 24.10.2026 ("-v2")
+      expect(stage(n).audio, `German recording ${n}`).toBe(`audio/abenteuer/jona/geschichte-${String(n).padStart(2, '0')}-${n === 9 ? 'v2' : 'v1'}.mp3`)
       expect(existsSync(`public/${stage(n).audio}`), `file ${stage(n).audio}`).toBe(true)
     }
   })
