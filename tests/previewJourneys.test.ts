@@ -689,3 +689,53 @@ describe('the hidden journey Elia (id elia)', () => {
     expect(m.journeys.filter((j) => j.id === 'elia')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Rut (id rut)', () => {
+  it('a normal build (without Rut) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_RUT', 'false')
+    open('?rut=rut-vorschau-k6p3')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('rut')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_RUT', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?rut=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.RUT_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?rut=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_RUT', 'true')
+    const first = await load()
+    open(`?rut=${first.RUT_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.RUT_UNLOCK_CODE).toBe('rut-vorschau-k6p3')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'rut'])
+    expect(localStorage.getItem('lk-preview-rut')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('rut')?.stages.length).toBe(9)
+    open('?rut=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-rut')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_RUT) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_RUT', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'rut')).toHaveLength(1)
+  })
+})

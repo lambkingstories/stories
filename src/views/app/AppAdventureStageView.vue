@@ -65,6 +65,10 @@ import GameRavens from '@/components/molecules/games/GameRavens.vue'
 import GameCaves from '@/components/molecules/games/GameCaves.vue'
 import GameRain from '@/components/molecules/games/GameRain.vue'
 import GameWhisper from '@/components/molecules/games/GameWhisper.vue'
+import GameGlean from '@/components/molecules/games/GameGlean.vue'
+import GameMeasure from '@/components/molecules/games/GameMeasure.vue'
+import GameElders from '@/components/molecules/games/GameElders.vue'
+import GameCradle from '@/components/molecules/games/GameCradle.vue'
 import GameWord from '@/components/molecules/games/GameWord.vue'
 import GameHush from '@/components/molecules/games/GameHush.vue'
 import GameHide from '@/components/molecules/games/GameHide.vue'
@@ -370,7 +374,7 @@ const hasPart = computed(() => partStars.value > 0 && !progress.finished.value)
 
 /** The games have a restart sign: a new key mounts the game afresh (round, mistakes and what was done begin again). */
 const gameKey = ref(0)
-const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew', 'overboard', 'shore', 'sacks', 'shade', 'days', 'statue', 'lamp', 'hours', 'ravens', 'caves', 'rain', 'whisper'] as const
+const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew', 'overboard', 'shore', 'sacks', 'shade', 'days', 'statue', 'lamp', 'hours', 'ravens', 'caves', 'rain', 'whisper', 'glean', 'measure', 'elders', 'cradle'] as const
 const hasGame = computed(() => hasCountGame.value || GAME_FIELDS.some((f) => !!gameTask.value?.[f]))
 function restartGame() {
   progress.reset()
@@ -500,6 +504,10 @@ const gameKind = computed(() => {
   if (g?.caves) return 'caves'
   if (g?.rain) return 'rain'
   if (g?.whisper) return 'whisper'
+  if (g?.glean) return 'glean'
+  if (g?.measure) return 'measure'
+  if (g?.elders) return 'elders'
+  if (g?.cradle) return 'cradle'
   return undefined
 })
 watch(
@@ -665,6 +673,10 @@ function openGift() {
         GameCaves(:key="gameKey" v-else-if="gameTask?.caves" :game="gameTask.caves" @done="taskDone")
         GameRain(:key="gameKey" v-else-if="gameTask?.rain" :game="gameTask.rain" @done="taskDone")
         GameWhisper(:key="gameKey" v-else-if="gameTask?.whisper" :game="gameTask.whisper" @done="taskDone")
+        GameGlean(:key="gameKey" v-else-if="gameTask?.glean" :game="gameTask.glean" @done="taskDone")
+        GameMeasure(:key="gameKey" v-else-if="gameTask?.measure" :game="gameTask.measure" @done="taskDone")
+        GameElders(:key="gameKey" v-else-if="gameTask?.elders" :game="gameTask.elders" @done="taskDone")
+        GameCradle(:key="gameKey" v-else-if="gameTask?.cradle" :game="gameTask.cradle" @done="taskDone")
         template(v-else-if="isPaint")
           img(:src="img(taskImage)" alt="" class="stage-paint" draggable="false")
           div(class="stage-actions")

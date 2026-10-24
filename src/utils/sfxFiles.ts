@@ -68,6 +68,7 @@ const GAME_MOOD: Record<string, Mood> = {
   overboard: 'mittel', shore: 'ruhig', sacks: 'ruhig', shade: 'ruhig',
   days: 'mittel', statue: 'ruhig', lamp: 'ruhig', hours: 'ruhig',
   ravens: 'ruhig', caves: 'ruhig', rain: 'ruhig', whisper: 'ruhig',
+  glean: 'mittel', measure: 'ruhig', elders: 'mittel', cradle: 'ruhig',
   puzzle: 'mittel', sort: 'mittel', harvest: 'mittel', build: 'mittel', way: 'mittel',
   fly: 'lebhaft', dots: 'lebhaft'
 }

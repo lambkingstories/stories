@@ -115,3 +115,11 @@ export const ELIA_ONLY_DIRS = ['images/abenteuer/elia', 'images/abenteuer/spiele
 export function stripEliaFiles(outDir: string) {
   strip(outDir, ELIA_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Rut" (id `rut`) alone, in the same three places as Adam and Eva. */
+export const RUT_ONLY_DIRS = ['images/abenteuer/rut', 'images/abenteuer/spiele/rut', 'audio/abenteuer/rut']
+
+/** Takes the folders of Rut out of a finished build. */
+export function stripRutFiles(outDir: string) {
+  strip(outDir, RUT_ONLY_DIRS)
+}

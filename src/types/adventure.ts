@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege'
 
 export interface AdventureQuestion {
   q: string
@@ -1791,6 +1791,115 @@ export interface StageTask {
   caves?: CavesGame
   rain?: RainGame
   whisper?: WhisperGame
+  glean?: GleanGame
+  measure?: MeasureGame
+  elders?: EldersGame
+  cradle?: CradleGame
+}
+
+/** One reaper of the gleaning game: the lane he cuts along (index into `GleanGame.lanes`), when he starts (ms after the lead), how long he needs to cross the picture, his picture (index into `GleanGame.reapers`) and the places (percent of the picture width) of the clumps of barley that stand in his lane. */
+export interface GleanReaper {
+  lane: number
+  at: number
+  dur: number
+  sprite: number
+  clumps: number[]
+}
+export interface GleanRound {
+  hint: string
+  reapers: GleanReaper[]
+}
+/** The game "Ears behind the reapers": the reapers cut the standing clumps of a lane from left to right and an ear stays lying where a clump fell; the child taps the lying ears into Ruth's basket; a tap on a clump that still stands is a mistake. */
+export interface GleanGame {
+  /** The field with the lanes (4:3). */
+  background: string
+  /** The feet of the reapers and the ground of the clumps and ears: the height of each lane (percent of the picture height). */
+  lanes: number[]
+  /** The reapers (walking to the right and bent over), the standing clumps and the lying ears (each in a few kinds, the app takes them in turn). */
+  reapers: string[]
+  clumps: string[]
+  ears: string[]
+  /** Ruth's basket (a picture) and where it stands (middle, foot and width in percent). */
+  basket: string
+  basketPos: { x: number; y: number; w: number }
+  /** Widths of a reaper, of a clump and of an ear (percent of the picture width). */
+  reaperW: number
+  clumpW: number
+  earW: number
+  rounds: GleanRound[]
+}
+
+export interface MeasureRound {
+  hint: string
+  /** The level to reach (1 = to the brim, 0.5 = half); the child may be 8 percent off. */
+  mark: number
+}
+/** The game "Fill the measure": the child holds a finger on the heap of barley, the grain runs into the measure, and lets go at the golden mark; too much spills (a mistake) and the measure is empty again. */
+export interface MeasureGame {
+  /** The picture of the place (4:3) with the heap of grain. */
+  background: string
+  /** The measure in five pictures of the same size (empty, a quarter, half, three quarters, full); the app fades between the two nearest ones. */
+  states: string[]
+  /** Where the measure stands (middle, foot, width in percent of the picture) and where the grain inside is: level 0 at `bottom` and level 1 at `top` (percent of the height of the measure picture, from its top). */
+  measure: { x: number; y: number; w: number; top: number; bottom: number }
+  /** The heap to hold the finger on (percent of the picture) and where the falling grains begin. */
+  heap: { x: number; y: number; w: number; h: number }
+  /** The little group of grains that falls (a picture) and its width (percent of the picture width). */
+  grain: string
+  grainW: number
+  /** The golden mark (an arrow that points to the left) and its width (percent of the picture width). */
+  markImage: string
+  markW: number
+  rounds: MeasureRound[]
+}
+
+/** One person who walks across the square in front of the gate. */
+export interface EldersWalker {
+  kind: 'elder' | 'other'
+  /** The index into `EldersGame.elders` (elder) or `EldersGame.others` (other). */
+  sprite: number
+  at: number
+  dur: number
+  /** The foot line of the walker (percent of the picture height). */
+  y: number
+}
+export interface EldersRound {
+  hint: string
+  walkers: EldersWalker[]
+}
+/** The game "Call ten elders to the gate": people walk across the square, the child taps the old men with gray beards; they walk to their seats in a half circle; a tap on anybody else is a mistake. */
+export interface EldersGame {
+  /** The square before the gate (4:3). */
+  background: string
+  /** The ten standing elders and the eight other people (pictures of the same size). */
+  elders: string[]
+  others: string[]
+  /** The ten elders sitting in a half circle (one picture) and where it lies (middle, foot, width in percent) - it fades in when all ten have come. */
+  seated: string
+  seatedBox: { x: number; y: number; w: number }
+  /** The ten places where a called elder stops (the middle of his foot, percent of the picture). */
+  seats: { x: number; y: number }[]
+  /** The width of a walker and of a called elder (percent of the picture width). */
+  walkerW: number
+  seatW: number
+  rounds: EldersRound[]
+}
+
+export interface CradleRound {
+  hint: string
+  /** How many calm rocks this round needs. */
+  calm: number
+  /** The next side to tap glows softly (only in the first round). */
+  guide: boolean
+}
+/** The game "Rock the cradle": the child taps the left and the right side of the cradle one after the other, calmly; the baby gets sleepy and falls asleep; too fast, too slow a rhythm, or the same side twice make it restless. */
+export interface CradleGame {
+  /** The room (4:3) and the cradle in three pictures of the same size (awake, sleepy, asleep). */
+  background: string
+  states: [string, string, string]
+  /** Where the cradle stands (middle, foot, width in percent of the picture). */
+  cradle: { x: number; y: number; w: number }
+  rounds: CradleRound[]
 }
 
 export interface AdventureStage {
