@@ -612,10 +612,10 @@ describe('Der Wolke folgen (cloud)', () => {
 
   it('speaks English', async () => {
     const w = await open('en')
-    expect(w.findAll('.cd-answers button')[0]!.text()).toBe('Break up')
+    expect(w.findAll('.cd-answers button')[0]!.text()).toBe('Set out')
     expect(w.findAll('.cd-answers button')[1]!.text()).toBe('Stay')
     await stay(w)
-    expect(w.find('.cd-fb').text()).toContain('the people break up')
+    expect(w.find('.cd-fb').text()).toContain('the people set out')
   })
 })
 

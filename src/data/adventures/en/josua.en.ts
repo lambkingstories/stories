@@ -137,14 +137,14 @@ export const josuaEn: TextOverlay<Journey> = {
       ref: 'Joshua 6:15–25',
       text: [
         'On the seventh day everyone gets up early. They walk around the city seven times, the men of the army first, then priests, golden chest, and people.',
-        'The seventh time Joshua calls, “Shout! God has given you the city!” The trumpets sound, and the people shout loudly.',
+        'The seventh time Joshua calls, “Shout! God has given you the city! It belongs to God. Only Rahab and everyone in her house are to stay alive.” The trumpets sound, and the people shout loudly.',
         'Then the wall collapses. The city of Jericho has fallen.',
         'Joshua reminds the spies of their promise, “Bring Rahab and her family out of the house with the red rope, as you swore.” So Rahab and all who belong to her stay alive. From then on she lives among the people of Israel.'
       ],
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'What happens to the wall of Jericho?', options: ['It collapses.', 'It is painted.', 'It keeps growing.'] },
-        { q: 'Who stays alive with her family?', options: ['Rahab', 'Barak', 'Deborah'] }
+        { q: 'Which woman in Jericho stays alive with her whole family?', options: ['Rahab', 'Zipporah', 'Miriam'] }
       ]
     },
     {
@@ -156,7 +156,7 @@ export const josuaEn: TextOverlay<Journey> = {
         'The people answer, “We want to serve God, too, for he brought us out of Egypt and has been with us until now.”',
         'Then Joshua takes a large stone and sets it up under the oak. “This stone shall be a witness, for it has heard all the words God has spoken to us.” Then he sends the people home. Afterward Joshua dies, one hundred and ten years old, and they bury him in his own land in the hills of Ephraim. At Shechem, however, the Israelites bury the bones of Joseph, which they had brought out of Egypt.'
       ],
-      task: { hint: 'Put the missing words into the sentence.', verse: { rounds: [{ hint: 'Drag the right leaf into the gap.', parts: ['As for me and my household, we will ', ' God.'], words: ['serve', 'forget', 'leave'] }, { hint: 'Now two words are missing.', parts: ['This stone shall be a ', ' for it has heard all the ', ' that God has spoken to us.'], words: ['witness', 'words', 'sign', 'stones'] }] } },
+      task: { hint: 'Put the missing words into the sentence.', verse: { rounds: [{ hint: 'Drag the right leaf into the gap.', parts: ['As for me and my household, we will ', ' God.'], words: ['serve', 'forget', 'leave'] }, { hint: 'Now two words are missing.', parts: ['This stone shall be a ', ' for it has heard all the ', ' that God has spoken to us.'], words: ['witness', 'words', 'wall', 'stones'] }] } },
       questions: [
         { q: 'What does Joshua say about himself and his house?', options: ['They will serve God.', 'They will move away.', 'They will become kings.'] },
         { q: 'What does Joshua set up under the oak?', options: ['a large stone', 'a tent', 'an altar with fire'] }
@@ -174,6 +174,7 @@ export const josuaEn: TextOverlay<Journey> = {
 }
 
 // the English recordings of the stories (voice Achernar, Gemini, 22.10.2026): geschichte-NN-en-v4.mp3, one per stage in the order of the stages
+// Text audit 24.10.2026: stage 9 got the sentence about the ban (Joshua 6:17) and was recorded again as "-en-v5" (round trip check 100 %)
 josuaEn.stages!.forEach((s, i) => {
-  s.audio = `audio/abenteuer/josua/geschichte-${String(i + 1).padStart(2, '0')}-en-v4.mp3`
+  s.audio = `audio/abenteuer/josua/geschichte-${String(i + 1).padStart(2, '0')}-en-${i === 8 ? 'v5' : 'v4'}.mp3`
 })

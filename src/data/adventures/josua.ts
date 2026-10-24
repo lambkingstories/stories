@@ -348,7 +348,7 @@ export const josua: Journey = {
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Was geschieht mit der Mauer von Jericho?', options: ['Sie stürzt ein.', 'Sie wird bemalt.', 'Sie wächst weiter.'], answer: 0 },
-        { q: 'Wer bleibt mit ihrer Familie am Leben?', options: ['Rahab', 'Barak', 'Debora'], answer: 0 }
+        { q: 'Welche Frau bleibt in Jericho mit ihrer ganzen Familie am Leben?', options: ['Rahab', 'Zippora', 'Mirjam'], answer: 0 }
       ]
     },
     {

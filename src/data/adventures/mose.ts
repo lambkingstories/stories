@@ -180,7 +180,7 @@ const VERS: VerseGame = {
   leaf: `${G}lueckenvers/blatt.webp`,
   rounds: [
     { hint: 'Ziehe das passende Blatt in die Lücke.', parts: ['Lass mein ', ' ziehen, damit es mir in der ', ' ein Fest feiert!'], words: ['Volk', 'Wüste', 'Land', 'Stadt'], answers: [0, 1] },
-    { hint: 'Jetzt fehlen drei Wörter.', parts: ['Ich will euch aus der schweren Arbeit ', ' und euch ', '. Ihr sollt mein Volk sein, und ich will euer ', ' sein.'], words: ['herausführen', 'retten', 'Gott', 'König', 'Hirte'], answers: [0, 1, 2] }
+    { hint: 'Jetzt fehlen drei Wörter.', parts: ['Ich will euch aus der schweren Arbeit herausführen und euch ', '. Ihr sollt mein ', ' sein, und ich will euer ', ' sein.'], words: ['retten', 'Volk', 'Gott', 'König', 'Hirte'], answers: [0, 1, 2] }
   ]
 }
 
@@ -540,7 +540,7 @@ export const mose: Journey = {
       // Spiel gebaut: Der Wolke folgen (wolke, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
       task: { kind: 'wolke', hint: 'Folge der Wolke: Brich auf, wenn sie sich hebt.', cloud: WOLKE },
       questions: [
-        { q: 'Was zeigt dem Volk den Weg?', options: ['die Wolke über dem Zelt', 'ein Vogel', 'ein Hirtenstab'], answer: 0 },
+        { q: 'Was geschieht, wenn sich die Wolke hebt?', options: ['Das Volk bricht auf.', 'Das Volk bleibt stehen.', 'Das Volk baut Zelte.'], answer: 0 },
         { q: 'Wo steht das Zelt, in dem Gott mit Mose spricht?', options: ['außerhalb des Lagers', 'mitten im Lager', 'auf dem Sinai'], answer: 0 }
       ]
     }
@@ -551,7 +551,7 @@ export const mose: Journey = {
     { q: 'Was ist mit dem Busch besonders, den Mose sieht?', options: ['Er brennt, aber verbrennt nicht.', 'Er wächst in einer Nacht.', 'Er ist aus Gold.'], answer: 0 },
     { q: 'Was teilt das Wasser am Meer?', options: ['ein starker Wind', 'ein Netz', 'ein Stab aus Gold'], answer: 0 },
     { q: 'Was antwortet das Volk Gott am Berg?', options: ['„Alles, was Gott gesagt hat, wollen wir tun.“', '„Wir wollen weiterziehen.“', '„Wir brauchen das nicht.“'], answer: 0 },
-    { q: 'Was zeigt dem Volk den Weg?', options: ['die Wolke über dem Zelt', 'ein Vogel', 'ein Hirtenstab'], answer: 0 }
+    { q: 'Was geschieht, wenn sich die Wolke hebt?', options: ['Das Volk bricht auf.', 'Das Volk bleibt stehen.', 'Das Volk baut Zelte.'], answer: 0 }
   ]
 }
 

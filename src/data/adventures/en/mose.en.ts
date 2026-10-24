@@ -98,7 +98,7 @@ export const moseEn: TextOverlay<Journey> = {
         'Moses goes to God.',
         'But God says to Moses, “I will lead you out of the hard labor and rescue you. You will be my people, and I will be your God.” Moses tells it to the people, but in their distress they do not listen.'
       ],
-      task: { hint: 'Put the missing words into the sentence.', verse: { rounds: [{ hint: 'Drag the right leaf into the gap.', parts: ['Let my ', ' go, so that they may hold a feast for me in the ', '!'], words: ['people', 'desert', 'land', 'city'] }, { hint: 'Now three words are missing.', parts: ['I will ', ' you out of the hard labor and ', ' you. You will be my people, and I will be your ', '.'], words: ['lead', 'rescue', 'God', 'king', 'shepherd'] }] } },
+      task: { hint: 'Put the missing words into the sentence.', verse: { rounds: [{ hint: 'Drag the right leaf into the gap.', parts: ['Let my ', ' go, so that they may hold a feast for me in the ', '!'], words: ['people', 'desert', 'land', 'city'] }, { hint: 'Now three words are missing.', parts: ['I will lead you out of the hard labor and ', ' you. You will be my ', ', and I will be your ', '.'], words: ['rescue', 'people', 'God', 'king', 'shepherd'] }] } },
       questions: [
         { q: 'What do the Israelites now have to do themselves?', options: ['look for their straw for the bricks', 'fetch their water', 'build their tents'] },
         { q: 'What does God promise the people?', options: ['He will rescue them.', 'He will punish them.', 'He will forget them.'] }
@@ -235,9 +235,9 @@ export const moseEn: TextOverlay<Journey> = {
         'Moses cuts two new stone tablets, and God writes his words on them. Then God calls out his name: “Merciful and gracious, slow to anger, and full of love and faithfulness!” When Moses comes down from the mountain, his face shines.',
         'Later the cloud covers the holy tent that Moses has set up for God. When the cloud rises, the people set out; when it stays, the people stay. By day the cloud shows the way, and by night there is fire in it.'
       ],
-      task: { hint: 'Follow the cloud: break up when it rises.', cloud: { rounds: [{ hint: 'When the pillar rises, the people break up; when it stays, they stay.' }, { hint: 'Now it is night. Sparks are no sign.' }] } },
+      task: { hint: 'Follow the cloud: set out when it rises.', cloud: { rounds: [{ hint: 'When the pillar rises, the people set out; when it stays, they stay.' }, { hint: 'Now it is night. Sparks are no sign.' }] } },
       questions: [
-        { q: 'What shows the people the way?', options: ['the cloud over the tent', 'a bird', 'a shepherd’s staff'] },
+        { q: 'What happens when the cloud rises?', options: ['The people set out.', 'The people stay where they are.', 'The people build tents.'] },
         { q: 'Where is the tent in which God speaks with Moses?', options: ['outside the camp', 'in the middle of the camp', 'on Sinai'] }
       ]
     }
@@ -248,7 +248,7 @@ export const moseEn: TextOverlay<Journey> = {
     { q: 'What is special about the bush Moses sees?', options: ['It burns but is not burned up.', 'It grows in one night.', 'It is made of gold.'] },
     { q: 'What parts the water at the sea?', options: ['a strong wind', 'a net', 'a golden staff'] },
     { q: 'What do the people answer God at the mountain?', options: ['“All that God has said we will do.”', '“We want to move on.”', '“We do not need this.”'] },
-    { q: 'What shows the people the way?', options: ['the cloud over the tent', 'a bird', 'a shepherd’s staff'] }
+    { q: 'What happens when the cloud rises?', options: ['The people set out.', 'The people stay where they are.', 'The people build tents.'] }
   ]
 }
 
