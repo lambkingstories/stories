@@ -125,7 +125,7 @@ export const jakobEn: TextOverlay<Journey> = {
         '“Why did you leave in secret?” asks Laban. “I served you for twenty years,” says Jacob. “If God had not been with me, you would have sent me away empty-handed.”',
         'Then the two make peace. They pile up stones into a heap and eat beside it. “This heap shall be a witness between you and me,” says Laban. The next morning he kisses his daughters and grandchildren, blesses them, and goes home.'
       ],
-      task: { hint: "Push Jacob's and Laban's stones to the middle together.", cairn: { rounds: [{ hint: 'Push both stones to the middle together. Tap left and right in turn.' }, { hint: 'Once more, now with four stones.' }] } },
+      task: { hint: 'Push Jacob’s and Laban’s stones to the middle together.', cairn: { rounds: [{ hint: 'Push both stones to the middle together. Tap left and right in turn.' }, { hint: 'Once more, now with four stones.' }] } },
       questions: [
         { q: 'Who speaks to Laban in a dream?', options: ['God', 'Jacob', 'Isaac'] },
         { q: 'What does the heap of stones between Jacob and Laban stand for?', options: ['It is to be a witness of their peace.', 'It is a house for Laban.', 'It is a grave.'] }

@@ -132,7 +132,7 @@ const BUND: CairnGame = {
   leftStart: [14, 66],
   rightStart: [86, 66],
   rounds: [
-    { hint: 'Schiebt die beiden Steine zusammen in die Mitte. Tippe abwechselnd links und rechts.', stones: 2, steps: 3 },
+    { hint: 'Schiebe die beiden Steine zusammen in die Mitte. Tippe abwechselnd links und rechts.', stones: 2, steps: 3 },
     { hint: 'Noch einmal, jetzt mit vier Steinen.', stones: 4, steps: 3 }
   ]
 }
