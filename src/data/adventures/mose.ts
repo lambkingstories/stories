@@ -538,7 +538,7 @@ export const mose: Journey = {
         'Später bedeckt die Wolke das heilige Zelt, das Mose für Gott aufgerichtet hat. Hebt sich die Wolke, bricht das Volk auf; bleibt sie stehen, bleibt das Volk. Am Tag zeigt die Wolke den Weg, und in der Nacht leuchtet Feuer in ihr.'
       ],
       // Spiel gebaut: Der Wolke folgen (wolke, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
-      task: { kind: 'wolke', hint: 'Folge der Wolke: Breche auf, wenn sie sich hebt.', cloud: WOLKE },
+      task: { kind: 'wolke', hint: 'Folge der Wolke: Brich auf, wenn sie sich hebt.', cloud: WOLKE },
       questions: [
         { q: 'Was zeigt dem Volk den Weg?', options: ['die Wolke über dem Zelt', 'ein Vogel', 'ein Hirtenstab'], answer: 0 },
         { q: 'Wo steht das Zelt, in dem Gott mit Mose spricht?', options: ['außerhalb des Lagers', 'mitten im Lager', 'auf dem Sinai'], answer: 0 }

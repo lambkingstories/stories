@@ -156,7 +156,7 @@ export const gideonEn: TextOverlay<Journey> = {
         'In the middle of the night the men take their places all around the camp of the enemies. Gideon blows the trumpet, and everyone smashes his jar. Suddenly the torches blaze up in the darkness, and the trumpets sound everywhere: “The sword of God and of Gideon!”',
         'The three hundred stay at their places. The enemies jolt out of their sleep, run about, and cry out. The whole army is terrified and flees.'
       ],
-      task: { hint: 'Wait for the horn and then answer in order.', cue: { rounds: [{ hint: "Wait for the horn. Then tap Gideon's jar, and after that the groups on the left and on the right." }, { hint: 'Take care: An owl calls. That is no sign. Answer only to the horn.' }] } },
+      task: { hint: 'Wait for the horn and then answer in order.', cue: { rounds: [{ hint: "Wait for the horn. Then tap Gideon’s jar, and after that the groups on the left and on the right." }, { hint: 'Take care: An owl calls. That is no sign. Answer only to the horn.' }] } },
       questions: [
         { q: 'What is inside the jars of the men?', options: ['torches', 'bread', 'water'] },
         { q: 'Into how many groups does Gideon divide the three hundred men?', options: ['three', 'two', 'twelve'] }

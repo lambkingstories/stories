@@ -190,7 +190,7 @@ export const moseEn: TextOverlay<Journey> = {
         'Everyone gathers as much as he needs, and there is enough for all. It tastes sweet, like bread with honey.',
         'God has said, “On the sixth day gather twice as much, for on the seventh day you rest.” And so it happens: on the sixth day there is twice as much, and on the seventh day there is nothing on the ground.'
       ],
-      task: { hint: 'Gather as much manna every day as you need.', manna: { rounds: [{ hint: 'Gather two full jars and then tap “Enough”.' }, { hint: 'On the sixth day you gather twice as much, on the seventh nothing lies on the ground.' }] } },
+      task: { hint: 'Gather as much manna every day as you need.', manna: { rounds: [{ hint: 'Gather two full jars and then tap “Enough.”' }, { hint: 'On the sixth day you gather twice as much, on the seventh nothing lies on the ground.' }] } },
       questions: [
         { q: 'What lies on the ground in the morning?', options: ['something white like frost', 'snow', 'gold'] },
         { q: 'How much do the people gather on an ordinary day?', options: ['as much as they need', 'as much as they can carry', 'only one jar'] }
@@ -205,7 +205,7 @@ export const moseEn: TextOverlay<Journey> = {
         'First God says how people shall live with him: “You shall have no other gods before me. You shall not make an idol. You shall not misuse my name. Keep the day of rest holy.”',
         'Then God says how people shall live with one another: “Honor your father and your mother. You shall not murder. You shall not break your marriage promise or steal. You shall not say anything false about your neighbor, and you shall not want what belongs to someone else.” The people become afraid and step back.'
       ],
-      task: { hint: "Put the words together to make God's words.", words: { rounds: [{ hint: 'Lay the words in the strip in the right order.', sentences: ['You shall not murder.', 'Honor your father and your mother.'] }, { hint: 'Now longer sentences.', sentences: ['You shall have no other gods before me.', 'I am your God, who freed you from Egypt.'] }] } },
+      task: { hint: "Put the words together to make God’s words.", words: { rounds: [{ hint: 'Lay the words in the strip in the right order.', sentences: ['You shall not murder.', 'Honor your father and your mother.'] }, { hint: 'Now longer sentences.', sentences: ['You shall have no other gods before me.', 'I am your God, who freed you from Egypt.'] }] } },
       questions: [
         { q: 'What do the people answer God at the mountain?', options: ['“All that God has said we will do.”', '“We want to move on.”', '“We do not need this.”'] },
         { q: 'What lies on Mount Sinai?', options: ['a thick cloud', 'deep snow', 'a tent'] }
