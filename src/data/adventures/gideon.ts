@@ -7,8 +7,7 @@
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/gideon/, images/abenteuer/spiele/gideon/<spiel>/, audio/abenteuer/gideon/.
  *
- * STAND 21.10.2026: alle neun Spiele sind gebaut (die Bilder der Spiele fehlen noch, bis dahin stehen Platzhalter, siehe `NOT_PAINTED_YET` in `utils/journeyFiles.ts`); die Etappen 1, 5 und 11 bleiben Quiz. Die Etappenbilder sind noch die von Josef;
- * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit allen zwölf Stationen und dem Ziel (PLATZHALTER bis zum eigenen Panorama); Medaille und Geschenk sind ebenfalls die von Josef.
+ * STAND 24.10.2026 (Technik-Audit: veraltete Hinweise „Platzhalter“ entfernt): alle neun Spiele, die Etappenbilder, das eigene Panorama, Medaille und Geschenk sind eingebaut; die Etappen 1, 5 und 11 bleiben Quiz.
  * Deutsche Vorlese-Aufnahmen: geschichte-NN-v3.mp3 (Gemini, Stimme Achernar, 21.10.2026, nicht gehört); Englisch noch nicht, die englische App liest mit der Gerätestimme. Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
 import type { CaveGame, CueGame, DewGame, FindGame, Journey, MemoryGame, SneakGame, SwitchGame, WinnowGame, WordGame } from '@/types/adventure'
@@ -223,18 +222,18 @@ export const gideon: Journey = {
     aspect: 9908 / 1648,
     widthPx: 9908,
     stages: [
-      { x: 0.0888, y: 0.3277, d: 0.0339 },
+      { x: 0.0888, y: 0.3398, d: 0.0339 },
       { x: 0.1514, y: 0.5461, d: 0.0339 },
-      { x: 0.2069, y: 0.1578, d: 0.0339 },
-      { x: 0.3109, y: 0.2609, d: 0.0339 },
-      { x: 0.3593, y: 0.4248, d: 0.0339 },
-      { x: 0.4118, y: 0.6493, d: 0.0339 },
-      { x: 0.5026, y: 0.2306, d: 0.0339 },
-      { x: 0.6106, y: 0.3034, d: 0.0339 },
-      { x: 0.6712, y: 0.2002, d: 0.0339 },
-      { x: 0.7923, y: 0.1396, d: 0.0339 },
+      { x: 0.2422, y: 0.6432, d: 0.0339 },
+      { x: 0.3331, y: 0.4794, d: 0.0339 },
+      { x: 0.3694, y: 0.4976, d: 0.0339 },
+      { x: 0.4199, y: 0.6493, d: 0.0339 },
+      { x: 0.5753, y: 0.4248, d: 0.0339 },
+      { x: 0.6288, y: 0.3398, d: 0.0339 },
+      { x: 0.6712, y: 0.4612, d: 0.0339 },
+      { x: 0.7721, y: 0.3580, d: 0.0339 },
       { x: 0.8781, y: 0.3277, d: 0.0339 },
-      { x: 0.9255, y: 0.3155, d: 0.0339 }
+      { x: 0.9255, y: 0.3944, d: 0.0339 }
     ],
     exam: { x: 0.9830, y: 0.2852, d: 0.0339 },
     path: GIDEON_PATH
