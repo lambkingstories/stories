@@ -177,7 +177,7 @@ export const elia: Journey = {
   downloadMb: 15, // gemessen 14,9 MB mit allen Aufnahmen (deutsch und englisch)
   medal: `${PICS}medaille-v3.webp`, // Medaille (Antons Wahl auf der Auswahlseite; bis dahin Entwurf 1)
   // Geschenk-Ausmalbild: Die Geschichte von Elia in einem Bild (Konturzeichnung)
-  gift: { title: 'Elia und die Raben', image: `${PICS}geschenk.webp` },
+  gift: { title: 'Elia und die Raben', image: `${PICS}geschenk-v2.webp` },
   // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, OpenAI-Bildmodell gpt-image-2.5-sunburst, Qualität max, mit neun Orten und dem Ziel) mit Stationen und Perlenweg aus eliaPath.ts
   map: {
     images: [1, 2, 3, 4].map((n) => `images/abenteuer/elia/karte-pano-v2-${n}.webp`),
@@ -187,15 +187,15 @@ export const elia: Journey = {
     stages: [
       { x: 0.0454, y: 0.6250, d: 0.0339 },
       { x: 0.1262, y: 0.3519, d: 0.0339 },
-      { x: 0.2473, y: 0.1820, d: 0.0339 },
+      { x: 0.3109, y: 0.6462, d: 0.0339 },
       { x: 0.3926, y: 0.6432, d: 0.0339 },
       { x: 0.5046, y: 0.6432, d: 0.0339 },
       { x: 0.6046, y: 0.6432, d: 0.0339 },
       { x: 0.6803, y: 0.3155, d: 0.0339 },
-      { x: 0.7812, y: 0.6462, d: 0.0339 },
-      { x: 0.8781, y: 0.3034, d: 0.0339 }
+      { x: 0.8498, y: 0.6129, d: 0.0339 },
+      { x: 0.9124, y: 0.3641, d: 0.0339 }
     ],
-    exam: { x: 0.9649, y: 0.2791, d: 0.0339 },
+    exam: { x: 0.9830, y: 0.2791, d: 0.0339 },
     path: ELIA_PATH
   },
   stages: [
