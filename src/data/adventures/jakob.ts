@@ -2,15 +2,14 @@
  * Abenteuer "Jakob" (1. Mose 25,19–34; 27; 28,10–22; 29–31; 32; 33,1–11; 35; 37,1–4) für 8 bis 10 Jahre: 12 Etappen (Ausbau am 20.10.2026, 1. Mose 25 bis 37), Untertitel "Ein Weg mit Umwegen". Entstanden nach dem Skill "LambKing Abenteuer Skill".
  * Quelle der Texte: D:/Claude/Abenteuer-Jakob/ENTWURF_Jakob-v3.md (zweitgeprüft, 90 bis 145 Wörter je Etappe wie bei Noah und Josef, eingebaut am 21.10.2026), Plan: ETAPPENPLAN-v3.md.
  * Deutsche Aufnahmen zu den neuen Texten: geschichte-NN-v3.mp3 (Gemini, Stimme Achernar, 21.10.2026, nicht gehört); Englisch noch nicht (die englische App liest mit der Gerätestimme).
- * Die Spielaufgaben der Etappen sind noch die von vor v3 (die Spiele folgen nach SPIELE/ENTWURF-v3.md). Die richtige Antwort steht in den Daten
+ * Die richtige Antwort steht in den Daten
  * IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
  * Spiele (Wahl der Leitung vom 20.10.2026, höchstens zwei alte Mechaniken): 1 Die Suppe kochen, bevor Esau kommt (neu), 2 nur Quiz, 3 Treppe zusammenschieben (neu), 4 Brunnen kurbeln (neu),
  * 5 Morgenrot halten (neu), 6 Puzzle (alt).
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/jakob/, images/abenteuer/spiele/jakob/<spiel>/, audio/abenteuer/jakob/.
  *
- * STAND 20.10.2026 (Ausbau auf 12 Etappen): Die Etappen 5 bis 9 und 12 haben bis zum Einbau ihrer Spiele und Bilder eine Quiz-Aufgabe (PLATZHALTER) und ein vorhandenes Etappenbild; die Karte (6 Stationen) bleibt unverändert.
- * Davor: alle Bilder (Panorama, Etappenbilder, Medaille, Geschenk, Spielbilder) und Messwerte sind eingebaut, die Etappen sind spielbar.
+ * STAND 24.10.2026 (Technik-Audit: veraltete Hinweise „Platzhalter“ entfernt): alle zwölf Etappen haben ihr Spiel (nur Etappe 2 ist Quiz), eigene Etappenbilder, Panorama, Medaille, Geschenk und Aufnahmen.
  * Das Abenteuer ist aber nicht öffentlich: es ist hinter `comingSoon` und dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
 import type { CairnGame, CatchGame, CrankGame, CycleGame, GuessGame, HoldGame, Journey, RelayGame, RingGame, SlideGame, StewGame } from '@/types/adventure'
@@ -340,7 +339,6 @@ export const jakob: Journey = {
         'Dann feiern sie Hochzeit, doch am Morgen merkt Jakob, dass Laban ihn getäuscht hat. Er hat ihm nicht Rahel gegeben, sondern ihre ältere Schwester Lea. „Warum hast du das getan?“, fragt Jakob. „Bei uns heiratet die Ältere zuerst“, sagt Laban.',
         '„Feiere noch diese Woche mit Lea“, sagt Laban, „dann gebe ich dir auch Rahel. Dafür dienst du mir noch einmal sieben Jahre.“ Jakob stimmt zu und bleibt.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
       task: { kind: 'jahre', hint: 'Ziehe die Jahreszeiten in die Lücken, Jahr für Jahr.', cycle: JAHRE },
       questions: [
         { q: 'Wie viele Jahre dient Jakob zuerst für Rahel?', options: ['sieben', 'zwei', 'zwanzig'], answer: 0 },
@@ -359,7 +357,6 @@ export const jakob: Journey = {
         'Rahel aber hat kein Kind. Sie beneidet ihre Schwester, denn Lea hat so viele. Auch die Mägde Bilha und Silpa schenken Jakob Söhne. Doch Gott vergisst Rahel nicht.',
         'Endlich schenkt Gott auch ihr einen Sohn. „Gott hat meine Schande von mir genommen“, sagt Rahel glücklich und nennt ihn Josef. Jakobs Zelte sind nun voller Kinder.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
       task: { kind: 'fangen', hint: 'Tippe die Kinder an, sie laufen zum Zelt.', catch: FANGEN },
       questions: [
         { q: 'Was ruft Lea, als Juda geboren wird?', options: ['„Jetzt will ich Gott danken!“', '„Nun will ich schlafen!“', '„Ich will fortgehen!“'], answer: 0 },
@@ -378,7 +375,6 @@ export const jakob: Journey = {
         'Da spricht Gott zu Jakob: „Zieh wieder in das Land deiner Väter. Ich will mit dir sein.“',
         'Jakob ruft Rahel und Lea aufs Feld und erzählt es ihnen. „Tu alles, was Gott dir gesagt hat“, sagen die beiden. Da macht sich Jakob bereit.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
       task: { kind: 'schaetzen', hint: 'Vergleiche die Herden und schätze, wie viele Tiere es sind.', guess: SCHAETZEN },
       questions: [
         { q: 'Was bittet Jakob den Laban?', options: ['ihn heimziehen zu lassen', 'ihm mehr Schafe zu geben', 'ihm ein Zelt zu bauen'], answer: 0 },
@@ -397,7 +393,6 @@ export const jakob: Journey = {
         '„Warum bist du heimlich fortgegangen?“, fragt Laban. „Zwanzig Jahre habe ich dir gedient“, sagt Jakob. „Wäre Gott nicht bei mir gewesen, du hättest mich mit leeren Händen fortgeschickt.“',
         'Dann schließen die beiden Frieden. Sie legen Steine zu einem Haufen auf und essen daneben. „Dieser Haufen sei Zeuge zwischen mir und dir“, sagt Laban. Am nächsten Morgen küsst er seine Töchter und Enkel, segnet sie und zieht heim.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
       task: { kind: 'bund', hint: 'Schiebe die Steine von Jakob und Laban gemeinsam in die Mitte.', cairn: BUND },
       questions: [
         { q: 'Wer spricht im Traum zu Laban?', options: ['Gott', 'Jakob', 'Isaak'], answer: 0 },
@@ -416,7 +411,6 @@ export const jakob: Journey = {
         'Er betet: „Gott, du hast gesagt, du willst mir Gutes tun. Ich bin zu klein für alles, was du mir geschenkt hast. Errette mich von der Hand meines Bruders!“',
         'Dann sucht Jakob Geschenke für Esau aus: Herden von Ziegen, Schafen und Kamelen. Seine Knechte sollen sie vor ihm hertreiben. „Lasst Raum zwischen einer Herde und der anderen“, sagt er. Vielleicht wird Esau freundlich sein, wenn er die Geschenke sieht.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
       task: { kind: 'staffel', hint: 'Schicke die Herden mit Abstand los.', relay: STAFFEL },
       questions: [
         { q: 'Wem begegnet Jakob unterwegs?', options: ['Engeln Gottes', 'Räubern', 'Hirten'], answer: 0 },
@@ -471,7 +465,6 @@ export const jakob: Journey = {
         'Nun hat Jakob zwölf Söhne, und aus ihnen soll ein großes Volk werden, wie Gott es versprochen hat. Am liebsten hat er Josef, den Sohn seines Alters.',
         'Josef ist siebzehn Jahre alt und hütet mit seinen Brüdern die Schafe. Jakob hat ihn so lieb, dass er ihm einen bunten Rock machen lässt.'
       ],
-      // PLATZHALTER bis Spiel/Bild: Quiz-Aufgabe und ein vorhandenes Etappenbild, bis das Spiel und das eigene Bild dieser Etappe eingebaut sind
       task: { kind: 'kreis', hint: 'Stelle die zwölf Söhne gleichmäßig um den Altar.', ring: KREIS },
       questions: [
         { q: 'Wohin zieht Jakob auf Gottes Wort?', options: ['nach Bethel', 'nach Haran', 'nach Ägypten'], answer: 0 },

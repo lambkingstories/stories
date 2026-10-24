@@ -406,8 +406,10 @@ adamEva.music = [
 // the German recordings of the stories (voice Achernar); there are no English ones yet, so the English app reads with the voice of the device
 // Bibeltreue-Korrektur 21.10.2026: the texts of these stages were changed (see NEUAUFNAHME-BIBELTREUE-2026-10-21.md in the adventure folder) and recorded again as "-v4"; the others are "-v3".
 const RECORDED_AGAIN = [3, 7, 8]
+// Technik-Audit 24.10.2026: the end of the recording of stage 6 was cut clean (a loud knock after the last sentence); same voice and words, new file name "-v3b"
+const CUT_AT_END: Record<number, string> = { 6: 'v3b' }
 for (const s of adamEva.stages) {
-  const file = `audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-${RECORDED_AGAIN.includes(s.id) ? 'v4' : 'v3'}.mp3`
+  const file = `audio/abenteuer/adam-eva/geschichte-${String(s.id).padStart(2, '0')}-${CUT_AT_END[s.id] ?? (RECORDED_AGAIN.includes(s.id) ? 'v4' : 'v3')}.mp3`
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 

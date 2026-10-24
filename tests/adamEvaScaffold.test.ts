@@ -54,7 +54,8 @@ describe('Adam und Eva: the scaffold', () => {
     // the pictures of the games and the recordings are part of the pack only when the stages are released
     expect(own.some((f) => f.includes('spiele/adam-eva/'))).toBe(adamEva.stages.every((s) => !s.soon))
     // the nine German recordings are linked (files "-v3"; stages 3, 7 and 8 were recorded again after the Bibeltreue correction of 21.10.2026 as "-v4"); the English ones belong to the English pack, not to the German one
-    expect(own.filter((f) => /geschichte-0\d-v3\.mp3$/.test(f))).toHaveLength(6)
+    // (stage 6 is "-v3b": the end of its file was cut clean in the Technik-Audit of 24.10.2026)
+    expect(own.filter((f) => /geschichte-0\d-v3b?\.mp3$/.test(f))).toHaveLength(6)
     expect(own.filter((f) => /geschichte-0\d-v4\.mp3$/.test(f))).toHaveLength(3)
     expect(own.some((f) => /geschichte-0\d-en-v\d\.mp3$/.test(f))).toBe(false)
   })

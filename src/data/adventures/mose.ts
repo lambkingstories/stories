@@ -7,8 +7,7 @@
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/mose/, images/abenteuer/spiele/mose/<spiel>/, audio/abenteuer/mose/.
  *
- * STAND 21.10.2026 (Phase 2a, Daten und Spiele; Bilder Platzhalter): Die zehn Spieletappen haben ihr Spiel, die ernsten Etappen 1, 3, 8, 9 und 14 bleiben Quiz; die Etappenbilder sind noch die von Josef;
- * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit fünfzehn Stationen und dem Ziel (PLATZHALTER bis eigenes Bild: das eigene Panorama); Medaille und Geschenk sind die eigenen von Mose.
+ * STAND 24.10.2026 (Technik-Audit: veraltete Hinweise „Platzhalter“ entfernt): die zehn Spieletappen haben ihr Spiel, die ernsten Etappen 1, 3, 8, 9 und 14 bleiben Quiz; Etappenbilder, eigenes Panorama, Medaille und Geschenk sind eingebaut.
  * Deutsche Vorlese-Aufnahmen: geschichte-NN-v3.mp3 (Gemini, Stimme Achernar, 21.10.2026, nicht gehört); Englisch noch nicht, die englische App liest mit der Gerätestimme (Liste der Aufnahmen: D:/Claude/Abenteuer-Mose/NEUAUFNAHME-Mose.md).
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
@@ -300,7 +299,7 @@ export const mose: Journey = {
         'Da kommt die Tochter des Pharao zum Nil. Sie entdeckt das Körbchen und öffnet es. Das Baby weint, und sie hat Mitleid.',
         '„Soll ich eine Frau holen, die das Kind stillt?“, fragt die Schwester. So wird die Mutter die Amme. Später nimmt die Tochter des Pharao den Jungen zu sich und nennt ihn Mose, denn sie hat ihn aus dem Wasser gezogen.'
       ],
-      // Spiel gebaut: Körbchen flechten (flechten, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
+      // Spiel gebaut: Körbchen flechten (flechten, neu)
       task: { kind: 'flechten', hint: 'Flechte das Körbchen aus Schilfrohr.', weave: FLECHTEN },
       questions: [
         { q: 'Wo legt die Mutter ihr Baby hin?', options: ['in ein Körbchen im Schilf', 'in ein Boot', 'in eine Höhle'], answer: 0 },
@@ -337,7 +336,7 @@ export const mose: Journey = {
         'Aus dem Busch ruft eine Stimme: „Mose, Mose! Zieh deine Schuhe aus, denn der Ort, auf dem du stehst, ist heiliger Boden. Ich bin der Gott Abrahams, Isaaks und Jakobs.“ Da verhüllt Mose sein Gesicht, denn er fürchtet sich, Gott anzuschauen.',
         '„Ich habe das Elend meines Volkes gesehen“, sagt Gott. „Ich sende dich zum Pharao, damit du mein Volk aus Ägypten führst.“ Mose zweifelt: „Wer bin ich?“ „Ich will mit dir sein“, antwortet Gott. Mose fragt: „Was soll ich dem Volk sagen, wie du heißt?“ Gott antwortet: „ICH WERDE SEIN, DER ICH SEIN WERDE.“'
       ],
-      // Spiel gebaut: Dem Leuchten nachgehen (leuchten, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
+      // Spiel gebaut: Dem Leuchten nachgehen (leuchten, neu)
       task: { kind: 'leuchten', hint: 'Geh dem Leuchten nach.', glow: LEUCHTEN },
       questions: [
         { q: 'Was ist mit dem Busch besonders?', options: ['Er brennt, aber verbrennt nicht.', 'Er wächst in einer Nacht.', 'Er ist aus Gold.'], answer: 0 },
@@ -355,7 +354,7 @@ export const mose: Journey = {
         'Mose zieht mit seiner Familie nach Ägypten. Am Berg Gottes kommt ihm Aaron entgegen, und die beiden Brüder umarmen sich.',
         'Gemeinsam rufen sie die Ältesten Israels zusammen. Aaron erzählt, was Gott gesagt hat. Die Ältesten glauben ihnen, und als sie hören, dass Gott ihr Elend gesehen hat, fallen sie nieder und beten an.'
       ],
-      // Spiel gebaut: Unterschiede finden (unterschied, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
+      // Spiel gebaut: Unterschiede finden (unterschied, neu)
       task: { kind: 'unterschied', hint: 'Finde, was im rechten Bild mehr ist.', diff: UNTERSCHIED },
       questions: [
         { q: 'Was sagt Mose, als Gott ihn sendet?', options: ['„Ich kann nicht gut reden.“', '„Ich bin zu müde.“', '„Ich kenne den Weg nicht.“'], answer: 0 },
@@ -373,7 +372,7 @@ export const mose: Journey = {
         'Mose geht zu Gott.',
         'Aber Gott sagt zu Mose: „Ich will euch aus der schweren Arbeit herausführen und euch retten. Ihr sollt mein Volk sein, und ich will euer Gott sein.“ Mose erzählt es dem Volk, doch vor lauter Not hören sie nicht zu.'
       ],
-      // Spiel gebaut: Lückenvers (lueckenvers, alt); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
+      // Spiel gebaut: Lückenvers (lueckenvers, alt)
       task: { kind: 'lueckenvers', hint: 'Setze die fehlenden Wörter in den Satz.', verse: VERS },
       questions: [
         { q: 'Was müssen die Israeliten jetzt selbst tun?', options: ['ihr Stroh für die Ziegel suchen', 'ihr Wasser holen', 'ihre Zelte bauen'], answer: 0 },
@@ -391,7 +390,7 @@ export const mose: Journey = {
         'Da ruft der Pharao Mose: „Bitte Gott, dass er die Frösche wegnimmt. Dann lasse ich das Volk ziehen.“ Mose betet, und Gott tut, worum er bittet: Die Frösche sterben in den Häusern, in den Höfen und auf den Feldern.',
         'Als der Pharao sieht, dass die Plage vorbei ist, wird er wieder hart. Er hält sein Wort nicht und lässt das Volk nicht ziehen.'
       ],
-      // Spiel gebaut: Wimmelbild: Frösche (wimmelbild, alt); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
+      // Spiel gebaut: Wimmelbild: Frösche (wimmelbild, alt)
       task: { kind: 'wimmelbild', hint: 'Finde die Frösche in der Backstube.', count: 7, find: WIMMEL },
       questions: [
         { q: 'Was geschieht zuerst mit dem Wasser im Nil?', options: ['Es wird zu Blut.', 'Es wird zu Eis.', 'Es versiegt.'], answer: 0 },
@@ -447,7 +446,7 @@ export const mose: Journey = {
         'Mose nimmt die Gebeine Josefs mit. Das hat Josef einst von seinen Brüdern gewünscht: „Gott wird sich euer annehmen. Dann nehmt meine Gebeine mit.“',
         'Gott selbst zeigt ihnen den Weg. Am Tag geht eine Wolkensäule vor ihnen her, und in der Nacht leuchtet ihnen eine Feuersäule.'
       ],
-      // Spiel gebaut: Packen (packen, vorhandene Mechanik aus Josua); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
+      // Spiel gebaut: Packen (packen, vorhandene Mechanik aus Josua)
       task: { kind: 'packen', hint: 'Packe das Tragetuch für den Auszug.', pack: AUSZUG },
       questions: [
         { q: 'Wessen Gebeine nimmt Mose mit?', options: ['die Gebeine Josefs', 'die Gebeine Jakobs', 'die Gebeine Abrahams'], answer: 0 },
@@ -465,7 +464,7 @@ export const mose: Journey = {
         'Die Wolkensäule stellt sich zwischen das Volk und das Heer. Mose streckt seine Hand über das Meer aus, und ein starker Ostwind teilt das Wasser. Rechts und links steht es wie eine Mauer, und das Volk geht trocken mitten hindurch.',
         'Das Heer des Pharao jagt dem Volk ins Meer nach. Da fällt das Wasser wieder zusammen und bedeckt die Wagen und die Reiter, und keiner von ihnen bleibt übrig. Auf der anderen Seite schlägt Mirjam, die Schwester von Mose und Aaron, die Pauke. „Singt Gott ein Lied!“, ruft sie, und die Frauen tanzen hinter ihr her.'
       ],
-      // Spiel gebaut: Mirjams Pauke (takt, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
+      // Spiel gebaut: Mirjams Pauke (takt, neu)
       task: { kind: 'takt', hint: 'Spiele mit Mirjam auf der Pauke.', beat: TAKT },
       questions: [
         { q: 'Was sagt Mose zum Volk am Meer?', options: ['„Fürchtet euch nicht!“', '„Lauft zurück!“', '„Baut Boote!“'], answer: 0 },
@@ -483,7 +482,7 @@ export const mose: Journey = {
         'Jeder sammelt, so viel er braucht, und es reicht für alle. Es schmeckt süß wie Brot mit Honig.',
         'Gott hat gesagt: „Sammelt am sechsten Tag doppelt, denn am siebten Tag ruht ihr.“ Und so geschieht es: Es gibt am sechsten Tag doppelt so viel, und am siebten Tag liegt nichts auf dem Boden.'
       ],
-      // Spiel gebaut: Manna sammeln (manna, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
+      // Spiel gebaut: Manna sammeln (manna, neu)
       task: { kind: 'manna', hint: 'Sammle jeden Tag so viel Manna, wie ihr braucht.', manna: MANNA },
       questions: [
         { q: 'Was liegt am Morgen auf dem Boden?', options: ['etwas Weißes wie Reif', 'Schnee', 'Gold'], answer: 0 },
@@ -501,7 +500,7 @@ export const mose: Journey = {
         'Zuerst sagt Gott, wie die Menschen mit ihm leben sollen: „Du sollst keine anderen Götter neben mir haben. Du sollst dir kein Bild machen. Du sollst meinen Namen nicht missbrauchen. Halte den Ruhetag heilig.“',
         'Dann sagt Gott, wie die Menschen miteinander leben sollen: „Ehre Vater und Mutter. Du sollst nicht töten. Du sollst die Ehe nicht brechen und nicht stehlen. Du sollst nichts Falsches über deinen Nächsten sagen und nicht begehren, was einem anderen gehört.“ Das Volk bekommt Angst und tritt zurück.'
       ],
-      // Spiel gebaut: Worte ordnen (worte, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
+      // Spiel gebaut: Worte ordnen (worte, neu)
       task: { kind: 'worte', hint: 'Lege die Wörter zu Gottes Worten zusammen.', words: WORTE },
       questions: [
         { q: 'Was antwortet das Volk Gott am Berg?', options: ['„Alles, was Gott gesagt hat, wollen wir tun.“', '„Wir wollen weiterziehen.“', '„Wir brauchen das nicht.“'], answer: 0 },
@@ -537,7 +536,7 @@ export const mose: Journey = {
         'Mose haut zwei neue Steintafeln zurecht, und Gott schreibt seine Worte darauf. Da ruft Gott seinen Namen aus: „Barmherzig und gnädig und geduldig und von großer Gnade und Treue!“ Als Mose vom Berg kommt, leuchtet sein Gesicht.',
         'Später bedeckt die Wolke das heilige Zelt, das Mose für Gott aufgerichtet hat. Hebt sich die Wolke, bricht das Volk auf; bleibt sie stehen, bleibt das Volk. Am Tag zeigt die Wolke den Weg, und in der Nacht leuchtet Feuer in ihr.'
       ],
-      // Spiel gebaut: Der Wolke folgen (wolke, neu); die Spielbilder stehen als Platzhalter, bis sie gemalt sind; das Etappenbild ist noch das von Josef
+      // Spiel gebaut: Der Wolke folgen (wolke, neu)
       task: { kind: 'wolke', hint: 'Folge der Wolke: Brich auf, wenn sie sich hebt.', cloud: WOLKE },
       questions: [
         { q: 'Was geschieht, wenn sich die Wolke hebt?', options: ['Das Volk bricht auf.', 'Das Volk bleibt stehen.', 'Das Volk baut Zelte.'], answer: 0 },

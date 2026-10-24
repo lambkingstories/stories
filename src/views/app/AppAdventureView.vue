@@ -82,7 +82,10 @@ const beadStyle = (b: [number, number], i: number) => ({ left: `calc(var(--w) * 
 const spotOf = (i: number): MapSpot => journey.value.map.stages[i] ?? journey.value.map.exam
 
 /** Where a spot sits on its tile, as percentages, and how big its round picture is. */
-const spotStyle = (s: MapSpot) => ({ left: `${s.x * 100}%`, top: `${s.y * 100}%`, width: `${s.d * 100}%` })
+// A round picture never reaches over the right edge of the painted map (the exam of Mose, Jona and Daniel sat 0.3–0.5 % too far right and hung on the plain
+// background); it is drawn at most this far right, the dotted way still ends under its ring.
+const spotLeft = (s: MapSpot) => Math.min(s.x, 0.999 - s.d / 2)
+const spotStyle = (s: MapSpot) => ({ left: `${spotLeft(s) * 100}%`, top: `${s.y * 100}%`, width: `${s.d * 100}%` })
 
 /** Each piece of the map picture is a few pixels wider than its share (4 px of the whole width), so that the pieces overlap. */
 const pieceLap = computed(() => 1 / Math.max(1, journey.value.map.images.length) + 4 / (journey.value.map.widthPx ?? 9824))
@@ -350,7 +353,10 @@ $ink: #3b2a12
   align-items: center
   min-height: 44px
   box-sizing: border-box
-  max-width: 40vw
+  // takes the room that the back button, the sound and the stars leave (Technik-Audit 24.10.2026: "Adam und Eva" was cut off on a phone)
+  flex: 0 1 auto
+  min-width: 0
+  max-width: 56vw
   padding: 0 18px
   border-radius: 28px
   background: var(--lk-surface)
@@ -363,6 +369,24 @@ $ink: #3b2a12
   overflow: hidden
   text-overflow: ellipsis
   box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.35)
+
+// on a narrow phone the back button is only the arrow (it keeps its label for screen readers), so the name of the journey fits
+@media (max-width: 420px)
+  .map-back
+    padding: 0 10px 0 8px
+
+    // only the word, not the arrow (the arrow is a span, too)
+    > span:last-child
+      position: absolute
+      width: 1px
+      height: 1px
+      overflow: hidden
+      clip-path: inset(50%)
+      white-space: nowrap
+
+  .map-title
+    padding: 0 12px
+    font-size: 0.98rem
 
 // the stars collected, small and in one line
 .map-points

@@ -253,6 +253,7 @@ export const moseEn: TextOverlay<Journey> = {
 }
 
 // the English recordings of the stories (voice Achernar, Gemini, 22.10.2026): geschichte-NN-en-v4.mp3, one per stage in the order of the stages
+// Technik-Audit 24.10.2026: the end of stage 15 was cut clean (a click after the last word); same voice and words, new file name "-en-v4b"
 moseEn.stages!.forEach((s, i) => {
-  s.audio = `audio/abenteuer/mose/geschichte-${String(i + 1).padStart(2, '0')}-en-v4.mp3`
+  s.audio = `audio/abenteuer/mose/geschichte-${String(i + 1).padStart(2, '0')}-en-${i === 14 ? 'v4b' : 'v4'}.mp3`
 })

@@ -55,7 +55,7 @@ describe('Josua: stories and questions', () => {
       expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(s.text.join(' '), `stage ${s.id}`).not.toMatch(FORBIDDEN)
       // the stages with a text corrected on 21.10.2026 (Bible faithfulness) were recorded again ("-v4")
-      expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/josua/geschichte-${String(s.id).padStart(2, '0')}-${RECORDED_AGAIN.includes(s.id) ? 'v4' : 'v3'}.mp3`)
+      expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/josua/geschichte-${String(s.id).padStart(2, '0')}-${s.id === 3 ? 'v4b' : RECORDED_AGAIN.includes(s.id) ? 'v4' : 'v3'}.mp3`)
       expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
       expect(s.image, `stage ${s.id}`).toBe(`images/abenteuer/josua/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
     }

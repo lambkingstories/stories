@@ -7,8 +7,7 @@
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/josua/, images/abenteuer/spiele/josua/<spiel>/, audio/abenteuer/josua/.
  *
- * STAND 21.10.2026 (Plan v3): alle Spiele sind gebaut (die Bilder der Spiele fehlen noch, bis dahin stehen Platzhalter, siehe `NOT_PAINTED_YET` in `utils/journeyFiles.ts`); die Etappen 7 und 9 bleiben Quiz. Die Etappenbilder sind noch die von Josef;
- * die Karte (Bilder, Stationen, Perlenweg) ist die von Josef mit den ersten zehn Stationen (PLATZHALTER bis zum eigenen Panorama); Medaille und Geschenk sind ebenfalls die von Josef.
+ * STAND 24.10.2026 (Technik-Audit: veraltete Hinweise „Platzhalter“ entfernt): alle Spiele, die Etappenbilder, das eigene Panorama, Medaille und Geschenk sind eingebaut; die Etappen 1, 7 und 9 bleiben Quiz.
  * Deutsche Vorlese-Aufnahmen: geschichte-NN-v3.mp3 (Gemini, Stimme Achernar, 21.10.2026, nicht gehört); Englisch noch nicht, die englische App liest mit der Gerätestimme. Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
 import type { BakeGame, CrossGame, HideGame, HushGame, Journey, LowerGame, MemoryGame, VerseGame } from '@/types/adventure'
@@ -390,8 +389,10 @@ for (const st of josua.stages) {
 // Stages whose text was corrected for Bible faithfulness on 21.10.2026 (1: Book of the Law, 3 and 9: the red rope, 7: "allein" removed, 8: the armed men, 9: the ban, 10: the grave of Joshua)
 // were recorded again as "-v4" (list in `D:/Claude/Abenteuer-Josua/NEUAUFNAHME-BIBELTREUE-2026-10-21.md`); the others are "-v3"
 const RECORDED_AGAIN = new Set([1, 3, 7, 8, 9, 10])
+// Technik-Audit 24.10.2026: the recording of stage 3 was too quiet (3 dB under the others) and was raised by about 2 dB (same voice and words), new file name "-v4b"
+const LOUDER: Record<number, string> = { 3: 'v4b' }
 for (const s of josua.stages) {
-  const file = `audio/abenteuer/josua/geschichte-${String(s.id).padStart(2, '0')}-${RECORDED_AGAIN.has(s.id) ? 'v4' : 'v3'}.mp3`
+  const file = `audio/abenteuer/josua/geschichte-${String(s.id).padStart(2, '0')}-${LOUDER[s.id] ?? (RECORDED_AGAIN.has(s.id) ? 'v4' : 'v3')}.mp3`
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' ? undefined : file), enumerable: true, configurable: true })
 }
 
