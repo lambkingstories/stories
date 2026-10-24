@@ -59,25 +59,25 @@ const VERS: VerseGame = {
 
 /**
  * Etappe 4, "Das Standbild": die fünf Scheiben des Standbildes aus dem Traum (Kopf aus Gold, Brust und Arme aus Silber, Bauch und Hüften aus Erz, Beine aus Eisen, Füße aus Eisen und Ton) werden auf ihre Plätze gezogen, danach rollt der Stein, das Standbild
- * zerfällt und der Stein wird zum Berg (neu). Bilder (Bildauftrag D31, Neufassung v2): `standbild/traum.webp` 900 × 675 (Sockel bei 27–73 Prozent der Breite), `scheibe-1..5.webp` (aus EINEM gemalten Standbild nach Material geschnitten, Gliederpuppe ohne Gesicht,
- * `tools/standbild_scheiben.py` in Abenteuer-Daniel), `stein.webp`, `berg.webp`. Lage und Breite in Prozent des Bildes aus dem Schnitt gemessen: Kopf bei 6, Füße bei 77 Prozent der Höhe; die Arme hängen neben Bauch und Beinen und gehören zur Brust
+ * zerfällt und der Stein wird zum Berg (neu). Bilder (Bildauftrag D31, Neufassung v3 vom 24.10.2026): `standbild/traum.webp` 900 × 675 (Sockel bei 27–73 Prozent der Breite), `scheibe-1..5.webp` (aus EINEM gemalten Standbild nach Material geschnitten, ein bärtiger babylonischer Riese mit Gesicht, Krone und Gewand (Bilder-Audit DA-3),
+ * `D:/Claude/lambking-design/_einbau-v4/standbild_scheiben_v3.py`), `stein.webp`, `berg.webp`. Lage und Breite in Prozent des Bildes aus dem Schnitt gemessen: Kopf bei 6, Füße bei 77 Prozent der Höhe; die Arme hängen neben Bauch und Beinen und gehören zur Brust
  * (darum liegt der Platz der Brust nur am Körper, die Scheibe selbst sitzt in der Mitte ihrer Umrisse). Wartend sind die Scheiben größer gezeichnet (`wait`).
  */
 const STANDBILD: StatueGame = {
   background: `${G}standbild/traum.webp`,
   pieces: [
-    { id: 'kopf', image: `${G}standbild/scheibe-1.webp`, label: 'Gold', w: 5.18, at: { x: 50.11, y: 11.9 }, wait: 2.2 },
-    { id: 'brust', image: `${G}standbild/scheibe-2.webp`, label: 'Silber', w: 15.68, at: { x: 50.01, y: 33.4 }, wait: 1.2 },
-    { id: 'bauch', image: `${G}standbild/scheibe-3.webp`, label: 'Erz', w: 9.35, at: { x: 50.13, y: 36.05 }, wait: 2.0 },
-    { id: 'beine', image: `${G}standbild/scheibe-4.webp`, label: 'Eisen', w: 9.22, at: { x: 50.07, y: 56.71 }, wait: 1.2 },
-    { id: 'fuesse', image: `${G}standbild/scheibe-5.webp`, label: 'Eisen und Ton', w: 13.01, at: { x: 50.09, y: 74.17 }, wait: 2.0 }
+    { id: 'kopf', image: `${G}standbild/scheibe-1.webp`, label: 'Gold', w: 11.34, at: { x: 50.01, y: 14.05 }, wait: 2.2 },
+    { id: 'brust', image: `${G}standbild/scheibe-2.webp`, label: 'Silber', w: 14.39, at: { x: 50.01, y: 35.65 }, wait: 1.2 },
+    { id: 'bauch', image: `${G}standbild/scheibe-3.webp`, label: 'Erz', w: 10.19, at: { x: 50.05, y: 40.91 }, wait: 2.0 },
+    { id: 'beine', image: `${G}standbild/scheibe-4.webp`, label: 'Eisen', w: 11.29, at: { x: 50.01, y: 60.31 }, wait: 1.2 },
+    { id: 'fuesse', image: `${G}standbild/scheibe-5.webp`, label: 'Eisen und Ton', w: 9.02, at: { x: 50.0, y: 74.22 }, wait: 2.0 }
   ],
   slots: [
-    { x: 50.11, y: 11.9, w: 5.18, h: 11.79 },
-    { x: 50.11, y: 23.88, w: 9.35, h: 12.18 },
-    { x: 50.13, y: 36.05, w: 9.35, h: 12.15 },
-    { x: 50.07, y: 56.71, w: 9.22, h: 29.18 },
-    { x: 50.09, y: 74.17, w: 13.01, h: 5.74 }
+    { x: 50.01, y: 14.05, w: 11.34, h: 16.1 },
+    { x: 50.04, y: 27.35, w: 10.17, h: 10.51 },
+    { x: 50.05, y: 40.91, w: 10.19, h: 16.61 },
+    { x: 50.01, y: 60.31, w: 11.29, h: 22.2 },
+    { x: 50.0, y: 74.22, w: 9.02, h: 5.63 }
   ],
   stone: `${G}standbild/stein.webp`,
   mountain: `${G}standbild/berg.webp`,
@@ -194,9 +194,9 @@ export const daniel: Journey = {
       { x: 0.651, y: 0.5461, d: 0.0339 },
       { x: 0.7216, y: 0.5825, d: 0.0339 },
       { x: 0.8377, y: 0.3883, d: 0.0339 },
-      { x: 0.9336, y: 0.2852, d: 0.0339 }
+      { x: 0.9336, y: 0.3641, d: 0.0339 }
     ],
-    exam: { x: 0.9861, y: 0.2852, d: 0.0339 },
+    exam: { x: 0.9861, y: 0.6129, d: 0.0339 },
     path: DANIEL_PATH
   },
   stages: [
