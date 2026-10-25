@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk'
 
 export interface AdventureQuestion {
   q: string
@@ -1795,6 +1795,12 @@ export interface StageTask {
   measure?: MeasureGame
   elders?: EldersGame
   cradle?: CradleGame
+  coat?: CoatGame
+  cows?: CowsGame
+  stone?: StoneGame
+  search?: SearchGame
+  baggage?: BaggageGame
+  gather?: GatherGame
 }
 
 /** One reaper of the gleaning game: the lane he cuts along (index into `GleanGame.lanes`), when he starts (ms after the lead), how long he needs to cross the picture, his picture (index into `GleanGame.reapers`) and the places (percent of the picture width) of the clumps of barley that stand in his lane. */
@@ -1900,6 +1906,173 @@ export interface CradleGame {
   /** Where the cradle stands (middle, foot, width in percent of the picture). */
   cradle: { x: number; y: number; w: number }
   rounds: CradleRound[]
+}
+
+/** One round of the game "The little robe": which of the three boys stands there (index into `CoatGame.boys`), the widths of the robes on offer (percent of the picture width, left to right). Exactly one of them fits (`coatFits`). */
+export interface CoatRound {
+  hint: string
+  boy: number
+  coats: number[]
+}
+/** The game "The little robe": every year Hannah brings Samuel a new robe; he has grown. The child taps the robe that fits (not too small, not too big) from three; a wrong one is a mistake. */
+export interface CoatGame {
+  /** The room (4:3). */
+  background: string
+  /** Samuel (one picture, the app shows it in three sizes: he grows) and the width of the picture at each age (percent of the picture width). */
+  boy: string
+  boyW: number[]
+  /** Where Samuel stands (the middle of his foot, percent of the picture). */
+  boyPos: { x: number; y: number }
+  /** The one picture of the robe (it is shown larger or smaller) and where the robes lie: the foot line (percent of the picture height) and the stretch (percent of the picture width) they are spread over. */
+  coat: string
+  shelf: { y: number; x0: number; x1: number }
+  /** How wide a robe is that fits, compared with the boy (the robe is a little narrower than the boy with his arms out: 0.8). */
+  ratio: number
+  rounds: CoatRound[]
+}
+
+/** One round of the game "Two cows pull home": how strongly the cart drifts to the side (percent of half the road per second) and how long the way is (ms). */
+export interface CowsRound {
+  hint: string
+  drift: number
+  dur: number
+}
+/** The game "Two cows pull home": the cart with the ark goes straight up the road, but the cows are drawn to the grass left and right; the child taps the left or the right half of the picture and the cart is nudged back to the middle. If a wheel touches the grass the cows stop to graze (a mistake) and the cart stands in the middle again. */
+export interface CowsGame {
+  /** The road (4:3) runs from the bottom toward a town in the distance: where the middle of the cart is at the start (`y0`) and at the end (`y1`, percent of the picture height), the middle of the road there (`cx0`, `cx1`) and half of its width (`half0`, `half1`, percent of the picture width). */
+  background: string
+  road: { y0: number; y1: number; cx0: number; cx1: number; half0: number; half1: number }
+  /** The cart with the two cows and the ark (one picture, seen from behind) and its width at the start (percent of the picture width); it gets smaller with the road. */
+  cart: string
+  cartW: number
+  /** Tufts of grass that stand at the edges of the road (pictures) and where (left/top in percent). */
+  tufts: { image: string; x: number; y: number; w: number }[]
+  rounds: CowsRound[]
+}
+
+/** One pair of landmarks between which a stone must stand: their pictures (index into `StoneGame.marks`) and their places (the middle of their foot, percent of the picture width). */
+export interface StonePair {
+  a: { image: number; x: number }
+  b: { image: number; x: number }
+}
+export interface StoneRound {
+  hint: string
+  /** A groove marks the middle of the way (only in the first round). */
+  notch: boolean
+  pairs: StonePair[]
+}
+/** The game "The stone of help": the child drags a stone to the middle between two landmarks (the town and the rock) and lets go; eight percent of the distance too far to one side is still right, more is a mistake and the stone goes back. */
+export interface StoneGame {
+  /** The country (4:3). */
+  background: string
+  /** The landmarks (pictures of the same scale) and their widths (percent of the picture width). */
+  marks: string[]
+  markW: number[]
+  /** The stone (one picture) and its width; the ground line where the stone stands and where the landmarks stand (percent of the picture height); where the stone waits. */
+  stone: string
+  stoneW: number
+  groundY: number
+  startPos: { x: number; y: number }
+  rounds: StoneRound[]
+}
+
+/** A place of the game "Follow the donkeys": the middle of the round area that is tapped (percent of the picture); the place itself is painted into the map. */
+export interface SearchPlace {
+  /** The name of the place (it stands under the area). */
+  label: string
+  x: number
+  y: number
+  /** The width of the area (percent of the picture width). */
+  w: number
+}
+export interface SearchRound {
+  hint: string
+  /** The footprints show the way from place to place (only in the first round). */
+  prints: boolean
+  /** The order in which the places must be visited (indexes into `SearchGame.places`). */
+  order: number[]
+}
+/** The game "Follow the donkeys": Saul and his servant look for the lost donkeys; the child taps the five places in the order of the story; a wrong place is a mistake. */
+export interface SearchGame {
+  /** The map of the hills (4:3). */
+  background: string
+  places: SearchPlace[]
+  /** The footprints (pictures, the app takes them in turn) that lie between two places in the first round; the width of one (percent of the picture width). */
+  prints: string[]
+  printW: number
+  /** Saul (a picture) who stands at the place that was visited last, and his width (percent of the picture width). */
+  saul: string
+  saulW: number
+  rounds: SearchRound[]
+}
+
+/** A pile of baggage: its picture (index into `BaggageGame.piles`), the middle of its foot (percent of the picture) and its height (percent of the picture height). */
+export interface BaggagePile {
+  kind: number
+  x: number
+  y: number
+  /** How large the pile is shown compared with its picture (1 = the full size, a tall one that can hide Saul; smaller ones cannot). */
+  scale?: number
+}
+export interface BaggageRound {
+  hint: string
+  piles: BaggagePile[]
+  /** Where Saul hides (index into `piles`). */
+  hidden: number
+}
+/** The game "Where is Saul?": the people look for Saul between the piles of baggage; the child lifts a pile with a tap; under the wrong pile there is only baggage (a mistake). Saul is a head taller than everyone: only a tall pile can hide him. */
+export interface BaggageGame {
+  /** The camp (4:3). */
+  background: string
+  /** The piles (pictures of one scale, from low to tall), their widths and their heights (percent of the picture). */
+  piles: string[]
+  pileW: number[]
+  pileH: number[]
+  /** Saul behind the pile (a picture), his width and his height (percent of the picture height). */
+  saul: string
+  saulW: number
+  saulH: number
+  /** The little things that lie under the piles that hide nobody (a jar, a kid, a basket: the app takes them in turn) and the width of one (percent of the picture width). */
+  things: string[]
+  thingW: number
+  rounds: BaggageRound[]
+}
+
+/** A man of the game "Hold the people together": where he stands (the middle of his foot, percent of the picture), his picture (index into `GatherGame.men`) and which way he runs when he leaves (-1 left, 1 right). */
+export interface GatherMan {
+  sprite: number
+  x: number
+  y: number
+  dir: -1 | 1
+}
+/** The moment (ms after the start) when a man begins to leave. */
+export interface GatherLeave {
+  man: number
+  at: number
+}
+export interface GatherRound {
+  hint: string
+  /** How many days of waiting (every day the sun moves on by one step) and how long a day is (ms). */
+  days: number
+  dayMs: number
+  leaves: GatherLeave[]
+}
+/** The game "Hold the people together": Saul waits seven days for Samuel; day by day the men get restless and walk away; the child taps a walking man and he comes back. A man who reaches the edge is gone (a mistake, he comes back later, ashamed). At the end Samuel arrives. */
+export interface GatherGame {
+  /** The hill with the altar (4:3). */
+  background: string
+  /** The men (pictures of one scale) and the width of one (percent of the picture width). */
+  men: string[]
+  manW: number
+  homes: GatherMan[]
+  /** Saul in his red mantle who stands at the altar (a picture and where: the middle of his foot). */
+  saul: string
+  saulPos: { x: number; y: number; w: number }
+  /** The sun that moves from day to day (one picture) and Samuel who arrives (one picture and where he stands: the middle of his foot). */
+  sun: string
+  samuel: string
+  samuelPos: { x: number; y: number; w: number }
+  rounds: GatherRound[]
 }
 
 export interface AdventureStage {

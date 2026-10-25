@@ -53,6 +53,7 @@ jobs:
       VITE_SHOW_DANIEL: "true"
       VITE_SHOW_ELIA: "true"
       VITE_SHOW_RUT: "true"
+      VITE_SHOW_SAMUEL: "true"
       VITE_CLIENT_KEY: tauri-key-public-1111
       VITE_API_BASE_URL: ${{ vars.API_BASE_URL || 'https://lbs-be.onrender.com' }}
 

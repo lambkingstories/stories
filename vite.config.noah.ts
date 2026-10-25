@@ -123,3 +123,11 @@ export const RUT_ONLY_DIRS = ['images/abenteuer/rut', 'images/abenteuer/spiele/r
 export function stripRutFiles(outDir: string) {
   strip(outDir, RUT_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Samuel und Saul" (id `samuel`) alone, in the same three places as Adam and Eva. */
+export const SAMUEL_ONLY_DIRS = ['images/abenteuer/samuel', 'images/abenteuer/spiele/samuel', 'audio/abenteuer/samuel']
+
+/** Takes the folders of Samuel und Saul out of a finished build. */
+export function stripSamuelFiles(outDir: string) {
+  strip(outDir, SAMUEL_ONLY_DIRS)
+}

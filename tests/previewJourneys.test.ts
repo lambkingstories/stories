@@ -739,3 +739,53 @@ describe('the hidden journey Rut (id rut)', () => {
     expect(m.journeys.filter((j) => j.id === 'rut')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Samuel und Saul (id samuel)', () => {
+  it('a normal build (without Samuel) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_SAMUEL', 'false')
+    open('?samuel=samuel-vorschau-x4h7')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('samuel')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_SAMUEL', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?samuel=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.SAMUEL_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?samuel=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_SAMUEL', 'true')
+    const first = await load()
+    open(`?samuel=${first.SAMUEL_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.SAMUEL_UNLOCK_CODE).toBe('samuel-vorschau-x4h7')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'samuel'])
+    expect(localStorage.getItem('lk-preview-samuel')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('samuel')?.stages.length).toBe(12)
+    open('?samuel=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-samuel')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_SAMUEL) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_SAMUEL', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'samuel')).toHaveLength(1)
+  })
+})

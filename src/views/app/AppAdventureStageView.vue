@@ -69,6 +69,12 @@ import GameGlean from '@/components/molecules/games/GameGlean.vue'
 import GameMeasure from '@/components/molecules/games/GameMeasure.vue'
 import GameElders from '@/components/molecules/games/GameElders.vue'
 import GameCradle from '@/components/molecules/games/GameCradle.vue'
+import GameCoat from '@/components/molecules/games/GameCoat.vue'
+import GameCows from '@/components/molecules/games/GameCows.vue'
+import GameStone from '@/components/molecules/games/GameStone.vue'
+import GameSearch from '@/components/molecules/games/GameSearch.vue'
+import GameBaggage from '@/components/molecules/games/GameBaggage.vue'
+import GameGather from '@/components/molecules/games/GameGather.vue'
 import GameWord from '@/components/molecules/games/GameWord.vue'
 import GameHush from '@/components/molecules/games/GameHush.vue'
 import GameHide from '@/components/molecules/games/GameHide.vue'
@@ -374,7 +380,7 @@ const hasPart = computed(() => partStars.value > 0 && !progress.finished.value)
 
 /** The games have a restart sign: a new key mounts the game afresh (round, mistakes and what was done begin again). */
 const gameKey = ref(0)
-const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew', 'overboard', 'shore', 'sacks', 'shade', 'days', 'statue', 'lamp', 'hours', 'ravens', 'caves', 'rain', 'whisper', 'glean', 'measure', 'elders', 'cradle'] as const
+const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew', 'overboard', 'shore', 'sacks', 'shade', 'days', 'statue', 'lamp', 'hours', 'ravens', 'caves', 'rain', 'whisper', 'glean', 'measure', 'elders', 'cradle', 'coat', 'cows', 'stone', 'search', 'baggage', 'gather'] as const
 const hasGame = computed(() => hasCountGame.value || GAME_FIELDS.some((f) => !!gameTask.value?.[f]))
 function restartGame() {
   progress.reset()
@@ -508,6 +514,12 @@ const gameKind = computed(() => {
   if (g?.measure) return 'measure'
   if (g?.elders) return 'elders'
   if (g?.cradle) return 'cradle'
+  if (g?.coat) return 'coat'
+  if (g?.cows) return 'cows'
+  if (g?.stone) return 'stone'
+  if (g?.search) return 'search'
+  if (g?.baggage) return 'baggage'
+  if (g?.gather) return 'gather'
   return undefined
 })
 watch(
@@ -583,7 +595,7 @@ function openGift() {
             span(class="step-label") {{ stepLabel(s) }}
         img(v-if="heroSrc" :src="heroSrc" alt="" class="stage-pic" draggable="false")
 
-    main(class="stage-body")
+    main(class="stage-body" :class="{ 'stage-body--game': phase === 'task' && hasGame }")
       //- 1. the text
       section(v-if="phase === 'text' && stage" class="stage-card")
         ReadAloud(:key="stage.id" :text="stage.text" :audio="stage.audio")
@@ -592,7 +604,7 @@ function openGift() {
           AdvButton(tone="gold" @click="fromText") {{ backFrom ? t('app.adventure.next') : isQuizStage ? t('app.adventure.toQuestions') : t('app.adventure.toTask') }}
 
       //- 2. the task
-      section(v-else-if="phase === 'task' && stage" class="stage-card")
+      section(v-else-if="phase === 'task' && stage" class="stage-card" :class="{ 'stage-card--game': hasGame }")
         h2(class="stage-h2") {{ t('app.adventure.task') }}
         p(class="stage-hint") {{ stage.task.hint }}
         ul(v-if="paintJobs.length" class="stage-jobs" :aria-label="t('app.adventure.paintJobsTitle')")
@@ -677,6 +689,12 @@ function openGift() {
         GameMeasure(:key="gameKey" v-else-if="gameTask?.measure" :game="gameTask.measure" @done="taskDone")
         GameElders(:key="gameKey" v-else-if="gameTask?.elders" :game="gameTask.elders" @done="taskDone")
         GameCradle(:key="gameKey" v-else-if="gameTask?.cradle" :game="gameTask.cradle" @done="taskDone")
+        GameCoat(:key="gameKey" v-else-if="gameTask?.coat" :game="gameTask.coat" @done="taskDone")
+        GameCows(:key="gameKey" v-else-if="gameTask?.cows" :game="gameTask.cows" @done="taskDone")
+        GameStone(:key="gameKey" v-else-if="gameTask?.stone" :game="gameTask.stone" @done="taskDone")
+        GameSearch(:key="gameKey" v-else-if="gameTask?.search" :game="gameTask.search" @done="taskDone")
+        GameBaggage(:key="gameKey" v-else-if="gameTask?.baggage" :game="gameTask.baggage" @done="taskDone")
+        GameGather(:key="gameKey" v-else-if="gameTask?.gather" :game="gameTask.gather" @done="taskDone")
         template(v-else-if="isPaint")
           img(:src="img(taskImage)" alt="" class="stage-paint" draggable="false")
           div(class="stage-actions")
@@ -891,6 +909,18 @@ $ink: var(--lk-text)
   background: var(--lk-surface)
   border: 1px solid var(--lk-line)
   box-shadow: var(--lk-shadow)
+
+// a game gets nearly the whole width of the phone (Anton, 25.10.2026: "die Spiele größer darstellen, dass man besser spielen kann")
+.stage-body--game
+  padding-left: 4px
+  padding-right: 4px
+
+.stage-card--game
+  padding: 16px 4px 18px
+
+  > .stage-h2, > .stage-hint, > .stage-jobs
+    padding-left: 14px
+    padding-right: 14px
 
 .stage-text
   margin: 0 0 16px

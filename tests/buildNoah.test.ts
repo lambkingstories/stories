@@ -16,7 +16,8 @@ import { jona } from '@/data/adventures/jona'
 import { daniel } from '@/data/adventures/daniel'
 import { elia } from '@/data/adventures/elia'
 import { rut } from '@/data/adventures/rut'
-import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, GIDEON_ONLY_DIRS, JAKOB_ONLY_DIRS, JONA_ONLY_DIRS, JOSUA_ONLY_DIRS, MOSE_ONLY_DIRS, NOAH_ONLY_DIRS, RUT_ONLY_DIRS, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles } from '../vite.config.noah'
+import { samuel } from '@/data/adventures/samuel'
+import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, GIDEON_ONLY_DIRS, JAKOB_ONLY_DIRS, JONA_ONLY_DIRS, JOSUA_ONLY_DIRS, MOSE_ONLY_DIRS, NOAH_ONLY_DIRS, RUT_ONLY_DIRS, SAMUEL_ONLY_DIRS, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles } from '../vite.config.noah'
 
 const inNoahDir = (f: string) => NOAH_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
 
@@ -550,6 +551,49 @@ describe('a build without Rut ships nothing of it', () => {
       for (const f of rutFiles) expect(existsSync(join(out, f)), f).toBe(false)
       for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
       expect(() => stripRutFiles(out)).not.toThrow()
+    } finally {
+      rmSync(out, { recursive: true, force: true })
+    }
+  })
+})
+
+const inSamuelDir = (f: string) => SAMUEL_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
+
+describe('a build without Samuel und Saul ships nothing of it', () => {
+  it('every file that only Samuel und Saul uses lies in a folder that the normal build removes', () => {
+    const others = new Set([...journeys, noah, adamEva, babel, abraham, jakob, josua, gideon, mose, jona, daniel, elia, rut].flatMap((j) => journeyFiles(j)))
+    const app = /^audio\/abenteuer\/(klang|musik)-/
+    const only = journeyFiles(samuel).filter((f) => !others.has(f) && !app.test(f))
+    const leaks = only.filter((f) => !inSamuelDir(f))
+    expect(leaks, `files of Samuel outside the folders that are removed: ${leaks.join(', ')}`).toEqual([])
+  })
+
+  it('the folders of Samuel are only the three places that belong to it, none is on the lists of the others, and no folder with "samuel" in its name is missing', () => {
+    expect([...SAMUEL_ONLY_DIRS].sort()).toEqual(['audio/abenteuer/samuel', 'images/abenteuer/samuel', 'images/abenteuer/spiele/samuel'])
+    for (const d of SAMUEL_ONLY_DIRS) {
+      for (const list of [NOAH_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, ABRAHAM_ONLY_DIRS, JAKOB_ONLY_DIRS, JOSUA_ONLY_DIRS, GIDEON_ONLY_DIRS, MOSE_ONLY_DIRS, JONA_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, RUT_ONLY_DIRS]) expect(list).not.toContain(d)
+    }
+    const found: string[] = []
+    for (const base of ['public/images/abenteuer', 'public/audio/abenteuer', 'public/images/abenteuer/spiele']) {
+      for (const n of readdirSync(base)) if (/samuel/i.test(n) && !n.includes('.')) found.push(`${base.replace('public/', '')}/${n}`)
+    }
+    for (const d of found) expect(SAMUEL_ONLY_DIRS, d).toContain(d)
+    for (const j of [...journeys, noah, adamEva, babel, abraham, jakob, josua, gideon, mose, jona, daniel, elia, rut]) for (const f of journeyFiles(j)) expect(inSamuelDir(f), `${j.id}: ${f}`).toBe(false)
+  })
+
+  it('removing takes the folders of Samuel out of a build and leaves everything else (the other journeys, the sounds)', () => {
+    const out = mkdtempSync(join(tmpdir(), 'lk-build-samuel-'))
+    try {
+      const samuelFiles = ['audio/abenteuer/samuel/geschichte-01-v1.mp3', 'images/abenteuer/samuel/etappe-bild-01.webp', 'images/abenteuer/spiele/samuel/kuehe/strasse.webp']
+      const keep = ['images/abenteuer/josef/etappe-01.webp', 'audio/abenteuer/noah/geschichte-01.mp3', 'audio/abenteuer/rut/geschichte-01-v1.mp3', 'images/abenteuer/rut/etappe-bild-01.webp', 'images/abenteuer/spiele/rut/wiege/stube.webp', 'audio/abenteuer/klang-stern.mp3']
+      for (const f of [...samuelFiles, ...keep]) {
+        mkdirSync(join(out, f, '..'), { recursive: true })
+        writeFileSync(join(out, f), 'x')
+      }
+      stripSamuelFiles(out)
+      for (const f of samuelFiles) expect(existsSync(join(out, f)), f).toBe(false)
+      for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
+      expect(() => stripSamuelFiles(out)).not.toThrow()
     } finally {
       rmSync(out, { recursive: true, force: true })
     }
