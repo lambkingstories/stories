@@ -1,4 +1,4 @@
-import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles } from './vite.config.noah'
+import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripDavidFiles } from './vite.config.noah'
 import { fileURLToPath, URL } from 'node:url'
 import { resolve, dirname } from 'node:path'
 import { rmSync } from 'node:fs'
@@ -110,6 +110,10 @@ export default defineConfig(({ mode }) => {
       // The same for "Samuel und Saul" (`VITE_INCLUDE_SAMUEL=true` / `vite --mode samuel`).
       if (env.VITE_SHOW_SAMUEL !== 'true' && env.VITE_INCLUDE_SAMUEL !== 'true') {
         stripSamuelFiles(outDir)
+      }
+      // The same for "David" (`VITE_INCLUDE_DAVID=true` / `vite --mode david`).
+      if (env.VITE_SHOW_DAVID !== 'true' && env.VITE_INCLUDE_DAVID !== 'true') {
+        stripDavidFiles(outDir)
       }
     }
   }

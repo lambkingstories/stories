@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel'
 
 export interface AdventureQuestion {
   q: string
@@ -1801,6 +1801,12 @@ export interface StageTask {
   search?: SearchGame
   baggage?: BaggageGame
   gather?: GatherGame
+  harp?: HarpGame
+  shepherd?: ShepherdGame
+  pebbles?: PebblesGame
+  sling?: SlingGame
+  arrow?: ArrowGame
+  hem?: HemGame
 }
 
 /** One reaper of the gleaning game: the lane he cuts along (index into `GleanGame.lanes`), when he starts (ms after the lead), how long he needs to cross the picture, his picture (index into `GleanGame.reapers`) and the places (percent of the picture width) of the clumps of barley that stand in his lane. */
@@ -2073,6 +2079,152 @@ export interface GatherGame {
   samuel: string
   samuelPos: { x: number; y: number; w: number }
   rounds: GatherRound[]
+}
+
+/** One round of the game "Calm Saul": how many calm notes Saul needs and how long the pause between two notes must be at least (ms) for a note to be calm. */
+export interface HarpRound {
+  hint: string
+  need: number
+  minGap: number
+}
+/** The game "Calm Saul": Saul sits restless in the hall (three painted states: restless, tired, calm) and David's harp lies in front of the child. Stroking slowly over the eight strings plucks them and calms Saul; fast, jangling strokes make him restless again. */
+export interface HarpGame {
+  /** The hall (4:3). */
+  background: string
+  /** Saul in three states (one scale, one place): restless, tired, calm; where he sits (the middle of the chair's foot, percent of the picture) and his width (percent of the picture width). */
+  saul: string[]
+  saulPos: { x: number; y: number; w: number }
+  /** The harp (one picture, seen from the front) and where it stands (the middle of its foot) with its width; where the strings lie inside the picture (fractions of its width and height). */
+  harp: string
+  harpPos: { x: number; y: number; w: number }
+  strings: { n: number; x0: number; x1: number; y0: number; y1: number }
+  rounds: HarpRound[]
+}
+
+/** A beast that comes toward a lamb: which picture (index into `ShepherdGame.animals`), from which side it comes, which lamb it goes for (index into `lambPos`), when it starts (ms) and how long it needs to reach the lamb (ms). */
+export interface ShepherdThreat {
+  animal: number
+  from: 'left' | 'right'
+  lamb: number
+  delay: number
+  dur: number
+}
+export interface ShepherdRound {
+  hint: string
+  threats: ShepherdThreat[]
+}
+/** The game "Protect the flock": David stands in the pasture, a lion or a bear walks slowly toward a lamb; the child moves David to the lamb that is in danger. If David stands there, the beast stops, hesitates and trots away; if the beast reaches the lamb first, the lamb runs frightened to David (a mistake) and the beast leaves too. Nothing is hurt, nothing is fought. */
+export interface ShepherdGame {
+  /** The pasture (4:3). */
+  background: string
+  /** David (one picture), his width (percent of the picture width) and where he starts (the middle of his foot). */
+  david: string
+  davidW: number
+  davidStart: { x: number; y: number }
+  /** The beasts (pictures that look to the left; the app mirrors them) and the width of each (percent of the picture width). */
+  animals: string[]
+  animalW: number[]
+  /** The lambs (pictures, the app takes them in turn), the width of one and where each stands (the middle of its foot). */
+  lambs: string[]
+  lambW: number
+  lambPos: { x: number; y: number }[]
+  /** Where the beasts come in from (the middle of their foot, percent of the picture): the left and the right edge. */
+  edge: { left: { x: number; y: number }; right: { x: number; y: number } }
+  /** How near David must stand to a lamb to guard it (percent of the picture width). */
+  guard: number
+  rounds: ShepherdRound[]
+}
+
+/** A stone of the game "Smooth stones": which picture (index into `smooth` or `rough`), the middle of its foot (percent of the picture) and its width (percent of the picture width). */
+export interface PebbleStone {
+  sprite: number
+  x: number
+  y: number
+  w: number
+}
+export interface PebbleRound {
+  hint: string
+  smooth: PebbleStone[]
+  rough: PebbleStone[]
+}
+/** The game "Smooth stones": David picks smooth stones from the brook for his shepherd's bag. The child taps the smooth ones, they fly into the bag; a rough, jagged stone wobbles and stays (a mistake). */
+export interface PebblesGame {
+  /** The brook (4:3). */
+  background: string
+  /** The smooth stones and the rough stones (pictures of one scale, the app takes the ones named in a round). */
+  smooth: string[]
+  rough: string[]
+  /** The shepherd's bag (one picture) and where it lies (the middle of its foot) with its width. */
+  bag: string
+  bagPos: { x: number; y: number; w: number }
+  rounds: PebbleRound[]
+}
+
+/** One round of the game "The sling": how long the stone needs for one turn (ms), how many degrees the aim may be off, and where Goliath stands (the middle of his foot, percent of the picture) with his width and the place of his forehead. */
+export interface SlingRound {
+  hint: string
+  period: number
+  tol: number
+  goliat: { x: number; y: number; w: number }
+  head: { x: number; y: number }
+}
+/** The game "The sling": David swings the sling, the stone circles round his hand; a fine ray shows where the stone would fly if it were let go and lights up when it points at Goliath. A tap lets the stone go. A hit makes Goliath fall (a second picture, calm, no blood); a miss is a mistake. */
+export interface SlingGame {
+  /** The valley (4:3). */
+  background: string
+  /** David (one picture), his width and where he stands (the middle of his foot); the hand with the sling (percent of the picture) and the radius of the turn (percent of the picture width). */
+  david: string
+  davidPos: { x: number; y: number; w: number }
+  hand: { x: number; y: number }
+  radius: number
+  /** Goliath standing and Goliath on the ground (pictures of one scale); the stone (one picture) and its width. */
+  goliat: string
+  goliatFallen: string
+  /** How wide the picture of Goliath on the ground is compared with the picture of Goliath standing (both painted at one scale). */
+  fallenScale: number
+  stone: string
+  stoneW: number
+  rounds: SlingRound[]
+}
+
+/** One round of the game "The sign of the arrows": which sign Jonathan sends, how many arrows, and where the arrow must land (percent of the picture width, from–to). */
+export interface ArrowRound {
+  hint: string
+  sign: 'peace' | 'flee'
+  arrows: number
+  zone: { from: number; to: number }
+}
+/** The game "The sign of the arrows": the child pulls the string back and lets go; the farther it is pulled, the farther the arrow flies. In the first round the arrow must land behind the boy (the sign of peace), in the second before him (the sign to flee). */
+export interface ArrowGame {
+  /** The field (4:3). */
+  background: string
+  /** Jonathan (one picture, seen from the side), where he stands and his width; the boy (one picture) and where he stands. */
+  jonatan: string
+  jonatanPos: { x: number; y: number; w: number }
+  boy: string
+  boyPos: { x: number; y: number; w: number }
+  /** The arrow (one picture, pointing right), its width, where it leaves the bow, the ground line where it lands (percent of the picture height) and the landing places for a pull of 0 and of 1 (percent of the picture width). */
+  arrow: string
+  arrowW: number
+  shootFrom: { x: number; y: number }
+  groundY: number
+  range: { min: number; max: number }
+  rounds: ArrowRound[]
+}
+
+/** One round of the game "The hem": how far off the seam the finger may wander (percent of the picture width) and the seam itself (points, percent of the picture). */
+export interface HemRound {
+  hint: string
+  tol: number
+  path: { x: number; y: number }[]
+}
+/** The game "The hem": in the cave Saul stands with his back to David; the child follows the seam of the mantle with a finger, quietly. Wandering off the seam is a mistake (Saul looks around) and the stroke begins again. When the seam is done the picture changes to David with the corner in his hand. */
+export interface HemGame {
+  /** The cave with Saul from behind (4:3). */
+  background: string
+  /** David holding the corner (4:3), shown when the last seam is done. */
+  reward: string
+  rounds: HemRound[]
 }
 
 export interface AdventureStage {

@@ -131,3 +131,11 @@ export const SAMUEL_ONLY_DIRS = ['images/abenteuer/samuel', 'images/abenteuer/sp
 export function stripSamuelFiles(outDir: string) {
   strip(outDir, SAMUEL_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "David" (id `david`) alone, in the same three places as Adam and Eva. */
+export const DAVID_ONLY_DIRS = ['images/abenteuer/david', 'images/abenteuer/spiele/david', 'audio/abenteuer/david']
+
+/** Takes the folders of David out of a finished build. */
+export function stripDavidFiles(outDir: string) {
+  strip(outDir, DAVID_ONLY_DIRS)
+}

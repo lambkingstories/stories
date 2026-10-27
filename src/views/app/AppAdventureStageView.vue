@@ -75,6 +75,12 @@ import GameStone from '@/components/molecules/games/GameStone.vue'
 import GameSearch from '@/components/molecules/games/GameSearch.vue'
 import GameBaggage from '@/components/molecules/games/GameBaggage.vue'
 import GameGather from '@/components/molecules/games/GameGather.vue'
+import GameHarp from '@/components/molecules/games/GameHarp.vue'
+import GameShepherd from '@/components/molecules/games/GameShepherd.vue'
+import GamePebbles from '@/components/molecules/games/GamePebbles.vue'
+import GameSling from '@/components/molecules/games/GameSling.vue'
+import GameArrow from '@/components/molecules/games/GameArrow.vue'
+import GameHem from '@/components/molecules/games/GameHem.vue'
 import GameWord from '@/components/molecules/games/GameWord.vue'
 import GameHush from '@/components/molecules/games/GameHush.vue'
 import GameHide from '@/components/molecules/games/GameHide.vue'
@@ -380,7 +386,7 @@ const hasPart = computed(() => partStars.value > 0 && !progress.finished.value)
 
 /** The games have a restart sign: a new key mounts the game afresh (round, mistakes and what was done begin again). */
 const gameKey = ref(0)
-const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew', 'overboard', 'shore', 'sacks', 'shade', 'days', 'statue', 'lamp', 'hours', 'ravens', 'caves', 'rain', 'whisper', 'glean', 'measure', 'elders', 'cradle', 'coat', 'cows', 'stone', 'search', 'baggage', 'gather'] as const
+const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew', 'overboard', 'shore', 'sacks', 'shade', 'days', 'statue', 'lamp', 'hours', 'ravens', 'caves', 'rain', 'whisper', 'glean', 'measure', 'elders', 'cradle', 'coat', 'cows', 'stone', 'search', 'baggage', 'gather', 'harp', 'shepherd', 'pebbles', 'sling', 'arrow', 'hem'] as const
 const hasGame = computed(() => hasCountGame.value || GAME_FIELDS.some((f) => !!gameTask.value?.[f]))
 function restartGame() {
   progress.reset()
@@ -520,6 +526,12 @@ const gameKind = computed(() => {
   if (g?.search) return 'search'
   if (g?.baggage) return 'baggage'
   if (g?.gather) return 'gather'
+  if (g?.harp) return 'harp'
+  if (g?.shepherd) return 'shepherd'
+  if (g?.pebbles) return 'pebbles'
+  if (g?.sling) return 'sling'
+  if (g?.arrow) return 'arrow'
+  if (g?.hem) return 'hem'
   return undefined
 })
 watch(
@@ -695,6 +707,12 @@ function openGift() {
         GameSearch(:key="gameKey" v-else-if="gameTask?.search" :game="gameTask.search" @done="taskDone")
         GameBaggage(:key="gameKey" v-else-if="gameTask?.baggage" :game="gameTask.baggage" @done="taskDone")
         GameGather(:key="gameKey" v-else-if="gameTask?.gather" :game="gameTask.gather" @done="taskDone")
+        GameHarp(:key="gameKey" v-else-if="gameTask?.harp" :game="gameTask.harp" @done="taskDone")
+        GameShepherd(:key="gameKey" v-else-if="gameTask?.shepherd" :game="gameTask.shepherd" @done="taskDone")
+        GamePebbles(:key="gameKey" v-else-if="gameTask?.pebbles" :game="gameTask.pebbles" @done="taskDone")
+        GameSling(:key="gameKey" v-else-if="gameTask?.sling" :game="gameTask.sling" @done="taskDone")
+        GameArrow(:key="gameKey" v-else-if="gameTask?.arrow" :game="gameTask.arrow" @done="taskDone")
+        GameHem(:key="gameKey" v-else-if="gameTask?.hem" :game="gameTask.hem" @done="taskDone")
         template(v-else-if="isPaint")
           img(:src="img(taskImage)" alt="" class="stage-paint" draggable="false")
           div(class="stage-actions")
