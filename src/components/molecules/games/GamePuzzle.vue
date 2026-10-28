@@ -129,7 +129,7 @@ const boardStyle = computed(() => ({
 
 <style scoped lang="sass">
 .pz
-  --w: 250px
+  --w: min(100%, 310px)
   display: flex
   flex-direction: column
   align-items: center
@@ -179,10 +179,11 @@ const boardStyle = computed(() => ({
   flex-wrap: wrap
   justify-content: center
   gap: 10px
+  width: 100%
   min-height: 96px
 
 .pz-piece
-  width: calc(var(--w) / var(--cols) * 0.74)
+  width: calc(var(--w) / var(--cols) * 0.6)
   aspect-ratio: var(--cell)
   border-radius: 7px
   border: 3px solid #d4a83e

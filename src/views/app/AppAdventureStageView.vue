@@ -132,9 +132,12 @@ const stage = computed<AdventureStage | undefined>(() =>
   isExam.value ? undefined : journey.value?.stages.find((s) => s.id === Number(route.params.stageId))
 )
 
-type Phase = 'text' | 'task' | 'painted' | 'bridge' | 'quiz' | 'result'
+type Phase = 'text' | 'task' | 'painted' | 'bridge' | 'quiz' | 'result' | 'free'
+/** The game of this stage played again as a reward from "My game room" (profile): no stars, no progress, no story and questions. */
+const freePlay = computed(() => route.query.free === '1')
 const startPhase = (): Phase => {
   if (isExam.value) return 'quiz'
+  if (route.query.free === '1') return 'task'
   // back from the coloring screen: the finished picture ("done"), or on to the questions
   if (route.query.back === 'task') return route.query.done === '1' ? 'painted' : 'bridge'
   return 'text'
@@ -253,6 +256,11 @@ const ui = (name: string) => img(`images/abenteuer/ui/${name}.webp`)
  * (its button then goes back to where the child came from); from the story itself, and from the end, it leads to the map.
  */
 function onBack() {
+  if (freePlay.value) {
+    stopAll()
+    void router.push({ name: 'app-profile' })
+    return
+  }
   if (isExam.value) {
     goMap()
     return
@@ -282,7 +290,7 @@ function fromText() {
 /** The big picture of the stage (one per stage, painted for the journey). */
 const heroSrc = computed(() => (stage.value?.image ? img(stage.value.image) : ''))
 
-const backLabel = computed(() => (phase.value === 'text' || phase.value === 'result' ? t('app.adventure.backToMap') : t('app.adventure.back')))
+const backLabel = computed(() => (freePlay.value ? t('app.adventure.backToRoom') : phase.value === 'text' || phase.value === 'result' ? t('app.adventure.backToMap') : t('app.adventure.back')))
 
 /** The way back has been taken: the star tones of this page that are still to come are dropped. */
 const leaving = ref(false)
@@ -371,8 +379,20 @@ function toTask() {
 
 /** A game that was not even begun earns no star (the questions can still bring some). */
 function skipTask() {
+  if (freePlay.value) {
+    phase.value = 'free'
+    return
+  }
   tryGame.value = 0
   phase.value = 'bridge'
+}
+
+/** "My game room": play the same game once more (fresh), or go back to the profile. */
+function playAgainFree() {
+  progress.reset()
+  gameKey.value++
+  started.value = false
+  phase.value = 'task'
 }
 
 // what the child did in the game: the share of the task that was done gives the stars of the button that goes on (two thirds 2 stars, 30 % one star);
@@ -388,9 +408,18 @@ const hasPart = computed(() => partStars.value > 0 && !progress.finished.value)
 const gameKey = ref(0)
 const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew', 'overboard', 'shore', 'sacks', 'shade', 'days', 'statue', 'lamp', 'hours', 'ravens', 'caves', 'rain', 'whisper', 'glean', 'measure', 'elders', 'cradle', 'coat', 'cows', 'stone', 'search', 'baggage', 'gather', 'harp', 'shepherd', 'pebbles', 'sling', 'arrow', 'hem'] as const
 const hasGame = computed(() => hasCountGame.value || GAME_FIELDS.some((f) => !!gameTask.value?.[f]))
+/** A game begins only when the child taps "play" (many games run on their own clock: the text and the hint are read first). */
+const started = ref(false)
+watch(phase, (p) => {
+  if (p === 'task') started.value = false
+})
+function startGame() {
+  started.value = true
+}
 function restartGame() {
   progress.reset()
   gameKey.value++
+  started.value = true
 }
 
 function partTask() {
@@ -401,6 +430,10 @@ function partTask() {
 
 function taskDone(stars: number) {
   if (!journey.value || !stage.value) return
+  if (freePlay.value) {
+    phase.value = 'free'
+    return
+  }
   tryGame.value = stars
   adv.recordStars(journey.value.id, stage.value.id, stars)
   phase.value = 'bridge'
@@ -599,13 +632,14 @@ function openGift() {
         p(class="stage-kind") {{ isExam ? t('app.adventure.exam') : t('app.adventure.stageOf', { n: stage?.id ?? 0, total: journey.stages.length }) }}
         h1(class="stage-title") {{ isExam ? t('app.adventure.examTitle', { title: journey.title }) : stage?.title }}
         p(v-if="stage" class="stage-ref") {{ stage.ref }}
-        ol(v-if="stage" class="stage-steps")
+        ol(v-if="stage && !freePlay && !(phase === 'task' && hasGame)" class="stage-steps")
           li(v-for="(s, k) in steps" :key="s" :class="stepState(s)")
             span(class="step-dot")
               ZIconography(v-if="stepState(s) === 'done'" name="check" :size="22")
               template(v-else) {{ k + 1 }}
             span(class="step-label") {{ stepLabel(s) }}
-        img(v-if="heroSrc" :src="heroSrc" alt="" class="stage-pic" draggable="false")
+        //- while a game is played the big picture steps aside: the game gets the screen
+        img(v-if="heroSrc && !freePlay && !(phase === 'task' && hasGame)" :src="heroSrc" alt="" class="stage-pic" draggable="false")
 
     main(class="stage-body" :class="{ 'stage-body--game': phase === 'task' && hasGame }")
       //- 1. the text
@@ -621,7 +655,12 @@ function openGift() {
         p(class="stage-hint") {{ stage.task.hint }}
         ul(v-if="paintJobs.length" class="stage-jobs" :aria-label="t('app.adventure.paintJobsTitle')")
           li(v-for="(j, i) in paintJobs" :key="i" class="stage-job") {{ j.hint }}
-        AdventureCount(:key="gameKey" v-if="hasCountGame" :count="countN" :image="taskImage" :image-off="taskImageOff" :background="taskBackground" :groups="gameTask?.groups" :question="gameTask?.question" @done="taskDone")
+        div(v-if="hasGame && !started" class="stage-ready")
+          button(type="button" class="stage-play-big" :aria-label="t('app.adventure.playGame')" @click="startGame")
+            svg(viewBox="0 0 24 24" width="56" height="56" fill="currentColor" aria-hidden="true")
+              path(d="M8 5.2v13.6a1 1 0 0 0 1.5.86l11-6.8a1 1 0 0 0 0-1.72l-11-6.8A1 1 0 0 0 8 5.2z")
+          p(class="stage-ready-text") {{ t('app.adventure.readyHint') }}
+        AdventureCount(:key="gameKey" v-else-if="hasCountGame" :count="countN" :image="taskImage" :image-off="taskImageOff" :background="taskBackground" :groups="gameTask?.groups" :question="gameTask?.question" @done="taskDone")
         GamePuzzle(:key="gameKey" v-else-if="gameTask?.puzzle" :game="gameTask.puzzle" @done="taskDone")
         GameWay(:key="gameKey" v-else-if="gameTask?.way" :game="gameTask.way" @done="taskDone")
         GameHarvest(:key="gameKey" v-else-if="gameTask?.harvest" :game="gameTask.harvest" @done="taskDone")
@@ -725,11 +764,22 @@ function openGift() {
             AdvButton(tone="gold" @click="taskDone(0)") {{ t('app.adventure.next') }}
         button(v-if="hasPart" type="button" class="stage-skip stage-part" @click="partTask") {{ t('app.adventure.partial', { n: partStars }, partStars) }}
         button(v-else-if="!progress.finished.value" type="button" class="stage-skip" @click="skipTask") {{ t('app.adventure.skip') }}
-        //- a small sign at the bottom: play the game again from the start (text and questions stay)
-        button(v-if="hasGame" type="button" class="stage-restart" :aria-label="t('app.adventure.restartGame')" :title="t('app.adventure.restartGame')" @click="restartGame")
-          svg(viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true")
-            path(d="M20 12a8 8 0 1 1-2.6-5.9")
-            path(d="M20 4v5h-5")
+        //- the signs at the bottom: play (begins the game) and play the game again from the start (text and questions stay)
+        div(v-if="hasGame" class="stage-ctrl")
+          button(type="button" class="stage-play" :class="{ pulse: !started }" :disabled="started" :aria-label="t('app.adventure.playGame')" :title="t('app.adventure.playGame')" @click="startGame")
+            svg(viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true")
+              path(d="M8 5.2v13.6a1 1 0 0 0 1.5.86l11-6.8a1 1 0 0 0 0-1.72l-11-6.8A1 1 0 0 0 8 5.2z")
+          button(type="button" class="stage-restart" :aria-label="t('app.adventure.restartGame')" :title="t('app.adventure.restartGame')" @click="restartGame")
+            svg(viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true")
+              path(d="M20 12a8 8 0 1 1-2.6-5.9")
+              path(d="M20 4v5h-5")
+
+      //- 2a. a reward game that is over: again, or back to the game room
+      section(v-else-if="phase === 'free'" class="stage-card stage-result")
+        h2(class="stage-h2") {{ t('app.adventure.freeDone') }}
+        div(class="stage-actions")
+          AdvButton(tone="gold" @click="playAgainFree") {{ t('app.adventure.playAgain') }}
+          AdvButton(tone="blau" @click="onBack") {{ t('app.adventure.backToRoom') }}
 
       //- 2b. the finished picture, with a little shine
       section(v-else-if="phase === 'painted'" class="stage-card stage-result")
@@ -1066,6 +1116,78 @@ $ink: var(--lk-text)
 
 .stage-part
   font-weight: 800
+
+.stage-ctrl
+  display: flex
+  justify-content: center
+  gap: 18px
+  margin: 8px 0 0
+
+.stage-ctrl .stage-restart
+  margin: 0
+
+.stage-play
+  display: flex
+  align-items: center
+  justify-content: center
+  width: 48px
+  height: 48px
+  padding: 0 0 0 2px
+  border: 1.5px solid var(--lk-accent)
+  border-radius: 50%
+  cursor: pointer
+  background: var(--lk-accent)
+  border-color: var(--lk-accent)
+  color: var(--lk-on-accent)
+
+  &:disabled
+    opacity: 0.35
+    cursor: default
+
+  &.pulse
+    animation: stage-pulse 1400ms ease-in-out infinite
+
+.stage-ready
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: 14px
+  padding: 28px 14px
+  margin: 10px 4px 0
+  border-radius: var(--lk-r-group)
+  background: var(--lk-surface-2)
+  border: 2px dashed var(--lk-line)
+
+.stage-play-big
+  width: 104px
+  height: 104px
+  display: flex
+  align-items: center
+  justify-content: center
+  padding: 0 0 0 6px
+  border: 0
+  border-radius: 50%
+  background: var(--lk-accent)
+  color: var(--lk-on-accent)
+  box-shadow: var(--lk-shadow)
+  cursor: pointer
+  animation: stage-pulse 1400ms ease-in-out infinite
+
+.stage-ready-text
+  margin: 0
+  text-align: center
+  font-weight: 700
+  color: var(--lk-muted)
+
+@keyframes stage-pulse
+  0%, 100%
+    transform: scale(1)
+  50%
+    transform: scale(1.08)
+
+@media (prefers-reduced-motion: reduce)
+  .stage-play, .stage-play-big
+    animation: none
 
 .stage-restart
   display: flex

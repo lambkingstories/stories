@@ -122,10 +122,10 @@ describe('Josua: the games, and the placeholders until the pictures come', () =>
     for (const s of josua.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
   })
 
-  it('5 memory: five pairs from the stages 1 to 5, each with a sentence that is true to the text; 10 verse: two sentences from the text with the right words first', () => {
+  it('5 memory: six pairs (five from the stages 1 to 5 and the ram horn), each with a sentence that is true to the text; 10 verse: two sentences from the text with the right words first', () => {
     const m = stage(5).task.memory
     expect(m, 'the game is built').toBeDefined()
-    expect(m!.pairs).toHaveLength(5)
+    expect(m!.pairs).toHaveLength(6)
     const told = josua.stages.slice(0, 5).map((x) => x.text.join(' ')).join(' ')
     for (const word of ['mutig und stark', 'Flachs', 'Seil', 'Lade', 'Steine']) expect(told, word).toContain(word)
     for (const p of m!.pairs) expect(p.text.length).toBeGreaterThan(20)
@@ -235,13 +235,17 @@ describe('Josua: the games, and the placeholders until the pictures come', () =>
       const b = g.bundles.find((x) => x.id === id)!
       return { x: cx - b.w / 2, y: cy - b.h / 2, w: b.w, h: b.h }
     }
+    const size = (id: string) => g.bundles.find((x) => x.id === id)!
     // round 1: two big bundles that lie a little over each other hide the man; the small one alone does not
     const a = man('mann-a')
-    expect(covered(a, [at('gross-1', a.x + 15, a.y + 5.4), at('gross-2', a.x + 15, a.y + a.h - 5.4)])).toBe(true)
-    expect(covered(a, [at('klein-1', a.x + 15, a.y + 5)])).toBe(false)
+    const big = size('gross-1')
+    expect(covered(a, [at('gross-1', a.x + a.w / 2, a.y + big.h / 2), at('gross-2', a.x + a.w / 2, a.y + a.h - big.h / 2)])).toBe(true)
+    expect(covered(a, [at('klein-1', a.x + a.w / 2, a.y + 5)])).toBe(false)
     // round 2: man a as before, man b with a big, a middle and a small bundle
     const b = man('mann-b')
-    const bundlesB = [at('gross-3', b.x + 15, b.y + 5.4), at('mittel-1', b.x + 8.3 + 10.85, b.y + 2.5 + 5), at('klein-1', b.x + 7.5, b.y + 3.3 + 4.6)]
+    const mid = size('mittel-1')
+    const small = size('klein-1')
+    const bundlesB = [at('gross-3', b.x + b.w / 2, b.y + big.h / 2), at('mittel-1', b.x + mid.w / 2, b.y + b.h - mid.h / 2), at('klein-1', b.x + b.w - small.w / 2, b.y + b.h - small.h / 2)]
     expect(covered(b, bundlesB)).toBe(true)
     // the roof is 100 wide and 133 high: both men lie inside and do not touch
     for (const m of [a, b]) {
@@ -291,7 +295,7 @@ describe('Josua: the games, and the placeholders until the pictures come', () =>
     expect(g(2).hide!.rounds.reduce((n, r) => n + r.men.length, 0)).toBe(3)
     expect(g(3).lower!.rounds.length).toBe(2)
     expect(1 + g(4).cross!.groups.length).toBe(4)
-    expect(g(5).memory!.pairs.length).toBe(5)
+    expect(g(5).memory!.pairs.length).toBe(6)
     expect(g(6).bake!.rounds.reduce((n, r) => n + r.dough, 0)).toBe(10)
     expect(g(8).hush!.rounds.reduce((n, r) => n + r.calms, 0)).toBe(13)
     expect(g(10).verse!.rounds.reduce((n, r) => n + r.answers.length, 0)).toBe(3)

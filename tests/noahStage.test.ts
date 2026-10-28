@@ -60,6 +60,9 @@ const openTask = async (stageId: number) => {
   await flushPromises()
   expect(w.text()).toContain(noah.stages[stageId - 1]!.title)
   await press(w, /Zur Aufgabe/)
+  // a game begins only when the child taps play (it runs on its own clock otherwise)
+  if (w.find('.stage-play-big').exists()) await w.find('.stage-play-big').trigger('click')
+  await flushPromises()
   return w
 }
 

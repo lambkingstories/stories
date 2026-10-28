@@ -151,7 +151,7 @@ const SCHLEUDER: SlingGame = {
   background: `${G}schleuder/tal.webp`,
   david: `${G}schleuder/david.webp`,
   davidPos: { x: 18, y: 96, w: 20.5 },
-  hand: { x: 20, y: 27 },
+  hand: { x: 13.5, y: 33 },
   radius: 8,
   goliat: `${G}schleuder/goliat.webp`,
   goliatFallen: `${G}schleuder/goliat-liegt.webp`,
@@ -174,7 +174,8 @@ const MEMORY: MemoryGame = {
     { image: `${G}memory/karte-mantel.webp`, text: 'Der Mantel: Jonatan legt ihn David um die Schultern.' },
     { image: `${G}memory/karte-schwert.webp`, text: 'Das Schwert: Jonatan schenkt es David.' },
     { image: `${G}memory/karte-bogen.webp`, text: 'Der Bogen: Auch ihn gibt Jonatan seinem Freund.' },
-    { image: `${G}memory/karte-guertel.webp`, text: 'Der Gürtel: Das letzte Geschenk zum Zeichen des Bundes.' }
+    { image: `${G}memory/karte-guertel.webp`, text: 'Der Gürtel: Das letzte Geschenk zum Zeichen des Bundes.' },
+    { image: `${G}memory/karte-stein.webp`, text: 'Der glatte Stein: David hat ihn im Bach gefunden, er trägt ihn noch in der Tasche.' }
   ]
 }
 

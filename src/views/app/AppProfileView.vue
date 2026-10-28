@@ -10,6 +10,7 @@ import ZIconography from '@/components/atoms/ZIconography.vue'
 import ZLanguageSwitcher from '@/components/atoms/ZLanguageSwitcher.vue'
 import AvatarPickerModal from '@/components/molecules/AvatarPickerModal.vue'
 import TipButton from '@/components/molecules/TipButton.vue'
+import MyRewards from '@/components/molecules/MyRewards.vue'
 import useModels from '@/use/useModels'
 import useApiBooks from '@/use/useApiBooks'
 import useUser from '@/use/useUser'
@@ -263,6 +264,9 @@ function onBackendToggle(e: Event) {
       //- the awards (cups, stars, medals) belong to the child's own place
       router-link(:to="{ name: 'app-awards' }" class="lk-btn lk-btn--outline lk-btn--full awards-open")
         span {{ t('app.profile.myAwards') }}
+
+      //- what was won on the adventures: the games of the gold cups and the coloring pictures
+      MyRewards
 
       //- ===== Settings (collapsible) =====
       div(

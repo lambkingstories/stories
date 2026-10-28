@@ -239,9 +239,9 @@ describe('David: the games', () => {
     expect(top.y).toBeGreaterThan(0)
   })
 
-  it('7 memory: five pairs, every one with a sentence', () => {
+  it('7 memory: six pairs (a full board of 3 x 4), every one with a sentence', () => {
     const g = stage(7).task.memory!
-    expect(g.pairs).toHaveLength(5)
+    expect(g.pairs).toHaveLength(6)
     for (const p of g.pairs) expect(p.text.length).toBeGreaterThan(10)
   })
 

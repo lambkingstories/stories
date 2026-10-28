@@ -273,7 +273,7 @@ const cellPct = (p: { x: number; y: number }) => ({ left: `${p.x}%`, top: `${p.y
           :key="`${round}-${b.id}`"
           class="hd-token"
           :class="{ chosen: selected === b.id, lifted: dragging === b.id }"
-          :style="{ width: `${Math.round(b.w * 3.2)}px`, ...dragStyle(b.id) }"
+          :style="{ width: `${b.w}cqw`, ...dragStyle(b.id) }"
           role="button"
           tabindex="0"
           :aria-label="t('app.adventure.hideBundle')"
@@ -288,6 +288,11 @@ const cellPct = (p: { x: number; y: number }) => ({ left: `${p.x}%`, top: `${p.y
 
 <style scoped lang="sass">
 .hd
+  // a bundle in the tray is as wide as it lies on the roof: the same unit (percent of the roof width = the width of this box)
+  container-type: inline-size
+  width: 100%
+  max-width: 440px
+  margin: 0 auto
   display: flex
   flex-direction: column
   gap: 10px
@@ -322,7 +327,6 @@ const cellPct = (p: { x: number; y: number }) => ({ left: `${p.x}%`, top: `${p.y
 .hd-roof
   position: relative
   width: 100%
-  max-width: 360px
   aspect-ratio: 3 / 4
   align-self: center
   overflow: hidden
@@ -400,6 +404,7 @@ const cellPct = (p: { x: number; y: number }) => ({ left: `${p.x}%`, top: `${p.y
   background: rgba(95, 65, 25, 0.22)
 
 .hd-token
+  flex: 0 0 auto
   min-width: 56px
   padding: 3px
   box-sizing: content-box

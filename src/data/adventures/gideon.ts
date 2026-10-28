@@ -57,7 +57,7 @@ const WIMMEL: FindGame = {
   ]
 }
 
-/** Etappe 12, "Rückblick" (Memory, alte Mechanik): fünf Paare aus den Etappen des Abenteuers (das Horn entfällt, es kommt im Zeichen-Spiel vor), zu jedem Treffer ein Satz aus dem Text. Bilder (gemalt, 21.10.2026): `memory/karte-*.webp` und `rueck.webp`, je 256 × 256 (Bildauftrag G37). */
+/** Etappe 12, "Rückblick" (Memory, alte Mechanik): sechs Paare (volles Brett aus 3 × 4 Karten; das Gerstenbrot ist neu, Bildauftrag MEM6; das Horn entfällt, es kommt im Zeichen-Spiel vor), zu jedem Treffer ein Satz aus dem Text. Bilder (gemalt, 21.10.2026): `memory/karte-*.webp` und `rueck.webp`, je 256 × 256 (Bildauftrag G37). */
 const MEMORY: MemoryGame = {
   back: `${G}memory/rueck.webp`,
   pairs: [
@@ -65,7 +65,8 @@ const MEMORY: MemoryGame = {
     { image: `${G}memory/karte-kelter.webp`, text: 'Die Kelter: Hier drischt Gideon heimlich Weizen.' },
     { image: `${G}memory/karte-fell.webp`, text: 'Das Fell: Erst ist nur das Fell nass, dann nur der Boden.' },
     { image: `${G}memory/karte-altar.webp`, text: 'Der Altar: Gott ist der Friede.' },
-    { image: `${G}memory/karte-krug.webp`, text: 'Der Krug: Darin steckt eine Fackel.' }
+    { image: `${G}memory/karte-krug.webp`, text: 'Der Krug: Darin steckt eine Fackel.' },
+    { image: `${G}memory/karte-brot.webp`, text: 'Das Gerstenbrot: Im Traum eines Mannes rollt es ins Lager und wirft ein Zelt um.' }
   ]
 }
 

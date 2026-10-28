@@ -117,6 +117,9 @@ describe('every game says how much its whole task is (Josef and Noah)', () => {
         expect(go, `${j.id} ${s.id} task button`).toBeTruthy()
         await go!.trigger('click')
         await flushPromises()
+        // the game begins when the child taps play
+        if (w.find('.stage-play-big').exists()) await w.find('.stage-play-big').trigger('click')
+        await flushPromises()
         expect(useTaskProgress().goal.value, `${j.id} stage ${s.id} (${s.task.kind})`).toBe(want)
         expect(want, `${j.id} stage ${s.id}`).toBeGreaterThan(0)
         seen.push(`${j.id}:${s.id}`)
@@ -138,6 +141,8 @@ describe('the button of a game that is left unfinished', () => {
     const w = mount(Stage, opts(locale))
     await flushPromises()
     await w.findAll('button').find((x) => /Zur Aufgabe|To the task|Task/.test(x.text()))!.trigger('click')
+    await flushPromises()
+    await w.find('.stage-play-big').trigger('click')
     await flushPromises()
     return w
   }

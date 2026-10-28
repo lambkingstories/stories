@@ -324,6 +324,12 @@ const { dragging, selected, down, tapPlace, toggleSelect, dragStyle } = useDragD
   100%
     box-shadow: 0 0 0 0 rgba(47, 174, 84, 0), 0 0 0 0 rgba(47, 174, 84, 0)
 
+// an odd last card stands in the middle, as wide as the others
+.od-card:last-child:nth-child(odd)
+  grid-column: 1 / -1
+  justify-self: center
+  width: calc(50% - 5px)
+
 @keyframes od-ready
   0%, 100%
     transform: scale(1)

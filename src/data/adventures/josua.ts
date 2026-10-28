@@ -53,15 +53,15 @@ const VERSTECKEN: HideGame = {
   background: `${G}verstecken/dach.webp`,
   messenger: `${G}verstecken/boten.webp`,
   men: [
-    { id: 'mann-a', image: `${G}verstecken/mann-a.webp`, x: 10, y: 24, w: 30, h: 9.375 },
-    { id: 'mann-b', image: `${G}verstecken/mann-b.webp`, x: 52, y: 60, w: 30, h: 9.375 }
+    { id: 'mann-a', image: `${G}verstecken/mann-a.webp`, x: 10, y: 24, w: 40.5, h: 12.7 },
+    { id: 'mann-b', image: `${G}verstecken/mann-b.webp`, x: 52, y: 60, w: 40.5, h: 12.7 }
   ],
   bundles: [
-    { id: 'gross-1', image: `${G}verstecken/flachs.webp`, w: 30, h: 10.8 },
-    { id: 'gross-2', image: `${G}verstecken/flachs.webp`, w: 30, h: 10.8 },
-    { id: 'gross-3', image: `${G}verstecken/flachs.webp`, w: 30, h: 10.8 },
-    { id: 'mittel-1', image: `${G}verstecken/flachs.webp`, w: 21.7, h: 10 },
-    { id: 'klein-1', image: `${G}verstecken/flachs.webp`, w: 15, h: 9.2 }
+    { id: 'gross-1', image: `${G}verstecken/flachs.webp`, w: 40.5, h: 14.6 },
+    { id: 'gross-2', image: `${G}verstecken/flachs.webp`, w: 40.5, h: 14.6 },
+    { id: 'gross-3', image: `${G}verstecken/flachs.webp`, w: 40.5, h: 14.6 },
+    { id: 'mittel-1', image: `${G}verstecken/flachs.webp`, w: 29.3, h: 13.5 },
+    { id: 'klein-1', image: `${G}verstecken/flachs.webp`, w: 20.2, h: 12.4 }
   ],
   rounds: [
     { hint: 'Rahab versteckt die beiden Männer unter dem Flachs. Fang mit dem ersten an und lege die Bündel über ihn.', men: ['mann-a'], bundles: ['gross-1', 'gross-2', 'klein-1'] },
@@ -128,7 +128,7 @@ const VERS: VerseGame = {
   ]
 }
 
-/** Etappe 5, "Erinnerungs-Memory": fünf Paare aus den Etappen 1 bis 5 (das Seil entfällt); zu jedem Treffer ein Satz aus dem Text. Bilder (gemalt, 21.10.2026): `memory/karte-*.webp` und `rueck.webp`, je 256 × 256 (Bildauftrag JO33). */
+/** Etappe 5, "Erinnerungs-Memory": sechs Paare (ein volles Brett aus 3 × 4 Karten): fünf aus den Etappen 1 bis 5 und das Widderhorn (Bildauftrag MEM6, `karte-horn.webp`; das Seil entfällt); zu jedem Treffer ein Satz aus dem Text. Bilder (gemalt, 21.10.2026): `memory/karte-*.webp` und `rueck.webp`, je 256 × 256 (Bildauftrag JO33). */
 const MEMORY: MemoryGame = {
   back: `${G}memory/rueck.webp`,
   pairs: [
@@ -136,7 +136,8 @@ const MEMORY: MemoryGame = {
     { image: `${G}memory/karte-flachs.webp`, text: 'Das Flachsbündel: Darunter hat Rahab die Männer versteckt.' },
     { image: `${G}memory/karte-schnur.webp`, text: 'Das rote Seil am Fenster: Wer im Haus bleibt, dem geschieht nichts.' },
     { image: `${G}memory/karte-lade.webp`, text: 'Die Lade des Bundes: Die Priester tragen sie voran in den Jordan.' },
-    { image: `${G}memory/karte-stein.webp`, text: 'Der Stein: Zwölf Steine erinnern an den Weg durch den Jordan.' }
+    { image: `${G}memory/karte-stein.webp`, text: 'Der Stein: Zwölf Steine erinnern an den Weg durch den Jordan.' },
+    { image: `${G}memory/karte-horn.webp`, text: 'Das Widderhorn: Mit solchen Hörnern ziehen bald die Priester um Jericho.' }
   ]
 }
 

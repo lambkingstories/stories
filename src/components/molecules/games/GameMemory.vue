@@ -49,6 +49,14 @@ const cards = computed<Card[]>(() => {
 })
 
 const back = computed(() => prependBaseUrl(props.game.back))
+/** The board is a full rectangle (twelve cards: three across and four down, big cards; sixteen: four by four), never a last row that is half empty. */
+const columns = computed(() => {
+  const n = cards.value.length
+  if (n === 12 || n === 6 || n === 18) return 3
+  if (n % 4 === 0) return 4
+  if (n % 3 === 0) return 3
+  return n % 5 === 0 ? 5 : 4
+})
 /** The pictures that could not be loaded (not painted yet): a quiet one-colour card stands in their place. */
 const missing = reactive(new Set<string>())
 const STAND = ['#d98b5f', '#6f9fc2', '#7fb069', '#e0c25a', '#b58ac4', '#7fc4b8', '#c98a8a', '#9aa5b5']
@@ -104,7 +112,7 @@ function turn(c: Card) {
       AdventureStars(:stars="stars" :size="26")
       span(class="mem-clock") {{ clock }}
       span(class="mem-rule") {{ t('app.adventure.memoryTime') }}
-    div(class="mem-grid" :class="{ done: finished }")
+    div(class="mem-grid" :class="{ done: finished }" :style="{ gridTemplateColumns: `repeat(${columns}, 1fr)` }")
       button(
         v-for="c in cards"
         :key="c.id"
@@ -134,7 +142,10 @@ function turn(c: Card) {
 .mem-grid
   display: grid
   grid-template-columns: repeat(4, 1fr)
-  gap: 8px
+  gap: 10px
+  width: 100%
+  max-width: 440px
+  margin: 0 auto
 
 .mem-card
   position: relative

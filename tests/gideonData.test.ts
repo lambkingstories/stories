@@ -146,7 +146,7 @@ describe('Gideon: the games, and the placeholders until the pictures come', () =
     setAdventureLanguage('de')
   })
 
-  it('8 hidden picture: five men and three covers (two pictures), every man lies on the scene and at least half of them are partly hidden; 12 memory: five pairs with a sentence that is true to the text', () => {
+  it('8 hidden picture: five men and three covers (two pictures), every man lies on the scene and at least half of them are partly hidden; 12 memory: six pairs with a sentence that is true to the text', () => {
     const f = stage(8).task.find
     expect(f, 'the game is built').toBeDefined()
     expect(stage(8).task.count).toBe(5)
@@ -161,7 +161,7 @@ describe('Gideon: the games, and the placeholders until the pictures come', () =
     expect(hidden.length).toBeGreaterThanOrEqual(3)
     const m = stage(12).task.memory
     expect(m, 'the game is built').toBeDefined()
-    expect(m!.pairs).toHaveLength(5)
+    expect(m!.pairs).toHaveLength(6)
     const told = gideon.stages.map((s) => s.text.join(' ')).join(' ')
     for (const word of ['Palme', 'Kelter', 'Fell', 'Altar', 'Fackel', 'Friede', 'Debora', 'Weizen']) expect(told, word).toContain(word)
     expect(m!.back).toMatch(/spiele\/gideon\/memory\//)
