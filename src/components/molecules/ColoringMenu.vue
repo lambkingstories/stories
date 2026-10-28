@@ -32,7 +32,7 @@ defineProps<Props>()
 const emit = defineEmits<{
   'open-book': [card: BookCard]
   'remove-book': [card: BookCard]
-  'to-reading': []
+  'to-books': []
   blank: [shape: 'portrait' | 'landscape']
   'own-image': []
   'open-work': [meta: ArtworkMeta]
@@ -87,8 +87,12 @@ const bookPercent = (b: BookCard) => `${Math.round((b.done / Math.max(1, b.total
                 span(class="ac-bigbook-sub") {{ b.done > 0 ? t('app.coloring.pagesPainted', { done: b.done, total: b.total }) : t('app.coloring.pagesCount', { total: b.total }) }}
               //- takes the book out of the shelf again (the painted pictures stay)
               button(type="button" class="ac-bigbook-remove" :aria-label="t('app.coloring.shelfRemove', { title: b.title })" @click="emit('remove-book', b)") ✕
+          //- the way to all coloring books, also when the shelf is full
+          button(type="button" class="lk-btn lk-btn--outline ac-allbooks" @click="emit('to-books')")
+            span {{ t('app.coloring.shelfGo') }}
+            ZIconography(name="chevron-right" :size="20")
         //- nothing on the shelf yet: a big door like the ones in Lesen
-        button(v-else type="button" class="ac-door" @click="emit('to-reading')")
+        button(v-else type="button" class="ac-door" @click="emit('to-books')")
           span(class="ac-door-pic")
             img(:src="booksDoorImage" alt="" draggable="false" decoding="async")
           span(class="ac-door-body")
@@ -264,6 +268,11 @@ button
   overflow: hidden
 
 // the books stand in one row on a shelf, swiped sideways: the one painted on last is in front
+.ac-allbooks
+  width: 100%
+  margin-top: 12px
+  justify-content: center
+
 .ac-bigbooks
   display: flex
   gap: 12px

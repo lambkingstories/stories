@@ -15,18 +15,21 @@ import { coloringPagesOfBook, type ColoringBookPage } from '@/utils/coloringBook
 import { deleteArtwork, getDrawing, listArtworks, pageArtworkId, type ArtworkMeta } from '@/use/useArtworks'
 import { LINE_ICONS } from '@/data/coloringKits'
 import { prependBaseUrl } from '@/utils/function'
-import { goBackTo } from '@/utils/navBack'
+import { goBackTo, previousPath } from '@/utils/navBack'
+import useColoringShelf from '@/use/useColoringShelf'
 import { cacheUrlToBlobUrl } from '@/use/useBookCache'
 import { allowedPages, freePageCount } from '@/use/useBookAccess'
 import usePremium from '@/use/usePremium'
 import { pickLocalizedImage } from '@/types/apiBook'
 import { openExternal } from '@/utils/openExternal'
+import { readingAreaOf } from '@/utils/readingAreas'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
 const router = useRouter()
 const { loadBook } = useApiBooks()
 const { showUpsell } = usePremium()
+const paintShelf = useColoringShelf()
 
 const bookId = computed(() => String(route.params.bookId))
 const title = ref('')
@@ -162,6 +165,8 @@ function paint() {
     unlock()
     return
   }
+  // a book that is painted in stands on the paint shelf
+  paintShelf.add(bookId.value)
   // in place of the overview: the history keeps only the menu, so one step back leaves the book again
   void router.replace({ name: 'app-coloring', query: { book: bookId.value, p: String(p.n) } })
 }
@@ -181,8 +186,16 @@ async function resetPage() {
   await refreshWorks()
 }
 
+/** A book of REACH Kids is opened from "Lesen → Reach Kids" and goes back there. */
+const ofReach = ref(false)
+
 function back() {
-  goBackTo(router, { name: 'app-coloring' })
+  // opened from the list of coloring books: one step back leads to the list again
+  if (previousPath()?.startsWith('/app/coloring-books')) {
+    router.back()
+    return
+  }
+  goBackTo(router, { name: ofReach.value ? 'app-reach-kids' : 'app-coloring' })
 }
 
 // ── Start ---------------------------------------------------------------------------------
@@ -200,6 +213,7 @@ async function start() {
     const loc = book.localizations as Record<string, { title?: string } | null | undefined>
     title.value = (loc[locale.value]?.title || loc.de?.title || bookId.value).replace(/^Buch\s*\d+\s*[–-]\s*/i, '')
     pages.value = list
+    ofReach.value = readingAreaOf(book as ApiBook) === 'reach'
     ownFree.value = (book as ApiBook).freePages ?? null
     shopLink.value = pickLocalizedImage((book as ApiBook).etsyLink, locale.value === 'en' ? 'en' : 'de')
     printedLink.value = (book as ApiBook).etsyLink?.[locale.value === 'en' ? 'en' : 'de'] ?? ''

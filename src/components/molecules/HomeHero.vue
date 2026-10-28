@@ -7,15 +7,20 @@
  */
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import LkCompanion from '@/components/atoms/LkCompanion.vue'
+import ZIconography from '@/components/atoms/ZIconography.vue'
 
 export interface HeroSlide {
   /** Tells the page which actions belong to the slide. */
   id?: string
   image: string
+  /** A small line above the title (a partner is introduced: "We are looking forward to the partnership with"). */
+  eyebrow?: string
   title: string
   /** A short line in the accent colour between the title and the text (the slogan). */
   slogan?: string
   text: string
+  /** A short list under the text: what the child can do in the app (symbol, bold word, one short line). */
+  points?: { icon: 'series' | 'compass' | 'brush' | 'star' | 'headphones'; label: string; text: string }[]
 }
 
 const props = withDefaults(defineProps<{ slides: HeroSlide[]; intervalMs?: number; label?: string }>(), {
@@ -84,9 +89,17 @@ onBeforeUnmount(() => {
           )
         div(:class="['hero-copy', { 'has-lamb': i === 0 }]")
           LkCompanion(v-if="i === 0" class="hero-lamb" pose="sitzen" :size="84")
-          h2(class="hero-title") {{ s.title }}
+          p(v-if="s.eyebrow" class="hero-eyebrow") {{ s.eyebrow }}
+          h2(:class="['hero-title', { 'has-eyebrow': !!s.eyebrow }]") {{ s.title }}
           p(v-if="s.slogan" class="hero-slogan") {{ s.slogan }}
           p(class="hero-text") {{ s.text }}
+          ul(v-if="s.points?.length" class="hero-points")
+            li(v-for="(p, k) in s.points" :key="k" class="hero-point")
+              span(class="hero-point-ico" aria-hidden="true")
+                ZIconography(:name="p.icon" :size="22")
+              span(class="hero-point-copy")
+                b {{ p.label }}
+                span {{ p.text }}
           div(class="hero-actions")
             slot(name="actions" :index="i" :id="s.id")
     div(v-if="slides.length > 1" class="hero-dots")
@@ -170,6 +183,23 @@ onBeforeUnmount(() => {
   font-size: 1.55rem
   line-height: 1.15
 
+// a partner is named: the introducing line is small and quiet, the name stands large under it with a fine accent line
+.hero-eyebrow
+  margin: 0 0 2px
+  font-weight: 700
+  font-size: 0.95rem
+  letter-spacing: 0.02em
+  color: var(--lk-muted)
+
+.hero-title.has-eyebrow
+  font-family: 'Fraunces', Georgia, serif
+  font-size: 2.1rem
+  line-height: 1.08
+  padding-bottom: 10px
+  margin-bottom: 8px
+  border-bottom: 3px solid var(--lk-accent)
+  align-self: flex-start
+
 .hero-slogan
   margin: 2px 0 4px
   font-weight: 800
@@ -182,6 +212,43 @@ onBeforeUnmount(() => {
   font-size: 1.02rem
   line-height: 1.4
   color: var(--lk-muted)
+
+// what the child can do here: a round symbol, the word in bold and one short line
+.hero-points
+  list-style: none
+  margin: 8px 0 0
+  padding: 0
+  display: flex
+  flex-direction: column
+  gap: 8px
+
+.hero-point
+  display: flex
+  align-items: center
+  gap: 12px
+
+.hero-point-ico
+  flex: 0 0 38px
+  width: 38px
+  height: 38px
+  border-radius: 12px
+  background: var(--lk-accent-soft)
+  color: var(--lk-accent)
+  display: flex
+  align-items: center
+  justify-content: center
+
+.hero-point-copy
+  display: flex
+  flex-direction: column
+  min-width: 0
+  font-size: 0.98rem
+  line-height: 1.25
+  color: var(--lk-muted)
+
+  b
+    color: var(--lk-text)
+    font-weight: 800
 
 .hero-actions
   display: flex
@@ -259,6 +326,9 @@ onBeforeUnmount(() => {
 
   .hero-title
     font-size: 2rem
+
+  .hero-title.has-eyebrow
+    font-size: 2.6rem
 
   .hero-text
     font-size: 1.15rem

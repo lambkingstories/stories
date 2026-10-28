@@ -5,7 +5,7 @@
  */
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import LkPageHead from '@/components/molecules/LkPageHead.vue'
 import useApiBooks from '@/use/useApiBooks'
 import { listArtworks, pageArtworkId, type ArtworkMeta } from '@/use/useArtworks'
@@ -16,7 +16,10 @@ import { goBackTo } from '@/utils/navBack'
 import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
 
 const { t, locale } = useI18n({ useScope: 'global' })
+const route = useRoute()
 const router = useRouter()
+/** Opened from the painting program: the way back leads there and not to "Lesen". */
+const fromPainting = computed(() => route.query.from === 'malen')
 const apiBooks = useApiBooks()
 
 const lang = computed<Locale>(() => (locale.value === 'en' ? 'en' : 'de'))
@@ -67,7 +70,7 @@ const cards = computed<Card[]>(() => {
 })
 
 function goBack() {
-  goBackTo(router, { name: 'app-read' })
+  goBackTo(router, { name: fromPainting.value ? 'app-coloring' : 'app-read' })
 }
 
 function openBook(bookId: string) {

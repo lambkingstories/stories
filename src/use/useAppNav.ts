@@ -23,7 +23,10 @@ function routeToNav(name: string): AppNavId {
   if (
     name === 'app-read'
     || name === 'app-books'
+    || name === 'app-book-preview'
     || name === 'app-coloring-books'
+    || name === 'app-reach-kids'
+    || name === 'app-reach-kids-book'
     || name === 'app-all-books'
     || name === 'app-book'
     || name === 'app-series'
@@ -61,7 +64,10 @@ export default function useAppNav(t: ComposerTranslation): {
     { id: 'profile', label: t('app.nav.profile'), icon: 'profile' },
   ])
 
-  const activeNav = computed<string | number>(() => routeToNav(String(route.name || '')))
+  // the list of coloring books belongs to "Lesen", but opened from the painting program it stays in "Malen"
+  const activeNav = computed<string | number>(() =>
+    route.name === 'app-coloring-books' && route.query.from === 'malen' ? 'malen' : routeToNav(String(route.name || ''))
+  )
 
   function onNav(id: string | number) {
     const name = ROUTE_BY_NAV[id as AppNavId]

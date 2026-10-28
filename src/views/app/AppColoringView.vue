@@ -3163,7 +3163,7 @@ watch(queryBook, (id) => {
         :backup-message="backupMessage"
         @open-book="openBookCard"
         @remove-book="(card) => paintShelf.remove(card.bookId)"
-        @to-reading="router.push({ name: 'app-read' })"
+        @to-books="router.push({ name: 'app-coloring-books', query: { from: 'malen' } })"
         @blank="startBlankSheet"
         @own-image="pickFile"
         @open-work="openWork"
