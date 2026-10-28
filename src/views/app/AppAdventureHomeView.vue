@@ -19,6 +19,7 @@ import useButtonSounds from '@/use/useButtonSounds'
 import { deleteArtwork, pageArtworkId } from '@/use/useArtworks'
 import useJourneyPack from '@/use/useJourneyPack'
 import { maxPoints, medalFor, nextStageIndex, pointsOf } from '@/utils/adventureScore'
+import { journeyToContinue } from '@/utils/continueJourney'
 import { prependBaseUrl } from '@/utils/function'
 
 const { t } = useI18n({ useScope: 'global' })
@@ -59,8 +60,8 @@ const groups = computed(() => groupByEpoch(items.value))
 
 // the adventure to go on with: the first one that was begun and is not finished (in the order of the time line)
 const goOn = computed(() => {
-  for (const g of groups.value) for (const e of g.entries) if (e.item && e.item.begun && e.item.doneCount < e.item.total) return e.item
-  return null
+  const j = journeyToContinue(journeys, adv.progressOf)
+  return items.value.find((i) => i.journey.id === j?.id) ?? null
 })
 
 function jumpTo(id: string) {

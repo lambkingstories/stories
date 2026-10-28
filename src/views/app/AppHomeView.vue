@@ -15,6 +15,7 @@ import ZIconography from '@/components/atoms/ZIconography.vue'
 import AppHeader from '@/components/molecules/AppHeader.vue'
 import HomeHero, { type HeroSlide } from '@/components/molecules/HomeHero.vue'
 import KoFiButton from '@/components/molecules/KoFiButton.vue'
+import BankTransfer from '@/components/molecules/BankTransfer.vue'
 import TipButton from '@/components/molecules/TipButton.vue'
 import useModels from '@/use/useModels'
 import useApiBooks from '@/use/useApiBooks'
@@ -25,6 +26,7 @@ import { listArtworks, type ArtworkMeta } from '@/use/useArtworks'
 import { journeys } from '@/data/adventures'
 import { sponsors } from '@/data/sponsors'
 import { nextStageIndex } from '@/utils/adventureScore'
+import { journeyToContinue } from '@/utils/continueJourney'
 import { isIOS } from '@/utils/platform'
 import type { ApiBook, Locale } from '@/types/apiBook'
 import { pickLocalizedImage } from '@/types/apiBook'
@@ -159,8 +161,8 @@ const pictureCard = computed<ResumeCard>(() => {
 
 const adventureCard = computed<ResumeCard>(() => {
   const kind = t('app.home.kindAdventure')
-  // the first journey that was begun and is not finished; otherwise the first journey
-  const begun = journeys.find((j) => adventure.progressOf(j.id) && nextStageIndex(j, adventure.progressOf(j.id)) !== null)
+  // the same adventure that the adventure page goes on with; if none was begun, the first one is offered
+  const begun = journeyToContinue(journeys, adventure.progressOf)
   const journey = begun ?? journeys[0]
   if (!journey) {
     return { id: 'adventure', kind, title: t('app.home.startHere'), meta: '', image: '', progress: -1, empty: true, go: () => void router.push({ name: 'app-adventure' }) }
@@ -215,6 +217,8 @@ function openBook(bookId: string) {
               div(class="donate-row")
                 KoFiButton(href="https://www.paypal.com/ncp/payment/5CWTQPB6NGWLU" tone="paypal" label="PayPal")
                 KoFiButton(href="https://ko-fi.com/U6U21YO0Z5" tone="kofi" label="Ko-fi")
+              //- a normal bank transfer: only there when the account is filled in (data/donation.ts)
+              BankTransfer
           button(v-else-if="id === 'reach'" type="button" class="lk-btn hero-shop" @click="openReach")
             span(class="hero-shop-label") {{ t('app.home.reachButton') }}
             ZIconography(name="chevron-right" :size="22")
@@ -347,16 +351,18 @@ button
 .hero-shop
   width: 100%
   max-width: 340px
-  justify-content: space-between
+  // the button stands in the middle of the card and its words in the middle of the button
+  margin: 0 auto
+  justify-content: center
   gap: 10px
-  padding: 0 20px 0 22px
+  padding: 0 20px
 
   :deep(.z-icon-outline)
     color: currentColor
 
 .hero-shop-label
-  flex: 1
-  text-align: left
+  flex: 0 1 auto
+  text-align: center
   font-size: 1.1rem
   font-weight: 800
 

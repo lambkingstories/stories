@@ -999,6 +999,7 @@ export default {
       },
       home: {
         slideLabel: 'Welcome',
+        bankButton: 'By bank transfer',
         starsTitle: 'Your stars',
         starsAll: 'Stars collected: {n} of {max}',
         welcomeTitle: 'Welcome to LambKing!',
@@ -2502,6 +2503,7 @@ export default {
       },
       home: {
         slideLabel: 'Willkommen',
+        bankButton: 'Per Überweisung',
         starsTitle: 'Deine Sterne',
         starsAll: 'Gesammelte Sterne: {n} von {max}',
         welcomeTitle: 'Willkommen bei LambKing!',

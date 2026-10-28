@@ -11,6 +11,8 @@ import { booksApi } from '@/api/booksApi'
 import useBookCache from '@/use/useBookCache'
 import type { ApiBook } from '@/types/apiBook'
 import { localColoringBooks, localColoringBooksMissingFrom } from '@/data/localColoringBooks'
+import { isHiddenBook, isHiddenBookOrSeries } from '@/data/hiddenBooks'
+import { reachBooks } from '@/data/reachColoringBook'
 
 const state = reactive<{
   byId: Record<string, ApiBook>
@@ -50,10 +52,24 @@ async function refreshBookInBackground(bookId: string): Promise<void> {
   }
 }
 
-/** Books that ship inside a test build (see `localColoringBooks`); they never touch the cache or the network. */
-const localBookById = (id: string): ApiBook | undefined => localColoringBooks().find((b) => b.bookId === id)
+/**
+ * Books that ship inside the app: the test books of a test build (see `localColoringBooks`) and the books of REACH Kids (in every
+ * build); they never touch the cache or the network.
+ */
+const localBookById = (id: string): ApiBook | undefined => [...localColoringBooks(), ...reachBooks()].find((b) => b.bookId === id)
 
+/** A book that is hidden (itself or by its series) is not delivered, also not from the copy kept on the device. */
 async function loadBook(bookId: string): Promise<ApiBook | null> {
+  const book = await loadBookUnfiltered(bookId)
+  if (book && isHiddenBookOrSeries(book)) {
+    delete state.byId[bookId]
+    return null
+  }
+  return book
+}
+
+async function loadBookUnfiltered(bookId: string): Promise<ApiBook | null> {
+  if (isHiddenBook(bookId)) return null
   const local = localBookById(bookId)
   if (local) {
     state.byId[bookId] = local
@@ -86,9 +102,15 @@ async function loadBook(bookId: string): Promise<ApiBook | null> {
 async function loadAllBooks(): Promise<ApiBook[]> {
   if (state.listLoading) return state.all ?? []
   state.listLoading = true
+  // the books that ship with the app are there at once, while the backend is still answering (it may be asleep and slow)
+  if (!state.all) {
+    const own = [...localColoringBooks(), ...reachBooks()]
+    if (own.length) state.all = own
+  }
   try {
-    const remote = await booksApi.list()
-    const books = [...remote, ...localColoringBooksMissingFrom(remote)]
+    const remote = (await booksApi.list()).filter((b) => !isHiddenBookOrSeries(b))
+    const ownReach = reachBooks().filter((b) => !remote.some((r) => r.bookId === b.bookId))
+    const books = [...remote, ...localColoringBooksMissingFrom(remote), ...ownReach]
     state.all = books
     for (const b of books) {
       // a slim entry (no story text) never replaces a whole book that is already known, and is not kept for offline use:
@@ -100,8 +122,8 @@ async function loadAllBooks(): Promise<ApiBook[]> {
     return books
   } catch (err) {
     state.error = (err as Error).message
-    // offline: a test build still has its own books
-    if (!state.all && localColoringBooks().length) state.all = localColoringBooks()
+    // offline: the books that ship with the app are still there
+    if (!state.all) state.all = [...localColoringBooks(), ...reachBooks()]
     return state.all ?? []
   } finally {
     state.listLoading = false
@@ -148,7 +170,10 @@ export const useApiBooks = () => {
     loadAllBooks,
     booksOfSeries,
     nextBookInSeries,
-    getById: (id: string): ApiBook | null => state.byId[id] ?? null
+    getById: (id: string): ApiBook | null => {
+      const book = state.byId[id] ?? null
+      return book && isHiddenBookOrSeries(book) ? null : book
+    }
   }
 }
 

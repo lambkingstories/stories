@@ -33,14 +33,99 @@ const stopNavBar = () => {
   clearTimeout(navTimer)
   navigating.value = false
 }
-router.beforeEach(() => {
+
+// ── How a screen changes ──────────────────────────────────────────────────────────────────────────────────────────────────────
+// Like on the iPhone: the main tabs fade into each other, going deeper pushes the new screen in from the right (the old one
+// moves a little to the left), going back slides the top screen away to the right. No bounce, no scaling, so nothing wobbles.
+type Motion = 'nav-fade' | 'nav-push' | 'nav-back'
+const MOTION_MS: Record<Motion, number> = { 'nav-fade': 200, 'nav-push': 380, 'nav-back': 380 }
+const motion = ref<Motion>('nav-fade')
+
+const DEPTH: Record<string, number> = {
+  'app-main': 0, 'app-read': 0, 'app-hoeren': 0, 'app-adventure': 0, 'app-profile': 0, 'app-coloring': 0,
+  'app-books': 1, 'app-coloring-books': 1, 'app-reach-kids': 1, 'app-reach-kids-book': 2, 'app-book-preview': 2, 'app-all-books': 1, 'app-all-new-books': 1, 'app-category': 1, 'app-awards': 1,
+  'app-legal': 1, 'app-adventure-map': 1, 'app-coloring-book': 1,
+  'app-series': 2, 'app-book': 2, 'app-adventure-stage': 2, 'app-adventure-stats': 2,
+  'app-reader': 3
+}
+// the painting program is a main tab, but a picture inside it (opened with a query) is a deeper screen
+const depthOf = (r: { name?: unknown; query: Record<string, unknown> }): number =>
+  r.name === 'app-coloring' && Object.keys(r.query).length ? 3 : (DEPTH[String(r.name ?? '')] ?? 1)
+
+// the position of the page in the browser history tells a step back (the position gets smaller) from a step forward
+const historyPosition = (): number => {
+  const pos = (window.history.state as { position?: number } | null)?.position
+  return typeof pos === 'number' ? pos : 0
+}
+let lastPosition = historyPosition()
+// where each screen was scrolled to, so that going back lands on the same spot
+const scrollOf = new Map<string, number>()
+let restoreY = 0
+let tabTapped = false
+try {
+  window.history.scrollRestoration = 'manual'
+} catch { /* not available */ }
+
+router.beforeEach((to, from) => {
   clearTimeout(navTimer)
   navTimer = setTimeout(() => (navigating.value = true), 90)
+  scrollOf.set(from.fullPath, window.scrollY)
+  const stepBack = historyPosition() < lastPosition
+  const stepForward = historyPosition() > lastPosition
+  if (!from.name) motion.value = 'nav-fade'
+  else if (from.name === 'app-coloring' && to.name === 'app-coloring') motion.value = 'nav-fade'
+  else if (tabTapped) motion.value = 'nav-fade'
+  // a wide window (computer, tablet lying down): a whole screen sliding sideways looks restless, so the screens melt into each other
+  else if (window.innerWidth >= 900) motion.value = 'nav-fade'
+  else if (stepBack) motion.value = 'nav-back'
+  else if (!stepForward && depthOf(to) < depthOf(from)) motion.value = 'nav-back'
+  else motion.value = 'nav-push'
+  restoreY = motion.value === 'nav-back' ? (scrollOf.get(to.fullPath) ?? 0) : 0
   return true
 })
-router.afterEach(stopNavBar)
-router.onError(stopNavBar)
-const { navItems, activeNav, onNav } = useAppNav(t)
+router.afterEach(() => {
+  stopNavBar()
+  lastPosition = historyPosition()
+  tabTapped = false
+})
+router.onError(() => {
+  stopNavBar()
+  tabTapped = false
+})
+
+// The leaving screen stays exactly where the child saw it (it is taken out of the flow, the page scroll jumps back to the top).
+function onBeforeLeave(el: Element) {
+  ;(el as HTMLElement).style.top = `${-window.scrollY}px`
+  // both screens lie on top of each other and the page would shrink to the window height for a moment: the bar for scrolling
+  // would jump up and down. The page keeps its height until the new screen has arrived.
+  const root = document.getElementById('app-root')
+  if (root) root.style.minHeight = `${Math.max(window.innerHeight, document.documentElement.scrollHeight)}px`
+}
+function releaseHeight() {
+  const root = document.getElementById('app-root')
+  if (root) root.style.minHeight = ''
+}
+// The entering screen starts at the top, or, when going back, at the spot where the child left it.
+function onBeforeEnter(el: Element) {
+  if (restoreY > 0) (el as HTMLElement).style.top = `${-restoreY}px`
+  else window.scrollTo(0, 0)
+}
+function onEnterDone(el: Element) {
+  const node = el as HTMLElement
+  releaseHeight()
+  node.style.top = ''
+  if (restoreY > 0) {
+    window.scrollTo(0, restoreY)
+    restoreY = 0
+  }
+}
+
+const { navItems, activeNav, onNav: goToTab } = useAppNav(t)
+// the tab bar fades, it never pushes
+const onNav = (id: string | number) => {
+  tabTapped = true
+  goToTab(id)
+}
 
 // Routes that render the shared ZBottomNav. Keeping the nav rendered at
 // the App level (outside the page-swipe transition wrapper) means it
@@ -52,6 +137,7 @@ const NAV_ROUTES = new Set([
   'app-read',
   'app-books',
   'app-coloring-books',
+  'app-reach-kids',
   'app-all-books',
   'app-all-new-books',
   'app-series',
@@ -186,7 +272,15 @@ function isCrazyGamesUrl() {
   div(id="app-root").min-h-screen.w-full.app-container.root-protection.game-ui-immune.relative
     div(v-if="navigating" class="nav-bar" role="progressbar" aria-busy="true")
     RouterView(v-slot="{ Component, route }")
-      transition(name="page-pop-scale" appear)
+      transition(
+        :name="motion"
+        :duration="MOTION_MS[motion]"
+        appear
+        @before-leave="onBeforeLeave"
+        @before-enter="onBeforeEnter"
+        @after-enter="onEnterDone"
+        @enter-cancelled="onEnterDone"
+      )
         component(:is="Component" :key="route.fullPath")
 
     //- Shared bottom nav lives outside the page-swipe <transition> so it
@@ -254,74 +348,99 @@ img
 // black/blue on Tauri.
 #app-root
   background-color: var(--color-bg-main)
+  // the pages slide sideways: what sticks out must not widen the page (that made the screen shiver)
+  overflow-x: clip
 
-// ----- Page swipe transition (constant speed) -----
-// Mirrors the BookReader's deck-swipe feel for global route changes:
-// the leaving page slides out to the left while the entering page
-// slides in from the right at the same constant speed (linear easing,
-// no overshoot, no fade), so the two appear glued together like a
-// single horizontal swipe.
-.page-swipe-enter-active,
-.page-swipe-leave-active
-  transition: transform 320ms linear
-  // While the two pages are mid-transition they need to overlap
-  // horizontally instead of stacking vertically — so take both out of
-  // flow. The router-view's parent (#app-root) already has `relative`.
-  // Height stays auto (no `bottom: 0`) so long pages don't get clipped
-  // to the viewport during the swipe.
+// ----- Screen changes (like on the iPhone) -----
+// Both screens lie on top of each other while they change (taken out of the flow; the leaving one keeps its scroll spot, see
+// `onBeforeLeave`). The shared ZBottomNav lives outside the <transition>, so it never moves. The screens that slide get a solid
+// background (the page background of the day/night theme), so the one below never shows through. Only transform and opacity
+// are animated, that is smooth on every phone. #app-root clips the sideways overflow, so no sideways scrollbar flickers.
+.nav-fade-enter-active, .nav-fade-leave-active,
+.nav-push-enter-active, .nav-push-leave-active,
+.nav-back-enter-active, .nav-back-leave-active
   position: absolute
   top: 0
   left: 0
   width: 100%
-  will-change: transform
-
-.page-swipe-enter-from
-  transform: translate3d(100%, 0, 0)
-
-.page-swipe-leave-to
-  transform: translate3d(-100%, 0, 0)
-
-.page-swipe-enter-to,
-.page-swipe-leave-from
-  transform: translate3d(0, 0, 0)
-
-// ----- Pop-scale transition (active route transition) -----
-// The entering page starts at 90% and snaps up to 100% with a small
-// overshoot, giving the navigation a poppy/bouncy feel. The outgoing
-// page fades out quickly so it doesn't fight the incoming pop. Both
-// pages are absolutely positioned so they overlap during the swap —
-// the shared ZBottomNav lives outside this <transition>, so it stays
-// at full size and isn't pulled into the scaling.
-.page-pop-scale-enter-active,
-.page-pop-scale-leave-active
-  position: absolute
-  top: 0
-  left: 0
-  width: 100%
-  transform-origin: center center
   will-change: transform, opacity
+  backface-visibility: hidden
 
-.page-pop-scale-enter-active
-  animation: page-pop-scale-in 480ms cubic-bezier(0.34, 1.56, 0.64, 1) both
+// the main tabs: the new screen fades in over the old one (which stays until it is covered)
+.nav-fade-enter-active
+  z-index: 2
+  background: var(--lk-bg, var(--color-bg-main))
+  animation: nav-fade-in 200ms ease-out both
 
-.page-pop-scale-leave-active
-  animation: page-pop-scale-out 160ms ease-out both
+.nav-fade-leave-active
+  z-index: 1
 
-@keyframes page-pop-scale-in
-  0%
+// going deeper: the new screen pushes in from the right, the old one moves a little to the left
+.nav-push-enter-active
+  z-index: 2
+  background: var(--lk-bg, var(--color-bg-main))
+  box-shadow: -12px 0 32px rgba(0, 0, 0, 0.16)
+  animation: nav-push-in 380ms cubic-bezier(0.32, 0.72, 0, 1) both
+
+.nav-push-leave-active
+  z-index: 1
+  animation: nav-push-out 380ms cubic-bezier(0.32, 0.72, 0, 1) both
+
+// going back: the top screen slides away to the right, the screen below moves back from the left
+.nav-back-enter-active
+  z-index: 1
+  animation: nav-back-in 380ms cubic-bezier(0.32, 0.72, 0, 1) both
+
+.nav-back-leave-active
+  z-index: 2
+  background: var(--lk-bg, var(--color-bg-main))
+  box-shadow: -12px 0 32px rgba(0, 0, 0, 0.16)
+  animation: nav-back-out 380ms cubic-bezier(0.32, 0.72, 0, 1) both
+
+@keyframes nav-fade-in
+  from
     opacity: 0
-    transform: scale(0.65)
-  100%
+  to
     opacity: 1
-    transform: scale(1)
 
-@keyframes page-pop-scale-out
-  0%
-    opacity: 1
-    transform: scale(1)
-  100%
-    opacity: 0
-    transform: scale(0.96)
+@keyframes nav-push-in
+  from
+    transform: translate3d(100%, 0, 0)
+  to
+    transform: translate3d(0, 0, 0)
+
+@keyframes nav-push-out
+  from
+    transform: translate3d(0, 0, 0)
+  to
+    transform: translate3d(-24%, 0, 0)
+
+@keyframes nav-back-in
+  from
+    transform: translate3d(-24%, 0, 0)
+  to
+    transform: translate3d(0, 0, 0)
+
+@keyframes nav-back-out
+  from
+    transform: translate3d(0, 0, 0)
+  to
+    transform: translate3d(100%, 0, 0)
+
+// whoever wants less movement gets a short fade instead of the sliding
+@media (prefers-reduced-motion: reduce)
+  .nav-push-enter-active,
+  .nav-back-enter-active
+    animation: nav-fade-in 150ms ease-out both
+    box-shadow: none
+    background: var(--lk-bg, var(--color-bg-main))
+    z-index: 2
+
+  .nav-push-leave-active,
+  .nav-back-leave-active
+    animation: none
+    box-shadow: none
+    z-index: 1
 
 // ----- Extra playful transitions -----
 // 1. Balloon bounce — drops in from above with a squash-and-stretch bounce
