@@ -243,8 +243,9 @@ export async function loadPreviewJourneys(): Promise<void> {
       if (!journeys.some((j) => j.id === journey.id)) journeys.push(journey)
       const at = comingSoon.findIndex((c) => c.id === journey.id)
       if (at >= 0) comingSoon.splice(at, 1)
-    } catch {
+    } catch (error) {
       // the journey could not be loaded (no net): the app simply goes on without it
+      console.error(`journey ${p.id} could not be loaded`, error)
     }
   }
 }
