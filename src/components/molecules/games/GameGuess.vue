@@ -17,6 +17,7 @@ import { mistakeStars } from '@/utils/adventureScore'
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
 import { prependBaseUrl } from '@/utils/function'
+import { softOf } from '@/utils/gameBackground'
 import type { GuessAnimal, GuessGame } from '@/types/adventure'
 
 const props = defineProps<{ game: GuessGame }>()
@@ -134,7 +135,7 @@ const total = computed(() => rounds.value.reduce((n, r) => n + r.tasks.length, 0
     template(v-if="!finished")
       p(v-if="rounds.length > 1" class="gs-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="gs-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
-      div(class="gs-field game-soft" role="group" :aria-label="t('app.adventure.guessField')" :style="{ '--bg': `url(${src(game.background)})` }")
+      div(class="gs-field game-soft" role="group" :aria-label="t('app.adventure.guessField')" :style="{ '--bg': `url(${src(game.background)})`, '--soft': softOf(game.background) }")
         template(v-if="!between")
           span(v-for="s in herdA" :key="s.key" class="gs-animal" :style="s.style")
             GameImage(:src="s.image" :ratio="1.2")

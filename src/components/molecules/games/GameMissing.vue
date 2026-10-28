@@ -17,6 +17,7 @@ import { mistakeStars } from '@/utils/adventureScore'
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
 import { prependBaseUrl } from '@/utils/function'
+import { softOf } from '@/utils/gameBackground'
 import type { MissingGame } from '@/types/adventure'
 
 const props = defineProps<{ game: MissingGame }>()
@@ -136,7 +137,7 @@ const gapStyle = (i: number) => ({ left: `${slotOf(i)[0]}%`, top: `${slotOf(i)[1
       p(v-if="rounds.length > 1" class="ms-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="ms-hint") {{ phase === 'look' ? current.hint : message || current.hint }}
       div(class="ms-field" role="group" :aria-label="t('app.adventure.missingRow')")
-        div(class="ms-bg" :style="{ backgroundImage: `url(${src(game.background)})` }" aria-hidden="true")
+        div(class="ms-bg" :style="{ backgroundImage: `url(${src(game.background)})`, filter: softOf(game.background) }" aria-hidden="true")
         template(v-for="(id, i) in standing" :key="`${round}-${taskNo}-${i}`")
           img(v-if="id" :src="src(personOf(id)?.image ?? '')" alt="" draggable="false" class="ms-person" :class="{ back: task.gone.includes(id) && found[id] }" :style="personStyle(i, id)")
           span(v-else class="ms-gap" :style="gapStyle(i)" role="img" :aria-label="t('app.adventure.missingGap')")

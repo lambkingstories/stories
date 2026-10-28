@@ -16,6 +16,7 @@ import { mistakeStars } from '@/utils/adventureScore'
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
 import { prependBaseUrl } from '@/utils/function'
+import { softOf } from '@/utils/gameBackground'
 import type { ChainGame } from '@/types/adventure'
 
 const props = defineProps<{ game: ChainGame }>()
@@ -110,7 +111,7 @@ function roundOver() {
       p(v-if="rounds.length > 1" class="ch-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="ch-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
       div(class="ch-field" role="group" :aria-label="t('app.adventure.chainField')")
-        div(class="ch-bg" :style="{ backgroundImage: `url(${src(game.background)})` }" aria-hidden="true")
+        div(class="ch-bg" :style="{ backgroundImage: `url(${src(game.background)})`, filter: softOf(game.background) }" aria-hidden="true")
         span(class="ch-oven" :style="place(current.source)" aria-hidden="true")
         div(class="ch-stack" :style="place(current.sink)" role="img" :aria-label="t('app.adventure.chainStack', { n: state.stacked.length })")
           img(v-for="(kind, i) in state.stacked" :key="i" :src="itemSrc(kind)" alt="" draggable="false" :style="{ bottom: `${(i % 4) * 22}%`, left: `${Math.floor(i / 4) * 30}%` }")

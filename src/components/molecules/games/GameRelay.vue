@@ -17,6 +17,7 @@ import { mistakeStars } from '@/utils/adventureScore'
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
 import { prependBaseUrl } from '@/utils/function'
+import { softOf } from '@/utils/gameBackground'
 import type { RelayGame, RelayHerd } from '@/types/adventure'
 
 const props = defineProps<{ game: RelayGame }>()
@@ -154,7 +155,7 @@ const band = computed(() => {
     template(v-if="!finished")
       p(v-if="rounds.length > 1" class="rl-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="rl-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
-      div(class="rl-field game-soft" role="group" :aria-label="t('app.adventure.relayField', { n: sent.length, total: current.herds.length })" :style="{ '--bg': `url(${src(game.background)})` }")
+      div(class="rl-field game-soft" role="group" :aria-label="t('app.adventure.relayField', { n: sent.length, total: current.herds.length })" :style="{ '--bg': `url(${src(game.background)})`, '--soft': softOf(game.background) }")
         svg(class="rl-road" viewBox="0 0 100 66.667" preserveAspectRatio="none" aria-hidden="true")
           polyline(:points="roadPoints")
         svg(class="rl-band" viewBox="0 0 100 66.667" preserveAspectRatio="none" aria-hidden="true")

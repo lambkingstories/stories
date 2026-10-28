@@ -15,6 +15,7 @@ import { holdProgress, onSpark, pointAt, wholePercent } from '@/utils/jakobGames
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
 import { prependBaseUrl } from '@/utils/function'
+import { softOf } from '@/utils/gameBackground'
 import type { HoldGame } from '@/types/adventure'
 
 const props = defineProps<{ game: HoldGame }>()
@@ -142,7 +143,7 @@ function lift() {
         class="hd-field game-soft soft-only"
         role="group"
         :aria-label="t('app.adventure.holdField')"
-        :style="{ '--bg': `url(${src(game.background)})` }"
+        :style="{ '--bg': `url(${src(game.background)})`, '--soft': softOf(game.background) }"
         @pointerdown="down"
         @pointermove="move"
         @pointerup="lift"

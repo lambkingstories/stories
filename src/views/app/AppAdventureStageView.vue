@@ -874,6 +874,10 @@ $ink: var(--lk-text)
 .stage-back
   gap: 4px
   padding: 0 18px 0 10px
+  // blue like every other button of the adventure (Anton, 28.10.2026)
+  background: var(--lk-accent)
+  border-color: transparent
+  color: var(--lk-on-accent)
 
   :deep(.z-icon-outline)
     color: currentColor
@@ -1207,6 +1211,53 @@ $ink: var(--lk-text)
   &:hover,
   &:focus-visible
     border-color: var(--lk-accent)
+
+// every button of a game is blue (the accent: petrol by day, gold by night) and the same size (Anton, 28.10.2026): the text buttons are one capsule of
+// 56 px, the round signs and the arrow keys are one blue as well. "Tipp", "Hilfe", "Von vorn", "Überspringen" are no longer white.
+.stage-card--game :deep(.adv-btn),
+.stage-card--game :deep(.ca-btn),
+.stage-card--game :deep(.rg-btn),
+.stage-card--game :deep(.bd-zoom),
+.stage-card--game .stage-skip
+  min-width: 240px
+  min-height: 56px
+  padding: 0 24px
+  border: 1px solid transparent
+  border-radius: 999px
+  background: var(--lk-accent)
+  color: var(--lk-on-accent)
+  font-size: 1rem
+  font-weight: 600
+  line-height: 1.2
+  box-shadow: none
+
+  &:disabled
+    opacity: 0.5
+
+// the two choices side by side (Jakob 8) share the row
+.stage-card--game :deep(.ca-btn)
+  min-width: 0
+  flex: 1
+
+.stage-card--game :deep(.rn-btn),
+.stage-card--game :deep(.cv-key)
+  background: var(--lk-accent)
+  border-color: var(--lk-accent)
+  color: var(--lk-on-accent)
+
+.stage-card--game .stage-restart
+  background: var(--lk-accent)
+  border-color: var(--lk-accent)
+  color: var(--lk-on-accent)
+
+// the read-aloud button of the story is blue, too
+.stage-card :deep(.ra .adv-btn)
+  background: var(--lk-accent)
+  border-color: transparent
+  color: var(--lk-on-accent)
+
+.stage-card :deep(.ra-icon)
+  filter: brightness(0) invert(1)
 
 // the small buttons under a game ("Weiter (1 Stern)", "Überspringen"): a solid pill with a fine line, centred, as high as a finger
 .stage-skip

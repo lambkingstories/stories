@@ -16,6 +16,7 @@ import { mistakeStars } from '@/utils/adventureScore'
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
 import { prependBaseUrl } from '@/utils/function'
+import { softOf } from '@/utils/gameBackground'
 import type { RingGame } from '@/types/adventure'
 
 const props = defineProps<{ game: RingGame }>()
@@ -153,7 +154,7 @@ const { dragging, selected, down, tapPlace, toggleSelect, dragStyle } = useDragD
         role="group"
         tabindex="0"
         :aria-label="t('app.adventure.ringField', { n: placed.length, total: current.count })"
-        :style="{ '--bg': `url(${src(game.background)})` }"
+        :style="{ '--bg': `url(${src(game.background)})`, '--soft': softOf(game.background) }"
         @click="tapPlace('ring', { x: $event.clientX, y: $event.clientY })"
         @keydown.enter.space.prevent="tapPlace('ring')"
       )

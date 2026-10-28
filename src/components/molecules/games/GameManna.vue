@@ -18,6 +18,7 @@ import { mistakeStars } from '@/utils/adventureScore'
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
 import { prependBaseUrl } from '@/utils/function'
+import { softOf } from '@/utils/gameBackground'
 import type { MannaGame } from '@/types/adventure'
 
 const props = defineProps<{ game: MannaGame }>()
@@ -150,7 +151,7 @@ const flakeImage = (i: number) => props.game.flakes[i % props.game.flakes.length
         )
           GameImage(:src="fill(k) === per ? game.jarFull : game.jar" :ratio="1" colour="#c98a5a" round)
           span(class="mn-fill") {{ fill(k) }}
-      div(class="mn-field game-soft" role="group" :aria-label="t('app.adventure.mannaField')" :style="{ '--bg': `url(${src(game.background)})` }")
+      div(class="mn-field game-soft" role="group" :aria-label="t('app.adventure.mannaField')" :style="{ '--bg': `url(${src(game.background)})`, '--soft': softOf(game.background) }")
         span(class="mn-dwellers" aria-hidden="true")
           GameImage(:src="game.dwellers" :ratio="1" colour="#4a4252")
         template(v-if="!between")

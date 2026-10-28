@@ -17,6 +17,7 @@ import { mistakeStars } from '@/utils/adventureScore'
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
 import { prependBaseUrl } from '@/utils/function'
+import { softOf } from '@/utils/gameBackground'
 import type { WordGame } from '@/types/adventure'
 
 const props = defineProps<{ game: WordGame }>()
@@ -114,7 +115,7 @@ const free = computed(() => tiles.value.map((letter, i) => ({ letter, i, id: `t$
 </script>
 
 <template lang="pug">
-  div(class="wd game-soft" :style="{ '--bg': `url(${src(game.background)})` }")
+  div(class="wd game-soft" :style="{ '--bg': `url(${src(game.background)})`, '--soft': softOf(game.background) }")
     template(v-if="!finished")
       p(v-if="rounds.length > 1" class="wd-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="wd-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}

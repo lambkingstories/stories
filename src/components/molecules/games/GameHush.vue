@@ -17,6 +17,7 @@ import { mistakeStars } from '@/utils/adventureScore'
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
 import { prependBaseUrl } from '@/utils/function'
+import { softOf } from '@/utils/gameBackground'
 import type { HushGame } from '@/types/adventure'
 
 const props = defineProps<{ game: HushGame }>()
@@ -148,7 +149,7 @@ const nameOf = (id: string) => t(`app.adventure.hushName${id.charAt(0).toUpperCa
     template(v-if="!finished")
       p(v-if="rounds.length > 1" class="hs-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="hs-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
-      div(class="hs-field game-soft" role="group" :aria-label="t('app.adventure.hushField', { n: calmed, total: current.calms })" :style="{ '--bg': `url(${src(game.background)})` }")
+      div(class="hs-field game-soft" role="group" :aria-label="t('app.adventure.hushField', { n: calmed, total: current.calms })" :style="{ '--bg': `url(${src(game.background)})`, '--soft': softOf(game.background) }")
         template(v-if="!between")
           button(
             v-for="(s, i) in game.spots"

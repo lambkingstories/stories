@@ -15,6 +15,7 @@ import { advance, arrived, heapSpot, PIC, type Pair, type Side } from '@/utils/j
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
 import { prependBaseUrl } from '@/utils/function'
+import { softOf } from '@/utils/gameBackground'
 import type { CairnGame } from '@/types/adventure'
 
 const props = defineProps<{ game: CairnGame }>()
@@ -135,7 +136,7 @@ function key(e: KeyboardEvent) {
         role="group"
         tabindex="0"
         :aria-label="t('app.adventure.cairnField', { n: placed, total: current.stones })"
-        :style="{ '--bg': `url(${src(game.background)})` }"
+        :style="{ '--bg': `url(${src(game.background)})`, '--soft': softOf(game.background) }"
         @keydown="key"
       )
         span(v-for="i in placed" :key="`${round}-${i}`" class="ca-small" :style="heapStyle(i - 1)")

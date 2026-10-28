@@ -18,6 +18,7 @@ import { mistakeStars } from '@/utils/adventureScore'
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
 import { prependBaseUrl } from '@/utils/function'
+import { softOf } from '@/utils/gameBackground'
 import type { WeaveGame } from '@/types/adventure'
 
 const props = defineProps<{ game: WeaveGame }>()
@@ -139,7 +140,7 @@ const gridStyle = computed(() => ({ gridTemplateColumns: `repeat(${current.value
       p(v-if="rounds.length > 1" class="wv-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="wv-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
       div(class="wv-field")
-        span(class="wv-bg" :style="{ backgroundImage: `url(${src(game.background)})` }" aria-hidden="true")
+        span(class="wv-bg" :style="{ backgroundImage: `url(${src(game.background)})`, filter: softOf(game.background) }" aria-hidden="true")
         div(v-if="!basket && !between" class="wv-grid" :style="gridStyle" role="group" :aria-label="t('app.adventure.weaveField', { row: Math.min(row + 1, current.rows), rows: current.rows })" @keydown="key")
           template(v-for="r in rowsTop" :key="`${round}-r-${r}`")
             button(

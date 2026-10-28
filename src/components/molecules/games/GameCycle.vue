@@ -17,6 +17,7 @@ import { mistakeStars } from '@/utils/adventureScore'
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
 import { prependBaseUrl } from '@/utils/function'
+import { softOf } from '@/utils/gameBackground'
 import type { CycleGame, CycleToken } from '@/types/adventure'
 
 const props = defineProps<{ game: CycleGame }>()
@@ -118,7 +119,7 @@ const { dragging, selected, down, tapPlace, toggleSelect, dragStyle } = useDragD
       div(class="cy-stick" role="img" :aria-label="t('app.adventure.cycleYears', { n: doneYears, total: years })")
         span(v-for="y in years" :key="y" class="cy-notch" :class="{ lit: yearDone(y) }")
         span(class="cy-years") {{ t('app.adventure.cycleYears', { n: doneYears, total: years }) }}
-      div(class="cy-field game-soft" role="group" :aria-label="t('app.adventure.cycleField')" :style="{ '--bg': `url(${src(game.background)})` }")
+      div(class="cy-field game-soft" role="group" :aria-label="t('app.adventure.cycleField')" :style="{ '--bg': `url(${src(game.background)})`, '--soft': softOf(game.background) }")
         div(class="cy-row" :style="{ gridTemplateColumns: `repeat(${cols}, 1fr)` }")
           template(v-for="place in row" :key="`${round}-${place.index}`")
             div(

@@ -19,6 +19,7 @@ import { mistakeStars } from '@/utils/adventureScore'
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
 import { prependBaseUrl } from '@/utils/function'
+import { softOf } from '@/utils/gameBackground'
 import type { BeatGame } from '@/types/adventure'
 
 const props = defineProps<{ game: BeatGame }>()
@@ -177,7 +178,7 @@ const totalRings = computed(() => times.value.length)
     template(v-if="!finished")
       p(v-if="rounds.length > 1" class="bt-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="bt-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
-      div(class="bt-field game-soft" role="group" :aria-label="t('app.adventure.beatField', { n: countHit, total: totalRings })" :style="{ '--bg': `url(${src(game.background)})` }")
+      div(class="bt-field game-soft" role="group" :aria-label="t('app.adventure.beatField', { n: countHit, total: totalRings })" :style="{ '--bg': `url(${src(game.background)})`, '--soft': softOf(game.background) }")
         button(type="button" class="bt-drum" :class="{ shine }" :aria-label="t('app.adventure.beatDrum')" :disabled="phase !== 'play'" @pointerdown.prevent="tap")
           GameImage(:src="game.drum" colour="#c9895a" round)
           span(v-for="r in visible" :key="`${round}-${r.i}`" class="bt-ring" :class="{ missed: r.s.missed }" :style="{ transform: `translate(-50%, -50%) scale(${r.s.scale})`, opacity: String(r.s.opacity) }" aria-hidden="true")

@@ -18,6 +18,7 @@ import { mistakeStars } from '@/utils/adventureScore'
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
 import { prependBaseUrl } from '@/utils/function'
+import { softOf } from '@/utils/gameBackground'
 import type { WinnowGame } from '@/types/adventure'
 
 const props = defineProps<{ game: WinnowGame }>()
@@ -176,7 +177,7 @@ const handleStyle = computed(() => ({ bottom: `${wind.value}%` }))
     template(v-if="!finished")
       p(v-if="rounds.length > 1" class="wn-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="wn-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
-      div(class="wn-field game-soft" role="group" :aria-label="t('app.adventure.winnowField', { n: chaffGone, total: current.chaff })" :style="{ '--bg': `url(${src(game.background)})` }")
+      div(class="wn-field game-soft" role="group" :aria-label="t('app.adventure.winnowField', { n: chaffGone, total: current.chaff })" :style="{ '--bg': `url(${src(game.background)})`, '--soft': softOf(game.background) }")
         div(class="wn-tray" :style="trayStyle" aria-hidden="true")
           GameImage(:src="game.tray" :ratio="480 / 300" colour="#b88f55")
         template(v-if="!between")

@@ -19,6 +19,7 @@ import { mistakeStars } from '@/utils/adventureScore'
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
 import { prependBaseUrl } from '@/utils/function'
+import { softOf } from '@/utils/gameBackground'
 import type { PackGame, PackItem } from '@/types/adventure'
 
 const props = defineProps<{ game: PackGame }>()
@@ -216,7 +217,7 @@ const cellLabel = (c: { col: number; row: number }) => (grid.value[c.row * cols.
     template(v-if="!finished")
       p(v-if="rounds.length > 1" class="pk-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="pk-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}
-      div(class="pk-field game-soft" role="group" :aria-label="t('app.adventure.packField', { n: placed.length, total: things.length })" :style="{ '--bg': `url(${src(game.background)})` }")
+      div(class="pk-field game-soft" role="group" :aria-label="t('app.adventure.packField', { n: placed.length, total: things.length })" :style="{ '--bg': `url(${src(game.background)})`, '--soft': softOf(game.background) }")
         div(class="pk-basket" :class="{ full }" :style="areaStyle")
           GameImage(:src="game.basket" :ratio="2" colour="#b8935a" class="pk-basket-img")
           div(class="pk-grid" :style="{ gridTemplateColumns: `repeat(${cols}, 1fr)`, gridTemplateRows: `repeat(${rows}, 1fr)` }")

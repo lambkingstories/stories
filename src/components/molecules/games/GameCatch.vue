@@ -17,6 +17,7 @@ import { seeded } from '@/utils/jakobGames'
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
 import { prependBaseUrl } from '@/utils/function'
+import { softOf } from '@/utils/gameBackground'
 import type { CatchGame, CatchKid } from '@/types/adventure'
 
 const props = defineProps<{ game: CatchGame }>()
@@ -174,7 +175,7 @@ const showAll = computed(() => idle.value >= IDLE_SECONDS && walkers.value.some(
         role="group"
         tabindex="0"
         :aria-label="t('app.adventure.catchField', { n: inTent, total: current.kids.length })"
-        :style="{ '--bg': `url(${src(game.background)})` }"
+        :style="{ '--bg': `url(${src(game.background)})`, '--soft': softOf(game.background) }"
         @pointerdown="tap"
         @keydown.enter.space.prevent="callNext"
       )
