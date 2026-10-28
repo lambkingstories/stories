@@ -17,6 +17,7 @@ import { MOSE_PATH } from './mosePath'
 import { localize } from './localize'
 import { adventureLanguage } from '@/use/adventureLanguage'
 import { moseEn } from './en/mose.en'
+import { backdropOr } from '@/utils/gameBackground'
 
 // Etappenbilder (vorläufig Variante a der neuen Bilder; Anton wählt später a/b): `images/abenteuer/mose/etappe-bild-NN.webp`, 960 × 640
 const PICS = 'images/abenteuer/mose/'
@@ -74,7 +75,7 @@ const UNTERSCHIED: DiffGame = {
  * Bilder (gemalt, 21.10.2026): `manna/koernchen-1.webp`, `koernchen-2.webp` je 90 × 90, `krug-leer.webp`, `krug-voll.webp` je 220 × 220, `bewohner.webp` 260 × 260 (alle transparent).
  */
 const MANNA: MannaGame = {
-  background: `${PICS}etappe-bild-12.webp`,
+  background: `${G}hintergrund/manna-hintergrund.webp`,
   flakes: [`${G}manna/koernchen-1.webp`, `${G}manna/koernchen-2.webp`],
   jar: `${G}manna/krug-leer.webp`,
   jarFull: `${G}manna/krug-voll.webp`,
@@ -126,7 +127,7 @@ const WOLKE: CloudGame = {
  * Bilder (gemalt, 21.10.2026): `flechten/stab.webp`, `rohr-vorn.webp`, `rohr-hinten.webp`, `reihe-aktiv.webp` je 192 × 192 (Kachel, transparent), `koerbchen-fertig.webp` 600 × 600.
  */
 const FLECHTEN: WeaveGame = {
-  background: `${PICS}etappe-bild-02.webp`,
+  background: `${G}hintergrund/flechten-hintergrund.webp`,
   tiles: { stake: `${G}flechten/stab.webp`, front: `${G}flechten/rohr-vorn.webp`, behind: `${G}flechten/rohr-hinten.webp`, active: `${G}flechten/reihe-aktiv.webp` },
   done: `${G}flechten/koerbchen-fertig.webp`,
   rounds: [
@@ -158,7 +159,7 @@ const LEUCHTEN: GlowGame = {
  * und `pauke-dumpf.mp3` sind noch nicht da (Ton-Agent); bis dahin klingen `bead` und `wrong`.
  */
 const TAKT: BeatGame = {
-  background: `${PICS}etappe-bild-11.webp`,
+  background: `${G}hintergrund/pauke-hintergrund.webp`,
   drum: `${G}takt/pauke.webp`,
   ring: `${G}takt/ring.webp`,
   rounds: [
@@ -217,7 +218,7 @@ const WIMMEL: FindGame = {
  * Bilder (gemalt, 21.10.2026): `packen/tuch.webp` 900 × 675, `teigtrog.webp` 200 × 200, `silberkrug.webp`, `goldkrug.webp` je 100 × 200, `kleiderbuendel.webp` 300 × 200, `tuchbuendel.webp` 200 × 300 (alle transparent).
  */
 const AUSZUG: PackGame = {
-  background: `${PICS}etappe-bild-10.webp`,
+  background: `${G}hintergrund/packen-hintergrund.webp`,
   basket: `${G}packen/tuch.webp`,
   items: [
     { id: 'kleiderbuendel', image: `${G}packen/kleiderbuendel.webp`, w: 3, h: 2, label: 'Kleiderbündel' },
@@ -226,7 +227,7 @@ const AUSZUG: PackGame = {
     { id: 'silberkrug', image: `${G}packen/silberkrug.webp`, w: 1, h: 2, label: 'Silberkrug' },
     { id: 'goldkrug', image: `${G}packen/goldkrug.webp`, w: 1, h: 2, label: 'Goldkrug' }
   ],
-  area: { x: 20, y: 26, w: 60, h: 64.8 },
+  area: { x: 20, y: 35, w: 60, h: 62.5 },
   rounds: [
     { hint: 'Packe das Tragetuch, ein Tippen dreht ein Stück.', cols: 4, rows: 3, items: ['kleiderbuendel', 'teigtrog', 'silberkrug'] },
     { hint: 'Jetzt mehr Stücke und kein Platz übrig.', cols: 5, rows: 4, items: ['kleiderbuendel', 'teigtrog', 'tuchbuendel', 'silberkrug', 'goldkrug'] }
@@ -557,11 +558,11 @@ export const mose: Journey = {
 // the games that lie on a stage picture (drawn soft by the app) follow the picture of their stage
 for (const st of mose.stages) {
   const t = st.task
-  if (t.weave) t.weave.background = st.image
+  if (t.weave) t.weave.background = backdropOr(t.weave.background, st.image)
   if (t.verse) t.verse.background = st.image
-  if (t.pack) t.pack.background = st.image
-  if (t.beat) t.beat.background = st.image
-  if (t.manna) t.manna.background = st.image
+  if (t.pack) t.pack.background = backdropOr(t.pack.background, st.image)
+  if (t.beat) t.beat.background = backdropOr(t.beat.background, st.image)
+  if (t.manna) t.manna.background = backdropOr(t.manna.background, st.image)
   if (t.words) t.words.background = st.image
 }
 

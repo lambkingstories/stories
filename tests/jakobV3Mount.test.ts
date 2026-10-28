@@ -49,7 +49,11 @@ describe('the games on a soft stage picture', () => {
 
   it('relay: the field is soft, the road is drawn by the app, a herd with copies is a troop of three animals, one without is a single animal', async () => {
     const { default: Relay } = await import('@/components/molecules/games/GameRelay.vue')
-    const w = mount(Relay, { ...opts(), props: { game: relay } })
+    // on a stage picture the app draws the road; a painted backdrop (`/hintergrund/`) has its own road and the line is left out
+    const painted = mount(Relay, { ...opts(), props: { game: { ...relay, background: 'images/x/hintergrund/staffel.webp' } } })
+    await flushPromises()
+    expect(painted.find('.rl-road').exists()).toBe(false)
+    const w = mount(Relay, { ...opts(), props: { game: { ...relay, background: 'images/x/stage.webp', road: [[6, 88], [94, 58]] } } })
     await flushPromises()
     const field = w.find('.rl-field')
     expect(field.classes()).toContain('game-soft')

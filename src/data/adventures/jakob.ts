@@ -88,7 +88,7 @@ const KURBEL: CrankGame = {
  * Runde 1 bleibt das Licht stehen (10 Sekunden Halten), Runde 2 wandert es das Ufer entlang (15 Sekunden). Lage und Weg des Lichts sind die Messwerte aus `halten/halten-messung.json` (Prozent des alten Etappenbildes, im Ufersand vor Jakobs Füßen, von links nach rechts).
  */
 const HALTEN: HoldGame = {
-  background: `${IMG}etappe-bild-10.webp`,
+  background: `${G}hintergrund/halten-hintergrund.webp`,
   spark: `${G}halten/funke.webp`,
   start: [22, 89],
   rounds: [
@@ -146,8 +146,8 @@ const KREIS: RingGame = {
   background: '',
   altar: `${G}kreis/altar.webp`,
   tokens: [`${G}kreis/sohn-a.webp`, `${G}kreis/sohn-b.webp`],
-  centre: [50, 58],
-  radius: 22,
+  centre: [50, 66],
+  radius: 20,
   rounds: [
     { hint: 'Stelle die vier Söhne auf die Plätze rund um den Altar.', count: 4, tolerance: 30 },
     { hint: 'Jetzt alle zwölf. Jeder hat seinen Platz.', count: 12, tolerance: 26 }
@@ -161,7 +161,7 @@ const KREIS: RingGame = {
  */
 const FANGEN: CatchGame = {
   background: '',
-  kids: [1, 2, 3].map((n) => ({ id: `kind-${n}`, image: `${G}fangen/kind-${n}.webp`, w: 7 })),
+  kids: [1, 2, 3].map((n) => ({ id: `kind-${n}`, image: `${G}fangen/kind-${n}.webp`, w: 10 })),
   tent: [88, 58],
   tentImage: `${G}fangen/zelt.webp`,
   field: { x: 6, y: 62, w: 70, h: 30 },
@@ -183,7 +183,7 @@ const STAFFEL: RelayGame = {
     { id: 'schafe', image: `${G}schaetzen/schaf.webp`, w: 16, copies: 3 },
     { id: 'kamele', image: `${G}schaetzen/kamel.webp`, w: 18, copies: 3 }
   ],
-  road: [[6, 88], [28, 82], [48, 80], [66, 72], [82, 64], [94, 58]],
+  road: [[3, 60], [20, 57], [38, 52], [56, 46], [72, 40], [86, 34], [94, 31]],
   rounds: [
     { hint: 'Schicke die Herden nacheinander los. Lass Raum zwischen ihnen.', herds: ['ziegen', 'schafe', 'kamele'], minGap: 25, speed: 0.1 },
     { hint: 'Noch vier Herden. Der Raum darf etwas enger sein.', herds: ['ziegen', 'schafe', 'kamele', 'ziegen'], minGap: 20, speed: 0.12 }
@@ -485,9 +485,17 @@ export const jakob: Journey = {
 }
 
 // the game of a stage lies on the picture of the stage (it follows when the stage picture is replaced)
+// (Anton, 28.10.2026: some games got their own painted, sharp backdrop, `spiele/jakob/hintergrund/`; the others keep the soft stage picture)
+const BACKDROP: Record<number, string> = {
+  6: `${G}hintergrund/fangen-hintergrund.webp`,
+  9: `${G}hintergrund/staffel-hintergrund.webp`,
+  12: `${G}hintergrund/kreis-hintergrund.webp`,
+  7: `${G}hintergrund/schaetzen-hintergrund.webp`,
+  8: `${G}hintergrund/bund-hintergrund.webp`
+}
 for (const s of jakob.stages) {
   const t = s.task
-  for (const g of [t.guess, t.cycle, t.cairn, t.ring, t.catch, t.relay]) if (g) g.background = s.image
+  for (const g of [t.guess, t.cycle, t.cairn, t.ring, t.catch, t.relay]) if (g) g.background = BACKDROP[s.id] ?? s.image
 }
 
 // the German recordings of the stories (voice Achernar); there are no English ones yet, so the English app reads with the voice of the device.

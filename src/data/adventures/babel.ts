@@ -29,7 +29,7 @@ const SOON = false
  * (das Etappenbild ist selbst voller Menschen). Der Junge (Figur 3) steht auf 80 % verkleinert; es gibt nur ein Kind (das Zopfmädchen hat der Bildgenerator abgelehnt, Figur 6 ist eine junge Frau).
  */
 const FEHLT: MissingGame = {
-  background: `${IMG}etappe-bild-01.webp`,
+  background: `${G}hintergrund/fehlt-hintergrund.webp`,
   cloud: `${G}fehlt/wolke.webp`,
   people: [
     { id: 'mensch-1', image: `${G}fehlt/mensch-1.webp`, label: 'Mann mit blauem Kopftuch' },
@@ -65,7 +65,7 @@ const FEHLT: MissingGame = {
  * dem ersten Messwert des Bildgenerators verschoben). Der Hintergrund wird im Spiel unscharf gezeichnet, weil das Etappenbild sehr voll ist.
  */
 const KETTE: ChainGame = {
-  background: `${IMG}etappe-bild-02.webp`,
+  background: `${G}hintergrund/kette-hintergrund.webp`,
   worker: `${G}kette/bauarbeiter.webp`,
   brick: `${G}kette/ziegel.webp`,
   pitch: `${G}kette/pechtopf.webp`,
@@ -75,16 +75,16 @@ const KETTE: ChainGame = {
       people: 3,
       items: ['brick', 'brick', 'brick', 'brick'],
       slots: [[30, 94], [46, 94], [62, 94]],
-      source: [48.5, 25.5],
-      sink: [90.6, 80]
+      source: [40, 46],
+      sink: [87, 54]
     },
     {
       hint: 'Jetzt kommen auch Pechtöpfe, und eine Person mehr hilft.',
       people: 4,
       items: ['brick', 'pitch', 'brick', 'brick', 'pitch', 'pitch'],
       slots: [[30, 94], [46, 94], [62, 94], [78, 94]],
-      source: [48.5, 25.5],
-      sink: [90.6, 80]
+      source: [40, 46],
+      sink: [87, 54]
     }
   ]
 }

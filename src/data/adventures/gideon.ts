@@ -16,6 +16,7 @@ import { GIDEON_PATH } from './gideonPath'
 import { localize } from './localize'
 import { adventureLanguage } from '@/use/adventureLanguage'
 import { gideonEn } from './en/gideon.en'
+import { backdropOr } from '@/utils/gameBackground'
 
 // Etappenbilder (vorläufig Variante a der neuen Bilder; Anton wählt später a/b): `images/abenteuer/gideon/etappe-bild-NN.webp`, 960 × 640
 const PICS = 'images/abenteuer/gideon/'
@@ -96,7 +97,7 @@ const TAU: DewGame = {
  * Bilder (gemalt, 21.10.2026): `worfeln/wanne.webp` 480 × 300, `korn.webp`, `spreu.webp` je 64 × 64, `regler-griff.webp` 120 × 120 (alle transparent).
  */
 const WORFELN: WinnowGame = {
-  background: `${PICS}etappe-bild-03.webp`,
+  background: `${G}hintergrund/weiche-hintergrund.webp`,
   tray: `${G}worfeln/wanne.webp`,
   grain: `${G}worfeln/korn.webp`,
   chaffImage: `${G}worfeln/spreu.webp`,
@@ -469,7 +470,7 @@ export const gideon: Journey = {
 
 // the games that lie on a stage picture (drawn soft by the app) follow the picture of their stage
 for (const st of gideon.stages) {
-  if (st.task.winnow) st.task.winnow.background = st.image
+  if (st.task.winnow) st.task.winnow.background = backdropOr(st.task.winnow.background, st.image)
   if (st.task.word) st.task.word.background = st.image
 }
 

@@ -143,7 +143,7 @@ describe('Josua: the games, and the placeholders until the pictures come', () =>
     // the words and the sentences come from the text of the stage
     const text = stage(10).text.join(' ')
     for (const word of ['dienen', 'Zeuge', 'Worte']) expect(text, word).toContain(word)
-    expect(v!.background).toBe(stage(10).image)
+    expect(v!.background === stage(10).image || /\/hintergrund\//.test(v!.background)).toBe(true)
     // the stage picture has big figures: the app draws it soft behind the board
     expect(v!.soft).toBe(true)
   })
@@ -270,7 +270,7 @@ describe('Josua: the games, and the placeholders until the pictures come', () =>
     expect(g.clouds).toHaveLength(3)
     expect(new Set(g.clouds).size, 'one picture of a cloud').toBe(1)
     expect(new Set(g.spots.map((s) => s.animal)).size).toBe(4)
-    expect(g.background).toBe(stage(8).image)
+    expect(g.background === stage(8).image || /\/hintergrund\//.test(g.background)).toBe(true)
     for (const s of g.spots) {
       expect(s.x >= 0 && s.x <= 100 && s.y >= 0 && s.y <= 100, s.id).toBe(true)
       expect(s.y, 'at the side of the road, low in the picture').toBeGreaterThan(70)

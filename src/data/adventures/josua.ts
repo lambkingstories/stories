@@ -16,6 +16,7 @@ import { JOSUA_PATH } from './josuaPath'
 import { localize } from './localize'
 import { adventureLanguage } from '@/use/adventureLanguage'
 import { josuaEn } from './en/josua.en'
+import { backdropOr } from '@/utils/gameBackground'
 
 // Etappenbilder (von Anton gewählt: 7 Variante b, die anderen a; 1, 3, 4, 8 und 9 vorläufig neu eingebaut): `images/abenteuer/josua/etappe-bild-NN.webp`, 960 × 640
 const PICS = 'images/abenteuer/josua/'
@@ -28,7 +29,7 @@ const G = 'images/abenteuer/spiele/josua/'
  * Bilder (gemalt, 21.10.2026): `still/kamel.webp`, `gans.webp`, `ziege.webp`, `lamm.webp` je 220 × 220, `wolke.webp` 120 × 100 (alle transparent).
  */
 const STILL: HushGame = {
-  background: `${PICS}etappe-bild-08.webp`,
+  background: `${G}hintergrund/still-hintergrund.webp`,
   clouds: [`${G}still/wolke.webp`, `${G}still/wolke.webp`, `${G}still/wolke.webp`],
   spots: [
     { id: 'platz-1', animal: 'kamel', image: `${G}still/kamel.webp`, x: 15, y: 90, w: 14 },
@@ -382,7 +383,7 @@ export const josua: Journey = {
 
 // the games that lie on a stage picture (drawn soft by the app) follow the picture of their stage
 for (const st of josua.stages) {
-  if (st.task.hush) st.task.hush.background = st.image
+  if (st.task.hush) st.task.hush.background = backdropOr(st.task.hush.background, st.image)
   if (st.task.verse) st.task.verse.background = st.image
 }
 
