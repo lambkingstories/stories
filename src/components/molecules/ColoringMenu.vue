@@ -1,14 +1,17 @@
 <script setup lang="ts">
 /**
- * The main menu of the painting program: one line "My coloring books" with the books big next to each other, a quiet part
- * for free painting and the child's own pictures, the other pictures folded away, and the part for parents.
+ * The main menu of the painting program. It is built like the other tabs (Lesen, Abenteuer, Ich): a left-aligned heading with the
+ * companion lamb, then framed groups in the surface colour, one after the other: "My coloring books" (the books standing on a
+ * shelf, or a big door to the books while the shelf is empty), "Paint freely" (blank sheets and an own picture), the pictures won
+ * as presents, the child's own paintings, the other pictures folded away, and the part for parents.
  * It only shows what it is given and says what was tapped; the screen with the picture does the rest.
  */
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { LINE_ICONS } from '@/data/coloringKits'
 import LkCompanion from '@/components/atoms/LkCompanion.vue'
+import ZIconography from '@/components/atoms/ZIconography.vue'
 import AppHeader from '@/components/molecules/AppHeader.vue'
+import { prependBaseUrl } from '@/utils/function'
 import type { ArtworkMeta } from '@/use/useArtworks'
 import type { BookCard, GalleryGroup, GalleryItem, RewardItem } from '@/types/coloringMenu'
 
@@ -45,6 +48,9 @@ const { t } = useI18n({ useScope: 'global' })
 /** The pictures from stories and the built-in ones stay folded away. */
 const showMore = ref(false)
 
+/** The same picture as the door "Malbücher" in Lesen. */
+const booksDoorImage = prependBaseUrl('images/lesen/malbuecher-kachel.webp')
+
 const bookPercent = (b: BookCard) => `${Math.round((b.done / Math.max(1, b.total)) * 100)}%`
 </script>
 
@@ -52,136 +58,165 @@ const bookPercent = (b: BookCard) => `${Math.round((b.done / Math.max(1, b.total
   div(class="ac-pick")
     //- the same top line as on the other tabs: logo, parents, my picture
     AppHeader(class="ac-apphead")
-    //- heading with the companion lamb
-    div(class="ac-head")
-      div(class="ac-head-text")
-        h1(class="ac-head-title") {{ t('app.nav.color') }}
-        p(class="ac-head-sub") {{ t('app.coloring.menuSub') }}
-      LkCompanion(class="ac-head-lamb" pose="stift" :size="96")
 
-    //- One line, the coloring books big next to each other
-    section(class="ac-mybooks lk-panel")
-      h2(class="ac-pick-title") {{ t('app.coloring.myBooks') }}
-      div(v-if="books.length" class="ac-bigbooks")
-        div(v-for="b in books" :key="b.bookId" class="ac-bigbook-wrap")
-          button(type="button" class="ac-bigbook" @click="emit('open-book', b)")
-            span(class="ac-bigbook-cover")
-              img(v-if="b.cover" :src="b.cover" alt="" draggable="false" loading="lazy")
-              span(v-if="b.done > 0" class="ac-bigbook-badge") {{ b.done }}/{{ b.total }}
-            //- the board the book stands on: the boards of all books join to one shelf
-            span(class="ac-bigbook-board" aria-hidden="true")
-            span(class="ac-bigbook-title") {{ b.title }}
-            span(v-if="b.done > 0" class="ac-bigbook-bar" aria-hidden="true")
-              span(class="ac-bigbook-fill" :style="{ width: bookPercent(b) }")
-            span(class="ac-bigbook-sub") {{ b.done > 0 ? t('app.coloring.pagesPainted', { done: b.done, total: b.total }) : t('app.coloring.pagesCount', { total: b.total }) }}
-          //- takes the book out of the shelf again (the painted pictures stay)
-          button(type="button" class="ac-bigbook-remove" :aria-label="t('app.coloring.shelfRemove', { title: b.title })" @click="emit('remove-book', b)") ✕
-      //- nothing on the shelf yet: where to find the books
-      div(v-else class="ac-shelf-empty")
-        p(class="ac-pick-sub") {{ t('app.coloring.shelfEmpty') }}
-        button(type="button" class="ac-link-btn" @click="emit('to-reading')") {{ t('app.coloring.shelfGo') }}
+    div(class="ac-body")
+      //- heading with the companion lamb
+      header(class="ac-head")
+        div(class="ac-head-text")
+          h1(class="ac-head-title") {{ t('app.nav.color') }}
+          p(class="ac-head-sub") {{ t('app.coloring.menuSub') }}
+        LkCompanion(class="ac-head-lamb" pose="stift" :size="92")
 
-    //- Free painting: a blank sheet or an own picture
-    section(class="ac-free")
-      h3(class="ac-sec-title") {{ t('app.coloring.freePainting') }}
-      div(class="ac-free-row")
-        button(type="button" class="ac-chip" @click="emit('blank', 'portrait')")
-          img(:src="LINE_ICONS.plus" alt="" draggable="false")
-          | {{ t('app.coloring.blankPortrait') }}
-        button(type="button" class="ac-chip" @click="emit('blank', 'landscape')")
-          img(:src="LINE_ICONS.plus" alt="" draggable="false")
-          | {{ t('app.coloring.blankLandscape') }}
-        button(type="button" class="ac-chip" @click="emit('own-image')")
-          img(:src="LINE_ICONS.frames" alt="" draggable="false")
-          | {{ t('app.coloring.ownImage') }}
+      //- 1. My coloring books: the books on their shelf, or the way to the books
+      section(class="ac-sec" aria-labelledby="ac-h-books")
+        h2(id="ac-h-books" class="ac-sec-title")
+          span {{ t('app.coloring.myBooks') }}
+          span(v-if="books.length" class="ac-count") {{ books.length }}
+        div(v-if="books.length" class="ac-shelf lk-panel")
+          div(class="ac-bigbooks")
+            div(v-for="b in books" :key="b.bookId" class="ac-bigbook-wrap")
+              button(type="button" class="ac-bigbook" @click="emit('open-book', b)")
+                span(class="ac-bigbook-cover")
+                  img(v-if="b.cover" :src="b.cover" alt="" draggable="false" loading="lazy")
+                  span(v-if="b.done > 0" class="ac-bigbook-badge") {{ b.done }}/{{ b.total }}
+                //- the board the book stands on: the boards of all books join to one shelf
+                span(class="ac-bigbook-board" aria-hidden="true")
+                span(class="ac-bigbook-title") {{ b.title }}
+                span(v-if="b.done > 0" class="ac-bigbook-bar" aria-hidden="true")
+                  span(class="ac-bigbook-fill" :style="{ width: bookPercent(b) }")
+                span(class="ac-bigbook-sub") {{ b.done > 0 ? t('app.coloring.pagesPainted', { done: b.done, total: b.total }) : t('app.coloring.pagesCount', { total: b.total }) }}
+              //- takes the book out of the shelf again (the painted pictures stay)
+              button(type="button" class="ac-bigbook-remove" :aria-label="t('app.coloring.shelfRemove', { title: b.title })" @click="emit('remove-book', b)") ✕
+        //- nothing on the shelf yet: a big door like the ones in Lesen
+        button(v-else type="button" class="ac-door" @click="emit('to-reading')")
+          span(class="ac-door-pic")
+            img(:src="booksDoorImage" alt="" draggable="false" decoding="async")
+          span(class="ac-door-body")
+            span(class="ac-door-text")
+              span(class="ac-door-title") {{ t('app.coloring.shelfDoorTitle') }}
+              span(class="ac-door-sub") {{ t('app.coloring.shelfDoorSub') }}
+            span(class="ac-door-go")
+              ZIconography(name="chevron-right" :size="26")
 
-    //- the pictures won as presents (a cup at the end of a journey)
-    section(v-if="rewards.length" class="ac-free ac-rewards")
-      h3(class="ac-sec-title") {{ t('app.coloring.myRewards') }}
-      div(class="ac-gallery")
-        button(v-for="r in rewards" :key="r.id" type="button" class="ac-gal-tile ac-reward" :aria-label="r.title" @click="emit('open-reward', r)")
-          img(:src="r.image" alt="" draggable="false")
-          span(class="ac-reward-name") {{ r.title }}
+      //- 2. Paint freely: a blank sheet or an own picture
+      section(class="ac-sec" aria-labelledby="ac-h-free")
+        h2(id="ac-h-free" class="ac-sec-title")
+          span {{ t('app.coloring.freePainting') }}
+        div(class="ac-free")
+          button(type="button" class="ac-tile" @click="emit('blank', 'portrait')")
+            span(class="ac-tile-ico")
+              ZIconography(name="plus" :size="26")
+            span(class="ac-tile-name") {{ t('app.coloring.blankSheet') }}
+            span(class="ac-tile-sub") {{ t('app.coloring.portraitShort') }}
+          button(type="button" class="ac-tile" @click="emit('blank', 'landscape')")
+            span(class="ac-tile-ico")
+              ZIconography(name="plus" :size="26")
+            span(class="ac-tile-name") {{ t('app.coloring.blankSheet') }}
+            span(class="ac-tile-sub") {{ t('app.coloring.landscapeShort') }}
+          button(type="button" class="ac-tile ac-tile--wide" @click="emit('own-image')")
+            span(class="ac-tile-ico")
+              ZIconography(name="image" :size="26")
+            span(class="ac-tile-text")
+              span(class="ac-tile-name") {{ t('app.coloring.ownImage') }}
+              span(class="ac-tile-sub") {{ t('app.coloring.ownImageHint') }}
+            ZIconography(class="ac-tile-go" name="chevron-right" :size="22")
 
-    section(v-if="works.length" class="ac-free")
-      h3(class="ac-sec-title") {{ t('app.coloring.myWorks') }}
-      div(class="ac-gallery")
-        div(v-for="w in works" :key="w.id" class="ac-work")
-          button(type="button" class="ac-gal-tile" :aria-label="w.title" @click="emit('open-work', w)")
-            img(:src="w.thumb" alt="" draggable="false")
-          button(
-            type="button"
-            class="ac-work-del"
-            :aria-label="t('app.coloring.deleteTitle')"
-            @click="emit('ask-delete', w)"
-          ) ✕
+      //- 3. the pictures won as presents (a cup at the end of a journey)
+      section(v-if="rewards.length" class="ac-sec" aria-labelledby="ac-h-rewards")
+        h2(id="ac-h-rewards" class="ac-sec-title")
+          span {{ t('app.coloring.myRewards') }}
+          span(class="ac-count") {{ rewards.length }}
+        div(class="ac-gallery")
+          button(v-for="r in rewards" :key="r.id" type="button" class="ac-gal-tile ac-reward" :aria-label="r.title" @click="emit('open-reward', r)")
+            img(:src="r.image" alt="" draggable="false")
+            span(class="ac-reward-name") {{ r.title }}
 
-    section(v-if="groups.length" class="ac-free ac-more")
-      button(type="button" class="ac-more-toggle" :class="{ open: showMore }" :aria-expanded="showMore" @click="showMore = !showMore")
-        | {{ showMore ? t('app.coloring.moreImagesHide') : t('app.coloring.moreImages') }}
-        img(:src="LINE_ICONS.down" alt="" draggable="false")
-      template(v-if="showMore")
-        template(v-for="g in groups" :key="g.key")
-          h3(class="ac-sec-title") {{ g.title }}
-          div(class="ac-gallery")
+      //- 4. the child's own paintings
+      section(v-if="works.length" class="ac-sec" aria-labelledby="ac-h-works")
+        h2(id="ac-h-works" class="ac-sec-title")
+          span {{ t('app.coloring.myWorks') }}
+          span(class="ac-count") {{ works.length }}
+        div(class="ac-gallery")
+          div(v-for="w in works" :key="w.id" class="ac-work")
+            button(type="button" class="ac-gal-tile" :aria-label="w.title" @click="emit('open-work', w)")
+              img(:src="w.thumb" alt="" draggable="false")
             button(
-              v-for="item in g.items"
-              :key="item.key"
               type="button"
-              class="ac-gal-tile"
-              :aria-label="item.title"
-              @click="emit('pick-item', item)"
-            )
-              img(v-if="item.preview" :src="item.preview" alt="" draggable="false" loading="lazy")
-              span(v-else class="ac-gal-pdf" aria-hidden="true") 🎨
+              class="ac-work-del"
+              :aria-label="t('app.coloring.deleteTitle')"
+              @click="emit('ask-delete', w)"
+            ) ✕
 
-    //- For parents: all paintings in one file, and back again.
-    div(class="ac-parents")
-      p(class="ac-parents-title") {{ t('app.coloring.forParents') }}
-      div(class="ac-parents-row")
-        button(type="button" class="ac-link-btn" :disabled="backupBusy" @click="emit('export-backup')") {{ t('app.coloring.backupAll') }}
-        button(type="button" class="ac-link-btn" :disabled="backupBusy" @click="emit('pick-backup')") {{ t('app.coloring.backupRestore') }}
-      p(v-if="backupMessage" class="ac-parents-msg" role="status") {{ backupMessage }}
+      //- 5. the other pictures, folded away
+      section(v-if="groups.length" class="ac-sec")
+        button(type="button" class="ac-more-row lk-panel" :class="{ open: showMore }" :aria-expanded="showMore" @click="showMore = !showMore")
+          span(class="ac-more-name") {{ showMore ? t('app.coloring.moreImagesHide') : t('app.coloring.moreImages') }}
+          ZIconography(class="ac-more-arrow" name="chevron-down" :size="22")
+        template(v-if="showMore")
+          div(v-for="g in groups" :key="g.key" class="ac-group")
+            h3(class="ac-group-title") {{ g.title }}
+            div(class="ac-gallery")
+              button(
+                v-for="item in g.items"
+                :key="item.key"
+                type="button"
+                class="ac-gal-tile"
+                :aria-label="item.title"
+                @click="emit('pick-item', item)"
+              )
+                img(v-if="item.preview" :src="item.preview" alt="" draggable="false" loading="lazy")
+                span(v-else class="ac-gal-pdf" aria-hidden="true") 🎨
+
+      //- 6. For parents: all paintings in one file, and back again.
+      section(class="ac-sec ac-parents lk-panel" aria-labelledby="ac-h-parents")
+        h2(id="ac-h-parents" class="ac-parents-title")
+          ZIconography(name="lock" :size="18")
+          span {{ t('app.coloring.forParents') }}
+        div(class="ac-parents-row")
+          button(type="button" class="lk-btn lk-btn--outline lk-btn--small" :disabled="backupBusy" @click="emit('export-backup')")
+            ZIconography(name="download" :size="18")
+            | {{ t('app.coloring.backupAll') }}
+          button(type="button" class="lk-btn lk-btn--outline lk-btn--small" :disabled="backupBusy" @click="emit('pick-backup')")
+            ZIconography(name="restart" :size="18")
+            | {{ t('app.coloring.backupRestore') }}
+        p(v-if="backupMessage" class="ac-parents-msg" role="status") {{ backupMessage }}
 </template>
 
 <style scoped lang="sass">
-$ink: var(--lk-text)
-$muted: var(--lk-muted)
-$line: var(--lk-line)
-$accent: var(--lk-read)
-$text: $ink
-$text-m: $muted
-$p-bdr: #e6d3a8
-$p-pale: #fffaf0
+button
+  -webkit-tap-highlight-color: transparent
+  font-family: inherit
+  touch-action: manipulation
 
 .ac-pick
   position: absolute
   inset: 0
   background: var(--lk-bg)
+  color: var(--lk-text)
   overflow-y: auto
-  padding: 0 18px calc(120px + env(safe-area-inset-bottom, 0px))
-  display: flex
-  flex-direction: column
-  align-items: center
-  text-align: center
+  padding: 0 16px calc(7rem + env(safe-area-inset-bottom, 0px))
   -webkit-overflow-scrolling: touch
 
 .ac-apphead
-  align-self: stretch
   width: 100%
-  max-width: 1040px
+  max-width: 980px
   margin: 0 auto 8px
   padding-left: 0
   padding-right: 0
 
+.ac-body
+  max-width: 980px
+  margin: 0 auto
+  display: flex
+  flex-direction: column
+  gap: 22px
+
+// ── Heading: like Lesen and Abenteuer ─────────────────────────────────────────────────────
 .ac-head
-  width: 100%
-  max-width: 1040px
   display: flex
   align-items: flex-end
   justify-content: space-between
-  margin: 0 auto 10px
-  text-align: left
+  gap: 12px
 
 .ac-head-title
   margin: 0
@@ -191,29 +226,40 @@ $p-pale: #fffaf0
 
 .ac-head-sub
   margin: 4px 0 0
-  color: $text-m
+  color: var(--lk-muted)
   font-size: 1.05rem
 
 .ac-head-lamb
+  flex: 0 0 auto
   margin-bottom: -4px
 
-.ac-pick-title
-  margin: 4px 0 0
-  font-size: 1.5rem
+// ── A group: its heading (with a small count) and what belongs to it ─────────────────────
+.ac-sec
+  display: flex
+  flex-direction: column
+  gap: 10px
+
+.ac-sec-title
+  display: flex
+  align-items: center
+  justify-content: space-between
+  gap: 12px
+  margin: 0
+  font-size: 1.25rem
   font-weight: 800
-  color: $text
+  color: var(--lk-text)
 
-.ac-pick-sub
-  margin: 4px 0 16px
-  font-size: 0.95rem
-  color: $text-m
+.ac-count
+  padding: 3px 10px
+  border: 1px solid var(--lk-line)
+  border-radius: 999px
+  background: var(--lk-surface)
+  font-size: 0.8rem
   font-weight: 700
+  color: var(--lk-muted)
 
-.ac-mybooks
-  flex: 0 0 auto
-  width: 100%
-  max-width: 1040px
-  margin: 0 auto
+// ── 1. The shelf of coloring books ────────────────────────────────────────────────────
+.ac-shelf
   padding: 14px 14px 16px
   overflow: hidden
 
@@ -221,13 +267,12 @@ $p-pale: #fffaf0
 .ac-bigbooks
   display: flex
   gap: 12px
-  margin: 10px -14px 0
+  margin: 0 -14px
   padding: 6px 14px 4px
   overflow-x: auto
   scroll-snap-type: x proximity
   scroll-padding-left: 14px
   scrollbar-width: none
-  justify-content: safe center
 
   &::-webkit-scrollbar
     display: none
@@ -253,9 +298,6 @@ $p-pale: #fffaf0
   cursor: pointer
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)
 
-.ac-shelf-empty
-  padding: 6px 8px 4px
-
 .ac-bigbook
   width: 100%
   display: flex
@@ -264,13 +306,17 @@ $p-pale: #fffaf0
   padding: 0
   border: 0
   background: transparent
-  color: $text
+  color: var(--lk-text)
   text-align: left
   cursor: pointer
-  -webkit-tap-highlight-color: transparent
 
   &:active .ac-bigbook-cover
     transform: scale(0.97)
+
+  &:focus-visible
+    outline: 3px solid var(--lk-accent)
+    outline-offset: 4px
+    border-radius: 12px
 
   @media (hover: hover)
     &:hover .ac-bigbook-cover
@@ -346,93 +392,184 @@ $p-pale: #fffaf0
 .ac-bigbook-sub
   font-size: 0.8rem
   font-weight: 700
-  color: $text-m
+  color: var(--lk-muted)
 
-// the rest of the main menu is quieter than the books
-.ac-free
-  width: 100%
-  max-width: 880px
-  margin: 12px auto 0
-
-.ac-free .ac-sec-title
-  text-align: center
-
-.ac-free-row
+// the empty shelf: a door with a picture on top, built like the doors of Lesen
+.ac-door
   display: flex
-  flex-wrap: wrap
-  justify-content: center
-  gap: 10px
-
-.ac-chip
-  display: inline-flex
-  align-items: center
-  gap: 8px
-  min-height: 56px
-  padding: 0 22px 0 18px
+  flex-direction: column
+  padding: 0
+  overflow: hidden
+  text-align: left
   border: 1px solid var(--lk-line)
-  border-radius: 28px
+  border-radius: var(--lk-r-card)
   background: var(--lk-surface)
-  color: $text
-  font-size: 1rem
-  font-weight: 600
+  color: var(--lk-text)
+  box-shadow: var(--lk-shadow)
   cursor: pointer
-  -webkit-tap-highlight-color: transparent
-  box-shadow: 0 2px 8px -4px rgba(60, 40, 10, 0.4)
-
-  img
-    width: 20px
-    height: 20px
-    object-fit: contain
-    opacity: 0.85
 
   &:active
-    transform: scale(0.97)
+    transform: translateY(1px)
 
-.ac-more
-  text-align: center
+  &:focus-visible
+    outline: 3px solid var(--lk-accent)
+    outline-offset: 2px
 
-.ac-more-toggle
-  display: inline-flex
-  align-items: center
-  gap: 8px
-  min-height: 40px
-  padding: 0 4px
-  border: 0
-  background: transparent
-  color: $text-m
-  font-size: 0.9rem
-  font-weight: 700
-  cursor: pointer
+.ac-door-pic
+  position: relative
+  display: block
+  aspect-ratio: 16 / 9
+  overflow: hidden
+  background: var(--lk-surface-2)
 
   img
-    width: 14px
-    height: 14px
-    transition: transform 220ms ease-out
+    position: absolute
+    inset: 0
+    width: 100%
+    height: 100%
+    object-fit: cover
+    display: block
 
-  &.open img
-    transform: rotate(180deg)
+.ac-door-body
+  display: flex
+  align-items: center
+  justify-content: space-between
+  gap: 12px
+  padding: 14px 14px 16px 18px
 
-.ac-gallery
-  width: 100%
-  max-width: 880px
+.ac-door-text
+  display: flex
+  flex-direction: column
+  gap: 2px
+  min-width: 0
+
+.ac-door-title
+  font-size: 1.3rem
+  font-weight: 800
+
+.ac-door-sub
+  color: var(--lk-muted)
+  font-size: 0.95rem
+  line-height: 1.35
+
+.ac-door-go
+  flex: 0 0 auto
   display: grid
-  grid-template-columns: repeat(auto-fill, 138px)
-  justify-content: center
+  place-items: center
+  width: 52px
+  height: 52px
+  border-radius: 50%
+  background: var(--lk-accent)
+  color: var(--lk-on-accent)
+
+// ── 2. Paint freely: two blank sheets and an own picture ─────────────────────────────
+.ac-free
+  display: grid
+  grid-template-columns: repeat(2, minmax(0, 1fr))
+  gap: 12px
+
+.ac-tile
+  display: flex
+  flex-direction: column
+  align-items: flex-start
+  gap: 2px
+  min-height: 56px
+  padding: 14px
+  border: 1px solid var(--lk-line)
+  border-radius: var(--lk-r-card)
+  background: var(--lk-surface)
+  color: var(--lk-text)
+  text-align: left
+  box-shadow: var(--lk-shadow)
+  cursor: pointer
+
+  &:active
+    transform: translateY(1px)
+
+  &:focus-visible
+    outline: 3px solid var(--lk-accent)
+    outline-offset: 2px
+
+.ac-tile-ico
+  display: grid
+  place-items: center
+  flex: 0 0 auto
+  width: 48px
+  height: 48px
+  margin-bottom: 8px
+  border-radius: 50%
+  background: var(--lk-accent-soft)
+  color: var(--lk-accent)
+
+.ac-tile-text
+  display: flex
+  flex-direction: column
+  gap: 2px
+  flex: 1 1 auto
+  min-width: 0
+
+.ac-tile-name
+  font-size: 1.02rem
+  font-weight: 800
+  line-height: 1.25
+
+.ac-tile-sub
+  font-size: 0.88rem
+  color: var(--lk-muted)
+
+// the own picture takes the full width: symbol, text, arrow in a row
+.ac-tile--wide
+  grid-column: 1 / -1
+  flex-direction: row
+  align-items: center
   gap: 14px
-  margin: 0 auto 20px
+
+  .ac-tile-ico
+    margin-bottom: 0
+
+.ac-tile-go
+  flex: 0 0 auto
+  color: var(--lk-muted)
+
+// wide screens: the three tiles stand side by side, all of the same build
+@media (min-width: 640px)
+  .ac-free
+    grid-template-columns: repeat(3, minmax(0, 1fr))
+
+  .ac-tile--wide
+    grid-column: auto
+    flex-direction: column
+    align-items: flex-start
+    gap: 2px
+
+    .ac-tile-ico
+      margin-bottom: 8px
+
+  .ac-tile-go
+    display: none
+
+  .ac-gallery
+    grid-template-columns: repeat(auto-fill, minmax(132px, 1fr))
+
+// ── 3. and 4. Pictures: presents and own paintings ──────────────────────────────────
+.ac-gallery
+  display: grid
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr))
+  gap: 12px
 
 .ac-gal-tile
   position: relative
+  display: block
+  width: 100%
   aspect-ratio: 3 / 4
   padding: 0
   overflow: hidden
-  border-radius: 16px
-  border: 3px solid #ffffff
+  border-radius: 18px
+  border: 1px solid var(--lk-line)
   background: #ffffff
-  box-shadow: 0 8px 18px -8px rgba(90, 58, 14, 0.45)
+  box-shadow: var(--lk-shadow)
   cursor: pointer
   transition: transform 140ms cubic-bezier(0.34, 1.56, 0.64, 1)
-  -webkit-tap-highlight-color: transparent
 
   img
     width: 100%
@@ -442,6 +579,10 @@ $p-pale: #fffaf0
 
   &:active
     transform: scale(0.96)
+
+  &:focus-visible
+    outline: 3px solid var(--lk-accent)
+    outline-offset: 2px
 
   @media (hover: hover)
     &:hover
@@ -454,34 +595,17 @@ $p-pale: #fffaf0
   height: 100%
   font-size: 2.4rem
 
-.ac-sec-title
-  align-self: flex-start
-  width: 100%
-  max-width: 880px
-  margin: 6px auto 10px
-  text-align: left
-  font-size: 1.05rem
-  font-weight: 800
-  color: $text
-
-.ac-rewards .ac-gallery
-  display: flex
-  flex-wrap: wrap
-  justify-content: center
-
 .ac-reward
-  position: relative
-  flex: 0 0 138px
-  border-color: #e8b94a
+  border: 2px solid var(--lk-gold)
 
 .ac-reward-name
   position: absolute
   left: 0
   right: 0
   bottom: 0
-  padding: 14px 6px 6px
-  background: linear-gradient(transparent, rgba(40, 28, 8, 0.72))
-  color: #fff
+  padding: 16px 6px 6px
+  background: linear-gradient(transparent, rgba(22, 36, 51, 0.78))
+  color: #ffffff
   font-size: 0.78rem
   font-weight: 800
   line-height: 1.15
@@ -494,54 +618,92 @@ $p-pale: #fffaf0
   position: absolute
   top: 6px
   right: 6px
-  width: 28px
-  height: 28px
+  width: 30px
+  height: 30px
   border-radius: 50%
-  border: 0
+  border: 1px solid var(--lk-line)
   background: var(--lk-surface)
-  color: $text-m
+  color: var(--lk-muted)
   font-size: 0.8rem
   font-weight: 800
   cursor: pointer
-  box-shadow: 0 2px 6px rgba(90, 58, 14, 0.3)
+  box-shadow: 0 2px 6px rgba(22, 60, 64, 0.3)
 
-// ── For parents ──────────────────────────────────────────────────────────────────────
+// ── 5. More pictures: one row that opens ───────────────────────────────────────────────
+.ac-more-row
+  display: flex
+  align-items: center
+  justify-content: space-between
+  gap: 12px
+  width: 100%
+  min-height: 56px
+  padding: 0 18px
+  color: var(--lk-text)
+  font-size: 1rem
+  font-weight: 700
+  text-align: left
+  cursor: pointer
+
+  &:active
+    transform: translateY(1px)
+
+  &:focus-visible
+    outline: 3px solid var(--lk-accent)
+    outline-offset: 2px
+
+.ac-more-arrow
+  flex: 0 0 auto
+  color: var(--lk-muted)
+  transition: transform 220ms ease-out
+
+.ac-more-row.open .ac-more-arrow
+  transform: rotate(180deg)
+
+.ac-group
+  display: flex
+  flex-direction: column
+  gap: 10px
+  margin-top: 6px
+
+.ac-group-title
+  margin: 0
+  font-size: 1.05rem
+  font-weight: 800
+  color: var(--lk-text)
+
+// ── 6. For parents ──────────────────────────────────────────────────────────────────────
 .ac-parents
-  margin: 26px auto 40px
-  max-width: 520px
-  text-align: center
+  padding: 16px
+  gap: 12px
 
 .ac-parents-title
-  margin: 0 0 8px
-  font-size: 0.72rem
+  display: flex
+  align-items: center
+  gap: 8px
+  margin: 0
+  font-size: 1.05rem
   font-weight: 800
-  letter-spacing: 0.08em
-  text-transform: uppercase
-  color: $muted
+  color: var(--lk-text)
 
 .ac-parents-row
   display: flex
   flex-wrap: wrap
-  justify-content: center
-  gap: 8px
+  gap: 10px
 
-.ac-link-btn
-  min-height: 40px
-  padding: 0 16px
-  border: 1px solid rgba(20, 24, 32, 0.16)
-  border-radius: 999px
-  background: var(--lk-surface)
-  color: $ink
-  font: inherit
-  font-size: 0.82rem
-  font-weight: 700
-  cursor: pointer
+  .lk-btn
+    flex: 1 1 200px
 
-  &:disabled
-    opacity: 0.5
+    &:disabled
+      opacity: 0.5
 
 .ac-parents-msg
-  margin: 10px 0 0
-  font-size: 0.82rem
-  color: $muted
+  margin: 0
+  font-size: 0.9rem
+  color: var(--lk-muted)
+
+@media (prefers-reduced-motion: reduce)
+  .ac-bigbook-cover,
+  .ac-gal-tile,
+  .ac-more-arrow
+    transition: none
 </style>
