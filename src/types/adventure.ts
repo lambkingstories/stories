@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron'
 
 export interface AdventureQuestion {
   q: string
@@ -1807,6 +1807,8 @@ export interface StageTask {
   sling?: SlingGame
   arrow?: ArrowGame
   hem?: HemGame
+  quiet?: QuietGame
+  throne?: ThroneGame
 }
 
 /** One reaper of the gleaning game: the lane he cuts along (index into `GleanGame.lanes`), when he starts (ms after the lead), how long he needs to cross the picture, his picture (index into `GleanGame.reapers`) and the places (percent of the picture width) of the clumps of barley that stand in his lane. */
@@ -2225,6 +2227,52 @@ export interface HemGame {
   /** David holding the corner (4:3), shown when the last seam is done. */
   reward: string
   rounds: HemRound[]
+}
+
+/** One gap in the foundation of the game "Lay the stones quietly": where a stone comes to lie (the middle, percent of the picture) and how wide it is. */
+export interface QuietGap {
+  x: number
+  y: number
+  w: number
+}
+/** One round: the gaps, where the stones wait (the middle of each stone, percent of the picture) and how fast a stone may be pulled at most (percent of the picture width per second). */
+export interface QuietRound {
+  hint: string
+  gaps: QuietGap[]
+  starts: { x: number; y: number }[]
+  max: number
+}
+/** The game "Lay the stones quietly": on the building site of God's house the child pulls smooth stones to the gaps of the foundation, slowly and without clatter; a stone that is pulled too fast clacks and goes back (a mistake). */
+export interface QuietGame {
+  /** The building site (4:3). */
+  background: string
+  /** The pictures of the stones (taken in turn) and the width of one (percent of the picture width). */
+  stones: string[]
+  stoneW: number
+  rounds: QuietRound[]
+}
+
+/** A place for a lion on the throne: the middle (percent of the picture), the width of the circle and which side of the throne it is on. */
+export interface ThroneSlot {
+  x: number
+  y: number
+  w: number
+  side: 'left' | 'right' | 'arm-left' | 'arm-right'
+}
+/** One round of the game "Build the throne": the slots to fill and the lions that wait (the way each looks; as many as there are slots). */
+export interface ThroneRound {
+  hint: string
+  slots: ThroneSlot[]
+  lions: ('left' | 'right')[]
+}
+/** The game "Build the throne": the ivory throne with six empty steps; the child puts the golden lions on the steps, one on the left and one on the right of every step (they look toward the middle), and two at the armrests. */
+export interface ThroneGame {
+  /** The hall with the empty throne (4:3). */
+  background: string
+  /** One lion that looks to the left (the app mirrors it) and the width of the lion in the hand (percent of the picture width). */
+  lion: string
+  lionW: number
+  rounds: ThroneRound[]
 }
 
 export interface AdventureStage {

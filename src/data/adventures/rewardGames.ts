@@ -18,5 +18,6 @@ export const REWARD_GAMES: Record<string, number[]> = {
   david: [7, 13],
   elia: [4, 2],
   jona: [6, 9],
-  daniel: [5, 4]
+  daniel: [5, 4],
+  salomo: [7, 9]
 }
