@@ -129,7 +129,7 @@ const KANAELE: ChannelGame = {
 
 /** Etappe 5, "Lückenvers": Sätze aus dem Text der Etappe; die Wörter sind kurze Blätter (die richtigen zuerst, `answers` zeigt auf sie). Hintergrund ist das Etappenbild 5. */
 const VERS: VerseGame = {
-  background: `${IMG}etappe-bild-05.webp`,
+  background: `${G}hintergrund/vers-hintergrund.webp`,
   board: `${G}lueckenvers/tafel.webp`,
   leaf: `${G}lueckenvers/blatt.webp`,
   rounds: [

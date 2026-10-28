@@ -30,7 +30,7 @@ const G = 'images/abenteuer/spiele/mose/'
  * Bilder (gemalt, 21.10.2026): `worte/stein.webp` 260 × 110 (leer, das Wort schreibt die App), `worte/streifen.webp` 900 × 160 (leer), beide transparent.
  */
 const WORTE: WordsGame = {
-  background: `${PICS}etappe-bild-04.webp`,
+  background: `${G}hintergrund/worte-hintergrund.webp`,
   chip: `${G}worte/stein.webp`,
   strip: `${G}worte/streifen.webp`,
   rounds: [
@@ -174,7 +174,7 @@ const TAKT: BeatGame = {
  * Hintergrund ist das Etappenbild 6, von der App weichgezeichnet (`soft`); keine neuen Bilder.
  */
 const VERS: VerseGame = {
-  background: `${PICS}etappe-bild-06.webp`,
+  background: `${G}hintergrund/vers-hintergrund.webp`,
   soft: true,
   board: `${G}lueckenvers/tafel.webp`,
   leaf: `${G}lueckenvers/blatt.webp`,
@@ -559,11 +559,11 @@ export const mose: Journey = {
 for (const st of mose.stages) {
   const t = st.task
   if (t.weave) t.weave.background = backdropOr(t.weave.background, st.image)
-  if (t.verse) t.verse.background = st.image
+  if (t.verse) t.verse.background = backdropOr(t.verse.background, st.image)
   if (t.pack) t.pack.background = backdropOr(t.pack.background, st.image)
   if (t.beat) t.beat.background = backdropOr(t.beat.background, st.image)
   if (t.manna) t.manna.background = backdropOr(t.manna.background, st.image)
-  if (t.words) t.words.background = st.image
+  if (t.words) t.words.background = backdropOr(t.words.background, st.image)
 }
 
 // the German recordings of the stories (voice Achernar); there are no English ones yet, so the English app reads with the voice of the device

@@ -16,6 +16,7 @@ import { SAMUEL_PATH } from './samuelPath'
 import { localize } from './localize'
 import { adventureLanguage } from '@/use/adventureLanguage'
 import { samuelEn } from './en/samuel.en'
+import { backdropOr } from '@/utils/gameBackground'
 
 // Etappenbilder (Variante a der neuen Bilder; Anton wählt auf der Vorschau-Seite a/b): `images/abenteuer/samuel/etappe-bild-NN.webp`, 960 × 640
 const PICS = 'images/abenteuer/samuel/'
@@ -47,7 +48,7 @@ const OBERKLEID: CoatGame = {
  * Tafel und Blatt sind die aus Elia, kopiert. Hintergrund ist das Etappenbild 3, von der App weichgezeichnet (`soft`).
  */
 const VERS: VerseGame = {
-  background: `${PICS}etappe-bild-03.webp`,
+  background: `${G}hintergrund/vers-hintergrund.webp`,
   soft: true,
   board: `${G}lueckenvers/tafel.webp`,
   leaf: `${G}lueckenvers/blatt.webp`,
@@ -488,7 +489,7 @@ export const samuel: Journey = {
 
 // the games that lie on a stage picture (drawn soft by the app) follow the picture of their stage
 for (const st of samuel.stages) {
-  if (st.task.verse) st.task.verse.background = st.image ?? st.task.verse.background
+  if (st.task.verse) st.task.verse.background = backdropOr(st.task.verse.background, st.image ?? st.task.verse.background)
 }
 
 // the German recordings of the stories (voice Achernar, files "geschichte-NN-v1.mp3"); until they are made the app reads with the voice of the device. Remove a number from this list when its file is in.

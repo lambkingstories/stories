@@ -14,9 +14,12 @@ import { mistakeStars } from '@/utils/adventureScore'
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
 import { prependBaseUrl } from '@/utils/function'
+import { isPainted } from '@/utils/gameBackground'
 import type { VerseGame } from '@/types/adventure'
 
 const props = defineProps<{ game: VerseGame }>()
+/** A soft (blurred) stage picture, unless the data names its own painted backdrop (`/hintergrund/`): that one is shown sharp. */
+const soft = computed(() => !!props.game.soft && !isPainted(props.game.background))
 const emit = defineEmits<{ done: [stars: number] }>()
 const { t } = useI18n({ useScope: 'global' })
 const { play } = useSfx()
@@ -120,7 +123,7 @@ const src = (p: string) => prependBaseUrl(p)
 </script>
 
 <template lang="pug">
-  div(class="vs" :class="{ 'game-soft': game.soft }" :style="game.soft ? { '--bg': `url(${src(game.background)})` } : { backgroundImage: `url(${src(game.background)})` }")
+  div(class="vs" :class="{ 'game-soft': soft }" :style="soft ? { '--bg': `url(${src(game.background)})` } : { backgroundImage: `url(${src(game.background)})` }")
     template(v-if="!finished")
       p(v-if="rounds.length > 1" class="vs-round") {{ t('app.adventure.gameRound', { n: round + 1, total: rounds.length }) }}
       p(class="vs-hint") {{ between ? t('app.adventure.gameNext') : current.hint }}

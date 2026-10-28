@@ -15,6 +15,7 @@ import { DANIEL_PATH } from './danielPath'
 import { localize } from './localize'
 import { adventureLanguage } from '@/use/adventureLanguage'
 import { danielEn } from './en/daniel.en'
+import { backdropOr } from '@/utils/gameBackground'
 
 // Etappenbilder (Variante a der neuen Bilder; Anton wählt später a/b): `images/abenteuer/daniel/etappe-bild-NN.webp`, 960 × 640
 const PICS = 'images/abenteuer/daniel/'
@@ -47,7 +48,7 @@ const TAGE: DaysGame = {
  * Tafel und Blatt sind die aus Jona, kopiert. Hintergrund ist das Etappenbild 3, von der App weichgezeichnet (`soft`).
  */
 const VERS: VerseGame = {
-  background: `${PICS}etappe-bild-03.webp`,
+  background: `${G}hintergrund/vers-hintergrund.webp`,
   soft: true,
   board: `${G}lueckenvers/tafel.webp`,
   leaf: `${G}lueckenvers/blatt.webp`,
@@ -370,7 +371,7 @@ export const daniel: Journey = {
 
 // the games that lie on a stage picture (drawn soft by the app) follow the picture of their stage
 for (const st of daniel.stages) {
-  if (st.task.verse) st.task.verse.background = st.image ?? st.task.verse.background
+  if (st.task.verse) st.task.verse.background = backdropOr(st.task.verse.background, st.image ?? st.task.verse.background)
 }
 
 // the German recordings of the stories (voice Achernar, Gemini, files "geschichte-NN-v1.mp3"); the English ones are linked in `en/daniel.en.ts` ("-en-v1")

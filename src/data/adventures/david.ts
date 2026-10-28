@@ -16,6 +16,7 @@ import { DAVID_PATH } from './davidPath'
 import { localize } from './localize'
 import { adventureLanguage } from '@/use/adventureLanguage'
 import { davidEn } from './en/david.en'
+import { backdropOr } from '@/utils/gameBackground'
 
 // Etappenbilder (Variante a der neuen Bilder; Anton wählt auf der Vorschau-Seite a/b): `images/abenteuer/david/etappe-bild-NN.webp`, 960 × 640
 const PICS = 'images/abenteuer/david/'
@@ -27,7 +28,7 @@ const G = 'images/abenteuer/spiele/david/'
  * Tafel und Blatt sind die aus Samuel (kopiert). Hintergrund ist das Etappenbild 1, von der App weichgezeichnet (`soft`).
  */
 const VERS: VerseGame = {
-  background: `${PICS}etappe-bild-01.webp`,
+  background: `${G}hintergrund/vers-hintergrund.webp`,
   soft: true,
   board: `${G}lueckenvers/tafel.webp`,
   leaf: `${G}lueckenvers/blatt.webp`,
@@ -239,7 +240,7 @@ const REIHENFOLGE: OrderGame = {
  * Hintergrund ist das Etappenbild 14 (weichgezeichnet); Steine und Streifen sind die aus Mose (kopiert).
  */
 const WORTE: WordsGame = {
-  background: `${PICS}etappe-bild-14.webp`,
+  background: `${G}hintergrund/worte-hintergrund.webp`,
   chip: `${G}worte/stein.webp`,
   strip: `${G}worte/streifen.webp`,
   rounds: [
@@ -567,8 +568,8 @@ export const david: Journey = {
 
 // the games that lie on a stage picture (drawn soft by the app) follow the picture of their stage
 for (const st of david.stages) {
-  if (st.task.verse) st.task.verse.background = st.image ?? st.task.verse.background
-  if (st.task.words) st.task.words.background = st.image ?? st.task.words.background
+  if (st.task.verse) st.task.verse.background = backdropOr(st.task.verse.background, st.image ?? st.task.verse.background)
+  if (st.task.words) st.task.words.background = backdropOr(st.task.words.background, st.image ?? st.task.words.background)
 }
 
 // the German recordings of the stories (voice Achernar, files "geschichte-NN-v1.mp3"); until they are made the app reads with the voice of the device. Remove a number from this list when its file is in.

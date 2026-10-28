@@ -119,7 +119,7 @@ const ABSEILEN: LowerGame = {
 
 /** Etappe 10, "Lückenvers": zwei Sätze aus dem Text der Etappe; die Wörter sind kurze Blätter (das richtige zuerst, `answers` zeigt auf sie). Tafel und Blatt sind die aus Adam und Eva, kopiert. Hintergrund ist das Etappenbild 10, von der App weichgezeichnet (`soft`). */
 const VERS: VerseGame = {
-  background: `${PICS}etappe-bild-10.webp`,
+  background: `${G}hintergrund/vers-hintergrund.webp`,
   soft: true,
   board: `${G}lueckenvers/tafel.webp`,
   leaf: `${G}lueckenvers/blatt.webp`,
@@ -384,7 +384,7 @@ export const josua: Journey = {
 // the games that lie on a stage picture (drawn soft by the app) follow the picture of their stage
 for (const st of josua.stages) {
   if (st.task.hush) st.task.hush.background = backdropOr(st.task.hush.background, st.image)
-  if (st.task.verse) st.task.verse.background = st.image
+  if (st.task.verse) st.task.verse.background = backdropOr(st.task.verse.background, st.image)
 }
 
 // the German recordings of the stories (voice Achernar); there are no English ones yet, so the English app reads with the voice of the device
