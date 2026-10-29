@@ -221,8 +221,7 @@ export const salomo: Journey = {
       task: { kind: 'zaehlen', hint: 'Tippe die Tiere an und zähle sie.', count: 13, image: '', question: 'Wie viele Tiere führen Salomos Leute nach Gibeon?', background: `${PICS}etappe-bild-01.webp`, groups: ZAEHLEN_GRUPPEN },
       questions: [
         { q: 'Wohin geht Salomo, um Gott zu danken?', options: ['nach Gibeon', 'nach Silo', 'nach Bethel'], answer: 0 },
-        { q: 'Wie viele Brandopfer bringt er dort?', options: ['tausend', 'zehn', 'hundert'], answer: 0 },
-        { q: 'Wie spricht Gott in dieser Nacht zu ihm?', options: ['im Traum', 'durch einen Boten', 'durch einen Brief'], answer: 0 }
+        { q: 'Wie viele Brandopfer bringt er dort?', options: ['tausend', 'zehn', 'hundert'], answer: 0 }
       ]
     },
     {
@@ -240,8 +239,7 @@ export const salomo: Journey = {
       task: { kind: 'lueckenvers', hint: 'Ziehe das passende Blatt in die Lücke.', verse: VERS },
       questions: [
         { q: 'Worum bittet Salomo?', options: ['um ein gehorsames Herz', 'um ein langes Leben', 'um viel Gold'], answer: 0 },
-        { q: 'Was gibt Gott ihm dazu?', options: ['Reichtum und Ehre', 'ein Schwert', 'ein Schiff'], answer: 0 },
-        { q: 'Wohin geht Salomo, als er aufwacht?', options: ['nach Jerusalem vor die Lade', 'zurück nach Hause', 'auf einen Berg'], answer: 0 }
+        { q: 'Was gibt Gott ihm dazu?', options: ['Reichtum und Ehre', 'ein Schwert', 'ein Schiff'], answer: 0 }
       ]
     },
     {
@@ -277,8 +275,7 @@ export const salomo: Journey = {
       task: { kind: 'ernten', hint: 'Tippe die reifen Früchte an. Steine und Dornen gehören nicht in den Korb.', harvest: ERNTEN },
       questions: [
         { q: 'Wo sitzen die Leute in Ruhe?', options: ['unter Weinstock und Feigenbaum', 'in der Burg', 'am Feuer'], answer: 0 },
-        { q: 'Wie viele Sprüche spricht Salomo?', options: ['dreitausend', 'dreißig', 'dreihundert'], answer: 0 },
-        { q: 'Wer kommt, um seine Weisheit zu hören?', options: ['Leute aus allen Völkern', 'nur seine Brüder', 'niemand'], answer: 0 }
+        { q: 'Wie viele Sprüche spricht Salomo?', options: ['dreitausend', 'dreißig', 'dreihundert'], answer: 0 }
       ]
     },
     {
@@ -295,8 +292,7 @@ export const salomo: Journey = {
       task: { kind: 'reihenfolge', hint: 'Lege die Bilder in die Reihenfolge der Geschichte.', order: REIHENFOLGE },
       questions: [
         { q: 'Wer schickt Holz für das Haus Gottes?', options: ['Hiram, der König von Tyrus', 'der Pharao', 'die Königin von Saba'], answer: 0 },
-        { q: 'Welches Holz kommt vom Libanon?', options: ['Zedern', 'Palmen', 'Feigen'], answer: 0 },
-        { q: 'Wie kommen die Stämme zu Salomo?', options: ['auf Flößen über das Meer', 'auf Kamelen', 'auf Wagen durch die Wüste'], answer: 0 }
+        { q: 'Welches Holz kommt vom Libanon?', options: ['Zedern', 'Palmen', 'Feigen'], answer: 0 }
       ]
     },
     {
@@ -313,8 +309,7 @@ export const salomo: Journey = {
       task: { kind: 'leise', hint: 'Ziehe den Stein ganz langsam in die Lücke, damit es leise bleibt.', quiet: LEISE },
       questions: [
         { q: 'Wie sind die Steine, wenn sie ankommen?', options: ['schon fertig behauen', 'noch ganz roh', 'aus Holz'], answer: 0 },
-        { q: 'Was hört man auf der Baustelle nicht?', options: ['Hammer und Beil', 'Vogelsang', 'Gesang'], answer: 0 },
-        { q: 'Wie viele Männer hauen Steine im Gebirge?', options: ['achtzigtausend', 'achtzig', 'achthundert'], answer: 0 }
+        { q: 'Was hört man auf der Baustelle nicht?', options: ['Hammer und Beil', 'Vogelsang', 'Gesang'], answer: 0 }
       ]
     },
     {
@@ -331,8 +326,7 @@ export const salomo: Journey = {
       task: { kind: 'memory', hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.', memory: MEMORY },
       questions: [
         { q: 'Aus welchem Holz sind die Wände innen?', options: ['aus Zedernholz', 'aus Tannenholz', 'aus Ebenholz'], answer: 0 },
-        { q: 'Womit überzieht Salomo den hinteren Raum?', options: ['mit reinem Gold', 'mit Silber', 'mit Ton'], answer: 0 },
-        { q: 'Was ist auf die Wände geschnitzt?', options: ['Cherubim, Palmen und Blumen', 'Löwen und Adler', 'Schafe und Sterne'], answer: 0 }
+        { q: 'Womit überzieht Salomo den hinteren Raum?', options: ['mit reinem Gold', 'mit Silber', 'mit Ton'], answer: 0 }
       ]
     },
     {
@@ -349,8 +343,7 @@ export const salomo: Journey = {
       task: { kind: 'worte', hint: 'Lege die Wörter in der richtigen Reihenfolge in den Streifen.', words: WORTE },
       questions: [
         { q: 'Wie heißt der Meister im Erz?', options: ['Hiram', 'Zadok', 'Natan'], answer: 0 },
-        { q: 'Wie heißen die beiden Säulen?', options: ['Jachin und Boas', 'Adam und Eva', 'Ruben und Simeon'], answer: 0 },
-        { q: 'Wie lange baut Salomo am Haus?', options: ['sieben Jahre', 'sieben Tage', 'siebzig Jahre'], answer: 0 }
+        { q: 'Wie heißen die beiden Säulen?', options: ['Jachin und Boas', 'Adam und Eva', 'Ruben und Simeon'], answer: 0 }
       ]
     },
     {
@@ -367,8 +360,7 @@ export const salomo: Journey = {
       task: { kind: 'puzzle', hint: 'Setze das Bild vom Einzug der Lade zusammen.', puzzle: { image: `${G}puzzle/lade.webp`, cols: 2, rows: 3 } },
       questions: [
         { q: 'Was tragen die Priester ins neue Haus?', options: ['die Lade des Bundes', 'den Thron des Königs', 'einen Altar aus Gold'], answer: 0 },
-        { q: 'Wohin stellen sie die Lade?', options: ['unter die Flügel der Cherubim', 'vor das Tor', 'in den Hof'], answer: 0 },
-        { q: 'Was liegt in der Lade?', options: ['die zwei steinernen Tafeln', 'Gold und Silber', 'nichts'], answer: 0 }
+        { q: 'Wohin stellen sie die Lade?', options: ['unter die Flügel der Cherubim', 'vor das Tor', 'in den Hof'], answer: 0 }
       ]
     },
     {
@@ -403,8 +395,7 @@ export const salomo: Journey = {
       task: { kind: 'sortieren', hint: 'Ziehe jedes Geschenk in die Truhe mit der gleichen Farbe.', sort: SORTIEREN },
       questions: [
         { q: 'Was bringt die Königin mit?', options: ['Gewürze, Gold und Edelsteine', 'Schafe und Ziegen', 'Schwerter und Schilde'], answer: 0 },
-        { q: 'Wie kommt sie nach Jerusalem?', options: ['mit Kamelen', 'mit einem Schiff', 'mit einem Wagen'], answer: 0 },
-        { q: 'Was sagt sie am Ende über Salomo?', options: ['Es ist mir nicht die Hälfte gesagt worden.', 'Er ist nur ein Mensch.', 'Ich bleibe nicht lange.'], answer: 0 }
+        { q: 'Wie kommt sie nach Jerusalem?', options: ['mit Kamelen', 'mit einem Schiff', 'mit einem Wagen'], answer: 0 }
       ]
     },
     {
@@ -421,8 +412,7 @@ export const salomo: Journey = {
       task: { kind: 'thron', hint: 'Setze die Löwen auf die Stufen. Sie sehen zur Mitte des Throns.', throne: THRON },
       questions: [
         { q: 'Woraus ist der Thron gebaut?', options: ['aus Elfenbein, mit Gold überzogen', 'aus Stein', 'aus Holz'], answer: 0 },
-        { q: 'Wie viele Stufen hat der Thron?', options: ['sechs', 'drei', 'zehn'], answer: 0 },
-        { q: 'Was steht auf den Stufen?', options: ['zwölf Löwen', 'zwölf Adler', 'zwölf Lämmer'], answer: 0 }
+        { q: 'Wie viele Stufen hat der Thron?', options: ['sechs', 'drei', 'zehn'], answer: 0 }
       ]
     }
   ],
@@ -451,9 +441,9 @@ for (const s of salomo.stages) {
 
 // the background music of this adventure: three pieces made with Google's Lyria 3.5 (the young king at Gibeon, the house of cedar, the queen's caravan); they follow one another at random
 salomo.music = [
-  'audio/abenteuer/salomo/musik-gibeon-v1.mp3',
-  'audio/abenteuer/salomo/musik-haus-v1.mp3',
-  'audio/abenteuer/salomo/musik-karawane-v1.mp3'
+  'audio/abenteuer/salomo/musik-gibeon-v2.mp3',
+  'audio/abenteuer/salomo/musik-haus-v2.mp3',
+  'audio/abenteuer/salomo/musik-karawane-v2.mp3'
 ]
 
 // the English texts (title, stories, questions, hints) lie over the German ones; the screens show them when the app is English

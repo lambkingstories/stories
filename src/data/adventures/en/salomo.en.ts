@@ -26,8 +26,7 @@ export const salomoEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'Where does Solomon go to thank God?', options: ['to Gibeon', 'to Shiloh', 'to Bethel'] },
-        { q: 'How many burnt offerings does he bring there?', options: ['a thousand', 'ten', 'a hundred'] },
-        { q: 'How does God speak to him that night?', options: ['in a dream', 'through a messenger', 'through a letter'] }
+        { q: 'How many burnt offerings does he bring there?', options: ['a thousand', 'ten', 'a hundred'] }
       ]
     },
     {
@@ -50,8 +49,7 @@ export const salomoEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'What does Solomon ask for?', options: ['an obedient heart', 'a long life', 'a lot of gold'] },
-        { q: 'What else does God give him?', options: ['riches and honor', 'a sword', 'a ship'] },
-        { q: 'Where does Solomon go when he wakes up?', options: ['to Jerusalem, before the ark', 'back home', 'up a mountain'] }
+        { q: 'What else does God give him?', options: ['riches and honor', 'a sword', 'a ship'] }
       ]
     },
     {
@@ -81,8 +79,7 @@ export const salomoEn: TextOverlay<Journey> = {
       task: { hint: 'Tap the ripe fruit. Stones and thorns do not belong in the basket.' },
       questions: [
         { q: 'Where do the people sit in peace?', options: ['under vine and fig tree', 'in the fortress', 'by the fire'] },
-        { q: 'How many proverbs does Solomon speak?', options: ['three thousand', 'thirty', 'three hundred'] },
-        { q: 'Who comes to hear his wisdom?', options: ['people from all nations', 'only his brothers', 'nobody'] }
+        { q: 'How many proverbs does Solomon speak?', options: ['three thousand', 'thirty', 'three hundred'] }
       ]
     },
     {
@@ -102,8 +99,7 @@ export const salomoEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'Who sends wood for God’s house?', options: ['Hiram, king of Tyre', 'Pharaoh', 'the queen of Sheba'] },
-        { q: 'Which wood comes from Lebanon?', options: ['cedars', 'palms', 'figs'] },
-        { q: 'How do the trunks get to Solomon?', options: ['on rafts over the sea', 'on camels', 'on wagons through the desert'] }
+        { q: 'Which wood comes from Lebanon?', options: ['cedars', 'palms', 'figs'] }
       ]
     },
     {
@@ -120,8 +116,7 @@ export const salomoEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'What are the stones like when they arrive?', options: ['already cut to size', 'still rough', 'made of wood'] },
-        { q: 'What can nobody hear on the building site?', options: ['hammer and axe', 'birdsong', 'singing'] },
-        { q: 'How many men cut stones in the mountains?', options: ['eighty thousand', 'eighty', 'eight hundred'] }
+        { q: 'What can nobody hear on the building site?', options: ['hammer and axe', 'birdsong', 'singing'] }
       ]
     },
     {
@@ -138,8 +133,7 @@ export const salomoEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'What wood are the walls made of inside?', options: ['cedar wood', 'fir wood', 'ebony'] },
-        { q: 'What does Solomon cover the back room with?', options: ['pure gold', 'silver', 'clay'] },
-        { q: 'What is carved on the walls?', options: ['cherubim, palm trees and flowers', 'lions and eagles', 'sheep and stars'] }
+        { q: 'What does Solomon cover the back room with?', options: ['pure gold', 'silver', 'clay'] }
       ]
     },
     {
@@ -161,8 +155,7 @@ export const salomoEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'What is the master of bronze called?', options: ['Hiram', 'Zadok', 'Nathan'] },
-        { q: 'What are the two pillars called?', options: ['Jachin and Boaz', 'Adam and Eve', 'Reuben and Simeon'] },
-        { q: 'How long does Solomon build on the house?', options: ['seven years', 'seven days', 'seventy years'] }
+        { q: 'What are the two pillars called?', options: ['Jachin and Boaz', 'Adam and Eve', 'Reuben and Simeon'] }
       ]
     },
     {
@@ -176,8 +169,7 @@ export const salomoEn: TextOverlay<Journey> = {
       task: { hint: 'Put the picture of the ark moving in together.' },
       questions: [
         { q: 'What do the priests carry into the new house?', options: ['the ark of the covenant', 'the king’s throne', 'an altar of gold'] },
-        { q: 'Where do they put the ark?', options: ['under the wings of the cherubim', 'in front of the gate', 'in the courtyard'] },
-        { q: 'What is in the ark?', options: ['the two stone tablets', 'gold and silver', 'nothing'] }
+        { q: 'Where do they put the ark?', options: ['under the wings of the cherubim', 'in front of the gate', 'in the courtyard'] }
       ]
     },
     {
@@ -211,8 +203,7 @@ export const salomoEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'What does the queen bring with her?', options: ['spices, gold and precious stones', 'sheep and goats', 'swords and shields'] },
-        { q: 'How does she come to Jerusalem?', options: ['with camels', 'with a ship', 'with a wagon'] },
-        { q: 'What does she say about Solomon at the end?', options: ['Not even half was told to me.', 'He is only a man.', 'I will not stay long.'] }
+        { q: 'How does she come to Jerusalem?', options: ['with camels', 'with a ship', 'with a wagon'] }
       ]
     },
     {
@@ -235,8 +226,7 @@ export const salomoEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'What is the throne made of?', options: ['ivory, covered with gold', 'stone', 'wood'] },
-        { q: 'How many steps does the throne have?', options: ['six', 'three', 'ten'] },
-        { q: 'What stands on the steps?', options: ['twelve lions', 'twelve eagles', 'twelve lambs'] }
+        { q: 'How many steps does the throne have?', options: ['six', 'three', 'ten'] }
       ]
     }
   ],

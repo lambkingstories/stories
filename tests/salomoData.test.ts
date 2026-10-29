@@ -55,8 +55,8 @@ describe('Salomo: stories and questions', () => {
     }
   })
 
-  it('three questions per stage, three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
-    for (const s of salomo.stages) expect(s.questions, `stage ${s.id}`).toHaveLength(3)
+  it('three questions in the two quiz stages and two after a game, three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
+    for (const s of salomo.stages) expect(s.questions, `stage ${s.id}`).toHaveLength(QUIZ_STAGES.includes(s.id) ? 3 : 2)
     for (const q of [...salomo.stages.flatMap((s) => s.questions), ...salomo.exam]) {
       expect(q.options, q.q).toHaveLength(3)
       expect(q.answer, q.q).toBe(0)
