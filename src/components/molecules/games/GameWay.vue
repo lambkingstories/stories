@@ -33,6 +33,10 @@ const current = computed(() => props.game.scenes[scene.value])
 const sceneSrc = computed(() => prependBaseUrl(current.value?.image ?? ''))
 const walkerSrc = computed(() => prependBaseUrl(props.game.walker))
 const busy = computed(() => walking.value !== '')
+/** The line under the picture: the words of the journey, or the Egypt words of Joseph. */
+const hintText = computed(() =>
+  props.game.texts ? props.game.texts.hint.replace('{n}', String(scene.value + 1)).replace('{total}', String(props.game.scenes.length)) : t('app.adventure.wayHint', { n: scene.value + 1, total: props.game.scenes.length })
+)
 /** A fork with three ways has a middle one, too. */
 const threeWays = computed(() => current.value?.paths === 3)
 /** The picture glows green for the right way and red for the wrong one. */
@@ -42,7 +46,7 @@ function choose(side: 'left' | 'right' | 'middle') {
   const c = current.value
   if (!c || busy.value) return
   if (side === c.goal) {
-    note.value = t('app.adventure.wayRight')
+    note.value = props.game.texts?.right ?? t('app.adventure.wayRight')
     progress.mark()
     walking.value = side
     play('caravan')
@@ -56,7 +60,7 @@ function choose(side: 'left' | 'right' | 'middle') {
   }
   mistakes.value++
   play('wrong')
-  note.value = t('app.adventure.wayWrong')
+  note.value = props.game.texts?.wrong ?? t('app.adventure.wayWrong')
   walking.value = side === 'left' ? 'back-left' : side === 'right' ? 'back-right' : 'back-middle'
   later(() => {
     walking.value = ''
@@ -75,8 +79,8 @@ function choose(side: 'left' | 'right' | 'middle') {
         button(type="button" class="way-hit left" :class="{ three: threeWays }" :disabled="busy" :aria-label="t('app.adventure.wayLeft')" @click="choose('left')")
         button(v-if="threeWays" type="button" class="way-hit middle three" :disabled="busy" :aria-label="t('app.adventure.wayMiddle')" @click="choose('middle')")
         button(type="button" class="way-hit right" :class="{ three: threeWays }" :disabled="busy" :aria-label="t('app.adventure.wayRight2')" @click="choose('right')")
-      p(class="way-note" :class="{ bad: walking.startsWith('back') }" role="status") {{ note || t('app.adventure.wayHint', { n: scene + 1, total: game.scenes.length }) }}
-    GameDone(v-else :stars="stars" :text="t('app.adventure.wayDone')" @next="emit('done', stars)")
+      p(class="way-note" :class="{ bad: walking.startsWith('back') }" role="status") {{ note || hintText }}
+    GameDone(v-else :stars="stars" :text="game.texts?.done ?? t('app.adventure.wayDone')" @next="emit('done', stars)")
 </template>
 
 <style scoped lang="sass">

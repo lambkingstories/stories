@@ -4,13 +4,13 @@
  * Nicht oder gemildert erzählt: Salomos Heirat, die Höhen, die Fronarbeiter, die Namen der Amtleute, Speisung und Pferde, die Strafworte Gottes (9,6–9), die zwanzig Städte für Hiram und das ganze Kapitel 11 (Abfall; liegt außerhalb dieses Abenteuers).
  * Das Urteil (Etappe 3) wird erzählt, nicht gespielt; das Schwert wird nur gebracht und nie gegen das Kind gehoben, die "zwei Huren" heißen "zwei Frauen". Die Lade wird immer mit zwei goldenen Cherubim gezeigt.
  * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
- * Spiele (Wahl der Leitung): 1 Zählen (alt), 2 Lückenvers (alt), 3 nur Quiz, 4 Ernten (alt), 5 Reihenfolge (alt), 6 Steine leise legen (neu), 7 Memory (alt), 8 Wörter ordnen (alt), 9 Puzzle (alt),
+ * Spiele (Wahl der Leitung): 1 Weggabelung (alt), 2 Lückenvers (alt), 3 nur Quiz, 4 Ernten (alt), 5 Reihenfolge (alt), 6 Steine leise legen (neu), 7 Memory (alt), 8 Wörter ordnen (alt), 9 Puzzle (alt),
  * 10 nur Quiz, 11 Sortieren (alt), 12 Den Thron bauen (neu).
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/salomo/, images/abenteuer/spiele/salomo/<spiel>/, audio/abenteuer/salomo/.
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { CountGroup, HarvestGame, Journey, MemoryGame, OrderGame, QuietGame, SortGame, ThroneGame, VerseGame, WordsGame } from '@/types/adventure'
+import type { HarvestGame, Journey, MemoryGame, OrderGame, QuietGame, SortGame, ThroneGame, VerseGame, WayGame, WordsGame } from '@/types/adventure'
 import { josef } from './josef'
 import { SALOMO_PATH } from './salomoPath'
 import { localize } from './localize'
@@ -26,14 +26,26 @@ const G = 'images/abenteuer/spiele/salomo/'
 const GS = 'images/abenteuer/spiele/'
 
 /**
- * Etappe 1, "Zählen" (alte Mechanik 1 von 8): die Tiere, die Salomos Leute nach Gibeon führen (Schafe, Ziegen, Rinder); das Kind tippt jedes Tier an und wählt dann die Zahl. Hintergrund ist das Etappenbild 1.
- * Schaf und Ziege sind die aus Abraham (kopiert), der Ochse ist neu (Bildauftrag S31).
+ * Etappe 1, "Weggabelung" (alte Mechanik 1 von 8): der Zug Salomos (Salomo auf dem Maultier, ein Diener, Ochsen und Schafe) zieht nach Gibeon; an fünf Gabelungen im steinigen Bergland tippt das Kind den Weg,
+ * auf dem die frischen Spuren der Tiere liegen und am Ende ein dünner Rauchfaden vom Opferhügel aufsteigt (ohne Schilder). Die letzte Gabelung hat drei Wege. Bilder (Bildauftrag S39): `weg/weg-1..5.webp` 1000 × 750, `weg/zug.webp`.
  */
-const ZAEHLEN_GRUPPEN: CountGroup[] = [
-  { image: `${G}zaehlen/schaf.webp`, count: 6 },
-  { image: `${G}zaehlen/ziege.webp`, count: 3 },
-  { image: `${G}zaehlen/ochse.webp`, count: 4 }
-]
+const WEG: WayGame = {
+  walker: `${G}weg/zug.webp`,
+  texts: {
+    hint: 'Weggabelung {n} von {total}: Tippe auf den Weg, auf dem die Spuren des Zuges liegen.',
+    right: 'Richtig! Der Zug zieht weiter nach Gibeon.',
+    wrong: 'Hier sind keine Spuren. Der Zug kehrt um.',
+    done: 'Der Zug hat den Weg nach Gibeon gefunden!'
+  },
+  scenes: [
+    { image: `${G}weg/weg-1.webp`, goal: 'right' },
+    { image: `${G}weg/weg-2.webp`, goal: 'left' },
+    { image: `${G}weg/weg-3.webp`, goal: 'left' },
+    { image: `${G}weg/weg-4.webp`, goal: 'right' },
+    // the last fork has three ways
+    { image: `${G}weg/weg-5.webp`, goal: 'middle', paths: 3 }
+  ]
+}
 
 /**
  * Etappe 2, "Lückenvers" (alte Mechanik 2 von 8): Salomos Bitte aus dem Text der Etappe in zwei Runden (erst ein Wort, dann zwei); die Wörter sind Blätter (das richtige zuerst, `answers` zeigt auf sie).
@@ -217,8 +229,8 @@ export const salomo: Journey = {
         'Das Haus für Gott gibt es noch nicht, denn in Jerusalem hat niemand es gebaut. Die Leute opfern an vielen Orten auf den Höhen. Der wichtigste Platz liegt bei Gibeon. Dorthin macht sich Salomo mit seinen Leuten auf den Weg.',
         'Auf dem großen Altar von Gibeon opfert er tausend Brandopfer. In der Nacht schläft er ein. Da kommt ein Traum, und Gott spricht zu ihm: „Bitte, was ich dir geben soll!“'
       ],
-      // Spiel: Zählen (zaehlen, alt 1 von 8)
-      task: { kind: 'zaehlen', hint: 'Tippe die Tiere an und zähle sie.', count: 13, image: '', question: 'Wie viele Tiere führen Salomos Leute nach Gibeon?', background: `${PICS}etappe-bild-01.webp`, groups: ZAEHLEN_GRUPPEN },
+      // Spiel: Weggabelung (weg, alt 1 von 8)
+      task: { kind: 'weg', hint: 'Folge den Spuren des Zuges nach Gibeon. Schau dir die Wege genau an.', way: WEG },
       questions: [
         { q: 'Wohin geht Salomo, um Gott zu danken?', options: ['nach Gibeon', 'nach Silo', 'nach Bethel'], answer: 0 },
         { q: 'Wie viele Brandopfer bringt er dort?', options: ['tausend', 'zehn', 'hundert'], answer: 0 }

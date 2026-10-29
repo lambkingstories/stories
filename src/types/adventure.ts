@@ -32,6 +32,8 @@ export interface WayScene {
 export interface WayGame {
   scenes: WayScene[]
   walker: string
+  /** Own words for another journey than Egypt: the hint (`{n}` of `{total}` forks), the line for the right way, for the wrong way and at the end. */
+  texts?: { hint: string; right: string; wrong: string; done: string }
 }
 
 /** The harvest: tap the ripe things in the field, not the stones and thorns. */

@@ -21,8 +21,15 @@ export const salomoEn: TextOverlay<Journey> = {
         'On the great altar at Gibeon he offers a thousand burnt offerings. In the night he falls asleep. Then a dream comes, and God speaks to him: "Ask what I shall give you!"'
       ],
       task: {
-        hint: 'Tap the animals and count them.',
-        question: 'How many animals do Solomon’s people lead to Gibeon?'
+        hint: 'Follow the tracks of the procession to Gibeon. Look at the roads closely.',
+        way: {
+          texts: {
+            hint: 'Fork {n} of {total}: tap the road with the tracks of the procession.',
+            right: 'Right! The procession goes on to Gibeon.',
+            wrong: 'No tracks here. The procession turns around.',
+            done: 'The procession has found the way to Gibeon!'
+          }
+        }
       },
       questions: [
         { q: 'Where does Solomon go to thank God?', options: ['to Gibeon', 'to Shiloh', 'to Bethel'] },

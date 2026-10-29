@@ -122,16 +122,19 @@ describe('Salomo: stories and questions', () => {
 
 describe('Salomo: the games', () => {
   it('the order of the games: 8 old, 2 new (quiet, throne), 2 quizzes; no game twice', () => {
-    expect(salomo.stages.map((s) => s.task.kind)).toEqual(['zaehlen', 'lueckenvers', 'quiz', 'ernten', 'reihenfolge', 'leise', 'memory', 'worte', 'puzzle', 'quiz', 'sortieren', 'thron'])
+    expect(salomo.stages.map((s) => s.task.kind)).toEqual(['weg', 'lueckenvers', 'quiz', 'ernten', 'reihenfolge', 'leise', 'memory', 'worte', 'puzzle', 'quiz', 'sortieren', 'thron'])
     const games = salomo.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
     expect(new Set(games).size).toBe(games.length)
     expect(games.filter((k) => ['leise', 'thron'].includes(k))).toHaveLength(2)
   })
 
-  it('1 counting: 13 animals in three groups, the question is the sum', () => {
-    const t = stage(1).task
-    expect(t.count).toBe(13)
-    expect(t.groups!.reduce((n, g) => n + g.count, 0)).toBe(13)
+  it('1 way: five forks (the fifth with three ways), the right way leaves on the side of the tracks, the walker and every picture are named', () => {
+    const g = stage(1).task.way!
+    expect(g.scenes).toHaveLength(5)
+    expect(g.scenes.map((x) => x.goal)).toEqual(['right', 'left', 'left', 'right', 'middle'])
+    expect(g.scenes.map((x) => x.paths ?? 2)).toEqual([2, 2, 2, 2, 3])
+    expect(g.walker).toMatch(/weg\/zug\.webp$/)
+    g.scenes.forEach((x, i) => expect(x.image.endsWith(`weg/weg-${i + 1}.webp`), x.image).toBe(true))
   })
 
   it('2 verse: the sentences are in the text and the right words are on the leaves', () => {
