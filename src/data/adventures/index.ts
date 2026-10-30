@@ -20,9 +20,9 @@ localize(comingSoon, [{ title: 'Adam and Eve' }, { title: 'Noah' }, { title: 'Th
 
 /**
  * Noah, Adam and Eve, the Tower of Babel, Abraham and Jacob are not public yet (texts and pictures are not released). A build that contains one of them
- * (`VITE_INCLUDE_NOAH=true`, `VITE_INCLUDE_ADAM=true`, `VITE_INCLUDE_BABEL=true`, `VITE_INCLUDE_ABRAHAM=true`, `VITE_INCLUDE_JAKOB=true`, `VITE_INCLUDE_JOSUA=true`, `VITE_INCLUDE_GIDEON=true`, `VITE_INCLUDE_MOSE=true`, `VITE_INCLUDE_JONA=true`, `VITE_INCLUDE_DANIEL=true`, `VITE_INCLUDE_ELIA=true`, `VITE_INCLUDE_RUT=true`, `VITE_INCLUDE_SAMUEL=true`, `VITE_INCLUDE_DAVID=true`, `VITE_INCLUDE_SALOMO=true`, the hidden test build) does not show it to everybody: it shows only
- * on a device that has been unlocked once by opening the app with the unlock link (`/?noah=<code>`, `/?adam=<code>`, `/?babel=<code>`, `/?abraham=<code>`, `/?jakob=<code>`, `/?josua=<code>`, `/?gideon=<code>`, `/?mose=<code>`, `/?jona=<code>`, `/?daniel=<code>`, `/?elia=<code>`, `/?rut=<code>`, `/?samuel=<code>`, `/?david=<code>`, `/?salomo=<code>`); the unlock is
- * kept on the device (`localStorage`), `?noah=off` / `?adam=off` / `?babel=off` / `?abraham=off` / `?jakob=off` / `?josua=off` / `?gideon=off` / `?mose=off` / `?jona=off` / `?daniel=off` / `?elia=off` / `?rut=off` / `?samuel=off` / `?david=off` / `?salomo=off` takes it away again. `VITE_SHOW_NOAH=true` / `VITE_SHOW_ADAM=true` /
+ * (`VITE_INCLUDE_NOAH=true`, `VITE_INCLUDE_ADAM=true`, `VITE_INCLUDE_BABEL=true`, `VITE_INCLUDE_ABRAHAM=true`, `VITE_INCLUDE_JAKOB=true`, `VITE_INCLUDE_JOSUA=true`, `VITE_INCLUDE_GIDEON=true`, `VITE_INCLUDE_MOSE=true`, `VITE_INCLUDE_JONA=true`, `VITE_INCLUDE_DANIEL=true`, `VITE_INCLUDE_ELIA=true`, `VITE_INCLUDE_RUT=true`, `VITE_INCLUDE_SAMUEL=true`, `VITE_INCLUDE_DAVID=true`, `VITE_INCLUDE_SALOMO=true`, `VITE_INCLUDE_ELISA=true`, the hidden test build) does not show it to everybody: it shows only
+ * on a device that has been unlocked once by opening the app with the unlock link (`/?noah=<code>`, `/?adam=<code>`, `/?babel=<code>`, `/?abraham=<code>`, `/?jakob=<code>`, `/?josua=<code>`, `/?gideon=<code>`, `/?mose=<code>`, `/?jona=<code>`, `/?daniel=<code>`, `/?elia=<code>`, `/?rut=<code>`, `/?samuel=<code>`, `/?david=<code>`, `/?salomo=<code>`, `/?elisa=<code>`); the unlock is
+ * kept on the device (`localStorage`), `?noah=off` / `?adam=off` / `?babel=off` / `?abraham=off` / `?jakob=off` / `?josua=off` / `?gideon=off` / `?mose=off` / `?jona=off` / `?daniel=off` / `?elia=off` / `?rut=off` / `?samuel=off` / `?david=off` / `?salomo=off` / `?elisa=off` takes it away again. `VITE_SHOW_NOAH=true` / `VITE_SHOW_ADAM=true` /
  * `VITE_SHOW_BABEL=true` / `VITE_SHOW_ABRAHAM=true` / `VITE_SHOW_JAKOB=true` / `VITE_SHOW_JOSUA=true` / `VITE_SHOW_GIDEON=true` / `VITE_SHOW_MOSE=true` (local `vite --mode noah` / `--mode adam` / `--mode babel` / `--mode abraham` / `--mode jakob`) shows it always.
  * A normal build contains none of it: the conditions below are constants there, so the chunk with the data of the journey is left out (and the
  * folders of its pictures and recordings are taken out of the build, see `vite.config.noah.ts`). Only data of our own server is loaded, never
@@ -58,6 +58,8 @@ export const DAVID_PREVIEW_KEY = 'lk-preview-david'
 export const DAVID_UNLOCK_CODE = 'david-vorschau-b8m3'
 export const SALOMO_PREVIEW_KEY = 'lk-preview-salomo'
 export const SALOMO_UNLOCK_CODE = 'salomo-vorschau-c5q8'
+export const ELISA_PREVIEW_KEY = 'lk-preview-elisa'
+export const ELISA_UNLOCK_CODE = 'elisa-vorschau-n6v4'
 
 /** A journey that is shown only on unlocked devices: the name of its link (`?<param>=<code>`), where the unlock is kept, and how it is loaded. */
 interface PreviewJourney {
@@ -214,6 +216,16 @@ function previewJourneys(): PreviewJourney[] {
       key: SALOMO_PREVIEW_KEY,
       always: import.meta.env.VITE_SHOW_SALOMO === 'true',
       load: async () => (await import('@/data/adventures/salomo')).salomo
+    })
+  }
+  if (import.meta.env.VITE_INCLUDE_ELISA === 'true' || import.meta.env.VITE_SHOW_ELISA === 'true') {
+    list.push({
+      id: 'elisa',
+      param: 'elisa',
+      code: ELISA_UNLOCK_CODE,
+      key: ELISA_PREVIEW_KEY,
+      always: import.meta.env.VITE_SHOW_ELISA === 'true',
+      load: async () => (await import('@/data/adventures/elisa')).elisa
     })
   }
   if (import.meta.env.VITE_INCLUDE_NOAH === 'true' || import.meta.env.VITE_SHOW_NOAH === 'true') {

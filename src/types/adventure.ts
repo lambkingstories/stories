@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen'
 
 export interface AdventureQuestion {
   q: string
@@ -1811,6 +1811,8 @@ export interface StageTask {
   hem?: HemGame
   quiet?: QuietGame
   throne?: ThroneGame
+  jars?: JarGame
+  dive?: DiveGame
 }
 
 /** One reaper of the gleaning game: the lane he cuts along (index into `GleanGame.lanes`), when he starts (ms after the lead), how long he needs to cross the picture, his picture (index into `GleanGame.reapers`) and the places (percent of the picture width) of the clumps of barley that stand in his lane. */
@@ -2275,6 +2277,52 @@ export interface ThroneGame {
   lion: string
   lionW: number
   rounds: ThroneRound[]
+}
+
+/** One jar of the game "Fill the jars": the middle of its foot (percent of the picture), its width, which picture it uses and how long it takes to fill (ms). */
+export interface JarSlot {
+  x: number
+  y: number
+  w: number
+  sprite: number
+  ms: number
+}
+/** One round: the jars that stand in a row on the ground. */
+export interface JarRound {
+  hint: string
+  jars: JarSlot[]
+}
+/** The game "Fill the jars": the widow's oil does not stop; the child moves the oil jug over the jars one after the other. A jar that is already full and still gets oil spills over (a mistake). */
+export interface JarGame {
+  /** The courtyard (4:3). */
+  background: string
+  /** The pictures of the empty jars (taken by `JarSlot.sprite`). */
+  jars: string[]
+  /** The oil jug, its width (percent of the picture width) and where it hangs at the start (the middle of the jug, percent of the picture). */
+  jug: string
+  jugW: number
+  jugStart: { x: number; y: number }
+  rounds: JarRound[]
+}
+
+/** The game "Dip seven times": Naaman stands in the Jordan; the child taps when the water is calm and he dips; seven dips make him well. */
+export interface DiveGame {
+  /** The river (4:3). */
+  background: string
+  /** Naaman standing in the water (cut off at the hips), and the same man healthy with raised arms; both picture files have the same size and place. */
+  naaman: string
+  naamanNew: string
+  /** The ring of water that spreads after every dip. */
+  ripple: string
+  /** The middle of the bottom edge of Naaman's picture and its width (percent of the picture). */
+  pos: { x: number; y: number; w: number }
+  /** The middle and the width of the ring on the water. */
+  ripplePos: { x: number; y: number; w: number }
+  /** How many dips (seven), how long he stays under water and how long the water needs to calm down (ms). */
+  dips: number
+  underMs: number
+  calmMs: number
+  hint: string
 }
 
 export interface AdventureStage {

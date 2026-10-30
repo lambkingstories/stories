@@ -889,3 +889,53 @@ describe('the hidden journey Salomo (id salomo)', () => {
     expect(m.journeys.filter((j) => j.id === 'salomo')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Elisa (id elisa)', () => {
+  it('a normal build (without Elisa) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_ELISA', 'false')
+    open('?elisa=elisa-vorschau-n6v4')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('elisa')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_ELISA', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?elisa=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.ELISA_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?elisa=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_ELISA', 'true')
+    const first = await load()
+    open(`?elisa=${first.ELISA_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.ELISA_UNLOCK_CODE).toBe('elisa-vorschau-n6v4')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'elisa'])
+    expect(localStorage.getItem('lk-preview-elisa')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('elisa')?.stages.length).toBe(9)
+    open('?elisa=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-elisa')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_ELISA) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_ELISA', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'elisa')).toHaveLength(1)
+  })
+})

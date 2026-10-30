@@ -147,3 +147,11 @@ export const SALOMO_ONLY_DIRS = ['images/abenteuer/salomo', 'images/abenteuer/sp
 export function stripSalomoFiles(outDir: string) {
   strip(outDir, SALOMO_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Elisha" (id `elisa`) alone, in the same three places as Adam and Eva. */
+export const ELISA_ONLY_DIRS = ['images/abenteuer/elisa', 'images/abenteuer/spiele/elisa', 'audio/abenteuer/elisa']
+
+/** Takes the folders of Elisha out of a finished build. */
+export function stripElisaFiles(outDir: string) {
+  strip(outDir, ELISA_ONLY_DIRS)
+}

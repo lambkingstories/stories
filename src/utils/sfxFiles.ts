@@ -70,7 +70,7 @@ const GAME_MOOD: Record<string, Mood> = {
   ravens: 'ruhig', caves: 'ruhig', rain: 'ruhig', whisper: 'ruhig',
   glean: 'mittel', measure: 'ruhig', elders: 'mittel', cradle: 'ruhig',
   coat: 'ruhig', cows: 'mittel', stone: 'ruhig', search: 'ruhig', baggage: 'mittel', gather: 'mittel',
-  harp: 'ruhig', shepherd: 'ruhig', pebbles: 'ruhig', sling: 'mittel', arrow: 'mittel', hem: 'ruhig', quiet: 'ruhig', throne: 'ruhig',
+  harp: 'ruhig', shepherd: 'ruhig', pebbles: 'ruhig', sling: 'mittel', arrow: 'mittel', hem: 'ruhig', quiet: 'ruhig', throne: 'ruhig', jars: 'ruhig', dive: 'ruhig',
   puzzle: 'mittel', sort: 'mittel', harvest: 'mittel', build: 'mittel', way: 'mittel',
   fly: 'lebhaft', dots: 'lebhaft'
 }
