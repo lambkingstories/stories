@@ -163,3 +163,11 @@ export const ESTER_ONLY_DIRS = ['images/abenteuer/ester', 'images/abenteuer/spie
 export function stripEsterFiles(outDir: string) {
   strip(outDir, ESTER_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Nehemiah" (id `nehemia`) alone, in the same three places as Adam and Eve. */
+export const NEHEMIA_ONLY_DIRS = ['images/abenteuer/nehemia', 'images/abenteuer/spiele/nehemia', 'audio/abenteuer/nehemia']
+
+/** Takes the folders of Nehemiah out of a finished build. */
+export function stripNehemiaFiles(outDir: string) {
+  strip(outDir, NEHEMIA_ONLY_DIRS)
+}

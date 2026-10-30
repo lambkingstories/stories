@@ -989,3 +989,53 @@ describe('the hidden journey Esther (id ester)', () => {
     expect(m.journeys.filter((j) => j.id === 'ester')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Nehemiah (id nehemia)', () => {
+  it('a normal build (without Nehemiah) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_NEHEMIA', 'false')
+    open('?nehemia=nehemia-vorschau-d3p7')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('nehemia')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_NEHEMIA', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?nehemia=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.NEHEMIA_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?nehemia=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_NEHEMIA', 'true')
+    const first = await load()
+    open(`?nehemia=${first.NEHEMIA_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.NEHEMIA_UNLOCK_CODE).toBe('nehemia-vorschau-d3p7')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'nehemia'])
+    expect(localStorage.getItem('lk-preview-nehemia')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('nehemia')?.stages.length).toBe(9)
+    open('?nehemia=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-nehemia')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_NEHEMIA) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_NEHEMIA', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'nehemia')).toHaveLength(1)
+  })
+})

@@ -62,6 +62,8 @@ export const ELISA_PREVIEW_KEY = 'lk-preview-elisa'
 export const ELISA_UNLOCK_CODE = 'elisa-vorschau-n6v4'
 export const ESTER_PREVIEW_KEY = 'lk-preview-ester'
 export const ESTER_UNLOCK_CODE = 'ester-vorschau-k5w9'
+export const NEHEMIA_PREVIEW_KEY = 'lk-preview-nehemia'
+export const NEHEMIA_UNLOCK_CODE = 'nehemia-vorschau-d3p7'
 
 /** A journey that is shown only on unlocked devices: the name of its link (`?<param>=<code>`), where the unlock is kept, and how it is loaded. */
 interface PreviewJourney {
@@ -238,6 +240,16 @@ function previewJourneys(): PreviewJourney[] {
       key: ESTER_PREVIEW_KEY,
       always: import.meta.env.VITE_SHOW_ESTER === 'true',
       load: async () => (await import('@/data/adventures/ester')).ester
+    })
+  }
+  if (import.meta.env.VITE_INCLUDE_NEHEMIA === 'true' || import.meta.env.VITE_SHOW_NEHEMIA === 'true') {
+    list.push({
+      id: 'nehemia',
+      param: 'nehemia',
+      code: NEHEMIA_UNLOCK_CODE,
+      key: NEHEMIA_PREVIEW_KEY,
+      always: import.meta.env.VITE_SHOW_NEHEMIA === 'true',
+      load: async () => (await import('@/data/adventures/nehemia')).nehemia
     })
   }
   if (import.meta.env.VITE_INCLUDE_NOAH === 'true' || import.meta.env.VITE_SHOW_NOAH === 'true') {

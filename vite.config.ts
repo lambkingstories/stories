@@ -1,4 +1,4 @@
-import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripDavidFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles } from './vite.config.noah'
+import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripDavidFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles } from './vite.config.noah'
 import { fileURLToPath, URL } from 'node:url'
 import { resolve, dirname } from 'node:path'
 import { rmSync } from 'node:fs'
@@ -126,6 +126,10 @@ export default defineConfig(({ mode }) => {
       // The same for "Ester" (`VITE_INCLUDE_ESTER=true` / `vite --mode ester`).
       if (env.VITE_SHOW_ESTER !== 'true' && env.VITE_INCLUDE_ESTER !== 'true') {
         stripEsterFiles(outDir)
+      }
+      // The same for "Nehemia" (`VITE_INCLUDE_NEHEMIA=true` / `vite --mode ester`).
+      if (env.VITE_SHOW_NEHEMIA !== 'true' && env.VITE_INCLUDE_NEHEMIA !== 'true') {
+        stripNehemiaFiles(outDir)
       }
     }
   }

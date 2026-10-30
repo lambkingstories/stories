@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune'
 
 export interface AdventureQuestion {
   q: string
@@ -1815,6 +1815,8 @@ export interface StageTask {
   dive?: DiveGame
   decor?: DecorGame
   honor?: HonorGame
+  ride?: RideGame
+  post?: PostGame
 }
 
 /** One reaper of the gleaning game: the lane he cuts along (index into `GleanGame.lanes`), when he starts (ms after the lead), how long he needs to cross the picture, his picture (index into `GleanGame.reapers`) and the places (percent of the picture width) of the clumps of barley that stand in his lane. */
@@ -2372,6 +2374,58 @@ export interface HonorGame {
   background: string
   parade: string
   rounds: HonorRound[]
+}
+
+/** One place on the map of the night ride: its name (shown under it), the middle (percent of the picture) and the width of its ring. */
+export interface RideSpot {
+  id: string
+  label: string
+  x: number
+  y: number
+  w: number
+}
+/** One round of the night ride: the places in the order of the text, and whether the list of the places is shown above the picture. */
+export interface RideRound {
+  hint: string
+  order: string[]
+  showList: boolean
+}
+/** The game "The ride by night": Nehemiah rides around the broken wall; the child taps the five places in the order of the text. */
+export interface RideGame {
+  /** The night picture of the city (4:3). */
+  background: string
+  /** Nehemiah on the donkey (a picture), its width (percent of the picture) and where the ride starts (the middle of its feet, percent). */
+  rider: string
+  riderW: number
+  start: { x: number; y: number }
+  spots: RideSpot[]
+  rounds: RideRound[]
+}
+
+/** A builder of the game "The trumpet calls": the middle of his feet (percent of the picture) and, when it differs from the others, his width. */
+export interface PostWorker {
+  x: number
+  y: number
+  w?: number
+}
+/** One round: where the trumpeter stands and where the builders stand. */
+export interface PostRound {
+  hint: string
+  horn: { x: number; y: number }
+  workers: PostWorker[]
+}
+/** The game "The trumpet calls": the builders stand far apart along the wall; the child taps each one and he walks to the trumpeter. */
+export interface PostGame {
+  /** The wall (4:3). */
+  background: string
+  /** The pictures of the builders (they are used in turn), their usual width (percent). */
+  workers: string[]
+  workerW: number
+  /** Nehemiah with the trumpeter (a picture) and its width, and the golden arcs of the sound. */
+  horn: string
+  hornW: number
+  wave: string
+  rounds: PostRound[]
 }
 
 export interface AdventureStage {
