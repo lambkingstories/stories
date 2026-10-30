@@ -25,8 +25,6 @@ function routeToNav(name: string): AppNavId {
     || name === 'app-books'
     || name === 'app-book-preview'
     || name === 'app-coloring-books'
-    || name === 'app-reach-kids'
-    || name === 'app-reach-kids-book'
     || name === 'app-all-books'
     || name === 'app-book'
     || name === 'app-series'

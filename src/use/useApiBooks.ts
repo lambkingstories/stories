@@ -12,7 +12,6 @@ import useBookCache from '@/use/useBookCache'
 import type { ApiBook } from '@/types/apiBook'
 import { localColoringBooks, localColoringBooksMissingFrom } from '@/data/localColoringBooks'
 import { isHiddenBook, isHiddenBookOrSeries } from '@/data/hiddenBooks'
-import { reachBooks } from '@/data/reachColoringBook'
 
 const state = reactive<{
   byId: Record<string, ApiBook>
@@ -53,10 +52,9 @@ async function refreshBookInBackground(bookId: string): Promise<void> {
 }
 
 /**
- * Books that ship inside the app: the test books of a test build (see `localColoringBooks`) and the books of REACH Kids (in every
- * build); they never touch the cache or the network.
+ * Books that ship inside the app: the test books of a test build (see `localColoringBooks`); they never touch the cache or the network.
  */
-const localBookById = (id: string): ApiBook | undefined => [...localColoringBooks(), ...reachBooks()].find((b) => b.bookId === id)
+const localBookById = (id: string): ApiBook | undefined => localColoringBooks().find((b) => b.bookId === id)
 
 /** A book that is hidden (itself or by its series) is not delivered, also not from the copy kept on the device. */
 async function loadBook(bookId: string): Promise<ApiBook | null> {
@@ -104,13 +102,12 @@ async function loadAllBooks(): Promise<ApiBook[]> {
   state.listLoading = true
   // the books that ship with the app are there at once, while the backend is still answering (it may be asleep and slow)
   if (!state.all) {
-    const own = [...localColoringBooks(), ...reachBooks()]
+    const own = localColoringBooks()
     if (own.length) state.all = own
   }
   try {
     const remote = (await booksApi.list()).filter((b) => !isHiddenBookOrSeries(b))
-    const ownReach = reachBooks().filter((b) => !remote.some((r) => r.bookId === b.bookId))
-    const books = [...remote, ...localColoringBooksMissingFrom(remote), ...ownReach]
+    const books = [...remote, ...localColoringBooksMissingFrom(remote)]
     state.all = books
     for (const b of books) {
       // a slim entry (no story text) never replaces a whole book that is already known, and is not kept for offline use:
@@ -123,7 +120,7 @@ async function loadAllBooks(): Promise<ApiBook[]> {
   } catch (err) {
     state.error = (err as Error).message
     // offline: the books that ship with the app are still there
-    if (!state.all) state.all = [...localColoringBooks(), ...reachBooks()]
+    if (!state.all) state.all = localColoringBooks()
     return state.all ?? []
   } finally {
     state.listLoading = false

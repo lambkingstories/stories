@@ -43,7 +43,7 @@ const motion = ref<Motion>('nav-fade')
 
 const DEPTH: Record<string, number> = {
   'app-main': 0, 'app-read': 0, 'app-hoeren': 0, 'app-adventure': 0, 'app-profile': 0, 'app-coloring': 0,
-  'app-books': 1, 'app-coloring-books': 1, 'app-reach-kids': 1, 'app-reach-kids-book': 2, 'app-book-preview': 2, 'app-all-books': 1, 'app-all-new-books': 1, 'app-category': 1, 'app-awards': 1,
+  'app-books': 1, 'app-coloring-books': 1, 'app-book-preview': 2, 'app-all-books': 1, 'app-all-new-books': 1, 'app-category': 1, 'app-awards': 1,
   'app-legal': 1, 'app-adventure-map': 1, 'app-coloring-book': 1,
   'app-series': 2, 'app-book': 2, 'app-adventure-stage': 2, 'app-adventure-stats': 2,
   'app-reader': 3
@@ -137,7 +137,6 @@ const NAV_ROUTES = new Set([
   'app-read',
   'app-books',
   'app-coloring-books',
-  'app-reach-kids',
   'app-all-books',
   'app-all-new-books',
   'app-series',

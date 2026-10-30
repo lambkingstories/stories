@@ -973,24 +973,8 @@ export default {
         auto: 'Automatic',
         hint: 'Night is easier on the eyes in the evening.'
       },
-      reach: {
-        title: 'Reach Kids',
-        sub: 'Children\'s Bible circle',
-        pages: '{n} pages to read and listen to',
-        open: 'Open the book',
-        pageOf: 'Page {n} of {total}',
-        turn: 'Turn the page',
-        prev: 'Previous page',
-        next: 'Next page',
-        close: 'Close the book',
-        coloringSeries: 'Coloring book',
-        coloringPages: '{n} pictures to paint',
-        germanOnly: 'These books are in German.'
-      },
       read: {
         back: 'Back',
-        reachTitle: 'Reach Kids',
-        reachSub: 'Children\'s Bible circle',
         preview: 'Preview',
         previewTitle: 'A look inside the book',
         previewCount: '{n} / {total}',
@@ -1077,10 +1061,6 @@ export default {
         newTitle: 'New for you',
         seeAll: 'Show all',
         slide3Button: 'To our shop',
-        reachIntro: 'We are looking forward to the partnership with',
-        reachTitle: 'Reach Kids Ministries',
-        reachText: 'Reach Kids Ministries proclaims the gospel and helps people through practical love for our neighbour and Christian children’s work.',
-        reachButton: 'To the REACH website',
         sponsorsTitle: 'Our sponsors',
         sponsorsText: 'Thank you to everyone who makes LambKing possible.'
       },
@@ -2510,24 +2490,8 @@ export default {
         auto: 'Automatisch',
         hint: 'Am Abend ist der Nachtmodus angenehmer für die Augen.'
       },
-      reach: {
-        title: 'Reach Kids',
-        sub: 'Kinderbibelkreis',
-        pages: '{n} Seiten zum Lesen und Hören',
-        open: 'Buch öffnen',
-        pageOf: 'Seite {n} von {total}',
-        turn: 'Seite umblättern',
-        prev: 'Seite zurück',
-        next: 'Nächste Seite',
-        close: 'Buch schließen',
-        coloringSeries: 'Ausmalbuch',
-        coloringPages: '{n} Bilder zum Ausmalen',
-        germanOnly: 'Diese Bücher gibt es auf Deutsch.'
-      },
       read: {
         back: 'Zurück',
-        reachTitle: 'Reach Kids',
-        reachSub: 'Kinderbibelkreis',
         preview: 'Vorschau',
         previewTitle: 'Ein Blick ins Buch',
         previewCount: '{n} / {total}',
@@ -2614,10 +2578,6 @@ export default {
         newTitle: 'Neu für dich',
         seeAll: 'Alle anzeigen',
         slide3Button: 'Zum LambKing-Shop',
-        reachIntro: 'Wir freuen uns auf die Partnerschaft mit',
-        reachTitle: 'Reach Kids Ministries',
-        reachText: 'Reach Kids Ministries verkündet das Evangelium und hilft Menschen durch praktische Nächstenliebe und christliche Kinderarbeit.',
-        reachButton: 'Zur REACH-Webseite',
         sponsorsTitle: 'Unsere Sponsoren',
         sponsorsText: 'Danke an alle, die LambKing möglich machen.'
       },

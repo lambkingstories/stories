@@ -54,11 +54,10 @@ describe('start page extras', () => {
     const wrapper = mount(Home, { global: { plugins: [i18n], stubs: { RouterLink: true } }, attachTo: document.body })
     await flushPromises()
     const slides = wrapper.findAll('.hero-slide')
-    expect(slides).toHaveLength(5)
-    // the sponsors come after the shop, then asking for support; the partnership with REACH Ministries is the last slide
+    expect(slides).toHaveLength(4)
+    // the sponsors come after the shop, then asking for support
     expect(slides[2]!.text()).toContain('Unsere Sponsoren')
     expect(slides[2]!.text()).toContain('Beispiel GmbH')
     expect(slides[3]!.text()).toContain('Unterstütze unsere Mission')
-    expect(slides[4]!.text()).toContain('Reach Kids Ministries')
   })
 })

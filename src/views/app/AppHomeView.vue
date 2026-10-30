@@ -21,7 +21,6 @@ import useModels from '@/use/useModels'
 import useApiBooks from '@/use/useApiBooks'
 import useReadingProgress from '@/use/useReadingProgress'
 import useAdventure from '@/use/useAdventure'
-import useReachKids from '@/use/useReachKids'
 import { listArtworks, type ArtworkMeta } from '@/use/useArtworks'
 import { journeys } from '@/data/adventures'
 import { sponsors } from '@/data/sponsors'
@@ -40,12 +39,8 @@ const { lastReadId } = useModels()
 const apiBooks = useApiBooks()
 const { getPct } = useReadingProgress()
 const adventure = useAdventure()
-// the fourth slide (REACH Kids) is there while it is switched on in the backend (see useReachKids)
-const { active: reachOn } = useReachKids()
 
 const STORE_URL = 'https://lambking.store'
-// the partner of the children's work: REACH Ministries Trossingen (the fourth slide)
-const REACH_URL = 'https://www.reach-ministries.de/copy-of-reach-street'
 
 const lang = computed<Locale>(() => (locale.value === 'en' ? 'en' : 'de'))
 const allBooks = computed<ApiBook[]>(() => (apiBooks.state.all ?? []) as ApiBook[])
@@ -80,17 +75,11 @@ const slides = computed(() => {
     list.push({ id: 'sponsors', image: prependBaseUrl('images/bg/welcome-bg-1.webp'), title: t('app.home.sponsorsTitle'), text: t('app.home.sponsorsText') })
   }
   list.push({ id: 'support', image: prependBaseUrl('images/bg/welcome-bg-2.webp'), title: t('app.main.welcomeTitle1'), text: t('app.home.supportText') })
-  // the fourth slide: the crest of REACH Kids and the partnership with REACH Ministries (only while REACH Kids is switched on)
-  if (reachOn.value) list.push({ id: 'reach', image: prependBaseUrl('images/reach-kids/wappen-slide.webp'), eyebrow: t('app.home.reachIntro'), title: t('app.home.reachTitle'), text: t('app.home.reachText') })
   return list
 })
 
 function openSponsor(url?: string) {
   if (url) void openExternal(url)
-}
-
-function openReach() {
-  void openExternal(REACH_URL)
 }
 
 function openStore() {
@@ -219,9 +208,6 @@ function openBook(bookId: string) {
                 KoFiButton(href="https://ko-fi.com/U6U21YO0Z5" tone="kofi" label="Ko-fi")
               //- a normal bank transfer: only there when the account is filled in (data/donation.ts)
               BankTransfer
-          button(v-else-if="id === 'reach'" type="button" class="lk-btn hero-shop" @click="openReach")
-            span(class="hero-shop-label") {{ t('app.home.reachButton') }}
-            ZIconography(name="chevron-right" :size="22")
           button(v-else-if="id === 'shop'" type="button" class="lk-btn hero-shop" @click="openStore")
             ZIconography(name="shop" :size="24")
             span(class="hero-shop-label") {{ t('app.home.slide3Button') }}

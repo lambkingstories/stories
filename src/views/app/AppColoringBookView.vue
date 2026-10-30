@@ -22,7 +22,6 @@ import { allowedPages, freePageCount } from '@/use/useBookAccess'
 import usePremium from '@/use/usePremium'
 import { pickLocalizedImage } from '@/types/apiBook'
 import { openExternal } from '@/utils/openExternal'
-import { readingAreaOf } from '@/utils/readingAreas'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
@@ -186,16 +185,13 @@ async function resetPage() {
   await refreshWorks()
 }
 
-/** A book of REACH Kids is opened from "Lesen → Reach Kids" and goes back there. */
-const ofReach = ref(false)
-
 function back() {
   // opened from the list of coloring books: one step back leads to the list again
   if (previousPath()?.startsWith('/app/coloring-books')) {
     router.back()
     return
   }
-  goBackTo(router, { name: ofReach.value ? 'app-reach-kids' : 'app-coloring' })
+  goBackTo(router, { name: 'app-coloring' })
 }
 
 // ── Start ---------------------------------------------------------------------------------
@@ -213,7 +209,6 @@ async function start() {
     const loc = book.localizations as Record<string, { title?: string } | null | undefined>
     title.value = (loc[locale.value]?.title || loc.de?.title || bookId.value).replace(/^Buch\s*\d+\s*[–-]\s*/i, '')
     pages.value = list
-    ofReach.value = readingAreaOf(book as ApiBook) === 'reach'
     ownFree.value = (book as ApiBook).freePages ?? null
     shopLink.value = pickLocalizedImage((book as ApiBook).etsyLink, locale.value === 'en' ? 'en' : 'de')
     printedLink.value = (book as ApiBook).etsyLink?.[locale.value === 'en' ? 'en' : 'de'] ?? ''
