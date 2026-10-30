@@ -22,7 +22,8 @@ import { salomo } from '@/data/adventures/salomo'
 import { elisa } from '@/data/adventures/elisa'
 import { ester } from '@/data/adventures/ester'
 import { nehemia } from '@/data/adventures/nehemia'
-import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, GIDEON_ONLY_DIRS, JAKOB_ONLY_DIRS, JONA_ONLY_DIRS, JOSUA_ONLY_DIRS, MOSE_ONLY_DIRS, NOAH_ONLY_DIRS, RUT_ONLY_DIRS, SAMUEL_ONLY_DIRS, DAVID_ONLY_DIRS, SALOMO_ONLY_DIRS, ELISA_ONLY_DIRS, ESTER_ONLY_DIRS, NEHEMIA_ONLY_DIRS, DAVID_ONLY_DIRS, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripDavidFiles } from '../vite.config.noah'
+import { propheten } from '@/data/adventures/propheten'
+import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, GIDEON_ONLY_DIRS, JAKOB_ONLY_DIRS, JONA_ONLY_DIRS, JOSUA_ONLY_DIRS, MOSE_ONLY_DIRS, NOAH_ONLY_DIRS, RUT_ONLY_DIRS, SAMUEL_ONLY_DIRS, DAVID_ONLY_DIRS, SALOMO_ONLY_DIRS, ELISA_ONLY_DIRS, ESTER_ONLY_DIRS, NEHEMIA_ONLY_DIRS, PROPHETEN_ONLY_DIRS, DAVID_ONLY_DIRS, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripDavidFiles } from '../vite.config.noah'
 
 const inNoahDir = (f: string) => NOAH_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
 
@@ -814,6 +815,49 @@ describe('a build without Nehemiah ships nothing of it', () => {
       for (const f of esterFiles) expect(existsSync(join(out, f)), f).toBe(false)
       for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
       expect(() => stripNehemiaFiles(out)).not.toThrow()
+    } finally {
+      rmSync(out, { recursive: true, force: true })
+    }
+  })
+})
+
+const inProphetenDir = (f: string) => PROPHETEN_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
+
+describe('a build without Propheten ships nothing of it', () => {
+  it('every file that only Propheten uses lies in a folder that the normal build removes', () => {
+    const others = new Set([...journeys, noah, adamEva, babel, abraham, jakob, josua, gideon, mose, jona, daniel, elia, rut, samuel, david, salomo, elisa, ester, nehemia].flatMap((j) => journeyFiles(j)))
+    const app = /^audio\/abenteuer\/(klang|musik)-/
+    const only = journeyFiles(propheten).filter((f) => !others.has(f) && !app.test(f))
+    const leaks = only.filter((f) => !inProphetenDir(f))
+    expect(leaks, `files of Propheten outside the folders that are removed: ${leaks.join(', ')}`).toEqual([])
+  })
+
+  it('the folders of Propheten are only the three places that belong to it, none is on the lists of the others, and no folder with "propheten" in its name is missing', () => {
+    expect([...PROPHETEN_ONLY_DIRS].sort()).toEqual(['audio/abenteuer/propheten', 'images/abenteuer/propheten', 'images/abenteuer/spiele/propheten'])
+    for (const d of PROPHETEN_ONLY_DIRS) {
+      for (const list of [NOAH_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, ABRAHAM_ONLY_DIRS, JAKOB_ONLY_DIRS, JOSUA_ONLY_DIRS, GIDEON_ONLY_DIRS, MOSE_ONLY_DIRS, JONA_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, RUT_ONLY_DIRS, SAMUEL_ONLY_DIRS, DAVID_ONLY_DIRS, SALOMO_ONLY_DIRS, ELISA_ONLY_DIRS, ESTER_ONLY_DIRS, NEHEMIA_ONLY_DIRS]) expect(list).not.toContain(d)
+    }
+    const found: string[] = []
+    for (const base of ['public/images/abenteuer', 'public/audio/abenteuer', 'public/images/abenteuer/spiele']) {
+      for (const n of readdirSync(base)) if (/propheten/i.test(n) && !n.includes('.')) found.push(`${base.replace('public/', '')}/${n}`)
+    }
+    for (const d of found) expect(PROPHETEN_ONLY_DIRS, d).toContain(d)
+    for (const j of [...journeys, noah, adamEva, babel, abraham, jakob, josua, gideon, mose, jona, daniel, elia, rut, samuel, david, salomo, elisa, ester, nehemia]) for (const f of journeyFiles(j)) expect(inProphetenDir(f), `${j.id}: ${f}`).toBe(false)
+  })
+
+  it('removing takes the folders of Propheten out of a build and leaves everything else (the other journeys, the sounds)', () => {
+    const out = mkdtempSync(join(tmpdir(), 'lk-build-propheten-'))
+    try {
+      const nehemiaFiles = ['audio/abenteuer/propheten/geschichte-01-v1.mp3', 'images/abenteuer/propheten/etappe-bild-01.webp', 'images/abenteuer/spiele/propheten/friede/wiese.webp']
+      const keep = ['images/abenteuer/josef/etappe-01.webp', 'audio/abenteuer/samuel/geschichte-01-v1.mp3', 'images/abenteuer/nehemia/etappe-bild-01.webp', 'images/abenteuer/spiele/nehemia/ritt/karte.webp', 'audio/abenteuer/klang-stern.mp3']
+      for (const f of [...nehemiaFiles, ...keep]) {
+        mkdirSync(join(out, f, '..'), { recursive: true })
+        writeFileSync(join(out, f), 'x')
+      }
+      stripProphetenFiles(out)
+      for (const f of nehemiaFiles) expect(existsSync(join(out, f)), f).toBe(false)
+      for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
+      expect(() => stripProphetenFiles(out)).not.toThrow()
     } finally {
       rmSync(out, { recursive: true, force: true })
     }

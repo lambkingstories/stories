@@ -1039,3 +1039,53 @@ describe('the hidden journey Nehemiah (id nehemia)', () => {
     expect(m.journeys.filter((j) => j.id === 'nehemia')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Propheten (id propheten)', () => {
+  it('a normal build (without Propheten) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_PROPHETEN', 'false')
+    open('?propheten=propheten-vorschau-t8m5')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('propheten')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_PROPHETEN', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?propheten=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.PROPHETEN_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?propheten=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_PROPHETEN', 'true')
+    const first = await load()
+    open(`?propheten=${first.PROPHETEN_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.PROPHETEN_UNLOCK_CODE).toBe('propheten-vorschau-t8m5')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'propheten'])
+    expect(localStorage.getItem('lk-preview-propheten')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('propheten')?.stages.length).toBe(9)
+    open('?propheten=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-propheten')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_PROPHETEN) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_PROPHETEN', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'propheten')).toHaveLength(1)
+  })
+})

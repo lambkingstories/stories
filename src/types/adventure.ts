@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden'
 
 export interface AdventureQuestion {
   q: string
@@ -1817,6 +1817,8 @@ export interface StageTask {
   honor?: HonorGame
   ride?: RideGame
   post?: PostGame
+  peace?: PeaceGame
+  forge?: ForgeGame
 }
 
 /** One reaper of the gleaning game: the lane he cuts along (index into `GleanGame.lanes`), when he starts (ms after the lead), how long he needs to cross the picture, his picture (index into `GleanGame.reapers`) and the places (percent of the picture width) of the clumps of barley that stand in his lane. */
@@ -2426,6 +2428,69 @@ export interface PostGame {
   hornW: number
   wave: string
   rounds: PostRound[]
+}
+
+/** One animal of the game "Peace among the animals": its picture, its name and its width (percent of the picture). */
+export interface PeaceAnimal {
+  id: string
+  image: string
+  label: string
+  w: number
+}
+/** One pair of the text: the animal that is dangerous (the predator) and the one that lives safely beside it (the prey). */
+export interface PeacePair {
+  predator: string
+  prey: string
+}
+/** One round of the game: the order of the prey on the strip below (from left to right) and whether the list of the pairs is shown above the picture. */
+export interface PeaceRound {
+  hint: string
+  showList: boolean
+  preyOrder: string[]
+}
+/** The game "Peace among the animals" (Isaiah 11,6-9): the child brings the animals together as the text says. */
+export interface PeaceGame {
+  /** The meadow (4:3). */
+  background: string
+  animals: PeaceAnimal[]
+  pairs: PeacePair[]
+  /** Where the predators stand, one place per pair (the middle of their feet, percent of the picture); the prey walks up beside them. */
+  spots: { x: number; y: number }[]
+  /** The height of the strip where the prey waits (percent). */
+  stripY: number
+  /** The little boy who comes in at the end, and his width (percent). */
+  boy: string
+  boyW: number
+  rounds: PeaceRound[]
+}
+
+/** One thing of the game "The forge": a weapon, a tool, the hammer or the glowing metal (a picture, its name and its width in percent). */
+export interface ForgeItem {
+  id: string
+  image: string
+  label: string
+  w: number
+}
+/** One round of the forge: the weapon on the anvil, the tool it becomes, the tools to choose from and the number of blows. */
+export interface ForgeRound {
+  hint: string
+  item: string
+  result: string
+  options: string[]
+  hits: number
+}
+/** The game "The forge" (Micah 4,3): the child beats a sword into a plowshare and a spear into a pruning hook. */
+export interface ForgeGame {
+  /** The smithy (4:3). */
+  background: string
+  items: ForgeItem[]
+  /** The id of the glowing metal and of the hammer among the items. */
+  hot: string
+  hammer: string
+  /** The middle of the foot of the anvil's top (percent) and the usual width of a thing on it (percent). */
+  anvil: { x: number; y: number }
+  itemW: number
+  rounds: ForgeRound[]
 }
 
 export interface AdventureStage {

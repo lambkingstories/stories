@@ -171,3 +171,11 @@ export const NEHEMIA_ONLY_DIRS = ['images/abenteuer/nehemia', 'images/abenteuer/
 export function stripNehemiaFiles(outDir: string) {
   strip(outDir, NEHEMIA_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Propheten" (id `propheten`) alone, in the same three places as Adam and Eve. */
+export const PROPHETEN_ONLY_DIRS = ['images/abenteuer/propheten', 'images/abenteuer/spiele/propheten', 'audio/abenteuer/propheten']
+
+/** Takes the folders of Propheten out of a finished build. */
+export function stripProphetenFiles(outDir: string) {
+  strip(outDir, PROPHETEN_ONLY_DIRS)
+}
