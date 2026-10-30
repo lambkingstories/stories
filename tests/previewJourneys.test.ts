@@ -939,3 +939,53 @@ describe('the hidden journey Elisa (id elisa)', () => {
     expect(m.journeys.filter((j) => j.id === 'elisa')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Esther (id ester)', () => {
+  it('a normal build (without Esther) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_ESTER', 'false')
+    open('?ester=ester-vorschau-k5w9')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('ester')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_ESTER', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?ester=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.ESTER_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?ester=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_ESTER', 'true')
+    const first = await load()
+    open(`?ester=${first.ESTER_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.ESTER_UNLOCK_CODE).toBe('ester-vorschau-k5w9')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'ester'])
+    expect(localStorage.getItem('lk-preview-ester')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('ester')?.stages.length).toBe(9)
+    open('?ester=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-ester')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_ESTER) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_ESTER', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'ester')).toHaveLength(1)
+  })
+})

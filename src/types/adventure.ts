@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren'
 
 export interface AdventureQuestion {
   q: string
@@ -1813,6 +1813,8 @@ export interface StageTask {
   throne?: ThroneGame
   jars?: JarGame
   dive?: DiveGame
+  decor?: DecorGame
+  honor?: HonorGame
 }
 
 /** One reaper of the gleaning game: the lane he cuts along (index into `GleanGame.lanes`), when he starts (ms after the lead), how long he needs to cross the picture, his picture (index into `GleanGame.reapers`) and the places (percent of the picture width) of the clumps of barley that stand in his lane. */
@@ -2323,6 +2325,53 @@ export interface DiveGame {
   underMs: number
   calmMs: number
   hint: string
+}
+
+/** One place on the picture of the game "Decorate the feast": the middle (percent of the picture) and the width. */
+export interface DecorSlot {
+  x: number
+  y: number
+  w: number
+}
+/** One thing that waits in the row: its picture and the design it has (two things with the same design are twins). */
+export interface DecorItem {
+  image: string
+  key: string
+}
+/** One round of "Decorate the feast". `order`: place i takes only the thing named in `want[i]`; `distinct`: every place takes any thing, but a design that is already on the table is refused. */
+export interface DecorRound {
+  hint: string
+  mode: 'order' | 'distinct'
+  slots: DecorSlot[]
+  items: DecorItem[]
+  want?: string[]
+  /** The width of the thing in the hand (percent of the picture). */
+  ghostW: number
+}
+/** The game "Decorate the feast": the garden court in Susa is decorated the way the text says (cloths on the pillars, the marble floor, the cups on the table). */
+export interface DecorGame {
+  /** The garden court (4:3). */
+  background: string
+  rounds: DecorRound[]
+}
+
+/** One choice of a round of "Honor the man": the picture, whether it is what Haman named, and a short name for the screen reader. */
+export interface HonorChoice {
+  image: string
+  right: boolean
+  label: string
+}
+/** One round: the king's man names one kind of thing (clothes, something for the head, an animal) and four things lie in a row. */
+export interface HonorRound {
+  hint: string
+  choices: HonorChoice[]
+}
+/** The game "Honor the man": in three rounds the child finds what Haman named (royal clothes, a crown, the king's horse); then the street shows Mordecai on the horse, led by Haman. */
+export interface HonorGame {
+  /** The street of Susa (4:3), and the picture of the finished parade (4:3). */
+  background: string
+  parade: string
+  rounds: HonorRound[]
 }
 
 export interface AdventureStage {

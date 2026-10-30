@@ -60,6 +60,8 @@ export const SALOMO_PREVIEW_KEY = 'lk-preview-salomo'
 export const SALOMO_UNLOCK_CODE = 'salomo-vorschau-c5q8'
 export const ELISA_PREVIEW_KEY = 'lk-preview-elisa'
 export const ELISA_UNLOCK_CODE = 'elisa-vorschau-n6v4'
+export const ESTER_PREVIEW_KEY = 'lk-preview-ester'
+export const ESTER_UNLOCK_CODE = 'ester-vorschau-k5w9'
 
 /** A journey that is shown only on unlocked devices: the name of its link (`?<param>=<code>`), where the unlock is kept, and how it is loaded. */
 interface PreviewJourney {
@@ -226,6 +228,16 @@ function previewJourneys(): PreviewJourney[] {
       key: ELISA_PREVIEW_KEY,
       always: import.meta.env.VITE_SHOW_ELISA === 'true',
       load: async () => (await import('@/data/adventures/elisa')).elisa
+    })
+  }
+  if (import.meta.env.VITE_INCLUDE_ESTER === 'true' || import.meta.env.VITE_SHOW_ESTER === 'true') {
+    list.push({
+      id: 'ester',
+      param: 'ester',
+      code: ESTER_UNLOCK_CODE,
+      key: ESTER_PREVIEW_KEY,
+      always: import.meta.env.VITE_SHOW_ESTER === 'true',
+      load: async () => (await import('@/data/adventures/ester')).ester
     })
   }
   if (import.meta.env.VITE_INCLUDE_NOAH === 'true' || import.meta.env.VITE_SHOW_NOAH === 'true') {

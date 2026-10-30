@@ -155,3 +155,11 @@ export const ELISA_ONLY_DIRS = ['images/abenteuer/elisa', 'images/abenteuer/spie
 export function stripElisaFiles(outDir: string) {
   strip(outDir, ELISA_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Esther" (id `ester`) alone, in the same three places as Adam and Eve. */
+export const ESTER_ONLY_DIRS = ['images/abenteuer/ester', 'images/abenteuer/spiele/ester', 'audio/abenteuer/ester']
+
+/** Takes the folders of Esther out of a finished build. */
+export function stripEsterFiles(outDir: string) {
+  strip(outDir, ESTER_ONLY_DIRS)
+}
