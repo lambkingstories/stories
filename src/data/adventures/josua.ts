@@ -168,25 +168,25 @@ export const josua: Journey = {
   medal: 'images/abenteuer/josua/medaille-wahl.webp', // Antons Wahl 31.10.2026: Entwurf 1
   // Geschenk-Ausmalbild: Die Posaunen von Jericho (sieben Priester mit Widderhörnern auf dem Weg zur Stadtmauer, Konturzeichnung)
   gift: { title: 'Die Posaunen von Jericho', image: `${PICS}geschenk.webp` },
-  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v3 mit zehn Orten und dem Ziel) mit Stationen und Perlenweg aus josuaPath.ts
+  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, erzählendes Panorama v4 (OpenAI-Bildmodell) mit zehn Orten und dem Ziel) mit Stationen und Perlenweg aus josuaPath.ts
   map: {
-    images: [1, 2, 3, 4].map((n) => `images/abenteuer/josua/karte-pano-v3-${n}.webp`),
+    images: [1, 2, 3, 4].map((n) => `images/abenteuer/josua/karte-pano-v4-${n}.webp`),
     ring: josef.map.ring,
     aspect: 9908 / 1648,
     widthPx: 9908,
     stages: [
-      { x: 0.0262, y: 0.2609, d: 0.0339 },
-      { x: 0.1574, y: 0.4612, d: 0.0339 },
-      { x: 0.2372, y: 0.534, d: 0.0339 },
-      { x: 0.3633, y: 0.267, d: 0.0339 },
-      { x: 0.4138, y: 0.5461, d: 0.0339 },
-      { x: 0.5117, y: 0.6007, d: 0.0339 },
-      { x: 0.5786, y: 0.3944, d: 0.0339 },
-      { x: 0.7216, y: 0.5825, d: 0.0339 },
-      { x: 0.8276, y: 0.534, d: 0.0339 },
-      { x: 0.9144, y: 0.625, d: 0.0339 }
+      { x: 0.1161, y: 0.6493, d: 0.0339 },
+      { x: 0.1736, y: 0.4794, d: 0.0339 },
+      { x: 0.2392, y: 0.6493, d: 0.0339 },
+      { x: 0.2927, y: 0.6493, d: 0.0339 },
+      { x: 0.4421, y: 0.6493, d: 0.0339 },
+      { x: 0.5773, y: 0.6493, d: 0.0339 },
+      { x: 0.6358, y: 0.5036, d: 0.0339 },
+      { x: 0.6914, y: 0.6493, d: 0.0339 },
+      { x: 0.7671, y: 0.7221, d: 0.0339 },
+      { x: 0.9164, y: 0.6493, d: 0.0339 }
     ],
-    exam: { x: 0.983, y: 0.3762, d: 0.0339 },
+    exam: { x: 0.983, y: 0.6189, d: 0.0339 },
     path: JOSUA_PATH
   },
   stages: [

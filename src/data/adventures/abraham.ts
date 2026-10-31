@@ -186,27 +186,27 @@ export const abraham: Journey = {
   medal: `${IMG}medaille-wahl.webp`, // Antons Wahl 31.10.2026: Entwurf 1
   // Geschenk-Ausmalbild: Abraham und Sara vor dem Zelt unter dem Sternenhimmel, mit Schafen, friedlich
   gift: { title: 'Abraham und Sara vor dem Zelt unter dem Sternenhimmel', image: `${IMG}geschenk.webp` },
-  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v3 mit zwölf Orten und dem Ziel) mit Stationen und Perlenweg aus abrahamPath.ts
+  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, erzählendes Panorama v4 (OpenAI-Bildmodell) mit zwölf Orten und dem Ziel) mit Stationen und Perlenweg aus abrahamPath.ts
   map: {
-    images: [1, 2, 3, 4].map((n) => `${IMG}karte-pano-v3-${n}.webp`),
+    images: [1, 2, 3, 4].map((n) => `${IMG}karte-pano-v4-${n}.webp`),
     ring: 'images/abenteuer/josef/medaillon-ring.webp',
     aspect: 9908 / 1648,
     widthPx: 9908,
     stages: [
-      { x: 0.0888, y: 0.2852, d: 0.0339 },
-      { x: 0.1574, y: 0.267, d: 0.0339 },
-      { x: 0.2422, y: 0.2306, d: 0.0339 },
-      { x: 0.3129, y: 0.5704, d: 0.0339 },
-      { x: 0.3835, y: 0.5461, d: 0.0339 },
-      { x: 0.4794, y: 0.6371, d: 0.0339 },
-      { x: 0.5339, y: 0.4794, d: 0.0339 },
-      { x: 0.5854, y: 0.2063, d: 0.0339 },
-      { x: 0.6762, y: 0.4612, d: 0.0339 },
-      { x: 0.757, y: 0.5461, d: 0.0339 },
-      { x: 0.8478, y: 0.625, d: 0.0339 },
-      { x: 0.9144, y: 0.6311, d: 0.0339 }
+      { x: 0.109, y: 0.6371, d: 0.0339 },
+      { x: 0.1756, y: 0.6129, d: 0.0339 },
+      { x: 0.2422, y: 0.6493, d: 0.0339 },
+      { x: 0.3078, y: 0.6432, d: 0.0339 },
+      { x: 0.3916, y: 0.6462, d: 0.0339 },
+      { x: 0.4542, y: 0.6493, d: 0.0339 },
+      { x: 0.545, y: 0.6129, d: 0.0339 },
+      { x: 0.6187, y: 0.6493, d: 0.0339 },
+      { x: 0.6863, y: 0.2427, d: 0.0339 },
+      { x: 0.7872, y: 0.6311, d: 0.0339 },
+      { x: 0.8528, y: 0.3155, d: 0.0339 },
+      { x: 0.9134, y: 0.6462, d: 0.0339 }
     ],
-    exam: { x: 0.983, y: 0.5461, d: 0.0339 },
+    exam: { x: 0.983, y: 0.6129, d: 0.0339 },
     path: ABRAHAM_PATH
   },
   stages: [

@@ -343,7 +343,7 @@ describe('Josua: the games, and the placeholders until the pictures come', () =>
 describe('Josua: die Karte', () => {
   const m = josua.map
   it('vier Stücke eines Bildes (eigene Karte v3), jedes unter 1,8 MB; zehn Stationen von links nach rechts plus Ziel, nicht zu tief; der Perlenweg hat eine Strecke je Station (die letzte führt zum Ziel)', () => {
-    expect(m.images).toEqual([1, 2, 3, 4].map((n) => `images/abenteuer/josua/karte-pano-v3-${n}.webp`))
+    expect(m.images).toEqual([1, 2, 3, 4].map((n) => `images/abenteuer/josua/karte-pano-v4-${n}.webp`))
     for (const f of m.images) expect(statSync(`public/${f}`).size / 1024, f).toBeLessThan(1800)
     expect(m.widthPx).toBe(9908)
     expect(m.aspect).toBeCloseTo(9908 / 1648, 3)
@@ -352,7 +352,8 @@ describe('Josua: die Karte', () => {
     expect(m.path).toBe(JOSUA_PATH)
     const spots = [...m.stages, m.exam]
     spots.forEach((sp, i) => {
-      expect(sp.y, `Station ${i + 1} nicht hinter der Leiste`).toBeLessThanOrEqual(0.65)
+      // Station 9 (the wall falls) lies lower (0.72) so that the ring keeps clear of the priests and Joshua; the others stay above 0.65
+      expect(sp.y, `Station ${i + 1} nicht hinter der Leiste`).toBeLessThanOrEqual(i === 8 ? 0.73 : 0.65)
       if (i > 0) expect(sp.x, `Station ${i + 1} rechts von ${i}`).toBeGreaterThan(spots[i - 1]!.x)
     })
     for (const seg of m.path) for (const [x, y] of seg) expect(x > 0 && x < 1 && y > 0 && y <= 0.8).toBe(true)
