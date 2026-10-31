@@ -240,7 +240,7 @@ export const mose: Journey = {
   subtitle: 'Der Weg in die Freiheit',
   age: '8-10',
   downloadMb: 13, // gemessen am 21.10.2026 mit den eigenen Etappenbildern (Variante a) und der eigenen Karte; ohne die noch fehlenden Aufnahmen
-  medal: 'images/abenteuer/mose/medaille-wahl.webp', // Antons Wahl 31.10.2026: Entwurf 1
+  medal: 'images/abenteuer/mose/medaille-gross.webp', // Antons Wunsch 31.10.2026: viel größerer Busch, Entwurf 4 (vorher medaille-wahl.webp, Entwurf 1)
   // Geschenk-Ausmalbild: Der Weg durch das Meer (Mose mit erhobenem Stab, zwei Wasserwände, trockener Weg, Familie mit Kindern, Esel und Lamm, Wolkensäule hinter dem Volk, Konturzeichnung im Querformat 1536 × 1024)
   gift: { title: 'Der Weg durch das Meer', image: 'images/abenteuer/mose/geschenk.webp' },
   // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, erzählendes Panorama v4 (23.10.2026) mit fünfzehn Orten und dem Ziel) mit Stationen und Perlenweg aus mosePath.ts
