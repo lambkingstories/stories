@@ -243,18 +243,18 @@ export const mose: Journey = {
   medal: 'images/abenteuer/mose/medaille-gross.webp', // Antons Wunsch 31.10.2026: viel größerer Busch, Entwurf 4 (vorher medaille-wahl.webp, Entwurf 1)
   // Geschenk-Ausmalbild: Der Weg durch das Meer (Mose mit erhobenem Stab, zwei Wasserwände, trockener Weg, Familie mit Kindern, Esel und Lamm, Wolkensäule hinter dem Volk, Konturzeichnung im Querformat 1536 × 1024)
   gift: { title: 'Der Weg durch das Meer', image: 'images/abenteuer/mose/geschenk.webp' },
-  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, erzählendes Panorama v5 (31.10.2026, riesiger Busch) mit fünfzehn Orten und dem Ziel) mit Stationen und Perlenweg aus mosePath.ts
+  // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, erzählendes Panorama v4 (23.10.2026) mit fünfzehn Orten und dem Ziel) mit Stationen und Perlenweg aus mosePath.ts
   map: {
-    images: [1, 2, 3, 4].map((n) => `images/abenteuer/mose/karte-pano-v5-${n}.webp`),
+    images: [1, 2, 3, 4].map((n) => `images/abenteuer/mose/karte-pano-v4-${n}.webp`),
     ring: josef.map.ring,
     aspect: 9908 / 1648,
     widthPx: 9908,
     stages: [
-      { x: 0.0646, y: 0.6432, d: 0.0339 },
-      { x: 0.0908, y: 0.3519, d: 0.0339 },
-      { x: 0.1665, y: 0.3277, d: 0.0339 },
-      { x: 0.217, y: 0.1638, d: 0.0339 },
-      { x: 0.3896, y: 0.6068, d: 0.0339 },
+      { x: 0.0807, y: 0.6432, d: 0.0339 },
+      { x: 0.1342, y: 0.4794, d: 0.0339 },
+      { x: 0.1968, y: 0.3641, d: 0.0339 },
+      { x: 0.2665, y: 0.2184, d: 0.0339 },
+      { x: 0.3553, y: 0.5765, d: 0.0339 },
       { x: 0.4582, y: 0.3459, d: 0.0339 },
       { x: 0.5147, y: 0.6432, d: 0.0339 },
       { x: 0.5612, y: 0.2913, d: 0.0339 },
