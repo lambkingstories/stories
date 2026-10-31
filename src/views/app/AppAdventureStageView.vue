@@ -93,6 +93,8 @@ import GamePeace from '@/components/molecules/games/GamePeace.vue'
 import GameForge from '@/components/molecules/games/GameForge.vue'
 import GameCrib from '@/components/molecules/games/GameCrib.vue'
 import GameSign from '@/components/molecules/games/GameSign.vue'
+import GameRoad from '@/components/molecules/games/GameRoad.vue'
+import GameNet from '@/components/molecules/games/GameNet.vue'
 import GameWord from '@/components/molecules/games/GameWord.vue'
 import GameHush from '@/components/molecules/games/GameHush.vue'
 import GameHide from '@/components/molecules/games/GameHide.vue'
@@ -418,7 +420,7 @@ const hasPart = computed(() => partStars.value > 0 && !progress.finished.value)
 
 /** The games have a restart sign: a new key mounts the game afresh (round, mistakes and what was done begin again). */
 const gameKey = ref(0)
-const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew', 'overboard', 'shore', 'sacks', 'shade', 'days', 'statue', 'lamp', 'hours', 'ravens', 'caves', 'rain', 'whisper', 'glean', 'measure', 'elders', 'cradle', 'coat', 'cows', 'stone', 'search', 'baggage', 'gather', 'harp', 'shepherd', 'pebbles', 'sling', 'arrow', 'hem', 'quiet', 'throne', 'jars', 'dive', 'decor', 'honor', 'ride', 'post', 'peace', 'forge', 'crib', 'sign'] as const
+const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew', 'overboard', 'shore', 'sacks', 'shade', 'days', 'statue', 'lamp', 'hours', 'ravens', 'caves', 'rain', 'whisper', 'glean', 'measure', 'elders', 'cradle', 'coat', 'cows', 'stone', 'search', 'baggage', 'gather', 'harp', 'shepherd', 'pebbles', 'sling', 'arrow', 'hem', 'quiet', 'throne', 'jars', 'dive', 'decor', 'honor', 'ride', 'post', 'peace', 'forge', 'crib', 'sign', 'road', 'net'] as const
 const hasGame = computed(() => hasCountGame.value || GAME_FIELDS.some((f) => !!gameTask.value?.[f]))
 /** A game begins only when the child taps "play" (many games run on their own clock: the text and the hint are read first). */
 const started = ref(false)
@@ -589,6 +591,8 @@ const gameKind = computed(() => {
   if (g?.forge) return 'forge'
   if (g?.crib) return 'crib'
   if (g?.sign) return 'sign'
+  if (g?.road) return 'road'
+  if (g?.net) return 'net'
   return undefined
 })
 watch(
@@ -788,6 +792,8 @@ function openGift() {
         GameForge(:key="gameKey" v-else-if="gameTask?.forge" :game="gameTask.forge" @done="taskDone")
         GameCrib(:key="gameKey" v-else-if="gameTask?.crib" :game="gameTask.crib" @done="taskDone")
         GameSign(:key="gameKey" v-else-if="gameTask?.sign" :game="gameTask.sign" @done="taskDone")
+        GameRoad(:key="gameKey" v-else-if="gameTask?.road" :game="gameTask.road" @done="taskDone")
+        GameNet(:key="gameKey" v-else-if="gameTask?.net" :game="gameTask.net" @done="taskDone")
         template(v-else-if="isPaint")
           img(:src="img(taskImage)" alt="" class="stage-paint" draggable="false")
           div(class="stage-actions")

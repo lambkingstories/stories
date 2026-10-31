@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz'
 
 export interface AdventureQuestion {
   q: string
@@ -1821,6 +1821,8 @@ export interface StageTask {
   forge?: ForgeGame
   crib?: CribGame
   sign?: SignGame
+  road?: RoadGame
+  net?: NetGame
 }
 
 /** One reaper of the gleaning game: the lane he cuts along (index into `GleanGame.lanes`), when he starts (ms after the lead), how long he needs to cross the picture, his picture (index into `GleanGame.reapers`) and the places (percent of the picture width) of the clumps of barley that stand in his lane. */
@@ -2550,6 +2552,59 @@ export interface SignGame {
   walkerW: number
   start: { x: number; y: number }
   rounds: SignRound[]
+}
+
+/** One thing of the game "Prepare the way": a stone, a thornbush, a branch or a traveler (a picture, its name and its width in percent of the picture). */
+export interface RoadItem {
+  id: string
+  image: string
+  label: string
+  w: number
+}
+/** A place on the road: which thing stands there (the middle of its bottom edge, percent of the picture); a traveler (`keep`) must not be tapped. */
+export interface RoadSpot {
+  item: string
+  x: number
+  y: number
+  keep?: boolean
+}
+/** One round of the road: the hint and the things that lie on it. */
+export interface RoadRound {
+  hint: string
+  spots: RoadSpot[]
+}
+/** The game "Prepare the way" (Matthew 3,3): the child clears the road of stones, thorns and branches for the Lord and leaves the travelers alone. */
+export interface RoadGame {
+  /** The empty road in the wilderness (4:3). */
+  background: string
+  items: RoadItem[]
+  rounds: RoadRound[]
+}
+
+/** A kind of fish in the net game (a picture facing right, its width in percent of the picture). */
+export interface NetFish {
+  id: string
+  image: string
+  w: number
+}
+/** One round of the net game: which fish swim (ids, a kind may be used several times), how fast (picture widths a second) and the hint. */
+export interface NetRound {
+  hint: string
+  fish: string[]
+  speed: number
+}
+/** The game "Cast the net" (Matthew 4,18): fish swim in the lake; a tap casts the round net there and takes in every fish under it. */
+export interface NetGame {
+  /** The lake (4:3). */
+  background: string
+  fish: NetFish[]
+  /** The spread net (a picture), its width in percent of the picture and the reach in percent of the width inside which fish are caught. */
+  net: string
+  netW: number
+  reach: number
+  /** Where the fish may swim (percent of the picture). */
+  area: { x: number; y: number; w: number; h: number }
+  rounds: NetRound[]
 }
 
 export interface AdventureStage {

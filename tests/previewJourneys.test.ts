@@ -1139,3 +1139,53 @@ describe('the hidden journey Weihnachten (id weihnachten)', () => {
     expect(m.journeys.filter((j) => j.id === 'weihnachten')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Taufe (id taufe)', () => {
+  it('a normal build (without Taufe) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_TAUFE', 'false')
+    open('?taufe=taufe-vorschau-b2q7')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('taufe')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_TAUFE', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?taufe=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.TAUFE_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?taufe=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_TAUFE', 'true')
+    const first = await load()
+    open(`?taufe=${first.TAUFE_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.TAUFE_UNLOCK_CODE).toBe('taufe-vorschau-b2q7')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'taufe'])
+    expect(localStorage.getItem('lk-preview-taufe')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('taufe')?.stages.length).toBe(9)
+    open('?taufe=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-taufe')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_TAUFE) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_TAUFE', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'taufe')).toHaveLength(1)
+  })
+})

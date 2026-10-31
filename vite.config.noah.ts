@@ -187,3 +187,11 @@ export const WEIHNACHTEN_ONLY_DIRS = ['images/abenteuer/weihnachten', 'images/ab
 export function stripWeihnachtenFiles(outDir: string) {
   strip(outDir, WEIHNACHTEN_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Taufe" (id `taufe`) alone, in the same three places as Adam and Eve. */
+export const TAUFE_ONLY_DIRS = ['images/abenteuer/taufe', 'images/abenteuer/spiele/taufe', 'audio/abenteuer/taufe']
+
+/** Takes the folders of Taufe out of a finished build. */
+export function stripTaufeFiles(outDir: string) {
+  strip(outDir, TAUFE_ONLY_DIRS)
+}
