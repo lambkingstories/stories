@@ -177,7 +177,7 @@ export const daniel: Journey = {
   subtitle: 'Die Löwen, das Feuer und die Schrift an der Wand',
   age: '8-10',
   downloadMb: 12, // gemessen 10,3 MB ohne die Vorlesedateien (neun Geschichten, ca. 2 MB); nach den Aufnahmen neu messen
-  medal: `${PICS}medaille.webp`, // Der ruhige Löwe und das Licht (Goldring mit Seilmuster)
+  medal: `${PICS}medaille-wahl.webp`, // Antons Wahl 31.10.2026: Entwurf 1
   // Geschenk-Ausmalbild: Die Geschichte von Daniel in einem Bild (Konturzeichnung)
   gift: { title: 'Daniel und die Löwen', image: `${PICS}geschenk.webp` },
   // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, OpenAI-Bildmodell gpt-image-2.5-sunburst, Qualität max, mit neun Orten und dem Ziel) mit Stationen und Perlenweg aus danielPath.ts

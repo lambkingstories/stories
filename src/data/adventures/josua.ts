@@ -165,7 +165,7 @@ export const josua: Journey = {
   subtitle: 'Mut für das neue Land',
   age: '8-10',
   downloadMb: 13, // gemessen am 21.10.2026 mit den eigenen Etappenbildern (Variante a), der Karte v3 und den gemalten Spielbildern; ohne die noch fehlenden Aufnahmen
-  medal: 'images/abenteuer/josua/medaille-v3.webp', // Die Posaune von Jericho (Widderhorn vor der Stadtmauer, Goldring)
+  medal: 'images/abenteuer/josua/medaille-wahl.webp', // Antons Wahl 31.10.2026: Entwurf 1
   // Geschenk-Ausmalbild: Die Posaunen von Jericho (sieben Priester mit Widderhörnern auf dem Weg zur Stadtmauer, Konturzeichnung)
   gift: { title: 'Die Posaunen von Jericho', image: `${PICS}geschenk.webp` },
   // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, Codex-Panorama v3 mit zehn Orten und dem Ziel) mit Stationen und Perlenweg aus josuaPath.ts

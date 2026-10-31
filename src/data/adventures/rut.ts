@@ -194,7 +194,7 @@ export const rut: Journey = {
   subtitle: 'Wo du hingehst, da gehe ich auch hin',
   age: '8-10',
   downloadMb: 16, // gemessen 15,4 MB (Bilder, Spielbilder, Aufnahmen deutsch und englisch, Musik), ohne die gemeinsamen Oberflächendateien
-  medal: `${PICS}medaille-v3.webp`, // Medaille (Antons Wahl auf der Auswahlseite; bis dahin Entwurf 1)
+  medal: `${PICS}medaille-wahl.webp`, // Antons Wahl 31.10.2026: Entwurf 3
   // Geschenk-Ausmalbild: Die Geschichte von Rut in einem Bild (Konturzeichnung)
   gift: { title: 'Rut und Noomi', image: `${PICS}geschenk.webp` },
   // die gemalte Karte (Panorama in vier Stücken, 9908 × 1648 px, OpenAI-Bildmodell gpt-image-2.5-sunburst, Qualität max, mit neun Orten und dem Ziel) mit Stationen und Perlenweg aus rutPath.ts
