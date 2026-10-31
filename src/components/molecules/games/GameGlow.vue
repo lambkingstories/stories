@@ -254,7 +254,7 @@ const bushStyle = computed(() => ({ left: `${target.value.x}%`, top: `${target.v
 .gl-bush
   position: absolute
   display: block
-  width: 16%
+  width: 24%
   transform: translate(-50%, -80%)
   transition: opacity 400ms ease
   pointer-events: none

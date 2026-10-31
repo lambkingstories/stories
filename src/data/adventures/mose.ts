@@ -140,11 +140,11 @@ const FLECHTEN: WeaveGame = {
  * Etappe 4, "Dem Leuchten nachgehen": Mose wird über einen dämmrigen Hang geführt, auf ein Leuchten zu, das heller wird, je näher er kommt; unter etwa 7 % der Bildbreite ist er da und der Busch leuchtet (Bildauftrag M31;
  * ein Hang für beide Runden). Es gibt keinen Fehler; nach 20 Sekunden ohne Fortschritt zeigt ein Tipp Funken in Richtung des Busches (zählt als Tipp). Plan v3: Runde 1 der Busch steht offen am Hang, Runde 2 legt `felsen-vorn.webp`
  * über denselben Hang und der Busch liegt hinter den Felsen, nur der Schein dringt durch die Lücken. Gott ist nicht im Bild und spricht nicht im Spiel. Start und Busch (Prozent des Bildes) sind am gemalten Bild abgelesen (`leuchten-messung.json`, Hang und Felsen Variante b): Runde 1 von links unten nach rechts oben, Runde 2 von rechts oben zum Busch hinter den Felsen (zwei Lücken, Alpha der Felsen dort 1 bis 2 von 255).
- * Bilder (gemalt, 21.10.2026): `leuchten/hang.webp` 1000 × 750 (ohne Busch), `busch.webp` 400 × 400, `mose.webp` 220 × 300, `felsen-vorn.webp` 1000 × 750 (transparent).
+ * Bilder (gemalt, 21.10.2026): `leuchten/hang.webp` 1000 × 750 (ohne Busch), `busch-hoch.webp` 400 × 600 (neu 31.10.2026: Antons Wunsch, ein großer Busch; früher `busch.webp`), `mose.webp` 220 × 300, `felsen-vorn.webp` 1000 × 750 (transparent).
  */
 const LEUCHTEN: GlowGame = {
   walker: `${G}leuchten/mose.webp`,
-  bush: `${G}leuchten/busch.webp`,
+  bush: `${G}leuchten/busch-hoch.webp`,
   rounds: [
     { hint: 'Führe Mose über den Hang, dort leuchtet etwas.', background: `${G}leuchten/hang.webp`, start: [18, 76], target: [74, 39], threshold: 7 },
     { hint: 'Jetzt verdecken Felsen das Licht.', background: `${G}leuchten/hang.webp`, start: [78, 38], target: [34, 74], threshold: 7, cover: `${G}leuchten/felsen-vorn.webp` }
