@@ -22,12 +22,13 @@ import { elisa } from '@/data/adventures/elisa'
 import { ester } from '@/data/adventures/ester'
 import { nehemia } from '@/data/adventures/nehemia'
 import { propheten } from '@/data/adventures/propheten'
+import { weihnachten } from '@/data/adventures/weihnachten'
 import { samuel } from '@/data/adventures/samuel'
 import { REWARD_GAMES } from '@/data/adventures/rewardGames'
 import { cupOf, rewardGameTotal, unlockedGames } from '@/utils/rewards'
 import type { Journey, JourneyProgress } from '@/types/adventure'
 
-const ALL: Journey[] = [adamEva, noah, babel, abraham, jakob, josef, mose, josua, gideon, rut, samuel, david, elia, jona, daniel, salomo, elisa, ester, nehemia, propheten]
+const ALL: Journey[] = [adamEva, noah, babel, abraham, jakob, josef, mose, josua, gideon, rut, samuel, david, elia, jona, daniel, salomo, elisa, ester, nehemia, propheten, weihnachten]
 
 /** A progress with the exam done and so many stars and right answers that the share of the possible points is about `share`. */
 function progressFor(j: Journey, share: number): JourneyProgress {

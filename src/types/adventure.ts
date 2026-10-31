@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen'
 
 export interface AdventureQuestion {
   q: string
@@ -1819,6 +1819,8 @@ export interface StageTask {
   post?: PostGame
   peace?: PeaceGame
   forge?: ForgeGame
+  crib?: CribGame
+  sign?: SignGame
 }
 
 /** One reaper of the gleaning game: the lane he cuts along (index into `GleanGame.lanes`), when he starts (ms after the lead), how long he needs to cross the picture, his picture (index into `GleanGame.reapers`) and the places (percent of the picture width) of the clumps of barley that stand in his lane. */
@@ -2491,6 +2493,63 @@ export interface ForgeGame {
   anvil: { x: number; y: number }
   itemW: number
   rounds: ForgeRound[]
+}
+
+/** One thing of the game "The manger": a cloth or a bed to choose from (a picture, its name and its width in percent of the picture). */
+export interface CribItem {
+  id: string
+  image: string
+  label: string
+  w: number
+}
+/** One round of the manger: the three things to choose from and the right one (the cloth the child is wrapped in, the bed he is laid in). */
+export interface CribRound {
+  hint: string
+  options: string[]
+  right: string
+}
+/** The game "The manger" (Luke 2,7): the child helps Mary to wrap the newborn baby in swaddling cloths and to lay him in the manger. */
+export interface CribGame {
+  /** The simple shelter (4:3). */
+  background: string
+  /** Mary and Joseph (a picture) with their middle and width, the wrapped baby and the manger with the baby (pictures) with their place and width (percent of the picture). */
+  parents: string
+  parentsAt: { x: number; y: number }
+  parentsW: number
+  baby: string
+  babyAt: { x: number; y: number }
+  babyW: number
+  manger: string
+  mangerAt: { x: number; y: number }
+  mangerW: number
+  items: CribItem[]
+  rounds: CribRound[]
+}
+
+/** One place of the game "Find the sign": a house, an empty house or the shelter with the manger (a picture and its name). */
+export interface SignPlace {
+  id: string
+  image: string
+  label: string
+}
+/** One round: which place stands in which of the six slots (from the top left to the bottom right) and the right place. */
+export interface SignRound {
+  hint: string
+  order: string[]
+  right: string
+}
+/** The game "Find the sign" (Luke 2,12.16): the shepherds look for the child in swaddling cloths in a manger; the child taps the places. */
+export interface SignGame {
+  /** The street (4:3). */
+  background: string
+  places: SignPlace[]
+  /** The six slots: middle of the bottom edge of a place and its width (percent of the picture). */
+  slots: { x: number; y: number; w: number }[]
+  /** The shepherds (a picture), their width and where they stand at the start (middle of their feet, percent). */
+  walker: string
+  walkerW: number
+  start: { x: number; y: number }
+  rounds: SignRound[]
 }
 
 export interface AdventureStage {

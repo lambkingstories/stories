@@ -60,6 +60,7 @@ jobs:
       VITE_SHOW_ESTER: "true"
       VITE_SHOW_NEHEMIA: "true"
       VITE_SHOW_PROPHETEN: "true"
+      VITE_SHOW_WEIHNACHTEN: "true"
       VITE_CLIENT_KEY: tauri-key-public-1111
       VITE_API_BASE_URL: ${{ vars.API_BASE_URL || 'https://lbs-be.onrender.com' }}
 

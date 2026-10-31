@@ -179,3 +179,11 @@ export const PROPHETEN_ONLY_DIRS = ['images/abenteuer/propheten', 'images/abente
 export function stripProphetenFiles(outDir: string) {
   strip(outDir, PROPHETEN_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Weihnachten" (id `weihnachten`) alone, in the same three places as Adam and Eve. */
+export const WEIHNACHTEN_ONLY_DIRS = ['images/abenteuer/weihnachten', 'images/abenteuer/spiele/weihnachten', 'audio/abenteuer/weihnachten']
+
+/** Takes the folders of Weihnachten out of a finished build. */
+export function stripWeihnachtenFiles(outDir: string) {
+  strip(outDir, WEIHNACHTEN_ONLY_DIRS)
+}

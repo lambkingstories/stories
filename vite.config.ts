@@ -1,4 +1,4 @@
-import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripDavidFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles } from './vite.config.noah'
+import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripDavidFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles } from './vite.config.noah'
 import { fileURLToPath, URL } from 'node:url'
 import { resolve, dirname } from 'node:path'
 import { rmSync } from 'node:fs'
@@ -134,6 +134,10 @@ export default defineConfig(({ mode }) => {
       // The same for "Propheten" (`VITE_INCLUDE_PROPHETEN=true` / `vite --mode propheten`).
       if (env.VITE_SHOW_PROPHETEN !== 'true' && env.VITE_INCLUDE_PROPHETEN !== 'true') {
         stripProphetenFiles(outDir)
+      }
+      // The same for "Weihnachten" (`VITE_INCLUDE_WEIHNACHTEN=true` / `vite --mode weihnachten`).
+      if (env.VITE_SHOW_WEIHNACHTEN !== 'true' && env.VITE_INCLUDE_WEIHNACHTEN !== 'true') {
+        stripWeihnachtenFiles(outDir)
       }
     }
   }

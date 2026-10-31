@@ -66,6 +66,8 @@ export const NEHEMIA_PREVIEW_KEY = 'lk-preview-nehemia'
 export const NEHEMIA_UNLOCK_CODE = 'nehemia-vorschau-d3p7'
 export const PROPHETEN_PREVIEW_KEY = 'lk-preview-propheten'
 export const PROPHETEN_UNLOCK_CODE = 'propheten-vorschau-t8m5'
+export const WEIHNACHTEN_PREVIEW_KEY = 'lk-preview-weihnachten'
+export const WEIHNACHTEN_UNLOCK_CODE = 'weihnachten-vorschau-b2q7'
 
 /** A journey that is shown only on unlocked devices: the name of its link (`?<param>=<code>`), where the unlock is kept, and how it is loaded. */
 interface PreviewJourney {
@@ -262,6 +264,16 @@ function previewJourneys(): PreviewJourney[] {
       key: PROPHETEN_PREVIEW_KEY,
       always: import.meta.env.VITE_SHOW_PROPHETEN === 'true',
       load: async () => (await import('@/data/adventures/propheten')).propheten
+    })
+  }
+  if (import.meta.env.VITE_INCLUDE_WEIHNACHTEN === 'true' || import.meta.env.VITE_SHOW_WEIHNACHTEN === 'true') {
+    list.push({
+      id: 'weihnachten',
+      param: 'weihnachten',
+      code: WEIHNACHTEN_UNLOCK_CODE,
+      key: WEIHNACHTEN_PREVIEW_KEY,
+      always: import.meta.env.VITE_SHOW_WEIHNACHTEN === 'true',
+      load: async () => (await import('@/data/adventures/weihnachten')).weihnachten
     })
   }
   if (import.meta.env.VITE_INCLUDE_NOAH === 'true' || import.meta.env.VITE_SHOW_NOAH === 'true') {
