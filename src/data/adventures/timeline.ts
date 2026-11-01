@@ -38,6 +38,7 @@ export const TIMELINE: TimelineEntry[] = [
   { id: 'jakob', de: 'Isaak und Jakob', en: 'Isaac and Jacob', epoch: 'erzvaeter' },
   { id: 'josef', de: 'Josef', en: 'Joseph', epoch: 'erzvaeter' },
   { id: 'mose', de: 'Mose', en: 'Moses', epoch: 'auszug' },
+  { id: 'wueste', de: 'Das Volk in der Wüste', en: 'The people in the desert', epoch: 'auszug' },
   { id: 'josua', de: 'Josua und Jericho', en: 'Joshua and Jericho', epoch: 'auszug' },
   { id: 'gideon', de: 'Gideon', en: 'Gideon', epoch: 'koenige' },
   { id: 'rut', de: 'Rut', en: 'Ruth', epoch: 'koenige' },

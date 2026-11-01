@@ -2,15 +2,15 @@ import { describe, expect, it } from 'vitest'
 import { EPOCHS, TIMELINE, groupByEpoch, timelineNumber } from '@/data/adventures/timeline'
 
 describe('the time line of the adventures', () => {
-  it('lists the 31 adventures of the plan once each, every one in a known epoch', () => {
-    expect(TIMELINE).toHaveLength(31)
-    expect(new Set(TIMELINE.map((e) => e.id)).size).toBe(31)
+  it('lists the 32 adventures of the plan once each, every one in a known epoch', () => {
+    expect(TIMELINE).toHaveLength(32)
+    expect(new Set(TIMELINE.map((e) => e.id)).size).toBe(32)
     const epochs = new Set(EPOCHS.map((e) => e.id))
     for (const e of TIMELINE) expect(epochs.has(e.epoch), e.id).toBe(true)
   })
 
   it('keeps the order of the Bible for the adventures that are built', () => {
-    const order = ['adam-eva', 'noah', 'babel', 'abraham', 'jakob', 'josef', 'mose', 'josua', 'gideon', 'rut', 'samuel', 'david', 'salomo', 'elia', 'elisa', 'jona', 'daniel', 'ester', 'nehemia', 'propheten', 'weihnachten', 'taufe', 'freunde']
+    const order = ['adam-eva', 'noah', 'babel', 'abraham', 'jakob', 'josef', 'mose', 'wueste', 'josua', 'gideon', 'rut', 'samuel', 'david', 'salomo', 'elia', 'elisa', 'jona', 'daniel', 'ester', 'nehemia', 'propheten', 'weihnachten', 'taufe', 'freunde']
     const nr = order.map(timelineNumber)
     expect(nr.every((n) => n > 0)).toBe(true)
     expect([...nr].sort((a, b) => a - b)).toEqual(nr)
@@ -26,7 +26,7 @@ describe('the time line of the adventures', () => {
     const groups = groupByEpoch(items)
     expect(groups).toHaveLength(EPOCHS.length)
     const all = groups.flatMap((g) => g.entries)
-    expect(all).toHaveLength(31)
+    expect(all).toHaveLength(32)
     expect(all.filter((e) => e.item).map((e) => e.id)).toEqual(['josef', 'mose'])
     expect(all.find((e) => e.id === 'josef')!.nr).toBe(timelineNumber('josef'))
     expect(all.find((e) => e.id === 'david')!.item).toBeNull()

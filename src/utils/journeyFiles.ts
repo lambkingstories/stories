@@ -9,7 +9,7 @@ import { MUSIC_FILES, SFX_FILES } from '@/utils/sfxFiles'
  * The version of the downloaded packs: raise it whenever a picture or sound of the adventures is replaced, so that devices that have
  * the old files load them again (the packs are served from the device without asking the net).
  */
-export const PACK_VERSION = 122
+export const PACK_VERSION = 123
 
 /** The painted signs and buttons that every journey uses (everything in `public/images/abenteuer/ui`). */
 export const ADVENTURE_UI_FILES = [
@@ -57,6 +57,8 @@ function pathsIn(value: unknown, out: Set<string>) {
 export const NOT_PAINTED_YET = [
   // Freunde: the map (three panorama parts) waits for the OpenAI credit; take this line out when `karte-pano-v1-*.webp` is delivered
   'images/abenteuer/freunde/karte-pano-v1',
+  // Wüste: the gift picture (the giant grapes) is painted later
+  'images/abenteuer/wueste/geschenk',
 ]
 
 export const notPaintedYet = (path: string) => NOT_PAINTED_YET.some((p) => path.startsWith(p))

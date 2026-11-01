@@ -203,3 +203,11 @@ export const FREUNDE_ONLY_DIRS = ['images/abenteuer/freunde', 'images/abenteuer/
 export function stripFreundeFiles(outDir: string) {
   strip(outDir, FREUNDE_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Das Volk in der Wüste" (id `wueste`) alone, in the same three places as Adam and Eve. */
+export const WUESTE_ONLY_DIRS = ['images/abenteuer/wueste', 'images/abenteuer/spiele/wueste', 'audio/abenteuer/wueste']
+
+/** Takes the folders of Wüste out of a finished build. */
+export function stripWuesteFiles(outDir: string) {
+  strip(outDir, WUESTE_ONLY_DIRS)
+}

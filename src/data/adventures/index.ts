@@ -72,6 +72,8 @@ export const TAUFE_PREVIEW_KEY = 'lk-preview-taufe'
 export const TAUFE_UNLOCK_CODE = 'taufe-vorschau-b2q7'
 export const FREUNDE_PREVIEW_KEY = 'lk-preview-freunde'
 export const FREUNDE_UNLOCK_CODE = 'freunde-vorschau-k4w9'
+export const WUESTE_PREVIEW_KEY = 'lk-preview-wueste'
+export const WUESTE_UNLOCK_CODE = 'wueste-vorschau-r6d2'
 
 /** A journey that is shown only on unlocked devices: the name of its link (`?<param>=<code>`), where the unlock is kept, and how it is loaded. */
 interface PreviewJourney {
@@ -298,6 +300,16 @@ function previewJourneys(): PreviewJourney[] {
       key: FREUNDE_PREVIEW_KEY,
       always: import.meta.env.VITE_SHOW_FREUNDE === 'true',
       load: async () => (await import('@/data/adventures/freunde')).freunde
+    })
+  }
+  if (import.meta.env.VITE_INCLUDE_WUESTE === 'true' || import.meta.env.VITE_SHOW_WUESTE === 'true') {
+    list.push({
+      id: 'wueste',
+      param: 'wueste',
+      code: WUESTE_UNLOCK_CODE,
+      key: WUESTE_PREVIEW_KEY,
+      always: import.meta.env.VITE_SHOW_WUESTE === 'true',
+      load: async () => (await import('@/data/adventures/wueste')).wueste
     })
   }
   if (import.meta.env.VITE_INCLUDE_NOAH === 'true' || import.meta.env.VITE_SHOW_NOAH === 'true') {

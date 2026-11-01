@@ -1239,3 +1239,53 @@ describe('the hidden journey Freunde (id freunde)', () => {
     expect(m.journeys.filter((j) => j.id === 'freunde')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Das Volk in der Wüste (id wueste)', () => {
+  it('a normal build (without Wüste) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_WUESTE', 'false')
+    open('?wueste=wueste-vorschau-r6d2')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('wueste')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_WUESTE', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?wueste=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.WUESTE_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?wueste=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_WUESTE', 'true')
+    const first = await load()
+    open(`?wueste=${first.WUESTE_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.WUESTE_UNLOCK_CODE).toBe('wueste-vorschau-r6d2')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'wueste'])
+    expect(localStorage.getItem('lk-preview-wueste')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('wueste')?.stages.length).toBe(15)
+    open('?wueste=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-wueste')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_WUESTE) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_WUESTE', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'wueste')).toHaveLength(1)
+  })
+})

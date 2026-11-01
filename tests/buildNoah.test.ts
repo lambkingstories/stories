@@ -26,7 +26,8 @@ import { propheten } from '@/data/adventures/propheten'
 import { weihnachten } from '@/data/adventures/weihnachten'
 import { taufe } from '@/data/adventures/taufe'
 import { freunde } from '@/data/adventures/freunde'
-import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, GIDEON_ONLY_DIRS, JAKOB_ONLY_DIRS, JONA_ONLY_DIRS, JOSUA_ONLY_DIRS, MOSE_ONLY_DIRS, NOAH_ONLY_DIRS, RUT_ONLY_DIRS, SAMUEL_ONLY_DIRS, DAVID_ONLY_DIRS, SALOMO_ONLY_DIRS, ELISA_ONLY_DIRS, ESTER_ONLY_DIRS, NEHEMIA_ONLY_DIRS, PROPHETEN_ONLY_DIRS, WEIHNACHTEN_ONLY_DIRS, TAUFE_ONLY_DIRS, FREUNDE_ONLY_DIRS, DAVID_ONLY_DIRS, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripDavidFiles } from '../vite.config.noah'
+import { wueste } from '@/data/adventures/wueste'
+import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, GIDEON_ONLY_DIRS, JAKOB_ONLY_DIRS, JONA_ONLY_DIRS, JOSUA_ONLY_DIRS, MOSE_ONLY_DIRS, NOAH_ONLY_DIRS, RUT_ONLY_DIRS, SAMUEL_ONLY_DIRS, DAVID_ONLY_DIRS, SALOMO_ONLY_DIRS, ELISA_ONLY_DIRS, ESTER_ONLY_DIRS, NEHEMIA_ONLY_DIRS, PROPHETEN_ONLY_DIRS, WEIHNACHTEN_ONLY_DIRS, TAUFE_ONLY_DIRS, FREUNDE_ONLY_DIRS, WUESTE_ONLY_DIRS, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripDavidFiles } from '../vite.config.noah'
 
 const inNoahDir = (f: string) => NOAH_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
 
@@ -990,6 +991,49 @@ describe('a build without Freunde ships nothing of it', () => {
       for (const f of prophetenFiles) expect(existsSync(join(out, f)), f).toBe(false)
       for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
       expect(() => stripFreundeFiles(out)).not.toThrow()
+    } finally {
+      rmSync(out, { recursive: true, force: true })
+    }
+  })
+})
+
+const inWuesteDir = (f: string) => WUESTE_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
+
+describe('a build without Wüste ships nothing of it', () => {
+  it('every file that only Wüste uses lies in a folder that the normal build removes', () => {
+    const others = new Set([...journeys, noah, adamEva, babel, abraham, jakob, josua, gideon, mose, jona, daniel, elia, rut, samuel, david, salomo, elisa, ester, nehemia, propheten, weihnachten, taufe, freunde].flatMap((j) => journeyFiles(j)))
+    const app = /^audio\/abenteuer\/(klang|musik)-/
+    const only = journeyFiles(wueste).filter((f) => !others.has(f) && !app.test(f))
+    const leaks = only.filter((f) => !inWuesteDir(f))
+    expect(leaks, `files of Wüste outside the folders that are removed: ${leaks.join(', ')}`).toEqual([])
+  })
+
+  it('the folders of Wüste are only the three places that belong to it, none is on the lists of the others, and no folder with "wueste" in its name is missing', () => {
+    expect([...WUESTE_ONLY_DIRS].sort()).toEqual(['audio/abenteuer/wueste', 'images/abenteuer/spiele/wueste', 'images/abenteuer/wueste'])
+    for (const d of WUESTE_ONLY_DIRS) {
+      for (const list of [NOAH_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, ABRAHAM_ONLY_DIRS, JAKOB_ONLY_DIRS, JOSUA_ONLY_DIRS, GIDEON_ONLY_DIRS, MOSE_ONLY_DIRS, JONA_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, RUT_ONLY_DIRS, SAMUEL_ONLY_DIRS, DAVID_ONLY_DIRS, SALOMO_ONLY_DIRS, ELISA_ONLY_DIRS, ESTER_ONLY_DIRS, NEHEMIA_ONLY_DIRS, PROPHETEN_ONLY_DIRS, WEIHNACHTEN_ONLY_DIRS, TAUFE_ONLY_DIRS, FREUNDE_ONLY_DIRS]) expect(list).not.toContain(d)
+    }
+    const found: string[] = []
+    for (const base of ['public/images/abenteuer', 'public/audio/abenteuer', 'public/images/abenteuer/spiele']) {
+      for (const n of readdirSync(base)) if (/wueste/i.test(n) && !n.includes('.')) found.push(`${base.replace('public/', '')}/${n}`)
+    }
+    for (const d of found) expect(WUESTE_ONLY_DIRS, d).toContain(d)
+    for (const j of [...journeys, noah, adamEva, babel, abraham, jakob, josua, gideon, mose, jona, daniel, elia, rut, samuel, david, salomo, elisa, ester, nehemia, propheten, weihnachten, taufe, freunde]) for (const f of journeyFiles(j)) expect(inWuesteDir(f), `${j.id}: ${f}`).toBe(false)
+  })
+
+  it('removing takes the folders of Wüste out of a build and leaves everything else (the other journeys, the sounds)', () => {
+    const out = mkdtempSync(join(tmpdir(), 'lk-build-wueste-'))
+    try {
+      const prophetenFiles = ['audio/abenteuer/wueste/geschichte-01-v1.mp3', 'images/abenteuer/wueste/etappe-bild-01.webp', 'images/abenteuer/spiele/wueste/zeichen/strasse.webp']
+      const keep = ['images/abenteuer/josef/etappe-01.webp', 'audio/abenteuer/samuel/geschichte-01-v1.mp3', 'images/abenteuer/propheten/etappe-bild-01.webp', 'images/abenteuer/spiele/propheten/friede/wiese.webp', 'audio/abenteuer/klang-stern.mp3']
+      for (const f of [...prophetenFiles, ...keep]) {
+        mkdirSync(join(out, f, '..'), { recursive: true })
+        writeFileSync(join(out, f), 'x')
+      }
+      stripWuesteFiles(out)
+      for (const f of prophetenFiles) expect(existsSync(join(out, f)), f).toBe(false)
+      for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
+      expect(() => stripWuesteFiles(out)).not.toThrow()
     } finally {
       rmSync(out, { recursive: true, force: true })
     }
