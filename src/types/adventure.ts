@@ -4,8 +4,9 @@
  * exam, and from all the stars and the exam a cup (bronze, silver, gold) and a coloring page as a present.
  */
 
+import type { JugsGame, EnoughGame, QuailsGame, StaffsGame, SerpentGame, DonkeyGame, CommissionGame } from './wuesteGames2'
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz' | 'boote' | 'dach'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz' | 'boote' | 'dach' | 'arme' | 'richter' | 'signal' | 'traube' | 'krug' | 'genug' | 'wachteln' | 'stab' | 'schlange' | 'eselin' | 'einsetzen'
 
 export interface AdventureQuestion {
   q: string
@@ -1825,6 +1826,17 @@ export interface StageTask {
   net?: NetGame
   boats?: BoatsGame
   roof?: RoofGame
+  jugs?: JugsGame
+  enough?: EnoughGame
+  quails?: QuailsGame
+  staffs?: StaffsGame
+  serpent?: SerpentGame
+  donkey?: DonkeyGame
+  commission?: CommissionGame
+  arms?: ArmsGame
+  judges?: JudgesGame
+  signal?: SignalGame
+  grapes?: GrapesGame
 }
 
 /** One reaper of the gleaning game: the lane he cuts along (index into `GleanGame.lanes`), when he starts (ms after the lead), how long he needs to cross the picture, his picture (index into `GleanGame.reapers`) and the places (percent of the picture width) of the clumps of barley that stand in his lane. */
@@ -2680,6 +2692,112 @@ export interface RoofGame {
   rope: { image: string; w: number }
   carriers: { image: string; w: number }
   rounds: RoofRound[]
+}
+
+/** A helper of the game "Hold the arms" (Aaron on the left, Hur on the right): his picture (kneeling, one arm stretched up), his name, his width (percent of the picture) and the middle of his bottom edge. */
+export interface ArmsHelper {
+  id: string
+  image: string
+  label: string
+  w: number
+  x: number
+  y: number
+}
+/** One round of the arms: the hint, whether Aaron and Hur help (then the child taps them one after the other), how many seconds the arms have to stay up, and how fast they sink (a share of the way per second). */
+export interface ArmsRound {
+  hint: string
+  helpers: boolean
+  goal: number
+  sink: number
+}
+/** The game "Hold the arms" (Exodus 17,11-12): while Moses holds his hands up Israel wins; the child holds them up until the sun goes down. */
+export interface ArmsGame {
+  /** The hilltop (4:3). */
+  background: string
+  /** Moses on his stone with the arms down, halfway up and up (the same size, the same stone). */
+  poses: [string, string, string]
+  moses: { label: string; w: number; x: number; y: number }
+  helpers: ArmsHelper[]
+  rounds: ArmsRound[]
+}
+
+/** A seat of the game "Share the cases": one of the men who judge (the picture of a man, his name, his width in percent of the picture and the middle of his feet); Moses sits at the one with `moses`. */
+export interface JudgeSeat {
+  id: string
+  image: string
+  label: string
+  w: number
+  x: number
+  y: number
+  moses?: boolean
+}
+/** A case (a quarrel): its picture, what it is, and whether it is a small matter (any judge decides it) or a great one (it goes to Moses). */
+export interface JudgeCase {
+  id: string
+  image: string
+  label: string
+  weight: 'small' | 'great'
+}
+export interface JudgesRound {
+  hint: string
+  /** The cases of this round (ids of `JudgesGame.cases`). */
+  cases: string[]
+}
+/** The game "Share the cases" (Exodus 18,22): small cases go to the men who judge, the great ones to Moses. */
+export interface JudgesGame {
+  /** The court (4:3). */
+  background: string
+  seats: JudgeSeat[]
+  cases: JudgeCase[]
+  /** The width of a case card in percent of the picture. */
+  caseW: number
+  rounds: JudgesRound[]
+}
+
+export type SignalId = 'all' | 'leaders' | 'break'
+/** An answer picture of the signal game: what the sound means (the whole people gathers, only the leaders come, the camp breaks up). */
+export interface SignalChoice {
+  id: SignalId
+  image: string
+  label: string
+}
+/** One round of the signals: the hint and its questions; a question is a row of signals that is blown (one in round 1, three in a row in round 2) and that the child answers in the same order. */
+export interface SignalRound {
+  hint: string
+  questions: SignalId[][]
+}
+/** The game "The silver trumpets" (Numbers 10,1-10): two trumpets mean the whole people comes together, one means the leaders come, another blast means the camp breaks up. */
+export interface SignalGame {
+  /** The camp (4:3). */
+  background: string
+  /** The two priests with their trumpets (one picture, the middle of its bottom edge and its width in percent of the picture). */
+  priests: { image: string; label: string; w: number; x: number; y: number }
+  /** The sound files of the three signals and how long each lasts (seconds). */
+  sounds: Record<SignalId, { file: string; seconds: number }>
+  choices: SignalChoice[]
+  rounds: SignalRound[]
+}
+
+/** One round of the grapes: the hint, how many seconds the way takes, how strongly the pole wobbles (0 to 1) and whether the way goes over hills. */
+export interface GrapesRound {
+  hint: string
+  seconds: number
+  wobble: number
+  hills: boolean
+}
+/** The game "Carry the grapes" (Numbers 13,23): two men carry a huge cluster of grapes on a pole; the child keeps the pole level. */
+export interface GrapesGame {
+  /** The way along the brook Eshcol (4:3). */
+  background: string
+  /** The two scouts (one picture each, seen from the side walking to the right): the one at the back and the one in front; their width and where they stand (middle of their feet, percent of the picture). */
+  men: { image: string; label: string; w: number; x: number; y: number }[]
+  /** The pole with the cluster (one picture; its width, the middle of the pole in percent of the picture). */
+  pole: { image: string; label: string; w: number; x: number; y: number }
+  /** A berry that falls off. */
+  berry: { image: string; w: number }
+  /** How many berries the cluster has (a berry falls when the pole tips too far). */
+  berries: number
+  rounds: GrapesRound[]
 }
 
 export interface AdventureStage {

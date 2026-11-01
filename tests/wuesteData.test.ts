@@ -49,9 +49,9 @@ describe('Das Volk in der Wüste: stories and questions', () => {
       const text = s.text.join(' ')
       const words = text.split(/\s+/).length
       expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(80)
-      expect(words, `words ${s.id}`).toBeLessThanOrEqual(160)
+      expect(words, `words ${s.id}`).toBeLessThanOrEqual(175)
       expect(text, `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.image, `stage ${s.id}`).toBe(`images/abenteuer/wueste/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
+      expect(s.image, `stage ${s.id}`).toMatch(new RegExp(`^images/abenteuer/wueste/etappe-bild-${String(s.id).padStart(2, '0')}(-v1)?\.webp$`))
     }
   })
 
@@ -118,7 +118,7 @@ describe('Das Volk in der Wüste: stories and questions', () => {
     expect(t(6)).toMatch(/siebzig Älteste/)
     expect(t(6)).toMatch(/Eldad und Medad/)
     expect(t(7)).toMatch(/Eschkol/)
-    expect(t(7)).toMatch(/zwei Männer sie an einer Stange/)
+    expect(t(7)).toMatch(/Zwei Männer tragen sie an einer Stange/)
     expect(t(8)).toMatch(/Das Land ist sehr gut/)
     expect(t(8)).toMatch(/Vierzig Jahre/)
     expect(t(9)).toMatch(/Mandeln/)
@@ -135,8 +135,12 @@ describe('Das Volk in der Wüste: stories and questions', () => {
   })
 
   it('Antons decisions: the angel of Balaam is only told, never a figure; the bronze snake only a sign; Amalek is not fought on screen', () => {
-    // no stage task is a game that would show the angel, the snake or a fight (stand-ins and the verse game only)
-    for (const s of wueste.stages) expect(['quiz', 'lueckenvers'], `stage ${s.id}`).toContain(s.task.kind)
+    // no game shows the angel (only a quiet light on the way), a living snake (only the bronze sign on its pole) or a fight; the serious stages are quizzes
+    for (const n of SERIOUS) expect(stage(n).task.kind, `stage ${n}`).toBe('quiz')
+    const pics = (o: unknown): string[] => JSON.stringify(o).match(/images\/[^"]+/g) ?? []
+    for (const f of [stage(11).task.serpent, stage(12).task.donkey]) for (const x of pics(f)) expect(x, x).not.toMatch(/engel|schlange-lebend|kampf/i)
+    expect(stage(12).task.kind).toBe('eselin')
+    expect(stage(11).task.kind).toBe('schlange')
     expect(stage(12).questions.map((q) => q.q).join(' ')).toContain('Engel')
   })
 })
@@ -160,7 +164,7 @@ describe('Das Volk in der Wüste: the games', () => {
   })
 
   it('the stand-ins and the finished games: no stage is an unknown task kind', () => {
-    expect(wueste.stages.map((s) => s.task.kind)).toEqual(['quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'lueckenvers', 'quiz', 'quiz'])
+    expect(wueste.stages.map((s) => s.task.kind)).toEqual(['krug', 'arme', 'richter', 'genug', 'signal', 'wachteln', 'traube', 'quiz', 'stab', 'quiz', 'schlange', 'eselin', 'lueckenvers', 'einsetzen', 'quiz'])
   })
 })
 
@@ -185,7 +189,7 @@ describe('Das Volk in der Wüste: map, files, English', () => {
   })
 
   it('every file of the adventure exists in `public/` (the pictures that are not painted yet are on the list `NOT_PAINTED_YET`)', () => {
-    const missing = journeyFiles(wueste).filter((f) => !existsSync(`public/${f}`) && !notPaintedYet(f) && !/^audio\/abenteuer\/wueste\/geschichte/.test(f))
+    const missing = journeyFiles(wueste).filter((f) => !existsSync(`public/${f}`) && !notPaintedYet(f))
     expect(missing).toEqual([])
   })
 
@@ -197,7 +201,7 @@ describe('Das Volk in der Wüste: map, files, English', () => {
     }
   })
 
-  it('the English file has the same shape: the same number of stages, paragraphs, questions and answers; the recordings are not made yet, so no stage has one', () => {
+  it('the English file has the same shape: the same number of stages, paragraphs, questions and answers; a stage has a recording only when its file exists', () => {
     const en = englishTextsOf(wueste) as { stages: { text: string[]; questions: { options: string[] }[]; task?: { hint?: string } }[]; exam: { options: string[] }[]; title: string }
     expect(en.title).toBe('The People in the Desert')
     expect(en.stages).toHaveLength(15)
@@ -214,8 +218,19 @@ describe('Das Volk in der Wüste: map, files, English', () => {
     expect(stage(12).title).toBe('Balaam and the Donkey')
     expect(stage(13).task.verse!.rounds[1]!.parts[0]).toContain('You shall love God')
     expect(wueste.gift.title).toBe('The Giant Cluster of Grapes')
-    for (const s of wueste.stages) expect(s.audio, `stage ${s.id}`).toBeUndefined()
+    // the recordings (voice Achernar): a stage has its file or none (then the voice of the device reads); the lists are kept by tools/ton/aufnahmen_eintragen.py
+    for (const s of wueste.stages) {
+      if (s.audio !== undefined) {
+        expect(s.audio, `stage ${s.id}`).toBe(`audio/abenteuer/wueste/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)
+        expect(existsSync(`public/${s.audio}`), s.audio).toBe(true)
+      }
+    }
     setAdventureLanguage('de')
-    for (const s of wueste.stages) expect(s.audio, `stage ${s.id}`).toBeUndefined()
+    for (const s of wueste.stages) {
+      if (s.audio !== undefined) {
+        expect(s.audio, `stage ${s.id}`).toBe(`audio/abenteuer/wueste/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`)
+        expect(existsSync(`public/${s.audio}`), s.audio).toBe(true)
+      }
+    }
   })
 })

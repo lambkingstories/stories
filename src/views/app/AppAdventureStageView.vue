@@ -97,6 +97,17 @@ import GameRoad from '@/components/molecules/games/GameRoad.vue'
 import GameNet from '@/components/molecules/games/GameNet.vue'
 import GameBoats from '@/components/molecules/games/GameBoats.vue'
 import GameRoof from '@/components/molecules/games/GameRoof.vue'
+import GameJugs from '@/components/molecules/games/GameJugs.vue'
+import GameEnough from '@/components/molecules/games/GameEnough.vue'
+import GameQuails from '@/components/molecules/games/GameQuails.vue'
+import GameStaffs from '@/components/molecules/games/GameStaffs.vue'
+import GameSerpent from '@/components/molecules/games/GameSerpent.vue'
+import GameDonkey from '@/components/molecules/games/GameDonkey.vue'
+import GameCommission from '@/components/molecules/games/GameCommission.vue'
+import GameArms from '@/components/molecules/games/GameArms.vue'
+import GameJudges from '@/components/molecules/games/GameJudges.vue'
+import GameSignal from '@/components/molecules/games/GameSignal.vue'
+import GameGrapes from '@/components/molecules/games/GameGrapes.vue'
 import GameWord from '@/components/molecules/games/GameWord.vue'
 import GameHush from '@/components/molecules/games/GameHush.vue'
 import GameHide from '@/components/molecules/games/GameHide.vue'
@@ -422,7 +433,7 @@ const hasPart = computed(() => partStars.value > 0 && !progress.finished.value)
 
 /** The games have a restart sign: a new key mounts the game afresh (round, mistakes and what was done begin again). */
 const gameKey = ref(0)
-const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew', 'overboard', 'shore', 'sacks', 'shade', 'days', 'statue', 'lamp', 'hours', 'ravens', 'caves', 'rain', 'whisper', 'glean', 'measure', 'elders', 'cradle', 'coat', 'cows', 'stone', 'search', 'baggage', 'gather', 'harp', 'shepherd', 'pebbles', 'sling', 'arrow', 'hem', 'quiet', 'throne', 'jars', 'dive', 'decor', 'honor', 'ride', 'post', 'peace', 'forge', 'crib', 'sign', 'road', 'net', 'boats', 'roof'] as const
+const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew', 'overboard', 'shore', 'sacks', 'shade', 'days', 'statue', 'lamp', 'hours', 'ravens', 'caves', 'rain', 'whisper', 'glean', 'measure', 'elders', 'cradle', 'coat', 'cows', 'stone', 'search', 'baggage', 'gather', 'harp', 'shepherd', 'pebbles', 'sling', 'arrow', 'hem', 'quiet', 'throne', 'jars', 'dive', 'decor', 'honor', 'ride', 'post', 'peace', 'forge', 'crib', 'sign', 'road', 'net', 'boats', 'roof', 'arms', 'judges', 'signal', 'grapes', 'jugs', 'enough', 'quails', 'staffs', 'serpent', 'donkey', 'commission'] as const
 const hasGame = computed(() => hasCountGame.value || GAME_FIELDS.some((f) => !!gameTask.value?.[f]))
 /** A game begins only when the child taps "play" (many games run on their own clock: the text and the hint are read first). */
 const started = ref(false)
@@ -597,6 +608,17 @@ const gameKind = computed(() => {
   if (g?.net) return 'net'
   if (g?.boats) return 'boats'
   if (g?.roof) return 'roof'
+  if (g?.jugs) return 'jugs'
+  if (g?.enough) return 'enough'
+  if (g?.quails) return 'quails'
+  if (g?.staffs) return 'staffs'
+  if (g?.serpent) return 'serpent'
+  if (g?.donkey) return 'donkey'
+  if (g?.commission) return 'commission'
+  if (g?.arms) return 'arms'
+  if (g?.judges) return 'judges'
+  if (g?.signal) return 'signal'
+  if (g?.grapes) return 'grapes'
   return undefined
 })
 watch(
@@ -800,6 +822,17 @@ function openGift() {
         GameNet(:key="gameKey" v-else-if="gameTask?.net" :game="gameTask.net" @done="taskDone")
         GameBoats(:key="gameKey" v-else-if="gameTask?.boats" :game="gameTask.boats" @done="taskDone")
         GameRoof(:key="gameKey" v-else-if="gameTask?.roof" :game="gameTask.roof" @done="taskDone")
+        GameJugs(:key="gameKey" v-else-if="gameTask?.jugs" :game="gameTask.jugs" @done="taskDone")
+        GameEnough(:key="gameKey" v-else-if="gameTask?.enough" :game="gameTask.enough" @done="taskDone")
+        GameQuails(:key="gameKey" v-else-if="gameTask?.quails" :game="gameTask.quails" @done="taskDone")
+        GameStaffs(:key="gameKey" v-else-if="gameTask?.staffs" :game="gameTask.staffs" @done="taskDone")
+        GameSerpent(:key="gameKey" v-else-if="gameTask?.serpent" :game="gameTask.serpent" @done="taskDone")
+        GameDonkey(:key="gameKey" v-else-if="gameTask?.donkey" :game="gameTask.donkey" @done="taskDone")
+        GameCommission(:key="gameKey" v-else-if="gameTask?.commission" :game="gameTask.commission" @done="taskDone")
+        GameArms(:key="gameKey" v-else-if="gameTask?.arms" :game="gameTask.arms" @done="taskDone")
+        GameJudges(:key="gameKey" v-else-if="gameTask?.judges" :game="gameTask.judges" @done="taskDone")
+        GameSignal(:key="gameKey" v-else-if="gameTask?.signal" :game="gameTask.signal" @done="taskDone")
+        GameGrapes(:key="gameKey" v-else-if="gameTask?.grapes" :game="gameTask.grapes" @done="taskDone")
         template(v-else-if="isPaint")
           img(:src="img(taskImage)" alt="" class="stage-paint" draggable="false")
           div(class="stage-actions")
