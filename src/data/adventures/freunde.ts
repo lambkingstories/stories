@@ -176,7 +176,7 @@ export const freunde: Journey = {
   title: 'Jesus ruft seine Freunde',
   subtitle: 'Vom Boot am See bis auf den Berg',
   age: '8-10',
-  downloadMb: 14, // gemessen 8,6 MB ohne die Karte (noch nicht gemalt, rund 5 MB dazu) (Bilder, Spielbilder, Aufnahmen deutsch und englisch, Musik), ohne die gemeinsamen Oberflächendateien
+  downloadMb: 14, // gemessen 8,6 MB ohne die Karte plus 5,4 MB Karte = rund 14 MB (Bilder, Spielbilder, Aufnahmen deutsch und englisch, Musik), ohne die gemeinsamen Oberflächendateien
   medal: `${PICS}medaille-v1.webp`, // Medaille (Antons Wahl auf der Auswahlseite; bis dahin Entwurf 1)
   // Geschenk-Ausmalbild: das volle Netz (Konturzeichnung)
   gift: { title: 'Das volle Netz', image: `${PICS}geschenk.webp` },
@@ -187,17 +187,17 @@ export const freunde: Journey = {
     aspect: 9920 / 1648,
     widthPx: 9920,
     stages: [
-      { x: 0.0706, y: 0.6068, d: 0.0339 },
-      { x: 0.1714, y: 0.6311, d: 0.0339 },
-      { x: 0.2621, y: 0.6371, d: 0.0339 },
-      { x: 0.4133, y: 0.6371, d: 0.0339 },
-      { x: 0.4990, y: 0.6371, d: 0.0339 },
-      { x: 0.5847, y: 0.6371, d: 0.0339 },
-      { x: 0.7157, y: 0.6371, d: 0.0339 },
-      { x: 0.8014, y: 0.6371, d: 0.0339 },
-      { x: 0.8871, y: 0.6371, d: 0.0339 }
+      { x: 0.1255, y: 0.5686, d: 0.0339 },
+      { x: 0.2453, y: 0.7160, d: 0.0339 },
+      { x: 0.3361, y: 0.7160, d: 0.0339 },
+      { x: 0.4193, y: 0.6735, d: 0.0339 },
+      { x: 0.5501, y: 0.6371, d: 0.0339 },
+      { x: 0.6493, y: 0.6414, d: 0.0339 },
+      { x: 0.7141, y: 0.7585, d: 0.0339 },
+      { x: 0.8063, y: 0.6675, d: 0.0339 },
+      { x: 0.8882, y: 0.7585, d: 0.0339 }
     ],
-    exam: { x: 0.9526, y: 0.6408, d: 0.0339 },
+    exam: { x: 0.9507, y: 0.7282, d: 0.0339 },
     path: FREUNDE_PATH
   },
   stages: [
