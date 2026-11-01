@@ -1189,3 +1189,53 @@ describe('the hidden journey Taufe (id taufe)', () => {
     expect(m.journeys.filter((j) => j.id === 'taufe')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Freunde (id freunde)', () => {
+  it('a normal build (without Freunde) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_FREUNDE', 'false')
+    open('?freunde=freunde-vorschau-k4w9')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('freunde')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_FREUNDE', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?freunde=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.FREUNDE_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?freunde=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_FREUNDE', 'true')
+    const first = await load()
+    open(`?freunde=${first.FREUNDE_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.FREUNDE_UNLOCK_CODE).toBe('freunde-vorschau-k4w9')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'freunde'])
+    expect(localStorage.getItem('lk-preview-freunde')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('freunde')?.stages.length).toBe(9)
+    open('?freunde=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-freunde')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_FREUNDE) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_FREUNDE', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'freunde')).toHaveLength(1)
+  })
+})

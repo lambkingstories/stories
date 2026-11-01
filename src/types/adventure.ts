@@ -5,7 +5,7 @@
  */
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz' | 'boote' | 'dach'
 
 export interface AdventureQuestion {
   q: string
@@ -1823,6 +1823,8 @@ export interface StageTask {
   sign?: SignGame
   road?: RoadGame
   net?: NetGame
+  boats?: BoatsGame
+  roof?: RoofGame
 }
 
 /** One reaper of the gleaning game: the lane he cuts along (index into `GleanGame.lanes`), when he starts (ms after the lead), how long he needs to cross the picture, his picture (index into `GleanGame.reapers`) and the places (percent of the picture width) of the clumps of barley that stand in his lane. */
@@ -2605,6 +2607,79 @@ export interface NetGame {
   /** Where the fish may swim (percent of the picture). */
   area: { x: number; y: number; w: number; h: number }
   rounds: NetRound[]
+}
+
+/** A boat of the game "Fill both boats": its picture (a raised side view, ratio width to height), its name, its width in percent of the picture, where the middle of its water line lies, and the place for the fish inside (percent of the boat's picture). */
+export interface BoatsBoat {
+  id: string
+  image: string
+  label: string
+  w: number
+  ratio: number
+  x: number
+  y: number
+  deck: { x: number; y: number; w: number; h: number }
+}
+/** A kind of fish that jumps into the boats (a picture, its width in percent of the picture). */
+export interface BoatsFish {
+  id: string
+  image: string
+  w: number
+}
+/** One round of the boats: the hint and how many fish each boat holds (one number for every boat). */
+export interface BoatsRound {
+  hint: string
+  capacity: number[]
+}
+/** The game "Fill both boats" (Luke 5,7): fish from the full net are sent into two boats until both are full to the mark, so full that they almost sink. */
+export interface BoatsGame {
+  /** The lake (4:3). */
+  background: string
+  boats: BoatsBoat[]
+  fish: BoatsFish[]
+  /** The net full of fish above the lake: its picture and where the middle of its bottom edge lies (percent of the picture) and its width. */
+  pile: string
+  pileAt: { x: number; y: number; w: number }
+  rounds: BoatsRound[]
+}
+
+/** A person (or a group) who sits in the house of the roof game: a picture, its name and its width in percent of the picture. */
+export interface RoofPerson {
+  id: string
+  image: string
+  label: string
+  w: number
+}
+/** Where a person sits: the middle of the person on the floor (percent of the picture width). */
+export interface RoofSpot {
+  person: string
+  x: number
+}
+/** One round of the roof: the hint, how many pieces the roof has, which of them (numbers from 0) lie above the free place, where Jesus sits and where the bed lands, and the people. */
+export interface RoofRound {
+  hint: string
+  cols: number
+  free: number[]
+  jesusX: number
+  matX: number
+  spots: RoofSpot[]
+}
+/** The game "Open the roof" (Mark 2,4): the roof is taken off above Jesus (and only there), then four friends let the bed with the sick man down. */
+export interface RoofGame {
+  /** The house without a roof, seen from the side (4:3). */
+  background: string
+  /** The strip of the roof (a picture) and where it lies (percent of the picture); it is cut in `cols` pieces. */
+  roof: string
+  area: { x: number; y: number; w: number; h: number }
+  /** The height of the floor where the people sit (percent of the picture). */
+  floor: number
+  jesus: { image: string; label: string; w: number }
+  people: RoofPerson[]
+  /** The bed with the man (ratio width to height) and the rope (a picture that is stretched down), and the four friends at the hole. */
+  mat: { image: string; label: string; w: number; ratio: number }
+  rope: { image: string; w: number }
+  carriers: { image: string; w: number }
+  rounds: RoofRound[]
 }
 
 export interface AdventureStage {
