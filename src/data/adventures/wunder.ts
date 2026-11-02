@@ -472,7 +472,7 @@ for (const st of wunder.stages) {
 }
 
 // the German recordings of the stories (voice Achernar, files "geschichte-NN-v1.mp3"); until they are made the app reads with the voice of the device. Remove a number from this list when its file is in.
-const WITHOUT_RECORDING = new Set<number>([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+const WITHOUT_RECORDING = new Set<number>([])
 for (const s of wunder.stages) {
   const file = `audio/abenteuer/wunder/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' || WITHOUT_RECORDING.has(s.id) ? undefined : file), enumerable: true, configurable: true })

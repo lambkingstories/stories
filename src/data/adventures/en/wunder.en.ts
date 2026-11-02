@@ -272,3 +272,9 @@ export const wunderEn: TextOverlay<Journey> = {
     { q: 'What does Jesus call out to the disciples on the water?', options: ['Be of good cheer! It is I, do not be afraid!', 'Row faster!', 'Sail back!'] }
   ]
 }
+
+// the English recordings of the stories (voice Achernar, Gemini): geschichte-NN-en-v1.mp3; a stage without a number in this list is read with the voice of the device
+const WITH_ENGLISH_RECORDING = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+wunderEn.stages!.forEach((s, i) => {
+  if (WITH_ENGLISH_RECORDING.includes(i + 1)) s.audio = `audio/abenteuer/wunder/geschichte-${String(i + 1).padStart(2, '0')}-en-v1.mp3`
+})
