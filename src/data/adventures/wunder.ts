@@ -17,7 +17,7 @@ import { adventureLanguage } from '@/use/adventureLanguage'
 import { wunderEn } from './en/wunder.en'
 import { backdropOr } from '@/utils/gameBackground'
 
-// Etappenbilder (Variante a der neuen Bilder; Anton wählt auf der Vorschau-Seite a/b): `images/abenteuer/wunder/etappe-bild-NN.webp`, 960 × 640
+// Etappenbilder (Variante a, bei Etappe 2 und 12 Variante b nach Antons Wahl): `images/abenteuer/wunder/etappe-bild-NN.webp`, bei b `etappe-bild-NN-b.webp`, 960 × 640
 const PICS = 'images/abenteuer/wunder/'
 
 const G = 'images/abenteuer/spiele/wunder/'
@@ -209,7 +209,7 @@ export const wunder: Journey = {
   subtitle: 'Vom Sturm bis zum Saum seines Kleides',
   age: '8-10',
   downloadMb: 17, // gemessen 2.11.2026: Bilder 7,9 MB (Karte 5 MB), Spielbilder 3,2 MB, Musik 1,4 MB; die Aufnahmen (rund 4 MB) kommen dazu, ohne die gemeinsamen Oberflächendateien
-  medal: `${PICS}medaille-v1.webp`, // Medaille (Antons Wahl auf der Auswahlseite; bis dahin Entwurf 1)
+  medal: `${PICS}medaille-3.webp`, // Medaille 3 (Jesus auf dem Wasser, Antons Wahl 2.11.2026)
   // Geschenk-Ausmalbild: fünf Brote und zwei Fische (Konturzeichnung)
   gift: { title: 'Fünf Brote und zwei Fische', image: `${PICS}geschenk.webp` },
   // die gemalte Karte (Panorama in drei Stücken, 9920 × 1648 px, OpenAI-Bildmodell gpt-image-2.5-sunburst, Qualität max, mit zwölf Orten und dem Ziel) mit Stationen und Perlenweg aus wunderPath.ts
@@ -256,7 +256,7 @@ export const wunder: Journey = {
     },
     {
       id: 2,
-      image: `${PICS}etappe-bild-02.webp`,
+      image: `${PICS}etappe-bild-02-b.webp`,
       title: 'Der Sturm',
       ref: 'Markus 4,37–38',
       text: [
@@ -438,7 +438,7 @@ export const wunder: Journey = {
     },
     {
       id: 12,
-      image: `${PICS}etappe-bild-12.webp`,
+      image: `${PICS}etappe-bild-12-b.webp`,
       title: 'Am Saum seines Kleides',
       ref: 'Markus 6,53–56',
       text: [
