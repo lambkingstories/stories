@@ -1289,3 +1289,53 @@ describe('the hidden journey Das Volk in der Wüste (id wueste)', () => {
     expect(m.journeys.filter((j) => j.id === 'wueste')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Jesu Wunder am See (id wunder)', () => {
+  it('a normal build (without Wunder) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_WUNDER', 'false')
+    open('?wunder=wunder-vorschau-p7c5')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('wunder')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_WUNDER', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?wunder=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.WUNDER_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?wunder=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_WUNDER', 'true')
+    const first = await load()
+    open(`?wunder=${first.WUNDER_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.WUNDER_UNLOCK_CODE).toBe('wunder-vorschau-p7c5')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'wunder'])
+    expect(localStorage.getItem('lk-preview-wunder')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('wunder')?.stages.length).toBe(12)
+    open('?wunder=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-wunder')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_WUNDER) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_WUNDER', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'wunder')).toHaveLength(1)
+  })
+})

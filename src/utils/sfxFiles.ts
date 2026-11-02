@@ -70,7 +70,7 @@ const GAME_MOOD: Record<string, Mood> = {
   ravens: 'ruhig', caves: 'ruhig', rain: 'ruhig', whisper: 'ruhig',
   glean: 'mittel', measure: 'ruhig', elders: 'mittel', cradle: 'ruhig',
   coat: 'ruhig', cows: 'mittel', stone: 'ruhig', search: 'ruhig', baggage: 'mittel', gather: 'mittel',
-  harp: 'ruhig', shepherd: 'ruhig', pebbles: 'ruhig', sling: 'mittel', arrow: 'mittel', hem: 'ruhig', quiet: 'ruhig', throne: 'ruhig', jars: 'ruhig', dive: 'ruhig', decor: 'ruhig', honor: 'ruhig', ride: 'ruhig', post: 'ruhig', peace: 'ruhig', forge: 'ruhig', crib: 'ruhig', sign: 'ruhig', road: 'ruhig', net: 'ruhig', boats: 'ruhig', roof: 'ruhig', arms: 'ruhig', judges: 'ruhig', signal: 'ruhig', grapes: 'mittel',
+  harp: 'ruhig', shepherd: 'ruhig', pebbles: 'ruhig', sling: 'mittel', arrow: 'mittel', hem: 'ruhig', quiet: 'ruhig', throne: 'ruhig', jars: 'ruhig', dive: 'ruhig', decor: 'ruhig', honor: 'ruhig', ride: 'ruhig', post: 'ruhig', peace: 'ruhig', forge: 'ruhig', crib: 'ruhig', sign: 'ruhig', road: 'ruhig', net: 'ruhig', boats: 'ruhig', roof: 'ruhig', bail: 'mittel', crowd: 'ruhig', bundle: 'ruhig', bread: 'ruhig', row: 'mittel',arms: 'ruhig', judges: 'ruhig', signal: 'ruhig', grapes: 'mittel',
   puzzle: 'mittel', sort: 'mittel', harvest: 'mittel', build: 'mittel', way: 'mittel',
   fly: 'lebhaft', dots: 'lebhaft',
   jugs: 'ruhig', enough: 'mittel', quails: 'mittel', staffs: 'ruhig', serpent: 'ruhig', donkey: 'ruhig', commission: 'ruhig'

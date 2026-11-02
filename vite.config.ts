@@ -1,4 +1,4 @@
-import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripDavidFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles } from './vite.config.noah'
+import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripDavidFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles } from './vite.config.noah'
 import { fileURLToPath, URL } from 'node:url'
 import { resolve, dirname } from 'node:path'
 import { rmSync } from 'node:fs'
@@ -150,6 +150,10 @@ export default defineConfig(({ mode }) => {
       // The same for "Das Volk in der Wüste" (`VITE_INCLUDE_WUESTE=true` / `vite --mode wueste`).
       if (env.VITE_SHOW_WUESTE !== 'true' && env.VITE_INCLUDE_WUESTE !== 'true') {
         stripWuesteFiles(outDir)
+      }
+      // The same for "Jesu Wunder am See" (`VITE_INCLUDE_WUNDER=true` / `vite --mode wunder`).
+      if (env.VITE_SHOW_WUNDER !== 'true' && env.VITE_INCLUDE_WUNDER !== 'true') {
+        stripWunderFiles(outDir)
       }
     }
   }

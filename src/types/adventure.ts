@@ -6,7 +6,7 @@
 
 import type { JugsGame, EnoughGame, QuailsGame, StaffsGame, SerpentGame, DonkeyGame, CommissionGame } from './wuesteGames2'
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz' | 'boote' | 'dach' | 'arme' | 'richter' | 'signal' | 'traube' | 'krug' | 'genug' | 'wachteln' | 'stab' | 'schlange' | 'eselin' | 'einsetzen'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz' | 'boote' | 'dach' | 'arme' | 'richter' | 'signal' | 'traube' | 'krug' | 'genug' | 'wachteln' | 'stab' | 'schlange' | 'eselin' | 'einsetzen' | 'schoepfen' | 'gedraenge' | 'buendel' | 'brote' | 'rudern'
 
 export interface AdventureQuestion {
   q: string
@@ -1829,6 +1829,11 @@ export interface StageTask {
   jugs?: JugsGame
   enough?: EnoughGame
   quails?: QuailsGame
+  bail?: BailGame
+  crowd?: CrowdGame
+  bundle?: BundleGame
+  bread?: BreadGame
+  row?: RowGame
   staffs?: StaffsGame
   serpent?: SerpentGame
   donkey?: DonkeyGame
@@ -2697,6 +2702,129 @@ export interface RoofGame {
 /** A helper of the game "Hold the arms" (Aaron on the left, Hur on the right): his picture (kneeling, one arm stretched up), his name, his width (percent of the picture) and the middle of his bottom edge. */
 export interface ArmsHelper {
   id: string
+/** A picture of a place on a game field: a name for the screen reader and the width in percent of the picture (the height follows the picture). */
+export interface WunderSprite {
+  image: string
+  label: string
+  w: number
+}
+
+/** A form of puddle of the game "Bail out the boat": its picture and its width in percent of the picture when the puddle is full. */
+export interface BailPuddleKind {
+  id: string
+  image: string
+  w: number
+}
+/** One round of the bailing: the hint, how many puddles are to be scooped away in all, and the seconds between two waves. */
+export interface BailRound {
+  hint: string
+  total: number
+  every: number
+}
+/** The game "Bail out the boat" (Mark 4,37): the waves throw water into the boat; a tap on a puddle scoops a cup of it overboard (three scoops for one puddle). Four puddles at once flood the boat (one mistake a round). */
+export interface BailGame {
+  /** The inside of the boat seen from above (3:2). */
+  background: string
+  /** The forms of the puddle (a place always has the same form: the place number modulo the number of forms). */
+  puddles: BailPuddleKind[]
+  cup: { image: string; w: number }
+  /** The places where a puddle can lie (the middle, percent of the picture); at least five. */
+  spots: { x: number; y: number }[]
+  rounds: BailRound[]
+}
+
+/** One round of the crowd: the hint and the rows of people, the top row first (five places per row, 0 = free, 1 or more = the picture of the person); they stand right above the place where the pair starts. */
+export interface CrowdRound {
+  hint: string
+  rows: number[][]
+}
+/** The game "Through the crowd" (Mark 5,24): the street is a grid of 5 × 6 places; a tap makes a person step aside (when the place beside him is free), the pair of Jesus and Jairus walks up the middle column as soon as the place in front of it is free. */
+export interface CrowdGame {
+  /** The street seen from above, the house of Jairus at the top (3:2). */
+  background: string
+  /** The grid of the street (percent of the picture): 5 columns, 6 rows. */
+  area: { x: number; y: number; w: number; h: number }
+  /** Jesus and Jairus (one picture), `w` is its width in percent of the picture. */
+  pair: WunderSprite
+  /** The pictures of the people (the number 1 in a row is the first one, and so on round again). */
+  people: WunderSprite[]
+  /** The door of the house (the middle of the pair when it has come in, percent of the picture). */
+  door: { x: number; y: number }
+  rounds: CrowdRound[]
+}
+
+/** A thing of the cloth: its picture, its name (also written under it) and its width in percent of the picture. */
+export interface BundleThing extends WunderSprite {
+  id: string
+}
+/** A thing on the cloth in a round: which one, whether Jesus allowed it, and the middle of its place (percent of the picture). */
+export interface BundleItem {
+  thing: string
+  allowed: boolean
+  x: number
+  y: number
+}
+/** One round of the bundle: the hint and the things on the cloth. */
+export interface BundleRound {
+  hint: string
+  items: BundleItem[]
+}
+/** The game "Pack the bundle" (Mark 6,8-9): only a staff, sandals and one shirt may go with the disciples; a tap on an allowed thing sends it into the bundle, a forbidden thing stays (a cross). */
+export interface BundleGame {
+  /** The table with the cloth (3:2). */
+  background: string
+  things: BundleThing[]
+  /** The bundle (its place is the middle of its picture, percent of the picture) and the disciple who stands beside it. */
+  bundle: WunderSprite & { x: number; y: number }
+  disciple: WunderSprite & { x: number; y: number }
+  rounds: BundleRound[]
+}
+
+/** A group of people on the grass: a picture, a name, the middle of the group and its width (percent of the picture). */
+export interface BreadGroup extends WunderSprite {
+  id: string
+  x: number
+  y: number
+}
+/** One round of the bread: the hint and what the child does (`feed` the groups, `collect` the baskets with the leftovers). */
+export interface BreadRound {
+  hint: string
+  kind: 'feed' | 'collect'
+}
+/** The game "Share the bread" (Mark 6,39-43): a tap on a group has a disciple bring bread and fish to it (the basket stays full); then the twelve baskets with the leftovers are gathered. */
+export interface BreadGame {
+  /** The green meadow (3:2). */
+  background: string
+  groups: BreadGroup[]
+  /** The basket with the five loaves and the two fish (the middle of its bottom edge, percent of the picture). */
+  basket: WunderSprite & { x: number; y: number }
+  /** The disciple who brings the bread (one picture). */
+  disciple: { image: string; w: number }
+  /** The baskets with the leftovers: one picture shown `count` times, the area where they lie (percent of the picture). */
+  leftover: { image: string; label: string; w: number; count: number; area: { x: number; y: number; w: number; h: number } }
+  rounds: BreadRound[]
+}
+
+/** One round of the rowing: the hint, how many strokes the way takes and the wind (degrees a second that the wind turns the bow; positive to the right). */
+export interface RowRound {
+  hint: string
+  distance: number
+  wind: number
+}
+/** The game "Row against the wind" (Mark 6,48): two big areas, left and right oar; the wind turns the boat, whoever rows left and right in turn keeps it straight and gets on; whoever rows on one side only turns it. */
+export interface RowGame {
+  /** The lake at night seen from above, the far shore at the top (3:2). */
+  background: string
+  /** The boat seen from above with its two oars (ratio width to height). */
+  boat: WunderSprite & { ratio: number }
+  /** Jesus on the water, who stands beside the boat at the end (the middle, percent of the picture). */
+  jesus: WunderSprite & { x: number; y: number }
+  /** The height of the middle of the boat at the start and at the end of a round (percent from the top). */
+  start: number
+  goal: number
+  rounds: RowRound[]
+}
+
   image: string
   label: string
   w: number

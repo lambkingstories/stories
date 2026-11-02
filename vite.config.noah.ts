@@ -211,3 +211,11 @@ export const WUESTE_ONLY_DIRS = ['images/abenteuer/wueste', 'images/abenteuer/sp
 export function stripWuesteFiles(outDir: string) {
   strip(outDir, WUESTE_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Jesu Wunder am See" (id `wunder`) alone, in the same three places as Adam and Eve. */
+export const WUNDER_ONLY_DIRS = ['images/abenteuer/wunder', 'images/abenteuer/spiele/wunder', 'audio/abenteuer/wunder']
+
+/** Takes the folders of Wunder out of a finished build. */
+export function stripWunderFiles(outDir: string) {
+  strip(outDir, WUNDER_ONLY_DIRS)
+}

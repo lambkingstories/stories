@@ -97,6 +97,11 @@ import GameRoad from '@/components/molecules/games/GameRoad.vue'
 import GameNet from '@/components/molecules/games/GameNet.vue'
 import GameBoats from '@/components/molecules/games/GameBoats.vue'
 import GameRoof from '@/components/molecules/games/GameRoof.vue'
+import GameBail from '@/components/molecules/games/GameBail.vue'
+import GameCrowd from '@/components/molecules/games/GameCrowd.vue'
+import GameBundle from '@/components/molecules/games/GameBundle.vue'
+import GameBread from '@/components/molecules/games/GameBread.vue'
+import GameRow from '@/components/molecules/games/GameRow.vue'
 import GameJugs from '@/components/molecules/games/GameJugs.vue'
 import GameEnough from '@/components/molecules/games/GameEnough.vue'
 import GameQuails from '@/components/molecules/games/GameQuails.vue'
@@ -433,7 +438,7 @@ const hasPart = computed(() => partStars.value > 0 && !progress.finished.value)
 
 /** The games have a restart sign: a new key mounts the game afresh (round, mistakes and what was done begin again). */
 const gameKey = ref(0)
-const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew', 'overboard', 'shore', 'sacks', 'shade', 'days', 'statue', 'lamp', 'hours', 'ravens', 'caves', 'rain', 'whisper', 'glean', 'measure', 'elders', 'cradle', 'coat', 'cows', 'stone', 'search', 'baggage', 'gather', 'harp', 'shepherd', 'pebbles', 'sling', 'arrow', 'hem', 'quiet', 'throne', 'jars', 'dive', 'decor', 'honor', 'ride', 'post', 'peace', 'forge', 'crib', 'sign', 'road', 'net', 'boats', 'roof', 'arms', 'judges', 'signal', 'grapes', 'jugs', 'enough', 'quails', 'staffs', 'serpent', 'donkey', 'commission'] as const
+const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew', 'overboard', 'shore', 'sacks', 'shade', 'days', 'statue', 'lamp', 'hours', 'ravens', 'caves', 'rain', 'whisper', 'glean', 'measure', 'elders', 'cradle', 'coat', 'cows', 'stone', 'search', 'baggage', 'gather', 'harp', 'shepherd', 'pebbles', 'sling', 'arrow', 'hem', 'quiet', 'throne', 'jars', 'dive', 'decor', 'honor', 'ride', 'post', 'peace', 'forge', 'crib', 'sign', 'road', 'net', 'boats', 'roof', 'bail', 'crowd', 'bundle', 'bread', 'row','arms', 'judges', 'signal', 'grapes', 'jugs', 'enough', 'quails', 'staffs', 'serpent', 'donkey', 'commission'] as const
 const hasGame = computed(() => hasCountGame.value || GAME_FIELDS.some((f) => !!gameTask.value?.[f]))
 /** A game begins only when the child taps "play" (many games run on their own clock: the text and the hint are read first). */
 const started = ref(false)
@@ -620,6 +625,11 @@ const gameKind = computed(() => {
   if (g?.signal) return 'signal'
   if (g?.grapes) return 'grapes'
   return undefined
+  if (g?.bail) return 'bail'
+  if (g?.crowd) return 'crowd'
+  if (g?.bundle) return 'bundle'
+  if (g?.bread) return 'bread'
+  if (g?.row) return 'row'
 })
 watch(
   () => phase.value === 'task' && !isPaint.value && !!gameKind.value,
@@ -834,6 +844,11 @@ function openGift() {
         GameSignal(:key="gameKey" v-else-if="gameTask?.signal" :game="gameTask.signal" @done="taskDone")
         GameGrapes(:key="gameKey" v-else-if="gameTask?.grapes" :game="gameTask.grapes" @done="taskDone")
         template(v-else-if="isPaint")
+        GameBail(:key="gameKey" v-else-if="gameTask?.bail" :game="gameTask.bail" @done="taskDone")
+        GameCrowd(:key="gameKey" v-else-if="gameTask?.crowd" :game="gameTask.crowd" @done="taskDone")
+        GameBundle(:key="gameKey" v-else-if="gameTask?.bundle" :game="gameTask.bundle" @done="taskDone")
+        GameBread(:key="gameKey" v-else-if="gameTask?.bread" :game="gameTask.bread" @done="taskDone")
+        GameRow(:key="gameKey" v-else-if="gameTask?.row" :game="gameTask.row" @done="taskDone")
           img(:src="img(taskImage)" alt="" class="stage-paint" draggable="false")
           div(class="stage-actions")
             AdvButton(tone="gold" @click="startPaint") {{ t('app.adventure.paint') }}
