@@ -45,7 +45,7 @@ export const wueste: Journey = {
   title: 'Das Volk in der Wüste',
   subtitle: 'Vierzig Jahre unterwegs',
   age: '8-10',
-  downloadMb: 20, // gemessen 2.11.2026: Bilder 8 MB (Karte 5 MB), Spielbilder 6 MB, Musik und Trompeten 4 MB; die Aufnahmen kommen dazu, ohne die gemeinsamen Oberflächendateien
+  downloadMb: 22, // gemessen 2.11.2026: Bilder 8 MB (Karte 5 MB), Spielbilder 5 MB, Musik und Trompeten 2 MB, Aufnahmen Deutsch und Englisch 7 MB, ohne die gemeinsamen Oberflächendateien
   medal: `${PICS}medaille-v1.webp`, // gemalter Entwurf 1 (Traube an der Stange); Antons Wahl aus drei Entwürfen steht noch aus
   // Geschenk-Ausmalbild: "Die Riesentraube" (Konturzeichnung; noch nicht gemalt, steht in NOT_PAINTED_YET)
   gift: { title: 'Die Riesentraube', image: `${PICS}geschenk.webp` },
@@ -366,7 +366,7 @@ for (const st of wueste.stages) {
 }
 
 // the German recordings of the stories (voice Achernar, files "geschichte-NN-v1.mp3"); until they are made the app reads with the voice of the device. Remove a number from this list when its file is in.
-const WITHOUT_RECORDING = new Set<number>([6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
+const WITHOUT_RECORDING = new Set<number>([])
 for (const s of wueste.stages) {
   const file = `audio/abenteuer/wueste/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' || WITHOUT_RECORDING.has(s.id) ? undefined : file), enumerable: true, configurable: true })
