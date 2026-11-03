@@ -1339,3 +1339,53 @@ describe('the hidden journey Jesu Wunder am See (id wunder)', () => {
     expect(m.journeys.filter((j) => j.id === 'wunder')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Jesus heilt (id heilung)', () => {
+  it('a normal build (without Wunder) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_HEILUNG', 'false')
+    open('?heilung=heilung-vorschau-t3m8')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('heilung')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_HEILUNG', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?heilung=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.HEILUNG_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?heilung=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_HEILUNG', 'true')
+    const first = await load()
+    open(`?heilung=${first.HEILUNG_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.HEILUNG_UNLOCK_CODE).toBe('heilung-vorschau-t3m8')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'heilung'])
+    expect(localStorage.getItem('lk-preview-heilung')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('heilung')?.stages.length).toBe(9)
+    open('?heilung=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-heilung')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_HEILUNG) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_HEILUNG', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'heilung')).toHaveLength(1)
+  })
+})

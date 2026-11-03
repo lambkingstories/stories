@@ -76,6 +76,8 @@ export const WUESTE_PREVIEW_KEY = 'lk-preview-wueste'
 export const WUESTE_UNLOCK_CODE = 'wueste-vorschau-r6d2'
 export const WUNDER_PREVIEW_KEY = 'lk-preview-wunder'
 export const WUNDER_UNLOCK_CODE = 'wunder-vorschau-p7c5'
+export const HEILUNG_PREVIEW_KEY = 'lk-preview-heilung'
+export const HEILUNG_UNLOCK_CODE = 'heilung-vorschau-t3m8'
 
 /** A journey that is shown only on unlocked devices: the name of its link (`?<param>=<code>`), where the unlock is kept, and how it is loaded. */
 interface PreviewJourney {
@@ -322,6 +324,16 @@ function previewJourneys(): PreviewJourney[] {
       key: WUNDER_PREVIEW_KEY,
       always: import.meta.env.VITE_SHOW_WUNDER === 'true',
       load: async () => (await import('@/data/adventures/wunder')).wunder
+    })
+  }
+  if (import.meta.env.VITE_INCLUDE_HEILUNG === 'true' || import.meta.env.VITE_SHOW_HEILUNG === 'true') {
+    list.push({
+      id: 'heilung',
+      param: 'heilung',
+      code: HEILUNG_UNLOCK_CODE,
+      key: HEILUNG_PREVIEW_KEY,
+      always: import.meta.env.VITE_SHOW_HEILUNG === 'true',
+      load: async () => (await import('@/data/adventures/heilung')).heilung
     })
   }
   if (import.meta.env.VITE_INCLUDE_NOAH === 'true' || import.meta.env.VITE_SHOW_NOAH === 'true') {

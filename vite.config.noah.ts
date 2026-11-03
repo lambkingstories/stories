@@ -219,3 +219,11 @@ export const WUNDER_ONLY_DIRS = ['images/abenteuer/wunder', 'images/abenteuer/sp
 export function stripWunderFiles(outDir: string) {
   strip(outDir, WUNDER_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Jesus heilt" (id `heilung`) alone, in the same three places as Adam and Eve. */
+export const HEILUNG_ONLY_DIRS = ['images/abenteuer/heilung', 'images/abenteuer/spiele/heilung', 'audio/abenteuer/heilung']
+
+/** Takes the folders of Heilung out of a finished build. */
+export function stripHeilungFiles(outDir: string) {
+  strip(outDir, HEILUNG_ONLY_DIRS)
+}

@@ -28,5 +28,6 @@ export const REWARD_GAMES: Record<string, number[]> = {
   taufe: [8, 5],
   freunde: [5, 7],
   wueste: [1, 6],
-  wunder: [2, 10]
+  wunder: [2, 10],
+  heilung: [2, 7]
 }

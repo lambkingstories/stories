@@ -6,7 +6,7 @@
 
 import type { JugsGame, EnoughGame, QuailsGame, StaffsGame, SerpentGame, DonkeyGame, CommissionGame } from './wuesteGames2'
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz' | 'boote' | 'dach' | 'arme' | 'richter' | 'signal' | 'traube' | 'krug' | 'genug' | 'wachteln' | 'stab' | 'schlange' | 'eselin' | 'einsetzen' | 'schoepfen' | 'gedraenge' | 'buendel' | 'brote' | 'rudern'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz' | 'boote' | 'dach' | 'arme' | 'richter' | 'signal' | 'traube' | 'krug' | 'genug' | 'wachteln' | 'stab' | 'schlange' | 'eselin' | 'einsetzen' | 'schoepfen' | 'gedraenge' | 'buendel' | 'brote' | 'rudern' | 'umkehr' | 'ruf'
 
 export interface AdventureQuestion {
   q: string
@@ -1826,9 +1826,6 @@ export interface StageTask {
   net?: NetGame
   boats?: BoatsGame
   roof?: RoofGame
-  jugs?: JugsGame
-  enough?: EnoughGame
-  quails?: QuailsGame
   bail?: BailGame
   crowd?: CrowdGame
   bundle?: BundleGame
@@ -1837,6 +1834,11 @@ export interface StageTask {
   staffs?: StaffsGame
   serpent?: SerpentGame
   donkey?: DonkeyGame
+  turnBack?: TurnBackGame
+  shout?: ShoutGame
+  jugs?: JugsGame
+  enough?: EnoughGame
+  quails?: QuailsGame
   commission?: CommissionGame
   arms?: ArmsGame
   judges?: JudgesGame
@@ -2699,9 +2701,6 @@ export interface RoofGame {
   rounds: RoofRound[]
 }
 
-/** A helper of the game "Hold the arms" (Aaron on the left, Hur on the right): his picture (kneeling, one arm stretched up), his name, his width (percent of the picture) and the middle of his bottom edge. */
-export interface ArmsHelper {
-  id: string
 /** A picture of a place on a game field: a name for the screen reader and the width in percent of the picture (the height follows the picture). */
 export interface WunderSprite {
   image: string
@@ -2828,6 +2827,63 @@ export interface RowGame {
   image: string
   label: string
   w: number
+/** One round of "Who turns back?": the hint, the seconds the child has to find the man who turns back (4), and whether the men wander over the road and cross each other (round 2). */
+export interface TurnBackRound {
+  hint: string
+  seconds: number
+  crossing: boolean
+}
+/**
+ * The game "Who turns back?" (Luke 17,14-16): ten men walk in a row along a country road to the house of the priests (a house at the right edge of the picture), Jesus stands with two disciples at the left edge.
+ * After a few seconds the hands of the men show clean (sparkles and ticks), then one of them, the Samaritan, turns round and runs slowly back to Jesus; the child taps him within `seconds`.
+ * A tap on another man is a mistake (the man wobbles, a cross), a round that runs out of time is a mistake and starts again. The right man runs to Jesus and kneels ("Thank you!"), the other nine walk on.
+ * Two mistakes in a round already give "Go on (1 star)". Stars: `heilungStars(mistakes, rounds)`.
+ */
+export interface TurnBackGame {
+  /** The country road seen from the side with the house of the priests at the right edge (3:2). */
+  background: string
+  /** The six pictures of the nine other men (a picture used a second time is mirrored); `w` is the width in percent of the picture. */
+  men: WunderSprite[]
+  /** The Samaritan with the blue and white striped headscarf. */
+  samaritan: WunderSprite
+  /** Jesus with two disciples at the left edge: his picture, and the middle of his feet (percent of the picture). */
+  jesus: WunderSprite & { x: number; y: number }
+  /**
+   * The road (percent of the picture): `y` the height of the feet of the row, `spread` the band in which the men cross each other (round 2), `startX` the middle of the last man of the row at the start,
+   * `gap` the distance between two men, `houseX` the place at the door where the men stop.
+   */
+  road: { y: number; spread: number; startX: number; gap: number; houseX: number }
+  rounds: TurnBackRound[]
+}
+
+/** One round of "Shout louder": the hint, the seconds (they run from the first tap), the taps that fill the bar, how often the crowd says "Quiet!", and how far it pushes the bar back (in taps; 3 when not given). */
+export interface ShoutRound {
+  hint: string
+  seconds: number
+  need: number
+  hushes: number
+  push?: number
+}
+/**
+ * The game "Shout louder" (Mark 10,46-49): Bartimaeus sits by the road before Jericho; Jesus, the disciples and a crowd walk by on the road above. A big button "Call out" (and Bartimaeus himself) fills a bar with every tap.
+ * From time to time the crowd says "Quiet!" (speech bubbles at the top) and pushes the bar back a little. Bar full in time: the group stops, a man of the crowd waves "Come!". Time over: a mistake, the group walks on, the round begins again;
+ * from 60 % of the bar in the first round "Go on (1 star)" is offered. Stars: `heilungStars(mistakes, rounds)`.
+ */
+export interface ShoutGame {
+  /** The road before Jericho (3:2). */
+  background: string
+  /** Bartimaeus by the road: his picture and the middle of his feet. */
+  bartimaeus: WunderSprite & { x: number; y: number }
+  /** The group of Jesus, the disciples and the crowd: one picture that walks from `from` to `to` (the middle, percent of the width) at the height `y` (the feet) while the round runs. */
+  group: WunderSprite & { y: number; from: number; to: number }
+  /** The man of the crowd who waves "Come!": his picture, his place beside the group (`dx` percent of the width to the right of the middle of the group) and the height of his feet. */
+  waver: WunderSprite & { dx: number; y: number }
+  rounds: ShoutRound[]
+}
+
+/** A helper of the game "Hold the arms" (Aaron on the left, Hur on the right): his picture (kneeling, one arm stretched up), his name, his width (percent of the picture) and the middle of his bottom edge. */
+export interface ArmsHelper {
+  id: string
   x: number
   y: number
 }
