@@ -1706,7 +1706,13 @@ export default {
         title: 'Privacy & Legal notice',
         linkLabel: 'Privacy & Legal notice',
         privacyTitle: 'Privacy policy',
+        imprintTitle: 'Legal notice',
         germanOnly: 'Our privacy policy and legal notice are only available in German.'
+      },
+      contact: {
+        title: 'Contact',
+        form: 'Contact form',
+        email: 'E-mail'
       },
       profile: {
         title: 'My Area',
@@ -2600,14 +2606,8 @@ export default {
         bakeTray: 'Teigkugeln',
         bakeDough: 'Teigkugel',
         bakeCount: 'Fladen gewendet: {n} von {total}',
-        imprintTitle: 'Legal notice',
         bakeDone: 'Das frische Brot aus dem neuen Land ist fertig.',
         packField: 'Der Korb: {n} von {total} Dingen sind gepackt',
-      contact: {
-        title: 'Contact',
-        form: 'Contact form',
-        email: 'E-mail'
-      },
         packCell: 'Feld {col}, Reihe {row}, frei',
         packCellFull: 'Feld {col}, Reihe {row}, belegt',
         packPacked: '{name}, im Korb',
@@ -3454,7 +3454,13 @@ export default {
         title: 'Datenschutz & Impressum',
         linkLabel: 'Datenschutz & Impressum',
         privacyTitle: 'Datenschutzerklärung',
+        imprintTitle: 'Impressum',
         germanOnly: 'Die Datenschutzerklärung und das Impressum gibt es nur auf Deutsch.'
+      },
+      contact: {
+        title: 'Kontakt',
+        form: 'Kontaktformular',
+        email: 'E-Mail'
       },
       profile: {
         title: 'Mein Bereich',
@@ -3492,9 +3498,3 @@ export default {
     }
   }
 }
-        imprintTitle: 'Impressum',
-      contact: {
-        title: 'Kontakt',
-        form: 'Kontaktformular',
-        email: 'E-Mail'
-      },
