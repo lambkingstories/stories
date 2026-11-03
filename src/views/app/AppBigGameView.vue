@@ -10,6 +10,7 @@ import { BIG_GAMES } from '@/data/bigGames'
 import useAdventure from '@/use/useAdventure'
 import { totalStars } from '@/utils/bigGames'
 import BigGameDavid from '@/components/molecules/games/BigGameDavid.vue'
+import BigGameMauer from '@/components/molecules/games/BigGameMauer.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -26,6 +27,7 @@ function leave() {
 
 <template lang="pug">
   BigGameDavid(v-if="game?.id === 'david' && open" @leave="leave")
+  BigGameMauer(v-else-if="game?.id === 'mauer' && open" @leave="leave")
   div(v-else class="bg-closed")
     button(type="button" class="bg-closed-btn" @click="leave") ←
 </template>
