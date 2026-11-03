@@ -131,7 +131,7 @@ export const heilung: Journey = {
   subtitle: 'Vom Mann mit dem Aussatz bis Bartimäus',
   age: '8-10',
   downloadMb: 14, // wird nach dem Bau gemessen (Bilder, Karte, Spielbilder, Musik, Aufnahmen), ohne die gemeinsamen Oberflächendateien
-  medal: `${PICS}medaille-v1.webp`, // Medaille 1 (Jesus streckt dem knienden Mann die Hand entgegen), bis Anton wählt
+  medal: `${PICS}medaille-v3.webp`, // Medaille 3 (Antons Wahl vom 3.11.2026)
   // Geschenk-Ausmalbild: Bartimäus' Mantel am Wegrand (Konturzeichnung)
   gift: { title: 'Der Mantel am Wegrand', image: `${PICS}geschenk.webp` },
   // die gemalte Karte (Panorama in drei Stücken, 9920 × 1648 px, OpenAI-Bildmodell, Qualität max, mit neun Orten und dem Ziel) mit Stationen und Perlenweg aus heilungPath.ts
@@ -157,7 +157,7 @@ export const heilung: Journey = {
   stages: [
     {
       id: 1,
-      image: `${PICS}etappe-bild-01.webp`,
+      image: `${PICS}etappe-bild-01-b.webp`,
       title: 'Wenn du willst',
       ref: 'Lukas 5,12–14',
       text: [
@@ -248,7 +248,7 @@ export const heilung: Journey = {
     },
     {
       id: 6,
-      image: `${PICS}etappe-bild-06.webp`,
+      image: `${PICS}etappe-bild-06-b.webp`,
       title: 'Einer kehrt um',
       ref: 'Lukas 17,14–19',
       text: [
