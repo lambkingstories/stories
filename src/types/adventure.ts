@@ -6,7 +6,7 @@
 
 import type { JugsGame, EnoughGame, QuailsGame, StaffsGame, SerpentGame, DonkeyGame, CommissionGame } from './wuesteGames2'
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz' | 'boote' | 'dach' | 'arme' | 'richter' | 'signal' | 'traube' | 'krug' | 'genug' | 'wachteln' | 'stab' | 'schlange' | 'eselin' | 'einsetzen' | 'schoepfen' | 'gedraenge' | 'buendel' | 'brote' | 'rudern' | 'umkehr' | 'ruf'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz' | 'boote' | 'dach' | 'arme' | 'richter' | 'signal' | 'traube' | 'krug' | 'genug' | 'wachteln' | 'stab' | 'schlange' | 'eselin' | 'einsetzen' | 'schoepfen' | 'gedraenge' | 'buendel' | 'brote' | 'rudern' | 'umkehr' | 'ruf' | 'graben' | 'muenze' | 'entgegen'
 
 export interface AdventureQuestion {
   q: string
@@ -1836,6 +1836,9 @@ export interface StageTask {
   donkey?: DonkeyGame
   turnBack?: TurnBackGame
   shout?: ShoutGame
+  dig?: DigGame
+  coin?: CoinGame
+  meet?: MeetGame
   jugs?: JugsGame
   enough?: EnoughGame
   quails?: QuailsGame
@@ -3074,3 +3077,106 @@ export interface JourneyProgress {
 }
 
 export type Medal = 'bronze' | 'silver' | 'gold'
+
+
+/** A picture on the field of one of the three games of "Stories of Jesus" (`dig`, `coin`, `meet`): its file, a name for the screen reader and its width in percent of the picture (the height follows the picture). */
+export interface GleichnisSprite {
+  image: string
+  label: string
+  w: number
+}
+
+/**
+ * One round of "Dig for the treasure" (Matthew 13,44-46). Round `field`: twelve mounds (four to a row) lie on the field, one of them hides the chest; `treasure` is its column and row (from 0),
+ * `cells` the middles of the twelve mounds (percent of the picture, row by row). Round `pearls`: five pearls lie on the table of the merchant at the places `slots` (middles, percent), the best one
+ * (the biggest, round, white one) at place `best`.
+ */
+export interface DigRound {
+  kind: 'field' | 'pearls'
+  hint: string
+  treasure?: [number, number]
+  cells?: [number, number][]
+  best?: number
+  slots?: [number, number][]
+}
+/**
+ * The game "Dig for the treasure" (Matthew 13,44-46; `dig`): round 1, the field: a tap on a mound digs it open; an empty hole shows a small arrow that points towards the chest (eight directions,
+ * a mistake without any loss); the chest opens (coins glimmer). Round 2, the pearl: the merchant has five pearls on his table, the child taps the most precious one (the biggest, round, white one);
+ * a wrong pearl wobbles and gets a cross. Stars: `gleichnisStars(holes + wrong pearls, rounds)` in `utils/gleichnisseGames.ts`.
+ */
+export interface DigGame {
+  /** The field seen from above with a spade at its edge (3:2). */
+  field: string
+  mound: GleichnisSprite
+  hole: GleichnisSprite
+  chest: GleichnisSprite
+  chestOpen: GleichnisSprite
+  /** The market stall of the merchant (3:2). */
+  stall: string
+  /** The five pearls: the best one first (`perle-1`), then four smaller, grey or crooked ones. */
+  pearls: GleichnisSprite[]
+  rounds: DigRound[]
+}
+
+/** A thing that lies free on the floor of the room and only looks like a coin (a lid of brass, a pebble): a tap on it is a mistake. The middle of the thing, percent of the picture. */
+export interface CoinDecoy {
+  kind: 'lid' | 'pebble'
+  x: number
+  y: number
+}
+/** One round of "Sweep for the coin": the hint, the room (3:2), the middle of the coin (percent of the picture) and the things that look like a coin. */
+export interface CoinRound {
+  hint: string
+  room: string
+  coin: [number, number]
+  decoys?: CoinDecoy[]
+}
+/**
+ * The game "Sweep for the coin" (Luke 15,8-10; `coin`): the room of the house is dark; a tap on the lamp lights it. Dust lies on the floor (a canvas, soft, brown-grey); the finger is the broom and sweeps it away
+ * (the grid and the share are those of the wiping game, `utils/wipe.ts`). When 60 % of the place of the coin is free the coin glints; a tap on it lifts it, and it flies into the hand of the woman. Round 2 has things on the
+ * floor that look like a coin (a tap on them is a mistake) and a "Help" button that makes the place of the coin glimmer (no loss, but no third star). Stars: `coinStars(mistakes, rounds, helped)`.
+ */
+export interface CoinGame {
+  /** The oil lamp: its middle (percent of the picture). */
+  lamp: GleichnisSprite & { x: number; y: number }
+  coin: GleichnisSprite
+  /** The woman kneeling with an open hand: the bottom middle (percent of the picture); the coin flies to her hand. */
+  woman: GleichnisSprite & { x: number; y: number }
+  /** The broom that follows the finger (only a sign). */
+  broom: GleichnisSprite
+  lid: GleichnisSprite
+  pebble: GleichnisSprite
+  rounds: CoinRound[]
+}
+
+/** The three gifts of the father (Luke 15,22): the robe, the ring, the shoes. */
+export type MeetGiftId = 'kleid' | 'ring' | 'schuhe'
+/** One round of "Meet the son": `run` (tap the feet in turn, the father runs) or `gifts` (bring robe, ring and shoes to the son). */
+export interface MeetRound {
+  kind: 'run' | 'gifts'
+  hint: string
+}
+/**
+ * The game "Meet the son" (Luke 15,20-24; `entgegen`). Round 1, the run: the son stands at the left on the country road, the father in the gate at the right; two big feet are the buttons, and the father runs
+ * one step when the child taps them in turn, left, right, left, right (`steps` steps; the same foot twice only says "In turn!", no mistake). At the end he falls on the neck of his son (`embrace` replaces both).
+ * Round 2, the gifts: in the yard stands the son in rags; the child drags robe, ring and shoes to him (or taps a gift and then the son), in any order; nothing can be wrong, all three stars at the end.
+ */
+export interface MeetGame {
+  /** The country road to the estate (3:2) and the yard (3:2). */
+  road: string
+  yard: string
+  /** The father in the gate at the start (the middle of his feet, percent of the picture) and the son at the left. */
+  father: GleichnisSprite & { x: number; y: number }
+  son: GleichnisSprite & { x: number; y: number }
+  /** The embrace of the two: shown at the middle between the son and the place `meet` where the father stops. */
+  embrace: GleichnisSprite
+  meet: number
+  /** How many steps the father runs (twelve). */
+  steps: number
+  /** The son in the yard: in rags, with the robe, and in robe, ring and shoes (all the same pose); the middle of his feet. */
+  ragged: GleichnisSprite & { x: number; y: number }
+  robed: GleichnisSprite
+  dressed: GleichnisSprite
+  gifts: (GleichnisSprite & { id: MeetGiftId })[]
+  rounds: MeetRound[]
+}

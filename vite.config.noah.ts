@@ -227,3 +227,11 @@ export const HEILUNG_ONLY_DIRS = ['images/abenteuer/heilung', 'images/abenteuer/
 export function stripHeilungFiles(outDir: string) {
   strip(outDir, HEILUNG_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Geschichten von Jesus" (id `gleichnisse`) alone, in the same three places as Adam and Eve. */
+export const GLEICHNISSE_ONLY_DIRS = ['images/abenteuer/gleichnisse', 'images/abenteuer/spiele/gleichnisse', 'audio/abenteuer/gleichnisse']
+
+/** Takes the folders of Gleichnisse out of a finished build. */
+export function stripGleichnisseFiles(outDir: string) {
+  strip(outDir, GLEICHNISSE_ONLY_DIRS)
+}

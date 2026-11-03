@@ -78,6 +78,8 @@ export const WUNDER_PREVIEW_KEY = 'lk-preview-wunder'
 export const WUNDER_UNLOCK_CODE = 'wunder-vorschau-p7c5'
 export const HEILUNG_PREVIEW_KEY = 'lk-preview-heilung'
 export const HEILUNG_UNLOCK_CODE = 'heilung-vorschau-t3m8'
+export const GLEICHNISSE_PREVIEW_KEY = 'lk-preview-gleichnisse'
+export const GLEICHNISSE_UNLOCK_CODE = 'gleichnisse-vorschau-k8w4'
 
 /** A journey that is shown only on unlocked devices: the name of its link (`?<param>=<code>`), where the unlock is kept, and how it is loaded. */
 interface PreviewJourney {
@@ -334,6 +336,16 @@ function previewJourneys(): PreviewJourney[] {
       key: HEILUNG_PREVIEW_KEY,
       always: import.meta.env.VITE_SHOW_HEILUNG === 'true',
       load: async () => (await import('@/data/adventures/heilung')).heilung
+    })
+  }
+  if (import.meta.env.VITE_INCLUDE_GLEICHNISSE === 'true' || import.meta.env.VITE_SHOW_GLEICHNISSE === 'true') {
+    list.push({
+      id: 'gleichnisse',
+      param: 'gleichnisse',
+      code: GLEICHNISSE_UNLOCK_CODE,
+      key: GLEICHNISSE_PREVIEW_KEY,
+      always: import.meta.env.VITE_SHOW_GLEICHNISSE === 'true',
+      load: async () => (await import('@/data/adventures/gleichnisse')).gleichnisse
     })
   }
   if (import.meta.env.VITE_INCLUDE_NOAH === 'true' || import.meta.env.VITE_SHOW_NOAH === 'true') {

@@ -1389,3 +1389,53 @@ describe('the hidden journey Jesus heilt (id heilung)', () => {
     expect(m.journeys.filter((j) => j.id === 'heilung')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Geschichten von Jesus (id gleichnisse)', () => {
+  it('a normal build (without Gleichnisse) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_GLEICHNISSE', 'false')
+    open('?gleichnisse=gleichnisse-vorschau-k8w4')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('gleichnisse')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_GLEICHNISSE', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?gleichnisse=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.GLEICHNISSE_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?gleichnisse=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_GLEICHNISSE', 'true')
+    const first = await load()
+    open(`?gleichnisse=${first.GLEICHNISSE_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.GLEICHNISSE_UNLOCK_CODE).toBe('gleichnisse-vorschau-k8w4')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'gleichnisse'])
+    expect(localStorage.getItem('lk-preview-gleichnisse')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('gleichnisse')?.stages.length).toBe(12)
+    open('?gleichnisse=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-gleichnisse')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_GLEICHNISSE) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_GLEICHNISSE', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'gleichnisse')).toHaveLength(1)
+  })
+})

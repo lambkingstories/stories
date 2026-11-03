@@ -1,4 +1,4 @@
-import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripDavidFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles } from './vite.config.noah'
+import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripDavidFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles, stripGleichnisseFiles } from './vite.config.noah'
 import { fileURLToPath, URL } from 'node:url'
 import { resolve, dirname } from 'node:path'
 import { rmSync } from 'node:fs'
@@ -158,6 +158,10 @@ export default defineConfig(({ mode }) => {
       // The same for "Jesus heilt" (`VITE_INCLUDE_HEILUNG=true` / `vite --mode heilung`).
       if (env.VITE_SHOW_HEILUNG !== 'true' && env.VITE_INCLUDE_HEILUNG !== 'true') {
         stripHeilungFiles(outDir)
+      }
+      // The same for "Geschichten von Jesus" (`VITE_INCLUDE_GLEICHNISSE=true` / `vite --mode gleichnisse`).
+      if (env.VITE_SHOW_GLEICHNISSE !== 'true' && env.VITE_INCLUDE_GLEICHNISSE !== 'true') {
+        stripGleichnisseFiles(outDir)
       }
     }
   }
