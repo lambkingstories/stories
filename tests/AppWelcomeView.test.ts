@@ -1,7 +1,7 @@
 /**
  * Welcome / language choice screen (`AppWelcomeView`): shown on the first start only.
  *   - One button goes to the start page and remembers that the welcome screen was seen.
- *   - The two languages are a radio list; picking the other one is written through `setSettingValue`, picking the
+ *   - The offered languages (German and English; Spanish is switched off for now) are a radio list; picking the other one is written through `setSettingValue`, picking the
  *     active one writes nothing.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
@@ -50,7 +50,7 @@ describe('AppWelcomeView', () => {
     expect(localStorage.getItem('lk-welcome-seen')).toBe('1')
   })
 
-  it('offers both languages and marks the active one', () => {
+  it('offers German and English (Spanish is switched off, see `SPANISH_ENABLED`) and marks the active one', () => {
     const w = mount(AppWelcomeView)
     const rows = w.findAll('.lang-row')
     expect(rows).toHaveLength(2)

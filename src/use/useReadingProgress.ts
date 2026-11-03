@@ -11,6 +11,7 @@
  * last real content page IS the lastRealPageIndex passed in by the caller.
  */
 import { computed, reactive } from 'vue'
+import { useActivity } from '@/use/useActivity'
 
 const LS_KEY = 'kanaan.readingProgress.v1'
 
@@ -67,6 +68,7 @@ export const useReadingProgress = () => {
     const rec = ensureEntry(bookId, totalPages)
     if (!rec.pagesRead.includes(page)) {
       rec.pagesRead = [...rec.pagesRead, page].sort((a, b) => a - b)
+      useActivity().count('pages')
     }
     rec.updatedAt = Date.now()
     if (rec.pagesRead.length >= totalPages && !rec.completedAt) {

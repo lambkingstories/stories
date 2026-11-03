@@ -20,8 +20,14 @@ import useColoringShelf from '@/use/useColoringShelf'
 import { cacheUrlToBlobUrl } from '@/use/useBookCache'
 import { allowedPages, freePageCount } from '@/use/useBookAccess'
 import usePremium from '@/use/usePremium'
+import usePurchases from '@/use/usePurchases'
+import { plusOffer } from '@/data/plus'
+import { bookProductId } from '@/data/plusProducts'
+import { requireParent } from '@/use/useParentalGate'
 import { pickLocalizedImage } from '@/types/apiBook'
 import { openExternal } from '@/utils/openExternal'
+import ColoringSpread from '@/components/molecules/ColoringSpread.vue'
+import { contentLocale } from '@/utils/contentLocale'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
@@ -57,6 +63,26 @@ const paintedCount = computed(() => pages.value.filter(isPainted).length)
 const allowed = computed(() => allowedPages(bookId.value, 'coloring', pages.value.length, ownFree.value))
 const isLockedPage = (i: number) => i >= allowed.value
 const pageLocked = computed(() => isLockedPage(index.value))
+/** The book is not open in full: the card with the two ways to unlock it is on show. */
+const bookLocked = computed(() => pages.value.length > 0 && allowed.value < pages.value.length)
+
+const purchases = usePurchases()
+const bookPrice = computed(() => purchases.prices.value[bookProductId(bookId.value)] ?? plusOffer.book)
+watch(bookId, (id) => {
+  if (id) void purchases.loadBookPrice(id)
+}, { immediate: true })
+
+/** Plus is a matter for grown-ups: the way to its page leads through the parental gate. */
+async function openPlus() {
+  if (!(await requireParent())) return
+  void router.push({ name: 'app-plus' })
+}
+
+/** Buying the single book: in the app from the store the purchase starts, elsewhere the sheet says it is coming. */
+function buyBook() {
+  if (purchases.available) void purchases.buyBook(bookId.value)
+  else unlock()
+}
 
 function unlock() {
   showUpsell('book', {
@@ -104,26 +130,29 @@ function dropLayers() {
 
 // ── Turning pages -----------------------------------------------------------------------
 
+const spread = ref<InstanceType<typeof ColoringSpread> | null>(null)
+const crown = prependBaseUrl('images/icons/navi/plus.webp')
+const brush = prependBaseUrl('images/icons/navi/malen.webp')
+const share = computed(() => (pages.value.length ? Math.round((paintedCount.value / pages.value.length) * 100) : 0))
+
+/** Turns to a page: the open book turns the leaf, then the page number is set (see `ColoringSpread`). */
 function go(i: number) {
   if (i < 0 || i >= pages.value.length) return
-  index.value = i
+  if (spread.value) void spread.value.flip(i)
+  else index.value = i
 }
 
-let startX: number | null = null
-let startY = 0
-
-function onPointerDown(e: PointerEvent) {
-  startX = e.clientX
-  startY = e.clientY
+/** The book has turned to this page. */
+function setIndex(i: number) {
+  if (i >= 0 && i < pages.value.length) index.value = i
 }
 
-function onPointerUp(e: PointerEvent) {
-  if (startX === null) return
-  const dx = e.clientX - startX
-  const dy = e.clientY - startY
-  startX = null
-  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4) go(index.value + (dx < 0 ? 1 : -1))
+/** The pictures of a page are ready before the leaf turns to it. */
+async function prepare(i: number) {
+  await Promise.all([loadLine(i), loadLayer(i)])
 }
+const lineOf = (p: ColoringBookPage) => lines.value[p.url] || p.url
+const layerOf = (i: number) => layers.value[i] ?? ''
 
 function onKeydown(e: KeyboardEvent) {
   if (confirming.value) return
@@ -210,8 +239,8 @@ async function start() {
     title.value = (loc[locale.value]?.title || loc.de?.title || bookId.value).replace(/^Buch\s*\d+\s*[–-]\s*/i, '')
     pages.value = list
     ownFree.value = (book as ApiBook).freePages ?? null
-    shopLink.value = pickLocalizedImage((book as ApiBook).etsyLink, locale.value === 'en' ? 'en' : 'de')
-    printedLink.value = (book as ApiBook).etsyLink?.[locale.value === 'en' ? 'en' : 'de'] ?? ''
+    shopLink.value = pickLocalizedImage((book as ApiBook).etsyLink, contentLocale(locale.value))
+    printedLink.value = (book as ApiBook).etsyLink?.[contentLocale(locale.value)] ?? ''
     // Back from the editor the page that was painted last is open (or the one named in the address);
     // a new book starts at page one.
     const wanted = Number(route.query.p)
@@ -261,67 +290,78 @@ watch(bookId, () => {
       div(class="bk-head")
         h1(class="bk-title") {{ title || t('app.coloring.books') }}
         p(v-if="pages.length" class="bk-progress") {{ t('app.coloring.pagesPainted', { done: paintedCount, total: pages.length }) }}
+        span(v-if="pages.length" class="bk-meter" aria-hidden="true")
+          span(class="bk-meter-fill" :style="{ width: share + '%' }")
 
     p(v-if="loading" class="bk-note") {{ t('app.coloring.loading') }}
     p(v-else-if="failed" class="bk-note") {{ t('app.coloring.bookFailed') }}
 
     template(v-else-if="page")
+      //- the book lies open: the words on the left, the picture on the right
       main(class="bk-stage")
-        button(
-          type="button"
-          class="bk-arrow bk-prev"
-          :disabled="index <= 0"
-          :aria-label="t('app.coloring.prevPage')"
-          @click="go(index - 1)"
-        ) ‹
-
-        //- The page as it looks now: the child's paint underneath, the line art multiplied on top.
-        div(
-          class="bk-sheet"
-          :key="page.url"
-          @pointerdown="onPointerDown"
-          @pointerup="onPointerUp"
-          @pointercancel="startX = null"
+        ColoringSpread(
+          ref="spread"
+          :pages="pages"
+          :index="index"
+          :line-of="lineOf"
+          :layer-of="layerOf"
+          :is-locked="isLockedPage"
+          :prepare="prepare"
+          :arrows="false"
+          @go="setIndex"
+          @paint="paint"
         )
-          img(v-if="layers[index]" class="bk-paint" :src="layers[index]" alt="" draggable="false")
-          img(class="bk-line" :class="{ faded: pageLocked }" :src="lines[page.url] || page.url" :alt="page.title" draggable="false")
-          span(v-if="pageLocked" class="bk-lock" aria-hidden="true") 🔒
 
-        button(
-          type="button"
-          class="bk-arrow bk-next"
-          :disabled="index >= pages.length - 1"
-          :aria-label="t('app.coloring.nextPage')"
-          @click="go(index + 1)"
-        ) ›
+      //- everything the child can do with the page, in one place
+      section(class="bk-dock")
+        div(class="bk-row")
+          button(type="button" class="bk-nav" :disabled="index <= 0" :aria-label="t('app.coloring.prevPage')" @click="go(index - 1)") ‹
+          button(type="button" class="bk-primary" @click="paint")
+            span(class="bk-primary-ico")
+              img(:src="pageLocked ? crown : brush" alt="" draggable="false")
+            span {{ pageLocked ? t('app.coloring.unlockBook') : current ? t('app.coloring.continuePaint') : t('app.coloring.startPaint') }}
+          button(type="button" class="bk-nav" :disabled="index >= pages.length - 1" :aria-label="t('app.coloring.nextPage')" @click="go(index + 1)") ›
 
-      section(class="bk-info")
-        p(class="bk-page-no") {{ t('app.coloring.pageOf', { n: index + 1, total: pages.length }) }}
-        h2(class="bk-page-title") {{ page.title }}
-        p(v-if="page.reference" class="bk-ref") {{ page.reference }}
-        p(v-if="page.text" class="bk-text") {{ page.text }}
+        nav(ref="strip" class="bk-strip" :aria-label="t('app.coloring.books')")
+          button(
+            v-for="(p, i) in pages"
+            :key="p.url"
+            type="button"
+            class="bk-thumb"
+            :class="{ current: i === index, painted: isPainted(p), locked: isLockedPage(i) }"
+            :aria-label="t('app.coloring.pageOf', { n: i + 1, total: pages.length })"
+            @click="go(i)"
+          )
+            //- Only painted pages have a small picture (saved with the painting); the others are plain chips,
+            //- so the strip does not have to download every page of the book.
+            img(v-if="thumbOf(p)" :src="thumbOf(p)" alt="" draggable="false")
+            img(v-if="isLockedPage(i)" class="bk-thumb-crown" :src="crown" alt="" draggable="false")
+            span(v-else class="bk-thumb-n") {{ i + 1 }}
+            img(v-if="works[idOf(p)]?.done" class="bk-thumb-star" :src="starImage" alt="" draggable="false")
 
-      div(class="bk-actions")
-        button(type="button" class="bk-primary" @click="paint") {{ pageLocked ? t('app.coloring.unlockBook') : current ? t('app.coloring.continuePaint') : t('app.coloring.startPaint') }}
-        button(v-if="current" type="button" class="bk-secondary" @click="confirming = true") {{ t('app.coloring.resetPage') }}
+        //- the two ways to open the whole book: Plus (all books) or this one book
+        div(v-if="bookLocked" class="bk-offer")
+          p(class="bk-offer-title") {{ t('app.coloring.offerTitle') }}
+          div(class="bk-offer-cols")
+            button(type="button" class="bk-offer-opt is-plus" @click="openPlus")
+              span(class="bk-offer-name")
+                img(:src="crown" alt="" draggable="false")
+                | {{ t('app.premium.optPlus') }}
+              span(class="bk-offer-price") {{ plusOffer.month }}
+              span(class="bk-offer-text") {{ t('app.premium.optPlusMonth') }}
+            button(type="button" class="bk-offer-opt is-plus is-best" @click="openPlus")
+              span(class="bk-offer-name")
+                img(:src="crown" alt="" draggable="false")
+                | {{ t('app.premium.optPlus') }}
+              span(class="bk-offer-price") {{ plusOffer.year }}
+              span(class="bk-offer-text") {{ t('app.premium.optPlusYear') }} · {{ t('app.plus.cheaper') }}
+            button(type="button" class="bk-offer-opt is-book" @click="buyBook")
+              span(class="bk-offer-name") {{ t('app.premium.optBook') }}
+              span(class="bk-offer-price") {{ bookPrice }}
 
-      button(v-if="printedLink" type="button" class="bk-printed" @click="openExternal(printedLink)") {{ t('app.coloring.printedAt') }} ›
-
-      nav(ref="strip" class="bk-strip" :aria-label="t('app.coloring.books')")
-        button(
-          v-for="(p, i) in pages"
-          :key="p.url"
-          type="button"
-          class="bk-thumb"
-          :class="{ current: i === index, painted: isPainted(p), locked: isLockedPage(i) }"
-          :aria-label="t('app.coloring.pageOf', { n: i + 1, total: pages.length })"
-          @click="go(i)"
-        )
-          //- Only painted pages have a small picture (saved with the painting); the others are plain sheets,
-          //- so the strip does not have to download every page of the book.
-          img(v-if="thumbOf(p)" :src="thumbOf(p)" alt="" draggable="false")
-          span(class="bk-thumb-n") {{ isLockedPage(i) ? '🔒' : i + 1 }}
-          img(v-if="works[idOf(p)]?.done" class="bk-thumb-star" :src="starImage" alt="" draggable="false")
+        div(v-if="current || printedLink" class="bk-links")
+          button(v-if="current" type="button" class="bk-link" @click="confirming = true") {{ t('app.coloring.resetPage') }}
+          button(v-if="printedLink" type="button" class="bk-link" @click="openExternal(printedLink)") {{ t('app.coloring.printedAt') }} ›
 
     div(
       v-if="confirming"
@@ -339,10 +379,9 @@ watch(bookId, () => {
 </template>
 
 <style scoped lang="sass">
-$ink: #22262e
-$muted: #6c7280
-$accent: #1f3a5f
-$glass: rgba(252, 251, 248, 0.88)
+$ink: var(--lk-text)
+$muted: var(--lk-muted)
+$accent: var(--lk-accent)
 
 .bk
   position: fixed
@@ -350,9 +389,9 @@ $glass: rgba(252, 251, 248, 0.88)
   display: flex
   flex-direction: column
   align-items: center
-  gap: 10px
-  padding: max(env(safe-area-inset-top, 0px), 10px) 12px max(env(safe-area-inset-bottom, 0px), 10px)
-  background: radial-gradient(ellipse at 50% 30%, #fff2d9 0%, #fbdcae 55%, #f3c58b 100%)
+  gap: 12px
+  padding: max(env(safe-area-inset-top, 0px), 10px) 14px max(env(safe-area-inset-bottom, 0px), 12px)
+  background: var(--lk-bg)
   color: $ink
   overflow-y: auto
   -webkit-overflow-scrolling: touch
@@ -366,14 +405,14 @@ $glass: rgba(252, 251, 248, 0.88)
 
 .bk-btn
   flex: 0 0 auto
-  width: 42px
-  height: 42px
+  width: 44px
+  height: 44px
   display: grid
   place-items: center
-  border: 1px solid rgba(20, 24, 32, 0.1)
-  border-radius: 12px
-  background: $glass
-  box-shadow: 0 2px 10px rgba(20, 24, 32, 0.15)
+  border: 1px solid var(--lk-line)
+  border-radius: 50%
+  background: var(--lk-surface)
+  box-shadow: var(--lk-shadow)
   cursor: pointer
 
   img
@@ -382,11 +421,12 @@ $glass: rgba(252, 251, 248, 0.88)
     object-fit: contain
 
 .bk-head
+  flex: 1 1 auto
   min-width: 0
 
 .bk-title
   margin: 0
-  font-size: 1.05rem
+  font-size: 1.1rem
   font-weight: 800
   line-height: 1.2
   overflow: hidden
@@ -394,22 +434,24 @@ $glass: rgba(252, 251, 248, 0.88)
   white-space: nowrap
 
 .bk-progress
-  margin: 2px 0 0
+  margin: 2px 0 6px
   font-size: 0.8rem
   font-weight: 600
   color: $muted
 
-.bk-printed
-  min-height: 44px
-  padding: 0 18px
-  border: 1px solid rgba(20, 24, 32, 0.12)
-  border-radius: 12px
-  background: $glass
-  color: $accent
-  font-family: inherit
-  font-weight: 700
-  font-size: 0.95rem
-  cursor: pointer
+.bk-meter
+  display: block
+  height: 6px
+  border-radius: 6px
+  background: var(--lk-track)
+  overflow: hidden
+
+.bk-meter-fill
+  display: block
+  height: 100%
+  border-radius: 6px
+  background: var(--lk-fill)
+  transition: width 0.4s ease
 
 .bk-note
   margin: 40px 0
@@ -418,128 +460,152 @@ $glass: rgba(252, 251, 248, 0.88)
 
 .bk-stage
   width: 100%
-  max-width: 980px
+  max-width: 1040px
   flex: 1 1 auto
-  min-height: 260px
+  min-height: 340px
+  display: flex
+  justify-content: center
+
+// one calm card under the book
+.bk-dock
+  width: 100%
+  max-width: 560px
+  display: flex
+  flex-direction: column
+  gap: 10px
+  padding: 12px
+  border: 1px solid var(--lk-line)
+  border-radius: 26px
+  background: var(--lk-surface)
+  box-shadow: var(--lk-shadow)
+
+.bk-row
   display: flex
   align-items: center
-  justify-content: center
-  gap: 8px
+  gap: 10px
 
-.bk-arrow
-  flex: 0 0 auto
-  width: 44px
-  height: 64px
-  border: 1px solid rgba(20, 24, 32, 0.1)
-  border-radius: 14px
-  background: $glass
-  color: $ink
-  font-size: 1.8rem
+// what it costs to open the whole book: two calm choices side by side
+.bk-offer
+  padding: 12px
+  border-radius: 18px
+  background: var(--lk-accent-soft)
+
+.bk-offer-title
+  margin: 0 0 8px
   font-weight: 800
-  line-height: 1
-  cursor: pointer
-  box-shadow: 0 2px 10px rgba(20, 24, 32, 0.15)
-
-  &:disabled
-    opacity: 0.35
-    cursor: default
-
-// The sheet keeps the picture's 3:4 shape and takes as much room as there is.
-.bk-sheet
-  position: relative
-  height: 100%
-  max-height: calc(100vh - 330px)
-  min-height: 220px
-  aspect-ratio: 3 / 4
-  max-width: calc(100% - 104px)
-  background: #ffffff
-  border-radius: 4px
-  box-shadow: 0 14px 34px -14px rgba(60, 40, 10, 0.55)
-  touch-action: pan-y
-  user-select: none
-
-  img
-    position: absolute
-    inset: 0
-    width: 100%
-    height: 100%
-    object-fit: contain
-    pointer-events: none
-
-.bk-line
-  mix-blend-mode: multiply
-
-  &.faded
-    opacity: 0.35
-
-.bk-lock
-  position: absolute
-  left: 50%
-  top: 50%
-  transform: translate(-50%, -50%)
-  font-size: 2.4rem
-  filter: drop-shadow(0 2px 6px rgba(20, 24, 32, 0.35))
-
-.bk-info
-  width: 100%
-  max-width: 640px
+  font-size: 0.95rem
   text-align: center
 
-.bk-page-no
-  margin: 0
-  font-size: 0.72rem
+.bk-offer-cols
+  display: grid
+  grid-template-columns: 1fr 1fr
+  gap: 8px
+
+.bk-offer-opt
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: 3px
+  padding: 10px 8px
+  border: 1px solid var(--lk-line)
+  border-radius: 14px
+  background: var(--lk-surface)
+  color: $ink
+  font: inherit
+  text-align: center
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+
+  &.is-plus
+    border: 2px solid var(--lk-gold)
+
+.bk-offer-opt.is-book
+  grid-column: 1 / -1
+
+.bk-offer-name
+  display: flex
+  align-items: center
+  gap: 5px
   font-weight: 800
-  letter-spacing: 0.08em
-  text-transform: uppercase
+  font-size: 0.95rem
+
+  img
+    width: 22px
+    height: 22px
+    object-fit: contain
+
+.bk-offer-text
+  font-size: 0.8rem
+  line-height: 1.25
   color: $muted
 
-.bk-page-title
-  margin: 2px 0 0
-  font-size: 1.05rem
+.bk-offer-price
+  margin-top: 2px
   font-weight: 800
-
-.bk-ref
-  margin: 2px 0 0
-  font-size: 0.8rem
-  font-weight: 700
+  font-size: 1rem
   color: $accent
 
-.bk-text
-  margin: 6px 0 0
-  font-size: 0.88rem
-  line-height: 1.45
-  color: #3b4150
+.bk-nav
+  flex: 0 0 auto
+  width: 46px
+  height: 46px
+  border: 1px solid var(--lk-line)
+  border-radius: 50%
+  background: transparent
+  color: $ink
+  font: inherit
+  font-size: 1.6rem
+  font-weight: 700
+  line-height: 1
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
 
-.bk-actions
-  display: flex
-  flex-wrap: wrap
-  gap: 10px
-  justify-content: center
+  &:disabled
+    opacity: 0.3
+    cursor: default
 
 .bk-primary,
 .bk-secondary,
 .bk-danger
   font: inherit
   font-weight: 800
-  font-size: 0.95rem
-  min-height: 46px
+  font-size: 1rem
+  min-height: 48px
   padding: 0 22px
   border-radius: 999px
   cursor: pointer
   -webkit-tap-highlight-color: transparent
 
   &:active
-    transform: scale(0.97)
+    transform: scale(0.98)
 
 .bk-primary
+  flex: 1 1 auto
+  display: flex
+  align-items: center
+  justify-content: center
+  gap: 10px
+  min-height: 50px
   border: 0
-  background: $accent
-  color: #ffffff
-  box-shadow: 0 8px 18px -8px rgba(31, 58, 95, 0.7)
+  background: var(--lk-accent)
+  color: var(--lk-on-accent)
+
+.bk-primary-ico
+  display: grid
+  place-items: center
+  width: 30px
+  height: 30px
+  border-radius: 50%
+  background: #fff
+
+  img
+    width: 24px
+    height: 24px
+    object-fit: contain
 
 .bk-secondary
-  border: 1px solid rgba(20, 24, 32, 0.18)
-  background: $glass
+  border: 1px solid var(--lk-line)
+  background: var(--lk-surface)
   color: $ink
 
 .bk-danger
@@ -547,12 +613,11 @@ $glass: rgba(252, 251, 248, 0.88)
   background: #a93d2e
   color: #ffffff
 
+// the pages as small chips, painted ones show their picture
 .bk-strip
-  width: 100%
-  max-width: 980px
   display: flex
   gap: 8px
-  padding: 6px 4px 8px
+  padding: 4px 2px
   overflow-x: auto
   scrollbar-width: none
   &::-webkit-scrollbar
@@ -561,15 +626,15 @@ $glass: rgba(252, 251, 248, 0.88)
 .bk-thumb
   position: relative
   flex: 0 0 auto
-  width: 54px
-  aspect-ratio: 3 / 4
+  width: 40px
+  height: 40px
   padding: 0
   border: 2px solid transparent
-  border-radius: 6px
-  background: #ffffff
+  border-radius: 12px
+  background: var(--lk-bg)
   overflow: hidden
   cursor: pointer
-  box-shadow: 0 3px 8px -4px rgba(60, 40, 10, 0.5)
+  -webkit-tap-highlight-color: transparent
 
   img
     width: 100%
@@ -579,39 +644,61 @@ $glass: rgba(252, 251, 248, 0.88)
 
   &.current
     border-color: $accent
+    box-shadow: 0 0 0 3px var(--lk-accent-soft)
 
 .bk-thumb .bk-thumb-star
   position: absolute
-  right: 1px
-  top: 1px
-  width: 18px
-  height: 18px
+  right: 0
+  top: 0
+  width: 16px
+  height: 16px
   object-fit: contain
   filter: drop-shadow(0 1px 2px rgba(20, 24, 32, 0.4))
 
+.bk-thumb .bk-thumb-crown
+  position: absolute
+  left: 50%
+  top: 50%
+  width: 62%
+  height: auto
+  object-fit: contain
+  transform: translate(-50%, -50%)
+
 .bk-thumb-n
   position: absolute
-  left: 2px
-  bottom: 2px
+  inset: 0
+  display: grid
+  place-items: center
+  font-size: 0.85rem
+  font-weight: 800
+  color: $muted
+
+.bk-thumb.painted .bk-thumb-n
+  inset: auto 2px 2px auto
   min-width: 16px
   padding: 0 3px
   border-radius: 6px
-  background: rgba(252, 251, 248, 0.9)
+  background: rgba(250, 252, 250, 0.9)
+  color: var(--lk-text)
   font-size: 0.62rem
-  font-weight: 800
   line-height: 15px
-  text-align: center
 
-.bk-thumb:not(.painted) .bk-thumb-n
-  left: 0
-  bottom: 0
-  right: 0
-  top: 0
-  display: grid
-  place-items: center
+.bk-links
+  display: flex
+  flex-wrap: wrap
+  justify-content: center
+  gap: 4px 18px
+
+.bk-link
+  min-height: 36px
+  padding: 0 4px
+  border: 0
   background: transparent
-  font-size: 0.85rem
-  color: $muted
+  color: $accent
+  font: inherit
+  font-size: 0.9rem
+  font-weight: 700
+  cursor: pointer
 
 .bk-overlay
   position: fixed
@@ -621,15 +708,15 @@ $glass: rgba(252, 251, 248, 0.88)
   align-items: center
   justify-content: center
   padding: 20px
-  background: rgba(20, 14, 6, 0.55)
+  background: rgba(10, 25, 30, 0.55)
 
 .bk-dialog
   width: 100%
   max-width: 360px
   padding: 22px 22px 18px
-  border-radius: 20px
-  background: #fffaf0
-  box-shadow: 0 20px 60px -16px rgba(58, 42, 18, 0.5)
+  border-radius: 24px
+  background: var(--lk-surface)
+  box-shadow: 0 20px 60px -16px rgba(10, 25, 30, 0.5)
 
   h2
     margin: 0 0 8px
@@ -640,7 +727,7 @@ $glass: rgba(252, 251, 248, 0.88)
     margin: 0 0 18px
     font-size: 0.95rem
     line-height: 1.45
-    color: #3b4150
+    color: $muted
 
 .bk-dialog-actions
   display: flex
@@ -648,11 +735,4 @@ $glass: rgba(252, 251, 248, 0.88)
   justify-content: flex-end
   flex-wrap: wrap
 
-@media (max-width: 640px)
-  .bk-arrow
-    width: 34px
-    height: 52px
-  .bk-sheet
-    max-width: calc(100% - 84px)
-    max-height: calc(100vh - 360px)
 </style>

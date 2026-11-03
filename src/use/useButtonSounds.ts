@@ -12,6 +12,8 @@ export default function useButtonSounds() {
   const onClick = (e: Event) => {
     const el = (e.target as Element | null)?.closest?.('button, [role="button"]') as HTMLElement | null
     if (!el || (el as HTMLButtonElement).disabled || el.getAttribute('aria-disabled') === 'true' || el.dataset.silent !== undefined) return
+    // the tab bar at the bottom leaves the journey: it never beeps (the page that is left is still there for the moment of the change)
+    if (el.closest('.z-bottom-nav, [data-silent]')) return
     const t0 = performance.now()
     // the handlers of the button run first; whether one of them started a sound is known one tick later
     window.setTimeout(() => {

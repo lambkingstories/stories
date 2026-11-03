@@ -378,18 +378,24 @@ function readUnlockLink(p: PreviewJourney): boolean {
   }
 }
 
-/** Adds the journeys that are shown only on unlocked devices. Called once before the app is mounted. */
+/** Adds the journeys that are shown only on unlocked devices. Called once before the app is mounted; the files are fetched all at once, not one after the other. */
 export async function loadPreviewJourneys(): Promise<void> {
-  for (const p of previewJourneys()) {
-    if (!(p.always || readUnlockLink(p))) continue
-    try {
-      const journey = await p.load()
-      if (!journeys.some((j) => j.id === journey.id)) journeys.push(journey)
-      const at = comingSoon.findIndex((c) => c.id === journey.id)
-      if (at >= 0) comingSoon.splice(at, 1)
-    } catch (error) {
-      // the journey could not be loaded (no net): the app simply goes on without it
-      console.error(`journey ${p.id} could not be loaded`, error)
-    }
+  const wanted = previewJourneys().filter((p) => p.always || readUnlockLink(p))
+  const loaded = await Promise.all(
+    wanted.map(async (p) => {
+      try {
+        return await p.load()
+      } catch (error) {
+        // the journey could not be loaded (no net): the app simply goes on without it
+        console.error(`journey ${p.id} could not be loaded`, error)
+        return null
+      }
+    })
+  )
+  for (const journey of loaded) {
+    if (!journey) continue
+    if (!journeys.some((j) => j.id === journey.id)) journeys.push(journey)
+    const at = comingSoon.findIndex((c) => c.id === journey.id)
+    if (at >= 0) comingSoon.splice(at, 1)
   }
 }

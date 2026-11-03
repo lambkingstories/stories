@@ -11,6 +11,7 @@ import { isMobileLandscape } from '@/use/useUser'
 import type { ApiBook, Locale } from '@/types/apiBook'
 import { pickLocalizedImage } from '@/types/apiBook'
 import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
+import { contentLocale } from '@/utils/contentLocale'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
@@ -24,7 +25,7 @@ onMounted(() => {
   void apiSeries.loadAll()
 })
 
-const lang = computed<Locale>(() => (locale.value === 'en' ? 'en' : 'de'))
+const lang = computed<Locale>(() => (contentLocale(locale.value)))
 
 function localizedTitle(book: ApiBook): string {
   return book.localizations?.[lang.value]?.title || book.localizations?.de?.title || ''

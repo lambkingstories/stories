@@ -1,5 +1,5 @@
-// "Lesen" has three areas: Stories (the stories of the app), Books (printed books that can be bought in the store) and
-// Malbücher (the coloring books). Every book of the backend belongs to exactly one of them.
+// "Lesen" has three areas: Stories (the stories of the app), Books (printed books that can be bought in the store) and Malbücher (the
+// coloring books). Every book belongs to exactly one.
 import { isColoringBook } from '@/utils/coloringBook'
 
 export type ReadingArea = 'stories' | 'books' | 'coloring'

@@ -5,7 +5,8 @@ describe('music for the mini games', () => {
   it('has pieces for every mood and a file for each', () => {
     for (const mood of ['ruhig', 'mittel', 'lebhaft'] as const) expect(GAME_MUSIC.filter((p) => p.mood === mood).length).toBeGreaterThanOrEqual(2)
     expect(GAME_MUSIC).toHaveLength(10)
-    expect(MUSIC_FILES).toHaveLength(11)
+    // the map piece, the ten mini game pieces and the piece of the big David game
+    expect(MUSIC_FILES).toHaveLength(12)
   })
 
   it('picks a piece of the mood and never the same twice in a row', () => {

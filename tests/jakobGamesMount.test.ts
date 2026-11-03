@@ -159,6 +159,22 @@ describe('Treppe zusammenschieben (slide)', () => {
     expect(w.findAll('.sl-tile.gap')).toHaveLength(1)
   })
 
+  it('a round with two free fields shows two gaps and a tile next to either of them slides', async () => {
+    const { default: Slide } = await import('@/components/molecules/games/GameSlide.vue')
+    const two: SlideGame = { image: 'images/x/night.webp', rounds: [{ hint: 'zwei Lücken', cols: 3, rows: 2, moves: 10, seed: 7, gaps: 2 }] }
+    const w = mount(Slide, { ...opts('de'), props: { game: two } })
+    await flushPromises()
+    expect(w.findAll('.sl-tile')).toHaveLength(6)
+    expect(w.findAll('.sl-tile.gap')).toHaveLength(2)
+    const board = scramble(3, 2, 10, 7, 2)
+    const movable = neighbors(board, 3, 2)
+    expect(w.findAll('.sl-tile.movable')).toHaveLength(movable.length)
+    await w.findAll('.sl-tile')[movable[0]!]!.trigger('click')
+    await flushPromises()
+    expect(w.findAll('.sl-tile.gap')).toHaveLength(2)
+    expect(played).toContain('tap')
+  })
+
   it('"Tip" shows the whole picture for three seconds and is counted', async () => {
     const w = await open()
     expect(w.find('.sl-model').exists()).toBe(false)

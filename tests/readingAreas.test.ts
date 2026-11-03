@@ -72,13 +72,13 @@ describe('the area of a book', () => {
 })
 
 describe('Lesen: the front door', () => {
-  it('shows three tiles that lead to Stories, Books and Malbücher', async () => {
+  it('shows the tiles that lead to Stories, Books, Malbücher and Good night', async () => {
     const { default: View } = await import('@/views/app/AppReadView.vue')
     const wrapper = mount(View, { global: { plugins: [i18n] }, attachTo: document.body })
     await flushPromises()
     const doors = wrapper.findAll('.door')
-    expect(doors.map((d) => d.find('.door-title').text())).toEqual(['Stories', 'Books', 'Malbücher'])
-    const routes = ['app-all-books', 'app-books', 'app-coloring-books']
+    expect(doors.map((d) => d.find('.door-title').text())).toEqual(['Stories', 'Books', 'Malbücher', 'Gute Nacht'])
+    const routes = ['app-all-books', 'app-books', 'app-coloring-books', 'app-goodnight']
     for (let i = 0; i < doors.length; i++) {
       push.mockClear()
       await doors[i]!.trigger('click')
@@ -107,5 +107,38 @@ describe('Books', () => {
     expect(storeBooks[0]!.url).toBe('https://lambking.store')
     expect(warnings.filter((w) => /not defined on instance|is not a function|ERROR/.test(w))).toEqual([])
     vi.doUnmock('@/use/useApiBooks')
+  })
+})
+
+describe('Books: the preview of "Zachäus begegnet Jesus"', () => {
+  it('has a preview button that opens the look inside', async () => {
+    vi.doMock('@/use/useApiBooks', () => ({ default: () => ({ state: { all: [] }, loadAllBooks: vi.fn() }) }))
+    vi.resetModules()
+    const { default: View } = await import('@/views/app/AppBooksView.vue')
+    const wrapper = mount(View, { global: { plugins: [i18n] }, attachTo: document.body })
+    await flushPromises()
+    push.mockClear()
+    await wrapper.find('.book-preview').trigger('click')
+    expect(push).toHaveBeenCalledWith({ name: 'app-book-preview', params: { bookId: 'der-mann-im-baum-zachaeus' } })
+    expect(warnings.filter((w) => /not defined on instance|is not a function|ERROR/.test(w))).toEqual([])
+  })
+})
+
+describe('Books: coming soon', () => {
+  it('shows "Völker der Bibel – Band 1" as coming soon with a preview and without a store button', async () => {
+    vi.doMock('@/use/useApiBooks', () => ({ default: () => ({ state: { all: [] }, loadAllBooks: vi.fn() }) }))
+    vi.resetModules()
+    const { default: View } = await import('@/views/app/AppBooksView.vue')
+    const wrapper = mount(View, { global: { plugins: [i18n] }, attachTo: document.body })
+    await flushPromises()
+    const cards = wrapper.findAll('.book-card')
+    expect(cards).toHaveLength(2)
+    expect(cards[1]!.text()).toContain('Völker der Bibel – Band 1')
+    expect(cards[1]!.find('.book-soon').text()).toBe('Bald erhältlich')
+    expect(cards[1]!.find('.book-preview').exists()).toBe(true)
+    expect(cards[1]!.find('.book-store').exists()).toBe(false)
+    // the book that is for sale keeps its store button
+    expect(cards[0]!.find('.book-store').exists()).toBe(true)
+    expect(cards[0]!.find('.book-soon').exists()).toBe(false)
   })
 })

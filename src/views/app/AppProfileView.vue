@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import useTheme, { type ThemeChoice } from '@/use/useTheme'
+import useTheme, { type PaletteName, type ThemeChoice } from '@/use/useTheme'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -10,7 +10,8 @@ import ZIconography from '@/components/atoms/ZIconography.vue'
 import ZLanguageSwitcher from '@/components/atoms/ZLanguageSwitcher.vue'
 import AvatarPickerModal from '@/components/molecules/AvatarPickerModal.vue'
 import TipButton from '@/components/molecules/TipButton.vue'
-import MyRewards from '@/components/molecules/MyRewards.vue'
+import TestUnlock from '@/components/molecules/TestUnlock.vue'
+import { PLUS_TEST } from '@/use/usePremium'
 import useModels from '@/use/useModels'
 import useApiBooks from '@/use/useApiBooks'
 import useUser from '@/use/useUser'
@@ -23,6 +24,7 @@ import type { ApiBook, Locale } from '@/types/apiBook'
 import { pickLocalizedImage } from '@/types/apiBook'
 import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
 import { prependBaseUrl } from '@/utils/function'
+import { contentLocale } from '@/utils/contentLocale'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
@@ -42,7 +44,7 @@ onMounted(() => {
   void apiBooks.loadAllBooks()
 })
 
-const lang = computed<Locale>(() => (locale.value === 'en' ? 'en' : 'de'))
+const lang = computed<Locale>(() => (contentLocale(locale.value)))
 
 // Backdrop — a tall artwork for portrait, a wide one for landscape. The swap
 // itself happens in CSS (`@media (orientation: …)`); we only feed the
@@ -111,7 +113,12 @@ function closeAvatar() {
 // now purely a way to collapse it out of the way.
 const settingsOpen = ref(true)
 
-const { choice: themeChoice, setChoice: setThemeChoice } = useTheme()
+const { choice: themeChoice, setChoice: setThemeChoice, palette, setPalette, isNight } = useTheme()
+const paletteOptions = computed<{ id: PaletteName; label: string }[]>(() => [
+  { id: 'mint', label: t('app.theme.mint') },
+  { id: 'beige', label: t('app.theme.beige') },
+  { id: 'creme', label: t('app.theme.creme') }
+])
 const themeOptions = computed<{ id: ThemeChoice; label: string; icon: 'sun' | 'moon' | 'auto' }[]>(() => [
   { id: 'day', label: t('app.theme.day'), icon: 'sun' },
   { id: 'night', label: t('app.theme.night'), icon: 'moon' },
@@ -169,6 +176,8 @@ function onBackendToggle(e: Event) {
   const target = e.target as HTMLInputElement
   setUseLocalBackend(target.checked)
 }
+
+const tileImg = (path: string) => prependBaseUrl(`images/${path}.webp`)
 </script>
 
 <template lang="pug">
@@ -261,12 +270,27 @@ function onBackendToggle(e: Event) {
             //  )
 
 
-      //- the awards (cups, stars, medals) belong to the child's own place
-      router-link(:to="{ name: 'app-awards' }" class="lk-btn lk-btn--outline lk-btn--full awards-open")
-        span {{ t('app.profile.myAwards') }}
+      //- the child's own places: four tiles of the same kind
+      nav(class="my-tiles" :aria-label="t('app.profile.myPlaces')")
+        router-link(:to="{ name: 'app-awards' }" class="my-tile")
+          img(:src="tileImg('abenteuer/ui/stern-gold-3')" alt="" class="my-tile-img" draggable="false")
+          span(class="my-tile-title") {{ t('app.profile.myAwards') }}
+          span(class="my-tile-sub") {{ t('app.profile.tileAwardsSub') }}
+        router-link(:to="{ name: 'app-collection' }" class="my-tile")
+          img(:src="tileImg('icons/navi/pokal')" alt="" class="my-tile-img" draggable="false")
+          span(class="my-tile-title") {{ t('app.collection.title') }}
+          span(class="my-tile-sub") {{ t('app.collection.quickSub') }}
+        router-link(:to="{ name: 'app-gameroom' }" class="my-tile")
+          img(:src="tileImg('icons/spielzimmer-4')" alt="" class="my-tile-img" draggable="false")
+          span(class="my-tile-title") {{ t('app.profile.gameRoom') }}
+          span(class="my-tile-sub") {{ t('app.profile.tileGameRoomSub') }}
+        router-link(:to="{ name: 'app-journal' }" class="my-tile")
+          img(:src="tileImg('icons/favorites')" alt="" class="my-tile-img" draggable="false")
+          span(class="my-tile-title") {{ t('app.journal.title') }}
+          span(class="my-tile-sub") {{ t('app.profile.tileJournalSub') }}
 
-      //- what was won on the adventures: the games of the gold cups and the coloring pictures
-      MyRewards
+      //- only in the test build: unlock all the adventures to try the cards and the big games
+      TestUnlock(v-if="PLUS_TEST")
 
       //- ===== Settings (collapsible) =====
       div(
@@ -295,6 +319,22 @@ function onBackendToggle(e: Event) {
               ZIconography(:name="opt.icon" :size="20")
               span {{ opt.label }}
           span(class="theme-hint") {{ t('app.theme.hint') }}
+
+        //- the colour of the day look: three round colour pads
+        div(v-if="!isNight" class="settings-row settings-row--col palette-row")
+          span(class="settings-label") {{ t('app.theme.paletteTitle') }}
+          div(class="palette-seg" role="radiogroup" :aria-label="t('app.theme.paletteTitle')")
+            button(
+              v-for="opt in paletteOptions"
+              :key="opt.id"
+              type="button"
+              role="radio"
+              :aria-checked="palette === opt.id"
+              :class="['palette-opt', `is-${opt.id}`, { 'is-on': palette === opt.id }]"
+              @click="setPalette(opt.id)"
+            )
+              span(class="palette-dot" aria-hidden="true")
+              span {{ opt.label }}
 
         //- Backend feature flag — flip the API host between Render and
         //- the local dev server. Reloads the page so the IndexedDB cache
@@ -526,6 +566,51 @@ button
   display: flex
   align-items: center
   gap: 14px
+
+.my-tiles
+  display: grid
+  grid-template-columns: 1fr 1fr
+  gap: 12px
+  margin-top: 14px
+
+.my-tile
+  display: flex
+  flex-direction: column
+  align-items: center
+  text-align: center
+  gap: 2px
+  padding: 14px 14px 16px
+  border: 1px solid var(--lk-line)
+  border-radius: 24px
+  background: var(--lk-surface)
+  box-shadow: var(--lk-shadow)
+  color: var(--lk-text)
+  text-decoration: none
+  -webkit-tap-highlight-color: transparent
+
+  &:active
+    transform: translateY(1px)
+
+  &.is-gold
+    background: linear-gradient(160deg, #fbecc2, #f3d484)
+    border-color: #e0bd62
+    color: #3a2c10
+
+.my-tile-img
+  width: 56px
+  height: 56px
+  margin-bottom: 6px
+  object-fit: contain
+
+.my-tile-title
+  font-size: 1.02rem
+  font-weight: 800
+  line-height: 1.2
+
+.my-tile-sub
+  font-size: 0.84rem
+  line-height: 1.3
+  opacity: 0.8
 
 .awards-open
   margin-top: 14px
@@ -1026,4 +1111,45 @@ button
 .theme-hint
   font-size: 0.88rem
   color: var(--lk-muted)
+
+// the three colours of the day look
+.palette-seg
+  display: flex
+  gap: 8px
+
+.palette-opt
+  flex: 1
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: 6px
+  padding: 10px 4px 8px
+  border: 2px solid transparent
+  border-radius: 20px
+  background: var(--lk-surface-2)
+  color: var(--lk-text)
+  font: inherit
+  font-weight: 700
+  font-size: 0.92rem
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+
+  &.is-on
+    border-color: var(--lk-accent)
+    background: var(--lk-accent-soft)
+
+.palette-dot
+  width: 40px
+  height: 40px
+  border-radius: 50%
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12)
+
+  .is-mint &
+    background: linear-gradient(135deg, #edf3f1 50%, #1d666a 50%)
+
+  .is-beige &
+    background: linear-gradient(135deg, #f0e9db 50%, #7a5530 50%)
+
+  .is-creme &
+    background: linear-gradient(135deg, #f8f4e9 50%, #1d666a 50%)
 </style>

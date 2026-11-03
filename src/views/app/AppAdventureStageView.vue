@@ -146,6 +146,8 @@ import SoundPanel from '@/components/molecules/SoundPanel.vue'
 import ReadAloud from '@/components/molecules/ReadAloud.vue'
 import { journeyById } from '@/data/adventures'
 import useAdventure from '@/use/useAdventure'
+import usePremium from '@/use/usePremium'
+import { isStagePlusLocked } from '@/utils/adventureAccess'
 import { getArtwork, pageArtworkId } from '@/use/useArtworks'
 import { prependBaseUrl } from '@/utils/function'
 import useTaskProgress from '@/use/useTaskProgress'
@@ -201,6 +203,8 @@ const lostStars = computed(() => (phase.value === 'result' ? Math.max(0, gameSta
 const gainedStars = computed(() => (phase.value === 'result' && tryFinal.value !== null ? Math.max(0, tryFinal.value - gameStars.value) : 0))
 /** The last time the stage was finished it was the first time (then the map slides on to the next stage; a replay leaves the map where it is). */
 const lastWasFirst = ref(false)
+/** After the questions: the card of this stage is new (all three stars for the first time), or still needs stars. */
+const cardState = ref<'' | 'new' | 'need'>('')
 /** Which try this is: a new one starts the questions afresh. */
 const attempt = ref(0)
 
@@ -395,7 +399,17 @@ async function buildPainted() {
   }
 }
 
+const { showUpsell } = usePremium()
+
 onMounted(() => {
+  // a stage behind LambKing Plus cannot be reached by a link either: back to the map, with the Plus sheet
+  const j = journey.value
+  const at = j && stage.value ? j.stages.indexOf(stage.value) : -1
+  if (j && at >= 0 && !freePlay.value && isStagePlusLocked(j.id, at)) {
+    showUpsell('adventure')
+    void router.replace({ name: 'app-adventure-map', params: { journeyId: j.id } })
+    return
+  }
   if (phase.value === 'painted') void buildPainted()
 })
 
@@ -670,7 +684,10 @@ function quizDone(correct: number) {
       // every wrong answer takes one star of the game away
       const f = finalStars(gameStars.value, correct, total - correct)
       tryFinal.value = f
+      const before = adv.stageOf(j.id, stage.value.id)
+      const hadCard = !!before?.done && (before.bestStars ?? 0) >= 3
       adv.recordFinal(j.id, stage.value.id, f)
+      cardState.value = stageStarsOf(adv.stageOf(j.id, stage.value.id)) >= 3 ? (hadCard ? '' : 'new') : 'need'
     }
     lastWasFirst.value = !adv.stageOf(j.id, stage.value.id)?.done
     adv.completeStage(j.id, stage.value.id)
@@ -952,8 +969,11 @@ function openGift() {
             li(v-if="!isQuizStage" class="account-row" :class="{ minus: tryWrong > 0 }")
               span {{ t('app.adventure.accWrong') }}
               strong {{ tryWrong > 0 ? '−' + tryWrong : '0' }}
+          p(v-if="cardState === 'new'" class="card-note is-new") {{ t('app.adventure.cardNew') }}
+          p(v-else-if="cardState === 'need'" class="card-note") {{ t('app.adventure.cardNeed') }}
           AdventureOverview(:rows="overviewRows(false)")
           div(class="stage-actions")
+            AdvButton(v-if="cardState === 'new'" tone="gold" @click="router.push({ name: 'app-collection' })") {{ t('app.adventure.cardShow') }}
             AdvButton(tone="gold" @click="goMap(stage?.id, lastWasFirst)") {{ isLastStage ? t('app.adventure.toExam') : t('app.adventure.backToMap') }}
             AdvButton(v-if="shownStars < 3" tone="blau" @click="retry") {{ t('app.adventure.retry') }}
 
@@ -1182,6 +1202,18 @@ $ink: var(--lk-text)
   margin: 0 0 14px
   font-size: 1.1rem
   color: var(--lk-muted)
+
+.card-note
+  margin: 10px auto 0
+  max-width: 28rem
+  text-align: center
+  font-weight: 700
+  line-height: 1.35
+  color: var(--lk-muted)
+
+  &.is-new
+    color: #a06a00
+    font-weight: 800
 
 .stage-actions
   display: flex

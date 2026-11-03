@@ -32,6 +32,14 @@ describe('parental gate', () => {
     expect(numberWord(99, 'en')).toBe('ninety-nine')
   })
 
+  it('writes the number in Spanish', () => {
+    expect(numberWord(21, 'es')).toBe('veintiuno')
+    expect(numberWord(23, 'es')).toBe('veintitrés')
+    expect(numberWord(31, 'es')).toBe('treinta y uno')
+    expect(numberWord(66, 'es')).toBe('sesenta y seis')
+    expect(numberWord(99, 'es')).toBe('noventa y nueve')
+  })
+
   it('lets the web build through without a dialog', async () => {
     // VITE_APP_NATIVE is not set under vitest, so there is no gate to show.
     await expect(requireParent()).resolves.toBe(true)

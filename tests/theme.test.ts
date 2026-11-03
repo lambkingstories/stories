@@ -45,3 +45,16 @@ describe('theme', () => {
     for (const n of names) expect(night, `night is missing --${n}`).toContain(`--${n}:`)
   })
 })
+
+describe('palette', () => {
+  it('the colour of the day look is written on <html> and remembered', () => {
+    localStorage.clear()
+    const { setPalette, palette } = useTheme()
+    setPalette('beige')
+    expect(document.documentElement.getAttribute('data-palette')).toBe('beige')
+    expect(palette.value).toBe('beige')
+    expect(localStorage.getItem('lk-palette')).toBe('beige')
+    setPalette('mint')
+    expect(document.documentElement.getAttribute('data-palette')).toBe('mint')
+  })
+})

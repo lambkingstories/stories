@@ -11,6 +11,7 @@ import {
   crankStep,
   FULL,
   gapOf,
+  gapsOf,
   grab,
   holdProgress,
   isSolved,
@@ -28,24 +29,23 @@ import {
 } from '@/utils/jakobGames'
 
 /** The shortest way back to the finished picture (a breadth-first search; fine for a board of 3 x 2). Returns the places of the tiles to slide, in order. */
-export function solveSteps(start: Board, cols: number): number[] {
-  const target = start.map((_, i) => i).join(',')
+export function solveSteps(start: Board, cols: number, gaps = 1): number[] {
   const seen = new Map<string, { from: string; place: number } | null>([[start.join(','), null]])
   let frontier: Board[] = [start]
   while (frontier.length) {
     const next: Board[] = []
     for (const b of frontier) {
-      if (b.join(',') === target) {
+      if (isSolved(b, gaps)) {
         const steps: number[] = []
-        let key = target
+        let key = b.join(',')
         for (let s = seen.get(key); s; s = seen.get(key)) {
           steps.unshift(s.place)
           key = s.from
         }
         return steps
       }
-      for (const place of neighbors(b, cols)) {
-        const m = move(b, cols, place)!
+      for (const place of neighbors(b, cols, gaps)) {
+        const m = move(b, cols, place, gaps)!
         const k = m.join(',')
         if (!seen.has(k)) {
           seen.set(k, { from: b.join(','), place })
@@ -141,11 +141,43 @@ describe('slide puzzle: the mixing', () => {
   it('the rounds of the data are mixed but not finished, and a round of 3 x 2 can be solved', () => {
     const s = jakob.stages[2]!.task.slide!
     for (const r of s.rounds) {
-      const b = scramble(r.cols, r.rows, r.moves, r.seed)
-      expect(isSolved(b)).toBe(false)
+      const b = scramble(r.cols, r.rows, r.moves, r.seed, r.gaps)
+      expect(isSolved(b, r.gaps)).toBe(false)
+      expect(solveSteps(b, r.cols, r.gaps ?? 1).length).toBeGreaterThan(2)
     }
-    const first = s.rounds[0]!
-    expect(solveSteps(scramble(first.cols, first.rows, first.moves, first.seed), first.cols).length).toBeGreaterThan(2)
+  })
+})
+
+describe('slide puzzle: two free fields', () => {
+  it('the last two pieces are the gaps and may lie at the last two places in either order', () => {
+    const b = solvedBoard(3, 2)
+    expect(gapsOf(b, 2)).toEqual([4, 5])
+    expect(isSolved([0, 1, 2, 3, 5, 4], 2)).toBe(true)
+    expect(isSolved([0, 1, 2, 4, 3, 5], 2)).toBe(false)
+    expect(isSolved([0, 1, 2, 3, 5, 4])).toBe(false)
+  })
+
+  it('a tile next to any of the gaps can be slid, a gap cannot', () => {
+    const b = solvedBoard(3, 2)
+    // gaps at 4 and 5: the neighbours are 1 (above 4), 3 (left of 4) and 2 (above 5)
+    expect(neighbors(b, 3, 2)).toEqual([1, 2, 3])
+    expect(move(b, 3, 4, 2)).toBeNull()
+    expect(move(b, 3, 3, 2)).toEqual([0, 1, 2, 4, 3, 5])
+    expect(move(b, 3, 2, 2)).toEqual([0, 1, 5, 3, 4, 2])
+    expect(move(b, 3, 0, 2)).toBeNull()
+  })
+
+  it('every mixed puzzle is not finished, has every piece once, and can be solved, and it is solved in fewer moves than with one gap', () => {
+    for (const [cols, rows] of [[3, 2], [4, 2]] as const) {
+      for (let seed = 1; seed <= 30; seed++) {
+        const b = scramble(cols, rows, 14, seed, 2)
+        expect(isSolved(b, 2), `${cols}x${rows} seed ${seed}`).toBe(false)
+        expect([...b].sort((x, y) => x - y)).toEqual(solvedBoard(cols, rows))
+        let cur = b
+        for (const place of solveSteps(b, cols, 2)) cur = move(cur, cols, place, 2)!
+        expect(isSolved(cur, 2)).toBe(true)
+      }
+    }
   })
 })
 

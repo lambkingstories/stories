@@ -6,10 +6,13 @@
  * iPad otherwise opened a German app, and App Review could not find the
  * "Support us" tip it was told to look for. On iOS `navigator.language` is
  * the bundle localization iOS chose (de.lproj or the English base), so it is
- * always one of the two.
+ * always one of the two. Spanish devices get Spanish as soon as it is offered again (`SPANISH_ENABLED`), until then English.
  */
-export function defaultLanguage(): 'de' | 'en' {
+import { offeredLanguage } from '@/utils/languages'
+
+export function defaultLanguage(): 'de' | 'en' | 'es' {
   if (import.meta.env.VITE_APP_NATIVE !== 'true') return 'de'
   const lang = typeof navigator !== 'undefined' ? navigator.language || '' : ''
-  return lang.toLowerCase().startsWith('de') ? 'de' : 'en'
+  const code = lang.toLowerCase()
+  return offeredLanguage(code.startsWith('de') ? 'de' : code.startsWith('es') ? 'es' : 'en')
 }

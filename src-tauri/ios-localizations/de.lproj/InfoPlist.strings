@@ -5,3 +5,4 @@
 "NSCameraUsageDescription" = "LambKing Stories nutzt die Kamera nur, wenn du „Foto aufnehmen“ wählst, um ein Bild zum Ausmalen zu holen.";
 "NSPhotoLibraryUsageDescription" = "LambKing Stories öffnet deine Fotos nur, wenn du ein Bild zum Ausmalen auswählst.";
 "NSPhotoLibraryAddUsageDescription" = "LambKing Stories speichert dein fertiges Ausmalbild in deinen Fotos, wenn du auf Herunterladen tippst oder „Bild sichern“ wählst.";
+"NSMicrophoneUsageDescription" = "LambKing Stories nutzt das Mikrofon nur, wenn ein Erwachsener eine Geschichte für das Kind aufnimmt. Die Aufnahmen bleiben auf diesem Gerät.";

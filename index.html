@@ -17,9 +17,20 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>LambKing</title>
+  <script src="/boot.js"></script>
+  <style>
+    /* the first picture while the app is loading: the colour of the app and the lamb, never a white screen */
+    html, body { margin: 0; background: #edf3f1; }
+    html[data-theme="day"][data-palette="beige"], html[data-theme="day"][data-palette="beige"] body { background: #f0e9db; }
+    html[data-theme="day"][data-palette="creme"], html[data-theme="day"][data-palette="creme"] body { background: #f8f4e9; }
+    html[data-theme="night"], html[data-theme="night"] body { background: #162433; }
+    .boot { position: fixed; inset: 0; display: grid; place-items: center; }
+    .boot img { width: 120px; height: auto; animation: boot-in 500ms ease-out both; }
+    @keyframes boot-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  </style>
 </head>
 <body>
-<div id="app"></div>
+<div id="app"><div class="boot"><img src="/images/logo/lk-lamm.webp" alt="" width="120" height="120"></div></div>
 <script type="module" src="/src/main.ts"></script>
 </body>
 </html>

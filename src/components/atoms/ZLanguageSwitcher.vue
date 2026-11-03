@@ -17,6 +17,7 @@
 import { useI18n } from 'vue-i18n'
 import { useId } from 'vue'
 import useUser from '@/use/useUser'
+import { SPANISH_ENABLED } from '@/utils/languages'
 
 interface Props {
   /** Flag width in px; the 3:2 height follows. */
@@ -25,7 +26,7 @@ interface Props {
 
 withDefaults(defineProps<Props>(), { size: 38 })
 
-const emit = defineEmits<{ change: [locale: 'de' | 'en'] }>()
+const emit = defineEmits<{ change: [locale: 'de' | 'en' | 'es'] }>()
 
 const { t } = useI18n({ useScope: 'global' })
 const { userLanguage, setSettingValue } = useUser()
@@ -35,7 +36,7 @@ const { userLanguage, setSettingValue } = useUser()
 // screen + an open profile card).
 const ukClipId = `z-uk-clip-${useId()}`
 
-function pick(code: 'de' | 'en') {
+function pick(code: 'de' | 'en' | 'es') {
   if (userLanguage.value === code) return
   setSettingValue('language', code)
   emit('change', code)
@@ -90,6 +91,21 @@ function pick(code: 'de' | 'en') {
         rect(width="60" height="13.5" y="0" fill="#000000")
         rect(width="60" height="13.5" y="13.3" fill="#dd0000")
         rect(width="60" height="13.4" y="26.6" fill="#ffce00")
+    button(
+      v-if="SPANISH_ENABLED"
+      type="button"
+      :class="['z-lang-btn', { 'is-active': userLanguage === 'es' }]"
+      :style="{ width: size + 'px' }"
+      :aria-label="t('app.language.spanish')"
+      :aria-pressed="userLanguage === 'es'"
+      :title="t('app.language.spanish')"
+      @click="pick('es')"
+    )
+      //- the flag of Spain: red, a yellow band twice as high, red
+      svg(viewBox="0 0 60 40" class="z-lang-flag" aria-hidden="true" focusable="false")
+        rect(width="60" height="10.1" y="0" fill="#c60b1e")
+        rect(width="60" height="20.2" y="9.9" fill="#ffc400")
+        rect(width="60" height="10.1" y="29.9" fill="#c60b1e")
 </template>
 
 <style scoped lang="sass">

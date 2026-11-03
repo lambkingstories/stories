@@ -46,7 +46,9 @@ describe('tool looks', () => {
   })
 
   it('lets transparent media darken what is under them, and covering media cover it', () => {
-    expect(BRUSH_LOOK.felt.passes[0]!.blend).toBe('multiply')
+    // felt-tip ink is solid and covers what is under it
+    expect(BRUSH_LOOK.felt.passes[0]!.blend).toBe('source-over')
+    expect(BRUSH_LOOK.felt.passes[0]!.alpha).toBe(1)
     // coloured pencil is see-through wax: overlapping colours mix
     expect(BRUSH_LOOK.pencil.passes[0]!.blend).toBe('multiply')
     expect(BRUSH_LOOK.chalk.passes[0]!.blend).toBe('source-over')
@@ -119,5 +121,73 @@ describe('tip shapes', () => {
   it('makes flat tips thin across their length', () => {
     expect(tipOf('flat').ratio).toBeLessThan(0.5)
     expect(tipOf('tall').ratio).toBeLessThan(0.5)
+  })
+})
+
+describe('glitter pencils', () => {
+  /** A canvas context that only writes down which calls it got. */
+  function recorder() {
+    const calls: string[] = []
+    const ctx = new Proxy({} as Record<string, unknown>, {
+      get: (target, key: string) => (key in target ? target[key] : (..._args: unknown[]) => void calls.push(key)),
+      set: (target, key: string, value) => ((target[key] = value), true)
+    })
+    return { ctx: ctx as unknown as CanvasRenderingContext2D, calls }
+  }
+
+  it('is a layered tool that covers the paper like a gel pen', () => {
+    expect(isLayeredTool('glitter')).toBe(true)
+    expect(BRUSH_LOOK.glitter.passes[0]?.blend).toBe('source-over')
+  })
+
+  it('paints a solid line and scatters many fine flecks over it', async () => {
+    const { paintLayerSegment, newStrokeState } = await import('@/utils/coloringBrushes')
+    const { ctx, calls } = recorder()
+    paintLayerSegment('glitter', ctx, 10, 10, 60, 30, { size: 20, color: '#E53935', pressure: 0.7 }, newStrokeState())
+    expect(calls).toContain('stroke')
+    // the flecks are tiny rectangles: a stroke of this length and width has a great many of them
+    expect(calls.filter((c) => c === 'fillRect').length).toBeGreaterThan(100)
+  })
+
+  it('the flecks stay inside the stroke, are small, and grow with the width of the stroke', async () => {
+    const { glitterSparkle } = await import('@/utils/coloringBrushes')
+    const rects: { x: number; y: number; w: number; h: number }[] = []
+    const ctx = new Proxy({} as Record<string, unknown>, {
+      get: (t, k: string) => (k === 'fillRect' ? (x: number, y: number, w: number, h: number) => void rects.push({ x, y, w, h }) : k in t ? t[k] : () => undefined),
+      set: (t, k: string, v) => ((t[k] = v), true)
+    }) as unknown as CanvasRenderingContext2D
+    glitterSparkle(ctx, 100, 100, 300, 100, 40, '#D4AF37')
+    expect(rects.length).toBeGreaterThan(500)
+    // over the whole stroke, the round ends included (a solid piece paints over whatever lay under its ends)
+    for (const r of rects) {
+      expect(r.x).toBeGreaterThan(100 - 40 * 0.49 - 3)
+      expect(r.x).toBeLessThan(300 + 40 * 0.49 + 3)
+      expect(Math.abs(r.y + r.h / 2 - 100)).toBeLessThanOrEqual(40 * 0.49 + 2)
+      expect(r.w).toBeLessThan(4)
+    }
+    expect(Math.min(...rects.map((r) => r.x))).toBeLessThan(100)
+    const small = Math.max(...rects.map((r) => r.w))
+    rects.length = 0
+    glitterSparkle(ctx, 100, 100, 300, 100, 100, '#D4AF37')
+    expect(Math.max(...rects.map((r) => r.w))).toBeGreaterThan(small)
+  })
+
+  it('uses light and dark versions of the colour, and stays grey for a grey', async () => {
+    const { glitterSparkle } = await import('@/utils/coloringBrushes')
+    const styles = new Set<string>()
+    const ctx = new Proxy({} as Record<string, unknown>, {
+      get: (t, k: string) => (k in t ? t[k] : () => undefined),
+      set: (t, k: string, v) => {
+        if (k === 'fillStyle') styles.add(String(v))
+        t[k] = v
+        return true
+      }
+    }) as unknown as CanvasRenderingContext2D
+    glitterSparkle(ctx, 0, 0, 200, 0, 40, '#E53935')
+    const lights = [...styles].map((s) => Number(/(\d+)%\)$/.exec(s)?.[1]))
+    expect(Math.max(...lights) - Math.min(...lights)).toBeGreaterThan(30)
+    styles.clear()
+    glitterSparkle(ctx, 0, 0, 200, 0, 40, '#C0C0C0')
+    expect([...styles].every((s) => / 0% /.test(s))).toBe(true)
   })
 })

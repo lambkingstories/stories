@@ -50,7 +50,7 @@ export const jakobEn: TextOverlay<Journey> = {
         'And God speaks, “I am the God of your fathers Abraham and Isaac. I will give you this land. I am with you and will watch over you wherever you go. I will bring you back home and will not leave you.”',
         'Jacob wakes up. “How holy this place is!” he cries. “God is here, and I did not know it.” He sets up the stone that was his pillow and calls the place Bethel, which means House of God.'
       ],
-      task: { hint: 'Slide the tiles until the stairway to heaven is whole again.', slide: { rounds: [{ hint: 'Round 1: Slide a tile into the free gap.' }, { hint: 'Round 2: Now there are more tiles.' }] } },
+      task: { hint: 'Slide the tiles until the stairway to heaven is whole again.', slide: { rounds: [{ hint: 'Round 1: Slide a tile into a free gap.' }, { hint: 'Round 2: Now there are more tiles.' }] } },
       questions: [
         { q: 'What does Jacob use as a pillow?', options: ['a stone', 'a fur', 'a sack'] },
         { q: 'What does God say to Jacob?', options: ['“I am with you.”', '“Go back to Esau.”', '“Stay here forever.”'] }

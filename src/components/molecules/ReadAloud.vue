@@ -8,10 +8,14 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AdvButton from '@/components/atoms/AdvButton.vue'
 import useSoundSettings from '@/use/useSoundSettings'
+import usePremium from '@/use/usePremium'
 import { prependBaseUrl } from '@/utils/function'
 
-const props = defineProps<{ text: string[]; audio?: string }>()
+// `plusOnly`: the read-aloud button of a book in the reading area comes with LambKing Plus; in the adventures (which sit behind
+// Plus as a whole) it is free.
+const props = defineProps<{ text: string[]; audio?: string; plusOnly?: boolean }>()
 const { t, locale } = useI18n({ useScope: 'global' })
+const { hasFeature, showUpsell } = usePremium()
 
 const { voiceVolume } = useSoundSettings()
 const playing = ref(false)
@@ -31,7 +35,8 @@ function stop() {
 
 function speak() {
   if (!synth) return
-  const lang = locale.value === 'en' ? 'en-US' : 'de-DE'
+  // the texts are English for every language but German (see `contentLocale`)
+  const lang = locale.value === 'de' ? 'de-DE' : 'en-US'
   const voices = synth.getVoices().filter((v) => v.lang.toLowerCase().startsWith(lang.slice(0, 2)))
   const parts = props.text.filter(Boolean)
   let i = 0
@@ -57,6 +62,11 @@ function speak() {
 function toggle() {
   if (playing.value) {
     stop()
+    return
+  }
+  // always allowed until the subscription is on (see `usePremium`)
+  if (props.plusOnly && !hasFeature('readAloud')) {
+    showUpsell('readAloud')
     return
   }
   playing.value = true

@@ -15,7 +15,7 @@ const { t } = useI18n({ useScope: 'global' })
 const router = useRouter()
 
 interface Door {
-  id: 'stories' | 'books' | 'coloring'
+  id: 'stories' | 'books' | 'coloring' | 'goodnight'
   title: string
   sub: string
   route: string
@@ -25,12 +25,10 @@ interface Door {
 const doors = computed<Door[]>(() => [
   { id: 'stories', title: t('app.read.storiesTitle'), sub: t('app.read.storiesSub'), route: 'app-all-books', image: prependBaseUrl('images/bg/series_landscape.webp') },
   { id: 'books', title: t('app.read.booksTitle'), sub: t('app.read.booksSub'), route: 'app-books', image: prependBaseUrl('images/bg/welcome-bg-3.webp') },
-  { id: 'coloring', title: t('app.read.coloringTitle'), sub: t('app.read.coloringSub'), route: 'app-coloring-books' }
+  { id: 'coloring', title: t('app.read.coloringTitle'), sub: t('app.read.coloringSub'), route: 'app-coloring-books', image: prependBaseUrl('images/lesen/malbuecher-kachel.webp') },
+  // for bedtime: a night-blue tile with the moon (no picture needed)
+  { id: 'goodnight', title: t('app.read.goodnightTitle'), sub: t('app.read.goodnightSub'), route: 'app-goodnight' }
 ])
-
-// the coloring tile has no photo: a sheet with a line drawing and some pencils lie on warm paper
-const sheet = prependBaseUrl('images/ausmalbilder/zachaeus.png')
-const pencils = ['01', '05', '08'].map((n) => prependBaseUrl(`images/ausmalen/pencil/${n}.webp`))
 </script>
 
 <template lang="pug">
@@ -53,9 +51,7 @@ const pencils = ['01', '05', '08'].map((n) => prependBaseUrl(`images/ausmalen/pe
         )
           span(class="door-pic")
             img(v-if="d.image" :src="d.image" alt="" draggable="false" decoding="async")
-            template(v-else)
-              img(class="sheet" :src="sheet" alt="" draggable="false")
-              img(v-for="(p, i) in pencils" :key="i" :class="['pencil', 'p' + i]" :src="p" alt="" draggable="false")
+            ZIconography(v-else name="moon" :size="72" class="door-moon")
           span(class="door-body")
             span(class="door-text")
               span(class="door-title") {{ d.title }}
@@ -103,7 +99,7 @@ button
   flex-direction: column
   padding: 0
   overflow: hidden
-  text-align: left
+  text-align: center
   border: 1px solid var(--lk-line)
   border-radius: var(--lk-r-card)
   background: var(--lk-surface)
@@ -134,43 +130,16 @@ button
     object-fit: cover
     display: block
 
-// warm paper with a sheet and pencils (the coloring tile)
-.is-coloring .door-pic
-  background: linear-gradient(135deg, #f6e8c9, #ecd5a2)
+// the good-night tile: always night blue, with a golden moon
+.door.is-goodnight .door-pic
+  display: flex
+  align-items: center
+  justify-content: center
+  background: radial-gradient(120% 90% at 50% 0%, #1f3252 0%, #0d1829 75%)
 
-  > img.sheet
-    inset: auto
-    left: 50%
-    top: 8%
-    width: auto
-    height: 118%
-    transform: translateX(-62%) rotate(-5deg)
-    object-fit: contain
-    background: #fff
-    border-radius: 6px
-    box-shadow: 0 8px 18px rgba(60, 40, 10, 0.35)
-
-  > img.pencil
-    inset: auto
-    width: auto
-    height: 74%
-    object-fit: contain
-    filter: drop-shadow(0 4px 5px rgba(60, 40, 10, 0.4))
-
-  > img.p0
-    left: 58%
-    bottom: 10%
-    transform: rotate(24deg)
-
-  > img.p1
-    left: 67%
-    bottom: 8%
-    transform: rotate(32deg)
-
-  > img.p2
-    left: 76%
-    bottom: 10%
-    transform: rotate(40deg)
+.door-moon
+  color: #e9c46a
+  filter: drop-shadow(0 0 16px rgba(233, 196, 106, 0.5))
 
 .door-body
   display: flex
@@ -213,13 +182,21 @@ button
   .hub-body
     padding: 0 28px
 
+  // the areas stay one under the other, each one wide: the picture on the left, name and line on the right
   .doors
-    grid-template-columns: repeat(3, minmax(0, 1fr))
     gap: 18px
 
-  .door-pic
-    aspect-ratio: 4 / 3
+  .door
+    flex-direction: row
+    align-items: stretch
 
-  .door-title
-    font-size: 1.4rem
+  .door-pic
+    flex: none
+    width: 46%
+    aspect-ratio: 16 / 9
+
+  .door-body
+    flex: 1
+    min-width: 0
+    padding: 18px 24px
 </style>

@@ -20,7 +20,7 @@ export interface HeroSlide {
   slogan?: string
   text: string
   /** A short list under the text: what the child can do in the app (symbol, bold word, one short line). */
-  points?: { icon: 'series' | 'compass' | 'brush' | 'star' | 'headphones'; label: string; text: string }[]
+  points?: { icon: 'series' | 'compass' | 'brush' | 'star' | 'headphones'; /** A painted picture instead of the line symbol. */ image?: string; label: string; text: string }[]
 }
 
 const props = withDefaults(defineProps<{ slides: HeroSlide[]; intervalMs?: number; label?: string }>(), {
@@ -95,8 +95,9 @@ onBeforeUnmount(() => {
           p(class="hero-text") {{ s.text }}
           ul(v-if="s.points?.length" class="hero-points")
             li(v-for="(p, k) in s.points" :key="k" class="hero-point")
-              span(class="hero-point-ico" aria-hidden="true")
-                ZIconography(:name="p.icon" :size="22")
+              span(class="hero-point-ico" :class="{ 'has-image': !!p.image }" aria-hidden="true")
+                img(v-if="p.image" :src="p.image" alt="" draggable="false")
+                ZIconography(v-else :name="p.icon" :size="22")
               span(class="hero-point-copy")
                 b {{ p.label }}
                 span {{ p.text }}
@@ -237,6 +238,19 @@ onBeforeUnmount(() => {
   display: flex
   align-items: center
   justify-content: center
+
+  // a painted symbol: the same as in the bottom bar, without a plate and without a shadow
+  &.has-image
+    flex-basis: 44px
+    width: 44px
+    height: 44px
+    background: transparent
+
+    img
+      display: block
+      width: 100%
+      height: 100%
+      object-fit: contain
 
 .hero-point-copy
   display: flex

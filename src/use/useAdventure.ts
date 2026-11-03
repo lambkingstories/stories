@@ -1,10 +1,12 @@
 /**
  * What the child has done in the adventures. Everything stays on the device (like the paintings and the awards); nothing is sent
- * anywhere. A stage can be played again: the result of the new try replaces the old one (it may be better or worse).
+ * anywhere. A stage can be played again: the result of the new try replaces the old one, but the best stars of all tries are kept
+ * (`bestStars`), so a worse try later never takes a star, a card or a cup away.
  */
 import { computed, reactive } from 'vue'
 import type { JourneyProgress, StageProgress } from '@/types/adventure'
 import { MAX_STARS } from '@/utils/adventureScore'
+import { useActivity } from '@/use/useActivity'
 
 const KEY = 'lk-adventure-v1'
 
@@ -52,6 +54,8 @@ export default function useAdventure() {
     /** The stars of the task of a stage: the result of the newest try. The stars of the questions of an earlier try are no longer valid. */
     recordStars(journeyId: string, stageId: number, stars: number) {
       const s = stage(journeyId, stageId)
+      // the final stars of the try before are about to go: keep them as the best so far
+      if (s.finalStars !== undefined) s.bestStars = Math.max(s.bestStars ?? 0, s.finalStars)
       s.stars = clampStars(stars)
       s.gameStars = clampStars(stars)
       delete s.finalStars
@@ -62,6 +66,7 @@ export default function useAdventure() {
     recordFinal(journeyId: string, stageId: number, stars: number) {
       const s = stage(journeyId, stageId)
       s.finalStars = clampStars(stars)
+      s.bestStars = Math.max(s.bestStars ?? 0, s.finalStars)
       save()
     },
     /** The answers to the questions of a stage (the newest try). */
@@ -72,12 +77,20 @@ export default function useAdventure() {
     },
     /** The stage was gone through to the end: the next one opens. */
     completeStage(journeyId: string, stageId: number) {
-      stage(journeyId, stageId).done = true
+      const s = stage(journeyId, stageId)
+      if (!s.done) useActivity().count('stages')
+      s.done = true
       save()
     },
     recordExam(journeyId: string, correct: number, total: number) {
       const j = journey(journeyId)
       if (!j.exam || correct >= j.exam.correct) j.exam = { correct, total }
+      save()
+    },
+    /** The test build only: put the whole progress in one go (all stars unlocked) or back (what was kept before). */
+    replaceAll(saved: Saved) {
+      for (const k of Object.keys(state)) delete state[k]
+      Object.assign(state, saved)
       save()
     },
     /** For the tests and the "start again" button. */

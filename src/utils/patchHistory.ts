@@ -21,6 +21,8 @@ export class PatchHistory {
   private stack: Patch[] = []
   /** How many patches of the stack are applied. */
   private applied = 0
+  /** The area the last undo or redo wrote to (so that only that part of the picture has to be looked at again). */
+  lastRect: { x0: number; y0: number; x1: number; y1: number } | null = null
 
   constructor(private readonly max = 40) {}
 
@@ -56,6 +58,7 @@ export class PatchHistory {
     if (!this.canUndo) return false
     const p = this.stack[--this.applied]!
     ctx.putImageData(p.before, p.x, p.y)
+    this.lastRect = { x0: p.x, y0: p.y, x1: p.x + p.before.width, y1: p.y + p.before.height }
     return true
   }
 
@@ -63,6 +66,7 @@ export class PatchHistory {
     if (!this.canRedo) return false
     const p = this.stack[this.applied++]!
     ctx.putImageData(p.after, p.x, p.y)
+    this.lastRect = { x0: p.x, y0: p.y, x1: p.x + p.after.width, y1: p.y + p.after.height }
     return true
   }
 }

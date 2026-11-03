@@ -33,6 +33,8 @@ export interface ArtworkMeta {
 interface ArtworkRecord extends ArtworkMeta {
   /** The painted layer (transparent PNG). */
   drawing: Blob
+  /** Where stickers sit (a mask, transparent PNG): they cover the line art. Missing in older pictures and in pictures without stickers. */
+  stickers?: Blob
 }
 
 const DB_NAME = 'lambking-artworks'
@@ -80,8 +82,8 @@ export function pageArtworkId(sourceUrl: string, page: number): string {
   return `src:${sourceUrl}#${page}`
 }
 
-export async function saveArtwork(meta: ArtworkMeta, drawing: Blob): Promise<void> {
-  const record: ArtworkRecord = { ...meta, drawing }
+export async function saveArtwork(meta: ArtworkMeta, drawing: Blob, stickers?: Blob | null): Promise<void> {
+  const record: ArtworkRecord = { ...meta, drawing, ...(stickers ? { stickers } : {}) }
   await request('readwrite', (s) => s.put(record))
 }
 
@@ -98,7 +100,7 @@ export async function listArtworks(): Promise<ArtworkMeta[]> {
   try {
     const all = (await request('readonly', (s) => s.getAll())) as ArtworkRecord[]
     return all
-      .map(({ drawing: _drawing, ...meta }) => meta)
+      .map(({ drawing: _drawing, stickers: _stickers, ...meta }) => meta)
       .sort((a, b) => b.updatedAt - a.updatedAt)
   } catch {
     return []

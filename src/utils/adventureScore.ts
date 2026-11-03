@@ -59,10 +59,10 @@ export function finalStars(gameStars: number, correct: number, wrong: number): n
   return Math.min(MAX_STARS, Math.max(0, net))
 }
 
-/** The stars that count for a stage: the final ones once the questions are done, otherwise those of the game. */
-export function stageStarsOf(s: { stars: number; gameStars?: number; finalStars?: number } | undefined): number {
+/** The stars that count for a stage: the final ones once the questions are done, otherwise those of the game; never fewer than the best try gave. */
+export function stageStarsOf(s: { stars: number; gameStars?: number; finalStars?: number; bestStars?: number } | undefined): number {
   if (!s) return 0
-  return Math.min(MAX_STARS, Math.max(0, s.finalStars ?? s.gameStars ?? s.stars))
+  return Math.min(MAX_STARS, Math.max(0, s.bestStars ?? 0, s.finalStars ?? s.gameStars ?? s.stars))
 }
 
 /**

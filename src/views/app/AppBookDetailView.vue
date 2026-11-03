@@ -20,7 +20,9 @@ import { markdownToHtml } from '@/utils/markdownToHtml'
 import { isColoringBook } from '@/utils/coloringBook'
 import useColoringShelf from '@/use/useColoringShelf'
 import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
-import usePremium from '@/use/usePremium'
+import usePremium, { PREMIUM_TEASER } from '@/use/usePremium'
+import PlusBadge from '@/components/atoms/PlusBadge.vue'
+import { contentLocale } from '@/utils/contentLocale'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
@@ -39,7 +41,7 @@ const book = computed<ApiBook | null>(
   () => (apiBooks.state.byId[bookId.value] as ApiBook | undefined) ?? null
 )
 
-const lang = computed<Locale>(() => (locale.value === 'en' ? 'en' : 'de'))
+const lang = computed<Locale>(() => (contentLocale(locale.value)))
 const localization = computed(() => {
   const b = book.value
   if (!b) return null
@@ -482,6 +484,7 @@ const seriesName = computed(() => seriesNameOfBook(book.value))
               )
                 ZIconography(name="headphones" :size="22")
                 span {{ t('app.bookDetail.listen') }}
+                PlusBadge(v-if="PREMIUM_TEASER && !hasFeature('readAloud')" size="small" class="listen-plus")
               button(
                 type="button"
                 class="lk-btn lk-btn--outline"
@@ -665,6 +668,16 @@ button
   display: grid
   grid-template-columns: 1fr 1fr
   gap: 10px
+
+.cta-second .lk-btn
+  position: relative
+
+// the Plus sign sits on the corner of the listen button, so the label keeps its room
+.cta-second .listen-plus
+  position: absolute
+  top: -11px
+  right: 8px
+  pointer-events: none
 
 .cta-second .lk-btn:disabled
   opacity: 0.55

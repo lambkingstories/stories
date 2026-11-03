@@ -166,3 +166,39 @@ body {
   border-radius: var(--lk-r-group);
   box-shadow: var(--lk-shadow);
 }
+
+/*
+ * Three colours for the day look, chosen in "Ich": mint (the look above), beige and cream white. Only the colours that carry the
+ * look change; the artwork and the tile colours stay. The night look ignores the choice.
+ */
+:root[data-theme='day'][data-palette='beige'] {
+  --lk-bg: #f0e9db;
+  --lk-surface: #fbf7ee;
+  --lk-surface-2: #e6dcc9;
+  --lk-text: #3a2f22;
+  --lk-muted: #6a5c48;
+  --lk-accent: #7a5530;
+  --lk-accent-soft: rgba(122, 85, 48, 0.14);
+  --lk-line: rgba(58, 47, 34, 0.15);
+  --lk-track: #dfd3bd;
+  --lk-fill: #7a5530;
+  --lk-nav-bg: #fbf7ee;
+  --lk-nav-line: rgba(58, 47, 34, 0.12);
+  --lk-nav-active: #7a5530;
+  --lk-shadow: 0 6px 18px -10px rgba(58, 47, 34, 0.35);
+}
+
+:root[data-theme='day'][data-palette='creme'] {
+  --lk-bg: #f8f4e9;
+  --lk-surface: #fffdf8;
+  --lk-surface-2: #efe9da;
+  --lk-text: #163c40;
+  --lk-muted: #52676a;
+  --lk-accent: #1d666a;
+  --lk-accent-soft: rgba(29, 102, 106, 0.12);
+  --lk-line: rgba(22, 60, 64, 0.13);
+  --lk-track: #e4dfcf;
+  --lk-nav-bg: #fffdf8;
+  --lk-nav-line: rgba(22, 60, 64, 0.1);
+  --lk-shadow: 0 6px 18px -10px rgba(60, 50, 30, 0.3);
+}

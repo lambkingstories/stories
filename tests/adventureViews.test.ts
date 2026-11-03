@@ -224,7 +224,8 @@ describe('the stars of a journey are counted the same way everywhere', () => {
     const map = mount(MapView, opts)
     await flushPromises()
     // 3 + 2 stars + 4 right answers of the exam
-    expect(home.find('.stars-count').text()).toBe(`9 / ${max}`)
+    // the home page shows the way to the next big game (the stars of the stages: 3 + 2 of the 20 that open it)
+    expect(home.find('.stars-count').text()).toBe('5 / 20')
     expect(map.find('.map-points').text()).toBe(`9 / ${max}`)
     adv.reset('josef')
   })
@@ -1215,10 +1216,15 @@ describe('playing a stage again and the camera of the map', () => {
     // plain arrival: nothing
     route.query = {}
     expect(celebrating(mount(MapView, opts))).toBe(0)
-    // a stage without stars: nothing to light
+    // a worse try later takes no star away: the best stars still light up
     useAdventure().recordStars('josef', 2, 0)
     useAdventure().recordFinal('josef', 2, 0)
     route.query = { at: '2' }
+    expect(celebrating(mount(MapView, opts))).toBe(1)
+    // a stage without stars: nothing to light
+    useAdventure().recordStars('josef', 3, 0)
+    useAdventure().recordFinal('josef', 3, 0)
+    route.query = { at: '3' }
     expect(celebrating(mount(MapView, opts))).toBe(0)
     route.query = {}
   })

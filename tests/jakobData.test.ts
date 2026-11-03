@@ -166,12 +166,12 @@ describe('Jakob: every stage has the game that was chosen', () => {
     expect(stage(1).questions.map((q) => q.q).join(' ')).not.toContain('gekocht')
   })
 
-  it('3 stairway: the picture is the stage picture; round 1 is 2 x 2 tiles, round 2 3 x 2; both rounds are mixed, never finished, and round 2 has more tiles and more moves', () => {
+  it('3 stairway: the picture is the stage picture; round 1 is 3 x 2 tiles, round 2 4 x 2, always with two free fields (easy); both rounds are mixed, never finished, and round 2 has more tiles and more moves', () => {
     const s = stage(3).task.slide!
     expect(s.image).toBe('images/abenteuer/jakob/etappe-bild-03.webp')
-    expect(s.rounds.map((r) => [r.cols, r.rows])).toEqual([[2, 2], [3, 2]])
+    expect(s.rounds.map((r) => [r.cols, r.rows, r.gaps])).toEqual([[3, 2, 2], [4, 2, 2]])
     for (const r of s.rounds) {
-      expect(isSolved(scramble(r.cols, r.rows, r.moves, r.seed))).toBe(false)
+      expect(isSolved(scramble(r.cols, r.rows, r.moves, r.seed, r.gaps), r.gaps)).toBe(false)
       expect(r.moves).toBeGreaterThan(5)
     }
     expect(s.rounds[1]!.moves).toBeGreaterThan(s.rounds[0]!.moves)

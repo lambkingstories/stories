@@ -2,6 +2,10 @@
 @use './components'
 
 /* Prevent all touch zooming and remove the 300ms delay */
+// the bar for scrolling keeps its place, so the page does not jump sideways when a screen is shorter than the window
+html
+  scrollbar-gutter: stable
+
 html, body
   touch-action: manipulation
   -ms-touch-action: manipulation

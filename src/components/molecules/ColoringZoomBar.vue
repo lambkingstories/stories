@@ -51,7 +51,7 @@ const { t } = useI18n({ useScope: 'global' })
 <style scoped lang="sass">
 $ink: #22262e
 $line: rgba(20, 24, 32, 0.1)
-$glass: rgba(252, 251, 248, 0.88)
+$glass: rgba(252, 251, 248, 0.96)
 
 .zb
   display: flex
@@ -68,8 +68,6 @@ $glass: rgba(252, 251, 248, 0.88)
   border: 1px solid $line
   border-radius: 12px
   background: $glass
-  backdrop-filter: blur(14px)
-  -webkit-backdrop-filter: blur(14px)
   box-shadow: 0 2px 10px rgba(20, 24, 32, 0.15)
   color: $ink
   cursor: pointer
@@ -89,9 +87,12 @@ $glass: rgba(252, 251, 248, 0.88)
     background: rgba(31, 58, 95, 0.16)
 
 .zb-pct
+  // the width stays the same while the number changes, so the bar does not shake during a pinch
+  min-width: 58px
   padding: 0 10px
   font-size: 0.8rem
   font-weight: 800
+  font-variant-numeric: tabular-nums
 
 // in a corner of the picture: quieter
 .zb.is-corner .zb-btn

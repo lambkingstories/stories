@@ -24,7 +24,7 @@ function hexToRgb(hex: string): RGB {
 
 export { TIP_SHAPES, ROUND_TIP, isTipShape, renderTipShape, tipOf, type Tip, type TipShape } from '@/utils/brushTips'
 
-export type LayeredTool = 'pencil' | 'graphite' | 'felt' | 'watercolor' | 'chalk'
+export type LayeredTool = 'pencil' | 'graphite' | 'whitepencil' | 'felt' | 'watercolor' | 'chalk' | 'glitter'
 
 /** One way a finished stroke is laid on the picture. */
 export interface BrushPass {
@@ -41,11 +41,16 @@ export const BRUSH_LOOK: Record<LayeredTool, BrushLook> = {
   // Coloured pencil is see-through wax: colours laid over each other mix, and every pass makes the colour deeper.
   pencil: { passes: [{ blend: 'multiply', alpha: 0.92 }] },
   graphite: { passes: [{ blend: 'multiply', alpha: 0.88 }] },
-  felt: { passes: [{ blend: 'multiply', alpha: 0.74 }] },
+  // The white pencil lies over what is there and makes it paler, so graphite and colour can be lightened and blended softly.
+  whitepencil: { passes: [{ blend: 'source-over', alpha: 0.55 }] },
+  // Felt-tip ink is solid: the stroke covers what is under it.
+  felt: { passes: [{ blend: 'source-over', alpha: 1 }] },
   // Watercolour covers what is under it, as paint that has dried; going over the same place again makes it denser,
   // and the small second pass makes the layers a little darker.
   watercolor: { passes: [{ blend: 'source-over', alpha: 0.8 }, { blend: 'multiply', alpha: 0.14 }] },
-  chalk: { passes: [{ blend: 'source-over', alpha: 0.96 }] }
+  chalk: { passes: [{ blend: 'source-over', alpha: 0.96 }] },
+  // Glitter paint covers what is under it, like a gel pen, and carries its sparkles in the stroke.
+  glitter: { passes: [{ blend: 'source-over', alpha: 0.95 }] }
 }
 
 /**
@@ -63,6 +68,7 @@ export function strokeReach(tool: LayeredTool, size: number): number {
     case 'pencil':
       return widest * 0.35 + 2
     case 'graphite':
+    case 'whitepencil':
       return widest * 0.6 + 2
     case 'felt':
       return widest * 0.6 + 3
@@ -274,6 +280,145 @@ export function drawSolidSegment(layer: CanvasRenderingContext2D, x1: number, y1
   layer.stroke()
 }
 
+/** A colour as hue 0–360, saturation and lightness 0–100. */
+function rgbToHsl([r, g, b]: RGB): { h: number; s: number; l: number } {
+  const R = r / 255
+  const G = g / 255
+  const B = b / 255
+  const max = Math.max(R, G, B)
+  const min = Math.min(R, G, B)
+  const l = (max + min) / 2
+  const d = max - min
+  if (d === 0) return { h: 0, s: 0, l: l * 100 }
+  const s = d / (1 - Math.abs(2 * l - 1))
+  const h = max === R ? ((G - B) / d) % 6 : max === G ? (B - R) / d + 2 : (R - G) / d + 4
+  return { h: (h * 60 + 360) % 360, s: s * 100, l: l * 100 }
+}
+
+const flecks = new Map<string, string[]>()
+
+/**
+ * The colours of the fine glitter flecks of a paint colour: the same hue (a little off to both sides) in many lights, from dark to bright
+ * (the light range follows the colour: a dark paint gets dark and mid flecks, a gold one all the way up to bright ones). A grey (silver, black)
+ * stays grey. About 35 colours, made once for each paint colour.
+ */
+function fleckColors(color: string): string[] {
+  const hit = flecks.get(color)
+  if (hit) return hit
+  const { h, s, l } = rgbToHsl(hexToRgb(color))
+  const lo = Math.max(10, l - 28)
+  const hi = Math.min(94, l + 42)
+  const out: string[] = []
+  for (const j of [-10, -5, 0, 5, 10]) for (let k = 0; k < 7; k++) out.push(`hsl(${Math.round(h + j + 360) % 360} ${Math.round(s)}% ${Math.round(lo + ((hi - lo) * k) / 6)}%)`)
+  if (flecks.size > 64) flecks.clear()
+  flecks.set(color, out)
+  return out
+}
+
+/**
+ * How much of the paint the flecks cover (about a quarter, like the demo "glitzerstift-demo.html"). The fleck density follows from it: the area of one
+ * fleck is about (1.07 · u) · (0.86 · u), with u = width / 38.
+ */
+const FLECK_COVERAGE = 0.28
+
+/**
+ * The fine glitter of the glitter markers: many tiny flecks in light and dark versions of the paint colour. Every piece of the stroke is a solid line with
+ * round ends, which paints over everything that lay under its ends, the flecks of the pieces before it included; so the flecks go over the whole of that
+ * round-ended piece (`x1, y1` to `x2, y2`, a tap is a disc), as the demo's stamps do. They are painted into the stroke layer on top of the solid line, so they
+ * are part of the picture for good: undo, redo, the eraser, zoom, saving and export keep them exactly where they are. The flecks grow with the width of the
+ * stroke (the demo's 38 is the measure), so a thick stroke has the same look as a thin one, only larger.
+ */
+export function glitterSparkle(layer: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number, width: number, color: string, random: () => number = Math.random) {
+  const len = Math.hypot(x2 - x1, y2 - y1)
+  const u = Math.max(0.3, width / 38)
+  const area = len * width + (Math.PI * width * width) / 4
+  const expected = (area * FLECK_COVERAGE) / (0.92 * u * u)
+  const count = Math.min(1500, Math.floor(expected) + (random() < expected % 1 ? 1 : 0))
+  if (count <= 0) return
+  const palette = fleckColors(color)
+  layer.save()
+  layer.globalCompositeOperation = 'source-over'
+  layer.globalAlpha = 1
+  for (let i = 0; i < count; i++) {
+    // a place on the path and a place in the disc round it (the round ends are part of the stroke)
+    const t = random()
+    const a = random() * Math.PI * 2
+    const r = Math.sqrt(random()) * width * 0.49
+    const x = x1 + (x2 - x1) * t + Math.cos(a) * r
+    const y = y1 + (y2 - y1) * t + Math.sin(a) * r
+    const sz = Math.max(0.9, (0.45 + random() * 1.25) * u)
+    layer.fillStyle = palette[Math.floor(random() * palette.length)]!
+    layer.fillRect(x - sz / 2, y - sz * 0.4, sz, sz * 0.8)
+  }
+  layer.restore()
+}
+
+/** A place in the glitter paint that flashes now and then (a twinkle that moves, drawn over the picture while the app is open). */
+export interface GlitterSite {
+  x: number
+  y: number
+  /** The base radius of the flash in picture pixels (it grows to about three times that at the brightest moment). */
+  r: number
+  /** Where in its period the flash is at time 0 (radians), and how fast it goes (radians per second). */
+  phase: number
+  speed: number
+}
+
+/**
+ * The places of the piece of stroke from (x1, y1) to (x2, y2) that will flash, one to about every third of a stamp the demo puts on the path
+ * (one flash place to every 40 pixels of a stroke 38 wide), spread over the inner two thirds of the stroke. Each one has its own beat; they all
+ * flash slowly and gently (a period of about three seconds), so that the picture sparkles without being restless.
+ */
+export function glitterSites(x1: number, y1: number, x2: number, y2: number, width: number, random: () => number = Math.random): GlitterSite[] {
+  const len = Math.hypot(x2 - x1, y2 - y1)
+  const u = Math.max(0.3, width / 38)
+  const expected = len >= 1 ? (len / Math.max(1.5, width * 0.1)) * 0.26 : 0.26
+  const count = Math.min(30, Math.floor(expected) + (random() < expected % 1 ? 1 : 0))
+  const dx = len >= 1 ? (x2 - x1) / len : 0
+  const dy = len >= 1 ? (y2 - y1) / len : 0
+  const out: GlitterSite[] = []
+  for (let i = 0; i < count; i++) {
+    const along = random() * len
+    const across = (random() - 0.5) * width * 0.65
+    out.push({
+      x: x1 + dx * along - dy * across,
+      y: y1 + dy * along + dx * across,
+      r: (1 + random() * 1.5) * u,
+      phase: random() * Math.PI * 2,
+      speed: 1.8 + random() * 0.4
+    })
+  }
+  return out
+}
+
+/** How bright a flash is at `seconds` (0 to 1): dark most of the time, a short soft flash (the twelfth power of a sine). */
+export function twinkle(site: GlitterSite, seconds: number): number {
+  return Math.pow(Math.max(0, Math.sin(seconds * site.speed + site.phase)), 12)
+}
+
+/**
+ * Draws the flash of a site: a bright four-pointed star with concave sides, small when it is faint and about three times as large at its brightest.
+ * `tone` is the colour of the light (a warm white, or gold on a pale ground where white would not show).
+ */
+export function drawTwinkle(ctx: CanvasRenderingContext2D, site: GlitterSite, level: number, tone = '#FFFBEA') {
+  if (level < 0.025) return
+  const r = site.r * (0.5 + level * 1.8)
+  const a = r * 1.5
+  const { x, y } = site
+  ctx.save()
+  ctx.globalCompositeOperation = 'source-over'
+  ctx.globalAlpha = Math.min(1, level * 0.85)
+  ctx.fillStyle = tone
+  ctx.beginPath()
+  ctx.moveTo(x - a, y)
+  ctx.quadraticCurveTo(x, y, x, y - a)
+  ctx.quadraticCurveTo(x, y, x + a, y)
+  ctx.quadraticCurveTo(x, y, x, y + a)
+  ctx.quadraticCurveTo(x, y, x - a, y)
+  ctx.fill()
+  ctx.restore()
+}
+
 export function drawNibSegment(layer: CanvasRenderingContext2D, x1: number, y1: number, x2: number, y2: number, a: number, tip: Tip, color: string) {
   layer.globalCompositeOperation = 'source-over'
   layer.fillStyle = color
@@ -419,7 +564,7 @@ export function shapeRegion(
 /** The look of a tool's finished paint, if it has one that has to be made from the plain shape (`null` = the shape as it is). */
 export function shapeOptionsOf(tool: LayeredTool, size: number): ShapeOptions | null {
   if (tool === 'watercolor') return { rim: Math.max(3, Math.round(size * 0.17)), rimStrength: 1.0, body: 0.85, uneven: 0.45 }
-  if (tool === 'felt') return { rim: Math.max(2, Math.round(size * 0.07)), rimStrength: 0.9, body: 0.88, uneven: 0 }
+  if (tool === 'felt') return { rim: Math.max(2, Math.round(size * 0.07)), rimStrength: 0.9, body: 1, uneven: 0 }
   return null
 }
 
@@ -651,31 +796,18 @@ export function paintLayerSegment(
       drawDrySegment(ctx, x1, y1, x2, y2, { width: width * 2.4, color: o.color, coverage: 0.07 + 0.1 * pe, kind: 'fine', tip: o.tip, shift: st.shift })
       break
     }
+    case 'whitepencil': {
+      const width = Math.max(1.4, sz * 0.5)
+      drawDrySegment(ctx, x1, y1, x2, y2, { width, color: '#FFFFFF', coverage: 0.3 + 0.45 * pe, kind: 'fine', tip: o.tip, shift: st.shift })
+      // a wide, faint veil round the line: it is what blends the edge of a graphite line into the paper
+      drawDrySegment(ctx, x1, y1, x2, y2, { width: width * 2.6, color: '#FFFFFF', coverage: 0.12 + 0.12 * pe, kind: 'fine', tip: o.tip, shift: st.shift })
+      break
+    }
     case 'felt': {
       const width = Math.max(2, sz * 1.05)
       if (o.tip && !o.tip.round) drawNibSegment(ctx, x1, y1, x2, y2, width / 2, o.tip, o.color)
       else drawSolidSegment(ctx, x1, y1, x2, y2, width, o.color)
-      // The felt dries in faint streaks along the stroke.
-      const dx = x2 - x1
-      const dy = y2 - y1
-      const len = Math.hypot(dx, dy)
-      if (len > 0.5) {
-        const nx = -dy / len
-        const ny = dx / len
-        ctx.save()
-        ctx.globalCompositeOperation = 'destination-out'
-        ctx.lineCap = 'butt'
-        for (let i = 0; i < 3; i++) {
-          const off = (Math.random() - 0.5) * width * 0.7
-          ctx.globalAlpha = 0.07 + Math.random() * 0.07
-          ctx.lineWidth = Math.max(0.6, width * 0.05)
-          ctx.beginPath()
-          ctx.moveTo(x1 + nx * off, y1 + ny * off)
-          ctx.lineTo(x2 + nx * off, y2 + ny * off)
-          ctx.stroke()
-        }
-        ctx.restore()
-      }
+      // Felt-tip ink is solid: no streaks, nothing shines through.
       break
     }
     case 'watercolor': {
@@ -706,5 +838,12 @@ export function paintLayerSegment(
       })
       chalkDust(ctx, x2, y2, sz * 0.75, o.color, 3)
       break
+    case 'glitter': {
+      const width = Math.max(3, sz * 1.0)
+      if (o.tip && !o.tip.round) drawNibSegment(ctx, x1, y1, x2, y2, width / 2, o.tip, o.color)
+      else drawSolidSegment(ctx, x1, y1, x2, y2, width, o.color)
+      glitterSparkle(ctx, x1, y1, x2, y2, width, o.color)
+      break
+    }
   }
 }

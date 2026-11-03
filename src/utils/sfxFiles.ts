@@ -16,6 +16,10 @@ export type SfxName =
   | 'button'
   | 'result'
   | 'trophy'
+  | 'hit'
+  | 'clunk'
+  | 'cardOpen'
+  | 'cardTurn'
 
 /** The file of each sound below `public/audio/abenteuer/` (a replaced sound gets a new name, so that phones do not keep the old one). */
 export const SFX_FILE: Record<SfxName, string> = {
@@ -34,7 +38,11 @@ export const SFX_FILE: Record<SfxName, string> = {
   coin: 'klang-muenze',
   button: 'klang-knopf-2',
   result: 'klang-ergebnis',
-  trophy: 'klang-pokal'
+  trophy: 'klang-pokal',
+  hit: 'klang-treffer',
+  clunk: 'klang-schild',
+  cardOpen: 'klang-karte-auf',
+  cardTurn: 'klang-karte-dreh'
 }
 /** Every sound file (`journeyFiles` puts them into the download pack). */
 export const SFX_FILES = Object.values(SFX_FILE).map((n) => `audio/abenteuer/${n}.mp3`)
@@ -84,4 +92,7 @@ export function pickGameMusic(mood: Mood, last?: string, rnd: () => number = Mat
   return pool[Math.min(pool.length - 1, Math.floor(rnd() * pool.length))]!
 }
 
-export const MUSIC_FILES = [MAP_MUSIC, ...GAME_MUSIC].map((m) => `audio/abenteuer/${m.file}.mp3`)
+/** The music of the big game of David (a fighting, brave piece: frame drum, lyre, a little bell; D Dorian, 108 beats a minute, 16 bars). */
+export const DAVID_MUSIC: MusicPiece = { file: 'musik-david', loop: (64 * 60) / 108, mood: 'mittel' }
+
+export const MUSIC_FILES = [MAP_MUSIC, ...GAME_MUSIC, DAVID_MUSIC].map((m) => `audio/abenteuer/${m.file}.mp3`)

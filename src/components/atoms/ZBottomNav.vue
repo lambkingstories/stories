@@ -96,25 +96,33 @@ button
     transform: translateY(1px)
 
 .z-nav-icon
-  width: 28px
-  height: 26px
+  width: 40px
+  height: 40px
+  flex: none
   color: inherit
 
+// the painted symbols: quiet when the tab is closed, on a cream disc when it is open (the disc stays above the word, never over it)
 .z-nav-star
   display: block
-  width: 42px
-  height: 42px
-  margin: -8px 0 -5px
+  box-sizing: border-box
+  width: 40px
+  height: 40px
+  padding: 2px
+  border-radius: 50%
   object-fit: contain
-  filter: drop-shadow(0 2px 3px rgba(60, 40, 10, 0.4)) drop-shadow(0 0 7px rgba(255, 214, 90, 0.6))
+  opacity: 1
+  transition: background-color 160ms ease-out, opacity 160ms ease-out
 
 .is-active .z-nav-star
-  transform: scale(1.08)
+  padding: 5px
+  background: #f7f0e1
+  opacity: 1
 
 .z-nav-icon :deep(.z-icon-outline)
   color: currentColor
 
 .z-nav-label
+  margin-top: 2px
   font-size: 12px
   line-height: 1.1
   font-weight: 600

@@ -186,7 +186,7 @@ export const gideonEn: TextOverlay<Journey> = {
         'Gideon is a man with faults. He asks for the gold the enemies wore and has a priestly garment made from it. All Israel worships it, and it becomes a snare to Gideon and his house.',
         'The enemies never lift up their heads again, and the land is quiet for forty years, as long as Gideon lives. When he has died, the people forget God again and run after Baal. And yet God was with Gideon, as he had promised, “I will be with you.”'
       ],
-      task: { hint: 'Find the matching cards. Remember where each one lies.', memory: { pairs: [{ text: 'The palm tree: Deborah sits here and gives judgment.' }, { text: 'The winepress: Gideon secretly threshes wheat here.' }, { text: 'The fleece: First only the fleece is wet, then only the ground.' }, { text: 'The altar: God is Peace.' }, { text: 'The jar: A torch is inside.' }] } },
+      task: { hint: 'Find the matching cards. Remember where each one lies.', memory: { pairs: [{ text: 'The palm tree: Deborah sits here and gives judgment.' }, { text: 'The winepress: Gideon secretly threshes wheat here.' }, { text: 'The fleece: First only the fleece is wet, then only the ground.' }, { text: 'The altar: God is Peace.' }, { text: 'The jar: A torch is inside.' }, { text: 'The barley bread: In a man’s dream it rolls into the camp and knocks a tent over.' }] } },
       questions: [
         { q: 'What does Gideon answer when they want to make him ruler?', options: ['“God shall be your Lord.”', '“Yes, I will be your king.”', '“My son shall be it.”'] },
         { q: 'How long is the land quiet as long as Gideon lives?', options: ['forty years', 'seven years', 'twenty years'] }

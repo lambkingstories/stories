@@ -13,7 +13,11 @@ import { booksOfArea } from '@/utils/readingAreas'
 import { coloringPagesOfBook } from '@/utils/coloringBook'
 import { pickLocalizedImage, type ApiBook, type Locale } from '@/types/apiBook'
 import { goBackTo } from '@/utils/navBack'
+import { PREMIUM_TEASER } from '@/use/usePremium'
+import { allowedPages } from '@/use/useBookAccess'
+import PlusBadge from '@/components/atoms/PlusBadge.vue'
 import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
+import { contentLocale } from '@/utils/contentLocale'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
@@ -22,7 +26,7 @@ const router = useRouter()
 const fromPainting = computed(() => route.query.from === 'malen')
 const apiBooks = useApiBooks()
 
-const lang = computed<Locale>(() => (locale.value === 'en' ? 'en' : 'de'))
+const lang = computed<Locale>(() => (contentLocale(locale.value)))
 const works = ref<ArtworkMeta[]>([])
 
 onMounted(() => {
@@ -44,6 +48,8 @@ interface Card {
   released: number
   total: number
   done: number
+  /** The book is not open in full without Plus (or the single purchase): it carries the Plus sign. */
+  plus: boolean
 }
 
 /** The title without a leading "Buch 01 –" of the old books. */
@@ -63,7 +69,8 @@ const cards = computed<Card[]>(() => {
       cover: withPlaceholder(pickLocalizedImage(book.previewImage, lang.value)),
       released: Date.parse(book.releaseDate) || 0,
       total: pages.length,
-      done: pages.filter((p) => painted.has(pageArtworkId(p.url, 1))).length
+      done: pages.filter((p) => painted.has(pageArtworkId(p.url, 1))).length,
+      plus: PREMIUM_TEASER && pages.length > 0 && allowedPages(book.bookId, 'coloring', pages.length) < pages.length
     })
   }
   return list.sort((a, b) => a.released - b.released || a.bookId.localeCompare(b.bookId))
@@ -88,6 +95,8 @@ function openBook(bookId: string) {
           button(type="button" class="cb-card" :aria-label="c.title" @click="openBook(c.bookId)")
             span(class="cb-cover")
               img(:src="c.cover" :alt="c.title" loading="lazy" draggable="false" @error="onImgFallback")
+              span(v-if="c.plus" class="cb-plus")
+                PlusBadge(size="small")
             span(class="cb-title") {{ c.title }}
             span(v-if="c.total" class="cb-meta") {{ c.done > 0 ? t('app.read.paintedOf', { done: c.done, total: c.total }) : t('app.read.pictures', { n: c.total }) }}
             span(v-if="c.done > 0 && c.total" class="cb-bar")
@@ -140,7 +149,13 @@ button
     outline-offset: 3px
     border-radius: 12px
 
+.cb-plus
+  position: absolute
+  top: 8px
+  right: 8px
+
 .cb-cover
+  position: relative
   display: block
   aspect-ratio: 3 / 4
   border-radius: var(--lk-r-cover)

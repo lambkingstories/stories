@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * Join the stairway: the picture of Jacob's dream (a stairway that reaches to heaven, in the night) is cut into tiles and mixed; one tile is missing, there is a free
- * gap. The child taps a tile next to the gap and it slides into the gap (or presses an arrow key). When every tile lies at its place the stairway lights up and the
+ * gap (in the Jacob stairway two, so it is easy: a round can have `gaps`). The child taps a tile next to a gap and it slides into the gap (or presses an arrow key). When every tile lies at its place the stairway lights up and the
  * last tile fills the gap. Every move is allowed, so nothing can go wrong and there is no clock. "Tip" shows the whole picture for three seconds (the tip counts,
  * `mistakeStars`). Round 1: 3 x 2 tiles, round 2: 4 x 3 tiles. The mixing is `scramble` in `utils/jakobGames.ts` (from the finished picture by valid moves: it can always be solved).
  */
@@ -10,7 +10,7 @@ import { useI18n } from 'vue-i18n'
 import AdvButton from '@/components/atoms/AdvButton.vue'
 import GameDone from '@/components/molecules/games/GameDone.vue'
 import useTimers from '@/use/useTimers'
-import { gapOf, isSolved, move, neighbors, scramble } from '@/utils/jakobGames'
+import { gapsOf, isSolved, move, neighbors, scramble } from '@/utils/jakobGames'
 import { mistakeStars } from '@/utils/adventureScore'
 import useSfx from '@/use/useSfx'
 import useTaskProgress from '@/use/useTaskProgress'
@@ -33,7 +33,10 @@ const lastRound = computed(() => round.value >= rounds.value.length - 1)
 const cols = computed(() => current.value.cols)
 const rows = computed(() => current.value.rows)
 
-const board = ref<number[]>(scramble(current.value.cols, current.value.rows, current.value.moves, current.value.seed))
+const gaps = computed(() => current.value.gaps ?? 1)
+const newBoard = () => scramble(current.value.cols, current.value.rows, current.value.moves, current.value.seed, gaps.value)
+
+const board = ref<number[]>(newBoard())
 const solved = ref(false)
 const between = ref(false)
 const finished = ref(false)
@@ -43,8 +46,8 @@ const message = ref('')
 const stars = computed(() => mistakeStars(tips.value, 0, 2))
 const src = (p: string) => prependBaseUrl(p)
 
-const gap = computed(() => gapOf(board.value))
-const movable = computed(() => new Set(neighbors(board.value, cols.value)))
+const free = computed(() => new Set(gapsOf(board.value, gaps.value)))
+const movable = computed(() => new Set(neighbors(board.value, cols.value, gaps.value)))
 /** The piece at a place: its part of the picture. */
 const tileStyle = (place: number) => {
   const piece = board.value[place]!
@@ -54,17 +57,17 @@ const tileStyle = (place: number) => {
   const y = rows.value > 1 ? (r / (rows.value - 1)) * 100 : 0
   return { backgroundImage: `url(${src(props.game.image)})`, backgroundSize: `${cols.value * 100}% ${rows.value * 100}%`, backgroundPosition: `${x}% ${y}%` }
 }
-const isGap = (place: number) => place === gap.value && !solved.value
+const isGap = (place: number) => free.value.has(place) && !solved.value
 const gridStyle = computed(() => ({ gridTemplateColumns: `repeat(${cols.value}, 1fr)`, gridTemplateRows: `repeat(${rows.value}, 1fr)` }))
 
 function slide(place: number) {
   if (solved.value || between.value || finished.value) return
-  const next = move(board.value, cols.value, place)
+  const next = move(board.value, cols.value, place, gaps.value)
   if (!next) return
   board.value = next
   play('tap')
   message.value = ''
-  if (isSolved(next)) roundOver()
+  if (isSolved(next, gaps.value)) roundOver()
 }
 
 function roundOver() {
@@ -82,7 +85,7 @@ function roundOver() {
     message.value = t('app.adventure.gameNext')
     later(() => {
       round.value++
-      board.value = scramble(current.value.cols, current.value.rows, current.value.moves, current.value.seed)
+      board.value = newBoard()
       solved.value = false
       between.value = false
       message.value = ''
@@ -90,16 +93,21 @@ function roundOver() {
   }, 1500)
 }
 
-/** The arrow keys slide the tile that lies on the other side of the gap in that direction into it. */
+/** The arrow keys slide the tile that lies on the other side of a gap in that direction into it (the first gap where there is such a tile). */
 function onKey(e: KeyboardEvent) {
   const d: Record<string, [number, number]> = { ArrowLeft: [1, 0], ArrowRight: [-1, 0], ArrowUp: [0, 1], ArrowDown: [0, -1] }
   const step = d[e.key]
   if (!step) return
   e.preventDefault()
-  const c = (gap.value % cols.value) + step[0]
-  const r = Math.floor(gap.value / cols.value) + step[1]
-  if (c < 0 || c >= cols.value || r < 0 || r >= rows.value) return
-  slide(r * cols.value + c)
+  for (const gap of free.value) {
+    const c = (gap % cols.value) + step[0]
+    const r = Math.floor(gap / cols.value) + step[1]
+    if (c < 0 || c >= cols.value || r < 0 || r >= rows.value) continue
+    const place = r * cols.value + c
+    if (free.value.has(place)) continue
+    slide(place)
+    return
+  }
 }
 
 /** "Tip": the whole picture is shown for three seconds. */

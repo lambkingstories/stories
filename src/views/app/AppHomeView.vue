@@ -27,11 +27,16 @@ import { sponsors } from '@/data/sponsors'
 import { nextStageIndex } from '@/utils/adventureScore'
 import { journeyToContinue } from '@/utils/continueJourney'
 import { isIOS } from '@/utils/platform'
+import usePremium, { PREMIUM_TEASER } from '@/use/usePremium'
+import { isJourneyPlusLocked } from '@/utils/adventureAccess'
+import PlusBadge from '@/components/atoms/PlusBadge.vue'
+import { requireParent } from '@/use/useParentalGate'
 import type { ApiBook, Locale } from '@/types/apiBook'
 import { pickLocalizedImage } from '@/types/apiBook'
 import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
 import { openExternal } from '@/utils/openExternal'
 import { prependBaseUrl } from '@/utils/function'
+import { contentLocale } from '@/utils/contentLocale'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
@@ -39,10 +44,11 @@ const { lastReadId } = useModels()
 const apiBooks = useApiBooks()
 const { getPct } = useReadingProgress()
 const adventure = useAdventure()
+const { plusOn } = usePremium()
 
 const STORE_URL = 'https://lambking.store'
 
-const lang = computed<Locale>(() => (locale.value === 'en' ? 'en' : 'de'))
+const lang = computed<Locale>(() => (contentLocale(locale.value)))
 const allBooks = computed<ApiBook[]>(() => (apiBooks.state.all ?? []) as ApiBook[])
 
 const artworks = ref<ArtworkMeta[]>([])
@@ -60,21 +66,29 @@ onMounted(() => {
 
 // ── 1. welcome card ──────────────────────────────────────────────────────────
 
-// The welcome comes first, the shop and the sponsors follow, then asking for support; the partner REACH Ministries is the fourth slide.
+// Three slides, as before: the welcome, the shop (and the sponsors when there are some), then Plus or asking for support.
+const symbol = (name: string) => prependBaseUrl(`images/icons/navi/${name}.webp`)
+
 const slides = computed(() => {
   const list: HeroSlide[] = [
     { id: 'welcome', image: prependBaseUrl('images/bg/welcome-bg-1.webp'), title: t('app.home.welcomeTitle'), slogan: t('app.home.slogan'), text: t('app.home.welcomeText'), points: [
-      { icon: 'series', label: t('app.home.pointReadLabel'), text: t('app.home.pointReadText') },
-      { icon: 'compass', label: t('app.home.pointAdventureLabel'), text: t('app.home.pointAdventureText') },
-      { icon: 'brush', label: t('app.home.pointColorLabel'), text: t('app.home.pointColorText') },
-      { icon: 'star', label: t('app.home.pointStarsLabel'), text: t('app.home.pointStarsText') }
+      { icon: 'series', image: symbol('lesen'), label: t('app.home.pointReadLabel'), text: t('app.home.pointReadText') },
+      { icon: 'compass', image: symbol('abenteuer'), label: t('app.home.pointAdventureLabel'), text: t('app.home.pointAdventureText') },
+      { icon: 'brush', image: symbol('malen'), label: t('app.home.pointColorLabel'), text: t('app.home.pointColorText') },
+      { icon: 'star', image: symbol('pokal'), label: t('app.home.pointStarsLabel'), text: t('app.home.pointStarsText') }
     ] },
     { id: 'shop', image: prependBaseUrl('images/bg/welcome-bg-3.webp'), title: t('app.main.welcomeTitle2'), text: t('app.home.shopText') }
   ]
   if (sponsors.length) {
-    list.push({ id: 'sponsors', image: prependBaseUrl('images/bg/welcome-bg-1.webp'), title: t('app.home.sponsorsTitle'), text: t('app.home.sponsorsText') })
+    list.push({ id: 'sponsors', image: prependBaseUrl('images/bg/welcome-bg-2.webp'), title: t('app.home.sponsorsTitle'), text: t('app.home.sponsorsText') })
   }
-  list.push({ id: 'support', image: prependBaseUrl('images/bg/welcome-bg-2.webp'), title: t('app.main.welcomeTitle1'), text: t('app.home.supportText') })
+  // asking for support: while Plus is shown this slide tells about LambKing Plus instead (the donation moves to the window for parents)
+  // (the welcome slider stays short: LambKing Plus gets one slide, the rest is on the Plus page)
+  if (PREMIUM_TEASER) {
+    list.push({ id: 'support', image: prependBaseUrl('images/bg/willkommen-plus-2.webp'), title: t('app.main.plusTitle'), text: t('app.main.plusText') })
+  } else {
+    list.push({ id: 'support', image: prependBaseUrl('images/bg/welcome-bg-2.webp'), title: t('app.main.welcomeTitle1'), text: t('app.home.supportText') })
+  }
   return list
 })
 
@@ -86,13 +100,29 @@ function openStore() {
   void openExternal(STORE_URL)
 }
 
+/** The way to the page for parents about Plus leads through the parental gate. */
+async function openPlus() {
+  if (!(await requireParent())) return
+  void router.push({ name: 'app-plus' })
+}
+
 // ── 2. the three main doors ──────────────────────────────────────────────────
 
 const bigButtons = computed(() => [
-  { id: 'color', label: t('app.home.bigColor'), icon: 'brush' as const, route: 'app-coloring' },
-  { id: 'read', label: t('app.home.bigRead'), icon: 'series' as const, route: 'app-read' },
-  { id: 'adventure', label: t('app.home.bigAdventure'), icon: 'compass' as const, route: 'app-adventure' }
+  { id: 'color', label: t('app.home.bigColor'), sub: t('app.home.bigColorSub'), image: symbol('malen'), route: 'app-coloring' },
+  { id: 'read', label: t('app.home.bigRead'), sub: t('app.home.bigReadSub'), image: symbol('lesen'), route: 'app-read' },
+  { id: 'adventure', label: t('app.home.bigAdventure'), sub: t('app.home.bigAdventureSub'), image: symbol('abenteuer'), route: 'app-adventure' }
 ])
+
+// ── the journey through the Bible (a row of medals to open an adventure) ─────
+
+const journeyTiles = computed(() =>
+  journeys.map((j) => ({ id: j.id, title: j.title, image: prependBaseUrl(j.medal), plus: isJourneyPlusLocked(j.id) }))
+)
+
+function openJourney(id: string) {
+  void router.push({ name: 'app-adventure-map', params: { journeyId: id } })
+}
 
 // ── 3. continue ──────────────────────────────────────────────────────────────
 
@@ -199,7 +229,10 @@ function openBook(bookId: string) {
       //- 1. welcome card (picture on top, text below)
       HomeHero(:slides="slides" :label="t('app.home.slideLabel')")
         template(#actions="{ id }")
-          template(v-if="id === 'support'")
+          button(v-if="id === 'support' && PREMIUM_TEASER" type="button" class="lk-btn hero-shop" @click="openPlus")
+            span(class="hero-shop-label") {{ t('app.main.plusMore') }}
+            ZIconography(name="chevron-right" :size="22")
+          template(v-else-if="id === 'support'")
             TipButton(v-if="isIOS")
             template(v-else)
               //- both buttons equally wide, side by side over the whole width
@@ -233,8 +266,9 @@ function openBook(bookId: string) {
           :class="['big-btn', 'is-' + b.id]"
           @click="router.push({ name: b.route })"
         )
-          ZIconography(:name="b.icon" :size="24")
+          img(class="big-art" :src="b.image" alt="" draggable="false")
           span(class="big-label") {{ b.label }}
+          span(class="big-sub") {{ b.sub }}
 
       //- 3. where the child stands
       section(class="block")
@@ -261,6 +295,23 @@ function openBook(bookId: string) {
               span(v-else-if="c.empty" class="resume-start") {{ t('app.home.startHere') }}
               span(v-else class="resume-meta") {{ c.meta }}
 
+      //- the journey through the Bible
+      section(v-if="journeyTiles.length" class="block")
+        div(class="block-head")
+          div(class="block-titles")
+            h2(class="block-title") {{ t('app.home.journeyTitle') }}
+            p(class="block-sub") {{ t('app.home.journeySub') }}
+          button(type="button" class="block-link" @click="router.push({ name: 'app-adventure' })")
+            span {{ t('app.home.seeAll') }}
+            ZIconography(name="chevron-right" :size="18")
+        div(class="journey-row")
+          button(v-for="j in journeyTiles" :key="j.id" type="button" class="journey-tile" @click="openJourney(j.id)")
+            span(class="journey-art")
+              img(:src="j.image" alt="" draggable="false" loading="lazy")
+              span(v-if="j.plus" class="journey-plus")
+                PlusBadge(size="small")
+            span(class="journey-name") {{ j.title }}
+
       //- 4. new
       section(v-if="newBooks.length" class="block")
         div(class="block-head")
@@ -285,6 +336,7 @@ function openBook(bookId: string) {
                 @error="onImgFallback"
               )
               span(v-if="i === 0" class="new-badge") {{ t('app.read.newBadge') }}
+
 </template>
 
 <style scoped lang="sass">
@@ -366,32 +418,34 @@ button
 // ── the three main doors ──
 .big-row
   display: grid
-  grid-template-columns: 1fr 1fr 1.08fr
-  gap: 8px
+  grid-template-columns: repeat(3, 1fr)
+  gap: 10px
 
+// a calm coloured tile: the symbol on a white disc, the word under it
 .big-btn
+  position: relative
   display: flex
+  flex-direction: column
   align-items: center
-  justify-content: center
-  gap: 6px
-  min-height: 56px
-  padding: 0 8px
+  justify-content: flex-end
+  gap: 4px
+  min-height: 132px
+  padding: 12px 6px 12px
   border: none
-  border-radius: var(--lk-r-btn)
-  background: var(--tone)
-  color: var(--lk-on-color)
+  border-radius: 24px
+  background: linear-gradient(165deg, color-mix(in srgb, var(--tone) 80%, #fff) 0%, var(--tone) 52%, color-mix(in srgb, var(--tone) 82%, #000) 100%)
+  color: #fff
   cursor: pointer
   touch-action: manipulation
-  // a fine inner line and a 1 px lower edge give it a hold; no tall plate, no strong 3D base
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16), 0 1px 0 rgba(0, 0, 0, 0.35)
+  box-shadow: 0 10px 18px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.08)
+  transition: transform 120ms ease-out
 
   &:active
-    transform: translateY(1px)
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16)
+    transform: scale(0.97)
 
   &:focus-visible
-    outline: 2px solid var(--lk-text)
-    outline-offset: 2px
+    outline: 3px solid var(--lk-text)
+    outline-offset: 3px
 
   &.is-color
     --tone: var(--lk-paint)
@@ -402,16 +456,31 @@ button
   &.is-adventure
     --tone: var(--lk-adventure)
 
-  :deep(.z-icon)
-    flex: none
-
-  :deep(.z-icon-outline)
-    color: currentColor
+.big-art
+  display: block
+  box-sizing: content-box
+  width: 40px
+  height: 40px
+  padding: 8px
+  border-radius: 50%
+  background: radial-gradient(circle at 35% 30%, #fffefb, #f4ecd8)
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.45), 0 6px 12px -4px rgba(0, 0, 0, 0.4)
+  object-fit: contain
+  margin-bottom: 4px
+  pointer-events: none
 
 .big-label
-  font-weight: 600
-  font-size: 1rem
+  font-weight: 800
+  font-size: 1.08rem
+  line-height: 1.1
   white-space: nowrap
+
+.big-sub
+  font-weight: 600
+  font-size: 0.7rem
+  line-height: 1.15
+  text-align: center
+  opacity: 0.94
 
 // ── blocks ──
 .block
@@ -428,8 +497,11 @@ button
   margin: 0
   font-weight: 800
   font-size: 1.4rem
+  line-height: 1.2
 
 .block-link
+  flex: 0 0 auto
+  white-space: nowrap
   display: inline-flex
   align-items: center
   gap: 2px
@@ -617,6 +689,71 @@ button
   font-size: 0.72rem
   font-weight: 800
   letter-spacing: 0.04em
+
+.block-titles
+  min-width: 0
+
+.block-sub
+  margin: 0
+  font-size: 0.9rem
+  color: var(--lk-muted)
+
+// ── the journey through the Bible ──
+.journey-row
+  display: flex
+  gap: 12px
+  overflow-x: auto
+  scroll-snap-type: x proximity
+  margin: 0 -16px
+  padding: 4px 16px 10px
+  scroll-padding-left: 16px
+  scrollbar-width: none
+
+  &::-webkit-scrollbar
+    display: none
+
+.journey-tile
+  flex: 0 0 96px
+  scroll-snap-align: start
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: 6px
+  padding: 0
+  border: none
+  background: transparent
+  color: var(--lk-text)
+  cursor: pointer
+
+.journey-art
+  position: relative
+  display: block
+  width: 96px
+  height: 96px
+  border-radius: 50%
+  background: radial-gradient(circle at 50% 35%, var(--lk-surface), var(--lk-surface-2))
+  border: 1px solid var(--lk-line)
+  box-shadow: var(--lk-shadow)
+
+  img
+    display: block
+    width: 100%
+    height: 100%
+    object-fit: contain
+    border-radius: 50%
+
+.journey-plus
+  position: absolute
+  left: 50%
+  bottom: -6px
+  transform: translateX(-50%)
+
+.journey-name
+  font-size: 0.85rem
+  font-weight: 800
+  line-height: 1.15
+  text-align: center
+  max-width: 96px
 
 // ── tablet and wide ──
 @media (min-width: 720px)

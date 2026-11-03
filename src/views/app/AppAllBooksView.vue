@@ -19,6 +19,7 @@ import { pickLocalizedImage } from '@/types/apiBook'
 import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
 import { booksOfArea } from '@/utils/readingAreas'
 import { goBackTo } from '@/utils/navBack'
+import { contentLocale } from '@/utils/contentLocale'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
@@ -48,7 +49,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('offline', setOnline)
 })
 
-const lang = computed<Locale>(() => (locale.value === 'en' ? 'en' : 'de'))
+const lang = computed<Locale>(() => (contentLocale(locale.value)))
 // only the stories: coloring books are in "Malbücher", printed store books in "Books"
 const allBooks = computed<ApiBook[]>(() => booksOfArea((apiBooks.state.all ?? []) as ApiBook[], 'stories'))
 

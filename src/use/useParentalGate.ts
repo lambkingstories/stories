@@ -32,12 +32,16 @@ const DE_UNITS = ['', 'ein', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben',
 const DE_TENS = ['', '', 'zwanzig', 'dreißig', 'vierzig', 'fünfzig', 'sechzig', 'siebzig', 'achtzig', 'neunzig']
 const EN_UNITS = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
 const EN_TENS = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety']
+const ES_UNITS = ['', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve']
+const ES_TWENTIES = ['', 'veintiuno', 'veintidós', 'veintitrés', 'veinticuatro', 'veinticinco', 'veintiséis', 'veintisiete', 'veintiocho', 'veintinueve']
+const ES_TENS = ['', '', 'veinte', 'treinta', 'cuarenta', 'cincuenta', 'sesenta', 'setenta', 'ochenta', 'noventa']
 
-/** 21–99 as a word: "dreiundvierzig" / "forty-three". Any language but English falls back to German like the rest of the app. */
+/** 21–99 as a word: "dreiundvierzig" / "forty-three" / "cuarenta y tres". Any other language falls back to German like the rest of the app. */
 export function numberWord(n: number, locale: string): string {
   const tens = Math.floor(n / 10)
   const unit = n % 10
   if (n < 21 || n > 99 || unit === 0) return String(n)
+  if (locale === 'es') return tens === 2 ? ES_TWENTIES[unit]! : `${ES_TENS[tens]} y ${ES_UNITS[unit]}`
   return locale === 'en' ? `${EN_TENS[tens]}-${EN_UNITS[unit]}` : `${DE_UNITS[unit]}und${DE_TENS[tens]}`
 }
 

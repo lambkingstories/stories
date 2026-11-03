@@ -10,7 +10,8 @@
  */
 const VERSION = 'lk-v1'
 // `files2`: the first file memory could hold the page for a picture that was not there yet (the host answers every unknown address with the page)
-const FILES = `${VERSION}-files2`
+// `files3` (30.10.2026): the symbols and head pictures were replaced under their old names, so the old memory is dropped
+const FILES = `${VERSION}-files3`
 const MAX_ENTRIES = 260
 
 self.addEventListener('install', () => self.skipWaiting())
@@ -18,7 +19,7 @@ self.addEventListener('install', () => self.skipWaiting())
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
-      for (const key of await caches.keys()) if (!key.startsWith(VERSION) || key === `${VERSION}-files`) await caches.delete(key)
+      for (const key of await caches.keys()) if (!key.startsWith(VERSION) || key === `${VERSION}-files` || key === `${VERSION}-files2`) await caches.delete(key)
       await self.clients.claim()
     })()
   )

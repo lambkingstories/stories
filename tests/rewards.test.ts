@@ -31,7 +31,7 @@ import { heilung } from '@/data/adventures/heilung'
 import { gleichnisse } from '@/data/adventures/gleichnisse'
 import { samuel } from '@/data/adventures/samuel'
 import { REWARD_GAMES } from '@/data/adventures/rewardGames'
-import { cupOf, rewardGameTotal, unlockedGames } from '@/utils/rewards'
+import { cupOf, rewardGameTotal, rewardGames, unlockedGames } from '@/utils/rewards'
 import type { Journey, JourneyProgress } from '@/types/adventure'
 
 const ALL: Journey[] = [adamEva, noah, babel, abraham, jakob, josef, mose, josua, gideon, rut, samuel, david, elia, jona, daniel, salomo, elisa, ester, nehemia, propheten, weihnachten, taufe, freunde, wueste, wunder, heilung, gleichnisse]
@@ -60,16 +60,21 @@ describe('reward games', () => {
     expect(Object.keys(REWARD_GAMES).sort()).toEqual(ALL.map((j) => j.id).sort())
   })
 
-  it('without a cup nothing is unlocked; the gold cup unlocks the listed games of that journey only', () => {
+  it('a game opens with the three stars of its stage, not with a cup', () => {
     const none = () => undefined
     expect(unlockedGames(ALL, none)).toEqual([])
+    expect(rewardGames(ALL, none)).toHaveLength(rewardGameTotal(ALL))
+    expect(rewardGames(ALL, none).every((g) => !g.open)).toBe(true)
     const only = (id: string, share: number) => (jid: string) => (jid === id ? progressFor(ALL.find((j) => j.id === id)!, share) : undefined)
-    const josuaGold = unlockedGames(ALL, only('josua', 1))
+    // all stars of Josua: its listed games are open (the exam does not matter)
+    const josuaAll = unlockedGames(ALL, only('josua', 1))
+    expect(josuaAll.map((g) => [g.journeyId, g.stageId])).toEqual(REWARD_GAMES.josua!.map((id) => ['josua', id]))
     expect(cupOf(josua, only('josua', 1)('josua'))).toBe('gold')
-    expect(josuaGold.map((g) => [g.journeyId, g.stageId])).toEqual(REWARD_GAMES.josua!.map((id) => ['josua', id]))
-    // silver and bronze give the coloring picture, but no game
-    expect(unlockedGames(ALL, only('josua', 0.8))).toEqual([])
-    expect(unlockedGames(ALL, only('josua', 0.55))).toEqual([])
+    // two stars on every stage open nothing
+    expect(unlockedGames(ALL, only('josua', 0.66))).toEqual([])
+    // one stage with three stars opens just its game
+    const one = (jid: string) => (jid === 'josua' ? { stages: { [REWARD_GAMES.josua![0]!]: { stars: 3, done: true } } } : undefined)
+    expect(unlockedGames(ALL, one).map((g) => g.stageId)).toEqual([REWARD_GAMES.josua![0]])
   })
 
   it('the total counts every listed game', () => {

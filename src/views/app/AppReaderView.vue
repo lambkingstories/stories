@@ -22,13 +22,14 @@ import AttachmentContextMenu from '@/components/molecules/AttachmentContextMenu.
 import useApiBooks from '@/use/useApiBooks'
 import useBookCache from '@/use/useBookCache'
 import useReadingProgress from '@/use/useReadingProgress'
-import { allowedPages, freePageCount, isLimited, previewTexts, type BookKind } from '@/use/useBookAccess'
+import { allowedPages, freePageCount } from '@/use/useBookAccess'
 import usePremium from '@/use/usePremium'
 import type { ApiBook, ApiLocalizedPage, Locale } from '@/types/apiBook'
 import { pickLocalizedImage } from '@/types/apiBook'
 import { coloringPagesOfBook, isColoringBook, pageCaptionOf, pageImageOf } from '@/utils/coloringBook'
 import { hasVerticalCenter, markdownToHtml, renderInline } from '@/utils/markdownToHtml'
 import { onImgFallback, PLACEHOLDER_IMAGE } from '@/utils/placeholder'
+import { contentLocale } from '@/utils/contentLocale'
 
 const route = useRoute()
 const router = useRouter()
@@ -72,7 +73,7 @@ watch(bookId, () => {
 
 // ----- Locale-aware content -----
 
-const lang = computed<Locale>(() => (locale.value === 'en' ? 'en' : 'de'))
+const lang = computed<Locale>(() => (contentLocale(locale.value)))
 
 const localization = computed(() => {
   const b = book.value
@@ -112,25 +113,21 @@ type DisplayEntry =
   | { kind: 'locked' }
 
 const { showUpsell } = usePremium()
-const bookKind = computed<BookKind>(() => (isColoring.value ? 'coloring' : 'story'))
+/** Only coloring books are ever shown in part, so the lock page always talks about a coloring book. */
+const bookKind = 'coloring' as const
 
 /**
- * How much of the book may be seen: the first pictures of a coloring book, the first 15 % of the text of any
- * other book (see `useBookAccess`). Only while the book is locked; then the rest is replaced by one page that says so.
+ * How much of the book may be seen: the first pictures of a coloring book (see `useBookAccess`). Only while the book is locked;
+ * then the rest is replaced by one page that says so. Stories are always shown in full.
  */
 const pageAccess = computed(() => {
   const b = book.value
   const list = pages.value
-  if (isColoring.value) {
-    // a coloring book counts its pictures, not its text pages (an intro)
-    const units = list.filter((p) => !!imageOf(p)).length
-    const allowed = b ? allowedPages(b.bookId, 'coloring', units, b.freePages) : units
-    return { units, allowed, locked: allowed < units, shown: list }
-  }
-  if (!b || !isLimited(b.bookId)) return { units: list.length, allowed: list.length, locked: false, shown: list }
-  const cut = previewTexts(list.map((p) => p.text))
-  const shown = cut.texts.map((text, i) => ({ ...list[i]!, text }))
-  return { units: list.length, allowed: shown.length, locked: cut.cut, shown }
+  if (!isColoring.value) return { units: list.length, allowed: list.length, locked: false, shown: list }
+  // a coloring book counts its pictures, not its text pages (an intro)
+  const units = list.filter((p) => !!imageOf(p)).length
+  const allowed = b ? allowedPages(b.bookId, 'coloring', units, b.freePages) : units
+  return { units, allowed, locked: allowed < units, shown: list }
 })
 
 const displayEntries = computed<DisplayEntry[]>(() => {
@@ -158,9 +155,9 @@ function openUpsell() {
   const shop = pickLocalizedImage(b.etsyLink, lang.value)
   showUpsell('allBooks', {
     bookId: b.bookId,
-    kind: bookKind.value,
+    kind: bookKind,
     title: localization.value?.title ?? b.bookId,
-    freePages: freePageCount(bookKind.value, pageAccess.value.units, book.value?.freePages),
+    freePages: freePageCount(bookKind, pageAccess.value.units, book.value?.freePages),
     totalPages: pageAccess.value.units,
     shopLink: shop || undefined
   })
@@ -563,12 +560,7 @@ function fireConfetti() {
 
 watch(isOnCelebration, (yes) => {
   if (!yes || !book.value) return
-  // Mark the book complete (force totals to current pages so a partial-read
-  // user who skips to the end doesn't 100% it just by swiping).
-  const total = totalPagesForProgress.value
-  for (let p = 1; p <= total - 1; p++) {
-    progress.markPageRead(bookId.value, p, total - 1)
-  }
+  // The pages that were really read are already marked (see `dwellMsForPage`); swiping to the end does not complete the book.
   if (celebrationFiredFor.value !== bookId.value) {
     celebrationFiredFor.value = bookId.value
     nextTick(() => fireConfetti())

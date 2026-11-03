@@ -6,7 +6,7 @@ import { BACKDROPS, isBackdropId } from '@/data/coloringBackdrops'
 describe('backdrops', () => {
   it('starts with the plain light and offers a table, a meadow and the beach', () => {
     expect(BACKDROPS[0]!.id).toBe('plain')
-    expect(BACKDROPS.map((b) => b.id)).toEqual(['plain', 'oak', 'meadow', 'sand'])
+    expect(BACKDROPS.map((b) => b.id)).toEqual(['plain', 'oak', 'walnut', 'birch', 'linen', 'cork', 'marble', 'slate', 'felt', 'picnic', 'meadow', 'sand'])
   })
 
   it('has a picture and a thumbnail for each backdrop except the plain one, and the files exist', () => {

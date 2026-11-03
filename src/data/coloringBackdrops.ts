@@ -1,11 +1,10 @@
 /**
- * The backdrops behind the paper of the coloring screen. The pictures were made with an image model (top-down views of a
- * table, a meadow and a beach); `plain` is the calm warm light the screen always had. To add one, put the picture and
+ * The backdrops behind the paper of the coloring screen. The pictures were made with an image model (top-down views of tables and cloths, a meadow and a beach); `plain` is the calm warm light the screen always had. To add one, put the picture and
  * its small `-t` thumbnail in `public/images/ausmalen-bg/` and list it here.
  */
 import { prependBaseUrl } from '@/utils/function'
 
-export type BackdropId = 'plain' | 'oak' | 'meadow' | 'sand'
+export type BackdropId = 'plain' | 'oak' | 'walnut' | 'birch' | 'linen' | 'cork' | 'marble' | 'slate' | 'felt' | 'picnic' | 'meadow' | 'sand'
 
 export interface Backdrop {
   id: BackdropId
@@ -23,11 +22,36 @@ const picture = (file: string): Pick<Backdrop, 'image' | 'thumb'> => ({
 export const BACKDROPS: Backdrop[] = [
   { id: 'plain', image: '', thumb: '' },
   { id: 'oak', ...picture('eiche') },
+  { id: 'walnut', ...picture('nussbaum') },
+  { id: 'birch', ...picture('birke') },
+  { id: 'linen', ...picture('leinen') },
+  { id: 'cork', ...picture('kork') },
+  { id: 'marble', ...picture('marmor') },
+  { id: 'slate', ...picture('schiefer') },
+  { id: 'felt', ...picture('filz') },
+  { id: 'picnic', ...picture('picknick') },
   { id: 'meadow', ...picture('wiese') },
   { id: 'sand', ...picture('sand') }
 ]
 
 export const BACKDROP_KEY = 'lk-coloring-backdrop'
+
+const warmed = new Map<string, HTMLImageElement>()
+
+/**
+ * Fetches and decodes the picture of a backdrop ahead of time, so the table is there at the very moment a picture opens (without it the
+ * wood appears a second late, because the picture is only asked for when the sheet shows). The images are kept, so the browser does not drop them.
+ */
+export function preloadBackdrop(id: string): void {
+  if (typeof Image === 'undefined') return
+  const b = BACKDROPS.find((x) => x.id === id)
+  if (!b?.image || warmed.has(b.image)) return
+  const img = new Image()
+  img.decoding = 'async'
+  img.src = b.image
+  warmed.set(b.image, img)
+  void img.decode?.().catch(() => undefined)
+}
 
 /** The table is what a child sees first. */
 export const DEFAULT_BACKDROP: BackdropId = 'oak'

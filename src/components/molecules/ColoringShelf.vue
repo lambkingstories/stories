@@ -11,6 +11,7 @@ import { nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { KitItem, KitVariant } from '@/data/coloringKits'
 import { colorName } from '@/utils/colorNames'
+import { contentLocale } from '@/utils/contentLocale'
 
 interface Props {
   /** Look of the items: sets their width and how much of each one shows. */
@@ -18,7 +19,9 @@ interface Props {
   items: KitItem[]
   /** Items after these are the "big box" colours; dimmed while locked. */
   extra: KitItem[]
-  extraLocked: boolean
+  extraLocked?: boolean
+  /** The free colour picker (the rainbow pencil) comes with Plus: the pencil is dimmed like the other locked ones. */
+  customLocked?: boolean
   /** The picture that opens the free colour picker, if the box has one. */
   rainbow: KitItem | null
   color: string
@@ -39,7 +42,7 @@ const emit = defineEmits<{
 const { t, locale } = useI18n({ useScope: 'global' })
 
 /** What the screen reader says for a pencil: its colour in words (the pencils are only pictures). */
-const labelOf = (it: KitItem) => t('app.coloring.colorNamed', { color: colorName(it.color, locale.value === 'en' ? 'en' : 'de') })
+const labelOf = (it: KitItem) => t('app.coloring.colorNamed', { color: colorName(it.color, contentLocale(locale.value)) })
 
 /** One stop on the tab key (the chosen pencil, or the first one); the arrow keys walk along the row. */
 const stopIndex = () => {
@@ -198,42 +201,45 @@ watch(() => props.open, (o) => {
       @click.capture="onClickCapture"
       @keydown="onKeydown"
     )
-      button(
-        v-for="(it, i) in items"
-        :key="`b-${i}`"
-        type="button"
-        class="sh-item"
-        :class="{ chosen: isChosen(it.color) }"
-        :style="{ '--i': i }"
-        :aria-label="labelOf(it)"
-        :tabindex="i === stopIndex() ? 0 : -1"
-        :aria-pressed="isChosen(it.color)"
-        @click="choose(it)"
-      )
-        img(:src="it.src" alt="" draggable="false" decoding="async")
+      //- the colours lie in a tray of light plastic (only its back wall; nothing goes over the sticks)
+      div(class="sh-track")
+        span(class="sh-tray" aria-hidden="true")
+        button(
+          v-for="(it, i) in items"
+          :key="`b-${i}`"
+          type="button"
+          class="sh-item"
+          :class="{ chosen: isChosen(it.color) }"
+          :style="{ '--i': i }"
+          :aria-label="labelOf(it)"
+          :tabindex="i === stopIndex() ? 0 : -1"
+          :aria-pressed="isChosen(it.color)"
+          @click="choose(it)"
+        )
+          img(:src="it.src" alt="" draggable="false" decoding="async")
 
-      button(
-        v-for="(it, i) in extra"
-        :key="`x-${i}`"
-        type="button"
-        class="sh-item"
-        :class="{ chosen: !extraLocked && isChosen(it.color), locked: extraLocked }"
-        :style="{ '--i': items.length + i }"
-        :aria-label="labelOf(it)"
-        :tabindex="items.length + i === stopIndex() ? 0 : -1"
-        @click="chooseExtra(it)"
-      )
-        img(:src="it.src" alt="" draggable="false" decoding="async")
+        button(
+          v-for="(it, i) in extra"
+          :key="`x-${i}`"
+          type="button"
+          class="sh-item"
+          :class="{ chosen: !extraLocked && isChosen(it.color), locked: extraLocked }"
+          :style="{ '--i': items.length + i }"
+          :aria-label="labelOf(it)"
+          :tabindex="items.length + i === stopIndex() ? 0 : -1"
+          @click="chooseExtra(it)"
+        )
+          img(:src="it.src" alt="" draggable="false" decoding="async")
 
-      button(
-        v-if="rainbow"
-        type="button"
-        class="sh-item sh-rainbow"
-        :class="{ chosen: customActive }"
-        :aria-label="t('app.coloring.customColor')"
-        @click="emit('custom')"
-      )
-        img(:src="rainbow.src" alt="" draggable="false" decoding="async")
+        button(
+          v-if="rainbow"
+          type="button"
+          class="sh-item sh-rainbow"
+          :class="{ chosen: customActive && !customLocked, locked: customLocked }"
+          :aria-label="t('app.coloring.customColor')"
+          @click="emit('custom')"
+        )
+          img(:src="rainbow.src" alt="" draggable="false" decoding="async")
 </template>
 
 <style scoped lang="sass">
@@ -258,6 +264,18 @@ watch(() => props.open, (o) => {
   &.is-chalk
     --w: 52px
     --vis: 92px
+  // round pans: whole, a little wider than the sticks
+  &.is-pans
+    --w: 58px
+    --vis: 86px
+    --lift: 14px
+    --tray-top: 0px
+  // fresh dabs of paint, whole
+  &.is-dabs
+    --w: 54px
+    --vis: 72px
+    --lift: 12px
+    --tray-top: 0px
   &.is-brushW
     --w: 36px
     --vis: 128px
@@ -290,19 +308,9 @@ watch(() => props.open, (o) => {
   .sh
     transition-duration: 1ms
 
-// the pencils rise one after the other when the box opens
-.sh:not(.collapsed) .sh-item img
-  animation: sh-rise 460ms cubic-bezier(0.34, 1.3, 0.5, 1) backwards
-  animation-delay: calc(min(var(--i, 0), 16) * 18ms + 80ms)
-
-@keyframes sh-rise
-  from
-    transform: translateY(calc(var(--lift) + 90px))
-
-// folded away: the pencils wait below the edge, ready to rise
+// folded away: the pencils wait below the edge and rise together when the box opens (no animation per pencil: changing the box must stay smooth)
 .sh.collapsed .sh-item img
   transform: translateY(calc(var(--lift) + 80px))
-  transition-delay: 0ms
   transition-duration: 220ms
 
 .sh-tab
@@ -318,8 +326,6 @@ watch(() => props.open, (o) => {
   border-bottom: 0
   border-radius: 12px 12px 0 0
   background: rgba(252, 251, 248, 0.92)
-  backdrop-filter: blur(12px)
-  -webkit-backdrop-filter: blur(12px)
   box-shadow: 0 -2px 10px rgba(20, 24, 32, 0.14)
   cursor: pointer
   -webkit-tap-highlight-color: transparent
@@ -339,9 +345,7 @@ watch(() => props.open, (o) => {
 
 .sh-row
   height: 100%
-  display: flex
-  align-items: flex-start
-  gap: 3px
+  display: block
   padding: 0 max(16px, env(safe-area-inset-left, 0px))
   overflow-x: auto
   overflow-y: hidden
@@ -354,8 +358,40 @@ watch(() => props.open, (o) => {
   &::-webkit-scrollbar
     display: none
 
+// the tray: everything that scrolls sits on it
+.sh-track
+  position: relative
+  display: flex
+  align-items: flex-start
+  gap: 3px
+  min-width: max-content
+  // a box with only a few pencils (the pencil tool has three) sits in the middle of the shelf
+  justify-content: center
+  height: 100%
+
+// the back wall of the tray: frosted light plastic with a bright rim on top
+.sh-tray
+  position: absolute
+  left: 0
+  right: 0
+  bottom: 0
+  top: calc(var(--lift) + var(--tray-top, 36px))
+  border-radius: 16px 16px 0 0
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(240, 244, 248, 0.9) 45%, rgba(224, 231, 238, 0.92) 100%)
+  border: 1px solid rgba(255, 255, 255, 0.95)
+  border-bottom: 0
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 1), inset 0 -10px 18px rgba(150, 165, 185, 0.22), 0 -3px 14px rgba(20, 30, 50, 0.16)
+  pointer-events: none
+  z-index: 0
+
+// whole things (pans, chalk in paper, colour dabs) stand on the tray
+.sh.is-pans, .sh.is-chalk, .sh.is-bucket, .sh.is-dabs
+  .sh-tray
+    top: calc(var(--lift) - 4px)
+
 .sh-item
   position: relative
+  z-index: 1
   flex: 0 0 auto
   width: var(--w)
   height: calc(var(--vis) + var(--lift))

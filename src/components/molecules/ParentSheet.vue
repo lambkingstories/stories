@@ -13,9 +13,11 @@ import LkCompanion from '@/components/atoms/LkCompanion.vue'
 import TipButton from '@/components/molecules/TipButton.vue'
 import ContactLinks from '@/components/molecules/ContactLinks.vue'
 import { isIOS } from '@/utils/platform'
+import { PREMIUM_TEASER } from '@/use/usePremium'
 import { openExternal } from '@/utils/openExternal'
 import { prependBaseUrl } from '@/utils/function'
 import { bank } from '@/data/donation'
+import { requireParent } from '@/use/useParentalGate'
 
 defineProps<{ open: boolean }>()
 const emit = defineEmits<{ (e: 'close'): void }>()
@@ -48,6 +50,18 @@ function go(name: string) {
   void router.push({ name })
 }
 
+/** The numbers about the child are for grown-ups only: the gate comes first. */
+async function openOverview() {
+  if (!(await requireParent())) return
+  go('app-parents')
+}
+
+/** Recording a story means the microphone: grown-ups only. */
+async function openVoices() {
+  if (!(await requireParent())) return
+  go('app-voices')
+}
+
 /** A picture that does not exist yet is simply hidden. */
 function hideBroken(e: Event) {
   const el = e.target
@@ -77,6 +91,20 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
             p(class="sheet-intro") {{ t('app.parent.intro') }}
 
             div(class="sheet-rule")
+
+            button(type="button" class="sheet-row" @click="go('app-features')")
+              ZIconography(name="star" :size="30" class="row-icon")
+              span(class="row-text")
+                span(class="row-title") {{ t('app.features.title') }}
+                span(class="row-sub") {{ t('app.parent.featuresText') }}
+              ZIconography(name="chevron-right" :size="22")
+
+            button(v-if="PREMIUM_TEASER" type="button" class="sheet-row" @click="go('app-plus')")
+              ZIconography(name="star" :size="30" class="row-icon")
+              span(class="row-text")
+                span(class="row-title") {{ t('app.plus.title') }}
+                span(class="row-sub") {{ t('app.parent.plusText') }}
+              ZIconography(name="chevron-right" :size="22")
 
             section(class="support")
               h3(class="support-title") {{ t('app.parent.supportTitle') }}
@@ -117,6 +145,20 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
               span(class="row-text")
                 span(class="row-title") {{ t('app.parent.shopTitle') }}
                 span(class="row-sub") {{ t('app.parent.shopText') }}
+              ZIconography(name="chevron-right" :size="22")
+
+            button(type="button" class="sheet-row" @click="openOverview")
+              ZIconography(name="profile" :size="30" class="row-icon")
+              span(class="row-text")
+                span(class="row-title") {{ t('app.parent.overviewTitle') }}
+                span(class="row-sub") {{ t('app.parent.overviewText') }}
+              ZIconography(name="chevron-right" :size="22")
+
+            button(type="button" class="sheet-row" @click="openVoices")
+              ZIconography(name="headphones" :size="30" class="row-icon")
+              span(class="row-text")
+                span(class="row-title") {{ t('app.parent.voicesTitle') }}
+                span(class="row-sub") {{ t('app.parent.voicesText') }}
               ZIconography(name="chevron-right" :size="22")
 
             button(type="button" class="sheet-row" @click="go('app-profile')")
@@ -243,7 +285,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 .support-btn
   display: flex
   align-items: center
-  justify-content: flex-start
+  justify-content: center
   gap: 12px
   min-height: 60px
   padding: 8px 18px
@@ -254,7 +296,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   font-size: clamp(0.82rem, 4.3vw, 1.05rem)
   font-weight: 700
   line-height: 1.2
-  text-align: left
+  text-align: center
   white-space: nowrap
   cursor: pointer
   -webkit-tap-highlight-color: transparent

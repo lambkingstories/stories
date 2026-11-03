@@ -18,22 +18,28 @@ export interface AppNavItem {
   image?: string
 }
 
-function routeToNav(name: string): AppNavId {
+/** The painted symbols of the app (the same ones are on the start page): start, lesen, abenteuer, malen, ich, pokal, plus. */
+const symbol = (name: string) => prependBaseUrl(`images/icons/navi/${name}.webp`)
+
+export function routeToNav(name: string): AppNavId {
   if (name === 'app-main') return 'home'
   if (
     name === 'app-read'
     || name === 'app-books'
     || name === 'app-book-preview'
+    || name === 'app-book-read'
     || name === 'app-coloring-books'
     || name === 'app-all-books'
     || name === 'app-book'
     || name === 'app-series'
     || name === 'app-all-new-books'
   ) return 'series'
-  if (name === 'app-adventure' || name === 'app-adventure-map' || name === 'app-adventure-stage' || name === 'app-adventure-stats') return 'abenteuer'
+  if (name === 'app-adventure' || name === 'app-adventure-map' || name === 'app-adventure-stage' || name === 'app-adventure-stats' || name === 'app-family' || name === 'app-family-quiz' || name === 'app-family-activity' || name === 'app-family-who' || name === 'app-family-order' || name === 'app-family-bingo' || name === 'app-family-memory') return 'abenteuer'
   if (name === 'app-hoeren') return 'hoeren'
+  // the good-night stories belong to "Lesen"
+  if (name === 'app-goodnight') return 'series'
   if (name === 'app-coloring' || name === 'app-coloring-book') return 'malen'
-  if (name === 'app-profile' || name === 'app-legal' || name === 'app-awards') return 'profile'
+  if (name === 'app-profile' || name === 'app-legal' || name === 'app-plus' || name === 'app-awards' || name === 'app-parents' || name === 'app-collection' || name === 'app-journal' || name === 'app-voices') return 'profile'
   return 'home'
 }
 
@@ -55,11 +61,11 @@ export default function useAppNav(t: ComposerTranslation): {
   const router = useRouter()
 
   const navItems = computed<AppNavItem[]>(() => [
-    { id: 'home', label: t('app.nav.home'), icon: 'home' },
-    { id: 'series', label: t('app.nav.series'), icon: 'series' },
-    { id: 'abenteuer', label: t('app.nav.abenteuer'), icon: 'compass', image: prependBaseUrl('images/icons/ui/reise-stern.webp') },
-    { id: 'malen', label: t('app.nav.color'), icon: 'brush' },
-    { id: 'profile', label: t('app.nav.profile'), icon: 'profile' },
+    { id: 'home', label: t('app.nav.home'), icon: 'home', image: symbol('start') },
+    { id: 'series', label: t('app.nav.series'), icon: 'series', image: symbol('lesen') },
+    { id: 'abenteuer', label: t('app.nav.abenteuer'), icon: 'compass', image: symbol('abenteuer') },
+    { id: 'malen', label: t('app.nav.color'), icon: 'brush', image: symbol('malen') },
+    { id: 'profile', label: t('app.nav.profile'), icon: 'profile', image: symbol('ich') },
   ])
 
   // the list of coloring books belongs to "Lesen", but opened from the painting program it stays in "Malen"

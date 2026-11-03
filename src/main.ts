@@ -14,7 +14,9 @@ import { createI18n } from 'vue-i18n'
 import baseTranslations from '@/i18n/translations'
 import bookTranslations from '@/i18n/books'
 import appTranslations from '@/i18n/app'
+import appSpanish from '@/i18n/app.es'
 import { defaultLanguage } from '@/utils/defaultLanguage'
+import { offeredLanguage } from '@/utils/languages'
 import { mergeObjectsRecursive } from '@/utils/function'
 import { GAME_USER_LANGUAGE } from '@/utils/constants.ts'
 import { loadPreviewJourneys } from '@/data/adventures'
@@ -52,7 +54,7 @@ const translations = mergeObjectsRecursive(
     mergeObjectsRecursive({}, bookTranslations),
     baseTranslations
   ),
-  appTranslations
+  mergeObjectsRecursive(appTranslations, appSpanish)
 )
 
 // Without a stored preference the website starts in German and the native
@@ -60,14 +62,17 @@ const translations = mergeObjectsRecursive(
 // keep whichever language they last picked via the profile toggle (localStorage), and
 // the in-tab session storage entry covers anonymous private-mode usage.
 const userLanguage = ref(
-  localStorage.getItem(GAME_USER_LANGUAGE)
-  || sessionStorage.getItem(GAME_USER_LANGUAGE)
-  || defaultLanguage()
+  offeredLanguage(
+    localStorage.getItem(GAME_USER_LANGUAGE)
+    || sessionStorage.getItem(GAME_USER_LANGUAGE)
+    || defaultLanguage()
+  )
 )
 
 const i18n: any = createI18n({
   locale: userLanguage.value || 'de',
-  fallbackLocale: 'de',
+  // a text that is missing in Spanish is shown in English, then in German
+  fallbackLocale: { es: ['en', 'de'], default: ['de'] },
   messages: translations,
   missingWarn: false,
   fallbackWarn: false
@@ -80,7 +85,11 @@ app.use(router)
 app.use(i18n)
 
 // journeys that are not public yet (Noah) are added on devices that were unlocked, before the first screen is drawn
-void loadPreviewJourneys().finally(() => app.mount('#app'))
+// (the first screen waits at most a second for them: later ones are there when a screen is opened again)
+void Promise.race([loadPreviewJourneys(), new Promise((resolve) => setTimeout(resolve, 1000))]).finally(() => app.mount('#app'))
+
+// In the app from the store: ask the store what the person owns (LambKing Plus, single coloring books). Loaded only there, so the web bundle never carries it.
+if (import.meta.env.VITE_APP_NATIVE === 'true') void import('@/use/usePurchases').then((m) => m.refreshOwned())
 
 // While the first screen is read, the screens of the bottom bar are loaded quietly in the background.
 const whenQuiet = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback

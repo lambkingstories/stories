@@ -23,7 +23,7 @@
  * BookDetail "Use in coloring app" CTA can drop straight into the
  * artwork, without going through the upload card.
  */
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 import { prependBaseUrl } from '@/utils/function'
@@ -31,9 +31,12 @@ import { isIOS } from '@/utils/platform'
 import { goBackTo } from '@/utils/navBack'
 import { screenToSheet } from '@/utils/sheetMath'
 import { PatchHistory } from '@/utils/patchHistory'
+import { StickerCover } from '@/utils/stickerCover'
+import useSfx from '@/use/useSfx'
 import { useToolbarDock } from '@/use/useToolbarDock'
 import { installPenTaps } from '@/use/usePenTaps'
 import useAdventure from '@/use/useAdventure'
+import useJournal, { drawingFrom, readDraft, writeDraft } from '@/use/useJournal'
 import { LOG_SCALE, MIN_STEPS, TimelapseLog, packTimelapse, recordStep, unpackTimelapse, type TimelapseData } from '@/utils/timelapse'
 import { floodFillPaint } from '@/utils/coloringFill'
 import { requireParent } from '@/use/useParentalGate'
@@ -44,13 +47,18 @@ import ColoringColorPicker from '@/components/molecules/ColoringColorPicker.vue'
 import ColoringZoomBar from '@/components/molecules/ColoringZoomBar.vue'
 import ColoringMenu from '@/components/molecules/ColoringMenu.vue'
 import ColoringTimelapse from '@/components/molecules/ColoringTimelapse.vue'
+import GreetingCardSheet from '@/components/molecules/GreetingCardSheet.vue'
+import { drawGreetingCard } from '@/utils/greetingCard'
+import useUserName from '@/use/useUserName'
 import type { BookCard, GalleryGroup, GalleryItem } from '@/types/coloringMenu'
-import { BACKDROPS, BACKDROP_KEY, DEFAULT_BACKDROP, PLAIN_COLORS, PLAIN_KEY, isBackdropId, isPlainColorId, type BackdropId } from '@/data/coloringBackdrops'
+import { BACKDROPS, BACKDROP_KEY, DEFAULT_BACKDROP, PLAIN_COLORS, PLAIN_KEY, isBackdropId, isPlainColorId, preloadBackdrop, type BackdropId } from '@/data/coloringBackdrops'
 import {
   BRUSH_LOOK,
   drawOilSegment,
   eraseSegment,
   emptyBounds,
+  glitterSites,
+  type GlitterSite,
   growBounds,
   type Bounds,
   isLayeredTool,
@@ -69,8 +77,11 @@ import {
   type LayeredTool,
   type ShapeOptions
 } from '@/utils/coloringBrushes'
-import { KIT_ARTWORK, LINE_ICONS, TOOL_SPRITES, type KitArtwork, type KitItem } from '@/data/coloringKits'
-import usePremium, { PREMIUM_TEASER } from '@/use/usePremium'
+import { KIT_ARTWORK, LINE_ICONS, TOOL_SPRITES, warmSprites, type KitArtwork, type KitItem } from '@/data/coloringKits'
+import usePremium from '@/use/usePremium'
+import { anchorsOf, recognize, shapePath, tidyLine, type Pt, type QuickShape } from '@/utils/quickShape'
+import { DEFAULT_STAMP, cleanStamp, stampUrl, type StampSettings } from '@/data/coloringStamps'
+import useGlitterTwinkle from '@/use/useGlitterTwinkle'
 import useApiBooks from '@/use/useApiBooks'
 import { pickLocalizedImage, type ApiBook } from '@/types/apiBook'
 import { BUILTIN_COLORING_PAGES } from '@/data/builtinColoringPages'
@@ -89,7 +100,9 @@ import useChrome from '@/use/useChrome'
 import useColoringShelf from '@/use/useColoringShelf'
 import { journeys } from '@/data/adventures'
 import { maxPoints, medalFor, pointsOf } from '@/utils/adventureScore'
+import { useActivity } from '@/use/useActivity'
 import type { RewardItem } from '@/types/coloringMenu'
+import { contentLocale } from '@/utils/contentLocale'
 import {
   type ArtworkMeta,
   deleteArtwork,
@@ -134,6 +147,26 @@ const advCtx = computed<{ journeyId: string; stageId: number } | null>(() => {
   const stageId = Number(stage)
   return journeyId && Number.isFinite(stageId) && stageId >= 1 ? { journeyId, stageId } : null
 })
+
+/**
+ * A picture painted for the thank-you book (`?journal=1`): a blank sheet, and "Put in my book" hands it in with the words that
+ * were written there (they wait in `readDraft`). The way back leads to the book.
+ */
+const journalCtx = computed(() => route.query.journal === '1')
+const journal = useJournal()
+
+async function toJournal(keep: boolean) {
+  let ok = true
+  if (keep) {
+    const picture = flattenCanvas()
+    ok = !!picture && journal.add(readDraft(), drawingFrom(picture))
+    if (ok) writeDraft('')
+  }
+  await persistNow()
+  hasImage.value = false
+  identity = null
+  void router.replace(ok ? { name: 'app-journal' } : { name: 'app-journal', query: { failed: '1' } })
+}
 
 /** Back to the stage; `done` shows the finished picture there ("well done") with its stars, otherwise the stage goes on with the questions. */
 function backToStage(done = false, stars = 0) {
@@ -292,8 +325,9 @@ async function leaveToStage() {
   const c = advCtx.value
   if (!c) return
   // (saving clears the flag of "something was painted", so it is read first)
+  if (savedFlash.value) return
   const painted = hasUserAction.value
-  await persistNow()
+  await persistWithNote()
   const stars = jobStars(painted || currentPaintShare() > 0)
   if (painted || stars > 0) adventure.recordStars(c.journeyId, c.stageId, stars)
   backToStage(false, stars)
@@ -335,6 +369,8 @@ function readPlain(): string {
 }
 
 const backdropId = ref<BackdropId>(readBackdrop())
+// the table is fetched while the menu is still on the screen
+preloadBackdrop(backdropId.value)
 const plainColorId = ref<string>(readPlain())
 const backdropVars = computed(() => {
   // the main menu keeps the calm warm light, so its text can always be read; the backdrop belongs to the sheet
@@ -348,6 +384,7 @@ const backdropVars = computed(() => {
 function setBackdrop(id: string) {
   if (!isBackdropId(id)) return
   backdropId.value = id
+  preloadBackdrop(id)
   try {
     localStorage.setItem(BACKDROP_KEY, id)
   } catch {
@@ -417,8 +454,11 @@ const awards = useAwards()
 const awardBanner = ref<AwardId[]>([])
 let awardBannerTimer: ReturnType<typeof setTimeout> | undefined
 
+const sfx = useSfx()
+
 function celebrate(won: AwardId[]) {
   if (!won.length) return
+  sfx.play('trophy')
   awardBanner.value = [...awardBanner.value, ...won]
   clearTimeout(awardBannerTimer)
   awardBannerTimer = setTimeout(() => {
@@ -450,6 +490,7 @@ async function finishPicture() {
   }
   const { drawing: layer, ...meta } = rec
   await saveArtwork({ ...meta, done: true }, layer)
+  if (!meta.done) useActivity().count('pictures')
   identity.done = true
   await flushTimelapse()
 
@@ -576,7 +617,7 @@ const coloringBooks = computed<BookCard[]>(() => {
     cards.push({
       bookId: book.bookId,
       title: (loc[locale.value]?.title || loc.de?.title || book.bookId).replace(/^Buch\s*\d+\s*[–-]\s*/i, ''),
-      cover: pickLocalizedImage(book.previewImage, locale.value === 'en' ? 'en' : 'de'),
+      cover: pickLocalizedImage(book.previewImage, contentLocale(locale.value)),
       total: pages.length,
       done,
       updatedAt
@@ -683,29 +724,30 @@ function openWork(meta: ArtworkMeta) {
 
 // ── Tool & paint state -------------------------------------------------------
 
-type ToolId = 'felt' | 'watercolor' | 'pencil' | 'graphite' | 'chalk' | 'oil' | 'fill' | 'eraser' | 'pipette'
+type ToolId = 'felt' | 'watercolor' | 'pencil' | 'graphite' | 'whitepencil' | 'chalk' | 'glitter' | 'oil' | 'fill' | 'eraser' | 'pipette' | 'stamp'
 
 // The boxes a child can open. Each one has its own tool and its own set of
 // colours (the artwork lives in `coloringKits.ts`); the chosen colour carries
 // over when switching boxes.
-type KitId = 'pencil' | 'marker' | 'watercolor' | 'oil' | 'graphite' | 'chalk' | 'bucket'
+type KitId = 'pencil' | 'graphite' | 'marker' | 'watercolor' | 'oil' | 'chalk' | 'glitter' | 'bucket'
 
 interface KitDef extends KitArtwork {
   id: KitId
   tool: ToolId
   /** Premium feature that unlocks the whole box, if any (see usePremium). */
-  feature: 'pencilBox' | 'paintBoxes' | null
+  feature?: 'glitter'
 }
 
 const KITS: KitDef[] = [
-  { id: 'pencil', tool: 'pencil', feature: null, ...KIT_ARTWORK.pencil },
-  { id: 'marker', tool: 'felt', feature: null, ...KIT_ARTWORK.marker },
-  { id: 'watercolor', tool: 'watercolor', feature: null, ...KIT_ARTWORK.watercolor },
-  { id: 'oil', tool: 'oil', feature: null, ...KIT_ARTWORK.oil },
-  { id: 'graphite', tool: 'graphite', feature: null, ...KIT_ARTWORK.graphite },
-  { id: 'chalk', tool: 'chalk', feature: null, ...KIT_ARTWORK.chalk },
+  { id: 'pencil', tool: 'pencil', ...KIT_ARTWORK.pencil },
+  { id: 'graphite', tool: 'graphite', ...KIT_ARTWORK.graphite },
+  { id: 'marker', tool: 'felt', ...KIT_ARTWORK.marker },
+  { id: 'watercolor', tool: 'watercolor', ...KIT_ARTWORK.watercolor },
+  { id: 'oil', tool: 'oil', ...KIT_ARTWORK.oil },
+  { id: 'chalk', tool: 'chalk', ...KIT_ARTWORK.chalk },
+  { id: 'glitter', tool: 'glitter', feature: 'glitter', ...KIT_ARTWORK.glitter },
   // the bucket has its own buckets of paint, and with them its own colour
-  { id: 'bucket', tool: 'fill', feature: null, ...KIT_ARTWORK.bucket }
+  { id: 'bucket', tool: 'fill', ...KIT_ARTWORK.bucket }
 ]
 
 const kit = ref<KitId>('pencil')
@@ -729,15 +771,50 @@ interface ToolPaint {
 const COLORS_KEY = 'lk-coloring-tool-colors'
 const HEX_COLOR = /^#[0-9a-f]{6}$/i
 
+/**
+ * The colour every tool starts with: all different (they all being red looked silly). It is the colour of the box that is nearest to this one.
+ * A tool that was never changed is not remembered, so its start colour is the one of today; a changed one keeps its colour.
+ */
+const START_COLORS: Record<KitId, string> = {
+  pencil: '#FA4429',
+  graphite: '#3C3C3B',
+  marker: '#0752B2',
+  watercolor: '#18993C',
+  oil: '#F89F07',
+  chalk: '#F7ACB7',
+  glitter: '#8C4BD8',
+  bucket: '#3BD6CC'
+}
+/** The tools whose colour was changed (only these are remembered). */
+const touchedKits = new Set<KitId>()
+
+function startColorOf(k: KitDef): string {
+  const items = [...k.base, ...k.extra]
+  const want = START_COLORS[k.id]
+  let best = items[0]?.color ?? want
+  let bd = Infinity
+  for (const it of items) {
+    const d = sqDist(it.color, want)
+    if (d < bd) {
+      bd = d
+      best = it.color
+    }
+  }
+  return best
+}
+
 function readToolColors(): Record<KitId, ToolPaint> {
   const out = {} as Record<KitId, ToolPaint>
-  for (const k of KITS) out[k.id] = { color: k.base[0]?.color ?? '#E53935', custom: false }
+  for (const k of KITS) out[k.id] = { color: startColorOf(k), custom: false }
   try {
     const saved = JSON.parse(localStorage.getItem(COLORS_KEY) ?? 'null') as Record<string, Partial<ToolPaint>> | null
     if (saved && typeof saved === 'object') {
       for (const k of KITS) {
         const v = saved[k.id]
-        if (v && typeof v.color === 'string' && HEX_COLOR.test(v.color)) out[k.id] = { color: v.color.toUpperCase(), custom: !!v.custom }
+        if (v && typeof v.color === 'string' && HEX_COLOR.test(v.color)) {
+          out[k.id] = { color: v.color.toUpperCase(), custom: !!v.custom }
+          touchedKits.add(k.id)
+        }
       }
     }
   } catch {
@@ -753,24 +830,25 @@ const customColor = computed<string | null>(() => (toolColors.value[kit.value].c
 
 function setPaint(c: string, custom: boolean) {
   toolColors.value = { ...toolColors.value, [kit.value]: { color: c.toUpperCase(), custom } }
+  touchedKits.add(kit.value)
   try {
-    localStorage.setItem(COLORS_KEY, JSON.stringify(toolColors.value))
+    localStorage.setItem(COLORS_KEY, JSON.stringify(Object.fromEntries([...touchedKits].map((id) => [id, toolColors.value[id]]))))
   } catch {
     // not remembered in a private window
   }
 }
-/** Brush size on a 2–60 scale (starts at the full 60); the picture's width scales it, so it feels the same on every picture. */
-const brushSize = ref<number>(60)
+/** Brush size on a 2–60 scale (starts at 80 % of the full 60); the picture's width scales it, so it feels the same on every picture. */
+const brushSize = ref<number>(31)
 /** The eraser has its own size and its own way of working, remembered between visits. */
-const ERASER_KEY = 'lk-coloring-eraser'
+const ERASER_KEY = 'lk-coloring-eraser-v2'
 const ERASER_SIZES = [6, 14, 26, 44]
 function readEraser(): { size: number; field: boolean } {
   try {
     const saved = JSON.parse(localStorage.getItem(ERASER_KEY) ?? 'null') as { size?: unknown; field?: unknown } | null
-    const size = typeof saved?.size === 'number' ? Math.round(Math.max(2, Math.min(60, saved.size))) : 60
+    const size = typeof saved?.size === 'number' ? Math.round(Math.max(2, Math.min(60, saved.size))) : 31
     return { size, field: saved?.field !== false }
   } catch {
-    return { size: 60, field: true }
+    return { size: 31, field: true }
   }
 }
 const eraserSaved = readEraser()
@@ -834,25 +912,29 @@ function setTip(shape: TipShape) {
 }
 
 const { hasFeature, showUpsell } = usePremium()
-// The big pencil box only locks the pencil kit's extra colours.
-const extraLocked = computed(() => kit.value === 'pencil' && !hasFeature('pencilBox'))
 
-function kitLocked(k: KitDef): boolean {
-  return !!k.feature && k.feature !== 'pencilBox' && !hasFeature(k.feature)
-}
+// Free: the 12 basic colours of every box and every tool but the glitter pencils. Plus: the other colours of a box (36 for the
+// pencils), the free colour picker and the glitter pencils (see `usePremium`).
+const extraLocked = computed(() => kitDef.value.extra.length > 0 && !hasFeature('colors'))
 
 function selectKit(k: KitDef) {
-  if (kitLocked(k)) {
-    showUpsell(k.feature!)
+  if (k.feature && !hasFeature(k.feature)) {
+    showUpsell(k.feature)
     return
   }
   kit.value = k.id
-  tool.value = k.tool
+  tool.value = paintToolOf(k, toolColors.value[k.id].color)
+}
+
+/** The drawing tool of a box with the colour that is chosen in it: the pencil box has the graphite pencils and the white pencil, which paint differently. */
+function paintToolOf(k: KitDef, c: string): ToolId {
+  const up = c.toUpperCase()
+  return [...k.base, ...k.extra].find((i) => i.color.toUpperCase() === up)?.tool ?? k.tool
 }
 
 /** Back to the open box's drawing tool (after the pipette, for example). */
 function selectPaint() {
-  tool.value = kitDef.value.tool
+  tool.value = paintToolOf(kitDef.value, color.value)
 }
 
 function selectToolById(id: string) {
@@ -867,7 +949,7 @@ function selectToolById(id: string) {
 
 /** A colour chosen below goes with a painting tool: after the eraser, the bucket or the pipette the box's tool comes back. */
 function backToPaint() {
-  if (tool.value === 'eraser' || tool.value === 'fill' || tool.value === 'pipette') selectPaint()
+  if (tool.value === 'eraser' || tool.value === 'fill' || tool.value === 'pipette' || tool.value === 'stamp') selectPaint()
   toolOverride.value = null
 }
 
@@ -875,6 +957,8 @@ function pickPreset(c: string) {
   arm()
   backToPaint()
   setPaint(c, false)
+  // the white pencil of the pencil tool paints differently from the graphite ones
+  if (kit.value === 'graphite' && (tool.value === 'graphite' || tool.value === 'whitepencil')) tool.value = paintToolOf(kitDef.value, c)
 }
 
 function pickCustom(c: string) {
@@ -886,11 +970,10 @@ function pickCustom(c: string) {
 /** The free colour picker (the rainbow item of a box). */
 const pickerOpen = ref(false)
 
-// The palette item opens the free colour picker, which belongs to the big box
-// once the subscription is switched on.
+// The palette item opens the free colour picker, which comes with Plus.
 function onCustomPencil() {
-  if (PREMIUM_TEASER && kit.value === 'pencil' && extraLocked.value) {
-    showUpsell('pencilBox')
+  if (!hasFeature('colors')) {
+    showUpsell('colors')
     return
   }
   pickerOpen.value = !pickerOpen.value
@@ -904,9 +987,10 @@ function sqDist(a: string, b: string): number {
 /** The picture of the pencil, marker, brush… of a tool that matches that tool's colour (or comes closest to it). */
 function spriteFor(k: KitDef): string {
   const want = toolColors.value[k.id].color
-  let best: KitItem | undefined = k.base[0]
+  const pool = k.toolSprites?.length ? k.toolSprites : [...k.base, ...k.extra]
+  let best: KitItem | undefined = pool[0]
   let bd = Infinity
-  for (const it of [...k.base, ...k.extra]) {
+  for (const it of pool) {
     const d = sqDist(it.color, want)
     if (d < bd) {
       bd = d
@@ -916,15 +1000,23 @@ function spriteFor(k: KitDef): string {
   return best?.src ?? ''
 }
 
-/** Every tool of the tool bar with its picture (in the colour of that tool): the tools of the boxes (the graphite pencil last), then eraser, bucket and pipette. */
-const TOOL_ORDER: KitId[] = ['pencil', 'marker', 'watercolor', 'oil', 'chalk', 'graphite']
-const toolbarTools = computed<ToolbarTool[]>(() => [
-  ...TOOL_ORDER.map((id) => KITS.find((k) => k.id === id)!).map((k) => ({ id: k.tool, label: t(`app.coloring.toolName.${k.tool}`), sprite: spriteFor(k) })),
-  { id: 'fill', label: t('app.coloring.toolName.fill'), sprite: spriteFor(KITS.find((k) => k.id === 'bucket')!) || TOOL_SPRITES.fill },
-  { id: 'pipette', label: t('app.coloring.toolName.pipette'), sprite: TOOL_SPRITES.pipette }
-])
+/** Every tool of the tool bar with its picture (in the colour of that tool): the tools of the boxes, then bucket and pipette (the pencil tool with its three pencils sits next to the coloured pencils). */
+const TOOL_ORDER: KitId[] = ['pencil', 'graphite', 'marker', 'watercolor', 'oil', 'chalk', 'glitter']
+const toolbarTools = computed<ToolbarTool[]>(() => {
+  const list: ToolbarTool[] = [
+    ...TOOL_ORDER.map((id) => KITS.find((k) => k.id === id)!).map((k) => ({ id: k.tool, label: t(`app.coloring.toolName.${k.tool}`), sprite: spriteFor(k) })),
+    { id: 'fill', label: t('app.coloring.toolName.fill'), sprite: spriteFor(KITS.find((k) => k.id === 'bucket')!) || TOOL_SPRITES.fill },
+    { id: 'pipette', label: t('app.coloring.toolName.pipette'), sprite: TOOL_SPRITES.pipette }
+  ]
+  // the Plus pens stay at the very bottom of the bar while Plus is not on; with Plus they sit among the other pens
+  if (hasFeature('glitter')) return list
+  const at = list.findIndex((x) => x.id === 'glitter')
+  return [...list.slice(0, at), ...list.slice(at + 1), list[at]!]
+})
 // the eraser is no pen of the bar, but the folded tab shows it while it is chosen
-const currentSprite = computed(() => (tool.value === 'eraser' ? TOOL_SPRITES.eraser : (toolbarTools.value.find((x) => x.id === tool.value)?.sprite ?? '')))
+/** The tool the bar shows as chosen: the white pencil is a pencil of the pencil tool, so that one is lit. */
+const barTool = computed<ToolId>(() => (tool.value === 'whitepencil' ? 'graphite' : tool.value))
+const currentSprite = computed(() => (tool.value === 'eraser' ? TOOL_SPRITES.eraser : tool.value === 'stamp' ? LINE_ICONS.stamp : (toolbarTools.value.find((x) => x.id === barTool.value)?.sprite ?? '')))
 
 // The tool bar and the small menu.
 const toolbarOpen = ref(true)
@@ -947,6 +1039,12 @@ function menuAction(fn: () => void) {
 const bgCanvas = ref<HTMLCanvasElement | null>(null)
 const drawCanvas = ref<HTMLCanvasElement | null>(null)
 const previewCanvas = ref<HTMLCanvasElement | null>(null)
+/** The flashes of the glitter paint, laid over the picture (see `useGlitterTwinkle`). */
+const sparkleCanvas = ref<HTMLCanvasElement | null>(null)
+const twinkling = useGlitterTwinkle(() => drawCtx, () => sparkleCanvas.value)
+/** Over the line art: the paint where a sticker sits, so a sticker covers the lines (see `utils/stickerCover.ts`). */
+const stickerView = ref<HTMLCanvasElement | null>(null)
+const cover = new StickerCover(() => drawCanvas.value, () => stickerView.value)
 const canvasWrap = ref<HTMLDivElement | null>(null)
 const mainEl = ref<HTMLElement | null>(null)
 const cursorRing = ref<HTMLDivElement | null>(null)
@@ -1029,6 +1127,7 @@ const zoom = {
 const isFullscreen = ref(false)
 // While a stroke is on, the bars fade back so the hand and the picture stay clear.
 const isPainting = ref(false)
+let paintFadeTimer: ReturnType<typeof setTimeout> | undefined
 
 // ── Bottom nav ---------------------------------------------------------------
 
@@ -1065,7 +1164,10 @@ function seedPaintShelf(list: BookCard[]) {
   if (list.length) paintShelf.seedShelf(list.filter((b) => b.done > 0).map((b) => b.bookId))
 }
 watch(coloringBooks, seedPaintShelf)
-onMounted(() => seedPaintShelf(coloringBooks.value))
+onMounted(() => {
+  seedPaintShelf(coloringBooks.value)
+  warmSprites()
+})
 
 const deleteCandidate = ref<ArtworkMeta | null>(null)
 let autosaveTimer: ReturnType<typeof setTimeout> | undefined
@@ -1095,15 +1197,20 @@ function autosaveWhenQuiet() {
 }
 
 /** The picture as it looks on screen: white paper, the paint, the line art multiplied on top. */
-function paintComposite(ctx: CanvasRenderingContext2D, w: number, h: number) {
+/** The picture as it looks: paper, paint, line art. `lights`: the flashes of the glitter paint are laid on as still stars (for the export; not for the bucket, which reads the pixels). */
+function paintComposite(ctx: CanvasRenderingContext2D, w: number, h: number, lights = false, stickers = true) {
   const dc = drawCanvas.value!, bg = bgCanvas.value!
   ctx.fillStyle = '#ffffff'
   ctx.fillRect(0, 0, w, h)
   ctx.drawImage(dc, 0, 0, w, h)
+  // the glitter: the fine flecks are in the paint already, the flashes are laid on as still stars
+  if (lights) twinkling.drawStatic(ctx, w / Math.max(1, dc.width))
   ctx.save()
   ctx.globalCompositeOperation = 'multiply'
   ctx.drawImage(bg, 0, 0, w, h)
   ctx.restore()
+  // a sticker covers the lines (the bucket does not look at them: it still finds the fields by the lines)
+  if (stickers) cover.drawOver(ctx, w, h)
 }
 
 function makeThumb(): string {
@@ -1150,7 +1257,24 @@ function makeThumb(): string {
   }
 }
 
+/** The picture that was saved last: leaving it shows "saved" (also when autosave had already done the work). */
+let lastSavedId = ''
+/** The short "picture saved" note on leaving. */
+const savedFlash = ref(false)
+const SAVED_PAUSE_MS = 900
+
+/** Save, and when the child painted on this picture say so for a moment before leaving, so nobody fears the picture is lost. */
+async function persistWithNote() {
+  const wants = hasUserAction.value || (!!identity && identity.id === lastSavedId)
+  await persistNow()
+  if (!wants || !identity || identity.id !== lastSavedId) return
+  savedFlash.value = true
+  await new Promise<void>((resolve) => setTimeout(resolve, SAVED_PAUSE_MS))
+  savedFlash.value = false
+}
+
 async function persistNow() {
+  commitStamp()
   clearTimeout(autosaveTimer)
   const dc = drawCanvas.value
   if (!identity || !dc || !hasImage.value || !hasUserAction.value) return
@@ -1158,6 +1282,7 @@ async function persistNow() {
   try {
     const drawing: Blob | null = await new Promise((resolve) => dc.toBlob((b) => resolve(b), 'image/png'))
     if (!drawing) return
+    const stickers = await cover.toBlob()
     await saveArtwork(
       {
         id: snapshot.id,
@@ -1174,9 +1299,11 @@ async function persistNow() {
         thumb: makeThumb(),
         updatedAt: Date.now()
       },
-      drawing
+      drawing,
+      stickers
     )
     hasUserAction.value = false
+    lastSavedId = snapshot.id
     saveToolMap()
     celebrate(awards.paintedToday())
   } catch (err) {
@@ -1201,6 +1328,7 @@ async function restoreSavedDrawing(): Promise<boolean> {
     const bmp = await createImageBitmap(rec.drawing)
     drawCtx.clearRect(0, 0, dc.width, dc.height)
     drawCtx.drawImage(bmp, 0, 0, dc.width, dc.height)
+    await cover.load(rec.stickers)
     loadToolMap()
     scheduleJobCheck()
     await loadTimelapseOf(identity.id, bmp)
@@ -1244,19 +1372,24 @@ const retStats = computed(() => {
 async function backToStats() {
   const id = retStats.value
   if (!id) return false
-  await persistNow()
+  await persistWithNote()
   void router.replace({ name: 'app-adventure-stats', params: { journeyId: id } })
   return true
 }
 
 async function onBack() {
+  if (savedFlash.value) return
+  if (journalCtx.value) {
+    await toJournal(false)
+    return
+  }
   if (advCtx.value) {
     await leaveToStage()
     return
   }
   if (await backToStats()) return
   if (hasImage.value) {
-    await persistNow()
+    await persistWithNote()
     bookCtx.value = null
     hasImage.value = false
     identity = null
@@ -1273,6 +1406,11 @@ async function onBack() {
 
 /** Back to the choose-a-picture screen; the picture is saved first. */
 async function closePicture() {
+  if (savedFlash.value) return
+  if (journalCtx.value) {
+    await toJournal(false)
+    return
+  }
   if (advCtx.value) {
     await leaveToStage()
     return
@@ -1282,7 +1420,7 @@ async function closePicture() {
     await leaveToBook()
     return
   }
-  await persistNow()
+  await persistWithNote()
   hasImage.value = false
   identity = null
   pdfDoc = null
@@ -1385,7 +1523,7 @@ async function openBook(bookId: string, page: number) {
       pages,
       freePages: (book as ApiBook).freePages ?? null,
       index: 0,
-      shopLink: pickLocalizedImage((book as ApiBook).etsyLink, locale.value === 'en' ? 'en' : 'de') || undefined
+      shopLink: pickLocalizedImage((book as ApiBook).etsyLink, contentLocale(locale.value)) || undefined
     }
   } catch (err) {
     console.error('coloring book load error', err)
@@ -1415,8 +1553,9 @@ async function gotoBookPage(delta: 1 | -1) {
 
 /** Back to the book's overview (the pages and how they look now). */
 async function leaveToBook() {
+  if (savedFlash.value) return
   const ctx = bookCtx.value
-  await persistNow()
+  await persistWithNote()
   if (ctx) {
     void router.replace({
       name: 'app-coloring-book',
@@ -1601,6 +1740,8 @@ async function renderPdfPage(num: number) {
         img.onerror = () => resolve()
         img.src = saved
       })
+      // the stickers of that page come from the saved picture
+      await cover.load(identity ? (await getArtwork(identity.id))?.stickers : null)
     }
     resetHistory()
   } finally {
@@ -1710,7 +1851,7 @@ const { dock, carry, justCarried, toolbarStyle, onHandleDown, onHandleMove, onHa
 })
 
 /** The zoom buttons show with a mouse, and on a touch screen as soon as the sheet is zoomed. */
-const showZoom = computed(() => finePointer.value || zoomPct.value !== 100)
+const showZoom = computed(() => finePointer.value || zoomPct.value !== 100 || zoomBarKept.value)
 /** The corner of the picture where undo and redo sit: the one away from the tool bar. */
 const cornerSide = computed(() => (dock.value.edge === 'right' ? 'left' : 'right'))
 /** The room of the colour box at the bottom edge is always kept free for the tool bar, so the bar never moves when the box comes out. */
@@ -1766,6 +1907,8 @@ function applyTransform() {
   const cx = baseLeft + zoom.panX + sw / 2
   const cy = baseTop + zoom.panY + sh / 2
   zoomPct.value = Math.round(zoom.scale * 100)
+  // while the sheet is moved or zoomed the flashes rest, so the phone only has to move the picture
+  twinkling.hold()
   wrap.style.transform = `translate(${cx}px, ${cy}px) rotate(${rotation.value}deg) scale(${zoom.scale}) translate(${-zoom.baseW / 2}px, ${-zoom.baseH / 2}px)`
 }
 
@@ -1790,6 +1933,17 @@ function setRotation(deg: number, smooth = false) {
 
 // ── Zoom and move with the mouse (two fingers do it on a touch screen) -----------------------------------------------
 const zoomPct = ref(100)
+/**
+ * The percentage button stays for a moment after the sheet is back at 100 %: while two fingers zoom through 100 % it must not
+ * come and go (the whole top bar shook with it).
+ */
+const zoomBarKept = ref(false)
+let zoomBarTimer: ReturnType<typeof setTimeout> | undefined
+watch(zoomPct, (v) => {
+  clearTimeout(zoomBarTimer)
+  if (v !== 100) zoomBarKept.value = true
+  else zoomBarTimer = setTimeout(() => (zoomBarKept.value = false), 2500)
+})
 /** The hand tool: dragging moves the sheet instead of painting (for a mouse). */
 const panMode = ref(false)
 const spaceHeld = ref(false)
@@ -1830,6 +1984,7 @@ function resetZoom() {
 
 function onWheel(e: WheelEvent) {
   if (!hasImage.value) return
+  if (stampWheel(e)) return
   e.preventDefault()
   // a trackpad pinch arrives as a wheel with the control key: finer steps
   zoomAt(zoom.scale * Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0016)), e.clientX, e.clientY)
@@ -1852,23 +2007,26 @@ function movePan(e: PointerEvent) {
   applyTransform()
 }
 
+/**
+ * How far the sheet may be moved (with two fingers, the hand tool or the mouse): in every position, also when the whole sheet is in view,
+ * so that it can be pushed out from under the tool bar and the colour box. A good part of it always stays on the screen, so it is never lost.
+ */
 function clampPan() {
   const m = mainEl.value
   if (!m) return
-  if (zoom.scale <= 1) {
-    zoom.panX = 0
-    zoom.panY = 0
-    return
-  }
   // Layout-box dims (see fitCanvas note).
-  const aw = m.clientWidth - PAGE_INSET * 2
-  const ah = m.clientHeight - topInset() - bottomInset()
+  const W = m.clientWidth
+  const H = m.clientHeight
   const sw = zoom.baseW * zoom.scale
   const sh = zoom.baseH * zoom.scale
-  const maxX = Math.max(0, (sw - aw) / 2 + 40)
-  const maxY = Math.max(0, (sh - ah) / 2 + 40)
+  // where the sheet lies when it is not moved (see applyTransform), measured from the middle of the whole screen
+  const homeY = topInset() + (H - topInset() - bottomInset()) / 2 - H / 2
+  const keepX = Math.min(sw, W) * 0.4
+  const keepY = Math.min(sh, H) * 0.4
+  const maxX = Math.max(0, (W + sw) / 2 - keepX)
+  const maxY = Math.max(0, (H + sh) / 2 - keepY)
   zoom.panX = Math.max(-maxX, Math.min(maxX, zoom.panX))
-  zoom.panY = Math.max(-maxY, Math.min(maxY, zoom.panY))
+  zoom.panY = Math.max(-maxY - homeY, Math.min(maxY - homeY, zoom.panY))
 }
 
 function onResize() {
@@ -1906,9 +2064,11 @@ const screenPerCanvas = () => {
 const RING_FACTOR: Record<string, [number, number]> = {
   pencil: [0.6, 0.6],
   graphite: [0.42, 0.42],
+  whitepencil: [0.5, 0.5],
   felt: [1.05, 1.05],
   watercolor: [0.9, 1.1],
   chalk: [1.1, 1.1],
+  glitter: [1.05, 1.05],
   oil: [0.8, 1],
   eraser: [1.5, 1.5],
   fill: [0.5, 0.5],
@@ -1924,6 +2084,17 @@ function updateCursorRing() {
   const t = activeTool.value
   const isErase = t === 'eraser'
   const k = screenPerCanvas()
+  if (t === 'stamp') {
+    // the stamp's size, as a soft round mark in its colour
+    const d = Math.max(10, stampPx() * k)
+    ring.style.width = `${d}px`
+    ring.style.height = `${d}px`
+    ring.style.borderRadius = '50%'
+    ring.style.transform = ''
+    ring.classList.remove('eraser-cursor')
+    ring.style.background = hexToRgba(stampSet.value.color, 0.14)
+    return
+  }
   const painting = t !== 'fill' && t !== 'pipette' && !isErase
   const tip = painting ? tipOfTool(t) : ROUND_TIP
   const [roundF, shapeF] = RING_FACTOR[t] ?? [1, 1]
@@ -1971,7 +2142,10 @@ function syncPreview() {
   if (!dc || !pc) return
   if (pc.width !== dc.width) pc.width = dc.width
   if (pc.height !== dc.height) pc.height = dc.height
+  if (sheetDims.value.w !== dc.width || sheetDims.value.h !== dc.height) sheetDims.value = { w: dc.width, h: dc.height }
   previewCtx = pc.getContext('2d', { willReadFrequently: true })
+  cover.size(dc.width, dc.height)
+  twinkling.sync()
 }
 
 // Eyedropper: the colour of the picture (paint plus line art) at a point.
@@ -1996,37 +2170,22 @@ function sampleColor(x: number, y: number): string | null {
 
 // ── Fields of the line art: stay inside the lines, and the bucket that does not leak -------------
 
-/** "In den Linien bleiben": a stroke only paints in the field where it started. Remembered between visits. */
-const STAY_KEY = 'lk-coloring-stay-inside-v2'
+/** "In den Linien bleiben": a stroke only paints in the field where it started. Off at the start; remembered between visits. */
+const STAY_KEY = 'lk-coloring-stay-inside-v3'
 function readStay(): boolean {
   try {
-    return localStorage.getItem(STAY_KEY) !== '0'
+    return localStorage.getItem(STAY_KEY) === '1'
   } catch {
-    return true
+    return false
   }
 }
 const stayInside = ref(readStay())
 
 /**
- * Colours that lie over each other and get darker (the see-through look of pencil, marker and watercolour). Off by default: going
- * over the same place twice is mostly an accident and leaves a darker spot. Off, a stroke replaces the paint under it instead.
+ * Colours that lie over each other and get darker (the see-through look of pencil, marker and watercolour) are not offered: going over the
+ * same place twice is mostly an accident and leaves a darker spot, so a stroke replaces the paint under it.
  */
-const OVERLAP_KEY = 'lk-coloring-overlap'
-function readOverlap(): boolean {
-  try {
-    return localStorage.getItem(OVERLAP_KEY) === '1'
-  } catch {
-    return false
-  }
-}
-const overlap = ref(readOverlap())
-watch(overlap, (on) => {
-  try {
-    localStorage.setItem(OVERLAP_KEY, on ? '1' : '0')
-  } catch {
-    // not remembered in a private window
-  }
-})
+const overlap = ref(false)
 watch(stayInside, (on) => {
   if (on && hasImage.value) whenIdle(() => void ensureRegionMap(), 4000)
   try {
@@ -2138,7 +2297,7 @@ function floodFill(sx: number, sy: number) {
   merged.width = cw
   merged.height = ch
   const mCtx = merged.getContext('2d', { willReadFrequently: true })!
-  paintComposite(mCtx, cw, ch)
+  paintComposite(mCtx, cw, ch, false, false)
   const paint = drawCtx.getImageData(0, 0, cw, ch)
   const c = color.value
   const did = floodFillPaint({
@@ -2215,6 +2374,8 @@ function onPointerDown(e: PointerEvent) {
     (e.currentTarget as Element).setPointerCapture?.(e.pointerId)
   } catch { /* ignore */
   }
+  // on the stamp that was just placed the press waits a moment: held still it takes hold of the stamp
+  if (stampDotStart(`p${e.pointerId}`, e.clientX, e.clientY) || stampPressStart(`p${e.pointerId}`, e.clientX, e.clientY)) return
   beginStroke(getPosFromClient(e.clientX, e.clientY, pressureOf(e), e.pointerType === 'pen'))
 }
 
@@ -2238,6 +2399,7 @@ function onPointerMove(e: PointerEvent) {
     movePan(e)
     return
   }
+  if ((stampPress || stampGrab || stampDot) && e.pointerType !== 'touch' && stampHandleMove(`p${e.pointerId}`, e.clientX, e.clientY)) return
   if (!drawing || ignoreUntilUp) return
   if (activeTouchId !== null) return
   if (e.pointerType === 'touch') return
@@ -2271,6 +2433,7 @@ function onPointerEnd(e: PointerEvent) {
     (e.currentTarget as Element).releasePointerCapture?.(e.pointerId)
   } catch { /* ignore */
   }
+  if (e.pointerType !== 'touch') stampHandleEnd(`p${e.pointerId}`)
   finishStroke()
   ignoreUntilUp = false
   // the pen button only counts while it is held down
@@ -2318,10 +2481,19 @@ function onTouchStart(e: TouchEvent) {
   }
   if (penInUse()) return
   if (e.touches.length >= 2) {
-    if (drawing) {
-      finishStroke()
-      activeTouchId = null
+    // a held stamp takes the second finger: it sizes and turns the stamp
+    if (stampGrab) {
+      for (let i = 0; i < e.changedTouches.length; i++) {
+        const c = e.changedTouches[i]!
+        stampAddFinger(`t${c.identifier}`, c.clientX, c.clientY)
+      }
+      return
     }
+    // a second finger while the dot is held changes nothing
+    if (stampDot) return
+    stampPressCancel()
+    activeTouchId = null
+    if (drawing) finishStroke()
     gesture.mode = 'pinch'
     const t1 = e.touches[0]!, t2 = e.touches[1]!
     gesture.startDist = tDist(t1, t2)
@@ -2340,12 +2512,21 @@ function onTouchStart(e: TouchEvent) {
   const t = e.changedTouches[0]
   if (!t) return
   activeTouchId = t.identifier
+  if (stampDotStart(`t${t.identifier}`, t.clientX, t.clientY) || stampPressStart(`t${t.identifier}`, t.clientX, t.clientY)) return
   beginStroke(getPosFromClient(t.clientX, t.clientY, touchPressure(t), false))
 }
 
 function onTouchMove(e: TouchEvent) {
   if (!hasImage.value) return
   e.preventDefault()
+  if (stampPress || stampGrab || stampDot) {
+    let used = false
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      const c = e.changedTouches[i]!
+      if (stampHandleMove(`t${c.identifier}`, c.clientX, c.clientY)) used = true
+    }
+    if (used) return
+  }
   if (gesture.mode === 'pinch' && e.touches.length >= 2) {
     const t1 = e.touches[0]!, t2 = e.touches[1]!
     const ratio = tDist(t1, t2) / gesture.startDist
@@ -2381,6 +2562,9 @@ function onTouchMove(e: TouchEvent) {
 function onTouchEnd(e: TouchEvent) {
   if (!hasImage.value) return
   e.preventDefault()
+  if (stampPress || stampGrab || stampDot) {
+    for (let i = 0; i < e.changedTouches.length; i++) stampHandleEnd(`t${e.changedTouches[i]!.identifier}`)
+  }
   if (gesture.mode === 'pinch') {
     if (e.touches.length < 2) gesture.mode = null
     return
@@ -2440,7 +2624,711 @@ function sizedCanvas(c: HTMLCanvasElement | null, w: number, h: number): HTMLCan
   return el
 }
 
+// ── Quick shapes: hold the pen still and the stroke turns into the clean figure ──────────────────────────────────────────────
+// An open stroke becomes a straight line, a closed one a circle, an oval, a rectangle, a triangle or another corner figure (see
+// `utils/quickShape.ts`). The line goes on following the finger afterwards, and its ends click onto the ends of lines that are there.
+const HOLD_SHAPE_MS = 480
+/** The finger may wobble this far (screen pixels) while it holds still. */
+const HOLD_SLOP_PX = 7
+/** A line end clicks onto another end that is this close (screen pixels). */
+const MAGNET_PX = 26
+/** The shortest stroke (screen pixels) that turns into a shape. */
+const SHAPE_MIN_PX = 28
+let strokePts: Pt[] = []
+let holdTimer: ReturnType<typeof setTimeout> | undefined
+let holdAnchor: Pt = { x: 0, y: 0 }
+let shapePressure = 0.7
+/** The shape the held stroke has turned into (`null`: the stroke is as it was drawn). */
+let shapeHold: { shape: QuickShape; endSnapped: boolean } | null = null
+/** The ends of the lines and the corners of the figures on the picture, with how many steps of the history there were when they were made. */
+let shapeAnchors: (Pt & { depth: number })[] = []
+
+/** Only the painting tools make shapes: the eraser, the bucket, the pipette and the stamps do not. */
+const makesShapes = (t: ToolId) => t !== 'eraser' && t !== 'fill' && t !== 'pipette' && t !== 'stamp'
+
+function armShapeHold(p: Pt) {
+  clearTimeout(holdTimer)
+  holdAnchor = { x: p.x, y: p.y }
+  if (shapeHold || !makesShapes(strokeTool)) return
+  holdTimer = setTimeout(takeShape, HOLD_SHAPE_MS)
+}
+
+function liveAnchors(): Pt[] {
+  return shapeAnchors.filter((a) => a.depth <= history.depth)
+}
+
+function addAnchors(list: Pt[]) {
+  const depth = history.depth
+  shapeAnchors = [...shapeAnchors, ...list.map((a) => ({ x: a.x, y: a.y, depth }))].slice(-80)
+}
+
+/** The stroke was held still: if it is a figure it is drawn again, clean. */
+function takeShape() {
+  holdTimer = undefined
+  if (!drawing || shapeHold || !makesShapes(strokeTool)) return
+  const per = screenPerCanvas()
+  const found = recognize(strokePts, SHAPE_MIN_PX / per)
+  if (!found) return
+  let shape: QuickShape = found
+  let snapped = false
+  if (found.kind === 'line') {
+    const t = tidyLine(found.a, found.b, liveAnchors(), MAGNET_PX / per)
+    shape = { kind: 'line', a: t.a, b: t.b }
+    snapped = t.snappedA || t.snappedB
+  }
+  shapePressure = pressureNow
+  shapeHold = { shape, endSnapped: snapped }
+  renderShape(shape)
+  navigator.vibrate?.(snapped ? 14 : 8)
+  noteShapeMade()
+}
+
+/** The held line follows the finger: its end clicks onto the ends that are near. */
+function moveShape(p: PaintPos) {
+  const h = shapeHold
+  if (!h || h.shape.kind !== 'line') return
+  const t = tidyLine(h.shape.a, { x: p.x, y: p.y }, liveAnchors(), MAGNET_PX / screenPerCanvas(), true)
+  if (t.snappedB && !h.endSnapped) navigator.vibrate?.(10)
+  h.endSnapped = t.snappedB
+  if (Math.abs(t.b.x - h.shape.b.x) < 0.5 && Math.abs(t.b.y - h.shape.b.y) < 0.5) return
+  h.shape = { kind: 'line', a: h.shape.a, b: t.b }
+  renderShape(h.shape)
+}
+
+/** Takes back what the stroke painted so far and paints the shape in its place, with the same tool. */
+function renderShape(s: QuickShape) {
+  const dc = drawCanvas.value
+  if (!dc || !drawCtx || !baseCanvas) return
+  const path = shapePath(s)
+  const first = path[0]!
+  const last = path[path.length - 1]!
+  const pad = 4
+  const x0 = Math.max(0, Math.floor(strokeBounds.x0 - pad))
+  const y0 = Math.max(0, Math.floor(strokeBounds.y0 - pad))
+  const x1 = Math.min(dc.width, Math.ceil(strokeBounds.x1 + pad))
+  const y1 = Math.min(dc.height, Math.ceil(strokeBounds.y1 + pad))
+  if (x1 > x0 && y1 > y0) {
+    drawCtx.save()
+    drawCtx.globalCompositeOperation = 'source-over'
+    drawCtx.globalAlpha = 1
+    drawCtx.clearRect(x0, y0, x1 - x0, y1 - y0)
+    drawCtx.drawImage(baseCanvas, x0, y0, x1 - x0, y1 - y0, x0, y0, x1 - x0, y1 - y0)
+    drawCtx.restore()
+    previewCtx?.clearRect(x0, y0, x1 - x0, y1 - y0)
+  }
+  dirty = emptyBounds()
+  if (activeLayered && previewCtx) {
+    strokeState = newStrokeState()
+    paintPiece(first.x, first.y, first.x, first.y, shapePressure)
+    for (let i = 1; i < path.length; i++) paintPiece(path[i - 1]!.x, path[i - 1]!.y, path[i]!.x, path[i]!.y, shapePressure)
+    flushStroke()
+  } else if (strokeTool === 'oil') {
+    oilState = newOilState(color.value)
+    const size = brushPx() * widthFactor(shapePressure)
+    growBounds(strokeBounds, first.x, first.y, oilReach())
+    drawOilSegment(drawCtx, first.x, first.y, first.x + 0.01, first.y, size, oilState, opacity.value, tipOfTool('oil'), oilAllow)
+    for (let i = 1; i < path.length; i++) {
+      growBounds(strokeBounds, path[i]!.x, path[i]!.y, oilReach())
+      drawOilSegment(drawCtx, path[i - 1]!.x, path[i - 1]!.y, path[i]!.x, path[i]!.y, size, oilState, opacity.value, tipOfTool('oil'), oilAllow)
+    }
+  }
+  lastX = last.x
+  lastY = last.y
+}
+
+// A short tip, shown a few times: after a few strokes that were not held, and never again once a shape has been made.
+const SHAPE_HINT_KEY = 'lk-shape-hint'
+const shapeHint = ref(false)
+let shapeHintTimer: ReturnType<typeof setTimeout> | undefined
+let strokesWithoutHold = 0
+
+function shapeHintCount(): number {
+  try {
+    return Number(localStorage.getItem(SHAPE_HINT_KEY) ?? 0) || 0
+  } catch {
+    return 0
+  }
+}
+function setShapeHintCount(n: number) {
+  try {
+    localStorage.setItem(SHAPE_HINT_KEY, String(n))
+  } catch {
+    // shown again in a private window
+  }
+}
+function noteShapeMade() {
+  setShapeHintCount(9)
+  shapeHint.value = false
+  clearTimeout(shapeHintTimer)
+}
+function noteFreeStroke() {
+  if (++strokesWithoutHold < 4) return
+  strokesWithoutHold = 0
+  const seen = shapeHintCount()
+  if (seen >= 3 || shapeHint.value) return
+  setShapeHintCount(seen + 1)
+  shapeHint.value = true
+  clearTimeout(shapeHintTimer)
+  shapeHintTimer = setTimeout(() => (shapeHint.value = false), 7000)
+}
+
+// ── Stamps: the shapes, any colour, any size, with glitter if wanted ───────────────────────────────────────────────────
+const STAMP_STORE_KEY = 'lk-coloring-stamp-v2'
+function readStamp(): StampSettings {
+  try {
+    return cleanStamp(JSON.parse(localStorage.getItem(STAMP_STORE_KEY) ?? 'null'))
+  } catch {
+    return { ...DEFAULT_STAMP }
+  }
+}
+const stampSet = ref<StampSettings>(readStamp())
+watch(
+  stampSet,
+  (v) => {
+    try {
+      localStorage.setItem(STAMP_STORE_KEY, JSON.stringify(v))
+    } catch {
+      // not remembered in a private window
+    }
+  },
+  { deep: true }
+)
+// another tool: the stamp that was just placed is final
+watch(tool, (t) => {
+  if (t !== 'stamp') commitStamp()
+})
+watch([stampSet, () => tool.value], () => updateCursorRing(), { deep: true })
+
+/** The pictures of the shapes, loaded when they are first wanted (a plain array on purpose: nothing reacts to it). */
+const stampImages: (HTMLImageElement | null)[] = []
+function loadStampImage(i: number) {
+  if (stampImages[i] !== undefined) return
+  stampImages[i] = null
+  const img = new Image()
+  img.onload = () => {
+    stampImages[i] = img
+    stampSprites.clear()
+  }
+  img.src = stampUrl(i)
+}
+
+interface StampSprite {
+  canvas: HTMLCanvasElement
+  px: number
+  alpha: Uint8ClampedArray
+}
+const stampSprites = new Map<string, StampSprite>()
+
+/** How large a stamp is on the picture: from a twentieth to a third of its width. */
+const stampPx = () => Math.max(16, Math.round((drawCanvas.value?.width ?? 1000) * (0.05 + 0.28 * (stampSet.value.size / 100))))
+
+/** Flecks and four-pointed stars on the opaque places of a stamp. */
+function sparkleOn(g: CanvasRenderingContext2D, px: number) {
+  const dots = Math.round((px * px) / 60)
+  const colors = ['rgba(255,255,255,0.95)', 'rgba(255,240,190,0.9)', 'rgba(255,255,255,0.55)', 'rgba(0,0,0,0.16)']
+  g.globalCompositeOperation = 'source-atop'
+  for (let i = 0; i < dots; i++) {
+    g.fillStyle = colors[Math.floor(Math.random() * colors.length)]!
+    const s = 0.6 + Math.random() * Math.max(0.8, px / 100)
+    g.fillRect(Math.random() * px, Math.random() * px, s, s)
+  }
+  const stars = Math.max(5, Math.round(px / 24))
+  g.strokeStyle = 'rgba(255,255,255,0.95)'
+  g.lineCap = 'round'
+  for (let i = 0; i < stars; i++) {
+    const x = px * (0.1 + Math.random() * 0.8)
+    const y = px * (0.1 + Math.random() * 0.8)
+    const r = px * (0.025 + Math.random() * 0.04)
+    g.lineWidth = Math.max(1, px / 110)
+    g.beginPath()
+    g.moveTo(x - r, y)
+    g.lineTo(x + r, y)
+    g.moveTo(x, y - r)
+    g.lineTo(x, y + r)
+    g.stroke()
+    g.beginPath()
+    g.arc(x, y, Math.max(0.8, r * 0.18), 0, Math.PI * 2)
+    g.fillStyle = '#ffffff'
+    g.fill()
+  }
+}
+
+/** A stamp as a small picture: the shape in its colour, a little shaded, with glitter if wanted. */
+function makeStampSprite(img: HTMLImageElement, px: number, color: string, glitter: boolean): StampSprite {
+  const c = document.createElement('canvas')
+  c.width = px
+  c.height = px
+  const g = c.getContext('2d', { willReadFrequently: true })!
+  g.drawImage(img, 0, 0, px, px)
+  g.globalCompositeOperation = 'source-in'
+  g.fillStyle = color
+  g.fillRect(0, 0, px, px)
+  // a little light from the top left, so the shape is not quite flat
+  g.globalCompositeOperation = 'source-atop'
+  const shade = g.createLinearGradient(0, 0, px, px)
+  shade.addColorStop(0, 'rgba(255,255,255,0.22)')
+  shade.addColorStop(1, 'rgba(0,0,0,0.15)')
+  g.fillStyle = shade
+  g.fillRect(0, 0, px, px)
+  if (glitter) sparkleOn(g, px)
+  g.globalCompositeOperation = 'source-over'
+  g.globalCompositeOperation = 'source-over'
+  return { canvas: c, px, alpha: g.getImageData(0, 0, px, px).data }
+}
+
+/** The stamp as it is chosen now, as a small picture (kept while the choice stays the same). */
+function stampSprite(): StampSprite | null {
+  const s = stampSet.value
+  const img = stampImages[s.shape]
+  if (!img) {
+    loadStampImage(s.shape)
+    return null
+  }
+  const px = stampPx()
+  const key = `${s.shape}|${s.color}|${s.glitter ? 1 : 0}|${px}`
+  const hit = stampSprites.get(key)
+  if (hit) return hit
+  const sprite = makeStampSprite(img, px, s.color, s.glitter)
+  if (stampSprites.size > 40) stampSprites.clear()
+  stampSprites.set(key, sprite)
+  return sprite
+}
+
+let stampLast: Pt | null = null
+
+function stampAt(x: number, y: number) {
+  const sp = stampSprite()
+  if (!sp || !drawCtx) return
+  drawCtx.save()
+  drawCtx.globalCompositeOperation = 'source-over'
+  drawCtx.globalAlpha = 1
+  drawCtx.drawImage(sp.canvas, x - sp.px / 2, y - sp.px / 2)
+  drawCtx.restore()
+  cover.put(sp, x, y, sp.px, 0)
+  growBounds(strokeBounds, x, y, sp.px * 0.75)
+  stampLast = { x, y }
+  if (stampSet.value.glitter) {
+    // the places that flash, only where the stamp has colour
+    const sites: GlitterSite[] = []
+    for (let i = 1; i <= 5; i++) {
+      const ly = y - sp.px / 2 + (sp.px * i) / 6
+      sites.push(...glitterSites(x - sp.px * 0.45, ly, x + sp.px * 0.45, ly, sp.px * 0.25))
+    }
+    twinkling.add(
+      sites.filter((s) => {
+        const ix = Math.floor(s.x - (x - sp.px / 2))
+        const iy = Math.floor(s.y - (y - sp.px / 2))
+        return ix >= 0 && iy >= 0 && ix < sp.px && iy < sp.px && (sp.alpha[(iy * sp.px + ix) * 4 + 3] ?? 0) > 200
+      })
+    )
+  }
+}
+
+function stampBegin(p: PaintPos) {
+  takeBase()
+  cover.begin()
+  strokeBounds = emptyBounds()
+  stampLast = null
+  const s = stampSet.value
+  const sprite = liveSpriteFor(s.shape, s.color, s.glitter)
+  if (!sprite) {
+    loadStampImage(s.shape)
+    return
+  }
+  // the stamp that has just been placed stays editable until something else is done (see `commitStamp`)
+  const l: LiveStamp = { x: p.x, y: p.y, size: stampPx(), angle: 0, shape: s.shape, color: s.color, glitter: s.glitter, sprite, bounds: emptyBounds() }
+  live.value = l
+  renderLive(l)
+  stampLast = { x: p.x, y: p.y }
+  lastX = p.x
+  lastY = p.y
+  showStampHint()
+}
+
+// ── The stamp that was just placed can still be changed: hold it, then move, enlarge, shrink and turn it ──────────────────────
+// It is on the picture already; the picture "before" is kept in `baseCanvas`, so every change draws it again on that. Only when something else
+// happens (another stroke, another tool, undo, leaving the picture) it is final, and the history gets its one step (`commitStamp`).
+interface LiveStamp {
+  x: number
+  y: number
+  /** Side of its square in picture pixels. */
+  size: number
+  /** Turn in radians. */
+  angle: number
+  shape: number
+  color: string
+  glitter: boolean
+  sprite: StampSprite
+  /** Everything the stamp has covered while it was changed (for the history and for taking it back). */
+  bounds: Bounds
+}
+const live = shallowRef<LiveStamp | null>(null)
+const sheetDims = ref({ w: 0, h: 0 })
+/** A finger holds the stamp. */
+const stampHeld = ref(false)
+const STAMP_HOLD_MS = 350
+const STAMP_HOLD_SLOP = 9
+
+/** The stamp as a bigger picture (so it stays sharp when it is enlarged). */
+function liveSpriteFor(shape: number, color: string, glitter: boolean): StampSprite | null {
+  const img = stampImages[shape]
+  if (!img) return null
+  return makeStampSprite(img, Math.round(Math.max(256, Math.min(768, stampPx() * 2))), color, glitter)
+}
+
+function renderLive(l: LiveStamp) {
+  const dc = drawCanvas.value
+  if (!dc || !drawCtx || !baseCanvas) return
+  growBounds(l.bounds, l.x, l.y, l.size * 0.75 + 4)
+  const x0 = Math.max(0, Math.floor(l.bounds.x0))
+  const y0 = Math.max(0, Math.floor(l.bounds.y0))
+  const x1 = Math.min(dc.width, Math.ceil(l.bounds.x1))
+  const y1 = Math.min(dc.height, Math.ceil(l.bounds.y1))
+  drawCtx.save()
+  drawCtx.globalCompositeOperation = 'source-over'
+  drawCtx.globalAlpha = 1
+  if (x1 > x0 && y1 > y0) {
+    drawCtx.clearRect(x0, y0, x1 - x0, y1 - y0)
+    drawCtx.drawImage(baseCanvas, x0, y0, x1 - x0, y1 - y0, x0, y0, x1 - x0, y1 - y0)
+  }
+  drawCtx.translate(l.x, l.y)
+  drawCtx.rotate(l.angle)
+  drawCtx.drawImage(l.sprite.canvas, -l.size / 2, -l.size / 2, l.size, l.size)
+  drawCtx.restore()
+  cover.put(l.sprite, l.x, l.y, l.size, l.angle, { x0, y0, x1, y1 })
+}
+
+/** The places of a glitter stamp that flash, where the stamp has colour (turned and moved as the stamp is). */
+function liveSites(l: LiveStamp): GlitterSite[] {
+  const sites: GlitterSite[] = []
+  for (let i = 1; i <= 5; i++) {
+    const ly = -l.size / 2 + (l.size * i) / 6
+    sites.push(...glitterSites(-l.size * 0.45, ly, l.size * 0.45, ly, l.size * 0.25))
+  }
+  const px = l.sprite.px
+  const c = Math.cos(l.angle)
+  const s = Math.sin(l.angle)
+  const out: GlitterSite[] = []
+  for (const st of sites) {
+    const ix = Math.floor((st.x / l.size + 0.5) * px)
+    const iy = Math.floor((st.y / l.size + 0.5) * px)
+    if (ix < 0 || iy < 0 || ix >= px || iy >= px || (l.sprite.alpha[(iy * px + ix) * 4 + 3] ?? 0) <= 200) continue
+    out.push({ ...st, x: l.x + st.x * c - st.y * s, y: l.y + st.x * s + st.y * c })
+  }
+  return out
+}
+
+/** The stamp is final: the history gets its step. */
+function commitStamp() {
+  const l = live.value
+  if (!l) return
+  live.value = null
+  stampGrabStop()
+  stampHint.value = false
+  if (l.glitter) twinkling.add(liveSites(l))
+  commitHistory(l.bounds, 'stamp')
+}
+
+const stampFrameStyle = computed<Record<string, string>>(() => {
+  const l = live.value
+  const d = sheetDims.value
+  if (!l || !d.w || !d.h) return {}
+  return {
+    left: `${(l.x / d.w) * 100}%`,
+    top: `${(l.y / d.h) * 100}%`,
+    width: `${((l.size * 1.06) / d.w) * 100}%`,
+    aspectRatio: '1',
+    transform: `translate(-50%, -50%) rotate(${l.angle}rad)`
+  }
+})
+
+const STAMP_HINT_KEY = 'lk-stamp-hint'
+const stampHint = ref(false)
+let stampHintTimer: ReturnType<typeof setTimeout> | undefined
+function showStampHint(force = false) {
+  if (!force) {
+    let seen = 0
+    try {
+      seen = Number(localStorage.getItem(STAMP_HINT_KEY) ?? 0) || 0
+      localStorage.setItem(STAMP_HINT_KEY, String(seen + 1))
+    } catch {
+      // shown every time in a private window
+    }
+    if (seen >= 3) return
+  }
+  stampHint.value = true
+  clearTimeout(stampHintTimer)
+  stampHintTimer = setTimeout(() => (stampHint.value = false), 7000)
+}
+
+interface StampPress {
+  key: string
+  cx: number
+  cy: number
+  timer: ReturnType<typeof setTimeout>
+}
+interface StampGrab {
+  /** The fingers that hold the stamp, by key, on the screen. */
+  pts: Map<string, { x: number; y: number }>
+  /** The stamp and the fingers (on the picture) when the number of fingers last changed. */
+  start: { x: number; y: number; size: number; angle: number }
+  base: Map<string, Pt>
+  snapped: boolean
+}
+let stampPress: StampPress | null = null
+let stampGrab: StampGrab | null = null
+
+const onPicture = (cx: number, cy: number): Pt => {
+  const p = getPosFromClient(cx, cy)
+  return { x: p.x, y: p.y }
+}
+
+function stampHit(cx: number, cy: number): boolean {
+  const l = live.value
+  if (!l || tool.value !== 'stamp' || !hasImage.value) return false
+  const p = onPicture(cx, cy)
+  const dx = p.x - l.x
+  const dy = p.y - l.y
+  const c = Math.cos(-l.angle)
+  const s = Math.sin(-l.angle)
+  const u = dx * c - dy * s
+  const v = dx * s + dy * c
+  const reach = (l.size / 2) * 1.08 + 8 / screenPerCanvas()
+  return Math.abs(u) <= reach && Math.abs(v) <= reach
+}
+
+/** The dot under the frame: held, it sizes the stamp (up and down) and turns it (left and right). */
+let stampDot: { key: string; x0: number; y0: number; size: number; angle: number; snapped: boolean } | null = null
+const stampDotHeld = ref(false)
+
+function stampDotHit(cx: number, cy: number): boolean {
+  const l = live.value
+  if (!l || tool.value !== 'stamp' || !hasImage.value) return false
+  const p = onPicture(cx, cy)
+  // the dot sits a little more than half a stamp below its middle, and turns with the stamp
+  const off = l.size * 0.615
+  const hx = l.x - Math.sin(l.angle) * off
+  const hy = l.y + Math.cos(l.angle) * off
+  return Math.hypot(p.x - hx, p.y - hy) <= 28 / screenPerCanvas()
+}
+
+function stampDotStart(key: string, cx: number, cy: number): boolean {
+  const l = live.value
+  if (!l || stampGrab || stampDot || !stampDotHit(cx, cy)) return false
+  stampPressCancel()
+  stampDot = { key, x0: cx, y0: cy, size: l.size, angle: l.angle, snapped: false }
+  stampDotHeld.value = true
+  stampHint.value = false
+  navigator.vibrate?.(10)
+  return true
+}
+
+function stampPressCancel() {
+  if (stampPress) clearTimeout(stampPress.timer)
+  stampPress = null
+}
+
+function stampGrabStop() {
+  stampPressCancel()
+  stampDot = null
+  stampDotHeld.value = false
+  stampGrab = null
+  stampHeld.value = false
+}
+
+/** A press on the placed stamp waits: held still it takes hold of the stamp. `true`: the press is taken. */
+function stampPressStart(key: string, cx: number, cy: number): boolean {
+  if (stampGrab || !stampHit(cx, cy)) return false
+  stampPressCancel()
+  stampPress = { key, cx, cy, timer: setTimeout(stampTakeHold, STAMP_HOLD_MS) }
+  return true
+}
+
+function stampRebase() {
+  const g = stampGrab
+  const l = live.value
+  if (!g || !l) return
+  g.start = { x: l.x, y: l.y, size: l.size, angle: l.angle }
+  g.base = new Map([...g.pts].map(([key, p]) => [key, onPicture(p.x, p.y)]))
+  g.snapped = false
+}
+
+function stampTakeHold() {
+  const pr = stampPress
+  stampPress = null
+  const l = live.value
+  if (!pr || !l) return
+  stampGrab = { pts: new Map([[pr.key, { x: pr.cx, y: pr.cy }]]), start: { x: l.x, y: l.y, size: l.size, angle: l.angle }, base: new Map(), snapped: false }
+  stampRebase()
+  stampHeld.value = true
+  stampHint.value = false
+  navigator.vibrate?.(12)
+}
+
+function setLive(patch: Partial<Pick<LiveStamp, 'x' | 'y' | 'size' | 'angle'>>) {
+  const l = live.value
+  const dc = drawCanvas.value
+  if (!l || !dc) return
+  const next: LiveStamp = { ...l, ...patch }
+  next.x = Math.max(0, Math.min(dc.width, next.x))
+  next.y = Math.max(0, Math.min(dc.height, next.y))
+  next.size = Math.max(dc.width * 0.04, Math.min(dc.width * 0.9, next.size))
+  live.value = next
+  renderLive(next)
+}
+
+/** One finger moves the stamp; two fingers move it with their middle, turn it with the line between them and size it with their distance. */
+function stampFollow() {
+  const g = stampGrab
+  if (!g) return
+  const keys = [...g.pts.keys()]
+  const now = (k: string) => onPicture(g.pts.get(k)!.x, g.pts.get(k)!.y)
+  if (keys.length === 1) {
+    const a0 = g.base.get(keys[0]!)!
+    const a1 = now(keys[0]!)
+    setLive({ x: g.start.x + (a1.x - a0.x), y: g.start.y + (a1.y - a0.y) })
+    return
+  }
+  const a0 = g.base.get(keys[0]!)!
+  const b0 = g.base.get(keys[1]!)!
+  const a1 = now(keys[0]!)
+  const b1 = now(keys[1]!)
+  const d0 = Math.hypot(b0.x - a0.x, b0.y - a0.y)
+  const d1 = Math.hypot(b1.x - a1.x, b1.y - a1.y)
+  const turn = Math.atan2(b1.y - a1.y, b1.x - a1.x) - Math.atan2(b0.y - a0.y, b0.x - a0.x)
+  const ratio = d0 > 12 ? d1 / d0 : 1
+  const m0 = { x: (a0.x + b0.x) / 2, y: (a0.y + b0.y) / 2 }
+  const m1 = { x: (a1.x + b1.x) / 2, y: (a1.y + b1.y) / 2 }
+  const ox = g.start.x - m0.x
+  const oy = g.start.y - m0.y
+  const c = Math.cos(turn)
+  const s = Math.sin(turn)
+  let angle = g.start.angle + turn
+  // upright (and the other right angles) catches lightly
+  const deg = (angle * 180) / Math.PI
+  const near = Math.round(deg / 90) * 90
+  const caught = Math.abs(deg - near) <= 4
+  if (caught) angle = (near * Math.PI) / 180
+  if (caught && !g.snapped) navigator.vibrate?.(6)
+  g.snapped = caught
+  setLive({ x: m1.x + (ox * c - oy * s) * ratio, y: m1.y + (ox * s + oy * c) * ratio, size: g.start.size * ratio, angle })
+}
+
+/** A moving finger: `true` when the stamp has it. */
+function stampHandleMove(key: string, cx: number, cy: number): boolean {
+  const d = stampDot
+  if (d && d.key === key) {
+    // up makes it bigger, down smaller; to the right turns it clockwise, to the left the other way
+    // (the whole width of the screen is one full turn)
+    let angle = d.angle + ((cx - d.x0) / Math.max(240, window.innerWidth * 0.9)) * Math.PI * 2
+    const deg = (angle * 180) / Math.PI
+    const near = Math.round(deg / 90) * 90
+    const caught = Math.abs(deg - near) <= 4
+    if (caught) angle = (near * Math.PI) / 180
+    if (caught && !d.snapped) navigator.vibrate?.(6)
+    d.snapped = caught
+    setLive({ size: d.size * Math.exp(-(cy - d.y0) / 160), angle })
+    return true
+  }
+  if (stampPress && stampPress.key === key) {
+    if (Math.hypot(cx - stampPress.cx, cy - stampPress.cy) > STAMP_HOLD_SLOP) {
+      // it moved before the hold: nothing is stamped, the tip shows how it is done
+      stampPressCancel()
+      showStampHint(true)
+    }
+    return true
+  }
+  if (stampGrab && stampGrab.pts.has(key)) {
+    stampGrab.pts.set(key, { x: cx, y: cy })
+    stampFollow()
+    return true
+  }
+  return false
+}
+
+function stampHandleEnd(key: string) {
+  if (stampDot && stampDot.key === key) {
+    stampDot = null
+    stampDotHeld.value = false
+    return
+  }
+  if (stampPress && stampPress.key === key) {
+    // a short tap on the placed stamp: the tip shows how to change it
+    stampPressCancel()
+    showStampHint(true)
+    return
+  }
+  const g = stampGrab
+  if (!g || !g.pts.has(key)) return
+  g.pts.delete(key)
+  if (!g.pts.size) {
+    stampGrabStop()
+    return
+  }
+  stampRebase()
+}
+
+/** A second finger comes down while the stamp is held. */
+function stampAddFinger(key: string, cx: number, cy: number): boolean {
+  if (!stampGrab) return false
+  if (!stampGrab.pts.has(key)) {
+    stampGrab.pts.set(key, { x: cx, y: cy })
+    stampRebase()
+  }
+  return true
+}
+
+/** The mouse wheel sizes a held stamp, with the shift key it turns it (a mouse has only one pointer). */
+function stampWheel(e: WheelEvent): boolean {
+  const g = stampGrab
+  const l = live.value
+  if (!g || !l) return false
+  e.preventDefault()
+  if (e.shiftKey) setLive({ angle: l.angle + Math.sign(e.deltaY) * (5 * Math.PI) / 180 })
+  else setLive({ size: l.size * Math.exp(-e.deltaY * 0.0016) })
+  stampRebase()
+  return true
+}
+
+/** The stamp tool is chosen. */
+function activateStamp(): boolean {
+  arm()
+  tool.value = 'stamp'
+  loadStampImage(stampSet.value.shape)
+  return true
+}
+
+/** A shape is chosen: the one before stays as it is, the tool bar folds away and the picture is there to stamp on. */
+function pickStamp(shape: number) {
+  commitStamp()
+  stampSet.value = { ...stampSet.value, shape }
+  loadStampImage(shape)
+  if (activateStamp()) {
+    pickerOpen.value = false
+    toolbarOpen.value = false
+  }
+}
+
+/** Size, colour and glitter: they change the stamp that was just placed, too. */
+function setStamp(patch: Partial<StampSettings>) {
+  stampSet.value = cleanStamp({ ...stampSet.value, ...patch })
+  const l = live.value
+  if (l && tool.value === 'stamp') {
+    const set = stampSet.value
+    const recolour = patch.color !== undefined || patch.glitter !== undefined
+    const sprite = recolour ? liveSpriteFor(l.shape, set.color, set.glitter) : l.sprite
+    if (sprite) {
+      live.value = { ...l, sprite, color: set.color, glitter: set.glitter }
+      setLive({ size: patch.size !== undefined ? stampPx() : l.size })
+    }
+    return
+  }
+  activateStamp()
+}
+
 function beginStroke(p: PaintPos) {
+  // what was stamped last is final as soon as something else is done
+  commitStamp()
   if (activeTool.value === 'pipette') {
     const picked = sampleColor(p.x, p.y)
     if (picked) pickCustom(picked)
@@ -2462,12 +3350,22 @@ function beginStroke(p: PaintPos) {
   menuOpen.value = false
   pickerOpen.value = false
   drawing = true
-  isPainting.value = true
+  // the bar fades only when a stroke has lasted a moment: two fingers that come down one after the other (a zoom) must not make it flicker
+  clearTimeout(paintFadeTimer)
+  paintFadeTimer = setTimeout(() => {
+    if (drawing) isPainting.value = true
+  }, 260)
   lastX = p.x
   lastY = p.y
   const t = activeTool.value
   strokeTool = t
+  if (t === 'stamp') {
+    stampBegin(p)
+    return
+  }
   celebrate(awards.toolUsed(t))
+  strokePts = [{ x: p.x, y: p.y }]
+  shapeHold = null
   const pressure = smoothPressure(p.pressure, true)
   const size = brushPx() * widthFactor(pressure)
   // "Stay inside the lines": the field where the stroke starts is the only place it paints.
@@ -2496,6 +3394,7 @@ function beginStroke(p: PaintPos) {
     growBounds(strokeBounds, p.x, p.y, eraserReach())
     eraseSegment(drawCtx!, p.x, p.y, p.x + 0.01, p.y, brushPx() * 1.5)
   }
+  armShapeHold(p)
 }
 
 /** Where the eraser went down, while it has not moved yet: a stroke that stays a tap wipes the whole field. */
@@ -2555,6 +3454,7 @@ function paintPiece(ax: number, ay: number, bx: number, by: number, pressure: nu
   if (!t || !previewCtx) return
   const size = brushPx()
   paintLayerSegment(t, previewCtx, ax, ay, bx, by, { size, color: color.value, pressure, tip: tipOfTool(t) }, strokeState)
+  if (t === 'glitter') twinkling.add(glitterSites(ax, ay, bx, by, size))
   const reach = strokeReach(t, size)
   growBounds(strokeBounds, bx, by, reach)
   growBounds(dirty, ax, ay, reach)
@@ -2632,7 +3532,30 @@ function flushStroke() {
 }
 
 function continueStroke(p: PaintPos) {
+  twinkling.hold()
   const t = strokeTool
+  if (t === 'stamp') {
+    // dragging leaves a trail of stamps, one stamp's width apart; the first stamp of a trail is final, so the trail is one step of the history
+    if (stampLast && Math.hypot(p.x - stampLast.x, p.y - stampLast.y) >= stampPx() * 0.95) {
+      const l = live.value
+      if (l) {
+        strokeBounds = { ...l.bounds }
+        live.value = null
+        if (l.glitter) twinkling.add(liveSites(l))
+      }
+      stampAt(p.x, p.y)
+    }
+    lastX = p.x
+    lastY = p.y
+    return
+  }
+  // held into a shape: a line follows the finger, a figure stays as it is
+  if (shapeHold) {
+    moveShape(p)
+    return
+  }
+  strokePts.push({ x: p.x, y: p.y })
+  if (makesShapes(t) && Math.hypot(p.x - holdAnchor.x, p.y - holdAnchor.y) * screenPerCanvas() > HOLD_SLOP_PX) armShapeHold(p)
   const pressure = smoothPressure(p.pressure, false)
   if (activeLayered && previewCtx) {
     paintPiece(lastX, lastY, p.x, p.y, pressure)
@@ -2651,8 +3574,11 @@ function continueStroke(p: PaintPos) {
 
 function finishStroke() {
   if (!drawing) return
+  clearTimeout(holdTimer)
+  holdTimer = undefined
   flushStroke()
   drawing = false
+  clearTimeout(paintFadeTimer)
   isPainting.value = false
   const dc = drawCanvas.value
   if (activeLayered && previewCtx && dc) {
@@ -2668,7 +3594,13 @@ function finishStroke() {
   drawCtx!.globalCompositeOperation = 'source-over'
   drawCtx!.globalAlpha = 1
   if (strokeTool === 'eraser') eraseTappedField()
-  commitHistory(strokeBounds, strokeTool)
+  // a stamp that was just placed stays editable: its step of the history comes when it is final (`commitStamp`)
+  if (!(strokeTool === 'stamp' && live.value)) commitHistory(strokeBounds, strokeTool)
+  if (shapeHold) addAnchors(anchorsOf(shapeHold.shape))
+  else if (makesShapes(strokeTool) && strokePts.length > 6) noteFreeStroke()
+  shapeHold = null
+  strokePts = []
+  stampLast = null
 }
 
 /** Something took the pen's line away (the screen changed size, the page lost focus): the stroke ends here, and the rest of that touch paints nothing. */
@@ -2701,12 +3633,16 @@ function commitHistory(b?: { x0: number; y0: number; x1: number; y1: number }, t
   if (x1 > x0 && y1 > y0) {
     const before = base.getContext('2d', { willReadFrequently: true })!.getImageData(x0, y0, x1 - x0, y1 - y0)
     history.record(drawCtx, x0, y0, x1 - x0, y1 - y0, before)
+    // the mask of the stickers takes its step along (all paint cleared: no stickers left; any other change takes the mask away where it touched the paint)
+    cover.commit({ x0, y0, x1, y1 }, tool === 'stamp' ? 'stamp' : !b && tool === 'eraser' ? 'clear' : 'other', before, drawCtx)
     if (tool && advTracks.value) {
       trackTool(base, dc, tool)
       scheduleJobCheck()
     }
     recordStep(timelapse, dc, x0, y0, x1, y1)
   }
+  // only the glitter places inside the changed area are looked at again (a whole-picture change has no area)
+  twinkling.settle(b && x1 > x0 && y1 > y0 ? { x0, y0, x1, y1 } : undefined)
   scheduleTimelapseSave()
   refreshHistButtons()
   hasUserAction.value = true
@@ -2714,7 +3650,12 @@ function commitHistory(b?: { x0: number; y0: number; x1: number; y1: number }, t
 }
 
 function resetHistory() {
+  live.value = null
+  stampGrabStop()
   history.clear()
+  cover.history.clear()
+  shapeAnchors = []
+  twinkling.clear()
   toolMap?.rebase()
   refreshHistButtons()
   // Loading a fresh image (or restoring a saved one) is a clean slate.
@@ -2727,7 +3668,11 @@ function refreshHistButtons() {
 }
 
 function undo() {
+  commitStamp()
   if (!drawCtx || !history.undo(drawCtx)) return
+  cover.undo()
+  shapeAnchors = shapeAnchors.filter((a) => a.depth <= history.depth)
+  twinkling.settle(history.lastRect ?? undefined)
   toolMap?.undo()
   scheduleJobCheck()
   timelapse.undo()
@@ -2738,7 +3683,10 @@ function undo() {
 }
 
 function redo() {
+  commitStamp()
   if (!drawCtx || !history.redo(drawCtx)) return
+  cover.redo()
+  twinkling.settle(history.lastRect ?? undefined)
   toolMap?.redo()
   scheduleJobCheck()
   timelapse.redo()
@@ -2760,7 +3708,9 @@ function confirmClear() {
   clearAsk.value = false
   if (!hasImage.value) return
   const dc = drawCanvas.value!
+  commitStamp()
   takeBase()
+  shapeAnchors = []
   drawCtx!.clearRect(0, 0, dc.width, dc.height)
   delete pageDrawings[currentPage.value]
   commitHistory(undefined, 'eraser')
@@ -2776,7 +3726,7 @@ function flattenCanvas(): HTMLCanvasElement | null {
   const out = document.createElement('canvas')
   out.width = bg.width
   out.height = bg.height
-  paintComposite(out.getContext('2d')!, bg.width, bg.height)
+  paintComposite(out.getContext('2d')!, bg.width, bg.height, true)
   return out
 }
 
@@ -2862,6 +3812,55 @@ async function shareCanvas() {
   }
 }
 
+// ── The greeting card: the painting in a frame with "Für Oma" underneath ───────────────────────────────────────────
+const cardOpen = ref(false)
+const { displayName, hasCustomName } = useUserName()
+
+function openCard() {
+  if (flattenCanvas()) cardOpen.value = true
+}
+
+/** The little lamb for the corner of the card; the card is made without it when it cannot be loaded. */
+function loadLogo(): Promise<HTMLImageElement | null> {
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.onload = () => resolve(img)
+    img.onerror = () => resolve(null)
+    img.src = prependBaseUrl('images/logo/lk-lamm.webp')
+  })
+}
+
+async function sendCard(payload: { to: string; line: string }) {
+  cardOpen.value = false
+  // sending leaves the app, so the parental gate comes first
+  if (!(await requireParent())) return
+  const picture = flattenCanvas()
+  if (!picture) return
+  const card = drawGreetingCard(
+    picture,
+    { to: payload.to, line: payload.line, from: hasCustomName.value ? displayName.value : '' },
+    { for: t('app.coloring.card.for'), paintedBy: t('app.coloring.card.paintedBy', { name: '{name}' }), paintedWith: t('app.coloring.card.paintedWith') },
+    await loadLogo()
+  )
+  const blob: Blob | null = await new Promise((resolve) => card.toBlob((b) => resolve(b), 'image/png'))
+  if (!blob) return
+  const file = new File([blob], buildExportFilename().replace('Ausmalbild', 'Karte'), { type: 'image/png' })
+  if (navigator.canShare?.({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: t('app.coloring.card.title'), text: payload.line })
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') console.warn('share failed', err)
+    }
+  } else {
+    // no file sharing here (a computer): the card is saved as a picture
+    const a = document.createElement('a')
+    a.download = file.name
+    a.href = URL.createObjectURL(blob)
+    a.click()
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000)
+  }
+}
+
 function enterFullscreen() {
   isFullscreen.value = true
   menuOpen.value = false
@@ -2928,7 +3927,7 @@ function toggleEraser() {
   // chosen with the bar open: the next press on the paper already works, it does not only close the bar
   arm()
   if (tool.value === 'eraser') {
-    tool.value = toolBeforeEraser === 'eraser' ? kitDef.value.tool : toolBeforeEraser
+    tool.value = toolBeforeEraser === 'eraser' ? paintToolOf(kitDef.value, color.value) : toolBeforeEraser
   } else {
     toolBeforeEraser = tool.value
     tool.value = 'eraser'
@@ -3071,7 +4070,9 @@ onMounted(() => {
 
   updateCursorRing()
 
-  if (queryBook.value) {
+  if (journalCtx.value) {
+    startBlankSheet('portrait')
+  } else if (queryBook.value) {
     void openBook(queryBook.value, queryBookPage.value)
   } else if (querySource.value && querySourceType.value) {
     void loadFromUrl(querySource.value, querySourceType.value as 'image' | 'pdf')
@@ -3089,6 +4090,7 @@ onMounted(() => {
   }
 })
 onBeforeUnmount(() => {
+  twinkling.stop()
   clearTimeout(saveNoticeTimer)
   mainResizeObserver?.disconnect()
   mainResizeObserver = null
@@ -3158,6 +4160,7 @@ watch(queryBook, (id) => {
         :books="orderedBooks"
         :works="looseWorks"
         :groups="galleryGroups"
+        :exhibition-works="myWorks"
         :rewards="rewards"
         :backup-busy="backupBusy"
         :backup-message="backupMessage"
@@ -3192,7 +4195,14 @@ watch(queryBook, (id) => {
           @pointerleave="onPointerLeaveCanvas"
         )
         canvas(ref="previewCanvas" class="ac-preview" :style="previewStyle")
+        canvas(ref="sparkleCanvas" class="ac-sparkle")
+        //- the frame of the stamp that was just placed: it can still be held, moved, sized and turned
+        div(v-if="live && hasImage && tool === 'stamp'" class="ac-stamp-frame" :class="{ held: stampHeld }" :style="stampFrameStyle" aria-hidden="true")
+          //- the dot: held, it sizes (up, down) and turns (left, right) the stamp
+          span(class="ac-stamp-dot" :class="{ held: stampDotHeld }")
         canvas(ref="bgCanvas" class="ac-bg")
+        //- over the line art: the stickers, so they cover the lines like real stickers
+        canvas(ref="stickerView" class="ac-stickers")
 
       div(v-show="isLoading" class="ac-loading")
         div(class="ac-spinner")
@@ -3219,6 +4229,8 @@ watch(queryBook, (id) => {
       div(v-if="!hasImage" class="ac-title") {{ t('app.coloring.title') }}
       //- the picture of an adventure stage: this button hands the finished picture in and goes back to the stage
       AdvButton(v-if="advCtx && hasImage" class="ac-adv-done" tone="gold" small @click="finishPicture") {{ t('app.coloring.doneShort') }}
+      //- the picture for the thank-you book: this button puts it in the book and goes back there
+      AdvButton(v-if="journalCtx && hasImage" class="ac-adv-done" tone="gold" small @click="toJournal(true)") {{ t('app.coloring.journalDone') }}
       div(class="ac-spacer")
 
       button(
@@ -3333,30 +4345,48 @@ watch(queryBook, (id) => {
             @click="setPlainColor(c.id)"
           )
       template(v-else)
-        button(type="button" role="menuitem" class="ac-mi ac-mi-main" @click="finishPicture")
-          img(:src="LINE_ICONS.check" alt="" draggable="false")
-          span {{ t('app.coloring.finish') }}
-        button(type="button" role="menuitem" class="ac-mi" @click="menuPage = 'eraser'")
-          img(:src="LINE_ICONS.eraser" alt="" draggable="false")
-          span {{ t('app.coloring.toolName.eraser') }}
-        button(type="button" role="menuitem" class="ac-mi" @click="menuPage = 'scene'")
-          img(:src="LINE_ICONS.background" alt="" draggable="false")
-          span {{ t('app.coloring.backdropShort') }}
-        button(type="button" role="menuitem" class="ac-mi" @click="menuAction(downloadPng)")
-          img(:src="LINE_ICONS.save" alt="" draggable="false")
-          span {{ t('app.coloring.savePng') }}
-        button(v-if="canShareCanvas" type="button" role="menuitem" class="ac-mi" @click="menuAction(shareCanvas)")
-          img(:src="LINE_ICONS.share" alt="" draggable="false")
-          span {{ t('app.coloring.share') }}
-        button(type="button" role="menuitem" class="ac-mi" @click="menuAction(enterFullscreen)")
-          img(:src="LINE_ICONS.fullscreen" alt="" draggable="false")
-          span {{ t('app.coloring.fullscreen') }}
-        button(type="button" role="menuitem" class="ac-mi" @click="menuAction(closePicture)")
-          img(:src="LINE_ICONS.frames" alt="" draggable="false")
-          span {{ advCtx ? t('app.coloring.backToStage') : bookCtx ? t('app.coloring.bookOverview') : t('app.coloring.newPage') }}
-        button(type="button" role="menuitem" class="ac-mi danger" @click="menuAction(clearAll)")
-          img(:src="LINE_ICONS.trash" alt="" draggable="false")
-          span {{ t('app.coloring.clear') }}
+        //- the one thing most children want: the picture is done
+        button(type="button" role="menuitem" class="ac-done" @click="finishPicture")
+          span(class="ac-done-ico")
+            img(:src="LINE_ICONS.check" alt="" draggable="false")
+          span(class="ac-done-text")
+            strong {{ t('app.coloring.finish') }}
+            small {{ t('app.coloring.finishSub') }}
+        p(class="ac-mg") {{ t('app.coloring.menuPaint') }}
+        div(class="ac-tiles")
+          button(type="button" role="menuitem" class="ac-tile" @click="menuPage = 'eraser'")
+            span(class="ac-tile-ico")
+              img(:src="LINE_ICONS.eraser" alt="" draggable="false")
+            span(class="ac-tile-name") {{ t('app.coloring.toolName.eraser') }}
+          button(type="button" role="menuitem" class="ac-tile" @click="menuPage = 'scene'")
+            span(class="ac-tile-ico")
+              img(:src="LINE_ICONS.background" alt="" draggable="false")
+            span(class="ac-tile-name") {{ t('app.coloring.backdropShort') }}
+          button(type="button" role="menuitem" class="ac-tile" @click="menuAction(enterFullscreen)")
+            span(class="ac-tile-ico")
+              img(:src="LINE_ICONS.fullscreen" alt="" draggable="false")
+            span(class="ac-tile-name") {{ t('app.coloring.fullscreen') }}
+        p(class="ac-mg") {{ t('app.coloring.menuSend') }}
+        div(class="ac-tiles")
+          button(type="button" role="menuitem" class="ac-tile" @click="menuAction(downloadPng)")
+            span(class="ac-tile-ico")
+              img(:src="LINE_ICONS.save" alt="" draggable="false")
+            span(class="ac-tile-name") {{ t('app.coloring.savePng') }}
+          button(v-if="canShareCanvas" type="button" role="menuitem" class="ac-tile" @click="menuAction(shareCanvas)")
+            span(class="ac-tile-ico")
+              img(:src="LINE_ICONS.share" alt="" draggable="false")
+            span(class="ac-tile-name") {{ t('app.coloring.share') }}
+          button(type="button" role="menuitem" class="ac-tile" @click="menuAction(openCard)")
+            span(class="ac-tile-ico")
+              img(:src="LINE_ICONS.text" alt="" draggable="false")
+            span(class="ac-tile-name") {{ t('app.coloring.card.menu') }}
+        div(class="ac-menu-foot")
+          button(type="button" role="menuitem" class="ac-foot-btn" @click="menuAction(closePicture)")
+            img(:src="LINE_ICONS.frames" alt="" draggable="false")
+            span {{ advCtx ? t('app.coloring.backToStage') : bookCtx ? t('app.coloring.bookOverview') : t('app.coloring.newPage') }}
+          button(type="button" role="menuitem" class="ac-foot-btn danger" @click="menuAction(clearAll)")
+            img(:src="LINE_ICONS.trash" alt="" draggable="false")
+            span {{ t('app.coloring.clear') }}
 
     //- Leave fullscreen
     button(
@@ -3368,19 +4398,32 @@ watch(queryBook, (id) => {
     )
       img(:src="LINE_ICONS.fullscreen" alt="" draggable="false")
 
+    //- A short tip: hold the pen still to straighten a line or make a figure
+    transition(name="ac-text")
+      div(v-if="shapeHint" class="ac-hint-chip" role="status") {{ t('app.coloring.shapeHint') }}
+
+    transition(name="ac-text")
+      div(v-if="stampHint && live" class="ac-hint-chip" role="status") {{ t('app.coloring.stampHint') }}
+
+    //- "Picture saved", for a moment before the painting program is left
+    div(v-if="savedFlash" class="ac-saved" role="status")
+      img(:src="LINE_ICONS.check" alt="" draggable="false")
+      span {{ t('app.coloring.savedNote') }}
+
     //- ───────── The floating tool bar ─────────
     ColoringToolbar(
       v-if="hasImage"
       :style="toolbarStyle"
       :expanded="toolbarOpen"
       :tools="toolbarTools"
-      :tool="tool"
+      :tool="barTool"
       :color="color"
       v-model:size="sizeModel"
       v-model:strength="strength"
       :tips="tips"
       :stay-inside="stayInside"
-      :overlap="overlap"
+      :stamp="stampSet"
+      :stamp-on="tool === 'stamp'"
       :rotation="rotation"
       :can-undo="canUndo"
       :can-redo="canRedo"
@@ -3393,7 +4436,8 @@ watch(queryBook, (id) => {
       @redo="redo"
       @toggle-shelf="toggleShelf"
       @toggle-stay="stayInside = !stayInside"
-      @toggle-overlap="overlap = !overlap"
+      @pick-stamp="pickStamp"
+      @set-stamp="setStamp"
       @set-rotation="setRotation"
       @collapse="toolbarOpen = false"
       @expand="onTabClick"
@@ -3435,13 +4479,14 @@ watch(queryBook, (id) => {
       :items="kitDef.base"
       :extra="kitDef.extra"
       :extra-locked="extraLocked"
+      :custom-locked="!hasFeature('colors')"
       :rainbow="kitDef.rainbow"
       :color="color"
       :custom-active="!!customColor"
       :open="shelfVisible"
       :arrow-icon="LINE_ICONS.back"
       @pick-color="pickPreset"
-      @pick-locked="showUpsell('pencilBox')"
+      @pick-locked="showUpsell('colors')"
       @custom="onCustomPencil"
       @toggle="toggleShelf"
     )
@@ -3486,6 +4531,8 @@ watch(queryBook, (id) => {
           button(type="button" class="ac-confirm-leave" @click="finishOverview") {{ retStats ? t('app.coloring.backToStats') : bookCtx ? t('app.coloring.bookOverview') : t('app.coloring.newPage') }}
           button(v-if="finishInfo.hasNext" type="button" class="ac-confirm-stay" @click="finishNext") {{ t('app.coloring.nextPage') }}
           button(v-else type="button" class="ac-confirm-stay" @click="closeFinish") {{ t('app.coloring.keepPainting') }}
+
+    GreetingCardSheet(:open="cardOpen" @close="cardOpen = false" @send="sendCard")
 
     ColoringTimelapse(
       :open="lapseOpen"
@@ -3552,7 +4599,7 @@ $ink: #22262e
 $muted: #6c7280
 $line: rgba(20, 24, 32, 0.1)
 $accent: #1f3a5f
-$glass: rgba(252, 251, 248, 0.88)
+$glass: rgba(252, 251, 248, 0.96)
 
 // Values the picker and dialog rules below were written with.
 $text: $ink
@@ -3631,12 +4678,28 @@ $accent-dark: $accent
   pointer-events: none
   opacity: 0
 
+// the flashes of the glitter paint: over the paint, under the line art
+.ac-sparkle
+  position: absolute
+  inset: 0
+  width: 100%
+  height: 100%
+  pointer-events: none
+
 .ac-bg
   position: absolute
   inset: 0
   width: 100%
   height: 100%
   mix-blend-mode: multiply
+  pointer-events: none
+
+// the stickers: the paint where a sticker sits, over the line art (see `utils/stickerCover.ts`)
+.ac-stickers
+  position: absolute
+  inset: 0
+  width: 100%
+  height: 100%
   pointer-events: none
 
 .ac-loading
@@ -3772,8 +4835,6 @@ $accent-dark: $accent
   padding: 8px 14px
   border-radius: 12px
   background: $glass
-  backdrop-filter: blur(14px)
-  -webkit-backdrop-filter: blur(14px)
   font-weight: 800
   font-size: 0.95rem
   box-shadow: 0 2px 10px rgba(20, 24, 32, 0.15)
@@ -3787,8 +4848,6 @@ $accent-dark: $accent
   border: 1px solid $line
   border-radius: 12px
   background: $glass
-  backdrop-filter: blur(14px)
-  -webkit-backdrop-filter: blur(14px)
   box-shadow: 0 2px 10px rgba(20, 24, 32, 0.15)
   cursor: pointer
   -webkit-tap-highlight-color: transparent
@@ -3878,8 +4937,6 @@ $accent-dark: $accent
   border: 1px solid $line
   border-radius: 18px
   background: rgba(252, 251, 248, 0.97)
-  backdrop-filter: blur(16px)
-  -webkit-backdrop-filter: blur(16px)
   box-shadow: 0 14px 40px rgba(20, 24, 32, 0.34)
   user-select: text
   -webkit-user-select: text
@@ -3929,8 +4986,6 @@ $accent-dark: $accent
   padding: 4px 8px
   border-radius: 12px
   background: $glass
-  backdrop-filter: blur(14px)
-  -webkit-backdrop-filter: blur(14px)
   box-shadow: 0 2px 10px rgba(20, 24, 32, 0.15)
 
 .ac-pg-btn
@@ -4109,17 +5164,248 @@ $accent-dark: $accent
   top: calc(max(env(safe-area-inset-top, 0px), 10px) + 50px)
   right: 12px
   z-index: 60
-  min-width: 220px
-  padding: 6px
-  border-radius: 14px
-  background: rgba(252, 251, 248, 0.97)
-  backdrop-filter: blur(18px)
-  -webkit-backdrop-filter: blur(18px)
+  width: 300px
+  max-width: calc(100vw - 24px)
+  // leaves the colour box at the bottom free; what does not fit scrolls
+  max-height: calc(100vh - 210px)
+  overflow-y: auto
+  padding: 10px
+  border-radius: 22px
+  background: linear-gradient(180deg, rgba(255, 253, 249, 0.98) 0%, rgba(247, 243, 235, 0.98) 100%)
   border: 1px solid $line
-  box-shadow: 0 14px 40px rgba(20, 24, 32, 0.3)
+  box-shadow: 0 18px 48px rgba(20, 24, 32, 0.34), 0 1px 0 rgba(255, 255, 255, 0.8) inset
+  transform-origin: top right
+  animation: ac-menu-in 220ms cubic-bezier(0.22, 1, 0.36, 1)
+
+@keyframes ac-menu-in
+  from
+    opacity: 0
+    transform: translateY(-6px) scale(0.97)
+
+@media (prefers-reduced-motion: reduce)
+  .ac-menu
+    animation: none
 
 .ac-menu.wide
   width: 292px
+
+// the big button: the picture is done
+.ac-done
+  width: 100%
+  display: flex
+  align-items: center
+  gap: 12px
+  padding: 10px 14px 10px 10px
+  border: 0
+  border-radius: 16px
+  background: linear-gradient(135deg, #2a4f7e 0%, #1f3a5f 100%)
+  color: #ffffff
+  text-align: left
+  cursor: pointer
+  box-shadow: 0 6px 16px -6px rgba(31, 58, 95, 0.7)
+  -webkit-tap-highlight-color: transparent
+
+  &:active
+    transform: scale(0.985)
+
+.ac-done-ico
+  flex: 0 0 auto
+  display: grid
+  place-items: center
+  width: 42px
+  height: 42px
+  border-radius: 50%
+  background: rgba(255, 255, 255, 0.92)
+
+  img
+    width: 24px
+    height: 24px
+    object-fit: contain
+
+.ac-done-text
+  display: flex
+  flex-direction: column
+  min-width: 0
+
+  strong
+    font-size: 1rem
+    font-weight: 800
+
+  small
+    font-size: 0.74rem
+    font-weight: 600
+    opacity: 0.82
+    line-height: 1.25
+
+// small group headings
+.ac-mg
+  margin: 14px 4px 6px
+  font-size: 0.68rem
+  font-weight: 800
+  letter-spacing: 0.08em
+  text-transform: uppercase
+  color: #7a6b55
+
+// the tiles: a round picture, the name beneath
+.ac-tiles
+  display: grid
+  grid-template-columns: repeat(3, 1fr)
+  gap: 6px
+
+.ac-tile
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: 6px
+  padding: 10px 4px 8px
+  border: 1px solid $line
+  border-radius: 16px
+  background: rgba(255, 255, 255, 0.78)
+  color: $ink
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+  transition: transform 100ms ease-out, background 140ms ease-out
+
+  &:active
+    transform: scale(0.95)
+    background: rgba(31, 58, 95, 0.1)
+
+.ac-tile-ico
+  display: grid
+  place-items: center
+  width: 44px
+  height: 44px
+  border-radius: 50%
+  background: rgba(31, 58, 95, 0.09)
+
+  img
+    width: 24px
+    height: 24px
+    object-fit: contain
+    opacity: 0.9
+
+.ac-tile-name
+  font-size: 0.74rem
+  font-weight: 700
+  line-height: 1.2
+  text-align: center
+
+.ac-menu-foot
+  display: flex
+  flex-direction: column
+  gap: 2px
+  margin-top: 12px
+  padding-top: 8px
+  border-top: 1px solid $line
+
+.ac-foot-btn
+  display: flex
+  align-items: center
+  gap: 10px
+  padding: 10px 8px
+  border: 0
+  border-radius: 12px
+  background: transparent
+  color: $ink
+  font-size: 0.88rem
+  font-weight: 600
+  text-align: left
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+
+  img
+    width: 20px
+    height: 20px
+    object-fit: contain
+    opacity: 0.8
+
+  &:active
+    background: rgba(20, 24, 32, 0.07)
+
+  &.danger
+    color: #a93d2e
+
+// "picture saved": a calm note in the middle of the screen while leaving
+.ac-saved
+  position: fixed
+  left: 50%
+  top: 50%
+  transform: translate(-50%, -50%)
+  z-index: 80
+  display: flex
+  align-items: center
+  gap: 10px
+  padding: 14px 22px
+  border-radius: 999px
+  background: rgba(255, 253, 249, 0.97)
+  border: 1px solid $line
+  color: $ink
+  font-size: 1.05rem
+  font-weight: 800
+  box-shadow: 0 16px 40px rgba(20, 24, 32, 0.34)
+  pointer-events: none
+  animation: ac-saved-in 220ms cubic-bezier(0.22, 1, 0.36, 1)
+
+  img
+    width: 26px
+    height: 26px
+    object-fit: contain
+
+@keyframes ac-saved-in
+  from
+    opacity: 0
+    transform: translate(-50%, -46%) scale(0.94)
+
+// the frame of the stamp that can still be changed
+.ac-stamp-frame
+  position: absolute
+  z-index: 7
+  box-sizing: border-box
+  border: 2px dashed rgba(31, 58, 95, 0.75)
+  border-radius: 10%
+  pointer-events: none
+  transition: box-shadow 160ms ease-out
+
+  &.held
+    border-style: solid
+    border-color: rgba(31, 58, 95, 0.95)
+    box-shadow: 0 0 0 4px rgba(31, 58, 95, 0.18)
+
+.ac-stamp-dot
+  position: absolute
+  left: 50%
+  top: 108%
+  width: 22px
+  height: 22px
+  box-sizing: border-box
+  border: 3px solid #ffffff
+  border-radius: 50%
+  background: #1f3a5f
+  box-shadow: 0 2px 8px rgba(20, 24, 32, 0.4)
+  transform: translate(-50%, -50%)
+  transition: box-shadow 140ms ease-out, background 140ms ease-out
+
+  &.held
+    background: #2f6fd0
+    box-shadow: 0 0 0 7px rgba(47, 111, 208, 0.28), 0 2px 8px rgba(20, 24, 32, 0.4)
+
+// a calm tip chip at the top of the screen
+.ac-hint-chip
+  position: fixed
+  left: 50%
+  top: calc(max(env(safe-area-inset-top, 0px), 10px) + 62px)
+  transform: translateX(-50%)
+  z-index: 58
+  max-width: min(92vw, 440px)
+  padding: 10px 16px
+  border-radius: 18px
+  background: rgba(31, 58, 95, 0.94)
+  color: #ffffff
+  font-size: 0.85rem
+  font-weight: 600
+  text-align: center
+  box-shadow: 0 10px 26px rgba(10, 26, 48, 0.4)
+  pointer-events: none
 
 .ac-mi-back
   font-weight: 800
@@ -4233,8 +5519,6 @@ $accent-dark: $accent
   border: 1px solid rgba(20, 24, 32, 0.08)
   border-radius: 13px
   background: rgba(252, 251, 248, 0.6)
-  backdrop-filter: blur(8px)
-  -webkit-backdrop-filter: blur(8px)
   color: $ink
   opacity: 0.62
   cursor: pointer
@@ -4320,8 +5604,6 @@ $accent-dark: $accent
   align-items: center
   justify-content: center
   padding: 20px
-  backdrop-filter: blur(3px)
-  -webkit-backdrop-filter: blur(3px)
   animation: ac-fade-in 0.16s ease-out
 
 .ac-confirm-dialog

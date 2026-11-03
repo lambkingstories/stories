@@ -17,7 +17,7 @@ const enabled = computed(() => settings.sfxVolume.value > 0 || settings.musicVol
 let lastPlayAt = 0
 
 /** How loud each sound is next to the others (the files are levelled to the bead sound, which is played at 0.45). */
-const GAIN: Record<SfxName, number> = { tap: 0.45, right: 0.45, wrong: 0.45, star: 0.45, fanfare: 0.45, flip: 0.45, basket: 0.45, sack: 0.45, snap: 0.45, bead: 0.45, found: 0.45, caravan: 0.45, coin: 0.45, button: 0.4, result: 0.45, trophy: 0.45 }
+const GAIN: Record<SfxName, number> = { tap: 0.45, right: 0.45, wrong: 0.45, star: 0.45, fanfare: 0.45, flip: 0.45, basket: 0.45, sack: 0.45, snap: 0.45, bead: 0.45, found: 0.45, caravan: 0.45, coin: 0.45, button: 0.4, result: 0.45, trophy: 0.45, hit: 0.7, clunk: 0.6, cardOpen: 0.5, cardTurn: 0.45 }
 
 let ctx: AudioContext | null = null
 const buffers = new Map<SfxName, AudioBuffer | Promise<AudioBuffer | null>>()

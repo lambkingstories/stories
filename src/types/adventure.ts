@@ -5,6 +5,7 @@
  */
 
 import type { JugsGame, EnoughGame, QuailsGame, StaffsGame, SerpentGame, DonkeyGame, CommissionGame } from './wuesteGames2'
+
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
 export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz' | 'boote' | 'dach' | 'arme' | 'richter' | 'signal' | 'traube' | 'krug' | 'genug' | 'wachteln' | 'stab' | 'schlange' | 'eselin' | 'einsetzen' | 'schoepfen' | 'gedraenge' | 'buendel' | 'brote' | 'rudern' | 'umkehr' | 'ruf' | 'graben' | 'muenze' | 'entgegen'
 
@@ -606,6 +607,8 @@ export interface SlideRound {
   rows: number
   moves: number
   seed: number
+  /** How many fields are free (default 1): with two the tiles move much more easily. */
+  gaps?: number
 }
 /** The slide puzzle "Stairway": the picture is cut into tiles, one is missing, and a tile next to the gap is slid into it until the picture is whole again (at most two rounds). The tiles are cut by the app. */
 export interface SlideGame {
@@ -1831,9 +1834,6 @@ export interface StageTask {
   bundle?: BundleGame
   bread?: BreadGame
   row?: RowGame
-  staffs?: StaffsGame
-  serpent?: SerpentGame
-  donkey?: DonkeyGame
   turnBack?: TurnBackGame
   shout?: ShoutGame
   dig?: DigGame
@@ -1842,6 +1842,9 @@ export interface StageTask {
   jugs?: JugsGame
   enough?: EnoughGame
   quails?: QuailsGame
+  staffs?: StaffsGame
+  serpent?: SerpentGame
+  donkey?: DonkeyGame
   commission?: CommissionGame
   arms?: ArmsGame
   judges?: JudgesGame
@@ -2827,9 +2830,6 @@ export interface RowGame {
   rounds: RowRound[]
 }
 
-  image: string
-  label: string
-  w: number
 /** One round of "Who turns back?": the hint, the seconds the child has to find the man who turns back (4), and whether the men wander over the road and cross each other (round 2). */
 export interface TurnBackRound {
   hint: string
@@ -2887,6 +2887,9 @@ export interface ShoutGame {
 /** A helper of the game "Hold the arms" (Aaron on the left, Hur on the right): his picture (kneeling, one arm stretched up), his name, his width (percent of the picture) and the middle of his bottom edge. */
 export interface ArmsHelper {
   id: string
+  image: string
+  label: string
+  w: number
   x: number
   y: number
 }
@@ -3065,6 +3068,8 @@ export interface StageProgress {
   gameStars?: number
   /** The stars that count: the game's stars minus one for every wrong answer to the questions (best try). */
   finalStars?: number
+  /** The most stars any try has given (a worse try later never takes stars away). */
+  bestStars?: number
   /** The questions of the stage were answered: how many were right. */
   quizCorrect?: number
   /** The stage was gone through to the end (text, task, questions): the next stage opens. */

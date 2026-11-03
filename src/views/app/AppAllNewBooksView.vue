@@ -11,6 +11,7 @@ import type { ApiBook, Locale } from '@/types/apiBook'
 import { pickLocalizedImage } from '@/types/apiBook'
 import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
 import { prependBaseUrl } from '@/utils/function'
+import { contentLocale } from '@/utils/contentLocale'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
@@ -20,7 +21,7 @@ onMounted(() => {
   void apiBooks.loadAllBooks()
 })
 
-const lang = computed<Locale>(() => (locale.value === 'en' ? 'en' : 'de'))
+const lang = computed<Locale>(() => (contentLocale(locale.value)))
 const THREE_MONTHS_MS = 1000 * 60 * 60 * 24 * 90
 
 // Backdrop — a tall artwork for portrait, a wide one for landscape. The swap

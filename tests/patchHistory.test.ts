@@ -94,4 +94,15 @@ describe('patch history', () => {
     expect(h.canUndo).toBe(false)
     expect(h.canRedo).toBe(false)
   })
+  it('says which area the last undo and redo wrote to', () => {
+    const c = fakeCanvas(8, 8)
+    const h = new PatchHistory()
+    expect(h.lastRect).toBeNull()
+    c.paint(h, 2, 3, 4, 2, 9)
+    h.undo(c.ctx)
+    expect(h.lastRect).toEqual({ x0: 2, y0: 3, x1: 6, y1: 5 })
+    h.lastRect = null
+    h.redo(c.ctx)
+    expect(h.lastRect).toEqual({ x0: 2, y0: 3, x1: 6, y1: 5 })
+  })
 })

@@ -12,10 +12,17 @@ export type Board = number[]
 /** The finished picture: every piece at its own place. */
 export const solvedBoard = (cols: number, rows: number): Board => Array.from({ length: cols * rows }, (_, i) => i)
 
-export const isSolved = (board: Board): boolean => board.every((piece, place) => piece === place)
+/**
+ * The finished picture: every tile at its own place. With `gaps` free fields (default one) the pieces with the highest numbers are the gaps; they are all the same
+ * empty field, so it does not matter which of them lies at which of the last places.
+ */
+export const isSolved = (board: Board, gaps = 1): boolean => board.every((piece, place) => place >= board.length - gaps || piece === place)
 
-/** The place of the gap. */
+/** The place of the gap (of the first one, when there are several). */
 export const gapOf = (board: Board): number => board.indexOf(board.length - 1)
+
+/** The places of all free fields. */
+export const gapsOf = (board: Board, gaps = 1): number[] => board.map((_, place) => place).filter((place) => board[place]! >= board.length - gaps)
 
 const near = (a: number, b: number, cols: number) => {
   const dc = Math.abs((a % cols) - (b % cols))
@@ -23,16 +30,18 @@ const near = (a: number, b: number, cols: number) => {
   return dc + dr === 1
 }
 
-/** The places of the tiles next to the gap (the ones that can be slid). */
-export function neighbors(board: Board, cols: number): number[] {
-  const gap = gapOf(board)
-  return board.map((_, place) => place).filter((place) => near(place, gap, cols))
+/** The places of the tiles next to a gap (the ones that can be slid). */
+export function neighbors(board: Board, cols: number, gaps = 1): number[] {
+  const free = gapsOf(board, gaps)
+  return board.map((_, place) => place).filter((place) => !free.includes(place) && free.some((g) => near(place, g, cols)))
 }
 
-/** The tile at `place` is slid into the gap. Returns the new board, or `null` when the tile is not next to the gap. */
-export function move(board: Board, cols: number, place: number): Board | null {
-  const gap = gapOf(board)
-  if (place === gap || !near(place, gap, cols)) return null
+/** The tile at `place` is slid into a gap next to it. Returns the new board, or `null` when the tile is not next to a gap. */
+export function move(board: Board, cols: number, place: number, gaps = 1): Board | null {
+  const free = gapsOf(board, gaps)
+  if (free.includes(place)) return null
+  const gap = free.find((g) => near(place, g, cols))
+  if (gap === undefined) return null
   const next = [...board]
   next[gap] = board[place]!
   next[place] = board[gap]!
@@ -55,16 +64,19 @@ export function seeded(seed: number): () => number {
  * Mixes the finished picture by `moves` random moves of the tile next to the gap (never the move that undoes the one before). A board that comes about by moves
  * from the finished one can always be slid back, so the puzzle can always be solved. The result is never the finished picture.
  */
-export function scramble(cols: number, rows: number, moves: number, seed: number): Board {
+export function scramble(cols: number, rows: number, moves: number, seed: number, gaps = 1): Board {
   const rand = seeded(seed)
   let board = solvedBoard(cols, rows)
   let before = -1
   const total = Math.max(1, moves)
-  for (let i = 0; i < total || isSolved(board); i++) {
-    const gap = gapOf(board)
-    const choices = neighbors(board, cols).filter((p) => p !== before)
+  for (let i = 0; i < total || isSolved(board, gaps); i++) {
+    const all = neighbors(board, cols, gaps)
+    const fresh = all.filter((p) => p !== before)
+    const choices = fresh.length ? fresh : all
     const place = choices[Math.floor(rand() * choices.length)]!
-    board = move(board, cols, place)!
+    // the tile leaves `place` for a free field next to it; the move that would bring it straight back is not drawn next
+    const gap = gapsOf(board, gaps).find((g) => near(place, g, cols))!
+    board = move(board, cols, place, gaps)!
     before = gap
     if (i > total + 200) break
   }

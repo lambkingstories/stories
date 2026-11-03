@@ -13,6 +13,8 @@ import AdventureStars from '@/components/molecules/AdventureStars.vue'
 import SoundPanel from '@/components/molecules/SoundPanel.vue'
 import { journeyById, journeys } from '@/data/adventures'
 import useAdventure from '@/use/useAdventure'
+import usePremium from '@/use/usePremium'
+import { isStagePlusLocked } from '@/utils/adventureAccess'
 import { isExamOpen, isStageOpen, maxPoints, medalFor, nextStageIndex, pointsOf, stageStarsOf } from '@/utils/adventureScore'
 import useButtonSounds from '@/use/useButtonSounds'
 import { clearViaStats } from '@/utils/adventureStats'
@@ -25,6 +27,7 @@ const { t } = useI18n({ useScope: 'global' })
 const route = useRoute()
 const router = useRouter()
 const adv = useAdventure()
+const { showUpsell } = usePremium()
 const { play, preload, stopAll } = useSfx()
 // the soft map music (switched off with the speaker switch)
 useButtonSounds()
@@ -42,6 +45,7 @@ const medal = computed(() => (progress.value?.exam ? medalFor(points.value, max.
 
 const img = (path: string) => prependBaseUrl(path)
 const ui = (name: string) => img(`images/abenteuer/ui/${name}.webp`)
+const crownIcon = img('images/icons/navi/plus.webp')
 const plate = (name: string) => `url(${ui(`plakette-${name}`)})`
 
 /** A journey whose map is not painted yet (the preview of Noah) shows a plain list of its stages instead. */
@@ -90,9 +94,16 @@ const spotStyle = (s: MapSpot) => ({ left: `${spotLeft(s) * 100}%`, top: `${s.y 
 /** Each piece of the map picture is a few pixels wider than its share (4 px of the whole width), so that the pieces overlap. */
 const pieceLap = computed(() => 1 / Math.max(1, journey.value.map.images.length) + 4 / (journey.value.map.widthPx ?? 9824))
 
+/** A stage of an adventure that is behind LambKing Plus (three adventures are free in full, see `adventureAccess`): it shows the lock and opens the Plus sheet. */
+const plusLocked = (i: number) => isStagePlusLocked(journey.value.id, i)
+
 function openStage(i: number) {
   const s = journey.value.stages[i]
   if (!s || !isStageOpen(journey.value, progress.value, i)) return
+  if (plusLocked(i)) {
+    showUpsell('adventure')
+    return
+  }
   void router.push({ name: 'app-adventure-stage', params: { journeyId: journey.value.id, stageId: String(s.id) } })
 }
 
@@ -281,7 +292,8 @@ onMounted(async () => {
             @click="openStage(i)"
           )
             span(class="spot-fog")
-            img(v-if="!isStageOpen(journey, progress, i)" :src="ui('lock')" alt="" class="spot-lock" draggable="false")
+            img(v-if="plusLocked(i)" :src="crownIcon" alt="" class="spot-lock is-crown" draggable="false")
+            img(v-else-if="!isStageOpen(journey, progress, i)" :src="ui('lock')" alt="" class="spot-lock" draggable="false")
           span(class="spot-coin" :style="{ backgroundImage: `url(${ui('coin')})` }") {{ s.id }}
           img(v-if="stageDone(s.id)" :src="ui('check')" alt="" class="spot-check" draggable="false")
           //- under the picture: the name, and the stars or the way on
@@ -642,6 +654,10 @@ $ink: #3b2a12
 .map-spot:not(.open) .spot-fog
   opacity: 1
 
+.spot-lock.is-crown
+  width: calc(var(--u) * 0.06)
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.35))
+
 .spot-lock
   position: absolute
   left: 50%
@@ -740,13 +756,14 @@ $ink: #3b2a12
     top: -34%
     width: 30%
 
+  // gold and silver are the same plain cup as the bronze one, only larger
   &.cup-silber, &.cup-silver
     top: -44%
-    width: 38%
+    width: 41%
 
   &.cup-gold
     top: -64%
-    width: 52%
+    width: 58%
 
 @keyframes spot-bob
   0%, 100%

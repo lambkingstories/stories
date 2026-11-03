@@ -10,7 +10,7 @@
 import { effectScope, watch } from 'vue'
 import useSoundSettings from '@/use/useSoundSettings'
 import { prependBaseUrl } from '@/utils/function'
-import { MAP_MUSIC, moodOfGame, pickGameMusic, type MusicPiece } from '@/utils/sfxFiles'
+import { DAVID_MUSIC, MAP_MUSIC, moodOfGame, pickGameMusic, type MusicPiece } from '@/utils/sfxFiles'
 
 /** One piece: a seamless loop of `loop` seconds (general pieces), or a whole piece that is crossfaded into the next one. */
 interface Track {
@@ -278,6 +278,12 @@ function playGame(kind?: string, music?: string[]) {
   start({ kind: 'game', pool: [asTrack(piece)] })
 }
 
+/** The music of the big game of David. */
+function playDavid() {
+  if (wanted?.kind === 'game' && running) return
+  start({ kind: 'game', pool: [asTrack(DAVID_MUSIC)] })
+}
+
 /**
  * Stops the music. With `only` ('map' or 'game') it stops just when that kind is the one playing (a view that closes later must not
  * stop the music of the next view).
@@ -292,5 +298,5 @@ function stop(only?: 'map' | 'game') {
 }
 
 export default function useMusic() {
-  return { playMap, playGame, stop }
+  return { playMap, playGame, playDavid, stop }
 }

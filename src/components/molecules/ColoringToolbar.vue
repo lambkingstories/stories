@@ -11,6 +11,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { TIP_SHAPES, renderTipShape, tipOf, type TipShape } from '@/utils/coloringBrushes'
 import { ICON_COLORS, LINE_ICONS } from '@/data/coloringKits'
+import { STAMP_COLORS, STAMP_IDS, stampUrl, type StampSettings } from '@/data/coloringStamps'
 
 export interface ToolbarTool {
   id: string
@@ -29,7 +30,10 @@ interface Props {
   strength: number
   tips: Record<string, TipShape>
   stayInside: boolean
-  overlap: boolean
+  /** The stamp that is chosen: shape, size, colour, glitter. */
+  stamp: StampSettings
+  /** The stamp is the tool that paints now. */
+  stampOn: boolean
   /** How far the sheet is turned, −90 to 90 degrees. */
   rotation: number
   canUndo: boolean
@@ -50,7 +54,8 @@ const emit = defineEmits<{
   redo: []
   'toggle-shelf': []
   'toggle-stay': []
-  'toggle-overlap': []
+  'pick-stamp': [shape: number]
+  'set-stamp': [patch: Partial<StampSettings>]
   'set-rotation': [degrees: number]
   collapse: []
   expand: []
@@ -65,7 +70,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n({ useScope: 'global' })
 
-const panel = ref<'options' | 'rotate' | 'dock' | null>(null)
+const panel = ref<'options' | 'rotate' | 'dock' | 'stamp' | null>(null)
 
 const DOCKS = ['left', 'right'] as const
 
@@ -101,7 +106,13 @@ function tapTool(tl: ToolbarTool) {
   emit('select-tool', tl.id)
 }
 
-function togglePanel(which: 'rotate') {
+/** A shape is chosen: the panel closes (the picture is there to stamp on). */
+function pickStampTile(i: number) {
+  emit('pick-stamp', i)
+  panel.value = null
+}
+
+function togglePanel(which: 'rotate' | 'stamp') {
   panel.value = panel.value === which ? null : which
 }
 
@@ -233,15 +244,15 @@ const degrees = computed(() => `${props.rotation > 0 ? '+' : ''}${props.rotation
         button(
           type="button"
           class="tb-act"
-          :class="{ on: overlap }"
-          :aria-pressed="overlap"
-          :aria-label="t('app.coloring.overlap')"
-          :title="t('app.coloring.overlap')"
-          @click="emit('toggle-overlap')"
+          :class="{ on: stampOn || panel === 'stamp' }"
+          :aria-expanded="panel === 'stamp'"
+          :aria-label="t('app.coloring.stampTitle')"
+          :title="t('app.coloring.stampTitle')"
+          @click="togglePanel('stamp')"
         )
           span(class="tb-ico")
-            img(:src="LINE_ICONS.frames" alt="" draggable="false")
-          span(class="tb-cap") {{ t('app.coloring.overlapShort') }}
+            img(:src="LINE_ICONS.stamp" alt="" draggable="false")
+          span(class="tb-cap") {{ t('app.coloring.stampShort') }}
         button(
           type="button"
           class="tb-act"
@@ -298,6 +309,39 @@ const degrees = computed(() => `${props.rotation > 0 ? '+' : ''}${props.rotation
             img(:class="`is-${d}`" :src="LINE_ICONS.back" alt="" draggable="false")
             span {{ t(`app.coloring.dock_${d}`) }}
 
+      //- the stamps: ten shapes, size, colour and glitter (Plus)
+      div(v-if="panel === 'stamp'" class="tb-pop tb-pop-stamp")
+        h3(class="tb-pop-title") {{ t('app.coloring.stampTitle') }}
+        div(class="tb-stamps" role="group" :aria-label="t('app.coloring.stampTitle')")
+          button(
+            v-for="(id, i) in STAMP_IDS"
+            :key="id"
+            type="button"
+            class="tb-stamp"
+            :class="{ on: stampOn && stamp.shape === i }"
+            :aria-pressed="stampOn && stamp.shape === i"
+            :aria-label="t(`app.coloring.stampName_${id}`)"
+            :title="t(`app.coloring.stampName_${id}`)"
+            @click="pickStampTile(i)"
+          )
+            span(class="tb-stamp-img" :class="{ glit: stamp.glitter }" :style="{ '--m': `url(${stampUrl(i)})`, '--c': stamp.color }")
+        label(class="tb-row")
+          span(class="tb-row-name") {{ t('app.coloring.stampSize') }}
+          input(type="range" min="1" max="100" step="1" :value="stamp.size" :aria-label="t('app.coloring.stampSize')" @input="emit('set-stamp', { size: numberOf($event) })")
+        div(class="tb-swatches" role="group" :aria-label="t('app.coloring.stampColor')")
+          button(
+            v-for="c in STAMP_COLORS"
+            :key="c"
+            type="button"
+            class="tb-swatch"
+            :class="{ on: stamp.color === c }"
+            :style="{ background: c }"
+            :aria-pressed="stamp.color === c"
+            :aria-label="c"
+            @click="emit('set-stamp', { color: c })"
+          )
+        button(type="button" class="tb-glit" :class="{ on: stamp.glitter }" :aria-pressed="stamp.glitter" @click="emit('set-stamp', { glitter: !stamp.glitter })") {{ t('app.coloring.stampGlitter') }}
+
       //- turning the sheet: 0 degrees is the normal position, up to 90 degrees to each side
       div(v-if="panel === 'rotate'" class="tb-pop")
         h3(class="tb-pop-title") {{ t('app.coloring.rotate') }}
@@ -318,6 +362,9 @@ $muted: #6c7280
 $line: rgba(20, 24, 32, 0.1)
 $accent: #1f3a5f
 $glass: rgba(252, 251, 248, 0.92)
+// the bar itself is warm paper, a little lighter at the top, with a thin lit edge
+$paper: linear-gradient(180deg, rgba(255, 254, 251, 0.96) 0%, rgba(247, 242, 232, 0.96) 100%)
+$tint: rgba(31, 58, 95, 0.055)
 
 // The anchor is a strip along the screen edge (without the colour box at the bottom); the bar and the tab slide along it
 // by `--pos` (0–1) and never leave it, however tall they are. The bar sits flush at the edge: the tools run right
@@ -347,11 +394,9 @@ $glass: rgba(252, 251, 248, 0.92)
 .tb-pill
   display: flex
   gap: 6px
-  border: 1px solid $line
-  background: $glass
-  backdrop-filter: blur(18px)
-  -webkit-backdrop-filter: blur(18px)
-  box-shadow: 0 10px 34px -8px rgba(20, 24, 32, 0.42), 0 1px 3px rgba(20, 24, 32, 0.14)
+  border: 1px solid rgba(122, 107, 85, 0.22)
+  background: $paper
+  box-shadow: 0 14px 38px -10px rgba(20, 24, 32, 0.46), 0 1px 3px rgba(20, 24, 32, 0.12), 0 1px 0 rgba(255, 255, 255, 0.9) inset
 
 .tb-tab
   display: grid
@@ -363,8 +408,6 @@ $glass: rgba(252, 251, 248, 0.92)
   border-radius: 50%
   overflow: hidden
   background: $glass
-  backdrop-filter: blur(16px)
-  -webkit-backdrop-filter: blur(16px)
   box-shadow: 0 8px 24px -6px rgba(20, 24, 32, 0.42)
   cursor: pointer
   touch-action: none
@@ -482,6 +525,11 @@ $glass: rgba(252, 251, 248, 0.92)
   gap: 6px
   flex: 0 0 auto
 
+.tb-hist
+  padding: 2px 4px
+  border-radius: 14px
+  background: $tint
+
 .tb.edge-left,
 .tb.edge-right
   .tb-top,
@@ -573,6 +621,27 @@ $glass: rgba(252, 251, 248, 0.92)
   background: transparent
   cursor: pointer
   -webkit-tap-highlight-color: transparent
+
+  // the groove the chosen tool lies in
+  &::before
+    content: ''
+    position: absolute
+    top: 4px
+    bottom: 4px
+    left: 0
+    right: 4px
+    border-radius: 999px
+    background: linear-gradient(90deg, rgba(31, 58, 95, 0), rgba(31, 58, 95, 0.13))
+    opacity: 0
+    transition: opacity 200ms ease-out
+
+  &.on::before
+    opacity: 1
+
+.tb.edge-right .tb-tool::before
+  left: 4px
+  right: 0
+  background: linear-gradient(270deg, rgba(31, 58, 95, 0), rgba(31, 58, 95, 0.13))
 
 .tb.edge-left .tb-tool,
 .tb.edge-right .tb-tool
@@ -668,9 +737,9 @@ $glass: rgba(252, 251, 248, 0.92)
 .tb.edge-right .tb-bottom
   display: grid
   grid-template-columns: repeat(2, 1fr)
-  gap: 2px
-  border-top: 1px solid $line
-  padding-top: 6px
+  gap: 4px
+  border-top: 1px solid rgba(122, 107, 85, 0.2)
+  padding-top: 8px
 
 .tb-act
   flex: 0 0 auto
@@ -679,20 +748,22 @@ $glass: rgba(252, 251, 248, 0.92)
   align-items: center
   gap: 1px
   min-width: 0
-  padding: 4px 2px 2px
-  border: 0
+  padding: 5px 2px 3px
+  border: 1px solid transparent
   border-radius: 14px
-  background: transparent
+  background: $tint
   color: $ink
   cursor: pointer
   -webkit-tap-highlight-color: transparent
-  transition: background 140ms ease-out
+  transition: background 140ms ease-out, border-color 140ms ease-out, transform 100ms ease-out
 
   &:active
-    background: rgba(20, 24, 32, 0.08)
+    background: rgba(20, 24, 32, 0.1)
+    transform: scale(0.95)
 
   &.on
-    background: rgba(31, 58, 95, 0.13)
+    background: rgba(31, 58, 95, 0.15)
+    border-color: rgba(31, 58, 95, 0.4)
 
 .tb-ico
   display: grid
@@ -729,12 +800,10 @@ $glass: rgba(252, 251, 248, 0.92)
   position: absolute
   width: 268px
   padding: 12px 14px 14px
-  border: 1px solid $line
-  border-radius: 18px
-  background: rgba(252, 251, 248, 0.97)
-  backdrop-filter: blur(18px)
-  -webkit-backdrop-filter: blur(18px)
-  box-shadow: 0 14px 40px rgba(20, 24, 32, 0.34)
+  border: 1px solid rgba(122, 107, 85, 0.22)
+  border-radius: 20px
+  background: linear-gradient(180deg, rgba(255, 254, 251, 0.98) 0%, rgba(247, 242, 232, 0.98) 100%)
+  box-shadow: 0 16px 44px rgba(20, 24, 32, 0.36), 0 1px 0 rgba(255, 255, 255, 0.9) inset
   animation: tb-pop-in 260ms cubic-bezier(0.22, 1, 0.36, 1)
 
 .tb.edge-left .tb-pop
@@ -835,6 +904,85 @@ $glass: rgba(252, 251, 248, 0.92)
 
   &.on
     background: rgba(31, 58, 95, 0.1)
+    border-color: rgba(31, 58, 95, 0.45)
+
+// the stamps
+.tb-pop-stamp
+  width: 276px
+
+.tb-stamps
+  display: grid
+  grid-template-columns: repeat(5, 1fr)
+  gap: 6px
+  margin-bottom: 10px
+  // many shapes: the list scrolls inside the panel, a part of the last row peeks out
+  max-height: 232px
+  overflow-y: auto
+  overscroll-behavior: contain
+  padding: 2px
+
+.tb-stamp
+  display: grid
+  place-items: center
+  aspect-ratio: 1
+  padding: 5px
+  border: 1px solid $line
+  border-radius: 12px
+  background: rgba(255, 255, 255, 0.75)
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+
+  &:active
+    background: rgba(20, 24, 32, 0.08)
+
+  &.on
+    background: rgba(31, 58, 95, 0.13)
+    border-color: rgba(31, 58, 95, 0.45)
+
+.tb-stamp-img
+  display: block
+  width: 100%
+  height: 100%
+  background: var(--c)
+  -webkit-mask: var(--m) center / contain no-repeat
+  mask: var(--m) center / contain no-repeat
+  pointer-events: none
+
+  // glitter: a pale shimmer across the colour and a few bright flecks
+  &.glit
+    background: radial-gradient(circle at 22% 30%, #fff 0 1.6px, transparent 2.4px), radial-gradient(circle at 68% 24%, #fff 0 1.3px, transparent 2px), radial-gradient(circle at 48% 62%, #fff 0 1.6px, transparent 2.4px), radial-gradient(circle at 80% 74%, #fff 0 1.2px, transparent 2px), radial-gradient(circle at 28% 80%, #fff 0 1.3px, transparent 2px), linear-gradient(120deg, var(--c) 0 38%, color-mix(in srgb, var(--c) 45%, #fff) 50%, var(--c) 62% 100%)
+
+.tb-swatches
+  display: grid
+  grid-template-columns: repeat(6, 1fr)
+  gap: 8px
+  margin: 6px 0 10px
+
+.tb-swatch
+  aspect-ratio: 1
+  border: 2px solid rgba(255, 255, 255, 0.9)
+  border-radius: 50%
+  box-shadow: 0 0 0 1px rgba(20, 24, 32, 0.22)
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+
+  &.on
+    box-shadow: 0 0 0 3px rgba(31, 58, 95, 0.85)
+
+.tb-glit
+  width: 100%
+  min-height: 44px
+  border: 1px solid $line
+  border-radius: 12px
+  background: rgba(255, 255, 255, 0.75)
+  color: $ink
+  font-size: 0.9rem
+  font-weight: 700
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+
+  &.on
+    background: rgba(31, 58, 95, 0.13)
     border-color: rgba(31, 58, 95, 0.45)
 
 .tb-turn

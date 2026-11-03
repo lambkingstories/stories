@@ -137,7 +137,7 @@ export const davidEn: TextOverlay<Journey> = {
       ],
       task: {
         hint: 'Find the matching cards. Remember where each one lies.',
-        memory: { pairs: [{ text: 'The robe: Jonathan takes it off and gives it to David.' }, { text: 'The cloak: Jonathan puts it around David’s shoulders.' }, { text: 'The sword: Jonathan gives it to David.' }, { text: 'The bow: Jonathan gives his friend this too.' }, { text: 'The belt: the last gift, a sign of the covenant.' }] }
+        memory: { pairs: [{ text: 'The robe: Jonathan takes it off and gives it to David.' }, { text: 'The cloak: Jonathan puts it around David’s shoulders.' }, { text: 'The sword: Jonathan gives it to David.' }, { text: 'The bow: Jonathan gives his friend this too.' }, { text: 'The belt: the last gift, a sign of the covenant.' }, { text: 'The smooth stone: David found it in the brook and still carries it in his bag.' }] }
       },
       questions: [
         { q: 'Who is Jonathan?', options: ['Saul’s son', 'David’s brother', 'a shepherd'] },

@@ -17,6 +17,7 @@ import useReadingProgress from '@/use/useReadingProgress'
 import type { ApiBook, Locale } from '@/types/apiBook'
 import { pickLocalizedImage } from '@/types/apiBook'
 import { onImgFallback, withPlaceholder, PLACEHOLDER_IMAGE } from '@/utils/placeholder'
+import { contentLocale } from '@/utils/contentLocale'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
@@ -32,7 +33,7 @@ onMounted(() => {
   void apiSeries.loadAll()
 })
 
-const lang = computed<Locale>(() => (locale.value === 'en' ? 'en' : 'de'))
+const lang = computed<Locale>(() => (contentLocale(locale.value)))
 const seriesId = computed(() => String(route.params.seriesId))
 const seriesMeta = computed(() => getSeries(seriesId.value))
 

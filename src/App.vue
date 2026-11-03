@@ -18,6 +18,8 @@ import ParentalGateModal from '@/components/molecules/ParentalGateModal.vue'
 import PremiumSheet from '@/components/molecules/PremiumSheet.vue'
 import { GAME_USER_LANGUAGE } from '@/utils/constants.ts'
 import { setAdventureLanguage } from '@/use/adventureLanguage'
+import { startActivityTracking, type Section } from '@/use/useActivity'
+import { routeToNav } from '@/use/useAppNav'
 
 const { initMusic, pauseMusic, continueMusic } = useMusic()
 const { userLanguage } = useUser()
@@ -43,8 +45,8 @@ const motion = ref<Motion>('nav-fade')
 
 const DEPTH: Record<string, number> = {
   'app-main': 0, 'app-read': 0, 'app-hoeren': 0, 'app-adventure': 0, 'app-profile': 0, 'app-coloring': 0,
-  'app-books': 1, 'app-coloring-books': 1, 'app-book-preview': 2, 'app-all-books': 1, 'app-all-new-books': 1, 'app-category': 1, 'app-awards': 1,
-  'app-legal': 1, 'app-adventure-map': 1, 'app-coloring-book': 1,
+  'app-books': 1, 'app-coloring-books': 1, 'app-book-preview': 2, 'app-book-read': 2,'app-all-books': 1, 'app-all-new-books': 1, 'app-category': 1, 'app-awards': 1, 'app-parents': 1, 'app-goodnight': 1, 'app-collection': 1, 'app-gameroom': 1, 'app-big-game': 2, 'app-family': 1, 'app-family-quiz': 2, 'app-family-activity': 2, 'app-family-who': 2, 'app-family-order': 2, 'app-family-bingo': 2, 'app-family-memory': 2, 'app-journal': 1, 'app-voices': 1,
+  'app-legal': 1, 'app-plus': 1, 'app-adventure-map': 1, 'app-coloring-book': 1,
   'app-series': 2, 'app-book': 2, 'app-adventure-stage': 2, 'app-adventure-stats': 2,
   'app-reader': 3
 }
@@ -147,7 +149,17 @@ const NAV_ROUTES = new Set([
   'app-adventure-map',
   'app-adventure-stage',
   'app-legal',
-  'app-awards'
+  'app-plus',
+  'app-awards',
+  'app-parents',
+  'app-collection',
+  'app-family',
+  'app-family-quiz',
+  'app-family-activity',
+  'app-family-who',
+  'app-family-order',
+  'app-journal',
+  'app-voices'
 ])
 const { coloringMenuShown } = useChrome()
 const showAppNav = computed(() => NAV_ROUTES.has(String(route.name || '')) || (route.name === 'app-coloring' && coloringMenuShown.value))
@@ -241,6 +253,14 @@ onUnmounted(() => {
   document.removeEventListener('visibilitychange', handleVisibilityChange)
   clearInterval(dimensionsInterval.value)
 })
+
+// the diary for the grown-ups: how long the app is in use, and in which part
+const SECTION_OF_NAV: Record<string, Section> = { home: 'home', series: 'read', hoeren: 'read', abenteuer: 'adventure', malen: 'paint', profile: 'other' }
+let stopTracking: (() => void) | undefined
+onMounted(() => {
+  stopTracking = startActivityTracking(() => SECTION_OF_NAV[routeToNav(String(route.name ?? ''))] ?? 'other')
+})
+onUnmounted(() => stopTracking?.())
 
 onMounted(() => {
   document.addEventListener('contextmenu', onContextMenu)

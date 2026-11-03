@@ -81,7 +81,7 @@ export const josuaEn: TextOverlay<Journey> = {
         'There Joshua sets up the twelve stones. “When your children ask you someday: What are these stones for?, then tell them,” he says.',
         '“God made the water of the Jordan stand still until we were across. These stones shall always remind us.”'
       ],
-      task: { hint: 'Find the matching cards. Remember where each one lies.', memory: { pairs: [{ text: 'The scroll: The Book of the Law. Joshua is to think about it day and night.' }, { text: 'The bundle of flax: Rahab hid the men under it.' }, { text: 'The red rope at the window: Whoever stays inside the house will be safe.' }, { text: 'The ark of the covenant: The priests carry it ahead into the Jordan.' }, { text: 'The stone: Twelve stones remind us of the way through the Jordan.' }] } },
+      task: { hint: 'Find the matching cards. Remember where each one lies.', memory: { pairs: [{ text: 'The scroll: The Book of the Law. Joshua is to think about it day and night.' }, { text: 'The bundle of flax: Rahab hid the men under it.' }, { text: 'The red rope at the window: Whoever stays inside the house will be safe.' }, { text: 'The ark of the covenant: The priests carry it ahead into the Jordan.' }, { text: 'The stone: Twelve stones remind us of the way through the Jordan.' }, { text: 'The ram’s horn: Priests will soon march around Jericho with horns like this.' }] } },
       questions: [
         { q: 'What do the twelve men carry out of the river?', options: ['stones', 'jars', 'branches'] },
         { q: 'What are the stones to remind us of?', options: ['that God made the Jordan stand still', 'that it is harvest time', 'that Jericho has a wall'] }

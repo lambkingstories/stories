@@ -12,19 +12,32 @@ import LkCompanion from '@/components/atoms/LkCompanion.vue'
 import AppHeader from '@/components/molecules/AppHeader.vue'
 import useUser from '@/use/useUser'
 import { prependBaseUrl } from '@/utils/function'
+import { contentLocale } from '@/utils/contentLocale'
+import { SPANISH_ENABLED } from '@/utils/languages'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
 const { setSettingValue } = useUser()
 
-const current = computed<'de' | 'en'>(() => (locale.value === 'en' ? 'en' : 'de'))
+// the language of the screens (German, English or Spanish; anything else counts as German)
+const current = computed<'de' | 'en' | 'es'>(() => (locale.value === 'en' || locale.value === 'es' ? locale.value : 'de'))
 
 const languages = computed(() => [
-  { code: 'de' as const, label: t('app.language.german'), flag: 'DE' },
-  { code: 'en' as const, label: t('app.language.english'), flag: 'EN' }
+  { code: 'de' as const, label: t('app.language.german') },
+  { code: 'en' as const, label: t('app.language.english') },
+  ...(SPANISH_ENABLED ? [{ code: 'es' as const, label: t('app.language.spanish') }] : [])
 ])
 
-function pick(code: 'de' | 'en') {
+// the little stars of the American flag: rows of six and five dots
+const stars = Array.from({ length: 9 }, (_, row) =>
+  Array.from({ length: row % 2 === 0 ? 6 : 5 }, (_, i) => ({
+    k: row * 10 + i,
+    x: (row % 2 === 0 ? 2.6 : 4.7) + i * 4.2,
+    y: 2.6 + row * 2.1
+  }))
+).flat()
+
+function pick(code: 'de' | 'en' | 'es') {
   if (current.value !== code) setSettingValue('language', code)
 }
 
@@ -69,7 +82,22 @@ function onStart() {
             @click="pick(l.code)"
           )
             span(class="lang-radio" aria-hidden="true")
-            span(class="lang-flag" aria-hidden="true") {{ l.flag }}
+            span(class="lang-flag" aria-hidden="true")
+              //- German flag (3:2) and the flag of the USA for English, on one 60 x 40 canvas
+              svg(v-if="l.code === 'de'" viewBox="0 0 60 40" focusable="false")
+                rect(width="60" height="13.5" y="0" fill="#000000")
+                rect(width="60" height="13.5" y="13.3" fill="#dd0000")
+                rect(width="60" height="13.4" y="26.6" fill="#ffce00")
+              //- the flag of Spain
+              svg(v-else-if="l.code === 'es'" viewBox="0 0 60 40" focusable="false")
+                rect(width="60" height="10.1" y="0" fill="#c60b1e")
+                rect(width="60" height="20.2" y="9.9" fill="#ffc400")
+                rect(width="60" height="10.1" y="29.9" fill="#c60b1e")
+              svg(v-else viewBox="0 0 60 40" focusable="false")
+                rect(width="60" height="40" fill="#ffffff")
+                rect(v-for="n in 7" :key="n" width="60" height="3.08" :y="(n - 1) * 6.154" fill="#b22234")
+                rect(width="26" height="21.5" fill="#3c3b6e")
+                circle(v-for="d in stars" :key="d.k" :cx="d.x" :cy="d.y" r="1.1" fill="#ffffff")
             span(class="lang-name") {{ l.label }}
 
       button(type="button" class="lk-btn lk-btn--full" @click="onStart")
@@ -172,14 +200,17 @@ function onStart() {
       background: var(--lk-accent)
 
 .lang-flag
-  min-width: 34px
-  padding: 2px 6px
-  border-radius: 8px
-  background: var(--lk-surface-2)
-  font-size: 0.8rem
-  font-weight: 800
-  letter-spacing: 0.04em
-  text-align: center
+  flex: none
+  width: 39px
+  height: 26px
+  border-radius: 5px
+  overflow: hidden
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18)
+
+  svg
+    display: block
+    width: 100%
+    height: 100%
 
 .lang-name
   flex: 1
