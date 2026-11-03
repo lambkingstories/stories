@@ -88,3 +88,9 @@ dist-phone
 # test-only coloring books (never commit or publish)
 public/images/ausmalbuecher/
 dist-paywall
+
+# Zugangsdaten und Entwürfe gehören nie ins Repo
+ANLEITUNG-Zugaenge-und-Passwoerter.pdf
+*Zugaenge*Passwoerter*
+/designs/
+scripts/__pycache__/
