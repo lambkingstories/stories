@@ -201,7 +201,7 @@ export const gleichnisse: Journey = {
   subtitle: 'Vom Sämann bis zum verlorenen Sohn',
   age: '8-10',
   downloadMb: 18, // wird nach dem Bau gemessen (Bilder, Karte, Spielbilder, Musik, Aufnahmen), ohne die gemeinsamen Oberflächendateien
-  medal: `${PICS}medaille-v1.webp`, // Medaille 1 bis zu Antons Wahl
+  medal: `${PICS}medaille-v3.webp`, // Medaille 1 bis zu Antons Wahl
   // Geschenk-Ausmalbild: der große Senfbaum mit Vögeln und einem Beet (Konturzeichnung)
   gift: { title: 'Der Senfbaum', image: `${PICS}geschenk.webp` },
   // die gemalte Karte (Panorama in drei Stücken, 9920 × 1648 px, OpenAI-Bildmodell, Qualität max, mit zwölf Orten und dem Ziel) mit Stationen und Perlenweg aus gleichnissePath.ts
@@ -230,7 +230,7 @@ export const gleichnisse: Journey = {
   stages: [
     {
       id: 1,
-      image: `${PICS}etappe-bild-01.webp`,
+      image: `${PICS}etappe-bild-01-b.webp`,
       title: 'Der Sämann geht aufs Feld',
       ref: 'Matthäus 13,1–8',
       text: [
@@ -248,7 +248,7 @@ export const gleichnisse: Journey = {
     },
     {
       id: 2,
-      image: `${PICS}etappe-bild-02.webp`,
+      image: `${PICS}etappe-bild-02-b.webp`,
       title: 'Wer Ohren hat',
       ref: 'Matthäus 13,9–11.18–23',
       text: [
@@ -283,7 +283,7 @@ export const gleichnisse: Journey = {
     },
     {
       id: 4,
-      image: `${PICS}etappe-bild-04.webp`,
+      image: `${PICS}etappe-bild-04-b.webp`,
       title: 'Der Schatz im Acker',
       ref: 'Matthäus 13,44–46',
       text: [
@@ -353,7 +353,7 @@ export const gleichnisse: Journey = {
     },
     {
       id: 8,
-      image: `${PICS}etappe-bild-08.webp`,
+      image: `${PICS}etappe-bild-08-b.webp`,
       title: 'Das verlorene Schaf',
       ref: 'Lukas 15,1–7',
       text: [
@@ -404,7 +404,7 @@ export const gleichnisse: Journey = {
     },
     {
       id: 11,
-      image: `${PICS}etappe-bild-11.webp`,
+      image: `${PICS}etappe-bild-11-b.webp`,
       title: 'Der Vater läuft ihm entgegen',
       ref: 'Lukas 15,20–24',
       text: [
