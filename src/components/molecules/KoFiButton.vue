@@ -12,6 +12,10 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { openExternal } from '@/utils/openExternal'
+import { prependBaseUrl } from '@/utils/function'
+
+// our own copy of the cup picture: loading it from ko-fi.com would send the visitor's address there
+const cupImage = prependBaseUrl('images/icons/ui/kofi.webp')
 
 interface Props {
   href: string
@@ -75,7 +79,7 @@ function onClick(event: MouseEvent) {
     span(v-if="tone === 'kofi'" class="kofi-btn-icon" aria-hidden="true")
       //- Mug + steam — recognisable as a coffee-tip icon at 18-20px sizes.
       span
-        img.kofi-img(class="mt-[2px]" src="https://storage.ko-fi.com/cdn/cup-border.png", alt="Ko-fi")
+        img.kofi-img(class="mt-[2px]" :src="cupImage", alt="Ko-fi")
     span(v-if="tone === 'paypal'" class="kofi-btn-icon -mb-1" aria-hidden="true")
       span
         section(style="font-size: 0.75rem;")

@@ -3,11 +3,13 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import LkPageHead from '@/components/molecules/LkPageHead.vue'
-import { renderLegalText } from '@/utils/renderLegalText'
+import ContactLinks from '@/components/molecules/ContactLinks.vue'
+import { legalBody, renderLegalText } from '@/utils/renderLegalText'
 import { openExternal } from '@/utils/openExternal'
-// Same file the website's privacy modal shows, so both always match. It
-// starts with the imprint (§ 5 TMG) block, hence one page for both.
-import privacyText from '../../../website/src/documentation/privacy-policy-de.md?raw'
+// Exactly the texts published on lambking.store, copied in by `scripts/sync-legal.mjs` (never edited by hand), so the
+// app and the website always say the same thing and the texts can be read offline.
+import imprintText from '../../legal/impressum-de.txt?raw'
+import privacyText from '../../legal/datenschutz-de.txt?raw'
 
 // App Review Guideline 5.1.1(i): the privacy policy must be reachable inside
 // the app, not only on the store page — so it is rendered here rather than
@@ -15,7 +17,8 @@ import privacyText from '../../../website/src/documentation/privacy-policy-de.md
 const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
 
-const rendered = computed(() => renderLegalText(privacyText))
+const renderedImprint = computed(() => renderLegalText(legalBody(imprintText)))
+const rendered = computed(() => renderLegalText(legalBody(privacyText)))
 
 function goBack() {
   if (window.history.length > 1) router.back()
@@ -38,8 +41,11 @@ function onTextClick(event: MouseEvent) {
 
     article(class="legal-card")
       p(v-if="locale !== 'de'" class="legal-note") {{ t('app.legal.germanOnly') }}
-      h2(class="legal-heading") {{ t('app.legal.privacyTitle') }}
-      div(class="legal-body" v-html="rendered" @click="onTextClick")
+      h2(class="legal-heading") {{ t('app.legal.imprintTitle') }}
+      div(class="legal-body" data-test="imprint" v-html="renderedImprint" @click="onTextClick")
+      ContactLinks(class="legal-contact")
+      h2(class="legal-heading legal-heading-next") {{ t('app.legal.privacyTitle') }}
+      div(class="legal-body" data-test="privacy" v-html="rendered" @click="onTextClick")
 </template>
 
 <style scoped lang="sass">
@@ -87,6 +93,12 @@ function onTextClick(event: MouseEvent) {
   font-size: 18px
   font-weight: 700
   margin: 0 0 10px
+
+.legal-heading-next
+  margin-top: 28px
+
+.legal-contact
+  margin-top: 4px
 
 .legal-body
   font-size: 14px

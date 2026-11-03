@@ -42,7 +42,7 @@
           | Nur in der App verfügbar
 
         .featured-b-fineprint(v-if="isPurchasable")
-          | Bezahlung &amp; Versand werden bei Etsy abgewickelt — sicher, mit Käuferschutz.
+          | Bezahlung &amp; Versand werden beim Händler abgewickelt.
 </template>
 
 <script setup lang="ts">

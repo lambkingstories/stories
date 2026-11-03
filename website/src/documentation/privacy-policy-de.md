@@ -1,145 +1,78 @@
-Verantwortlich für den Inhalt nach § 5 TMG:
+1. Verantwortlicher
 
-Anton Bernt
-Allmendstr. 35
-75223 Niefern-Öschelbronn
-
-Kontakt:
-
+Anton Bernt, LambKing, c/o Vera Bike, Leopoldstraße 5B, 76133 Karlsruhe, Deutschland
 E-Mail: hello@lambking.store
 
-Internet: www.lambking.store
+2. Hosting über GitHub Pages
 
-EU-Streitschlichtung:
+Diese Website wird über GitHub Pages (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA) bereitgestellt. Beim Aufruf der Seite verarbeitet GitHub technisch notwendige Verbindungsdaten (z. B. IP-Adresse, Datum und Uhrzeit des Zugriffs, aufgerufene Seite, Browsertyp) in Server-Logfiles. Diese Verarbeitung ist erforderlich, um die Website auszuliefern (Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO – berechtigtes Interesse am sicheren Betrieb dieser Website). Da GitHub seinen Sitz in den USA hat, kann eine Datenverarbeitung in den USA nicht ausgeschlossen werden. Details dazu finden Sie im GitHub Privacy Statement.
 
-Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS)
-bereit: https://ec.europa.eu/consumers/odr/.
-Unsere E-Mail-Adresse findest du oben im Impressum.
+3. Spracheinstellung (lokale Speicherung)
 
-Verbraucherstreitbeilegung/Universalschlichtungsstelle:
-Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle
-teilzunehmen.
+Diese Website speichert Ihre gewählte Sprache (Deutsch/Englisch) ausschließlich lokal in Ihrem Browser (localStorage, Schlüssel „lambking-lang"). Diese Information wird nicht an uns oder Dritte übertragen und nicht für Werbung oder Tracking verwendet. Sie können sie jederzeit über die Browser-Einstellungen löschen.
 
-1. Datenschutz auf einen Blick
-Allgemeine Hinweise
-Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit deinen personenbezogenen Daten passiert, wenn du
-diese App nutzt oder unsere Website besuchst. Personenbezogene Daten sind alle Daten, mit denen du persönlich
-identifiziert werden kannst.
+4. Anonyme Reichweitenmessung und Klickstatistik
 
-Datenerfassung in dieser App
-In dieser App werden keine Benutzerkonten erstellt und keine Daten erhoben, mit denen wir dich identifizieren könnten.
-Die App speichert auch keine Kennung auf deinem Gerät und sendet keine an uns. Wir zählen lediglich, wie oft eine
-Buchseite geöffnet wurde – als reine Zahl pro Tag, ohne jeden Bezug zu einer Person oder einem Gerät (siehe
-Abschnitt 3). Die App folgt dem Prinzip der Datensparsamkeit.
+Zur rein statistischen Auswertung erfassen wir die Anzahl der Aufrufe dieser Landingpage und die Anzahl der Klicks auf bestimmte externe Schaltflächen, nämlich auf die Amazon-Schaltfläche des jeweiligen Buches, auf die Schaltflächen für die freiwillige Unterstützung (PayPal, Ko-fi) und auf die Schaltflächen zum Laden der App (Google Play, App Store). Unsere Anwendung speichert dabei ausschließlich zusammengefasste Zählerstände pro Kalendertag und Ereignis beziehungsweise interner Kennung der Schaltfläche. Wir setzen hierfür keine Cookies oder vergleichbaren Wiedererkennungstechniken ein, speichern keine Kennungen im Browser, erstellen keine Nutzerprofile und führen einzelne Aufrufe nicht zu einem Besucherverlauf zusammen.
 
-2. Verantwortlicher
-   Der Verantwortliche für die Datenverarbeitung auf dieser Website und in der App ist:
+Bei der Übermittlung an den von Cloudflare bereitgestellten Zähldienst wird die IP-Adresse technisch als Verbindungsdatum übertragen. Sie wird von unserer Zähleranwendung weder ausgelesen noch in der Zählerdatenbank gespeichert. Die automatischen Aufrufprotokolle des Workers sind deaktiviert. Anbieter der technischen Infrastruktur ist Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, USA. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO; unser berechtigtes Interesse liegt in der anonymen Reichweiten- und Erfolgsmessung unserer Website.
 
-Anton Bernt
-Allmendstr. 35
-75223 Niefern-Öschelbronn
-E-Mail: hello@lambking.store
+5. Keine Cookies und keine Wiedererkennung
 
-3. Datenerfassung in der App
-   Verzicht auf Registrierung und Login
-   Die Nutzung der App erfolgt ohne Anmeldung. Wir nutzen keine Google-Konten, Facebook-Logins oder eigenen
-   Registrierungssysteme. Es werden keine Profile erstellt.
+Diese Website verwendet keine Cookies und keine Analyse- oder Marketingtechnik zur Wiedererkennung von Besuchern. Schriftarten werden lokal von dieser Website geladen, nicht von externen Diensten.
 
-Lokal gespeicherte Daten
-Dein Name und dein Profilbild in „Mein Bereich“, deine Merkliste und dein Lesefortschritt werden nur auf deinem Gerät
-gespeichert und nicht an uns übertragen.
+6. Externe Links
 
-Abruf der Inhalte
-Die App lädt Geschichten, Bilder und Hörbücher von unserem Server. Er wird bei Render Services, Inc. betrieben und steht
-in Frankfurt am Main; die Inhalte liegen in einer Datenbank bei MongoDB, Inc. (MongoDB Atlas). Bei jedem Abruf werden
-technisch notwendige Daten verarbeitet, insbesondere deine IP-Adresse, Datum und Uhrzeit sowie die abgerufene Adresse.
-Sie dienen nur der Auslieferung der Inhalte und der Sicherheit des Dienstes (Rechtsgrundlage: Art. 6 Abs. 1 lit. f
-DSGVO).
+Diese Website enthält Links zu externen Anbietern:
+- Amazon (Kauf der Bücher)
+- PayPal (freiwillige Unterstützung) – als reiner Link, ohne eingebettetes Zahlungsformular
+- Ko-fi (freiwillige Unterstützung) – als reiner Link, ohne JavaScript-Widget oder iFrame; erst wenn Sie den Ko-fi-Link anklicken, wird die Website von Ko-fi geöffnet, und ab diesem Zeitpunkt erfolgt die Datenverarbeitung nach den Datenschutzbestimmungen von Ko-fi
+- LambKing Web-App (ebenfalls über GitHub Pages)
 
-Aufrufzählung ohne Personenbezug
-Wenn du eine Buchseite öffnest, erhöht unser Server einen Zähler um eins. Gespeichert wird ausschließlich das Datum und
-die Zahl der Aufrufe dieses Tages – also ein einziger Eintrag pro Kalendertag für alle Nutzer zusammen. Es wird keine
-Kennung erzeugt, gespeichert oder übertragen, nichts wird einem Gerät oder einer Person zugeordnet, und es entstehen
-keine Nutzungsprofile. Aus diesen Zahlen lässt sich weder ablesen, wer die App benutzt, noch wie oft eine einzelne
-Person sie öffnet. Rechtsgrundlage ist unser berechtigtes Interesse an einer einfachen Nutzungsstatistik
-(Art. 6 Abs. 1 lit. f DSGVO).
+Erst wenn Sie einen dieser Links anklicken, verlassen Sie diese Website. Ab diesem Zeitpunkt erfolgt die Datenverarbeitung nach den Datenschutzbestimmungen des jeweiligen Anbieters.
 
-Bilder-Teilen-Funktion
-Die App bietet die Möglichkeit, Bilder zu teilen. Hierbei nutzt die App ausschließlich die systemeigenen
-„Teilen“-Funktionen deines Endgeräts (z. B. das Share-Sheet von iOS oder Android).
+7. Kontaktaufnahme und Creator-Bewerbungen per E-Mail
 
-Wir haben keinen Zugriff auf deine Kontakte, Empfänger oder die genutzten Dienste.
+Bei Kontaktaufnahme per E-Mail werden die übermittelten Daten (E-Mail-Adresse und Inhalt der Nachricht) ausschließlich zur Bearbeitung der Anfrage verarbeitet. Das Creator-Bewerbungsformular speichert und übermittelt selbst keine Angaben. Nach dem Ausfüllen wird lediglich im E-Mail-Programm des Bewerbers eine vorbereitete Nachricht an hello@lambking.store geöffnet. Erst wenn der Bewerber diese Nachricht dort absendet, werden die Angaben über die beteiligten E-Mail-Anbieter übertragen.
 
-Die Verarbeitung findet lokal auf deinem Gerät statt.
+Creator-Bewerbungen werden zur Prüfung einer möglichen Zusammenarbeit und zur Kontaktaufnahme verarbeitet. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (vorvertragliche Maßnahmen auf Anfrage des Bewerbers) sowie, soweit erforderlich, Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Bearbeitung und Dokumentation geschäftlicher Anfragen). Nicht angenommene Bewerbungen werden grundsätzlich spätestens sechs Monate nach Abschluss des Bewerbungsverfahrens gelöscht, sofern keine gesetzlichen Pflichten oder die Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen eine längere Aufbewahrung erfordern.
 
-Keine Analyse und Werbung
-Wir setzen keine Analyse-Tools (wie Google Analytics) und keine Werbenetzwerke ein. Abgesehen von dem Tageszähler oben
-wird dein Nutzungsverhalten nicht erfasst oder ausgewertet.
+8. Kontaktformular
 
-Sprachdaten
-Es werden keine Sprachaufnahmen durch den Nutzer erstellt, verarbeitet oder auf Servern gespeichert.
+Wenn Sie uns über das Kontaktformular auf dieser Website schreiben, verarbeiten wir die Angaben, die Sie eingeben: Ihren Namen, Ihre E-Mail-Adresse und den Inhalt Ihrer Nachricht. Mit dem Absenden bestätigen Sie außerdem, dass Sie diese Datenschutzerklärung gelesen haben und einverstanden sind.
 
-4. Datenerfassung auf der Webseite (lambking.store)
-   Hosting und Server-Log-Files
-   Der Provider der Seiten erhebt und speichert automatisch Informationen in sogenannten Server-Log-Files, die dein
-   Browser automatisch an uns übermittelt. Dies sind:
+Zweck. Wir verwenden diese Daten ausschließlich, um Ihre Anfrage zu beantworten und mit Ihnen in Kontakt zu treten. Die Nachricht wird per E-Mail an hello@lambking.store weitergeleitet; Ihre E-Mail-Adresse ist dabei als Antwortadresse (Reply-To) gesetzt. Eine Verwendung für andere Zwecke oder eine Weitergabe an Dritte findet nicht statt.
 
-Browsertyp und Browserversion
+Keine dauerhafte Speicherung im Formular-Dienst. Der Dienst hinter dem Formular speichert Ihre Angaben nicht in einer Datenbank und legt keine Kopie Ihrer Nachricht ab. Er verarbeitet sie nur kurz, um die E-Mail zu erzeugen, und leitet sie weiter. Die E-Mail liegt danach in unserem Postfach und wird dort nur so lange aufbewahrt, wie es zur Bearbeitung Ihrer Anfrage erforderlich ist. Anschließend wird sie gelöscht, sofern keine gesetzlichen Aufbewahrungspflichten entgegenstehen.
 
-Verwendetes Betriebssystem
+Betrieb. Das Formular läuft über einen von uns eingerichteten Dienst bei Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, USA (Cloudflare Workers). Dabei werden technisch notwendige Verbindungsdaten wie die IP-Adresse verarbeitet; die automatischen Aufrufprotokolle des Dienstes sind deaktiviert. Die E-Mail wird über den E-Mail-Server unseres Postfachanbieters Spacemail (Spaceship) zugestellt. Da diese Anbieter ihren Sitz in den USA haben, kann eine Datenverarbeitung in den USA nicht ausgeschlossen werden. Einzelheiten finden Sie in den Datenschutzhinweisen der Anbieter.
 
-Referrer URL (die zuvor besuchte Seite)
+Spam-Schutz. Zum Schutz vor Missbrauch und automatisierten Nachrichten nutzen wir ein für Menschen unsichtbares Feld (Honeypot) und begrenzen die Anzahl der Nachrichten pro IP-Adresse (Rate Limiting). Dafür wird Ihre IP-Adresse nur kurzzeitig verarbeitet: Sie wird nicht im Klartext gespeichert, sondern nur als mit einem geheimen Schlüssel erzeugter Hashwert zusammen mit einem Zähler. Dieser Eintrag wird höchstens eine Stunde aufbewahrt und danach automatisch gelöscht. Wir verwenden kein Google reCAPTCHA und keine anderen externen Captcha-Dienste.
 
-Hostname des zugreifenden Rechners
+Rechtsgrundlage. Die Verarbeitung Ihrer Angaben aus dem Formular beruht auf Ihrer Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die Sie durch das Anklicken des Kontrollkästchens erteilen, sowie auf Art. 6 Abs. 1 lit. b DSGVO, soweit Ihre Anfrage auf einen Vertrag oder vorvertragliche Maßnahmen zielt. Die kurzzeitige Verarbeitung der IP-Adresse zum Spam-Schutz beruht auf unserem berechtigten Interesse am sicheren und störungsfreien Betrieb des Formulars (Art. 6 Abs. 1 lit. f DSGVO). Sie können Ihre Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen, zum Beispiel per E-Mail an hello@lambking.store; die Rechtmäßigkeit der bis dahin erfolgten Verarbeitung bleibt davon unberührt. Die Angabe der Daten ist freiwillig, ohne sie kann das Formular aber nicht abgesendet werden. Sie können uns jederzeit auch direkt per E-Mail schreiben.
 
-Uhrzeit der Serveranfrage
+9. Nutzung der App „LambKing Stories“ (iOS und Android)
 
-IP-Adresse
+Die App lässt sich ohne Benutzerkonto nutzen. Es gibt keine Registrierung und keinen Login; wir fragen in der App keine Angaben zu deiner Person ab.
 
-Diese Daten sind technisch notwendig, um die Sicherheit und Stabilität der Webseite zu gewährleisten (Rechtsgrundlage:
-Art. 6 Abs. 1 lit. f DSGVO).
+Abruf der Inhalte. Geschichten, Bilder und Hörbücher lädt die App von unserem Server. Er wird bei Render Services, Inc. betrieben und steht in Frankfurt am Main; die Inhalte liegen in einer Datenbank bei MongoDB, Inc. (MongoDB Atlas). Bei jedem Abruf werden technisch notwendige Daten verarbeitet, insbesondere die IP-Adresse, Datum und Uhrzeit sowie die abgerufene Adresse. Sie dienen der Auslieferung der Inhalte und der Sicherheit des Dienstes (Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO – berechtigtes Interesse am sicheren Betrieb).
 
-5. Externe Links und Drittanbieter
-   Etsy-Shop (Aktuell)
-   Auf unserer Webseite befinden sich Links zu unserem Shop auf der Plattform Etsy. Wenn du diese Links anklickst,
-   verlässt du unseren Verantwortungsbereich. Etsy verarbeitet Daten nach eigenen Richtlinien. Informationen hierzu
-   findest du in der Datenschutzerklärung von Etsy: https://www.etsy.com/de/legal/privacy/.
+Anonyme Buchdetailseiten-Aufrufe. Beim Abruf einer Buchdetailseite über die API wird ausschließlich die Anzahl der Aufrufe gezählt. Die Aufrufe werden als gemeinsame Tagessummen erfasst. Dabei werden keine persönlichen Informationen oder Nutzerkennungen gespeichert, und es findet keine Wiedererkennung von Nutzern statt. Die Zählung ermittelt keine einzelnen oder eindeutig gezählten Nutzer und erstellt keine Nutzerprofile.
 
-Hinweis zum geplanten Wechsel (Shopify):
-Sobald der Shop auf Shopify umgestellt wird, wird diese Datenschutzerklärung aktualisiert, um die Datenverarbeitung
-durch Shopify (E-Commerce-Abwicklung, Zahlungsdienstleister) abzudecken.
+Nur auf dem Gerät gespeichert. Der Name und das Profilbild in „Mein Bereich“, die Merkliste und der Lesefortschritt werden ausschließlich auf dem Gerät gespeichert und nicht an uns übertragen.
 
-Spenden (Website und Android-App)
-Die Spenden-Schaltflächen führen zu PayPal bzw. Ko-fi. Dort gelten deren eigene Datenschutzbestimmungen.
+Keine Werbung und keine externen Analyse-Dienste. Wir setzen keine Analyse-Dienste (etwa Google Analytics) und keine Werbenetzwerke ein.
 
-Unterstützen (iOS-App)
-Die iOS-App enthält keine Spenden-Schaltflächen. Stattdessen kann man uns dort mit einem freiwilligen einmaligen
-Trinkgeld über den In-App-Kauf von Apple unterstützen. Der Kauf wird vollständig von Apple abgewickelt; wir erhalten
-weder Zahlungsdaten noch den Namen, die Apple-ID oder den Kaufbeleg der kaufenden Person. An unseren Server werden
-keinerlei Daten zu diesem Kauf übermittelt. Es gilt die Datenschutzerklärung von Apple:
-https://www.apple.com/legal/privacy/de-ww/.
+Freiwillige einmalige Apple-In-App-Trinkgelder. In der iOS-App kannst du LambKing Stories freiwillig durch ein einmaliges kostenpflichtiges Trinkgeld als Apple-In-App-Kauf unterstützen. Die Zahlungsabwicklung erfolgt über Apple. Für die dabei von Apple verarbeiteten Kauf- und Zahlungsdaten gelten die Datenschutzbestimmungen von Apple.
 
-App-Stores
-Die Links zum Google Play Store oder Apple App Store führen dazu, dass die jeweiligen Betreiber Daten über den Aufruf
-und den Download erheben. Hierauf haben wir keinen Einfluss.
+Bilder teilen. Fertige Ausmalbilder lassen sich über die „Teilen“-Funktion des Geräts weitergeben (z. B. das Share-Sheet von iOS oder Android). Die Verarbeitung findet dabei lokal auf dem Gerät statt; wir haben keinen Zugriff auf Kontakte, Empfänger oder die genutzten Dienste.
 
-Links aus der App
-Links, die aus der App herausführen, öffnen sich im Browser des Geräts, nicht innerhalb der App. Ab dort gelten die
-Datenschutzbestimmungen der jeweiligen Seite.
+Links aus der App heraus. In der Android-App führen Spenden-Schaltflächen zu PayPal bzw. Ko-fi; dort gelten deren eigene Datenschutzbestimmungen. Beim Öffnen externer Links gelten die Datenschutzbestimmungen des jeweiligen Anbieters.
 
-6. Besonderer Schutz von Kindern
-   Unsere App und Webseite richten sich an Kinder. Über die technisch notwendigen Daten und den Tageszähler aus
-   Abschnitt 3 hinaus erheben wir keine personenbezogenen Daten von Minderjährigen. Wir fordern Kinder nicht auf,
-   Namen, Adressen oder sonstige private Informationen preiszugeben.
+Kinder. Die App richtet sich an Kinder. Wir fordern Kinder nicht auf, Namen, Adressen oder sonstige private Informationen preiszugeben.
 
-7. Deine Rechte (Betroffenenrechte)
-   Du hast jederzeit das Recht:
+10. Ihre Rechte
 
-Auskunft über Herkunft, Empfänger und Zweck deiner gespeicherten personenbezogenen Daten zu erhalten (Art. 15 DSGVO).
+Sie haben das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch. Zudem haben Sie das Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren.
 
-Die Berichtigung oder Löschung dieser Daten zu verlangen (Art. 16 & 17 DSGVO).
-
-Sich bei der zuständigen Aufsichtsbehörde zu beschweren.
-
-Da wir in der App keine Konten oder Namen speichern, besitzen wir in der Regel keine Daten, die wir einer spezifischen
-Person zuordnen könnten.
+Stand: November 2026

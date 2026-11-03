@@ -26,6 +26,16 @@ function autoLink(s: string): string {
   })
 }
 
+/** The generated files in `src/legal/` start with `//` lines ("generated, do not edit by hand"); they are for people, not for the page. */
+export function legalBody(raw: string): string {
+  return raw
+    .replace(/\r\n/g, '\n')
+    .split('\n')
+    .filter((line) => !line.startsWith('//'))
+    .join('\n')
+    .trim()
+}
+
 export function renderLegalText(text: string): string {
   const blocks = text
     .split('\n')

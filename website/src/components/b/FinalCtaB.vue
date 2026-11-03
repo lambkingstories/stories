@@ -12,7 +12,7 @@
           rect(x="3", y="1.5", width="8", height="11", rx="1.5")
           circle(cx="7", cy="10", r="0.6", fill="currentColor", stroke="none")
         | Nur in der App verfügbar
-      .micro(v-if="isPurchasable") Bezahlung &amp; Versand über Etsy · 14 Tage Widerrufsrecht
+      .micro(v-if="isPurchasable") Bezahlung &amp; Versand beim Händler
 </template>
 
 <script setup lang="ts">

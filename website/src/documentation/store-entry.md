@@ -37,5 +37,5 @@ Webseite.
 4. Technischer Stack
    Webseite: lambking.store (Informationsseite)
 
-E-Commerce: Verlinkung zu einem externen Etsy-Shop (geplanter Wechsel zu Shopify). Es findet kein Datenaustausch
-zwischen der App-Laufzeit und den Shop-Systemen statt.
+E-Commerce: Verlinkung zu externen Verkaufsseiten für die gedruckten Bücher. Es findet kein Datenaustausch
+zwischen der App-Laufzeit und diesen Seiten statt; die Links öffnen erst nach dem Eltern-Gate im Browser.

@@ -11,6 +11,7 @@ import { useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import LkCompanion from '@/components/atoms/LkCompanion.vue'
 import TipButton from '@/components/molecules/TipButton.vue'
+import ContactLinks from '@/components/molecules/ContactLinks.vue'
 import { isIOS } from '@/utils/platform'
 import { openExternal } from '@/utils/openExternal'
 import { prependBaseUrl } from '@/utils/function'
@@ -173,6 +174,8 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   display: flex
   align-items: flex-start
   justify-content: space-between
+
+            ContactLinks
   gap: 12px
 
 .sheet-title

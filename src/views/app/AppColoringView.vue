@@ -102,9 +102,9 @@ import {
 } from '@/use/useArtworks'
 // pdf.js is large (it was most of this screen's 1.7 MB) and only a PDF needs it, so it is loaded the first time a PDF is
 // opened, not with the screen. `?worker&inline` makes Vite inline the worker source as a blob — no separate asset file
-// (which the production obfuscator drops), and the CSP's `worker-src 'self' blob:` accepts it. cMaps come from jsdelivr —
-// the CSP's `connect-src 'self' https:` allows any https origin for fetches.
-const PDFJS_CMAP = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/cmaps/'
+// (which the production obfuscator drops), and the CSP's `worker-src 'self' blob:` accepts it. The cMaps (character tables
+// for PDFs) are our own copy in `public/pdfjs/cmaps/` (from pdfjs-dist 4.10.38), so no other server ever sees a request.
+const PDFJS_CMAP = new URL(prependBaseUrl('pdfjs/cmaps/'), window.location.href).href
 let pdfjsReady: Promise<typeof import('pdfjs-dist')> | null = null
 
 function loadPdfjs(): Promise<typeof import('pdfjs-dist')> {

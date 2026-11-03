@@ -2504,8 +2504,14 @@ export default {
         bakeTray: 'Teigkugeln',
         bakeDough: 'Teigkugel',
         bakeCount: 'Fladen gewendet: {n} von {total}',
+        imprintTitle: 'Legal notice',
         bakeDone: 'Das frische Brot aus dem neuen Land ist fertig.',
         packField: 'Der Korb: {n} von {total} Dingen sind gepackt',
+      contact: {
+        title: 'Contact',
+        form: 'Contact form',
+        email: 'E-mail'
+      },
         packCell: 'Feld {col}, Reihe {row}, frei',
         packCellFull: 'Feld {col}, Reihe {row}, belegt',
         packPacked: '{name}, im Korb',
@@ -3390,3 +3396,9 @@ export default {
     }
   }
 }
+        imprintTitle: 'Impressum',
+      contact: {
+        title: 'Kontakt',
+        form: 'Kontaktformular',
+        email: 'E-Mail'
+      },
