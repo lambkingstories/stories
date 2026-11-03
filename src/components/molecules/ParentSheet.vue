@@ -132,6 +132,8 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
                 span(class="row-title") {{ t('app.parent.legalTitle') }}
                 span(class="row-sub") {{ t('app.parent.legalText') }}
               ZIconography(name="chevron-right" :size="22")
+
+            ContactLinks
 </template>
 
 <style scoped lang="sass">
@@ -174,8 +176,6 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   display: flex
   align-items: flex-start
   justify-content: space-between
-
-            ContactLinks
   gap: 12px
 
 .sheet-title
