@@ -235,3 +235,11 @@ export const GLEICHNISSE_ONLY_DIRS = ['images/abenteuer/gleichnisse', 'images/ab
 export function stripGleichnisseFiles(outDir: string) {
   strip(outDir, GLEICHNISSE_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Zachäus und Lazarus" (id `zachaeus`) alone, in the same three places as Adam and Eve. */
+export const ZACHAEUS_ONLY_DIRS = ['images/abenteuer/zachaeus', 'images/abenteuer/spiele/zachaeus', 'audio/abenteuer/zachaeus']
+
+/** Takes the folders of Zachäus out of a finished build. */
+export function stripZachaeusFiles(outDir: string) {
+  strip(outDir, ZACHAEUS_ONLY_DIRS)
+}

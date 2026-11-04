@@ -81,7 +81,7 @@ const GAME_MOOD: Record<string, Mood> = {
   harp: 'ruhig', shepherd: 'ruhig', pebbles: 'ruhig', sling: 'mittel', arrow: 'mittel', hem: 'ruhig', quiet: 'ruhig', throne: 'ruhig', jars: 'ruhig', dive: 'ruhig', decor: 'ruhig', honor: 'ruhig', ride: 'ruhig', post: 'ruhig', peace: 'ruhig', forge: 'ruhig', crib: 'ruhig', sign: 'ruhig', road: 'ruhig', net: 'ruhig', boats: 'ruhig', roof: 'ruhig', bail: 'mittel', crowd: 'ruhig', bundle: 'ruhig', bread: 'ruhig', row: 'mittel',arms: 'ruhig', judges: 'ruhig', signal: 'ruhig', grapes: 'mittel',
   puzzle: 'mittel', sort: 'mittel', harvest: 'mittel', build: 'mittel', way: 'mittel',
   fly: 'lebhaft', dots: 'lebhaft',
-  jugs: 'ruhig', enough: 'mittel', quails: 'mittel', staffs: 'ruhig', serpent: 'ruhig', donkey: 'ruhig', commission: 'ruhig',  turnBack: 'ruhig', shout: 'mittel', dig: 'ruhig', coin: 'ruhig', meet: 'mittel'
+  jugs: 'ruhig', enough: 'mittel', quails: 'mittel', staffs: 'ruhig', serpent: 'ruhig', donkey: 'ruhig', commission: 'ruhig',  turnBack: 'ruhig', shout: 'mittel', dig: 'ruhig', coin: 'ruhig', meet: 'mittel', climb: 'mittel', halve: 'ruhig', unwrap: 'ruhig'
 }
 export const moodOfGame = (kind: string | undefined): Mood => (kind && GAME_MOOD[kind]) || 'mittel'
 

@@ -7,7 +7,7 @@
 import type { JugsGame, EnoughGame, QuailsGame, StaffsGame, SerpentGame, DonkeyGame, CommissionGame } from './wuesteGames2'
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz' | 'boote' | 'dach' | 'arme' | 'richter' | 'signal' | 'traube' | 'krug' | 'genug' | 'wachteln' | 'stab' | 'schlange' | 'eselin' | 'einsetzen' | 'schoepfen' | 'gedraenge' | 'buendel' | 'brote' | 'rudern' | 'umkehr' | 'ruf' | 'graben' | 'muenze' | 'entgegen'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz' | 'boote' | 'dach' | 'arme' | 'richter' | 'signal' | 'traube' | 'krug' | 'genug' | 'wachteln' | 'stab' | 'schlange' | 'eselin' | 'einsetzen' | 'schoepfen' | 'gedraenge' | 'buendel' | 'brote' | 'rudern' | 'umkehr' | 'ruf' | 'graben' | 'muenze' | 'entgegen' | 'klettern' | 'halbieren' | 'loesen'
 
 export interface AdventureQuestion {
   q: string
@@ -1839,6 +1839,9 @@ export interface StageTask {
   dig?: DigGame
   coin?: CoinGame
   meet?: MeetGame
+  climb?: ClimbGame
+  halve?: HalveGame
+  unwrap?: UnwrapGame
   jugs?: JugsGame
   enough?: EnoughGame
   quails?: QuailsGame
@@ -3184,4 +3187,91 @@ export interface MeetGame {
   dressed: GleichnisSprite
   gifts: (GleichnisSprite & { id: MeetGiftId })[]
   rounds: MeetRound[]
+}
+
+/** A picture on the field of one of the three games of "Zacchaeus and Lazarus" (`climb`, `halve`, `unwrap`): its file, a name for the screen reader and its width in percent of the picture (the height follows the picture). */
+export interface ZachaeusSprite {
+  image: string
+  label: string
+  w: number
+}
+/** A sprite that stands at a place: the middle of its lower edge (percent of the picture). */
+export type ZachaeusSpot = ZachaeusSprite & { x: number; y: number }
+
+/** One height of the tree in "Up the tree": the side of the strong branch (`l` left, `r` right) and the height of the two branches (y of their middle, percent of the tree picture from the top). */
+export interface ClimbLevel {
+  strong: 'l' | 'r'
+  y: number
+}
+export interface ClimbRound {
+  hint: string
+  /** The heights from the bottom to the top. */
+  levels: ClimbLevel[]
+}
+/**
+ * The game "Up the tree" (Luke 19,4; `klettern`): the sycomore tree (3:4), on every height two branches to choose from; a tap on the strong one lets Zacchaeus climb there, the weak one creaks and wobbles
+ * (Zacchaeus holds on and stays, a mistake without loss). At the top the view down the road (3:2). Stars: `zachaeusStars(mistakes, rounds)` in `utils/zachaeusGames.ts`.
+ */
+export interface ClimbGame {
+  /** The tree with its trunk in the middle (3:4) and the view from the top (3:2). */
+  tree: string
+  view: string
+  climber: ZachaeusSprite
+  strong: ZachaeusSprite
+  weak: ZachaeusSprite
+  /** The middle of the trunk, the middles of the left and the right branch (percent of the width) and where Zacchaeus stands at the start (lower edge, percent of the height). */
+  trunk: number
+  branches: [number, number]
+  start: number
+  rounds: ClimbRound[]
+}
+
+/** One round of "Half to the poor": the number of coins (even), where the divider lies at the start (coins to its left), and small shifts of single coins up or down (percent of the height). */
+export interface HalveRound {
+  hint: string
+  coins: number
+  start: number
+  offsets?: number[]
+}
+/**
+ * The game "Half to the poor" (Luke 19,8; `halbieren`): a row of equal coins on the stone table; the divider is dragged (or moved with the arrow buttons) and snaps between two coins; left lies the part
+ * of Zacchaeus, right the part of the poor. "Done" checks: exactly the middle lets the coins roll into the bowls, otherwise an arrow shows where the divider must go. A "Help" shows the middle (no third star).
+ * Stars: `halveStars(mistakes, rounds, helped)` in `utils/zachaeusGames.ts`.
+ */
+export interface HalveGame {
+  table: string
+  coin: ZachaeusSprite
+  divider: ZachaeusSprite
+  bowlSelf: ZachaeusSpot
+  bowlPoor: ZachaeusSpot
+  poor: ZachaeusSpot
+  /** The row of coins: its height (middle) and where it begins and ends (percent of the picture). */
+  row: { y: number; from: number; to: number }
+  rounds: HalveRound[]
+}
+
+/** A linen strip over Lazarus in "Loose him": its picture and place (middle, percent of the scene), its loose end, the direction of the pull, and how many other strips must be off before it can be loosed. */
+export interface UnwrapStrip {
+  id: number
+  image: string
+  label: string
+  x: number
+  y: number
+  w: number
+  end: [number, number]
+  dir: [number, number]
+  needs?: number
+}
+/**
+ * The game "Loose him" (John 11,44; `loesen`): Lazarus stands at the entrance of the cave; five linen strips lie over him, each with a loose end. Pulling at an end (or tapping it three times) unwinds the strip,
+ * it falls to the ground; the cloth on the head comes off only after two others. At the end Lazarus raises his hand (`free` replaces `lazarus`) and Mary runs to him. Nothing can be wrong: three stars, two with "Help".
+ */
+export interface UnwrapGame {
+  scene: string
+  lazarus: ZachaeusSpot
+  free: ZachaeusSprite
+  /** Mary: where she stops (lower edge middle) and where she starts running (x, percent; may lie outside the picture). */
+  maria: ZachaeusSpot & { from: number }
+  hint: string
+  strips: UnwrapStrip[]
 }

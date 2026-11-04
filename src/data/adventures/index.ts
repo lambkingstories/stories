@@ -80,6 +80,8 @@ export const HEILUNG_PREVIEW_KEY = 'lk-preview-heilung'
 export const HEILUNG_UNLOCK_CODE = 'heilung-vorschau-t3m8'
 export const GLEICHNISSE_PREVIEW_KEY = 'lk-preview-gleichnisse'
 export const GLEICHNISSE_UNLOCK_CODE = 'gleichnisse-vorschau-k8w4'
+export const ZACHAEUS_PREVIEW_KEY = 'lk-preview-zachaeus'
+export const ZACHAEUS_UNLOCK_CODE = 'zachaeus-vorschau-q3m7'
 
 /** A journey that is shown only on unlocked devices: the name of its link (`?<param>=<code>`), where the unlock is kept, and how it is loaded. */
 interface PreviewJourney {
@@ -346,6 +348,16 @@ function previewJourneys(): PreviewJourney[] {
       key: GLEICHNISSE_PREVIEW_KEY,
       always: import.meta.env.VITE_SHOW_GLEICHNISSE === 'true',
       load: async () => (await import('@/data/adventures/gleichnisse')).gleichnisse
+    })
+  }
+  if (import.meta.env.VITE_INCLUDE_ZACHAEUS === 'true' || import.meta.env.VITE_SHOW_ZACHAEUS === 'true') {
+    list.push({
+      id: 'zachaeus',
+      param: 'zachaeus',
+      code: ZACHAEUS_UNLOCK_CODE,
+      key: ZACHAEUS_PREVIEW_KEY,
+      always: import.meta.env.VITE_SHOW_ZACHAEUS === 'true',
+      load: async () => (await import('@/data/adventures/zachaeus')).zachaeus
     })
   }
   if (import.meta.env.VITE_INCLUDE_NOAH === 'true' || import.meta.env.VITE_SHOW_NOAH === 'true') {
