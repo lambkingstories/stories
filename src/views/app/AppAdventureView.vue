@@ -94,7 +94,7 @@ const spotStyle = (s: MapSpot) => ({ left: `${spotLeft(s) * 100}%`, top: `${s.y 
 /** Each piece of the map picture is a few pixels wider than its share (4 px of the whole width), so that the pieces overlap. */
 const pieceLap = computed(() => 1 / Math.max(1, journey.value.map.images.length) + 4 / (journey.value.map.widthPx ?? 9824))
 
-/** A stage of an adventure that is behind LambKing Plus (three adventures are free in full, see `adventureAccess`): it shows the lock and opens the Plus sheet. */
+/** A stage of an adventure that is behind LambKing Plus (six adventures are free in full, see `adventureAccess`): it shows the lock and opens the Plus sheet. */
 const plusLocked = (i: number) => isStagePlusLocked(journey.value.id, i)
 
 function openStage(i: number) {

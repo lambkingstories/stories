@@ -39,6 +39,8 @@ jobs:
       VITE_APP_TITLE: LambKing Stories
       # Release 1.1 (2026-11-04): exactly these adventures are public and in the app: Josef (always) + Adam und Eva, Noah, Babel, Abraham, Jakob, Mose.
       # Every adventure adds about 17 MB; Apple allows 500 MB for the executable, Google about 200 MB per download. Do not add more without measuring (vite build, du -sm dist).
+      # Release 1.2 (2026-11-04): purchases on (LambKing Plus). Free: Josef, Adam und Eva, Noah, Babel, Abraham, Jakob (FREE_JOURNEYS); Mose is Plus.
+      VITE_PREMIUM_TEASER: "true"
       VITE_SHOW_NOAH: "true"
       VITE_SHOW_ADAM: "true"
       VITE_SHOW_BABEL: "true"

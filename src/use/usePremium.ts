@@ -8,7 +8,7 @@
  *     not asked about: the adventures sit behind Plus as a whole (see `adventure`).
  *   - `colors`: the colours beyond the 12 basic ones of every box (36 for the pencils) and the free colour picker in the coloring app
  *   - `glitter`: the glitter pencils, a tool of the coloring app
- *   - `adventure`: all the adventures (three of them are free in full,
+ *   - `adventure`: all the adventures (six of them are free in full,
  *     see `utils/adventureAccess`)
  *   - `allBooks`: every coloring book in full (the subscription). Without it a book shows only a few pictures
  *     (see `useBookAccess`), unless that single book was bought.

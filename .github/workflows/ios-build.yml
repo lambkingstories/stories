@@ -60,6 +60,8 @@ jobs:
       VITE_DEBUG_CONSOLE: "false"
       VITE_APP_TITLE: LambKing Stories
       # Release 1.1 (2026-11-04): only these adventures are public (see android-build.yml).
+      # Release 1.2 (2026-11-04): purchases on (LambKing Plus). Free: Josef, Adam und Eva, Noah, Babel, Abraham, Jakob (FREE_JOURNEYS); Mose is Plus.
+      VITE_PREMIUM_TEASER: "true"
       VITE_SHOW_NOAH: "true"
       VITE_SHOW_ADAM: "true"
       VITE_SHOW_BABEL: "true"

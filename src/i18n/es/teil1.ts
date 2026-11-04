@@ -27,7 +27,7 @@ export default {
         tileFamilySub: 'Quiz, memoria, bingo y más',
         rewardsTitle: 'Lo que te dan las estrellas',
         rewardCard: 'Carta de colección',
-        rewardCardSub: 'Las tres estrellas en cada etapa de una aventura. Las tres aventuras gratis te dan tres cartas.',
+        rewardCardSub: 'Las tres estrellas en cada etapa de una aventura. Las seis aventuras gratis te dan seis cartas.',
         rewardMini: 'Minijuego',
         rewardMiniSub: 'Tres estrellas en una etapa: su juego se muda a tu sala de juegos.',
         rewardBonus: 'Juego bonus',
