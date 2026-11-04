@@ -27,6 +27,7 @@ import { wunder } from '../src/data/adventures/wunder'
 import { heilung } from '../src/data/adventures/heilung'
 import { gleichnisse } from '../src/data/adventures/gleichnisse'
 import { zachaeus } from '../src/data/adventures/zachaeus'
+import { letztewoche } from '../src/data/adventures/letztewoche'
 import type { Journey } from '../src/types/adventure'
 
 /** Rules for the dotted way on the maps (Anton, 19.10.2026): into every medal from the left, out of it on the right, always curved, 10 beads between two medals. */
@@ -60,7 +61,8 @@ describe.each([
   ['Wunder', wunder],
   ['Heilung', heilung],
   ['Gleichnisse', gleichnisse],
-  ['Zachäus', zachaeus]
+  ['Zachäus', zachaeus],
+  ['Die letzte Woche', letztewoche]
 ] as [string, Journey][])('the dotted way of %s', (_name, j) => {
   const m = j.map
   const spots = [...m.stages, m.exam]

@@ -59,7 +59,7 @@ export const TIMELINE: TimelineEntry[] = [
   { id: 'heilung', de: 'Jesus heilt', en: 'Jesus heals', epoch: 'jesus' },
   { id: 'gleichnisse', de: 'Geschichten von Jesus', en: 'Stories of Jesus', epoch: 'jesus' },
   { id: 'zachaeus', de: 'Zachäus und Lazarus', en: 'Zacchaeus and Lazarus', epoch: 'jesus' },
-  { id: 'letzte-woche', de: 'Die letzte Woche', en: 'The last week', epoch: 'jesus' },
+  { id: 'letztewoche', de: 'Die letzte Woche', en: 'The last week', epoch: 'jesus' },
   { id: 'ostern', de: 'Ostern', en: 'Easter', epoch: 'jesus' },
   { id: 'pfingsten', de: 'Pfingsten', en: 'Pentecost', epoch: 'gemeinde' },
   { id: 'paulus', de: 'Paulus', en: 'Paul', epoch: 'gemeinde' }

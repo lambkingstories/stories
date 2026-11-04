@@ -1,4 +1,4 @@
-import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripDavidFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles, stripGleichnisseFiles, stripZachaeusFiles } from './vite.config.noah'
+import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripDavidFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles, stripGleichnisseFiles, stripZachaeusFiles, stripLetztewocheFiles } from './vite.config.noah'
 import { fileURLToPath, URL } from 'node:url'
 import { resolve, dirname } from 'node:path'
 import { rmSync } from 'node:fs'
@@ -166,6 +166,10 @@ export default defineConfig(({ mode }) => {
       // The same for "Zachäus und Lazarus" (`VITE_INCLUDE_ZACHAEUS=true` / `vite --mode zachaeus`).
       if (env.VITE_SHOW_ZACHAEUS !== 'true' && env.VITE_INCLUDE_ZACHAEUS !== 'true') {
         stripZachaeusFiles(outDir)
+      }
+      // The same for "Die letzte Woche" (`VITE_INCLUDE_LETZTEWOCHE=true` / `vite --mode letztewoche`).
+      if (env.VITE_SHOW_LETZTEWOCHE !== 'true' && env.VITE_INCLUDE_LETZTEWOCHE !== 'true') {
+        stripLetztewocheFiles(outDir)
       }
     }
   }

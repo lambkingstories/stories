@@ -243,3 +243,11 @@ export const ZACHAEUS_ONLY_DIRS = ['images/abenteuer/zachaeus', 'images/abenteue
 export function stripZachaeusFiles(outDir: string) {
   strip(outDir, ZACHAEUS_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Die letzte Woche" (id `letztewoche`) alone, in the same three places as Adam and Eve. */
+export const LETZTEWOCHE_ONLY_DIRS = ['images/abenteuer/letztewoche', 'images/abenteuer/spiele/letztewoche', 'audio/abenteuer/letztewoche']
+
+/** Takes the folders of Die letzte Woche out of a finished build. */
+export function stripLetztewocheFiles(outDir: string) {
+  strip(outDir, LETZTEWOCHE_ONLY_DIRS)
+}

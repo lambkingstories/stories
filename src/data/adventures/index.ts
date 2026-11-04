@@ -82,6 +82,8 @@ export const GLEICHNISSE_PREVIEW_KEY = 'lk-preview-gleichnisse'
 export const GLEICHNISSE_UNLOCK_CODE = 'gleichnisse-vorschau-k8w4'
 export const ZACHAEUS_PREVIEW_KEY = 'lk-preview-zachaeus'
 export const ZACHAEUS_UNLOCK_CODE = 'zachaeus-vorschau-q3m7'
+export const LETZTEWOCHE_PREVIEW_KEY = 'lk-preview-letztewoche'
+export const LETZTEWOCHE_UNLOCK_CODE = 'letztewoche-vorschau-k8w2'
 
 /** A journey that is shown only on unlocked devices: the name of its link (`?<param>=<code>`), where the unlock is kept, and how it is loaded. */
 interface PreviewJourney {
@@ -358,6 +360,16 @@ function previewJourneys(): PreviewJourney[] {
       key: ZACHAEUS_PREVIEW_KEY,
       always: import.meta.env.VITE_SHOW_ZACHAEUS === 'true',
       load: async () => (await import('@/data/adventures/zachaeus')).zachaeus
+    })
+  }
+  if (import.meta.env.VITE_INCLUDE_LETZTEWOCHE === 'true' || import.meta.env.VITE_SHOW_LETZTEWOCHE === 'true') {
+    list.push({
+      id: 'letztewoche',
+      param: 'letztewoche',
+      code: LETZTEWOCHE_UNLOCK_CODE,
+      key: LETZTEWOCHE_PREVIEW_KEY,
+      always: import.meta.env.VITE_SHOW_LETZTEWOCHE === 'true',
+      load: async () => (await import('@/data/adventures/letztewoche')).letztewoche
     })
   }
   if (import.meta.env.VITE_INCLUDE_NOAH === 'true' || import.meta.env.VITE_SHOW_NOAH === 'true') {

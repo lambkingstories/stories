@@ -7,7 +7,7 @@
 import type { JugsGame, EnoughGame, QuailsGame, StaffsGame, SerpentGame, DonkeyGame, CommissionGame } from './wuesteGames2'
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz' | 'boote' | 'dach' | 'arme' | 'richter' | 'signal' | 'traube' | 'krug' | 'genug' | 'wachteln' | 'stab' | 'schlange' | 'eselin' | 'einsetzen' | 'schoepfen' | 'gedraenge' | 'buendel' | 'brote' | 'rudern' | 'umkehr' | 'ruf' | 'graben' | 'muenze' | 'entgegen' | 'klettern' | 'halbieren' | 'loesen'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz' | 'boote' | 'dach' | 'arme' | 'richter' | 'signal' | 'traube' | 'krug' | 'genug' | 'wachteln' | 'stab' | 'schlange' | 'eselin' | 'einsetzen' | 'schoepfen' | 'gedraenge' | 'buendel' | 'brote' | 'rudern' | 'umkehr' | 'ruf' | 'graben' | 'muenze' | 'entgegen' | 'klettern' | 'halbieren' | 'loesen' | 'bereiten' | 'lampen' | 'helfen'
 
 export interface AdventureQuestion {
   q: string
@@ -1842,6 +1842,9 @@ export interface StageTask {
   climb?: ClimbGame
   halve?: HalveGame
   unwrap?: UnwrapGame
+  prepare?: PrepareGame
+  lamps?: OilLampGame
+  help?: HelpGame
   jugs?: JugsGame
   enough?: EnoughGame
   quails?: QuailsGame
@@ -3274,4 +3277,108 @@ export interface UnwrapGame {
   maria: ZachaeusSpot & { from: number }
   hint: string
   strips: UnwrapStrip[]
+}
+
+/** A picture on the field of one of the three games of "The last week" (`prepare`, `lamps`, `help`): its file, a name for the screen reader and its width in percent of the picture (the height follows the picture). */
+export interface WeekSprite {
+  image: string
+  label: string
+  w: number
+}
+/** A sprite that stands at a place: the middle of its lower edge (percent of the picture). */
+export type WeekSpot = WeekSprite & { x: number; y: number }
+
+/** One round of "Prepare the way": how many of the bare places of the road are used (`fields`, the places are spread evenly over the five unless `use` names them), and whether the donkey walks on slowly by itself (`slow`). */
+export interface PrepareRound {
+  hint: string
+  fields: number
+  /** The indices of the places (0 = the first from the left) that are used; without it they are spread evenly over `spots`. */
+  use?: number[]
+  /** The donkey walks up to the next bare place by itself, slowly, and waits there (no time is lost). */
+  slow?: boolean
+}
+/**
+ * The game "Prepare the way" (Matthew 21,7-8; `bereiten`): a road on the Mount of Olives (3:2) with five bare places. The child drags (or taps the pile, then the place) a cloak or branches onto a bare place, and the
+ * donkey with Jesus walks on to the next; a stone on the road wobbles, a cross, and goes back (a mistake). A cloak or branches on a place that is covered already does not work (no mistake). At the city gate the round is done;
+ * round 1 uses three places, round 2 all five (the donkey walks on slowly by itself and waits at the bare place). The people at the edge cry "Hosanna!" Stars: `weekStars(mistakes, rounds)` in `utils/letzteWocheGames.ts`.
+ */
+export interface PrepareGame {
+  /** The empty road (3:2). */
+  road: string
+  /** The donkey with Jesus on it: the start (the middle of the lower edge) and the width; it faces right. */
+  donkey: WeekSpot
+  /** The cloaks (three colours) and the branches (palm, olive) that are laid, one after the other in turn; the stone that does not belong on the road. */
+  cloaks: WeekSprite[]
+  branches: WeekSprite[]
+  stone: WeekSprite
+  /** The cheering people at the edge (the middle of the lower edge) and the part of the city gate (the middle of the lower edge). */
+  crowd: WeekSpot
+  gate: WeekSpot
+  /** The five bare places of the road, from the left: the middle of each (percent of the picture), where the donkey puts down its hooves. */
+  spots: { x: number; y: number }[]
+  /** The width of a bare place (percent of the picture; the touch area is at least 44 pixels). */
+  field: number
+  rounds: PrepareRound[]
+}
+
+/** One round of "Fill the lamps": the hint, the height of the golden mark of every lamp (percent of the height of the glass opening, from the bottom) and how far from it the oil may stand (percent). */
+export interface OilLampRound {
+  hint: string
+  marks: number[]
+  /** Without it: 10 in round 1, 7 in round 2. */
+  tolerance?: number
+}
+/**
+ * The game "Fill the lamps" (Matthew 25,1-13; `lampen`): night before the house of the wedding (3:2). In the middle a big clay lamp with a glass opening and a golden ring (the mark); at the side the jug of oil.
+ * Holding the jug (or the button "Pour", or Space/Enter) pours oil, the level rises; letting go ends it: at the mark (within the tolerance) the lamp burns (tick); too little and the lamp flickers and goes out (cross, "Pour more",
+ * the oil stays, one pours on); too much and the oil runs over (cross, a mistake, the level goes back to the mark). Alternative: "Tap instead of hold" (every tap pours a little). Round 1: three lamps, round 2: three lamps with
+ * a narrower tolerance. At the end the six lamps stand in a row and burn. Stars: `weekStars(mistakes, rounds)` in `utils/letzteWocheGames.ts`.
+ */
+export interface OilLampGame {
+  /** The night (3:2) and the six burning lamps in a row (3:2). */
+  night: string
+  row: string
+  /** The empty lamp (the middle of the lower edge and the width), the burning one and the cold one (same size and place). */
+  lamp: WeekSpot
+  lit: WeekSprite
+  out: WeekSprite
+  /** The oil that fills the glass opening (tiled), the golden ring and the jug (the middle of the lower edge). */
+  oil: WeekSprite
+  mark: WeekSprite
+  jug: WeekSpot
+  /** The glass opening of the lamp sprite: left, top, width and height in percent of the lamp picture. */
+  glass: { x: number; y: number; w: number; h: number }
+  rounds: OilLampRound[]
+}
+
+/** What a person in the village needs: hungry, thirsty, a stranger, freezing, sick, in prison (Matthew 25,35-36). */
+export type HelpNeed = 'hunger' | 'durst' | 'fremd' | 'frieren' | 'krank' | 'gefangen'
+/** A person who needs something: the sprite in need and the glad one (same size, same place), where he or she stands (middle of the lower edge) and how wide, and the card with what he or she needs (3:4). */
+export interface HelpPerson {
+  id: HelpNeed
+  image: string
+  glad: string
+  label: string
+  x: number
+  y: number
+  w: number
+  card: string
+  cardLabel: string
+}
+export interface HelpRound {
+  hint: string
+  /** The three people that are asked for in this round (the others of round 1 stay glad, the ones of round 2 are not there yet). */
+  people: HelpNeed[]
+}
+/**
+ * The game "Who needs what?" (Matthew 25,35-36; `helfen`): a village street (3:2) with six people who need something. The child drags a card to the one who needs it (or taps the card, then the person): right, the person
+ * is glad (the glad sprite replaces the sprite in need), the card stays with him, a tick; wrong, the card wobbles and jumps back, a cross, a mistake. Round 1: the hungry, the thirsty and the stranger; round 2: the
+ * freezing, the sick and the prisoner. Stars: `weekStars(mistakes, rounds)` in `utils/letzteWocheGames.ts`.
+ */
+export interface HelpGame {
+  village: string
+  /** The width of the person sprites divided by their height. */
+  ratio: number
+  people: HelpPerson[]
+  rounds: HelpRound[]
 }
