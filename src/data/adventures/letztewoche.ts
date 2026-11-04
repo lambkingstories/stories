@@ -151,7 +151,7 @@ export const letztewoche: Journey = {
   subtitle: 'Von Jerusalem bis zum Grab',
   age: '8-10',
   downloadMb: 18, // wird nach dem Bau gemessen (Bilder, Karte, Spielbilder, Musik, Aufnahmen), ohne die gemeinsamen Oberflächendateien
-  medal: `${PICS}medaille-v1.webp`, // Medaille 1 bis zu Antons Wahl
+  medal: `${PICS}medaille-v3.webp`, // Medaille 3 (Anton 5.11.2026)
   // Geschenk-Ausmalbild: der Palmzweig mit Mantel und der Eselin mit Fohlen (Konturzeichnung)
   gift: { title: 'Der Palmzweig', image: `${PICS}geschenk.webp` },
   // die gemalte Karte (Panorama in drei Stücken, 9920 × 1648 px, OpenAI-Bildmodell): vom Ölberg durch Jerusalem hinaus nach Golgatha und zum Grab, mit Stationen und Perlenweg aus letztewochePath.ts
@@ -363,7 +363,7 @@ export const letztewoche: Journey = {
     },
     {
       id: 11,
-      image: `${PICS}etappe-bild-11.webp`,
+      image: `${PICS}etappe-bild-11-b.webp`,
       title: 'Auf dem Hügel Golgatha',
       ref: 'Matthäus 27, Auswahl',
       text: [
@@ -381,7 +381,7 @@ export const letztewoche: Journey = {
     },
     {
       id: 12,
-      image: `${PICS}etappe-bild-12.webp`,
+      image: `${PICS}etappe-bild-12-b.webp`,
       title: 'Das Grab',
       ref: 'Matthäus 27,57–66',
       text: [
