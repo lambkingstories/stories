@@ -1,8 +1,8 @@
 <script setup lang="ts">
 /**
- * The "read aloud" button of a story. When the stage has a recording (`audio`, a path below `public/`) that is played; until the
- * recordings are made, the device's own voice reads the text (the speech synthesis of the phone, nothing is sent from the app). A
- * second tap stops it, and leaving the screen stops it too.
+ * The "read aloud" button of a story. It plays the recording of the stage (`audio`, a path below `public/`). A stage without a recording
+ * has no button: the robotic voice of the device is not used any more (Anton, 4.11.2026: only the best quality in the app). A second tap
+ * stops the voice, and leaving the screen stops it too.
  */
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -14,14 +14,13 @@ import { prependBaseUrl } from '@/utils/function'
 // `plusOnly`: the read-aloud button of a book in the reading area comes with LambKing Plus; in the adventures (which sit behind
 // Plus as a whole) it is free.
 const props = defineProps<{ text: string[]; audio?: string; plusOnly?: boolean }>()
-const { t, locale } = useI18n({ useScope: 'global' })
+const { t } = useI18n({ useScope: 'global' })
 const { hasFeature, showUpsell } = usePremium()
 
 const { voiceVolume } = useSoundSettings()
 const playing = ref(false)
 let player: HTMLAudioElement | null = null
-const synth = typeof window !== 'undefined' && 'speechSynthesis' in window ? window.speechSynthesis : null
-const available = computed(() => !!props.audio || !!synth)
+const available = computed(() => !!props.audio)
 const icon = prependBaseUrl('images/abenteuer/ui/ton-an.webp')
 
 function stop() {
@@ -30,33 +29,6 @@ function stop() {
     player.pause()
     player = null
   }
-  synth?.cancel()
-}
-
-function speak() {
-  if (!synth) return
-  // the texts are English for every language but German (see `contentLocale`)
-  const lang = locale.value === 'de' ? 'de-DE' : 'en-US'
-  const voices = synth.getVoices().filter((v) => v.lang.toLowerCase().startsWith(lang.slice(0, 2)))
-  const parts = props.text.filter(Boolean)
-  let i = 0
-  const next = () => {
-    if (!playing.value || i >= parts.length) {
-      playing.value = false
-      return
-    }
-    const u = new SpeechSynthesisUtterance(parts[i++]!)
-    u.lang = lang
-    u.rate = 0.88
-    u.pitch = 1.05
-    u.volume = voiceVolume.value
-    if (voices[0]) u.voice = voices[0]
-    u.onend = next
-    u.onerror = () => (playing.value = false)
-    synth.speak(u)
-  }
-  synth.cancel()
-  next()
 }
 
 function toggle() {
@@ -74,17 +46,9 @@ function toggle() {
     player = new Audio(prependBaseUrl(props.audio))
     player.volume = voiceVolume.value
     player.onended = () => (playing.value = false)
-    player.onerror = () => {
-      player = null
-      speak()
-    }
-    void player.play().catch(() => {
-      player = null
-      speak()
-    })
-    return
+    player.onerror = () => stop()
+    void player.play().catch(() => stop())
   }
-  speak()
 }
 
 // the slider of the sound window works while the voice is speaking
