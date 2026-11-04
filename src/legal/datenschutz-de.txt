@@ -66,6 +66,10 @@ Anonyme Buchdetailseiten-Aufrufe. Beim Abruf einer Buchdetailseite über die API
 
 Nur auf dem Gerät gespeichert. Der Name und das Profilbild in „Mein Bereich“, die Merkliste und der Lesefortschritt werden ausschließlich auf dem Gerät gespeichert und nicht an uns übertragen.
 
+Familien-Stimmen und Mikrofon. In der App kann ein Erwachsener (hinter der Eltern-Abfrage) eine Geschichte mit dem Mikrofon vorlesen und aufnehmen. Dafür fragt das Gerät nach der Erlaubnis zum Mikrofon; du kannst sie jederzeit in den Einstellungen des Geräts wieder entziehen. Die Aufnahmen bleiben ausschließlich auf dem Gerät gespeichert, die App lädt sie nicht hoch, und sie lassen sich in der App wieder löschen. Wer eine Aufnahme weitergeben möchte, zum Beispiel an die Großeltern, verschickt sie selbst als Datei über die „Teilen“-Funktion des Geräts; wir haben darauf keinen Zugriff.
+
+Eltern-Übersicht, Dankbuch und Sammlung. Die Eltern-Übersicht zeigt Zahlen zur Nutzung der letzten 60 Tage (Zeit je Bereich, gelesene Seiten, gespielte Etappen, fertige Bilder). Diese Zahlen sowie die Einträge im Dankbuch (Text und Zeichnungen), die Ausstellung ausgemalter Bilder und die Sammlung werden nur auf dem Gerät gespeichert und nicht an uns übertragen. Für Geschichten ohne aufgenommene Stimme kann die App den Text mit der Sprachausgabe des Geräts vorlesen; das übernimmt das Betriebssystem des Geräts.
+
 Keine Werbung und keine externen Analyse-Dienste. Wir setzen keine Analyse-Dienste (etwa Google Analytics) und keine Werbenetzwerke ein.
 
 Freiwillige einmalige Apple-In-App-Trinkgelder. In der iOS-App kannst du LambKing Stories freiwillig durch ein einmaliges kostenpflichtiges Trinkgeld als Apple-In-App-Kauf unterstützen. Die Zahlungsabwicklung erfolgt über Apple. Für die dabei von Apple verarbeiteten Kauf- und Zahlungsdaten gelten die Datenschutzbestimmungen von Apple.
