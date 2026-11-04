@@ -19,13 +19,14 @@ tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
-# In-app purchases, iOS only: the App Store forbids linking out to PayPal /
-# Ko-fi for donations (App Review Guideline 3.1.1(a)), so the iOS build offers
-# a tip through StoreKit instead. Scoped to iOS on purpose — pulling it into
-# the Android build would add Google Play Billing, which the Play release
-# neither uses nor should declare.
-[target.'cfg(target_os = "ios")'.dependencies]
+# In-app purchases (LambKing Plus, coloring books, iOS tips): StoreKit on iOS,
+# Google Play Billing on Android. Since release 1.2 (2026-11-04) Android sells
+# Plus too, so the plugin (and with it the BILLING permission) is in both
+# mobile builds. Desktop keeps the PayPal / Ko-fi links.
+[target.'cfg(any(target_os = "ios", target_os = "android"))'.dependencies]
 tauri-plugin-iap = "0.9"
+
+[target.'cfg(target_os = "ios")'.dependencies]
 # Coloring page download button: WKWebView ignores <a download>, so the
 # picture goes straight into Photos through this app-local plugin.
 tauri-plugin-save-photo = { path = "plugins/tauri-plugin-save-photo" }

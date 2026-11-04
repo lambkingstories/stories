@@ -2,9 +2,9 @@
 pub fn run() {
     let builder = tauri::Builder::default().plugin(tauri_plugin_opener::init());
 
-    // StoreKit tips — see `[target.'cfg(target_os = "ios")'.dependencies]` in
-    // Cargo.toml. Android and desktop keep the PayPal / Ko-fi links instead.
-    #[cfg(target_os = "ios")]
+    // In-app purchases: StoreKit on iOS, Play Billing on Android (LambKing Plus,
+    // coloring books; tips only on iOS). See Cargo.toml.
+    #[cfg(any(target_os = "ios", target_os = "android"))]
     let builder = builder.plugin(tauri_plugin_iap::init());
 
     // Coloring page download — saves the picture to Photos (see the plugin).

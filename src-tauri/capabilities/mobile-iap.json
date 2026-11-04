@@ -1,8 +1,8 @@
 {
   "$schema": "../gen/schemas/mobile-schema.json",
   "identifier": "mobile-iap",
-  "description": "StoreKit tips in the iOS build. Kept out of the default capability so desktop and Android builds, which do not compile the IAP plugin, still validate.",
-  "platforms": ["iOS"],
+  "description": "In-app purchases (StoreKit on iOS, Play Billing on Android). Kept out of the default capability so the desktop build, which does not compile the IAP plugin, still validates.",
+  "platforms": ["iOS", "android"],
   "windows": ["main"],
   "permissions": ["iap:default"]
 }
