@@ -18,7 +18,7 @@ export const plusOffer = {
   /** The introductory price for the first year (a start offer), or `null` when there is none. */
   introPrice: '19,99 €' as string | null,
   /** The last day of the introductory offer as "YYYY-MM-DD" (the whole day counts), or `null` while it has no end date. */
-  introUntil: null as string | null
+  introUntil: '2027-02-28' as string | null
 }
 
 /** True while the sentence about the introductory price is shown. */
