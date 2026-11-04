@@ -19,7 +19,7 @@ afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => josua.stages[n - 1]!
 /** Words that no text of the German data may use (the fall of Jericho is told without fighting and without anything that is hurt). */
 /** Stages whose text was corrected for Bible faithfulness on 21.10.2026 and were recorded again (see `NEUAUFNAHME-BIBELTREUE-2026-10-21.md`). */
-const RECORDED_AGAIN = [1, 3, 7, 8, 9, 10]
+const RECORDED_AGAIN = [1, 3, 4, 7, 8, 9, 10]
 const FORBIDDEN = /\b(Messer|Schwert|Speer|Pfeil|Blut|töten|erschlagen|Teufel|Hölle)\b/i
 
 describe('Josua: stories and questions', () => {

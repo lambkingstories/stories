@@ -310,5 +310,5 @@ export const wuesteEn: TextOverlay<Journey> = {
 // the English recordings of the stories (voice Achernar, Gemini, 1.11.2026): geschichte-NN-en-v1.mp3, one per stage in the order of the stages; a stage without a number in this list is read with the voice of the device
 const WITH_ENGLISH_RECORDING: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
 wuesteEn.stages!.forEach((s, i) => {
-  if (WITH_ENGLISH_RECORDING.includes(i + 1)) s.audio = `audio/abenteuer/wueste/geschichte-${String(i + 1).padStart(2, '0')}-en-v1.mp3`
+  if (WITH_ENGLISH_RECORDING.includes(i + 1)) s.audio = `audio/abenteuer/wueste/geschichte-${String(i + 1).padStart(2, '0')}-en-${i + 1 === 4 || i + 1 === 12 ? 'v2' : 'v1'}.mp3`
 })

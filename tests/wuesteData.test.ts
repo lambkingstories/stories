@@ -221,14 +221,14 @@ describe('Das Volk in der Wüste: map, files, English', () => {
     // the recordings (voice Achernar): a stage has its file or none (then the voice of the device reads); the lists are kept by tools/ton/aufnahmen_eintragen.py
     for (const s of wueste.stages) {
       if (s.audio !== undefined) {
-        expect(s.audio, `stage ${s.id}`).toBe(`audio/abenteuer/wueste/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)
+        expect(s.audio, `stage ${s.id}`).toBe(`audio/abenteuer/wueste/geschichte-${String(s.id).padStart(2, '0')}-en-${s.id === 4 || s.id === 12 ? 'v2' : 'v1'}.mp3`)
         expect(existsSync(`public/${s.audio}`), s.audio).toBe(true)
       }
     }
     setAdventureLanguage('de')
     for (const s of wueste.stages) {
       if (s.audio !== undefined) {
-        expect(s.audio, `stage ${s.id}`).toBe(`audio/abenteuer/wueste/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`)
+        expect(s.audio, `stage ${s.id}`).toBe(`audio/abenteuer/wueste/geschichte-${String(s.id).padStart(2, '0')}-${s.id === 11 ? 'v2' : 'v1'}.mp3`)
         expect(existsSync(`public/${s.audio}`), s.audio).toBe(true)
       }
     }

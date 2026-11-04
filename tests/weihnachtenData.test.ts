@@ -285,7 +285,7 @@ describe('Weihnachten: map, files, English', () => {
     }
     setAdventureLanguage('de')
     for (const s of weihnachten.stages) {
-      if (s.audio) expect(s.audio, `stage ${s.id}`).toBe(`audio/abenteuer/weihnachten/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`)
+      if (s.audio) expect(s.audio, `stage ${s.id}`).toBe(`audio/abenteuer/weihnachten/geschichte-${String(s.id).padStart(2, '0')}-${s.id === 1 ? 'v2' : 'v1'}.mp3`)
     }
   })
 })

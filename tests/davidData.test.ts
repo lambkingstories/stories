@@ -361,7 +361,7 @@ describe('David: map, files, English', () => {
     expect(stage(14).task.words!.rounds[0]!.sentences[1]).toBe('Then they all go home.')
     for (const s of david.stages) {
       const audio = s.audio
-      if (audio) expect(audio, `stage ${s.id}`).toBe(`audio/abenteuer/david/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)
+      if (audio) expect(audio, `stage ${s.id}`).toBe(`audio/abenteuer/david/geschichte-${String(s.id).padStart(2, '0')}-en-${s.id === 15 ? 'v2' : 'v1'}.mp3`)
     }
     setAdventureLanguage('de')
     for (const s of david.stages) {

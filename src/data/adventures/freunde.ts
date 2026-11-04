@@ -383,7 +383,7 @@ for (const st of freunde.stages) {
 // the German recordings of the stories (voice Achernar, files "geschichte-NN-v1.mp3"); until they are made the app reads with the voice of the device. Remove a number from this list when its file is in.
 const WITHOUT_RECORDING = new Set<number>([])
 for (const s of freunde.stages) {
-  const file = `audio/abenteuer/freunde/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`
+  const file = `audio/abenteuer/freunde/geschichte-${String(s.id).padStart(2, '0')}-${s.id === 5 ? 'v2' : 'v1'}.mp3`
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' || WITHOUT_RECORDING.has(s.id) ? undefined : file), enumerable: true, configurable: true })
 }
 

@@ -383,7 +383,7 @@ for (const s of josef.stages) {
   // stage 10: Joseph wears the blue-and-white striped headcloth, so that his brothers do not know him (19.10.2026)
   s.image = s.id === 10 ? `${IMG}etappe-bild-10-v2.webp` : `${IMG}etappe-bild-${nn}.webp`
   // the story read aloud by a speech model (scripts/tts-gemini.py)
-  s.audio = `audio/abenteuer/josef/geschichte-${nn}-v3.mp3`
+  s.audio = `audio/abenteuer/josef/geschichte-${nn}-${s.id === 4 ? 'v4' : 'v3'}.mp3`
 }
 
 // the background music of this journey (calm pieces made with Google's Lyria 3.5, see the skill `lambking-abenteuer-skill`, ton.md): they follow one another at random

@@ -390,7 +390,7 @@ for (const st of josua.stages) {
 // the German recordings of the stories (voice Achernar); there are no English ones yet, so the English app reads with the voice of the device
 // Stages whose text was corrected for Bible faithfulness on 21.10.2026 (1: Book of the Law, 3 and 9: the red rope, 7: "allein" removed, 8: the armed men, 9: the ban, 10: the grave of Joshua)
 // were recorded again as "-v4" (list in `D:/Claude/Abenteuer-Josua/NEUAUFNAHME-BIBELTREUE-2026-10-21.md`); the others are "-v3"
-const RECORDED_AGAIN = new Set([1, 3, 7, 8, 9, 10])
+const RECORDED_AGAIN = new Set([1, 3, 4, 7, 8, 9, 10])
 // Technik-Audit 24.10.2026: the recording of stage 3 was too quiet (3 dB under the others) and was raised by about 2 dB (same voice and words), new file name "-v4b"
 const LOUDER: Record<number, string> = { 3: 'v4b' }
 for (const s of josua.stages) {

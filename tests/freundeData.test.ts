@@ -306,7 +306,7 @@ describe('Freunde: map, files, English', () => {
     }
     setAdventureLanguage('de')
     for (const s of freunde.stages) {
-      if (s.audio) expect(s.audio, `stage ${s.id}`).toBe(`audio/abenteuer/freunde/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`)
+      if (s.audio) expect(s.audio, `stage ${s.id}`).toBe(`audio/abenteuer/freunde/geschichte-${String(s.id).padStart(2, '0')}-${s.id === 5 ? 'v2' : 'v1'}.mp3`)
     }
   })
 })

@@ -307,6 +307,6 @@ describe('Rut: map, files, English', () => {
       if (audio) expect(audio, `stage ${s.id}`).toBe(`audio/abenteuer/rut/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)
     }
     setAdventureLanguage('de')
-    for (const s of rut.stages) expect(s.audio, `stage ${s.id}`).toBe(`audio/abenteuer/rut/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`)
+    for (const s of rut.stages) expect(s.audio, `stage ${s.id}`).toBe(`audio/abenteuer/rut/geschichte-${String(s.id).padStart(2, '0')}-${s.id === 5 ? 'v2' : 'v1'}.mp3`)
   })
 })

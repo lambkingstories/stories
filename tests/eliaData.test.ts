@@ -283,7 +283,7 @@ describe('Elia: map, files, English', () => {
     expect(stage(1).task.hint).toContain('ravens')
     expect(stage(8).task.whisper!.rounds[0]!.hint).toContain('quiet sound')
     // the English recordings are their own files, never the German ones
-    for (const s of elia.stages) expect(s.audio, `stage ${s.id}`).toBe(`audio/abenteuer/elia/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)
+    for (const s of elia.stages) expect(s.audio, `stage ${s.id}`).toBe(`audio/abenteuer/elia/geschichte-${String(s.id).padStart(2, '0')}-en-${s.id === 5 || s.id === 6 ? 'v2' : 'v1'}.mp3`)
     setAdventureLanguage('de')
     for (const s of elia.stages) expect(s.audio, `stage ${s.id}`).toBe(`audio/abenteuer/elia/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`)
   })
