@@ -1,6 +1,7 @@
 /**
  * The data of "The Young Jesus and His Baptism" (`taufe.ts`, `en/taufe.en.ts`, `taufePath.ts`): the stories and questions follow the rules of the adventures (texts of the draft `D:/Claude/Abenteuer-Taufe/ENTWURF_Taufe.md`,
- * Luther 1912 told in our own words), the two quiz stages are only quizzes, the two new games and the five old ones have sound data, the map has nine stations and the exam, and the English file has the same shape.
+ * Luther 1912 told in our own words), the two quiz stages are only quizzes, the five new games (Anton's plan of games, 5.11.2026: at most two old ones, never in a row) and the two old ones have sound data,
+ * the map has nine stations and the exam, and the English file has the same shape.
  */
 import { existsSync, statSync } from 'node:fs'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -9,6 +10,8 @@ import { TAUFE_PATH } from '@/data/adventures/taufePath'
 import { englishTextsOf } from '@/data/adventures/localize'
 import { setAdventureLanguage } from '@/use/adventureLanguage'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
+import { scrollProblems, shadeProblems, sunriseProblems } from '@/utils/taufeNeu'
+import type { ScrollGame, ShadowWalkGame, SunGame } from '@/utils/taufeNeu'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => taufe.stages[n - 1]!
@@ -123,11 +126,11 @@ describe('Taufe: stories and questions', () => {
 })
 
 describe('Taufe: the games', () => {
-  it('the order of the games: 5 old, 2 new (road, net), 2 quizzes; no game twice', () => {
-    expect(taufe.stages.map((s) => s.task.kind)).toEqual(['wimmelbild', 'lueckenvers', 'bahn', 'reihenfolge', 'memory', 'quiz', 'puzzle', 'netz', 'quiz'])
+  it('the order of the games: 2 old (hidden pictures, order; not in a row), 5 new, 2 quizzes; no game twice', () => {
+    expect(taufe.stages.map((s) => s.task.kind)).toEqual(['wimmelbild', 'schriftrolle', 'bahn', 'reihenfolge', 'schattenweg', 'quiz', 'sonnenaufgang', 'netz', 'quiz'])
     const games = taufe.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
     expect(new Set(games).size).toBe(games.length)
-    expect(games.filter((k) => ['bahn', 'netz'].includes(k))).toHaveLength(2)
+    expect(games.filter((k) => ['bahn', 'netz', 'schriftrolle', 'schattenweg', 'sonnenaufgang'].includes(k))).toHaveLength(5)
   })
 
   it('1 hidden pictures: five relatives, covers, every place inside the picture; Jesus is not among them', () => {
@@ -147,17 +150,14 @@ describe('Taufe: the games', () => {
     expect(f.doneText).toContain('Jesus ist nicht dabei')
   })
 
-  it('2 verse: the sentences are in the text and the right words are on the leaves', () => {
-    const g = stage(2).task.verse!
-    expect(g.rounds).toHaveLength(2)
-    for (const r of g.rounds) {
-      expect(r.parts).toHaveLength(r.answers.length + 1)
-      for (const a of r.answers) expect(r.words[a]).toBeTruthy()
-    }
-    expect(g.rounds[0]!.words[g.rounds[0]!.answers[0]!]).toBe('Vaters')
-    expect(g.rounds[1]!.answers.map((a) => g.rounds[1]!.words[a])).toEqual(['Weisheit', 'Alter'])
-    const text = stage(2).text.join(' ')
-    expect(text).toContain(`${g.rounds[0]!.parts[0]}Vaters${g.rounds[0]!.parts[1]}`.replace('„', '').replace('“', ''))
+  it('2 scrolls: two rounds, the checker of the game finds nothing, the temple is looked for first; the text tells of the temple', () => {
+    const t = stage(2).task as unknown as { kind: string; scroll: ScrollGame }
+    expect(t.kind).toBe('schriftrolle')
+    expect(scrollProblems(t.scroll)).toEqual([])
+    expect(t.scroll.rounds).toHaveLength(2)
+    expect(t.scroll.rounds[0]!.find[0]).toBe('tempel')
+    expect(t.scroll.frame).toMatch(/taufe\/schriftrolle\/rolle\.webp$/)
+    expect(stage(2).text.join(' ')).toContain('im Tempel')
   })
 
   it('3 road: two rounds, stones, thorns and branches to clear, the travelers to leave alone; every thing has a picture; everything inside the picture', () => {
@@ -189,19 +189,22 @@ describe('Taufe: the games', () => {
     expect(g.rounds[1]!.cards).toEqual(['kommt', 'tauft', 'steigt', 'himmel'])
   })
 
-  it('5 memory: six pairs (a full board of 3 x 4), every one with a sentence that the text of the wilderness tells', () => {
-    const g = stage(5).task.memory!
-    expect(g.pairs).toHaveLength(6)
-    for (const p of g.pairs) expect(p.text.length).toBeGreaterThan(10)
-    const text = stage(5).text.join(' ')
-    for (const w of ['Steine', 'Brot', 'Hunger', 'Schrift', 'Tage', 'Nächte']) expect(text, w).toContain(w)
+  it('5 sun and shade: two rounds, the checker finds nothing ("Help me" reaches the big rock without a mistake); the text tells of the dry wilderness', () => {
+    const t = stage(5).task as unknown as { kind: string; shadowWalk: ShadowWalkGame }
+    expect(t.kind).toBe('schattenweg')
+    expect(shadeProblems(t.shadowWalk)).toEqual([])
+    expect(t.shadowWalk.rounds).toHaveLength(2)
+    expect(t.shadowWalk.walker).toMatch(/taufe\/schattenweg\/jesus\.webp$/)
+    expect(stage(5).text.join(' ')).toContain('Die Wüste ist trocken')
   })
 
-  it('7 puzzle: a portrait picture in 2 columns and 3 rows', () => {
-    const g = stage(7).task.puzzle!
-    expect(g.cols).toBe(2)
-    expect(g.rows).toBe(3)
-    expect(g.image).toMatch(/puzzle\/kapernaum\.webp$/)
+  it('7 light over Galilee: two rounds, the checker finds nothing, Capernaum is among the villages; the text tells of the great light', () => {
+    const t = stage(7).task as unknown as { kind: string; sunrise: SunGame }
+    expect(t.kind).toBe('sonnenaufgang')
+    expect(sunriseProblems(t.sunrise)).toEqual([])
+    expect(t.sunrise.rounds.map((r) => r.villages.length)).toEqual([4, 6])
+    expect(t.sunrise.rounds[0]!.villages.map((v) => v.name)).toContain('Kapernaum')
+    expect(stage(7).text.join(' ')).toContain('großes Licht gesehen')
   })
 
   it('8 net: two rounds with four and six fish, every fish has a picture, the area and the reach are inside the picture and the speed is slow', () => {
@@ -274,7 +277,9 @@ describe('Taufe: map, files, English', () => {
     expect(stage(3).task.road!.items[0]!.label).toBe('Boulder')
     expect(stage(3).task.road!.rounds[0]!.hint).toContain('Clear the road')
     expect(stage(8).task.net!.rounds[0]!.hint).toContain('Cast the net')
-    expect(stage(2).task.verse!.rounds[1]!.parts[0]).toContain('Jesus grows')
+    expect((stage(2).task as unknown as { scroll: ScrollGame }).scroll.tiles[0]!.label).toBe('the temple')
+    expect((stage(5).task as unknown as { shadowWalk: ShadowWalkGame }).shadowWalk.rounds[0]!.hint).toContain('Lead Jesus')
+    expect((stage(7).task as unknown as { sunrise: SunGame }).sunrise.rounds[0]!.villages[0]!.name).toBe('Capernaum')
     for (const s of taufe.stages) {
       const audio = s.audio
       if (audio) expect(audio, `stage ${s.id}`).toBe(`audio/abenteuer/taufe/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)

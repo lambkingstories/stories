@@ -39,12 +39,10 @@ export const taufeEn: TextOverlay<Journey> = {
         'Jesus goes down with them to Nazareth and obeys them. Mary keeps all these words in her heart. Jesus grows in wisdom and in stature, and in favor with God and with people.'
       ],
       task: {
-        hint: 'Drag the right leaf into the gap.',
-        verse: {
-          rounds: [
-            { hint: 'Drag the right leaf into the gap.', parts: ['“Did you not know that I must be in my ', ' house?”'], words: ['Father’s', 'teacher’s', 'friend’s'] },
-            { hint: 'Now two words are missing.', parts: ['Jesus grows in ', ', ', ' and in favor with God and with people.'], words: ['wisdom', 'stature', 'riches', 'power'] }
-          ]
+        hint: 'Roll the scroll up and down and find the pictures you are looking for.',
+        scroll: {
+          tiles: [{ label: 'the temple' }, { label: 'the lamb' }, { label: 'the donkey' }, { label: 'the jar' }, { label: 'the bread basket' }, { label: 'the city gate' }, { label: 'the palm tree' }, { label: 'the oil lamp' }],
+          rounds: [{ hint: 'Jesus sits in the temple among the teachers. Roll the scroll until the picture you are looking for stands in the middle.' }, { hint: 'Now the scroll is longer, and the picture must stand exactly in the middle.' }]
         }
       },
       questions: [
@@ -113,8 +111,11 @@ export const taufeEn: TextOverlay<Journey> = {
         'Jesus does not make bread out of the stones. He answers with a word from Scripture that God has said: “It is written: A person does not live on bread alone, but on every word that comes out of the mouth of God.”'
       ],
       task: {
-        hint: 'Find the matching cards. Remember where each one lies.',
-        memory: { pairs: [{ text: 'The stone: The tempter says: Tell these stones to become bread.' }, { text: 'The bread: A person does not live on bread alone.' }, { text: 'The empty bowl: After forty days Jesus is very hungry.' }, { text: 'The scroll: Jesus answers: It is written.' }, { text: 'The sun: Jesus fasts for forty days.' }, { text: 'The moon: Jesus fasts for forty nights.' }] }
+        hint: 'Tap a shadow. Jesus walks there and stays in the shade.',
+        shadowWalk: {
+          things: [{ label: 'the boulder' }, { label: 'the tall rock' }, { label: 'the flat rock' }, { label: 'the thornbush' }, { label: 'the tamarisk bush' }, { label: 'the big rock' }],
+          rounds: [{ hint: 'The sun moves across the wilderness. Lead Jesus from shade to shade to the big rock.' }, { hint: 'The way is longer and the sun is hotter. Do not stay in the sun too long.' }]
+        }
       },
       questions: [
         { q: 'How long does Jesus fast in the wilderness?', options: ['forty days and forty nights', 'seven days', 'three days'] },
@@ -145,7 +146,15 @@ export const taufeEn: TextOverlay<Journey> = {
         'So it happens as the prophet Isaiah said about this land by the way to the sea: “The people who sat in darkness have seen a great light. For those who live in the dark, a light has dawned.”',
         'From then on Jesus begins to preach. He tells the people: “Turn back to God! The kingdom of heaven is near.”'
       ],
-      task: { hint: 'Put the picture of Capernaum by the lake together.' },
+      task: {
+        hint: 'Pull the sun up along the arc until there is light over every village by the lake.',
+        sunrise: {
+          rounds: [
+            { hint: 'It is still dark over the land by the lake. Pull the sun up along the arc until there is light over every village.', villages: [{ name: 'Capernaum' }, { name: 'a village by the lake' }, { name: 'a village on the hillside' }, { name: 'a fishing village' }] },
+            { hint: 'Now there are more villages. Find the place on the arc where there is light everywhere.', villages: [{ name: 'Capernaum' }, { name: 'a village by the lake' }, { name: 'a village on the hillside' }, { name: 'a larger village' }, { name: 'a fishing village' }, { name: 'a village with a well' }] }
+          ]
+        }
+      },
       questions: [
         { q: 'Where does Jesus live now?', options: ['in Capernaum', 'in Nazareth', 'in Jerusalem'] },
         { q: 'What did the people who sat in darkness see?', options: ['a great light', 'a great star', 'a great fire'] }

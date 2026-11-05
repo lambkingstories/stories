@@ -4,38 +4,25 @@
  * Quelle der Texte: D:/Claude/Abenteuer-Taufe/ENTWURF_Taufe.md (Luther 1912 von bibeltext.com gelesen, nichts abgeschrieben), Plan: ETAPPENPLAN.md, Figuren: FIGUREN.md, Prüfbericht: PRUEFBERICHT-BIBELTREUE-2026-10-31.md.
  * Der Versucher wird im Erzähltext "der Versucher" genannt (Mt 4,3); nur in Jesu Wort steht "Satan" (Mt 4,10).
  * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
- * Spiele (Wahl der Leitung): 1 Wimmelbild (alt), 2 Lückenvers (alt), 3 Den Weg bereiten (neu), 4 Reihenfolge (alt), 5 Memory (alt), 6 nur Quiz, 7 Puzzle (alt), 8 Das Netz auswerfen (neu), 9 nur Quiz.
+ * Spiele (Antons Spielplan 5.11.2026: höchstens zwei bekannte, nie hintereinander): 1 Wimmelbild (alt), 2 Schriftrollen (neu), 3 Den Weg bereiten (neu), 4 Reihenfolge (alt), 5 Sonne und Schatten (neu), 6 nur Quiz,
+ * 7 Licht über Galiläa (neu), 8 Das Netz auswerfen (neu), 9 nur Quiz. Die Typen der drei neuesten Spiele kommen aus `@/utils/taufeNeu`.
+ * ERZEUGT von D:/Claude/Abenteuer-Taufe/tools/bauen_taufe.py (Spieldaten der neuen Spiele: neue_spiele_taufe.py); nicht von Hand ändern.
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/taufe/, images/abenteuer/spiele/taufe/<spiel>/, audio/abenteuer/taufe/.
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { FindGame, Journey, MemoryGame, NetGame, OrderGame, RoadGame, VerseGame } from '@/types/adventure'
+import type { FindGame, Journey, NetGame, OrderGame, RoadGame } from '@/types/adventure'
+import type { ScrollGame, ShadowWalkGame, SunGame } from '@/utils/taufeNeu'
 import { josef } from './josef'
 import { TAUFE_PATH } from './taufePath'
 import { localize } from './localize'
 import { adventureLanguage } from '@/use/adventureLanguage'
 import { taufeEn } from './en/taufe.en'
-import { backdropOr } from '@/utils/gameBackground'
 
 // Etappenbilder (Variante a der neuen Bilder; Anton wählt auf der Vorschau-Seite a/b): `images/abenteuer/taufe/etappe-bild-NN.webp`, 960 × 640
 const PICS = 'images/abenteuer/taufe/'
 
 const G = 'images/abenteuer/spiele/taufe/'
-
-/**
- * Etappe 2, "Lückenvers" (alte Mechanik): zwei Sätze aus dem Text der Etappe in zwei Runden (erst ein Wort, dann zwei); die Wörter sind Blätter (das richtige zuerst, `answers` zeigt auf sie).
- * Tafel und Blatt sind die aus Salomo (kopiert). Hintergrund ist der gemalte Vorhof des Tempels (Bildauftrag S30).
- */
-const VERS: VerseGame = {
-  background: `${G}hintergrund/vers-hintergrund.webp`,
-  soft: true,
-  board: `${G}lueckenvers/tafel.webp`,
-  leaf: `${G}lueckenvers/blatt.webp`,
-  rounds: [
-    { hint: 'Ziehe das passende Blatt in die Lücke.', parts: ['„Wisst ihr nicht, dass ich sein muss in dem, was meines ', ' ist?“'], words: ['Vaters', 'Lehrers', 'Freundes'], answers: [0] },
-    { hint: 'Jetzt fehlen zwei Wörter.', parts: ['Jesus nimmt zu an ', ', ', ' und Gnade bei Gott und den Menschen.'], words: ['Weisheit', 'Alter', 'Reichtum', 'Macht'], answers: [0, 1] }
-  ]
-}
 
 /**
  * Etappe 4, "Jesu Taufe" (alte Mechanik, Reihenfolge legen): Jesus kommt an den Jordan, Johannes tauft ihn, Jesus steigt aus dem Wasser, der Himmel tut sich auf.
@@ -51,21 +38,6 @@ const REIHENFOLGE: OrderGame = {
   rounds: [
     { hint: 'Runde 1: Lege die Bilder in die Reihenfolge der Geschichte. Die Punkte zeigen, wo sie hinkommen.', numbered: true, cards: ['tauft', 'steigt', 'himmel'] },
     { hint: 'Runde 2: Jetzt mit dem Weg zum Jordan und ohne Punkte: Was kommt zuerst, was danach?', numbered: false, cards: ['kommt', 'tauft', 'steigt', 'himmel'] }
-  ]
-}
-
-/**
- * Etappe 5, "Memory" (alte Mechanik): sechs Dinge der Wüste (Stein, Brot, leere Schale, Schriftrolle, Sonne, Mond); die Rückseite zeigt eine goldene Sonne (Bildauftrag S32, ein Bogen mit den sechs Dingen, vom Code geschnitten).
- */
-const MEMORY: MemoryGame = {
-  back: `${G}memory/rueck.webp`,
-  pairs: [
-    { image: `${G}memory/karte-stein.webp`, text: 'Der Stein: Der Versucher sagt: Diese Steine sollen zu Brot werden.' },
-    { image: `${G}memory/karte-brot.webp`, text: 'Das Brot: Der Mensch lebt nicht vom Brot allein.' },
-    { image: `${G}memory/karte-schale.webp`, text: 'Die leere Schale: Nach vierzig Tagen hat Jesus großen Hunger.' },
-    { image: `${G}memory/karte-schriftrolle.webp`, text: 'Die Schriftrolle: Jesus antwortet: Es steht geschrieben.' },
-    { image: `${G}memory/karte-sonne.webp`, text: 'Die Sonne: Vierzig Tage fastet Jesus.' },
-    { image: `${G}memory/karte-mond.webp`, text: 'Der Mond: Vierzig Nächte fastet Jesus.' }
   ]
 }
 
@@ -160,6 +132,124 @@ const WIMMEL: FindGame = {
   ]
 }
 
+/**
+ * Etappe 2, "Schriftrollen" (neu, Antons Spielplan 5.11.2026): Jesus sitzt im Tempel mitten unter den Lehrern (Lk 2,46). Eine Schriftrolle wird auf- und abgerollt (Finger, Knöpfe, Pfeiltasten),
+ * bis das gesuchte Bild in der Mitte des Fensters steht; „Das ist es!“. Runde 1: sechs Bilder, drei gesucht; Runde 2: acht Bilder, vier gesucht, genauer. Bilder (Bildauftrag S40): `schriftrolle/rolle.webp`
+ * (Fenster = das leere Pergament, gemessen von neue_spiele_bilder_taufe.py), acht Miniaturen aus einem Bogen. Hintergrund: der gemalte Vorhof des Tempels (S30).
+ */
+const SCHRIFT: ScrollGame = {
+  background: `${G}hintergrund/vers-hintergrund.webp`,
+  frame: `${G}schriftrolle/rolle.webp`,
+  frameRatio: 0.7712,
+  window: { x: 14.14, y: 12.45, w: 70.88, h: 77.03 },
+  tiles: [
+    { id: 'tempel', image: `${G}schriftrolle/tempel.webp`, label: 'der Tempel' },
+    { id: 'lamm', image: `${G}schriftrolle/lamm.webp`, label: 'das Lamm' },
+    { id: 'esel', image: `${G}schriftrolle/esel.webp`, label: 'der Esel' },
+    { id: 'krug', image: `${G}schriftrolle/krug.webp`, label: 'der Krug' },
+    { id: 'brot', image: `${G}schriftrolle/brot.webp`, label: 'der Brotkorb' },
+    { id: 'tor', image: `${G}schriftrolle/tor.webp`, label: 'das Stadttor' },
+    { id: 'palme', image: `${G}schriftrolle/palme.webp`, label: 'die Palme' },
+    { id: 'lampe', image: `${G}schriftrolle/lampe.webp`, label: 'die Öllampe' }
+  ],
+  rounds: [
+    { hint: 'Jesus sitzt im Tempel mitten unter den Lehrern. Roll die Schriftrolle, bis das gesuchte Bild in der Mitte steht.', tiles: ['lamm', 'tempel', 'esel', 'krug', 'brot', 'tor'], find: ['tempel', 'brot', 'lamm'], start: 3, tolerance: 0.35 },
+    { hint: 'Jetzt ist die Rolle länger, und das Bild muss genau in der Mitte stehen.', tiles: ['krug', 'palme', 'tempel', 'lampe', 'esel', 'tor', 'lamm', 'brot'], find: ['lampe', 'lamm', 'palme', 'brot'], start: 0, tolerance: 0.22 }
+  ]
+}
+
+/**
+ * Etappe 5, "Sonne und Schatten" (neu, Antons Spielplan 5.11.2026): Jesus fastet in der Wüste (Mt 4,1-2). Die Sonne wandert von Osten nach Westen, die Schatten der Felsen und Sträucher wandern mit.
+ * Das Kind tippt einen Schatten an, Jesus geht hin; zu lange in der Sonne ist ein Fehler. Ziel ist der Schatten des großen Felsens. Der Versucher ist nie im Bild (nur der Text erzählt von ihm).
+ * Bilder (Bildauftrag S41): `schattenweg/wueste.webp` 1200 × 800, `jesus` (Referenz jesus30), sechs Dinge aus einem Bogen, `sonne`, `schatten` (gemalter weicher Schatten, freigestellt).
+ */
+const SCHATTEN: ShadowWalkGame = {
+  background: `${G}schattenweg/wueste.webp`,
+  walker: `${G}schattenweg/jesus.webp`,
+  walkerW: 8,
+  walkerRatio: 0.3583,
+  sun: `${G}schattenweg/sonne.webp`,
+  sunW: 11,
+  shadow: `${G}schattenweg/schatten.webp`,
+  things: [
+    { id: 'fels', image: `${G}schattenweg/fels.webp`, label: 'der Felsbrocken', w: 12, ratio: 1.0851 },
+    { id: 'stein', image: `${G}schattenweg/stein.webp`, label: 'der hohe Fels', w: 8, ratio: 0.4434 },
+    { id: 'platte', image: `${G}schattenweg/platte.webp`, label: 'der flache Fels', w: 15, ratio: 2.1638 },
+    { id: 'dorn', image: `${G}schattenweg/dorn.webp`, label: 'der Dornstrauch', w: 12, ratio: 1.152 },
+    { id: 'tamariske', image: `${G}schattenweg/tamariske.webp`, label: 'der Tamariskenstrauch', w: 13, ratio: 1.209 },
+    { id: 'gross', image: `${G}schattenweg/gross.webp`, label: 'der große Fels', w: 26, ratio: 1.8919 }
+  ],
+  rounds: [
+    {
+      hint: 'Die Sonne wandert über die Wüste. Führe Jesus von Schatten zu Schatten bis zum großen Felsen.',
+      places: [
+        { thing: 'fels', x: 12, y: 80, reach: 7, size: 6 },
+        { thing: 'dorn', x: 34, y: 70, reach: 7, size: 5.5 },
+        { thing: 'platte', x: 56, y: 84, reach: 6, size: 7 },
+        { thing: 'gross', x: 82, y: 66, reach: 8, size: 11, goal: true }
+      ],
+      start: 0,
+      seconds: 30,
+      heat: 3,
+      speed: 8
+    },
+    {
+      hint: 'Der Weg ist länger und die Sonne brennt stärker. Bleib nicht zu lange in der Sonne.',
+      places: [
+        { thing: 'fels', x: 13, y: 88, reach: 7, size: 6 },
+        { thing: 'tamariske', x: 28, y: 74, reach: 7, size: 6 },
+        { thing: 'dorn', x: 46, y: 90, reach: 7, size: 5.5 },
+        { thing: 'stein', x: 60, y: 72, reach: 10, size: 4.5 },
+        { thing: 'tamariske', x: 42, y: 56, reach: 7, size: 6 },
+        { thing: 'gross', x: 81, y: 82, reach: 8, size: 11, goal: true }
+      ],
+      start: 0,
+      seconds: 22,
+      heat: 2.4,
+      speed: 8
+    }
+  ]
+}
+
+/**
+ * Etappe 7, "Licht über Galiläa" (neu, Antons Spielplan 5.11.2026): „Das Volk, das in Finsternis saß, hat ein großes Licht gesehen“ (Mt 4,16). Die Sonne wird am Bogen hochgezogen; jedes Dorf am See
+ * hat Licht, solange die Sonne auf seinem Stück des Bogens steht (`from` bis `to`). Licht über allen zugleich (festhalten oder dort loslassen) gewinnt die Runde; zu früh loslassen ist ein Fehler.
+ * Bilder (Bildauftrag S42): `sonnenaufgang/see.webp` 1200 × 800, sechs Dörfer aus einem Bogen, `glanz` (gemalter Lichtschein, freigestellt), die Sonne aus S41, die Perle des Perlenwegs.
+ */
+const SONNE: SunGame = {
+  background: `${G}sonnenaufgang/see.webp`,
+  sun: `${G}sonnenaufgang/sonne.webp`,
+  sunW: 13,
+  glow: `${G}sonnenaufgang/glanz.webp`,
+  bead: `${G}sonnenaufgang/perle.webp`,
+  arc: { cx: 50, cy: 46, rx: 40, ry: 32 },
+  hold: 1,
+  rounds: [
+    {
+      hint: 'Über dem Land am See ist es noch dunkel. Zieh die Sonne am Bogen hoch, bis über allen Dörfern Licht ist.',
+      villages: [
+        { image: `${G}sonnenaufgang/dorf-1.webp`, name: 'Kapernaum', x: 20, y: 84, w: 15, from: 0.15, to: 0.62 },
+        { image: `${G}sonnenaufgang/dorf-2.webp`, name: 'ein Dorf am See', x: 40, y: 92, w: 15, from: 0.3, to: 0.7 },
+        { image: `${G}sonnenaufgang/dorf-3.webp`, name: 'ein Dorf am Hang', x: 62, y: 84, w: 15, from: 0.35, to: 0.85 },
+        { image: `${G}sonnenaufgang/dorf-5.webp`, name: 'ein Fischerdorf', x: 82, y: 92, w: 15, from: 0.25, to: 0.75 }
+      ],
+      start: 0.04
+    },
+    {
+      hint: 'Jetzt sind es mehr Dörfer. Such die Stelle am Bogen, an der überall Licht ist.',
+      villages: [
+        { image: `${G}sonnenaufgang/dorf-1.webp`, name: 'Kapernaum', x: 12, y: 82, w: 14, from: 0.1, to: 0.52 },
+        { image: `${G}sonnenaufgang/dorf-2.webp`, name: 'ein Dorf am See', x: 29, y: 93, w: 14, from: 0.3, to: 0.7 },
+        { image: `${G}sonnenaufgang/dorf-3.webp`, name: 'ein Dorf am Hang', x: 45, y: 85, w: 14, from: 0.4, to: 0.88 },
+        { image: `${G}sonnenaufgang/dorf-4.webp`, name: 'ein größeres Dorf', x: 61, y: 94, w: 14, from: 0.22, to: 0.6 },
+        { image: `${G}sonnenaufgang/dorf-5.webp`, name: 'ein Fischerdorf', x: 75, y: 82, w: 14, from: 0.43, to: 0.8 },
+        { image: `${G}sonnenaufgang/dorf-6.webp`, name: 'ein Dorf mit Brunnen', x: 90, y: 93, w: 14, from: 0.35, to: 0.75 }
+      ],
+      start: 0.02
+    }
+  ]
+}
+
 export const taufe: Journey = {
   id: 'taufe',
   title: 'Der junge Jesus und die Taufe',
@@ -218,8 +308,8 @@ export const taufe: Journey = {
         '„Warum habt ihr mich gesucht?“, fragt Jesus. „Wisst ihr nicht, dass ich sein muss in dem, was meines Vaters ist?“ Sie verstehen das Wort nicht, das er zu ihnen sagt.',
         'Jesus geht mit ihnen hinab nach Nazareth und ist ihnen gehorsam. Maria behält alle diese Worte in ihrem Herzen. Jesus nimmt zu an Weisheit, Alter und Gnade bei Gott und den Menschen.'
       ],
-      // Spiel: Lückenvers (lueckenvers, alt)
-      task: { kind: 'lueckenvers', hint: 'Ziehe das passende Blatt in die Lücke.', verse: VERS },
+      // Spiel: Schriftrollen (schriftrolle, neu)
+      task: { kind: 'schriftrolle', hint: 'Roll die Schriftrolle auf und ab und finde die gesuchten Bilder.', scroll: SCHRIFT },
       questions: [
         { q: 'Wo finden Maria und Josef den Jungen Jesus?', options: ['im Tempel', 'auf dem Markt', 'am Stadttor'], answer: 0 },
         { q: 'Was tut Jesus unter den Lehrern?', options: ['Er hört ihnen zu und fragt sie.', 'Er schläft.', 'Er läuft davon.'], answer: 0 }
@@ -271,8 +361,8 @@ export const taufe: Journey = {
         'Da kommt der Versucher zu ihm. „Wenn du Gottes Sohn bist“, sagt er, „dann sprich, dass diese Steine zu Brot werden.“',
         'Jesus macht aus den Steinen kein Brot. Er antwortet mit einem Wort aus der Schrift, das Gott gesagt hat: „Es steht geschrieben: Der Mensch lebt nicht vom Brot allein, sondern von jedem Wort, das aus dem Mund Gottes kommt.“'
       ],
-      // Spiel: Memory (memory, alt)
-      task: { kind: 'memory', hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.', memory: MEMORY },
+      // Spiel: Sonne und Schatten (schattenweg, neu)
+      task: { kind: 'schattenweg', hint: 'Tippe auf einen Schatten. Jesus geht hin und bleibt im Schatten.', shadowWalk: SCHATTEN },
       questions: [
         { q: 'Wie lange fastet Jesus in der Wüste?', options: ['vierzig Tage und vierzig Nächte', 'sieben Tage', 'drei Tage'], answer: 0 },
         { q: 'Was sollen die Steine nach den Worten des Versuchers werden?', options: ['Brot', 'Gold', 'Wasser'], answer: 0 }
@@ -307,8 +397,8 @@ export const taufe: Journey = {
         'So geschieht, was der Prophet Jesaja über dieses Land gesagt hat, das am Weg zum Meer liegt: „Das Volk, das in der Finsternis saß, hat ein großes Licht gesehen. Über denen, die im Dunkeln wohnen, ist ein Licht aufgegangen.“',
         'Von da an fängt Jesus an zu predigen. Er sagt den Menschen: „Kehrt um! Das Himmelreich ist nahe.“'
       ],
-      // Spiel: Puzzle (puzzle, alt)
-      task: { kind: 'puzzle', hint: 'Setze das Bild von Kapernaum am See zusammen.', puzzle: { image: `${G}puzzle/kapernaum.webp`, cols: 2, rows: 3 } },
+      // Spiel: Licht über Galiläa (sonnenaufgang, neu)
+      task: { kind: 'sonnenaufgang', hint: 'Zieh die Sonne am Bogen hoch, bis über allen Dörfern am See Licht ist.', sunrise: SONNE },
       questions: [
         { q: 'Wo wohnt Jesus jetzt?', options: ['in Kapernaum', 'in Nazareth', 'in Jerusalem'], answer: 0 },
         { q: 'Was hat das Volk gesehen, das in der Finsternis saß?', options: ['ein großes Licht', 'einen großen Stern', 'ein großes Feuer'], answer: 0 }
@@ -359,11 +449,6 @@ export const taufe: Journey = {
     { q: 'Wem soll man allein dienen, sagt Jesus?', options: ['Gott, dem Herrn', 'dem Versucher', 'den Königen'], answer: 0 },
     { q: 'Wozu will Jesus Simon und Andreas machen?', options: ['zu Menschenfischern', 'zu Hirten', 'zu Bauern'], answer: 0 }
   ]
-}
-
-// the games that lie on a stage picture (drawn soft by the app) follow the picture of their stage
-for (const st of taufe.stages) {
-  if (st.task.verse) st.task.verse.background = backdropOr(st.task.verse.background, st.image ?? st.task.verse.background)
 }
 
 // the German recordings of the stories (voice Achernar, files "geschichte-NN-v1.mp3"); until they are made the app reads with the voice of the device. Remove a number from this list when its file is in.
