@@ -9,7 +9,9 @@ import { noah } from '@/data/adventures/noah'
 import { journeyFiles } from '@/utils/journeyFiles'
 import type { AdventureQuestion } from '@/types/adventure'
 
-const KINDS = ['quiz', 'zaehlen', 'ausmalen', 'puzzle', 'weg', 'ernten', 'memory', 'sortieren', 'wimmelbild', 'teilen', 'paare', 'bauen', 'punkte', 'steuern']
+const KINDS = ['quiz', 'zaehlen', 'ausmalen', 'puzzle', 'weg', 'ernten', 'memory', 'sortieren', 'wimmelbild', 'teilen', 'paare', 'bauen', 'punkte', 'steuern',
+  // Josef, neue Spiele 5.11.2026 (utils/josefNeu.ts)
+  'garben', 'keltern', 'kuehenil', 'umarmen', 'begegnung']
 
 describe.each([...journeys, noah].map((j) => [j.id, j] as const))('Abenteuer %s', (_id, j) => {
   const questionsOf = (qs: AdventureQuestion[]) => qs.map((q) => q.q)

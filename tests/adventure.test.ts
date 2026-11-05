@@ -111,6 +111,11 @@ describe('adventure progress', () => {
   })
 })
 
+/** The field of each new game of Josef (5.11.2026) and every picture in its data. */
+const JOSEF_NEU: Record<string, string> = { garben: 'sheavesBow', keltern: 'winePress', kuehenil: 'nileCows', umarmen: 'embrace2', begegnung: 'meeting' }
+const webpIn = (v: unknown): string[] =>
+  typeof v === 'string' ? (v.endsWith('.webp') ? [v] : []) : Array.isArray(v) ? v.flatMap(webpIn) : v && typeof v === 'object' ? Object.values(v).flatMap(webpIn) : []
+
 describe('the journeys', () => {
   it('has twelve stages in order, each with a text, a task and one to three questions', () => {
     expect(josef.stages.map((s) => s.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
@@ -191,6 +196,11 @@ describe('the journeys', () => {
         const groups = t.groups ?? [{ image: t.image!, imageOff: t.imageOff, count: t.count! }]
         expect(groups.reduce((n, g) => n + g.count, 0)).toBe(t.count)
         for (const g of groups) files.push(g.image.replace('{n}', '1'), (g.imageOff ?? g.image).replace('{n}', '1'))
+      } else if (JOSEF_NEU[t.kind as string]) {
+        // the five new games of 5.11.2026 (utils/josefNeu.ts): every picture named in their data
+        const game = (t as unknown as Record<string, unknown>)[JOSEF_NEU[t.kind as string]!]
+        expect(game, `stage ${s.id}`).toBeTruthy()
+        files.push(...webpIn(game))
       }
     }
     expect(files.length).toBeGreaterThan(40)

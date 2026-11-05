@@ -40,7 +40,15 @@ export const josefEn: TextOverlay<Journey> = {
         'Not long after, Joseph dreams again. “The sun, the moon, and eleven stars bowed down to me,” he tells them. Even his father shakes his head: “Are we all supposed to fall down before you?”',
         'The brothers become jealous of Joseph. But Jacob does not forget the dream.'
       ],
-      task: { hint: 'Tap the stars in the night sky and count them.' },
+      task: {
+        hint: 'Turn every sheaf toward Joseph’s sheaf in the middle until they all bow down.',
+        sheavesBow: {
+          rounds: [
+            { hint: 'Round 1: Tap each sheaf until its ears point to Joseph’s sheaf in the middle.' },
+            { hint: 'Round 2: Two circles! Each sheaf now turns only a little bit at a time.' }
+          ]
+        }
+      },
       questions: [
         { q: 'What bowed down in the first dream?', options: ['sheaves of grain', 'sheep', 'camels'] },
         { q: 'Who asks, ‘Are we all supposed to fall down before you?’', options: ['Joseph’s father', 'Reuben', 'a merchant'] }
@@ -128,15 +136,11 @@ export const josefEn: TextOverlay<Journey> = {
         'To the baker, Joseph says that his dream means something sad. It happens just as Joseph said. The cupbearer may go back to the Pharaoh, but he forgets Joseph, and Joseph stays in prison.'
       ],
       task: {
-        hint: 'Find the matching cards. Remember where each one lies.',
-        memory: {
-          pairs: [
-            { text: 'The vine: This is what the cupbearer dreams of.' },
-            { text: 'The Pharaoh’s cup: The cupbearer squeezes the grapes into it.' },
-            { text: 'The cupbearer: He pours the wine for the Pharaoh.' },
-            { text: 'The Pharaoh: The cupbearer may go back to him.' },
-            { text: 'Joseph: He explains the dreams.' },
-            { text: 'God: He can explain dreams, says Joseph.' }
+        hint: 'Press the grapes over Pharaoh’s cup until it is full. But it must not run over!',
+        winePress: {
+          rounds: [
+            { hint: 'Round 1: Press the grapes and keep holding. Let go when the cup is full.' },
+            { hint: 'Round 2: Now the juice runs faster. Fill two cups without letting one run over.' }
           ]
         }
       },
@@ -157,7 +161,15 @@ export const josefEn: TextOverlay<Journey> = {
         'In the morning the Pharaoh is troubled. He sends for all the wise men of the land, but nobody can explain the dream. Then the cupbearer remembers Joseph. Joseph is brought out of prison, he is given fresh clothes, and he stands before the Pharaoh.',
         '“I cannot explain it,” he says, “but God will give the Pharaoh the answer.” Both dreams mean the same thing: Seven good years are coming, with a big harvest. After that come seven years of hunger.'
       ],
-      task: { hint: 'Tap every cow and count along: the fat ones and the thin ones.', question: 'How many cows are there altogether?' },
+      task: {
+        hint: 'The cows come up out of the Nile. Tap only the seven fat ones and let the thin ones walk by.',
+        nileCows: {
+          rounds: [
+            { hint: 'Round 1: First come the fat cows, then the thin ones. Tap only the seven fat ones.' },
+            { hint: 'Round 2: Now fat and thin cows come mixed up, and faster. Only the fat ones!' }
+          ]
+        }
+      },
       questions: [
         { q: 'Who gives the Pharaoh the answer?', options: ['God', 'the wise men', 'the cupbearer'] },
         { q: 'What comes after the seven good years?', options: ['seven years of hunger', 'seven years of rain', 'a big feast'] }
@@ -214,17 +226,13 @@ export const josefEn: TextOverlay<Journey> = {
         'Then Joseph hugs Benjamin, and both of them weep. He kisses all the other brothers, too. Everyone weeps. And at last the brothers talk with him.'
       ],
       task: {
-        hint: 'Color the whole picture.',
-        jobs: [
-          { hint: 'Color the sky blue.' },
-          { hint: 'Color the big jug brown.' },
-          { hint: 'Color Joseph’s robe with watercolor.' },
-          { hint: 'Color Joseph’s robe with colored pencil.' },
-          { hint: 'Color the boy’s coat with the felt-tip marker.' },
-          { hint: 'Color the boy’s coat with chalk.' },
-          { hint: 'Color the pillars with colored pencil.' },
-          { hint: 'Color the pillars with chalk.' }
-        ]
+        hint: 'Lead Joseph to Benjamin and then to every brother. With every hug a frightened face becomes glad.',
+        embrace2: {
+          rounds: [
+            { hint: 'Round 1: Lead Joseph to Benjamin, the youngest, first. Then to every brother.', brothers: [{ name: 'Reuben' }, { name: 'Simeon' }, { name: 'Benjamin' }, { name: 'Judah' }, { name: 'Levi' }] },
+            { hint: 'Round 2: All eleven brothers are here. Can you find Benjamin yourself?', brothers: [{ name: 'Dan' }, { name: 'Naphtali' }, { name: 'Gad' }, { name: 'Asher' }, { name: 'Issachar' }, { name: 'Reuben' }, { name: 'Simeon' }, { name: 'Zebulun' }, { name: 'Judah' }, { name: 'Levi' }, { name: 'Benjamin' }] }
+          ]
+        }
       },
       questions: [
         { q: 'What does Joseph ask right after he says his name?', options: ['whether his father is still alive', 'whether they are hungry', 'whether Benjamin is well'] },
@@ -241,7 +249,15 @@ export const josefEn: TextOverlay<Journey> = {
         'Jacob sets out with his whole family. In the night God speaks to him: “Do not be afraid to go down to Egypt. I will go with you.” When Joseph sees his father coming, he rides out to meet him, throws his arms around his neck, and weeps for a long time.',
         'Jacob lives in Egypt for seventeen more years, and then he dies. The brothers are afraid that Joseph will take revenge now. But Joseph says, “Do not be afraid! You meant to do me harm, but God turned it into good.” He speaks kindly to them and comforts them.'
       ],
-      task: { hint: 'Find the eleven brothers on the road to Egypt. Some of them are hiding!' },
+      task: {
+        hint: 'Steer Joseph’s chariot and Jacob’s wagon at the same time until they meet in the middle.',
+        meeting: {
+          rounds: [
+            { hint: 'Round 1: Tap on the left to steer Joseph’s chariot and on the right for Jacob’s wagon. Drive past everything!' },
+            { hint: 'Round 2: More rocks and sheep, and the wagons drive faster. Steer with two fingers at once!' }
+          ]
+        }
+      },
       questions: [
         { q: 'What does Joseph do when he sees his father?', options: ['He throws his arms around him', 'He turns away', 'He bows down before him'] },
         { q: 'What does Joseph say to his brothers after Jacob’s death?', options: ['“Do not be afraid!”', '“Go away!”', '“Give me silver!”'] }

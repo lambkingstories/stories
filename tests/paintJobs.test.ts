@@ -242,9 +242,9 @@ describe('the pictures of the journeys that come with tasks', () => {
     expect(t.jobs!.find((x) => x.hint === 'Male den Regenbogen mit Wasserfarbe.')).toMatchObject({ zone: 'regenbogen', tool: 'watercolor' })
   })
 
-  it('Josef 6 and Josef 11 have five elements each (three of them are drawn)', () => {
+  it('Josef 6 has five elements (three of them are drawn); Josef 11 is a game since 5.11.2026 (Embrace), no second picture to paint', () => {
     expect(Object.keys(task(josef, 6).zones!).sort()).toEqual(['fenster', 'gewand', 'krug', 'lichtstrahl', 'teppich'])
-    expect(Object.keys(task(josef, 11).zones!).sort()).toEqual(['gewand', 'himmel', 'krug', 'rock', 'saeulen'])
+    expect(josef.stages.filter((s) => s.task.kind === 'ausmalen').map((s) => s.id)).toEqual([6])
   })
 
   it('the zones of Noah 9: five bands of the rainbow, one sun, several clouds, the hull of the ark, the meadow', () => {

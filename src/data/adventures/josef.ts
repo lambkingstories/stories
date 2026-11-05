@@ -4,6 +4,7 @@
  * Luther 1912 on 21.10.2026 (`D:/Claude/Abenteuer-Josef/PRUEFBERICHT-BIBELTREUE-2026-10-21.md`; open suggestions for Anton are in the report). In the data the right answer of a question is listed first (`answer: 0`); the options are shuffled when shown.
  */
 import type { Journey, PaintJob, PaintZone } from '@/types/adventure'
+import type { EmbraceGame, MeetingGame, NileCowsGame, SheavesGame, WinePressGame } from '@/utils/josefNeu'
 import { JOSEF_PATH } from './josefPath'
 import { localize } from './localize'
 import { josefEn } from './en/josef.en'
@@ -12,7 +13,7 @@ const IMG = 'images/abenteuer/josef/'
 const G = 'images/abenteuer/spiele/'
 
 /**
- * Etappe 6 und 11, Ausmalen: die Elemente des Bildes, über die die Zusatzbedingungen sprechen (je ein Punkt mitten in jeder geschlossenen Fläche des
+ * Etappe 6, Ausmalen: die Elemente des Bildes, über die die Zusatzbedingungen sprechen (je ein Punkt mitten in jeder geschlossenen Fläche des
  * Strichbildes, am Bild gemessen: Abenteuer-Noah/SPIELE/ausmalen-*-zonen.json, Bild-Sitzung). Bei jedem Start werden drei Aufgaben (für verschiedene Elemente) aus dem Pool gezogen; jede erfüllte Aufgabe ist ein Stern.
  */
 const AUSMALEN_6_ZONEN: Record<string, PaintZone> = {
@@ -30,23 +31,165 @@ const AUSMALEN_6_AUFGABEN: PaintJob[] = [
   { zone: 'teppich', tool: 'pencil', hint: 'Male den Teppich mit Buntstift.' },
   { zone: 'fenster', tool: 'chalk', hint: 'Male das Fenster mit Kreide.' }
 ]
-const AUSMALEN_11_ZONEN: Record<string, PaintZone> = {
-  himmel: { seeds: [[17.0, 11.4], [69.9, 1.5]] },
-  gewand: { seeds: [[69.1, 90.0], [66.6, 45.5]] },
-  rock: { seeds: [[31.3, 93.4], [33.1, 62.4], [35.6, 61.8]] },
-  krug: { seeds: [[5.2, 75.0], [6.9, 69.7], [9.0, 74.0], [3.9, 72.6], [3.9, 65.2], [6.6, 85.3]] },
-  saeulen: { seeds: [[10.2, 16.1], [5.2, 16.5], [13.2, 12.7], [9.0, 8.4], [7.6, 10.9], [8.4, 6.0], [8.6, 1.8], [23.5, 11.9], [23.5, 19.4], [22.9, 6.3], [24.6, 5.0], [93.8, 8.2], [93.7, 10.7], [90.9, 1.8]] }
+// ---------------------------------------------------------------- the five new games (5.11.2026, Anton's game plan; logic and checks: utils/josefNeu.ts)
+// Pictures: Codex with its own image generator (orders J1 to J4 in D:/Claude/Abenteuer-Josef/BILDAUFTRAEGE); places measured on the painted pictures
+// (D:/Claude/Abenteuer-Josef/tools/neue_spiele_bilder_josef.py). "Cows by the Nile" uses the cows and the meadow that were painted for the old counting game.
+const NEU = `${G}josef/`
+
+/** Etappe 2, Garben verneigen sich (1. Mose 37,7): elf Garben im Kreis um Josefs Garbe; `start` = wohin die Ähren am Anfang zeigen (Grad, 0 = oben, im Uhrzeigersinn). */
+const GARBEN: SheavesGame = {
+  field: `${NEU}garben/feld.webp`,
+  josef: `${NEU}garben/josef.webp`,
+  josefW: 26,
+  sheafW: 17,
+  rounds: [
+    {
+      hint: 'Runde 1: Tippe jede Garbe an, bis ihre Ähren zu Josefs Garbe in der Mitte zeigen.',
+      center: { x: 50, y: 50 },
+      step: 45,
+      sheaves: [
+        [55.0, 14.4, 92], [73.5, 22.7, 183], [84.5, 39.7, 112], [84.6, 60.0, 203], [73.7, 77.1, 268], [55.2, 85.6, 224],
+        [35.1, 82.8, 333], [19.8, 69.6, 334], [14.0, 50.1, 309], [19.7, 30.6, 40], [34.9, 17.3, 104]
+      ].map(([x, y, start], i) => ({ x: x!, y: y!, start: start!, image: `${NEU}garben/garbe-${(i % 2) + 1}.webp` }))
+    },
+    {
+      hint: 'Runde 2: Zwei Kreise! Jede Garbe dreht sich jetzt nur ein kleines Stück weiter.',
+      center: { x: 50, y: 50 },
+      step: 30,
+      sheaves: [
+        [57.5, 29.3, 106], [72.0, 50.8, 127], [56.1, 71.1, 280], [31.8, 62.3, 301], [32.7, 36.5, 34],
+        [50.0, 10.0, 65], [84.6, 30.0, 176], [84.6, 70.0, 155], [50.0, 90.0, 266], [15.4, 70.0, 305], [15.4, 30.0, 56]
+      ].map(([x, y, start], i) => ({ x: x!, y: y!, start: start!, image: `${NEU}garben/garbe-${(i % 2) + 1}.webp` }))
+    }
+  ]
 }
-const AUSMALEN_11_AUFGABEN: PaintJob[] = [
-  { zone: 'himmel', color: 'blue', hint: 'Male den Himmel blau.' },
-  { zone: 'krug', color: 'brown', hint: 'Male den großen Krug braun.' },
-  { zone: 'gewand', tool: 'watercolor', hint: 'Male Josefs Gewand mit Wasserfarbe.' },
-  { zone: 'gewand', tool: 'pencil', hint: 'Male Josefs Gewand mit Buntstift.' },
-  { zone: 'rock', tool: 'felt', hint: 'Male den Rock des Jungen mit dem Filzstift.' },
-  { zone: 'rock', tool: 'chalk', hint: 'Male den Rock des Jungen mit Kreide.' },
-  { zone: 'saeulen', tool: 'pencil', hint: 'Male die Säulen mit Buntstift.' },
-  { zone: 'saeulen', tool: 'chalk', hint: 'Male die Säulen mit Kreide.' }
-]
+
+/** Etappe 7, Keltern (1. Mose 40,11): die Trauben über dem Becher des Pharao drücken und halten, bis er voll ist, ohne dass er überläuft. */
+const KELTERN: WinePressGame = {
+  background: `${NEU}keltern/hintergrund.webp`,
+  ratio: 3 / 4,
+  cups: ['leer', 'wenig', 'halb', 'voll', 'ueber'].map((n) => `${NEU}keltern/becher-${n}.webp`) as WinePressGame['cups'],
+  cupRatio: 1,
+  // der Fuß des Bechers steht auf der Tischplatte (am Bild gemessen: 62 bis 74 % der Höhe); die Traube hängt darüber vor der mittleren Rebe
+  cup: { x: 50, y: 71, w: 38 },
+  grapes: { x: 50, y: 29, w: 30, image: `${NEU}keltern/trauben.webp`, ratio: 1 },
+  drop: `${NEU}keltern/tropfen.webp`,
+  puddle: `${NEU}keltern/lache.webp`,
+  rounds: [
+    { hint: 'Runde 1: Drück die Trauben und halte sie gedrückt. Lass los, wenn der Becher voll ist.', flow: 0.13, push: 0.02, full: 0.82, cups: 1 },
+    { hint: 'Runde 2: Jetzt läuft der Saft schneller. Fülle zwei Becher, ohne dass einer überläuft.', flow: 0.16, push: 0.04, full: 0.84, cups: 2 }
+  ]
+}
+
+/** Etappe 8, Kühe am Nil (1. Mose 41,2–3): Kühe steigen aus dem Nil; nur die sieben dicken antippen. Die Bilder schauen nach rechts und werden gespiegelt (sie gehen nach links). */
+// dick-2 und duenn-2 schauen schon nach links (am Bild gemessen), die anderen werden gespiegelt
+const KUH = (kind: 'fat' | 'lean', n: number, lane: number, at: number) => ({ kind, lane, at, faceLeft: n === 2, image: `${G}kuehe/${kind === 'fat' ? 'dick' : 'duenn'}-${n}.webp` })
+const KUEHE_NIL: NileCowsGame = {
+  background: `${G}kuehe/wiese.webp`,
+  ratio: 4 / 3,
+  shore: { x: 86, y: 44 },
+  shoreScale: 0.55,
+  lanes: [
+    { x: -14, y: 66, scale: 0.85 },
+    { x: -14, y: 94, scale: 1.15 }
+  ],
+  cowW: 24,
+  cowRatio: 380 / 275,
+  rise: 0.8,
+  rounds: [
+    {
+      hint: 'Runde 1: Erst kommen die dicken Kühe, dann die mageren. Tippe nur die sieben dicken an.',
+      speed: 12,
+      cows: [
+        ...[0, 1, 2, 3, 4, 5, 6].map((i) => KUH('fat', (i % 3) + 1, i % 2, 0.5 + i * 2)),
+        ...[0, 1, 2, 3, 4, 5, 6].map((i) => KUH('lean', (i % 3) + 1, i % 2, 14.5 + i * 2))
+      ]
+    },
+    {
+      hint: 'Runde 2: Jetzt kommen dicke und magere durcheinander und schneller. Nur die dicken!',
+      speed: 16,
+      cows: (['fat', 'lean', 'fat', 'fat', 'lean', 'fat', 'lean', 'lean', 'fat', 'lean', 'fat', 'fat', 'lean', 'lean'] as const).map((k, i) => KUH(k, (i % 3) + 1, i % 2, 0.5 + i * 1.5))
+    }
+  ]
+}
+
+/**
+ * Etappe 11, Umarmen (1. Mose 45,14–15): zuerst Benjamin, dann jeden Bruder; die Bilder je Bruder: erschrocken und froh. Die Zuordnung der Namen zu den Gesichtern ist frei.
+ * Benjamin ist im Spiel ein junger Mann (der Generator lehnte den Jüngling zweimal ab; 1. Mose 46,21 nennt zehn Söhne Benjamins, vgl. PRUEFBERICHT-BIBELTREUE Teil C).
+ */
+const BRUDER = (id: string, name: string, x: number, y: number, h: number, flip = false) => ({ id, name, x, y, h, flip, scared: `${NEU}umarmen/${id}-erschrocken.webp`, glad: `${NEU}umarmen/${id}-froh.webp` })
+const UMARMEN: EmbraceGame = {
+  background: `${NEU}umarmen/saal.webp`,
+  ratio: 3 / 2,
+  josef: `${NEU}umarmen/josef.webp`,
+  josefH: 54,
+  figureRatio: 2 / 3,
+  speed: 40,
+  rounds: [
+    {
+      hint: 'Runde 1: Führe Josef zuerst zu Benjamin, dem Jüngsten. Dann zu jedem Bruder.',
+      start: { x: 50, y: 70 },
+      showBenjamin: true,
+      brothers: [
+        BRUDER('bruder-1', 'Ruben', 10, 96, 50),
+        BRUDER('bruder-2', 'Simeon', 29, 96, 50),
+        { ...BRUDER('benjamin', 'Benjamin', 71, 96, 50), benjamin: true },
+        BRUDER('bruder-3', 'Juda', 90, 96, 50),
+        BRUDER('bruder-4', 'Levi', 52, 96, 50)
+      ]
+    },
+    {
+      hint: 'Runde 2: Alle elf Brüder sind da. Findest du Benjamin selbst?',
+      start: { x: 4, y: 80 },
+      showBenjamin: false,
+      brothers: [
+        BRUDER('bruder-5', 'Dan', 17, 70, 42),
+        BRUDER('bruder-6', 'Naftali', 35, 70, 42),
+        BRUDER('bruder-7', 'Gad', 53, 70, 42),
+        BRUDER('bruder-8', 'Ascher', 71, 70, 42),
+        BRUDER('bruder-9', 'Issachar', 89, 70, 42),
+        BRUDER('bruder-1', 'Ruben', 10.5, 97, 46),
+        BRUDER('bruder-2', 'Simeon', 26.5, 97, 46),
+        BRUDER('bruder-10', 'Sebulon', 42.5, 97, 46),
+        BRUDER('bruder-3', 'Juda', 74.5, 97, 46),
+        BRUDER('bruder-4', 'Levi', 90.5, 97, 46),
+        { ...BRUDER('benjamin', 'Benjamin', 58.5, 97, 46), benjamin: true }
+      ]
+    }
+  ]
+}
+
+/** Etappe 12, Begegnung (1. Mose 46,29): Josefs Wagen von links, Jakobs Wagen von rechts; beide treffen sich am Brunnen in der Mitte. */
+const DING = (side: 'josef' | 'jakob', lane: number, x: number, n: 'felsen' | 'dornbusch' | 'schaf') => ({ side, lane, x, image: `${NEU}begegnung/${n}.webp`, w: 12 })
+const BEGEGNUNG: MeetingGame = {
+  background: `${NEU}begegnung/land.webp`,
+  ratio: 4 / 3,
+  // die Linie, auf der die Räder stehen (Straße von 50 % bis unten, am Bild gemessen)
+  lanes: [54, 73, 92],
+  josef: { image: `${NEU}begegnung/josef-wagen.webp`, w: 28, ratio: 350 / 165 },
+  jakob: { image: `${NEU}begegnung/jakob-wagen.webp`, w: 34.4, ratio: 430 / 140 },
+  from: -8,
+  meet: 50,
+  gap: 2,
+  bump: 1.2,
+  rounds: [
+    {
+      hint: 'Runde 1: Tippe links, um Josefs Wagen zu lenken, und rechts für Jakobs Wagen. Fahrt an allem vorbei!',
+      speed: 4,
+      startLane: { josef: 1, jakob: 1 },
+      obstacles: [DING('josef', 1, 22, 'felsen'), DING('josef', 0, 36, 'dornbusch'), DING('jakob', 1, 78, 'schaf'), DING('jakob', 2, 64, 'felsen')]
+    },
+    {
+      hint: 'Runde 2: Mehr Steine und Schafe, und die Wagen fahren schneller. Lenke mit zwei Fingern zugleich!',
+      speed: 5.5,
+      startLane: { josef: 0, jakob: 2 },
+      obstacles: [
+        DING('josef', 0, 16, 'felsen'), DING('josef', 1, 24, 'schaf'), DING('josef', 2, 32, 'dornbusch'), DING('josef', 1, 40, 'felsen'),
+        DING('jakob', 2, 84, 'dornbusch'), DING('jakob', 1, 76, 'felsen'), DING('jakob', 0, 68, 'schaf'), DING('jakob', 1, 60, 'dornbusch')
+      ]
+    }
+  ]
+}
 
 export const josef: Journey = {
   id: 'josef',
@@ -108,7 +251,8 @@ export const josef: Journey = {
         'Nicht lange danach träumt Josef noch einmal. „Die Sonne, der Mond und elf Sterne haben sich vor mir verneigt“, erzählt er. Sogar sein Vater schüttelt den Kopf: „Sollen wir alle vor dir niederfallen?“',
         'Die Brüder werden eifersüchtig auf Josef. Aber Jakob vergisst den Traum nicht.'
       ],
-      task: { kind: 'zaehlen', hint: 'Tippe die Sterne am Nachthimmel an und zähle sie.', count: 11, image: 'images/abenteuer/ui/stern-gold-{n}.webp', imageOff: 'images/abenteuer/ui/stern-aus-{n}.webp', background: `${IMG}himmel.webp` },
+      // Spiel: Garben verneigen sich (garben, neu 5.11.2026)
+      task: { kind: 'garben', hint: 'Drehe jede Garbe zu Josefs Garbe in der Mitte, bis sich alle verneigen.', sheavesBow: GARBEN },
       questions: [
         { q: 'Was verbeugte sich im ersten Traum?', options: ['Garben', 'Schafe', 'Kamele'], answer: 0 },
         { q: 'Wer fragt: „Sollen wir alle vor dir niederfallen?“', options: ['Josefs Vater', 'Ruben', 'ein Händler'], answer: 0 }
@@ -210,22 +354,8 @@ export const josef: Journey = {
         'Der Mundschenk träumt von einem Weinstock mit drei Zweigen. Die Trauben werden reif, und er drückt sie in den Becher des Pharao. „Nach drei Tagen darfst du wieder zum Pharao zurück“, sagt Josef. „Bitte denk dann an mich! Ich habe nichts Unrechtes getan.“',
         'Dem Bäcker sagt Josef, dass sein Traum etwas Trauriges bedeutet. Es geschieht, wie Josef es gesagt hat. Der Mundschenk darf wieder zum Pharao, aber er vergisst den Josef, und Josef bleibt im Gefängnis.'
       ],
-      task: {
-        kind: 'memory',
-        hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.',
-        memory: {
-          back: `${G}memory/rueck.webp`,
-          // every picture is on two cards; the line tells what it is in the story (only things that are in the text)
-          pairs: [
-            { image: `${G}memory/wein.webp`, text: 'Der Weinstock: Davon träumt der Mundschenk.' },
-            { image: `${G}memory/becher.webp`, text: 'Der Becher des Pharao: In ihn drückt der Mundschenk die Trauben aus.' },
-            { image: `${G}memory/schenk.webp`, text: 'Der Mundschenk: Er schenkt dem Pharao den Wein ein.' },
-            { image: `${G}memory/pharao.webp`, text: 'Der Pharao: Zu ihm darf der Mundschenk zurück.' },
-            { image: `${G}memory/josef.webp`, text: 'Josef: Er deutet die Träume.' },
-            { image: `${G}memory/gott.webp`, text: 'Gott: Er kann Träume deuten, sagt Josef.' }
-          ]
-        }
-      },
+      // Spiel: Keltern (keltern, neu 5.11.2026)
+      task: { kind: 'keltern', hint: 'Drück die Trauben über dem Becher des Pharao, bis er voll ist. Aber er darf nicht überlaufen!', winePress: KELTERN },
       questions: [
         { q: 'Was sagt Josef dem Mundschenk?', options: ['Nach drei Tagen darfst du wieder zum Pharao zurück.', 'Du bleibst für immer im Gefängnis.', 'Du bekommst einen Sack voll Gold.'], answer: 0 },
         { q: 'Worum bittet Josef den Mundschenk?', options: ['an ihn zu denken', 'ihm Essen zu bringen', 'ihm einen neuen Rock zu schenken'], answer: 0 }
@@ -240,18 +370,8 @@ export const josef: Journey = {
         'Am Morgen ist der Pharao unruhig. Er lässt alle Weisen des Landes rufen, aber keiner kann den Traum deuten. Da fällt dem Mundschenk der Josef wieder ein. Josef wird aus dem Gefängnis geholt, er bekommt frische Kleider und tritt vor den Pharao.',
         '„Nicht ich kann das deuten“, sagt er, „aber Gott gibt dem Pharao die Antwort.“ Beide Träume bedeuten dasselbe: Es kommen sieben gute Jahre mit viel Ernte. Danach kommen sieben Jahre mit Hunger.'
       ],
-      task: {
-        kind: 'zaehlen',
-        hint: 'Tippe jede Kuh an und zähle mit: die dicken und die dünnen.',
-        count: 14,
-        image: '',
-        question: 'Wie viele Kühe sind es zusammen?',
-        background: `${G}kuehe/wiese.webp`,
-        groups: [
-          { image: `${G}kuehe/dick-{n}.webp`, imageOff: `${G}kuehe/dick-aus-{n}.webp`, count: 7 },
-          { image: `${G}kuehe/duenn-{n}.webp`, imageOff: `${G}kuehe/duenn-aus-{n}.webp`, count: 7 }
-        ]
-      },
+      // Spiel: Kühe am Nil (kuehenil, neu 5.11.2026)
+      task: { kind: 'kuehenil', hint: 'Die Kühe steigen aus dem Nil. Tippe nur die sieben dicken an und lass die mageren vorbeiziehen.', nileCows: KUEHE_NIL },
       questions: [
         { q: 'Wer gibt dem Pharao die Antwort?', options: ['Gott', 'die Weisen', 'der Mundschenk'], answer: 0 },
         { q: 'Was kommt nach den sieben guten Jahren?', options: ['sieben Jahre mit Hunger', 'sieben Jahre mit Regen', 'ein großes Fest'], answer: 0 }
@@ -311,7 +431,8 @@ export const josef: Journey = {
         '„Kommt näher zu mir“, sagt Josef freundlich. „Ich bin euer Bruder, den ihr nach Ägypten verkauft habt. Seid nicht traurig und macht euch keine Vorwürfe. Gott hat mich vor euch hergeschickt, damit er Menschen am Leben erhält.“',
         'Dann umarmt Josef Benjamin, und beide weinen. Er küsst auch alle anderen Brüder. Alle weinen. Und endlich reden die Brüder mit ihm.'
       ],
-      task: { kind: 'ausmalen', hint: 'Male das Bild voll aus.', image: `${IMG}etappe-11.webp`, zones: AUSMALEN_11_ZONEN, jobs: AUSMALEN_11_AUFGABEN, jobCount: 3 },
+      // Spiel: Umarmen (umarmen, neu 5.11.2026)
+      task: { kind: 'umarmen', hint: 'Führe Josef zu Benjamin und dann zu jedem Bruder. Mit jeder Umarmung wird ein erschrockenes Gesicht froh.', embrace2: UMARMEN },
       questions: [
         { q: 'Wonach fragt Josef gleich nach seinem Namen?', options: ['ob sein Vater noch lebt', 'ob sie Hunger haben', 'ob Benjamin gesund ist'], answer: 0 },
         { q: 'Wer hat Josef nach Ägypten geschickt, sagt er?', options: ['Gott', 'der Pharao', 'die Händler'], answer: 0 }
@@ -327,40 +448,8 @@ export const josef: Journey = {
         'Jakob bricht mit seiner ganzen Familie auf. In der Nacht spricht Gott zu ihm: „Fürchte dich nicht, nach Ägypten zu ziehen. Ich gehe mit dir.“ Als Josef seinen Vater kommen sieht, fährt er ihm entgegen, fällt ihm um den Hals und weint lange.',
         'Siebzehn Jahre lebt Jakob noch in Ägypten, dann stirbt er. Die Brüder bekommen Angst, dass Josef sich jetzt rächt. Doch Josef sagt: „Fürchtet euch nicht! Ihr wolltet mir Böses tun, aber Gott hat es zum Guten gewendet.“ Er spricht freundlich mit ihnen und tröstet sie.'
       ],
-      task: {
-        kind: 'wimmelbild',
-        hint: 'Finde die elf Brüder auf der Straße nach Ägypten. Manche verstecken sich!',
-        count: 11,
-        find: {
-          scene: `${G}wimmel/strasse.webp`,
-          // the middle of the feet and the width, in percent of the scene
-          finds: [
-            { image: `${G}wimmel/bruder-1.webp`, x: 9, y: 50, w: 12 },
-            { image: `${G}wimmel/bruder-2.webp`, x: 40, y: 38, w: 8 },
-            { image: `${G}wimmel/bruder-3.webp`, x: 60, y: 50, w: 12 },
-            { image: `${G}wimmel/bruder-4.webp`, x: 84, y: 40, w: 11 },
-            { image: `${G}wimmel/bruder-5.webp`, x: 22, y: 66, w: 13 },
-            { image: `${G}wimmel/bruder-6.webp`, x: 59, y: 69, w: 14 },
-            { image: `${G}wimmel/bruder-7.webp`, x: 46, y: 78, w: 15 },
-            { image: `${G}wimmel/bruder-8.webp`, x: 12, y: 86, w: 15 },
-            { image: `${G}wimmel/bruder-9.webp`, x: 89, y: 82, w: 15 },
-            { image: `${G}wimmel/bruder-10.webp`, x: 28, y: 27, w: 8 },
-            { image: `${G}wimmel/bruder-11.webp`, x: 62, y: 93, w: 15 }
-          ],
-          // in front of some of them, so that only a part of them looks out
-          covers: [
-            { image: `${G}wimmel/busch.webp`, x: 7, y: 54, w: 20 },
-            { image: `${G}wimmel/faesser.webp`, x: 62, y: 55, w: 24 },
-            { image: `${G}wimmel/fels.webp`, x: 86, y: 44, w: 20 },
-            { image: `${G}wimmel/kruege.webp`, x: 18, y: 71, w: 18 },
-            { image: `${G}wimmel/heu.webp`, x: 74, y: 71, w: 26 },
-            { image: `${G}wimmel/busch2.webp`, x: 11, y: 91, w: 22 },
-            { image: `${G}wimmel/dorn.webp`, x: 91, y: 87, w: 22 },
-            { image: `${G}wimmel/palme.webp`, x: 25, y: 31, w: 16 },
-            { image: `${G}wimmel/busch.webp`, x: 63, y: 98, w: 24 }
-          ]
-        }
-      },
+      // Spiel: Begegnung (begegnung, neu 5.11.2026)
+      task: { kind: 'begegnung', hint: 'Lenke Josefs Wagen und Jakobs Wagen zugleich, bis sie sich in der Mitte treffen.', meeting: BEGEGNUNG },
       questions: [
         { q: 'Was tut Josef, als er seinen Vater sieht?', options: ['er fällt ihm um den Hals', 'er wendet sich ab', 'er verneigt sich vor ihm'], answer: 0 },
         { q: 'Was sagt Josef nach Jakobs Tod zu den Brüdern?', options: ['„Fürchtet euch nicht!“', '„Geht fort!“', '„Gebt mir Silber!“'], answer: 0 }

@@ -236,40 +236,52 @@ describe('the games', () => {
     const { default: Puzzle } = await import('@/components/molecules/games/GamePuzzle.vue')
     const { default: Way } = await import('@/components/molecules/games/GameWay.vue')
     const { default: Harvest } = await import('@/components/molecules/games/GameHarvest.vue')
-    const { default: Memory } = await import('@/components/molecules/games/GameMemory.vue')
     const { default: Sort } = await import('@/components/molecules/games/GameSort.vue')
-    const { default: Find } = await import('@/components/molecules/games/GameFind.vue')
     const { default: Count } = await import('@/components/molecules/AdventureCount.vue')
+    // the five new games of 5.11.2026 (counting, memory, the second colouring page and the picture search are replaced; utils/josefNeu.ts)
+    const { default: Garben } = await import('@/components/molecules/games/GameGarben.vue')
+    const { default: Keltern } = await import('@/components/molecules/games/GameKeltern.vue')
+    const { default: Kuehenil } = await import('@/components/molecules/games/GameKuehenil.vue')
+    const { default: Umarmen } = await import('@/components/molecules/games/GameUmarmen.vue')
+    const { default: Begegnung } = await import('@/components/molecules/games/GameBegegnung.vue')
     const tasks = journeys[0]!.stages.map((s) => s.task)
-    const by = (k: string) => tasks.find((t) => t.kind === k)!
+    const by = (k: string) => tasks.find((t) => (t.kind as string) === k)!
+    const field = (k: string, f: string) => (by(k) as unknown as Record<string, unknown>)[f]
     const mounts = [
       mount(Puzzle, { ...opts, props: { game: by('puzzle').puzzle! } }),
       mount(Way, { ...opts, props: { game: by('weg').way! } }),
       mount(Harvest, { ...opts, props: { game: by('ernten').harvest! } }),
-      mount(Memory, { ...opts, props: { game: by('memory').memory! } }),
       mount(Sort, { ...opts, props: { game: by('sortieren').sort! } }),
-      mount(Find, { ...opts, props: { game: by('wimmelbild').find! } }),
-      mount(Count, { ...opts, props: { count: 11, image: 'images/abenteuer/ui/stern-gold-{n}.webp' } })
+      mount(Count, { ...opts, props: { count: 11, image: 'images/abenteuer/ui/stern-gold-{n}.webp' } }),
+      mount(Garben, { ...opts, props: { game: field('garben', 'sheavesBow') as never } }),
+      mount(Keltern, { ...opts, props: { game: field('keltern', 'winePress') as never } }),
+      mount(Kuehenil, { ...opts, props: { game: field('kuehenil', 'nileCows') as never } }),
+      mount(Umarmen, { ...opts, props: { game: field('umarmen', 'embrace2') as never } }),
+      mount(Begegnung, { ...opts, props: { game: field('begegnung', 'meeting') as never } })
     ]
     await flushPromises()
     for (const m of mounts) expect(m.html().length).toBeGreaterThan(200)
     expect(mounts[2]!.findAll('.hv-thing').length).toBeGreaterThan(10)
-    expect(mounts[3]!.findAll('.mem-card').length).toBe(by('memory').memory!.pairs.length * 2)
-    expect(mounts[5]!.findAll('.fd-thing').length).toBe(11)
+    expect(mounts[5]!.findAll('.gg-sheaf').length).toBe(11)
+    expect(mounts[8]!.findAll('.gu-bro').length).toBe(5)
     expect(problems()).toEqual([])
+    for (const m of mounts) m.unmount()
   })
 
-  it('the harvest, the memory and the way react to taps', async () => {
+  it('the harvest, the sheaves and the way react to taps', async () => {
     const { default: Harvest } = await import('@/components/molecules/games/GameHarvest.vue')
-    const { default: Memory } = await import('@/components/molecules/games/GameMemory.vue')
+    const { default: Garben } = await import('@/components/molecules/games/GameGarben.vue')
     const { default: Way } = await import('@/components/molecules/games/GameWay.vue')
     const tasks = journeys[0]!.stages.map((s) => s.task)
     const h = mount(Harvest, { ...opts, props: { game: tasks.find((t) => t.kind === 'ernten')!.harvest! } })
     await h.find('.hv-thing:not(.weed)').trigger('click')
     expect(h.find('.hv-thing.fly').exists()).toBe(true)
-    const m = mount(Memory, { ...opts, props: { game: tasks.find((t) => t.kind === 'memory')!.memory! } })
-    await m.findAll('.mem-card')[0]!.trigger('click')
-    expect(m.findAll('.mem-card.up').length).toBe(1)
+    // the sheaves of Josef 2 (since 5.11.2026 instead of the memory of stage 7): a tap turns a sheaf
+    const sheaves = (tasks.find((t) => (t.kind as string) === 'garben') as unknown as Record<string, unknown>).sheavesBow
+    const m = mount(Garben, { ...opts, props: { game: sheaves as never } })
+    const before = m.find('[data-sheaf="0"] .gg-turn').attributes('style')
+    await m.find('[data-sheaf="0"]').trigger('click')
+    expect(m.find('[data-sheaf="0"] .gg-turn').attributes('style')).not.toBe(before)
     const w = mount(Way, { ...opts, props: { game: tasks.find((t) => t.kind === 'weg')!.way! } })
     await w.find('.way-hit.left').trigger('click')
     expect(w.find('.way-scene').classes().some((c) => c === 'good' || c === 'bad')).toBe(true)
@@ -1074,7 +1086,8 @@ describe('a picture to paint that asks for a tool', () => {
     return w
   }
 
-  it.each([['6'], ['11']])('Josef %s: "Male das Bild voll aus." and three tasks for three different elements of the pool under it, never a word about the rest', async (stage) => {
+  // Josef 11 is a game since 5.11.2026 (Embrace); only stage 6 is a picture to paint
+  it.each([['6']])('Josef %s: "Male das Bild voll aus." and three tasks for three different elements of the pool under it, never a word about the rest', async (stage) => {
     const { josef } = await import('@/data/adventures/josef')
     const pool = josef.stages.find((x) => x.id === Number(stage))!.task.jobs!
     const w = await mountStage('josef', stage, {})

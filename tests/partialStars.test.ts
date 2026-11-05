@@ -126,18 +126,21 @@ describe('every game says how much its whole task is (Josef and Noah)', () => {
         w.unmount()
       }
     }
-    expect(seen.length).toBeGreaterThanOrEqual(12)
+    // Josef keeps four of the old games since 5.11.2026 (puzzle, way, harvest, sort); the new ones have their own tests (josefNeu*)
+    expect(seen.length).toBeGreaterThanOrEqual(10)
   })
 })
 
 describe('the button of a game that is left unfinished', () => {
-  const josef = journeys.find((j) => j.id === 'josef')!
-  const findStage = josef.stages.find((s) => s.task.find)!
+  // Josef has no wimmelbild any more since 5.11.2026 (new games); the hill wimmelbild of Noah has 4 things
+  const JID = 'noah'
+  const noah = journeys.find((j) => j.id === JID)!
+  const findStage = noah.stages.find((s) => s.task.find)!
   const things = findStage.task.find!.finds.length
 
   const openFind = async (locale: 'de' | 'en' = 'de') => {
     const { default: Stage } = await import('@/views/app/AppAdventureStageView.vue')
-    route.params = { journeyId: 'josef', stageId: String(findStage.id) }
+    route.params = { journeyId: JID, stageId: String(findStage.id) }
     const w = mount(Stage, opts(locale))
     await flushPromises()
     await w.findAll('button').find((x) => /Zur Aufgabe|To the task|Task/.test(x.text()))!.trigger('click')
@@ -148,8 +151,8 @@ describe('the button of a game that is left unfinished', () => {
   }
   const label = (w: ReturnType<typeof mount>) => w.findAll('button').find((x) => x.classes().includes('stage-skip'))?.text()
 
-  it('the wimmelbild with 11 things: 10 found two stars, 4 found one star, 3 found only "Skip" (no star)', async () => {
-    expect(things).toBe(11)
+  it('the wimmelbild with 4 things: 3 found two stars, 2 found one star, 1 found only "Skip" (no star)', async () => {
+    expect(things).toBe(4)
     const w = await openFind()
     expect(label(w)).toBe('Überspringen (ohne Sterne)')
     const tap = async (n: number) => {
@@ -157,22 +160,22 @@ describe('the button of a game that is left unfinished', () => {
       for (let i = 0; i < n; i++) await buttons[i]!.trigger('click')
       await flushPromises()
     }
-    await tap(3)
+    await tap(1)
     expect(label(w)).toBe('Überspringen (ohne Sterne)')
     await tap(1)
     expect(label(w)).toBe('Weiter (1 Stern)')
-    await tap(6)
+    await tap(1)
     expect(label(w)).toBe('Weiter (2 Sterne)')
-    // 10 of 11: two stars, not the one star of before and not the three of a whole game
+    // 3 of 4: two stars, not the one star of before and not the three of a whole game
     const { default: useAdventure } = await import('@/use/useAdventure')
     await w.findAll('button').find((x) => x.classes().includes('stage-part'))!.trigger('click')
     await flushPromises()
-    expect(useAdventure().stageOf('josef', findStage.id)?.stars).toBe(2)
+    expect(useAdventure().stageOf(JID, findStage.id)?.stars).toBe(2)
   })
 
   it('skipping gives no star (also after a try that stays under 30 %)', async () => {
     const { default: adv } = await import('@/use/useAdventure')
-    adv().reset('josef')
+    adv().reset(JID)
     const w = await openFind()
     await w.findAll('.fd-thing')[0]!.trigger('click')
     await flushPromises()
@@ -180,7 +183,7 @@ describe('the button of a game that is left unfinished', () => {
     await w.findAll('button').find((x) => x.classes().includes('stage-skip'))!.trigger('click')
     await flushPromises()
     const { default: useAdventure } = await import('@/use/useAdventure')
-    const st = useAdventure().stageOf('josef', findStage.id)
+    const st = useAdventure().stageOf(JID, findStage.id)
     expect(st?.stars ?? 0).toBe(0)
     expect(w.text()).toContain('Die Etappe ist noch nicht zu Ende')
   })
@@ -189,10 +192,10 @@ describe('the button of a game that is left unfinished', () => {
     const w = await openFind('en')
     expect(label(w)).toBe('Skip (no stars)')
     const buttons = w.findAll('.fd-thing')
-    for (let i = 0; i < 4; i++) await buttons[i]!.trigger('click')
+    for (let i = 0; i < 2; i++) await buttons[i]!.trigger('click')
     await flushPromises()
     expect(label(w)).toBe('Go on (1 star)')
-    for (let i = 4; i < 9; i++) await buttons[i]!.trigger('click')
+    for (let i = 2; i < 3; i++) await buttons[i]!.trigger('click')
     await flushPromises()
     expect(label(w)).toBe('Go on (2 stars)')
   })
