@@ -3,13 +3,15 @@
  * Anton (31.10.2026): Jesus wird mit Gesicht gezeigt (ohne Heiligenschein). Gott der Vater, Engel, böse Geister und Lichtgestalten sind nie im Bild.
  * Quelle der Texte: D:/Claude/Abenteuer-Gleichnisse/ENTWURF_Gleichnisse.md (Luther 1912 von bibeltext.com gelesen, nichts abgeschrieben), Plan: ETAPPENPLAN.md, Figuren: FIGUREN.md, Spiele: SPIELE.md.
  * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
- * Spiele (Wahl der Leitung, Anton 1.11.2026: neu und zur Szene passend): 1 Lückenvers (alt), 2 Wimmelbild (alt), 3 Reihenfolge (alt), 4 Der Schatz im Acker (neu, graben), 5 nur Quiz, 6 Puzzle (alt),
- * 7 Memory (alt), 8 Weg (alt, ohne Schilder), 9 Die verlorene Münze (neu, muenze), 10 Lückenvers (alt), 11 Der Vater läuft ihm entgegen (neu, entgegen), 12 nur Quiz.
+ * Spiele nach Antons Regel (5.11.2026: höchstens zwei bekannte Spiele, nie zwei hintereinander): 1 Lückenvers (bekannt), 2 Hundertfach (neu, hundertfach), 3 Reihenfolge (bekannt),
+ * 4 Der Schatz im Acker (neu, graben), 5 nur Quiz, 6 Anhalten (neu, anhalten), 7 Zur Herberge (neu, herberge), 8 Heimtragen (neu, heimtragen), 9 Die verlorene Münze (neu, muenze),
+ * 10 Heimweg (neu, heimweg), 11 Der Vater läuft ihm entgegen (neu, entgegen), 12 nur Quiz. Die Spiele vom 5.11.2026: Typen und Prüfer in `@/utils/gleichnisseNeu`.
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/gleichnisse/, images/abenteuer/spiele/gleichnisse/<spiel>/, audio/abenteuer/gleichnisse/.
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { CoinGame, DigGame, FindGame, Journey, MeetGame, MemoryGame, OrderGame, VerseGame, WayGame } from '@/types/adventure'
+import type { CoinGame, DigGame, Journey, MeetGame, OrderGame, VerseGame } from '@/types/adventure'
+import type { CarryGame, HaltGame, HomeGame, InnGame, YieldGame } from '@/utils/gleichnisseNeu'
 import { josef } from './josef'
 import { GLEICHNISSE_PATH } from './gleichnissePath'
 import { localize } from './localize'
@@ -37,19 +39,6 @@ const VERS: VerseGame = {
   ]
 }
 
-/**
- * Etappe 10, "Lückenvers" (alte Mechanik): zwei Sätze des Sohnes aus dem Text der Etappe; Tafel, Blatt und Hintergrund wie in Etappe 1 (ein eigener Hintergrund `hintergrund/vers-hintergrund-2.webp` ist möglich).
- */
-const VERS2: VerseGame = {
-  background: `${G}hintergrund/vers-hintergrund.webp`,
-  soft: true,
-  board: `${G}lueckenvers/tafel.webp`,
-  leaf: `${G}lueckenvers/blatt.webp`,
-  rounds: [
-    { hint: 'Ziehe das passende Blatt in die Lücke.', parts: ['„Bei meinem Vater haben sogar die Arbeiter ', ' genug, und ich verhungere hier!“'], words: ['Brot', 'Wasser', 'Arbeit'], answers: [0] },
-    { hint: 'Jetzt fehlen zwei Wörter.', parts: ['Ich will mich ', ' und zu meinem ', ' gehen.'], words: ['aufmachen', 'Vater', 'verkaufen', 'Bruder'], answers: [0, 1] }
-  ]
-}
 
 /**
  * Etappe 3, "Das kleinste Korn" (alte Mechanik, Reihenfolge legen): Senfkorn in die Erde, Spross, Strauch, Baum mit Vögeln.
@@ -68,40 +57,7 @@ const REIHENFOLGE: OrderGame = {
   ]
 }
 
-/**
- * Etappe 7, "Memory" (alte Mechanik): sechs Dinge aus der Geschichte vom Samariter (Ölkrug, Weinschlauch, Verbandsrolle, Esel, Herberge, zwei Silbermünzen); die Rückseite zeigt einen Olivenzweig (Bildauftrag).
- * Bilder: `memory/karte-1..6.webp` (in dieser Reihenfolge), `memory/rueckseite.webp`.
- */
-const MEMORY: MemoryGame = {
-  back: `${G}memory/rueckseite.webp`,
-  pairs: [
-    { image: `${G}memory/karte-1.webp`, text: 'Der Ölkrug: Der Samariter gießt Öl auf die Wunden des Mannes.' },
-    { image: `${G}memory/karte-2.webp`, text: 'Der Weinschlauch: Auch Wein gießt er darauf.' },
-    { image: `${G}memory/karte-3.webp`, text: 'Die Verbandsrolle: Der Samariter verbindet den Verletzten.' },
-    { image: `${G}memory/karte-4.webp`, text: 'Der Esel: Auf dem Tier des Samariters kommt der Verletzte zur Herberge.' },
-    { image: `${G}memory/karte-5.webp`, text: 'Die Herberge: Dort kümmert sich der Samariter um ihn.' },
-    { image: `${G}memory/karte-6.webp`, text: 'Die zwei Silbermünzen: Sie gibt der Samariter dem Wirt.' }
-  ]
-}
 
-/**
- * Etappe 8, "Weg" (alte Mechanik, ohne Schilder): der Hirte sucht sein Schaf; an drei Gabelungen mit je drei Wegen tippt das Kind den Weg, auf dem im Bild ein Hinweis auf das Schaf liegt
- * (Wollflocken am Dornenstrauch, Hufspuren, ein dunkles Ohr hinter dem Felsen). Der richtige Weg: links, in der Mitte, rechts. Bilder (Bildauftrag): `weg/gabel-1..3.webp`, `weg/hirte.webp`.
- */
-const WEG: WayGame = {
-  walker: `${G}weg/hirte.webp`,
-  texts: {
-    hint: 'Weggabelung {n} von {total}: Tippe auf den Weg, auf dem eine Spur des Schafes liegt.',
-    right: 'Richtig! Hier ist eine Spur des Schafes.',
-    wrong: 'Hier ist keine Spur. Der Hirte kehrt um.',
-    done: 'Der Hirte hat sein Schaf gefunden!'
-  },
-  scenes: [
-    { image: `${G}weg/gabel-1.webp`, goal: 'left', paths: 3 },
-    { image: `${G}weg/gabel-2.webp`, goal: 'middle', paths: 3 },
-    { image: `${G}weg/gabel-3.webp`, goal: 'right', paths: 3 }
-  ]
-}
 
 /**
  * Etappe 4, "Der Schatz im Acker" (neu, `graben`, Mt 13,44-46): Runde 1 zwölf Erdhaufen auf dem Acker (4 x 3), unter einem liegt die Truhe; ein leeres Loch zeigt mit einem Pfeil zur Truhe (kein Verlust).
@@ -172,26 +128,104 @@ const ENTGEGEN: MeetGame = {
 }
 
 /**
- * Etappe 2, "Wimmelbild" (alte Mechanik): der breite Acker am Hang mit Weg, Felsen, Dornenhecke und gutem Feld (Bildauftrag); gesucht werden vier Dinge aus dem Gleichnis vom Sämann (Mt 13,3-8):
- * ein Vogel auf dem Weg, ein Fels, ein Dornenbusch und eine reife Ähre. Einige stehen hinter Sträuchern, Ähren, einem Krug und einem Sack. Bilder: `wimmel/szene.webp`, `figur-1..4.webp`, `verdecker-1..4.webp`.
+ * Etappe 2, "Hundertfach" (neu, `hundertfach`, Mt 13,8.23): auf dem gepflügten Acker stehen Ähren auf gutem Land (klein, mittel, groß: dreißig, sechzig, hundert Körner) und Saat, die nichts brachte
+ * (verdorrt auf dem Fels, erstickt in den Dornen, der Vogel auf dem Weg). Ein Tipp auf eine Ähre macht sie zu ihren Körnern, sie fliegen in den Sack. Runde 2 in der Reihenfolge der Bibel (hundert, sechzig, dreißig).
+ * Bilder (Bildauftrag S90): `hundertfach/acker.webp`, `aehre-30`, `aehre-60`, `aehre-100`, `fels`, `dorn`, `weg`, `korn`, `sack`. Typen und Prüfer: `@/utils/gleichnisseNeu`.
  */
-const WIMMEL: FindGame = {
-  labels: ['Der Vogel auf dem Weg', 'Der Fels', 'Der Dornenbusch', 'Die reife Ähre'],
-  doneText: 'Du hast alles gefunden, was in der Geschichte vom Sämann vorkommt: den Vogel, den Felsen, den Dornenbusch und die Ähre.',
-  scene: `${G}wimmel/szene.webp`,
-  finds: [
-    { image: `${G}wimmel/figur-1.webp`, x: 30, y: 90, w: 12 },
-    { image: `${G}wimmel/figur-2.webp`, x: 72, y: 93, w: 15 },
-    { image: `${G}wimmel/figur-3.webp`, x: 84, y: 70, w: 14 },
-    { image: `${G}wimmel/figur-4.webp`, x: 46, y: 64, w: 9 }
-  ],
-  covers: [
-    { image: `${G}wimmel/verdecker-1.webp`, x: 72, y: 94, w: 22 },
-    { image: `${G}wimmel/verdecker-2.webp`, x: 46, y: 66, w: 12 },
-    { image: `${G}wimmel/verdecker-3.webp`, x: 58, y: 88, w: 9 },
-    { image: `${G}wimmel/verdecker-4.webp`, x: 30, y: 91, w: 18 },
-    { image: `${G}wimmel/verdecker-1.webp`, x: 84, y: 72, w: 17 },
-    { image: `${G}wimmel/verdecker-2.webp`, x: 70, y: 52, w: 9 }
+const HUNDERTFACH: YieldGame = {
+  field: `${G}hundertfach/acker.webp`,
+  sprites: {
+    y30: { image: `${G}hundertfach/aehre-30.webp`, label: 'Ein kleiner Halm mit drei Ähren', w: 15 },
+    y60: { image: `${G}hundertfach/aehre-60.webp`, label: 'Ein Halm mit sechs Ähren', w: 15 },
+    y100: { image: `${G}hundertfach/aehre-100.webp`, label: 'Ein großer Büschel mit vielen schweren Ähren', w: 15 },
+    rock: { image: `${G}hundertfach/fels.webp`, label: 'Ein verdorrter Halm auf dem Fels', w: 15 },
+    thorn: { image: `${G}hundertfach/dorn.webp`, label: 'Ein Halm, erstickt in den Dornen', w: 15 },
+    path: { image: `${G}hundertfach/weg.webp`, label: 'Ein Vogel pickt die Körner auf dem Weg', w: 15 }
+  },
+  grain: { image: `${G}hundertfach/korn.webp`, label: 'Körner', w: 9 },
+  sack: { image: `${G}hundertfach/sack.webp`, label: 'Der Sack für die Körner', w: 14, x: 89, y: 99 },
+  rounds: [
+    { hint: 'Tippe die reifen Ähren auf dem guten Land an. Was auf dem Fels, in den Dornen und auf dem Weg wächst, bringt keine Frucht.', plants: [{ kind: 'y30', x: 12, y: 55 }, { kind: 'rock', x: 34, y: 55 }, { kind: 'y60', x: 56, y: 55 }, { kind: 'y100', x: 78, y: 55 }, { kind: 'y100', x: 22, y: 77 }, { kind: 'thorn', x: 46, y: 77 }, { kind: 'y30', x: 70, y: 77 }, { kind: 'path', x: 12, y: 99 }, { kind: 'y60', x: 36, y: 99 }] },
+    { hint: 'Jetzt wie in der Geschichte: erst die Ähren mit hundert Körnern, dann die mit sechzig, dann die mit dreißig.', ordered: true, plants: [{ kind: 'y60', x: 9, y: 54 }, { kind: 'y30', x: 27, y: 54 }, { kind: 'rock', x: 45, y: 54 }, { kind: 'y100', x: 63, y: 54 }, { kind: 'y30', x: 81, y: 54 }, { kind: 'y100', x: 18, y: 76 }, { kind: 'thorn', x: 36, y: 76 }, { kind: 'y60', x: 54, y: 76 }, { kind: 'path', x: 72, y: 76 }, { kind: 'y100', x: 90, y: 76 }, { kind: 'rock', x: 10, y: 98 }, { kind: 'y30', x: 30, y: 98 }, { kind: 'y60', x: 50, y: 98 }] }
+  ]
+}
+
+/**
+ * Etappe 6, "Anhalten" (neu, `anhalten`, Lk 10,33-34): die Straße nach Jericho von der Seite; gedrückt halten lässt den Esel des Samariters gehen, loslassen lässt ihn anhalten. Er soll genau neben dem Überfallenen
+ * stehen bleiben (zu weit ist ein Fehler, er kehrt um). Runde 2: schneller, längerer Bremsweg, engere Stelle. Bilder (Bildauftrag S91/S92): `anhalten/strasse.webp`, `reiter`, `verletzter`, `kniet`, `esel`.
+ */
+const ANHALTEN: HaltGame = {
+  background: `${G}anhalten/strasse.webp`,
+  road: 84,
+  rider: { image: `${G}anhalten/reiter.webp`, label: 'Der Samariter auf seinem Esel', w: 32 },
+  man: { image: `${G}anhalten/verletzter.webp`, label: 'Der Mann, der überfallen wurde', w: 24 },
+  donkey: { image: `${G}anhalten/esel.webp`, label: 'Der Esel des Samariters', w: 26 },
+  kneel: { image: `${G}anhalten/kniet.webp`, label: 'Der Samariter kniet bei dem Mann und hilft ihm', w: 24 },
+  rounds: [
+    { hint: 'Halte gedrückt, damit der Esel geht. Lass rechtzeitig los, damit er genau neben dem Mann stehen bleibt.', start: 17, man: 72, spot: 50, tolerance: 5, speed: 14, accel: 30, brake: 22 },
+    { hint: 'Jetzt ist der Esel schneller und braucht länger, bis er steht. Lass früher los.', start: 17, man: 64, spot: 41, tolerance: 3, speed: 20, accel: 36, brake: 16 }
+  ]
+}
+
+/**
+ * Etappe 7, "Zur Herberge" (neu, `herberge`, Lk 10,34): der Samariter führt seinen Esel zur Herberge, auf dem Esel sitzt der verbundene Mann. Der Esel geht von selbst; Steine und das Schaukeln
+ * neigen den Mann nach vorn oder hinten, das Kind hält ihn gerade (links halten = nach hinten, rechts = nach vorn). Rutscht er, ist das ein Fehler. Runde 2: mehr Steine, er wackelt leichter.
+ * Bilder (Bildauftrag S92): `herberge/weg.webp`, `esel`, `mann`, `samariter`, `stein-1`, `stein-2`.
+ */
+const HERBERGE: InnGame = {
+  background: `${G}herberge/weg.webp`,
+  road: 86,
+  start: 14,
+  gate: 67,
+  donkey: { image: `${G}herberge/esel.webp`, label: 'Der Esel des Samariters', w: 22 },
+  rider: { image: `${G}herberge/mann.webp`, label: 'Der verbundene Mann auf dem Esel', w: 15 },
+  leader: { image: `${G}herberge/samariter.webp`, label: 'Der Samariter führt den Esel', w: 17 },
+  seat: { x: 47, y: 43 },
+  lead: 2,
+  stones: [{ image: `${G}herberge/stein-1.webp`, label: 'Ein Stein', w: 4 }, { image: `${G}herberge/stein-2.webp`, label: 'Eine Steinplatte', w: 7 }],
+  rounds: [
+    { hint: 'Der Weg ist holprig. Neigt sich der Mann nach vorn, halte links. Neigt er sich nach hinten, halte rechts.', speed: 4, drift: 1.2, bumps: [{ x: 34, push: 40, stone: 0 }, { x: 46, push: -35, stone: 1 }, { x: 58, push: 45, stone: 0 }, { x: 70, push: -40, stone: 1 }] },
+    { hint: 'Jetzt liegen mehr Steine auf dem Weg, und der Mann wackelt leichter.', speed: 4.5, drift: 2.4, bumps: [{ x: 26, push: 45, stone: 0 }, { x: 34, push: -50, stone: 1 }, { x: 42, push: 40, stone: 0 }, { x: 50, push: -45, stone: 0 }, { x: 58, push: 55, stone: 1 }, { x: 66, push: -40, stone: 0 }] }
+  ]
+}
+
+/**
+ * Etappe 8, "Heimtragen" (neu, `heimtragen`, Lk 15,5-6): der Hirte trägt das gefundene Schaf auf den Schultern nach Hause; die Weide zieht vorbei, ein Tipp lässt ihn über Felsen, Bäche und Dornen springen.
+ * Am Ende stehen Freunde und Nachbarn vor dem Haus. Runde 2: schneller, mehr und breitere Hindernisse. Bilder (Bildauftrag S93): `heimtragen/weide.webp`, `hirte`, `steine`, `bach`, `dorn`, `zuhause`.
+ */
+const HEIMTRAGEN: CarryGame = {
+  background: `${G}heimtragen/weide.webp`,
+  road: 86,
+  hero: { image: `${G}heimtragen/hirte.webp`, label: 'Der Hirte trägt das Schaf auf den Schultern', w: 20 },
+  heroAt: 26,
+  jump: 1.1,
+  height: 26,
+  sprites: { rock: `${G}heimtragen/steine.webp`, brook: `${G}heimtragen/bach.webp`, thorn: `${G}heimtragen/dorn.webp` },
+  labels: { rock: 'Ein Haufen Felsbrocken', brook: 'Ein Bach', thorn: 'Ein Dornbusch' },
+  sink: { brook: 1 },
+  home: { image: `${G}heimtragen/zuhause.webp`, label: 'Das Haus mit den Freunden und Nachbarn', w: 30 },
+  rounds: [
+    { hint: 'Der Hirte trägt das Schaf nach Hause. Tippe, damit er über Felsen und Bäche springt.', speed: 18, home: 300, obstacles: [{ kind: 'rock', at: 95, w: 8 }, { kind: 'brook', at: 135, w: 9 }, { kind: 'rock', at: 175, w: 8 }, { kind: 'thorn', at: 212, w: 8 }, { kind: 'brook', at: 252, w: 9 }] },
+    { hint: 'Jetzt geht er schneller. Über einen breiten Bach springst du früher ab.', speed: 22, home: 460, obstacles: [{ kind: 'rock', at: 95, w: 8 }, { kind: 'brook', at: 140, w: 12 }, { kind: 'thorn', at: 186, w: 9 }, { kind: 'rock', at: 230, w: 8 }, { kind: 'brook', at: 276, w: 12 }, { kind: 'thorn', at: 322, w: 9 }, { kind: 'rock', at: 366, w: 8 }, { kind: 'brook', at: 412, w: 12 }] }
+  ]
+}
+
+/**
+ * Etappe 10, "Heimweg" (neu, `heimweg`, Lk 15,18.20): der Sohn geht Schritt für Schritt im Takt nach Hause; mit jedem Schlag kommt eine Fußspur, das Kind tippt, wenn sie ganz da ist.
+ * Das Bild wächst zum Haus des Vaters hin. Runde 2: schneller, und die richtige Spur (links, rechts) muss getroffen werden. Bilder (Bildauftrag S94): `heimweg/strasse.webp`, `sohn`, `fuss`.
+ */
+const HEIMWEG: HomeGame = {
+  background: `${G}heimweg/strasse.webp`,
+  ratio: 0.75,
+  house: { x: 51, y: 31 },
+  zoom: 2.2,
+  son: { image: `${G}heimweg/sohn.webp`, label: 'Der Sohn auf dem Weg nach Hause', w: 34, x: 50, y: 99 },
+  print: { image: `${G}heimweg/fuss.webp`, label: 'Eine Fußspur', w: 18 },
+  left: { x: 37, y: 62 },
+  right: { x: 63, y: 62 },
+  rounds: [
+    { hint: 'Der Sohn macht sich auf den Weg zu seinem Vater. Tippe immer dann, wenn die Fußspur ganz klar ist.', beat: 900, window: 260, steps: 10 },
+    { hint: 'Jetzt geht er schneller. Tippe genau auf die Fußspur, die kommt: links, rechts, links …', beat: 720, window: 200, steps: 14, feet: true }
   ]
 }
 
@@ -256,8 +290,8 @@ export const gleichnisse: Journey = {
         '„Der Same ist das Wort vom Himmelreich. Der Weg, das sind die Menschen, die es hören und nicht verstehen. Dann geht es wieder verloren. Im felsigen Boden hat das Wort keine Wurzeln. Wenn es schwer wird, geben sie schnell auf.“',
         '„Bei den Dornen ersticken die Sorgen dieser Welt und der Reichtum, der täuscht, das Wort. Das gute Land aber sind die Menschen, die das Wort hören, verstehen und Frucht bringen.“'
       ],
-      // Spiel: Wimmelbild (wimmelbild, alt)
-      task: { kind: 'wimmelbild', hint: 'Suche auf dem Acker: Finde, was in der Geschichte vorkommt.', count: 4, find: WIMMEL },
+      // Spiel: Hundertfach (hundertfach, neu 5.11.2026)
+      task: { kind: 'hundertfach', hint: 'Tippe die Ähren auf dem guten Land an.', yieldGame: HUNDERTFACH },
       questions: [
         { q: 'Was bedeutet der Same in der Geschichte?', options: ['das Wort vom Himmelreich', 'das Wetter', 'das Geld'], answer: 0 },
         { q: 'Wer ist das gute Land?', options: ['Menschen, die das Wort hören, verstehen und Frucht bringen', 'Menschen, die schnell aufgeben', 'Menschen, die nie zuhören'], answer: 0 }
@@ -326,8 +360,8 @@ export const gleichnisse: Journey = {
         'Dann kommt ein Samariter, der auf Reisen ist. Er sieht den Mann am Weg, und er hat Mitleid mit ihm.',
         'Er geht zu ihm hin und verbindet seine Wunden. Er gießt Öl und Wein darauf.'
       ],
-      // Spiel: Puzzle (puzzle, alt)
-      task: { kind: 'puzzle', hint: 'Setze das Bild von der Straße nach Jericho zusammen.', puzzle: { image: `${G}puzzle/strasse.webp`, cols: 2, rows: 3 } },
+      // Spiel: Anhalten (anhalten, neu 5.11.2026)
+      task: { kind: 'anhalten', hint: 'Halte gedrückt, dann reitet der Samariter. Lass los, dann hält er an.', halt: ANHALTEN },
       questions: [
         { q: 'Wer geht zuerst vorbei?', options: ['ein Priester', 'ein Soldat', 'ein Hirte'], answer: 0 },
         { q: 'Was tut der Samariter, als er den Mann sieht?', options: ['Er hat Mitleid und geht zu ihm.', 'Er geht schnell weiter.', 'Er ruft die Räuber.'], answer: 0 }
@@ -344,8 +378,8 @@ export const gleichnisse: Journey = {
         'Dann fragt Jesus den Schriftgelehrten: „Wer von den dreien war der Nächste von dem, der unter die Räuber fiel?“ „Der, der Erbarmen mit ihm hatte“, antwortet der Mann.',
         '„Dann geh hin und tu das auch“, sagt Jesus.'
       ],
-      // Spiel: Memory (memory, alt)
-      task: { kind: 'memory', hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.', memory: MEMORY },
+      // Spiel: Zur Herberge (herberge, neu 5.11.2026)
+      task: { kind: 'herberge', hint: 'Halte den Mann auf dem Esel gerade, bis ihr an der Herberge seid.', inn: HERBERGE },
       questions: [
         { q: 'Wohin bringt der Samariter den Verletzten?', options: ['in eine Herberge', 'nach Jerusalem', 'zum Priester'], answer: 0 },
         { q: 'Was gibt er dem Wirt?', options: ['zwei Silbermünzen', 'seinen Mantel', 'einen Esel'], answer: 0 }
@@ -361,8 +395,8 @@ export const gleichnisse: Journey = {
         'Da erzählt Jesus: „Wer von euch hat hundert Schafe und verliert eins? Lässt er nicht die neunundneunzig zurück und sucht das eine, bis er es findet?“',
         '„Wenn er es gefunden hat, legt er es voll Freude auf seine Schultern. Er ruft seine Freunde und Nachbarn: ‚Freut euch mit mir! Ich habe mein Schaf gefunden.‘ Ich sage euch: So ist im Himmel Freude über einen Sünder, der umkehrt.“'
       ],
-      // Spiel: Weg ohne Schilder (weg, alt)
-      task: { kind: 'weg', hint: 'Finde den Weg, auf dem der Hirte das verlorene Schaf sucht.', way: WEG },
+      // Spiel: Heimtragen (heimtragen, neu 5.11.2026)
+      task: { kind: 'heimtragen', hint: 'Tippe, damit der Hirte mit dem Schaf springt.', carryHome: HEIMTRAGEN },
       questions: [
         { q: 'Wie viele Schafe hat der Hirte?', options: ['hundert', 'zehn', 'zwölf'], answer: 0 },
         { q: 'Was tut er, als ein Schaf fehlt?', options: ['Er sucht es, bis er es findet.', 'Er wartet zu Hause.', 'Er kauft ein neues.'], answer: 0 }
@@ -395,8 +429,8 @@ export const gleichnisse: Journey = {
         'Dann kommt eine große Hungersnot. Der Sohn hütet bei einem Mann des Landes die Schweine. Er hat so großen Hunger, dass er gern vom Schweinefutter äße, aber niemand gibt ihm etwas.',
         'Da denkt er nach: „Bei meinem Vater haben sogar die Arbeiter Brot genug, und ich verhungere hier! Ich will mich aufmachen und zu meinem Vater gehen. Ich will sagen: Vater, ich habe mich versündigt gegen den Himmel und vor dir.“'
       ],
-      // Spiel: Lückenvers (lueckenvers, alt)
-      task: { kind: 'lueckenvers', hint: 'Ziehe das passende Blatt in die Lücke.', verse: VERS2 },
+      // Spiel: Heimweg (heimweg, neu 5.11.2026)
+      task: { kind: 'heimweg', hint: 'Tippe im Takt, wenn die Fußspur ganz da ist.', homeward: HEIMWEG },
       questions: [
         { q: 'Wohin zieht der jüngere Sohn?', options: ['in ein fernes Land', 'auf einen Berg', 'in die Stadt Jerusalem'], answer: 0 },
         { q: 'Welche Arbeit bekommt er?', options: ['Er hütet Schweine.', 'Er fischt im See.', 'Er baut ein Haus.'], answer: 0 }

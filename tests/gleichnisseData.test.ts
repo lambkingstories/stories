@@ -1,6 +1,7 @@
 /**
  * The data of "Geschichten von Jesus" (`gleichnisse.ts`, `en/gleichnisse.en.ts`, `gleichnissePath.ts`): the stories and questions follow the rules of the adventures (texts of the draft
- * `D:/Claude/Abenteuer-Gleichnisse/ENTWURF_Gleichnisse.md`, Luther 1912 told in our own words), the two quiz stages are only quizzes, the three new games and the seven old ones have sound data,
+ * `D:/Claude/Abenteuer-Gleichnisse/ENTWURF_Gleichnisse.md`, Luther 1912 told in our own words), the two quiz stages are only quizzes, the games follow Anton's rule of 5.11.2026
+ * (at most two known games, never two in a row: Lückenvers 1 and Reihenfolge 3; the five games of that day in 2, 6, 7, 8 and 10, checked by `@/utils/gleichnisseNeu`) and have sound data,
  * the map has twelve stations and the exam, and the English file has the same shape.
  */
 import { existsSync, statSync } from 'node:fs'
@@ -11,6 +12,8 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { setAdventureLanguage } from '@/use/adventureLanguage'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 import { coinProblems, digProblems, meetProblems } from '@/utils/gleichnisseGames'
+import { carryProblems, haltProblems, homeProblems, innProblems, yieldProblems } from '@/utils/gleichnisseNeu'
+import type { CarryGame, HaltGame, HomeGame, InnGame, YieldGame } from '@/utils/gleichnisseNeu'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => gleichnisse.stages[n - 1]!
@@ -158,15 +161,17 @@ describe('Gleichnisse: stories and questions', () => {
 })
 
 describe('Gleichnisse: the games', () => {
-  it('the order of the games: 7 old, 3 new (graben, muenze, entgegen), 2 quizzes; no game twice in a row', () => {
-    expect(gleichnisse.stages.map((s) => s.task.kind)).toEqual(['lueckenvers', 'wimmelbild', 'reihenfolge', 'graben', 'quiz', 'puzzle', 'memory', 'weg', 'muenze', 'lueckenvers', 'entgegen', 'quiz'])
-    const kinds = gleichnisse.stages.map((s) => s.task.kind)
+  it('the order of the games (Anton 5.11.2026): 2 known (Lückenvers, Reihenfolge, not in a row), 8 new, 2 quizzes; no game twice in a row', () => {
+    const kinds = gleichnisse.stages.map((s) => s.task.kind as string)
+    expect(kinds).toEqual(['lueckenvers', 'hundertfach', 'reihenfolge', 'graben', 'quiz', 'anhalten', 'herberge', 'heimtragen', 'muenze', 'heimweg', 'entgegen', 'quiz'])
     for (let i = 1; i < kinds.length; i++) expect(kinds[i], `same game in a row at ${i + 1}`).not.toBe(kinds[i - 1])
-    expect(kinds.filter((k) => ['graben', 'muenze', 'entgegen'].includes(k!))).toHaveLength(3)
+    const known = kinds.map((k, i) => (['lueckenvers', 'reihenfolge'].includes(k) ? i : -1)).filter((i) => i >= 0)
+    expect(known).toEqual([0, 2])
+    expect(kinds.filter((k) => ['hundertfach', 'graben', 'anhalten', 'herberge', 'heimtragen', 'muenze', 'heimweg', 'entgegen'].includes(k))).toHaveLength(8)
   })
 
-  it('1 and 10 verse: two rounds each, the sentences stand word for word in the text of the stage, the right words are on the leaves', () => {
-    for (const n of [1, 10]) {
+  it('1 verse: two rounds, the sentences stand word for word in the text of the stage, the right words are on the leaves', () => {
+    for (const n of [1]) {
       const g = stage(n).task.verse!
       expect(g.rounds, `stage ${n}`).toHaveLength(2)
       const text = plain(stage(n).text.join(' '))
@@ -182,26 +187,6 @@ describe('Gleichnisse: the games', () => {
       expect(g.rounds.map((r) => r.answers.length)).toEqual([1, 2])
     }
     expect(stage(1).task.verse!.rounds[0]!.words[0]).toBe('Vögel')
-    expect(stage(10).task.verse!.rounds[0]!.words[0]).toBe('Brot')
-  })
-
-  it('2 hidden pictures: the four things of the sower (bird, rock, thorn bush, ear), covers, every place inside the picture', () => {
-    const t = stage(2).task
-    expect(t.kind).toBe('wimmelbild')
-    expect(t.count).toBe(4)
-    const f = t.find!
-    expect(f.finds).toHaveLength(4)
-    expect(f.labels).toHaveLength(4)
-    expect(f.covers.length).toBeGreaterThanOrEqual(6)
-    for (const s of [...f.finds, ...f.covers]) {
-      expect(s.x - s.w / 2).toBeGreaterThanOrEqual(-1)
-      expect(s.x + s.w / 2).toBeLessThanOrEqual(101)
-      expect(s.y).toBeLessThanOrEqual(100)
-    }
-    expect(f.labels!.join(' ')).toMatch(/Vogel/)
-    expect(f.labels!.join(' ')).toMatch(/Fels/)
-    expect(f.labels!.join(' ')).toMatch(/Dornenbusch/)
-    expect(f.labels!.join(' ')).toMatch(/Ähre/)
   })
 
   it('3 order: four cards in the order of the story (seed, sprout, bush, tree); round 1 with the numbers and three cards, round 2 with all four', () => {
@@ -224,29 +209,25 @@ describe('Gleichnisse: the games', () => {
     expect(g.pearls[0]!.image).toMatch(/graben\/perle-1\.webp$/)
   })
 
-  it('6 puzzle: a picture in 2 columns and 3 rows', () => {
-    const g = stage(6).task.puzzle!
-    expect(g.cols).toBe(2)
-    expect(g.rows).toBe(3)
-    expect(g.image).toMatch(/puzzle\/strasse\.webp$/)
-  })
-
-  it('7 memory: six pairs with a sentence each, in the order oil jug, wine skin, bandage, donkey, inn, two coins', () => {
-    const g = stage(7).task.memory!
-    expect(g.pairs).toHaveLength(6)
-    for (const p of g.pairs) expect(p.text.length).toBeGreaterThan(10)
-    expect(g.pairs.map((p) => p.text.split(':')[0])).toEqual(['Der Ölkrug', 'Der Weinschlauch', 'Die Verbandsrolle', 'Der Esel', 'Die Herberge', 'Die zwei Silbermünzen'])
-    expect(g.pairs.map((p) => p.image)).toEqual([1, 2, 3, 4, 5, 6].map((n) => `images/abenteuer/spiele/gleichnisse/memory/karte-${n}.webp`))
-  })
-
-  it('8 way: three forks without signs, each with three ways, the right way on the left, in the middle and on the right', () => {
-    const g = stage(8).task.way!
-    expect(g.scenes).toHaveLength(3)
-    expect(g.scenes.map((s) => s.paths)).toEqual([3, 3, 3])
-    expect(g.scenes.map((s) => s.goal)).toEqual(['left', 'middle', 'right'])
-    expect(g.walker).toMatch(/weg\/hirte\.webp$/)
-    expect(g.texts!.hint).toContain('{n}')
-    expect(g.texts!.hint).toContain('{total}')
+  it('2, 6, 7, 8, 10: the five games of 5.11.2026 can be played (all checkers say nothing), with two rounds each and the pictures of their folders', () => {
+    const t = (n: number) => stage(n).task as unknown as Record<string, unknown>
+    const y = t(2).yieldGame as YieldGame
+    expect(yieldProblems(y)).toEqual([])
+    expect(y.field).toMatch(/gleichnisse\/hundertfach\/acker\.webp$/)
+    expect(y.rounds.map((r) => !!r.ordered)).toEqual([false, true])
+    const h = t(6).halt as HaltGame
+    expect(haltProblems(h)).toEqual([])
+    expect(h.background).toMatch(/gleichnisse\/anhalten\/strasse\.webp$/)
+    const inn = t(7).inn as InnGame
+    expect(innProblems(inn)).toEqual([])
+    expect(inn.background).toMatch(/gleichnisse\/herberge\/weg\.webp$/)
+    const c = t(8).carryHome as CarryGame
+    expect(carryProblems(c)).toEqual([])
+    expect(c.hero.image).toMatch(/gleichnisse\/heimtragen\/hirte\.webp$/)
+    const hw = t(10).homeward as HomeGame
+    expect(homeProblems(hw)).toEqual([])
+    expect(hw.background).toMatch(/gleichnisse\/heimweg\/strasse\.webp$/)
+    for (const g of [y, h, inn, c, hw]) expect(g.rounds).toHaveLength(2)
   })
 
   it('9 coin: two rounds, the first without things that look like a coin, the second with two (a lid, a pebble); the data can be played', () => {
@@ -327,10 +308,10 @@ describe('Gleichnisse: map, files, English', () => {
     expect(stage(9).task.coin!.lamp.label).toBe('The little oil lamp')
     expect(stage(11).task.meet!.rounds[1]!.hint).toContain('robe')
     expect(stage(11).task.meet!.gifts.map((g) => g.label)).toEqual(['The robe', 'The ring', 'The shoes'])
-    expect(stage(8).task.way!.texts!.hint).toContain('Fork {n} of {total}')
+    expect((stage(2).task as unknown as { yieldGame: YieldGame }).yieldGame.rounds[1]!.hint).toContain('a hundred grains')
+    expect((stage(6).task as unknown as { halt: HaltGame }).halt.man.label).toBe('The man who was robbed')
+    expect((stage(10).task as unknown as { homeward: HomeGame }).homeward.print.label).toBe('A footprint')
     expect(stage(1).task.verse!.rounds[0]!.parts[0]).toContain('Some seeds fell by the road')
-    expect(stage(7).task.memory!.pairs[0]!.text).toContain('jug of oil')
-    expect(stage(2).task.find!.labels![0]).toBe('The bird on the road')
     for (const s of gleichnisse.stages) {
       const audio = s.audio
       if (audio) expect(audio, `stage ${s.id}`).toBe(`audio/abenteuer/gleichnisse/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)
@@ -343,7 +324,7 @@ describe('Gleichnisse: map, files, English', () => {
 
   it('the English verses stand word for word in the English texts of the stages', () => {
     const en = englishTextsOf(gleichnisse) as { stages: { text: string[]; task?: { verse?: { rounds: { parts: string[]; words: string[] }[] } } }[] }
-    for (const n of [1, 10]) {
+    for (const n of [1]) {
       const e = en.stages[n - 1]!
       const text = plain(e.text.join(' '))
       const de = stage(n).task.verse!

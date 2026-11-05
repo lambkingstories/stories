@@ -44,8 +44,13 @@ export const gleichnisseEn: TextOverlay<Journey> = {
         '“Among the thorns the word is choked by the worries of this world and by riches that deceive. But the good ground is the people who hear the word, understand it and bear fruit.”'
       ],
       task: {
-        hint: 'Search the field: find what appears in the story.',
-        find: { labels: ['The bird on the road', 'The rock', 'The thorn bush', 'The ripe ear of grain'], doneText: 'You have found everything that appears in the story of the sower: the bird, the rock, the thorn bush and the ear of grain.' }
+        hint: 'Tap the ears on the good ground.',
+        yieldGame: {
+          sprites: { y30: { label: 'A small stalk with three ears' }, y60: { label: 'A stalk with six ears' }, y100: { label: 'A big clump with many heavy ears' }, rock: { label: 'A withered stalk on the rock' }, thorn: { label: 'A stalk choked in the thorns' }, path: { label: 'A bird pecks the seeds by the road' } },
+          grain: { label: 'Grains' },
+          sack: { label: 'The sack for the grain' },
+          rounds: [{ hint: 'Tap the ripe ears on the good ground. What grows on the rock, in the thorns and by the road brings no fruit.' }, { hint: 'Now as in the story: first the ears with a hundred grains, then those with sixty, then those with thirty.' }]
+        }
       },
       questions: [
         { q: 'What does the seed mean in the story?', options: ['the word of the kingdom', 'the weather', 'money'] },
@@ -123,7 +128,10 @@ export const gleichnisseEn: TextOverlay<Journey> = {
         'Then a Samaritan comes, who is on a journey. He sees the man by the road, and he has pity on him.',
         'He goes to him and bandages his wounds. He pours oil and wine on them.'
       ],
-      task: { hint: 'Put the picture of the road to Jericho together.' },
+      task: {
+        hint: 'Hold down and the Samaritan rides. Let go and he stops.',
+        halt: { rider: { label: 'The Samaritan on his donkey' }, man: { label: 'The man who was robbed' }, donkey: { label: 'The Samaritan’s donkey' }, kneel: { label: 'The Samaritan kneels by the man and helps him' }, rounds: [{ hint: 'Hold down so that the donkey walks. Let go in time so that it stops right beside the man.' }, { hint: 'Now the donkey is quicker and takes longer to stop. Let go earlier.' }] }
+      },
       questions: [
         { q: 'Who passes by first?', options: ['a priest', 'a soldier', 'a shepherd'] },
         { q: 'What does the Samaritan do when he sees the man?', options: ['He has pity and goes to him.', 'He hurries on.', 'He calls the robbers.'] }
@@ -139,17 +147,8 @@ export const gleichnisseEn: TextOverlay<Journey> = {
         '“Then go and do the same,” says Jesus.'
       ],
       task: {
-        hint: 'Find the matching cards. Remember where each one lies.',
-        memory: {
-          pairs: [
-            { text: 'The jug of oil: The Samaritan pours oil on the man’s wounds.' },
-            { text: 'The wineskin: He pours wine on them, too.' },
-            { text: 'The roll of bandage: The Samaritan bandages the hurt man.' },
-            { text: 'The donkey: On the Samaritan’s animal the hurt man comes to the inn.' },
-            { text: 'The inn: There the Samaritan takes care of him.' },
-            { text: 'The two silver coins: The Samaritan gives them to the innkeeper.' }
-          ]
-        }
+        hint: 'Keep the man on the donkey upright until you reach the inn.',
+        inn: { donkey: { label: 'The Samaritan’s donkey' }, rider: { label: 'The bandaged man on the donkey' }, leader: { label: 'The Samaritan leads the donkey' }, stones: [{ label: 'A stone' }, { label: 'A flat stone' }], rounds: [{ hint: 'The road is bumpy. If the man leans forward, hold the left side. If he leans back, hold the right side.' }, { hint: 'Now there are more stones on the road, and the man wobbles more easily.' }] }
       },
       questions: [
         { q: 'Where does the Samaritan take the hurt man?', options: ['to an inn', 'to Jerusalem', 'to the priest'] },
@@ -165,15 +164,8 @@ export const gleichnisseEn: TextOverlay<Journey> = {
         '“When he has found it, he lays it on his shoulders, full of joy. He calls his friends and neighbours: ‘Rejoice with me! I have found my sheep.’ I tell you: In the same way there is joy in heaven over one sinner who repents.”'
       ],
       task: {
-        hint: 'Find the way on which the shepherd looks for the lost sheep.',
-        way: {
-          texts: {
-            hint: 'Fork {n} of {total}: tap the road with a trace of the sheep.',
-            right: 'Right! Here is a trace of the sheep.',
-            wrong: 'No trace here. The shepherd turns around.',
-            done: 'The shepherd has found his sheep!'
-          }
-        }
+        hint: 'Tap so that the shepherd jumps with the sheep.',
+        carryHome: { hero: { label: 'The shepherd carries the sheep on his shoulders' }, labels: { rock: 'A heap of rocks', brook: 'A brook', thorn: 'A thornbush' }, home: { label: 'The house with the friends and neighbours' }, rounds: [{ hint: 'The shepherd carries the sheep home. Tap so that he jumps over rocks and brooks.' }, { hint: 'Now he walks faster. Jump earlier over a wide brook.' }] }
       },
       questions: [
         { q: 'How many sheep does the shepherd have?', options: ['a hundred', 'ten', 'twelve'] },
@@ -217,13 +209,8 @@ export const gleichnisseEn: TextOverlay<Journey> = {
         'Then he thinks: “At my father’s house even the workers have bread enough, and I am starving here! I will get up and go to my father. I will say: Father, I have sinned against heaven and before you.”'
       ],
       task: {
-        hint: 'Drag the right leaf into the gap.',
-        verse: {
-          rounds: [
-            { hint: 'Drag the right leaf into the gap.', parts: ['“At my father’s house even the workers have ', ' enough, and I am starving here!”'], words: ['bread', 'water', 'work'] },
-            { hint: 'Now two words are missing.', parts: ['I will ', ' up and go to my ', '.'], words: ['get', 'father', 'run', 'brother'] }
-          ]
-        }
+        hint: 'Tap in time when the footprint is fully there.',
+        homeward: { son: { label: 'The son on the way home' }, print: { label: 'A footprint' }, rounds: [{ hint: 'The son sets out for his father. Tap each time the footprint is quite clear.' }, { hint: 'Now he walks faster. Tap exactly on the footprint that comes: left, right, left …' }] }
       },
       questions: [
         { q: 'Where does the younger son travel to?', options: ['to a far country', 'up a mountain', 'to the city of Jerusalem'] },
