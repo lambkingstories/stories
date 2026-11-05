@@ -35,8 +35,15 @@ export const nehemiaEn: TextOverlay<Journey> = {
         'Then Nehemiah prays to God. After that he asks: "Send me to Judah, so that I may build the city again." The queen sits beside the king. "How long will your journey be?" asks the king. He lets Nehemiah go and gives him letters for the governors and for Asaph, the keeper of the forest, who is to give timber for the gates. Horsemen ride with him.'
       ],
       task: {
-        hint: 'Find the matching cards. Remember where each one lies.',
-        memory: { pairs: [{ text: 'The cup: Nehemiah hands the king the cup.' }, { text: 'The wine jug: wine stands before the king.' }, { text: 'The letter: the king gives Nehemiah letters for the governors.' }, { text: 'The timber: Asaph is to give Nehemiah timber for the gates.' }, { text: 'The horse: the king sends horsemen with him.' }, { text: 'The gate: Nehemiah wants to build the city with its gates again.' }] }
+        hint: 'Carry the full cup to the king without spilling any wine.',
+        cupCarry: {
+          walker: { label: 'Nehemiah with the cup' },
+          cup: { label: 'The cup' },
+          rounds: [
+            { hint: 'Bring the cup to the king. Move your finger slowly ahead of Nehemiah, or the wine will slosh.', things: [{ label: 'Big jar' }, { label: 'Potted palm' }] },
+            { hint: 'Now more things stand in the hall, and the cup is even fuller. Walk calmly around them.', things: [{ label: 'Potted palm' }, { label: 'Big jar' }, { label: 'Potted palm' }, { label: 'Big jar' }, { label: 'Big jar' }, { label: 'Potted palm' }] }
+          ]
+        }
       },
       questions: [
         { q: 'What does Nehemiah hand to the king?', options: ['a cup of wine', 'a loaf of bread', 'a letter'] },
@@ -130,10 +137,15 @@ export const nehemiaEn: TextOverlay<Journey> = {
         '"I too have lent money," says Nehemiah. "Let us forgive this debt. Give them back their fields, vineyards, olive groves and houses today." "We will give everything back," say the leaders. They promise it before the priests. All the people cry "Amen!" and praise God.'
       ],
       task: {
-        hint: 'Put the pictures in the order of the story.',
-        order: {
-          cards: [{ label: 'The families cry out in their need' }, { label: 'Nehemiah speaks to the leaders' }, { label: 'The leaders give everything back' }, { label: 'The people cry Amen and praise God' }],
-          rounds: [{ hint: 'Round 1: Put the pictures in the order of the story. The dots show where they go.' }, { hint: 'Round 2: Now with the crying of the families and without dots: What comes first, what comes next?' }]
+        hint: 'Give every family its pledge back.',
+        pledges: {
+          chest: { label: 'The chest with the pledges' },
+          families: [{ label: 'The family with the son' }, { label: 'The family with the baby' }, { label: 'The grandmother with her grandchildren' }, { label: 'The family with two daughters' }],
+          slips: { acker: { label: 'The field' }, weinberg: { label: 'The vineyard' }, oelgarten: { label: 'The olive grove' }, haus: { label: 'The house' } },
+          rounds: [
+            { hint: 'Pull a pledge out of the chest and bring it to the family it belongs to. Above every family you see what it gave as a pledge.' },
+            { hint: 'Now four families are waiting. Look closely: the vineyard and the olive grove look alike.' }
+          ]
         }
       },
       questions: [
@@ -165,11 +177,14 @@ export const nehemiaEn: TextOverlay<Journey> = {
         'Then everyone goes home glad. The next day they read in the Law that they are to build huts. They fetch branches and make huts, on the roofs and in the courtyards. It is a great feast of joy.'
       ],
       task: {
-        hint: 'Drag the right leaf into the gap.',
-        verse: {
+        hint: 'Fetch branches of olive, myrtle and palm and build the booth on the roof.',
+        booths: {
+          walker: { label: 'The man with the basket' },
+          trees: { oel: { label: 'Olive tree' }, myrte: { label: 'Myrtle' }, palme: { label: 'Palm tree' }, dorn: { label: 'Dry thorn bush' } },
+          boughs: { oel: { label: 'olive branch', plural: 'Olive branches' }, myrte: { label: 'myrtle branch', plural: 'Myrtle branches' }, palme: { label: 'palm branch', plural: 'Palm branches' } },
           rounds: [
-            { hint: 'Drag the right leaf into the gap.', parts: ['“This day is ', ' to the Lord your God. Do not be sad!”'], words: ['holy', 'hard', 'short'] },
-            { hint: 'Now two words are missing.', parts: ['“The ', ' of the Lord is your ', '.”'], words: ['joy', 'strength', 'worry', 'wall'] }
+            { hint: 'Tap the trees: the man fetches branches. Then tap the house: he takes them up to the roof.' },
+            { hint: 'Now the booth needs more branches. The dry thorn bush has no leaves.' }
           ]
         }
       },

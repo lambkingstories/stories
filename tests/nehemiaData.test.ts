@@ -1,6 +1,7 @@
 /**
  * The data of "Nehemiah" (`nehemia.ts`, `en/nehemia.en.ts`, `nehemiaPath.ts`): the stories and questions follow the rules of the adventures (texts of the draft `D:/Claude/Abenteuer-Nehemia/ENTWURF_Nehemia.md`, Luther 1912 told in our own words),
- * the two quiz stages are only quizzes, the two new games and the five old ones have sound data, the map has nine stations and the exam, and the English file has the same shape.
+ * the two quiz stages are only quizzes, the five new games (ride, trumpet; since Anton's plan of 5.11.2026 also the cup, the pledges and the booths) and the two old ones
+ * (puzzle, hidden pictures; never in two stages in a row) have sound data, the map has nine stations and the exam, and the English file has the same shape.
  */
 import { existsSync, statSync } from 'node:fs'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -9,6 +10,8 @@ import { NEHEMIA_PATH } from '@/data/adventures/nehemiaPath'
 import { englishTextsOf } from '@/data/adventures/localize'
 import { setAdventureLanguage } from '@/use/adventureLanguage'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
+import { boothProblems, boothTotal, cupProblems, pledgeProblems } from '@/utils/nehemiaNeu'
+import type { BoothGame, CupGame, PledgeGame } from '@/utils/nehemiaNeu'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => nehemia.stages[n - 1]!
@@ -121,11 +124,14 @@ describe('Nehemia: stories and questions', () => {
 })
 
 describe('Nehemia: the games', () => {
-  it('the order of the games: 5 old, 2 new (ride, trumpet), 2 quizzes; no game twice', () => {
-    expect(nehemia.stages.map((s) => s.task.kind)).toEqual(['puzzle', 'memory', 'ritt', 'wimmelbild', 'quiz', 'posaune', 'reihenfolge', 'quiz', 'lueckenvers'])
+  it('the order of the games (the plan of Anton, 5.11.2026): only 2 known games (puzzle, hidden pictures), never in a row; 5 new; 2 quizzes; no game twice', () => {
+    expect(nehemia.stages.map((s) => s.task.kind)).toEqual(['puzzle', 'becher', 'ritt', 'wimmelbild', 'quiz', 'posaune', 'pfand', 'quiz', 'laubhuetten'])
     const games = nehemia.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
     expect(new Set(games).size).toBe(games.length)
-    expect(games.filter((k) => ['ritt', 'posaune'].includes(k))).toHaveLength(2)
+    const known = ['puzzle', 'wimmelbild', 'memory', 'reihenfolge', 'lueckenvers']
+    const kinds = nehemia.stages.map((s) => s.task.kind)
+    expect(kinds.filter((k) => known.includes(k))).toHaveLength(2)
+    for (let i = 1; i < kinds.length; i++) expect(known.includes(kinds[i]!) && known.includes(kinds[i - 1]!), `known games in a row at ${i + 1}`).toBe(false)
   })
 
   it('1 puzzle: a portrait picture in 2 columns and 3 rows', () => {
@@ -135,12 +141,15 @@ describe('Nehemia: the games', () => {
     expect(g.image).toMatch(/puzzle\/mauer\.webp$/)
   })
 
-  it('2 memory: six pairs (a full board of 3 x 4), every one with a sentence that the text of the stage tells', () => {
-    const g = stage(2).task.memory!
-    expect(g.pairs).toHaveLength(6)
-    for (const p of g.pairs) expect(p.text.length).toBeGreaterThan(10)
+  it('2 the cup: the checker finds nothing; the hall, Nehemiah and the cup are painted; round 2 is harder (more things, a smaller limit)', () => {
+    const g = (stage(2).task as unknown as { cupCarry: CupGame }).cupCarry
+    expect(cupProblems(g)).toEqual([])
+    expect(g.rounds).toHaveLength(2)
+    expect(g.rounds[1]!.things.length).toBeGreaterThan(g.rounds[0]!.things.length)
+    expect(g.rounds[1]!.limit).toBeLessThan(g.rounds[0]!.limit)
+    expect(g.background).toMatch(/nehemia\/becher\/saal\.webp$/)
     const text = stage(2).text.join(' ')
-    for (const w of ['Becher', 'Wein', 'Briefe', 'Holz', 'Reiter', 'Tore']) expect(text, w).toContain(w)
+    for (const w of ['Becher', 'Wein', 'König', 'Königin']) expect(text, w).toContain(w)
   })
 
   it('3 ride: five different places that are named in the text in this order; every place lies inside the picture and the places are far apart; round 1 with the list, round 2 without', () => {
@@ -203,23 +212,36 @@ describe('Nehemia: the games', () => {
     expect(g.background).toMatch(/nehemia\/posaune\/mauer\.webp$/)
   })
 
-  it('7 order: four cards, round 1 with the numbers and three cards, round 2 with all four', () => {
-    const g = stage(7).task.order!
-    expect(g.cards).toHaveLength(4)
-    expect(g.rounds.map((r) => r.cards.length)).toEqual([3, 4])
-    expect(g.rounds.map((r) => r.numbered)).toEqual([true, false])
+  it('7 the pledges: the checker finds nothing; the fields, vineyards, olive groves and houses of the text; three families, then four', () => {
+    const g = (stage(7).task as unknown as { pledges: PledgeGame }).pledges
+    expect(pledgeProblems(g)).toEqual([])
+    expect(g.rounds.map((r) => r.spots.length)).toEqual([3, 4])
+    expect([...g.rounds[1]!.spots.map((s) => s.kind)].sort()).toEqual(['acker', 'haus', 'oelgarten', 'weinberg'])
+    expect(stage(7).text.join(' ')).toMatch(/Äcker, Weinberge, Ölgärten und Häuser/)
   })
 
-  it('9 verse: the sentences are in the text and the right words are on the leaves', () => {
-    const g = stage(9).task.verse!
-    expect(g.rounds).toHaveLength(2)
-    for (const r of g.rounds) {
-      expect(r.parts).toHaveLength(r.answers.length + 1)
-      for (const a of r.answers) expect(r.words[a]).toBeTruthy()
+  it('9 the booths: the checker finds nothing; olive, myrtle and palm as in the text of Nehemiah 8,15; round 2 needs more and has the dry thorn bush', () => {
+    const g = (stage(9).task as unknown as { booths: BoothGame }).booths
+    expect(boothProblems(g)).toEqual([])
+    expect(g.rounds.map((r) => boothTotal(r))).toEqual([6, 9])
+    expect(g.rounds[1]!.trees.some((t) => t.kind === 'dorn')).toBe(true)
+    expect(stage(9).text.join(' ')).toMatch(/Laubhütten/)
+    expect(stage(9).text.join(' ')).toMatch(/Dächern/)
+  })
+
+  it('the pictures of the three new games are all there and small (at least 20 files, each under 620 KB)', () => {
+    const files = new Set<string>()
+    const walk = (v: unknown) => {
+      if (typeof v === 'string' && /\.webp$/.test(v)) files.add(v)
+      else if (Array.isArray(v)) v.forEach(walk)
+      else if (v && typeof v === 'object') Object.values(v).forEach(walk)
     }
-    expect(g.rounds[0]!.words[g.rounds[0]!.answers[0]!]).toBe('heilig')
-    expect(g.rounds[1]!.answers.map((a) => g.rounds[1]!.words[a])).toEqual(['Freude', 'Stärke'])
-    expect(stage(9).text.join(' ')).toMatch(/Dieser Tag ist heilig/)
+    for (const n of [2, 7, 9]) walk(stage(n).task)
+    expect(files.size).toBeGreaterThanOrEqual(20)
+    for (const f of files) {
+      expect(existsSync(`public/${f}`), f).toBe(true)
+      expect(statSync(`public/${f}`).size, f).toBeLessThan(620_000)
+    }
   })
 })
 
@@ -272,7 +294,10 @@ describe('Nehemia: map, files, English', () => {
     expect(stage(1).title).toBe('The news from Jerusalem')
     expect(stage(3).task.ride!.spots[0]!.label).toBe('Valley Gate')
     expect(stage(6).task.post!.rounds[0]!.hint).toContain('trumpet')
-    expect(stage(9).task.verse!.rounds[1]!.parts[0]).toContain('The')
+    expect(stage(2).task.hint).toContain('cup')
+    expect((stage(7).task as unknown as { pledges: PledgeGame }).pledges.slips.haus.label).toBe('The house')
+    expect((stage(9).task as unknown as { booths: BoothGame }).booths.boughs.palme.plural).toBe('Palm branches')
+    expect((stage(2).task as unknown as { cupCarry: CupGame }).cupCarry.rounds[1]!.things[0]!.label).toBe('Potted palm')
     for (const s of nehemia.stages) {
       const audio = s.audio
       if (audio) expect(audio, `stage ${s.id}`).toBe(`audio/abenteuer/nehemia/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)

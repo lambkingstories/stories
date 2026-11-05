@@ -1,20 +1,22 @@
 /**
+ * ERZEUGT von D:/Claude/Abenteuer-Nehemia/tools/bauen_nehemia.py (Spieldaten der neuen Spiele: neue_spiele_nehemia.py). Nicht von Hand ändern, sondern dort ändern und neu bauen.
  * Abenteuer "Nehemia" (Nehemia 1–8) für 8 bis 10 Jahre: 9 Etappen, Untertitel "Die Mauer von Jerusalem". Entstanden nach dem Skill "LambKing Abenteuer Skill" (Leitung, 30.10.2026).
  * Quelle der Texte: D:/Claude/Abenteuer-Nehemia/ENTWURF_Nehemia.md (Luther 1912 von bibeltext.com gelesen, nichts abgeschrieben), Plan: ETAPPENPLAN.md, Figuren: FIGUREN.md.
  * Gemildert erzählt: die Mordpläne der Feinde ("die Arbeit stoppen", nie gezeigt), die Rachegebete (4,4–5; 6,14), das Namensverzeichnis (Neh 7). Waffen werden nur getragen, nie gebraucht.
  * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
- * Spiele (Wahl der Leitung): 1 Puzzle (alt), 2 Memory (alt), 3 Der nächtliche Ritt (neu), 4 Wimmelbild (alt), 5 nur Quiz, 6 Die Posaune ruft (neu), 7 Reihenfolge (alt), 8 nur Quiz, 9 Lückenvers (alt).
+ * Spiele (Antons Spielplan 5.11.2026: höchstens zwei bekannte, nie hintereinander): 1 Puzzle (alt), 2 Der Becher (neu), 3 Der nächtliche Ritt (neu), 4 Wimmelbild (alt), 5 nur Quiz,
+ * 6 Die Posaune ruft (neu), 7 Pfand zurück (neu), 8 nur Quiz, 9 Laubhütten (neu). Die Typen der drei neuesten Spiele kommen aus `@/utils/nehemiaNeu`.
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/nehemia/, images/abenteuer/spiele/nehemia/<spiel>/, audio/abenteuer/nehemia/.
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { FindGame, Journey, MemoryGame, OrderGame, PostGame, RideGame, VerseGame } from '@/types/adventure'
+import type { FindGame, Journey, PostGame, RideGame } from '@/types/adventure'
+import type { BoothGame, CupGame, PledgeGame } from '@/utils/nehemiaNeu'
 import { josef } from './josef'
 import { NEHEMIA_PATH } from './nehemiaPath'
 import { localize } from './localize'
 import { adventureLanguage } from '@/use/adventureLanguage'
 import { nehemiaEn } from './en/nehemia.en'
-import { backdropOr } from '@/utils/gameBackground'
 
 // Etappenbilder (Variante a der neuen Bilder; Anton wählt auf der Vorschau-Seite a/b): `images/abenteuer/nehemia/etappe-bild-NN.webp`, 960 × 640
 const PICS = 'images/abenteuer/nehemia/'
@@ -22,49 +24,147 @@ const PICS = 'images/abenteuer/nehemia/'
 const G = 'images/abenteuer/spiele/nehemia/'
 
 /**
- * Etappe 9, "Lückenvers" (alte Mechanik): zwei Sätze aus dem Text der Etappe in zwei Runden (erst ein Wort, dann zwei); die Wörter sind Blätter (das richtige zuerst, `answers` zeigt auf sie).
- * Tafel und Blatt sind die aus Salomo (kopiert). Hintergrund ist der gemalte Platz vor dem Wassertor (Bildauftrag S30).
+ * Etappe 2, "Der Becher" (neu, Antons Spielplan 5.11.2026, Neh 2,1): der Thronsaal in Susa von schräg oben (Hochformat 2:3), oben der König und die Königin. Nehemia trägt den vollen Becher
+ * über den glatten Boden; der Finger zeigt, wohin er geht. Anfahren, Bremsen, Wenden und Stöße an Krug und Palme lassen den Wein schwappen; zu viel ist ein Fehler.
+ * Runde 2 hat mehr Dinge und eine kleinere Grenze. `path` ist der sichere Weg der Hilfe. Bilder (Bildauftrag S90): `becher/saal.webp`, `nehemia.webp`, `krug`, `palme`, `becher.webp`.
+ * Prüfer: `cupProblems` (src/utils/nehemiaNeu.ts).
  */
-const VERS: VerseGame = {
-  background: `${G}hintergrund/vers-hintergrund.webp`,
-  soft: true,
-  board: `${G}lueckenvers/tafel.webp`,
-  leaf: `${G}lueckenvers/blatt.webp`,
+const BECHER: CupGame = {
+  background: `${G}becher/saal.webp`,
+  ratio: 2 / 3,
+  floor: { left: 6, right: 94, top: 40, bottom: 97 },
+  walker: { image: `${G}becher/nehemia.webp`, label: 'Nehemia mit dem Becher', w: 16 },
+  body: 3,
+  cup: { image: `${G}becher/becher.webp`, label: 'Der Becher' },
+  king: { x: 49, y: 40.5, r: 8 },
+  speed: 18,
   rounds: [
-    { hint: 'Ziehe das passende Blatt in die Lücke.', parts: ['„Dieser Tag ist ', ' dem Herrn, eurem Gott. Seid nicht traurig!“'], words: ['heilig', 'schwer', 'kurz'], answers: [0] },
-    { hint: 'Jetzt fehlen zwei Wörter.', parts: ['„Die ', ' am Herrn ist eure ', '.“'], words: ['Freude', 'Stärke', 'Sorge', 'Mauer'], answers: [0, 1] }
+    {
+      hint: 'Bring dem König den Becher. Zieh den Finger langsam vor Nehemia her, sonst schwappt der Wein.',
+      start: { x: 50, y: 96 },
+      limit: 3.2,
+      things: [
+        { image: `${G}becher/krug.webp`, label: 'Großer Krug', x: 47, y: 76, w: 18, r: 4.5 },
+        { image: `${G}becher/palme.webp`, label: 'Topfpalme', x: 30, y: 58, w: 17, r: 5 }
+      ],
+      path: [{ x: 50, y: 96 }, { x: 60, y: 84 }, { x: 56, y: 60 }, { x: 49, y: 41 }]
+    },
+    {
+      hint: 'Jetzt stehen mehr Dinge im Saal, und der Becher ist noch voller. Geh ruhig um sie herum.',
+      start: { x: 20, y: 96 },
+      limit: 2.2,
+      things: [
+        { image: `${G}becher/palme.webp`, label: 'Topfpalme', x: 36, y: 88, w: 17, r: 5 },
+        { image: `${G}becher/krug.webp`, label: 'Großer Krug', x: 18, y: 74, w: 18, r: 4.5 },
+        { image: `${G}becher/palme.webp`, label: 'Topfpalme', x: 52, y: 72, w: 17, r: 5 },
+        { image: `${G}becher/krug.webp`, label: 'Großer Krug', x: 80, y: 78, w: 18, r: 4.5 },
+        { image: `${G}becher/krug.webp`, label: 'Großer Krug', x: 34, y: 56, w: 18, r: 4.5 },
+        { image: `${G}becher/palme.webp`, label: 'Topfpalme', x: 70, y: 52, w: 17, r: 5 }
+      ],
+      path: [{ x: 20, y: 96 }, { x: 24, y: 92 }, { x: 25, y: 84 }, { x: 35, y: 75 }, { x: 42, y: 64 }, { x: 50, y: 50 }, { x: 49, y: 41 }]
+    }
   ]
 }
 
 /**
- * Etappe 7, "Die Schulden werden erlassen" (alte Mechanik, Reihenfolge legen): die Familien klagen, Nehemia spricht zu den Obersten, die Reichen geben alles zurück, das Volk ruft Amen und lobt Gott.
- * Runde 1 drei Karten mit Punkten, Runde 2 alle vier ohne Punkte. Bilder (Bildauftrag S36): `reihenfolge/karte-1..4.webp` (4:3).
+ * Etappe 7, "Pfand zurück" (neu, Antons Spielplan 5.11.2026, Neh 5,11–12): ein Platz in Jerusalem (3:2), vorn die offene Truhe mit den Pfandscheinen, dahinter die Familien; über jeder Familie
+ * hängt blass der Schein, auf den sie wartet (Acker, Weinberg, Ölgarten, Haus). Das Kind zieht die Scheine nacheinander aus der Truhe (`draw`) und bringt jeden der richtigen Familie;
+ * die falsche Familie ist ein Fehler. Runde 1: drei Familien, Runde 2: vier in anderer Ordnung. Bilder (Bildauftrag S91): `pfand/platz`, `truhe`, `schein-*`, `familie-1..4`.
+ * Prüfer: `pledgeProblems` (src/utils/nehemiaNeu.ts).
  */
-const REIHENFOLGE: OrderGame = {
-  cards: [
-    { id: 'geschrei', image: `${G}reihenfolge/karte-1.webp`, label: 'Die Familien klagen über ihre Not' },
-    { id: 'rede', image: `${G}reihenfolge/karte-2.webp`, label: 'Nehemia spricht zu den Obersten' },
-    { id: 'zurueck', image: `${G}reihenfolge/karte-3.webp`, label: 'Die Obersten geben alles zurück' },
-    { id: 'amen', image: `${G}reihenfolge/karte-4.webp`, label: 'Das Volk ruft Amen und lobt Gott' }
+const PFAND: PledgeGame = {
+  background: `${G}pfand/platz.webp`,
+  ratio: 1.5,
+  chest: { image: `${G}pfand/truhe.webp`, label: 'Die Truhe mit den Pfandscheinen', x: 90, y: 99, w: 18 },
+  families: [
+    { image: `${G}pfand/familie-1.webp`, label: 'Familie mit dem Sohn' },
+    { image: `${G}pfand/familie-2.webp`, label: 'Familie mit dem Baby' },
+    { image: `${G}pfand/familie-3.webp`, label: 'Großmutter mit den Enkeln' },
+    { image: `${G}pfand/familie-4.webp`, label: 'Familie mit zwei Töchtern' }
+  ],
+  slips: {
+    acker: { image: `${G}pfand/schein-acker.webp`, label: 'Der Acker' },
+    weinberg: { image: `${G}pfand/schein-weinberg.webp`, label: 'Der Weinberg' },
+    oelgarten: { image: `${G}pfand/schein-oelgarten.webp`, label: 'Der Ölgarten' },
+    haus: { image: `${G}pfand/schein-haus.webp`, label: 'Das Haus' }
+  },
+  slipW: 13,
+  familyAspect: 1.67,
+  rounds: [
+    {
+      hint: 'Zieh einen Pfandschein aus der Truhe und bring ihn der Familie, der er gehört. Über jeder Familie siehst du, was sie verpfändet hat.',
+      spots: [
+        { family: 0, kind: 'acker', x: 15, y: 75, w: 20 },
+        { family: 1, kind: 'weinberg', x: 40, y: 71, w: 20 },
+        { family: 2, kind: 'haus', x: 65, y: 75, w: 20 }
+      ],
+      draw: ['haus', 'acker', 'weinberg']
+    },
+    {
+      hint: 'Jetzt warten vier Familien. Schau genau: Weinberg und Ölgarten sehen sich ähnlich.',
+      spots: [
+        { family: 3, kind: 'oelgarten', x: 10, y: 75, w: 20 },
+        { family: 2, kind: 'weinberg', x: 30, y: 71, w: 20 },
+        { family: 1, kind: 'haus', x: 50, y: 75, w: 20 },
+        { family: 0, kind: 'acker', x: 70, y: 71, w: 20 }
+      ],
+      draw: ['weinberg', 'acker', 'oelgarten', 'haus']
+    }
+  ]
+}
+
+/**
+ * Etappe 9, "Laubhütten" (neu, Antons Spielplan 5.11.2026, Neh 8,15–16): links der Hang vor der Stadt mit Ölbaum, Myrte und Palme, rechts ein Haus mit Außentreppe, auf dem Dach das leere
+ * Gestell einer Laubhütte (3:2, von der Seite). Ein junger Mann mit Korb geht den Weg entlang: Baum antippen = einen Zweig holen, Haus antippen = den Korb aufs Dach bringen; die Zweige werden
+ * Platz für Platz an das Gestell gebunden. Ein Zweig, von dem genug da ist, und der dürre Dornbusch sind Fehler. Runde 2 braucht mehr Zweige und hat den Dornbusch.
+ * Bilder (Bildauftrag S92): `laubhuetten/hof`, `oelbaum`, `myrte`, `palme`, `dornbusch`, `zweig-*`, `traeger`. Prüfer: `boothProblems` (src/utils/nehemiaNeu.ts).
+ */
+const LAUBHUETTEN: BoothGame = {
+  background: `${G}laubhuetten/hof.webp`,
+  ratio: 1.5,
+  hill: 81,
+  road: 87,
+  walker: { image: `${G}laubhuetten/traeger.webp`, label: 'Der Mann mit dem Korb', w: 14 },
+  speed: 22,
+  stairs: 51,
+  house: { left: 44, right: 100, top: 8, bottom: 88 },
+  trees: {
+    oel: { image: `${G}laubhuetten/oelbaum.webp`, label: 'Ölbaum' },
+    myrte: { image: `${G}laubhuetten/myrte.webp`, label: 'Myrte' },
+    palme: { image: `${G}laubhuetten/palme.webp`, label: 'Palme' },
+    dorn: { image: `${G}laubhuetten/dornbusch.webp`, label: 'Dürrer Dornbusch' }
+  },
+  boughs: {
+    oel: { image: `${G}laubhuetten/zweig-oel.webp`, label: 'Ölzweig', plural: 'Ölzweige' },
+    myrte: { image: `${G}laubhuetten/zweig-myrte.webp`, label: 'Myrtenzweig', plural: 'Myrtenzweige' },
+    palme: { image: `${G}laubhuetten/zweig-palme.webp`, label: 'Palmzweig', plural: 'Palmzweige' }
+  },
+  slots: [
+    { x: 70, y: 28, w: 11, rot: -45 },
+    { x: 96, y: 28, w: 11, rot: -45 },
+    { x: 76, y: 29, w: 11, rot: -40 },
+    { x: 90, y: 29, w: 11, rot: -50 },
+    { x: 83, y: 29, w: 11, rot: -45 },
+    { x: 75, y: 15, w: 11, rot: 45 },
+    { x: 84, y: 14, w: 11, rot: 45 },
+    { x: 92, y: 15, w: 11, rot: 45 },
+    { x: 80, y: 20, w: 11, rot: 40 }
   ],
   rounds: [
-    { hint: 'Runde 1: Lege die Bilder in die Reihenfolge der Geschichte. Die Punkte zeigen, wo sie hinkommen.', numbered: true, cards: ['rede', 'zurueck', 'amen'] },
-    { hint: 'Runde 2: Jetzt mit dem Klagen der Familien und ohne Punkte: Was kommt zuerst, was danach?', numbered: false, cards: ['geschrei', 'rede', 'zurueck', 'amen'] }
-  ]
-}
-
-/**
- * Etappe 2, "Memory" (alte Mechanik): die sechs Dinge des Mundschenks (Becher, Weinkrug, Brief, Holzbalken, Pferd, Tor); die Rückseite zeigt einen goldenen Becher (Bildauftrag S32, ein Bogen mit den sechs Dingen, vom Code geschnitten).
- */
-const MEMORY: MemoryGame = {
-  back: `${G}memory/rueck.webp`,
-  pairs: [
-    { image: `${G}memory/karte-becher.webp`, text: 'Der Becher: Nehemia reicht dem König den Becher.' },
-    { image: `${G}memory/karte-weinkrug.webp`, text: 'Der Weinkrug: Wein steht vor dem König.' },
-    { image: `${G}memory/karte-brief.webp`, text: 'Der Brief: Der König gibt Nehemia Briefe für die Statthalter.' },
-    { image: `${G}memory/karte-holz.webp`, text: 'Das Holz: Asaf soll Nehemia Holz für die Tore geben.' },
-    { image: `${G}memory/karte-pferd.webp`, text: 'Das Pferd: Der König schickt Reiter mit.' },
-    { image: `${G}memory/karte-tor.webp`, text: 'Das Tor: Nehemia will die Stadt mit ihren Toren wieder aufbauen.' }
+    {
+      hint: 'Tippe die Bäume an: Der Mann holt Zweige. Dann tippe das Haus an: Er bringt sie aufs Dach.',
+      trees: [{ kind: 'oel', x: 10, w: 20 }, { kind: 'myrte', x: 26, w: 18 }, { kind: 'palme', x: 42, w: 22 }],
+      need: { oel: 2, myrte: 2, palme: 2 },
+      carry: 3,
+      start: 51
+    },
+    {
+      hint: 'Jetzt braucht die Hütte mehr Zweige. Am dürren Dornbusch ist kein Laub.',
+      trees: [{ kind: 'palme', x: 8, w: 19 }, { kind: 'dorn', x: 19.5, w: 13 }, { kind: 'oel', x: 31, w: 17 }, { kind: 'myrte', x: 43, w: 16 }],
+      need: { oel: 3, myrte: 3, palme: 3 },
+      carry: 3,
+      start: 51
+    }
   ]
 }
 
@@ -208,8 +308,8 @@ export const nehemia: Journey = {
         'Nehemia erschrickt sehr. „Der König lebe ewig“, sagt er. „Wie sollte ich nicht traurig sein? Die Stadt, in der meine Väter begraben sind, liegt in Trümmern, und ihre Tore sind verbrannt.“ „Was wünschst du dir?“, fragt der König.',
         'Da betet Nehemia zu Gott. Dann bittet er: „Schick mich nach Juda, damit ich die Stadt wieder aufbaue.“ Die Königin sitzt neben dem König. „Wie lange dauert deine Reise?“, fragt der König. Er lässt Nehemia ziehen und gibt ihm Briefe für die Statthalter und für Asaf, den Waldhüter, der Holz für die Tore geben soll. Reiter ziehen mit.'
       ],
-      // Spiel: Memory (memory, alt)
-      task: { kind: 'memory', hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.', memory: MEMORY },
+      // Spiel: Der Becher (becher, neu 5.11.2026)
+      task: { kind: 'becher', hint: 'Trag den vollen Becher zum König, ohne dass Wein überschwappt.', cupCarry: BECHER },
       questions: [
         { q: 'Was reicht Nehemia dem König?', options: ['einen Becher Wein', 'ein Brot', 'einen Brief'], answer: 0 },
         { q: 'Worum bittet Nehemia den König?', options: ['nach Juda gesandt zu werden, um die Stadt wieder aufzubauen', 'um viel Gold', 'um ein Haus in Susa'], answer: 0 }
@@ -294,8 +394,8 @@ export const nehemia: Journey = {
         'Nehemia wird sehr zornig. „Das ist nicht gut, was ihr tut!“, sagt er zu den Obersten. „Wir sind doch Brüder.“ Er ruft das ganze Volk zusammen, und die Obersten schweigen.',
         '„Auch ich habe Geld verliehen“, sagt Nehemia. „Lasst uns diese Schuld erlassen. Gebt ihnen heute ihre Äcker, Weinberge, Ölgärten und Häuser zurück.“ „Wir geben alles zurück“, sagen die Obersten. Vor den Priestern versprechen sie es. Das ganze Volk ruft „Amen!“ und lobt Gott.'
       ],
-      // Spiel: Reihenfolge legen (reihenfolge, alt)
-      task: { kind: 'reihenfolge', hint: 'Lege die Bilder in die Reihenfolge der Geschichte.', order: REIHENFOLGE },
+      // Spiel: Pfand zurück (pfand, neu 5.11.2026)
+      task: { kind: 'pfand', hint: 'Gib jeder Familie ihr Pfand zurück.', pledges: PFAND },
       questions: [
         { q: 'Was müssen die Familien verpfänden, um Getreide zu kaufen?', options: ['Äcker, Weinberge und Häuser', 'Schafe und Esel', 'Töpfe und Teppiche'], answer: 0 },
         { q: 'Wie reagiert Nehemia auf die Not der Familien?', options: ['Er wird zornig und ruft das Volk zusammen.', 'Er schaut weg.', 'Er reist ab.'], answer: 0 }
@@ -329,8 +429,8 @@ export const nehemia: Journey = {
         'Als das Volk die Worte hört, weinen viele. Aber Nehemia und Esra sagen: „Dieser Tag ist heilig. Seid nicht traurig! Geht hin, esst und trinkt, und schickt denen etwas davon, die nichts haben. Denn die Freude am Herrn ist eure Stärke.“',
         'Da gehen alle fröhlich heim. Am nächsten Tag lesen sie im Gesetz, dass sie Laubhütten bauen sollen. Sie holen Zweige und bauen sich Hütten, auf den Dächern und in den Höfen. Es ist ein großes Freudenfest.'
       ],
-      // Spiel: Lückenvers (lueckenvers, alt)
-      task: { kind: 'lueckenvers', hint: 'Ziehe das passende Blatt in die Lücke.', verse: VERS },
+      // Spiel: Laubhütten (laubhuetten, neu 5.11.2026)
+      task: { kind: 'laubhuetten', hint: 'Hol Zweige von Ölbaum, Myrte und Palme und bau die Laubhütte auf dem Dach.', booths: LAUBHUETTEN },
       questions: [
         { q: 'Wer liest dem Volk aus dem Buch des Gesetzes vor?', options: ['Esra', 'Hanani', 'Tobija'], answer: 0 },
         { q: 'Was sollen die Leute denen schicken, die nichts haben?', options: ['etwas vom Essen und Trinken', 'ihre Häuser', 'ihre Kleider'], answer: 0 }
@@ -345,11 +445,6 @@ export const nehemia: Journey = {
     { q: 'Was soll das Volk tun, wenn es die Posaune hört?', options: ['sich dort sammeln', 'nach Hause gehen', 'schlafen'], answer: 0 },
     { q: 'Was ist die Stärke des Volkes, sagt Nehemia?', options: ['die Freude am Herrn', 'die hohe Mauer', 'das viele Gold'], answer: 0 }
   ]
-}
-
-// the games that lie on a stage picture (drawn soft by the app) follow the picture of their stage
-for (const st of nehemia.stages) {
-  if (st.task.verse) st.task.verse.background = backdropOr(st.task.verse.background, st.image ?? st.task.verse.background)
 }
 
 // the German recordings of the stories (voice Achernar, files "geschichte-NN-v1.mp3"); until they are made the app reads with the voice of the device. Remove a number from this list when its file is in.
