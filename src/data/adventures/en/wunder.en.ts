@@ -130,8 +130,13 @@ export const wunderEn: TextOverlay<Journey> = {
         'Then the woman comes, trembling, and falls down before him. She tells him everything. Jesus says: “Daughter, your faith has made you well. Go in peace.”'
       ],
       task: {
-        hint: 'Search the crowd: find the four people from the story.',
-        find: { labels: ['The woman with the head cloth', 'Jairus', 'Jesus', 'Simon, a disciple'], doneText: 'You have found all four: the woman, Jairus, Jesus and Simon. They were all in the crowd by the lake.' }
+        hint: 'Tap the hem of his mantle when Jesus walks past the woman.',
+        hemTouch: {
+          jesus: { label: 'Jesus' },
+          woman: { label: 'A woman of the crowd' },
+          people: [{ label: 'A man with a bundle' }, { label: 'A woman with a jar' }, { label: 'An old man with a staff' }, { label: 'A boy with a basket' }],
+          rounds: [{ hint: 'Tap right on the tassels of the hem when they are at the woman’s hand. The ring shows how far she can reach.' }, { hint: 'Now Jesus walks faster, and people push in front. Wait for the right moment.' }]
+        }
       },
       questions: [
         { q: 'How long has the woman been sick?', options: ['twelve years', 'two days', 'ten years'] },
@@ -189,7 +194,15 @@ export const wunderEn: TextOverlay<Journey> = {
         'But the people see them leaving. From all the towns they run on foot along the shore, and they are already there when the boat arrives.',
         'Jesus steps out and sees the many people. He feels sorry for them, because they are like sheep without a shepherd. He begins to tell them many things.'
       ],
-      task: { hint: 'Put the picture of the people on the green meadow together.' },
+      task: {
+        hint: 'Draw a way for the crowd along the shore, round the rocks to the landing place.',
+        bankPath: {
+          rocks: [{ label: 'A big boulder' }, { label: 'Two rocks' }, { label: 'A tall rock' }, { label: 'A round rock with a bush' }],
+          crowd: { label: 'The crowd' },
+          boat: { label: 'The boat with Jesus and the disciples' },
+          rounds: [{ hint: 'Start at the crowd and draw a way with your finger along the shore to the landing place. Not through the rocks, not into the water.' }, { hint: 'Now a bay is in the way, and more rocks lie on the shore. Lead the crowd round them.' }]
+        }
+      },
       questions: [
         { q: 'Where does Jesus want to go with the disciples?', options: ['to a lonely place', 'home', 'to Jerusalem'] },
         { q: 'How do the people get there?', options: ['They run on foot along the shore.', 'They sail in boats.', 'They ride on donkeys.'] }

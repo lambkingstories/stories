@@ -1,6 +1,7 @@
 /**
  * The data of "Jesu Wunder am See" (`wunder.ts`, `en/wunder.en.ts`, `wunderPath.ts`): the stories and questions follow the rules of the adventures (texts of the draft `D:/Claude/Abenteuer-Wunder/ENTWURF_Wunder.md`,
- * Luther 1912 told in our own words), the three quiz stages are only quizzes, the five new games and the four old ones have sound data, the map has twelve stations and the exam, and the English file has the same shape.
+ * Luther 1912 told in our own words), the three quiz stages are only quizzes, the seven new games and the two old ones have sound data (Anton's plan of 5.11.2026: at most two known games;
+ * "The hem" and "Along the shore" replace the hidden picture and the puzzle), the map has twelve stations and the exam, and the English file has the same shape.
  */
 import { existsSync, statSync } from 'node:fs'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -10,6 +11,7 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { setAdventureLanguage } from '@/use/adventureLanguage'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 import { bailRoundProblems, bundleProblems, crowdProblems, rowRoundProblems } from '@/utils/wunderGames'
+import { saumProblems, uferProblems } from '@/utils/wunderNeu'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => wunder.stages[n - 1]!
@@ -139,11 +141,11 @@ describe('Wunder: stories and questions', () => {
 })
 
 describe('Wunder: the games', () => {
-  it('the order of the games: 4 old, 5 new (bail, crowd, bundle, bread, row), 3 quizzes; no game twice', () => {
-    expect(wunder.stages.map((s) => s.task.kind)).toEqual(['lueckenvers', 'schoepfen', 'reihenfolge', 'quiz', 'gedraenge', 'wimmelbild', 'quiz', 'buendel', 'puzzle', 'brote', 'rudern', 'quiz'])
+  it('the order of the games: 2 old (verse, order; not one after the other), 7 new (bail, crowd, hem, bundle, shore, bread, row), 3 quizzes; no game twice', () => {
+    expect(wunder.stages.map((s) => s.task.kind)).toEqual(['lueckenvers', 'schoepfen', 'reihenfolge', 'quiz', 'gedraenge', 'saum', 'quiz', 'buendel', 'ufer', 'brote', 'rudern', 'quiz'])
     const games = wunder.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
     expect(new Set(games).size).toBe(games.length)
-    expect(games.filter((k) => ['schoepfen', 'gedraenge', 'buendel', 'brote', 'rudern'].includes(k))).toHaveLength(5)
+    expect(games.filter((k) => ['schoepfen', 'gedraenge', 'saum', 'buendel', 'ufer', 'brote', 'rudern'].includes(k))).toHaveLength(7)
   })
 
   it('1 verse: the sentences are in the text and the right words are on the leaves', () => {
@@ -194,21 +196,15 @@ describe('Wunder: the games', () => {
     expect(g.door.y).toBeLessThan(g.area.y)
   })
 
-  it('6 hidden pictures: the woman, Jairus, Jesus and Simon, covers, every place inside the picture', () => {
+  it('6 the hem: the data are in order (the hem at the height of her fingers, a moment long enough, round 2 shorter and with people in front, the help touches it)', () => {
     const t = stage(6).task
-    expect(t.kind).toBe('wimmelbild')
-    expect(t.count).toBe(4)
-    const f = t.find!
-    expect(f.finds).toHaveLength(4)
-    expect(f.labels).toHaveLength(4)
-    expect(f.covers.length).toBeGreaterThanOrEqual(6)
-    for (const s of [...f.finds, ...f.covers]) {
-      expect(s.x - s.w / 2).toBeGreaterThanOrEqual(-1)
-      expect(s.x + s.w / 2).toBeLessThanOrEqual(101)
-      expect(s.y).toBeLessThanOrEqual(100)
-    }
-    expect(f.labels.join(' ')).toMatch(/Jairus/)
-    expect(f.labels.join(' ')).toMatch(/Jesus/)
+    expect(t.kind).toBe('saum')
+    const g = t.hemTouch!
+    expect(saumProblems(g)).toEqual([])
+    expect(g.rounds).toHaveLength(2)
+    expect(g.rounds[0]!.ring).toBe(true)
+    expect(g.background).toMatch(/wunder\/saum\/strasse\.webp$/)
+    expect(g.jesus.label).toBe('Jesus')
   })
 
   it('8 bundle: two rounds, only the staff, the sandals and one shirt are allowed, the things do not overlap', () => {
@@ -225,11 +221,14 @@ describe('Wunder: the games', () => {
     expect(forbidden).toEqual(['brot', 'geld', 'hemd2', 'tasche'])
   })
 
-  it('9 puzzle: a picture in 2 columns and 3 rows', () => {
-    const g = stage(9).task.puzzle!
-    expect(g.cols).toBe(2)
-    expect(g.rows).toBe(3)
-    expect(g.image).toMatch(/puzzle\/wiese\.webp$/)
+  it('9 along the shore: the data are in order (the way round the rocks is wide enough, round 2 with the bay is longer, the help reaches the landing place without a mistake)', () => {
+    const t = stage(9).task
+    expect(t.kind).toBe('ufer')
+    const g = t.bankPath!
+    expect(uferProblems(g)).toEqual([])
+    expect(g.rounds).toHaveLength(2)
+    expect(g.rounds.map((r) => r.background)).toEqual([1, 2].map((n) => `images/abenteuer/spiele/wunder/ufer/ufer-${n}.webp`))
+    expect(g.rounds[1]!.water.length).toBeGreaterThanOrEqual(1)
   })
 
   it('10 bread: five groups and twelve baskets, two rounds (feed, collect), everything inside the picture', () => {
@@ -308,6 +307,10 @@ describe('Wunder: map, files, English', () => {
     expect(stage(8).task.bundle!.things[0]!.label).toBe('Staff')
     expect(stage(10).task.bread!.rounds[1]!.hint).toContain('twelve baskets')
     expect(stage(11).task.row!.boat.label).toBe('The boat with two oars')
+    expect(stage(6).task.hemTouch!.woman.label).toBe('A woman of the crowd')
+    expect(stage(6).task.hemTouch!.rounds[1]!.hint).toContain('Wait for the right moment')
+    expect(stage(9).task.bankPath!.crowd.label).toBe('The crowd')
+    expect(stage(9).task.bankPath!.rounds[0]!.hint).toContain('along the shore')
     expect(stage(1).task.verse!.rounds[0]!.parts[0]).toContain('Let us go over')
     for (const s of wunder.stages) {
       const audio = s.audio

@@ -3,13 +3,14 @@
  * Anton (31.10.2026): Jesus wird mit Gesicht gezeigt (ohne Heiligenschein). Gott der Vater, Engel, böse Geister und Lichtgestalten sind nie im Bild.
  * Quelle der Texte: D:/Claude/Abenteuer-Wunder/ENTWURF_Wunder.md (Luther 1912 von bibeltext.com gelesen, nichts abgeschrieben), Plan: ETAPPENPLAN.md, Figuren: FIGUREN.md, Prüfbericht: PRUEFBERICHT-BIBELTREUE-2026-11-01.md.
  * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
- * Spiele (Wahl der Leitung, Anton 1.11.2026: neu und zur Szene passend): 1 Lückenvers (alt), 2 Boot ausschöpfen (neu), 3 Reihenfolge (alt), 4 nur Quiz, 5 Durch das Gedränge (neu), 6 Wimmelbild (alt), 7 nur Quiz,
- * 8 Reisebündel packen (neu), 9 Puzzle (alt), 10 Brot austeilen (neu), 11 Gegen den Wind rudern (neu), 12 nur Quiz.
+ * Spiele (Wahl der Leitung, Anton 1.11.2026: neu und zur Szene passend; Antons Spielplan 5.11.2026: höchstens zwei bekannte Spiele): 1 Lückenvers (alt), 2 Boot ausschöpfen (neu), 3 Reihenfolge (alt), 4 nur Quiz,
+ * 5 Durch das Gedränge (neu), 6 Der Saum (neu, 5.11.), 7 nur Quiz, 8 Reisebündel packen (neu), 9 Am Ufer entlang (neu, 5.11.), 10 Brot austeilen (neu), 11 Gegen den Wind rudern (neu), 12 nur Quiz.
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/wunder/, images/abenteuer/spiele/wunder/<spiel>/, audio/abenteuer/wunder/.
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { BailGame, BreadGame, BundleGame, CrowdGame, FindGame, Journey, OrderGame, RowGame, VerseGame } from '@/types/adventure'
+import type { BailGame, BreadGame, BundleGame, CrowdGame, Journey, OrderGame, RowGame, VerseGame } from '@/types/adventure'
+import type { SaumGame, UferGame } from '@/utils/wunderNeu'
 import { josef } from './josef'
 import { WUNDER_PATH } from './wunderPath'
 import { localize } from './localize'
@@ -179,27 +180,96 @@ const RUDERN: RowGame = {
 }
 
 /**
- * Etappe 6, "Wimmelbild" (alte Mechanik): das Gedränge am Ufer von Kapernaum (Bildauftrag S33); gesucht werden vier Menschen aus der Geschichte (Mk 5,22-31): die Frau, Jairus, Jesus und ein Jünger,
- * einige stehen hinter Menschen, Körben und Tüchern. Bilder: `wimmel/szene.webp`, `figur-1..4.webp` (aus einem Bogen geschnitten), `verdecker-1..4.webp` (aus einem Bogen geschnitten).
+ * Etappe 6, "Der Saum" (neu, Antons Spielplan 5.11.2026; Mk 5,25-34): Jesus geht in der Gasse von Kapernaum durch die Menge, eine Frau aus der Menge streckt die Hand aus.
+ * Das Kind tippt genau auf die Quasten am Saum, wenn sie an ihrer Hand vorbeikommen. Runde 1 langsam mit Ring, Runde 2 schneller, Menschen gehen davor vorbei.
+ * Bilder (Bildauftrag S70): `saum/strasse.webp`, `jesus.webp`, `frau.webp`, `mensch-1..4.webp`. Lagen an den Bildern gemessen (tools/neue_spiele_wunder.py).
  */
-const WIMMEL: FindGame = {
-  labels: ['Die Frau mit dem Kopftuch', 'Jairus', 'Jesus', 'Simon, ein Jünger'],
-  doneText: 'Du hast alle vier gefunden: die Frau, Jairus, Jesus und Simon. Sie alle waren in der Menge am See.',
-  scene: `${G}wimmel/szene.webp`,
-  finds: [
-    { image: `${G}wimmel/figur-1.webp`, x: 60, y: 50, w: 15 },
-    { image: `${G}wimmel/figur-2.webp`, x: 15, y: 42, w: 15 },
-    { image: `${G}wimmel/figur-3.webp`, x: 86, y: 52, w: 15 },
-    { image: `${G}wimmel/figur-4.webp`, x: 38, y: 38, w: 14 }
+const SAUM: SaumGame = {
+  background: `${G}saum/strasse.webp`,
+  road: 93,
+  jesus: { image: `${G}saum/jesus.webp`, label: 'Jesus', w: 14.25, aspect: 1.87 },
+  hem: { x: 13.75, y: 78.7 },
+  woman: { image: `${G}saum/frau.webp`, label: 'Eine Frau aus der Menge', w: 18.89, aspect: 1.06, x: 40.63, y: 99.51 },
+  touch: { x: 50, y: 84.48 },
+  people: [
+    { image: `${G}saum/mensch-1.webp`, label: 'Ein Mann mit einem Bündel', w: 12.51, aspect: 2.18 },
+    { image: `${G}saum/mensch-2.webp`, label: 'Eine Frau mit einem Krug', w: 11.25, aspect: 2.55 },
+    { image: `${G}saum/mensch-3.webp`, label: 'Ein alter Mann mit Stab', w: 12.57, aspect: 2 },
+    { image: `${G}saum/mensch-4.webp`, label: 'Ein Junge mit einem Korb', w: 11.24, aspect: 1.81 }
   ],
-  covers: [
-    { image: `${G}wimmel/verdecker-1.webp`, x: 56, y: 52, w: 12 },
-    { image: `${G}wimmel/verdecker-2.webp`, x: 19, y: 44, w: 12 },
-    { image: `${G}wimmel/verdecker-3.webp`, x: 82, y: 54, w: 12 },
-    { image: `${G}wimmel/verdecker-4.webp`, x: 42, y: 40, w: 11 },
-    { image: `${G}wimmel/verdecker-1.webp`, x: 48, y: 66, w: 13 },
-    { image: `${G}wimmel/verdecker-2.webp`, x: 72, y: 42, w: 12 },
-    { image: `${G}wimmel/verdecker-3.webp`, x: 28, y: 60, w: 13 }
+  rounds: [
+    {
+      hint: 'Tippe genau auf die Quasten am Saum, wenn sie bei der Hand der Frau sind. Der Ring zeigt, wie weit sie reicht.',
+      duration: 9,
+      pause: 1.5,
+      reach: 9,
+      hemR: 7,
+      sway: 1,
+      ring: true,
+      walkers: []
+    },
+    {
+      hint: 'Jetzt geht Jesus schneller, und Menschen drängen sich davor. Warte auf den richtigen Augenblick.',
+      duration: 6.5,
+      pause: 1.2,
+      reach: 8,
+      hemR: 6.5,
+      sway: 2,
+      walkers: [{ person: 0, lane: 99, from: 110, to: -10, at: 0.9, dur: 4 }, { person: 3, lane: 100, from: -10, to: 110, at: 0.2, dur: 3 }]
+    }
+  ]
+}
+
+/**
+ * Etappe 9, "Am Ufer entlang" (neu, Antons Spielplan 5.11.2026; Mk 6,30-34): Jesus und die Jünger fahren mit dem Boot an einen einsamen Ort, die Menschen laufen zu Fuß am Ufer entlang.
+ * Das Kind zeichnet der Menge mit dem Finger einen Weg um die Felsen herum, nicht ins Wasser, bis zur Anlegestelle; dann läuft die Menge den Weg und das Boot kommt an.
+ * Bilder (Bildauftrag S71): `ufer/ufer-1.webp`, `ufer-2.webp` (Ufer ohne Felsen), `fels-1..4.webp`, `menge.webp`, `boot.webp`. Das Wasser ist am Bild gemessen (Farbe, tools/neue_spiele_bilder_wunder.py).
+ */
+const UFER: UferGame = {
+  rocks: [
+    { image: `${G}ufer/fels-1.webp`, label: 'Ein großer Felsbrocken', w: 16 },
+    { image: `${G}ufer/fels-2.webp`, label: 'Zwei Felsen', w: 16 },
+    { image: `${G}ufer/fels-3.webp`, label: 'Ein hoher Felsen', w: 16 },
+    { image: `${G}ufer/fels-4.webp`, label: 'Ein runder Felsen mit Busch', w: 16 }
+  ],
+  crowd: { image: `${G}ufer/menge.webp`, label: 'Die Menge', w: 12 },
+  boat: { image: `${G}ufer/boot.webp`, label: 'Das Boot mit Jesus und den Jüngern', w: 17 },
+  pad: 2,
+  rounds: [
+    {
+      hint: 'Fang bei der Menge an und zieh mit dem Finger einen Weg am Ufer entlang bis zur Anlegestelle. Nicht durch die Felsen, nicht ins Wasser.',
+      background: `${G}ufer/ufer-1.webp`,
+      water: [
+        [{ x: 0, y: 0 }, { x: 100, y: 0 }, { x: 100, y: 36 }, { x: 96, y: 37.5 }, { x: 92, y: 38.5 }, { x: 88, y: 40.5 }, { x: 84, y: 42.5 }, { x: 78, y: 43.5 }, { x: 70, y: 43.5 }, { x: 60, y: 43 }, { x: 50, y: 42 }, { x: 40, y: 40.5 }, { x: 30, y: 39 }, { x: 20, y: 37 }, { x: 15, y: 34 }, { x: 12, y: 30 }, { x: 8, y: 24 }, { x: 4, y: 18.5 }, { x: 0, y: 17 }]
+      ],
+      rocks: [
+        { rock: 0, x: 30, y: 72, w: 15, r: 6 },
+        { rock: 1, x: 48, y: 88, w: 15, r: 6 },
+        { rock: 3, x: 68, y: 63, w: 14, r: 5.5 }
+      ],
+      start: { x: 13, y: 84 },
+      goal: { x: 93, y: 48 },
+      boatFrom: { x: 20, y: 18 },
+      boatTo: { x: 84, y: 26 }
+    },
+    {
+      hint: 'Jetzt ist eine Bucht im Weg, und mehr Felsen liegen am Ufer. Führe die Menge außen herum.',
+      background: `${G}ufer/ufer-2.webp`,
+      water: [
+        [{ x: 0, y: 0 }, { x: 100, y: 0 }, { x: 100, y: 14 }, { x: 97, y: 17 }, { x: 93, y: 22 }, { x: 92, y: 28 }, { x: 93, y: 35 }, { x: 92, y: 45 }, { x: 89, y: 55 }, { x: 84, y: 62 }, { x: 77, y: 66 }, { x: 68, y: 68.5 }, { x: 60, y: 69.5 }, { x: 50, y: 68.5 }, { x: 42, y: 67 }, { x: 33, y: 63.5 }, { x: 25, y: 58.5 }, { x: 20, y: 52 }, { x: 16, y: 45 }, { x: 13.5, y: 38 }, { x: 14, y: 30 }, { x: 16, y: 26 }, { x: 14, y: 22 }, { x: 9, y: 17 }, { x: 4, y: 12 }, { x: 0, y: 11 }]
+      ],
+      rocks: [
+        { rock: 2, x: 12, y: 60, w: 12, r: 4.8 },
+        { rock: 0, x: 30, y: 84, w: 14, r: 5.5 },
+        { rock: 3, x: 52, y: 92, w: 13, r: 5 },
+        { rock: 1, x: 71, y: 83, w: 14, r: 5.5 },
+        { rock: 2, x: 90, y: 68, w: 12, r: 4.8 }
+      ],
+      start: { x: 7, y: 80 },
+      goal: { x: 96.5, y: 36 },
+      boatFrom: { x: 30, y: 22 },
+      boatTo: { x: 82, y: 30 }
+    }
   ]
 }
 
@@ -338,8 +408,8 @@ export const wunder: Journey = {
         'Jesus bleibt stehen und dreht sich um. „Wer hat meine Kleider angerührt?“ Die Jünger wundern sich: „Du siehst doch, wie sie dich drängen!“',
         'Da kommt die Frau zitternd und fällt vor ihm nieder. Sie erzählt alles. Jesus sagt: „Meine Tochter, dein Glaube hat dich gesund gemacht. Geh hin in Frieden.“'
       ],
-      // Spiel: Wimmelbild (wimmelbild, alt)
-      task: { kind: 'wimmelbild', hint: 'Suche in der Menge: Finde die vier Menschen aus der Geschichte.', count: 4, find: WIMMEL },
+      // Spiel: Der Saum (saum, neu 5.11.2026)
+      task: { kind: 'saum', hint: 'Tippe auf den Saum seines Mantels, wenn Jesus an der Frau vorbeigeht.', hemTouch: SAUM },
       questions: [
         { q: 'Wie lange ist die Frau schon krank?', options: ['zwölf Jahre', 'zwei Tage', 'zehn Jahre'], answer: 0 },
         { q: 'Was berührt sie?', options: ['Jesu Kleid', 'Jesu Hand', 'das Boot'], answer: 0 }
@@ -393,8 +463,8 @@ export const wunder: Journey = {
         'Aber die Menschen sehen sie wegfahren. Aus allen Städten laufen sie zu Fuß am Ufer entlang und sind schon da, als das Boot ankommt.',
         'Jesus steigt aus und sieht die vielen Menschen. Sie tun ihm leid, denn sie sind wie Schafe ohne Hirten. Er fängt an, ihnen vieles zu erzählen.'
       ],
-      // Spiel: Puzzle (puzzle, alt)
-      task: { kind: 'puzzle', hint: 'Setze das Bild von den Menschen auf der grünen Wiese zusammen.', puzzle: { image: `${G}puzzle/wiese.webp`, cols: 2, rows: 3 } },
+      // Spiel: Am Ufer entlang (ufer, neu 5.11.2026)
+      task: { kind: 'ufer', hint: 'Zeichne der Menge einen Weg am Ufer entlang, um die Felsen herum bis zur Anlegestelle.', bankPath: UFER },
       questions: [
         { q: 'Wohin will Jesus mit den Jüngern fahren?', options: ['an einen einsamen Ort', 'nach Hause', 'nach Jerusalem'], answer: 0 },
         { q: 'Wie kommen die Menschen dorthin?', options: ['Sie laufen zu Fuß am Ufer entlang.', 'Sie fahren mit Booten.', 'Sie reiten auf Eseln.'], answer: 0 }
