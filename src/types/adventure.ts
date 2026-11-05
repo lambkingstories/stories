@@ -7,7 +7,7 @@
 import type { JugsGame, EnoughGame, QuailsGame, StaffsGame, SerpentGame, DonkeyGame, CommissionGame } from './wuesteGames2'
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz' | 'boote' | 'dach' | 'arme' | 'richter' | 'signal' | 'traube' | 'krug' | 'genug' | 'wachteln' | 'stab' | 'schlange' | 'eselin' | 'einsetzen' | 'schoepfen' | 'gedraenge' | 'buendel' | 'brote' | 'rudern' | 'umkehr' | 'ruf' | 'graben' | 'muenze' | 'entgegen' | 'klettern' | 'halbieren' | 'loesen' | 'bereiten' | 'lampen' | 'helfen'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz' | 'boote' | 'dach' | 'arme' | 'richter' | 'signal' | 'traube' | 'krug' | 'genug' | 'wachteln' | 'stab' | 'schlange' | 'eselin' | 'einsetzen' | 'schoepfen' | 'gedraenge' | 'buendel' | 'brote' | 'rudern' | 'umkehr' | 'ruf' | 'graben' | 'muenze' | 'entgegen' | 'klettern' | 'halbieren' | 'loesen' | 'bereiten' | 'lampen' | 'helfen' | 'fischzug' | 'weiden'
 
 export interface AdventureQuestion {
   q: string
@@ -1856,6 +1856,8 @@ export interface StageTask {
   judges?: JudgesGame
   signal?: SignalGame
   grapes?: GrapesGame
+  fischzug?: FischzugGame
+  graze?: GrazeGame
 }
 
 /** One reaper of the gleaning game: the lane he cuts along (index into `GleanGame.lanes`), when he starts (ms after the lead), how long he needs to cross the picture, his picture (index into `GleanGame.reapers`) and the places (percent of the picture width) of the clumps of barley that stand in his lane. */
@@ -3381,4 +3383,106 @@ export interface HelpGame {
   ratio: number
   people: HelpPerson[]
   rounds: HelpRound[]
+}
+
+// ---------------------------------------------------------------- "Ostern" (no. 29, id `ostern`): the games `fischzug` and `weiden`
+
+/** A picture on the field of one of the two games of "Ostern" (`fischzug`, `weiden`): its file, a name for the screen reader and its width in percent of the picture (the height follows the picture). */
+export interface OsterSprite {
+  image: string
+  label: string
+  w: number
+}
+/** A sprite that stands at a place: the middle of its lower edge (percent of the picture width and height). */
+export type OsterSpot = OsterSprite & { x: number; y: number }
+/** A rectangle of the picture (percent of the width and of the height). */
+export interface OsterBox {
+  left: number
+  top: number
+  right: number
+  bottom: number
+}
+
+/** One round of "The net on the right" (John 21,6): the hint, how many fish swim (in `schools` swarms, one by default), how many casts the child has, how many fish are enough, and how loosely a swarm swims (`spread`, percent of the picture width). */
+export interface FischzugRound {
+  hint: string
+  fish: number
+  throws: number
+  goal: number
+  schools?: number
+  spread?: number
+}
+/**
+ * The game "The net on the right" (John 21,6; `fischzug`): the lake in the early morning (3:2, empty), the boat with the seven fishermen at the lower left and dark fish shadows that swim in swarms. The finger pulls a dashed
+ * circle (the size of the net) from the boat onto the water and lets go: the net flies in an arc, sinks, and every fish whose middle lies in the circle is caught (it glitters silver and flies into the basket at the upper right).
+ * A cast without a catch is a mistake (a cross, the net comes back dripping). A tap on the water casts to exactly that place; the arrow keys move the circle and Enter casts. Round 1: five fish in one swarm, three casts,
+ * four are enough; round 2: eight fish in two swarms, four casts, six are enough. If the casts are used up before the goal is reached, the fish have moved on and the round begins again. At the end the full net lies on the shore
+ * (`full`, 3:2). Stars: `osterStars(mistakes)` in `utils/osternGames.ts` (`mistakeStars(mistakes, 2, 4)`).
+ */
+export interface FischzugGame {
+  /** The lake (3:2, empty). */
+  lake: string
+  /** The boat (the middle of its lower edge and the width); it does not move. */
+  boat: OsterSpot
+  /** The round net seen from above; `w` is also the size of the circle (the catch is a circle of this width). */
+  net: OsterSprite
+  /** The fish shadows (three shapes, the app takes them in turn). */
+  fish: OsterSprite[]
+  /** The basket for the fish at the upper right (the middle of its lower edge). */
+  basket: OsterSpot
+  /** The picture of the full net on the shore at the end (3:2). */
+  full: string
+  /** Where the fish may swim: a rectangle on the water (percent of the picture). */
+  area: OsterBox
+  /** How fast a swarm swims (percent of the picture width a second; 3.5 without it). */
+  speed?: number
+  rounds: FischzugRound[]
+}
+
+/** One animal kind of "Lead the lambs": the sprite (facing right), its name in the data (`lamm-1`) and how fast it walks (percent of the picture width a second; sheep are slower than lambs). */
+export interface GrazeKind extends OsterSprite {
+  id: string
+  speed?: number
+}
+/** One round of "Lead the lambs": the words of Jesus as the title, the hint, the animals (kinds, in the order of their start places), where they wait (`starts`, percent of the picture), the thornbushes of the round (the middle of their lower edge) and whether the brook is there. */
+export interface GrazeRound {
+  title: string
+  hint: string
+  animals: string[]
+  starts?: { x: number; y: number }[]
+  thorns: { x: number; y: number }[]
+  stream: boolean
+}
+/** The brook as a band from top to bottom (left and right edge, percent of the width) and the lane of the plank bridge across it (top and bottom edge, percent of the height). */
+export interface GrazeStream {
+  from: number
+  to: number
+  top: number
+  bottom: number
+}
+/**
+ * The game "Lead the lambs" (John 21,15-17; `weiden`): a green hillside above the lake (3:2). The child moves the shepherd (a drag, a tap on the meadow where he is to walk, or the arrow keys); an animal that is near enough to him
+ * (14 percent of the width) joins and walks after him in a line. He leads them into the pen with the open gate: whoever stands in the pen has been tended (a tick, a soft "baa"). A thornbush stops an animal that walks into
+ * it (it stands and bleats, a cross, a mistake) and it must be called again: the shepherd goes to it, and from then on it walks round the thorns. In round 2 a brook runs through the middle: the animals (and the shepherd) cross
+ * only on the plank bridge. A walking shepherd who is too fast loses the slow sheep (no mistake, he goes back to them). Round 1 "Feed my lambs": four lambs, no brook; round 2 "Feed my sheep": two lambs and two sheep, with the
+ * brook. Stars: `osterStars(mistakes)` in `utils/osternGames.ts`.
+ */
+export interface GrazeGame {
+  /** The meadow (3:2, empty) and, when the brook is a part of the picture, the same meadow with the brook (used in the rounds with `stream`). */
+  meadow: string
+  meadowStream?: string
+  /** The shepherd (facing right): where he starts (the middle of his lower edge) and his width. */
+  hirte: OsterSpot
+  /** The animal kinds of the rounds. */
+  kinds: GrazeKind[]
+  /** The thornbush. */
+  thorn: OsterSprite
+  /** The pen with the open gate (the middle of its lower edge) and its inside, where the animals stand. */
+  pen: OsterSpot & { area: OsterBox }
+  /** The plank bridge across the brook (the middle of its lower edge). */
+  bridge: OsterSpot
+  stream: GrazeStream
+  /** How fast the shepherd walks (percent of the picture width a second; 22 without it). */
+  speed?: number
+  rounds: GrazeRound[]
 }

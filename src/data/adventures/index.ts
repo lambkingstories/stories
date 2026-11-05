@@ -84,6 +84,8 @@ export const ZACHAEUS_PREVIEW_KEY = 'lk-preview-zachaeus'
 export const ZACHAEUS_UNLOCK_CODE = 'zachaeus-vorschau-q3m7'
 export const LETZTEWOCHE_PREVIEW_KEY = 'lk-preview-letztewoche'
 export const LETZTEWOCHE_UNLOCK_CODE = 'letztewoche-vorschau-k8w2'
+export const OSTERN_PREVIEW_KEY = 'lk-preview-ostern'
+export const OSTERN_UNLOCK_CODE = 'ostern-vorschau-w5n3'
 
 /** A journey that is shown only on unlocked devices: the name of its link (`?<param>=<code>`), where the unlock is kept, and how it is loaded. */
 interface PreviewJourney {
@@ -370,6 +372,16 @@ function previewJourneys(): PreviewJourney[] {
       key: LETZTEWOCHE_PREVIEW_KEY,
       always: import.meta.env.VITE_SHOW_LETZTEWOCHE === 'true',
       load: async () => (await import('@/data/adventures/letztewoche')).letztewoche
+    })
+  }
+  if (import.meta.env.VITE_INCLUDE_OSTERN === 'true' || import.meta.env.VITE_SHOW_OSTERN === 'true') {
+    list.push({
+      id: 'ostern',
+      param: 'ostern',
+      code: OSTERN_UNLOCK_CODE,
+      key: OSTERN_PREVIEW_KEY,
+      always: import.meta.env.VITE_SHOW_OSTERN === 'true',
+      load: async () => (await import('@/data/adventures/ostern')).ostern
     })
   }
   if (import.meta.env.VITE_INCLUDE_NOAH === 'true' || import.meta.env.VITE_SHOW_NOAH === 'true') {

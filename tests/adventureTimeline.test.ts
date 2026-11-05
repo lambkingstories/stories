@@ -10,7 +10,7 @@ describe('the time line of the adventures', () => {
   })
 
   it('keeps the order of the Bible for the adventures that are built', () => {
-    const order = ['adam-eva', 'noah', 'babel', 'abraham', 'jakob', 'josef', 'mose', 'wueste', 'josua', 'gideon', 'rut', 'samuel', 'david', 'salomo', 'elia', 'elisa', 'jona', 'daniel', 'ester', 'nehemia', 'propheten', 'weihnachten', 'taufe', 'freunde', 'wunder', 'heilung', 'gleichnisse', 'zachaeus', 'letztewoche']
+    const order = ['adam-eva', 'noah', 'babel', 'abraham', 'jakob', 'josef', 'mose', 'wueste', 'josua', 'gideon', 'rut', 'samuel', 'david', 'salomo', 'elia', 'elisa', 'jona', 'daniel', 'ester', 'nehemia', 'propheten', 'weihnachten', 'taufe', 'freunde', 'wunder', 'heilung', 'gleichnisse', 'zachaeus', 'letztewoche', 'ostern']
     const nr = order.map(timelineNumber)
     expect(nr.every((n) => n > 0)).toBe(true)
     expect([...nr].sort((a, b) => a - b)).toEqual(nr)

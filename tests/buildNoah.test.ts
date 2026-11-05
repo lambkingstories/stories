@@ -32,7 +32,8 @@ import { heilung } from '@/data/adventures/heilung'
 import { gleichnisse } from '@/data/adventures/gleichnisse'
 import { zachaeus } from '@/data/adventures/zachaeus'
 import { letztewoche } from '@/data/adventures/letztewoche'
-import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, GIDEON_ONLY_DIRS, JAKOB_ONLY_DIRS, JONA_ONLY_DIRS, JOSUA_ONLY_DIRS, MOSE_ONLY_DIRS, NOAH_ONLY_DIRS, RUT_ONLY_DIRS, SAMUEL_ONLY_DIRS, DAVID_ONLY_DIRS, SALOMO_ONLY_DIRS, ELISA_ONLY_DIRS, ESTER_ONLY_DIRS, NEHEMIA_ONLY_DIRS, PROPHETEN_ONLY_DIRS, WEIHNACHTEN_ONLY_DIRS, TAUFE_ONLY_DIRS, FREUNDE_ONLY_DIRS, WUESTE_ONLY_DIRS, WUNDER_ONLY_DIRS, HEILUNG_ONLY_DIRS, GLEICHNISSE_ONLY_DIRS, ZACHAEUS_ONLY_DIRS, LETZTEWOCHE_ONLY_DIRS, stripLetztewocheFiles, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles, stripGleichnisseFiles, stripZachaeusFiles, stripDavidFiles } from '../vite.config.noah'
+import { ostern } from '@/data/adventures/ostern'
+import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, GIDEON_ONLY_DIRS, JAKOB_ONLY_DIRS, JONA_ONLY_DIRS, JOSUA_ONLY_DIRS, MOSE_ONLY_DIRS, NOAH_ONLY_DIRS, RUT_ONLY_DIRS, SAMUEL_ONLY_DIRS, DAVID_ONLY_DIRS, SALOMO_ONLY_DIRS, ELISA_ONLY_DIRS, ESTER_ONLY_DIRS, NEHEMIA_ONLY_DIRS, PROPHETEN_ONLY_DIRS, WEIHNACHTEN_ONLY_DIRS, TAUFE_ONLY_DIRS, FREUNDE_ONLY_DIRS, WUESTE_ONLY_DIRS, WUNDER_ONLY_DIRS, HEILUNG_ONLY_DIRS, GLEICHNISSE_ONLY_DIRS, ZACHAEUS_ONLY_DIRS, LETZTEWOCHE_ONLY_DIRS, OSTERN_ONLY_DIRS, stripOsternFiles, stripLetztewocheFiles, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles, stripGleichnisseFiles, stripZachaeusFiles, stripDavidFiles } from '../vite.config.noah'
 
 const inNoahDir = (f: string) => NOAH_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
 
@@ -1254,6 +1255,49 @@ describe('a build without Letztewoche ships nothing of it', () => {
       for (const f of letztewocheFiles) expect(existsSync(join(out, f)), f).toBe(false)
       for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
       expect(() => stripLetztewocheFiles(out)).not.toThrow()
+    } finally {
+      rmSync(out, { recursive: true, force: true })
+    }
+  })
+})
+
+const inOsternDir = (f: string) => OSTERN_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
+
+describe('a build without Ostern ships nothing of it', () => {
+  it('every file that only Ostern uses lies in a folder that the normal build removes', () => {
+    const others = new Set([...journeys, noah, adamEva, babel, abraham, jakob, josua, gideon, mose, jona, daniel, elia, rut, samuel, david, salomo, elisa, ester, nehemia, propheten, weihnachten, taufe, freunde, wueste, wunder, heilung, gleichnisse, zachaeus, letztewoche].flatMap((j) => journeyFiles(j)))
+    const app = /^audio\/abenteuer\/(klang|musik)-/
+    const only = journeyFiles(ostern).filter((f) => !others.has(f) && !app.test(f))
+    const leaks = only.filter((f) => !inOsternDir(f))
+    expect(leaks, `files of Ostern outside the folders that are removed: ${leaks.join(', ')}`).toEqual([])
+  })
+
+  it('the folders of Ostern are only the three places that belong to it, none is on the lists of the others, and no folder with "ostern" in its name is missing', () => {
+    expect([...OSTERN_ONLY_DIRS].sort()).toEqual(['audio/abenteuer/ostern', 'images/abenteuer/ostern', 'images/abenteuer/spiele/ostern'])
+    for (const d of OSTERN_ONLY_DIRS) {
+      for (const list of [LETZTEWOCHE_ONLY_DIRS, ZACHAEUS_ONLY_DIRS, GLEICHNISSE_ONLY_DIRS, HEILUNG_ONLY_DIRS, WUNDER_ONLY_DIRS, NOAH_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, ABRAHAM_ONLY_DIRS, JAKOB_ONLY_DIRS, JOSUA_ONLY_DIRS, GIDEON_ONLY_DIRS, MOSE_ONLY_DIRS, JONA_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, RUT_ONLY_DIRS, SAMUEL_ONLY_DIRS, DAVID_ONLY_DIRS, SALOMO_ONLY_DIRS, ELISA_ONLY_DIRS, ESTER_ONLY_DIRS, NEHEMIA_ONLY_DIRS, PROPHETEN_ONLY_DIRS, WEIHNACHTEN_ONLY_DIRS, TAUFE_ONLY_DIRS, FREUNDE_ONLY_DIRS, WUESTE_ONLY_DIRS]) expect(list).not.toContain(d)
+    }
+    const found: string[] = []
+    for (const base of ['public/images/abenteuer', 'public/audio/abenteuer', 'public/images/abenteuer/spiele']) {
+      for (const n of readdirSync(base)) if (/ostern/i.test(n) && !n.includes('.')) found.push(`${base.replace('public/', '')}/${n}`)
+    }
+    for (const d of found) expect(OSTERN_ONLY_DIRS, d).toContain(d)
+    for (const j of [...journeys, noah, adamEva, babel, abraham, jakob, josua, gideon, mose, jona, daniel, elia, rut, samuel, david, salomo, elisa, ester, nehemia, propheten, weihnachten, taufe, freunde, wueste, wunder, heilung, gleichnisse, zachaeus, letztewoche]) for (const f of journeyFiles(j)) expect(inOsternDir(f), `${j.id}: ${f}`).toBe(false)
+  })
+
+  it('removing takes the folders of Ostern out of a build and leaves everything else (the other journeys, the sounds)', () => {
+    const out = mkdtempSync(join(tmpdir(), 'lk-build-ostern-'))
+    try {
+      const osternFiles = ['audio/abenteuer/ostern/geschichte-01-v1.mp3', 'images/abenteuer/ostern/etappe-bild-01.webp', 'images/abenteuer/spiele/ostern/fischzug/see.webp']
+      const keep = ['images/abenteuer/josef/etappe-01.webp', 'audio/abenteuer/samuel/geschichte-01-v1.mp3', 'images/abenteuer/letztewoche/etappe-bild-01.webp', 'images/abenteuer/spiele/letztewoche/bereiten/strasse.webp', 'audio/abenteuer/klang-stern.mp3']
+      for (const f of [...osternFiles, ...keep]) {
+        mkdirSync(join(out, f, '..'), { recursive: true })
+        writeFileSync(join(out, f), 'x')
+      }
+      stripOsternFiles(out)
+      for (const f of osternFiles) expect(existsSync(join(out, f)), f).toBe(false)
+      for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
+      expect(() => stripOsternFiles(out)).not.toThrow()
     } finally {
       rmSync(out, { recursive: true, force: true })
     }

@@ -251,3 +251,11 @@ export const LETZTEWOCHE_ONLY_DIRS = ['images/abenteuer/letztewoche', 'images/ab
 export function stripLetztewocheFiles(outDir: string) {
   strip(outDir, LETZTEWOCHE_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Ostern" (id `ostern`) alone, in the same three places as Adam and Eve. */
+export const OSTERN_ONLY_DIRS = ['images/abenteuer/ostern', 'images/abenteuer/spiele/ostern', 'audio/abenteuer/ostern']
+
+/** Takes the folders of Ostern out of a finished build. */
+export function stripOsternFiles(outDir: string) {
+  strip(outDir, OSTERN_ONLY_DIRS)
+}

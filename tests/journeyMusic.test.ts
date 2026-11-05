@@ -29,12 +29,13 @@ import { heilung } from '@/data/adventures/heilung'
 import { gleichnisse } from '@/data/adventures/gleichnisse'
 import { zachaeus } from '@/data/adventures/zachaeus'
 import { letztewoche } from '@/data/adventures/letztewoche'
+import { ostern } from '@/data/adventures/ostern'
 import { noah } from '@/data/adventures/noah'
 import { journeyFiles } from '@/utils/journeyFiles'
 import { MUSIC_FILES } from '@/utils/sfxFiles'
 
 // every adventure has its own music: at least three pieces (Anton, 21.10.2026), so that one hears more than one piece
-const ALL = [josef, noah, adamEva, abraham, jakob, babel, josua, gideon, mose, jona, daniel, elia, rut, samuel, david, salomo, elisa, ester, nehemia, propheten, weihnachten, taufe, freunde, wueste, wunder, heilung, gleichnisse, zachaeus, letztewoche]
+const ALL = [josef, noah, adamEva, abraham, jakob, babel, josua, gideon, mose, jona, daniel, elia, rut, samuel, david, salomo, elisa, ester, nehemia, propheten, weihnachten, taufe, freunde, wueste, wunder, heilung, gleichnisse, zachaeus, letztewoche, ostern]
 
 describe('the music of the journeys', () => {
   for (const j of ALL) {
