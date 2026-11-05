@@ -1,6 +1,6 @@
 /**
  * The data of "Solomon" (`salomo.ts`, `en/salomo.en.ts`, `salomoPath.ts`): the stories and questions follow the rules of the adventures (texts of the draft `D:/Claude/Abenteuer-Salomo/ENTWURF_Salomo.md`, Luther 1912),
- * the quiz stages are only quizzes, the two new games and the eight old ones have sound data, the map has twelve stations and the exam, and the English file has the same shape.
+ * the quiz stages are only quizzes, the games (two known ones, two new ones from 28.10. and six new ones of Anton's plan of 5.11.2026) have sound data, the map has twelve stations and the exam, and the English file has the same shape.
  */
 import { existsSync, statSync } from 'node:fs'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -10,9 +10,13 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { setAdventureLanguage } from '@/use/adventureLanguage'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 import { dist } from '@/utils/salomoGames'
+import { carvingProblems, pomegranatesProblems, raftsProblems, stairsProblems, treasuryProblems, wishCardsProblems } from '@/utils/salomoNeu'
+import type { CarveGame, PomGame, RaftGame, StairsGame, TreasuryGame, WishGame } from '@/utils/salomoNeu'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => salomo.stages[n - 1]!
+/** The task of a stage with the fields of the new games (they are not in `GameTask` until the lead adds them). */
+const task = (n: number) => stage(n).task as unknown as Record<string, unknown>
 /** Words that no text of the German data may use (Solomon is told without cruelty). The judgment (stage 3) says "Schwert" and "tötet", and nothing else of it. */
 const FORBIDDEN = /\b(Blut|Teufel|Hölle|erschlagen|erwürgen|ertrinken|ertrunken|umbringen|schlachten|geschlachtet|Leiche|Leichen|Hure|Huren)\b/i
 const FORBIDDEN_EXCEPT_3 = /\b(Schwert|töten|tötet|Tod|tot)\b/i
@@ -121,11 +125,14 @@ describe('Salomo: stories and questions', () => {
 })
 
 describe('Salomo: the games', () => {
-  it('the order of the games: 8 old, 2 new (quiet, throne), 2 quizzes; no game twice', () => {
-    expect(salomo.stages.map((s) => s.task.kind)).toEqual(['weg', 'lueckenvers', 'quiz', 'ernten', 'reihenfolge', 'leise', 'memory', 'worte', 'puzzle', 'quiz', 'sortieren', 'thron'])
+  it('the order of the games (Anton 5.11.2026): only two known games (1 way, 4 harvest), never one after the other; the rest new; 2 quizzes; no game twice', () => {
+    expect(salomo.stages.map((s) => s.task.kind)).toEqual(['weg', 'wunschkarten', 'quiz', 'ernten', 'floesse', 'leise', 'schnitzen', 'granatapfel', 'stufen', 'quiz', 'schatzkammer', 'thron'])
     const games = salomo.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
     expect(new Set(games).size).toBe(games.length)
-    expect(games.filter((k) => ['leise', 'thron'].includes(k))).toHaveLength(2)
+    const known = ['weg', 'ernten']
+    expect(games.filter((k) => known.includes(k))).toHaveLength(2)
+    const kinds = salomo.stages.map((s) => s.task.kind)
+    for (let i = 1; i < kinds.length; i++) expect(known.includes(kinds[i]!) && known.includes(kinds[i - 1]!), `two known games in a row at ${i + 1}`).toBe(false)
   })
 
   it('1 way: five forks (the fifth with three ways), the right way leaves on the side of the tracks, the walker and every picture are named', () => {
@@ -137,15 +144,21 @@ describe('Salomo: the games', () => {
     g.scenes.forEach((x, i) => expect(x.image.endsWith(`weg/weg-${i + 1}.webp`), x.image).toBe(true))
   })
 
-  it('2 verse: the sentences are in the text and the right words are on the leaves', () => {
-    const g = stage(2).task.verse!
-    expect(g.rounds).toHaveLength(2)
-    const text = stage(2).text.join(' ')
-    for (const r of g.rounds) {
-      expect(r.parts).toHaveLength(r.answers.length + 1)
-      const filled = r.parts.map((p, i) => p + (r.answers[i] !== undefined ? r.words[r.answers[i]!] : '')).join('').replace(/[„“]/g, '')
-      expect(text.includes(filled.replace(/\.$/, '').trim()), filled).toBe(true)
-    }
+  it('the six new games (5.11.2026) have no problems, each in its field', () => {
+    expect(wishCardsProblems(task(2).wishCards as WishGame)).toEqual([])
+    expect(raftsProblems(task(5).rafts as RaftGame)).toEqual([])
+    expect(carvingProblems(task(7).carving as CarveGame)).toEqual([])
+    expect(pomegranatesProblems(task(8).pomegranates as PomGame)).toEqual([])
+    expect(stairsProblems(task(9).stairs as StairsGame)).toEqual([])
+    expect(treasuryProblems(task(11).treasury as TreasuryGame)).toEqual([])
+  })
+
+  it('2 wish cards: the four wishes of 1 Kings 3,11 and only the obedient heart is caught (as in the text of the stage)', () => {
+    const g = task(2).wishCards as WishGame
+    expect(Object.keys(g.cards).sort()).toEqual(['heart', 'life', 'riches', 'victory'])
+    expect(g.cards.heart.label).toBe('Ein gehorsames Herz')
+    expect(stage(2).text.join(' ')).toMatch(/gehorsames Herz/)
+    expect(stage(2).text.join(' ')).toMatch(/nicht um langes Leben, nicht um Reichtum/)
   })
 
   it('4 harvest: figs, grapes, pomegranates and dates against thorns and stones; ten ripe things', () => {
@@ -156,11 +169,11 @@ describe('Salomo: the games', () => {
     expect(g.field).toMatch(/salomo\/ernten\/feld\.webp$/)
   })
 
-  it('5 order: four cards, round 1 with the numbers and three cards, round 2 with all four', () => {
-    const g = stage(5).task.order!
-    expect(g.cards).toHaveLength(4)
-    expect(g.rounds.map((r) => r.cards.length)).toEqual([3, 4])
-    expect(g.rounds.map((r) => r.numbered)).toEqual([true, false])
+  it('5 rafts: the trunks are bound into rafts and brought over the sea (1 Kings 5,9; the text of the stage tells it); round 2 has more trunks', () => {
+    const g = task(5).rafts as RaftGame
+    expect(stage(5).text.join(' ')).toMatch(/binden sie zu Flößen/)
+    expect(g.rounds.map((r) => r.loose.length)).toEqual([3, 4])
+    expect(g.rounds[1]!.drift).toBeDefined()
   })
 
   it('6 quiet: three rounds with 1, 2 and 3 stones, every stone has its own waiting place, every gap lies inside the picture, the limits get stricter and the gaps are wide enough for the stone', () => {
@@ -192,29 +205,29 @@ describe('Salomo: the games', () => {
     expect(g.rounds[2]!.max).toBeGreaterThanOrEqual(36)
   })
 
-  it('7 memory: six pairs (a full board of 3 x 4), every one with a sentence', () => {
-    const g = stage(7).task.memory!
-    expect(g.pairs).toHaveLength(6)
-    for (const p of g.pairs) expect(p.text.length).toBeGreaterThan(10)
+  it('7 carving: flowers, knots and a palm tree (the cherubim are not shown); every board has a golden line read from the picture', () => {
+    const g = task(7).carving as CarveGame
+    expect(g.patterns.map((p) => p.label)).toEqual(['Blume', 'Knoten', 'Palme', 'Ranke mit Blumen'])
+    for (const p of g.patterns) expect(p.rows.join('').split('#').length - 1, p.label).toBeGreaterThan(80)
+    expect(stage(7).text.join(' ')).toMatch(/Knoten und Blumen geschnitzt/)
   })
 
-  it('8 words: the sentences stand in the text of the stage', () => {
-    const w = stage(8).task.words!
-    const text = stage(8).text.join(' ')
-    for (const r of w.rounds) for (const s of r.sentences) expect(text.includes(s), s).toBe(true)
+  it('8 pomegranates: pomegranates, lilies and chain links (1 Kings 7,17-20), round 1 one chain, round 2 two chains', () => {
+    const g = task(8).pomegranates as PomGame
+    expect(g.rounds.map((r) => r.rows.length)).toEqual([1, 2])
+    expect(stage(8).text.join(' ')).toMatch(/Granatäpfeln/)
   })
 
-  it('9 puzzle: a portrait picture in 2 columns and 3 rows', () => {
-    const g = stage(9).task.puzzle!
-    expect(g.cols).toBe(2)
-    expect(g.rows).toBe(3)
-    expect(g.image).toMatch(/puzzle\/lade\.webp$/)
+  it('9 up the steps: the priests carry the ark (the text of the stage); round 2 is strict and longer', () => {
+    const g = task(9).stairs as StairsGame
+    expect(stage(9).text.join(' ')).toMatch(/Die Priester heben die Lade auf und tragen sie hinauf/)
+    expect(g.rounds.map((r) => !!r.strict)).toEqual([false, true])
   })
 
-  it('11 sorting: three chests (green, golden, blue), two rounds', () => {
-    const g = stage(11).task.sort!
-    expect(g.bins.map((b) => b.id)).toEqual(['gruen', 'gold', 'blau'])
-    expect(g.rounds!.map((r) => r.perBin)).toEqual([1, 2])
+  it('11 treasury: spices, gold and gems from the camels (1 Kings 10,2), every gift has its compartment', () => {
+    const g = task(11).treasury as TreasuryGame
+    expect(stage(11).text.join(' ')).toMatch(/Gewürze, viel Gold und Edelsteine/)
+    expect(g.rounds.map((r) => r.camels.length)).toEqual([1, 2])
   })
 
   it('12 throne: twelve lions on six steps (one on the left and one on the right of each) and two at the armrests, counted in three rounds; the lions that wait fit the slots', () => {
@@ -295,7 +308,8 @@ describe('Salomo: map, files, English', () => {
     expect(stage(1).title).toBe('On the way to Gibeon')
     expect(stage(6).task.quiet!.rounds[0]!.hint).toContain('very slowly')
     expect(stage(12).task.throne!.rounds[2]!.hint).toContain('armrests')
-    expect(stage(8).task.words!.rounds[0]!.sentences[0]).toBe('Solomon builds on God’s house for seven years.')
+    expect((task(2).wishCards as WishGame).cards.heart.label).toBe('An obedient heart')
+    expect((task(11).treasury as TreasuryGame).rounds[1]!.hint).toContain('two camels')
     for (const s of salomo.stages) {
       const audio = s.audio
       if (audio) expect(audio, `stage ${s.id}`).toBe(`audio/abenteuer/salomo/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)

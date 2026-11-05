@@ -4,19 +4,19 @@
  * Nicht oder gemildert erzählt: Salomos Heirat, die Höhen, die Fronarbeiter, die Namen der Amtleute, Speisung und Pferde, die Strafworte Gottes (9,6–9), die zwanzig Städte für Hiram und das ganze Kapitel 11 (Abfall; liegt außerhalb dieses Abenteuers).
  * Das Urteil (Etappe 3) wird erzählt, nicht gespielt; das Schwert wird nur gebracht und nie gegen das Kind gehoben, die "zwei Huren" heißen "zwei Frauen". Die Lade wird immer mit zwei goldenen Cherubim gezeigt.
  * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
- * Spiele (Wahl der Leitung): 1 Weggabelung (alt), 2 Lückenvers (alt), 3 nur Quiz, 4 Ernten (alt), 5 Reihenfolge (alt), 6 Steine leise legen (neu), 7 Memory (alt), 8 Wörter ordnen (alt), 9 Puzzle (alt),
- * 10 nur Quiz, 11 Sortieren (alt), 12 Den Thron bauen (neu).
+ * Spiele (Antons Spielplan 5.11.2026: höchstens zwei bekannte, nie hintereinander): 1 Weggabelung (bekannt), 2 Wunschkarten (neu), 3 nur Quiz, 4 Ernten (bekannt), 5 Flöße (neu), 6 Steine leise legen (neu),
+ * 7 Schnitzen (neu), 8 Granatäpfel (neu), 9 Die Stufen hinauf (neu), 10 nur Quiz, 11 Die Schatzkammer (neu), 12 Den Thron bauen (neu). Die Typen der sechs Spiele vom 5.11.2026 stehen in `@/utils/salomoNeu`.
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/salomo/, images/abenteuer/spiele/salomo/<spiel>/, audio/abenteuer/salomo/.
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { HarvestGame, Journey, MemoryGame, OrderGame, QuietGame, SortGame, ThroneGame, VerseGame, WayGame, WordsGame } from '@/types/adventure'
+import type { HarvestGame, Journey, QuietGame, ThroneGame, WayGame } from '@/types/adventure'
+import type { CarveGame, PomGame, RaftGame, StairsGame, TreasuryGame, WishGame } from '@/utils/salomoNeu'
 import { josef } from './josef'
 import { SALOMO_PATH } from './salomoPath'
 import { localize } from './localize'
 import { adventureLanguage } from '@/use/adventureLanguage'
 import { salomoEn } from './en/salomo.en'
-import { backdropOr } from '@/utils/gameBackground'
 
 // Etappenbilder (Variante a der neuen Bilder; Anton wählt auf der Vorschau-Seite a/b): `images/abenteuer/salomo/etappe-bild-NN.webp`, 960 × 640
 const PICS = 'images/abenteuer/salomo/'
@@ -48,21 +48,6 @@ const WEG: WayGame = {
 }
 
 /**
- * Etappe 2, "Lückenvers" (alte Mechanik 2 von 8): Salomos Bitte aus dem Text der Etappe in zwei Runden (erst ein Wort, dann zwei); die Wörter sind Blätter (das richtige zuerst, `answers` zeigt auf sie).
- * Tafel und Blatt sind die aus David (kopiert). Hintergrund ist der gemalte Terrassenplatz bei Gibeon (Bildauftrag S30).
- */
-const VERS: VerseGame = {
-  background: `${G}hintergrund/vers-hintergrund.webp`,
-  soft: true,
-  board: `${G}lueckenvers/tafel.webp`,
-  leaf: `${G}lueckenvers/blatt.webp`,
-  rounds: [
-    { hint: 'Ziehe das passende Blatt in die Lücke.', parts: ['„Gib mir ein gehorsames ', ', damit ich dein Volk richten kann und weiß, was gut ist und was böse.“'], words: ['Herz', 'Schwert', 'Haus'], answers: [0] },
-    { hint: 'Jetzt fehlen zwei Wörter.', parts: ['„Ich gebe dir ein ', ' und verständiges Herz. Und was du nicht erbeten hast, gebe ich dir dazu: ', ' und Ehre.“'], words: ['weises', 'Reichtum', 'kluges', 'Silber'], answers: [0, 1] }
-  ]
-}
-
-/**
  * Etappe 4, "Ernten" (alte Mechanik 3 von 8): ein sonniger Garten mit Feigenbaum und Weinstock; reife Früchte (Trauben, Feigen, Granatäpfel, Datteln) kommen in den Korb, Dornen und Steine nicht.
  * Früchte, Dornen und Korb sind die gemeinsamen aus Josef (`images/abenteuer/spiele/ernten/`), der Garten ist neu (Bildauftrag S32).
  */
@@ -74,68 +59,6 @@ const ERNTEN: HarvestGame = {
   count: 10
 }
 
-/**
- * Etappe 5, "Die Zedernlieferung ordnen" (alte Mechanik 4 von 8, Reihenfolge legen): Salomo diktiert den Brief, Hiram liest ihn, die Zedern werden gefällt, die Stämme zu Flößen gebunden.
- * Runde 1 drei Karten mit Punkten, Runde 2 alle vier ohne Punkte. Bilder (Bildauftrag S33): `reihenfolge/karte-1..4.webp` (4:3).
- */
-const REIHENFOLGE: OrderGame = {
-  cards: [
-    { id: 'brief', image: `${G}reihenfolge/karte-1.webp`, label: 'Salomo schickt einen Brief an Hiram' },
-    { id: 'freude', image: `${G}reihenfolge/karte-2.webp`, label: 'Hiram liest den Brief und freut sich' },
-    { id: 'faellen', image: `${G}reihenfolge/karte-3.webp`, label: 'Die Zedern werden gefällt' },
-    { id: 'floss', image: `${G}reihenfolge/karte-4.webp`, label: 'Die Stämme werden zu Flößen gebunden' }
-  ],
-  rounds: [
-    { hint: 'Runde 1: Lege die Bilder in die Reihenfolge der Geschichte. Die Punkte zeigen, wo sie hinkommen.', numbered: true, cards: ['freude', 'faellen', 'floss'] },
-    { hint: 'Runde 2: Jetzt mit dem Brief und ohne Punkte: Was kommt zuerst, was danach?', numbered: false, cards: ['brief', 'freude', 'faellen', 'floss'] }
-  ]
-}
-
-/**
- * Etappe 7, "Memory" (alte Mechanik 5 von 8): die sechs Dinge aus dem Haus Gottes (Zeder, Gold, Cherub, Palme, Blume, Granatapfel); die Rückseite zeigt eine goldene Lilie (Bildauftrag S34, ein Bogen mit den sechs Dingen, vom Code geschnitten).
- */
-const MEMORY: MemoryGame = {
-  back: `${G}memory/rueck.webp`,
-  pairs: [
-    { image: `${G}memory/karte-zeder.webp`, text: 'Die Zeder: Das Holz kommt vom Libanon, und die Wände im Haus sind ganz aus Zedernholz.' },
-    { image: `${G}memory/karte-gold.webp`, text: 'Das Gold: Salomo überzieht das ganze Haus mit reinem Gold.' },
-    { image: `${G}memory/karte-cherub.webp`, text: 'Der Cherub: Zwei Cherubim mit ausgebreiteten Flügeln stehen im hinteren Raum.' },
-    { image: `${G}memory/karte-palme.webp`, text: 'Die Palme: Palmen sind an die Wände und Türen geschnitzt.' },
-    { image: `${G}memory/karte-blume.webp`, text: 'Die Blume: Auch Blumen sind in das Zedernholz geschnitzt.' },
-    { image: `${G}memory/karte-granat.webp`, text: 'Der Granatapfel: Zweihundert Granatäpfel schmücken jeden Knauf der Säulen.' }
-  ]
-}
-
-/**
- * Etappe 8, "Die Wörter ordnen" (alte Mechanik 6 von 8): die Wörter eines Satzes liegen auf Steinplättchen in gemischter Folge und werden der Reihe nach in den Streifen gelegt; alle Sätze stehen wörtlich im Text der Etappe.
- * Hintergrund ist der gemalte Hof der Zimmerleute (Bildauftrag S30); Steine und Streifen sind die aus David (kopiert).
- */
-const WORTE: WordsGame = {
-  background: `${G}hintergrund/worte-hintergrund.webp`,
-  chip: `${G}worte/stein.webp`,
-  strip: `${G}worte/streifen.webp`,
-  rounds: [
-    { hint: 'Lege die Wörter in der richtigen Reihenfolge in den Streifen.', sentences: ['Sieben Jahre lang baut Salomo am Haus Gottes.', 'Die rechte nennt er Jachin, die linke Boas.'] },
-    { hint: 'Jetzt längere Sätze.', sentences: ['Er gießt zwei Säulen aus Erz, jede achtzehn Ellen hoch.', 'Hiram ist voller Weisheit und Kunst und macht alle Werke, die Salomo braucht.'] }
-  ]
-}
-
-/**
- * Etappe 11, "Die Gaben sortieren" (alte Mechanik 7 von 8, Sortieren): die Königin schenkt Salomo Gewürze, Gold und Edelsteine; das Kind zieht jedes Geschenk in die Truhe seiner Farbe (grün, golden, blau).
- * Bilder (Bildauftrag S36): `sortieren/truhe-gruen/gold/blau.webp`, `gabe-gruen/gold/blau.webp` (aus zwei Bögen auf Magenta geschnitten).
- */
-const SORTIEREN: SortGame = {
-  perBin: 2,
-  bins: [
-    { id: 'gruen', house: `${G}sortieren/truhe-gruen.webp`, sack: `${G}sortieren/gabe-gruen.webp` },
-    { id: 'gold', house: `${G}sortieren/truhe-gold.webp`, sack: `${G}sortieren/gabe-gold.webp` },
-    { id: 'blau', house: `${G}sortieren/truhe-blau.webp`, sack: `${G}sortieren/gabe-blau.webp` }
-  ],
-  rounds: [
-    { perBin: 1, hint: 'Runde 1: Ziehe jedes Geschenk der Königin in die Truhe mit der gleichen Farbe.' },
-    { perBin: 2, hint: 'Runde 2: Jetzt mehr Geschenke. Gewürze gehören in die grüne, Gold in die goldene, Edelsteine in die blaue Truhe.' }
-  ]
-}
 
 /**
  * Etappe 6, "Steine leise legen": der Bauplatz des Hauses Gottes (gemaltes Bild) mit einem Fundament, in dem drei Lücken offen sind; die Steine warten links (neu). Das Kind zieht einen Stein mit dem Finger zu einer Lücke und lässt los:
@@ -186,6 +109,328 @@ const THRON: ThroneGame = {
   ]
 }
 
+/**
+ * Etappe 2, "Die Wunschkarten" (neu, 5.11.2026; 1. Kön 3,5–14): In der Nacht bei Gibeon schweben Bildkarten über den Himmel: Reichtum, langes Leben, Sieg über die Feinde und ein gehorsames Herz.
+ * Das Kind fängt nur das Herz (darum bittet Salomo); eine andere Karte ist ein Fehler. Runde 1 drei Herzen, Runde 2 schneller und vier Herzen. Bilder (Bildauftrag S40): `wunschkarten/nacht.webp`, `karte-*.webp`.
+ */
+const WUNSCHKARTEN: WishGame = {
+  background: `${G}wunschkarten/nacht.webp`,
+  cards: {
+    heart: { image: `${G}wunschkarten/karte-herz.webp`, label: 'Ein gehorsames Herz', w: 15 },
+    riches: { image: `${G}wunschkarten/karte-reichtum.webp`, label: 'Reichtum', w: 15 },
+    life: { image: `${G}wunschkarten/karte-leben.webp`, label: 'Ein langes Leben', w: 15 },
+    victory: { image: `${G}wunschkarten/karte-sieg.webp`, label: 'Sieg über die Feinde', w: 15 }
+  },
+  cardW: 15,
+  rounds: [
+    { hint: 'Die Karten schweben vorbei. Fang dreimal das gehorsame Herz.', speed: 8, period: 12, need: 3, cards: [{ kind: 'heart', lane: 50, at: 0 }, { kind: 'riches', lane: 17, at: 3 }, { kind: 'life', lane: 83, at: 6 }, { kind: 'victory', lane: 50, at: 9 }, { kind: 'heart', lane: 83, at: 10 }] },
+    { hint: 'Jetzt schneller. Fang viermal das Herz.', speed: 12, period: 10, need: 4, cards: [{ kind: 'riches', lane: 50, at: 0 }, { kind: 'heart', lane: 17, at: 1.5 }, { kind: 'victory', lane: 83, at: 2.5 }, { kind: 'life', lane: 50, at: 3.2 }, { kind: 'life', lane: 17, at: 4.5 }, { kind: 'riches', lane: 83, at: 6 }, { kind: 'heart', lane: 50, at: 6.5 }, { kind: 'victory', lane: 17, at: 8 }] }
+  ]
+}
+
+/**
+ * Etappe 5, "Die Flöße" (neu, 5.11.2026; 1. Kön 5,9): Das Meer von oben. Das Kind tippt die Zedernstämme am Strand von Tyrus an, sie legen sich zu einem Floß zusammen, die Seile werden gebunden.
+ * Dann fährt das Floß nach rechts; ein Tipp aufs Meer gibt die Richtung. Riffe und die Felsen der Küste sind Fehler, der helle Strand ist der Landeplatz. Runde 2: vier Stämme, mehr Riffe, das Meer treibt das Floß ab.
+ * Bilder (Bildauftrag S41): `floesse/meer.webp`, `stamm.webp`, `seil.webp`, `riff-1.webp`, `riff-2.webp`.
+ */
+const FLOESSE: RaftGame = {
+  background: `${G}floesse/meer.webp`,
+  trunk: { image: `${G}floesse/stamm.webp`, label: 'Zedernstamm', w: 13, thick: 2.17 },
+  rope: { image: `${G}floesse/seil.webp`, label: 'Seil', w: 2 },
+  reefs: [
+    { image: `${G}floesse/riff-1.webp`, label: 'Riff', w: 10 },
+    { image: `${G}floesse/riff-2.webp`, label: 'Riff', w: 10 }
+  ],
+  coast: 88,
+  rounds: [
+    {
+      hint: 'Tippe die drei Stämme an. Dann steuere das Floß zum hellen Strand.',
+      loose: [{ x: 20, y: 22 }, { x: 22, y: 50 }, { x: 19, y: 78 }],
+      start: { x: 20, y: 50 },
+      speed: 7,
+      turn: 75,
+      landing: { top: 32, bottom: 58 },
+      reefs: [{ x: 42, y: 28, r: 4.5, kind: 0 }, { x: 52, y: 72, r: 4.5, kind: 1 }, { x: 64, y: 38, r: 4.5, kind: 0 }],
+      route: [{ x: 34, y: 52 }, { x: 52, y: 48 }, { x: 66, y: 56 }, { x: 80, y: 46 }]
+    },
+    {
+      hint: 'Jetzt vier Stämme und mehr Riffe. Das Meer treibt das Floß nach unten.',
+      loose: [{ x: 19, y: 14 }, { x: 22, y: 36 }, { x: 19, y: 58 }, { x: 22, y: 80 }],
+      start: { x: 20, y: 50 },
+      speed: 8,
+      turn: 70, drift: { x: 0, y: 2.2 },
+      landing: { top: 34, bottom: 56 },
+      reefs: [{ x: 38, y: 28, r: 4.5, kind: 0 }, { x: 40, y: 74, r: 4.5, kind: 1 }, { x: 56, y: 44, r: 4.5, kind: 0 }, { x: 70, y: 72, r: 4.5, kind: 1 }, { x: 72, y: 22, r: 4.5, kind: 0 }],
+      route: [{ x: 32, y: 50 }, { x: 46, y: 54 }, { x: 58, y: 62 }, { x: 68, y: 52 }, { x: 78, y: 46 }, { x: 84, y: 44 }]
+    }
+  ]
+}
+
+/**
+ * Etappe 7, "Schnitzen" (neu, 5.11.2026; 1. Kön 6,18.29): Ein Brett aus Zedernholz zeigt eine Blume, einen Knoten, eine Palme oder eine Ranke als goldene Linie. Das Kind fährt die Linie mit dem Finger nach,
+ * das Schnitzeisen folgt; weicht der Finger zu weit ab, rutscht das Eisen ab (Fehler). Die Cherubim werden nicht gezeigt (Anton: nur als geschnitztes Muster, hier gar nicht).
+ * Die Linie (`rows`, 40 x 40 Zellen) hat neue_spiele_salomo.py aus den gemalten Brettern gelesen (Goldfarbe). Bilder (Bildauftrag S42): `schnitzen/*.webp`, `eisen.webp`, `staub.webp`.
+ */
+const SCHNITZEN: CarveGame = {
+  patterns: [
+    {
+      image: `${G}schnitzen/blume.webp`,
+      label: 'Blume',
+      rows: [
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '...................###..................',
+        '.................##..##.................',
+        '................#......#................',
+        '................#......#................',
+        '...............##......##...............',
+        '............##.##......##.##............',
+        '..........#######......#######..........',
+        '.........##.....##....##.....##.........',
+        '.........#.......######.......#.........',
+        '.........#.......##..##.......##........',
+        '.........#.......#....#.......#.........',
+        '.........#......##....##......#.........',
+        '.........##.....##....##.....##.........',
+        '..........########....########..........',
+        '.............##...####...##.............',
+        '............#......##......#............',
+        '...........##......##......#............',
+        '...........#.......##......##...........',
+        '...........#.......##......##...........',
+        '............#.....####.....#............',
+        '............##...######...#.............',
+        '..............###..##..###..............',
+        '...................##...................',
+        '............#####..##..#####............',
+        '............##...######...##............',
+        '.............#....####....#.............',
+        '..............#....##....#..............',
+        '...............##########...............',
+        '...................###..................',
+        '...................##...................',
+        '...................##...................',
+        '...................#....................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................'
+      ]
+    },
+    {
+      image: `${G}schnitzen/knoten.webp`,
+      label: 'Knoten',
+      rows: [
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '................########................',
+        '...............##......##...............',
+        '..............##........##..............',
+        '.............##..........##.............',
+        '.............#............#.............',
+        '............##............#.............',
+        '............##............#.............',
+        '............##............#.............',
+        '............##............#.............',
+        '.............#............#.............',
+        '.............#...........##.............',
+        '.............##..........#..............',
+        '..............##........#...............',
+        '..........#######......######...........',
+        '........####..####....####..####........',
+        '.......##........##.###........##.......',
+        '......##..........###...........##......',
+        '.....##............##............#......',
+        '.....#............####............#.....',
+        '.....#............#..#............#.....',
+        '....##...........##..#............#.....',
+        '....##...........#...##...........#.....',
+        '.....#...........#....#...........#.....',
+        '.....#..........#.....##.........##.....',
+        '.....##........##......#.........#......',
+        '......##......##........#.......##......',
+        '.......###...##..........##...###.......',
+        '.........####.............#####.........',
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................'
+      ]
+    },
+    {
+      image: `${G}schnitzen/palme.webp`,
+      label: 'Palme',
+      rows: [
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '.....................####...............',
+        '....................##.#................',
+        '...................#..#.................',
+        '.............#....##.#..................',
+        '..........#######.#..#...###............',
+        '.........###....###.#####..###..........',
+        '........#######..##.###....####.........',
+        '..............##..#.##..########........',
+        '..............####.##.###...............',
+        '............##...##########.............',
+        '...........#....#######...##............',
+        '..........#..###...##.###..##...........',
+        '..........#.##.....##....##.#...........',
+        '.........###.......##.....###...........',
+        '.........##........##......##...........',
+        '...................##.......#...........',
+        '...................##...................',
+        '...................##...................',
+        '...................##...................',
+        '...................##...................',
+        '...................##...................',
+        '...................##...................',
+        '...................##...................',
+        '...................##...................',
+        '...................##...................',
+        '...................##...................',
+        '...................##...................',
+        '...................##...................',
+        '...................##...................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................'
+      ]
+    },
+    {
+      image: `${G}schnitzen/ranke.webp`,
+      label: 'Ranke mit Blumen',
+      rows: [
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '........##..............................',
+        '.......####.............................',
+        '.....###..#.............................',
+        '.....#.#..###...........................',
+        '....##......#...........................',
+        '.....##...###...........................',
+        '......#.#..#............................',
+        '.....##.##.#............................',
+        '......######.......#....................',
+        '.......##.........####..................',
+        '......########...##..#.............####.',
+        '....##.......###.##.##..........###.....',
+        '.###...........######..........##.......',
+        '..................###........##.........',
+        '....................###########.........',
+        '........................##...#..........',
+        '..........................#######.......',
+        '..........................#..#..#.......',
+        '..........................##...##.......',
+        '.........................#......#.......',
+        '.........................#..#...##......',
+        '.........................###..###.......',
+        '...........................####.........',
+        '............................##..........',
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................',
+        '........................................'
+      ]
+    }
+  ],
+  tool: { image: `${G}schnitzen/eisen.webp`, label: 'Schnitzeisen', w: 16 },
+  dust: `${G}schnitzen/staub.webp`,
+  brush: 1.6,
+  rounds: [
+    { hint: 'Fahre die Blume und den Knoten mit dem Finger nach.', patterns: [0, 1], need: 0.8, slip: 3.5 },
+    { hint: 'Jetzt die Palme und die Ranke. Bleib genau auf der goldenen Linie.', patterns: [2, 3], need: 0.85, slip: 2.6 }
+  ]
+}
+
+/**
+ * Etappe 8, "Granatäpfel" (neu, 5.11.2026; 1. Kön 7,17–20): Am Knauf der Erzsäule hängen Ketten. Die ersten Dinge zeigen ein Muster (Granatapfel, Lilie, Kettenglied), die übrigen Haken sind leer.
+ * Ein Tipp auf einen Haken hängt ein Ding daran, jeder weitere Tipp wechselt es; "Prüfen" schaut die Kette an (eine Prüfung mit Fehlern ist ein Fehler). Runde 2 zwei Ketten mit drei Dingen.
+ * Bilder (Bildauftrag S43): `granatapfel/saeule.webp`, `granat.webp`, `lilie.webp`, `kette.webp`, `haken.webp`.
+ */
+const GRANATAPFEL: PomGame = {
+  background: `${G}granatapfel/saeule.webp`,
+  items: {
+    granat: { image: `${G}granatapfel/granat.webp`, label: 'Granatapfel', w: 13 },
+    lilie: { image: `${G}granatapfel/lilie.webp`, label: 'Lilie', w: 13 },
+    kette: { image: `${G}granatapfel/kette.webp`, label: 'Kettenglied', w: 13 }
+  },
+  hook: { image: `${G}granatapfel/haken.webp`, label: 'Haken', w: 5 },
+  x0: 11,
+  x1: 89,
+  slotW: 13,
+  rounds: [
+    { hint: 'Schau dir das Muster an und hänge die Kette fertig.', rows: [{ y: 42, motif: ['granat', 'lilie'], length: 6, given: [0, 1, 2] }] },
+    { hint: 'Zwei Ketten mit drei Dingen. Setze jedes Muster fort.', rows: [{ y: 20, motif: ['granat', 'granat', 'lilie'], length: 6, given: [0, 1, 2] }, { y: 58, motif: ['lilie', 'kette', 'granat'], length: 6, given: [0, 1, 2] }] }
+  ]
+}
+
+/**
+ * Etappe 9, "Die Stufen hinauf" (neu, 5.11.2026; 1. Kön 8,3–6): Die Priester tragen die Lade die breite Treppe zum Haus Gottes hinauf. Das Kind tippt links und rechts im Gleichschritt;
+ * der falsche Fuß und ein zu schneller Schritt sind Fehler, in Runde 2 auch ein zu langsamer. Bilder (Bildauftrag S44): `stufen/treppe.webp` (Hochformat 3:4), `traeger.webp` (von hinten).
+ */
+const STUFEN: StairsGame = {
+  background: `${G}stufen/treppe.webp`,
+  ratio: 0.75,
+  group: { image: `${G}stufen/traeger.webp`, label: 'Vier Priester tragen die Lade des Bundes', w: 50 },
+  bottom: 99,
+  top: 44,
+  topScale: 0.45,
+  rounds: [
+    { hint: 'Tippe links, rechts, links, rechts. Nicht zu schnell, die Lade ist schwer!', steps: 10, min: 0.35, max: 2.5 },
+    { hint: 'Jetzt mehr Stufen. Bleib im Gleichschritt: nicht zu schnell und nicht zu langsam.', steps: 14, min: 0.4, max: 1.3, strict: true }
+  ]
+}
+
+/**
+ * Etappe 11, "Die Schatzkammer" (neu, 5.11.2026; 1. Kön 10,2.10): Ein Kamel der Königin steht in der Vorratskammer, auf seinem Tragbrett liegen Gewürze, Gold und Edelsteine. Das Kind zieht jedes Geschenk
+ * in das Fach mit der passenden Form (oder tippt erst das Geschenk, dann das Fach); eine falsche Form ist ein Fehler. Runde 2: zwei Kamele, sechs Fächer.
+ * Bilder (Bildauftrag S45): `schatzkammer/kammer.webp`, `kamel.webp`, `fach-*.webp`; die Geschenke sind die früheren Gaben der Etappe (Bildauftrag S36), umbenannt.
+ */
+const SCHATZKAMMER: TreasuryGame = {
+  background: `${G}schatzkammer/kammer.webp`,
+  camel: { image: `${G}schatzkammer/kamel.webp`, label: 'Ein Kamel der Königin', w: 38, x: 79, y: 98 },
+  board: [{ x: 79, y: 50.5 }, { x: 89, y: 50.5 }, { x: 84, y: 37 }],
+  items: {
+    sack: { image: `${G}schatzkammer/sack.webp`, label: 'Gewürze', w: 12 },
+    barren: { image: `${G}schatzkammer/barren.webp`, label: 'Gold', w: 12 },
+    stein: { image: `${G}schatzkammer/stein.webp`, label: 'Edelstein', w: 12 }
+  },
+  niches: {
+    sack: { image: `${G}schatzkammer/fach-sack.webp`, label: 'Fach für Gewürze', w: 14.5 },
+    barren: { image: `${G}schatzkammer/fach-barren.webp`, label: 'Fach für Gold', w: 14.5 },
+    stein: { image: `${G}schatzkammer/fach-stein.webp`, label: 'Fach für Edelsteine', w: 14.5 }
+  },
+  rounds: [
+    { hint: 'Ein Kamel bringt drei Geschenke. Lege jedes in das Fach mit seiner Form.', slots: [{ shape: 'sack', x: 21, y: 32 }, { shape: 'barren', x: 36, y: 32 }, { shape: 'stein', x: 51, y: 32 }], camels: [['sack', 'barren', 'stein']] },
+    { hint: 'Jetzt kommen zwei Kamele mit sechs Geschenken.', slots: [{ shape: 'barren', x: 21, y: 20 }, { shape: 'stein', x: 36, y: 20 }, { shape: 'sack', x: 51, y: 20 }, { shape: 'sack', x: 21, y: 46 }, { shape: 'barren', x: 36, y: 46 }, { shape: 'stein', x: 51, y: 46 }], camels: [['stein', 'sack', 'barren'], ['barren', 'stein', 'sack']] }
+  ]
+}
+
 export const salomo: Journey = {
   id: 'salomo',
   title: 'Salomo',
@@ -229,7 +474,7 @@ export const salomo: Journey = {
         'Das Haus für Gott gibt es noch nicht, denn in Jerusalem hat niemand es gebaut. Die Leute opfern an vielen Orten auf den Höhen. Der wichtigste Platz liegt bei Gibeon. Dorthin macht sich Salomo mit seinen Leuten auf den Weg.',
         'Auf dem großen Altar von Gibeon opfert er tausend Brandopfer. In der Nacht schläft er ein. Da kommt ein Traum, und Gott spricht zu ihm: „Bitte, was ich dir geben soll!“'
       ],
-      // Spiel: Weggabelung (weg, alt 1 von 8)
+      // Spiel: Weggabelung (weg, bekannt)
       task: { kind: 'weg', hint: 'Folge den Spuren des Zuges nach Gibeon. Schau dir die Wege genau an.', way: WEG },
       questions: [
         { q: 'Wohin geht Salomo, um Gott zu danken?', options: ['nach Gibeon', 'nach Silo', 'nach Bethel'], answer: 0 },
@@ -247,8 +492,8 @@ export const salomo: Journey = {
         'Gott gefällt diese Bitte. „Du bittest nicht um langes Leben, nicht um Reichtum und nicht darum, dass es deinen Feinden schlecht ergeht“, sagt er. „Ich gebe dir ein weises und verständiges Herz. Und was du nicht erbeten hast, gebe ich dir dazu: Reichtum und Ehre.“',
         'Salomo wacht auf, und es war ein Traum. Er geht nach Jerusalem, tritt vor die Lade des Bundes und feiert ein großes Mahl mit allen seinen Leuten.'
       ],
-      // Spiel: Lückenvers (lueckenvers, alt 2 von 8)
-      task: { kind: 'lueckenvers', hint: 'Ziehe das passende Blatt in die Lücke.', verse: VERS },
+      // Spiel: Die Wunschkarten (wunschkarten, neu 5.11.2026)
+      task: { kind: 'wunschkarten', hint: 'Fang nur die Karte mit dem, worum Salomo bittet.', wishCards: WUNSCHKARTEN },
       questions: [
         { q: 'Worum bittet Salomo?', options: ['um ein gehorsames Herz', 'um ein langes Leben', 'um viel Gold'], answer: 0 },
         { q: 'Was gibt Gott ihm dazu?', options: ['Reichtum und Ehre', 'ein Schwert', 'ein Schiff'], answer: 0 }
@@ -283,7 +528,7 @@ export const salomo: Journey = {
         'Gott hat Salomo viel Weisheit gegeben, so weit wie der Sand am Ufer des Meeres. Er spricht dreitausend Sprüche und singt tausendundfünf Lieder. Er redet über Bäume, von der Zeder auf dem Libanon bis zum Ysop, der aus der Mauer wächst. Er redet über Vieh, Vögel, Kriechtiere und Fische.',
         'Aus allen Völkern kommen Menschen, um ihn zu hören, auch von den Königen der Erde, die von seiner Weisheit gehört haben.'
       ],
-      // Spiel: Ernten (ernten, alt 3 von 8)
+      // Spiel: Ernten (ernten, bekannt)
       task: { kind: 'ernten', hint: 'Tippe die reifen Früchte an. Steine und Dornen gehören nicht in den Korb.', harvest: ERNTEN },
       questions: [
         { q: 'Wo sitzen die Leute in Ruhe?', options: ['unter Weinstock und Feigenbaum', 'in der Burg', 'am Feuer'], answer: 0 },
@@ -300,8 +545,8 @@ export const salomo: Journey = {
         'Salomo lässt ihm sagen: „Mein Vater David konnte kein Haus für den Namen Gottes bauen, denn er musste Kriege führen. Nun hat Gott mir Ruhe geschenkt. Ich will das Haus bauen. Lass Zedern auf dem Libanon schlagen. Bei uns versteht niemand so gut Holz zu hauen wie deine Leute.“',
         'Hiram freut sich und sagt: „Gelobt sei der Herr, der David einen weisen Sohn gegeben hat!“ Seine Männer bringen die Stämme hinab ans Meer und binden sie zu Flößen. Dafür schickt Salomo ihm Weizen und Öl, Jahr für Jahr. Die beiden Könige schließen Frieden miteinander.'
       ],
-      // Spiel: Reihenfolge legen (reihenfolge, alt 4 von 8)
-      task: { kind: 'reihenfolge', hint: 'Lege die Bilder in die Reihenfolge der Geschichte.', order: REIHENFOLGE },
+      // Spiel: Die Flöße (floesse, neu 5.11.2026)
+      task: { kind: 'floesse', hint: 'Binde die Stämme zu einem Floß und steuere es über das Meer an die Küste.', rafts: FLOESSE },
       questions: [
         { q: 'Wer schickt Holz für das Haus Gottes?', options: ['Hiram, der König von Tyrus', 'der Pharao', 'die Königin von Saba'], answer: 0 },
         { q: 'Welches Holz kommt vom Libanon?', options: ['Zedern', 'Palmen', 'Feigen'], answer: 0 }
@@ -334,8 +579,8 @@ export const salomo: Journey = {
         'Hinten im Haus liegt ein Raum, zwanzig Ellen lang, breit und hoch. Dort soll die Lade des Bundes stehen. Salomo überzieht alles mit reinem Gold. Er lässt zwei Cherubim aus Ölbaumholz machen, jeder zehn Ellen hoch, und überzieht auch sie mit Gold. Ihre Flügel reichen von Wand zu Wand und berühren sich in der Mitte.',
         'An den Wänden und auf den Türen sind Cherubim, Palmen und Blumen geschnitzt. Alles glänzt golden.'
       ],
-      // Spiel: Memory (memory, alt 5 von 8)
-      task: { kind: 'memory', hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.', memory: MEMORY },
+      // Spiel: Schnitzen (schnitzen, neu 5.11.2026)
+      task: { kind: 'schnitzen', hint: 'Fahre die goldene Linie im Zedernholz mit dem Finger nach.', carving: SCHNITZEN },
       questions: [
         { q: 'Aus welchem Holz sind die Wände innen?', options: ['aus Zedernholz', 'aus Tannenholz', 'aus Ebenholz'], answer: 0 },
         { q: 'Womit überzieht Salomo den hinteren Raum?', options: ['mit reinem Gold', 'mit Silber', 'mit Ton'], answer: 0 }
@@ -351,8 +596,8 @@ export const salomo: Journey = {
         'Er gießt zwei Säulen aus Erz, jede achtzehn Ellen hoch. Oben auf jede Säule setzt er einen Knauf wie eine Lilie, mit Gitterwerk und zwei Reihen Granatäpfeln, zweihundert an jedem Knauf. Er stellt die Säulen vor die Halle des Hauses. Die rechte nennt er Jachin, die linke Boas.',
         'Sieben Jahre lang baut Salomo am Haus Gottes. Dann ist alles fertig, genau wie es sein soll.'
       ],
-      // Spiel: Die Wörter ordnen (worte, alt 6 von 8)
-      task: { kind: 'worte', hint: 'Lege die Wörter in der richtigen Reihenfolge in den Streifen.', words: WORTE },
+      // Spiel: Granatäpfel (granatapfel, neu 5.11.2026)
+      task: { kind: 'granatapfel', hint: 'Hänge die Ketten fertig. Setze das Muster fort.', pomegranates: GRANATAPFEL },
       questions: [
         { q: 'Wie heißt der Meister im Erz?', options: ['Hiram', 'Zadok', 'Natan'], answer: 0 },
         { q: 'Wie heißen die beiden Säulen?', options: ['Jachin und Boas', 'Adam und Eva', 'Ruben und Simeon'], answer: 0 }
@@ -368,8 +613,8 @@ export const salomo: Journey = {
         'Die Priester heben die Lade auf und tragen sie hinauf. Der König und das ganze Volk gehen vor ihr her. Sie opfern Schafe und Rinder, so viele, dass niemand sie zählen kann. Die Priester bringen die Lade in den hinteren Raum, unter die Flügel der Cherubim. In der Lade liegen nur die zwei steinernen Tafeln. Mose hat sie am Berg Horeb hineingelegt.',
         'Als die Priester das Haus verlassen, erfüllt eine Wolke das Haus Gottes. Sie können nicht mehr stehen, um ihren Dienst zu tun, denn Gottes Herrlichkeit ist da.'
       ],
-      // Spiel: Puzzle (puzzle, alt 7 von 8)
-      task: { kind: 'puzzle', hint: 'Setze das Bild vom Einzug der Lade zusammen.', puzzle: { image: `${G}puzzle/lade.webp`, cols: 2, rows: 3 } },
+      // Spiel: Die Stufen hinauf (stufen, neu 5.11.2026)
+      task: { kind: 'stufen', hint: 'Trage die Lade mit den Priestern hinauf: links, rechts, im Gleichschritt.', stairs: STUFEN },
       questions: [
         { q: 'Was tragen die Priester ins neue Haus?', options: ['die Lade des Bundes', 'den Thron des Königs', 'einen Altar aus Gold'], answer: 0 },
         { q: 'Wohin stellen sie die Lade?', options: ['unter die Flügel der Cherubim', 'vor das Tor', 'in den Hof'], answer: 0 }
@@ -403,8 +648,8 @@ export const salomo: Journey = {
         'Salomo beantwortet alles, was sie fragt. Nichts ist ihm zu schwer. Sie sieht sein Haus, die Speisen auf seinem Tisch, die Diener in ihren Kleidern, die Mundschenke und die Opfer im Haus Gottes. Da kommt sie aus dem Staunen nicht mehr heraus.',
         '„Es ist wahr, was ich gehört habe“, sagt sie. „Ich habe es erst nicht glauben wollen, bis ich es mit eigenen Augen sah. Es ist mir nicht einmal die Hälfte gesagt worden. Gelobt sei der Herr, dein Gott!“ Sie schenkt Salomo Gold und Gewürze. Er gibt ihr alles, was sie sich wünscht, und sie zieht heim.'
       ],
-      // Spiel: Sortieren (sortieren, alt 8 von 8)
-      task: { kind: 'sortieren', hint: 'Ziehe jedes Geschenk in die Truhe mit der gleichen Farbe.', sort: SORTIEREN },
+      // Spiel: Die Schatzkammer (schatzkammer, neu 5.11.2026)
+      task: { kind: 'schatzkammer', hint: 'Lege jedes Geschenk in das Fach mit der passenden Form.', treasury: SCHATZKAMMER },
       questions: [
         { q: 'Was bringt die Königin mit?', options: ['Gewürze, Gold und Edelsteine', 'Schafe und Ziegen', 'Schwerter und Schilde'], answer: 0 },
         { q: 'Wie kommt sie nach Jerusalem?', options: ['mit Kamelen', 'mit einem Schiff', 'mit einem Wagen'], answer: 0 }
@@ -436,12 +681,6 @@ export const salomo: Journey = {
     { q: 'Was liegt in der Lade des Bundes?', options: ['die zwei steinernen Tafeln', 'Brot und Wein', 'ein Schwert'], answer: 0 },
     { q: 'Wie viele Löwen stehen auf den Stufen des Throns?', options: ['zwölf', 'sechs', 'hundert'], answer: 0 }
   ]
-}
-
-// the games that lie on a stage picture (drawn soft by the app) follow the picture of their stage
-for (const st of salomo.stages) {
-  if (st.task.verse) st.task.verse.background = backdropOr(st.task.verse.background, st.image ?? st.task.verse.background)
-  if (st.task.words) st.task.words.background = backdropOr(st.task.words.background, st.image ?? st.task.words.background)
 }
 
 // the German recordings of the stories (voice Achernar, files "geschichte-NN-v1.mp3"); until they are made the app reads with the voice of the device. Remove a number from this list when its file is in.

@@ -121,6 +121,12 @@ import GameWanderweg from '@/components/molecules/games/GameWanderweg.vue'
 import GameTischdecken from '@/components/molecules/games/GameTischdecken.vue'
 import GameFensterlaeden from '@/components/molecules/games/GameFensterlaeden.vue'
 import GameLichtweg from '@/components/molecules/games/GameLichtweg.vue'
+import GameWunschkarten from '@/components/molecules/games/GameWunschkarten.vue'
+import GameFloesse from '@/components/molecules/games/GameFloesse.vue'
+import GameSchnitzen from '@/components/molecules/games/GameSchnitzen.vue'
+import GameGranatapfel from '@/components/molecules/games/GameGranatapfel.vue'
+import GameStufen from '@/components/molecules/games/GameStufen.vue'
+import GameSchatzkammer from '@/components/molecules/games/GameSchatzkammer.vue'
 import GameBecher from '@/components/molecules/games/GameBecher.vue'
 import GamePfand from '@/components/molecules/games/GamePfand.vue'
 import GameLaubhuetten from '@/components/molecules/games/GameLaubhuetten.vue'
@@ -498,7 +504,7 @@ const hasPart = computed(() => partStars.value > 0 && !progress.finished.value)
 
 /** The games have a restart sign: a new key mounts the game afresh (round, mistakes and what was done begin again). */
 const gameKey = ref(0)
-const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew', 'overboard', 'shore', 'sacks', 'shade', 'days', 'statue', 'lamp', 'hours', 'ravens', 'caves', 'rain', 'whisper', 'glean', 'measure', 'elders', 'cradle', 'coat', 'cows', 'stone', 'search', 'baggage', 'gather', 'harp', 'shepherd', 'pebbles', 'sling', 'arrow', 'hem', 'quiet', 'throne', 'jars', 'dive', 'decor', 'honor', 'ride', 'post', 'peace', 'forge', 'crib', 'sign', 'road', 'net', 'boats', 'roof', 'bail', 'crowd', 'bundle', 'bread', 'row', 'turnBack', 'shout', 'dig', 'coin', 'meet', 'climb', 'halve', 'unwrap', 'prepare', 'lamps', 'help','arms', 'judges', 'signal', 'grapes', 'jugs', 'enough', 'quails', 'staffs', 'serpent', 'donkey', 'commission', 'fischzug', 'graze', 'errand', 'wander', 'table', 'shutters', 'synagogue', 'ten', 'children', 'plumb', 'seats', 'twelve', 'census', 'fire', 'tell', 'star', 'stepStones', 'commandment', 'gateWatch', 'sceptre', 'riders', 'scroll', 'shadowWalk', 'sunrise', 'hemTouch', 'bankPath', 'frogFlick', 'cupCarry', 'pledges', 'booths', 'flame', 'yieldGame', 'halt', 'inn', 'carryHome', 'homeward'] as const
+const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew', 'overboard', 'shore', 'sacks', 'shade', 'days', 'statue', 'lamp', 'hours', 'ravens', 'caves', 'rain', 'whisper', 'glean', 'measure', 'elders', 'cradle', 'coat', 'cows', 'stone', 'search', 'baggage', 'gather', 'harp', 'shepherd', 'pebbles', 'sling', 'arrow', 'hem', 'quiet', 'throne', 'jars', 'dive', 'decor', 'honor', 'ride', 'post', 'peace', 'forge', 'crib', 'sign', 'road', 'net', 'boats', 'roof', 'bail', 'crowd', 'bundle', 'bread', 'row', 'turnBack', 'shout', 'dig', 'coin', 'meet', 'climb', 'halve', 'unwrap', 'prepare', 'lamps', 'help','arms', 'judges', 'signal', 'grapes', 'jugs', 'enough', 'quails', 'staffs', 'serpent', 'donkey', 'commission', 'fischzug', 'graze', 'errand', 'wander', 'table', 'shutters', 'synagogue', 'ten', 'children', 'plumb', 'seats', 'twelve', 'census', 'fire', 'tell', 'star', 'stepStones', 'commandment', 'gateWatch', 'sceptre', 'riders', 'scroll', 'shadowWalk', 'sunrise', 'hemTouch', 'bankPath', 'frogFlick', 'cupCarry', 'pledges', 'booths', 'wishCards', 'rafts', 'carving', 'pomegranates', 'stairs', 'treasury', 'flame', 'yieldGame', 'halt', 'inn', 'carryHome', 'homeward'] as const
 const hasGame = computed(() => hasCountGame.value || GAME_FIELDS.some((f) => !!gameTask.value?.[f]))
 /** A game begins only when the child taps "play" (many games run on their own clock: the text and the hint are read first). */
 const started = ref(false)
@@ -730,6 +736,12 @@ const gameKind = computed(() => {
   if (g?.cupCarry) return 'cupCarry'
   if (g?.pledges) return 'pledges'
   if (g?.booths) return 'booths'
+  if (g?.wishCards) return 'wishCards'
+  if (g?.rafts) return 'rafts'
+  if (g?.carving) return 'carving'
+  if (g?.pomegranates) return 'pomegranates'
+  if (g?.stairs) return 'stairs'
+  if (g?.treasury) return 'treasury'
   if (g?.flame) return 'flame'
   if (g?.yieldGame) return 'yieldGame'
   if (g?.halt) return 'halt'
@@ -996,6 +1008,12 @@ function openGift() {
         GameBecher(:key="gameKey" v-else-if="gameTask?.cupCarry" :game="gameTask.cupCarry" @done="taskDone")
         GamePfand(:key="gameKey" v-else-if="gameTask?.pledges" :game="gameTask.pledges" @done="taskDone")
         GameLaubhuetten(:key="gameKey" v-else-if="gameTask?.booths" :game="gameTask.booths" @done="taskDone")
+        GameWunschkarten(:key="gameKey" v-else-if="gameTask?.wishCards" :game="gameTask.wishCards" @done="taskDone")
+        GameFloesse(:key="gameKey" v-else-if="gameTask?.rafts" :game="gameTask.rafts" @done="taskDone")
+        GameSchnitzen(:key="gameKey" v-else-if="gameTask?.carving" :game="gameTask.carving" @done="taskDone")
+        GameGranatapfel(:key="gameKey" v-else-if="gameTask?.pomegranates" :game="gameTask.pomegranates" @done="taskDone")
+        GameStufen(:key="gameKey" v-else-if="gameTask?.stairs" :game="gameTask.stairs" @done="taskDone")
+        GameSchatzkammer(:key="gameKey" v-else-if="gameTask?.treasury" :game="gameTask.treasury" @done="taskDone")
         GameLichtweg(:key="gameKey" v-else-if="gameTask?.flame" :game="gameTask.flame" @done="taskDone")
         GameHundertfach(:key="gameKey" v-else-if="gameTask?.yieldGame" :game="gameTask.yieldGame" @done="taskDone")
         GameAnhalten(:key="gameKey" v-else-if="gameTask?.halt" :game="gameTask.halt" @done="taskDone")

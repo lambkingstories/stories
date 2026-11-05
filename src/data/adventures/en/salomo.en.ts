@@ -46,12 +46,10 @@ export const salomoEn: TextOverlay<Journey> = {
         'Solomon wakes up, and it was a dream. He goes to Jerusalem, stands before the ark of the covenant and holds a great meal with all his servants.'
       ],
       task: {
-        hint: 'Drag the right leaf into the gap.',
-        verse: {
-          rounds: [
-            { hint: 'Drag the right leaf into the gap.', parts: ['“Give me an obedient ', ', so that I can judge your people and know what is good and what is evil.”'], words: ['heart', 'sword', 'house'] },
-            { hint: 'Now two words are missing.', parts: ['“I give you a ', ' and understanding heart. And what you did not ask for, I give you as well: ', ' and honor.”'], words: ['wise', 'riches', 'clever', 'silver'] }
-          ]
+        hint: 'Catch only the card with what Solomon asks for.',
+        wishCards: {
+          cards: { heart: { label: 'An obedient heart' }, riches: { label: 'Riches' }, life: { label: 'A long life' }, victory: { label: 'Victory over the enemies' } },
+          rounds: [{ hint: 'The cards float past. Catch the obedient heart three times.' }, { hint: 'Now faster. Catch the heart four times.' }]
         }
       },
       questions: [
@@ -98,10 +96,12 @@ export const salomoEn: TextOverlay<Journey> = {
         'Hiram is glad and says: "Blessed be the Lord, who has given David a wise son!" His men bring the trunks down to the sea and tie them together as rafts. In return Solomon sends him wheat and oil, year after year. The two kings make peace with each other.'
       ],
       task: {
-        hint: 'Put the pictures in the order of the story.',
-        order: {
-          cards: [{ label: 'Solomon sends a letter to Hiram' }, { label: 'Hiram reads the letter and is glad' }, { label: 'The cedars are cut down' }, { label: 'The trunks are bound into rafts' }],
-          rounds: [{ hint: 'Round 1: Put the pictures in the order of the story. The dots show where they go.' }, { hint: 'Round 2: Now with the letter and without dots: What comes first, what comes next?' }]
+        hint: 'Bind the trunks into a raft and steer it over the sea to the coast.',
+        rafts: {
+          trunk: { label: 'Cedar trunk' },
+          rope: { label: 'Rope' },
+          reefs: [{ label: 'Reef' }, { label: 'Reef' }],
+          rounds: [{ hint: 'Tap the three trunks. Then steer the raft to the bright beach.' }, { hint: 'Now four trunks and more reefs. The sea drifts the raft downward.' }]
         }
       },
       questions: [
@@ -135,8 +135,12 @@ export const salomoEn: TextOverlay<Journey> = {
         'Cherubim, palm trees and flowers are carved on the walls and on the doors. Everything shines with gold.'
       ],
       task: {
-        hint: 'Find the matching cards. Remember where each one lies.',
-        memory: { pairs: [{ text: 'The cedar: the wood comes from Lebanon, and the walls inside the house are all cedar.' }, { text: 'The gold: Solomon covers the whole house with pure gold.' }, { text: 'The cherub: two cherubim with outspread wings stand in the room at the back.' }, { text: 'The palm tree: palm trees are carved on the walls and doors.' }, { text: 'The flower: flowers are carved into the cedar wood too.' }, { text: 'The pomegranate: two hundred pomegranates decorate every capital of the pillars.' }] }
+        hint: 'Trace the golden line in the cedar wood with your finger.',
+        carving: {
+          patterns: [{ label: 'Flower' }, { label: 'Knot' }, { label: 'Palm tree' }, { label: 'Vine with flowers' }],
+          tool: { label: 'Carving iron' },
+          rounds: [{ hint: 'Trace the flower and the knot with your finger.' }, { hint: 'Now the palm tree and the vine. Stay right on the golden line.' }]
+        }
       },
       questions: [
         { q: 'What wood are the walls made of inside?', options: ['cedar wood', 'fir wood', 'ebony'] },
@@ -152,12 +156,11 @@ export const salomoEn: TextOverlay<Journey> = {
         'Solomon builds on God’s house for seven years. Then everything is finished, just as it should be.'
       ],
       task: {
-        hint: 'Put the words into the strip in the right order.',
-        words: {
-          rounds: [
-            { hint: 'Put the words into the strip in the right order.', sentences: ['Solomon builds on God’s house for seven years.', 'The one on the right he calls Jachin, the one on the left Boaz.'] },
-            { hint: 'Now longer sentences.', sentences: ['He casts two pillars of bronze, each eighteen cubits high.', 'Hiram is full of wisdom and skill and makes all the work Solomon needs.'] }
-          ]
+        hint: 'Finish the chains. Continue the pattern.',
+        pomegranates: {
+          items: { granat: { label: 'Pomegranate' }, lilie: { label: 'Lily' }, kette: { label: 'Chain link' } },
+          hook: { label: 'Hook' },
+          rounds: [{ hint: 'Look at the pattern and finish the chain.' }, { hint: 'Two chains with three things. Continue each pattern.' }]
         }
       },
       questions: [
@@ -173,7 +176,13 @@ export const salomoEn: TextOverlay<Journey> = {
         'The priests lift the ark and carry it up. The king and all the people walk in front of it. They offer sheep and oxen, so many that nobody can count them. The priests bring the ark into the room at the back, under the wings of the cherubim. In the ark lie only the two stone tablets. Moses put them there at Mount Horeb.',
         'When the priests leave the house, a cloud fills God’s house. They cannot stand there to do their service, because God’s glory is there.'
       ],
-      task: { hint: 'Put the picture of the ark moving in together.' },
+      task: {
+        hint: 'Carry the ark up with the priests: left, right, in step.',
+        stairs: {
+          group: { label: 'Four priests carry the ark of the covenant' },
+          rounds: [{ hint: 'Tap left, right, left, right. Not too fast, the ark is heavy!' }, { hint: 'Now more steps. Keep in step: not too fast and not too slow.' }]
+        }
+      },
       questions: [
         { q: 'What do the priests carry into the new house?', options: ['the ark of the covenant', 'the king’s throne', 'an altar of gold'] },
         { q: 'Where do they put the ark?', options: ['under the wings of the cherubim', 'in front of the gate', 'in the courtyard'] }
@@ -203,9 +212,12 @@ export const salomoEn: TextOverlay<Journey> = {
         '"What I heard is true," she says. "I did not want to believe it until I saw it with my own eyes. Not even half was told to me. Blessed be the Lord your God!" She gives Solomon gold and spices. He gives her everything she wishes, and she travels home.'
       ],
       task: {
-        hint: 'Drag each gift into the chest of the same color.',
-        sort: {
-          rounds: [{ hint: 'Round 1: Drag each gift of the queen into the chest of the same color.' }, { hint: 'Round 2: Now more gifts. Spices belong in the green chest, gold in the golden one, gems in the blue one.' }]
+        hint: 'Put each gift into the compartment with the shape that fits.',
+        treasury: {
+          camel: { label: 'A camel of the queen' },
+          items: { sack: { label: 'Spices' }, barren: { label: 'Gold' }, stein: { label: 'Gemstone' } },
+          niches: { sack: { label: 'Compartment for spices' }, barren: { label: 'Compartment for gold' }, stein: { label: 'Compartment for gems' } },
+          rounds: [{ hint: 'A camel brings three gifts. Put each into the compartment with its shape.' }, { hint: 'Now two camels come with six gifts.' }]
         }
       },
       questions: [
