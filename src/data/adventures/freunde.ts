@@ -3,38 +3,29 @@
  * Anton (31.10.2026): Jesus wird mit Gesicht gezeigt (ohne Heiligenschein). Gott der Vater, Engel und Lichtgestalten sind nie im Bild.
  * Quelle der Texte: D:/Claude/Abenteuer-Freunde/ENTWURF_Freunde.md (Luther 1912 von bibeltext.com gelesen, nichts abgeschrieben), Plan: ETAPPENPLAN.md, Figuren: FIGUREN.md, Prüfbericht: PRUEFBERICHT-BIBELTREUE-2026-11-01.md.
  * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
- * Spiele (Wahl der Leitung): 1 Puzzle (alt), 2 Lückenvers (alt), 3 Beide Boote füllen (neu), 4 Reihenfolge (alt), 5 Das Dach öffnen (neu), 6 nur Quiz, 7 Memory (alt), 8 Wimmelbild (alt), 9 nur Quiz.
+ * Spiele (nach Antons Regel vom 5.11.2026: höchstens zwei bekannte, nie hintereinander): 1 Puzzle (alt), 2 Das Lot (neu), 3 Beide Boote füllen (neu), 4 Reihenfolge (alt), 5 Das Dach öffnen (neu), 6 nur Quiz, 7 Sitzplätze (neu), 8 Die Zwölf (neu), 9 nur Quiz.
+ * Bilder der neuen Spiele: D:/Claude/Abenteuer-Freunde/BILDAUFTRAEGE/BILDAUFTRAG-S37..S39; Maße: tools/_masse_neu.json; Leitung: D:/Claude/Spiele-Neu/freunde/BERICHT.md.
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/freunde/, images/abenteuer/spiele/freunde/<spiel>/, audio/abenteuer/freunde/.
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { BoatsGame, FindGame, Journey, MemoryGame, OrderGame, RoofGame, VerseGame } from '@/types/adventure'
+import type { BoatsGame, Journey, OrderGame, RoofGame } from '@/types/adventure'
+import type { PlumbGame, SeatsGame, TwelveGame } from '@/utils/freundeNeu'
 import { josef } from './josef'
 import { FREUNDE_PATH } from './freundePath'
 import { localize } from './localize'
 import { adventureLanguage } from '@/use/adventureLanguage'
 import { freundeEn } from './en/freunde.en'
-import { backdropOr } from '@/utils/gameBackground'
 
 // Etappenbilder (Variante a der neuen Bilder; Anton wählt auf der Vorschau-Seite a/b): `images/abenteuer/freunde/etappe-bild-NN.webp`, 960 × 640
 const PICS = 'images/abenteuer/freunde/'
 
 const G = 'images/abenteuer/spiele/freunde/'
 
-/**
- * Etappe 2, "Lückenvers" (alte Mechanik): zwei Sätze aus dem Text der Etappe in zwei Runden (erst ein Wort, dann zwei); die Wörter sind Blätter (das richtige zuerst, `answers` zeigt auf sie).
- * Tafel und Blatt sind die aus Nr. 22 (kopiert). Hintergrund ist der gemalte Strand am See (Bildauftrag S30).
- */
-const VERS: VerseGame = {
-  background: `${G}hintergrund/vers-hintergrund.webp`,
-  soft: true,
-  board: `${G}lueckenvers/tafel.webp`,
-  leaf: `${G}lueckenvers/blatt.webp`,
-  rounds: [
-    { hint: 'Ziehe das passende Blatt in die Lücke.', parts: ['„Auf dein ', ' will ich das Netz auswerfen.“'], words: ['Wort', 'Zeichen', 'Gebot'], answers: [0] },
-    { hint: 'Jetzt fehlen zwei Wörter.', parts: ['„Fahre hinaus auf die ', '. Werft eure ', ', damit ihr einen Fang tut.“'], words: ['Tiefe', 'Netze', 'Ufer', 'Anker'], answers: [0, 1] }
-  ]
-}
+const SURFACE_1 = 32.7 // Wasserlinie im Bild see.webp in Prozent der Höhe (gemessen)
+const SURFACE_2 = 30.8 // dasselbe für see2.webp
+const LEAD_RATIO = 0.5789 // Breite : Höhe des Senkbleis
+const MAT_RATIO = 2.699 // Breite : Höhe der Matte
 
 /**
  * Etappe 4, "Der Fischzug" (alte Mechanik, Reihenfolge legen): Jesus lehrt vom Boot, Simon wirft das Netz aus, beide Boote sind voll, sie lassen alles zurück und folgen Jesus.
@@ -50,21 +41,6 @@ const REIHENFOLGE: OrderGame = {
   rounds: [
     { hint: 'Runde 1: Lege die Bilder in die Reihenfolge der Geschichte. Die Punkte zeigen, wo sie hinkommen.', numbered: true, cards: ['wirft', 'voll', 'folgt'] },
     { hint: 'Runde 2: Jetzt mit dem Anfang am Ufer und ohne Punkte: Was kommt zuerst, was danach?', numbered: false, cards: ['lehrt', 'wirft', 'voll', 'folgt'] }
-  ]
-}
-
-/**
- * Etappe 7, "Memory" (alte Mechanik): sechs Dinge vom Fest bei Levi (Brot, Krug, Schale, Salbentopf, Schriftrolle, Münzbeutel); die Rückseite zeigt einen goldenen Fisch (Bildauftrag S32, ein Bogen mit den sechs Dingen, vom Code geschnitten).
- */
-const MEMORY: MemoryGame = {
-  back: `${G}memory/rueck.webp`,
-  pairs: [
-    { image: `${G}memory/karte-brot.webp`, text: 'Das Brot: Jesus isst mit den Zöllnern und Sündern.' },
-    { image: `${G}memory/karte-krug.webp`, text: 'Der Krug: Levi gibt in seinem Haus ein großes Mahl.' },
-    { image: `${G}memory/karte-schale.webp`, text: 'Die Schale: Viele Zöllner und Sünder essen mit Jesus.' },
-    { image: `${G}memory/karte-salbe.webp`, text: 'Der Salbentopf: Nicht die Gesunden brauchen einen Arzt, sondern die Kranken.' },
-    { image: `${G}memory/karte-schriftrolle.webp`, text: 'Die Schriftrolle: Die Schriftgelehrten fragen: Warum isst er mit den Sündern?' },
-    { image: `${G}memory/karte-beutel.webp`, text: 'Der Münzbeutel: Levi ist ein Zöllner und nimmt den Zoll ein.' }
   ]
 }
 
@@ -147,27 +123,133 @@ const DACH: RoofGame = {
 }
 
 /**
- * Etappe 8, "Wimmelbild" (alte Mechanik): ein Berghang im Hochformat voller Menschen (Bildauftrag S33); gesucht werden die vier Fischer, die Jesus am See gerufen hat (Mk 1,16-20), jeder mit etwas in der Hand, das zu ihm gehört;
- * einige stehen hinter Fels, Baum, Mauer und Busch. Bilder: `wimmel/szene.webp`, `fischer-1..4.webp` (aus einem Bogen geschnitten), `verdecker-1..4.webp` (aus einem Bogen geschnitten).
+ * Etappe 2, "Das Lot" (neu, Lk 5,4-5): Jesus sagt „Fahre hinaus auf die Tiefe“. Der See im Schnitt von der Seite, Simons Boot schwimmt oben; das Kind fährt es mit dem Finger oder den Pfeiltasten, lässt das Lot an der Leine hinunter, liest ab,
+ * wie viele Klafter tief es ist (Apg 27,28 kennt Lot und Klafter), und lässt Simon das Netz nur auswerfen, wo es tief genug ist. Das Wort „Klafter“ steht im Hinweis erklärt. Die Tiefen sind Spieldaten, die Bibel nennt keine Zahl.
+ * Bilder (Bildauftrag S37): `lot/see.webp` 1200 × 900 (Wasserlinie bei 32,7 %) und `see2.webp` 1200 × 800 (30,8 %, ein Dorf am Ufer), `boot.webp` 760 × 423 (Simon kniet, Jesus sitzt hinten), `lot2.webp` (das Blei), `leine.webp` (das Seil aus Nr. 23, nur gestreckt).
  */
-const WIMMEL: FindGame = {
-  labels: ['Simon mit dem Fangnetz', 'Andreas mit dem Fischkorb', 'Jakobus mit dem Seil', 'Johannes mit dem Ruder'],
-  doneText: 'Du hast alle vier gefunden: Simon, Andreas, Jakobus und Johannes. Sie gehören zu den zwölf Freunden von Jesus.',
-  scene: `${G}wimmel/szene.webp`,
-  finds: [
-    { image: `${G}wimmel/fischer-1.webp`, x: 52, y: 44, w: 20 },
-    { image: `${G}wimmel/fischer-2.webp`, x: 50, y: 80, w: 20 },
-    { image: `${G}wimmel/fischer-3.webp`, x: 24, y: 61, w: 20 },
-    { image: `${G}wimmel/fischer-4.webp`, x: 81, y: 85, w: 20 }
+const LOT: PlumbGame = {
+  boat: { image: `${G}lot/boot.webp`, label: 'Simons Boot', w: 40, ratio: 760 / 423, hand: { x: 71, y: 71 }, keel: 88 },
+  lead: { image: `${G}lot/lot2.webp`, w: 7, ratio: LEAD_RATIO },
+  line: `${G}lot/leine.webp`,
+  rounds: [
+    {
+      hint: 'Fahre das Boot mit dem Finger und lass das Lot hinunter. Das Netz braucht mindestens 12 Klafter Wasser. Ein Klafter ist so lang wie zwei ausgestreckte Arme.',
+      background: `${G}lot/see.webp`,
+      ratio: 4 / 3,
+      surface: SURFACE_1,
+      floor: 96,
+      scale: 20,
+      bottom: [{ x: 0, d: 3 }, { x: 20, d: 4 }, { x: 38, d: 7 }, { x: 52, d: 12 }, { x: 70, d: 16 }, { x: 84, d: 13 }, { x: 92, d: 6 }, { x: 100, d: 4 }],
+      range: [20, 80],
+      start: 22,
+      deep: 12
+    },
+    {
+      hint: 'Die tiefe Stelle ist jetzt schmaler. Das Netz braucht mindestens 14 Klafter. Suche genau, vorher liegen Stellen mit 12 und 13.',
+      background: `${G}lot/see2.webp`,
+      ratio: 3 / 2,
+      surface: SURFACE_2,
+      floor: 96,
+      scale: 20,
+      bottom: [{ x: 0, d: 7 }, { x: 14, d: 12 }, { x: 24, d: 13 }, { x: 34, d: 7 }, { x: 44, d: 5 }, { x: 56, d: 9 }, { x: 64, d: 14 }, { x: 72, d: 19 }, { x: 80, d: 15 }, { x: 88, d: 8 }, { x: 100, d: 5 }],
+      range: [20, 80],
+      start: 24,
+      deep: 14
+    }
+  ]
+}
+
+/**
+ * Etappe 7, "Sitzplätze" (neu, Mk 2,15; Lk 5,29): Levi gibt ein großes Mahl, viele Zöllner und Sünder sitzen mit Jesus zu Tisch. Levis Haus von oben, ein Schiebepuzzle: Das Kind schiebt Bänke (zwei oder drei Plätze),
+ * bis auf jeder Matte am langen Tisch eine Bank liegt. Raum 1 5 × 5 mit zwei Matten, Raum 2 6 × 6 mit drei Matten, einem Krug und einem Korb. Die Zugzahlen (`par`) sind vom Test mit einer Breitensuche geprüft.
+ * Bilder (Bildauftrag S38): `sitzplaetze/boden.webp` 900 × 900, `tisch` (4 : 1), `bank-2` (2 : 1), `bank-3` (3 : 1), `matte`, `krug`, `korb`, `gaeste` (Levi heißt fünf Gäste willkommen).
+ */
+const SITZ: SeatsGame = {
+  floor: `${G}sitzplaetze/boden.webp`,
+  table: `${G}sitzplaetze/tisch.webp`,
+  bench2: `${G}sitzplaetze/bank-2.webp`,
+  bench3: `${G}sitzplaetze/bank-3.webp`,
+  jar: `${G}sitzplaetze/krug.webp`,
+  basket: `${G}sitzplaetze/korb.webp`,
+  mat: `${G}sitzplaetze/matte.webp`,
+  matRatio: MAT_RATIO,
+  guests: `${G}sitzplaetze/gaeste.webp`,
+  guestsLabel: 'Levi begrüßt seine Gäste',
+  rounds: [
+    {
+      hint: 'Schiebe die Bänke, bis auf beiden Matten am Tisch eine Bank liegt. Dann haben alle Gäste einen Platz.',
+      rows: ['.....', '.....', '.TTTT', '.....', '.....'],
+      mats: [{ r: 1, c: 1 }, { r: 3, c: 3 }],
+      benches: [
+        { id: 'a', r: 1, c: 3, len: 2, dir: 'h' },
+        { id: 'b', r: 3, c: 1, len: 2, dir: 'h' },
+        { id: 'c', r: 0, c: 3, len: 2, dir: 'h' },
+        { id: 'd', r: 0, c: 0, len: 3, dir: 'v' },
+        { id: 'e', r: 4, c: 1, len: 2, dir: 'h' },
+        { id: 'f', r: 0, c: 1, len: 2, dir: 'v' }
+      ],
+      par: 4
+    },
+    {
+      hint: 'Jetzt kommen noch mehr Gäste. Schiebe die Bänke auf alle drei Matten am Tisch.',
+      rows: ['......', '......', '.TTTT.', '......', 'K....O', '......'],
+      mats: [{ r: 1, c: 1 }, { r: 1, c: 3 }, { r: 3, c: 3 }],
+      benches: [
+        { id: 'a', r: 3, c: 1, len: 2, dir: 'h' },
+        { id: 'b', r: 0, c: 0, len: 2, dir: 'v' },
+        { id: 'c', r: 0, c: 1, len: 3, dir: 'h' },
+        { id: 'd', r: 2, c: 0, len: 2, dir: 'v' },
+        { id: 'e', r: 4, c: 1, len: 2, dir: 'h' },
+        { id: 'f', r: 0, c: 4, len: 2, dir: 'h' },
+        { id: 'g', r: 3, c: 4, len: 2, dir: 'v' },
+        { id: 'h', r: 3, c: 3, len: 2, dir: 'v' },
+        { id: 'i', r: 5, c: 2, len: 2, dir: 'h' }
+      ],
+      par: 8
+    }
+  ]
+}
+
+/**
+ * Etappe 8, "Die Zwölf" (neu, Mk 3,13-19; Lk 6,14-16): Ein Name leuchtet auf, dazu sein Zeichen in Worten, und das Kind tippt den Freund von Jesus an. Zeichen gibt es nur, wo die Bibel sie hergibt (die Fischer Simon, Andreas, Jakobus und Johannes;
+ * Matthäus, der Zöllner, Mt 10,3); bei den anderen nur etwas zum Unterscheiden (Kopftuch, Bart, Glatze, Stab, Stirnband), keine Aussage über sie. Alle wirken freundlich, auch Judas. Namen nach Mk 3,16-19.
+ * Runde 1: sechs Freunde, fünf Namen; Runde 2: alle zwölf, acht Namen. Bilder (Bildauftrag S39): `zwoelf/berg.webp` 900 × 1200, zwölf stehende Figuren 200 × 330 (vier aus Nr. 23, acht neu im gleichen Maßstab).
+ */
+const ZWOELF: TwelveGame = {
+  background: `${G}zwoelf/berg.webp`,
+  ratio: 900 / 1200,
+  figure: 200 / 330,
+  disciples: [
+    { id: 'simon', image: `${G}zwoelf/simon.webp`, name: 'Simon Petrus', sign: 'der Fischer mit dem Netz' },
+    { id: 'andreas', image: `${G}zwoelf/andreas.webp`, name: 'Andreas', sign: 'der Fischer mit dem Fischkorb' },
+    { id: 'jakobus-z', image: `${G}zwoelf/jakobus-z.webp`, name: 'Jakobus, Sohn des Zebedäus', sign: 'der Fischer mit dem Seil' },
+    { id: 'johannes', image: `${G}zwoelf/johannes.webp`, name: 'Johannes', sign: 'der Fischer mit dem Ruder' },
+    { id: 'philippus', image: `${G}zwoelf/philippus.webp`, name: 'Philippus', sign: 'der Mann mit dem hellen Kopftuch' },
+    { id: 'bartholomaeus', image: `${G}zwoelf/bartholomaeus.webp`, name: 'Bartholomäus', sign: 'der Mann mit dem grauen Bart' },
+    { id: 'matthaeus', image: `${G}zwoelf/matthaeus.webp`, name: 'Matthäus', sign: 'der Zöllner mit dem Münzkästchen' },
+    { id: 'thomas', image: `${G}zwoelf/thomas.webp`, name: 'Thomas', sign: 'der junge Mann ohne Bart' },
+    { id: 'jakobus-a', image: `${G}zwoelf/jakobus-a.webp`, name: 'Jakobus, Sohn des Alphäus', sign: 'der Mann mit der Glatze' },
+    { id: 'thaddaeus', image: `${G}zwoelf/thaddaeus.webp`, name: 'Thaddäus', sign: 'der Mann mit dem langen Wanderstab' },
+    { id: 'simon-z', image: `${G}zwoelf/simon-z.webp`, name: 'Simon, der Zelot', sign: 'der Mann mit dem langen schwarzen Bart' },
+    { id: 'judas', image: `${G}zwoelf/judas.webp`, name: 'Judas Iskariot', sign: 'der Mann mit dem Stirnband' }
   ],
-  covers: [
-    { image: `${G}wimmel/verdecker-1.webp`, x: 52, y: 46.5, w: 28 },
-    { image: `${G}wimmel/verdecker-2.webp`, x: 50, y: 83, w: 26 },
-    { image: `${G}wimmel/verdecker-3.webp`, x: 24, y: 64, w: 28 },
-    { image: `${G}wimmel/verdecker-4.webp`, x: 81, y: 87.5, w: 26 },
-    { image: `${G}wimmel/verdecker-1.webp`, x: 36, y: 70, w: 18 },
-    { image: `${G}wimmel/verdecker-2.webp`, x: 10, y: 89, w: 22 },
-    { image: `${G}wimmel/verdecker-3.webp`, x: 63, y: 93, w: 20 }
+  rounds: [
+    {
+      hint: 'Ein Name leuchtet auf. Tippe den Freund von Jesus an, der dazu passt.',
+      spots: [{ x: 20, y: 62, w: 24 }, { x: 50, y: 62, w: 24 }, { x: 80, y: 62, w: 24 }, { x: 20, y: 96, w: 24 }, { x: 50, y: 96, w: 24 }, { x: 80, y: 96, w: 24 }],
+      stand: ['simon', 'matthaeus', 'thomas', 'philippus', 'andreas', 'johannes'],
+      call: ['matthaeus', 'andreas', 'thomas', 'philippus', 'simon']
+    },
+    {
+      hint: 'Jetzt stehen alle zwölf am Berg. Tippe immer den an, dessen Name leuchtet.',
+      spots: [
+        { x: 14, y: 55, w: 20 }, { x: 38, y: 55, w: 20 }, { x: 62, y: 55, w: 20 }, { x: 86, y: 55, w: 20 },
+        { x: 14, y: 78, w: 20 }, { x: 38, y: 78, w: 20 }, { x: 62, y: 78, w: 20 }, { x: 86, y: 78, w: 20 },
+        { x: 14, y: 99, w: 20 }, { x: 38, y: 99, w: 20 }, { x: 62, y: 99, w: 20 }, { x: 86, y: 99, w: 20 }
+      ],
+      stand: ['matthaeus', 'simon', 'philippus', 'judas', 'thomas', 'jakobus-z', 'bartholomaeus', 'johannes', 'simon-z', 'andreas', 'thaddaeus', 'jakobus-a'],
+      call: ['andreas', 'judas', 'thomas', 'simon', 'matthaeus', 'thaddaeus', 'jakobus-a', 'philippus']
+    }
   ]
 }
 
@@ -230,8 +312,8 @@ export const freunde: Journey = {
         'Aber dann sagt Simon: „Auf dein Wort will ich das Netz auswerfen.“',
         'Vom Boot aus hat Jesus eben noch zu den Menschen am Ufer gesprochen. Jetzt tut Simon, was Jesus gesagt hat. Sie fahren hinaus auf den See, und Jesus ist bei ihnen im Boot.'
       ],
-      // Spiel: Lückenvers (lueckenvers, alt)
-      task: { kind: 'lueckenvers', hint: 'Ziehe das passende Blatt in die Lücke.', verse: VERS },
+      // Spiel: Das Lot (lot, neu)
+      task: { kind: 'lot', hint: 'Fahre das Boot zur tiefen Stelle und lass das Lot hinunter.', plumb: LOT },
       questions: [
         { q: 'Was sagt Jesus zu Simon?', options: ['Fahre hinaus auf die Tiefe und werft eure Netze aus.', 'Geh nach Hause.', 'Bring mir einen Fisch.'], answer: 0 },
         { q: 'Was hat Simon in der Nacht gefangen?', options: ['nichts', 'hundert Fische', 'einen großen Fisch'], answer: 0 }
@@ -320,8 +402,8 @@ export const freunde: Journey = {
         'Jesus hört, was sie sagen. Er antwortet ihnen: „Nicht die Gesunden brauchen einen Arzt, sondern die Kranken.“',
         'Dann sagt er: „Ich bin nicht gekommen, die Gerechten zu rufen. Ich bin gekommen, die Sünder zu rufen, damit sie umkehren.“'
       ],
-      // Spiel: Memory (memory, alt)
-      task: { kind: 'memory', hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.', memory: MEMORY },
+      // Spiel: Sitzplätze (sitzplaetze, neu)
+      task: { kind: 'sitzplaetze', hint: 'Schiebe die Bänke, bis jeder Gast am Tisch einen Platz hat.', seats: SITZ },
       questions: [
         { q: 'Bei wem sitzt Jesus zu Tisch?', options: ['bei Levi', 'bei Simon', 'bei Zebedäus'], answer: 0 },
         { q: 'Wer isst mit Jesus?', options: ['viele Zöllner und Sünder', 'nur die Schriftgelehrten', 'nur Fischer'], answer: 0 }
@@ -338,8 +420,8 @@ export const freunde: Journey = {
         'Jesus gibt Simon den Namen Petrus. Jakobus und Johannes, die Söhne des Zebedäus, nennt er Donnersöhne. Dazu kommen Andreas, Philippus, Bartholomäus, Matthäus und Thomas.',
         'Und Jakobus, der Sohn des Alphäus, Thaddäus, Simon, der Zelot, und Judas Iskariot. Der hat ihn später verraten.'
       ],
-      // Spiel: Wimmelbild (wimmelbild, alt)
-      task: { kind: 'wimmelbild', hint: 'Suche am Berg: Finde die vier Fischer, die Jesus am See gerufen hat.', count: 4, find: WIMMEL },
+      // Spiel: Die Zwölf (zwoelf, neu)
+      task: { kind: 'zwoelf', hint: 'Tippe den Freund von Jesus an, dessen Name leuchtet.', twelve: ZWOELF },
       questions: [
         { q: 'Wohin geht Jesus, als er die Zwölf ruft?', options: ['auf einen Berg', 'an den See', 'in den Tempel'], answer: 0 },
         { q: 'Welchen Namen gibt Jesus dem Simon?', options: ['Petrus', 'Johannes', 'Thaddäus'], answer: 0 }
@@ -373,11 +455,6 @@ export const freunde: Journey = {
     { q: 'Wer braucht den Arzt, sagt Jesus?', options: ['die Kranken', 'die Gesunden', 'niemand'], answer: 0 },
     { q: 'Welchen Namen gibt Jesus dem Simon?', options: ['Petrus', 'Johannes', 'Thaddäus'], answer: 0 }
   ]
-}
-
-// the games that lie on a stage picture (drawn soft by the app) follow the picture of their stage
-for (const st of freunde.stages) {
-  if (st.task.verse) st.task.verse.background = backdropOr(st.task.verse.background, st.image ?? st.task.verse.background)
 }
 
 // the German recordings of the stories (voice Achernar, files "geschichte-NN-v1.mp3"); until they are made the app reads with the voice of the device. Remove a number from this list when its file is in.

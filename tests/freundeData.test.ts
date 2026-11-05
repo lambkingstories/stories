@@ -1,6 +1,6 @@
 /**
  * The data of "Jesus Calls His Friends" (`freunde.ts`, `en/freunde.en.ts`, `freundePath.ts`): the stories and questions follow the rules of the adventures (texts of the draft `D:/Claude/Abenteuer-Freunde/ENTWURF_Freunde.md`,
- * Luther 1912 told in our own words), the two quiz stages are only quizzes, the two new games and the five old ones have sound data, the map has nine stations and the exam, and the English file has the same shape.
+ * Luther 1912 told in our own words), the two quiz stages are only quizzes, the five new games and the two old ones have sound data, the map has nine stations and the exam, and the English file has the same shape.
  */
 import { existsSync, statSync } from 'node:fs'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -10,6 +10,8 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { setAdventureLanguage } from '@/use/adventureLanguage'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 import { roofRoundProblems } from '@/utils/freundeGames'
+import { plumbProblems, seatsProblems, twelveProblems } from '@/utils/freundeNeu'
+import type { PlumbGame, SeatsGame, TwelveGame } from '@/utils/freundeNeu'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => freunde.stages[n - 1]!
@@ -127,11 +129,12 @@ describe('Freunde: stories and questions', () => {
 })
 
 describe('Freunde: the games', () => {
-  it('the order of the games: 5 old, 2 new (boats, roof), 2 quizzes; no game twice', () => {
-    expect(freunde.stages.map((s) => s.task.kind)).toEqual(['puzzle', 'lueckenvers', 'boote', 'reihenfolge', 'dach', 'quiz', 'memory', 'wimmelbild', 'quiz'])
+  it('the order of the games: 2 known (puzzle, order), 5 new (lead, boats, roof, seats, the Twelve), 2 quizzes; no game twice, the two known ones never in a row', () => {
+    expect(freunde.stages.map((s) => s.task.kind)).toEqual(['puzzle', 'lot', 'boote', 'reihenfolge', 'dach', 'quiz', 'sitzplaetze', 'zwoelf', 'quiz'])
     const games = freunde.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
     expect(new Set(games).size).toBe(games.length)
-    expect(games.filter((k) => ['boote', 'dach'].includes(k))).toHaveLength(2)
+    expect(games.filter((k) => ['puzzle', 'reihenfolge'].includes(k))).toHaveLength(2)
+    expect(games.filter((k) => ['lot', 'boote', 'dach', 'sitzplaetze', 'zwoelf'].includes(k))).toHaveLength(5)
   })
 
   it('1 puzzle: a portrait picture in 2 columns and 3 rows', () => {
@@ -141,18 +144,16 @@ describe('Freunde: the games', () => {
     expect(g.image).toMatch(/puzzle\/ufer\.webp$/)
   })
 
-  it('2 verse: the sentences are in the text and the right words are on the leaves', () => {
-    const g = stage(2).task.verse!
+  it('2 lead: two rounds, the data are in order (`plumbProblems`), the second round is deeper and has the hint with its number; the lake pictures and the boat are in the data', () => {
+    const g = stage(2).task.plumb as PlumbGame
+    expect(plumbProblems(g)).toEqual([])
     expect(g.rounds).toHaveLength(2)
-    for (const r of g.rounds) {
-      expect(r.parts).toHaveLength(r.answers.length + 1)
-      for (const a of r.answers) expect(r.words[a]).toBeTruthy()
-    }
-    expect(g.rounds[0]!.words[g.rounds[0]!.answers[0]!]).toBe('Wort')
-    expect(g.rounds[1]!.answers.map((a) => g.rounds[1]!.words[a])).toEqual(['Tiefe', 'Netze'])
-    const text = stage(2).text.join(' ')
-    expect(text).toContain(`${g.rounds[0]!.parts[0]}Wort${g.rounds[0]!.parts[1]}`.replace('„', '').replace('“', ''))
-    expect(text).toContain('Fahre hinaus auf die Tiefe')
+    expect(g.rounds.map((r) => r.deep)).toEqual([12, 14])
+    for (const r of g.rounds) expect(r.hint).toContain(`${r.deep} Klafter`)
+    expect(g.rounds[0]!.background).toMatch(/freunde\/lot\/see\.webp$/)
+    expect(g.rounds[1]!.background).toMatch(/freunde\/lot\/see2\.webp$/)
+    expect(g.boat.image).toMatch(/freunde\/lot\/boot\.webp$/)
+    expect(stage(2).text.join(' ')).toContain('Fahre hinaus auf die Tiefe')
   })
 
   it('3 boats: two rounds, two boats with a mark each, the places of the fish are inside the boat, every fish has a picture, the heap and the boats are inside the lake', () => {
@@ -222,29 +223,25 @@ describe('Freunde: the games', () => {
     expect(stage(5).text.join(' ')).toContain('Dach')
   })
 
-  it('7 memory: six pairs (a full board of 3 x 4), every one with a sentence that the text of the feast tells', () => {
-    const g = stage(7).task.memory!
-    expect(g.pairs).toHaveLength(6)
-    for (const p of g.pairs) expect(p.text.length).toBeGreaterThan(10)
+  it('7 seats: two rounds, the data are in order (`seatsProblems`: the fewest moves are checked by a search), the feast is told in the stage', () => {
+    const g = stage(7).task.seats as SeatsGame
+    expect(seatsProblems(g)).toEqual([])
+    expect(g.rounds).toHaveLength(2)
+    expect(g.rounds.map((r) => r.par)).toEqual([4, 8])
     const text = `${stage(6).text.join(' ')} ${stage(7).text.join(' ')}`
-    for (const w of ['Zöllner', 'Sünder', 'Schriftgelehrten', 'Arzt', 'Zoll', 'Essen']) expect(text, w).toContain(w)
+    for (const w of ['Zöllner', 'Sünder', 'Schriftgelehrten', 'Arzt', 'Zoll', 'Tisch']) expect(text, w).toContain(w)
+    expect(g.floor).toMatch(/freunde\/sitzplaetze\/boden\.webp$/)
   })
 
-  it('8 hidden pictures: the four fishermen, covers, every place inside the picture', () => {
+  it('8 the Twelve: the data are in order (`twelveProblems`), twelve different disciples, the names are in the text of the stage', () => {
     const t = stage(8).task
-    expect(t.kind).toBe('wimmelbild')
-    expect(t.count).toBe(4)
-    const f = t.find!
-    expect(f.finds).toHaveLength(4)
-    expect(f.labels).toHaveLength(4)
-    expect(f.covers.length).toBeGreaterThanOrEqual(6)
-    for (const s of [...f.finds, ...f.covers]) {
-      expect(s.x - s.w / 2).toBeGreaterThanOrEqual(-1)
-      expect(s.x + s.w / 2).toBeLessThanOrEqual(101)
-      expect(s.y).toBeLessThanOrEqual(100)
-    }
-    expect(f.labels.join(' ')).toMatch(/Simon/)
-    expect(f.labels.join(' ')).not.toMatch(/Jesus/)
+    expect(t.kind).toBe('zwoelf')
+    const g = t.twelve as TwelveGame
+    expect(twelveProblems(g)).toEqual([])
+    expect(g.disciples).toHaveLength(12)
+    expect(g.rounds.map((r) => r.stand.length)).toEqual([6, 12])
+    const text = stage(8).text.join(' ')
+    for (const n of ['Petrus', 'Andreas', 'Philippus', 'Bartholomäus', 'Matthäus', 'Thomas', 'Thaddäus', 'Judas Iskariot', 'Jakobus', 'Johannes']) expect(text, n).toContain(n)
   })
 })
 
@@ -299,7 +296,10 @@ describe('Freunde: map, files, English', () => {
     expect(stage(3).task.boats!.rounds[0]!.hint).toContain('Fill both boats')
     expect(stage(5).task.roof!.rounds[0]!.hint).toContain('Open the roof')
     expect(stage(5).task.roof!.people[1]!.label).toBe('Woman with a child')
-    expect(stage(2).task.verse!.rounds[1]!.parts[0]).toContain('Launch out')
+    expect((stage(2).task.plumb as PlumbGame).rounds[0]!.hint).toContain('Steer the boat')
+    expect((stage(2).task.plumb as PlumbGame).boat.label).toBe("Simon's boat")
+    expect((stage(7).task.seats as SeatsGame).rounds[1]!.hint).toContain('all three mats')
+    expect((stage(8).task.twelve as TwelveGame).disciples[0]!.name).toBe('Simon Peter')
     for (const s of freunde.stages) {
       const audio = s.audio
       if (audio) expect(audio, `stage ${s.id}`).toBe(`audio/abenteuer/freunde/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)

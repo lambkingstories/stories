@@ -37,11 +37,12 @@ export const freundeEn: TextOverlay<Journey> = {
         'From the boat Jesus has just been speaking to the people on the shore. Now Simon does what Jesus has said. They sail out onto the lake, and Jesus is with them in the boat.'
       ],
       task: {
-        hint: 'Drag the right leaf into the gap.',
-        verse: {
+        hint: 'Sail the boat to the deep place and let the lead down.',
+        plumb: {
+          boat: { label: "Simon's boat" },
           rounds: [
-            { hint: 'Drag the right leaf into the gap.', parts: ['“At your ', ' I will let down the net.”'], words: ['word', 'sign', 'command'] },
-            { hint: 'Now two words are missing.', parts: ['“Launch out into the ', '. Let down your ', ', so that you may catch some fish.”'], words: ['deep', 'nets', 'shore', 'anchor'] }
+            { hint: 'Steer the boat with your finger and let the lead down. The net needs at least 12 fathoms of water. A fathom is as long as two outstretched arms.' },
+            { hint: 'The deep place is narrower now. The net needs at least 14 fathoms. Look carefully: before it there are places with 12 and 13.' }
           ]
         }
       },
@@ -146,8 +147,14 @@ export const freundeEn: TextOverlay<Journey> = {
         'Then he says: “I have not come to call the righteous. I have come to call sinners, so that they turn back.”'
       ],
       task: {
-        hint: 'Find the matching cards. Remember where each one lies.',
-        memory: { pairs: [{ text: 'The bread: Jesus eats with the tax collectors and sinners.' }, { text: 'The jug: Levi gives a big meal in his house.' }, { text: 'The bowl: Many tax collectors and sinners eat with Jesus.' }, { text: 'The ointment pot: Those who are well do not need a doctor, but those who are sick.' }, { text: 'The scroll: The scribes ask: Why does he eat with the sinners?' }, { text: 'The coin pouch: Levi is a tax collector and collects the tax.' }] }
+        hint: 'Push the benches until every guest at the table has a seat.',
+        seats: {
+          guestsLabel: 'Levi welcomes his guests',
+          rounds: [
+            { hint: 'Push the benches until a bench lies on both mats at the table. Then all the guests have a seat.' },
+            { hint: 'Now even more guests come. Push the benches onto all three mats at the table.' }
+          ]
+        }
       },
       questions: [
         { q: 'At whose table does Jesus sit?', options: ['at Levi’s', 'at Simon’s', 'at Zebedee’s'] },
@@ -164,8 +171,27 @@ export const freundeEn: TextOverlay<Journey> = {
         'And James, the son of Alphaeus, Thaddaeus, Simon the Zealot and Judas Iscariot. He later betrayed him.'
       ],
       task: {
-        hint: 'Look on the mountain: find the four fishermen whom Jesus called at the lake.',
-        find: { labels: ['Simon with the casting net', 'Andrew with the fish basket', 'James with the rope', 'John with the oar'], doneText: 'You have found all four: Simon, Andrew, James and John. They are among the twelve friends of Jesus.' }
+        hint: 'Tap the friend of Jesus whose name lights up.',
+        twelve: {
+          disciples: [
+            { name: 'Simon Peter', sign: 'the fisherman with the net' },
+            { name: 'Andrew', sign: 'the fisherman with the fish basket' },
+            { name: 'James, son of Zebedee', sign: 'the fisherman with the rope' },
+            { name: 'John', sign: 'the fisherman with the oar' },
+            { name: 'Philip', sign: 'the man with the light head cloth' },
+            { name: 'Bartholomew', sign: 'the man with the gray beard' },
+            { name: 'Matthew', sign: 'the tax collector with the coin box' },
+            { name: 'Thomas', sign: 'the young man without a beard' },
+            { name: 'James, son of Alphaeus', sign: 'the man with the bald head' },
+            { name: 'Thaddaeus', sign: 'the man with the long walking staff' },
+            { name: 'Simon the Zealot', sign: 'the man with the long black beard' },
+            { name: 'Judas Iscariot', sign: 'the man with the headband' }
+          ],
+          rounds: [
+            { hint: 'A name lights up. Tap the friend of Jesus who matches it.' },
+            { hint: 'Now all twelve stand on the mountain. Always tap the one whose name lights up.' }
+          ]
+        }
       },
       questions: [
         { q: 'Where does Jesus go when he calls the twelve?', options: ['up a mountain', 'to the lake', 'to the temple'] },
