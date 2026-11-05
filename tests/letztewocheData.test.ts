@@ -11,14 +11,15 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { setAdventureLanguage } from '@/use/adventureLanguage'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 import { helpProblems, lampProblems, prepareProblems } from '@/utils/letzteWocheGames'
+import { commandCardsOf, commandKindOf, commandProblems } from '@/utils/letztewocheNeu'
+import type { CommandGame } from '@/utils/letztewocheNeu'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => letztewoche.stages[n - 1]!
 /** Words that no text of the German data may use. "Blut" stands once, in the words of Jesus over the cup (stage 6). The passion is told without any detail of the suffering. */
 const FORBIDDEN = /\b(Teufel|Hölle|Leiche|Leichen|Leichnam|Nägel|Nagel|Dornen|Dornenkrone|Peitsche|Peitschen|Geißel|Geißelung|Wunde|Wunden|Fesseln|gefesselt|blutet|blutig|Heiligenschein)\b/i
 const BLOOD = /\bBlut\b/i
-const QUIZ_STAGES = [7, 8, 9, 10, 11]
-const plain = (s: string) => s.replace(/[„“”]/g, '')
+const QUIZ_STAGES = [7, 8, 9, 10, 11, 12]
 
 describe('Die letzte Woche: stories and questions', () => {
   it('twelve stages with 3 or 4 paragraphs of 70 to 160 words and the Bible passage under every one', () => {
@@ -52,7 +53,7 @@ describe('Die letzte Woche: stories and questions', () => {
     for (const s of letztewoche.stages) for (const q of s.questions) expect(`${q.q} ${q.options.join(' ')}`, `stage ${s.id}`).not.toMatch(FORBIDDEN)
   })
 
-  it('three questions in the five quiz stages and two after a game, three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
+  it('three questions in the six quiz stages and two after a game, three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
     for (const s of letztewoche.stages) expect(s.questions, `stage ${s.id}`).toHaveLength(QUIZ_STAGES.includes(s.id) ? 3 : 2)
     for (const q of [...letztewoche.stages.flatMap((s) => s.questions), ...letztewoche.exam]) {
       expect(q.options, q.q).toHaveLength(3)
@@ -89,7 +90,8 @@ describe('Die letzte Woche: stories and questions', () => {
     expect(q).toMatch(/Josef/)
   })
 
-  it('the five stages of the passion (7 to 11) are only quizzes; no game is played twice in a row (the quiz stages follow one another by design)', () => {
+  it('the five stages of the passion (7 to 11) and the grave (12) are only quizzes; no game is played twice in a row (the quiz stages follow one another by design)', () => {
+    expect(stage(12).task.hint).toBe('Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.')
     for (const n of QUIZ_STAGES) expect(stage(n).task.kind, `kind ${n}`).toBe('quiz')
     const kinds = letztewoche.stages.map((s) => s.task.kind)
     for (let i = 1; i < kinds.length; i++) if (kinds[i] !== 'quiz') expect(kinds[i], `same game in a row at ${i + 1}`).not.toBe(kinds[i - 1])
@@ -139,8 +141,8 @@ describe('Die letzte Woche: stories and questions', () => {
 })
 
 describe('Die letzte Woche: the games', () => {
-  it('the order of the games: 4 old, 3 new (bereiten, lampen, helfen), 5 quizzes of the passion', () => {
-    expect(letztewoche.stages.map((s) => s.task.kind)).toEqual(['bereiten', 'wimmelbild', 'lueckenvers', 'lampen', 'helfen', 'reihenfolge', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'puzzle'])
+  it('the order of the games (Anton 5.11.2026): 2 old (wimmelbild, reihenfolge, not in a row), 4 new (bereiten, gebote, lampen, helfen), 6 quizzes (passion and grave)', () => {
+    expect(letztewoche.stages.map((s) => s.task.kind as string)).toEqual(['bereiten', 'wimmelbild', 'gebote', 'lampen', 'helfen', 'reihenfolge', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz', 'quiz'])
   })
 
   it('1 prepare: five bare places, round 1 with three and round 2 with five (the donkey goes on slowly); the data can be played; the pictures come from the data', () => {
@@ -174,22 +176,15 @@ describe('Die letzte Woche: the games', () => {
     expect(f.scene).toBe('images/abenteuer/spiele/letztewoche/wimmel/szene.webp')
   })
 
-  it('3 verse: two rounds, the second commandment stands word for word in the text of the stage, the right words are on the leaves', () => {
-    const g = stage(3).task.verse!
-    expect(g.rounds).toHaveLength(2)
-    const text = plain(stage(3).text.join(' '))
-    for (const r of g.rounds) {
-      expect(r.parts).toHaveLength(r.answers.length + 1)
-      let sentence = r.parts[0]!
-      r.answers.forEach((a, k) => {
-        sentence += r.words[a] + r.parts[k + 1]
-      })
-      expect(text, `"${sentence}"`).toContain(plain(sentence))
-      expect(sentence).toBe(r.answers.length === 1 ? 'Du sollst deinen Nächsten lieben wie dich selbst.' : 'Du sollst deinen Nächsten lieben wie dich selbst.')
-    }
-    expect(g.rounds.map((r) => r.answers.length)).toEqual([1, 2])
-    expect(g.rounds[0]!.words[0]).toBe('Nächsten')
-    expect(g.board).toBe('images/abenteuer/spiele/letztewoche/lueckenvers/tafel.webp')
+  it('3 two halves: the data can be played; six pictures, three for each commandment; round 1 two pictures, round 2 four; the pictures come from the data', () => {
+    const g = (stage(3).task as unknown as { commandment: CommandGame }).commandment
+    expect(commandProblems(g)).toEqual([])
+    expect(g.cards.filter((c) => c.kind === 'god')).toHaveLength(3)
+    expect(g.cards.filter((c) => c.kind === 'neighbor')).toHaveLength(3)
+    expect(g.rounds.map((r) => commandCardsOf(r).length)).toEqual([2, 4])
+    for (const r of g.rounds) expect(new Set(commandCardsOf(r).map((c) => commandKindOf(g, c)))).toEqual(new Set(['god', 'neighbor']))
+    expect(g.heart.image).toBe('images/abenteuer/spiele/letztewoche/gebote/herz.webp')
+    for (const c of g.cards) expect(c.image).toBe(`images/abenteuer/spiele/letztewoche/gebote/${c.id}.webp`)
   })
 
   it('4 lamps: two rounds of three lamps, the second narrower; the data can be played; the pictures come from the data', () => {
@@ -223,11 +218,12 @@ describe('Die letzte Woche: the games', () => {
     expect(g.rounds[1]!.cards).toEqual(['tisch', 'mahl', 'brot', 'oelberg'])
   })
 
-  it('12 puzzle: the picture of the garden with the rock tomb in 2 columns and 3 rows', () => {
-    const g = stage(12).task.puzzle!
-    expect(g.cols).toBe(2)
-    expect(g.rows).toBe(3)
-    expect(g.image).toBe('images/abenteuer/spiele/letztewoche/puzzle/garten.webp')
+  it('12 the grave: no game, three questions about the text (the third: the guard at the grave, Matthew 27,64-66)', () => {
+    const t = stage(12).task as unknown as Record<string, unknown>
+    expect(t.kind).toBe('quiz')
+    expect(Object.keys(t).sort()).toEqual(['hint', 'kind'])
+    expect(stage(12).questions.map((q) => q.options[0])).toEqual(['Josef aus Arimatäa', 'in sein eigenes Grab im Felsen', 'Sie lassen das Grab bewachen.'])
+    expect(stage(12).text.join(' ')).toMatch(/Lass das Grab bewachen/)
   })
 })
 
@@ -286,6 +282,12 @@ describe('Die letzte Woche: map, files, English', () => {
     expect(stage(5).task.help!.people[5]!.label).toContain('prisoner')
     expect(stage(6).task.order!.cards[2]!.label).toContain('breaks the bread')
     expect(stage(2).task.find!.labels![2]).toContain('dove seller')
+    const cmd = (stage(3).task as unknown as { commandment: CommandGame }).commandment
+    expect(cmd.cards[1]!.label).toBe('A boy shares his bread with the boy next door')
+    expect(cmd.heart.label).toContain('neighbors')
+    expect(cmd.rounds[1]!.hint).toContain('upside down')
+    expect(stage(12).task.hint).toContain('serious')
+    expect(stage(12).questions[2]!.q).toBe('What do the chief priests do the next day?')
     for (const s of letztewoche.stages) if (s.audio) expect(s.audio, `stage ${s.id}`).toBe(`audio/abenteuer/letztewoche/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)
     setAdventureLanguage('de')
     expect(stage(4).task.lamps!.jug.label).toBe('Ein Krug mit Öl')
@@ -297,20 +299,6 @@ describe('Die letzte Woche: map, files, English', () => {
       const t = e.text.join(' ')
       expect(t, `stage ${i + 1}`).not.toMatch(/\b(nails?|thorns?|crown of thorns|whip|scourg\w*|wounds?|chains?|corpse|bleed\w*|hell|devil)\b/i)
       if (i + 1 !== 6) expect(t, `stage ${i + 1}`).not.toMatch(/\bblood\b/i)
-    })
-  })
-
-  it('the English verse stands word for word in the English text of stage 3', () => {
-    const en = englishTextsOf(letztewoche) as { stages: { text: string[]; task?: { verse?: { rounds: { parts: string[]; words: string[] }[] } } }[] }
-    const e = en.stages[2]!
-    const text = plain(e.text.join(' '))
-    const de = stage(3).task.verse!
-    e.task!.verse!.rounds.forEach((r, k) => {
-      let sentence = r.parts[0]!
-      de.rounds[k]!.answers.forEach((a, i) => {
-        sentence += r.words[a] + r.parts[i + 1]
-      })
-      expect(text, `"${sentence}"`).toContain(plain(sentence))
     })
   })
 })

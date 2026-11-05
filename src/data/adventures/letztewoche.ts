@@ -4,40 +4,25 @@
  * Die Passion (Etappen 7 bis 11) wird ruhig erzählt und nur gefragt, nicht gespielt; kein Blut, keine Wunden, keine Nägel, keine Dornen im Text oder Bild.
  * Quelle der Texte: D:/Claude/Abenteuer-LetzteWoche/ENTWURF_LetzteWoche.md (Luther 1912 von bibeltext.com gelesen, nichts abgeschrieben), Plan: ETAPPENPLAN.md, Figuren: FIGUREN.md, Spiele: SPIELE.md.
  * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
- * Spiele (Wahl der Leitung, Anton 1.11.2026: neu und zur Szene passend): 1 Weg bereiten (neu, bereiten), 2 Wimmelbild (alt), 3 Lückenvers (alt), 4 Lampen füllen (neu, lampen),
- * 5 Wem helfen? (neu, helfen), 6 Reihenfolge (alt), 7 bis 11 nur Quiz, 12 Puzzle (alt).
+ * Spiele (Antons Spielplan 5.11.2026: höchstens zwei bekannte Spiele, nie hintereinander): 1 Weg bereiten (neu, bereiten), 2 Wimmelbild (alt), 3 Zwei Hälften (neu, gebote),
+ * 4 Lampen füllen (neu, lampen), 5 Wem helfen? (neu, helfen), 6 Reihenfolge (alt), 7 bis 12 nur Quiz (12 ist ernst: erzählt statt gespielt, drei Fragen).
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/letztewoche/, images/abenteuer/spiele/letztewoche/<spiel>/, audio/abenteuer/letztewoche/.
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  * ERZEUGT von D:/Claude/Abenteuer-LetzteWoche/tools/bauen_letztewoche.py: nicht von Hand ändern.
  */
-import type { FindGame, Journey, OrderGame, VerseGame, PrepareGame, OilLampGame, HelpGame } from '@/types/adventure'
+import type { FindGame, Journey, OrderGame, PrepareGame, OilLampGame, HelpGame } from '@/types/adventure'
+import type { CommandGame } from '@/utils/letztewocheNeu'
 import { josef } from './josef'
 import { LETZTEWOCHE_PATH } from './letztewochePath'
 import { localize } from './localize'
 import { adventureLanguage } from '@/use/adventureLanguage'
 import { letztewocheEn } from './en/letztewoche.en'
-import { backdropOr } from '@/utils/gameBackground'
 
 // Etappenbilder (Variante a, bei b mit Endung -b nach Antons Wahl): `images/abenteuer/letztewoche/etappe-bild-NN.webp`, 960 × 640
 const PICS = 'images/abenteuer/letztewoche/'
 
 const G = 'images/abenteuer/spiele/letztewoche/'
-
-/**
- * Etappe 3, "Lückenvers" (alte Mechanik): das zweite Gebot aus dem Text der Etappe (Matthäus 22,39) in zwei Runden (erst ein Wort, dann zwei); die Wörter sind Blätter (das richtige zuerst, `answers` zeigt auf sie).
- * Tafel und Blatt sind die aus Nr. 27 (kopiert). Hintergrund: ein Olivenzweig mit Früchten (Bildauftrag). Die Sätze stehen wörtlich im Etappentext (das Bauskript prüft es).
- */
-const VERS: VerseGame = {
-  background: `${G}hintergrund/vers-hintergrund.webp`,
-  soft: true,
-  board: `${G}lueckenvers/tafel.webp`,
-  leaf: `${G}lueckenvers/blatt.webp`,
-  rounds: [
-    { hint: 'Ziehe das passende Blatt in die Lücke.', parts: ['Du sollst deinen ', ' lieben wie dich selbst.'], words: ['Nächsten', 'Mantel', 'Tempel'], answers: [0] },
-    { hint: 'Jetzt fehlen zwei Wörter.', parts: ['Du sollst deinen Nächsten ', ' wie dich ', '.'], words: ['lieben', 'selbst', 'vergessen', 'verkaufen'], answers: [0, 1] }
-  ]
-}
 
 /**
  * Etappe 6, "Das letzte Mahl" (alte Mechanik, Reihenfolge legen): die Jünger bereiten den Tisch, Jesus sitzt mit den Zwölf am Tisch, Jesus bricht das Brot, sie gehen hinaus zum Ölberg.
@@ -74,6 +59,29 @@ const BEREITEN: PrepareGame = {
   rounds: [
     { hint: 'Decke die drei kahlen Stellen mit Mänteln und Zweigen.', fields: 3 },
     { hint: 'Jetzt sind es fünf Stellen. Die Eselin wartet an jeder kahlen Stelle.', fields: 5, slow: true }
+  ]
+}
+
+/**
+ * Etappe 3, "Zwei Hälften" (neu, `gebote`, Mt 22,37-39): sechs gemalte Alltagsbilder (3:2), jedes zeigt eine Tat der Liebe (beten, loben, danken: Gott lieben;
+ * teilen, helfen, besuchen: den Nächsten lieben). Die App schneidet jedes Bild in eine linke und eine rechte Hälfte; die Hälften liegen gedreht in der Leiste.
+ * Das Kind dreht sie gerade, legt sie auf die Werkbank (links die linke, rechts die rechte) und bringt das ganze Bild zur richtigen Hälfte des Herzens
+ * (links Himmelslicht = Gott lieben, rechts die Nachbarn = den Nächsten lieben). Runde 1 zwei Bilder, Runde 2 vier (zwei je Gebot, Hälften auf dem Kopf).
+ * Am Ende rücken die zwei Hälften des Herzens zusammen. Bilder (Codex): `gebote/herz`, `gott-1..3`, `naechster-1..3` (je 3:2).
+ */
+const GEBOTE: CommandGame = {
+  heart: { image: `${G}gebote/herz.webp`, label: 'Ein rotes Herz: links der Himmel mit Sonnenlicht, rechts die Nachbarn' },
+  cards: [
+    { id: 'gott-1', image: `${G}gebote/gott-1.webp`, label: 'Ein Mädchen betet am Abend am Fenster', kind: 'god' },
+    { id: 'naechster-1', image: `${G}gebote/naechster-1.webp`, label: 'Ein Junge teilt sein Brot mit dem Nachbarsjungen', kind: 'neighbor' },
+    { id: 'gott-2', image: `${G}gebote/gott-2.webp`, label: 'Eine Familie singt am Morgen ein Loblied', kind: 'god' },
+    { id: 'gott-3', image: `${G}gebote/gott-3.webp`, label: 'Eine Familie dankt vor dem Essen', kind: 'god' },
+    { id: 'naechster-2', image: `${G}gebote/naechster-2.webp`, label: 'Eine junge Frau trägt der alten Nachbarin den Krug', kind: 'neighbor' },
+    { id: 'naechster-3', image: `${G}gebote/naechster-3.webp`, label: 'Ein Mädchen bringt dem kranken Nachbarn Suppe', kind: 'neighbor' }
+  ],
+  rounds: [
+    { hint: 'Dreh die Hälften und setze zwei Bilder zusammen. Gehören sie zu Gott oder zum Nächsten?', pieces: [{ card: 'naechster-1', side: 'R', turn: 90 }, { card: 'gott-1', side: 'L', turn: 270 }, { card: 'naechster-1', side: 'L', turn: 270 }, { card: 'gott-1', side: 'R', turn: 90 }] },
+    { hint: 'Jetzt sind es vier Bilder, und manche Hälften stehen auf dem Kopf.', pieces: [{ card: 'gott-3', side: 'R', turn: 180 }, { card: 'naechster-2', side: 'L', turn: 90 }, { card: 'gott-2', side: 'L', turn: 270 }, { card: 'naechster-3', side: 'R', turn: 180 }, { card: 'gott-2', side: 'R', turn: 90 }, { card: 'gott-3', side: 'L', turn: 270 }, { card: 'naechster-3', side: 'L', turn: 90 }, { card: 'naechster-2', side: 'R', turn: 180 }] }
   ]
 }
 
@@ -224,8 +232,8 @@ export const letztewoche: Journey = {
         'Jesus antwortet ihm: „Du sollst den Herrn, deinen Gott, lieben von ganzem Herzen, von ganzer Seele und mit deinem ganzen Denken. Das ist das wichtigste und größte Gebot.“',
         'Dann sagt er: „Das zweite aber ist ihm gleich: Du sollst deinen Nächsten lieben wie dich selbst. An diesen beiden Geboten hängt alles, was im Gesetz und bei den Propheten steht.“'
       ],
-      // Spiel: Lückenvers (lueckenvers, alt)
-      task: { kind: 'lueckenvers', hint: 'Ziehe das passende Wort in die Lücke.', verse: VERS },
+      // Spiel: Zwei Hälften (gebote, neu)
+      task: { kind: 'gebote', hint: 'Dreh die Bildhälften, setze sie zusammen und bringe jedes Bild zum richtigen Herzen.', commandment: GEBOTE },
       questions: [
         { q: 'Wen fragt der Schriftgelehrte?', options: ['Jesus', 'Pilatus', 'einen Hirten'], answer: 0 },
         { q: 'Was ist das wichtigste Gebot?', options: ['Gott lieben von ganzem Herzen', 'Früh aufstehen', 'Nie lachen'], answer: 0 }
@@ -389,11 +397,12 @@ export const letztewoche: Journey = {
         'Josef wickelt ihn in ein sauberes Leinentuch und legt ihn in sein eigenes Grab, das er in den Felsen hat hauen lassen. Er wälzt einen großen Stein vor den Eingang und geht fort. Maria Magdalena und die andere Maria bleiben und setzen sich gegenüber dem Grab.',
         'Am nächsten Tag gehen die Hohenpriester und Pharisäer zu Pilatus. „Dieser Verführer hat gesagt: Nach drei Tagen werde ich auferstehen“, sagen sie. „Lass das Grab bewachen, damit seine Jünger ihn nicht stehlen.“ „Ihr habt Wächter“, sagt Pilatus, „geht und sichert es, so gut ihr könnt.“ Sie versiegeln den Stein und stellen die Wächter davor.'
       ],
-      // Spiel: Puzzle (puzzle, alt)
-      task: { kind: 'puzzle', hint: 'Setze das Bild vom Garten zusammen.', puzzle: { image: `${G}puzzle/garten.webp`, cols: 2, rows: 3 } },
+      // nur Quiz (ernst, ohne Spiel; Antons Spielplan 5.11.2026)
+      task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wer bittet Pilatus um den Leib Jesu?', options: ['Josef aus Arimatäa', 'Judas', 'Barabbas'], answer: 0 },
-        { q: 'Wohin legt Josef Jesus?', options: ['in sein eigenes Grab im Felsen', 'in ein Boot', 'in den Tempel'], answer: 0 }
+        { q: 'Wohin legt Josef Jesus?', options: ['in sein eigenes Grab im Felsen', 'in ein Boot', 'in den Tempel'], answer: 0 },
+        { q: 'Was tun die Hohenpriester am nächsten Tag?', options: ['Sie lassen das Grab bewachen.', 'Sie bauen ein Haus.', 'Sie reisen ab.'], answer: 0 }
       ]
     }
   ],
@@ -405,11 +414,6 @@ export const letztewoche: Journey = {
     { q: 'Was geschieht, als Petrus es zum dritten Mal sagt?', options: ['Ein Hahn kräht.', 'Es regnet.', 'Die Tür geht auf.'], answer: 0 },
     { q: 'Wer bittet Pilatus um den Leib Jesu?', options: ['Josef aus Arimatäa', 'Judas', 'Barabbas'], answer: 0 }
   ]
-}
-
-// the games that lie on a stage picture (drawn soft by the app) follow the picture of their stage
-for (const st of letztewoche.stages) {
-  if (st.task.verse) st.task.verse.background = backdropOr(st.task.verse.background, st.image ?? st.task.verse.background)
 }
 
 // the German recordings of the stories (voice Achernar, files "geschichte-NN-v1.mp3"); until they are made the app reads with the voice of the device. Remove a number from this list when its file is in.

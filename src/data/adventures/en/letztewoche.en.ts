@@ -65,12 +65,11 @@ export const letztewocheEn: TextOverlay<Journey> = {
         'Then he says: “And the second is like it: You shall love your neighbor as yourself. On these two commandments hang all the law and the prophets.”'
       ],
       task: {
-        hint: 'Drag the right leaf into the gap.',
-        verse: {
-          rounds: [
-            { hint: 'Drag the right leaf into the gap.', parts: ['You shall love your ', ' as yourself.'], words: ['neighbor', 'cloak', 'temple'] },
-            { hint: 'Now two words are missing.', parts: ['You shall ', ' your neighbor as ', '.'], words: ['love', 'yourself', 'forget', 'sell'] }
-          ]
+        hint: 'Turn the halves, put them together and bring each picture to the right heart.',
+        commandment: {
+          heart: { label: 'A red heart: on the left the sky with sunlight, on the right the neighbors' },
+          cards: [{ label: 'A girl prays at the window in the evening' }, { label: 'A boy shares his bread with the boy next door' }, { label: 'A family sings a song of praise in the morning' }, { label: 'A family gives thanks before the meal' }, { label: 'A young woman carries the jug for her old neighbor' }, { label: 'A girl brings soup to her sick neighbor' }],
+          rounds: [{ hint: 'Turn the halves and put two pictures together. Do they belong to God or to the neighbor?' }, { hint: 'Now there are four pictures, and some halves are upside down.' }]
         }
       },
       questions: [
@@ -233,10 +232,11 @@ export const letztewocheEn: TextOverlay<Journey> = {
         'Joseph wraps it in a clean linen cloth and lays it in his own tomb, which he has had cut out of the rock. He rolls a great stone in front of the entrance and goes away. Mary Magdalene and the other Mary stay and sit down opposite the tomb.',
         'The next day the chief priests and Pharisees go to Pilate. “That deceiver said: After three days I will rise again,” they say. “Have the tomb guarded, so that his disciples cannot steal him away.” “You have a guard,” says Pilate, “go and make it as secure as you can.” They seal the stone and set the guards in front of it.'
       ],
-      task: { hint: 'Put the picture of the garden together.' },
+      task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'Who asks Pilate for the body of Jesus?', options: ['Joseph of Arimathaea', 'Judas', 'Barabbas'] },
-        { q: 'Where does Joseph lay Jesus?', options: ['in his own tomb in the rock', 'in a boat', 'in the temple'] }
+        { q: 'Where does Joseph lay Jesus?', options: ['in his own tomb in the rock', 'in a boat', 'in the temple'] },
+        { q: 'What do the chief priests do the next day?', options: ['They have the tomb guarded.', 'They build a house.', 'They leave town.'] }
       ]
     }
   ],
