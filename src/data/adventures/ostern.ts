@@ -226,7 +226,7 @@ export const ostern: Journey = {
   stages: [
     {
       id: 1,
-      image: `${PICS}etappe-bild-01.webp`,
+      image: `${PICS}etappe-bild-01-b.webp`,
       title: 'Das Grab ist leer',
       ref: 'Johannes 20,1–10',
       text: [
@@ -282,7 +282,7 @@ export const ostern: Journey = {
     },
     {
       id: 4,
-      image: `${PICS}etappe-bild-04.webp`,
+      image: `${PICS}etappe-bild-04-b.webp`,
       title: 'Das Brot in Emmaus',
       ref: 'Lukas 24,28–35',
       text: [
@@ -300,7 +300,7 @@ export const ostern: Journey = {
     },
     {
       id: 5,
-      image: `${PICS}etappe-bild-05.webp`,
+      image: `${PICS}etappe-bild-05-b.webp`,
       title: 'Friede sei mit euch',
       ref: 'Lukas 24,36–43; Johannes 20,19–20',
       text: [
@@ -338,7 +338,7 @@ export const ostern: Journey = {
     },
     {
       id: 7,
-      image: `${PICS}etappe-bild-07.webp`,
+      image: `${PICS}etappe-bild-07-b.webp`,
       title: 'Der Fischzug am See',
       ref: 'Johannes 21,1–14',
       text: [
