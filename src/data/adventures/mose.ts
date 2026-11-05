@@ -3,7 +3,7 @@
  * Quelle der Texte: D:/Claude/Abenteuer-Mose/ENTWURF_Mose.md (Phase 1, 20.10.2026, zweiter Durchgang am selben Abend), Plan: ETAPPENPLAN.md, Figuren: FIGUREN.md, Entscheidungen: ENTSCHEIDUNGEN-zur-Pruefung.md.
  * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
  * Spiele (Wahl der Leitung vom 20.10.2026, höchstens zwei alte Mechaniken): 1 nur Quiz, 2 Körbchen flechten (neu), 3 nur Quiz, 4 Dem Leuchten nachgehen (neu), 5 Unterschiede finden (neu),
- * 6 Lückenvers (alt), 7 Wimmelbild (alt), 8 nur Quiz, 9 nur Quiz, 10 Packen (neu), 11 Mirjams Pauke (neu), 12 Manna sammeln (neu), 13 Worte ordnen (neu), 14 nur Quiz, 15 Der Wolke folgen (neu).
+ * 6 Lückenvers (alt), 7 Frösche zurück in den Nil (neu, 5.11.2026; vorher Wimmelbild), 8 nur Quiz, 9 nur Quiz, 10 Packen (neu), 11 Mirjams Pauke (neu), 12 Manna sammeln (neu), 13 Worte ordnen (neu), 14 nur Quiz, 15 Der Wolke folgen (neu).
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/mose/, images/abenteuer/spiele/mose/<spiel>/, audio/abenteuer/mose/.
  *
@@ -11,7 +11,8 @@
  * Deutsche Vorlese-Aufnahmen: geschichte-NN-v3.mp3 (Gemini, Stimme Achernar, 21.10.2026, nicht gehört); Englisch noch nicht, die englische App liest mit der Gerätestimme (Liste der Aufnahmen: D:/Claude/Abenteuer-Mose/NEUAUFNAHME-Mose.md).
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { BeatGame, CloudGame, DiffGame, FindGame, GlowGame, Journey, MannaGame, PackGame, VerseGame, WeaveGame, WordsGame } from '@/types/adventure'
+import type { BeatGame, CloudGame, DiffGame, GlowGame, Journey, MannaGame, PackGame, VerseGame, WeaveGame, WordsGame } from '@/types/adventure'
+import type { FrogFlickGame } from '@/utils/moseNeu'
 import { josef } from './josef'
 import { MOSE_PATH } from './mosePath'
 import { localize } from './localize'
@@ -184,32 +185,60 @@ const VERS: VerseGame = {
   ]
 }
 
+// <froesche: erzeugt von D:/Claude/Abenteuer-Mose/tools/froesche_einbauen.py>
 /**
- * Etappe 7, "Frösche in der Backstube" (Wimmelbild, alte Mechanik): in Pharaos Haus (Backstube mit Ofen und Backtrog, darunter die Schlafkammer) sitzen sieben kleine, freundliche Frösche, vier davon halb hinter Dingen
- * (Verdecker). Komisch und ruhig, ohne Ekel: kein toter Frosch, kein Gestank, kein Blut (Bildauftrag M33; eigene Szene `wimmel/szene.webp`). Plan v3: drei Froschbilder und drei Verdeckerbilder, die sich wiederholen.
- * Die Lagen (Mitte der Unterkante und Breite, Prozent der Szene) sind am gemalten Bild abgelesen (`wimmel-messung.json`; die vier Verdecker sind so weit nach unten gesetzt, dass jeder Frosch noch zu einem Drittel bis zur Hälfte herausschaut).
- * Bilder (gemalt, 21.10.2026): `wimmel/szene.webp` 1100 × 1467, `frosch-a.webp`, `frosch-b.webp`, `frosch-c.webp` je ca. 140–190 breit (transparent), `decke-a.webp`, `decke-b.webp`, `decke-c.webp` je 330 breit (transparent).
+ * Etappe 7, "Frösche zurück in den Nil" (neu, 5.11.2026, Spielplan aller Abenteuer; ersetzt das Wimmelbild): überall im Haus sitzen freundliche Frösche (2. Mose 7,28 nach heutiger Zählung: Haus, Schlafkammer, Bett,
+ * Backöfen, Teige); das Kind schnippt sie mit einem kurzen Wisch durch die offene Seite des Hauses zum Nil. Ein Aufräum-Spiel, keine Nacherzählung: in der Bibel sterben die Frösche (8,9–10), das sagt der Text der Etappe;
+ * das Spiel behauptet nichts anderes. Runde 1: die Backstube, 5 Frösche sitzen still, jeder Wisch zählt (`aim: 180`). Runde 2: die Schlafkammer, 7 Frösche hüpfen der Reihe nach weiter (`hop`, Sekunden),
+ * und der Wisch muss zum Wasser zeigen (`aim`: Grad über den Rand des Wassers hinaus). Typ und Prüfung: `utils/moseNeu.ts` (`frogFlickProblems`). Bildauftrag M60.
+ * Lagen (Füße der Frösche, Wasserfläche, Prozent des Bildes) am gemalten Bild abgelesen: D:/Claude/Abenteuer-Mose/tools/froesche_lagen.json, eingesetzt von froesche_einbauen.py.
+ * Bilder: `froesche/haus-1.webp`, `haus-2.webp` je 900 × 1200 (gemalt 5.11.2026, ohne Frösche); die Frösche sind die gemalten aus dem alten Wimmelbild (21.10.2026), kopiert:
+ * `frosch-sitzt-1.webp`, `frosch-sitzt-2.webp`, `frosch-springt.webp`.
  */
-const WIMMEL: FindGame = {
-  labels: Array.from({ length: 7 }, () => 'Frosch'),
-  doneText: 'Du hast alle sieben Frösche gefunden!',
-  scene: `${G}wimmel/szene.webp`,
-  finds: [
-    { image: `${G}wimmel/frosch-a.webp`, x: 13, y: 25.5, w: 13 },
-    { image: `${G}wimmel/frosch-c.webp`, x: 47, y: 24.7, w: 13 },
-    { image: `${G}wimmel/frosch-b.webp`, x: 87, y: 35.7, w: 13 },
-    { image: `${G}wimmel/frosch-c.webp`, x: 65, y: 79, w: 13 },
-    { image: `${G}wimmel/frosch-a.webp`, x: 84, y: 91, w: 13 },
-    { image: `${G}wimmel/frosch-c.webp`, x: 25, y: 94, w: 13 },
-    { image: `${G}wimmel/frosch-a.webp`, x: 76, y: 55, w: 13 }
-  ],
-  covers: [
-    { image: `${G}wimmel/decke-a.webp`, x: 65, y: 83.5, w: 28 },
-    { image: `${G}wimmel/decke-c.webp`, x: 84, y: 95.5, w: 28 },
-    { image: `${G}wimmel/decke-b.webp`, x: 25, y: 98.5, w: 20 },
-    { image: `${G}wimmel/decke-b.webp`, x: 76, y: 60.5, w: 20 }
+const FROESCHE: FrogFlickGame = {
+  frogs: [`${G}froesche/frosch-sitzt-1.webp`, `${G}froesche/frosch-sitzt-2.webp`],
+  jump: `${G}froesche/frosch-springt.webp`,
+  rounds: [
+    {
+      hint: 'Hilf beim Aufräumen: Schnipp jeden Frosch mit einem kurzen Wisch zum Nil.',
+      scene: `${G}froesche/haus-1.webp`,
+      ratio: 0.75,
+      river: { x: 27, y: 29, w: 46, h: 12 },
+      spots: [
+        { x: 10, y: 27.5, w: 12 },
+        { x: 51, y: 45, w: 12 },
+        { x: 89, y: 50, w: 12 },
+        { x: 24, y: 72, w: 13 },
+        { x: 62, y: 68, w: 13 }
+      ],
+      count: 5,
+      aim: 180
+    },
+    {
+      hint: 'Jetzt hüpfen die Frösche weiter. Wisch genau in Richtung Wasser.',
+      scene: `${G}froesche/haus-2.webp`,
+      ratio: 0.75,
+      river: { x: 7, y: 33, w: 44, h: 9 },
+      spots: [
+        { x: 82, y: 41.5, w: 13 },
+        { x: 60, y: 44, w: 13 },
+        { x: 70, y: 54, w: 13 },
+        { x: 93, y: 51, w: 12 },
+        { x: 35, y: 62, w: 13 },
+        { x: 55, y: 70, w: 13 },
+        { x: 80, y: 72, w: 13 },
+        { x: 25, y: 80, w: 14 },
+        { x: 50, y: 88, w: 14 },
+        { x: 78, y: 90, w: 14 },
+        { x: 15, y: 95, w: 14 }
+      ],
+      count: 7,
+      aim: 25,
+      hop: 3.5
+    }
   ]
 }
+// </froesche>
 
 /**
  * Etappe 10, "Der Auszug": Teig, Gefäße aus Silber und Gold und Kleider kommen in ein Tragetuch (2. Mose 12,34–36), Form und Platz statt Gewicht (Bildauftrag M14). Das Spiel ist das vorhandene "Packen" (Josua 1), hier nur Daten: ein Tuch
@@ -391,8 +420,8 @@ export const mose: Journey = {
         'Da ruft der Pharao Mose: „Bitte Gott, dass er die Frösche wegnimmt. Dann lasse ich das Volk ziehen.“ Mose betet, und Gott tut, worum er bittet: Die Frösche sterben in den Häusern, in den Höfen und auf den Feldern.',
         'Als der Pharao sieht, dass die Plage vorbei ist, wird er wieder hart. Er hält sein Wort nicht und lässt das Volk nicht ziehen.'
       ],
-      // Spiel gebaut: Wimmelbild: Frösche (wimmelbild, alt)
-      task: { kind: 'wimmelbild', hint: 'Finde die Frösche in der Backstube.', count: 7, find: WIMMEL },
+      // Spiel gebaut: Frösche zurück in den Nil (froesche, neu 5.11.2026; vorher Wimmelbild)
+      task: { kind: 'froesche', hint: 'Hilf beim Aufräumen: Schnipp die Frösche zum Nil.', frogFlick: FROESCHE },
       questions: [
         { q: 'Was geschieht zuerst mit dem Wasser im Nil?', options: ['Es wird zu Blut.', 'Es wird zu Eis.', 'Es versiegt.'], answer: 0 },
         { q: 'Was verspricht der Pharao, wenn die Frösche weg sind?', options: ['Er will das Volk ziehen lassen.', 'Er will Mose belohnen.', 'Er will einen neuen Palast bauen.'], answer: 0 }

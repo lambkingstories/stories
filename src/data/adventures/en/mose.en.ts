@@ -113,7 +113,7 @@ export const moseEn: TextOverlay<Journey> = {
         'Then Pharaoh calls Moses, “Ask God to take the frogs away. Then I will let the people go.” Moses prays, and God does what he asks: The frogs die in the houses, in the courtyards, and in the fields.',
         'When Pharaoh sees that the plague is over, his heart becomes hard again. He does not keep his word and does not let the people go.'
       ],
-      task: { hint: 'Find the frogs in the bakery.', find: { labels: ['Frog', 'Frog', 'Frog', 'Frog', 'Frog', 'Frog', 'Frog'], doneText: 'You found all seven frogs!' } },
+      task: { hint: 'Help tidy up: flick the frogs to the Nile.', frogFlick: { rounds: [{ hint: 'Help tidy up: flick every frog to the Nile with a short swipe.' }, { hint: 'Now the frogs hop on. Swipe straight at the water.' }] } },
       questions: [
         { q: 'What happens first to the water in the Nile?', options: ['It turns to blood.', 'It turns to ice.', 'It dries up.'] },
         { q: 'What does Pharaoh promise when the frogs are gone?', options: ['He will let the people go.', 'He will reward Moses.', 'He will build a new palace.'] }

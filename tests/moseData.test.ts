@@ -14,6 +14,8 @@ import { isStageOpen } from '@/utils/adventureScore'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 import { solvable } from '@/utils/josuaGames'
 import { dayOk, diffAt, distance, frontCells, frontCount, glow, noTriple, ringTimes, shuffle, wordsOf } from '@/utils/moseGames'
+import { frogFlickProblems, frogGoal } from '@/utils/moseNeu'
+import type { FrogFlickGame } from '@/utils/moseNeu'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => mose.stages[n - 1]!
@@ -128,15 +130,16 @@ describe('Mose: stories and questions', () => {
 })
 
 describe('Mose: the games, and the placeholders until the pictures come', () => {
-  it('the plan of the games: ten stages with a game, the five serious ones only quizzes; six new mechanics, one drum game; three old ones (verse, hidden pictures, packing) and no mechanic twice; at most two rounds each', () => {
-    expect(mose.stages.map((s) => s.task.kind)).toEqual(['quiz', 'flechten', 'quiz', 'leuchten', 'unterschied', 'lueckenvers', 'wimmelbild', 'quiz', 'quiz', 'packen', 'takt', 'manna', 'worte', 'quiz', 'wolke'])
+  it('the plan of the games (plan of all adventures, 5.11.2026): ten stages with a game, the five serious ones only quizzes; stage 7 is the new "Frogs back to the Nile" instead of the hidden pictures; old: verse and packing; no mechanic twice; at most two rounds each', () => {
+    expect(mose.stages.map((s) => s.task.kind)).toEqual(['quiz', 'flechten', 'quiz', 'leuchten', 'unterschied', 'lueckenvers', 'froesche', 'quiz', 'quiz', 'packen', 'takt', 'manna', 'worte', 'quiz', 'wolke'])
     for (const s of mose.stages) expect(s.task.hint.length, `hint ${s.id}`).toBeGreaterThan(8)
     const games = mose.stages.filter((s) => s.task.kind !== 'quiz')
     expect(games).toHaveLength(10)
     expect(new Set(games.map((s) => s.task.kind)).size, 'no mechanic twice').toBe(10)
     for (const s of games) {
-      const g = (s.task.weave ?? s.task.glow ?? s.task.diff ?? s.task.verse ?? s.task.pack ?? s.task.beat ?? s.task.manna ?? s.task.words ?? s.task.cloud) as { rounds: unknown[] } | undefined
-      if (s.task.kind !== 'wimmelbild') expect(g?.rounds.length, `rounds of stage ${s.id}`).toBeLessThanOrEqual(2)
+      const frogs = (s.task as unknown as { frogFlick?: FrogFlickGame }).frogFlick
+      const g = (s.task.weave ?? s.task.glow ?? s.task.diff ?? s.task.verse ?? s.task.pack ?? s.task.beat ?? s.task.manna ?? s.task.words ?? s.task.cloud ?? frogs) as { rounds: unknown[] } | undefined
+      expect(g?.rounds.length, `rounds of stage ${s.id}`).toBe(2)
     }
   })
 
@@ -300,27 +303,32 @@ describe('Mose: the games, and the placeholders until the pictures come', () => 
     expect(g.soft).toBe(true)
   })
 
-  it('7 hidden frogs: seven finds, four covers, a label for each; three frog pictures and three cover pictures; all inside the picture; every cover hides a find', () => {
-    const f = stage(7).task.find
-    expect(f, 'the game is built').toBeDefined()
-    if (!f) return
-    expect(stage(7).task.count).toBe(7)
-    expect(f.finds).toHaveLength(7)
-    expect(f.covers).toHaveLength(4)
-    expect(f.labels).toHaveLength(7)
-    expect(new Set(f.covers.map((t) => t.image)).size).toBe(3)
-    // the text names the places of the frogs
-    expect(stage(7).text.join(' ')).toMatch(/Backstube/)
-    expect(stage(7).text.join(' ')).toMatch(/Schlafkammer/)
-    for (const t of [...f.finds, ...f.covers]) {
-      expect(t.x >= 0 && t.x <= 100 && t.y >= 0 && t.y <= 100).toBe(true)
-    }
-    // each cover stands just in front of a find (its middle is near the find's, a little lower)
-    for (const c of f.covers) {
-      const hides = f.finds.filter((t) => Math.abs(t.x - c.x) <= c.w / 2 && c.y - t.y >= 0 && c.y - t.y <= 10)
-      expect(hides.length, `cover at ${c.x}/${c.y}`).toBeGreaterThanOrEqual(1)
-    }
-    expect(new Set(f.finds.map((t) => t.image)).size, 'three different frogs').toBe(3)
+  it('7 frogs back to the Nile (new, 5.11.2026): the checker finds nothing; round 2 has more frogs, they hop and the swipe must point at the water; the text names the places of the frogs and says that they die (the game only tidies up); the goal is every frog', () => {
+    const g = (stage(7).task as unknown as { frogFlick?: FrogFlickGame }).frogFlick
+    expect(g, 'the game is built').toBeDefined()
+    if (!g) return
+    expect(frogFlickProblems(g)).toEqual([])
+    const [r1, r2] = g.rounds
+    expect(r2!.count).toBeGreaterThan(r1!.count)
+    expect([r1!.hop, r1!.aim]).toEqual([undefined, 180])
+    expect(r2!.hop).toBeGreaterThan(0)
+    expect(r2!.aim).toBeLessThan(45)
+    expect(frogGoal(g)).toBe(r1!.count + r2!.count)
+    for (const f of [...g.frogs, g.jump, ...g.rounds.map((r) => r.scene)]) expect(existsSync(`public/${f}`), f).toBe(true)
+    const text = stage(7).text.join(' ')
+    expect(text).toMatch(/Backstube/)
+    expect(text).toMatch(/Schlafkammer/)
+    // Bible: the frogs die (Exodus 8,9 Luther 1912 / 8,13 KJV); the game is framed as tidying up, not as the story
+    expect(text).toMatch(/Die Frösche sterben/)
+    expect(stage(7).task.hint).toMatch(/Aufräumen/)
+    for (const r of g.rounds) expect(r.hint).not.toMatch(/Gott|Bibel|lebendig|überleben/)
+    setAdventureLanguage('en')
+    const en = (stage(7).task as unknown as { frogFlick: FrogFlickGame }).frogFlick
+    expect(stage(7).task.hint).toMatch(/tidy/)
+    expect(en.rounds.map((r) => r.hint)).toEqual(['Help tidy up: flick every frog to the Nile with a short swipe.', 'Now the frogs hop on. Swipe straight at the water.'])
+    setAdventureLanguage('de')
+    // the old hidden pictures game of this stage is gone
+    expect(JSON.stringify(mose.stages.map((s) => s.task))).not.toContain('/wimmel/')
   })
 
   it('10 pack: two rounds fill the cloth exactly and can be packed; the pieces have names; the goal is 8', () => {
