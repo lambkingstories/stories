@@ -1,6 +1,7 @@
 /**
  * The data of "Elisha and Naaman" (`elisa.ts`, `en/elisa.en.ts`, `elisaPath.ts`): the stories and questions follow the rules of the adventures (texts of the draft `D:/Claude/Abenteuer-Elisa/ENTWURF_Elisa.md`, Luther 1912),
- * the quiz stages are only quizzes, the two new games and the five old ones have sound data, the map has nine stations and the exam, and the English file has the same shape.
+ * the quiz stages are only quizzes, the five new games (jars, hand mill, seal, dip, earth for Naaman; three of them from Anton's plan of 5.11.2026) and the two known ones (puzzle, harvest) have sound data,
+ * the map has nine stations and the exam, and the English file has the same shape.
  */
 import { existsSync, statSync } from 'node:fs'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -9,6 +10,8 @@ import { ELISA_PATH } from '@/data/adventures/elisaPath'
 import { englishTextsOf } from '@/data/adventures/localize'
 import { setAdventureLanguage } from '@/use/adventureLanguage'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
+import { earthLoadProblems, handMillProblems, sealTurnProblems } from '@/utils/elisaNeu'
+import type { EarthGame, MillGame, SealGame } from '@/utils/elisaNeu'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => elisa.stages[n - 1]!
@@ -118,11 +121,11 @@ describe('Elisa: stories and questions', () => {
 })
 
 describe('Elisa: the games', () => {
-  it('the order of the games: 5 old, 2 new (jars, dip), 2 quizzes; no game twice', () => {
-    expect(elisa.stages.map((s) => s.task.kind)).toEqual(['kruege', 'puzzle', 'quiz', 'ernten', 'reihenfolge', 'quiz', 'memory', 'tauchen', 'lueckenvers'])
+  it('the order of the games (Anton’s rule of 5.11.2026): 2 known (puzzle, harvest, not in a row), 5 new, 2 quizzes; no game twice', () => {
+    expect(elisa.stages.map((s) => s.task.kind)).toEqual(['kruege', 'puzzle', 'quiz', 'ernten', 'handmuehle', 'quiz', 'siegel', 'tauchen', 'naamanerde'])
     const games = elisa.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
     expect(new Set(games).size).toBe(games.length)
-    expect(games.filter((k) => ['kruege', 'tauchen'].includes(k))).toHaveLength(2)
+    expect(games.filter((k) => ['kruege', 'handmuehle', 'siegel', 'tauchen', 'naamanerde'].includes(k))).toHaveLength(5)
   })
 
   it('1 jars: three rounds with 3, 4 and 5 jars, every jar lies inside the picture and has a picture of its own, the jars do not overlap, the oil takes between 1 and 2.5 seconds', () => {
@@ -162,23 +165,32 @@ describe('Elisa: the games', () => {
     expect(g.field).toMatch(/elisa\/ernten\/feld\.webp$/)
   })
 
-  it('5 order: four cards, round 1 with the numbers and three cards, round 2 with all four', () => {
-    const g = stage(5).task.order!
-    expect(g.cards).toHaveLength(4)
-    expect(g.rounds.map((r) => r.cards.length)).toEqual([3, 4])
-    expect(g.rounds.map((r) => r.numbered)).toEqual([true, false])
+  it('5 hand mill: the checker finds nothing; two rounds, the second needs pouring and a calm pace', () => {
+    const g = (stage(5).task as unknown as { handMill: MillGame }).handMill
+    expect(handMillProblems(g)).toEqual([])
+    expect(g.rounds).toHaveLength(2)
+    expect(g.rounds[0]!.hopper).toBe(0)
+    expect(g.rounds[1]!.hopper).toBeGreaterThan(0)
+    expect(g.rounds[1]!.maxSpeed).toBeGreaterThan(0)
+    expect(g.background).toMatch(/elisa\/handmuehle\/boden\.webp$/)
+    // the text tells the fresh grain that the man brings
+    expect(stage(5).text.join(' ')).toMatch(/frisches Getreide/)
   })
 
-  it('7 memory: six pairs (a full board of 3 x 4), every one with a sentence that the text of the stage tells', () => {
-    const g = stage(7).task.memory!
-    expect(g.pairs).toHaveLength(6)
-    for (const p of g.pairs) expect(p.text.length).toBeGreaterThan(10)
-    const text = stage(7).text.join(' ')
-    expect(text).toMatch(/Brief/)
-    expect(text).toMatch(/Zentner Silber/)
-    expect(text).toMatch(/Goldstücke/)
-    expect(text).toMatch(/Festkleider/)
-    expect(text).toMatch(/Pferden und Wagen/)
+  it('7 seal: the checker finds nothing; two seals, then three more exact ones; the text tells the letter', () => {
+    const g = (stage(7).task as unknown as { sealTurn: SealGame }).sealTurn
+    expect(sealTurnProblems(g)).toEqual([])
+    expect(g.rounds.map((r) => r.spots.length)).toEqual([2, 3])
+    expect(g.seal).toMatch(/elisa\/siegel\/siegel\.webp$/)
+    expect(stage(7).text.join(' ')).toMatch(/Brief/)
+  })
+
+  it('9 earth for Naaman: the checker finds nothing; the sacks can be shared equally; the text tells the two mules', () => {
+    const g = (stage(9).task as unknown as { earthLoad: EarthGame }).earthLoad
+    expect(earthLoadProblems(g)).toEqual([])
+    expect(g.rounds.map((r) => r.sacks.length)).toEqual([6, 7])
+    expect(g.mule).toHaveLength(2)
+    expect(stage(9).text.join(' ')).toMatch(/zwei Maultiere/)
   })
 
   it('8 dip: seven dips, he stays under water for a moment and the water needs longer to calm down; the pictures are named', () => {
@@ -194,17 +206,6 @@ describe('Elisa: the games', () => {
     expect(g.naamanNew).toMatch(/tauchen\/naaman-neu\.webp$/)
     expect(g.ripple).toMatch(/tauchen\/welle\.webp$/)
     expect(g.background).toMatch(/tauchen\/jordan\.webp$/)
-  })
-
-  it('9 verse: the sentences are in the text and the right words are on the leaves', () => {
-    const g = stage(9).task.verse!
-    expect(g.rounds).toHaveLength(2)
-    const text = stage(9).text.join(' ')
-    for (const r of g.rounds) {
-      expect(r.parts).toHaveLength(r.answers.length + 1)
-      const filled = r.parts.map((p, i) => p + (r.answers[i] !== undefined ? r.words[r.answers[i]!] : '')).join('').replace(/[„“]/g, '')
-      expect(text.includes(filled.replace(/[!.]$/, '').trim()), filled).toBe(true)
-    }
   })
 })
 
@@ -257,7 +258,11 @@ describe('Elisa: map, files, English', () => {
     expect(stage(1).title).toBe('The widow\u2019s oil'.replace('\u2019', '’'))
     expect(stage(1).task.jars!.rounds[0]!.hint).toContain('Drag the jug')
     expect(stage(8).task.dive!.hint).toContain('calm')
-    expect(stage(9).task.verse!.rounds[0]!.parts[0]).toContain('Go in')
+    const t9 = stage(9).task as unknown as { hint: string; earthLoad: { rounds: { hint: string }[] } }
+    expect(t9.hint).toContain('mules')
+    expect(t9.earthLoad.rounds[0]!.hint).toContain('Tap a sack')
+    expect((stage(5).task as unknown as { handMill: { rounds: { hint: string }[] } }).handMill.rounds[1]!.hint).toContain('tap the sack')
+    expect((stage(7).task as unknown as { sealTurn: { rounds: { hint: string }[] } }).sealTurn.rounds[0]!.hint).toContain('lion')
     for (const s of elisa.stages) {
       const audio = s.audio
       if (audio) expect(audio, `stage ${s.id}`).toBe(`audio/abenteuer/elisa/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)

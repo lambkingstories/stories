@@ -4,18 +4,19 @@
  * Nicht oder gemildert erzählt: Elisas Nachfolge und die Spottkinder (2. Kön 2), der Moabiterkrieg (3), Gehasis Habgier und seine Strafe (5,20–27). Der Tod des Jungen in Schunem wird nur kurz erzählt (Etappe 3 ist nur Quiz),
  * der "Tod im Topf" heißt "Gift im Topf", der Aussatz heißt "eine schlimme Hautkrankheit" und wird nie gemalt: Naaman ist nur müde und still, nach dem Bad strahlt seine gesunde Haut.
  * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
- * Spiele (Wahl der Leitung): 1 Krüge füllen (neu), 2 Puzzle (alt), 3 nur Quiz, 4 Ernten (alt), 5 Reihenfolge (alt), 6 nur Quiz, 7 Memory (alt), 8 Siebenmal untertauchen (neu), 9 Lückenvers (alt).
+ * Spiele (Antons Regel vom 5.11.2026: höchstens zwei bekannte Spiele, nie hintereinander): 1 Krüge füllen (neu), 2 Puzzle (bekannt), 3 nur Quiz, 4 Ernten (bekannt), 5 Die Handmühle (neu), 6 nur Quiz,
+ * 7 Das Siegel (neu), 8 Siebenmal untertauchen (neu), 9 Erde für Naaman (neu). Die drei Spiele vom 5.11.2026 ersetzen Reihenfolge, Memory und Lückenvers; ihre Typen stehen in `@/utils/elisaNeu`.
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/elisa/, images/abenteuer/spiele/elisa/<spiel>/, audio/abenteuer/elisa/.
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { DiveGame, HarvestGame, JarGame, Journey, MemoryGame, OrderGame, VerseGame } from '@/types/adventure'
+import type { DiveGame, HarvestGame, JarGame, Journey } from '@/types/adventure'
+import type { EarthGame, MillGame, SealGame } from '@/utils/elisaNeu'
 import { josef } from './josef'
 import { ELISA_PATH } from './elisaPath'
 import { localize } from './localize'
 import { adventureLanguage } from '@/use/adventureLanguage'
 import { elisaEn } from './en/elisa.en'
-import { backdropOr } from '@/utils/gameBackground'
 
 // Etappenbilder (Variante a der neuen Bilder; Anton wählt auf der Vorschau-Seite a/b): `images/abenteuer/elisa/etappe-bild-NN.webp`, 960 × 640
 const PICS = 'images/abenteuer/elisa/'
@@ -23,21 +24,6 @@ const PICS = 'images/abenteuer/elisa/'
 const G = 'images/abenteuer/spiele/elisa/'
 // gemeinsame Bilder der alten Spiele (Gemüse aus Josef)
 const GS = 'images/abenteuer/spiele/'
-
-/**
- * Etappe 9, "Lückenvers" (alte Mechanik): Elisas Abschied und seine Antwort aus dem Text der Etappe in zwei Runden (erst ein Wort, dann zwei); die Wörter sind Blätter (das richtige zuerst, `answers` zeigt auf sie).
- * Tafel und Blatt sind die aus Salomo (kopiert). Hintergrund ist der gemalte Hof vor Elisas Haus (Bildauftrag S30).
- */
-const VERS: VerseGame = {
-  background: `${G}hintergrund/vers-hintergrund.webp`,
-  soft: true,
-  board: `${G}lueckenvers/tafel.webp`,
-  leaf: `${G}lueckenvers/blatt.webp`,
-  rounds: [
-    { hint: 'Ziehe das passende Blatt in die Lücke.', parts: ['„Zieh hin in ', '!“'], words: ['Frieden', 'Eile', 'Streit'], answers: [0] },
-    { hint: 'Jetzt fehlen zwei Wörter.', parts: ['„So wahr ', ' lebt, ich nehme ', '.“'], words: ['Gott', 'nichts', 'Gold', 'Silber'], answers: [0, 1] }
-  ]
-}
 
 /**
  * Etappe 4, "Gemüse ernten" (alte Mechanik, Ernten): ein Garten bei Gilgal im Hochformat (Bildauftrag S34); Gemüse (Lauch, Möhre, Zwiebel, Melone) kommt in den Korb, die wilden Ranken mit den gelben Früchten nicht.
@@ -49,38 +35,6 @@ const ERNTEN: HarvestGame = {
   fruits: ['lauch', 'moehre', 'zwiebel', 'melone'].map((n) => `${GS}ernten/${n}.webp`),
   weeds: [1, 2, 3].map((n) => `${G}ernten/ranke-${n}.webp`),
   count: 10
-}
-
-/**
- * Etappe 5, "Die Brote austeilen" (alte Mechanik, Reihenfolge legen): der Mann bringt die Brote, Elisa sagt "Gib es den Leuten", der Diener teilt aus, alle werden satt und Brot bleibt übrig.
- * Runde 1 drei Karten mit Punkten, Runde 2 alle vier ohne Punkte. Bilder (Bildauftrag S35): `reihenfolge/karte-1..4.webp` (4:3).
- */
-const REIHENFOLGE: OrderGame = {
-  cards: [
-    { id: 'bringt', image: `${G}reihenfolge/karte-1.webp`, label: 'Der Mann bringt zwanzig Brote zu Elisa' },
-    { id: 'befehl', image: `${G}reihenfolge/karte-2.webp`, label: 'Elisa sagt: Gib es den Leuten' },
-    { id: 'teilt', image: `${G}reihenfolge/karte-3.webp`, label: 'Der Diener teilt die Brote aus' },
-    { id: 'uebrig', image: `${G}reihenfolge/karte-4.webp`, label: 'Alle werden satt, und Brot bleibt übrig' }
-  ],
-  rounds: [
-    { hint: 'Runde 1: Lege die Bilder in die Reihenfolge der Geschichte. Die Punkte zeigen, wo sie hinkommen.', numbered: true, cards: ['befehl', 'teilt', 'uebrig'] },
-    { hint: 'Runde 2: Jetzt mit dem Mann und seinen Broten und ohne Punkte: Was kommt zuerst, was danach?', numbered: false, cards: ['bringt', 'befehl', 'teilt', 'uebrig'] }
-  ]
-}
-
-/**
- * Etappe 7, "Memory" (alte Mechanik): die sechs Dinge der Reise nach Samaria (Brief, Silber, Gold, Festkleid, Wagen, Pferd); die Rückseite zeigt einen goldenen Krug (Bildauftrag S36, ein Bogen mit den sechs Dingen, vom Code geschnitten).
- */
-const MEMORY: MemoryGame = {
-  back: `${G}memory/rueck.webp`,
-  pairs: [
-    { image: `${G}memory/karte-brief.webp`, text: 'Der Brief: Der König von Syrien schreibt einen Brief an den König von Israel.' },
-    { image: `${G}memory/karte-silber.webp`, text: 'Das Silber: Naaman nimmt zehn Zentner Silber mit.' },
-    { image: `${G}memory/karte-gold.webp`, text: 'Das Gold: Dazu nimmt er sechstausend Goldstücke mit.' },
-    { image: `${G}memory/karte-kleid.webp`, text: 'Das Festkleid: Zehn Festkleider hat Naaman dabei.' },
-    { image: `${G}memory/karte-wagen.webp`, text: 'Der Wagen: Naaman fährt mit seinen Wagen nach Samaria und vor Elisas Haus.' },
-    { image: `${G}memory/karte-pferd.webp`, text: 'Das Pferd: Seine Pferde ziehen den Wagen bis zu Elisas Haus.' }
-  ]
 }
 
 /**
@@ -128,6 +82,75 @@ const TAUCHEN: DiveGame = {
   underMs: 900,
   calmMs: 1800,
   hint: 'Tippe, wenn das Wasser ruhig ist. Siebenmal taucht Naaman unter.'
+}
+
+/**
+ * Etappe 5, "Die Handmühle" (neu, 5.11.2026): von oben eine Schilfmatte, darauf die Handmühle (unterer Stein, darüber der Läuferstein mit Griff und Loch), daneben die Schale und der offene Sack Gerste.
+ * Das Kind dreht den Läufer mit kreisendem Finger (oder mit dem Knopf „Drehen“, den Pfeiltasten); jede Umdrehung mahlt Mehl, das in der Schale wächst. Runde 1: vier Umdrehungen, Korn genug.
+ * Runde 2: sechs Umdrehungen; das Korn im Loch reicht nur anderthalb Umdrehungen (auf den Sack tippen schüttet nach), und wer zu schnell dreht, dem springen die Körner heraus (ein Fehler).
+ * Logik und Prüfer: `src/utils/elisaNeu.ts` (handMillProblems). Bilder (Bildauftrag S40): `handmuehle/boden.webp`, `unterstein`, `laeufer`, `schale`, `mehl`, `sack`, `koerner`.
+ */
+const MUEHLE: MillGame = {
+  background: `${G}handmuehle/boden.webp`,
+  lower: `${G}handmuehle/unterstein.webp`,
+  upper: `${G}handmuehle/laeufer.webp`,
+  bowl: `${G}handmuehle/schale.webp`,
+  flour: `${G}handmuehle/mehl.webp`,
+  sack: `${G}handmuehle/sack.webp`,
+  grain: `${G}handmuehle/koerner.webp`,
+  mill: { x: 50, y: 50, w: 44 },
+  upperW: 37,
+  bowlAt: { x: 84, y: 70, w: 24 },
+  sackAt: { x: 15, y: 72, w: 22 },
+  flourW: 14,
+  grainW: 7,
+  rounds: [
+    { hint: 'Lege den Finger auf den Mühlstein und dreh ihn im Kreis. Viermal herum, dann ist die Schale voll.', turns: 4, hopper: 0, maxSpeed: 0 },
+    { hint: 'Jetzt mehr Mehl für die Leute. Sind die Körner im Loch alle, tippe auf den Sack. Und dreh ruhig, nicht zu schnell!', turns: 6, hopper: 1.5, maxSpeed: 1.6 }
+  ]
+}
+
+/**
+ * Etappe 7, "Das Siegel" (neu, 5.11.2026): von oben der Schreibtisch des Königs von Syrien mit dem gerollten Brief; auf dem Brief liegt rotes Wachs mit dem blassen Abdruck des Königssiegels (Löwe mit Stern).
+ * Das Kind dreht das Siegel (mit dem Finger im Kreis, mit den Drehknöpfen oder den Pfeiltasten), bis es genau im Abdruck liegt, und drückt es dann fest („Siegeln“). Passt es nicht: ein Kreuz, ein Fehler.
+ * Runde 1: zwei Siegel, 14 Grad Spielraum; Runde 2: drei Siegel, 7 Grad. Logik und Prüfer: `src/utils/elisaNeu.ts` (sealTurnProblems). Bilder (Bildauftrag S40): `siegel/tisch.webp`, `brief`, `wachs`, `siegel`.
+ */
+const SIEGEL: SealGame = {
+  background: `${G}siegel/tisch.webp`,
+  letter: `${G}siegel/brief.webp`,
+  wax: `${G}siegel/wachs.webp`,
+  seal: `${G}siegel/siegel.webp`,
+  letterAt: { x: 50, y: 52, w: 92 },
+  letterRatio: 4.76,
+  waxW: 19,
+  sealW: 17,
+  rounds: [
+    { hint: 'Dreh das Siegel mit dem Finger, bis der Löwe genau im Abdruck liegt. Dann tippe auf „Siegeln“.', tolerance: 14, spots: [{ x: 34, y: 52, angle: 0, start: 130 }, { x: 66, y: 52, angle: 300, start: 60 }] },
+    { hint: 'Jetzt drei Siegel, und sie müssen noch genauer passen.', tolerance: 7, spots: [{ x: 25, y: 52, angle: 45, start: 250 }, { x: 50, y: 52, angle: 180, start: 20 }, { x: 75, y: 52, angle: 250, start: 130 }] }
+  ]
+}
+
+/**
+ * Etappe 9, "Erde für Naaman" (neu, 5.11.2026; 2. Kön 5,17 „dieser Erde Last, soviel zwei Maultiere tragen“): vor Elisas Haus stehen zwei Maultiere, unten auf dem Weg warten Säcke mit Erde (klein, mittel, groß).
+ * Das Kind tippt einen Sack und dann ein Maultier (oder zieht den Sack hin); beide Maultiere sollen gleich viel tragen. Würde ein Maultier mehr als die Hälfte tragen: „Zu schwer!“, ein Kreuz, ein Fehler.
+ * Ein Sack auf einem Maultier kann wieder heruntergenommen werden (kein Fehler). Runde 1 sechs Säcke, Runde 2 sieben. Logik und Prüfer: `src/utils/elisaNeu.ts` (earthLoadProblems).
+ * Bilder (Bildauftrag S40): `naamanerde/weg.webp`, `maultier-1`, `maultier-2`, `sack-1..3`.
+ */
+const ERDE: EarthGame = {
+  background: `${G}naamanerde/weg.webp`,
+  mule: [`${G}naamanerde/maultier-1.webp`, `${G}naamanerde/maultier-2.webp`],
+  sacks: [`${G}naamanerde/sack-1.webp`, `${G}naamanerde/sack-2.webp`, `${G}naamanerde/sack-3.webp`],
+  sackRatio: [0.89, 0.95, 0.96],
+  mules: [{ x: 27, y: 52, w: 30 }, { x: 73, y: 52, w: 30 }],
+  muleRatio: 0.86,
+  back: { x: 62, y: 46, w: 34 },
+  sackY: 97,
+  sackW: [7.5, 10.5, 13.5],
+  loadScale: 0.6,
+  rounds: [
+    { hint: 'Tippe einen Sack an und dann ein Maultier. Jedes Maultier trägt die Hälfte.', sacks: [3, 1, 2, 2, 1, 3] },
+    { hint: 'Jetzt sieben Säcke. Überlege gut, welcher Sack auf welches Maultier kommt.', sacks: [2, 3, 1, 2, 3, 2, 1] }
+  ]
 }
 
 export const elisa: Journey = {
@@ -187,7 +210,7 @@ export const elisa: Journey = {
         'So geschieht es. Als Elisa wiederkommt, schläft er in dem Zimmer. Er will der Frau danken und lässt sie rufen. Sein Diener Gehasi sagt: „Sie hat keinen Sohn, und ihr Mann ist alt.“',
         '„Um diese Zeit im nächsten Jahr“, sagt Elisa zu der Frau, „wirst du einen Sohn im Arm halten.“ Sie kann es kaum glauben. Doch es geschieht, wie Elisa gesagt hat.'
       ],
-      // Spiel: Puzzle (puzzle, alt)
+      // Spiel: Puzzle (puzzle, bekannt)
       task: { kind: 'puzzle', hint: 'Setze das Bild vom Zimmer auf dem Dach zusammen.', puzzle: { image: `${G}puzzle/zimmer.webp`, cols: 2, rows: 3 } },
       questions: [
         { q: 'Was baut die Frau für Elisa?', options: ['ein kleines Zimmer auf dem Dach', 'ein Zelt im Garten', 'einen Stall'], answer: 0 },
@@ -222,7 +245,7 @@ export const elisa: Journey = {
         'Einer von ihnen geht aufs Feld, um Kräuter zu sammeln. Er findet eine wilde Ranke mit Früchten und füllt sein Kleid damit. Er schneidet sie in den Topf, denn niemand kennt sie.',
         'Als die Männer essen wollen, rufen sie: „Mann Gottes, im Topf ist Gift!“ Es schmeckt so bitter, dass sie es nicht essen können. Elisa sagt: „Bringt Mehl!“ Er streut das Mehl in den Topf und sagt: „Schüttet es den Männern vor.“ Nun können alle essen, und es schadet ihnen nicht.'
       ],
-      // Spiel: Ernten (ernten, alt)
+      // Spiel: Ernten (ernten, bekannt)
       task: { kind: 'ernten', hint: 'Tippe das Gemüse an. Die wilden Früchte gehören nicht in den Korb.', harvest: ERNTEN },
       questions: [
         { q: 'Wo kocht Elisa das Gemüse?', options: ['in einem großen Topf', 'auf einem Stein', 'am Fluss'], answer: 0 },
@@ -239,8 +262,8 @@ export const elisa: Journey = {
         '„Gib es den Leuten zu essen“, sagt Elisa zu seinem Diener. Der Diener schaut auf die Brote und dann auf die Männer. „Wie soll ich das hundert Männern geben?“, fragt er.',
         'Aber Elisa sagt noch einmal: „Gib es den Leuten, damit sie essen. Denn so spricht Gott: Sie werden essen, und es wird noch etwas übrig bleiben.“ Der Diener teilt die Brote aus. Alle Männer essen, und sie werden satt. Und es bleibt noch Brot übrig, wie Gott gesagt hat.'
       ],
-      // Spiel: Reihenfolge legen (reihenfolge, alt)
-      task: { kind: 'reihenfolge', hint: 'Lege die Bilder in die Reihenfolge der Geschichte.', order: REIHENFOLGE },
+      // Spiel: Die Handmühle (handmuehle, neu 5.11.2026)
+      task: { kind: 'handmuehle', hint: 'Mahle das frische Korn: Dreh den Mühlstein im Kreis, bis die Schale voll Mehl ist.', handMill: MUEHLE },
       questions: [
         { q: 'Woher kommt der Mann mit den Broten?', options: ['aus Baal-Schalischa', 'aus Damaskus', 'aus Gilgal'], answer: 0 },
         { q: 'Wie viele Brote bringt er?', options: ['zwanzig', 'zwei', 'zweihundert'], answer: 0 }
@@ -274,8 +297,8 @@ export const elisa: Journey = {
         'Der König von Israel liest den Brief und erschrickt. „Bin ich Gott?“, ruft er. „Wie soll ich einen Menschen gesund machen?“ Er reißt seine Kleider ein. Doch Elisa hört davon und lässt ihm sagen: „Warum bist du so erschrocken? Lass ihn zu mir kommen. Dann merkt er, dass es einen Propheten in Israel gibt.“',
         'Naaman fährt mit seinen Pferden und Wagen vor Elisas Haus. Elisa kommt nicht heraus. Er schickt einen Boten: „Geh und wasch dich siebenmal im Jordan. Dann wirst du gesund.“'
       ],
-      // Spiel: Memory (memory, alt)
-      task: { kind: 'memory', hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.', memory: MEMORY },
+      // Spiel: Das Siegel (siegel, neu 5.11.2026)
+      task: { kind: 'siegel', hint: 'Dreh das Siegel des Königs, bis es genau in den Abdruck passt. Dann drück es fest.', sealTurn: SIEGEL },
       questions: [
         { q: 'Was schreibt der König von Syrien?', options: ['einen Brief', 'ein Lied', 'ein Gesetz'], answer: 0 },
         { q: 'Wohin fährt Naaman?', options: ['nach Samaria', 'nach Ägypten', 'nach Babel'], answer: 0 }
@@ -308,8 +331,8 @@ export const elisa: Journey = {
         'Aber Elisa sagt: „So wahr Gott lebt, ich nehme nichts.“ Naaman bittet ihn noch einmal, doch Elisa bleibt dabei.',
         'Da sagt Naaman: „Dann gib mir wenigstens so viel Erde mit, wie zwei Maultiere tragen können. Dein Knecht will keinem anderen Gott mehr opfern, nur noch dem Herrn.“ Elisa sagt zu ihm: „Zieh hin in Frieden!“ Und Naaman fährt mit seinen Wagen nach Hause.'
       ],
-      // Spiel: Lückenvers (lueckenvers, alt)
-      task: { kind: 'lueckenvers', hint: 'Ziehe das passende Blatt in die Lücke.', verse: VERS },
+      // Spiel: Erde für Naaman (naamanerde, neu 5.11.2026)
+      task: { kind: 'naamanerde', hint: 'Lade die Säcke mit Erde auf die zwei Maultiere. Beide sollen gleich viel tragen.', earthLoad: ERDE },
       questions: [
         { q: 'Was erkennt Naaman?', options: ['Es gibt nur in Israel einen Gott.', 'Der Jordan ist ein kalter Fluss.', 'Elisa ist ein reicher Mann.'], answer: 0 },
         { q: 'Was nimmt Elisa von Naaman an?', options: ['nichts', 'das Silber', 'die Festkleider'], answer: 0 }
@@ -324,11 +347,6 @@ export const elisa: Journey = {
     { q: 'Wer rät Naaman, zum Propheten zu gehen?', options: ['ein junges Mädchen aus Israel', 'der König', 'sein Sohn'], answer: 0 },
     { q: 'Wie oft soll sich Naaman im Jordan waschen?', options: ['siebenmal', 'dreimal', 'zehnmal'], answer: 0 }
   ]
-}
-
-// the games that lie on a stage picture (drawn soft by the app) follow the picture of their stage
-for (const st of elisa.stages) {
-  if (st.task.verse) st.task.verse.background = backdropOr(st.task.verse.background, st.image ?? st.task.verse.background)
 }
 
 // the German recordings of the stories (voice Achernar, files "geschichte-NN-v1.mp3"); until they are made the app reads with the voice of the device. Remove a number from this list when its file is in.

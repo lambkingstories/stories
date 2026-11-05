@@ -83,10 +83,9 @@ export const elisaEn: TextOverlay<Journey> = {
         'But Elisha says once more: "Give it to the people so that they can eat. For this is what God says: They will eat, and there will be some left over." The servant hands out the loaves. All the men eat and are full. And there is bread left over, as God said.'
       ],
       task: {
-        hint: 'Put the pictures in the order of the story.',
-        order: {
-          cards: [{ label: 'The man brings twenty loaves to Elisha' }, { label: 'Elisha says: Give it to the people' }, { label: 'The servant hands out the loaves' }, { label: 'Everyone is full, and bread is left over' }],
-          rounds: [{ hint: 'Round 1: Put the pictures in the order of the story. The dots show where they go.' }, { hint: 'Round 2: Now with the man and his loaves and without dots: What comes first, what comes next?' }]
+        hint: 'Grind the fresh grain: turn the millstone round until the bowl is full of flour.',
+        handMill: {
+          rounds: [{ hint: 'Put your finger on the millstone and turn it round and round. Four times round, and the bowl is full.' }, { hint: 'Now more flour for the people. When the grain in the hole is gone, tap the sack. And turn calmly, not too fast!' }]
         }
       },
       questions: [
@@ -118,8 +117,10 @@ export const elisaEn: TextOverlay<Journey> = {
         'Naaman drives up to Elisha’s house with his horses and chariots. Elisha does not come out. He sends a messenger: "Go and wash seven times in the Jordan. Then you will be well."'
       ],
       task: {
-        hint: 'Find the matching cards. Remember where each one lies.',
-        memory: { pairs: [{ text: 'The letter: the king of Syria writes a letter to the king of Israel.' }, { text: 'The silver: Naaman takes ten talents of silver with him.' }, { text: 'The gold: he also takes six thousand pieces of gold.' }, { text: 'The festive robe: Naaman has ten festive robes with him.' }, { text: 'The chariot: Naaman drives to Samaria with his chariots, right up to Elisha’s house.' }, { text: 'The horse: his horses pull the chariot up to Elisha’s house.' }] }
+        hint: 'Turn the king’s seal until it fits exactly into the imprint. Then press it down.',
+        sealTurn: {
+          rounds: [{ hint: 'Turn the seal with your finger until the lion lies exactly in the imprint. Then tap “Seal”.' }, { hint: 'Now three seals, and they must fit even more exactly.' }]
+        }
       },
       questions: [
         { q: 'What does the king of Syria write?', options: ['a letter', 'a song', 'a law'] },
@@ -152,12 +153,9 @@ export const elisaEn: TextOverlay<Journey> = {
         'Then Naaman says: "Then at least let me take home as much earth as two mules can carry. Your servant will no longer offer sacrifices to any other god, only to the Lord." Elisha says to him: "Go in peace!" And Naaman drives home with his chariots.'
       ],
       task: {
-        hint: 'Drag the right leaf into the gap.',
-        verse: {
-          rounds: [
-            { hint: 'Drag the right leaf into the gap.', parts: ['“Go in ', '!”'], words: ['peace', 'haste', 'strife'] },
-            { hint: 'Now two words are missing.', parts: ['“As surely as ', ' lives, I will take ', '.”'], words: ['God', 'nothing', 'gold', 'silver'] }
-          ]
+        hint: 'Load the sacks of earth onto the two mules. Both should carry the same.',
+        earthLoad: {
+          rounds: [{ hint: 'Tap a sack and then a mule. Each mule carries half.' }, { hint: 'Now seven sacks. Think carefully which sack goes on which mule.' }]
         }
       },
       questions: [
