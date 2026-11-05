@@ -1,6 +1,7 @@
 /**
  * The data of "Esther" (`ester.ts`, `en/ester.en.ts`, `esterPath.ts`): the stories and questions follow the rules of the adventures (texts of the draft `D:/Claude/Abenteuer-Ester/ENTWURF_Ester.md`, Luther 1912 told in our own words),
- * the two quiz stages are only quizzes, the two new games and the five old ones have sound data, the map has nine stations and the exam, and the English file has the same shape.
+ * the two quiz stages are only quizzes, the five new games and the two old ones (Anton's rule of 5.11.2026: at most two known games, never one after the other) have sound data,
+ * the map has nine stations and the exam, and the English file has the same shape. The new games of 5.11.2026 (gate, sceptre, messengers) are checked by their `*Problems` of `utils/esterNeu.ts`.
  */
 import { existsSync, statSync } from 'node:fs'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -9,6 +10,8 @@ import { ESTER_PATH } from '@/data/adventures/esterPath'
 import { englishTextsOf } from '@/data/adventures/localize'
 import { setAdventureLanguage } from '@/use/adventureLanguage'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
+import { gateProblems, ridersProblems, sceptreProblems } from '@/utils/esterNeu'
+import type { GateGame, RidersGame, SceptreGame } from '@/utils/esterNeu'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => ester.stages[n - 1]!
@@ -118,11 +121,11 @@ describe('Ester: stories and questions', () => {
 })
 
 describe('Ester: the games', () => {
-  it('the order of the games: 5 old, 2 new (decorate, honor), 2 quizzes; no game twice', () => {
-    expect(ester.stages.map((s) => s.task.kind)).toEqual(['schmuecken', 'puzzle', 'memory', 'quiz', 'lueckenvers', 'reihenfolge', 'ehren', 'quiz', 'wimmelbild'])
+  it('the order of the games: 2 known (puzzle, verse; not one after the other), 5 new (decorate, gate, sceptre, honor, messengers), 2 quizzes; no game twice', () => {
+    expect(ester.stages.map((s) => s.task.kind)).toEqual(['schmuecken', 'puzzle', 'tor', 'quiz', 'lueckenvers', 'zepter', 'ehren', 'quiz', 'boten'])
     const games = ester.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
     expect(new Set(games).size).toBe(games.length)
-    expect(games.filter((k) => ['schmuecken', 'ehren'].includes(k))).toHaveLength(2)
+    expect(games.filter((k) => ['schmuecken', 'tor', 'zepter', 'ehren', 'boten'].includes(k))).toHaveLength(5)
   })
 
   it('1 decorate: three rounds (cloths, floor, cups); every place lies inside the picture; the cloths and the floor name the order of the text; the cups have twins and as many designs as places', () => {
@@ -156,17 +159,16 @@ describe('Ester: the games', () => {
     expect(g.image).toMatch(/puzzle\/tor\.webp$/)
   })
 
-  it('3 memory: six pairs (a full board of 3 x 4), every one with a sentence that the text of the stage tells', () => {
-    const g = stage(3).task.memory!
-    expect(g.pairs).toHaveLength(6)
-    for (const p of g.pairs) expect(p.text.length).toBeGreaterThan(10)
-    const text = stage(3).text.join(' ')
-    expect(text).toMatch(/Salben/)
-    expect(text).toMatch(/Gewürzen/)
-    expect(text).toMatch(/Krone/)
-    expect(text).toMatch(/Fest/)
-    expect(text).toMatch(/schenkt reich/)
-    expect(text).toMatch(/Chronik/)
+  it('3 gate (new): Mordecai hears the two doorkeepers while they whisper; the check of the data finds nothing; the text tells it', () => {
+    const t = stage(3).task as unknown as { gateWatch: GateGame }
+    const g = t.gateWatch
+    expect(gateProblems(g)).toEqual([])
+    expect(g.rounds).toHaveLength(2)
+    expect(g.background).toMatch(/ester\/tor\/hof\.webp$/)
+    expect(g.guards.apart).toMatch(/tor\/wachen-ruhig\.webp$/)
+    expect(g.guards.whisper).toMatch(/tor\/wachen-fluestern\.webp$/)
+    for (const f of [g.background, g.guards.apart, g.guards.whisper]) expect(existsSync(`public/${f}`), f).toBe(true)
+    expect(stage(3).text.join(' ')).toMatch(/Mordechai sitzt am Tor des Königs. Dort hört er, dass zwei Türhüter/)
   })
 
   it('5 verse: the sentences are in the text and the right words are on the leaves', () => {
@@ -182,11 +184,13 @@ describe('Ester: the games', () => {
     expect(g.rounds[1]!.answers.map((a) => g.rounds[1]!.words[a])).toEqual(['drei', 'Nacht'])
   })
 
-  it('6 order: four cards, round 1 with the numbers and three cards, round 2 with all four', () => {
-    const g = stage(6).task.order!
-    expect(g.cards).toHaveLength(4)
-    expect(g.rounds.map((r) => r.cards.length)).toEqual([3, 4])
-    expect(g.rounds.map((r) => r.numbered)).toEqual([true, false])
+  it('6 sceptre (new): Esther’s hand to the top of the golden sceptre; the check of the data finds nothing (a calm hand reaches it); the text tells it', () => {
+    const t = stage(6).task as unknown as { sceptre: SceptreGame }
+    const g = t.sceptre
+    expect(sceptreProblems(g)).toEqual([])
+    expect(g.rounds).toHaveLength(2)
+    for (const f of [g.background, g.arm.image, g.hand.image]) expect(existsSync(`public/${f}`), f).toBe(true)
+    expect(stage(6).text.join(' ')).toMatch(/streckt er ihr das goldene Zepter entgegen, und Ester berührt die Spitze/)
   })
 
   it('7 honor: three rounds with four choices each, exactly one right; the right ones are what the text names (clothes, crown, horse)', () => {
@@ -203,19 +207,18 @@ describe('Ester: the games', () => {
     expect(g.parade).toMatch(/ester\/ehren\/umzug\.webp$/)
   })
 
-  it('9 hidden pictures: six messengers on mules, covers, every place inside the picture', () => {
-    const t = stage(9).task
-    expect(t.kind).toBe('wimmelbild')
-    expect(t.count).toBe(6)
-    const f = t.find!
-    expect(f.finds).toHaveLength(6)
-    expect(f.covers.length).toBeGreaterThanOrEqual(6)
-    for (const s of [...f.finds, ...f.covers]) {
-      expect(s.x - s.w / 2).toBeGreaterThanOrEqual(-1)
-      expect(s.x + s.w / 2).toBeLessThanOrEqual(101)
-      expect(s.y).toBeLessThanOrEqual(100)
-    }
-    expect(f.labels).toHaveLength(6)
+  it('9 messengers (new): every letter is sealed and its rider sent to its land; India and Kush first (Esther 8,9); the check of the data finds nothing; the text tells it', () => {
+    const t = stage(9).task as unknown as { riders: RidersGame }
+    const g = t.riders
+    expect(ridersProblems(g)).toEqual([])
+    expect(g.lands.map((l) => l.id)).toEqual(['medien', 'indien', 'persien', 'kusch'])
+    expect(g.rounds[0]!.letters.map((l) => l.land)).toEqual(['indien', 'kusch'])
+    expect(g.rounds[1]!.letters.map((l) => l.land).sort()).toEqual(['indien', 'kusch', 'medien', 'persien'])
+    const files = [g.map, g.letter, g.ring, g.seal, ...g.rounds.flatMap((r) => r.letters.map((l) => l.rider))]
+    for (const f of files) expect(existsSync(`public/${f}`), f).toBe(true)
+    expect(stage(9).text.join(' ')).toMatch(/Siegelring/)
+    expect(stage(9).text.join(' ')).toMatch(/Reitende Boten auf jungen Maultieren tragen ihn in alle Länder/)
+    expect(stage(1).text.join(' ')).toMatch(/von Indien bis nach Kusch/)
   })
 })
 
@@ -269,6 +272,15 @@ describe('Ester: map, files, English', () => {
     expect(stage(1).task.decor!.rounds[0]!.hint).toContain('Hang the cloths')
     expect(stage(7).task.honor!.rounds[0]!.hint).toContain('royal robe')
     expect(stage(5).task.verse!.rounds[0]!.parts[0]).toContain('And who')
+    const en3 = stage(3).task as unknown as { gateWatch: GateGame }
+    expect(en3.gateWatch.rounds[0]!.hint).toContain('Mordecai sits in the gate')
+    expect(en3.gateWatch.guards.names[0]).toBe('First doorkeeper')
+    const en6 = stage(6).task as unknown as { sceptre: SceptreGame }
+    expect(en6.sceptre.rounds[0]!.hint).toContain('golden sceptre')
+    const en9 = stage(9).task as unknown as { riders: RidersGame }
+    expect(en9.riders.rounds[0]!.hint).toContain('king’s ring')
+    expect(en9.riders.lands.map((l) => l.name)).toEqual(['Media', 'India', 'Persia', 'Ethiopia'])
+    expect(en9.riders.susa.name).toBe('Shushan')
     for (const s of ester.stages) {
       const audio = s.audio
       if (audio) expect(audio, `stage ${s.id}`).toBe(`audio/abenteuer/ester/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)

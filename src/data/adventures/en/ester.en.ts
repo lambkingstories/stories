@@ -58,8 +58,14 @@ export const esterEn: TextOverlay<Journey> = {
         'Mordecai sits at the king’s gate. There he hears that two doorkeepers want to harm the king. He tells Esther, and Esther tells the king in Mordecai’s name. People look into it, and it is true. The two men are punished, and Mordecai’s help is written down in the king’s chronicle.'
       ],
       task: {
-        hint: 'Find the matching cards. Remember where each one lies.',
-        memory: { pairs: [{ text: 'The ointment: for a year every woman is made ready with ointments and sweet oils.' }, { text: 'The spices: spices are part of it too.' }, { text: 'The crown: the king sets the crown on Esther’s head.' }, { text: 'The feast: the king gives a great feast for Esther.' }, { text: 'The gifts: the king gives rich gifts.' }, { text: 'The chronicle: Mordecai’s help is written in the king’s chronicle.' }] }
+        hint: 'Tap the two doorkeepers when they put their heads together.',
+        gateWatch: {
+          guards: { names: ['First doorkeeper', 'Second doorkeeper'] },
+          rounds: [
+            { hint: 'Mordecai sits in the gate. When the two doorkeepers put their heads together, tap both of them.' },
+            { hint: 'Now they whisper for a shorter time. Watch closely and tap both while they whisper.' }
+          ]
+        }
       },
       questions: [
         { q: 'What does the king set on Esther’s head?', options: ['the crown', 'a wreath', 'a veil'] },
@@ -112,10 +118,12 @@ export const esterEn: TextOverlay<Journey> = {
         'At the feast the king asks again. But Esther invites both of them to a second feast the next day. Haman goes home glad, but at the gate he sees Mordecai. He does not rise before him. So Haman has a tall pole put up for Mordecai.'
       ],
       task: {
-        hint: 'Put the pictures in the order of the story.',
-        order: {
-          cards: [{ label: 'Esther puts on her royal clothes' }, { label: 'Esther steps into the inner court' }, { label: 'The king holds out the golden scepter' }, { label: 'Esther invites the king and Haman to a feast' }],
-          rounds: [{ hint: 'Round 1: Put the pictures in the order of the story. The dots show where they go.' }, { hint: 'Round 2: Now with the dressing and without dots: What comes first, what comes next?' }]
+        hint: 'Lead Esther’s hand calmly to the top of the golden sceptre.',
+        sceptre: {
+          rounds: [
+            { hint: 'Lead Esther’s hand very calmly to the top of the golden sceptre and keep it there.' },
+            { hint: 'Now the sceptre moves more. Very calmly, and keep the top a little longer.' }
+          ]
         }
       },
       questions: [
@@ -170,8 +178,15 @@ export const esterEn: TextOverlay<Journey> = {
         'Mordecai leaves the king in blue and white clothes, with a golden crown and a purple cloak. Shushan rejoices. To the Jews there has come light and gladness and joy and honor. On the day when they were to be attacked, they stand up for their lives, and no one can withstand them. After that they keep the feast of Purim. They send one another gifts and share with the poor.'
       ],
       task: {
-        hint: 'Find the six messengers who carry the letter to all the lands.',
-        find: { labels: ['Messenger 1', 'Messenger 2', 'Messenger 3', 'Messenger 4', 'Messenger 5', 'Messenger 6'], doneText: 'You have found all six messengers who carry the letter to all the lands!' }
+        hint: 'Seal the letters and send the messengers in the right direction.',
+        riders: {
+          susa: { name: 'Shushan' },
+          lands: [{ name: 'Media' }, { name: 'India' }, { name: 'Persia' }, { name: 'Ethiopia' }],
+          rounds: [
+            { hint: 'Seal the letter with the king’s ring. Then send the messenger to the land of the letter.' },
+            { hint: 'Now there are four letters. Seal each one and send the messenger exactly in the direction of his land.' }
+          ]
+        }
       },
       questions: [
         { q: 'Who carries the new letter to all the lands?', options: ['riders on mules', 'ships', 'carrier pigeons'] },

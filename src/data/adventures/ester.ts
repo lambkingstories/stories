@@ -4,12 +4,15 @@
  * Gemildert erzählt: Hamans Plan ("vernichten", Etappe 4 nur Quiz), die Strafe der Türhüter, Hamans Ende ("der Pfahl wird sein eigener", Etappe 8 nur Quiz, nie im Bild), die Kämpfe am Schluss ("stehen für ihr Leben ein").
  * Das Buch Ester nennt Gott nie beim Namen; der Text erfindet deshalb kein Wort Gottes und kein Gebet.
  * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
- * Spiele (Wahl der Leitung): 1 Das Fest schmücken (neu), 2 Puzzle (alt), 3 Memory (alt), 4 nur Quiz, 5 Lückenvers (alt), 6 Reihenfolge (alt), 7 Den Mann ehren (neu), 8 nur Quiz, 9 Wimmelbild (alt).
+ * Spiele (Antons Spielplan 5.11.2026: höchstens zwei bekannte, nie hintereinander): 1 Das Fest schmücken (neu), 2 Puzzle (bekannt), 3 Lauschen am Tor (neu), 4 nur Quiz, 5 Lückenvers (bekannt),
+ * 6 Das Zepter (neu), 7 Den Mann ehren (neu), 8 nur Quiz, 9 Boten reiten aus (neu). Typen der neuen Spiele: `@/utils/esterNeu`.
+ * ERZEUGT von D:/Claude/Abenteuer-Ester/tools/bauen_ester.py (Spieldaten der neuen Spiele: tools/neue_spiele_ester.py); nicht von Hand ändern, sondern dort und neu bauen.
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/ester/, images/abenteuer/spiele/ester/<spiel>/, audio/abenteuer/ester/.
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { DecorGame, FindGame, HonorGame, Journey, MemoryGame, OrderGame, VerseGame } from '@/types/adventure'
+import type { DecorGame, HonorGame, Journey, VerseGame } from '@/types/adventure'
+import type { GateGame, RidersGame, SceptreGame } from '@/utils/esterNeu'
 import { josef } from './josef'
 import { ESTER_PATH } from './esterPath'
 import { localize } from './localize'
@@ -34,38 +37,6 @@ const VERS: VerseGame = {
   rounds: [
     { hint: 'Ziehe das passende Blatt in die Lücke.', parts: ['„Und wer ', ', ob du nicht um dieser Zeit willen zur königlichen Würde gekommen bist?“'], words: ['weiß', 'sagt', 'zählt'], answers: [0] },
     { hint: 'Jetzt fehlen zwei Wörter.', parts: ['„Fastet für mich, dass ihr nicht esset und trinket in ', ' Tagen, weder Tag noch ', '.“'], words: ['drei', 'Nacht', 'zehn', 'Abend'], answers: [0, 1] }
-  ]
-}
-
-/**
- * Etappe 6, "Vor den König" (alte Mechanik, Reihenfolge legen): Ester zieht ihre königlichen Kleider an, tritt in den inneren Hof, der König streckt das goldene Zepter aus, Ester lädt den König und Haman zum Mahl ein.
- * Runde 1 drei Karten mit Punkten, Runde 2 alle vier ohne Punkte. Bilder (Bildauftrag S35): `reihenfolge/karte-1..4.webp` (4:3).
- */
-const REIHENFOLGE: OrderGame = {
-  cards: [
-    { id: 'kleider', image: `${G}reihenfolge/karte-1.webp`, label: 'Ester zieht ihre königlichen Kleider an' },
-    { id: 'hof', image: `${G}reihenfolge/karte-2.webp`, label: 'Ester tritt in den inneren Hof' },
-    { id: 'zepter', image: `${G}reihenfolge/karte-3.webp`, label: 'Der König streckt das goldene Zepter aus' },
-    { id: 'mahl', image: `${G}reihenfolge/karte-4.webp`, label: 'Ester lädt den König und Haman zum Mahl ein' }
-  ],
-  rounds: [
-    { hint: 'Runde 1: Lege die Bilder in die Reihenfolge der Geschichte. Die Punkte zeigen, wo sie hinkommen.', numbered: true, cards: ['hof', 'zepter', 'mahl'] },
-    { hint: 'Runde 2: Jetzt mit dem Ankleiden und ohne Punkte: Was kommt zuerst, was danach?', numbered: false, cards: ['kleider', 'hof', 'zepter', 'mahl'] }
-  ]
-}
-
-/**
- * Etappe 3, "Memory" (alte Mechanik): die sechs Dinge der neuen Königin (Salbe, Gewürze, Krone, Fest, Geschenke, Chronik); die Rückseite zeigt eine goldene Krone (Bildauftrag S34, ein Bogen mit den sechs Dingen, vom Code geschnitten).
- */
-const MEMORY: MemoryGame = {
-  back: `${G}memory/rueck.webp`,
-  pairs: [
-    { image: `${G}memory/karte-salbe.webp`, text: 'Die Salbe: Ein Jahr lang wird jede Frau mit Salben und Duftölen vorbereitet.' },
-    { image: `${G}memory/karte-gewuerze.webp`, text: 'Die Gewürze: Auch Gewürze gehören zur Vorbereitung.' },
-    { image: `${G}memory/karte-krone.webp`, text: 'Die Krone: Der König setzt Ester die Krone aufs Haupt.' },
-    { image: `${G}memory/karte-fest.webp`, text: 'Das Fest: Der König gibt ein großes Fest für Ester.' },
-    { image: `${G}memory/karte-geschenk.webp`, text: 'Die Geschenke: Der König schenkt reich.' },
-    { image: `${G}memory/karte-chronik.webp`, text: 'Die Chronik: Mordechais Hilfe wird in die Chronik des Königs geschrieben.' }
   ]
 }
 
@@ -112,6 +83,47 @@ const SCHMUECKEN: DecorGame = {
 }
 
 /**
+ * Etappe 3, "Lauschen am Tor" (neu, Est 2,21-23): Mordechai sitzt im Tor des Königs (gemaltes Bild); rechts stehen die zwei Türhüter. Ab und zu stecken sie die Köpfe zusammen und flüstern:
+ * genau dann tippt das Kind beide an, und Mordechai hat es gehört. Ein Tipp, während sie nicht flüstern, ist ein Fehler. Runde 1: dreimal, lange Flüsterzeit; Runde 2: viermal, kürzer.
+ * Keine Gewalt im Bild: die Türhüter flüstern nur. Bilder (Bildauftrag S40): `tor/hof.webp` 1200 × 900, `tor/wachen-ruhig.webp` und `wachen-fluestern.webp` (ein Bogen, gleicher Maßstab, an den Füßen ausgerichtet).
+ */
+const TOR: GateGame = {
+  background: `${G}tor/hof.webp`,
+  ratio: 4 / 3,
+  guards: {
+    apart: `${G}tor/wachen-ruhig.webp`,
+    whisper: `${G}tor/wachen-fluestern.webp`,
+    x: 69,
+    y: 85,
+    w: 32,
+    ratio: 0.667,
+    split: 0.505,
+    top: 0.08,
+    names: ['Erster Türhüter', 'Zweiter Türhüter']
+  },
+  rounds: [
+    { hint: 'Mordechai sitzt im Tor. Wenn die zwei Türhüter die Köpfe zusammenstecken, tippe beide an.', need: 3, pattern: [3000, 3800, 2600], whisperMs: 2400 },
+    { hint: 'Jetzt flüstern sie kürzer. Pass gut auf und tippe beide an, solange sie flüstern.', need: 4, pattern: [2200, 3400, 1600, 2800, 1900], whisperMs: 1600 }
+  ]
+}
+
+/**
+ * Etappe 6, "Das Zepter" (neu, Est 5,1-2): der innere Hof (gemaltes Bild); von rechts streckt der König das goldene Zepter aus, es bewegt sich leicht hin und her. Das Kind führt Esters Hand
+ * ruhig zur Spitze des Zepters und hält sie dort einen Augenblick. Eine hastige Hand zittert und geht zurück (ein Fehler). Runde 2: das Zepter bewegt sich mehr, die Hand muss ruhiger sein.
+ * Bilder (Bildauftrag S41): `zepter/saal.webp` 1200 × 900, `zepter/arm.webp` (Arm des Königs mit Zepter, vom rechten Rand), `zepter/hand.webp` (Esters Hand von unten); Drehpunkt und Spitzen gemessen.
+ */
+const ZEPTER: SceptreGame = {
+  background: `${G}zepter/saal.webp`,
+  ratio: 4 / 3,
+  arm: { image: `${G}zepter/arm.webp`, w: 70, aspect: 4.167, pivot: { x: 1, y: 0.403 }, tip: { x: 0.028, y: 0.765 } },
+  hand: { image: `${G}zepter/hand.webp`, w: 20, aspect: 0.449, pivot: { x: 0.828, y: 0.006 }, tip: { x: 0.828, y: 0.006 } },
+  rounds: [
+    { hint: 'Führe Esters Hand ganz ruhig zur Spitze des goldenen Zepters und halte sie dort.', pivot: { x: 104, y: 45 }, angle: 0, sway: 4, period: 4.2, start: { x: 24, y: 88 }, reach: 8, hold: 0.8, maxSpeed: 80 },
+    { hint: 'Jetzt bewegt sich das Zepter mehr. Ganz ruhig, und halte die Spitze etwas länger.', pivot: { x: 104, y: 42 }, angle: -3, sway: 7, period: 3.4, start: { x: 72, y: 90 }, reach: 6.5, hold: 1.2, maxSpeed: 55 }
+  ]
+}
+
+/**
  * Etappe 7, "Den Mann ehren" (neu): Haman nennt für den Mann, den der König ehren will, königliche Kleider, ein Pferd des Königs und eine Krone. In drei Runden findet das Kind das Genannte: Runde 1 die Kleider, Runde 2 etwas für den Kopf,
  * Runde 3 das Tier; je vier Dinge liegen in einer Reihe, nur eines hat Haman genannt. Das Richtige fliegt in einen Rahmen im Bild, ein falsches wird durchgestrichen (ein Fehler, es kann nicht noch einmal gewählt werden).
  * Am Ende zeigt die Straße von Susa Mordechai auf dem Pferd des Königs, von Haman geführt.
@@ -152,30 +164,45 @@ const EHREN: HonorGame = {
 }
 
 /**
- * Etappe 9, "Wimmelbild" (alte Mechanik): das festlich geschmückte Susa im Hochformat (Bildauftrag S36) mit sechs Boten auf jungen Maultieren, die den Brief in alle Länder tragen; manche stehen hinter Marktständen, Teppichen und Körben.
- * Bilder: `wimmel/szene.webp`, `bote-1..6.webp` (aus einem Bogen geschnitten), `verdecker-1..4.webp` (aus einem Bogen geschnitten).
+ * Etappe 9, "Boten reiten aus" (neu, Est 8,9-10): unter der gemalten Karte des Reiches liegt ein Brief und der Siegelring des Königs. Das Kind siegelt den Brief mit dem Ring
+ * und schickt den reitenden Boten auf seinem jungen Maultier in die Richtung des Landes, in das der Brief geht (wischen oder das Land antippen). Ein falsches Land ist ein Fehler.
+ * Runde 1: zwei Briefe, nach Indien und nach Kusch (die zwei Enden des Reiches, Est 8,9), weite Richtungen; Runde 2: vier Briefe (dazu Medien und Persien, Est 1,3), genauer.
+ * Die Karte ist ein Bild, nicht maßstäblich; die Richtungen stimmen grob (Medien nördlich von Susa, Indien östlich, Persien südöstlich, Kusch südwestlich). Namen sind Wörter der App, nicht im Bild.
+ * Bilder: `boten/karte.webp` 1200 × 900 und `brief`, `ring`, `siegel` (Bildauftrag S42); die Reiter sind die Boten aus Bildauftrag S36 (`boten/reiter-1..4.webp`, Kopien von `wimmel/bote-1..4`).
  */
-const WIMMEL: FindGame = {
-  labels: ['Bote 1', 'Bote 2', 'Bote 3', 'Bote 4', 'Bote 5', 'Bote 6'],
-  doneText: 'Du hast alle sechs Boten gefunden, die den Brief in alle Länder tragen!',
-  scene: `${G}wimmel/szene.webp`,
-  finds: [
-    { image: `${G}wimmel/bote-1.webp`, x: 58, y: 57, w: 13 },
-    { image: `${G}wimmel/bote-2.webp`, x: 77, y: 58, w: 13 },
-    { image: `${G}wimmel/bote-3.webp`, x: 66, y: 71, w: 16 },
-    { image: `${G}wimmel/bote-4.webp`, x: 87, y: 73, w: 17 },
-    { image: `${G}wimmel/bote-5.webp`, x: 60, y: 88, w: 21 },
-    { image: `${G}wimmel/bote-6.webp`, x: 48, y: 66, w: 15 }
+const BOTEN: RidersGame = {
+  map: `${G}boten/karte.webp`,
+  ratio: 4 / 3,
+  susa: { x: 47.5, y: 44, name: 'Susa' },
+  lands: [
+    { id: 'medien', name: 'Medien', x: 50.5, y: 14, angle: -82 },
+    { id: 'indien', name: 'Indien', x: 91.5, y: 38, angle: -6 },
+    { id: 'persien', name: 'Persien', x: 77.5, y: 76.5, angle: 39 },
+    { id: 'kusch', name: 'Kusch', x: 12.5, y: 75.5, angle: 146 }
   ],
-  covers: [
-    { image: `${G}wimmel/verdecker-1.webp`, x: 49, y: 68, w: 15 },
-    { image: `${G}wimmel/verdecker-2.webp`, x: 88, y: 75, w: 20 },
-    { image: `${G}wimmel/verdecker-3.webp`, x: 66, y: 72, w: 18 },
-    { image: `${G}wimmel/verdecker-4.webp`, x: 60, y: 91, w: 20 },
-    { image: `${G}wimmel/verdecker-1.webp`, x: 80, y: 66, w: 14 },
-    { image: `${G}wimmel/verdecker-2.webp`, x: 52, y: 76, w: 14 },
-    { image: `${G}wimmel/verdecker-3.webp`, x: 74, y: 86, w: 13 },
-    { image: `${G}wimmel/verdecker-4.webp`, x: 94, y: 62, w: 12 }
+  letter: `${G}boten/brief.webp`,
+  letterAspect: 2,
+  ring: `${G}boten/ring.webp`,
+  seal: `${G}boten/siegel.webp`,
+  sealAt: { x: 0.6, y: 0.47 },
+  sealW: 0.28,
+  riderW: 16,
+  rounds: [
+    {
+      hint: 'Siegle den Brief mit dem Ring des Königs. Dann schick den Boten in das Land des Briefes.',
+      tolerance: 40,
+      letters: [{ land: 'indien', rider: `${G}boten/reiter-1.webp` }, { land: 'kusch', rider: `${G}boten/reiter-2.webp` }]
+    },
+    {
+      hint: 'Jetzt sind es vier Briefe. Siegle jeden und schick den Boten genau in die Richtung seines Landes.',
+      tolerance: 25,
+      letters: [
+        { land: 'medien', rider: `${G}boten/reiter-3.webp` },
+        { land: 'kusch', rider: `${G}boten/reiter-4.webp` },
+        { land: 'persien', rider: `${G}boten/reiter-1.webp` },
+        { land: 'indien', rider: `${G}boten/reiter-2.webp` }
+      ]
+    }
   ]
 }
 
@@ -253,8 +280,8 @@ export const ester: Journey = {
         'Der König gewinnt Ester lieber als alle anderen. Er setzt ihr die Krone auf und macht sie zur Königin. Dann gibt er ein großes Fest für sie und schenkt reich.',
         'Mordechai sitzt am Tor des Königs. Dort hört er, dass zwei Türhüter dem König schaden wollen. Er sagt es Ester, und Ester sagt es dem König in Mordechais Namen. Man forscht nach, und es stimmt. Die beiden Männer werden bestraft, und Mordechais Hilfe wird in die Chronik des Königs geschrieben.'
       ],
-      // Spiel: Memory (memory, alt)
-      task: { kind: 'memory', hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.', memory: MEMORY },
+      // Spiel: Lauschen am Tor (tor, neu)
+      task: { kind: 'tor', hint: 'Tippe die zwei Türhüter an, wenn sie die Köpfe zusammenstecken.', gateWatch: TOR },
       questions: [
         { q: 'Was setzt der König Ester auf den Kopf?', options: ['die Krone', 'einen Kranz', 'einen Schleier'], answer: 0 },
         { q: 'Wer hört am Tor, dass zwei Türhüter dem König schaden wollen?', options: ['Mordechai', 'Hegai', 'Ester'], answer: 0 }
@@ -305,8 +332,8 @@ export const ester: Journey = {
         '„Was ist dir, Königin Ester?“, fragt der König. „Was willst du? Auch die Hälfte des Reiches soll dir gehören.“ Ester sagt nur: „Der König und Haman sollen heute zu dem Mahl kommen, das ich vorbereitet habe.“',
         'Beim Mahl fragt der König noch einmal. Doch Ester lädt beide für den nächsten Tag zu einem zweiten Mahl ein. Haman geht froh nach Hause, aber am Tor sieht er Mordechai. Der steht nicht vor ihm auf. Da lässt Haman einen hohen Pfahl für Mordechai aufrichten.'
       ],
-      // Spiel: Reihenfolge legen (reihenfolge, alt)
-      task: { kind: 'reihenfolge', hint: 'Lege die Bilder in die Reihenfolge der Geschichte.', order: REIHENFOLGE },
+      // Spiel: Das Zepter (zepter, neu)
+      task: { kind: 'zepter', hint: 'Führe Esters Hand ruhig zur Spitze des goldenen Zepters.', sceptre: ZEPTER },
       questions: [
         { q: 'Was streckt der König Ester entgegen?', options: ['das goldene Zepter', 'seine Krone', 'einen Brief'], answer: 0 },
         { q: 'Wen lädt Ester zum Mahl ein?', options: ['den König und Haman', 'Mordechai und Hegai', 'den König und Hathach'], answer: 0 }
@@ -357,8 +384,8 @@ export const ester: Journey = {
         'Ein Befehl des Königs darf nicht zurückgenommen werden. Darum schreiben die Schreiber einen neuen Brief, in der Sprache jedes Volkes. Die Juden dürfen ihr Leben schützen. Reitende Boten auf jungen Maultieren tragen ihn in alle Länder.',
         'Mordechai geht in blauen und weißen Kleidern vom König, mit goldener Krone und purpurnem Mantel. Susa jubelt. Den Juden ist Licht und Freude und Wonne und Ehre gekommen. Am Tag, an dem man sie überfallen wollte, stehen sie für ihr Leben ein, und niemand kann ihnen widerstehen. Danach feiern sie das Purimfest. Sie schicken einander Geschenke und geben den Armen davon ab.'
       ],
-      // Spiel: Wimmelbild (wimmelbild, alt)
-      task: { kind: 'wimmelbild', hint: 'Finde die sechs Boten, die den Brief in alle Länder tragen.', count: 6, find: WIMMEL },
+      // Spiel: Boten reiten aus (boten, neu)
+      task: { kind: 'boten', hint: 'Siegle die Briefe und schick die Boten in die richtige Richtung.', riders: BOTEN },
       questions: [
         { q: 'Wer trägt den neuen Brief in alle Länder?', options: ['reitende Boten auf Maultieren', 'Schiffe', 'Brieftauben'], answer: 0 },
         { q: 'Was gibt der König Mordechai?', options: ['den Siegelring', 'ein Schwert', 'Silber'], answer: 0 }
