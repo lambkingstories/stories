@@ -1,10 +1,10 @@
 /**
  * The data of "Ostern" (`ostern.ts`, `en/ostern.en.ts`, `osternPath.ts`): the stories and questions follow the rules of the adventures (texts of the draft
- * `D:/Claude/Abenteuer-Ostern/ENTWURF_Ostern.md`, Luther 1912 told in our own words), the seven old games and the two new ones (`fischzug`, `weiden`) have playable data,
+ * `D:/Claude/Abenteuer-Ostern/ENTWURF_Ostern.md`, Luther 1912 told in our own words), the games (since 5.11.2026 two known and seven new ones) have playable data,
  * the map has nine stations and the exam, and the English file has the same shape.
  *
  * The pictures: while the pictures are still being painted (nothing of them is in `public/` yet) the test does not ask for the picture files; it asks for them as soon as the
- * pictures are built in (the last file that `bilder_einbauen.py` writes, `spiele/ostern/lueckenvers/tafel.webp`, lies in `public/`). The recordings and the music are checked at once.
+ * pictures are built in (the picture of the last new game, `spiele/ostern/licht/huegel.webp`, lies in `public/`). The recordings and the music are checked at once.
  */
 import { existsSync, statSync } from 'node:fs'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -14,6 +14,8 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { setAdventureLanguage } from '@/use/adventureLanguage'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 import { fischzugProblems, grazeProblems } from '@/utils/osternGames'
+import { errandProblems, shuttersProblems } from '@/utils/osternNeuA'
+import { flameProblems, tableProblems, wanderProblems } from '@/utils/osternNeuB'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => ostern.stages[n - 1]!
@@ -21,7 +23,7 @@ const stage = (n: number) => ostern.stages[n - 1]!
 const FORBIDDEN = /\b(Teufel|Hölle|Leiche|Leichen|Leichnam|Nägel|Nagel|Nägelmale|Wunde|Wunden|Blut|blutet|blutig|Dornenkrone|Heiligenschein|Kreuz|Kreuze)\b/i
 const plain = (s: string) => s.replace(/[„“”]/g, '')
 /** The pictures are in `public/` when the last file of the building-in script is there. */
-const PICTURES_IN = existsSync('public/images/abenteuer/spiele/ostern/lueckenvers/tafel.webp')
+const PICTURES_IN = existsSync('public/images/abenteuer/spiele/ostern/licht/huegel.webp')
 
 describe('Ostern: stories and questions', () => {
   it('nine stages with 3 to 5 paragraphs of 100 to 180 words and the Bible passage under every one', () => {
@@ -91,7 +93,7 @@ describe('Ostern: stories and questions', () => {
     expect(q).toMatch(/Folge mir nach/)
   })
 
-  it('no game is played twice in a row (the verse gaps of stages 2 and 9 are far apart); the two new games are on stages 7 and 8', () => {
+  it('no game is played twice in a row; the net and the pasture are on stages 7 and 8', () => {
     const kinds = ostern.stages.map((s) => s.task.kind)
     for (let i = 1; i < kinds.length; i++) expect(kinds[i], `same game in a row at ${i + 1}`).not.toBe(kinds[i - 1])
     expect(stage(7).task.kind).toBe('fischzug')
@@ -135,10 +137,9 @@ describe('Ostern: stories and questions', () => {
 })
 
 describe('Ostern: the games', () => {
-  it('the order of the games: 7 old ones (wimmelbild, lueckenvers, weg, reihenfolge, puzzle, memory, lueckenvers) and 2 new ones (fischzug, weiden)', () => {
-    expect(ostern.stages.map((s) => s.task.kind)).toEqual(['wimmelbild', 'lueckenvers', 'weg', 'reihenfolge', 'puzzle', 'memory', 'fischzug', 'weiden', 'lueckenvers'])
+  it('the order of the games (Antons Regel 5.11.2026): two known ones (wimmelbild, unterschied) far apart, the others new', () => {
+    expect(ostern.stages.map((s) => s.task.kind)).toEqual(['wimmelbild', 'botengang', 'wanderweg', 'tischdecken', 'fensterlaeden', 'unterschied', 'fischzug', 'weiden', 'lichtweg'])
   })
-
   it('1 hidden pictures: Mary Magdalene, Peter, the other disciple and the linen cloths, covers, every place inside the picture', () => {
     const t = stage(1).task
     expect(t.count).toBe(4)
@@ -158,64 +159,53 @@ describe('Ostern: the games', () => {
     expect(f.scene).toBe('images/abenteuer/spiele/ostern/wimmel/szene.webp')
   })
 
-  it.each([
-    [2, 'Ich habe den Herrn gesehen!', 'gesehen'],
-    [9, 'Ihr aber seid Zeugen von alledem.', 'Zeugen']
-  ])('%i verse: two rounds, the sentence stands word for word in the text of the stage, the right words are on the leaves', (n, verse, firstWord) => {
-    const g = stage(n).task.verse!
+  it('the new games can be played: errand, road, table, shutters, flame (the checks of their logic find nothing)', () => {
+    expect(errandProblems(stage(2).task.errand!)).toEqual([])
+    expect(wanderProblems(stage(3).task.wander!)).toEqual([])
+    expect(tableProblems(stage(4).task.table!)).toEqual([])
+    expect(shuttersProblems(stage(5).task.shutters!)).toEqual([])
+    expect(flameProblems(stage(9).task.flame!)).toEqual([])
+  })
+
+  it('2 errand: Mary from the garden gate to the house of the disciples, round 2 bigger with more wells', () => {
+    const g = stage(2).task.errand!
     expect(g.rounds).toHaveLength(2)
-    const text = plain(stage(n).text.join(' '))
-    for (const r of g.rounds) {
-      expect(r.parts).toHaveLength(r.answers.length + 1)
-      let sentence = r.parts[0]!
-      r.answers.forEach((a, k) => {
-        sentence += r.words[a] + r.parts[k + 1]
-      })
-      expect(text, `"${sentence}"`).toContain(plain(sentence))
-      expect(sentence).toBe(verse)
-    }
-    expect(g.rounds.map((r) => r.answers.length)).toEqual([1, 2])
-    expect(g.rounds[0]!.words[0]).toBe(firstWord)
-    expect(g.board).toBe('images/abenteuer/spiele/ostern/lueckenvers/tafel.webp')
-    expect(g.leaf).toBe('images/abenteuer/spiele/ostern/lueckenvers/blatt.webp')
+    const wells = (r: { rows: string[] }) => r.rows.join('').split('B').length - 1
+    expect(wells(g.rounds[1]!)).toBeGreaterThan(wells(g.rounds[0]!))
+    expect(g.walker).toBe('images/abenteuer/spiele/ostern/botengang/maria.webp')
   })
 
-  it('3 way: three forks with three ways each (left, right, middle), the walkers and the own words of the journey to Emmaus', () => {
-    const g = stage(3).task.way!
-    expect(g.scenes.map((s) => s.goal)).toEqual(['left', 'right', 'middle'])
-    for (const s of g.scenes) expect(s.paths).toBe(3)
-    expect(g.scenes.map((s) => s.image)).toEqual([1, 2, 3].map((n) => `images/abenteuer/spiele/ostern/weg/gabel-${n}.webp`))
+  it('3 road: the two walkers of the old way game on two painted roads, round 2 with more obstacles', () => {
+    const g = stage(3).task.wander!
     expect(g.walker).toBe('images/abenteuer/spiele/ostern/weg/wanderer.webp')
-    expect(g.texts!.hint).toContain('{n}')
-    expect(g.texts!.hint).toContain('{total}')
-    expect(g.texts!.done).toContain('Emmaus')
+    expect(g.rounds.map((r) => r.background)).toEqual([1, 2].map((n) => `images/abenteuer/spiele/ostern/wanderweg/strasse-${n}.webp`))
+    expect(g.rounds[1]!.obstacles.length).toBeGreaterThan(g.rounds[0]!.obstacles.length)
   })
 
-  it('4 order: four cards in the order of the story (road, stranger, bread, back); round 1 with the numbers and three cards, round 2 with all four', () => {
-    const g = stage(4).task.order!
-    expect(g.cards.map((c) => c.id)).toEqual(['weg', 'fremder', 'brot', 'zurueck'])
-    expect(g.rounds.map((r) => r.cards.length)).toEqual([3, 4])
-    expect(g.rounds.map((r) => r.numbered)).toEqual([true, false])
-    expect(g.rounds[1]!.cards).toEqual(['weg', 'fremder', 'brot', 'zurueck'])
-    expect(g.cards.map((c) => c.image)).toEqual([1, 2, 3, 4].map((n) => `images/abenteuer/spiele/ostern/reihenfolge/karte-${n}.webp`))
+  it('4 table: a cup and a bowl at every place, then lamp and jug in the middle, the bread to the guest, net and staff into the basket', () => {
+    const g = stage(4).task.table!
+    expect(g.guestSlot).toBe('oben')
+    expect(g.rounds[0]!.items.map((i) => i.target).sort()).toEqual(['links', 'links', 'oben', 'oben', 'rechts', 'rechts'])
+    expect(Object.fromEntries(g.rounds[1]!.items.map((i) => [i.id, i.target]))).toEqual({ lampe: 'mitte', krug: 'mitte', brot: 'oben', netz: 'korb', stab: 'korb' })
   })
 
-  it('5 puzzle: the picture of the room with Jesus in the middle in 2 columns and 3 rows', () => {
-    const g = stage(5).task.puzzle!
-    expect(g.cols).toBe(2)
-    expect(g.rows).toBe(3)
-    expect(g.image).toBe('images/abenteuer/spiele/ostern/puzzle/saal.webp')
+  it('5 shutters: four windows in a row (best 2), then two rows of three with five closed (best 3)', () => {
+    const g = stage(5).task.shutters!
+    expect(g.rounds.map((r) => r.windows.length)).toEqual([4, 6])
+    expect(g.rounds.map((r) => r.par)).toEqual([2, 3])
+    expect(g.rounds[1]!.start.filter((o) => !o)).toHaveLength(5)
   })
 
-  it('6 memory: six pairs with a text each (only what is in the texts of the stages), the back of the cards', () => {
-    const g = stage(6).task.memory!
-    expect(g.pairs).toHaveLength(6)
-    expect(g.back).toBe('images/abenteuer/spiele/ostern/memory/rueckseite.webp')
-    expect(g.pairs.map((p) => p.image)).toEqual([1, 2, 3, 4, 5, 6].map((n) => `images/abenteuer/spiele/ostern/memory/karte-${n}.webp`))
-    expect(new Set(g.pairs.map((p) => p.text)).size).toBe(6)
-    for (const p of g.pairs) expect(p.text, p.text).not.toMatch(FORBIDDEN)
+  it('6 differences: two views of the room, three big things and then four small ones', () => {
+    const g = stage(6).task.diff!
+    expect(g.rounds.map((r) => r.items.length)).toEqual([3, 4])
+    expect(g.rounds.map((r) => r.base)).toEqual([1, 2].map((n) => `images/abenteuer/spiele/ostern/unterschied/saal-${n}.webp`))
   })
 
+  it('9 flame: six people in a row, then nine with a fork; every lamp can be reached', () => {
+    const g = stage(9).task.flame!
+    expect(g.rounds.map((r) => r.people.length)).toEqual([6, 9])
+  })
   it('7 net: two rounds (five fish in one swarm, eight fish in two swarms); the data can be played; the pictures come from the data', () => {
     const g = stage(7).task.fischzug!
     expect(fischzugProblems(g)).toEqual([])
@@ -308,9 +298,12 @@ describe('Ostern: map, files, English', () => {
     setAdventureLanguage('en')
     expect(stage(1).title).toBe('The Tomb Is Empty')
     expect(stage(1).task.find!.labels![0]).toBe('Mary Magdalene')
-    expect(stage(3).task.way!.texts!.done).toContain('Emmaus')
-    expect(stage(4).task.order!.cards[2]!.label).toContain('breaks the bread')
-    expect(stage(6).task.memory!.pairs[4]!.text).toContain('net')
+    expect(stage(2).task.errand!.rounds[0]!.hint).toContain('Mary')
+    expect(stage(3).task.wander!.rounds[0]!.obstacles.map((o) => o.name)).toContain('A stone')
+    expect(stage(4).task.table!.rounds[1]!.items.map((i) => i.name)).toContain('The flatbread')
+    expect(stage(5).task.shutters!.rounds[0]!.hint).toContain('shutters')
+    expect(stage(6).task.diff!.rounds[0]!.hint).toContain('Eight days later')
+    expect(stage(9).task.flame!.rounds[0]!.hint).toContain('Jerusalem')
     expect(stage(7).task.fischzug!.rounds[0]!.hint).toContain('net')
     expect(stage(7).task.fischzug!.boat.label).toContain('seven fishermen')
     expect(stage(8).task.graze!.rounds.map((r) => r.title)).toEqual(['Feed my lambs!', 'Feed my sheep!'])
@@ -326,21 +319,5 @@ describe('Ostern: map, files, English', () => {
       const t = e.text.join(' ')
       expect(t, `stage ${i + 1}`).not.toMatch(/\b(nails?|thorns?|whip|scourg\w*|wounds?|corpse|bleed\w*|blood|hell|devil|cross)\b/i)
     })
-  })
-
-  it('the English verses stand word for word in the English text of stages 2 and 9', () => {
-    const en = englishTextsOf(ostern) as { stages: { text: string[]; task?: { verse?: { rounds: { parts: string[]; words: string[] }[] } } }[] }
-    for (const n of [2, 9]) {
-      const e = en.stages[n - 1]!
-      const text = plain(e.text.join(' '))
-      const de = stage(n).task.verse!
-      e.task!.verse!.rounds.forEach((r, k) => {
-        let sentence = r.parts[0]!
-        de.rounds[k]!.answers.forEach((a, i) => {
-          sentence += r.words[a] + r.parts[i + 1]
-        })
-        expect(text, `"${sentence}"`).toContain(plain(sentence))
-      })
-    }
   })
 })

@@ -39,12 +39,9 @@ export const osternEn: TextOverlay<Journey> = {
         'Mary Magdalene goes to the disciples. “I have seen the Lord!” she tells them, and she says what he said to her.'
       ],
       task: {
-        hint: 'Drag the right word into the gap.',
-        verse: {
-          rounds: [
-            { hint: 'Drag the right leaf into the gap.', parts: ['I have ', ' the Lord!'], words: ['seen', 'heard', 'forgotten'] },
-            { hint: 'Now two words are missing.', parts: ['I have ', ' the ', '!'], words: ['seen', 'Lord', 'gardener', 'heard'] }
-          ]
+        hint: 'Bring Mary through the lanes to the disciples.',
+        errand: {
+          rounds: [{ hint: 'Mary runs from the garden to the disciples. Tap the lane she should run along.' }, { hint: 'Now there are more lanes. Where there is a well, the lane ends.' }]
         }
       },
       questions: [
@@ -62,14 +59,9 @@ export const osternEn: TextOverlay<Journey> = {
         '“Did not the Christ have to suffer all this and then enter into his glory?” asks Jesus. And he explains to them what is written about him in all the Scriptures, beginning with Moses and going through all the prophets.'
       ],
       task: {
-        hint: 'Find the way to Emmaus.',
-        way: {
-          texts: {
-            hint: 'Fork {n} of {total}: tap the road with a village and a thread of smoke at its end.',
-            right: 'Right! There is a village with smoke.',
-            wrong: 'No village here. The disciples turn around.',
-            done: 'The two disciples have reached Emmaus!'
-          }
+        hint: 'Lead the two walkers to Emmaus.',
+        wander: {
+          rounds: [{ hint: 'Lead the two walkers up the road to the milestone. Keep away from the stones and thornbushes.', obstacles: [{ name: 'A stone' }, { name: 'A thornbush' }, { name: 'A stone' }, { name: 'A stone' }, { name: 'A thornbush' }], goal: { name: 'The milestone' } }, { hint: 'Now the road is longer and there are more stones on it.', obstacles: [{ name: 'A stone' }, { name: 'A thornbush' }, { name: 'A stone' }, { name: 'A thornbush' }, { name: 'A stone' }, { name: 'A stone' }, { name: 'A thornbush' }, { name: 'A stone' }], goal: { name: 'The milestone' } }]
         }
       },
       questions: [
@@ -86,10 +78,10 @@ export const osternEn: TextOverlay<Journey> = {
         'In the same hour they get up and go back to Jerusalem. There the disciples are gathered together. “The Lord is risen indeed,” they tell them, “and he has appeared to Simon!” Then the two tell what happened on the road, and how they knew him: he broke the bread.'
       ],
       task: {
-        hint: 'Put the four pictures in the order of the story.',
-        order: {
-          cards: [{ label: 'Two disciples walk sadly along the road to Emmaus' }, { label: 'A stranger walks with them and talks, the disciples listen' }, { label: 'At the table Jesus breaks the bread, the two look at him in wonder' }, { label: 'The two run back to Jerusalem at dusk, beaming' }],
-          rounds: [{ hint: 'Round 1: Put the pictures in the order of the story. The dots show where they go.' }, { hint: 'Round 2: Now with the beginning on the road and without dots: What comes first, what comes next?' }]
+        hint: 'Set the table in Emmaus.',
+        table: {
+          slots: [{ name: 'The place on the left' }, { name: 'The place of the guest' }, { name: 'The place on the right' }, { name: 'The middle of the table' }, { name: 'The basket beside the table' }],
+          rounds: [{ hint: 'The two ask the stranger: Abide with us! Put a cup and a bowl at every place.', items: [{ name: 'A cup' }, { name: 'A cup' }, { name: 'A cup' }, { name: 'A bowl' }, { name: 'A bowl' }, { name: 'A bowl' }] }, { hint: 'The lamp and the jug go in the middle, the bread to the guest. What does not belong on the table goes into the basket.', items: [{ name: 'The oil lamp' }, { name: 'The jug' }, { name: 'The flatbread' }, { name: 'A fishing net' }, { name: 'A shepherd’s staff' }] }]
         }
       },
       questions: [
@@ -105,7 +97,12 @@ export const osternEn: TextOverlay<Journey> = {
         'The disciples are startled and afraid. They think they are seeing a ghost. “Why are you so frightened?” asks Jesus. “Look at my hands and my feet: it is I myself! Touch me and see: a ghost does not have flesh and bones, as you see that I have.” And he shows them his hands. Then the disciples are glad when they see the Lord.',
         'But for sheer joy they still cannot believe it, and they wonder. “Do you have anything to eat?” asks Jesus. They give him a piece of broiled fish. He takes it and eats it before their eyes.'
       ],
-      task: { hint: 'Put the picture of the room together.' },
+      task: {
+        hint: 'Open all the shutters of the room.',
+        shutters: {
+          rounds: [{ hint: 'Jesus stands in the midst of the disciples. Open all the shutters. A shutter takes its neighbours with it.' }, { hint: 'Now the house has two rows. In each row the neighbours on the left and right move too.' }]
+        }
+      },
       questions: [
         { q: 'What does Jesus say when he stands among the disciples?', options: ['Peace be with you!', 'Be afraid!', 'Go home!'] },
         { q: 'What does Jesus eat in front of them?', options: ['a piece of broiled fish', 'a piece of bread', 'a bowl of grapes'] }
@@ -122,16 +119,9 @@ export const osternEn: TextOverlay<Journey> = {
         '“You believe because you have seen me,” says Jesus. “Blessed are those who have not seen and yet have believed!”'
       ],
       task: {
-        hint: 'Find the matching cards. Remember where each one lies.',
-        memory: {
-          pairs: [
-            { text: 'The stone: Mary Magdalene sees that it has been rolled away from the tomb.' },
-            { text: 'The linen cloth: The disciples see the linen cloths lying in the tomb.' },
-            { text: 'The bread: In Emmaus the two disciples know Jesus when he breaks it.' },
-            { text: 'The broiled fish: Jesus eats a piece of it in front of the disciples.' },
-            { text: 'The net: It is full of great fish and does not break.' },
-            { text: 'The fire of coals: Fish and bread lie on it on the shore.' }
-          ]
+        hint: 'Find what is missing in the left picture.',
+        diff: {
+          rounds: [{ hint: 'Eight days later the disciples are in the house again. The right picture has a few more things. Tap what is missing on the left.' }, { hint: 'Once more, with smaller things.' }]
         }
       },
       questions: [
@@ -196,12 +186,9 @@ export const osternEn: TextOverlay<Journey> = {
         'Then Jesus leads them out as far as Bethany. He lifts up his hands and blesses them. While he blesses them, he leaves them and is carried up into heaven. The disciples worship him and go back to Jerusalem with great joy. There they are in the temple every day, praising God.'
       ],
       task: {
-        hint: 'Drag the right word into the gap.',
-        verse: {
-          rounds: [
-            { hint: 'Drag the right leaf into the gap.', parts: ['And you are ', ' of all this.'], words: ['witnesses', 'fishermen', 'messengers'] },
-            { hint: 'Now two words are missing.', parts: ['And you are witnesses ', ' ', '.'], words: ['of', 'all this', 'about', 'all that'] }
-          ]
+        hint: 'Pass the light on as far as Jerusalem.',
+        flame: {
+          rounds: [{ hint: 'The disciples go back to Jerusalem with great joy. Pull the flame from lamp to lamp until they all burn.', people: [{ name: 'Someone with an oil lamp' }, { name: 'Someone with an oil lamp' }, { name: 'Someone with an oil lamp' }, { name: 'Someone with an oil lamp' }, { name: 'Someone with an oil lamp' }, { name: 'Someone with an oil lamp' }] }, { hint: 'Now the way divides. All the lamps should burn, on both ways.', people: [{ name: 'Someone with an oil lamp' }, { name: 'Someone with an oil lamp' }, { name: 'Someone with an oil lamp' }, { name: 'Someone with an oil lamp' }, { name: 'Someone with an oil lamp' }, { name: 'Someone with an oil lamp' }, { name: 'Someone with an oil lamp' }, { name: 'Someone with an oil lamp' }, { name: 'Someone with an oil lamp' }] }]
         }
       },
       questions: [

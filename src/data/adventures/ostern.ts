@@ -4,14 +4,16 @@
  * Der Ton ist hell und froh, aber leise: die Menschen verstehen nach und nach. Kein Kreuz im Bild, kein Blut, keine Wunden, kein Leichnam; die Leinentücher liegen flach gefaltet im leeren Grab.
  * Quelle der Texte: D:/Claude/Abenteuer-Ostern/ENTWURF_Ostern.md (Luther 1912 von bibeltext.com gelesen, nichts abgeschrieben), Plan: ETAPPENPLAN.md, Figuren: FIGUREN.md, Spiele: SPIELE.md.
  * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
- * Spiele (Wahl der Leitung, Anton 1.11.2026: neu und zur Szene passend): 1 Wimmelbild (alt), 2 Lückenvers (alt), 3 Weg (alt), 4 Reihenfolge (alt), 5 Puzzle (alt), 6 Memory (alt),
- * 7 Das Netz zur Rechten (neu, fischzug), 8 Die Lämmer führen (neu, weiden), 9 Lückenvers (alt).
+ * Spiele (Antons Regel 5.11.2026: höchstens zwei bekannte Spiele, nie hintereinander): 1 Wimmelbild (bekannt), 2 Botengang (neu), 3 Wanderweg (neu), 4 Tisch decken (neu), 5 Fensterläden (neu),
+ * 6 Unterschiede finden (bekannt, Mechanik von Mose), 7 Das Netz zur Rechten (neu, fischzug), 8 Die Lämmer führen (neu, weiden), 9 Licht weitergeben (neu).
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/ostern/, images/abenteuer/spiele/ostern/<spiel>/, audio/abenteuer/ostern/.
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  * ERZEUGT von D:/Claude/Abenteuer-Ostern/tools/bauen_ostern.py: nicht von Hand ändern.
  */
-import type { FindGame, Journey, MemoryGame, OrderGame, VerseGame, WayGame, FischzugGame, GrazeGame } from '@/types/adventure'
+import type { DiffGame, FindGame, Journey, FischzugGame, GrazeGame } from '@/types/adventure'
+import type { ErrandGame, ShuttersGame } from '@/utils/osternNeuA'
+import type { FlameGame, TableGame, WanderGame } from '@/utils/osternNeuB'
 import { josef } from './josef'
 import { OSTERN_PATH } from './osternPath'
 import { localize } from './localize'
@@ -24,84 +26,213 @@ const PICS = 'images/abenteuer/ostern/'
 
 const G = 'images/abenteuer/spiele/ostern/'
 
-/**
- * Etappe 2, "Lückenvers" (alte Mechanik): der Ruf der Maria Magdalena aus dem Text der Etappe (Johannes 20,18) in zwei Runden (erst ein Wort, dann zwei); die Wörter sind Blätter (das richtige zuerst, `answers` zeigt auf sie).
- * Tafel und Blatt sind die aus Nr. 28 (kopiert). Hintergrund: Morgensonne über einem Garten mit Olivenzweig (Bildauftrag). Die Sätze stehen wörtlich im Etappentext (das Bauskript prüft es).
- */
-const VERS: VerseGame = {
-  background: `${G}hintergrund/vers-hintergrund.webp`,
-  soft: true,
-  board: `${G}lueckenvers/tafel.webp`,
-  leaf: `${G}lueckenvers/blatt.webp`,
-  rounds: [
-    { hint: 'Ziehe das passende Blatt in die Lücke.', parts: ['Ich habe den Herrn ', '!'], words: ['gesehen', 'gehört', 'vergessen'], answers: [0] },
-    { hint: 'Jetzt fehlen zwei Wörter.', parts: ['Ich habe den ', ' ', '!'], words: ['Herrn', 'gesehen', 'Gärtner', 'gehört'], answers: [0, 1] }
-  ]
-}
 
 /**
- * Etappe 9, "Lückenvers" (alte Mechanik): das Wort Jesu an die Jünger (Lukas 24,48) aus dem Text der Etappe in zwei Runden; Tafel, Blatt und Hintergrund wie in Etappe 2.
+ * Etappe 2, "Botengang" (neu, `botengang`, Joh 20,18): Maria Magdalena läuft durch die Gassen Jerusalems zu den Jüngern. Das Gitter ist aus gemalten Gassenkacheln (Draufsicht, 256 × 256),
+ * die App dreht sie nach den Nachbarn (`#` Dach, `.` Gasse, `S` Gartentor, `Z` Haus der Jünger, `B` Sackgasse mit Brunnen). Runde 1: 5 × 5 mit einer Sackgasse, Runde 2: 6 × 7 mit vier.
  */
-const VERS2: VerseGame = {
-  background: `${G}hintergrund/vers-hintergrund.webp`,
-  soft: true,
-  board: `${G}lueckenvers/tafel.webp`,
-  leaf: `${G}lueckenvers/blatt.webp`,
-  rounds: [
-    { hint: 'Ziehe das passende Blatt in die Lücke.', parts: ['Ihr aber seid ', ' von alledem.'], words: ['Zeugen', 'Fischer', 'Boten'], answers: [0] },
-    { hint: 'Jetzt fehlen zwei Wörter.', parts: ['Ihr aber seid Zeugen ', ' ', '.'], words: ['von', 'alledem', 'über', 'allem'], answers: [0, 1] }
-  ]
-}
-
-/**
- * Etappe 3, "Weg" (alte Mechanik, ohne Schilder): die zwei Jünger gehen nach Emmaus; an drei Gabelungen mit je drei Wegen tippt das Kind den Weg, an dessen Ende ein Dorf mit einem Rauchfaden aus dem Schornstein liegt.
- * Der richtige Weg: links, rechts, in der Mitte. Bilder (Bildauftrag): `weg/gabel-1..3.webp`, `weg/wanderer.webp`.
- */
-const WEG: WayGame = {
-  walker: `${G}weg/wanderer.webp`,
-  texts: {
-    hint: 'Weggabelung {n} von {total}: Tippe auf den Weg, an dessen Ende ein Dorf mit Rauch liegt.',
-    right: 'Richtig! Dort liegt ein Dorf mit Rauch.',
-    wrong: 'Hier ist kein Dorf. Die Jünger kehren um.',
-    done: 'Die beiden Jünger sind in Emmaus angekommen!'
+const BOTENGANG: ErrandGame = {
+  tiles: {
+    straight: `${G}botengang/gasse-gerade.webp`,
+    corner: `${G}botengang/gasse-ecke.webp`,
+    tee: `${G}botengang/gasse-t.webp`,
+    cross: `${G}botengang/gasse-kreuz.webp`,
+    dead: `${G}botengang/sackgasse.webp`,
+    roofs: [`${G}botengang/dach-1.webp`, `${G}botengang/dach-2.webp`],
+    start: `${G}botengang/start.webp`,
+    goal: `${G}botengang/ziel.webp`
   },
-  scenes: [
-    { image: `${G}weg/gabel-1.webp`, goal: 'left', paths: 3 },
-    { image: `${G}weg/gabel-2.webp`, goal: 'right', paths: 3 },
-    { image: `${G}weg/gabel-3.webp`, goal: 'middle', paths: 3 }
-  ]
-}
-
-/**
- * Etappe 4, "Das Brot in Emmaus" (alte Mechanik, Reihenfolge legen): zwei Jünger gehen nach Emmaus, ein Fremder geht mit und erzählt, am Tisch bricht er das Brot, die beiden laufen zurück nach Jerusalem.
- * Runde 1 drei Karten mit Punkten, Runde 2 alle vier ohne Punkte. Bilder (Bildauftrag): `reihenfolge/karte-1..4.webp` (4:3).
- */
-const REIHENFOLGE: OrderGame = {
-  cards: [
-    { id: 'weg', image: `${G}reihenfolge/karte-1.webp`, label: 'Zwei Jünger gehen traurig auf der Landstraße nach Emmaus' },
-    { id: 'fremder', image: `${G}reihenfolge/karte-2.webp`, label: 'Ein Fremder geht mit ihnen und erzählt, die Jünger hören zu' },
-    { id: 'brot', image: `${G}reihenfolge/karte-3.webp`, label: 'Am Tisch bricht Jesus das Brot, die beiden sehen ihn staunend an' },
-    { id: 'zurueck', image: `${G}reihenfolge/karte-4.webp`, label: 'Die beiden laufen in der Dämmerung strahlend zurück nach Jerusalem' }
-  ],
+  walker: `${G}botengang/maria.webp`,
   rounds: [
-    { hint: 'Runde 1: Lege die Bilder in die Reihenfolge der Geschichte. Die Punkte zeigen, wo sie hinkommen.', numbered: true, cards: ['fremder', 'brot', 'zurueck'] },
-    { hint: 'Runde 2: Jetzt mit dem Anfang auf der Landstraße und ohne Punkte: Was kommt zuerst, was danach?', numbered: false, cards: ['weg', 'fremder', 'brot', 'zurueck'] }
+    { hint: 'Maria läuft vom Garten zu den Jüngern. Tippe auf die Gasse, in die sie laufen soll.', rows: ['S..#Z', '##.#.', 'B....', '#.#.#', '#...#'] },
+    { hint: 'Jetzt sind es mehr Gassen. Wo ein Brunnen steht, geht es nicht weiter.', rows: ['S..##B#', '##.#..Z', 'B....##', '##.#.##', '#..#..B', '#B#####'] }
   ]
 }
 
 /**
- * Etappe 6, "Memory" (alte Mechanik): sechs Dinge aus den Geschichten dieser Reise (der Stein, das Leinentuch, das Brot, der gebratene Fisch, das Netz, das Kohlenfeuer); die Rückseite zeigt ein Muster aus Olivenzweigen (Bildauftrag).
- * Bilder: `memory/karte-1..6.webp` (in dieser Reihenfolge), `memory/rueckseite.webp`. Die Texte sagen nur, was im Text der Etappen steht.
+ * Etappe 3, "Wanderweg" (neu, `wanderweg`, Lk 24,13–15): die zwei Jünger gehen nach Emmaus; das Kind führt sie mit dem Finger die gemalte Landstraße hinauf (3:4) an Steinen und Dornbüschen vorbei
+ * zum Meilenstein. Straßenmitte und Hindernisse vom gemalten Bild abgelesen (tools/_massen_neu.json). Der Wanderer-Sprite ist der aus dem alten Wegspiel (`weg/wanderer.webp`).
  */
-const MEMORY: MemoryGame = {
-  back: `${G}memory/rueckseite.webp`,
-  pairs: [
-    { image: `${G}memory/karte-1.webp`, text: 'Der Stein: Maria Magdalena sieht, dass er vom Grab weggerollt ist.' },
-    { image: `${G}memory/karte-2.webp`, text: 'Das Leinentuch: Die Jünger sehen die Leinentücher im Grab liegen.' },
-    { image: `${G}memory/karte-3.webp`, text: 'Das Brot: In Emmaus erkennen die zwei Jünger Jesus, als er es bricht.' },
-    { image: `${G}memory/karte-4.webp`, text: 'Der gebratene Fisch: Jesus isst ein Stück davon vor den Jüngern.' },
-    { image: `${G}memory/karte-5.webp`, text: 'Das Netz: Es ist voll großer Fische und reißt nicht.' },
-    { image: `${G}memory/karte-6.webp`, text: 'Das Kohlenfeuer: Am Ufer liegen Fisch und Brot darauf.' }
+const WANDERWEG: WanderGame = {
+  walker: `${G}weg/wanderer.webp`,
+  walkerW: 16,
+  rounds: [
+    {
+      hint: 'Führe die zwei Wanderer die Straße hinauf bis zum Meilenstein. Weiche den Steinen und Dornbüschen aus.',
+      background: `${G}wanderweg/strasse-1.webp`,
+      road: 12,
+      path: [{ x: 43.2, y: 100 }, { x: 41.8, y: 90 }, { x: 47.8, y: 80 }, { x: 58.2, y: 70 }, { x: 61.6, y: 60 }, { x: 52.8, y: 50 }, { x: 37.6, y: 40 }, { x: 34.9, y: 30 }, { x: 48.1, y: 20 }, { x: 56, y: 10 }],
+      obstacles: [
+        { image: `${G}wanderweg/stein-1.webp`, x: 31.4, y: 88, r: 5, name: 'Ein Stein', kind: 'stone' },
+        { image: `${G}wanderweg/dorn-1.webp`, x: 66.9, y: 72, r: 5, name: 'Ein Dornbusch', kind: 'thorn' },
+        { image: `${G}wanderweg/stein-2.webp`, x: 46.1, y: 55, r: 4.5, name: 'Ein Stein', kind: 'stone' },
+        { image: `${G}wanderweg/stein-3.webp`, x: 48.7, y: 38, r: 4.5, name: 'Ein Stein', kind: 'stone' },
+        { image: `${G}wanderweg/dorn-2.webp`, x: 31.6, y: 22, r: 5, name: 'Ein Dornbusch', kind: 'thorn' }
+      ],
+      goal: { image: `${G}wanderweg/ziel.webp`, x: 64.1, y: 5, w: 12, name: 'Der Meilenstein' }
+    },
+    {
+      hint: 'Jetzt ist die Straße länger und es liegen mehr Steine darauf.',
+      background: `${G}wanderweg/strasse-2.webp`,
+      road: 12,
+      path: [{ x: 40.8, y: 100 }, { x: 41.9, y: 95 }, { x: 41.1, y: 90 }, { x: 37.8, y: 80 }, { x: 30.6, y: 70 }, { x: 30.4, y: 60 }, { x: 35, y: 55 }, { x: 43.9, y: 50 }, { x: 56.2, y: 45 }, { x: 63.2, y: 40 }, { x: 66.3, y: 35 }, { x: 63.4, y: 30 }, { x: 55.3, y: 25 }, { x: 43.7, y: 20 }, { x: 36.8, y: 15 }, { x: 37.8, y: 10 }, { x: 45, y: 5 }],
+      obstacles: [
+        { image: `${G}wanderweg/stein-1.webp`, x: 30.6, y: 90, r: 3.5, name: 'Ein Stein', kind: 'stone' },
+        { image: `${G}wanderweg/dorn-1.webp`, x: 47.2, y: 80, r: 3.5, name: 'Ein Dornbusch', kind: 'thorn' },
+        { image: `${G}wanderweg/stein-3.webp`, x: 39, y: 70, r: 3.5, name: 'Ein Stein', kind: 'stone' },
+        { image: `${G}wanderweg/dorn-2.webp`, x: 23.2, y: 60, r: 3.5, name: 'Ein Dornbusch', kind: 'thorn' },
+        { image: `${G}wanderweg/stein-2.webp`, x: 33.9, y: 50, r: 3.5, name: 'Ein Stein', kind: 'stone' },
+        { image: `${G}wanderweg/stein-1.webp`, x: 68.9, y: 40, r: 3.5, name: 'Ein Stein', kind: 'stone' },
+        { image: `${G}wanderweg/dorn-1.webp`, x: 70.1, y: 30, r: 3.5, name: 'Ein Dornbusch', kind: 'thorn' },
+        { image: `${G}wanderweg/stein-3.webp`, x: 51, y: 20, r: 3.5, name: 'Ein Stein', kind: 'stone' }
+      ],
+      goal: { image: `${G}wanderweg/ziel.webp`, x: 57, y: 5, w: 12, name: 'Der Meilenstein' }
+    }
+  ]
+}
+
+/**
+ * Etappe 4, "Tisch decken" (neu, `tischdecken`, Lk 24,29–31): der Tisch in Emmaus von oben mit drei Kissen; das Kind zieht die Dinge an ihre Plätze. Runde 1 je Platz ein Becher und eine Schale,
+ * Runde 2 Lampe und Krug in die Mitte, das Fladenbrot zum Gast (oben), Netz und Hirtenstab gehören nicht auf den Tisch (in den Korb). Am Ende bricht das Brot in zwei Hälften.
+ * Plätze vom gemalten Tisch abgelesen (tools/_massen_neu.json).
+ */
+const TISCH: TableGame = {
+  background: `${G}tisch/tisch.webp`,
+  slots: [
+    { id: 'links', x: 29.7, y: 51.6, r: 7, name: 'Der Platz links' },
+    { id: 'oben', x: 49, y: 38, r: 6.5, name: 'Der Platz des Gastes' },
+    { id: 'rechts', x: 68.4, y: 51.6, r: 7, name: 'Der Platz rechts' },
+    { id: 'mitte', x: 49, y: 57.5, r: 7, name: 'Die Mitte des Tisches' },
+    { id: 'korb', x: 87, y: 87.5, r: 9, name: 'Der Korb neben dem Tisch' }
+  ],
+  basket: { image: `${G}tisch/korb.webp`, x: 87, y: 87.5, w: 16 },
+  bread: { item: 'brot', whole: `${G}tisch/brot.webp`, halves: [`${G}tisch/brot-haelfte-1.webp`, `${G}tisch/brot-haelfte-2.webp`] },
+  guestSlot: 'oben',
+  rounds: [
+    {
+      hint: 'Die zwei bitten den Fremden: Bleib bei uns! Stell an jeden Platz einen Becher und eine Schale.',
+      items: [
+        { id: 'becher-1', image: `${G}tisch/becher.webp`, name: 'Ein Becher', w: 7, target: 'links', kind: 'becher' },
+        { id: 'becher-2', image: `${G}tisch/becher.webp`, name: 'Ein Becher', w: 7, target: 'oben', kind: 'becher' },
+        { id: 'becher-3', image: `${G}tisch/becher.webp`, name: 'Ein Becher', w: 7, target: 'rechts', kind: 'becher' },
+        { id: 'schale-1', image: `${G}tisch/schale.webp`, name: 'Eine Schale', w: 9, target: 'links', kind: 'schale' },
+        { id: 'schale-2', image: `${G}tisch/schale.webp`, name: 'Eine Schale', w: 9, target: 'oben', kind: 'schale' },
+        { id: 'schale-3', image: `${G}tisch/schale.webp`, name: 'Eine Schale', w: 9, target: 'rechts', kind: 'schale' }
+      ]
+    },
+    {
+      hint: 'Lampe und Krug kommen in die Mitte, das Brot zum Gast. Was nicht auf den Tisch gehört, kommt in den Korb.',
+      items: [
+        { id: 'lampe', image: `${G}tisch/lampe.webp`, name: 'Die Öllampe', w: 8, target: 'mitte', kind: 'lampe' },
+        { id: 'krug', image: `${G}tisch/krug.webp`, name: 'Der Krug', w: 8, target: 'mitte', kind: 'krug' },
+        { id: 'brot', image: `${G}tisch/brot.webp`, name: 'Das Fladenbrot', w: 12, target: 'oben', kind: 'brot' },
+        { id: 'netz', image: `${G}tisch/netz.webp`, name: 'Ein Fischernetz', w: 12, target: 'korb', kind: 'netz' },
+        { id: 'stab', image: `${G}tisch/stab.webp`, name: 'Ein Hirtenstab', w: 14, target: 'korb', kind: 'stab' }
+      ]
+    }
+  ]
+}
+
+/**
+ * Etappe 5, "Fensterläden" (neu, `fensterlaeden`, Lk 24,36): das Obergeschoss am Abend; jedes Fenster hat einen Laden. Ein Tippen klappt den Laden um und die Nachbarn mit; hinter jedem offenen
+ * Fenster leuchtet Lampenlicht und ein froher Jünger. Runde 1: vier Fenster in einer Reihe, alle zu (Bestzahl 2). Runde 2: zwei Reihen zu drei, die Nachbarn je Reihe, fünf zu (Bestzahl 3).
+ * Die Öffnungen der zwei Häuser sind verschieden geformt, darum hat Runde 1 eigene, schmalere Bilder. Lagen vom gemalten Bild abgelesen (tools/_massen_neu.json).
+ */
+const FENSTER: ShuttersGame = {
+  shutter: `${G}fenster/laden.webp`,
+  lights: [`${G}fenster/licht-1.webp`, `${G}fenster/licht-2.webp`, `${G}fenster/licht-3.webp`, `${G}fenster/licht-4.webp`, `${G}fenster/licht-5.webp`, `${G}fenster/licht-6.webp`],
+  rounds: [
+    {
+      hint: 'Jesus steht mitten unter den Jüngern. Öffne alle Fensterläden. Ein Laden nimmt seine Nachbarn mit.',
+      background: `${G}fenster/haus-1.webp`,
+      ratio: 1.5,
+      shutter: `${G}fenster/laden-schmal.webp`,
+      lights: [`${G}fenster/licht-schmal-1.webp`, `${G}fenster/licht-schmal-2.webp`, `${G}fenster/licht-schmal-3.webp`, `${G}fenster/licht-schmal-4.webp`],
+      windows: [{ x: 9.3, y: 37.8, w: 12.4, h: 31.9 }, { x: 32.6, y: 37.8, w: 12.3, h: 31.8 }, { x: 54.9, y: 37.8, w: 12.3, h: 31.8 }, { x: 77.7, y: 37.8, w: 12.2, h: 31.8 }],
+      links: [[1], [0, 2], [1, 3], [2]],
+      start: [false, false, false, false],
+      par: 2
+    },
+    {
+      hint: 'Jetzt hat das Haus zwei Reihen. In jeder Reihe gehen die Nachbarn links und rechts mit.',
+      background: `${G}fenster/haus-2.webp`,
+      ratio: 4 / 3,
+      windows: [{ x: 14.7, y: 20.3, w: 12.8, h: 24.4 }, { x: 43.9, y: 20.3, w: 12.7, h: 24.4 }, { x: 73.1, y: 20.3, w: 12.6, h: 24.5 }, { x: 14.9, y: 56.6, w: 12.6, h: 24.4 }, { x: 43.9, y: 56.5, w: 12.8, h: 24.7 }, { x: 73.1, y: 56.3, w: 12.7, h: 24.8 }],
+      links: [[1], [0, 2], [1], [4], [3, 5], [4]],
+      start: [false, true, false, false, false, false],
+      par: 3
+    }
+  ]
+}
+
+/**
+ * Etappe 6, "Unterschiede finden" (Mechanik von Mose Etappe 5, eines der zwei bekannten Spiele dieses Abenteuers; Joh 20,26): zwei Ansichten des Saals acht Tage später, das rechte Bild hat Dinge mehr.
+ * Runde 1 drei große Dinge (Mantel, Krug, Sandalen), Runde 2 vier kleinere (Becher, Brot, Rolle, Lampe). Lagen vom gemalten Bild abgelesen (tools/_massen_neu.json).
+ */
+const UNTERSCHIED: DiffGame = {
+  rounds: [
+    {
+      hint: 'Acht Tage später sind die Jünger wieder im Haus. Das rechte Bild hat ein paar Dinge mehr. Tippe, was links fehlt.',
+      base: `${G}unterschied/saal-1.webp`,
+      items: [
+        { image: `${G}unterschied/mantel.webp`, x: 66, y: 69.3, w: 16 },
+        { image: `${G}unterschied/krug.webp`, x: 86, y: 69, w: 12 },
+        { image: `${G}unterschied/sandalen.webp`, x: 46, y: 89.1, w: 10 }
+      ]
+    },
+    {
+      hint: 'Noch einmal, mit kleineren Dingen.',
+      base: `${G}unterschied/saal-2.webp`,
+      items: [
+        { image: `${G}unterschied/becher.webp`, x: 35.9, y: 61.5, w: 4.5 },
+        { image: `${G}unterschied/brot.webp`, x: 64.2, y: 62.3, w: 6 },
+        { image: `${G}unterschied/rolle.webp`, x: 89.1, y: 15.5, w: 6 },
+        { image: `${G}unterschied/lampe.webp`, x: 9, y: 30, w: 5 }
+      ]
+    }
+  ]
+}
+
+/**
+ * Etappe 9, "Licht weitergeben" (neu, `lichtweg`, Lk 24,52–53): auf dem Weg vom Hügel bei Bethanien nach Jerusalem stehen Menschen mit Öllampen; das Kind zieht die Flamme von einer brennenden Lampe zur
+ * nächsten in Reichweite, bis alle brennen. Runde 1: sechs Menschen in einer Reihe, Runde 2: neun mit einer Gabelung. Fußpunkte und Lampenanker vom gemalten Bild abgelesen (tools/_massen_neu.json).
+ */
+const LICHT: FlameGame = {
+  flame: `${G}licht/flamme.webp`,
+  rounds: [
+    {
+      hint: 'Die Jünger gehen mit großer Freude zurück nach Jerusalem. Zieh die Flamme von Lampe zu Lampe, bis alle brennen.',
+      background: `${G}licht/huegel.webp`,
+      people: [
+        { image: `${G}licht/mensch-1.webp`, x: 26, y: 94, w: 17.33, anchor: { x: 61, y: 31 }, name: 'Ein Mensch mit einer Öllampe' },
+        { image: `${G}licht/mensch-2.webp`, x: 15, y: 72, w: 14, anchor: { x: 61, y: 31 }, name: 'Ein Mensch mit einer Öllampe' },
+        { image: `${G}licht/mensch-3.webp`, x: 30, y: 54.5, w: 10.67, anchor: { x: 61, y: 31.5 }, name: 'Ein Mensch mit einer Öllampe' },
+        { image: `${G}licht/mensch-4.webp`, x: 52, y: 42, w: 8, anchor: { x: 65, y: 31.5 }, name: 'Ein Mensch mit einer Öllampe' },
+        { image: `${G}licht/mensch-1.webp`, x: 74, y: 44, w: 7.33, anchor: { x: 61, y: 31 }, name: 'Ein Mensch mit einer Öllampe' },
+        { image: `${G}licht/mensch-2.webp`, x: 89, y: 37.5, w: 6, anchor: { x: 61, y: 31 }, name: 'Ein Mensch mit einer Öllampe' }
+      ],
+      start: 0,
+      reach: 26,
+      gate: { x: 91.5, y: 33 }
+    },
+    {
+      hint: 'Jetzt teilt sich der Weg. Alle Lampen sollen brennen, auf beiden Wegen.',
+      background: `${G}licht/huegel.webp`,
+      people: [
+        { image: `${G}licht/mensch-1.webp`, x: 27, y: 95, w: 17.33, anchor: { x: 61, y: 31 }, name: 'Ein Mensch mit einer Öllampe' },
+        { image: `${G}licht/mensch-2.webp`, x: 15, y: 78, w: 14.67, anchor: { x: 61, y: 31 }, name: 'Ein Mensch mit einer Öllampe' },
+        { image: `${G}licht/mensch-3.webp`, x: 17, y: 62, w: 12, anchor: { x: 61, y: 31.5 }, name: 'Ein Mensch mit einer Öllampe' },
+        { image: `${G}licht/mensch-4.webp`, x: 32, y: 53.5, w: 10, anchor: { x: 65, y: 31.5 }, name: 'Ein Mensch mit einer Öllampe' },
+        { image: `${G}licht/mensch-1.webp`, x: 45, y: 47, w: 8.67, anchor: { x: 61, y: 31 }, name: 'Ein Mensch mit einer Öllampe' },
+        { image: `${G}licht/mensch-2.webp`, x: 55, y: 42, w: 7.33, anchor: { x: 61, y: 31 }, name: 'Ein Mensch mit einer Öllampe' },
+        { image: `${G}licht/mensch-3.webp`, x: 63, y: 49.5, w: 8, anchor: { x: 61, y: 31.5 }, name: 'Ein Mensch mit einer Öllampe' },
+        { image: `${G}licht/mensch-4.webp`, x: 76, y: 44.5, w: 6.67, anchor: { x: 65, y: 31.5 }, name: 'Ein Mensch mit einer Öllampe' },
+        { image: `${G}licht/mensch-1.webp`, x: 89, y: 37.5, w: 6, anchor: { x: 61, y: 31 }, name: 'Ein Mensch mit einer Öllampe' }
+      ],
+      start: 0,
+      reach: 20,
+      gate: { x: 91.5, y: 33 }
+    }
   ]
 }
 
@@ -252,8 +383,8 @@ export const ostern: Journey = {
         '„Maria!“, sagt Jesus. Da wendet sie sich ihm zu. „Rabbuni!“, ruft sie, das heißt Meister. „Geh zu meinen Brüdern“, sagt Jesus, „und sag ihnen: Ich gehe hinauf zu meinem Vater und zu eurem Vater, zu meinem Gott und zu eurem Gott.“',
         'Maria Magdalena geht zu den Jüngern. „Ich habe den Herrn gesehen!“, erzählt sie, und sie sagt ihnen, was er zu ihr gesagt hat.'
       ],
-      // Spiel: Lückenvers (lueckenvers, alt)
-      task: { kind: 'lueckenvers', hint: 'Ziehe das passende Wort in die Lücke.', verse: VERS },
+      // Spiel: Botengang (botengang, neu)
+      task: { kind: 'botengang', hint: 'Bring Maria durch die Gassen zu den Jüngern.', errand: BOTENGANG },
       questions: [
         { q: 'Wofür hält Maria den Mann am Grab?', options: ['für den Gärtner', 'für einen Soldaten', 'für einen Händler'], answer: 0 },
         { q: 'Was ruft Jesus?', options: ['Maria!', 'Petrus!', 'Thomas!'], answer: 0 }
@@ -270,8 +401,8 @@ export const ostern: Journey = {
         '„Du bist wohl der Einzige in Jerusalem, der nicht weiß, was dort geschehen ist“, sagt Kleopas. „Was denn?“, fragt Jesus. „Das mit Jesus von Nazareth“, sagen sie. „Er war ein Prophet, mächtig in Taten und Worten. Er wurde gekreuzigt. Wir hatten gehofft, dass er Israel erlöst. Heute früh waren Frauen am Grab. Sie haben seinen Leib nicht gefunden und sagen, er lebe.“',
         '„Musste der Christus nicht das alles leiden und dann in seine Herrlichkeit gehen?“, fragt Jesus. Und er erklärt ihnen, was in der ganzen Schrift von ihm steht, von Mose an und durch alle Propheten.'
       ],
-      // Spiel: Weg (weg, alt)
-      task: { kind: 'weg', hint: 'Finde den Weg nach Emmaus.', way: WEG },
+      // Spiel: Wanderweg (wanderweg, neu)
+      task: { kind: 'wanderweg', hint: 'Führe die zwei Wanderer nach Emmaus.', wander: WANDERWEG },
       questions: [
         { q: 'Wohin gehen die zwei Jünger?', options: ['nach Emmaus', 'nach Bethlehem', 'ans Meer'], answer: 0 },
         { q: 'Was erklärt Jesus ihnen?', options: ['was in der Schrift von ihm steht', 'wie man Fische fängt', 'den Weg nach Jerusalem'], answer: 0 }
@@ -287,8 +418,8 @@ export const ostern: Journey = {
         'Am Tisch nimmt Jesus das Brot, dankt, bricht es und gibt es ihnen. Da werden ihre Augen geöffnet, und sie erkennen ihn. Aber er verschwindet vor ihnen. „Brannte nicht unser Herz“, sagen sie zueinander, „als er unterwegs mit uns redete und uns die Schrift öffnete?“',
         'Noch in derselben Stunde stehen sie auf und gehen zurück nach Jerusalem. Dort sind die Jünger versammelt. „Der Herr ist wirklich auferstanden“, sagen die ihnen, „und Simon ist er erschienen!“ Da erzählen die beiden, was auf dem Weg geschehen ist und woran sie ihn erkannt haben: Er hat das Brot gebrochen.'
       ],
-      // Spiel: Reihenfolge legen (reihenfolge, alt)
-      task: { kind: 'reihenfolge', hint: 'Lege die vier Bilder in die Reihenfolge der Geschichte.', order: REIHENFOLGE },
+      // Spiel: Tisch decken (tischdecken, neu)
+      task: { kind: 'tischdecken', hint: 'Deck den Tisch in Emmaus.', table: TISCH },
       questions: [
         { q: 'Was sagen die beiden zu Jesus vor dem Dorf?', options: ['Bleib bei uns!', 'Geh weiter!', 'Wir kennen dich nicht.'], answer: 0 },
         { q: 'Woran erkennen sie Jesus?', options: ['Er bricht das Brot.', 'Er singt ein Lied.', 'Er zeigt ihnen ein Netz.'], answer: 0 }
@@ -304,8 +435,8 @@ export const ostern: Journey = {
         'Die Jünger erschrecken und fürchten sich. Sie meinen, sie sehen einen Geist. „Warum seid ihr so erschrocken?“, fragt Jesus. „Seht meine Hände und meine Füße: Ich bin es selbst! Fasst mich an und seht: Ein Geist hat kein Fleisch und keine Knochen, wie ihr seht, dass ich sie habe.“ Und er zeigt ihnen seine Hände. Da werden die Jünger froh, dass sie den Herrn sehen.',
         'Aber vor lauter Freude können sie es noch nicht glauben und wundern sich. „Habt ihr etwas zu essen?“, fragt Jesus. Sie geben ihm ein Stück gebratenen Fisch. Er nimmt es und isst es vor ihren Augen.'
       ],
-      // Spiel: Puzzle (puzzle, alt)
-      task: { kind: 'puzzle', hint: 'Setze das Bild vom Saal zusammen.', puzzle: { image: `${G}puzzle/saal.webp`, cols: 2, rows: 3 } },
+      // Spiel: Fensterläden (fensterlaeden, neu)
+      task: { kind: 'fensterlaeden', hint: 'Öffne alle Fensterläden des Saals.', shutters: FENSTER },
       questions: [
         { q: 'Was sagt Jesus, als er mitten unter die Jünger tritt?', options: ['Friede sei mit euch!', 'Fürchtet euch!', 'Geht nach Hause!'], answer: 0 },
         { q: 'Was isst Jesus vor ihnen?', options: ['ein Stück gebratenen Fisch', 'ein Stück Brot', 'eine Schale Trauben'], answer: 0 }
@@ -323,8 +454,8 @@ export const ostern: Journey = {
         'Thomas antwortet: „Mein Herr und mein Gott!“',
         '„Du glaubst, weil du mich gesehen hast“, sagt Jesus. „Selig sind, die nicht sehen und doch glauben!“'
       ],
-      // Spiel: Memory (memory, alt)
-      task: { kind: 'memory', hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.', memory: MEMORY },
+      // Spiel: Unterschiede finden (unterschied, bekannt aus Mose)
+      task: { kind: 'unterschied', hint: 'Finde, was im linken Bild fehlt.', diff: UNTERSCHIED },
       questions: [
         { q: 'Was sagt Thomas den anderen Jüngern?', options: ['Ich glaube es nicht, wenn ich ihn nicht selbst sehe.', 'Ich glaube euch sofort.', 'Ich will nichts davon hören.'], answer: 0 },
         { q: 'Was sagt Thomas zu Jesus?', options: ['Mein Herr und mein Gott!', 'Ich kenne dich nicht!', 'Geh weg!'], answer: 0 }
@@ -375,8 +506,8 @@ export const ostern: Journey = {
         '„So steht es geschrieben“, sagt er. „Der Christus muss leiden und am dritten Tag von den Toten auferstehen. In seinem Namen soll allen Völkern Umkehr und Vergebung der Sünden verkündet werden, und das beginnt in Jerusalem. Ihr aber seid Zeugen von alledem. Ich will auf euch senden, was mein Vater verheißen hat. Bleibt in der Stadt Jerusalem, bis ihr mit der Kraft aus der Höhe ausgerüstet werdet.“',
         'Dann führt Jesus sie hinaus bis nach Bethanien. Er hebt die Hände und segnet sie. Während er sie segnet, verlässt er sie und fährt auf in den Himmel. Die Jünger beten ihn an und gehen mit großer Freude zurück nach Jerusalem. Dort sind sie jeden Tag im Tempel und loben Gott.'
       ],
-      // Spiel: Lückenvers (lueckenvers, alt)
-      task: { kind: 'lueckenvers', hint: 'Ziehe das passende Wort in die Lücke.', verse: VERS2 },
+      // Spiel: Licht weitergeben (lichtweg, neu)
+      task: { kind: 'lichtweg', hint: 'Gib das Licht weiter bis nach Jerusalem.', flame: LICHT },
       questions: [
         { q: 'Was tut Jesus dort mit erhobenen Händen?', options: ['Er segnet sie.', 'Er ruft Soldaten.', 'Er baut ein Zelt.'], answer: 0 },
         { q: 'Wie gehen die Jünger nach Jerusalem zurück?', options: ['mit großer Freude', 'mit Angst', 'traurig und schweigend'], answer: 0 }
