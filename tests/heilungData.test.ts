@@ -1,6 +1,7 @@
 /**
  * The data of "Jesus heilt" (`heilung.ts`, `en/heilung.en.ts`, `heilungPath.ts`): the stories and questions follow the rules of the adventures (texts of the draft `D:/Claude/Abenteuer-Heilung/ENTWURF_Heilung.md`,
- * Luther 1912 told in our own words), the two quiz stages are only quizzes, the two new games and the five old ones have sound data, the map has nine stations and the exam, and the English file has the same shape.
+ * Luther 1912 told in our own words), the two quiz stages are only quizzes, the games have sound data (Anton's rule of 5.11.2026: at most two known games, never in two stages in a row;
+ * the new games `synagoge`, `zehn` and `kinder` are checked by their `*Problems` functions), the map has nine stations and the exam, and the English file has the same shape.
  */
 import { existsSync, statSync } from 'node:fs'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -10,12 +11,16 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { setAdventureLanguage } from '@/use/adventureLanguage'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 import { shoutRoundProblems, turnRoundProblems } from '@/utils/heilungGames'
+import { childrenNext, childrenProblems, synagogueProblems, tenPlayRoute, tenProblems } from '@/utils/heilungNeu'
+import type { ChildrenGame, SynagogueGame, TenGame } from '@/utils/heilungNeu'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => heilung.stages[n - 1]!
 /** Words that no text of the German data may use (the story is told without cruelty: no killing, no blood, no devil). */
 const FORBIDDEN = /\b(Blut|Teufel|Hölle|erschlagen|erwürgen|ertrinken|ertrunken|umbringen|schlachten|geschlachtet|Leiche|Leichen|Galgen|töten|tötet|Tod|tot|Wunden|Eiter)\b/i
 const QUIZ_STAGES = [4, 9]
+/** The data of a new game (its field is not in `GameTask` until the lead adds it). */
+const newGame = <T>(n: number, field: string): T => (stage(n).task as unknown as Record<string, T>)[field]!
 
 describe('Heilung: stories and questions', () => {
   it('nine stages with 3 or 4 paragraphs of 80 to 145 words and the Bible passage under every one', () => {
@@ -138,11 +143,13 @@ describe('Heilung: stories and questions', () => {
 })
 
 describe('Heilung: the games', () => {
-  it('the order of the games: 5 old, 2 new (turnBack, shout), 2 quizzes; no game twice', () => {
-    expect(heilung.stages.map((s) => s.task.kind)).toEqual(['lueckenvers', 'memory', 'reihenfolge', 'quiz', 'puzzle', 'umkehr', 'wimmelbild', 'ruf', 'quiz'])
-    const games = heilung.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
+  it('the order of the games: 2 known (verse, order), never two in a row; 5 new; 2 quizzes; no game twice', () => {
+    expect(heilung.stages.map((s) => s.task.kind as string)).toEqual(['lueckenvers', 'synagoge', 'reihenfolge', 'quiz', 'zehn', 'umkehr', 'kinder', 'ruf', 'quiz'])
+    const games = heilung.stages.map((s) => s.task.kind as string).filter((k) => k !== 'quiz')
     expect(new Set(games).size).toBe(games.length)
-    expect(games.filter((k) => ['umkehr', 'ruf'].includes(k))).toHaveLength(2)
+    const known = heilung.stages.map((s) => ['lueckenvers', 'reihenfolge'].includes(s.task.kind))
+    expect(known.filter(Boolean)).toHaveLength(2)
+    for (let i = 1; i < known.length; i++) expect(known[i] && known[i - 1], `two known games in a row at ${i + 1}`).toBe(false)
   })
 
   it('1 verse: the sentences are in the text and the right words are on the leaves', () => {
@@ -159,10 +166,14 @@ describe('Heilung: the games', () => {
     expect(text).toContain('Sei rein!')
   })
 
-  it('2 memory: six pairs with a sentence each', () => {
-    const g = stage(2).task.memory!
-    expect(g.pairs).toHaveLength(6)
-    for (const p of g.pairs) expect(p.text.length).toBeGreaterThan(10)
+  it('2 synagogue: the parts stand on the platform and on each other, round 1 four columns and a beam, round 2 six columns, two beams and the roof; no problems', () => {
+    const g = newGame<SynagogueGame>(2, 'synagogue')
+    expect(synagogueProblems(g)).toEqual([])
+    expect(g.rounds.map((r) => r.slots.map((s) => s.kind).join(','))).toEqual(['column,column,column,column,beam', 'column,column,column,column,column,column,beam,beam,roof'])
+    expect(g.rounds.map((r) => r.outline)).toEqual([true, false])
+    expect(g.background).toMatch(/heilung\/synagoge\/bauplatz\.webp$/)
+    for (const k of ['column', 'beam', 'roof'] as const) expect(existsSync(`public/${g.parts[k].image}`), k).toBe(true)
+    expect(existsSync(`public/${g.background}`)).toBe(true)
   })
 
   it('3 order: four cards in the order of the story; round 1 with the numbers and three cards, round 2 with all four', () => {
@@ -173,11 +184,20 @@ describe('Heilung: the games', () => {
     expect(g.rounds[1]!.cards).toEqual(['bitte', 'weg', 'wort', 'gesund'])
   })
 
-  it('5 puzzle: a picture in 2 columns and 3 rows', () => {
-    const g = stage(5).task.puzzle!
-    expect(g.cols).toBe(2)
-    expect(g.rows).toBe(3)
-    expect(g.image).toMatch(/puzzle\/strasse\.webp$/)
+  it('5 ten on the way: ten men, two rounds, along the safe way all ten arrive without anyone left behind; no problems; every picture is there', () => {
+    const g = newGame<TenGame>(5, 'ten')
+    expect(tenProblems(g)).toEqual([])
+    expect(g.men).toHaveLength(10)
+    expect(g.rounds).toHaveLength(2)
+    expect(g.rounds[1]!.obstacles.length).toBeGreaterThan(g.rounds[0]!.obstacles.length)
+    expect(g.rounds[1]!.obstacles.some((o) => o.kind === 'wall')).toBe(true)
+    for (let ri = 0; ri < 2; ri++) {
+      const play = tenPlayRoute(g, ri)
+      expect(play.done && play.lost === 0, `round ${ri + 1}`).toBe(true)
+      expect(play.seconds, `round ${ri + 1}`).toBeLessThan(40)
+    }
+    const files = [...g.men, g.house.image, ...g.rounds.flatMap((r) => [r.background, ...r.obstacles.map((o) => o.image)])]
+    for (const f of files) expect(existsSync(`public/${f}`), f).toBe(true)
   })
 
   it('6 turn back: two rounds, six men and the Samaritan, every round can be played, the second one lets the men cross', () => {
@@ -190,21 +210,23 @@ describe('Heilung: the games', () => {
     expect(g.background).toMatch(/heilung\/umkehr\/strasse\.webp$/)
   })
 
-  it('7 hidden pictures: four children, covers, every place inside the picture', () => {
-    const t = stage(7).task
-    expect(t.kind).toBe('wimmelbild')
-    expect(t.count).toBe(4)
-    const f = t.find!
-    expect(f.finds).toHaveLength(4)
-    expect(f.labels).toHaveLength(4)
-    expect(f.covers.length).toBeGreaterThanOrEqual(6)
-    for (const s of [...f.finds, ...f.covers]) {
-      expect(s.x - s.w / 2).toBeGreaterThanOrEqual(-1)
-      expect(s.x + s.w / 2).toBeLessThanOrEqual(101)
-      expect(s.y).toBeLessThanOrEqual(100)
+  it('7 to Jesus: four and then six children, the little ones on the arm first, the others clearly growing; no problems; every picture is there', () => {
+    const g = newGame<ChildrenGame>(7, 'children')
+    expect(childrenProblems(g)).toEqual([])
+    expect(g.rounds.map((r) => r.children.length)).toEqual([4, 6])
+    expect(g.rounds.map((r) => r.children.filter((c) => c.carried).length)).toEqual([1, 2])
+    for (const r of g.rounds) {
+      const order: string[] = []
+      const come = new Set<string>()
+      for (let c = childrenNext(r, come); c; c = childrenNext(r, come)) {
+        order.push(c.id)
+        come.add(c.id)
+      }
+      expect(order).toHaveLength(r.children.length)
+      expect(r.children.find((c) => c.id === order[0])!.carried).toBe(true)
     }
-    expect(f.labels.join(' ')).toMatch(/Zopf/)
-    expect(f.labels.join(' ')).toMatch(/Lämmchen/)
+    const files = [g.background, ...g.rounds.flatMap((r) => r.children.map((c) => c.image))]
+    for (const f of files) expect(existsSync(`public/${f}`), f).toBe(true)
   })
 
   it('8 shout: two rounds, the second needs more calls and more hushes, every round can be won', () => {
@@ -267,7 +289,11 @@ describe('Heilung: map, files, English', () => {
     expect(stage(6).task.turnBack!.rounds[0]!.hint).toContain('turns back')
     expect(stage(8).task.shout!.bartimaeus.label).toBe('Bartimaeus by the road')
     expect(stage(1).task.verse!.rounds[0]!.parts[0]).toContain('if you will')
-    expect(stage(2).task.memory!.pairs[0]!.text).toContain('helmet')
+    expect(stage(2).task.hint).toBe('Build the synagogue that the captain built.')
+    expect(newGame<SynagogueGame>(2, 'synagogue').rounds[0]!.hint).toContain('columns')
+    expect(newGame<SynagogueGame>(2, 'synagogue').parts.column.name).toBe('A column')
+    expect(newGame<TenGame>(5, 'ten').rounds[1]!.hint).toMatch(/wall/)
+    expect(newGame<ChildrenGame>(7, 'children').rounds[0]!.children.map((c) => c.name).join(' ')).toMatch(/braid/)
     for (const s of heilung.stages) {
       const audio = s.audio
       if (audio) expect(audio, `stage ${s.id}`).toBe(`audio/abenteuer/heilung/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)

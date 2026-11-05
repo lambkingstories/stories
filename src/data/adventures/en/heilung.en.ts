@@ -45,16 +45,10 @@ export const heilungEn: TextOverlay<Journey> = {
         'Jesus sets out and goes with them through the streets of Capernaum.'
       ],
       task: {
-        hint: 'Find the matching cards. Remember where each one lies.',
-        memory: {
-          pairs: [
-            { text: 'The helmet: The captain has soldiers under him.' },
-            { text: 'The bed: His servant lies at death’s door in it.' },
-            { text: 'The synagogue: The captain built it for the people.' },
-            { text: 'The scroll: The elders of the Jews plead for him.' },
-            { text: 'The house: Jesus goes there with the elders.' },
-            { text: 'The sandals: Jesus sets out through the streets of Capernaum.' }
-          ]
+        hint: 'Build the synagogue that the captain built.',
+        synagogue: {
+          parts: { column: { name: 'A column' }, beam: { name: 'A beam' }, roof: { name: 'The roof' } },
+          rounds: [{ hint: 'The captain built the synagogue. First set up the four columns, then lay the beam on them.', slots: [{ name: 'The place of the first column' }, { name: 'The place of the second column' }, { name: 'The place of the third column' }, { name: 'The place of the fourth column' }, { name: 'The beam' }] }, { hint: 'Now you build the whole front: six columns, two beams and the roof. What carries comes first.', slots: [{ name: 'The place of the first column' }, { name: 'The place of the second column' }, { name: 'The place of the third column' }, { name: 'The place of the fourth column' }, { name: 'The place of the fifth column' }, { name: 'The place of the sixth column' }, { name: 'The left beam' }, { name: 'The right beam' }, { name: 'The place of the roof' }] }]
         }
       },
       questions: [
@@ -108,7 +102,13 @@ export const heilungEn: TextOverlay<Journey> = {
         'Jesus looks at them. “Go,” he says, “and show yourselves to the priests!”',
         'The men are still sick. But they set out on the way to the priests, all ten together.'
       ],
-      task: { hint: 'Put the picture of the village edge with the ten men together.' },
+      task: {
+        hint: 'Lead all ten men together to the house of the priests.',
+        ten: {
+          house: { name: 'The house of the priests' },
+          rounds: [{ hint: 'Jesus says: “Go and show yourselves to the priests!” Lead all ten with one finger to the house of the priests. Leave nobody behind.', obstacles: [{ name: 'An olive tree' }, { name: 'A boulder' }, { name: 'An olive tree' }, { name: 'A thornbush' }] }, { hint: 'Now walls stand in the way. Lead the men through the gap, or one is left behind.', obstacles: [{ name: 'A field wall' }, { name: 'A field wall' }, { name: 'A field wall' }, { name: 'A thornbush' }, { name: 'An olive tree' }, { name: 'A boulder' }, { name: 'An olive tree' }] }]
+        }
+      },
       questions: [
         { q: 'How many men call to Jesus?', options: ['ten', 'two', 'twelve'] },
         { q: 'Where do the men stand?', options: ['far away at the edge of the village', 'in the middle of the marketplace', 'in a boat'] }
@@ -149,8 +149,10 @@ export const heilungEn: TextOverlay<Journey> = {
         'Then he takes the children in his arms, lays his hands on them and blesses them.'
       ],
       task: {
-        hint: 'Search the courtyard: find the four children who come to Jesus.',
-        find: { labels: ['The girl with the braid', 'The boy with the curls', 'The boy with the little lamb', 'The little child in the arms'], doneText: 'You have found all four children. Jesus took them all in his arms and blessed them.' }
+        hint: 'Bring the children to Jesus one after another, the smallest first.',
+        children: {
+          rounds: [{ hint: 'The little ones may go first. Always tap the smallest child who is still waiting.', children: [{ name: 'The girl with the braid' }, { name: 'The big girl with the head scarf' }, { name: 'The toddler in its mother’s arms' }, { name: 'The little girl with the flower' }] }, { hint: 'Now there are six. Look closely: children are waiting on arms, too.', children: [{ name: 'The boy with the little lamb' }, { name: 'The little girl with the flower' }, { name: 'The baby in its father’s arms' }, { name: 'The big girl with the head scarf' }, { name: 'The toddler in its mother’s arms' }, { name: 'The girl with the braid' }] }]
+        }
       },
       questions: [
         { q: 'Who tries to keep the people with the children away?', options: ['the disciples', 'the priests', 'the soldiers'] },
