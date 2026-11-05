@@ -8,6 +8,8 @@ import type { JugsGame, EnoughGame, QuailsGame, StaffsGame, SerpentGame, DonkeyG
 // Ostern, neue Spiele nach Antons Regel (5.11.2026): die Typen liegen bei ihrer Logik
 import type { ErrandGame, ShuttersGame } from '@/utils/osternNeuA'
 import type { WanderGame, TableGame, FlameGame } from '@/utils/osternNeuB'
+import type { EarthGame, MillGame, SealGame } from '@/utils/elisaNeu'
+import type { LanternGame, ShootGame, ZionGame } from '@/utils/prophetenNeu'
 import type { CarveGame, PomGame, RaftGame, StairsGame, TreasuryGame, WishGame } from '@/utils/salomoNeu'
 import type { BoothGame, CupGame, PledgeGame } from '@/utils/nehemiaNeu'
 import type { FrogFlickGame } from '@/utils/moseNeu'
@@ -22,7 +24,7 @@ import type { ChildrenGame, SynagogueGame, TenGame } from '@/utils/heilungNeu'
 import type { CarryGame, HaltGame, HomeGame, InnGame, YieldGame } from '@/utils/gleichnisseNeu'
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz' | 'boote' | 'dach' | 'arme' | 'richter' | 'signal' | 'traube' | 'krug' | 'genug' | 'wachteln' | 'stab' | 'schlange' | 'eselin' | 'einsetzen' | 'schoepfen' | 'gedraenge' | 'buendel' | 'brote' | 'rudern' | 'umkehr' | 'ruf' | 'graben' | 'muenze' | 'entgegen' | 'klettern' | 'halbieren' | 'loesen' | 'bereiten' | 'lampen' | 'helfen' | 'fischzug' | 'weiden' | 'botengang' | 'wanderweg' | 'tischdecken' | 'fensterlaeden' | 'lot' | 'sitzplaetze' | 'zwoelf' | 'zaehlung' | 'hirtenfeuer' | 'weitersagen' | 'stern' | 'bachsteine' | 'gebote' | 'tor' | 'zepter' | 'boten' | 'schriftrolle' | 'schattenweg' | 'sonnenaufgang' | 'saum' | 'ufer' | 'froesche' | 'becher' | 'pfand' | 'laubhuetten' | 'wunschkarten' | 'floesse' | 'schnitzen' | 'granatapfel' | 'stufen' | 'schatzkammer' | 'lichtweg' | 'synagoge' | 'zehn' | 'kinder' | 'hundertfach' | 'anhalten' | 'herberge' | 'heimtragen' | 'heimweg'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz' | 'boote' | 'dach' | 'arme' | 'richter' | 'signal' | 'traube' | 'krug' | 'genug' | 'wachteln' | 'stab' | 'schlange' | 'eselin' | 'einsetzen' | 'schoepfen' | 'gedraenge' | 'buendel' | 'brote' | 'rudern' | 'umkehr' | 'ruf' | 'graben' | 'muenze' | 'entgegen' | 'klettern' | 'halbieren' | 'loesen' | 'bereiten' | 'lampen' | 'helfen' | 'fischzug' | 'weiden' | 'botengang' | 'wanderweg' | 'tischdecken' | 'fensterlaeden' | 'lot' | 'sitzplaetze' | 'zwoelf' | 'zaehlung' | 'hirtenfeuer' | 'weitersagen' | 'stern' | 'bachsteine' | 'gebote' | 'tor' | 'zepter' | 'boten' | 'schriftrolle' | 'schattenweg' | 'sonnenaufgang' | 'saum' | 'ufer' | 'froesche' | 'becher' | 'pfand' | 'laubhuetten' | 'wunschkarten' | 'floesse' | 'schnitzen' | 'granatapfel' | 'stufen' | 'schatzkammer' | 'laternen' | 'spross' | 'zionwege' | 'handmuehle' | 'siegel' | 'naamanerde' | 'lichtweg' | 'synagoge' | 'zehn' | 'kinder' | 'hundertfach' | 'anhalten' | 'herberge' | 'heimtragen' | 'heimweg'
 
 export interface AdventureQuestion {
   q: string
@@ -1904,6 +1906,12 @@ export interface StageTask {
   pomegranates?: PomGame
   stairs?: StairsGame
   treasury?: TreasuryGame
+  lanterns?: LanternGame
+  shootGrow?: ShootGame
+  zionPaths?: ZionGame
+  handMill?: MillGame
+  sealTurn?: SealGame
+  earthLoad?: EarthGame
   flame?: FlameGame
   synagogue?: SynagogueGame
   ten?: TenGame

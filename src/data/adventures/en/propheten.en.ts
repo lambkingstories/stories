@@ -35,11 +35,12 @@ export const prophetenEn: TextOverlay<Journey> = {
         'His rule will grow great. Of the increase of his peace there will be no end, upon the throne of David and over his kingdom. He will establish it with justice and righteousness, from now on and for ever. The zeal of the Lord of hosts will do this.'
       ],
       task: {
-        hint: 'Drag the right leaf into the gap.',
-        verse: {
+        hint: 'Catch the lanterns with the names of the child.',
+        lanterns: {
+          names: ['Wonderful', 'Counsellor', 'Mighty God', 'Everlasting Father', 'Prince of Peace'],
           rounds: [
-            { hint: 'Drag the right leaf into the gap.', parts: ['“For unto us a child is ', ', unto us a son is given.”'], words: ['born', 'found', 'lost'] },
-            { hint: 'Now two words are missing.', parts: ['“Of the increase of his peace there will be no ', ' upon the ', ' of David.”'], words: ['end', 'throne', 'beginning', 'tower'] }
+            { hint: 'Catch the lanterns that carry a name of the child. Tap them.' },
+            { hint: 'Now in the order of the verse: first Wonderful, then Counsellor, Mighty God, Everlasting Father and Prince of Peace.' }
           ]
         }
       },
@@ -74,10 +75,9 @@ export const prophetenEn: TextOverlay<Journey> = {
         'Isaiah speaks of the branch as of a man. He will not judge by what his eyes see. He will not decide by what his ears hear. With righteousness he will judge the poor and decide for the meek of the earth. Righteousness will be the belt around his waist.'
       ],
       task: {
-        hint: 'Put the pictures in the order in which the branch grows.',
-        order: {
-          cards: [{ label: 'The old tree stump' }, { label: 'A first young shoot' }, { label: 'A branch with many leaves' }, { label: 'A strong branch with fruit' }],
-          rounds: [{ hint: 'Round 1: Put the pictures in the order in which the branch grows. The dots show where they go.' }, { hint: 'Round 2: Now with the stump and without dots: What comes first, what comes next?' }]
+        hint: 'Steer the shoot from the tree stump to the light.',
+        shootGrow: {
+          rounds: [{ hint: 'Steer the young shoot past the stones to the light.' }, { hint: 'Now there are more stones in the way. Steer the shoot to the light again.' }]
         }
       },
       questions: [
@@ -188,8 +188,10 @@ export const prophetenEn: TextOverlay<Journey> = {
         '"And this man will be the peace," says Micah.'
       ],
       task: {
-        hint: 'Find the matching cards. Remember where each one lies.',
-        memory: { pairs: [{ text: 'The shepherd’s staff: He will stand and feed his flock.' }, { text: 'The crown: The Lord will be king over them.' }, { text: 'The plowshare: Swords are beaten into plowshares.' }, { text: 'The pruning hook: Spears are beaten into pruning hooks.' }, { text: 'The grapes: Everyone will sit under his vine.' }, { text: 'The fig: Everyone will sit under his fig tree.' }] }
+        hint: 'Turn the path tiles until everybody has a way to Mount Zion.',
+        zionPaths: {
+          rounds: [{ hint: 'Tap the path tiles to turn them. Make a way to Mount Zion for every person.' }, { hint: 'Now four people are waiting. Make a way to Mount Zion for all of them.' }]
+        }
       },
       questions: [
         { q: 'Whom will the Lord gather according to Micah?', options: ['those who limp and those who were driven away', 'only the rich', 'only the soldiers'] },

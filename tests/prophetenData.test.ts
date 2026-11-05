@@ -1,6 +1,6 @@
 /**
  * The data of "The King Is Coming" (`propheten.ts`, `en/propheten.en.ts`, `prophetenPath.ts`): the stories and questions follow the rules of the adventures (texts of the draft `D:/Claude/Abenteuer-Propheten/ENTWURF_Propheten.md`, Luther 1912 told in our own words),
- * the two quiz stages (Isaiah 53) are only quizzes, the two new games and the five old ones have sound data, the map has nine stations and the exam, and the English file has the same shape.
+ * the two quiz stages (Isaiah 53) are only quizzes, the five new games and the two known ones (Antons rule of 5.11.2026) have sound data, the map has nine stations and the exam, and the English file has the same shape.
  */
 import { existsSync, statSync } from 'node:fs'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -9,6 +9,8 @@ import { PROPHETEN_PATH } from '@/data/adventures/prophetenPath'
 import { englishTextsOf } from '@/data/adventures/localize'
 import { setAdventureLanguage } from '@/use/adventureLanguage'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
+import { lanternsProblems, shootGrowProblems, zionPathsProblems } from '@/utils/prophetenNeu'
+import type { LanternGame, ShootGame, ZionGame } from '@/utils/prophetenNeu'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => propheten.stages[n - 1]!
@@ -127,11 +129,11 @@ describe('Der König kommt: stories and questions', () => {
 })
 
 describe('Der König kommt: the games', () => {
-  it('the order of the games: 5 old, 2 new (peace, forge), 2 quizzes; no game twice', () => {
-    expect(propheten.stages.map((s) => s.task.kind)).toEqual(['puzzle', 'lueckenvers', 'wimmelbild', 'reihenfolge', 'quiz', 'friede', 'quiz', 'schmieden', 'memory'])
+  it('the order of the games (Antons rule of 5.11.2026): only two known games (puzzle, hidden pictures), never next to each other; five new ones; two quizzes; no game twice', () => {
+    expect(propheten.stages.map((s) => s.task.kind)).toEqual(['puzzle', 'laternen', 'wimmelbild', 'spross', 'quiz', 'friede', 'quiz', 'schmieden', 'zionwege'])
     const games = propheten.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
     expect(new Set(games).size).toBe(games.length)
-    expect(games.filter((k) => ['friede', 'schmieden'].includes(k))).toHaveLength(2)
+    expect(games.filter((k) => ['friede', 'schmieden', 'laternen', 'spross', 'zionwege'].includes(k))).toHaveLength(5)
   })
 
   it('1 puzzle: a portrait picture in 2 columns and 3 rows', () => {
@@ -141,17 +143,13 @@ describe('Der König kommt: the games', () => {
     expect(g.image).toMatch(/puzzle\/licht\.webp$/)
   })
 
-  it('2 verse: the sentences are in the text and the right words are on the leaves', () => {
-    const g = stage(2).task.verse!
-    expect(g.rounds).toHaveLength(2)
-    for (const r of g.rounds) {
-      expect(r.parts).toHaveLength(r.answers.length + 1)
-      for (const a of r.answers) expect(r.words[a]).toBeTruthy()
-    }
-    expect(g.rounds[0]!.words[g.rounds[0]!.answers[0]!]).toBe('geboren')
-    expect(g.rounds[1]!.answers.map((a) => g.rounds[1]!.words[a])).toEqual(['Ende', 'Stuhl'])
-    expect(stage(2).text.join(' ')).toMatch(/uns ist ein Kind geboren/)
-    expect(stage(2).text.join(' ')).toMatch(/kein Ende sein auf dem Stuhl Davids/)
+  it('2 name lanterns: the names of the stage text (Luther 1912), each once in every round, round 2 in order; the check of the data finds nothing', () => {
+    const g = (stage(2).task as unknown as { lanterns: LanternGame }).lanterns
+    expect(g.names).toEqual(['Wunderbar', 'Rat', 'Held', 'Ewig-Vater', 'Friedefürst'])
+    expect(stage(2).text.join(' ')).toContain('Wunderbar, Rat, Held, Ewig-Vater, Friedefürst')
+    expect(g.rounds.map((r) => r.order)).toEqual([false, true])
+    expect(lanternsProblems(g)).toEqual([])
+    expect(g.background).toMatch(/propheten\/laternen\/nacht\.webp$/)
   })
 
   it('3 hidden pictures: five lambs, covers, every place inside the picture', () => {
@@ -169,12 +167,13 @@ describe('Der König kommt: the games', () => {
     expect(f.labels).toHaveLength(5)
   })
 
-  it('4 order: four cards, round 1 with the numbers and three cards, round 2 with all four', () => {
-    const g = stage(4).task.order!
-    expect(g.cards).toHaveLength(4)
-    expect(g.rounds.map((r) => r.cards.length)).toEqual([3, 4])
-    expect(g.rounds.map((r) => r.numbered)).toEqual([true, false])
-    expect(g.rounds[1]!.cards).toEqual(['stumpf', 'trieb', 'zweig', 'frucht'])
+  it('4 the shoot: from the stump to the light, round 2 with more stones; the help reaches the light without a stone; the check of the data finds nothing', () => {
+    const g = (stage(4).task as unknown as { shootGrow: ShootGame }).shootGrow
+    expect(g.rounds).toHaveLength(2)
+    expect(g.rounds[1]!.stones.length).toBeGreaterThan(g.rounds[0]!.stones.length)
+    expect(g.start.y).toBeGreaterThan(g.light.y)
+    expect(shootGrowProblems(g)).toEqual([])
+    expect(stage(4).text.join(' ')).toMatch(/Stamm Isais/)
   })
 
   it('6 peace: four pairs of the text (wolf and lamb, leopard and young goat, lion and calf, bear and cow); round 1 with the list, round 2 without and with another order; everything inside the picture', () => {
@@ -230,10 +229,12 @@ describe('Der König kommt: the games', () => {
     for (const w of ['Schwerter zu Pflugscharen', 'Spieße zu Sicheln']) expect(text, w).toContain(w)
   })
 
-  it('9 memory: six pairs (a full board of 3 x 4), every one with a sentence that the text of Micah tells', () => {
-    const g = stage(9).task.memory!
-    expect(g.pairs).toHaveLength(6)
-    for (const p of g.pairs) expect(p.text.length).toBeGreaterThan(10)
+  it('9 ways to Zion: Mount Zion at the top, three and then four people, round 2 harder; solvable with the fewest taps of the data; the check of the data finds nothing', () => {
+    const g = (stage(9).task as unknown as { zionPaths: ZionGame }).zionPaths
+    expect(g.rounds.map((r) => r.people.length)).toEqual([3, 4])
+    for (const r of g.rounds) expect(r.rows[0]).toContain('Z')
+    expect(zionPathsProblems(g)).toEqual([])
+    expect(stage(9).text.join(' ')).toMatch(/Berg Zion/)
   })
 })
 
@@ -288,7 +289,8 @@ describe('Der König kommt: map, files, English', () => {
     expect(stage(6).task.peace!.animals[7]!.label).toBe('Cow')
     expect(stage(8).task.forge!.items[0]!.label).toBe('Sword')
     expect(stage(8).task.forge!.rounds[0]!.hint).toContain('anvil')
-    expect(stage(2).task.verse!.rounds[1]!.parts[0]).toContain('increase of his peace')
+    expect((stage(2).task as unknown as { lanterns: LanternGame }).lanterns.names).toEqual(['Wonderful', 'Counsellor', 'Mighty God', 'Everlasting Father', 'Prince of Peace'])
+    expect((stage(9).task as unknown as { zionPaths: ZionGame }).zionPaths.rounds[0]!.hint).toContain('Mount Zion')
     for (const s of propheten.stages) {
       const audio = s.audio
       if (audio) expect(audio, `stage ${s.id}`).toBe(`audio/abenteuer/propheten/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)

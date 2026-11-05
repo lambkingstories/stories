@@ -3,12 +3,14 @@
  * Quelle der Texte: D:/Claude/Abenteuer-Propheten/ENTWURF_Propheten.md (Luther 1912 von bibeltext.com gelesen, nichts abgeschrieben), Plan: ETAPPENPLAN.md, Figuren: FIGUREN.md, Prüfbericht: PRUEFBERICHT-BIBELTREUE-2026-10-30.md.
  * Gemildert erzählt: Jesaja 9,8 ff., 11,4, 11,10-16, Micha 5,5 ff.; Jesaja 53 nur als Quiz und ohne ein Leiden im Bild. Jesus wird weder gezeigt noch genannt; die einzige Brücke ist Matthäus 2,1-6.
  * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
- * Spiele (Wahl der Leitung): 1 Puzzle (alt), 2 Lückenvers (alt), 3 Wimmelbild (alt), 4 Reihenfolge (alt), 5 nur Quiz, 6 Frieden unter den Tieren (neu), 7 nur Quiz, 8 Die Schmiede (neu), 9 Memory (alt).
+ * Spiele (Antons Spielplan 5.11.2026: höchstens zwei bekannte, nie hintereinander): 1 Puzzle (bekannt), 2 Namen-Laternen (neu), 3 Wimmelbild (bekannt), 4 Der Spross (neu), 5 nur Quiz, 6 Frieden unter den Tieren (neu), 7 nur Quiz, 8 Die Schmiede (neu), 9 Wege zum Zion (neu).
+ * Die Daten der drei neuesten Spiele erzeugt tools/neue_spiele_propheten.py (Typen und Prüfer: src/utils/prophetenNeu.ts).
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/propheten/, images/abenteuer/spiele/propheten/<spiel>/, audio/abenteuer/propheten/.
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { FindGame, ForgeGame, Journey, MemoryGame, OrderGame, PeaceGame, VerseGame } from '@/types/adventure'
+import type { FindGame, ForgeGame, Journey, PeaceGame } from '@/types/adventure'
+import type { LanternGame, ShootGame, ZionGame } from '@/utils/prophetenNeu'
 import { josef } from './josef'
 import { PROPHETEN_PATH } from './prophetenPath'
 import { localize } from './localize'
@@ -22,49 +24,131 @@ const PICS = 'images/abenteuer/propheten/'
 const G = 'images/abenteuer/spiele/propheten/'
 
 /**
- * Etappe 2, "Lückenvers" (alte Mechanik): zwei Sätze aus dem Text der Etappe in zwei Runden (erst ein Wort, dann zwei); die Wörter sind Blätter (das richtige zuerst, `answers` zeigt auf sie).
- * Tafel und Blatt sind die aus Salomo (kopiert). Hintergrund ist der gemalte Hof auf dem Hügel von Jerusalem (Bildauftrag S30).
+ * Etappe 2, "Namen-Laternen" (neu, `laternen`, Jesaja 9,5): Laternen steigen in den Abendhimmel über Galiläa. Die Laternen mit einem Namen des Kindes fängt das Kind durch Antippen;
+ * eine Laterne ohne Namen ist ein Fehler. Runde 1 in beliebiger Reihenfolge, Runde 2 schneller, mit mehr Laternen ohne Namen und in der Reihenfolge des Verses.
+ * Die Namen (wie in der Etappe und bei Luther 1912: Wunderbar, Rat, Held, Ewig-Vater, Friedefürst) stehen als Schrift der App auf einem Schild, nicht im Bild.
+ * Bilder (Bildauftrag S100): `laternen/nacht.webp` 900 × 1200, `laternen/laterne-1..4.webp` (3:4, ein Bogen mit Magenta-Schnitt).
  */
-const VERS: VerseGame = {
-  background: `${G}hintergrund/vers-hintergrund.webp`,
-  soft: true,
-  board: `${G}lueckenvers/tafel.webp`,
-  leaf: `${G}lueckenvers/blatt.webp`,
+const LATERNEN: LanternGame = {
+  background: `${G}laternen/nacht.webp`,
+  designs: [1, 2, 3, 4].map((n) => `${G}laternen/laterne-${n}.webp`),
+  names: ['Wunderbar', 'Rat', 'Held', 'Ewig-Vater', 'Friedefürst'],
+  lanes: [12, 31, 50, 69, 88],
+  w: 15,
   rounds: [
-    { hint: 'Ziehe das passende Blatt in die Lücke.', parts: ['„Denn uns ist ein Kind ', ', ein Sohn ist uns gegeben.“'], words: ['geboren', 'gefunden', 'verloren'], answers: [0] },
-    { hint: 'Jetzt fehlen zwei Wörter.', parts: ['„Des Friedens wird kein ', ' sein auf dem ', ' Davids.“'], words: ['Ende', 'Stuhl', 'Anfang', 'Turm'], answers: [0, 1] }
+    {
+      hint: 'Fange die Laternen, auf denen ein Name des Kindes steht. Tippe sie an.',
+      rise: 9000,
+      loop: 15000,
+      order: false,
+      sway: 1,
+      lanterns: [
+        { name: 0, lane: 1, at: 0, design: 0 },
+        { name: -1, lane: 3, at: 1200, design: 1 },
+        { name: 1, lane: 4, at: 2600, design: 2 },
+        { name: 2, lane: 0, at: 4200, design: 3 },
+        { name: -1, lane: 2, at: 5600, design: 0 },
+        { name: 3, lane: 3, at: 7200, design: 1 },
+        { name: -1, lane: 1, at: 8800, design: 2 },
+        { name: 4, lane: 2, at: 10400, design: 3 }
+      ]
+    },
+    {
+      hint: 'Jetzt in der Reihenfolge des Verses: zuerst Wunderbar, dann Rat, Held, Ewig-Vater und Friedefürst.',
+      rise: 7000,
+      loop: 11000,
+      order: true,
+      sway: 1.5,
+      lanterns: [
+        { name: 0, lane: 2, at: 0, design: 0 },
+        { name: -1, lane: 0, at: 1000, design: 1 },
+        { name: 3, lane: 4, at: 2000, design: 2 },
+        { name: -1, lane: 1, at: 3000, design: 3 },
+        { name: 1, lane: 3, at: 4000, design: 0 },
+        { name: -1, lane: 2, at: 5000, design: 1 },
+        { name: 4, lane: 0, at: 6000, design: 2 },
+        { name: -1, lane: 4, at: 7000, design: 3 },
+        { name: 2, lane: 1, at: 8000, design: 0 },
+        { name: -1, lane: 3, at: 9000, design: 1 },
+        { name: -1, lane: 0, at: 10000, design: 2 }
+      ]
+    }
   ]
 }
 
 /**
- * Etappe 4, "Ein Zweig aus dem Stamm Isais" (alte Mechanik, Reihenfolge legen): ein Baumstumpf, aus dem ein junger Zweig wächst: Stumpf, erster Trieb, junger Zweig, Zweig mit Früchten.
- * Runde 1 drei Karten mit Punkten, Runde 2 alle vier ohne Punkte. Bilder (Bildauftrag S36): `reihenfolge/karte-1..4.webp` (4:3).
+ * Etappe 4, "Der Spross" (neu, `spross`, Jesaja 11,1): aus dem Baumstumpf wächst ein junger Trieb von allein nach oben; das Kind lenkt ihn (Finger auf dem Bild, zwei Knöpfe oder Pfeiltasten)
+ * an den Steinen vorbei zum Licht. Ein Stein berührt ist ein Fehler (je Stein einmal); der Trieb gleitet am Stein entlang oder wartet. Runde 1 drei Steine, Runde 2 sechs.
+ * Steine: Mitte in Prozent des Bildes, `r` = Sperrkreis in Prozent der Breite; `route` = Weg der Hilfe. Bilder (Bildauftrag S101): `spross/boden.webp` 900 × 1200,
+ * `spross/stein-1..3.webp`, `spross/stiel.webp`, `spross/spitze.webp`.
  */
-const REIHENFOLGE: OrderGame = {
-  cards: [
-    { id: 'stumpf', image: `${G}reihenfolge/karte-1.webp`, label: 'Der alte Baumstumpf' },
-    { id: 'trieb', image: `${G}reihenfolge/karte-2.webp`, label: 'Ein erster junger Trieb' },
-    { id: 'zweig', image: `${G}reihenfolge/karte-3.webp`, label: 'Ein Zweig mit vielen Blättern' },
-    { id: 'frucht', image: `${G}reihenfolge/karte-4.webp`, label: 'Ein starker Zweig mit Früchten' }
-  ],
+const SPROSS: ShootGame = {
+  background: `${G}spross/boden.webp`,
+  stem: `${G}spross/stiel.webp`,
+  tip: `${G}spross/spitze.webp`,
+  stones: [1, 2, 3].map((n) => `${G}spross/stein-${n}.webp`),
+  start: { x: 50, y: 84 },
+  light: { x: 50, y: 6 },
+  lightR: 10,
+  stoneScale: 1.15,
   rounds: [
-    { hint: 'Runde 1: Lege die Bilder in die Reihenfolge, wie der Zweig wächst. Die Punkte zeigen, wo sie hinkommen.', numbered: true, cards: ['trieb', 'zweig', 'frucht'] },
-    { hint: 'Runde 2: Jetzt mit dem Baumstumpf und ohne Punkte: Was kommt zuerst, was danach?', numbered: false, cards: ['stumpf', 'trieb', 'zweig', 'frucht'] }
+    {
+      hint: 'Lenke den jungen Trieb an den Steinen vorbei zum Licht.',
+      stones: [
+        { x: 50, y: 63, r: 8, image: 0 },
+        { x: 28, y: 42, r: 8, image: 1 },
+        { x: 68, y: 24, r: 8, image: 2 }
+      ],
+      route: [{ x: 72, y: 64 }, { x: 46, y: 30 }]
+    },
+    {
+      hint: 'Jetzt liegen mehr Steine im Weg. Lenke den Trieb wieder zum Licht.',
+      stones: [
+        { x: 50, y: 64, r: 8, image: 0 },
+        { x: 16, y: 48, r: 8, image: 1 },
+        { x: 84, y: 48, r: 8, image: 2 },
+        { x: 56, y: 31.5, r: 8, image: 1 },
+        { x: 24, y: 16.5, r: 7.5, image: 2 },
+        { x: 78, y: 16.5, r: 7.5, image: 0 }
+      ],
+      route: [{ x: 33, y: 66 }, { x: 31, y: 37.5 }]
+    }
   ]
 }
 
 /**
- * Etappe 9, "Memory" (alte Mechanik): sechs Dinge aus Michas Worten (Hirtenstab, Krone, Pflugschar, Sichel, Traube, Feige); die Rückseite zeigt eine goldene Sonne (Bildauftrag S32, ein Bogen mit den sechs Dingen, vom Code geschnitten).
+ * Etappe 9, "Wege zum Zion" (neu, `zionwege`, Micha 4,1-2.6-7): eine Landkarte aus Wegplatten, oben der Berg Zion. Ein Tipp dreht eine Platte um eine Vierteldrehung;
+ * wer einen Weg zum Zion hat, bekommt einen Haken. Erst je vier Drehungen über der Bestzahl (`par`) sind ein Fehler. Runde 1: 4 × 4 mit drei Menschen, Runde 2: 5 × 5 mit vier.
+ * Karte: `.` Feld, `Z` Berg Zion, `I` gerade, `L` Ecke, `T` T-Stück, `E` Wegende; `start`/`solution`: Vierteldrehungen im Uhrzeigersinn. Lösbarkeit und `par` prüft `zionPathsProblems`.
+ * Bilder (Bildauftrag S102): `zionwege/gerade`, `ecke`, `t`, `ende`, `zion`, `feld-1..4` (256 × 256, ein Bogen 3 × 3), `zionwege/mensch-1..4` (ein Bogen mit Magenta-Schnitt).
  */
-const MEMORY: MemoryGame = {
-  back: `${G}memory/rueck.webp`,
-  pairs: [
-    { image: `${G}memory/karte-hirtenstab.webp`, text: 'Der Hirtenstab: Er wird auftreten und weiden.' },
-    { image: `${G}memory/karte-krone.webp`, text: 'Die Krone: Der Herr wird König über sie sein.' },
-    { image: `${G}memory/karte-pflugschar.webp`, text: 'Die Pflugschar: Aus Schwertern werden Pflugscharen.' },
-    { image: `${G}memory/karte-sichel.webp`, text: 'Die Sichel: Aus Spießen werden Sicheln.' },
-    { image: `${G}memory/karte-traube.webp`, text: 'Die Traube: Ein jeder wird unter seinem Weinstock wohnen.' },
-    { image: `${G}memory/karte-feige.webp`, text: 'Die Feige: Ein jeder wird unter seinem Feigenbaum wohnen.' }
+const ZIONWEGE: ZionGame = {
+  tiles: {
+    straight: `${G}zionwege/gerade.webp`,
+    corner: `${G}zionwege/ecke.webp`,
+    tee: `${G}zionwege/t.webp`,
+    end: `${G}zionwege/ende.webp`,
+    zion: `${G}zionwege/zion.webp`,
+    fields: [1, 2, 3, 4].map((n) => `${G}zionwege/feld-${n}.webp`)
+  },
+  people: [1, 2, 3, 4].map((n) => `${G}zionwege/mensch-${n}.webp`),
+  rounds: [
+    {
+      hint: 'Tippe auf die Wegplatten, dann drehen sie sich. Bau jedem Menschen einen Weg zum Berg Zion.',
+      rows: ['.Z..', 'LTTL', 'ILEE', 'E...'],
+      start: ['0000', '0033', '1101', '1000'],
+      solution: ['0000', '1202', '2122', '2000'],
+      par: 12,
+      people: [{ r: 3, c: 0, image: 0 }, { r: 2, c: 2, image: 1 }, { r: 2, c: 3, image: 2 }]
+    },
+    {
+      hint: 'Jetzt warten vier Menschen. Bau allen einen Weg zum Berg Zion.',
+      rows: ['..Z..', '.LTL.', 'ET.IL', '.IETE', '.LE..'],
+      start: ['00000', '03130', '22013', '01201', '02300'],
+      solution: ['00000', '01220', '31023', '02321', '00100'],
+      par: 19,
+      people: [{ r: 2, c: 0, image: 0 }, { r: 4, c: 2, image: 3 }, { r: 3, c: 2, image: 1 }, { r: 3, c: 4, image: 2 }]
+    }
   ]
 }
 
@@ -213,8 +297,8 @@ export const propheten: Journey = {
         '„Denn uns ist ein Kind geboren“, sagt er, „ein Sohn ist uns gegeben. Die Herrschaft liegt auf seiner Schulter.“ Er nennt die Namen des Kindes: Wunderbar, Rat, Held, Ewig-Vater, Friedefürst.',
         'Seine Herrschaft wird groß werden. Des Friedens wird kein Ende sein auf dem Stuhl Davids und in seinem Königreich. Er wird es festigen mit Recht und Gerechtigkeit, von nun an bis in Ewigkeit. Der Eifer des Herrn Zebaoth wird das tun.'
       ],
-      // Spiel: Lückenvers (lueckenvers, alt)
-      task: { kind: 'lueckenvers', hint: 'Ziehe das passende Blatt in die Lücke.', verse: VERS },
+      // Spiel: Namen-Laternen (laternen, neu)
+      task: { kind: 'laternen', hint: 'Fange die Laternen mit den Namen des Kindes.', lanterns: LATERNEN },
       questions: [
         { q: 'Was geschieht mit den Rüstungen der Krieger?', options: ['Sie werden verbrannt.', 'Sie werden verkauft.', 'Sie werden vergraben.'], answer: 0 },
         { q: 'Auf wessen Stuhl wird des Friedens kein Ende sein?', options: ['auf dem Stuhl Davids', 'auf dem Stuhl des Pharao', 'auf dem Stuhl Sauls'], answer: 0 }
@@ -247,8 +331,8 @@ export const propheten: Journey = {
         'Auf diesem Zweig wird der Geist des Herrn ruhen. Es ist der Geist der Weisheit und des Verstandes. Es ist der Geist des Rates und der Stärke. Es ist der Geist der Erkenntnis und der Furcht des Herrn.',
         'Jesaja spricht von dem Zweig wie von einem Menschen. Er wird nicht richten nach dem, was seine Augen sehen. Er wird nicht urteilen nach dem, was seine Ohren hören. Mit Gerechtigkeit wird er den Armen Recht schaffen, den Elenden im Land. Gerechtigkeit wird der Gurt um seine Hüften sein.'
       ],
-      // Spiel: Reihenfolge legen (reihenfolge, alt)
-      task: { kind: 'reihenfolge', hint: 'Lege die Bilder in die Reihenfolge, wie der Zweig wächst.', order: REIHENFOLGE },
+      // Spiel: Der Spross (spross, neu)
+      task: { kind: 'spross', hint: 'Lenke den Trieb aus dem Baumstumpf zum Licht.', shootGrow: SPROSS },
       questions: [
         { q: 'Wer ist Isai?', options: ['der Vater von König David', 'ein Prophet', 'ein König von Babel'], answer: 0 },
         { q: 'Was wird aus dem Stamm Isais aufgehen?', options: ['eine Rute und ein Zweig', 'eine Mauer', 'ein Zelt'], answer: 0 }
@@ -334,8 +418,8 @@ export const propheten: Journey = {
         'Und noch einmal spricht Micha vom Herrscher aus Bethlehem. Er wird auftreten und weiden in der Kraft des Herrn und im Namen des Herrn, seines Gottes. Sie werden wohnen, und er wird groß sein, so weit die Welt reicht.',
         '„Und er wird unser Friede sein“, sagt Micha.'
       ],
-      // Spiel: Memory (memory, alt)
-      task: { kind: 'memory', hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.', memory: MEMORY },
+      // Spiel: Wege zum Zion (zionwege, neu)
+      task: { kind: 'zionwege', hint: 'Dreh die Wegplatten, bis alle einen Weg zum Berg Zion haben.', zionPaths: ZIONWEGE },
       questions: [
         { q: 'Wen will der Herr nach Michas Worten sammeln?', options: ['die Lahmen und die Verstoßenen', 'nur die Reichen', 'nur die Krieger'], answer: 0 },
         { q: 'Was sagt Micha über den Herrscher aus Bethlehem?', options: ['Er wird unser Friede sein.', 'Er wird uns reich machen.', 'Er wird eine Stadt bauen.'], answer: 0 }
