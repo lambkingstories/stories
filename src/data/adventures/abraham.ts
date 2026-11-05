@@ -329,6 +329,7 @@ export const abraham: Journey = {
       ],
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
+        { q: 'Was will Gott mit der Stadt tun, wenn es dort genug gute Menschen gibt?', options: ['Er will sie verschonen.', 'Er will sie größer machen.', 'Er will dort wohnen.'], answer: 0 },
         { q: 'Um wie viele Gerechte bittet Abraham zuletzt?', options: ['zehn', 'fünfzig', 'hundert'], answer: 0 },
         { q: 'Wen bringt Gott in Sicherheit?', options: ['Lot', 'Hagar', 'Isaak'], answer: 0 }
       ],
@@ -365,6 +366,7 @@ export const abraham: Journey = {
       ],
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
+        { q: 'Was trägt Isaak den Berg hinauf?', options: ['das Holz', 'einen Krug Wasser', 'ein Lamm'], answer: 0 },
         { q: 'Was antwortet Abraham auf Isaaks Frage nach dem Opfertier?', options: ['Gott wird dafür sorgen.', 'Wir kaufen eines unterwegs.', 'Ich habe es vergessen.'], answer: 0 },
         { q: 'Was sieht Abraham im Gebüsch?', options: ['einen Widder', 'einen Hirsch', 'einen Esel'], answer: 0 }
       ],
@@ -402,7 +404,8 @@ export const abraham: Journey = {
       task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wen schickt Abraham in das Land seiner Familie?', options: ['seinen ältesten Knecht', 'seinen Sohn Isaak', 'seinen Neffen Lot'], answer: 0 },
-        { q: 'Woran erkennt der Knecht die richtige Frau?', options: ['Sie gibt auch den Kamelen zu trinken.', 'Sie trägt einen roten Schleier.', 'Sie singt am Brunnen.'], answer: 0 }
+        { q: 'Woran erkennt der Knecht die richtige Frau?', options: ['Sie gibt auch den Kamelen zu trinken.', 'Sie trägt einen roten Schleier.', 'Sie singt am Brunnen.'], answer: 0 },
+        { q: 'Was tut der Knecht am Ende?', options: ['Er verneigt sich und dankt Gott.', 'Er reitet sofort davon.', 'Er schläft am Brunnen ein.'], answer: 0 }
       ],
       soon: SOON
     },

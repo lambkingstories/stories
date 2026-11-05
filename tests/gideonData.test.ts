@@ -63,8 +63,8 @@ describe('Gideon: stories and questions', () => {
     expect(new Set(gideon.stages.map((s) => s.image)).size).toBe(12)
   })
 
-  it('two questions per stage, three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
-    expect(gideon.stages.map((s) => s.questions.length)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2])
+  it('two questions after a game, three in a stage without one, three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
+    expect(gideon.stages.map((s) => s.questions.length)).toEqual(gideon.stages.map((s) => (s.task?.kind === 'quiz' ? 3 : 2)))
     for (const q of [...gideon.stages.flatMap((s) => s.questions), ...gideon.exam]) {
       expect(q.options, q.q).toHaveLength(3)
       expect(q.answer, q.q).toBe(0)

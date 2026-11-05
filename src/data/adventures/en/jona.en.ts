@@ -24,6 +24,7 @@ export const jonaEn: TextOverlay<Journey> = {
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'Where is Jonah supposed to go?', options: ['to Nineveh', 'to Tarshish', 'to Joppa'] },
+        { q: 'What does Jonah do when God sends him to Nineveh?', options: ['He runs the other way.', 'He sets off at once.', 'He stays at home and sleeps.'] },
         { q: 'In which city by the sea does Jonah board a ship?', options: ['in Joppa', 'in Nineveh', 'in Tarshish'] }
       ]
     },
@@ -80,6 +81,7 @@ export const jonaEn: TextOverlay<Journey> = {
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'What does Jonah say so that the sea will be calm?', options: ['“Throw me into the sea.”', '“Pray to your gods.”', '“Sail on to Tarshish.”'] },
+        { q: 'What do the men do before they throw Jonah into the sea?', options: ['They row back and cry to God.', 'They sail faster to Tarshish.', 'They fall asleep.'] },
         { q: 'What happens when Jonah is in the sea?', options: ['The sea becomes calm.', 'The storm gets stronger.', 'The ship goes down.'] }
       ]
     },
@@ -145,6 +147,7 @@ export const jonaEn: TextOverlay<Journey> = {
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'Why is Jonah angry?', options: ['God spares Nineveh.', 'The ship has gone down.', 'The fish swallowed him.'] },
+        { q: 'What does Jonah know about God?', options: ['that God is gracious and merciful', 'that God does not know Nineveh', 'that God does not listen'] },
         { q: 'Where does Jonah sit down?', options: ['in a hut outside the city', 'in the king’s palace', 'on a ship'] }
       ]
     },

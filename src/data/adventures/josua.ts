@@ -205,7 +205,8 @@ export const josua: Journey = {
       task: { kind: 'quiz', hint: 'Diese Etappe ist ruhig. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Was sagt Gott zu Josua?', options: ['„Ich bin mit dir.“', '„Geh allein.“', '„Kehre um.“'], answer: 0 },
-        { q: 'Wer führt das Volk nach Moses Tod?', options: ['Josua', 'Aaron', 'Barak'], answer: 0 }
+        { q: 'Wer führt das Volk nach Moses Tod?', options: ['Josua', 'Aaron', 'Barak'], answer: 0 },
+        { q: 'Woran soll Josua Tag und Nacht denken?', options: ['an das Buch des Gesetzes', 'an seine Feinde', 'an Ägypten'], answer: 0 }
       ]
     },
     {
@@ -312,6 +313,7 @@ export const josua: Journey = {
       // nur Quiz (ernst bzw. ruhig, nichts wird gespielt); das Etappenbild ist noch das von Josef
       task: { kind: 'quiz', hint: 'Diese Etappe ist ruhig und ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
+        { q: 'Wer steht vor Josua?', options: ['der Fürst über das Heer Gottes', 'ein Soldat aus Jericho', 'ein Hirte'], answer: 0 },
         { q: 'Was soll Josua tun, weil der Ort heilig ist?', options: ['seine Schuhe ausziehen', 'sich verstecken', 'ein Feuer anzünden'], answer: 0 },
         { q: 'Was soll das Volk sechs Tage lang tun?', options: ['einmal am Tag um die Stadt gehen', 'die Stadt belagern', 'im Lager bleiben'], answer: 0 }
       ]
@@ -348,6 +350,7 @@ export const josua: Journey = {
       // nur Quiz (ernst bzw. ruhig, nichts wird gespielt); das Etappenbild ist noch das von Josef
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
+        { q: 'Was schallt, bevor die Mauer einstürzt?', options: ['die Posaunen', 'die Glocken', 'die Trommeln'], answer: 0 },
         { q: 'Was geschieht mit der Mauer von Jericho?', options: ['Sie stürzt ein.', 'Sie wird bemalt.', 'Sie wächst weiter.'], answer: 0 },
         { q: 'Welche Frau bleibt in Jericho mit ihrer ganzen Familie am Leben?', options: ['Rahab', 'Zippora', 'Mirjam'], answer: 0 }
       ]

@@ -523,6 +523,7 @@ export const mose: Journey = {
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Was macht Aaron aus dem Gold?', options: ['ein Kalb', 'eine Krone', 'ein Zelt'], answer: 0 },
+        { q: 'Was tut Mose, als er das Kalb sieht?', options: ['Er zerbricht die Tafeln.', 'Er feiert mit.', 'Er versteckt sich.'], answer: 0 },
         { q: 'Was bittet Mose für das Volk?', options: ['dass Gott ihnen vergibt', 'dass Gott sie bestraft', 'dass Gott sie verlässt'], answer: 0 }
       ]
     },

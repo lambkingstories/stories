@@ -59,7 +59,8 @@ export const eliaEn: TextOverlay<Journey> = {
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'Where does Elijah carry the sick boy?', options: ['up to his room', 'into the garden', 'to the town gate'] },
-        { q: 'How many times does Elijah stretch himself over the child?', options: ['three times', 'once', 'seven times'] }
+        { q: 'How many times does Elijah stretch himself over the child?', options: ['three times', 'once', 'seven times'] },
+        { q: 'What does the woman know now?', options: ['that Elijah is a man of God', 'that Elijah is a king', 'that Elijah is a merchant'] }
       ]
     },
     {
@@ -114,7 +115,8 @@ export const eliaEn: TextOverlay<Journey> = {
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'How many stones does Elijah build the altar from?', options: ['twelve', 'seven', 'three'] },
-        { q: 'What does Elijah do before he prays?', options: ['He has water poured over the offering three times.', 'He lights the wood.', 'He sends the people away.'] }
+        { q: 'What does Elijah do before he prays?', options: ['He has water poured over the offering three times.', 'He lights the wood.', 'He sends the people away.'] },
+        { q: 'What do the people cry out when the fire falls?', options: ['“The Lord is God!”', '“Elijah is king!”', '“We are going home!”'] }
       ]
     },
     {
@@ -165,6 +167,7 @@ export const eliaEn: TextOverlay<Journey> = {
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'What does Elijah throw over Elisha?', options: ['his cloak', 'his staff', 'his sword'] },
+        { q: 'What does Elisha answer when Elijah says, “Stay here”?', options: ['“I will not leave you.”', '“All right, I will stay here.”', '“I am going home.”'] },
         { q: 'What separates Elijah and Elisha at the Jordan?', options: ['a chariot of fire with horses of fire', 'a high wall', 'a wide river'] }
       ]
     }

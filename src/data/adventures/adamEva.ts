@@ -344,6 +344,7 @@ export const adamEva: Journey = {
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wer spricht die Frau im Garten an?', options: ['die Schlange', 'Adam', 'ein Vogel'], answer: 0 },
+        { q: 'Was sagt die Schlange zur Frau?', options: ['„Ihr werdet nicht sterben.“', '„Pflückt nur die reifen Früchte.“', '„Fragt zuerst Adam.“'], answer: 0 },
         { q: 'Was tun die beiden, nachdem ihnen die Augen aufgegangen sind?', options: ['Sie flechten Feigenblätter zusammen.', 'Sie bauen ein Boot.', 'Sie pflücken Datteln.'], answer: 0 }
       ],
       soon: SOON

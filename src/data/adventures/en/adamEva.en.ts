@@ -113,6 +113,7 @@ export const adamEvaEn: TextOverlay<Journey> = {
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'Who speaks to the woman in the garden?', options: ['the snake', 'Adam', 'a bird'] },
+        { q: 'What does the snake say to the woman?', options: ['“You will not die.”', '“Pick only the ripe fruit.”', '“Ask Adam first.”'] },
         { q: 'What do the two do after their eyes are opened?', options: ['They sew fig leaves together.', 'They build a boat.', 'They pick dates.'] }
       ]
     },

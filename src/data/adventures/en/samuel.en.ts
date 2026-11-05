@@ -70,8 +70,7 @@ export const samuelEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'To whom does Samuel run in the night?', options: ['to Eli', 'to Hannah', 'to Elkanah'] },
-        { q: 'Who realizes that God is calling the boy?', options: ['Eli', 'Samuel', 'Elkanah'] },
-        { q: 'What does all Israel know?', options: ['Samuel is a prophet of God.', 'Samuel is a judge.', 'Samuel is a king.'] }
+        { q: 'Who realizes that God is calling the boy?', options: ['Eli', 'Samuel', 'Elkanah'] }
       ]
     },
     {
@@ -102,7 +101,6 @@ export const samuelEn: TextOverlay<Journey> = {
         cows: { rounds: [{ hint: 'The cows want to go to the grass. Tap the side the cart should go back to.' }, { hint: 'Now they pull harder. Keep the cart on the road.' }] }
       },
       questions: [
-        { q: 'What stays at home with the cows?', options: ['the calves', 'the cart', 'the yoke'] },
         { q: 'Where do the cows go?', options: ['straight toward Beth-shemesh', 'back to Ashdod', 'to the sea'] },
         { q: 'What are the people in Beth-shemesh doing?', options: ['They are cutting wheat.', 'They are baking bread.', 'They are building a house.'] }
       ]
@@ -120,7 +118,6 @@ export const samuelEn: TextOverlay<Journey> = {
         stone: { rounds: [{ hint: 'Set the stone exactly in the middle between the two places. The notch helps you.' }, { hint: 'Once more, now without the notch. Guess the middle.' }] }
       },
       questions: [
-        { q: 'What do the people pour out before God in Mizpeh?', options: ['water', 'wine', 'oil'] },
         { q: 'What does God send over the Philistines?', options: ['a mighty thunder', 'a rain of stones', 'a storm'] },
         { q: 'What does Samuel call the stone?', options: ['Eben-ezer', 'Shiloh', 'Ramah'] }
       ]
@@ -157,8 +154,7 @@ export const samuelEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'Whose son is Saul?', options: ['Kish’s', 'Eli’s', 'Elkanah’s'] },
-        { q: 'What have Saul and the servant lost and are looking for?', options: ['Kish’s donkeys', 'their tent', 'their bread'] },
-        { q: 'What does the servant have with him for the man of God?', options: ['a quarter of a silver coin', 'a jug of wine', 'a lamb'] }
+        { q: 'What have Saul and the servant lost and are looking for?', options: ['Kish’s donkeys', 'their tent', 'their bread'] }
       ]
     },
     {
@@ -178,7 +174,6 @@ export const samuelEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'What does Samuel pour on Saul’s head?', options: ['oil', 'water', 'wine'] },
-        { q: 'What does Samuel say about the donkeys?', options: ['They have been found.', 'They have been sold.', 'They have run away.'] },
         { q: 'What does God give Saul when he turns to go?', options: ['another heart', 'a sword', 'a crown'] }
       ]
     },
@@ -196,8 +191,7 @@ export const samuelEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'Where does Samuel call the people?', options: ['to Mizpeh', 'to Shiloh', 'to Gilgal'] },
-        { q: 'What does the people shout when Saul stands before them?', options: ['Long live the king!', 'We want to go home!', 'Where is Samuel?'] },
-        { q: 'Where does Saul go afterwards?', options: ['to Gibeah', 'to Ramah', 'to Shiloh'] }
+        { q: 'What does the people shout when Saul stands before them?', options: ['Long live the king!', 'We want to go home!', 'Where is Samuel?'] }
       ]
     },
     {
@@ -213,7 +207,6 @@ export const samuelEn: TextOverlay<Journey> = {
         gather: { rounds: [{ hint: 'Saul is waiting for Samuel. Tap every man who walks away: he comes back.' }, { hint: 'Now for seven days. Keep the men with Saul.' }] }
       },
       questions: [
-        { q: 'Where do the Israelites hide from the Philistines?', options: ['in caves, cracks in the rocks and pits', 'in the town of Shiloh', 'behind the ark'] },
         { q: 'What does Saul do when the people run away?', options: ['He offers the offering himself.', 'He runs away too.', 'He attacks alone.'] },
         { q: 'What does Samuel say to Saul?', options: ['You have acted foolishly.', 'You have waited well.', 'You are a brave king.'] }
       ]

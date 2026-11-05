@@ -65,8 +65,8 @@ describe('Mose: stories and questions', () => {
     }
   })
 
-  it('two questions per stage (three in the serious stages 1, 3, 8 and 9), three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
-    expect(mose.stages.map((s) => s.questions.length)).toEqual([3, 2, 3, 2, 2, 2, 2, 3, 3, 2, 2, 2, 2, 2, 2])
+  it('two questions after a game, three in a stage without one, three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
+    expect(mose.stages.map((s) => s.questions.length)).toEqual(mose.stages.map((s) => (s.task?.kind === 'quiz' ? 3 : 2)))
     for (const q of [...mose.stages.flatMap((s) => s.questions), ...mose.exam]) {
       expect(q.options, q.q).toHaveLength(3)
       expect(q.answer, q.q).toBe(0)

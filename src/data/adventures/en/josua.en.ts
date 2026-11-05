@@ -24,7 +24,8 @@ export const josuaEn: TextOverlay<Journey> = {
       task: { hint: 'This stage is calm. Listen carefully and answer the questions.' },
       questions: [
         { q: 'What does God say to Joshua?', options: ['“I will be with you.”', '“Go alone.”', '“Turn back.”'] },
-        { q: 'Who leads the people after the death of Moses?', options: ['Joshua', 'Aaron', 'Barak'] }
+        { q: 'Who leads the people after the death of Moses?', options: ['Joshua', 'Aaron', 'Barak'] },
+        { q: 'What is Joshua to think about day and night?', options: ['the Book of the Law', 'his enemies', 'Egypt'] }
       ]
     },
     {
@@ -113,6 +114,7 @@ export const josuaEn: TextOverlay<Journey> = {
       ],
       task: { hint: 'This stage is calm and serious. Listen carefully and answer the questions.' },
       questions: [
+        { q: 'Who is standing in front of Joshua?', options: ['the commander of God’s army', 'a soldier from Jericho', 'a shepherd'] },
         { q: 'What is Joshua to do because the place is holy?', options: ['take off his sandals', 'hide', 'light a fire'] },
         { q: 'What are the people to do for six days?', options: ['walk around the city once a day', 'besiege the city', 'stay in the camp'] }
       ]
@@ -143,6 +145,7 @@ export const josuaEn: TextOverlay<Journey> = {
       ],
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
+        { q: 'What sounds just before the wall falls down?', options: ['the trumpets', 'the bells', 'the drums'] },
         { q: 'What happens to the wall of Jericho?', options: ['It collapses.', 'It is painted.', 'It keeps growing.'] },
         { q: 'Which woman in Jericho stays alive with her whole family?', options: ['Rahab', 'Zipporah', 'Miriam'] }
       ]

@@ -38,6 +38,7 @@ export const jakobEn: TextOverlay<Journey> = {
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'Who can hardly see?', options: ['Isaac', 'Laban', 'Esau'] },
+        { q: 'What does Jacob say when Isaac asks who he is?', options: ['“I am Esau.”', '“I am Jacob.”', '“I am Laban.”'] },
         { q: 'Where does Jacob have to go afterward?', options: ['to Laban', 'to Esau', 'to the sea'] }
       ]
     },

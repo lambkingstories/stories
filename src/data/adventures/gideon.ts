@@ -256,7 +256,8 @@ export const gideon: Journey = {
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Unter welchem Baum sitzt Debora?', options: ['unter einer Palme', 'unter einer Eiche', 'unter einer Zeder'], answer: 0 },
-        { q: 'Was sagt Barak zu Debora?', options: ['„Wenn du mit mir gehst, gehe ich.“', '„Ich gehe allein.“', '„Ich bleibe hier.“'], answer: 0 }
+        { q: 'Was sagt Barak zu Debora?', options: ['„Wenn du mit mir gehst, gehe ich.“', '„Ich gehe allein.“', '„Ich bleibe hier.“'], answer: 0 },
+        { q: 'Was ruft Debora auf dem Berg Tabor?', options: ['„Gott zieht vor dir her!“', '„Wir kehren um!“', '„Wartet bis morgen!“'], answer: 0 }
       ]
     },
     {
@@ -328,6 +329,7 @@ export const gideon: Journey = {
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wann reißt Gideon den Altar des Baal nieder?', options: ['in der Nacht', 'am Mittag', 'zur Erntezeit'], answer: 0 },
+        { q: 'Was soll Gideon bauen, nachdem er den Altar des Baal niedergerissen hat?', options: ['einen Altar für Gott oben auf dem Felsen', 'ein Haus für seinen Vater', 'einen hohen Turm'], answer: 0 },
         { q: 'Wer stellt sich vor Gideon?', options: ['sein Vater Joas', 'Barak', 'ein Prophet'], answer: 0 }
       ]
     },
@@ -435,6 +437,7 @@ export const gideon: Journey = {
       // nur Quiz (ernst bzw. ruhig, nichts wird gespielt); das Etappenbild ist noch das von Josef
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
+        { q: 'Was sollen die Männer von Ephraim besetzen?', options: ['die Furten am Jordan', 'die Stadttore', 'die Berge'], answer: 0 },
         { q: 'Wer kommt zornig zu Gideon?', options: ['die Männer von Ephraim', 'Barak', 'die Feinde'], answer: 0 },
         { q: 'Wie antwortet Gideon den Männern von Ephraim?', options: ['ruhig und freundlich', 'mit lauten Worten', 'gar nicht'], answer: 0 }
       ]

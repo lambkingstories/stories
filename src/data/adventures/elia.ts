@@ -249,7 +249,8 @@ export const elia: Journey = {
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wohin trägt Elia den kranken Jungen?', options: ['hinauf in sein Zimmer', 'in den Garten', 'zum Stadttor'], answer: 0 },
-        { q: 'Wie oft beugt sich Elia über das Kind?', options: ['dreimal', 'einmal', 'siebenmal'], answer: 0 }
+        { q: 'Wie oft beugt sich Elia über das Kind?', options: ['dreimal', 'einmal', 'siebenmal'], answer: 0 },
+        { q: 'Was weiß die Frau jetzt?', options: ['dass Elia ein Mann Gottes ist', 'dass Elia ein König ist', 'dass Elia ein Händler ist'], answer: 0 }
       ]
     },
     {
@@ -302,7 +303,8 @@ export const elia: Journey = {
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Aus wie vielen Steinen baut Elia den Altar?', options: ['aus zwölf', 'aus sieben', 'aus drei'], answer: 0 },
-        { q: 'Was tut Elia, bevor er betet?', options: ['Er lässt dreimal Wasser über das Opfer gießen.', 'Er zündet das Holz an.', 'Er schickt das Volk fort.'], answer: 0 }
+        { q: 'Was tut Elia, bevor er betet?', options: ['Er lässt dreimal Wasser über das Opfer gießen.', 'Er zündet das Holz an.', 'Er schickt das Volk fort.'], answer: 0 },
+        { q: 'Was ruft das Volk, als das Feuer fällt?', options: ['„Der Herr ist Gott!“', '„Elia ist König!“', '„Wir gehen nach Hause!“'], answer: 0 }
       ]
     },
     {
@@ -356,6 +358,7 @@ export const elia: Journey = {
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Was wirft Elia über Elisa?', options: ['seinen Mantel', 'seinen Stab', 'sein Schwert'], answer: 0 },
+        { q: 'Was antwortet Elisa, wenn Elia sagt: „Bleib doch hier“?', options: ['„Ich verlasse dich nicht.“', '„Gut, ich bleibe hier.“', '„Ich gehe nach Hause.“'], answer: 0 },
         { q: 'Was trennt Elia und Elisa am Jordan?', options: ['ein feuriger Wagen mit feurigen Pferden', 'eine hohe Mauer', 'ein breiter Fluss'], answer: 0 }
       ]
     }

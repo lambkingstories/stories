@@ -65,8 +65,8 @@ describe('Abraham: stories and questions', () => {
     expect(all.split(/\s+/).length / abraham.stages.length, 'about as long as Noah (117) and Josef (122)').toBeLessThan(135)
   })
 
-  it('two questions per stage, three answers each, the right one first and the answers differ; the exam has six', () => {
-    expect(abraham.stages.map((s) => s.questions.length)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2])
+  it('two questions after a game, three in a stage without one, three answers each, the right one first and the answers differ; the exam has six', () => {
+    expect(abraham.stages.map((s) => s.questions.length)).toEqual(abraham.stages.map((s) => (s.task?.kind === 'quiz' ? 3 : 2)))
     for (const q of [...abraham.stages.flatMap((s) => s.questions), ...abraham.exam]) {
       expect(q.options, q.q).toHaveLength(3)
       expect(q.answer, q.q).toBe(0)

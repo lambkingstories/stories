@@ -82,7 +82,8 @@ export const babelEn: TextOverlay<Journey> = {
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'What does God confuse?', options: ['their language', 'their roads', 'their bricks'] },
-        { q: 'What can the builders no longer do?', options: ['plan together', 'walk', 'see'] }
+        { q: 'What can the builders no longer do?', options: ['plan together', 'walk', 'see'] },
+        { q: 'What is left lying around at the end?', options: ['tools and bricks', 'bread and water', 'gold and silver'] }
       ]
     },
     {

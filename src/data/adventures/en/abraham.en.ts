@@ -110,6 +110,7 @@ export const abrahamEn: TextOverlay<Journey> = {
       ],
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
+        { q: 'What will God do with the city if there are enough good people in it?', options: ['He will spare it.', 'He will make it bigger.', 'He will live there.'] },
         { q: 'For how many righteous people does Abraham plead in the end?', options: ['ten', 'fifty', 'a hundred'] },
         { q: 'Whom does God bring to safety?', options: ['Lot', 'Hagar', 'Isaac'] }
       ]
@@ -140,6 +141,7 @@ export const abrahamEn: TextOverlay<Journey> = {
       ],
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
+        { q: 'What does Isaac carry up the mountain?', options: ['the wood', 'a jar of water', 'a lamb'] },
         { q: 'What does Abraham answer when Isaac asks about the animal for the offering?', options: ['God will provide it.', 'We will buy one on the way.', 'I have forgotten it.'] },
         { q: 'What does Abraham see in the thicket?', options: ['a ram', 'a deer', 'a donkey'] }
       ]
@@ -171,7 +173,8 @@ export const abrahamEn: TextOverlay<Journey> = {
       task: { hint: 'Listen carefully and answer the questions.' },
       questions: [
         { q: 'Whom does Abraham send to the land of his family?', options: ['his oldest servant', 'his son Isaac', 'his nephew Lot'] },
-        { q: 'How does the servant recognize the right woman?', options: ['She gives the camels water, too.', 'She wears a red veil.', 'She sings at the well.'] }
+        { q: 'How does the servant recognize the right woman?', options: ['She gives the camels water, too.', 'She wears a red veil.', 'She sings at the well.'] },
+        { q: 'What does the servant do at the end?', options: ['He bows down and thanks God.', 'He rides away at once.', 'He falls asleep at the well.'] }
       ]
     },
     {

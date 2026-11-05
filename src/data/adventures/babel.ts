@@ -253,7 +253,8 @@ export const babel: Journey = {
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Was verwirrt Gott?', options: ['ihre Sprache', 'ihre Wege', 'ihre Ziegel'], answer: 0 },
-        { q: 'Was können die Bauleute jetzt nicht mehr?', options: ['gemeinsam planen', 'gehen', 'sehen'], answer: 0 }
+        { q: 'Was können die Bauleute jetzt nicht mehr?', options: ['gemeinsam planen', 'gehen', 'sehen'], answer: 0 },
+        { q: 'Was bleibt am Ende liegen?', options: ['Werkzeug und Ziegel', 'Brot und Wasser', 'Gold und Silber'], answer: 0 }
       ],
       soon: SOON
     },

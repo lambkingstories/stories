@@ -223,6 +223,7 @@ export const moseEn: TextOverlay<Journey> = {
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'What does Aaron make from the gold?', options: ['a calf', 'a crown', 'a tent'] },
+        { q: 'What does Moses do when he sees the calf?', options: ['He breaks the tablets.', 'He joins the feast.', 'He hides.'] },
         { q: 'What does Moses ask for the people?', options: ['that God forgive them', 'that God punish them', 'that God leave them'] }
       ]
     },

@@ -216,6 +216,7 @@ export const jona: Journey = {
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wohin soll Jona gehen?', options: ['nach Ninive', 'nach Tarsis', 'nach Japho'], answer: 0 },
+        { q: 'Was tut Jona, als Gott ihn nach Ninive schickt?', options: ['Er läuft in die andere Richtung.', 'Er geht sofort los.', 'Er bleibt zu Hause und schläft.'], answer: 0 },
         { q: 'In welcher Stadt am Meer steigt Jona auf ein Schiff?', options: ['in Japho', 'in Ninive', 'in Tarsis'], answer: 0 }
       ]
     },
@@ -270,6 +271,7 @@ export const jona: Journey = {
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Was sagt Jona, damit das Meer still wird?', options: ['„Werft mich ins Meer.“', '„Betet zu euren Göttern.“', '„Fahrt nach Tarsis.“'], answer: 0 },
+        { q: 'Was tun die Männer, bevor sie Jona ins Meer werfen?', options: ['Sie rudern zurück und rufen zu Gott.', 'Sie fahren schneller nach Tarsis.', 'Sie schlafen ein.'], answer: 0 },
         { q: 'Was geschieht, als Jona im Meer ist?', options: ['Das Meer wird still.', 'Der Sturm wird stärker.', 'Das Schiff geht unter.'], answer: 0 }
       ]
     },
@@ -341,6 +343,7 @@ export const jona: Journey = {
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Warum ist Jona zornig?', options: ['Gott verschont Ninive.', 'Das Schiff ist untergegangen.', 'Der Fisch hat ihn verschluckt.'], answer: 0 },
+        { q: 'Was weiß Jona von Gott?', options: ['dass Gott gnädig und barmherzig ist', 'dass Gott Ninive nicht kennt', 'dass Gott nicht zuhört'], answer: 0 },
         { q: 'Wohin setzt sich Jona?', options: ['in eine Hütte vor der Stadt', 'in den Palast des Königs', 'auf ein Schiff'], answer: 0 }
       ]
     },

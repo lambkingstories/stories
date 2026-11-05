@@ -208,6 +208,7 @@ export const wuesteEn: TextOverlay<Journey> = {
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'What does Moses do at the rock differently from what God said?', options: ['He strikes it with the staff.', 'He sends the people away.', 'He drinks first.'] },
+        { q: 'Why may Moses and Aaron not lead the people into the land?', options: ['They did not trust God.', 'They are too tired.', 'They have forgotten the way.'] },
         { q: 'Who receives the priest’s robe on Mount Hor?', options: ['Eleazar', 'Joshua', 'Hur'] }
       ]
     },
@@ -237,7 +238,6 @@ export const wuesteEn: TextOverlay<Journey> = {
       ],
       task: { hint: ESELIN_EN.steps?.[0]?.hint, donkey: ESELIN_EN },
       questions: [
-        { q: 'Who wants Balaam to curse the people?', options: ['Balak', 'Jethro', 'Joshua'] },
         { q: 'Who sees the angel first?', options: ['the donkey', 'Balaam', 'Balak'] },
         { q: 'What does Balaam speak about Israel at the end?', options: ['a blessing', 'a curse', 'a riddle'] }
       ]

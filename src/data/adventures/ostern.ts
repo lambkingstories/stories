@@ -238,7 +238,6 @@ export const ostern: Journey = {
       task: { kind: 'wimmelbild', hint: 'Finde Maria Magdalena, Petrus, den anderen Jünger und die Leinentücher im Garten.', count: 4, find: WIMMEL },
       questions: [
         { q: 'Wer kommt früh zum Grab?', options: ['Maria Magdalena', 'Pilatus', 'ein Hirte'], answer: 0 },
-        { q: 'Was ist mit dem Stein vor dem Grab?', options: ['Er ist weggerollt.', 'Er liegt noch davor.', 'Er ist zerbrochen.'], answer: 0 },
         { q: 'Was sehen die Jünger im Grab?', options: ['die Leinentücher', 'einen Schatz', 'ein Feuer'], answer: 0 }
       ]
     },
@@ -257,8 +256,7 @@ export const ostern: Journey = {
       task: { kind: 'lueckenvers', hint: 'Ziehe das passende Wort in die Lücke.', verse: VERS },
       questions: [
         { q: 'Wofür hält Maria den Mann am Grab?', options: ['für den Gärtner', 'für einen Soldaten', 'für einen Händler'], answer: 0 },
-        { q: 'Was ruft Jesus?', options: ['Maria!', 'Petrus!', 'Thomas!'], answer: 0 },
-        { q: 'Wohin schickt Jesus Maria?', options: ['zu den Jüngern, seinen Brüdern', 'zum Tempel', 'zum See'], answer: 0 }
+        { q: 'Was ruft Jesus?', options: ['Maria!', 'Petrus!', 'Thomas!'], answer: 0 }
       ]
     },
     {
@@ -276,7 +274,6 @@ export const ostern: Journey = {
       task: { kind: 'weg', hint: 'Finde den Weg nach Emmaus.', way: WEG },
       questions: [
         { q: 'Wohin gehen die zwei Jünger?', options: ['nach Emmaus', 'nach Bethlehem', 'ans Meer'], answer: 0 },
-        { q: 'Wer geht mit ihnen, ohne dass sie ihn erkennen?', options: ['Jesus', 'Petrus', 'ein Hirte'], answer: 0 },
         { q: 'Was erklärt Jesus ihnen?', options: ['was in der Schrift von ihm steht', 'wie man Fische fängt', 'den Weg nach Jerusalem'], answer: 0 }
       ]
     },
@@ -294,8 +291,7 @@ export const ostern: Journey = {
       task: { kind: 'reihenfolge', hint: 'Lege die vier Bilder in die Reihenfolge der Geschichte.', order: REIHENFOLGE },
       questions: [
         { q: 'Was sagen die beiden zu Jesus vor dem Dorf?', options: ['Bleib bei uns!', 'Geh weiter!', 'Wir kennen dich nicht.'], answer: 0 },
-        { q: 'Woran erkennen sie Jesus?', options: ['Er bricht das Brot.', 'Er singt ein Lied.', 'Er zeigt ihnen ein Netz.'], answer: 0 },
-        { q: 'Wohin gehen die beiden danach?', options: ['zurück nach Jerusalem', 'nach Nazareth', 'zum See'], answer: 0 }
+        { q: 'Woran erkennen sie Jesus?', options: ['Er bricht das Brot.', 'Er singt ein Lied.', 'Er zeigt ihnen ein Netz.'], answer: 0 }
       ]
     },
     {
@@ -312,7 +308,6 @@ export const ostern: Journey = {
       task: { kind: 'puzzle', hint: 'Setze das Bild vom Saal zusammen.', puzzle: { image: `${G}puzzle/saal.webp`, cols: 2, rows: 3 } },
       questions: [
         { q: 'Was sagt Jesus, als er mitten unter die Jünger tritt?', options: ['Friede sei mit euch!', 'Fürchtet euch!', 'Geht nach Hause!'], answer: 0 },
-        { q: 'Was meinen die Jünger zuerst?', options: ['Sie meinen, sie sehen einen Geist.', 'Sie meinen, sie sehen einen Gärtner.', 'Sie meinen, sie sehen einen Soldaten.'], answer: 0 },
         { q: 'Was isst Jesus vor ihnen?', options: ['ein Stück gebratenen Fisch', 'ein Stück Brot', 'eine Schale Trauben'], answer: 0 }
       ]
     },
@@ -331,7 +326,6 @@ export const ostern: Journey = {
       // Spiel: Memory (memory, alt)
       task: { kind: 'memory', hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.', memory: MEMORY },
       questions: [
-        { q: 'Wer war nicht dabei, als Jesus zu den Jüngern kam?', options: ['Thomas', 'Petrus', 'ein Hirte'], answer: 0 },
         { q: 'Was sagt Thomas den anderen Jüngern?', options: ['Ich glaube es nicht, wenn ich ihn nicht selbst sehe.', 'Ich glaube euch sofort.', 'Ich will nichts davon hören.'], answer: 0 },
         { q: 'Was sagt Thomas zu Jesus?', options: ['Mein Herr und mein Gott!', 'Ich kenne dich nicht!', 'Geh weg!'], answer: 0 }
       ]
@@ -350,7 +344,6 @@ export const ostern: Journey = {
       task: { kind: 'fischzug', hint: 'Wirf das Netz dorthin, wo die Fische schwimmen.', fischzug: FISCHZUG },
       questions: [
         { q: 'Was fangen die Jünger in der Nacht?', options: ['nichts', 'sehr viele Fische', 'nur kleine Fische'], answer: 0 },
-        { q: 'Wohin sollen sie das Netz werfen?', options: ['auf die rechte Seite des Bootes', 'auf die linke Seite des Bootes', 'ans Ufer'], answer: 0 },
         { q: 'Was tut Petrus, als er hört: Es ist der Herr?', options: ['Er springt ins Wasser.', 'Er versteckt sich im Boot.', 'Er läuft in die Berge.'], answer: 0 }
       ]
     },
@@ -369,7 +362,6 @@ export const ostern: Journey = {
       task: { kind: 'weiden', hint: 'Führe die Lämmer zur Weide.', graze: WEIDEN },
       questions: [
         { q: 'Was fragt Jesus Petrus?', options: ['Hast du mich lieb?', 'Willst du zurück nach Hause?', 'Hast du Hunger?'], answer: 0 },
-        { q: 'Was sagt Jesus, als Petrus zum dritten Mal geantwortet hat?', options: ['Weide meine Schafe!', 'Fange Fische!', 'Geh nach Hause!'], answer: 0 },
         { q: 'Was sagt Jesus zum Schluss zu Petrus?', options: ['Folge mir nach!', 'Bleib hier am Feuer!', 'Fahre zurück zum Boot!'], answer: 0 }
       ]
     },
@@ -386,7 +378,6 @@ export const ostern: Journey = {
       // Spiel: Lückenvers (lueckenvers, alt)
       task: { kind: 'lueckenvers', hint: 'Ziehe das passende Wort in die Lücke.', verse: VERS2 },
       questions: [
-        { q: 'Wohin führt Jesus die Jünger?', options: ['bis nach Bethanien', 'auf den Berg bei Tiberias', 'zum Grab im Garten'], answer: 0 },
         { q: 'Was tut Jesus dort mit erhobenen Händen?', options: ['Er segnet sie.', 'Er ruft Soldaten.', 'Er baut ein Zelt.'], answer: 0 },
         { q: 'Wie gehen die Jünger nach Jerusalem zurück?', options: ['mit großer Freude', 'mit Angst', 'traurig und schweigend'], answer: 0 }
       ]

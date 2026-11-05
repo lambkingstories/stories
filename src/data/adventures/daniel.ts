@@ -215,6 +215,7 @@ export const daniel: Journey = {
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wie heißt der König von Babel?', options: ['Nebukadnezar', 'Belsazar', 'Darius'], answer: 0 },
+        { q: 'Was sollen die jungen Männer am Hof lernen?', options: ['die Schrift und die Sprache der Babylonier', 'Schiffe bauen', 'Löwen zähmen'], answer: 0 },
         { q: 'Welchen neuen Namen bekommt Daniel?', options: ['Beltsazar', 'Sadrach', 'Abed-Nego'], answer: 0 }
       ]
     },
@@ -301,7 +302,8 @@ export const daniel: Journey = {
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wie viele Männer sieht der König im Feuer?', options: ['vier', 'drei', 'sieben'], answer: 0 },
-        { q: 'Was ist mit den Mänteln der drei Männer?', options: ['Sie sind heil geblieben.', 'Sie sind verbrannt.', 'Sie sind nass.'], answer: 0 }
+        { q: 'Was ist mit den Mänteln der drei Männer?', options: ['Sie sind heil geblieben.', 'Sie sind verbrannt.', 'Sie sind nass.'], answer: 0 },
+        { q: 'Was sagt der König am Ende?', options: ['„Gelobt sei der Gott der drei!“', '„Holt meine Räte!“', '„Macht das Feuer aus!“'], answer: 0 }
       ]
     },
     {
@@ -355,7 +357,8 @@ export const daniel: Journey = {
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Womit versiegelt der König den Stein?', options: ['mit seinem Ring', 'mit Wachs', 'mit Lehm'], answer: 0 },
-        { q: 'Wer hält den Löwen den Rachen zu?', options: ['ein Engel Gottes', 'Daniel', 'der König'], answer: 0 }
+        { q: 'Wer hält den Löwen den Rachen zu?', options: ['ein Engel Gottes', 'Daniel', 'der König'], answer: 0 },
+        { q: 'Was schreibt der König am Ende allen Völkern?', options: ['„Ehrt den Gott Daniels!“', '„Fürchtet die Löwen!“', '„Ehrt den König!“'], answer: 0 }
       ]
     }
   ],

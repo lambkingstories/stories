@@ -299,7 +299,6 @@ export const david: Journey = {
       task: { kind: 'lueckenvers', hint: 'Ziehe das passende Blatt in die Lücke.', verse: VERS },
       questions: [
         { q: 'Wohin schickt Gott Samuel?', options: ['nach Bethlehem', 'nach Silo', 'nach Jericho'], answer: 0 },
-        { q: 'Was tut David, als Samuel nach den Söhnen fragt?', options: ['Er hütet die Schafe.', 'Er schläft im Haus.', 'Er kämpft im Heer.'], answer: 0 },
         { q: 'Was tut Samuel mit dem Horn?', options: ['Er salbt David.', 'Er trinkt daraus.', 'Er verschenkt es.'], answer: 0 }
       ]
     },
@@ -317,7 +316,6 @@ export const david: Journey = {
       task: { kind: 'harfe', hint: 'Streiche langsam über die Saiten, dann wird Saul ruhig.', harp: HARFE },
       questions: [
         { q: 'Was soll David für Saul spielen?', options: ['die Harfe', 'die Flöte', 'die Trommel'], answer: 0 },
-        { q: 'Was schickt Isai mit David zu Saul?', options: ['Brot, Wein und ein Ziegenböcklein', 'ein Schwert und einen Schild', 'Gold und Silber'], answer: 0 },
         { q: 'Was geschieht, wenn David spielt?', options: ['Saul wird ruhig.', 'Saul wird zornig.', 'Saul schläft ein.'], answer: 0 }
       ]
     },
@@ -353,7 +351,6 @@ export const david: Journey = {
       task: { kind: 'hirte', hint: 'Stelle David zwischen das Tier und das Lamm.', shepherd: HIRTE },
       questions: [
         { q: 'Was erzählt David von seiner Herde?', options: ['Ein Löwe und ein Bär holten ein Schaf, und er rettete es.', 'Ein Wolf bewachte die Herde.', 'Alle Schafe liefen davon.'], answer: 0 },
-        { q: 'Wer gibt David die Rüstung?', options: ['Saul', 'Goliat', 'Isai'], answer: 0 },
         { q: 'Warum legt David die Rüstung ab?', options: ['Er ist sie nicht gewohnt.', 'Sie ist zu klein.', 'Sie ist kaputt.'], answer: 0 }
       ]
     },
@@ -371,7 +368,6 @@ export const david: Journey = {
       task: { kind: 'kiesel', hint: 'Tippe die glatten Steine an.', pebbles: KIESEL },
       questions: [
         { q: 'Wie viele Steine sucht David aus dem Bach?', options: ['fünf', 'zwei', 'zehn'], answer: 0 },
-        { q: 'Wo steckt David die Steine hin?', options: ['in seine Hirtentasche', 'in seinen Gürtel', 'in einen Korb'], answer: 0 },
         { q: 'Womit kommt David zu Goliat?', options: ['mit Stab und Schleuder', 'mit Schwert und Spieß', 'mit Pfeil und Bogen'], answer: 0 }
       ]
     },
@@ -388,7 +384,6 @@ export const david: Journey = {
       // Spiel: Die Schleuder schwingen (schleuder, neu)
       task: { kind: 'schleuder', hint: 'Tippe, wenn der Stein auf Goliat zeigt.', sling: SCHLEUDER },
       questions: [
-        { q: 'Womit besiegt David Goliat?', options: ['mit einer Schleuder und einem Stein', 'mit einem Schwert', 'mit einem Spieß'], answer: 0 },
         { q: 'Was tun die Philister, als Goliat am Boden liegt?', options: ['Sie laufen davon.', 'Sie greifen an.', 'Sie bleiben stehen.'], answer: 0 },
         { q: 'Wer hilft Israel?', options: ['Gott', 'der Schildträger', 'der König allein'], answer: 0 }
       ]
@@ -407,7 +402,6 @@ export const david: Journey = {
       task: { kind: 'memory', hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.', memory: MEMORY },
       questions: [
         { q: 'Wer ist Jonatan?', options: ['Sauls Sohn', 'Davids Bruder', 'ein Hirte'], answer: 0 },
-        { q: 'Was gibt Jonatan David?', options: ['seinen Rock, Mantel, sein Schwert, seinen Bogen und seinen Gürtel', 'ein Pferd', 'ein Haus'], answer: 0 },
         { q: 'Was machen Jonatan und David miteinander?', options: ['einen Bund', 'einen Wettlauf', 'ein Fest'], answer: 0 }
       ]
     },
@@ -442,7 +436,6 @@ export const david: Journey = {
       // Spiel: Das Zeichen mit den Pfeilen (pfeil, neu)
       task: { kind: 'pfeil', hint: 'Ziehe die Sehne so weit, dass der Pfeil in der Zielstrecke landet.', arrow: PFEIL },
       questions: [
-        { q: 'Wohin geht Jonatan mit dem Jungen?', options: ['aufs Feld', 'in die Stadt', 'in die Wüste'], answer: 0 },
         { q: 'Was bedeutet der Pfeil, der weiter vorn liegt?', options: ['David muss fliehen.', 'David darf zurückkommen.', 'Das Essen ist fertig.'], answer: 0 },
         { q: 'Wo versteckt sich David?', options: ['hinter einem Stein', 'in einem Zelt', 'in einem Haus'], answer: 0 }
       ]
@@ -460,7 +453,6 @@ export const david: Journey = {
       // Spiel: Den Zipfel abschneiden (zipfel, neu)
       task: { kind: 'zipfel', hint: 'Folge der Naht mit dem Finger, ganz leise.', hem: ZIPFEL },
       questions: [
-        { q: 'Wo sind David und seine Männer?', options: ['in einer Höhle', 'in einer Stadt', 'auf einem Schiff'], answer: 0 },
         { q: 'Was schneidet David ab?', options: ['einen Zipfel von Sauls Mantel', 'Sauls Bart', 'Sauls Schwert'], answer: 0 },
         { q: 'Was tut Saul, als David ihm den Zipfel zeigt?', options: ['Er weint.', 'Er lacht.', 'Er greift an.'], answer: 0 }
       ]
@@ -478,7 +470,6 @@ export const david: Journey = {
       // Spiel: Reihenfolge legen (reihenfolge, alt 3 von 5)
       task: { kind: 'reihenfolge', hint: 'Lege die Bilder in die Reihenfolge der Geschichte.', order: REIHENFOLGE },
       questions: [
-        { q: 'Wer schickt die Boten weg?', options: ['Nabal', 'Abigajil', 'Saul'], answer: 0 },
         { q: 'Was lädt Abigajil auf die Esel?', options: ['Brot, Wein, Schafe und Kuchen', 'Schwerter und Schilde', 'Gold und Silber'], answer: 0 },
         { q: 'Was sagt David zu Abigajil?', options: ['Gelobt sei Gott, der dich zu mir geschickt hat.', 'Geh weg!', 'Ich habe dich nicht gesehen.'], answer: 0 }
       ]
@@ -515,7 +506,6 @@ export const david: Journey = {
       task: { kind: 'puzzle', hint: 'Setze das Bild der Stadt Davids zusammen.', puzzle: { image: `${G}puzzle/stadt.webp`, cols: 2, rows: 3 } },
       questions: [
         { q: 'Wohin zieht David auf Gottes Wort?', options: ['nach Hebron', 'nach Silo', 'nach Gilgal'], answer: 0 },
-        { q: 'Wie alt ist David, als er König wird?', options: ['dreißig Jahre', 'zehn Jahre', 'hundert Jahre'], answer: 0 },
         { q: 'Wie heißt die Burg, die David gewinnt?', options: ['Zion, die Stadt Davids', 'Bethlehem', 'Gibea'], answer: 0 }
       ]
     },
@@ -533,7 +523,6 @@ export const david: Journey = {
       task: { kind: 'worte', hint: 'Lege die Wörter in der richtigen Reihenfolge in den Streifen.', words: WORTE },
       questions: [
         { q: 'Mit was spielen David und Israel vor Gott?', options: ['mit Harfen, Pauken, Schellen und Zimbeln', 'mit Schwertern', 'mit Steinen'], answer: 0 },
-        { q: 'Wo bleibt die Lade drei Monate?', options: ['im Haus Obed-Edoms', 'im Zelt Davids', 'in Silo'], answer: 0 },
         { q: 'Was tut David vor der Lade?', options: ['Er tanzt mit aller Kraft.', 'Er schläft.', 'Er läuft weg.'], answer: 0 }
       ]
     },

@@ -267,7 +267,6 @@ export const rut: Journey = {
       // Spiel: Ähren hinter den Schnittern (nachlese, neu)
       task: { kind: 'nachlese', hint: 'Sammle die Ähren, die hinter den Schnittern liegen.', glean: NACHLESE },
       questions: [
-        { q: 'Wie will Noomi jetzt genannt werden?', options: ['Mara', 'Orpa', 'Rut'], answer: 0 },
         { q: 'Was tut Rut auf dem Feld?', options: ['Sie liest Ähren auf.', 'Sie schneidet das Korn.', 'Sie bindet die Garben.'], answer: 0 },
         { q: 'Wem gehört das Feld?', options: ['Boas', 'Elimelech', 'Orpa'], answer: 0 }
       ]
@@ -305,8 +304,7 @@ export const rut: Journey = {
       task: { kind: 'epha', hint: 'Halte gedrückt, bis das Maß bis zur Marke gefüllt ist.', measure: MASS },
       questions: [
         { q: 'Was gibt Rut Noomi außer der Gerste noch?', options: ['was vom Essen übrig geblieben ist', 'ein Stück Land', 'einen Mantel'], answer: 0 },
-        { q: 'Wie heißt der Mann, bei dem Rut gesammelt hat?', options: ['Boas', 'Elimelech', 'Obed'], answer: 0 },
-        { q: 'Wie lange sammelt Rut auf den Feldern von Boas?', options: ['bis die Gersten- und die Weizenernte vorbei sind', 'bis zum Winter', 'bis zur nächsten Hochzeit'], answer: 0 }
+        { q: 'Wie heißt der Mann, bei dem Rut gesammelt hat?', options: ['Boas', 'Elimelech', 'Obed'], answer: 0 }
       ]
     },
     {
@@ -323,7 +321,6 @@ export const rut: Journey = {
       task: { kind: 'reihenfolge', hint: 'Lege die Karten in die Reihenfolge von Noomis Rat.', order: REIHENFOLGE },
       questions: [
         { q: 'Was soll Rut tun, bis Boas gegessen und getrunken hat?', options: ['sich ihm nicht zu erkennen geben', 'ihm helfen', 'nach Hause gehen'], answer: 0 },
-        { q: 'Wann erschrickt Boas?', options: ['um Mitternacht', 'am Morgen', 'bei Sonnenuntergang'], answer: 0 },
         { q: 'Wie antwortet Rut, als Boas wissen will, wer sie ist?', options: ['Ich bin Rut, deine Magd.', 'Ich bin Noomi.', 'Ich bin eine Schnitterin.'], answer: 0 }
       ]
     },
@@ -358,7 +355,6 @@ export const rut: Journey = {
       // Spiel: Älteste an das Tor rufen (aelteste, neu)
       task: { kind: 'aelteste', hint: 'Rufe zehn Älteste an das Tor. Tippe nur die Männer mit grauem Bart an.', elders: AELTESTE },
       questions: [
-        { q: 'Wohin geht Boas, um die Sache zu klären?', options: ['zum Stadttor', 'zur Tenne', 'zum Brunnen'], answer: 0 },
         { q: 'Was zieht der nähere Verwandte aus und gibt es Boas?', options: ['seinen Schuh', 'seinen Mantel', 'seinen Ring'], answer: 0 },
         { q: 'Was kauft Boas?', options: ['das Feldstück, das Elimelech gehörte', 'ein Haus in der Stadt', 'einen Weinberg'], answer: 0 }
       ]
@@ -377,7 +373,6 @@ export const rut: Journey = {
       // Spiel: Die Wiege schaukeln (wiege, neu)
       task: { kind: 'wiege', hint: 'Tippe abwechselnd links und rechts, ganz ruhig, bis das Kind schläft.', cradle: WIEGE },
       questions: [
-        { q: 'Wie heißt der Sohn von Rut und Boas?', options: ['Obed', 'Isai', 'Elimelech'], answer: 0 },
         { q: 'Wer legt das Kind auf ihren Schoß?', options: ['Noomi', 'Orpa', 'Rut'], answer: 0 },
         { q: 'Wer ist Davids Großvater?', options: ['Obed', 'Boas', 'Elimelech'], answer: 0 }
       ]

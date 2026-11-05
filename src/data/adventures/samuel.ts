@@ -310,8 +310,7 @@ export const samuel: Journey = {
       task: { kind: 'lueckenvers', hint: 'Ziehe das passende Blatt in die Lücke.', verse: VERS },
       questions: [
         { q: 'Zu wem läuft Samuel in der Nacht?', options: ['zu Eli', 'zu Hanna', 'zu Elkana'], answer: 0 },
-        { q: 'Wer merkt, dass Gott den Jungen ruft?', options: ['Eli', 'Samuel', 'Elkana'], answer: 0 },
-        { q: 'Was erkennt ganz Israel?', options: ['Samuel ist ein Prophet Gottes.', 'Samuel ist ein Richter.', 'Samuel ist ein König.'], answer: 0 }
+        { q: 'Wer merkt, dass Gott den Jungen ruft?', options: ['Eli', 'Samuel', 'Elkana'], answer: 0 }
       ]
     },
     {
@@ -345,7 +344,6 @@ export const samuel: Journey = {
       // Spiel: Zwei Kühe ziehen heim (kuehe, neu)
       task: { kind: 'kuehe', hint: 'Halte den Wagen auf der Straße. Tippe auf die Seite, zu der er zurück soll.', cows: KUEHE },
       questions: [
-        { q: 'Was bleibt bei den Kühen zu Hause?', options: ['die Kälber', 'der Wagen', 'das Joch'], answer: 0 },
         { q: 'Wohin gehen die Kühe?', options: ['geradewegs auf Bet-Schemesch zu', 'zurück nach Aschdod', 'ans Meer'], answer: 0 },
         { q: 'Was tun die Leute in Bet-Schemesch gerade?', options: ['Sie schneiden Weizen.', 'Sie backen Brot.', 'Sie bauen ein Haus.'], answer: 0 }
       ]
@@ -363,7 +361,6 @@ export const samuel: Journey = {
       // Spiel: Den Stein in die Mitte setzen (stein, neu)
       task: { kind: 'stein', hint: 'Ziehe den Stein genau in die Mitte zwischen die beiden Orte.', stone: STEIN },
       questions: [
-        { q: 'Was gießt das Volk in Mizpa vor Gott aus?', options: ['Wasser', 'Wein', 'Öl'], answer: 0 },
         { q: 'Was lässt Gott über die Philister krachen?', options: ['einen gewaltigen Donner', 'einen Steinregen', 'einen Sturm'], answer: 0 },
         { q: 'Wie nennt Samuel den Stein?', options: ['Eben-Ezer', 'Silo', 'Rama'], answer: 0 }
       ]
@@ -400,8 +397,7 @@ export const samuel: Journey = {
       task: { kind: 'suchen', hint: 'Tippe die Orte in der Reihenfolge der Geschichte an.', search: SUCHEN },
       questions: [
         { q: 'Wessen Sohn ist Saul?', options: ['Kischs', 'Elis', 'Elkanas'], answer: 0 },
-        { q: 'Was haben Saul und der Knecht verloren und suchen?', options: ['Kischs Eselinnen', 'ihr Zelt', 'ihr Brot'], answer: 0 },
-        { q: 'Was hat der Knecht für den Mann Gottes bei sich?', options: ['ein Viertel Silberstück', 'einen Krug Wein', 'ein Lamm'], answer: 0 }
+        { q: 'Was haben Saul und der Knecht verloren und suchen?', options: ['Kischs Eselinnen', 'ihr Zelt', 'ihr Brot'], answer: 0 }
       ]
     },
     {
@@ -418,7 +414,6 @@ export const samuel: Journey = {
       task: { kind: 'reihenfolge', hint: 'Lege die Karten in die Reihenfolge der Zeichen.', order: REIHENFOLGE },
       questions: [
         { q: 'Was gießt Samuel auf Sauls Kopf?', options: ['Öl', 'Wasser', 'Wein'], answer: 0 },
-        { q: 'Was sagt Samuel über die Eselinnen?', options: ['Sie sind gefunden.', 'Sie sind verkauft.', 'Sie sind weggelaufen.'], answer: 0 },
         { q: 'Was gibt Gott Saul, als er sich zum Gehen wendet?', options: ['ein anderes Herz', 'ein Schwert', 'eine Krone'], answer: 0 }
       ]
     },
@@ -436,8 +431,7 @@ export const samuel: Journey = {
       task: { kind: 'gepaeck', hint: 'Hebe die Gepäckstapel an und finde Saul.', baggage: GEPAECK },
       questions: [
         { q: 'Wohin ruft Samuel das Volk?', options: ['nach Mizpa', 'nach Silo', 'nach Gilgal'], answer: 0 },
-        { q: 'Was ruft das Volk, als Saul vor sie tritt?', options: ['Es lebe der König!', 'Wir wollen heim!', 'Wo ist Samuel?'], answer: 0 },
-        { q: 'Wohin geht Saul danach?', options: ['nach Gibea', 'nach Rama', 'nach Silo'], answer: 0 }
+        { q: 'Was ruft das Volk, als Saul vor sie tritt?', options: ['Es lebe der König!', 'Wir wollen heim!', 'Wo ist Samuel?'], answer: 0 }
       ]
     },
     {
@@ -453,7 +447,6 @@ export const samuel: Journey = {
       // Spiel: Das Volk bei Saul halten (volk, neu)
       task: { kind: 'volk', hint: 'Tippe jeden Mann an, der weggeht, und halte das Volk bei Saul.', gather: VOLK },
       questions: [
-        { q: 'Wo verstecken sich die Israeliten vor den Philistern?', options: ['in Höhlen, Felsspalten und Gruben', 'in der Stadt Silo', 'hinter der Lade'], answer: 0 },
         { q: 'Was tut Saul, als das Volk davonläuft?', options: ['Er opfert selbst.', 'Er läuft auch davon.', 'Er greift allein an.'], answer: 0 },
         { q: 'Was sagt Samuel zu Saul?', options: ['Du hast töricht gehandelt.', 'Du hast gut gewartet.', 'Du bist ein tapferer König.'], answer: 0 }
       ]

@@ -64,7 +64,6 @@ export const rutEn: TextOverlay<Journey> = {
         glean: { rounds: [{ hint: 'Collect the ears of grain that lie behind the reapers.' }, { hint: 'Now three reapers are working. Wait until they have passed and tap only the ears that lie on the ground.' }] }
       },
       questions: [
-        { q: 'What does Naomi want to be called now?', options: ['Mara', 'Orpah', 'Ruth'] },
         { q: 'What does Ruth do in the field?', options: ['She picks up ears of grain.', 'She cuts the grain.', 'She ties the sheaves.'] },
         { q: 'Whose field is it?', options: ['Boaz', 'Elimelech', 'Orpah'] }
       ]
@@ -99,8 +98,7 @@ export const rutEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'What else does Ruth give Naomi besides the barley?', options: ['what was left over from her meal', 'a piece of land', 'a cloak'] },
-        { q: 'What is the name of the man Ruth gathered with?', options: ['Boaz', 'Elimelech', 'Obed'] },
-        { q: 'How long does Ruth gather in the fields of Boaz?', options: ['until the barley and wheat harvests are over', 'until winter', 'until the next wedding'] }
+        { q: 'What is the name of the man Ruth gathered with?', options: ['Boaz', 'Elimelech', 'Obed'] }
       ]
     },
     {
@@ -120,7 +118,6 @@ export const rutEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'What should Ruth do until Boaz has eaten and drunk?', options: ['not let him know who she is', 'help him', 'go home'] },
-        { q: 'When is Boaz startled?', options: ['at midnight', 'in the morning', 'at sunset'] },
         { q: 'How does Ruth answer when Boaz asks who she is?', options: ['I am Ruth, your servant.', 'I am Naomi.', 'I am a reaper.'] }
       ]
     },
@@ -152,7 +149,6 @@ export const rutEn: TextOverlay<Journey> = {
         elders: { rounds: [{ hint: 'Call ten elders to the gate. Tap only the men with gray beards.' }, { hint: 'Now the next five come. Again tap only the men with gray beards.' }] }
       },
       questions: [
-        { q: 'Where does Boaz go to settle the matter?', options: ['to the town gate', 'to the threshing floor', 'to the well'] },
         { q: 'What does the closer relative take off and give to Boaz?', options: ['his sandal', 'his cloak', 'his ring'] },
         { q: 'What does Boaz buy?', options: ['the piece of land that belonged to Elimelech', 'a house in the town', 'a vineyard'] }
       ]
@@ -171,7 +167,6 @@ export const rutEn: TextOverlay<Journey> = {
         cradle: { rounds: [{ hint: 'Tap left and right, one after the other, very gently, until the child is asleep.' }, { hint: 'Now without the glow. Again one side after the other, and calm.' }] }
       },
       questions: [
-        { q: 'What is the son of Ruth and Boaz called?', options: ['Obed', 'Jesse', 'Elimelech'] },
         { q: 'Who lays the child in her lap?', options: ['Naomi', 'Orpah', 'Ruth'] },
         { q: 'Who is David’s grandfather?', options: ['Obed', 'Boaz', 'Elimelech'] }
       ]

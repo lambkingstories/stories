@@ -78,6 +78,21 @@ describe('AdventureRewards', () => {
     expect(t).toContain('3 von 12 Punkten')
   })
 
+  it('starts folded with the stars in the head line and opens and closes with a tap', async () => {
+    const adv = useAdventure()
+    adv.state['testreise'] = { stages: { 1: { stars: 3, bestStars: 3, done: true } } }
+    const w = make(1)
+    const toggle = w.get('button.rw-toggle')
+    expect(toggle.attributes('aria-expanded')).toBe('false')
+    expect(text(toggle)).toContain('3 von 9')
+    expect((w.get('ul.rw-list').element as HTMLElement).style.display).toBe('none')
+    await toggle.trigger('click')
+    expect(toggle.attributes('aria-expanded')).toBe('true')
+    expect((w.get('ul.rw-list').element as HTMLElement).style.display).toBe('')
+    await toggle.trigger('click')
+    expect((w.get('ul.rw-list').element as HTMLElement).style.display).toBe('none')
+  })
+
   it('has no "see my card" button on the stage page and no device voice in the read-aloud button', () => {
     const stageView = readFileSync('src/views/app/AppAdventureStageView.vue', 'utf-8')
     expect(stageView).not.toContain('cardShow')

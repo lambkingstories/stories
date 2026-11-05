@@ -62,8 +62,8 @@ describe('Josua: stories and questions', () => {
     expect(new Set(josua.stages.map((s) => s.image)).size).toBe(10)
   })
 
-  it('two questions per stage, three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
-    expect(josua.stages.map((s) => s.questions.length)).toEqual([2, 2, 2, 2, 2, 2, 2, 2, 2, 2])
+  it('two questions after a game, three in a stage without one, three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
+    expect(josua.stages.map((s) => s.questions.length)).toEqual(josua.stages.map((s) => (s.task?.kind === 'quiz' ? 3 : 2)))
     for (const q of [...josua.stages.flatMap((s) => s.questions), ...josua.exam]) {
       expect(q.options, q.q).toHaveLength(3)
       expect(q.answer, q.q).toBe(0)

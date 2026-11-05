@@ -24,7 +24,8 @@ export const gideonEn: TextOverlay<Journey> = {
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'Under which tree does Deborah sit?', options: ['under a palm tree', 'under an oak', 'under a cedar'] },
-        { q: 'What does Barak say to Deborah?', options: ['“If you go with me, I will go.”', '“I will go alone.”', '“I will stay here.”'] }
+        { q: 'What does Barak say to Deborah?', options: ['“If you go with me, I will go.”', '“I will go alone.”', '“I will stay here.”'] },
+        { q: 'What does Deborah call out on Mount Tabor?', options: ['“God goes out before you!”', '“We are turning back!”', '“Wait until tomorrow!”'] }
       ]
     },
     {
@@ -84,6 +85,7 @@ export const gideonEn: TextOverlay<Journey> = {
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'At what time does Gideon tear down the altar of Baal?', options: ['at night', 'at noon', 'at harvest time'] },
+        { q: 'What is Gideon to build after he tears down Baal’s altar?', options: ['an altar for God on top of the rock', 'a house for his father', 'a tall tower'] },
         { q: 'Who stands in front of Gideon?', options: ['his father Joash', 'Barak', 'a prophet'] }
       ]
     },
@@ -173,6 +175,7 @@ export const gideonEn: TextOverlay<Journey> = {
       ],
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
+        { q: 'What are the men of Ephraim to hold?', options: ['the fords of the Jordan', 'the city gates', 'the mountains'] },
         { q: 'Who comes angrily to Gideon?', options: ['the men of Ephraim', 'Barak', 'the enemies'] },
         { q: 'How does Gideon answer the men of Ephraim?', options: ['calmly and kindly', 'with loud words', 'not at all'] }
       ]

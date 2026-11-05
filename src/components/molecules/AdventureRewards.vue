@@ -5,7 +5,7 @@
  * how far the next bonus game is, and how near the cup is. Nothing is a button: the child only reads where it stands.
  * Everything is worked out from the progress, so the same lines are right after every try.
  */
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
 import useAdventure from '@/use/useAdventure'
@@ -24,6 +24,8 @@ const { t } = useI18n({ useScope: 'global' })
 const adv = useAdventure()
 
 const ui = (name: string) => prependBaseUrl(`images/abenteuer/ui/${name}.webp`)
+/** The account starts folded on every page: only the head line with the stars shows until the child taps it. */
+const open = ref(false)
 const progress = computed(() => adv.progressOf(props.journey.id))
 const playable = computed(() => props.journey.stages.filter((s) => !s.soon))
 
@@ -165,11 +167,21 @@ const rows = computed<Row[]>(() => {
 </script>
 
 <template lang="pug">
-  section(class="rw" :aria-label="t('app.adventure.rHead')")
+  section(class="rw" :class="{ 'is-open': open }" :aria-label="t('app.adventure.rHead')")
+    //- folded by default (Anton 5.11.2026): one line with the stars of the adventure; a tap opens the whole account, another closes it
     h3(class="rw-head")
-      AdventureStars(:stars="3" :size="22" class="rw-head-stars")
-      span {{ t('app.adventure.rHead') }}
-    ul(class="rw-list")
+      button(
+        type="button"
+        class="rw-toggle"
+        :aria-expanded="open ? 'true' : 'false'"
+        aria-controls="rw-list"
+        @click="open = !open"
+      )
+        AdventureStars(:stars="3" :size="22" class="rw-head-stars")
+        span(class="rw-head-title") {{ t('app.adventure.rHead') }}
+        span(class="rw-head-count") {{ t('app.adventure.rOf', { n: starsNow, max: starsMax }) }}
+        span(class="rw-chevron" aria-hidden="true") ▾
+    ul(v-show="open" id="rw-list" class="rw-list")
       li(v-for="r in rows" :key="r.key" class="rw-row" :class="[`rw-${r.key}`, { 'is-done': r.done }]")
         span(class="rw-icon" :class="{ 'is-card': r.isCard }")
           img(
@@ -195,14 +207,51 @@ const rows = computed<Row[]>(() => {
   text-align: left
 
 .rw-head
-  display: flex
-  align-items: center
-  justify-content: center
-  gap: 10px
-  margin: 0 0 12px
-  font-size: 1.2rem
+  margin: 0
+  font-size: 1.05rem
   font-weight: 800
   color: var(--lk-text)
+
+.rw-toggle
+  display: flex
+  align-items: center
+  gap: 10px
+  width: 100%
+  min-height: 48px
+  padding: 8px 14px
+  border-radius: 18px
+  border: 2px solid rgba(212, 168, 62, 0.35)
+  background: rgba(255, 255, 255, 0.6)
+  font: inherit
+  color: inherit
+  text-align: left
+  cursor: pointer
+
+  &:focus-visible
+    outline: 3px solid #d4a83e
+    outline-offset: 2px
+
+.rw-head-title
+  flex: 1 1 auto
+  min-width: 0
+
+.rw-head-count
+  flex: 0 0 auto
+  font-size: 0.95rem
+  color: var(--lk-muted)
+
+.rw-chevron
+  flex: 0 0 auto
+  font-size: 1.1rem
+  line-height: 1
+  transition: transform 0.2s ease
+
+.is-open
+  .rw-chevron
+    transform: rotate(180deg)
+
+  .rw-list
+    margin-top: 10px
 
 .rw-list
   list-style: none
@@ -317,6 +366,7 @@ const rows = computed<Row[]>(() => {
   color: var(--lk-muted)
 
 @media (prefers-reduced-motion: reduce)
-  .rw-fill
+  .rw-fill,
+  .rw-chevron
     transition: none
 </style>

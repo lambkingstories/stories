@@ -31,7 +31,6 @@ export const davidEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'Where does God send Samuel?', options: ['to Bethlehem', 'to Shiloh', 'to Jericho'] },
-        { q: 'What is David doing when Samuel asks about the sons?', options: ['He is looking after the sheep.', 'He is sleeping at home.', 'He is fighting in the army.'] },
         { q: 'What does Samuel do with the horn?', options: ['He anoints David.', 'He drinks from it.', 'He gives it away.'] }
       ]
     },
@@ -49,7 +48,6 @@ export const davidEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'What is David to play for Saul?', options: ['the harp', 'the flute', 'the drum'] },
-        { q: 'What does Jesse send with David to Saul?', options: ['bread, wine and a young goat', 'a sword and a shield', 'gold and silver'] },
         { q: 'What happens when David plays?', options: ['Saul grows calm.', 'Saul grows angry.', 'Saul falls asleep.'] }
       ]
     },
@@ -87,7 +85,6 @@ export const davidEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'What does David tell about his flock?', options: ['A lion and a bear took a lamb, and he rescued it.', 'A wolf guarded the flock.', 'All the sheep ran away.'] },
-        { q: 'Who gives David the armor?', options: ['Saul', 'Goliath', 'Jesse'] },
         { q: 'Why does David take the armor off?', options: ['He is not used to it.', 'It is too small.', 'It is broken.'] }
       ]
     },
@@ -105,7 +102,6 @@ export const davidEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'How many stones does David pick from the brook?', options: ['five', 'two', 'ten'] },
-        { q: 'Where does David put the stones?', options: ['into his shepherd’s bag', 'into his belt', 'into a basket'] },
         { q: 'What does David bring to Goliath?', options: ['a staff and a sling', 'sword and spear', 'bow and arrow'] }
       ]
     },
@@ -122,7 +118,6 @@ export const davidEn: TextOverlay<Journey> = {
         sling: { rounds: [{ hint: 'David swings the sling. Tap when the stone points at Goliath.' }, { hint: 'Now Goliath stands nearer and the stone turns faster. Aim carefully.' }] }
       },
       questions: [
-        { q: 'What does David defeat Goliath with?', options: ['a sling and a stone', 'a sword', 'a spear'] },
         { q: 'What do the Philistines do when Goliath is on the ground?', options: ['They run away.', 'They attack.', 'They stand still.'] },
         { q: 'Who helps Israel?', options: ['God', 'the shield-bearer', 'the king alone'] }
       ]
@@ -141,7 +136,6 @@ export const davidEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'Who is Jonathan?', options: ['Saul’s son', 'David’s brother', 'a shepherd'] },
-        { q: 'What does Jonathan give David?', options: ['his robe, cloak, sword, bow and belt', 'a horse', 'a house'] },
         { q: 'What do Jonathan and David make with each other?', options: ['a covenant', 'a race', 'a feast'] }
       ]
     },
@@ -178,7 +172,6 @@ export const davidEn: TextOverlay<Journey> = {
         }
       },
       questions: [
-        { q: 'Where does Jonathan go with the boy?', options: ['into the field', 'into the town', 'into the desert'] },
         { q: 'What does the arrow that lies farther on mean?', options: ['David must flee.', 'David may come back.', 'Dinner is ready.'] },
         { q: 'Where does David hide?', options: ['behind a stone', 'in a tent', 'in a house'] }
       ]
@@ -196,7 +189,6 @@ export const davidEn: TextOverlay<Journey> = {
         hem: { rounds: [{ hint: 'Follow the seam with your finger, very quietly.' }, { hint: 'Once more: the seam is curved. Stay on the track.' }] }
       },
       questions: [
-        { q: 'Where are David and his men?', options: ['in a cave', 'in a city', 'on a ship'] },
         { q: 'What does David cut off?', options: ['a corner of Saul’s robe', 'Saul’s beard', 'Saul’s sword'] },
         { q: 'What does Saul do when David shows him the corner?', options: ['He weeps.', 'He laughs.', 'He attacks.'] }
       ]
@@ -217,7 +209,6 @@ export const davidEn: TextOverlay<Journey> = {
         }
       },
       questions: [
-        { q: 'Who sends the messengers away?', options: ['Nabal', 'Abigail', 'Saul'] },
         { q: 'What does Abigail load onto the donkeys?', options: ['bread, wine, sheep and cakes', 'swords and shields', 'gold and silver'] },
         { q: 'What does David say to Abigail?', options: ['Blessed be God, who sent you to me.', 'Go away!', 'I have not seen you.'] }
       ]
@@ -248,7 +239,6 @@ export const davidEn: TextOverlay<Journey> = {
       task: { hint: 'Put the picture of the City of David together.' },
       questions: [
         { q: 'Where does David go at God’s word?', options: ['to Hebron', 'to Shiloh', 'to Gilgal'] },
-        { q: 'How old is David when he becomes king?', options: ['thirty years', 'ten years', 'a hundred years'] },
         { q: 'What is the fortress called that David takes?', options: ['Zion, the City of David', 'Bethlehem', 'Gibeah'] }
       ]
     },
@@ -271,7 +261,6 @@ export const davidEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'What do David and Israel play before God?', options: ['harps, tambourines, rattles and cymbals', 'swords', 'stones'] },
-        { q: 'Where does the ark stay for three months?', options: ['in the house of Obed-edom', 'in David’s tent', 'in Shiloh'] },
         { q: 'What does David do before the ark?', options: ['He dances with all his might.', 'He sleeps.', 'He runs away.'] }
       ]
     },

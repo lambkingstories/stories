@@ -24,6 +24,7 @@ export const danielEn: TextOverlay<Journey> = {
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'What is the king of Babylon called?', options: ['Nebuchadnezzar', 'Belshazzar', 'Darius'] },
+        { q: 'What are the young men to learn at the court?', options: ['the writing and the language of the Babylonians', 'how to build ships', 'how to tame lions'] },
         { q: 'What new name does Daniel get?', options: ['Belteshazzar', 'Shadrach', 'Abednego'] }
       ]
     },
@@ -112,7 +113,8 @@ export const danielEn: TextOverlay<Journey> = {
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'How many men does the king see in the fire?', options: ['four', 'three', 'seven'] },
-        { q: 'What has happened to the coats of the three men?', options: ['They are whole.', 'They are burnt.', 'They are wet.'] }
+        { q: 'What has happened to the coats of the three men?', options: ['They are whole.', 'They are burnt.', 'They are wet.'] },
+        { q: 'What does the king say at the end?', options: ['“Blessed be the God of the three!”', '“Call my counselors!”', '“Put out the fire!”'] }
       ]
     },
     {
@@ -163,7 +165,8 @@ export const danielEn: TextOverlay<Journey> = {
       task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'What does the king seal the stone with?', options: ['with his ring', 'with wax', 'with clay'] },
-        { q: 'Who shuts the lions’ mouths?', options: ['an angel of God', 'Daniel', 'the king'] }
+        { q: 'Who shuts the lions’ mouths?', options: ['an angel of God', 'Daniel', 'the king'] },
+        { q: 'What does the king write to all peoples at the end?', options: ['“Honor the God of Daniel!”', '“Fear the lions!”', '“Honor the king!”'] }
       ]
     }
   ],

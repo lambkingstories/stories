@@ -26,7 +26,6 @@ export const osternEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'Who comes to the tomb early?', options: ['Mary Magdalene', 'Pilate', 'a shepherd'] },
-        { q: 'What has happened to the stone in front of the tomb?', options: ['It has been rolled away.', 'It is still in front.', 'It is broken.'] },
         { q: 'What do the disciples see in the tomb?', options: ['the linen cloths', 'a treasure', 'a fire'] }
       ]
     },
@@ -50,8 +49,7 @@ export const osternEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'What does Mary think the man at the tomb is?', options: ['the gardener', 'a soldier', 'a merchant'] },
-        { q: 'What does Jesus call out?', options: ['Mary!', 'Peter!', 'Thomas!'] },
-        { q: 'Where does Jesus send Mary?', options: ['to the disciples, his brothers', 'to the temple', 'to the sea'] }
+        { q: 'What does Jesus call out?', options: ['Mary!', 'Peter!', 'Thomas!'] }
       ]
     },
     {
@@ -76,7 +74,6 @@ export const osternEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'Where are the two disciples going?', options: ['to Emmaus', 'to Bethlehem', 'to the sea'] },
-        { q: 'Who walks with them without their knowing him?', options: ['Jesus', 'Peter', 'a shepherd'] },
         { q: 'What does Jesus explain to them?', options: ['what is written about him in the Scriptures', 'how to catch fish', 'the way to Jerusalem'] }
       ]
     },
@@ -97,8 +94,7 @@ export const osternEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'What do the two say to Jesus before the village?', options: ['Stay with us!', 'Go on!', 'We do not know you.'] },
-        { q: 'How do they know Jesus?', options: ['He breaks the bread.', 'He sings a song.', 'He shows them a net.'] },
-        { q: 'Where do the two go afterward?', options: ['back to Jerusalem', 'to Nazareth', 'to the sea'] }
+        { q: 'How do they know Jesus?', options: ['He breaks the bread.', 'He sings a song.', 'He shows them a net.'] }
       ]
     },
     {
@@ -112,7 +108,6 @@ export const osternEn: TextOverlay<Journey> = {
       task: { hint: 'Put the picture of the room together.' },
       questions: [
         { q: 'What does Jesus say when he stands among the disciples?', options: ['Peace be with you!', 'Be afraid!', 'Go home!'] },
-        { q: 'What do the disciples think at first?', options: ['They think they see a ghost.', 'They think they see a gardener.', 'They think they see a soldier.'] },
         { q: 'What does Jesus eat in front of them?', options: ['a piece of broiled fish', 'a piece of bread', 'a bowl of grapes'] }
       ]
     },
@@ -140,7 +135,6 @@ export const osternEn: TextOverlay<Journey> = {
         }
       },
       questions: [
-        { q: 'Who was not there when Jesus came to the disciples?', options: ['Thomas', 'Peter', 'a shepherd'] },
         { q: 'What does Thomas say to the other disciples?', options: ['I will not believe it unless I see him myself.', 'I believe you at once.', 'I do not want to hear about it.'] },
         { q: 'What does Thomas say to Jesus?', options: ['My Lord and my God!', 'I do not know you!', 'Go away!'] }
       ]
@@ -165,7 +159,6 @@ export const osternEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'What do the disciples catch in the night?', options: ['nothing', 'a great many fish', 'only small fish'] },
-        { q: 'Where are they to cast the net?', options: ['on the right side of the boat', 'on the left side of the boat', 'onto the shore'] },
         { q: 'What does Peter do when he hears: It is the Lord?', options: ['He jumps into the water.', 'He hides in the boat.', 'He runs into the hills.'] }
       ]
     },
@@ -191,7 +184,6 @@ export const osternEn: TextOverlay<Journey> = {
       },
       questions: [
         { q: 'What does Jesus ask Peter?', options: ['Do you love me?', 'Do you want to go back home?', 'Are you hungry?'] },
-        { q: 'What does Jesus say when Peter has answered for the third time?', options: ['Feed my sheep!', 'Catch fish!', 'Go home!'] },
         { q: 'What does Jesus say to Peter at the end?', options: ['Follow me!', 'Stay here by the fire!', 'Row back to the boat!'] }
       ]
     },
@@ -213,7 +205,6 @@ export const osternEn: TextOverlay<Journey> = {
         }
       },
       questions: [
-        { q: 'Where does Jesus lead the disciples?', options: ['as far as Bethany', 'to the mountain by Tiberias', 'to the tomb in the garden'] },
         { q: 'What does Jesus do there with raised hands?', options: ['He blesses them.', 'He calls soldiers.', 'He builds a tent.'] },
         { q: 'How do the disciples go back to Jerusalem?', options: ['with great joy', 'with fear', 'sad and silent'] }
       ]

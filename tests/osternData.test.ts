@@ -54,8 +54,8 @@ describe('Ostern: stories and questions', () => {
     for (const q of ostern.exam) expect(`${q.q} ${q.options.join(' ')}`).not.toMatch(FORBIDDEN)
   })
 
-  it('three questions in every stage, three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
-    for (const s of ostern.stages) expect(s.questions, `stage ${s.id}`).toHaveLength(3)
+  it('two questions after a game, three in a stage without one, three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
+    for (const s of ostern.stages) expect(s.questions, `stage ${s.id}`).toHaveLength((s.task?.kind === 'quiz' ? 3 : 2))
     for (const q of [...ostern.stages.flatMap((s) => s.questions), ...ostern.exam]) {
       expect(q.options, q.q).toHaveLength(3)
       expect(q.answer, q.q).toBe(0)

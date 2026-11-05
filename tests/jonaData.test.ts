@@ -50,8 +50,8 @@ describe('Jona: stories and questions', () => {
     }
   })
 
-  it('two questions per stage, three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
-    for (const s of jona.stages) expect(s.questions, `stage ${s.id}`).toHaveLength(2)
+  it('two questions after a game, three in a stage without one, three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
+    for (const s of jona.stages) expect(s.questions, `stage ${s.id}`).toHaveLength((s.task?.kind === 'quiz' ? 3 : 2))
     for (const q of [...jona.stages.flatMap((s) => s.questions), ...jona.exam]) {
       expect(q.options, q.q).toHaveLength(3)
       expect(q.answer, q.q).toBe(0)

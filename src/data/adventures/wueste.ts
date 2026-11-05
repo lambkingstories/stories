@@ -254,6 +254,7 @@ export const wueste: Journey = {
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Was tut Mose am Felsen anders, als Gott gesagt hat?', options: ['Er schlägt mit dem Stab auf ihn', 'Er schickt das Volk weg', 'Er trinkt zuerst'], answer: 0 },
+        { q: 'Warum dürfen Mose und Aaron das Volk nicht in das Land führen?', options: ['Sie haben Gott nicht vertraut.', 'Sie sind zu müde.', 'Sie haben den Weg vergessen.'], answer: 0 },
         { q: 'Wer bekommt auf dem Berg Hor das Priestergewand?', options: ['Eleasar', 'Josua', 'Hur'], answer: 0 }
       ]
     },
@@ -289,7 +290,6 @@ export const wueste: Journey = {
       // PLATZHALTER: Quiz, bis das Spiel dieser Etappe gebaut ist (siehe ETAPPENPLAN.md)
       task: { kind: 'eselin', hint: ESELIN.steps[0]!.hint, donkey: ESELIN },
       questions: [
-        { q: 'Wer will, dass Bileam das Volk verflucht?', options: ['Balak', 'Jitro', 'Josua'], answer: 0 },
         { q: 'Wer sieht den Engel zuerst?', options: ['die Eselin', 'Bileam', 'Balak'], answer: 0 },
         { q: 'Was spricht Bileam am Ende über Israel?', options: ['einen Segen', 'einen Fluch', 'ein Rätsel'], answer: 0 }
       ]

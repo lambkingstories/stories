@@ -288,6 +288,7 @@ export const jakob: Journey = {
       task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wer kann kaum noch sehen?', options: ['Isaak', 'Laban', 'Esau'], answer: 0 },
+        { q: 'Was sagt Jakob, als Isaak ihn fragt, wer er ist?', options: ['„Ich bin Esau.“', '„Ich bin Jakob.“', '„Ich bin Laban.“'], answer: 0 },
         { q: 'Wohin muss Jakob danach gehen?', options: ['zu Laban', 'zu Esau', 'ans Meer'], answer: 0 }
       ],
       soon: SOON
