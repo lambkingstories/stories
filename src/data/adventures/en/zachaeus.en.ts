@@ -112,10 +112,12 @@ export const zachaeusEn: TextOverlay<Journey> = {
         'Then he says to his disciples: “Our friend Lazarus sleeps. I am going to wake him up.” The disciples think he is speaking about sleep. So Jesus says it plainly: “Lazarus is dead. Let us go to him.”'
       ],
       task: {
-        hint: 'Put the four pictures in the right order.',
-        order: {
-          cards: [{ label: 'Lazarus lies sick in the house, Mary and Martha are with him' }, { label: 'A messenger runs along the road to Jesus' }, { label: 'Jesus stays with the disciples where he is' }, { label: 'Jesus goes with the disciples to Bethany' }],
-          rounds: [{ hint: 'Round 1: Put the pictures in the order of the story. The dots show where they go.' }, { hint: 'Round 2: Now with the beginning in the house in Bethany and without dots: What comes first, what comes next?' }]
+        hint: 'Lay stepping stones in the brook so that the messenger gets to Jesus dry.',
+        stepStones: {
+          rounds: [
+            { hint: 'Lay stones on the calm places so that the messenger gets across dry.' },
+            { hint: 'The brook is wider and there are more whirls. This time you have only one stone more than you need.' }
+          ]
         }
       },
       questions: [
@@ -147,10 +149,11 @@ export const zachaeusEn: TextOverlay<Journey> = {
         'When Mary comes to Jesus, she falls at his feet. “Lord, if you had been here, my brother would not have died,” she says. She weeps, and the people around her weep too. Jesus is deeply moved and troubled.',
         '“Where have you laid him?” he asks. “Lord, come and see,” they answer. Then Jesus weeps. “See how he loved him!” say the people.'
       ],
-      task: { hint: 'Put the picture of Bethany together.' },
+      task: { hint: 'This stage is serious. Listen carefully and answer the questions.' },
       questions: [
         { q: 'Where does Mary fall when she sees Jesus?', options: ['at his feet', 'on the street', 'in the garden'] },
-        { q: 'What comes to Jesus when they want to show him the way to the grave?', options: ['tears', 'laughter', 'he walks away'] }
+        { q: 'What comes to Jesus when they want to show him the way to the grave?', options: ['tears', 'laughter', 'he walks away'] },
+        { q: 'What do the people say when Jesus weeps?', options: ['See how he loved him!', 'See, he is tired.', 'See, he wants to go on at once.'] }
       ]
     },
     {

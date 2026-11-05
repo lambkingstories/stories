@@ -1,6 +1,7 @@
 /**
  * The data of "Zachäus und Lazarus" (`zachaeus.ts`, `en/zachaeus.en.ts`, `zachaeusPath.ts`): the stories and questions follow the rules of the adventures (texts of the draft
- * `D:/Claude/Abenteuer-Zachaeus/ENTWURF_Zachaeus.md`, Luther 1912 told in our own words), the two quiz stages are only quizzes, the three new games and the four old ones have sound data,
+ * `D:/Claude/Abenteuer-Zachaeus/ENTWURF_Zachaeus.md`, Luther 1912 told in our own words), the three quiz stages are only quizzes, the four new games and the two old ones have sound data
+ * (Anton's plan of 5.11.2026: at most two known games, never in two stages in a row; stage 5 "Bachsteine" instead of the order game, stage 7 serious, only questions),
  * the map has nine stations and the exam, and the English file has the same shape.
  */
 import { existsSync, statSync } from 'node:fs'
@@ -11,12 +12,17 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { setAdventureLanguage } from '@/use/adventureLanguage'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 import { climbProblems, halveProblems, unwrapProblems } from '@/utils/zachaeusGames'
+import { stepStonesProblems, stonesFewest } from '@/utils/zachaeusNeu'
+import type { StonesGame } from '@/utils/zachaeusNeu'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => zachaeus.stages[n - 1]!
 /** Words that no text of the German data may use (Lazarus is told gently: no smell, no corpse, no stoning; "gestorben" stays, because Jesus says it). */
 const FORBIDDEN = /\b(Blut|Teufel|Hölle|stinkt|Gestank|Leiche|Leichen|Leichnam|steinigen|Steinigung|töten|tötet|verwest|Verwesung|Heiligenschein)\b/i
-const QUIZ_STAGES = [6, 8]
+const QUIZ_STAGES = [6, 7, 8]
+/** The games that are known from other adventures (Anton, 5.11.2026: at most two in an adventure, never in two stages in a row). */
+const KNOWN = ['wimmelbild', 'lueckenvers', 'reihenfolge', 'puzzle', 'memory', 'weg', 'unterschied']
+const stones = () => (stage(5).task as { stepStones?: StonesGame }).stepStones!
 const plain = (s: string) => s.replace(/[„“”]/g, '')
 
 describe('Zachäus: stories and questions', () => {
@@ -43,7 +49,7 @@ describe('Zachäus: stories and questions', () => {
     expect(zachaeus.stages.map((s) => s.ref.split(',')[0])).toEqual(['Lukas 19', 'Lukas 19', 'Lukas 19', 'Lukas 19', 'Johannes 11', 'Johannes 11', 'Johannes 11', 'Johannes 11', 'Johannes 11'])
   })
 
-  it('three questions in the two quiz stages and two after a game, three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
+  it('three questions in the three quiz stages and two after a game, three answers each, the right one first and the answers differ; the exam has six; nothing is asked twice', () => {
     for (const s of zachaeus.stages) expect(s.questions, `stage ${s.id}`).toHaveLength(QUIZ_STAGES.includes(s.id) ? 3 : 2)
     for (const q of [...zachaeus.stages.flatMap((s) => s.questions), ...zachaeus.exam]) {
       expect(q.options, q.q).toHaveLength(3)
@@ -80,10 +86,13 @@ describe('Zachäus: stories and questions', () => {
     expect(q).toMatch(/komm heraus/)
   })
 
-  it('the two quiz stages (6, 8) are only quizzes, never two in a row', () => {
+  it('the three quiz stages (6, 7, 8: the serious middle of John 11) are only quizzes; stage 7 says that it is serious and asks what the people say when Jesus weeps', () => {
     for (const n of QUIZ_STAGES) expect(stage(n).task.kind, `kind ${n}`).toBe('quiz')
-    const kinds = zachaeus.stages.map((s) => s.task.kind)
-    for (let i = 1; i < kinds.length; i++) expect(kinds[i] === 'quiz' && kinds[i - 1] === 'quiz', `two quizzes in a row at ${i + 1}`).toBe(false)
+    expect(stage(7).task.hint).toBe('Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.')
+    expect(stage(7).questions.map((q) => q.options[0])).toEqual(['ihm zu Füßen', 'die Tränen', 'Seht, wie lieb er ihn gehabt hat!'])
+    expect(stage(7).questions[2]!.q).toBe('Was sagen die Leute, als Jesus weint?')
+    expect(plain(stage(7).text.join(' '))).toContain('Seht, wie lieb er ihn gehabt hat!')
+    expect(stage(7).task.puzzle).toBeUndefined()
   })
 
   it('the key words of the Bible are there (Luther 1912, told in our own words)', () => {
@@ -115,10 +124,12 @@ describe('Zachäus: stories and questions', () => {
 })
 
 describe('Zachäus: the games', () => {
-  it('the order of the games: 4 old, 3 new (klettern, halbieren, loesen), 2 quizzes; no game twice in a row', () => {
-    expect(zachaeus.stages.map((s) => s.task.kind)).toEqual(['wimmelbild', 'klettern', 'lueckenvers', 'halbieren', 'reihenfolge', 'quiz', 'puzzle', 'quiz', 'loesen'])
-    const kinds = zachaeus.stages.map((s) => s.task.kind)
-    for (let i = 1; i < kinds.length; i++) expect(kinds[i], `same game in a row at ${i + 1}`).not.toBe(kinds[i - 1])
+  it('the order of the games: 2 old, 4 new (klettern, halbieren, bachsteine, loesen), 3 quizzes; no game twice in a row; the known games never in two stages in a row', () => {
+    const kinds = zachaeus.stages.map((s) => s.task.kind as string)
+    expect(kinds).toEqual(['wimmelbild', 'klettern', 'lueckenvers', 'halbieren', 'bachsteine', 'quiz', 'quiz', 'quiz', 'loesen'])
+    for (let i = 1; i < kinds.length; i++) if (kinds[i] !== 'quiz') expect(kinds[i], `same game in a row at ${i + 1}`).not.toBe(kinds[i - 1])
+    expect(kinds.filter((k) => KNOWN.includes(k))).toEqual(['wimmelbild', 'lueckenvers'])
+    for (let i = 1; i < kinds.length; i++) expect(KNOWN.includes(kinds[i]!) && KNOWN.includes(kinds[i - 1]!), `two known games in a row at ${i + 1}`).toBe(false)
   })
 
   it('1 hidden pictures: Zacchaeus, Jesus, the child on the shoulders and the donkey, covers, every place inside the picture', () => {
@@ -174,19 +185,25 @@ describe('Zachäus: the games', () => {
     expect([g.coin, g.divider, g.bowlSelf, g.bowlPoor, g.poor].map((x) => x.image)).toEqual(['muenze', 'teiler', 'schale-zachaeus', 'schale-arme', 'arme'].map((f) => `images/abenteuer/spiele/zachaeus/halbieren/${f}.webp`))
   })
 
-  it('5 order: four cards in the order of the story (sick, messenger, waiting, setting out); round 1 with the numbers and three cards, round 2 with all four', () => {
-    const g = stage(5).task.order!
-    expect(g.cards.map((c) => c.id)).toEqual(['krank', 'bote', 'warten', 'aufbruch'])
-    expect(g.rounds.map((r) => r.cards.length)).toEqual([3, 4])
-    expect(g.rounds.map((r) => r.numbered)).toEqual([true, false])
-    expect(g.rounds[1]!.cards).toEqual(['krank', 'bote', 'warten', 'aufbruch'])
+  it('5 stepping stones: two brooks, the data can be played (three stones on two ways, then five round the whirls), the pictures come from the data', () => {
+    const g = stones()
+    expect(stage(5).task.kind as string).toBe('bachsteine')
+    expect(stepStonesProblems(g)).toEqual([])
+    expect(g.rounds.map((r) => stonesFewest(r))).toEqual([3, 5])
+    expect(g.rounds.map((r) => r.stones)).toEqual([5, 6])
+    expect(g.rounds.map((r) => r.background)).toEqual([1, 2].map((n) => `images/abenteuer/spiele/zachaeus/bachsteine/bach-${n}.webp`))
+    expect([g.messenger, g.shallow, g.whirl, ...g.stone]).toEqual(['bote', 'flach', 'strudel', 'stein-1', 'stein-2', 'stein-3'].map((f) => `images/abenteuer/spiele/zachaeus/bachsteine/${f}.webp`))
+    expect(stage(5).task.order).toBeUndefined()
   })
 
-  it('7 puzzle: the picture of Bethany in 2 columns and 3 rows', () => {
-    const g = stage(7).task.puzzle!
-    expect(g.cols).toBe(2)
-    expect(g.rows).toBe(3)
-    expect(g.image).toBe('images/abenteuer/spiele/zachaeus/puzzle/strasse.webp')
+  it('the old pictures of the order game and the puzzle are gone; the new pictures are there and small', () => {
+    expect(existsSync('public/images/abenteuer/spiele/zachaeus/reihenfolge')).toBe(false)
+    expect(existsSync('public/images/abenteuer/spiele/zachaeus/puzzle')).toBe(false)
+    const g = stones()
+    for (const f of [...g.rounds.map((r) => r.background), g.messenger, g.shallow, g.whirl, ...g.stone]) {
+      expect(existsSync(`public/${f}`), f).toBe(true)
+      expect(statSync(`public/${f}`).size, f).toBeLessThan(300_000)
+    }
   })
 
   it('9 unwrap: five strips, the cloth on the head waits for two others; the data can be played', () => {
@@ -254,7 +271,9 @@ describe('Zachäus: map, files, English', () => {
     expect(stage(4).task.halve!.bowlPoor.label).toBe('The bowl for the poor')
     expect(stage(9).task.unwrap!.hint).toContain('Pull at the cloths')
     expect(stage(9).task.unwrap!.strips.map((s) => s.label)[4]).toBe('The cloth on the head')
-    expect(stage(5).task.order!.cards[1]!.label).toContain('messenger')
+    expect(stones().rounds[0]!.hint).toContain('messenger')
+    expect(stage(7).task.hint).toBe('This stage is serious. Listen carefully and answer the questions.')
+    expect(stage(7).questions[2]!.q).toBe('What do the people say when Jesus weeps?')
     expect(stage(1).task.find!.labels![0]).toContain('Zacchaeus')
     for (const s of zachaeus.stages) if (s.audio) expect(s.audio, `stage ${s.id}`).toBe(`audio/abenteuer/zachaeus/geschichte-${String(s.id).padStart(2, '0')}-en-v1.mp3`)
     setAdventureLanguage('de')

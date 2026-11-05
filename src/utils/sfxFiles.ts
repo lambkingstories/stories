@@ -81,6 +81,7 @@ const GAME_MOOD: Record<string, Mood> = {
   harp: 'ruhig', shepherd: 'ruhig', pebbles: 'ruhig', sling: 'mittel', arrow: 'mittel', hem: 'ruhig', quiet: 'ruhig', throne: 'ruhig', jars: 'ruhig', dive: 'ruhig', decor: 'ruhig', honor: 'ruhig', ride: 'ruhig', post: 'ruhig', peace: 'ruhig', forge: 'ruhig', crib: 'ruhig', sign: 'ruhig', road: 'ruhig', net: 'ruhig', boats: 'ruhig', roof: 'ruhig', bail: 'mittel', crowd: 'ruhig', bundle: 'ruhig', bread: 'ruhig', row: 'mittel',arms: 'ruhig', judges: 'ruhig', signal: 'ruhig', grapes: 'mittel',
   puzzle: 'mittel', sort: 'mittel', harvest: 'mittel', build: 'mittel', way: 'mittel',
   errand: 'mittel', wander: 'ruhig', table: 'ruhig', shutters: 'ruhig', flame: 'ruhig',
+  stepStones: 'ruhig',
   census: 'ruhig', fire: 'mittel', tell: 'ruhig', star: 'ruhig',
   plumb: 'ruhig', seats: 'mittel', twelve: 'ruhig',
   synagogue: 'ruhig', ten: 'mittel', children: 'ruhig',

@@ -3,14 +3,15 @@
  * Anton (31.10.2026): Jesus wird mit Gesicht gezeigt (ohne Heiligenschein). Gott der Vater, Engel, böse Geister und Lichtgestalten sind nie im Bild.
  * Quelle der Texte: D:/Claude/Abenteuer-Zachaeus/ENTWURF_Zachaeus.md (Luther 1912 von bibeltext.com gelesen, nichts abgeschrieben), Plan: ETAPPENPLAN.md, Figuren: FIGUREN.md, Spiele: SPIELE.md.
  * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
- * Spiele (Wahl der Leitung, Anton 1.11.2026: neu und zur Szene passend): 1 Wimmelbild (alt), 2 Auf den Baum (neu, klettern), 3 Lückenvers (alt), 4 Die Hälfte den Armen (neu, halbieren),
- * 5 Reihenfolge (alt), 6 nur Quiz, 7 Puzzle (alt), 8 nur Quiz, 9 Löst ihn auf (neu, loesen).
+ * Spiele (Wahl der Leitung, Anton 1.11.2026: neu und zur Szene passend; Antons Spielplan 5.11.2026: höchstens 2 bekannte Spiele): 1 Wimmelbild (alt), 2 Auf den Baum (neu, klettern), 3 Lückenvers (alt),
+ * 4 Die Hälfte den Armen (neu, halbieren), 5 Bachsteine (neu, bachsteine), 6 nur Quiz, 7 nur Quiz (ernst), 8 nur Quiz, 9 Löst ihn auf (neu, loesen).
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/zachaeus/, images/abenteuer/spiele/zachaeus/<spiel>/, audio/abenteuer/zachaeus/.
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  * ERZEUGT von D:/Claude/Abenteuer-Zachaeus/tools/bauen_zachaeus.py: nicht von Hand ändern.
  */
-import type { ClimbGame, FindGame, HalveGame, Journey, OrderGame, UnwrapGame, VerseGame } from '@/types/adventure'
+import type { ClimbGame, FindGame, HalveGame, Journey, UnwrapGame, VerseGame } from '@/types/adventure'
+import type { StonesGame } from '@/utils/zachaeusNeu'
 import { josef } from './josef'
 import { ZACHAEUS_PATH } from './zachaeusPath'
 import { localize } from './localize'
@@ -35,23 +36,6 @@ const VERS: VerseGame = {
   rounds: [
     { hint: 'Ziehe das passende Blatt in die Lücke.', parts: ['„Zachäus“, sagt er, „steig schnell ', '!“'], words: ['herunter', 'hinauf', 'weiter'], answers: [0] },
     { hint: 'Jetzt fehlen zwei Wörter.', parts: ['„Denn ich muss heute in deinem ', ' ', '.“'], words: ['Haus', 'einkehren', 'Garten', 'schlafen'], answers: [0, 1] }
-  ]
-}
-
-/**
- * Etappe 5, "Der Freund ist krank" (alte Mechanik, Reihenfolge legen): Lazarus liegt krank, der Bote läuft zu Jesus, Jesus wartet mit den Jüngern, Jesus bricht nach Bethanien auf.
- * Runde 1 drei Karten mit Punkten, Runde 2 alle vier ohne Punkte. Bilder (Bildauftrag): `reihenfolge/karte-1..4.webp` (3:2).
- */
-const REIHENFOLGE: OrderGame = {
-  cards: [
-    { id: 'krank', image: `${G}reihenfolge/karte-1.webp`, label: 'Lazarus liegt krank im Haus, Maria und Marta sind bei ihm' },
-    { id: 'bote', image: `${G}reihenfolge/karte-2.webp`, label: 'Ein Bote läuft die Straße entlang zu Jesus' },
-    { id: 'warten', image: `${G}reihenfolge/karte-3.webp`, label: 'Jesus bleibt mit den Jüngern noch dort, wo er ist' },
-    { id: 'aufbruch', image: `${G}reihenfolge/karte-4.webp`, label: 'Jesus geht mit den Jüngern nach Bethanien' }
-  ],
-  rounds: [
-    { hint: 'Runde 1: Lege die Bilder in die Reihenfolge der Geschichte. Die Punkte zeigen, wo sie hinkommen.', numbered: true, cards: ['bote', 'warten', 'aufbruch'] },
-    { hint: 'Runde 2: Jetzt mit dem Anfang im Haus in Bethanien und ohne Punkte: Was kommt zuerst, was danach?', numbered: false, cards: ['krank', 'bote', 'warten', 'aufbruch'] }
   ]
 }
 
@@ -91,6 +75,42 @@ const HALBIEREN: HalveGame = {
   rounds: [
     { hint: 'Teile die Münzen genau in der Mitte. Die Hälfte ist für die Armen.', coins: 10, start: 2 },
     { hint: 'Jetzt sind es mehr Münzen. Teile wieder genau in der Mitte.', coins: 14, start: 11, offsets: [0, 0, -3, 0, 2, 0, 0, -2, 0, 0, 3, 0, 0, -2] }
+  ]
+}
+
+/**
+ * Etappe 5, "Der Freund ist krank" (neu, `bachsteine`, Joh 11,3; Antons Spielplan 5.11.2026): Die Schwestern schicken einen Boten zu Jesus. Ein Bach im Hochformat (3:4); das Kind legt
+ * Trittsteine auf die ruhigen Stellen (ein Strudel nimmt den Stein mit: ein Fehler), der Bote steigt von Stein zu Stein, nie weiter als `reach`, und geht trocken hinüber.
+ * Runde 1: 9 Stellen, 2 Strudel, wenigstens 3 Steine (zwei Wege), 5 Steine; Runde 2: 14 Stellen, 4 Strudel, wenigstens 5 Steine (ein Weg um die Strudel), 6 Steine.
+ * Lagen an den gemalten Bildern abgelesen; Rechnung und Prüfung: `src/utils/zachaeusNeu.ts` (`stepStonesProblems`). Bilder (Codex, 5.11.2026): `bachsteine/bach-1`, `bach-2`, `stein-1..3`, `flach`, `strudel`, `bote`.
+ */
+const BACHSTEINE: StonesGame = {
+  messenger: `${G}bachsteine/bote.webp`,
+  stone: [1, 2, 3].map((n) => `${G}bachsteine/stein-${n}.webp`),
+  shallow: `${G}bachsteine/flach.webp`,
+  whirl: `${G}bachsteine/strudel.webp`,
+  messengerW: 12,
+  stoneW: 12,
+  spotW: 14,
+  rounds: [
+    {
+      hint: 'Lege Steine auf die ruhigen Stellen, damit der Bote trocken hinüberkommt.',
+      background: `${G}bachsteine/bach-1.webp`,
+      start: { x: 50, y: 76 },
+      goal: { x: 50, y: 28 },
+      reach: 25,
+      stones: 5,
+      spots: [{ x: 36, y: 60.5 }, { x: 52, y: 60, whirl: true }, { x: 68, y: 60.5 }, { x: 26, y: 50.5 }, { x: 45, y: 50.5 }, { x: 63, y: 50 }, { x: 34, y: 41 }, { x: 54, y: 41, whirl: true }, { x: 72, y: 41 }]
+    },
+    {
+      hint: 'Der Bach ist breiter, und es gibt mehr Strudel. Diesmal hast du nur einen Stein mehr, als du brauchst.',
+      background: `${G}bachsteine/bach-2.webp`,
+      start: { x: 50, y: 80 },
+      goal: { x: 50, y: 25 },
+      reach: 23,
+      stones: 6,
+      spots: [{ x: 37, y: 66.5 }, { x: 54, y: 66.5, whirl: true }, { x: 70, y: 66 }, { x: 27, y: 57, whirl: true }, { x: 44, y: 57 }, { x: 62, y: 57 }, { x: 79, y: 56.5 }, { x: 33, y: 47 }, { x: 52, y: 47, whirl: true }, { x: 72, y: 47 }, { x: 24, y: 38 }, { x: 43, y: 38, whirl: true }, { x: 62, y: 38 }, { x: 80, y: 38.5 }]
+    }
   ]
 }
 
@@ -247,8 +267,8 @@ export const zachaeus: Journey = {
         'Jesus hat Marta, Maria und Lazarus lieb. Als er die Nachricht hört, bleibt er noch zwei Tage dort, wo er ist.',
         'Dann sagt er zu seinen Jüngern: „Lazarus, unser Freund, schläft. Ich gehe hin, um ihn aufzuwecken.“ Die Jünger meinen, er spricht vom Schlaf. Da sagt Jesus es offen: „Lazarus ist gestorben. Lasst uns zu ihm gehen.“'
       ],
-      // Spiel: Reihenfolge legen (reihenfolge, alt)
-      task: { kind: 'reihenfolge', hint: 'Bringe die vier Bilder in die richtige Reihenfolge.', order: REIHENFOLGE },
+      // Spiel: Bachsteine (bachsteine, neu, Spielplan 5.11.2026)
+      task: { kind: 'bachsteine', hint: 'Lege Trittsteine in den Bach, damit der Bote trocken zu Jesus kommt.', stepStones: BACHSTEINE },
       questions: [
         { q: 'Wo wohnen Maria, Marta und Lazarus?', options: ['in Bethanien', 'in Jericho', 'in Nazareth'], answer: 0 },
         { q: 'Was lassen die Schwestern Jesus sagen?', options: ['Der, den du lieb hast, ist krank.', 'Komm sofort zum Fest.', 'Wir brauchen ein Boot.'], answer: 0 }
@@ -283,11 +303,12 @@ export const zachaeus: Journey = {
         'Als Maria zu Jesus kommt, fällt sie ihm zu Füßen. „Herr, wärst du hier gewesen, dann wäre mein Bruder nicht gestorben“, sagt sie. Sie weint, und die Menschen um sie herum weinen auch. Jesus ist tief bewegt und betrübt.',
         '„Wo habt ihr ihn hingelegt?“, fragt er. „Herr, komm und sieh es!“, antworten sie. Da kommen Jesus die Tränen. „Seht, wie lieb er ihn gehabt hat!“, sagen die Leute.'
       ],
-      // Spiel: Puzzle (puzzle, alt)
-      task: { kind: 'puzzle', hint: 'Setze das Bild von Bethanien zusammen.', puzzle: { image: `${G}puzzle/strasse.webp`, cols: 2, rows: 3 } },
+      // nur Quiz (ernst, Spielplan 5.11.2026)
+      task: { kind: 'quiz', hint: 'Diese Etappe ist ernst. Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wohin fällt Maria, als sie Jesus sieht?', options: ['ihm zu Füßen', 'auf die Straße', 'in den Garten'], answer: 0 },
-        { q: 'Was kommt Jesus, als sie ihm den Weg zum Grab zeigen wollen?', options: ['die Tränen', 'Er lacht.', 'Er geht fort.'], answer: 0 }
+        { q: 'Was kommt Jesus, als sie ihm den Weg zum Grab zeigen wollen?', options: ['die Tränen', 'Er lacht.', 'Er geht fort.'], answer: 0 },
+        { q: 'Was sagen die Leute, als Jesus weint?', options: ['Seht, wie lieb er ihn gehabt hat!', 'Seht, er ist müde.', 'Seht, er will gleich weitergehen.'], answer: 0 }
       ]
     },
     {
