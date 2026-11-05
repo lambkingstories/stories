@@ -1,6 +1,7 @@
 /**
  * The data of "Christmas" (`weihnachten.ts`, `en/weihnachten.en.ts`, `weihnachtenPath.ts`): the stories and questions follow the rules of the adventures (texts of the draft `D:/Claude/Abenteuer-Weihnachten/ENTWURF_Weihnachten.md`, Luther 1912 told in our own words),
- * the two quiz stages are only quizzes, the two new games and the five old ones have sound data, the map has nine stations and the exam, and the English file has the same shape.
+ * the two quiz stages are only quizzes, the five new games (the census, the manger, the shepherds' fire, spread the word, follow the star) and the two known ones (verse, order) have sound data (Antons Regel 5.11.2026:
+ * at most two known games, never next to each other; the new games are tested in depth in `weihnachtenNeu.test.ts`), the map has nine stations and the exam, and the English file has the same shape.
  */
 import { existsSync, statSync } from 'node:fs'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -9,7 +10,8 @@ import { WEIHNACHTEN_PATH } from '@/data/adventures/weihnachtenPath'
 import { englishTextsOf } from '@/data/adventures/localize'
 import { setAdventureLanguage } from '@/use/adventureLanguage'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
-import { roundIsValid } from '@/utils/weihnachtenGames'
+import { censusProblems, fireProblems, starProblems, tellProblems } from '@/utils/weihnachtenNeu'
+import type { CensusGame, FireGame, StarGame, TellGame } from '@/utils/weihnachtenNeu'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => weihnachten.stages[n - 1]!
@@ -126,11 +128,14 @@ describe('Weihnachten: stories and questions', () => {
 })
 
 describe('Weihnachten: the games', () => {
-  it('the order of the games: 5 old, 2 new (manger, sign), 2 quizzes; no game twice', () => {
-    expect(weihnachten.stages.map((s) => s.task.kind)).toEqual(['lueckenvers', 'quiz', 'reihenfolge', 'wimmelbild', 'krippe', 'memory', 'zeichen', 'puzzle', 'quiz'])
+  it('the order of the games: 2 known (verse, order), 5 new (census, manger, fire, tell, star), 2 quizzes; no game twice; the known ones never next to each other', () => {
+    expect(weihnachten.stages.map((s) => s.task.kind)).toEqual(['lueckenvers', 'quiz', 'reihenfolge', 'zaehlung', 'krippe', 'hirtenfeuer', 'weitersagen', 'stern', 'quiz'])
     const games = weihnachten.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
     expect(new Set(games).size).toBe(games.length)
-    expect(games.filter((k) => ['krippe', 'zeichen'].includes(k))).toHaveLength(2)
+    expect(games.filter((k) => ['lueckenvers', 'reihenfolge'].includes(k))).toHaveLength(2)
+    expect(games.filter((k) => ['zaehlung', 'krippe', 'hirtenfeuer', 'weitersagen', 'stern'].includes(k))).toHaveLength(5)
+    const known = weihnachten.stages.map((s) => ['lueckenvers', 'reihenfolge'].includes(s.task.kind))
+    for (let i = 1; i < known.length; i++) expect(known[i] && known[i - 1]).toBe(false)
   })
 
   it('1 verse: the sentences are in the text and the right words are on the leaves', () => {
@@ -152,21 +157,15 @@ describe('Weihnachten: the games', () => {
     expect(g.rounds[1]!.cards).toEqual(['denkt', 'traum', 'erwacht', 'nimmt'])
   })
 
-  it('4 hidden pictures: Joseph, Mary and three travelers, covers, every place inside the picture', () => {
+  it('4 census: six towns, four and seven travelers, Joseph and Mary go to Bethlehem; the checker says nothing', () => {
     const t = stage(4).task
-    expect(t.kind).toBe('wimmelbild')
-    expect(t.count).toBe(5)
-    const f = t.find!
-    expect(f.finds).toHaveLength(5)
-    expect(f.covers.length).toBeGreaterThanOrEqual(6)
-    for (const s of [...f.finds, ...f.covers]) {
-      expect(s.x - s.w / 2).toBeGreaterThanOrEqual(-1)
-      expect(s.x + s.w / 2).toBeLessThanOrEqual(101)
-      expect(s.y).toBeLessThanOrEqual(100)
-    }
-    expect(f.labels).toHaveLength(5)
-    expect(f.labels).toContain('Josef')
-    expect(f.labels).toContain('Maria')
+    expect(t.kind).toBe('zaehlung')
+    const g = (t as unknown as { census: CensusGame }).census
+    expect(censusProblems(g)).toEqual([])
+    expect(g.towns).toHaveLength(6)
+    expect(g.rounds.map((r) => r.people.length)).toEqual([4, 7])
+    for (const r of g.rounds) for (const who of ['Josef', 'Maria']) expect(r.people.find((p) => p.name === who)!.town).toBe('bethlehem')
+    expect(stage(4).text.join(' ')).toContain('Bethlehem')
   })
 
   it('5 manger: two rounds (the cloth, the bed); the right ones are swaddling cloths and a manger among three; everything inside the picture', () => {
@@ -190,41 +189,35 @@ describe('Weihnachten: the games', () => {
     for (const w of ['Windeln', 'Krippe']) expect(text, w).toContain(w)
   })
 
-  it('6 memory: six pairs (a full board of 3 x 4), every one with a sentence that the text of the shepherds tells', () => {
-    const g = stage(6).task.memory!
-    expect(g.pairs).toHaveLength(6)
-    for (const p of g.pairs) expect(p.text.length).toBeGreaterThan(10)
+  it('6 fire: one fire, then two; wood in the right moment; the checker says nothing; the shepherds and the night are in the text (the angel only in the text)', () => {
+    const t = stage(6).task
+    expect(t.kind).toBe('hirtenfeuer')
+    const g = (t as unknown as { fire: FireGame }).fire
+    expect(fireProblems(g)).toEqual([])
+    expect(g.rounds.map((r) => r.spots.length)).toEqual([1, 2])
     const text = stage(6).text.join(' ')
-    for (const w of ['Hirten', 'Herde', 'Windeln', 'Krippe', 'Hürden']) expect(text, w).toContain(w)
+    for (const w of ['Hirten', 'Herde', 'Nacht', 'Engel']) expect(text, w).toContain(w)
+    expect(JSON.stringify(g)).not.toMatch(/engel/i)
   })
 
-  it('7 sign: three rounds, six places in six slots, the shelter with the manger is the right place and stands in another slot each round; round and slots inside the picture', () => {
-    const g = stage(7).task.sign!
-    expect(g.places).toHaveLength(6)
-    expect(g.slots).toHaveLength(6)
-    const ids = g.places.map((p) => p.id)
-    expect(g.rounds).toHaveLength(3)
-    for (const r of g.rounds) {
-      expect(r.right).toBe('stall')
-      expect(roundIsValid(r.order, r.right, ids)).toBe(true)
-    }
-    const spots = g.rounds.map((r) => r.order.indexOf('stall'))
-    expect(new Set(spots).size).toBe(3)
-    for (const s of g.slots) {
-      expect(s.x - s.w / 2).toBeGreaterThanOrEqual(0)
-      expect(s.x + s.w / 2).toBeLessThanOrEqual(100)
-      expect(s.y).toBeLessThanOrEqual(100)
-    }
-    expect(g.background).toMatch(/weihnachten\/zeichen\/strasse\.webp$/)
-    expect(g.walker).toMatch(/weihnachten\/zeichen\/hirten\.webp$/)
-    expect(stage(7).text.join(' ')).toContain('Krippe')
+  it('7 tell: the shelter and four, then eight houses; the paths must not cross; the checker says nothing; the shepherds tell the news (the text)', () => {
+    const t = stage(7).task
+    expect(t.kind).toBe('weitersagen')
+    const g = (t as unknown as { tell: TellGame }).tell
+    expect(tellProblems(g)).toEqual([])
+    expect(g.rounds.map((r) => r.houses.length)).toEqual([4, 8])
+    expect(g.rounds[0]!.start.name).toBe('Der Unterstand mit der Krippe')
+    expect(stage(7).text.join(' ')).toContain('Sie erzählen überall')
   })
 
-  it('8 puzzle: a portrait picture in 2 columns and 3 rows', () => {
-    const g = stage(8).task.puzzle!
-    expect(g.cols).toBe(2)
-    expect(g.rows).toBe(3)
-    expect(g.image).toMatch(/puzzle\/stern\.webp$/)
+  it('8 star: a slower star in round 1, a faster one in round 2; it ends over the house; the checker says nothing; no animals (the Bible names none)', () => {
+    const t = stage(8).task
+    expect(t.kind).toBe('stern')
+    const g = (t as unknown as { star: StarGame }).star
+    expect(starProblems(g)).toEqual([])
+    expect(g.rounds[1]!.starSpeed).toBeGreaterThan(g.rounds[0]!.starSpeed)
+    expect(stage(8).text.join(' ')).toContain('Der Stern')
+    expect(JSON.stringify(g)).not.toMatch(/kamel|esel|pferd/i)
   })
 })
 
@@ -276,8 +269,10 @@ describe('Weihnachten: map, files, English', () => {
     setAdventureLanguage('en')
     expect(stage(1).title).toBe('The angel comes to Mary')
     expect(stage(5).task.crib!.items[0]!.label).toBe('Swaddling cloths')
-    expect(stage(7).task.sign!.places[5]!.label).toBe('The shelter with the manger')
-    expect(stage(7).task.sign!.rounds[0]!.hint).toContain('swaddling cloths')
+    expect((stage(7).task as unknown as { tell: TellGame }).tell.rounds[0]!.start.name).toBe('The shelter with the manger')
+    expect((stage(4).task as unknown as { census: CensusGame }).census.towns[0]!.name).toBe('Capernaum')
+    expect((stage(6).task as unknown as { fire: FireGame }).fire.rounds[0]!.hint).toContain('shepherds')
+    expect((stage(8).task as unknown as { star: StarGame }).star.rounds[0]!.hint).toContain('wise men')
     expect(stage(1).task.verse!.rounds[1]!.parts[0]).toContain('With God')
     for (const s of weihnachten.stages) {
       const audio = s.audio

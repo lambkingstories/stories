@@ -4,12 +4,14 @@
  * Quelle der Texte: D:/Claude/Abenteuer-Weihnachten/ENTWURF_Weihnachten.md (Luther 1912 von bibeltext.com gelesen, nichts abgeschrieben), Plan: ETAPPENPLAN.md, Figuren: FIGUREN.md, Prüfbericht: PRUEFBERICHT-BIBELTREUE-2026-10-31.md.
  * Nicht erzählt: der Kindermord in Bethlehem (Mt 2,16-18). Was die Bibel nicht sagt, steht nicht da: kein Ochse, kein Esel, kein Stall, keine Zahl der Weisen im Text.
  * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
- * Spiele (Wahl der Leitung): 1 Lückenvers (alt), 2 nur Quiz, 3 Reihenfolge (alt), 4 Wimmelbild (alt), 5 Das Kind in die Krippe legen (neu), 6 Memory (alt), 7 Das Zeichen finden (neu), 8 Puzzle (alt), 9 nur Quiz.
+ * Spiele (Antons Regel 5.11.2026: höchstens zwei bekannte Spiele, nie hintereinander): 1 Lückenvers (bekannt), 2 nur Quiz, 3 Reihenfolge (bekannt), 4 Die Zählung (neu), 5 Das Kind in die Krippe legen (neu), 6 Das Hirtenfeuer (neu), 7 Weitersagen (neu), 8 Dem Stern folgen (neu), 9 nur Quiz.
+ * Die neuen Spiele 4, 6, 7, 8 stehen in D:/Claude/Abenteuer-Weihnachten/tools/neue_spiele_weihnachten.py (Daten aus Messwerten), Logik in src/utils/weihnachtenNeu.ts.
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/weihnachten/, images/abenteuer/spiele/weihnachten/<spiel>/, audio/abenteuer/weihnachten/.
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { CribGame, FindGame, Journey, MemoryGame, OrderGame, SignGame, VerseGame } from '@/types/adventure'
+import type { CribGame, Journey, OrderGame, VerseGame } from '@/types/adventure'
+import type { CensusGame, FireGame, StarGame, TellGame } from '@/utils/weihnachtenNeu'
 import { josef } from './josef'
 import { WEIHNACHTEN_PATH } from './weihnachtenPath'
 import { localize } from './localize'
@@ -55,21 +57,6 @@ const REIHENFOLGE: OrderGame = {
 }
 
 /**
- * Etappe 6, "Memory" (alte Mechanik): sechs Dinge der Hirten (Hirtenstab, Schaf, Laterne, Windeln, Krippe, Hürde); die Rückseite zeigt einen goldenen Stern (Bildauftrag S32, ein Bogen mit den sechs Dingen, vom Code geschnitten).
- */
-const MEMORY: MemoryGame = {
-  back: `${G}memory/rueck.webp`,
-  pairs: [
-    { image: `${G}memory/karte-hirtenstab.webp`, text: 'Der Hirtenstab: Die Hirten hüten in der Nacht ihre Herde.' },
-    { image: `${G}memory/karte-schaf.webp`, text: 'Das Schaf: Die Hirten hüten ihre Herde.' },
-    { image: `${G}memory/karte-laterne.webp`, text: 'Die Laterne: Es ist Nacht auf dem Feld.' },
-    { image: `${G}memory/karte-windeln.webp`, text: 'Die Windeln: Das Kind ist in Windeln gewickelt.' },
-    { image: `${G}memory/karte-krippe.webp`, text: 'Die Krippe: Das Kind liegt in einer Krippe.' },
-    { image: `${G}memory/karte-huerde.webp`, text: 'Die Hürde: Die Hirten sind auf dem Feld bei den Hürden.' }
-  ]
-}
-
-/**
  * Etappe 5, "Das Kind in die Krippe legen" (neu): im einfachen Unterstand sitzen Maria und Josef (Bild). Runde 1: „Sie wickelt ihn in Windeln“: drei Stoffe (Windeln, Königsmantel, Tierfell); der richtige lässt das gewickelte Kind erscheinen.
  * Runde 2: „und legt ihn in eine Krippe“: drei Lager (Krippe, goldenes Bett, Korb); das richtige legt das Kind in die Krippe. Ein falsches ist ein Fehler (Kreuz). Das Kind hat ein friedliches Gesicht, keinen Heiligenschein.
  * Bilder (Bildauftrag S34): `krippe/stall.webp` 1200 × 900, `eltern.webp`, `windeln`, `koenigstuch`, `fell`, `krippe`, `bett`, `korb`, `kind`, `krippe-kind` (Bögen mit Magenta-Schnitt).
@@ -100,55 +87,124 @@ const KRIPPE: CribGame = {
 }
 
 /**
- * Etappe 7, "Das Zeichen finden" (neu): der Engel hat gesagt: „Ihr werdet das Kind finden, in Windeln gewickelt und in einer Krippe liegend.“ Die Hirten eilen durch Bethlehem im Morgenlicht. Auf der Straße stehen sechs Orte
- * (vier Häuser, ein leeres Haus, der Unterstand mit der Krippe, dem Kind, Maria und Josef). Das Kind tippt einen Ort an: die Hirten laufen hin; am falschen Ort fehlt das Zeichen (Kreuz, sie gehen zurück), am richtigen bleiben sie.
- * Drei Runden mit anderer Reihenfolge der Orte. Bilder (Bildauftrag S33): `zeichen/strasse.webp` 1200 × 900, `haus1..4`, `leer`, `stall`, `hirten` (Bögen mit Magenta-Schnitt).
+ * Etappe 4, "Die Zählung" (neu, `zaehlung`, Lk 2,1-5): „Jedermann ging, dass er sich schätzen ließe, ein jeglicher in seine Stadt.“ Auf der gemalten Karte (2:3, ohne Schrift) liegen sechs Städte (die App schreibt die Namen);
+ * unter der Karte warten die Reisenden, jeder mit einem Hinweis auf seine Heimatstadt. Das Kind bringt jeden in seine Stadt (ziehen oder antippen). Josef und Maria gehören nach Bethlehem, in die Stadt Davids.
+ * Runde 1: vier Reisende mit Stadtnamen im Hinweis, Runde 2: sechs mit Hinweisen auf Lage und Landschaft. Bilder: `zaehlung/karte.webp` 800 × 1200, die Reisenden je 300 × 330 (Bildaufträge S35 und S40).
  */
-const ZEICHEN: SignGame = {
-  background: `${G}zeichen/strasse.webp`,
-  places: [
-    { id: 'haus1', image: `${G}zeichen/haus1.webp`, label: 'Ein Haus voller Reisender' },
-    { id: 'haus2', image: `${G}zeichen/haus2.webp`, label: 'Ein Gasthaus voller Gäste' },
-    { id: 'haus3', image: `${G}zeichen/haus3.webp`, label: 'Ein Haus mit Wäsche' },
-    { id: 'haus4', image: `${G}zeichen/haus4.webp`, label: 'Ein Haus mit einem Karren' },
-    { id: 'leer', image: `${G}zeichen/leer.webp`, label: 'Ein leeres Haus' },
-    { id: 'stall', image: `${G}zeichen/stall.webp`, label: 'Der Unterstand mit der Krippe' }
+const ZAEHLUNG: CensusGame = {
+  map: `${G}zaehlung/karte.webp`,
+  figureW: 14,
+  towns: [
+    { id: 'kapernaum', name: 'Kapernaum', x: 65.4, y: 13.8, side: -1 },
+    { id: 'nazareth', name: 'Nazareth', x: 36.3, y: 23.3 },
+    { id: 'jerusalem', name: 'Jerusalem', x: 45.9, y: 46.2, side: -1 },
+    { id: 'jericho', name: 'Jericho', x: 72.8, y: 50.8 },
+    { id: 'bethlehem', name: 'Bethlehem', x: 38.8, y: 65.3 },
+    { id: 'hebron', name: 'Hebron', x: 41.2, y: 84.2 }
   ],
-  slots: [{ x: 26, y: 57, w: 26 }, { x: 55, y: 57, w: 26 }, { x: 84, y: 57, w: 26 }, { x: 26, y: 89, w: 26 }, { x: 55, y: 89, w: 26 }, { x: 84, y: 89, w: 26 }],
-  walker: `${G}zeichen/hirten.webp`,
-  walkerW: 16,
-  start: { x: 8, y: 99 },
   rounds: [
-    { hint: 'Der Engel hat gesagt: Ihr werdet das Kind finden, in Windeln gewickelt und in einer Krippe liegend. Suche das Zeichen. Tippe einen Ort an.', order: ['haus1', 'stall', 'haus2', 'leer', 'haus3', 'haus4'], right: 'stall' },
-    { hint: 'Noch einmal: Wo liegt das Kind in der Krippe? Die Orte stehen jetzt anders.', order: ['leer', 'haus3', 'haus4', 'stall', 'haus1', 'haus2'], right: 'stall' },
-    { hint: 'Zum dritten Mal: Finde den Ort mit dem Zeichen.', order: ['haus4', 'haus1', 'leer', 'haus2', 'haus3', 'stall'], right: 'stall' }
+    {
+      hint: 'Jeder soll in seine Stadt, um sich zählen zu lassen. Bring jeden Reisenden in seine Heimatstadt: Ziehe ihn mit dem Finger hin.',
+      people: [
+        { image: `${G}zaehlung/josef.webp`, name: 'Josef', clue: 'Er ist aus dem Haus Davids. Er geht nach Bethlehem.', town: 'bethlehem' },
+        { image: `${G}zaehlung/maria.webp`, name: 'Maria', clue: 'Sie geht mit Josef nach Bethlehem.', town: 'bethlehem' },
+        { image: `${G}zaehlung/alter.webp`, name: 'Der alte Mann', clue: 'Er wohnt in Nazareth, oben in Galiläa.', town: 'nazareth' },
+        { image: `${G}zaehlung/maedchen.webp`, name: 'Das Mädchen', clue: 'Sie wohnt in Kapernaum am See.', town: 'kapernaum' }
+      ]
+    },
+    {
+      hint: 'Jetzt sind es mehr Reisende, und sie sagen nur, wo sie zu Hause sind. Josef gehört in die Stadt Davids.',
+      people: [
+        { image: `${G}zaehlung/josef.webp`, name: 'Josef', clue: 'Er ist aus dem Haus Davids und muss in die Stadt Davids.', town: 'bethlehem' },
+        { image: `${G}zaehlung/maria.webp`, name: 'Maria', clue: 'Sie ist mit Josef verlobt und geht mit ihm.', town: 'bethlehem' },
+        { image: `${G}zaehlung/fischer.webp`, name: 'Der Fischer', clue: 'Er wohnt ganz im Norden an dem See.', town: 'kapernaum' },
+        { image: `${G}zaehlung/kruegerin.webp`, name: 'Die Frau mit Krug', clue: 'Ihr Dorf liegt in den grünen Hügeln von Galiläa, weit vom See.', town: 'nazareth' },
+        { image: `${G}zaehlung/junge.webp`, name: 'Der junge Mann', clue: 'Er wohnt ganz im Süden, hinter Bethlehem.', town: 'hebron' },
+        { image: `${G}zaehlung/haendler.webp`, name: 'Der Händler', clue: 'Er wohnt im Jordantal, wo das Tote Meer anfängt.', town: 'jericho' },
+        { image: `${G}zaehlung/alte.webp`, name: 'Die alte Frau', clue: 'Sie wohnt in der Stadt mit dem Tempel, oben auf dem Berg.', town: 'jerusalem' }
+      ]
+    }
   ]
 }
 
 /**
- * Etappe 4, "Wimmelbild" (alte Mechanik): die volle Straße am Stadttor von Bethlehem im Hochformat (Bildauftrag S35); gesucht werden Josef, Maria und drei andere Reisende, einige stehen hinter Karren, Fels, Baum und Marktstand.
- * Bilder: `wimmel/szene.webp`, `reisende-1..5.webp` (aus einem Bogen geschnitten), `verdecker-1..4.webp` (aus einem Bogen geschnitten).
+ * Etappe 6, "Das Hirtenfeuer" (neu, `hirtenfeuer`, Lk 2,8): „Hirten auf dem Felde bei den Hürden, die hüteten des Nachts ihre Herde.“ Das Feld bei Nacht (3:2, der Vordergrund leer), davor brennt ein Lagerfeuer, das von selbst
+ * herunterbrennt (vier gemalte Größen: Glut, klein, mittel, groß). Tippen im richtigen Augenblick legt Holz nach (zu früh: Fehler; ausgegangen: Fehler). Der Mond wandert über den Himmel. Der Engel ist nur im Text, nie im Bild.
+ * Runde 1: ein Feuer, Runde 2: zwei Feuer, die schneller herunterbrennen. Bilder: `hirtenfeuer/feld.webp` 1200 × 800, `feuer-0..3.webp` je 400 × 312, `holz.webp`, `mond.webp` (Bildauftrag S41).
  */
-const WIMMEL: FindGame = {
-  labels: ['Josef', 'Alter Mann mit Wanderstab', 'Maria', 'Mädchen mit Korb', 'Händler mit Tonkrug'],
-  doneText: 'Du hast alle fünf Reisenden gefunden: Josef, Maria, den Händler, den alten Mann und das Mädchen mit dem Korb!',
-  scene: `${G}wimmel/szene.webp`,
-  finds: [
-    { image: `${G}wimmel/reisende-1.webp`, x: 22, y: 57, w: 12 },
-    { image: `${G}wimmel/reisende-2.webp`, x: 62, y: 75, w: 12 },
-    { image: `${G}wimmel/reisende-3.webp`, x: 84, y: 41, w: 12 },
-    { image: `${G}wimmel/reisende-4.webp`, x: 40, y: 93, w: 12 },
-    { image: `${G}wimmel/reisende-5.webp`, x: 14, y: 81, w: 12 }
-  ],
-  covers: [
-    { image: `${G}wimmel/verdecker-1.webp`, x: 22, y: 56, w: 20 },
-    { image: `${G}wimmel/verdecker-2.webp`, x: 62, y: 74, w: 24 },
-    { image: `${G}wimmel/verdecker-3.webp`, x: 84, y: 40, w: 20 },
-    { image: `${G}wimmel/verdecker-4.webp`, x: 40, y: 92, w: 22 },
-    { image: `${G}wimmel/verdecker-1.webp`, x: 14, y: 80, w: 18 },
-    { image: `${G}wimmel/verdecker-2.webp`, x: 70, y: 52, w: 18 },
-    { image: `${G}wimmel/verdecker-3.webp`, x: 50, y: 40, w: 14 },
-    { image: `${G}wimmel/verdecker-4.webp`, x: 90, y: 78, w: 20 }
+const HIRTENFEUER: FireGame = {
+  background: `${G}hirtenfeuer/feld.webp`,
+  stages: [`${G}hirtenfeuer/feuer-0.webp`, `${G}hirtenfeuer/feuer-1.webp`, `${G}hirtenfeuer/feuer-2.webp`, `${G}hirtenfeuer/feuer-3.webp`],
+  wood: `${G}hirtenfeuer/holz.webp`,
+  moon: `${G}hirtenfeuer/mond.webp`,
+  moonFrom: { x: 12, y: 11 },
+  moonTo: { x: 88, y: 11 },
+  moonW: 14,
+  rounds: [
+    { hint: 'Die Hirten hüten in der Nacht ihre Herde. Halte das Feuer am Brennen: Wenn es klein wird, tippe darauf und lege Holz nach. Nicht zu früh!', spots: [{ x: 50, y: 93, w: 34 }], feeds: 4, burn: 11, start: [1] },
+    { hint: 'Jetzt brennen zwei Feuer, und beide werden schneller klein. Behalte beide im Blick.', spots: [{ x: 27, y: 93, w: 28 }, { x: 73, y: 93, w: 28 }], feeds: 8, burn: 9, start: [1, 0.6] }
+  ]
+}
+
+/**
+ * Etappe 7, "Weitersagen" (neu, `weitersagen`, Lk 2,17): „Da sie es aber gesehen hatten, breiteten sie das Wort aus.“ Das Dorf Bethlehem von oben (4:3, ein leerer Dorfanger); die Hirten gehen vom Unterstand mit der Krippe von Haus zu Haus.
+ * Der Weg von Tür zu Tür ist ein gemalter Pfad (ein Streifen, der sich wiederholt); zwei Wege dürfen sich nicht kreuzen und nicht durch eine fremde Tür gehen. Runde 1: vier Häuser, Runde 2: acht Häuser, in denen man stecken bleiben kann.
+ * Bilder: `weitersagen/boden.webp` 1200 × 900, die Häuser je 340 × 290, `hirten.webp` 400 × 420, `pfad.webp` (Bildauftrag S42; Häuser 1 bis 4, Unterstand und Hirten stammen aus dem alten Spiel „Das Zeichen finden“ von Bildauftrag S33).
+ */
+const WEITERSAGEN: TellGame = {
+  background: `${G}weitersagen/boden.webp`,
+  path: `${G}weitersagen/pfad.webp`,
+  walker: `${G}weitersagen/hirten.webp`,
+  walkerW: 18,
+  rounds: [
+    {
+      hint: 'Die Hirten erzählen es weiter. Führe sie von Haus zu Haus, bis alle es gehört haben. Die Wege dürfen sich nicht kreuzen.',
+      start: { image: `${G}weitersagen/stall.webp`, name: 'Der Unterstand mit der Krippe', x: 50, y: 96, w: 26 },
+      houses: [
+        { image: `${G}weitersagen/haus1.webp`, name: 'Das Haus mit den Reisenden', x: 50, y: 64, w: 26 },
+        { image: `${G}weitersagen/haus2.webp`, name: 'Das Gasthaus', x: 50, y: 34, w: 26 },
+        { image: `${G}weitersagen/haus3.webp`, name: 'Das Haus mit der Wäsche', x: 16, y: 64, w: 26 },
+        { image: `${G}weitersagen/haus4.webp`, name: 'Das Haus mit dem Karren', x: 84, y: 64, w: 26 }
+      ]
+    },
+    {
+      hint: 'Jetzt sind es mehr Häuser. Überlege, in welcher Reihenfolge die Hirten gehen, damit sie nicht stecken bleiben.',
+      start: { image: `${G}weitersagen/stall.webp`, name: 'Der Unterstand mit der Krippe', x: 50, y: 96, w: 24 },
+      houses: [
+        { image: `${G}weitersagen/haus1.webp`, name: 'Das Haus mit den Reisenden', x: 16, y: 33, w: 24 },
+        { image: `${G}weitersagen/haus2.webp`, name: 'Das Gasthaus', x: 50, y: 33, w: 24 },
+        { image: `${G}weitersagen/haus3.webp`, name: 'Das Haus mit der Wäsche', x: 84, y: 33, w: 24 },
+        { image: `${G}weitersagen/haus4.webp`, name: 'Das Haus mit dem Karren', x: 16, y: 64, w: 24 },
+        { image: `${G}weitersagen/haus5.webp`, name: 'Das blaugraue Haus', x: 50, y: 64, w: 24 },
+        { image: `${G}weitersagen/haus6.webp`, name: 'Das Haus mit dem Feigenbaum', x: 84, y: 64, w: 24 },
+        { image: `${G}weitersagen/haus7.webp`, name: 'Das weiße Haus mit dem Balkon', x: 24, y: 96, w: 24 },
+        { image: `${G}weitersagen/haus8.webp`, name: 'Das Haus mit dem runden Tor', x: 76, y: 96, w: 24 }
+      ]
+    }
+  ]
+}
+
+/**
+ * Etappe 8, "Dem Stern folgen" (neu, `stern`, Mt 2,9): „Der Stern ging vor ihnen hin, bis dass er kam und stand oben über, da das Kindlein war.“ Eine Nacht auf dem Weg nach Bethlehem (3:2); der Stern zieht über den Himmel (immer weiter zum Haus,
+ * mit Pausen), die Weisen gehen unten auf der Straße. Das Kind hält sie mit dem Finger unter dem Stern; wer ihn zu lange verliert, macht einen Fehler. Am Ende bleibt der Stern über dem Haus stehen. Keine Tiere (die Bibel nennt keine).
+ * Runde 1: langsamer Stern, viel Platz; Runde 2: schneller, weniger Platz. Bilder: `stern/land.webp` 1200 × 800, `stern.webp`, `haus.webp` je 400 × 400, `weise.webp` 520 × 420 (Bildauftrag S43).
+ */
+const STERN: StarGame = {
+  background: `${G}stern/land.webp`,
+  star: `${G}stern/stern.webp`,
+  walkers: `${G}stern/weise.webp`,
+  house: `${G}stern/haus.webp`,
+  starY: 20,
+  starW: 16,
+  walkY: 95,
+  walkW: 26,
+  houseW: 24,
+  walkSpeed: 14,
+  walkRatio: 1.24,
+  houseRatio: 1,
+  rounds: [
+    { hint: 'Die Weisen folgen dem Stern. Halte den Finger unter den Stern, dann gehen sie mit. Bleib unter ihm, bis er stehen bleibt.', stops: [22, 34, 44, 56, 66, 70], starSpeed: 4, pause: 1.5, tolerance: 9, goal: 14, end: 70 },
+    { hint: 'Der Stern wird schneller, und es bleibt weniger Platz. Bleib dicht unter ihm.', stops: [14, 22, 30, 40, 48, 58, 66, 74, 78], starSpeed: 7, pause: 0.5, tolerance: 6.5, goal: 12, end: 78 }
   ]
 }
 
@@ -244,8 +300,8 @@ export const weihnachten: Journey = {
         'Auch Josef macht sich auf den Weg. Er stammt aus dem Haus Davids, darum muss er nach Bethlehem, in die Stadt Davids. Von Nazareth in Galiläa geht es hinauf ins jüdische Land.',
         'Josef will sich zusammen mit Maria aufschreiben lassen. Maria, seine Verlobte, geht mit ihm. Sie erwartet ihr Kind. Auch viele andere sind unterwegs, denn jeder geht in seine Stadt.'
       ],
-      // Spiel: Wimmelbild (wimmelbild, alt)
-      task: { kind: 'wimmelbild', hint: 'Finde Josef, Maria und drei andere Reisende auf der vollen Straße nach Bethlehem.', count: 5, find: WIMMEL },
+      // Spiel: Die Zählung (zaehlung, neu)
+      task: { kind: 'zaehlung', hint: 'Bring jeden Reisenden in seine Heimatstadt.', census: ZAEHLUNG },
       questions: [
         { q: 'Wer befiehlt, dass alle gezählt werden?', options: ['Kaiser Augustus', 'König Herodes', 'Pilatus'], answer: 0 },
         { q: 'In welche Stadt geht Josef?', options: ['nach Bethlehem', 'nach Jericho', 'nach Jerusalem'], answer: 0 }
@@ -278,8 +334,8 @@ export const weihnachten: Journey = {
         '„Fürchtet euch nicht!“, sagt der Engel. „Ich verkünde euch große Freude, die allem Volk widerfahren wird. Heute ist euch der Heiland geboren, Christus, der Herr, in der Stadt Davids. Daran erkennt ihr ihn: Ihr werdet das Kind finden, in Windeln gewickelt und in einer Krippe liegend.“',
         'Auf einmal ist bei dem Engel eine große Schar von Engeln aus dem Himmel. Sie loben Gott: „Ehre sei Gott in der Höhe und Friede auf Erden bei den Menschen seines Wohlgefallens!“'
       ],
-      // Spiel: Memory (memory, alt)
-      task: { kind: 'memory', hint: 'Finde die gleichen Karten. Merke dir, wo welche liegt.', memory: MEMORY },
+      // Spiel: Das Hirtenfeuer (hirtenfeuer, neu)
+      task: { kind: 'hirtenfeuer', hint: 'Halte das Feuer der Hirten am Brennen: Lege Holz nach, wenn es klein wird.', fire: HIRTENFEUER },
       questions: [
         { q: 'Was tun die Hirten in der Nacht?', options: ['Sie hüten ihre Herde.', 'Sie schlafen im Haus.', 'Sie ernten das Korn.'], answer: 0 },
         { q: 'Woran sollen die Hirten das Kind erkennen?', options: ['in Windeln gewickelt, in einer Krippe', 'mit einer Krone, auf einem Thron', 'in einem Königsmantel, im Palast'], answer: 0 }
@@ -295,8 +351,8 @@ export const weihnachten: Journey = {
         'Sie eilen hin. Sie finden Maria und Josef und das Kind, das in der Krippe liegt. Sie erzählen überall, was ihnen über dieses Kind gesagt worden ist. Alle, die es hören, wundern sich über das, was die Hirten sagen.',
         'Maria aber behält alle diese Worte und bewegt sie in ihrem Herzen. Die Hirten kehren um. Sie loben und preisen Gott für alles, was sie gehört und gesehen haben, so wie es ihnen gesagt worden war.'
       ],
-      // Spiel: Das Zeichen finden (zeichen, neu)
-      task: { kind: 'zeichen', hint: 'Finde den Ort mit dem Zeichen: das Kind in Windeln, in einer Krippe.', sign: ZEICHEN },
+      // Spiel: Weitersagen (weitersagen, neu)
+      task: { kind: 'weitersagen', hint: 'Führe die Hirten von Haus zu Haus. Die Wege dürfen sich nicht kreuzen.', tell: WEITERSAGEN },
       questions: [
         { q: 'Was tun die Hirten, als die Engel weg sind?', options: ['Sie gehen nach Bethlehem.', 'Sie bleiben bei ihrer Herde.', 'Sie ziehen nach Jerusalem.'], answer: 0 },
         { q: 'Was behält Maria?', options: ['alle diese Worte in ihrem Herzen', 'ein Stück Wolle', 'die Windeln des Kindes'], answer: 0 }
@@ -312,8 +368,8 @@ export const weihnachten: Journey = {
         'Herodes erschrickt. Er fragt die Hohenpriester und Schriftgelehrten, wo der Christus geboren werden soll. „In Bethlehem“, sagen sie. Da schickt Herodes die Weisen heimlich dorthin: „Wenn ihr das Kind findet, sagt es mir.“',
         'Der Stern, den die Weisen im Morgenland gesehen haben, geht vor ihnen her. Er bleibt über dem Haus stehen, wo das Kind ist. Sie finden es mit Maria, seiner Mutter. Sie fallen nieder und beten es an. Sie schenken ihm Gold, Weihrauch und Myrrhe. Gott sagt ihnen im Traum, dass sie nicht zu Herodes zurückgehen sollen. Auf einem anderen Weg ziehen sie heim.'
       ],
-      // Spiel: Puzzle (puzzle, alt)
-      task: { kind: 'puzzle', hint: 'Setze das Bild vom Stern über Bethlehem zusammen.', puzzle: { image: `${G}puzzle/stern.webp`, cols: 2, rows: 3 } },
+      // Spiel: Dem Stern folgen (stern, neu)
+      task: { kind: 'stern', hint: 'Halte die Weisen unter dem Stern, bis er stehen bleibt.', star: STERN },
       questions: [
         { q: 'Was haben die Weisen im Morgenland gesehen?', options: ['einen Stern', 'eine Wolke', 'eine Feuersäule'], answer: 0 },
         { q: 'Was schenken die Weisen dem Kind?', options: ['Gold, Weihrauch und Myrrhe', 'Brot, Wein und Öl', 'Wolle, Honig und Feigen'], answer: 0 }

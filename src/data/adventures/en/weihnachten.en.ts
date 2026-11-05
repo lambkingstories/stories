@@ -78,8 +78,40 @@ export const weihnachtenEn: TextOverlay<Journey> = {
         'Joseph wants to be registered together with Mary. Mary, his betrothed, goes with him. She is expecting her child. Many others are on the road too, for everyone is going to his own city.'
       ],
       task: {
-        hint: 'Find Joseph, Mary and three other travelers on the crowded road to Bethlehem.',
-        find: { labels: ['Joseph', 'Old man with a walking staff', 'Mary', 'Girl with a basket', 'Merchant with a clay jar'], doneText: 'You have found all five travelers: Joseph, Mary, the merchant, the old man and the girl with the basket!' }
+        hint: 'Bring every traveler to his home town.',
+        census: {
+          towns: [
+            { name: 'Capernaum' },
+            { name: 'Nazareth' },
+            { name: 'Jerusalem' },
+            { name: 'Jericho' },
+            { name: 'Bethlehem' },
+            { name: 'Hebron' }
+          ],
+          rounds: [
+            {
+              hint: 'Everyone is to go to his own city to be counted. Bring every traveler to his home town: drag him there with your finger.',
+              people: [
+                { name: 'Joseph', clue: 'He is of the house of David. He goes to Bethlehem.' },
+                { name: 'Mary', clue: 'She goes with Joseph to Bethlehem.' },
+                { name: 'The old man', clue: 'He lives in Nazareth, up in Galilee.' },
+                { name: 'The girl', clue: 'She lives in Capernaum by the lake.' }
+              ]
+            },
+            {
+              hint: 'Now there are more travelers, and they only say where their home is. Joseph belongs to the city of David.',
+              people: [
+                { name: 'Joseph', clue: 'He is of the house of David and must go to the city of David.' },
+                { name: 'Mary', clue: 'She is engaged to Joseph and goes with him.' },
+                { name: 'The fisherman', clue: 'He lives far in the north by the lake.' },
+                { name: 'The woman with the jug', clue: 'Her village lies in the green hills of Galilee, far from the lake.' },
+                { name: 'The young man', clue: 'He lives far in the south, beyond Bethlehem.' },
+                { name: 'The merchant', clue: 'He lives in the Jordan valley, where the Dead Sea begins.' },
+                { name: 'The old woman', clue: 'She lives in the city with the temple, up on the hill.' }
+              ]
+            }
+          ]
+        }
       },
       questions: [
         { q: 'Who commands that everyone be counted?', options: ['Emperor Augustus', 'King Herod', 'Pilate'] },
@@ -125,8 +157,8 @@ export const weihnachtenEn: TextOverlay<Journey> = {
         'Suddenly a great company of angels from heaven is with the angel. They praise God: "Glory to God in the highest, and on earth peace among those with whom he is pleased!"'
       ],
       task: {
-        hint: 'Find the matching cards. Remember where each one lies.',
-        memory: { pairs: [{ text: 'The shepherd’s staff: The shepherds keep watch over their flock by night.' }, { text: 'The sheep: The shepherds keep their flock.' }, { text: 'The lantern: It is night in the field.' }, { text: 'The swaddling cloths: The child is wrapped in swaddling cloths.' }, { text: 'The manger: The child lies in a manger.' }, { text: 'The sheepfold: The shepherds are in the field by the sheepfolds.' }] }
+        hint: 'Keep the shepherds’ fire burning: lay on wood when it gets small.',
+        fire: { rounds: [{ hint: 'The shepherds keep watch over their flock by night. Keep the fire burning: when it gets small, tap it and lay on wood. Not too early!' }, { hint: 'Now two fires burn, and both burn down faster. Keep an eye on both.' }] }
       },
       questions: [
         { q: 'What do the shepherds do at night?', options: ['They keep watch over their flock.', 'They sleep in the house.', 'They harvest the grain.'] },
@@ -142,20 +174,19 @@ export const weihnachtenEn: TextOverlay<Journey> = {
         'But Mary keeps all these words and thinks about them in her heart. The shepherds return. They praise and glorify God for all that they have heard and seen, just as it was told them.'
       ],
       task: {
-        hint: 'Find the place with the sign: the child in swaddling cloths, in a manger.',
-        sign: {
-          places: [
-            { label: 'A house full of travelers' },
-            { label: 'An inn full of guests' },
-            { label: 'A house with laundry' },
-            { label: 'A house with a cart' },
-            { label: 'An empty house' },
-            { label: 'The shelter with the manger' }
-          ],
+        hint: 'Lead the shepherds from house to house. The paths must not cross.',
+        tell: {
           rounds: [
-            { hint: 'The angel said: You will find the child wrapped in swaddling cloths and lying in a manger. Look for the sign. Tap a place.' },
-            { hint: 'Once more: Where does the child lie in the manger? The places stand differently now.' },
-            { hint: 'For the third time: Find the place with the sign.' }
+            {
+              hint: 'The shepherds tell it to everyone. Lead them from house to house until all have heard it. The paths must not cross.',
+              start: { name: 'The shelter with the manger' },
+              houses: [{ name: 'The house with the travelers' }, { name: 'The inn' }, { name: 'The house with the laundry' }, { name: 'The house with the cart' }]
+            },
+            {
+              hint: 'Now there are more houses. Think about the order in which the shepherds go, so that they do not get stuck.',
+              start: { name: 'The shelter with the manger' },
+              houses: [{ name: 'The house with the travelers' }, { name: 'The inn' }, { name: 'The house with the laundry' }, { name: 'The house with the cart' }, { name: 'The blue-grey house' }, { name: 'The house with the fig tree' }, { name: 'The white house with the balcony' }, { name: 'The house with the arched door' }]
+            }
           ]
         }
       },
@@ -172,7 +203,10 @@ export const weihnachtenEn: TextOverlay<Journey> = {
         'Herod is troubled. He asks the chief priests and scribes where the Christ is to be born. "In Bethlehem," they say. Then Herod sends the wise men there secretly: "When you find the child, tell me."',
         'The star that the wise men saw in the east goes before them. It stops over the house where the child is. They find him with Mary, his mother. They fall down and worship him. They give him gold, frankincense and myrrh. God tells them in a dream not to go back to Herod. They go home another way.'
       ],
-      task: { hint: 'Put the picture of the star over Bethlehem together.' },
+      task: {
+        hint: 'Keep the wise men under the star until it stands still.',
+        star: { rounds: [{ hint: 'The wise men follow the star. Hold your finger under the star and they go along. Stay under it until it stands still.' }, { hint: 'The star gets faster and there is less room. Stay close under it.' }] }
+      },
       questions: [
         { q: 'What did the wise men see in the east?', options: ['a star', 'a cloud', 'a pillar of fire'] },
         { q: 'What do the wise men give the child?', options: ['gold, frankincense and myrrh', 'bread, wine and oil', 'wool, honey and figs'] }
