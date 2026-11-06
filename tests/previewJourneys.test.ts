@@ -1689,3 +1689,53 @@ describe('the hidden journey Paulus (id paulus)', () => {
     expect(m.journeys.filter((j) => j.id === 'paulus')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Bis nach Rom (id paulusrom)', () => {
+  it('a normal build (without Bis nach Rom) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_PAULUSROM', 'false')
+    open('?paulusrom=paulusrom-vorschau-k4w8')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('paulusrom')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_PAULUSROM', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?paulusrom=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.PAULUSROM_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?paulusrom=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_PAULUSROM', 'true')
+    const first = await load()
+    open(`?paulusrom=${first.PAULUSROM_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.PAULUSROM_UNLOCK_CODE).toBe('paulusrom-vorschau-k4w8')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'paulusrom'])
+    expect(localStorage.getItem('lk-preview-paulusrom')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('paulusrom')?.stages.length).toBe(9)
+    open('?paulusrom=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-paulusrom')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_PAULUSROM) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_PAULUSROM', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'paulusrom')).toHaveLength(1)
+  })
+})

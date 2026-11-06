@@ -275,3 +275,11 @@ export const PAULUS_ONLY_DIRS = ['images/abenteuer/paulus', 'images/abenteuer/sp
 export function stripPaulusFiles(outDir: string) {
   strip(outDir, PAULUS_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Bis nach Rom" (id `paulusrom`) alone, in the same three places as Adam and Eve. */
+export const PAULUSROM_ONLY_DIRS = ['images/abenteuer/paulusrom', 'images/abenteuer/spiele/paulusrom', 'audio/abenteuer/paulusrom']
+
+/** Takes the folders of "Bis nach Rom" out of a finished build. */
+export function stripPaulusromFiles(outDir: string) {
+  strip(outDir, PAULUSROM_ONLY_DIRS)
+}

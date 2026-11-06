@@ -35,7 +35,8 @@ import { letztewoche } from '@/data/adventures/letztewoche'
 import { ostern } from '@/data/adventures/ostern'
 import { pfingsten } from '@/data/adventures/pfingsten'
 import { paulus } from '@/data/adventures/paulus'
-import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, GIDEON_ONLY_DIRS, JAKOB_ONLY_DIRS, JONA_ONLY_DIRS, JOSUA_ONLY_DIRS, MOSE_ONLY_DIRS, NOAH_ONLY_DIRS, RUT_ONLY_DIRS, SAMUEL_ONLY_DIRS, DAVID_ONLY_DIRS, SALOMO_ONLY_DIRS, ELISA_ONLY_DIRS, ESTER_ONLY_DIRS, NEHEMIA_ONLY_DIRS, PROPHETEN_ONLY_DIRS, WEIHNACHTEN_ONLY_DIRS, TAUFE_ONLY_DIRS, FREUNDE_ONLY_DIRS, WUESTE_ONLY_DIRS, WUNDER_ONLY_DIRS, HEILUNG_ONLY_DIRS, GLEICHNISSE_ONLY_DIRS, ZACHAEUS_ONLY_DIRS, LETZTEWOCHE_ONLY_DIRS, OSTERN_ONLY_DIRS, stripOsternFiles, PFINGSTEN_ONLY_DIRS, stripPfingstenFiles, PAULUS_ONLY_DIRS, stripPaulusFiles, stripLetztewocheFiles, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles, stripGleichnisseFiles, stripZachaeusFiles, stripDavidFiles } from '../vite.config.noah'
+import { paulusrom } from '@/data/adventures/paulusrom'
+import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, GIDEON_ONLY_DIRS, JAKOB_ONLY_DIRS, JONA_ONLY_DIRS, JOSUA_ONLY_DIRS, MOSE_ONLY_DIRS, NOAH_ONLY_DIRS, RUT_ONLY_DIRS, SAMUEL_ONLY_DIRS, DAVID_ONLY_DIRS, SALOMO_ONLY_DIRS, ELISA_ONLY_DIRS, ESTER_ONLY_DIRS, NEHEMIA_ONLY_DIRS, PROPHETEN_ONLY_DIRS, WEIHNACHTEN_ONLY_DIRS, TAUFE_ONLY_DIRS, FREUNDE_ONLY_DIRS, WUESTE_ONLY_DIRS, WUNDER_ONLY_DIRS, HEILUNG_ONLY_DIRS, GLEICHNISSE_ONLY_DIRS, ZACHAEUS_ONLY_DIRS, LETZTEWOCHE_ONLY_DIRS, OSTERN_ONLY_DIRS, stripOsternFiles, PFINGSTEN_ONLY_DIRS, stripPfingstenFiles, PAULUS_ONLY_DIRS, PAULUSROM_ONLY_DIRS, stripPaulusFiles, stripPaulusromFiles, stripLetztewocheFiles, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles, stripGleichnisseFiles, stripZachaeusFiles, stripDavidFiles } from '../vite.config.noah'
 
 const inNoahDir = (f: string) => NOAH_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
 
@@ -1386,6 +1387,49 @@ describe('a build without Paulus ships nothing of it', () => {
       for (const f of paulusFiles) expect(existsSync(join(out, f)), f).toBe(false)
       for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
       expect(() => stripPaulusFiles(out)).not.toThrow()
+    } finally {
+      rmSync(out, { recursive: true, force: true })
+    }
+  })
+})
+
+const inPaulusromDir = (f: string) => PAULUSROM_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
+
+describe('a build without Bis nach Rom ships nothing of it', () => {
+  it('every file that only Bis nach Rom uses lies in a folder that the normal build removes', () => {
+    const others = new Set([...journeys, noah, adamEva, babel, abraham, jakob, josua, gideon, mose, jona, daniel, elia, rut, samuel, david, salomo, elisa, ester, nehemia, propheten, weihnachten, taufe, freunde, wueste, wunder, heilung, gleichnisse, zachaeus, letztewoche, ostern, pfingsten, paulus].flatMap((j) => journeyFiles(j)))
+    const app = /^audio\/abenteuer\/(klang|musik)-/
+    const only = journeyFiles(paulusrom).filter((f) => !others.has(f) && !app.test(f))
+    const leaks = only.filter((f) => !inPaulusromDir(f))
+    expect(leaks, `files of Bis nach Rom outside the folders that are removed: ${leaks.join(', ')}`).toEqual([])
+  })
+
+  it('the folders of Bis nach Rom are only the three places that belong to it, none is on the lists of the others, and no folder with "paulusrom" in its name is missing', () => {
+    expect([...PAULUSROM_ONLY_DIRS].sort()).toEqual(['audio/abenteuer/paulusrom', 'images/abenteuer/paulusrom', 'images/abenteuer/spiele/paulusrom'])
+    for (const d of PAULUSROM_ONLY_DIRS) {
+      for (const list of [PAULUS_ONLY_DIRS, PFINGSTEN_ONLY_DIRS, OSTERN_ONLY_DIRS, LETZTEWOCHE_ONLY_DIRS, ZACHAEUS_ONLY_DIRS, GLEICHNISSE_ONLY_DIRS, HEILUNG_ONLY_DIRS, WUNDER_ONLY_DIRS, NOAH_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, ABRAHAM_ONLY_DIRS, JAKOB_ONLY_DIRS, JOSUA_ONLY_DIRS, GIDEON_ONLY_DIRS, MOSE_ONLY_DIRS, JONA_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, RUT_ONLY_DIRS, SAMUEL_ONLY_DIRS, DAVID_ONLY_DIRS, SALOMO_ONLY_DIRS, ELISA_ONLY_DIRS, ESTER_ONLY_DIRS, NEHEMIA_ONLY_DIRS, PROPHETEN_ONLY_DIRS, WEIHNACHTEN_ONLY_DIRS, TAUFE_ONLY_DIRS, FREUNDE_ONLY_DIRS, WUESTE_ONLY_DIRS]) expect(list, d).not.toContain(d)
+    }
+    const found: string[] = []
+    for (const base of ['public/images/abenteuer', 'public/audio/abenteuer', 'public/images/abenteuer/spiele']) {
+      for (const n of readdirSync(base)) if (/^paulusrom$/i.test(n) && !n.includes('.')) found.push(`${base.replace('public/', '')}/${n}`)
+    }
+    for (const d of found) expect(PAULUSROM_ONLY_DIRS, d).toContain(d)
+    for (const j of [...journeys, noah, adamEva, babel, abraham, jakob, josua, gideon, mose, jona, daniel, elia, rut, samuel, david, salomo, elisa, ester, nehemia, propheten, weihnachten, taufe, freunde, wueste, wunder, heilung, gleichnisse, zachaeus, letztewoche, ostern, pfingsten, paulus]) for (const f of journeyFiles(j)) expect(inPaulusromDir(f), `${j.id}: ${f}`).toBe(false)
+  })
+
+  it('removing takes the folders of Bis nach Rom out of a build and leaves everything else (the other journeys, the sounds)', () => {
+    const out = mkdtempSync(join(tmpdir(), 'lk-build-paulusrom-'))
+    try {
+      const paulusromFiles = ['audio/abenteuer/paulusrom/geschichte-01-v1.mp3', 'images/abenteuer/paulusrom/etappe-bild-01.webp', 'images/abenteuer/spiele/paulusrom/bretter/bucht.webp']
+      const keep = ['images/abenteuer/josef/etappe-01.webp', 'images/abenteuer/ostern/etappe-bild-02.webp', 'images/abenteuer/spiele/ostern/fischzug/see.webp', 'images/abenteuer/spiele/pfingsten/wagen/fern.webp', 'audio/abenteuer/klang-stern.mp3']
+      for (const f of [...paulusromFiles, ...keep]) {
+        mkdirSync(join(out, f, '..'), { recursive: true })
+        writeFileSync(join(out, f), 'x')
+      }
+      stripPaulusromFiles(out)
+      for (const f of paulusromFiles) expect(existsSync(join(out, f)), f).toBe(false)
+      for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
+      expect(() => stripPaulusromFiles(out)).not.toThrow()
     } finally {
       rmSync(out, { recursive: true, force: true })
     }
