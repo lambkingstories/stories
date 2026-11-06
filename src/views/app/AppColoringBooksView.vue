@@ -13,9 +13,11 @@ import { booksOfArea } from '@/utils/readingAreas'
 import { coloringPagesOfBook } from '@/utils/coloringBook'
 import { pickLocalizedImage, type ApiBook, type Locale } from '@/types/apiBook'
 import { goBackTo } from '@/utils/navBack'
-import { PREMIUM_TEASER } from '@/use/usePremium'
-import { allowedPages } from '@/use/useBookAccess'
-import PlusBadge from '@/components/atoms/PlusBadge.vue'
+import { PREMIUM_TEASER, hasFeature, ownsBook } from '@/use/usePremium'
+import { FREE_COLORING_BOOKS } from '@/use/useBookAccess'
+import OwnBadge from '@/components/atoms/OwnBadge.vue'
+import OwnFilter from '@/components/molecules/OwnFilter.vue'
+import { matchesOwnFilter, ownCounts, ownershipOf, type OwnFilterValue, type Ownership } from '@/utils/bookOwnership'
 import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
 import { contentLocale } from '@/utils/contentLocale'
 
@@ -48,8 +50,8 @@ interface Card {
   released: number
   total: number
   done: number
-  /** The book is not open in full without Plus (or the single purchase): it carries the Plus sign. */
-  plus: boolean
+  /** What the person has of this book: free, bought, with Plus, or still to buy. */
+  own: Ownership
 }
 
 /** The title without a leading "Buch 01 –" of the old books. */
@@ -70,11 +72,16 @@ const cards = computed<Card[]>(() => {
       released: Date.parse(book.releaseDate) || 0,
       total: pages.length,
       done: pages.filter((p) => painted.has(pageArtworkId(p.url, 1))).length,
-      plus: PREMIUM_TEASER && pages.length > 0 && allowedPages(book.bookId, 'coloring', pages.length) < pages.length
+      own: ownershipOf({ free: !PREMIUM_TEASER || FREE_COLORING_BOOKS.includes(book.bookId), owned: ownsBook(book.bookId), plus: hasFeature('allBooks') })
     })
   }
   return list.sort((a, b) => a.released - b.released || a.bookId.localeCompare(b.bookId))
 })
+
+const filter = ref<OwnFilterValue>('all')
+const counts = computed(() => ownCounts(cards.value.map((c) => c.own)))
+/** The books of the chosen chip (the whole shelf is on show with "Alle"). */
+const shown = computed(() => cards.value.filter((c) => matchesOwnFilter(c.own, filter.value)))
 
 function goBack() {
   goBackTo(router, { name: fromPainting.value ? 'app-coloring' : 'app-read' })
@@ -90,17 +97,19 @@ function openBook(bookId: string) {
     LkPageHead(:title="t('app.read.coloringTitle')" :subtitle="t('app.read.coloringSub')" @back="goBack")
 
     main(class="cb-body")
-      ul(v-if="cards.length" class="cb-grid")
-        li(v-for="c in cards" :key="c.bookId")
-          button(type="button" class="cb-card" :aria-label="c.title" @click="openBook(c.bookId)")
+      OwnFilter(v-if="PREMIUM_TEASER && cards.length" v-model="filter" :counts="counts")
+      ul(v-if="shown.length" class="cb-grid")
+        li(v-for="c in shown" :key="c.bookId")
+          button(type="button" :class="['cb-card', { 'is-locked': c.own === 'locked' }]" :aria-label="c.title" @click="openBook(c.bookId)")
             span(class="cb-cover")
               img(:src="c.cover" :alt="c.title" loading="lazy" draggable="false" @error="onImgFallback")
-              span(v-if="c.plus" class="cb-plus")
-                PlusBadge(size="small")
+              span(v-if="PREMIUM_TEASER" class="cb-plus")
+                OwnBadge(:state="c.own")
             span(class="cb-title") {{ c.title }}
             span(v-if="c.total" class="cb-meta") {{ c.done > 0 ? t('app.read.paintedOf', { done: c.done, total: c.total }) : t('app.read.pictures', { n: c.total }) }}
             span(v-if="c.done > 0 && c.total" class="cb-bar")
               span(class="cb-bar-fill" :style="{ width: Math.round((c.done / c.total) * 100) + '%' }")
+      p(v-else-if="cards.length" class="cb-empty") {{ t('app.read.ownNone') }}
       p(v-else class="cb-empty") {{ t('app.read.coloringEmpty') }}
 </template>
 
@@ -153,6 +162,9 @@ button
   position: absolute
   top: 8px
   right: 8px
+
+.cb-card.is-locked .cb-cover img
+  filter: saturate(0.8)
 
 .cb-cover
   position: relative

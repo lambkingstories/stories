@@ -4,7 +4,7 @@
  * button to the store. Links leave the app through `openExternal`, which asks the parents first. The books are the entries of
  * `storeBooks` and the books of the backend series "Einzelne Bücher".
  */
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
@@ -17,6 +17,10 @@ import usePurchases from '@/use/usePurchases'
 import { booksOfArea } from '@/utils/readingAreas'
 import { pickLocalizedImage, type ApiBook, type Locale } from '@/types/apiBook'
 import { goBackTo } from '@/utils/navBack'
+import OwnBadge from '@/components/atoms/OwnBadge.vue'
+import OwnFilter from '@/components/molecules/OwnFilter.vue'
+import { PREMIUM_TEASER } from '@/use/usePremium'
+import { matchesOwnFilter, ownCounts, ownershipOf, type OwnFilterValue } from '@/utils/bookOwnership'
 import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
 import { openExternal } from '@/utils/openExternal'
 import { prependBaseUrl } from '@/utils/function'
@@ -96,6 +100,11 @@ function toPreview(id: string) {
 /** A digital book: the price of the store (or the one of the data until the store has answered), whether it is bought, buying and reading. */
 const priceOf = (id: string) => purchases.prices.value[bookProductId(id)] ?? storeBooks.find((b) => b.id === id)?.digital?.price ?? ''
 const isOwned = (id: string) => ownsBook(id)
+/** A digital book that was bought is "mine"; every other book (to buy in the app or in the store) is still to buy. */
+const ownOf = (c: BookCardData) => ownershipOf({ free: false, owned: c.digital && ownsBook(c.id), plus: false })
+const filter = ref<OwnFilterValue>('all')
+const counts = computed(() => ownCounts(cards.value.map(ownOf)))
+const shown = computed(() => cards.value.filter((c) => matchesOwnFilter(ownOf(c), filter.value)))
 /** Said above the list when a purchase did not go through. */
 const buyMessage = computed(() => {
   const s = purchases.status.value
@@ -118,11 +127,13 @@ function toRead(id: string) {
 
     main(class="books-body")
       p(v-if="buyMessage" class="books-msg lk-panel" role="status") {{ buyMessage }}
-      ul(v-if="cards.length" class="book-list")
-        li(v-for="c in cards" :key="c.id" class="book-card lk-panel")
+      OwnFilter(v-if="PREMIUM_TEASER && cards.length" v-model="filter" :counts="counts")
+      ul(v-if="shown.length" class="book-list")
+        li(v-for="c in shown" :key="c.id" class="book-card lk-panel")
           span(:class="['book-cover', { tall: c.ratio < 0.9 }]" :style="{ aspectRatio: String(c.ratio) }")
             img(:src="c.cover" :alt="c.title" loading="lazy" draggable="false" @error="onImgFallback")
           span(class="book-info")
+            OwnBadge(v-if="PREMIUM_TEASER && !c.comingSoon" :state="ownOf(c)" class="book-own")
             span(v-if="c.comingSoon" class="book-soon") {{ t('app.read.comingSoon') }}
             span(v-if="c.series" class="book-series") {{ c.series }}
             h2(class="book-title") {{ c.title }}
@@ -142,6 +153,7 @@ function toRead(id: string) {
             p(v-if="c.digital && !c.comingSoon" class="book-note") {{ isOwned(c.id) ? t('app.read.digitalOwned') : t('app.read.digitalNote') }}
             p(v-else-if="!c.comingSoon" class="book-note") {{ t('app.read.storeParents') }}
             p(v-else class="book-note") {{ t('app.read.soonNote') }}
+      p(v-else-if="cards.length" class="books-empty") {{ t('app.read.ownNone') }}
       p(v-else class="books-empty") {{ t('app.read.booksEmpty') }}
 </template>
 
@@ -160,6 +172,10 @@ button
   max-width: 980px
   margin: 0 auto
   padding: 12px 16px 0
+
+.book-own
+  align-self: flex-start
+  margin-bottom: 4px
 
 .book-list
   list-style: none

@@ -2,7 +2,7 @@
  * How much of a book may be seen without paying.
  *
  *   - Stories (and every book that is not a coloring book) are free in full, with reading aloud.
- *   - A coloring book: the first 2 pictures. The books in `FREE_COLORING_BOOKS` (Band 1) are free in full.
+ *   - A coloring book: the first picture. The one book in `FREE_COLORING_BOOKS` (Band 1 of the Buntstift series) is free in full.
  *
  * The rest opens with the subscription (LambKing Plus) or when the single book was bought. All of this only
  * applies when `VITE_PREMIUM_TEASER=true` (see `usePremium`): while nothing can be bought yet, a book is
@@ -10,18 +10,16 @@
  */
 import { PREMIUM_TEASER, hasBook } from '@/use/usePremium'
 
-export const FREE_COLORING_PAGES = 2
+export const FREE_COLORING_PAGES = 1
 
 /**
- * The coloring books that are free in full: Band 1 of the Buntstift series "Gott erschafft die Welt" and Band 1 of the series
- * for 9 to 12 "Die Schöpfung" (each the id in the backend, and the id of the copy that is built into the test app). A book can
+ * The one coloring book that is free in full (Anton, 6.11.2026): Band 1 of the Buntstift series "Gott erschafft die Welt" (the id
+ * in the backend, and the id of the copy that is built into the test app). Every other book is for sale (or comes with Plus). A book can
  * also be made free in the AdminUI with its own number of free pictures.
  */
 export const FREE_COLORING_BOOKS: readonly string[] = [
   'ba-02-gott-erschafft-die-welt',
-  'ba-1-buntstift-schoepfung',
-  'ba-11-schoepfung-gott-macht-die-welt',
-  'lokal-912-schoepfung'
+  'ba-1-buntstift-schoepfung'
 ]
 
 export type BookKind = 'story' | 'coloring'

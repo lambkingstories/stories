@@ -1,16 +1,16 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 describe('free part of a book', () => {
-  it('gives a coloring book its first two pictures', async () => {
+  it('gives a coloring book its first picture', async () => {
     const { freePageCount } = await import('@/use/useBookAccess')
-    expect(freePageCount('coloring', 36)).toBe(2)
-    expect(freePageCount('coloring', 20)).toBe(2)
-    expect(freePageCount('coloring', 2)).toBe(2)
+    expect(freePageCount('coloring', 36)).toBe(1)
+    expect(freePageCount('coloring', 20)).toBe(1)
+    expect(freePageCount('coloring', 1)).toBe(1)
     // a book can have its own number
     expect(freePageCount('coloring', 36, 8)).toBe(8)
     expect(freePageCount('coloring', 36, 0)).toBe(0)
     expect(freePageCount('coloring', 4, 8)).toBe(4)
-    expect(freePageCount('coloring', 36, null)).toBe(2)
+    expect(freePageCount('coloring', 36, null)).toBe(1)
   })
 
   it('shows every story in full', async () => {
@@ -51,14 +51,15 @@ describe('what a person may use', () => {
     expect(m.hasFeature('glitter')).toBe(true)
   })
 
-  it('shows a coloring book in part, except Band 1, once Plus is shown', async () => {
+  it('shows a coloring book in part, except Band 1 of the Buntstift series, once Plus is shown', async () => {
     const m = await load({ VITE_PREMIUM_TEASER: 'true' })
-    expect(m.allowedPages('lokal-abraham', 'coloring', 30)).toBe(2)
+    expect(m.allowedPages('lokal-abraham', 'coloring', 30)).toBe(1)
     expect(m.allowedPages('ba-02-gott-erschafft-die-welt', 'coloring', 30)).toBe(30)
     expect(m.allowedPages('ba-1-buntstift-schoepfung', 'coloring', 30)).toBe(30)
-    expect(m.allowedPages('ba-11-schoepfung-gott-macht-die-welt', 'coloring', 30)).toBe(30)
-    expect(m.allowedPages('lokal-912-schoepfung', 'coloring', 30)).toBe(30)
-    expect(m.allowedPages('ba-12-david-und-goliath-mutig-mit-gott', 'coloring', 30)).toBe(2)
+    // the 9-to-12 series is no longer free in full (Anton, 6.11.2026): only one picture
+    expect(m.allowedPages('ba-11-schoepfung-gott-macht-die-welt', 'coloring', 30)).toBe(1)
+    expect(m.allowedPages('lokal-912-schoepfung', 'coloring', 30)).toBe(1)
+    expect(m.allowedPages('ba-12-david-und-goliath-mutig-mit-gott', 'coloring', 30)).toBe(1)
     // a story is never shown in part
     expect(m.allowedPages('some-story', 'story', 12)).toBe(12)
     expect(m.hasFeature('readAloud')).toBe(false)
