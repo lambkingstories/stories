@@ -2,7 +2,7 @@ name: Android Build & Sign
 
 # Builds the signed Play Store bundle (.aab) and an installable .apk.
 # Upload the .aab by hand in the Play Console (Test and release -> Closed testing).
-# Last build request: 2026-11-04 (release 1.2: purchases on Android through Play Billing (tauri-plugin-iap), microphone permission for family voices; second run after restoring the Mauer game files).
+# Last build request: 2026-11-06 (family games on the old map: Bible quiz, token choice, keep playing, music; new adventures).
 #
 # Needs the repository secrets ANDROID_KEYSTORE_BASE64 (the release keystore,
 # base64) and ANDROID_KEYSTORE_PASSWORD (store = key password; alias `lambking`).
