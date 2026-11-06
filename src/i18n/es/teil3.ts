@@ -352,7 +352,7 @@ export default {
     rounds: '¿Cuántas veces le toca a cada uno?',
     rule: 'Cada estación en su lugar da 1 punto. Si toda la fila es correcta, hay 2 puntos extra.',
     turnOf: 'Turno {n} de {total}',
-    handover: 'Pasa el dispositivo a la siguiente persona.',
+    handover: 'Pasa el dispositivo a {name}.',
     show: 'Mostrar los pasos',
     task: 'Toca las estaciones en el orden en que ocurren en la historia: la primera primero.',
     yours: 'Tu orden',

@@ -51,7 +51,8 @@ const src = `url(${prependBaseUrl('images/familie/karte/knopf.webp')})`
     min-width: 170px
     height: 54px
     font-size: 1rem
-    filter: saturate(0.7) brightness(0.82) drop-shadow(0 4px 5px rgba(10, 5, 0, 0.55))
+    // the second choice is a pale, friendly plate (not a dark one)
+    filter: sepia(0.25) saturate(0.7) brightness(1.28) drop-shadow(0 4px 5px rgba(10, 5, 0, 0.5))
 
 .mb-text
   display: block

@@ -514,14 +514,14 @@ const nameSize = computed(() => (medal.value >= 200 ? '1.7rem' : medal.value >= 
   cursor: pointer
   -webkit-tap-highlight-color: transparent
 
-// ── text on the table: a dark leather plate, so that it reads on the map ──
+// ── text on the table: a light parchment plate, so that it reads on the map ──
 .fb-plate
   margin: 0
   padding: 9px 14px
-  border: 1px solid rgba(226, 189, 102, 0.35)
+  border: 2px solid #b98a32
   border-radius: 8px
-  background: rgba(28, 19, 10, 0.78)
-  color: var(--mp-cream, #f6ead0)
+  background: rgba(255, 247, 222, 0.92)
+  color: var(--mp-ink, #3a2812)
   font-family: var(--mp-serif, Georgia, serif)
   font-size: 1.02rem
   font-weight: 600

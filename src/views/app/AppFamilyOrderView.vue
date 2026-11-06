@@ -324,7 +324,7 @@ function hide(e: Event) {
       p(class="fo-count") {{ t('app.order.turnOf', { n: turn + 1, total: totalTurns }) }}
       MapToken(:index="who" :size="92" lit class="fo-hero")
       h2(class="fo-big") {{ t('app.family.turn', { name: whoName }) }}
-      p(v-if="playerCount > 1" class="fo-note") {{ t('app.order.handover') }}
+      p(v-if="playerCount > 1" class="fo-note") {{ t('app.order.handover', { name: whoName }) }}
       MapRoute(v-if="playerCount > 1" :players="routePlayers" :max="routeMax" class="fo-wide")
       MapButton(@click="go") {{ t('app.order.show') }}
 

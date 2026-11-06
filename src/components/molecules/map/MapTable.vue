@@ -149,6 +149,23 @@ const toggleSfx = () => sound.setSfxVolume(sound.sfxVolume.value > 0 ? 0 : DEFAU
   display: flex
   gap: 8px
 
+@media (max-width: 440px)
+  .mt-top
+    gap: 8px
+    padding-left: 10px
+    padding-right: 10px
+
+  .mt-title
+    font-size: 1.05rem
+    letter-spacing: 0.06em
+
+  .mt-back, .mt-round
+    width: 40px
+    height: 40px
+
+  .mt-actions
+    gap: 6px
+
 .mt-body
   position: relative
   z-index: 1
@@ -156,6 +173,8 @@ const toggleSfx = () => sound.setSfxVolume(sound.sfxVolume.value > 0 ? 0 : DEFAU
   min-height: 0
   overflow-y: auto
   overflow-x: hidden
+  // a card that is turned (3D) reaches over the board for a moment: the scroll bar must not come and go and push the whole board aside
+  scrollbar-gutter: stable both-edges
   -webkit-overflow-scrolling: touch
   padding: 4px 14px max(18px, env(safe-area-inset-bottom))
 </style>
