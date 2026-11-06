@@ -86,6 +86,8 @@ export const LETZTEWOCHE_PREVIEW_KEY = 'lk-preview-letztewoche'
 export const LETZTEWOCHE_UNLOCK_CODE = 'letztewoche-vorschau-k8w2'
 export const OSTERN_PREVIEW_KEY = 'lk-preview-ostern'
 export const OSTERN_UNLOCK_CODE = 'ostern-vorschau-w5n3'
+export const PFINGSTEN_PREVIEW_KEY = 'lk-preview-pfingsten'
+export const PFINGSTEN_UNLOCK_CODE = 'pfingsten-vorschau-z7r4'
 
 /** A journey that is shown only on unlocked devices: the name of its link (`?<param>=<code>`), where the unlock is kept, and how it is loaded. */
 interface PreviewJourney {
@@ -382,6 +384,16 @@ function previewJourneys(): PreviewJourney[] {
       key: OSTERN_PREVIEW_KEY,
       always: import.meta.env.VITE_SHOW_OSTERN === 'true',
       load: async () => (await import('@/data/adventures/ostern')).ostern
+    })
+  }
+  if (import.meta.env.VITE_INCLUDE_PFINGSTEN === 'true' || import.meta.env.VITE_SHOW_PFINGSTEN === 'true') {
+    list.push({
+      id: 'pfingsten',
+      param: 'pfingsten',
+      code: PFINGSTEN_UNLOCK_CODE,
+      key: PFINGSTEN_PREVIEW_KEY,
+      always: import.meta.env.VITE_SHOW_PFINGSTEN === 'true',
+      load: async () => (await import('@/data/adventures/pfingsten')).pfingsten
     })
   }
   if (import.meta.env.VITE_INCLUDE_NOAH === 'true' || import.meta.env.VITE_SHOW_NOAH === 'true') {

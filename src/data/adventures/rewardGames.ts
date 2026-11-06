@@ -33,5 +33,6 @@ export const REWARD_GAMES: Record<string, number[]> = {
   gleichnisse: [7, 2],
   zachaeus: [2, 4],
   letztewoche: [1, 4, 5],
-  ostern: [7, 8]
+  ostern: [7, 8],
+  pfingsten: [7, 2]
 }

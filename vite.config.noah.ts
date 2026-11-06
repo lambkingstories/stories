@@ -259,3 +259,11 @@ export const OSTERN_ONLY_DIRS = ['images/abenteuer/ostern', 'images/abenteuer/sp
 export function stripOsternFiles(outDir: string) {
   strip(outDir, OSTERN_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Pfingsten" (id `pfingsten`) alone, in the same three places as Adam and Eve. */
+export const PFINGSTEN_ONLY_DIRS = ['images/abenteuer/pfingsten', 'images/abenteuer/spiele/pfingsten', 'audio/abenteuer/pfingsten']
+
+/** Takes the folders of Pfingsten out of a finished build. */
+export function stripPfingstenFiles(outDir: string) {
+  strip(outDir, PFINGSTEN_ONLY_DIRS)
+}

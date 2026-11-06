@@ -1589,3 +1589,53 @@ describe('the hidden journey Ostern (id ostern)', () => {
     expect(m.journeys.filter((j) => j.id === 'ostern')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Pfingsten (id pfingsten)', () => {
+  it('a normal build (without Pfingsten) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_PFINGSTEN', 'false')
+    open('?pfingsten=pfingsten-vorschau-z7r4')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('pfingsten')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_PFINGSTEN', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?pfingsten=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.PFINGSTEN_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?pfingsten=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_PFINGSTEN', 'true')
+    const first = await load()
+    open(`?pfingsten=${first.PFINGSTEN_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.PFINGSTEN_UNLOCK_CODE).toBe('pfingsten-vorschau-z7r4')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'pfingsten'])
+    expect(localStorage.getItem('lk-preview-pfingsten')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('pfingsten')?.stages.length).toBe(9)
+    open('?pfingsten=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-pfingsten')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_PFINGSTEN) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_PFINGSTEN', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'pfingsten')).toHaveLength(1)
+  })
+})
