@@ -196,7 +196,7 @@ export const offenbarung: Journey = {
   subtitle: 'Eine Auswahl aus der Offenbarung: die Kapitel der Hoffnung',
   age: '8-10',
   downloadMb: 16, // grob geschätzt (Bilder, Karte, Spielbilder, Musik, Aufnahmen), die Leitung misst nach dem Einbau nach
-  medal: `${PICS}medaille-v1.webp`, // Medaille 1 bis zu Antons Wahl
+  medal: `${PICS}medaille-v3.webp`, // Medaille 3 (Antons Wahl 6.11.2026)
   // Geschenk-Ausmalbild: die Stadt und der Strom (Strom, Baum des Lebens an beiden Ufern, ein Perlentor im Hintergrund; ohne Gestalt, ohne Schrift; Konturzeichnung)
   gift: { title: 'Die Stadt und der Strom', image: `${PICS}geschenk.webp` },
   // die gemalte Karte (Panorama in drei Stücken, 9920 × 1648 px, OpenAI-Bildmodell): von Patmos über die sieben Städte, Regenbogen und Licht, die neue Erde bis zur Stadt am Strom mit dem Baum des Lebens;
@@ -260,7 +260,7 @@ export const offenbarung: Journey = {
     },
     {
       id: 3,
-      image: `${PICS}etappe-bild-03.webp`,
+      image: `${PICS}etappe-bild-03-b.webp`,
       title: 'Briefe an die Gemeinden',
       ref: 'Offenbarung 2–3, Auswahl',
       text: [
