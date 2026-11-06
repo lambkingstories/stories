@@ -271,7 +271,7 @@ export const pfingsten: Journey = {
   stages: [
     {
       id: 1,
-      image: `${PICS}etappe-bild-01.webp`,
+      image: `${PICS}etappe-bild-01-b.webp`,
       title: 'Bis an das Ende der Erde',
       ref: 'Apostelgeschichte 1,3–14',
       text: [
@@ -343,7 +343,7 @@ export const pfingsten: Journey = {
     },
     {
       id: 5,
-      image: `${PICS}etappe-bild-05.webp`,
+      image: `${PICS}etappe-bild-05-b.webp`,
       title: 'Gold und Silber habe ich nicht',
       ref: 'Apostelgeschichte 3,1–10',
       text: [
@@ -398,7 +398,7 @@ export const pfingsten: Journey = {
     },
     {
       id: 8,
-      image: `${PICS}etappe-bild-08.webp`,
+      image: `${PICS}etappe-bild-08-b.webp`,
       title: 'Das Tuch mit den Tieren',
       ref: 'Apostelgeschichte 10',
       text: [
