@@ -367,7 +367,7 @@ export const paulus: Journey = {
     },
     {
       id: 5,
-      image: `${PICS}etappe-bild-05.webp`,
+      image: `${PICS}etappe-bild-05-b.webp`,
       title: 'Ausgesandt',
       ref: 'Apostelgeschichte 13,1–6.9; 4,36',
       text: [
@@ -385,7 +385,7 @@ export const paulus: Journey = {
     },
     {
       id: 6,
-      image: `${PICS}etappe-bild-06.webp`,
+      image: `${PICS}etappe-bild-06-b.webp`,
       title: 'Der Ruf nach Mazedonien',
       ref: 'Apostelgeschichte 15,40; 16,1–11',
       text: [
@@ -440,7 +440,7 @@ export const paulus: Journey = {
     },
     {
       id: 9,
-      image: `${PICS}etappe-bild-09.webp`,
+      image: `${PICS}etappe-bild-09-b.webp`,
       title: 'Zeltmacher in Korinth',
       ref: 'Apostelgeschichte 18,1–5',
       text: [
