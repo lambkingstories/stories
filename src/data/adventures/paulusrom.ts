@@ -454,7 +454,12 @@ for (const s of paulusrom.stages) {
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' || WITHOUT_RECORDING.has(s.id) ? undefined : file), enumerable: true, configurable: true })
 }
 
-// the music of its own is not made yet: until then the general pieces play (journeyFiles puts them into the pack)
+// the background music of this adventure: three pieces made with Google's Lyria (the market of Athens, the wide sea, evening in Rome); they follow one another at random
+paulusrom.music = [
+  'audio/abenteuer/paulusrom/musik-athen-v1.mp3',
+  'audio/abenteuer/paulusrom/musik-meer-v1.mp3',
+  'audio/abenteuer/paulusrom/musik-rom-v1.mp3'
+]
 
 // the English texts (title, stories, questions, hints) lie over the German ones; the screens show them when the app is English
 localize(paulusrom, paulusromEn)

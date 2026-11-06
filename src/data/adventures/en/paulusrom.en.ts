@@ -198,7 +198,7 @@ export const paulusromEn: TextOverlay<Journey> = {
 }
 
 // the English recordings of the stories (voice Achernar, Gemini): geschichte-NN-en-v1.mp3; a stage without a number in this list is read with the voice of the device
-const WITH_ENGLISH_RECORDING = [1]
+const WITH_ENGLISH_RECORDING = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 paulusromEn.stages!.forEach((s, i) => {
   if (WITH_ENGLISH_RECORDING.includes(i + 1)) s.audio = `audio/abenteuer/paulusrom/geschichte-${String(i + 1).padStart(2, '0')}-en-v1.mp3`
 })
