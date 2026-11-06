@@ -202,10 +202,10 @@ export const davidEn: TextOverlay<Journey> = {
         'A servant tells Abigail. She quickly loads two hundred loaves, two skins of wine, sheep, flour, raisin cakes and fig cakes onto donkeys and rides to meet David. She bows before him. “Listen to me,” she says. “God has kept you from taking justice into your own hands.” “Blessed be God, who sent you to me,” says David. “Go in peace.”'
       ],
       task: {
-        hint: 'Put the pictures in the order of the story.',
-        order: {
-          cards: [{ label: 'Nabal sends the messengers away' }, { label: 'Abigail loads the donkeys' }, { label: 'Abigail kneels before David' }, { label: 'David accepts the gifts' }],
-          rounds: [{ hint: 'Round 1: Put the pictures in the order of the story. The dots show where they go.' }, { hint: 'Round 2: Now with Nabal and without dots: What comes first, what comes next?' }]
+        hint: 'Share the gifts between the baskets so that the load hangs straight.',
+        donkeyLoad: {
+          goods: { brot: { name: 'Loaves' }, krug: { name: 'Wine jar' }, rosinen: { name: 'Raisin cakes' }, feigen: { name: 'Fig cakes' } },
+          rounds: [{ hint: 'Put the gifts into the two baskets. In the end the load must hang straight.' }, { hint: 'Now eight gifts. The load must never hang too crooked, or something slides off.' }]
         }
       },
       questions: [
@@ -236,7 +236,15 @@ export const davidEn: TextOverlay<Journey> = {
         'Later all the tribes of Israel come to Hebron. “We belong together,” they say. “Even when Saul was king, you led us. God has said: You shall shepherd my people Israel.” The elders make a covenant with David and anoint him king over all Israel. David is thirty years old, and he reigns for forty years.',
         'Then David goes to Jerusalem with his men. The people there say, “You will not come in here!” But David takes the fortress of Zion. From now on it is called the City of David, and David builds it up. He grows greater and greater, for God is with him.'
       ],
-      task: { hint: 'Put the picture of the City of David together.' },
+      task: {
+        hint: 'Open the gate just when the tribes stand in front of it.',
+        gateTime: {
+          rounds: [
+            { hint: 'The tribes of Israel come to Hebron. Open the gate when they stand in front of it.', tribes: [{ name: 'The tribe of Judah' }, { name: 'The tribe of Simeon' }, { name: 'The tribe of Levi' }, { name: 'The tribe of Benjamin' }, { name: 'The tribe of Ephraim' }] },
+            { hint: 'Now they come faster, and not all at the same pace. Watch carefully!', tribes: [{ name: 'The half tribe of Manasseh' }, { name: 'The tribe of Issachar' }, { name: 'The tribe of Zebulun' }, { name: 'The tribe of Naphtali' }, { name: 'The tribe of Dan' }, { name: 'The tribe of Asher' }, { name: 'Reuben and Gad' }] }
+          ]
+        }
+      },
       questions: [
         { q: 'Where does David go at God’s word?', options: ['to Hebron', 'to Shiloh', 'to Gilgal'] },
         { q: 'What is the fortress called that David takes?', options: ['Zion, the City of David', 'Bethlehem', 'Gibeah'] }
@@ -251,12 +259,10 @@ export const davidEn: TextOverlay<Journey> = {
         'In the city they put the ark in the tent that David has pitched for it. David blesses the people and gives everyone a loaf of bread, a piece of meat and some wine. Then they all go home.'
       ],
       task: {
-        hint: 'Put the words into the strip in the right order.',
-        words: {
-          rounds: [
-            { hint: 'Put the words into the strip in the right order.', sentences: ['God blesses the house of Obed-edom.', 'Then they all go home.'] },
-            { hint: 'Now longer sentences.', sentences: ['All Israel brings up the ark with shouting and trumpets.', 'David dances with all his might before God, in a linen robe.'] }
-          ]
+        hint: 'Tap the musician who lights up.',
+        festMarch: {
+          musicians: [{ name: 'The man with the harp' }, { name: 'The woman with the drum' }, { name: 'The boy with the rattles' }, { name: 'The man with the cymbals' }],
+          rounds: [{ hint: 'The musicians play before God. Tap the one who lights up.' }, { hint: 'Now they play little tunes. Listen and play them after them.' }]
         }
       },
       questions: [

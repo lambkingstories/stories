@@ -4,13 +4,15 @@
  * Nicht oder gemildert erzählt: Löwe und Bär nur als Davids Bericht ("rettete das Schaf"), Goliats Tod ohne Kopf, Schwert und Blut (der Stein trifft, der Riese stürzt, die Philister fliehen), Sauls Spieß nur als ein Satz,
  * Nob und Doeg, Sauls Schlaf im Lager, Nabals Tod, Sauls Tod im Einzelnen, der Amalekiter, Davids Frauen und Kinder, Usas Tod nur als "ein Unglück geschieht", Michal, Davids Kriege.
  * Die Lade wird immer mit zwei goldenen Cherubim gezeigt. Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
- * Spiele (Wahl der Leitung): 1 Lückenvers (alt), 2 Saul zur Ruhe bringen (neu), 3 nur Quiz, 4 Die Herde beschützen (neu), 5 Glatte Steine finden (neu), 6 Die Schleuder schwingen (neu), 7 Memory (alt), 8 nur Quiz,
- * 9 Das Zeichen mit den Pfeilen (neu), 10 Den Zipfel abschneiden (neu), 11 Reihenfolge (alt), 12 nur Quiz, 13 Puzzle (alt), 14 Wörter ordnen (alt), 15 nur Quiz.
+ * Spiele (Wahl der Leitung, 5.11.2026 nach Antons Spielplan: höchstens zwei bekannte Spiele): 1 Lückenvers (alt), 2 Saul zur Ruhe bringen (neu), 3 nur Quiz, 4 Die Herde beschützen (neu), 5 Glatte Steine finden (neu),
+ * 6 Die Schleuder schwingen (neu), 7 Memory (alt), 8 nur Quiz, 9 Das Zeichen mit den Pfeilen (neu), 10 Den Zipfel abschneiden (neu), 11 Esel beladen (neu), 12 nur Quiz, 13 Das Tor von Hebron (neu), 14 Festzug (neu), 15 nur Quiz.
+ * ERZEUGT von D:/Claude/Abenteuer-David/tools/bauen_david.py: nicht von Hand ändern, sondern den Generator ändern und neu bauen.
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/david/, images/abenteuer/spiele/david/<spiel>/, audio/abenteuer/david/.
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { ArrowGame, HarpGame, HemGame, Journey, MemoryGame, OrderGame, PebblesGame, ShepherdGame, SlingGame, VerseGame, WordsGame } from '@/types/adventure'
+import type { ArrowGame, HarpGame, HemGame, Journey, MemoryGame, PebblesGame, ShepherdGame, SlingGame, VerseGame } from '@/types/adventure'
+import type { DonkeyLoadGame, FestMarchGame, HebronGateGame } from '@/utils/davidNeu'
 import { josef } from './josef'
 import { DAVID_PATH } from './davidPath'
 import { localize } from './localize'
@@ -219,33 +221,100 @@ const ZIPFEL: HemGame = {
 }
 
 /**
- * Etappe 11, "Abigajil bringt Brot" (alte Mechanik 3 von 5, Reihenfolge legen): Nabal schickt die Boten weg, Abigajil lädt die Esel, sie kniet vor David, David nimmt die Gaben an.
- * Runde 1 drei Karten (packen, knien, Segen) mit Punkten, Runde 2 alle vier ohne Punkte. Bilder (Bildauftrag R37): `reihenfolge/karte-1..4.webp` (4:3).
+ * Etappe 11, "Esel beladen" (neu, 5.11.2026, 1. Sam 25,18): Abigajils Gaben (Brote, Weinkrug, Rosinenkuchen, Feigenkuchen) kommen in die zwei Körbe des Packsattels, bis die Last gerade hängt.
+ * Der Sattel neigt sich zur schwereren Seite (in Worten: hängt nach links / rechts / gerade). Runde 1: vier Gaben, nur am Ende muss es gerade sein; Runde 2: acht Gaben, und die Last darf beim Laden
+ * nie mehr als zwei schief hängen (sonst rutscht die Gabe zurück, ein Fehler): erst die leichten. Gewichte: leicht 1, mittel 2, schwer 3 (als Wort unter jeder Gabe).
+ * Bilder (Bildauftrag R40, Codex): `esel/hof-esel.webp` 1200 × 900 (der Hof mit dem Esel von vorn, ins Bild gemalt: Einzelbilder des Esels lehnte der Generator ab), `esel/packsattel.webp` (eng beschnitten), `esel/brot|krug|rosinen|feigen.webp` (ein Bogen, gleicher Maßstab).
+ * Lagen: D:/Claude/Abenteuer-David/tools/_massen_david_neu.json.
  */
-const REIHENFOLGE: OrderGame = {
-  cards: [
-    { id: 'nabal', image: `${G}reihenfolge/karte-1.webp`, label: 'Nabal schickt die Boten weg' },
-    { id: 'packen', image: `${G}reihenfolge/karte-2.webp`, label: 'Abigajil lädt die Esel' },
-    { id: 'knien', image: `${G}reihenfolge/karte-3.webp`, label: 'Abigajil kniet vor David' },
-    { id: 'gaben', image: `${G}reihenfolge/karte-4.webp`, label: 'David nimmt die Gaben an' }
-  ],
+const ESEL: DonkeyLoadGame = {
+  background: `${G}esel/hof-esel.webp`,
+  ratio: 1.33,
+  donkeyRatio: 0.45,
+  donkeyPos: { x: 50, y: 90, w: 30 },
+  saddle: `${G}esel/packsattel.webp`,
+  saddleRatio: 1.34,
+  saddlePos: { x: 52, y: 44, w: 50 },
+  baskets: [{ x: 19.7, y: 64 }, { x: 80.3, y: 64 }],
+  goods: {
+    brot: { image: `${G}esel/brot.webp`, name: 'Brote', weight: 2 },
+    krug: { image: `${G}esel/krug.webp`, name: 'Weinkrug', weight: 3 },
+    rosinen: { image: `${G}esel/rosinen.webp`, name: 'Rosinenkuchen', weight: 1 },
+    feigen: { image: `${G}esel/feigen.webp`, name: 'Feigenkuchen', weight: 2 }
+  },
+  goodW: 22,
   rounds: [
-    { hint: 'Runde 1: Lege die Bilder in die Reihenfolge der Geschichte. Die Punkte zeigen, wo sie hinkommen.', numbered: true, cards: ['packen', 'knien', 'gaben'] },
-    { hint: 'Runde 2: Jetzt mit Nabal und ohne Punkte: Was kommt zuerst, was danach?', numbered: false, cards: ['nabal', 'packen', 'knien', 'gaben'] }
+    { hint: 'Leg die Gaben in die zwei Körbe. Am Ende muss die Last gerade hängen.', goods: ['krug', 'brot', 'feigen', 'rosinen'], places: 3, maxLean: 99 },
+    { hint: 'Jetzt acht Gaben. Die Last darf nie zu schief hängen, sonst rutscht etwas herunter.', goods: ['krug', 'brot', 'rosinen', 'feigen', 'krug', 'brot', 'rosinen', 'feigen'], places: 4, maxLean: 2 }
   ]
 }
 
 /**
- * Etappe 14, "Die Wörter ordnen" (alte Mechanik 5 von 5): die Wörter eines Satzes liegen auf Steinplättchen in gemischter Folge und werden der Reihe nach in den Streifen gelegt; alle Sätze stehen wörtlich im Text der Etappe.
- * Hintergrund ist das Etappenbild 14 (weichgezeichnet); Steine und Streifen sind die aus Mose (kopiert).
+ * Etappe 13, "Das Tor von Hebron" (neu, 5.11.2026, 2. Sam 5,1-3): Die Stämme Israels kommen auf der Straße nach Hebron, eine Gruppe nach der anderen (die Namen nach 1. Chronik 12,24-38).
+ * Das Kind öffnet das Tor genau dann, wenn die Gruppe davor steht: zu früh ist ein Fehler, und wenn sie vor dem geschlossenen Tor länger als `grace` warten muss, auch.
+ * Runde 1: fünf Stämme, gleich langsam, die richtige Strecke ist markiert; Runde 2: sieben Stämme, schneller und verschieden schnell, kürzere Strecke, nicht markiert. Zusammen zwölf.
+ * Bilder (Bildauftrag R40, Codex): `hebron/stadt.webp` 1200 × 800 (Mauer von vorn, Toröffnung rechts), `hebron/tor.webp` (die zwei Torflügel, eng beschnitten), `hebron/stamm-1..4.webp` (ein Bogen).
  */
-const WORTE: WordsGame = {
-  background: `${G}hintergrund/worte-hintergrund.webp`,
-  chip: `${G}worte/stein.webp`,
-  strip: `${G}worte/streifen.webp`,
+const HEBRON: HebronGateGame = {
+  background: `${G}hebron/stadt.webp`,
+  ratio: 1.5,
+  door: `${G}hebron/tor.webp`,
+  gate: { x: 70.2, y: 39.8, w: 17.5, h: 33.9 },
+  groups: [1, 2, 3, 4].map((n) => `${G}hebron/stamm-${n}.webp`),
+  groupRatio: 1.5,
+  groupW: 25,
+  road: { y: 88, from: 0, stop: 83 },
   rounds: [
-    { hint: 'Lege die Wörter in der richtigen Reihenfolge in den Streifen.', sentences: ['Gott segnet Obed-Edoms Haus.', 'Dann gehen alle nach Hause.'] },
-    { hint: 'Jetzt längere Sätze.', sentences: ['Ganz Israel führt die Lade mit Jauchzen und Posaunen herauf.', 'David tanzt mit aller Kraft vor Gott her, im leinenen Gewand.'] }
+    {
+      hint: 'Die Stämme Israels kommen nach Hebron. Öffne das Tor, wenn sie davor stehen.',
+      zone: 14,
+      grace: 1500,
+      gap: 1200,
+      tribes: [
+        { name: 'Der Stamm Juda', sprite: 0, speed: 10 },
+        { name: 'Der Stamm Simeon', sprite: 1, speed: 10 },
+        { name: 'Der Stamm Levi', sprite: 2, speed: 10 },
+        { name: 'Der Stamm Benjamin', sprite: 3, speed: 10 },
+        { name: 'Der Stamm Ephraim', sprite: 0, speed: 10 }
+      ]
+    },
+    {
+      hint: 'Jetzt kommen sie schneller, und nicht alle gleich schnell. Pass gut auf!',
+      zone: 9,
+      grace: 800,
+      gap: 1000,
+      tribes: [
+        { name: 'Der halbe Stamm Manasse', sprite: 1, speed: 12 },
+        { name: 'Der Stamm Issachar', sprite: 2, speed: 15 },
+        { name: 'Der Stamm Sebulon', sprite: 3, speed: 13 },
+        { name: 'Der Stamm Naftali', sprite: 0, speed: 16 },
+        { name: 'Der Stamm Dan', sprite: 1, speed: 14 },
+        { name: 'Der Stamm Asser', sprite: 2, speed: 17 },
+        { name: 'Ruben und Gad', sprite: 3, speed: 13 }
+      ]
+    }
+  ]
+}
+
+/**
+ * Etappe 14, "Festzug" (neu, 5.11.2026, 2. Sam 6,5): Auf dem Weg hinauf zur Stadt Davids tragen hinten vier Priester die Lade (klein, mit den zwei goldenen Cherubim auf dem Deckel, kein Wagen, kein Leuchten);
+ * vorn gehen vier Musiker mit Harfe, Pauke, Schellen und Zimbeln. Runde 1: einer nach dem anderen leuchtet, das Kind tippt ihn an (ein anderer ist ein Fehler, ein verpasstes Leuchten kommt am Ende wieder);
+ * Runde 2: die Musiker spielen kurze Lieder (zwei, drei, vier Töne), das Kind spielt sie nach. Usa kommt nicht vor.
+ * Bilder (Bildauftrag R40, Codex): `festzug/weg.webp` 1200 × 900, `festzug/harfe|pauke|schellen|zimbeln.webp` (ein Bogen, gleicher Maßstab, die Füße unten).
+ */
+const FESTZUG: FestMarchGame = {
+  background: `${G}festzug/weg.webp`,
+  ratio: 1.33,
+  musicianRatio: 0.54,
+  musicians: [
+    { instrument: 'harfe', name: 'Der Mann mit der Harfe', image: `${G}festzug/harfe.webp`, x: 13, y: 96, w: 19 },
+    { instrument: 'pauke', name: 'Die Frau mit der Pauke', image: `${G}festzug/pauke.webp`, x: 37, y: 96, w: 19 },
+    { instrument: 'schellen', name: 'Der Junge mit den Schellen', image: `${G}festzug/schellen.webp`, x: 63, y: 96, w: 19 },
+    { instrument: 'zimbeln', name: 'Der Mann mit den Zimbeln', image: `${G}festzug/zimbeln.webp`, x: 87, y: 96, w: 19 }
+  ],
+  rounds: [
+    { hint: 'Die Musiker spielen vor Gott. Tippe den an, der gerade leuchtet.', mode: 'glow', order: [0, 2, 1, 3, 2, 0, 3, 1], glowMs: 2600 },
+    { hint: 'Jetzt spielen sie kleine Lieder. Hör zu und spiel sie nach.', mode: 'echo', tunes: [[0, 2], [1, 3, 0], [2, 0, 3, 1]], stepMs: 800 }
   ]
 }
 
@@ -467,8 +536,8 @@ export const david: Journey = {
         'David bittet Nabal um etwas zu essen, denn seine Männer haben Nabals Hirten beschützt. „Wer ist David?“, sagt Nabal und schickt die Boten weg. David wird zornig und zieht mit vierhundert Männern los.',
         'Ein Knecht erzählt es Abigajil. Sie lädt eilig zweihundert Brote, zwei Krüge Wein, Schafe, Mehl, Rosinen- und Feigenkuchen auf Esel und reitet David entgegen. Sie verneigt sich vor ihm. „Hör mich an“, sagt sie. „Gott hat dich davor bewahrt, dir selbst Recht zu verschaffen.“ „Gelobt sei Gott, der dich zu mir geschickt hat“, sagt David. „Geh in Frieden.“'
       ],
-      // Spiel: Reihenfolge legen (reihenfolge, alt 3 von 5)
-      task: { kind: 'reihenfolge', hint: 'Lege die Bilder in die Reihenfolge der Geschichte.', order: REIHENFOLGE },
+      // Spiel: Esel beladen (eselladen, neu 5.11.2026)
+      task: { kind: 'eselladen', hint: 'Verteile die Gaben so auf die Körbe, dass die Last gerade hängt.', donkeyLoad: ESEL },
       questions: [
         { q: 'Was lädt Abigajil auf die Esel?', options: ['Brot, Wein, Schafe und Kuchen', 'Schwerter und Schilde', 'Gold und Silber'], answer: 0 },
         { q: 'Was sagt David zu Abigajil?', options: ['Gelobt sei Gott, der dich zu mir geschickt hat.', 'Geh weg!', 'Ich habe dich nicht gesehen.'], answer: 0 }
@@ -502,8 +571,8 @@ export const david: Journey = {
         'Später kommen alle Stämme Israels nach Hebron. „Wir gehören zusammen“, sagen sie. „Schon als Saul König war, hast du uns geführt. Gott hat gesagt: Du sollst mein Volk Israel hüten.“ Die Ältesten schließen mit David einen Bund und salben ihn zum König über ganz Israel. David ist dreißig Jahre alt und regiert vierzig Jahre.',
         'Dann zieht David mit seinen Männern nach Jerusalem. Die Bewohner sagen: „Du kommst hier nicht herein!“ Aber David gewinnt die Burg Zion. Sie heißt von nun an Davids Stadt, und David baut sie aus. Er wird immer mächtiger, denn Gott ist mit ihm.'
       ],
-      // Spiel: Puzzle (puzzle, alt 4 von 5)
-      task: { kind: 'puzzle', hint: 'Setze das Bild der Stadt Davids zusammen.', puzzle: { image: `${G}puzzle/stadt.webp`, cols: 2, rows: 3 } },
+      // Spiel: Das Tor von Hebron (hebrontor, neu 5.11.2026)
+      task: { kind: 'hebrontor', hint: 'Öffne das Tor genau dann, wenn die Stämme davor stehen.', gateTime: HEBRON },
       questions: [
         { q: 'Wohin zieht David auf Gottes Wort?', options: ['nach Hebron', 'nach Silo', 'nach Gilgal'], answer: 0 },
         { q: 'Wie heißt die Burg, die David gewinnt?', options: ['Zion, die Stadt Davids', 'Bethlehem', 'Gibea'], answer: 0 }
@@ -519,8 +588,8 @@ export const david: Journey = {
         'Als David das hört, holt er die Lade mit Freude. Nach sechs Schritten bringen sie ein Opfer dar. David tanzt mit aller Kraft vor Gott her, im leinenen Gewand. Ganz Israel führt die Lade mit Jauchzen und Posaunen herauf.',
         'In der Stadt stellen sie die Lade in das Zelt, das David für sie aufgeschlagen hat. David segnet das Volk und gibt jedem einen Brotkuchen, ein Stück Fleisch und Wein. Dann gehen alle nach Hause.'
       ],
-      // Spiel: Die Wörter ordnen (worte, alt 5 von 5)
-      task: { kind: 'worte', hint: 'Lege die Wörter in der richtigen Reihenfolge in den Streifen.', words: WORTE },
+      // Spiel: Festzug (festzug, neu 5.11.2026)
+      task: { kind: 'festzug', hint: 'Tippe den Musiker an, der gerade leuchtet.', festMarch: FESTZUG },
       questions: [
         { q: 'Mit was spielen David und Israel vor Gott?', options: ['mit Harfen, Pauken, Schellen und Zimbeln', 'mit Schwertern', 'mit Steinen'], answer: 0 },
         { q: 'Was tut David vor der Lade?', options: ['Er tanzt mit aller Kraft.', 'Er schläft.', 'Er läuft weg.'], answer: 0 }
@@ -555,10 +624,9 @@ export const david: Journey = {
   ]
 }
 
-// the games that lie on a stage picture (drawn soft by the app) follow the picture of their stage
+// the gap verse lies on its painted backdrop (or, without it, on the stage picture, drawn soft by the app)
 for (const st of david.stages) {
   if (st.task.verse) st.task.verse.background = backdropOr(st.task.verse.background, st.image ?? st.task.verse.background)
-  if (st.task.words) st.task.words.background = backdropOr(st.task.words.background, st.image ?? st.task.words.background)
 }
 
 // the German recordings of the stories (voice Achernar, files "geschichte-NN-v1.mp3"); until they are made the app reads with the voice of the device. Remove a number from this list when its file is in.

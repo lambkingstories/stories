@@ -1,6 +1,6 @@
 /**
  * The data of "David" (`david.ts`, `en/david.en.ts`, `davidPath.ts`): the stories and questions follow the rules of the adventures (texts of the draft `D:/Claude/Abenteuer-David/ENTWURF_David.md`, Luther 1912),
- * the quiz stages are only quizzes, the six new games and the five old ones have sound data, the map has fifteen stations and the exam, and the English file has the same shape.
+ * the quiz stages are only quizzes, the nine new games and the two old ones have sound data (the three newest, 5.11.2026, are checked by `*Problems` of `utils/davidNeu.ts`), the map has fifteen stations and the exam, and the English file has the same shape.
  */
 import { existsSync, statSync } from 'node:fs'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -10,6 +10,12 @@ import { englishTextsOf } from '@/data/adventures/localize'
 import { setAdventureLanguage } from '@/use/adventureLanguage'
 import { journeyFiles, notPaintedYet } from '@/utils/journeyFiles'
 import { arrowLanding, arrowZoneHit, dist, nearestOnPath, pathLength, slingAimError, slingAngle, slingHit, slingPos, stringAt, ASPECT } from '@/utils/davidGames'
+import { donkeyLoadProblems, donkeySolve, festMarchProblems, gateTimeProblems } from '@/utils/davidNeu'
+import type { DonkeyLoadGame, FestMarchGame, HebronGateGame } from '@/utils/davidNeu'
+
+/** The three new games are not in `GameTask` yet (the lead adds them): read through this view. */
+type NewTask = { donkeyLoad?: DonkeyLoadGame; gateTime?: HebronGateGame; festMarch?: FestMarchGame }
+const newTask = (n: number) => david.stages[n - 1]!.task as unknown as NewTask
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => david.stages[n - 1]!
@@ -127,11 +133,14 @@ describe('David: stories and questions', () => {
 })
 
 describe('David: the games', () => {
-  it('the order of the games: 5 old (verse, memory, order, puzzle, words), 6 new, 4 quizzes; no game twice', () => {
-    expect(david.stages.map((s) => s.task.kind)).toEqual(['lueckenvers', 'harfe', 'quiz', 'hirte', 'kiesel', 'schleuder', 'memory', 'quiz', 'pfeil', 'zipfel', 'reihenfolge', 'quiz', 'puzzle', 'worte', 'quiz'])
-    const games = david.stages.map((s) => s.task.kind).filter((k) => k !== 'quiz')
+  it("the order of the games (Anton's plan, 5.11.2026): 2 old (verse, memory), never next to each other, 9 new, 4 quizzes; no game twice", () => {
+    expect(david.stages.map((s) => s.task.kind as string)).toEqual(['lueckenvers', 'harfe', 'quiz', 'hirte', 'kiesel', 'schleuder', 'memory', 'quiz', 'pfeil', 'zipfel', 'eselladen', 'quiz', 'hebrontor', 'festzug', 'quiz'])
+    const games = david.stages.map((s) => s.task.kind as string).filter((k) => k !== 'quiz')
     expect(new Set(games).size).toBe(games.length)
-    expect(games.filter((k) => ['lueckenvers', 'memory', 'reihenfolge', 'puzzle', 'worte'].includes(k))).toHaveLength(5)
+    const OLD = ['lueckenvers', 'memory', 'reihenfolge', 'puzzle', 'worte']
+    expect(games.filter((k) => OLD.includes(k))).toEqual(['lueckenvers', 'memory'])
+    const kinds = david.stages.map((s) => s.task.kind as string)
+    for (let i = 1; i < kinds.length; i++) expect(OLD.includes(kinds[i]!) && OLD.includes(kinds[i - 1]!), `two known games in a row at ${i + 1}`).toBe(false)
   })
 
   it('1 verse: the sentences are in the text and the right words are on the leaves', () => {
@@ -288,21 +297,31 @@ describe('David: the games', () => {
     }
   })
 
-  it('11 order: four cards, round 1 with the numbers and three cards, round 2 with all four; 14 words: the sentences stand in the text', () => {
-    const g = stage(11).task.order!
-    expect(g.cards).toHaveLength(4)
-    expect(g.rounds.map((r) => r.cards.length)).toEqual([3, 4])
-    expect(g.rounds.map((r) => r.numbered)).toEqual([true, false])
-    const w = stage(14).task.words!
-    const text = stage(14).text.join(' ')
-    for (const r of w.rounds) for (const s of r.sentences) expect(text.includes(s), s).toBe(true)
+  it('11 load the donkey: the data has no problem; round 1 four gifts, round 2 eight with a lean limit, both can be loaded straight', () => {
+    const g = newTask(11).donkeyLoad!
+    expect(donkeyLoadProblems(g)).toEqual([])
+    expect(g.rounds.map((r) => r.goods.length)).toEqual([4, 8])
+    for (const r of g.rounds) expect(donkeySolve(g, r, [[], []])).not.toBeNull()
+    expect(g.rounds[1]!.maxLean).toBeLessThan(g.rounds[0]!.maxLean)
+    // the gifts of 1 Samuel 25,18 in the text of the stage: bread, wine, raisins, figs
+    const text = stage(11).text.join(' ')
+    expect(text).toMatch(/Brot/)
   })
 
-  it('13 puzzle: a portrait picture in 2 columns and 3 rows', () => {
-    const g = stage(13).task.puzzle!
-    expect(g.cols).toBe(2)
-    expect(g.rows).toBe(3)
-    expect(g.image).toMatch(/puzzle\/stadt\.webp$/)
+  it('13 the gate of Hebron: the data has no problem; twelve tribes in all (1 Chronicles 12), every name once', () => {
+    const g = newTask(13).gateTime!
+    expect(gateTimeProblems(g)).toEqual([])
+    expect(g.rounds.map((r) => r.tribes.length)).toEqual([5, 7])
+    expect(g.rounds[0]!.tribes[0]!.name).toBe('Der Stamm Juda')
+    expect(stage(13).text.join(' ')).toMatch(/alle Stämme Israels nach Hebron/)
+  })
+
+  it('14 the festive procession: the data has no problem; harp, drum, rattles and cymbals as in the text of the stage', () => {
+    const g = newTask(14).festMarch!
+    expect(festMarchProblems(g)).toEqual([])
+    expect(g.musicians.map((m) => m.instrument)).toEqual(['harfe', 'pauke', 'schellen', 'zimbeln'])
+    expect(stage(14).text.join(' ')).toMatch(/Harfen, Pauken, Schellen und Zimbeln/)
+    expect(g.rounds.map((r) => r.mode)).toEqual(['glow', 'echo'])
   })
 
   it('the questions do not ask what a game of the stage shows (not how many strings, not how many lambs)', () => {
@@ -358,7 +377,9 @@ describe('David: map, files, English', () => {
     expect(stage(1).title).toBe('The Youngest in the Pasture')
     expect(stage(2).task.harp!.rounds[0]!.hint).toContain('Stroke slowly')
     expect(stage(9).task.arrow!.rounds[1]!.hint).toContain('flee')
-    expect(stage(14).task.words!.rounds[0]!.sentences[1]).toBe('Then they all go home.')
+    expect((stage(14).task as unknown as NewTask).festMarch!.musicians[0]!.name).toBe('The man with the harp')
+    expect((stage(13).task as unknown as NewTask).gateTime!.rounds[0]!.tribes[0]!.name).toBe('The tribe of Judah')
+    expect((stage(11).task as unknown as NewTask).donkeyLoad!.goods.krug.name).toBe('Wine jar')
     for (const s of david.stages) {
       const audio = s.audio
       if (audio) expect(audio, `stage ${s.id}`).toBe(`audio/abenteuer/david/geschichte-${String(s.id).padStart(2, '0')}-en-${s.id === 15 ? 'v2' : 'v1'}.mp3`)
