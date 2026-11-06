@@ -13,6 +13,7 @@ import { computed, nextTick, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import MapTable from '@/components/molecules/map/MapTable.vue'
+import { goBackTo } from '@/utils/navBack'
 import MapPaper from '@/components/molecules/map/MapPaper.vue'
 import MapCoin from '@/components/molecules/map/MapCoin.vue'
 import MapToken from '@/components/molecules/map/MapToken.vue'
@@ -280,7 +281,7 @@ function goBack() {
     phase.value = 'setup'
     return
   }
-  void router.push({ name: 'app-family' })
+  goBackTo(router, { name: 'app-family' })
 }
 
 function begin(list: FamilyQuestion[], playersCount: number) {

@@ -8,6 +8,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import MapTable from '@/components/molecules/map/MapTable.vue'
+import { goBackTo } from '@/utils/navBack'
 import MapPaper from '@/components/molecules/map/MapPaper.vue'
 import MapMedallion from '@/components/molecules/map/MapMedallion.vue'
 import MapToken from '@/components/molecules/map/MapToken.vue'
@@ -53,7 +54,7 @@ const save = useFamilySave<ActivitySnap>('activity', 1)
 /** In the game the back button leads to the start page of this game (where a new round can begin); from there to the main menu. */
 function goBack() {
   if (phase.value === 'setup') {
-    void router.push({ name: 'app-family' })
+    goBackTo(router, { name: 'app-family' })
     return
   }
   stopTimer()

@@ -10,6 +10,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import MapTable from '@/components/molecules/map/MapTable.vue'
+import { goBackTo } from '@/utils/navBack'
 import MapPaper from '@/components/molecules/map/MapPaper.vue'
 import MapButton from '@/components/molecules/map/MapButton.vue'
 import MapSeats from '@/components/molecules/map/MapSeats.vue'
@@ -55,7 +56,7 @@ function goBack() {
     phase.value = 'setup'
     return
   }
-  void router.push({ name: 'app-family' })
+  goBackTo(router, { name: 'app-family' })
 }
 
 const locked = computed(() => PREMIUM_TEASER && !hasFeature('family'))
