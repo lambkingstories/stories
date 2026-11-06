@@ -8,6 +8,12 @@ import type { JugsGame, EnoughGame, QuailsGame, StaffsGame, SerpentGame, DonkeyG
 // Ostern, neue Spiele nach Antons Regel (5.11.2026): die Typen liegen bei ihrer Logik
 import type { ErrandGame, ShuttersGame } from '@/utils/osternNeuA'
 import type { WanderGame, TableGame, FlameGame } from '@/utils/osternNeuB'
+import type { LettersGame, PraiseGame, WriteGame } from '@/utils/offenbarungNeuA'
+import type { GatesGame, PalmsGame } from '@/utils/offenbarungNeuB'
+import type { PlanksGame, QuietSpotGame, WallShadowGame } from '@/utils/paulusromNeuA'
+import type { BrushwoodGame, VisitorsGame } from '@/utils/paulusromNeuB'
+import type { RefindGame, SailGame, StreetGame } from '@/utils/paulusNeuA'
+import type { DyeGame, TentShopGame } from '@/utils/paulusNeuB'
 import type { DonkeyLoadGame, FestMarchGame, HebronGateGame } from '@/utils/davidNeu'
 import type { FillGame, TonguesGame, WitnessGame } from '@/utils/pfingstenNeuA'
 import type { ChariotGame, HopGame, PeekGame } from '@/utils/pfingstenNeuB'
@@ -28,7 +34,7 @@ import type { ChildrenGame, SynagogueGame, TenGame } from '@/utils/heilungNeu'
 import type { CarryGame, HaltGame, HomeGame, InnGame, YieldGame } from '@/utils/gleichnisseNeu'
 
 /** The kinds of tasks. `quiz` means the questions of the stage are the task. */
-export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz' | 'boote' | 'dach' | 'arme' | 'richter' | 'signal' | 'traube' | 'krug' | 'genug' | 'wachteln' | 'stab' | 'schlange' | 'eselin' | 'einsetzen' | 'schoepfen' | 'gedraenge' | 'buendel' | 'brote' | 'rudern' | 'umkehr' | 'ruf' | 'graben' | 'muenze' | 'entgegen' | 'klettern' | 'halbieren' | 'loesen' | 'bereiten' | 'lampen' | 'helfen' | 'fischzug' | 'weiden' | 'botengang' | 'wanderweg' | 'tischdecken' | 'fensterlaeden' | 'lot' | 'sitzplaetze' | 'zwoelf' | 'zaehlung' | 'hirtenfeuer' | 'weitersagen' | 'stern' | 'bachsteine' | 'gebote' | 'tor' | 'zepter' | 'boten' | 'schriftrolle' | 'schattenweg' | 'sonnenaufgang' | 'saum' | 'ufer' | 'froesche' | 'becher' | 'pfand' | 'laubhuetten' | 'wunschkarten' | 'floesse' | 'schnitzen' | 'granatapfel' | 'stufen' | 'schatzkammer' | 'laternen' | 'spross' | 'zionwege' | 'handmuehle' | 'siegel' | 'naamanerde' | 'garben' | 'keltern' | 'kuehenil' | 'umarmen' | 'begegnung' | 'zeugen' | 'sprachen' | 'koerbe' | 'huepfen' | 'wagen' | 'spaehen' | 'eselladen' | 'hebrontor' | 'festzug' | 'lichtweg' | 'synagoge' | 'zehn' | 'kinder' | 'hundertfach' | 'anhalten' | 'herberge' | 'heimtragen' | 'heimweg'
+export type TaskKind = 'quiz' | 'zaehlen' | 'ausmalen' | 'puzzle' | 'weg' | 'ernten' | 'memory' | 'sortieren' | 'wimmelbild' | 'teilen' | 'bauen' | 'punkte' | 'steuern' | 'reihenfolge' | 'giessen' | 'lichter' | 'lueckenvers' | 'echo' | 'kanaele' | 'spiegeln' | 'saeen' | 'hueten' | 'fehlt' | 'wischen' | 'kette' | 'stapeln' | 'spur' | 'waage' | 'sternbild' | 'schieben' | 'kurbel' | 'halten' | 'jahre' | 'fangen' | 'schaetzen' | 'bund' | 'staffel' | 'kreis' | 'voegel' | 'ringe' | 'silber' | 'hinweise' | 'fokus' | 'packen' | 'verstecken' | 'abseilen' | 'schritt' | 'backen' | 'still' | 'hoehle' | 'worfeln' | 'wort' | 'tau' | 'weiche' | 'schleichen' | 'zeichen' | 'flechten' | 'leuchten' | 'unterschied' | 'takt' | 'manna' | 'worte' | 'wolke' | 'jordan' | 'suppe' | 'bord' | 'strand' | 'saecke' | 'schatten' | 'tage' | 'standbild' | 'lampe' | 'zeiten' | 'raben' | 'hoehlen' | 'regen' | 'sausen' | 'nachlese' | 'epha' | 'aelteste' | 'wiege' | 'oberkleid' | 'kuehe' | 'stein' | 'suchen' | 'gepaeck' | 'volk' | 'harfe' | 'hirte' | 'kiesel' | 'schleuder' | 'pfeil' | 'zipfel' | 'leise' | 'thron' | 'kruege' | 'tauchen' | 'schmuecken' | 'ehren' | 'ritt' | 'posaune' | 'friede' | 'schmieden' | 'krippe' | 'zeichen' | 'bahn' | 'netz' | 'boote' | 'dach' | 'arme' | 'richter' | 'signal' | 'traube' | 'krug' | 'genug' | 'wachteln' | 'stab' | 'schlange' | 'eselin' | 'einsetzen' | 'schoepfen' | 'gedraenge' | 'buendel' | 'brote' | 'rudern' | 'umkehr' | 'ruf' | 'graben' | 'muenze' | 'entgegen' | 'klettern' | 'halbieren' | 'loesen' | 'bereiten' | 'lampen' | 'helfen' | 'fischzug' | 'weiden' | 'botengang' | 'wanderweg' | 'tischdecken' | 'fensterlaeden' | 'lot' | 'sitzplaetze' | 'zwoelf' | 'zaehlung' | 'hirtenfeuer' | 'weitersagen' | 'stern' | 'bachsteine' | 'gebote' | 'tor' | 'zepter' | 'boten' | 'schriftrolle' | 'schattenweg' | 'sonnenaufgang' | 'saum' | 'ufer' | 'froesche' | 'becher' | 'pfand' | 'laubhuetten' | 'wunschkarten' | 'floesse' | 'schnitzen' | 'granatapfel' | 'stufen' | 'schatzkammer' | 'laternen' | 'spross' | 'zionwege' | 'handmuehle' | 'siegel' | 'naamanerde' | 'garben' | 'keltern' | 'kuehenil' | 'umarmen' | 'begegnung' | 'zeugen' | 'sprachen' | 'koerbe' | 'huepfen' | 'wagen' | 'spaehen' | 'eselladen' | 'hebrontor' | 'festzug' | 'gerade' | 'wiederfinden' | 'segel' | 'purpur' | 'werkstatt' | 'wandschatten' | 'beiseite' | 'bretter' | 'reisig' | 'besuch' | 'schreiben' | 'briefe' | 'lob' | 'palmen' | 'perlentore' | 'lichtweg' | 'synagoge' | 'zehn' | 'kinder' | 'hundertfach' | 'anhalten' | 'herberge' | 'heimtragen' | 'heimweg'
 
 export interface AdventureQuestion {
   q: string
@@ -1031,6 +1037,8 @@ export interface LowerGame {
   warnLead: number
   knots: number
   rounds: LowerRound[]
+  /** Own words for another descent than the red rope of Joshua: the line of the field (`{n}` men down of `{total}` rounds may stand in it) and the line at the end. */
+  texts?: { field?: string; done?: string }
 }
 
 /** A round of the step game: the beats a minute, the steps to take and how far from the beat a tap may be (seconds). */
@@ -1930,6 +1938,21 @@ export interface StageTask {
   donkeyLoad?: DonkeyLoadGame
   gateTime?: HebronGateGame
   festMarch?: FestMarchGame
+  straightStreet?: StreetGame
+  refind?: RefindGame
+  sailTrim?: SailGame
+  dye?: DyeGame
+  tentShop?: TentShopGame
+  wallShadows?: WallShadowGame
+  quietSpot?: QuietSpotGame
+  planks?: PlanksGame
+  brushwood?: BrushwoodGame
+  visitors?: VisitorsGame
+  write?: WriteGame
+  letters?: LettersGame
+  praise?: PraiseGame
+  palms?: PalmsGame
+  gates?: GatesGame
   flame?: FlameGame
   synagogue?: SynagogueGame
   ten?: TenGame

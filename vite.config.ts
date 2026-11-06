@@ -1,4 +1,4 @@
-import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripDavidFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles, stripGleichnisseFiles, stripZachaeusFiles, stripLetztewocheFiles, stripOsternFiles, stripPfingstenFiles } from './vite.config.noah'
+import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripDavidFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles, stripGleichnisseFiles, stripZachaeusFiles, stripLetztewocheFiles, stripOsternFiles, stripPfingstenFiles, stripPaulusFiles } from './vite.config.noah'
 import { fileURLToPath, URL } from 'node:url'
 import { resolve, dirname } from 'node:path'
 import { rmSync } from 'node:fs'
@@ -178,6 +178,10 @@ export default defineConfig(({ mode }) => {
       // The same for "Pfingsten" (`VITE_INCLUDE_PFINGSTEN=true` / `vite --mode pfingsten`).
       if (env.VITE_SHOW_PFINGSTEN !== 'true' && env.VITE_INCLUDE_PFINGSTEN !== 'true') {
         stripPfingstenFiles(outDir)
+      }
+      // The same for "Paulus" (`VITE_INCLUDE_PAULUS=true` / `vite --mode paulus`).
+      if (env.VITE_SHOW_PAULUS !== 'true' && env.VITE_INCLUDE_PAULUS !== 'true') {
+        stripPaulusFiles(outDir)
       }
     }
   }

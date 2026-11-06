@@ -121,6 +121,21 @@ import GameWanderweg from '@/components/molecules/games/GameWanderweg.vue'
 import GameTischdecken from '@/components/molecules/games/GameTischdecken.vue'
 import GameFensterlaeden from '@/components/molecules/games/GameFensterlaeden.vue'
 import GameLichtweg from '@/components/molecules/games/GameLichtweg.vue'
+import GameSchreiben from '@/components/molecules/games/GameSchreiben.vue'
+import GameBriefe from '@/components/molecules/games/GameBriefe.vue'
+import GameLob from '@/components/molecules/games/GameLob.vue'
+import GamePalmen from '@/components/molecules/games/GamePalmen.vue'
+import GamePerlentore from '@/components/molecules/games/GamePerlentore.vue'
+import GameWandschatten from '@/components/molecules/games/GameWandschatten.vue'
+import GameBeiseite from '@/components/molecules/games/GameBeiseite.vue'
+import GameBretter from '@/components/molecules/games/GameBretter.vue'
+import GameReisig from '@/components/molecules/games/GameReisig.vue'
+import GameBesuch from '@/components/molecules/games/GameBesuch.vue'
+import GameGerade from '@/components/molecules/games/GameGerade.vue'
+import GameWiederfinden from '@/components/molecules/games/GameWiederfinden.vue'
+import GameSegel from '@/components/molecules/games/GameSegel.vue'
+import GamePurpur from '@/components/molecules/games/GamePurpur.vue'
+import GameWerkstatt from '@/components/molecules/games/GameWerkstatt.vue'
 import GameEselLaden from '@/components/molecules/games/GameEselLaden.vue'
 import GameHebrontor from '@/components/molecules/games/GameHebrontor.vue'
 import GameFestzug from '@/components/molecules/games/GameFestzug.vue'
@@ -524,7 +539,7 @@ const hasPart = computed(() => partStars.value > 0 && !progress.finished.value)
 
 /** The games have a restart sign: a new key mounts the game afresh (round, mistakes and what was done begin again). */
 const gameKey = ref(0)
-const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew', 'overboard', 'shore', 'sacks', 'shade', 'days', 'statue', 'lamp', 'hours', 'ravens', 'caves', 'rain', 'whisper', 'glean', 'measure', 'elders', 'cradle', 'coat', 'cows', 'stone', 'search', 'baggage', 'gather', 'harp', 'shepherd', 'pebbles', 'sling', 'arrow', 'hem', 'quiet', 'throne', 'jars', 'dive', 'decor', 'honor', 'ride', 'post', 'peace', 'forge', 'crib', 'sign', 'road', 'net', 'boats', 'roof', 'bail', 'crowd', 'bundle', 'bread', 'row', 'turnBack', 'shout', 'dig', 'coin', 'meet', 'climb', 'halve', 'unwrap', 'prepare', 'lamps', 'help','arms', 'judges', 'signal', 'grapes', 'jugs', 'enough', 'quails', 'staffs', 'serpent', 'donkey', 'commission', 'fischzug', 'graze', 'errand', 'wander', 'table', 'shutters', 'synagogue', 'ten', 'children', 'plumb', 'seats', 'twelve', 'census', 'fire', 'tell', 'star', 'stepStones', 'commandment', 'gateWatch', 'sceptre', 'riders', 'scroll', 'shadowWalk', 'sunrise', 'hemTouch', 'bankPath', 'frogFlick', 'cupCarry', 'pledges', 'booths', 'wishCards', 'rafts', 'carving', 'pomegranates', 'stairs', 'treasury', 'lanterns', 'shootGrow', 'zionPaths', 'handMill', 'sealTurn', 'earthLoad', 'sheavesBow', 'winePress', 'nileCows', 'embrace2', 'meeting', 'witness', 'tongues', 'fill', 'hop', 'chariot', 'peek', 'donkeyLoad', 'gateTime', 'festMarch', 'flame', 'yieldGame', 'halt', 'inn', 'carryHome', 'homeward'] as const
+const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew', 'overboard', 'shore', 'sacks', 'shade', 'days', 'statue', 'lamp', 'hours', 'ravens', 'caves', 'rain', 'whisper', 'glean', 'measure', 'elders', 'cradle', 'coat', 'cows', 'stone', 'search', 'baggage', 'gather', 'harp', 'shepherd', 'pebbles', 'sling', 'arrow', 'hem', 'quiet', 'throne', 'jars', 'dive', 'decor', 'honor', 'ride', 'post', 'peace', 'forge', 'crib', 'sign', 'road', 'net', 'boats', 'roof', 'bail', 'crowd', 'bundle', 'bread', 'row', 'turnBack', 'shout', 'dig', 'coin', 'meet', 'climb', 'halve', 'unwrap', 'prepare', 'lamps', 'help','arms', 'judges', 'signal', 'grapes', 'jugs', 'enough', 'quails', 'staffs', 'serpent', 'donkey', 'commission', 'fischzug', 'graze', 'errand', 'wander', 'table', 'shutters', 'synagogue', 'ten', 'children', 'plumb', 'seats', 'twelve', 'census', 'fire', 'tell', 'star', 'stepStones', 'commandment', 'gateWatch', 'sceptre', 'riders', 'scroll', 'shadowWalk', 'sunrise', 'hemTouch', 'bankPath', 'frogFlick', 'cupCarry', 'pledges', 'booths', 'wishCards', 'rafts', 'carving', 'pomegranates', 'stairs', 'treasury', 'lanterns', 'shootGrow', 'zionPaths', 'handMill', 'sealTurn', 'earthLoad', 'sheavesBow', 'winePress', 'nileCows', 'embrace2', 'meeting', 'witness', 'tongues', 'fill', 'hop', 'chariot', 'peek', 'donkeyLoad', 'gateTime', 'festMarch', 'straightStreet', 'refind', 'sailTrim', 'dye', 'tentShop', 'wallShadows', 'quietSpot', 'planks', 'brushwood', 'visitors', 'write', 'letters', 'praise', 'palms', 'gates', 'flame', 'yieldGame', 'halt', 'inn', 'carryHome', 'homeward'] as const
 const hasGame = computed(() => hasCountGame.value || GAME_FIELDS.some((f) => !!gameTask.value?.[f]))
 /** A game begins only when the child taps "play" (many games run on their own clock: the text and the hint are read first). */
 const started = ref(false)
@@ -782,6 +797,21 @@ const gameKind = computed(() => {
   if (g?.donkeyLoad) return 'donkeyLoad'
   if (g?.gateTime) return 'gateTime'
   if (g?.festMarch) return 'festMarch'
+  if (g?.straightStreet) return 'straightStreet'
+  if (g?.refind) return 'refind'
+  if (g?.sailTrim) return 'sailTrim'
+  if (g?.dye) return 'dye'
+  if (g?.tentShop) return 'tentShop'
+  if (g?.wallShadows) return 'wallShadows'
+  if (g?.quietSpot) return 'quietSpot'
+  if (g?.planks) return 'planks'
+  if (g?.brushwood) return 'brushwood'
+  if (g?.visitors) return 'visitors'
+  if (g?.write) return 'write'
+  if (g?.letters) return 'letters'
+  if (g?.praise) return 'praise'
+  if (g?.palms) return 'palms'
+  if (g?.gates) return 'gates'
   if (g?.flame) return 'flame'
   if (g?.yieldGame) return 'yieldGame'
   if (g?.halt) return 'halt'
@@ -1074,6 +1104,21 @@ function openGift() {
         GameEselLaden(:key="gameKey" v-else-if="gameTask?.donkeyLoad" :game="gameTask.donkeyLoad" @done="taskDone")
         GameHebrontor(:key="gameKey" v-else-if="gameTask?.gateTime" :game="gameTask.gateTime" @done="taskDone")
         GameFestzug(:key="gameKey" v-else-if="gameTask?.festMarch" :game="gameTask.festMarch" @done="taskDone")
+        GameGerade(:key="gameKey" v-else-if="gameTask?.straightStreet" :game="gameTask.straightStreet" @done="taskDone")
+        GameWiederfinden(:key="gameKey" v-else-if="gameTask?.refind" :game="gameTask.refind" @done="taskDone")
+        GameSegel(:key="gameKey" v-else-if="gameTask?.sailTrim" :game="gameTask.sailTrim" @done="taskDone")
+        GamePurpur(:key="gameKey" v-else-if="gameTask?.dye" :game="gameTask.dye" @done="taskDone")
+        GameWerkstatt(:key="gameKey" v-else-if="gameTask?.tentShop" :game="gameTask.tentShop" @done="taskDone")
+        GameWandschatten(:key="gameKey" v-else-if="gameTask?.wallShadows" :game="gameTask.wallShadows" @done="taskDone")
+        GameBeiseite(:key="gameKey" v-else-if="gameTask?.quietSpot" :game="gameTask.quietSpot" @done="taskDone")
+        GameBretter(:key="gameKey" v-else-if="gameTask?.planks" :game="gameTask.planks" @done="taskDone")
+        GameReisig(:key="gameKey" v-else-if="gameTask?.brushwood" :game="gameTask.brushwood" @done="taskDone")
+        GameBesuch(:key="gameKey" v-else-if="gameTask?.visitors" :game="gameTask.visitors" @done="taskDone")
+        GameSchreiben(:key="gameKey" v-else-if="gameTask?.write" :game="gameTask.write" @done="taskDone")
+        GameBriefe(:key="gameKey" v-else-if="gameTask?.letters" :game="gameTask.letters" @done="taskDone")
+        GameLob(:key="gameKey" v-else-if="gameTask?.praise" :game="gameTask.praise" @done="taskDone")
+        GamePalmen(:key="gameKey" v-else-if="gameTask?.palms" :game="gameTask.palms" @done="taskDone")
+        GamePerlentore(:key="gameKey" v-else-if="gameTask?.gates" :game="gameTask.gates" @done="taskDone")
         GameLichtweg(:key="gameKey" v-else-if="gameTask?.flame" :game="gameTask.flame" @done="taskDone")
         GameHundertfach(:key="gameKey" v-else-if="gameTask?.yieldGame" :game="gameTask.yieldGame" @done="taskDone")
         GameAnhalten(:key="gameKey" v-else-if="gameTask?.halt" :game="gameTask.halt" @done="taskDone")

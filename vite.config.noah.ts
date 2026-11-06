@@ -267,3 +267,11 @@ export const PFINGSTEN_ONLY_DIRS = ['images/abenteuer/pfingsten', 'images/abente
 export function stripPfingstenFiles(outDir: string) {
   strip(outDir, PFINGSTEN_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Paulus" (id `paulus`, part 1) alone, in the same three places as Adam and Eve. */
+export const PAULUS_ONLY_DIRS = ['images/abenteuer/paulus', 'images/abenteuer/spiele/paulus', 'audio/abenteuer/paulus']
+
+/** Takes the folders of Paulus out of a finished build. */
+export function stripPaulusFiles(outDir: string) {
+  strip(outDir, PAULUS_ONLY_DIRS)
+}

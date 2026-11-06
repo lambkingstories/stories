@@ -82,6 +82,12 @@ const announce = ref('')
 const flash = ref<'good' | 'bad' | null>(null)
 const src = (p: string) => prependBaseUrl(p)
 const stars = computed(() => mistakeStars(seen.value, 1, 3))
+/** The line of the field (read by the screen reader): the words of the journey (`{n}` and `{total}` allowed), or the Joshua words. */
+const fieldText = computed(() =>
+  props.game.texts?.field
+    ? props.game.texts.field.replace('{n}', String(downCount.value)).replace('{total}', String(rounds.value.length))
+    : t('app.adventure.lowerField', { n: downCount.value, total: rounds.value.length })
+)
 let last = 0
 let lastInput = 0
 
@@ -256,7 +262,7 @@ const lightStyle = computed(() => ({ left: `${shownX.value ?? 0}%`, top: `${prop
         class="lw-field"
         :class="{ holding }"
         role="group"
-        :aria-label="t('app.adventure.lowerField', { n: downCount, total: rounds.length })"
+        :aria-label="fieldText"
         :style="{ backgroundImage: `url(${src(game.background)})` }"
         @pointerdown.prevent="pointerDown"
         @pointerup="pointerUp"
@@ -286,7 +292,7 @@ const lightStyle = computed(() => ({ left: `${shownX.value ?? 0}%`, top: `${prop
         @pointerup="pointerUp"
         @click.stop="toggle"
       ) {{ t('app.adventure.lowerHold') }}
-    GameDone(v-else :stars="stars" :text="t('app.adventure.lowerDone')" @next="emit('done', stars)")
+    GameDone(v-else :stars="stars" :text="game.texts?.done ?? t('app.adventure.lowerDone')" @next="emit('done', stars)")
 </template>
 
 <style scoped lang="sass">

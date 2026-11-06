@@ -34,5 +34,6 @@ export const REWARD_GAMES: Record<string, number[]> = {
   zachaeus: [2, 4],
   letztewoche: [1, 4, 5],
   ostern: [7, 8],
-  pfingsten: [7, 2]
+  pfingsten: [7, 2],
+  paulus: [5, 9]
 }

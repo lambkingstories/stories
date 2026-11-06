@@ -1639,3 +1639,53 @@ describe('the hidden journey Pfingsten (id pfingsten)', () => {
     expect(m.journeys.filter((j) => j.id === 'pfingsten')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Paulus (id paulus)', () => {
+  it('a normal build (without Paulus) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_PAULUS', 'false')
+    open('?paulus=paulus-vorschau-r6t9')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('paulus')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_PAULUS', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?paulus=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.PAULUS_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?paulus=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_PAULUS', 'true')
+    const first = await load()
+    open(`?paulus=${first.PAULUS_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.PAULUS_UNLOCK_CODE).toBe('paulus-vorschau-r6t9')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'paulus'])
+    expect(localStorage.getItem('lk-preview-paulus')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('paulus')?.stages.length).toBe(9)
+    open('?paulus=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-paulus')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_PAULUS) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_PAULUS', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'paulus')).toHaveLength(1)
+  })
+})
