@@ -1421,7 +1421,7 @@ describe('a build without Bis nach Rom ships nothing of it', () => {
   it('removing takes the folders of Bis nach Rom out of a build and leaves everything else (the other journeys, the sounds)', () => {
     const out = mkdtempSync(join(tmpdir(), 'lk-build-paulusrom-'))
     try {
-      const paulusromFiles = ['audio/abenteuer/paulusrom/geschichte-01-v1.mp3', 'images/abenteuer/paulusrom/etappe-bild-01.webp', 'images/abenteuer/spiele/paulusrom/bretter/bucht.webp']
+      const paulusromFiles = ['audio/abenteuer/paulusrom/geschichte-01-v1.mp3', 'images/abenteuer/paulusrom/etappe-bild-01-v2.webp', 'images/abenteuer/spiele/paulusrom/bretter/bucht.webp']
       const keep = ['images/abenteuer/josef/etappe-01.webp', 'images/abenteuer/ostern/etappe-bild-02.webp', 'images/abenteuer/spiele/ostern/fischzug/see.webp', 'images/abenteuer/spiele/pfingsten/wagen/fern.webp', 'audio/abenteuer/klang-stern.mp3']
       for (const f of [...paulusromFiles, ...keep]) {
         mkdirSync(join(out, f, '..'), { recursive: true })

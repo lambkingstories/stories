@@ -20,7 +20,7 @@ import { localize } from './localize'
 import { adventureLanguage } from '@/use/adventureLanguage'
 import { paulusromEn } from './en/paulusrom.en'
 
-// Etappenbilder (Variante a, bei b mit Endung -b nach Antons Wahl): `images/abenteuer/paulusrom/etappe-bild-NN.webp`, 960 × 640
+// Etappenbilder (Antons Wahl 6.11.2026: 1b 2a 3b 4b 5a 6b 7a 8a 9b; geaenderte Bilder heissen etappe-bild-NN-v2.webp wegen Handy-Cache): `images/abenteuer/paulusrom/etappe-bild-NN.webp`, 960 × 640
 const PICS = 'images/abenteuer/paulusrom/'
 
 const G = 'images/abenteuer/spiele/paulusrom/'
@@ -247,7 +247,7 @@ export const paulusrom: Journey = {
   subtitle: 'Paulus reist in die Hauptstadt der Welt',
   age: '8-10',
   downloadMb: 17, // grob geschätzt (Bilder, Karte, Spielbilder, Musik, Aufnahmen), die Leitung misst nach dem Einbau nach
-  medal: `${PICS}medaille-v1.webp`, // Medaille 1 bis zu Antons Wahl
+  medal: `${PICS}medaille-v3.webp`, // Medaille 3 (Antons Wahl 6.11.2026)
   // Geschenk-Ausmalbild: das Schiff vor Malta (Konturzeichnung, ohne Menschen, ohne Schlange)
   gift: { title: 'Das Schiff vor Malta', image: `${PICS}geschenk.webp` },
   // die gemalte Karte (Panorama in drei Stücken, 9920 × 1648 px, Bildmodell von Antons Codex bzw. OpenAI-API nur fürs Panorama): eine Seereise von Ost nach West, Athen, Troas, Milet, Jerusalem, Cäsarea,
@@ -274,7 +274,7 @@ export const paulusrom: Journey = {
   stages: [
     {
       id: 1,
-      image: `${PICS}etappe-bild-01.webp`,
+      image: `${PICS}etappe-bild-01-v2.webp`,
       title: 'Dem unbekannten Gott',
       ref: 'Apostelgeschichte 17,16–34',
       text: [
@@ -310,7 +310,7 @@ export const paulusrom: Journey = {
     },
     {
       id: 3,
-      image: `${PICS}etappe-bild-03.webp`,
+      image: `${PICS}etappe-bild-03-v2.webp`,
       title: 'Abschied in Milet',
       ref: 'Apostelgeschichte 20,13–38',
       text: [
@@ -329,7 +329,7 @@ export const paulusrom: Journey = {
     },
     {
       id: 4,
-      image: `${PICS}etappe-bild-04.webp`,
+      image: `${PICS}etappe-bild-04-v2.webp`,
       title: 'Der Neffe des Paulus',
       ref: 'Apostelgeschichte 21,27–23,24',
       text: [
@@ -365,7 +365,7 @@ export const paulusrom: Journey = {
     },
     {
       id: 6,
-      image: `${PICS}etappe-bild-06.webp`,
+      image: `${PICS}etappe-bild-06-v2.webp`,
       title: 'Sturm auf dem Meer',
       ref: 'Apostelgeschichte 27,1–26',
       text: [
@@ -384,7 +384,7 @@ export const paulusrom: Journey = {
     },
     {
       id: 7,
-      image: `${PICS}etappe-bild-07.webp`,
+      image: `${PICS}etappe-bild-07-v2.webp`,
       title: 'Alle kommen an Land',
       ref: 'Apostelgeschichte 27,27–44',
       text: [
@@ -420,7 +420,7 @@ export const paulusrom: Journey = {
     },
     {
       id: 9,
-      image: `${PICS}etappe-bild-09.webp`,
+      image: `${PICS}etappe-bild-09-v2.webp`,
       title: 'Unverboten in Rom',
       ref: 'Apostelgeschichte 28,10–31',
       text: [

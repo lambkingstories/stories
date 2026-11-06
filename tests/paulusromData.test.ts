@@ -44,7 +44,7 @@ describe('Bis nach Rom: stories and questions', () => {
       expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(100)
       expect(words, `words ${s.id}`).toBeLessThanOrEqual(190)
       expect(text, `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.image, `stage ${s.id}`).toMatch(new RegExp(`^images/abenteuer/paulusrom/etappe-bild-${String(s.id).padStart(2, '0')}(-b)?\\.webp$`))
+      expect(s.image, `stage ${s.id}`).toMatch(new RegExp(`^images/abenteuer/paulusrom/etappe-bild-${String(s.id).padStart(2, '0')}(-b|-v2)?\\.webp$`))
     }
     expect(paulusrom.stages.map((s) => s.ref.split(',')[0])).toEqual([
       'Apostelgeschichte 17',
