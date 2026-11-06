@@ -112,7 +112,11 @@ const isLast = computed(() => index.value >= deck.value.length - 1)
 /** The word was painted in the painting program: the card is back with the time over (or "Done" pressed) and asks who guessed it. */
 const painted = ref(false)
 const paintedOver = ref(false)
-const timeUp = computed(() => phase.value === 'card' && (painted.value ? paintedOver.value : left.value <= 0))
+/** The painting program could not be opened (the hand-over could not be written): the card then works like the others, with the sand. */
+const noPaintApp = ref(false)
+/** A card whose way is "paint": the word is shown first, the painting program opens when the person taps the button (the time starts there). */
+const readyToPaint = computed(() => phase.value === 'card' && card.value?.mode === 'draw' && !painted.value && !noPaintApp.value)
+const timeUp = computed(() => phase.value === 'card' && !readyToPaint.value && (painted.value ? paintedOver.value : left.value <= 0))
 const placing = computed(() => ranking(names.value, scores.value))
 const winners = computed(() => placing.value.filter((p) => p.rank === 1))
 /** The same order as `ranking` (it sorts stably), so every place knows which team (which token) it is. */
@@ -186,8 +190,8 @@ function start() {
 }
 
 /**
- * A card whose way is "paint" goes straight to the painting program (blank sheet, the word and the sand in a band on top); the others
- * look at the word on the medallion. What is kept is the hand-over of this card, so the round comes back to the same card.
+ * A card whose way is "paint" first shows the word (like the others); the button there goes to the painting program (blank sheet, the
+ * word and the sand in a band on top). What is kept is the hand-over of this card, so the round comes back to the same card.
  */
 function paintCard(c: ActivityCard): boolean {
   keep()
@@ -217,9 +221,7 @@ function returnFromPaint() {
 }
 
 /** The card is shown and the time runs (by the clock, so it stays right when the screen sleeps a moment). */
-function showCard() {
-  if (card.value?.mode === 'draw' && paintCard(card.value)) return
-  painted.value = false
+function runClock() {
   left.value = seconds.value
   deadline = Date.now() + seconds.value * 1000
   stopTimer()
@@ -227,8 +229,30 @@ function showCard() {
     left.value = Math.max(0, Math.ceil((deadline - Date.now()) / 1000))
     if (left.value <= 0) stopTimer()
   }, 250)
+}
+
+function showCard() {
+  painted.value = false
+  noPaintApp.value = false
+  stopTimer()
+  if (card.value?.mode === 'draw') {
+    // no sand yet: the word is shown, and the time starts when the painting program opens
+    left.value = seconds.value
+    keep()
+  } else {
+    runClock()
+  }
   void play('cardTurn')
   phase.value = 'card'
+}
+
+/** The button of a paint card: to the painting program; when that is not possible the card goes on like the others, with the sand. */
+function goPaint() {
+  const c = card.value
+  if (!c || c.mode !== 'draw') return
+  if (paintCard(c)) return
+  noPaintApp.value = true
+  runClock()
 }
 
 watch(timeUp, (up) => {
@@ -335,7 +359,7 @@ returnFromPaint()
                 span(class="fa-mode") {{ t(`app.activity.mode_${card?.mode ?? 'explain'}`) }}
                 span(class="fa-word" :style="{ fontSize: wordSize + 'rem' }") {{ card?.word }}
           div(class="fa-side")
-            div(v-if="!painted || paintedOver" class="fa-clock" :class="{ 'is-up': timeUp, 'is-low': !timeUp && !painted && left <= 10 }")
+            div(v-if="!readyToPaint && (!painted || paintedOver)" class="fa-clock" :class="{ 'is-up': timeUp, 'is-low': !timeUp && !painted && left <= 10 }")
               img(:src="hourglass" alt="" class="fa-glass" draggable="false" @error="hideImg")
               div(class="fa-time")
                 div(class="fa-track" aria-hidden="true")
@@ -343,12 +367,14 @@ returnFromPaint()
                 p(class="fa-left" role="timer") {{ timeUp ? t('app.activity.timeUp') : t('app.activity.secondsLeft', { n: left }) }}
             MapPaper(v-if="!painted" kind="strip")
               span(class="fa-strip") {{ t(`app.activity.rule_${card?.mode ?? 'explain'}`) }}
-            h3(class="fa-h fa-h--center") {{ t('app.activity.whoGuessed') }}
-            div(class="fa-figures")
+            //- a paint card: first the word, then the button to the painting program
+            MapButton(v-if="readyToPaint" @click="goPaint") {{ t('app.activity.paintGo') }}
+            h3(v-if="!readyToPaint" class="fa-h fa-h--center") {{ t('app.activity.whoGuessed') }}
+            div(v-if="!readyToPaint" class="fa-figures")
               button(v-for="(n, i) in names" :key="i" type="button" :class="['fa-fig', { 'is-turn': i === team }]" :aria-label="t('app.activity.guessedBy', { team: n })" @click="answer(i)")
                 MapToken(:index="i" :size="wide ? 36 : 44" :lit="i === team")
                 span(class="fa-fig-name") {{ n }}
-            MapButton(quiet @click="answer(null)") {{ t('app.activity.wrong') }}
+            MapButton(v-if="!readyToPaint" quiet @click="answer(null)") {{ t('app.activity.wrong') }}
 
       //- ===== the end =====
       template(v-else)

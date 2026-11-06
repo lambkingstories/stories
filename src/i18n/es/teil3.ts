@@ -281,6 +281,7 @@ export default {
     mode_explain: 'Explicar',
     mode_draw: 'Pintar',
     paintBand: 'Pinta: {word}',
+    paintGo: 'Abrir la app de pintura',
     paintDone: 'Listo',
     paintTimeUp: '¡Se acabó el tiempo!',
     modeHint_draw: 'Se pinta directamente en la app de pintura, sin hablar.',
