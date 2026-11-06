@@ -449,13 +449,18 @@ for (const st of pfingsten.stages) {
 }
 
 // the German recordings of the stories (voice Achernar, files "geschichte-NN-v1.mp3"); until they are made the app reads with the voice of the device. Remove a number from this list when its file is in.
-const WITHOUT_RECORDING = new Set<number>([1, 2, 3, 4, 5, 6, 7, 8, 9])
+const WITHOUT_RECORDING = new Set<number>([])
 for (const s of pfingsten.stages) {
   const file = `audio/abenteuer/pfingsten/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' || WITHOUT_RECORDING.has(s.id) ? undefined : file), enumerable: true, configurable: true })
 }
 
-// the music of its own is not made yet: until then the general pieces play (journeyFiles puts them into the pack)
+// the background music of this adventure: three pieces made with Google's Lyria (morning in Jerusalem, the road to Gaza, by the sea at Joppa); they follow one another at random
+pfingsten.music = [
+  'audio/abenteuer/pfingsten/musik-jerusalem-v1.mp3',
+  'audio/abenteuer/pfingsten/musik-gaza-v1.mp3',
+  'audio/abenteuer/pfingsten/musik-joppe-v1.mp3'
+]
 
 // the English texts (title, stories, questions, hints) lie over the German ones; the screens show them when the app is English
 localize(pfingsten, pfingstenEn)
