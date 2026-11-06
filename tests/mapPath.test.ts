@@ -32,6 +32,7 @@ import { ostern } from '../src/data/adventures/ostern'
 import { pfingsten } from '../src/data/adventures/pfingsten'
 import { paulus } from '../src/data/adventures/paulus'
 import { paulusrom } from '../src/data/adventures/paulusrom'
+import { offenbarung } from '../src/data/adventures/offenbarung'
 import type { Journey } from '../src/types/adventure'
 
 /** Rules for the dotted way on the maps (Anton, 19.10.2026): into every medal from the left, out of it on the right, always curved, 10 beads between two medals. */
@@ -70,7 +71,8 @@ describe.each([
   ['Ostern', ostern],
   ['Pfingsten', pfingsten],
   ['Paulus', paulus],
-  ['Bis nach Rom', paulusrom]
+  ['Bis nach Rom', paulusrom],
+  ['Alles wird neu', offenbarung]
 ] as [string, Journey][])('the dotted way of %s', (_name, j) => {
   const m = j.map
   const spots = [...m.stages, m.exam]

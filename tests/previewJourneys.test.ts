@@ -1739,3 +1739,53 @@ describe('the hidden journey Bis nach Rom (id paulusrom)', () => {
     expect(m.journeys.filter((j) => j.id === 'paulusrom')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Alles wird neu (id offenbarung)', () => {
+  it('a normal build (without Alles wird neu) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_OFFENBARUNG', 'false')
+    open('?offenbarung=offenbarung-vorschau-q4m8')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('offenbarung')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_OFFENBARUNG', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?offenbarung=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.OFFENBARUNG_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?offenbarung=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_OFFENBARUNG', 'true')
+    const first = await load()
+    open(`?offenbarung=${first.OFFENBARUNG_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.OFFENBARUNG_UNLOCK_CODE).toBe('offenbarung-vorschau-q4m8')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'offenbarung'])
+    expect(localStorage.getItem('lk-preview-offenbarung')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('offenbarung')?.stages.length).toBe(9)
+    open('?offenbarung=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-offenbarung')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_OFFENBARUNG) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_OFFENBARUNG', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'offenbarung')).toHaveLength(1)
+  })
+})

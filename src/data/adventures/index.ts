@@ -92,6 +92,8 @@ export const PAULUS_PREVIEW_KEY = 'lk-preview-paulus'
 export const PAULUS_UNLOCK_CODE = 'paulus-vorschau-r6t9'
 export const PAULUSROM_PREVIEW_KEY = 'lk-preview-paulusrom'
 export const PAULUSROM_UNLOCK_CODE = 'paulusrom-vorschau-k4w8'
+export const OFFENBARUNG_PREVIEW_KEY = 'lk-preview-offenbarung'
+export const OFFENBARUNG_UNLOCK_CODE = 'offenbarung-vorschau-q4m8'
 
 /** A journey that is shown only on unlocked devices: the name of its link (`?<param>=<code>`), where the unlock is kept, and how it is loaded. */
 interface PreviewJourney {
@@ -418,6 +420,16 @@ function previewJourneys(): PreviewJourney[] {
       key: PAULUSROM_PREVIEW_KEY,
       always: import.meta.env.VITE_SHOW_PAULUSROM === 'true',
       load: async () => (await import('@/data/adventures/paulusrom')).paulusrom
+    })
+  }
+  if (import.meta.env.VITE_INCLUDE_OFFENBARUNG === 'true' || import.meta.env.VITE_SHOW_OFFENBARUNG === 'true') {
+    list.push({
+      id: 'offenbarung',
+      param: 'offenbarung',
+      code: OFFENBARUNG_UNLOCK_CODE,
+      key: OFFENBARUNG_PREVIEW_KEY,
+      always: import.meta.env.VITE_SHOW_OFFENBARUNG === 'true',
+      load: async () => (await import('@/data/adventures/offenbarung')).offenbarung
     })
   }
   if (import.meta.env.VITE_INCLUDE_NOAH === 'true' || import.meta.env.VITE_SHOW_NOAH === 'true') {

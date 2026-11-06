@@ -283,3 +283,11 @@ export const PAULUSROM_ONLY_DIRS = ['images/abenteuer/paulusrom', 'images/abente
 export function stripPaulusromFiles(outDir: string) {
   strip(outDir, PAULUSROM_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Alles wird neu" (id `offenbarung`) alone, in the same three places as Adam and Eve. */
+export const OFFENBARUNG_ONLY_DIRS = ['images/abenteuer/offenbarung', 'images/abenteuer/spiele/offenbarung', 'audio/abenteuer/offenbarung']
+
+/** Takes the folders of "Alles wird neu" out of a finished build. */
+export function stripOffenbarungFiles(outDir: string) {
+  strip(outDir, OFFENBARUNG_ONLY_DIRS)
+}
