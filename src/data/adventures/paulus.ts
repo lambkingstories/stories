@@ -474,7 +474,12 @@ for (const s of paulus.stages) {
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' || WITHOUT_RECORDING.has(s.id) ? undefined : file), enumerable: true, configurable: true })
 }
 
-// the music of its own is not made yet: until then the general pieces play (journeyFiles puts them into the pack)
+// the background music of this adventure: three pieces made with Google's Lyria (the road to Damascus, the sail to Cyprus, by the river at Philippi); they follow one another at random
+paulus.music = [
+  'audio/abenteuer/paulus/musik-damaskus-v1.mp3',
+  'audio/abenteuer/paulus/musik-zypern-v1.mp3',
+  'audio/abenteuer/paulus/musik-philippi-v1.mp3'
+]
 
 // the English texts (title, stories, questions, hints) lie over the German ones; the screens show them when the app is English
 localize(paulus, paulusEn)
