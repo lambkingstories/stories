@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * "Davids Schleuder": the big game (rules and physics in `utils/davidGame.ts`, this file draws it and takes the touch).
- * Five levels: the wolves, the bear, the lion, the storm, Goliath. The picture is 16:9; on a phone held upright a note asks to turn it.
+ * Ten levels: wolves, bears, lions and the pack, at the end Goliath. The picture is 16:9; on a phone held upright a note asks to turn it.
  */
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -13,6 +13,7 @@ import useMusic from '@/use/useMusic'
 import { prependBaseUrl } from '@/utils/function'
 import {
   GOLIATH_K,
+  GOLIATH_LEVEL,
   GROUND,
   H,
   LEVELS,
@@ -29,6 +30,7 @@ import {
   shoot,
   starsFor,
   step,
+  sway,
   type Animal,
   type Game,
   type Kind
@@ -44,7 +46,7 @@ const ID = 'david'
 // ── the pictures ────────────────────────────────────────────────────────────────────────────────────────────────────────────
 const NAMES = [
   'wiese', 'david-bereit', 'david-spannt', 'david-spannt-koerper', 'david-arm', 'david-schiesst', 'stein', 'schaf', 'schaf-grasen', 'lamm', 'busch', 'fels-gross', 'fels-mittel', 'fels-klein',
-  'wolf-a', 'wolf-b', 'wolf-treffer', 'baer-a', 'baer-b', 'baer-treffer', 'loewe-a', 'loewe-b', 'loewe-treffer', 'goliat-a', 'goliat-b', 'goliat-schild'
+  'wolf-a', 'wolf-b', 'wolf-treffer', 'baer-a', 'baer-b', 'baer-treffer', 'loewe-a', 'loewe-b', 'loewe-treffer', 'adler-a', 'adler-b', 'adler-treffer', 'goliat-a', 'goliat-b', 'goliat-schild', 'goliat-1', 'goliat-2', 'goliat-3', 'goliat-4'
 ]
 const img: Record<string, HTMLImageElement | undefined> = {}
 const loaded = ref(false)
@@ -82,7 +84,7 @@ const levelStars = computed(() => progress.levels(ID))
 const unlocked = (i: number) => i === 0 || (levelStars.value[i - 1] ?? 0) >= 1
 
 // what the page shows while it plays (the game itself is not reactive)
-const hud = reactive({ sheep: 3, stones: 0, wind: 0 })
+const hud = reactive({ sheep: 3, stones: 0 })
 const outcome = reactive({ phase: 'play' as 'play' | 'won' | 'lost', stars: 0, noStones: false })
 
 // ── the game ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -127,14 +129,28 @@ function start(i: number) {
   outcome.noStones = false
   hud.sheep = g.sheep
   hud.stones = g.stonesLeft
-  hud.wind = 0
   screen.value = 'play'
   paused.value = false
-  tipShown.value = i === 0 || i === 4
+  // in the first rounds the card explains the game first (the game waits)
+  how.value = progress.plays(ID) < 3
+  paused.value = how.value
+  tipShown.value = !how.value && (i === 0 || i === EAGLE_TIP_LEVEL || i === GOLIATH_LEVEL)
   window.setTimeout(() => (tipShown.value = false), 6500)
   tryLandscape()
 }
 const tipShown = ref(false)
+/** The first level with eagles gets a word about them. */
+const EAGLE_TIP_LEVEL = LEVELS.findIndex((l) => l.waves.some((w) => w.kind === 'eagle'))
+/** The card that explains the game: pull back and let go (in the first rounds, and from the button in the levels list). */
+const how = ref(false)
+/** A picture that is missing is not shown. */
+const hideBroken = (e: Event) => {
+  ;(e.target as HTMLElement).style.display = 'none'
+}
+function closeHow() {
+  how.value = false
+  if (screen.value === 'play') paused.value = false
+}
 
 function tryLandscape() {
   try {
@@ -254,8 +270,6 @@ function frame(now: number) {
     runners = runners.filter((r) => r.x > -150)
     if (hud.sheep !== g.sheep) hud.sheep = g.sheep
     if (hud.stones !== g.stonesLeft) hud.stones = g.stonesLeft
-    const w = Math.round(g.windNow / 10)
-    if (hud.wind !== w) hud.wind = w
   }
   draw(now / 1000)
 }
@@ -286,24 +300,36 @@ function spr(c: CanvasRenderingContext2D, name: string, cx: number, bottom: numb
 const KIND_SPRITE: Record<Exclude<Kind, 'goliath'>, { a: string; b: string; hit: string; k: number }> = {
   wolf: { a: 'wolf-a', b: 'wolf-b', hit: 'wolf-treffer', k: 0.5 },
   bear: { a: 'baer-a', b: 'baer-b', hit: 'baer-treffer', k: 0.77 },
-  lion: { a: 'loewe-a', b: 'loewe-b', hit: 'loewe-treffer', k: 0.57 }
+  lion: { a: 'loewe-a', b: 'loewe-b', hit: 'loewe-treffer', k: 0.57 },
+  eagle: { a: 'adler-a', b: 'adler-b', hit: 'adler-treffer', k: 0.42 }
+}
+
+/**
+ * The picture of Goliath's stride: four phases of a walk cycle (left foot forward, legs passing, right foot forward, legs passing), one step
+ * per 0.55 seconds. While those pictures are not painted yet, the two old ones take over.
+ */
+function goliathStep(a: Animal): string {
+  if (img['goliat-1'] && img['goliat-2'] && img['goliat-3'] && img['goliat-4']) return `goliat-${(Math.floor(a.t / 0.55) % 4) + 1}`
+  return Math.floor(a.t * 1.6) % 2 ? 'goliat-b' : 'goliat-a'
 }
 
 function drawAnimal(c: CanvasRenderingContext2D, a: Animal) {
   const bottom = GROUND - a.lift + 8
   if (a.kind === 'goliath') {
-    const name = a.shield > 0 ? 'goliat-schild' : Math.floor(a.t * 1.6) % 2 ? 'goliat-b' : 'goliat-a'
+    const name = a.shield > 0 ? 'goliat-schild' : goliathStep(a)
     // when he falls he tips forward, towards David
     const ease = a.fall * a.fall * (3 - 2 * a.fall)
-    spr(c, name, a.x, bottom, GOLIATH_K, false, -ease * (Math.PI / 2) * 0.96)
+    spr(c, name, a.x, bottom + sway(a), GOLIATH_K, false, -ease * (Math.PI / 2) * 0.96)
     return
   }
   const s = KIND_SPRITE[a.kind]
   const flee = a.mode === 'flee'
   const hurt = a.hit < 0.25
   const name = hurt ? s.hit : Math.floor(a.t * (flee ? 9 : 5)) % 2 ? s.b : s.a
-  const bob = Math.sin(a.t * 12) * 3
-  spr(c, name, a.x, bottom + bob, s.k, flee)
+  // the eagle beats its wings slower than a runner steps, and has no steps to bob
+  const wings = a.kind === 'eagle' ? (Math.floor(a.t * (flee ? 8 : 3.5)) % 2 ? s.b : s.a) : name
+  const bob = a.kind === 'eagle' ? 0 : Math.sin(a.t * 12) * 3
+  spr(c, hurt ? s.hit : wings, a.x, bottom + bob, s.k, flee)
 }
 
 function draw(time: number) {
@@ -457,11 +483,11 @@ function draw(time: number) {
 
 // ── the page ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 const stonesRow = computed(() => Array.from({ length: hud.stones }, (_, i) => i))
-const wonText = computed(() => (level.value === 4 ? t('app.bigGames.david.wonGoliath') : t('app.bigGames.david.won')))
+const wonText = computed(() => (level.value === GOLIATH_LEVEL ? t('app.bigGames.david.wonGoliath') : t('app.bigGames.david.won')))
 const resultText = computed(() => (outcome.phase === 'won' ? wonText.value : outcome.noStones ? t('app.bigGames.david.noStones') : t('app.bigGames.david.lost')))
 const levelTitle = (i: number) => levelNames.value[i] ?? String(i + 1)
-const windArrow = computed(() => (hud.wind === 0 ? '' : hud.wind > 0 ? '→' : '←'))
 const pic = (n: string) => prependBaseUrl(`images/spiele-gross/david/${n}.webp`)
+const arrowSrc = prependBaseUrl('images/spiele-gross/elia/wisch-pfeil.webp')
 
 function leave() {
   leaveFullscreen()
@@ -526,7 +552,9 @@ onBeforeUnmount(() => {
             span(class="dg-level-name") {{ levelTitle(i) }}
             AdventureStars(:stars="levelStars[i] ?? 0" :size="20")
         p(class="dg-rules") {{ t('app.bigGames.david.starRules') }}
-        AdvButton(tone="blau" small @click="leave") {{ t('app.bigGames.david.leave') }}
+        div(class="dg-menu-buttons")
+          AdvButton(tone="blau" small data-test="david-how" @click="how = true") {{ t('app.bigGames.david.howTitle') }}
+          AdvButton(tone="blau" small @click="leave") {{ t('app.bigGames.david.leave') }}
 
     //- the game
     template(v-else-if="screen === 'play'")
@@ -536,12 +564,11 @@ onBeforeUnmount(() => {
           img(v-for="n in hud.sheep" :key="n" :src="pic('schaf')" alt="" class="dg-ico")
         div(class="dg-hud-mid")
           span(class="dg-level-label") {{ levelTitle(level) }}
-          span(v-if="hud.wind !== 0" class="dg-wind") {{ t('app.bigGames.david.wind') }} {{ windArrow }} {{ Math.abs(hud.wind) }}
         div(class="dg-hud-group dg-hud-stones" :aria-label="t('app.bigGames.david.stones')")
           img(v-for="n in stonesRow" :key="n" :src="pic('stein')" alt="" class="dg-ico dg-ico--stone")
-      div(v-if="tipShown" class="dg-tip") {{ level === 4 ? t('app.bigGames.david.tipGoliath') : t('app.bigGames.david.tip') }}
+      div(v-if="tipShown" class="dg-tip") {{ level === GOLIATH_LEVEL ? t('app.bigGames.david.tipGoliath') : level === EAGLE_TIP_LEVEL ? t('app.bigGames.david.tipEagle') : t('app.bigGames.david.tip') }}
 
-      div(v-if="paused" class="dg-menu dg-menu--dim")
+      div(v-if="paused && !how" class="dg-menu dg-menu--dim")
         div(class="dg-card dg-card--small")
           h2(class="dg-title") {{ t('app.bigGames.david.pause') }}
           AdvButton(@click="paused = false") {{ t('app.bigGames.david.resume') }}
@@ -554,9 +581,21 @@ onBeforeUnmount(() => {
         h2(class="dg-title") {{ levelTitle(level) }}
         AdventureStars(:stars="outcome.stars" :size="56" celebrate)
         p(class="dg-text") {{ resultText }}
-        AdvButton(v-if="outcome.phase === 'won' && level < 4" @click="start(level + 1)") {{ t('app.bigGames.david.next') }}
-        AdvButton(:tone="outcome.phase === 'won' && level < 4 ? 'blau' : 'gold'" @click="start(level)") {{ t('app.bigGames.david.again') }}
+        AdvButton(v-if="outcome.phase === 'won' && level < GOLIATH_LEVEL" @click="start(level + 1)") {{ t('app.bigGames.david.next') }}
+        AdvButton(:tone="outcome.phase === 'won' && level < GOLIATH_LEVEL ? 'blau' : 'gold'" @click="start(level)") {{ t('app.bigGames.david.again') }}
         AdvButton(tone="blau" @click="toMenu") {{ t('app.bigGames.david.menu') }}
+
+    //- the explanation: pull back, let go
+    div(v-if="how && loaded" class="dg-menu dg-menu--dim")
+      div(class="dg-card dg-how")
+        h2(class="dg-title") {{ t('app.bigGames.david.howTitle') }}
+        //- the golden arrow of the swipe cross of Elijah's game, turned to the left: pull back
+        img(:src="arrowSrc" alt="" class="dg-how-pic" @error="hideBroken")
+        p(class="dg-how-line") {{ t('app.bigGames.david.howPull') }}
+        p(class="dg-how-line") {{ t('app.bigGames.david.howFar') }}
+        p(class="dg-how-line") {{ t('app.bigGames.david.howAnimals') }}
+        p(class="dg-how-line") {{ t('app.bigGames.david.howRocks') }}
+        AdvButton(data-test="david-go" @click="closeHow") {{ t('app.bigGames.david.go') }}
 
     //- upright: the note to turn the phone
     div(v-if="portrait && screen === 'play' && !showRotateAnyway" class="dg-rotate")
@@ -746,9 +785,27 @@ onBeforeUnmount(() => {
 .dg-level-label
   font-size: 0.95rem
 
-.dg-wind
-  font-size: 0.8rem
-  color: #4a5a8a
+.dg-menu-buttons
+  display: flex
+  flex-wrap: wrap
+  justify-content: center
+  gap: 10px
+
+.dg-how
+  gap: 8px
+
+.dg-how-pic
+  display: block
+  width: 64px
+  height: auto
+  margin: 0 auto
+  transform: rotate(-90deg)
+
+.dg-how-line
+  margin: 0
+  text-align: left
+  font-size: 0.95rem
+  line-height: 1.35
 
 .dg-tip
   position: absolute

@@ -1,0 +1,2901 @@
+[
+ {
+  "id": "l1-001",
+  "level": 1,
+  "q": "¿Qué construyó Noé por orden de Dios?",
+  "options": [
+   "Una torre",
+   "Un templo",
+   "Un arca",
+   "Un puente"
+  ],
+  "answer": 2,
+  "ref": "Génesis 6:14"
+ },
+ {
+  "id": "l1-002",
+  "level": 1,
+  "q": "¿Qué ave le trajo a Noé una hoja fresca de olivo?",
+  "options": [
+   "Una paloma",
+   "Un cuervo",
+   "Un águila",
+   "Una golondrina"
+  ],
+  "answer": 0,
+  "ref": "Génesis 8:10-11"
+ },
+ {
+  "id": "l1-003",
+  "level": 1,
+  "q": "¿Qué puso Dios en el cielo como señal después del diluvio?",
+  "options": [
+   "Una estrella brillante",
+   "Una aurora boreal",
+   "Una estrella fugaz",
+   "Un arco iris"
+  ],
+  "answer": 3,
+  "ref": "Génesis 9:13"
+ },
+ {
+  "id": "l1-004",
+  "level": 1,
+  "q": "¿Cómo se llamaba el hijo que Abraham tuvo a los cien años?",
+  "options": [
+   "Ismael",
+   "Isaac",
+   "Jacob",
+   "Esaú"
+  ],
+  "answer": 1,
+  "ref": "Génesis 21:5"
+ },
+ {
+  "id": "l1-005",
+  "level": 1,
+  "q": "¿Qué regaló Jacob a su hijo José, y por eso sus hermanos le tuvieron envidia?",
+  "options": [
+   "Un bastón de pastor",
+   "Una túnica de colores",
+   "Una espada",
+   "Un anillo de plata"
+  ],
+  "answer": 1,
+  "ref": "Génesis 37:3-4"
+ },
+ {
+  "id": "l1-006",
+  "level": 1,
+  "q": "¿A qué país llevaron los mercaderes a José?",
+  "options": [
+   "Babilonia",
+   "Canaán",
+   "Siria",
+   "Egipto"
+  ],
+  "answer": 3,
+  "ref": "Génesis 37:28"
+ },
+ {
+  "id": "l1-007",
+  "level": 1,
+  "q": "¿Dónde puso la madre de Moisés a su bebé a la orilla del Nilo?",
+  "options": [
+   "En una cestita de juncos",
+   "En una cueva junto a la orilla",
+   "En una gran vasija de barro",
+   "En una red de pescar"
+  ],
+  "answer": 0,
+  "ref": "Éxodo 2:3"
+ },
+ {
+  "id": "l1-008",
+  "level": 1,
+  "q": "¿Qué ardía sin consumirse cuando Moisés cuidaba las ovejas?",
+  "options": [
+   "Un cedro",
+   "Un olivo",
+   "Una zarza",
+   "Una higuera"
+  ],
+  "answer": 2,
+  "ref": "Éxodo 3:1-2"
+ },
+ {
+  "id": "l1-009",
+  "level": 1,
+  "q": "¿Qué pasó con el mar cuando Israel estaba en la orilla y Moisés extendió la mano sobre él?",
+  "options": [
+   "El agua se congeló",
+   "El agua se volvió sangre",
+   "El agua hirvió",
+   "El agua se dividió"
+  ],
+  "answer": 3,
+  "ref": "Éxodo 14:21"
+ },
+ {
+  "id": "l1-010",
+  "level": 1,
+  "q": "¿Sobre qué escribió Dios los Diez Mandamientos para Moisés?",
+  "options": [
+   "Sobre rollos de papiro",
+   "Sobre trozos de cuero",
+   "Sobre dos tablas de piedra",
+   "Sobre tablas de madera"
+  ],
+  "answer": 2,
+  "ref": "Deuteronomio 4:13"
+ },
+ {
+  "id": "l1-011",
+  "level": 1,
+  "q": "¿A quién debes honrar según los Diez Mandamientos?",
+  "options": [
+   "Al alcalde",
+   "A tu padre y a tu madre",
+   "Al sacerdote",
+   "Al rey"
+  ],
+  "answer": 1,
+  "ref": "Éxodo 20:12"
+ },
+ {
+  "id": "l1-012",
+  "level": 1,
+  "q": "¿Quién venció al gigante Goliat?",
+  "options": [
+   "David",
+   "Saúl",
+   "Jonatán",
+   "Sansón"
+  ],
+  "answer": 0,
+  "ref": "1 Samuel 17:50"
+ },
+ {
+  "id": "l1-013",
+  "level": 1,
+  "q": "¿Con qué venció el joven pastor al gigante Goliat?",
+  "options": [
+   "Con una honda",
+   "Con una lanza",
+   "Con arco y flechas",
+   "Con una espada"
+  ],
+  "answer": 0,
+  "ref": "1 Samuel 17:50"
+ },
+ {
+  "id": "l1-014",
+  "level": 1,
+  "q": "¿Qué animales cuidaba David cuando era joven?",
+  "options": [
+   "Camellos",
+   "Asnos",
+   "Ovejas",
+   "Vacas"
+  ],
+  "answer": 2,
+  "ref": "1 Samuel 16:11"
+ },
+ {
+  "id": "l1-015",
+  "level": 1,
+  "q": "¿Adónde echaron a Daniel por seguir orando a su Dios?",
+  "options": [
+   "A una cárcel",
+   "Al foso de los leones",
+   "A un horno de fuego",
+   "A una cisterna profunda"
+  ],
+  "answer": 1,
+  "ref": "Daniel 6:10-16"
+ },
+ {
+  "id": "l1-016",
+  "level": 1,
+  "q": "¿Cuánto tiempo estuvo Jonás en el vientre del gran pez?",
+  "options": [
+   "Un día y una noche",
+   "Siete días y siete noches",
+   "Cuarenta días y cuarenta noches",
+   "Tres días y tres noches"
+  ],
+  "answer": 3,
+  "ref": "Jonás 1:17"
+ },
+ {
+  "id": "l1-017",
+  "level": 1,
+  "q": "¿En qué ciudad nació Jesús?",
+  "options": [
+   "Nazaret",
+   "Jerusalén",
+   "Belén",
+   "Jericó"
+  ],
+  "answer": 2,
+  "ref": "Lucas 2:4-7"
+ },
+ {
+  "id": "l1-018",
+  "level": 1,
+  "q": "¿Quién llevó a María la noticia de que daría a luz a Jesús?",
+  "options": [
+   "El ángel Miguel",
+   "El ángel Gabriel",
+   "El sacerdote Zacarías",
+   "El profeta Isaías"
+  ],
+  "answer": 1,
+  "ref": "Lucas 1:26-31"
+ },
+ {
+  "id": "l1-019",
+  "level": 1,
+  "q": "¿Cómo llevaron cuatro hombres a un paralítico ante Jesús, si la casa estaba llena de gente?",
+  "options": [
+   "Por la puerta de atrás",
+   "Por una ventana",
+   "Por un sótano",
+   "Por el techo"
+  ],
+  "answer": 3,
+  "ref": "Marcos 2:1-4"
+ },
+ {
+  "id": "l1-020",
+  "level": 1,
+  "q": "¿A quiénes se apareció un ángel en el campo cerca de Belén para anunciar el nacimiento de Jesús?",
+  "options": [
+   "A pastores",
+   "A sacerdotes",
+   "A reyes",
+   "A pescadores"
+  ],
+  "answer": 0,
+  "ref": "Lucas 2:8-11"
+ },
+ {
+  "id": "l1-021",
+  "level": 1,
+  "q": "¿En qué notaron los magos de oriente que había nacido un nuevo rey?",
+  "options": [
+   "En un sueño",
+   "En una nube",
+   "En un eclipse de luna",
+   "En una estrella"
+  ],
+  "answer": 3,
+  "ref": "Mateo 2:2"
+ },
+ {
+  "id": "l1-022",
+  "level": 1,
+  "q": "¿Quién bautizó a Jesús en el Jordán?",
+  "options": [
+   "Juan el Bautista",
+   "Pedro",
+   "Jacobo",
+   "Andrés"
+  ],
+  "answer": 0,
+  "ref": "Mateo 3:13"
+ },
+ {
+  "id": "l1-023",
+  "level": 1,
+  "q": "¿Cuál era el oficio de Simón Pedro cuando Jesús lo llamó?",
+  "options": [
+   "Cobrador de impuestos",
+   "Carpintero",
+   "Pescador",
+   "Pastor"
+  ],
+  "answer": 2,
+  "ref": "Mateo 4:18"
+ },
+ {
+  "id": "l1-024",
+  "level": 1,
+  "q": "¿Cuántos discípulos escogió Jesús como apóstoles?",
+  "options": [
+   "Siete",
+   "Doce",
+   "Diez",
+   "Veinte"
+  ],
+  "answer": 1,
+  "ref": "Lucas 6:13"
+ },
+ {
+  "id": "l1-025",
+  "level": 1,
+  "q": "¿Qué tenían los discípulos cuando Jesús dio de comer a cinco mil personas?",
+  "options": [
+   "Tres panes y cinco peces",
+   "Cinco panes y dos peces",
+   "Siete panes y tres peces",
+   "Dos panes y tres peces"
+  ],
+  "answer": 1,
+  "ref": "Mateo 14:17-21"
+ },
+ {
+  "id": "l1-026",
+  "level": 1,
+  "q": "¿Qué hacía Jesús en la barca cuando estalló la gran tormenta?",
+  "options": [
+   "Remaba",
+   "Pescaba",
+   "Dormía",
+   "Llevaba el timón"
+  ],
+  "answer": 2,
+  "ref": "Marcos 4:37-38"
+ },
+ {
+  "id": "l1-027",
+  "level": 1,
+  "q": "¿Cómo se llama la parábola del hombre que cayó en manos de ladrones?",
+  "options": [
+   "El buen samaritano",
+   "El hijo pródigo",
+   "El buen pastor",
+   "El rico insensato"
+  ],
+  "answer": 0,
+  "ref": "Lucas 10:30-37"
+ },
+ {
+  "id": "l1-028",
+  "level": 1,
+  "q": "¿Qué tuvo que cuidar el hijo pródigo después de gastar todo lo que tenía?",
+  "options": [
+   "Ovejas",
+   "Camellos",
+   "Cabras",
+   "Cerdos"
+  ],
+  "answer": 3,
+  "ref": "Lucas 15:13-15"
+ },
+ {
+  "id": "l1-029",
+  "level": 1,
+  "q": "¿Por qué subió Zaqueo a un árbol?",
+  "options": [
+   "Era pequeño y quería ver a Jesús",
+   "Quería esconderse de Jesús",
+   "Quería recoger frutas",
+   "Quería gritarle algo a la gente"
+  ],
+  "answer": 0,
+  "ref": "Lucas 19:2-4"
+ },
+ {
+  "id": "l1-030",
+  "level": 1,
+  "q": "¿Por quién tomó María Magdalena al hombre junto a la tumba en la mañana de Pascua?",
+  "options": [
+   "Por un soldado",
+   "Por un sacerdote",
+   "Por un pescador",
+   "Por el hortelano"
+  ],
+  "answer": 3,
+  "ref": "Juan 20:15"
+ },
+ {
+  "id": "l1-031",
+  "level": 1,
+  "q": "¿Qué discípulo negó a Jesús tres veces antes de que cantara el gallo?",
+  "options": [
+   "Juan",
+   "Pedro",
+   "Judas",
+   "Tomás"
+  ],
+  "answer": 1,
+  "ref": "Lucas 22:56-61"
+ },
+ {
+  "id": "l1-032",
+  "level": 1,
+  "q": "¿Qué discípulo dudó de que Jesús viviera, hasta que lo vio con sus propios ojos?",
+  "options": [
+   "Felipe",
+   "Mateo",
+   "Tomás",
+   "Andrés"
+  ],
+  "answer": 2,
+  "ref": "Juan 20:24-29"
+ },
+ {
+  "id": "l1-033",
+  "level": 1,
+  "q": "¿Qué creó Dios el primer día?",
+  "options": [
+   "Las estrellas",
+   "Los animales",
+   "La luz",
+   "Las montañas"
+  ],
+  "answer": 2,
+  "ref": "Génesis 1:3-5"
+ },
+ {
+  "id": "l1-034",
+  "level": 1,
+  "q": "¿Qué nombre le puso Adán a su mujer?",
+  "options": [
+   "Sara",
+   "Rebeca",
+   "Lea",
+   "Eva"
+  ],
+  "answer": 3,
+  "ref": "Génesis 3:20"
+ },
+ {
+  "id": "l1-035",
+  "level": 1,
+  "q": "¿Cómo se llamaban los dos primeros hijos de Adán y Eva?",
+  "options": [
+   "Caín y Abel",
+   "Esaú y Jacob",
+   "Isaac e Ismael",
+   "Set y Enoc"
+  ],
+  "answer": 0,
+  "ref": "Génesis 4:1-2"
+ },
+ {
+  "id": "l1-036",
+  "level": 1,
+  "q": "¿Qué querían construir los hombres en Babel?",
+  "options": [
+   "Un dique contra el diluvio",
+   "Una torre hasta el cielo",
+   "Un palacio para el rey",
+   "Un puerto junto al mar"
+  ],
+  "answer": 1,
+  "ref": "Génesis 11:4"
+ },
+ {
+  "id": "l1-037",
+  "level": 1,
+  "q": "¿A qué tierra se fue Abraham cuando Dios lo llamó?",
+  "options": [
+   "Egipto",
+   "Canaán",
+   "Babilonia",
+   "Asiria"
+  ],
+  "answer": 1,
+  "ref": "Génesis 12:1-5"
+ },
+ {
+  "id": "l1-038",
+  "level": 1,
+  "q": "¿Cómo se llamaba la esposa de Abraham?",
+  "options": [
+   "Sara",
+   "Lea",
+   "Rebeca",
+   "Raquel"
+  ],
+  "answer": 0,
+  "ref": "Génesis 17:15"
+ },
+ {
+  "id": "l1-039",
+  "level": 1,
+  "q": "¿Por qué vendió Esaú su primogenitura a Jacob?",
+  "options": [
+   "Por una tienda",
+   "Por un camello",
+   "Por una oveja",
+   "Por un guisado de lentejas"
+  ],
+  "answer": 3,
+  "ref": "Génesis 25:33-34"
+ },
+ {
+  "id": "l1-040",
+  "level": 1,
+  "q": "¿Qué vio Jacob en sueños mientras dormía con la cabeza sobre una piedra?",
+  "options": [
+   "Una torre de oro",
+   "Un puente de luz",
+   "Una escalera hasta el cielo",
+   "Un árbol enorme"
+  ],
+  "answer": 2,
+  "ref": "Génesis 28:11-12"
+ },
+ {
+  "id": "l1-041",
+  "level": 1,
+  "q": "¿Con qué animales soñó el faraón antes de que José le explicara el sueño?",
+  "options": [
+   "Con ovejas",
+   "Con caballos",
+   "Con camellos",
+   "Con vacas"
+  ],
+  "answer": 3,
+  "ref": "Génesis 41:1-4"
+ },
+ {
+  "id": "l1-042",
+  "level": 1,
+  "q": "¿Cuántos hijos tuvo Jacob?",
+  "options": [
+   "Diez",
+   "Doce",
+   "Siete",
+   "Catorce"
+  ],
+  "answer": 1,
+  "ref": "Génesis 35:22"
+ },
+ {
+  "id": "l1-043",
+  "level": 1,
+  "q": "¿Cómo llamaron los israelitas al pan que Dios les dio del cielo en el desierto?",
+  "options": [
+   "Pan sin levadura",
+   "Tortas de miel",
+   "Maná",
+   "Pan del desierto"
+  ],
+  "answer": 2,
+  "ref": "Éxodo 16:15; 16:31"
+ },
+ {
+  "id": "l1-044",
+  "level": 1,
+  "q": "¿Qué pasó con las murallas de Jericó cuando el pueblo gritó con fuerza?",
+  "options": [
+   "Se derrumbaron",
+   "Quedaron en pie sin daño",
+   "Fueron arrastradas por el agua",
+   "Fueron quemadas"
+  ],
+  "answer": 0,
+  "ref": "Josué 6:20"
+ },
+ {
+  "id": "l1-045",
+  "level": 1,
+  "q": "¿Qué no se le podía cortar nunca a Sansón?",
+  "options": [
+   "El cabello",
+   "La barba",
+   "Las uñas",
+   "Las cejas"
+  ],
+  "answer": 0,
+  "ref": "Jueces 16:17"
+ },
+ {
+  "id": "l1-046",
+  "level": 1,
+  "q": "¿Quién oyó de joven, una noche en el templo, la voz de Dios junto a Elí?",
+  "options": [
+   "Elías",
+   "Samuel",
+   "Natán",
+   "Jeremías"
+  ],
+  "answer": 1,
+  "ref": "1 Samuel 3:3-10"
+ },
+ {
+  "id": "l1-047",
+  "level": 1,
+  "q": "¿Qué aves llevaban pan y carne al profeta Elías?",
+  "options": [
+   "Palomas",
+   "Águilas",
+   "Golondrinas",
+   "Cuervos"
+  ],
+  "answer": 3,
+  "ref": "1 Reyes 17:4-6"
+ },
+ {
+  "id": "l1-048",
+  "level": 1,
+  "q": "¿Qué profeta subió al cielo en un carro de fuego?",
+  "options": [
+   "Isaías",
+   "Samuel",
+   "Elías",
+   "Daniel"
+  ],
+  "answer": 2,
+  "ref": "2 Reyes 2:11"
+ },
+ {
+  "id": "l1-049",
+  "level": 1,
+  "q": "¿Qué rey pidió a Dios un corazón sabio?",
+  "options": [
+   "David",
+   "Saúl",
+   "Salomón",
+   "Roboam"
+  ],
+  "answer": 2,
+  "ref": "1 Reyes 3:9-12"
+ },
+ {
+  "id": "l1-050",
+  "level": 1,
+  "q": "¿Qué hizo construir el rey Salomón para Dios en Jerusalén?",
+  "options": [
+   "Un templo",
+   "Una torre",
+   "Un puerto",
+   "Un castillo"
+  ],
+  "answer": 0,
+  "ref": "1 Reyes 6:1-2"
+ },
+ {
+  "id": "l1-051",
+  "level": 1,
+  "q": "¿Qué reina salvó a su pueblo de ser destruido?",
+  "options": [
+   "Rut",
+   "Ester",
+   "Ana",
+   "Sara"
+  ],
+  "answer": 1,
+  "ref": "Ester 7:3-4"
+ },
+ {
+  "id": "l1-052",
+  "level": 1,
+  "q": "¿Cómo empieza el Salmo 23? «Jehová es mi …»",
+  "options": [
+   "Roca",
+   "Luz",
+   "Escudo",
+   "Pastor"
+  ],
+  "answer": 3,
+  "ref": "Salmo 23:1"
+ },
+ {
+  "id": "l1-053",
+  "level": 1,
+  "q": "¿Qué pasó con el agua del río Nilo en la primera plaga?",
+  "options": [
+   "Se secó",
+   "Se congeló",
+   "Se volvió salada",
+   "Se convirtió en sangre"
+  ],
+  "answer": 3,
+  "ref": "Éxodo 7:20"
+ },
+ {
+  "id": "l1-054",
+  "level": 1,
+  "q": "¿A quién dijo Rut: «A dondequiera que tú fueres, iré yo»?",
+  "options": [
+   "A su madre",
+   "A su hermana",
+   "A su suegra",
+   "A su marido"
+  ],
+  "answer": 2,
+  "ref": "Rut 1:16"
+ },
+ {
+  "id": "l1-055",
+  "level": 1,
+  "q": "¿Quién dirigió la reconstrucción del muro de Jerusalén?",
+  "options": [
+   "Nehemías",
+   "Esdras",
+   "Jeremías",
+   "Ezequiel"
+  ],
+  "answer": 0,
+  "ref": "Nehemías 2:17-18"
+ },
+ {
+  "id": "l1-056",
+  "level": 1,
+  "q": "¿Cuál era el oficio del segundo hijo de Adán y Eva?",
+  "options": [
+   "Pescador",
+   "Pastor de ovejas",
+   "Carpintero",
+   "Cazador"
+  ],
+  "answer": 1,
+  "ref": "Génesis 4:2"
+ },
+ {
+  "id": "l1-057",
+  "level": 1,
+  "q": "¿Cómo empieza la oración que Jesús enseñó a sus discípulos?",
+  "options": [
+   "Señor, escucha ahora mi oración",
+   "Padre nuestro que estás en los cielos",
+   "Dios nuestro, tú eres muy grande",
+   "Querido Dios que estás en el cielo"
+  ],
+  "answer": 1,
+  "ref": "Mateo 6:9"
+ },
+ {
+  "id": "l1-058",
+  "level": 1,
+  "q": "¿Qué convirtió Jesús en la boda de Caná?",
+  "options": [
+   "Vino en agua",
+   "Agua en aceite",
+   "Pan en vino",
+   "Agua en vino"
+  ],
+  "answer": 3,
+  "ref": "Juan 2:1-9"
+ },
+ {
+  "id": "l1-059",
+  "level": 1,
+  "q": "¿A qué hermano de María y Marta llamó Jesús desde la tumba?",
+  "options": [
+   "Nicodemo",
+   "Bartimeo",
+   "Lázaro",
+   "Zaqueo"
+  ],
+  "answer": 2,
+  "ref": "Juan 11:1-2; 11:43-44"
+ },
+ {
+  "id": "l1-060",
+  "level": 1,
+  "q": "¿Sobre qué animal entró Jesús en Jerusalén?",
+  "options": [
+   "Sobre un asno",
+   "Sobre un caballo",
+   "Sobre un camello",
+   "Sobre una mula"
+  ],
+  "answer": 0,
+  "ref": "Mateo 21:7"
+ },
+ {
+  "id": "l1-061",
+  "level": 1,
+  "q": "¿Qué cobrador de impuestos siguió a Jesús cuando le dijo: «Sígueme»?",
+  "options": [
+   "Mateo",
+   "Felipe",
+   "Andrés",
+   "Tomás"
+  ],
+  "answer": 0,
+  "ref": "Mateo 9:9"
+ },
+ {
+  "id": "l1-062",
+  "level": 1,
+  "q": "¿Qué pasó cuando los discípulos echaron la red al lado derecho de la barca?",
+  "options": [
+   "La red volvió a quedar vacía",
+   "La red se rompió enseguida",
+   "La red se llenó de peces",
+   "Solo entró un pez en la red"
+  ],
+  "answer": 2,
+  "ref": "Juan 21:6"
+ },
+ {
+  "id": "l1-063",
+  "level": 1,
+  "q": "¿Con qué otro nombre se conoce también a Pablo?",
+  "options": [
+   "Simón",
+   "Silas",
+   "Esteban",
+   "Saulo"
+  ],
+  "answer": 3,
+  "ref": "Hechos 13:9"
+ },
+ {
+  "id": "l1-064",
+  "level": 1,
+  "q": "¿Camino de qué ciudad se encontró Pablo con Jesús en una luz del cielo?",
+  "options": [
+   "A Roma",
+   "A Damasco",
+   "A Atenas",
+   "A Antioquía"
+  ],
+  "answer": 1,
+  "ref": "Hechos 9:1-5"
+ },
+ {
+  "id": "l1-065",
+  "level": 1,
+  "q": "¿De qué se alimentaba Juan el Bautista en el desierto?",
+  "options": [
+   "De dátiles y leche de cabra",
+   "De pan y pescado asado",
+   "De langostas y miel silvestre",
+   "De bayas y queso de cabra"
+  ],
+  "answer": 2,
+  "ref": "Mateo 3:4"
+ },
+ {
+  "id": "l1-066",
+  "level": 1,
+  "q": "¿Cómo se veía el Espíritu de Dios que descendió cuando Jesús fue bautizado?",
+  "options": [
+   "Como un águila",
+   "Como una paloma",
+   "Como una llama",
+   "Como un torbellino"
+  ],
+  "answer": 1,
+  "ref": "Mateo 3:16"
+ },
+ {
+  "id": "l1-067",
+  "level": 1,
+  "q": "¿Sobre qué construyó su casa el hombre prudente de la parábola de Jesús?",
+  "options": [
+   "Sobre la roca",
+   "Sobre la arena",
+   "Sobre barro",
+   "Sobre postes de madera"
+  ],
+  "answer": 0,
+  "ref": "Mateo 7:24-25"
+ },
+ {
+  "id": "l1-068",
+  "level": 1,
+  "q": "¿Qué pasó con la semilla que cayó en buena tierra, en la parábola del sembrador?",
+  "options": [
+   "Se la comieron las aves",
+   "Se secó con el sol",
+   "Los espinos la ahogaron",
+   "Dio mucho fruto"
+  ],
+  "answer": 3,
+  "ref": "Mateo 13:8"
+ },
+ {
+  "id": "l1-069",
+  "level": 1,
+  "q": "¿Cuántas ovejas tenía el pastor de la parábola de la oveja perdida?",
+  "options": [
+   "Cincuenta",
+   "Cien",
+   "Diez",
+   "Veinte"
+  ],
+  "answer": 1,
+  "ref": "Lucas 15:4"
+ },
+ {
+  "id": "l1-070",
+  "level": 1,
+  "q": "¿Qué edad tenía Jesús cuando habló con los maestros en el templo?",
+  "options": [
+   "Doce años",
+   "Ocho años",
+   "Quince años",
+   "Veinte años"
+  ],
+  "answer": 0,
+  "ref": "Lucas 2:42-46"
+ },
+ {
+  "id": "l1-071",
+  "level": 1,
+  "q": "¿Qué hizo Pedro cuando Jesús le dijo «Ven» en medio del lago?",
+  "options": [
+   "Remó hacia Jesús",
+   "Nadó hacia Jesús",
+   "Caminó sobre el agua",
+   "Echó la red"
+  ],
+  "answer": 2,
+  "ref": "Mateo 14:28-29"
+ },
+ {
+  "id": "l1-072",
+  "level": 1,
+  "q": "¿A quiénes debían dejar los discípulos que vinieran a Jesús?",
+  "options": [
+   "A los sacerdotes",
+   "A los soldados",
+   "A los reyes",
+   "A los niños"
+  ],
+  "answer": 3,
+  "ref": "Marcos 10:13-14"
+ },
+ {
+  "id": "l1-073",
+  "level": 1,
+  "q": "¿En qué ciudad se crió Jesús?",
+  "options": [
+   "Capernaum",
+   "Belén",
+   "Jerusalén",
+   "Nazaret"
+  ],
+  "answer": 3,
+  "ref": "Lucas 4:16"
+ },
+ {
+  "id": "l1-074",
+  "level": 1,
+  "q": "¿Cuántos de los diez leprosos sanados volvieron a dar gracias a Jesús?",
+  "options": [
+   "Nueve",
+   "Uno",
+   "Cinco",
+   "Tres"
+  ],
+  "answer": 1,
+  "ref": "Lucas 17:15-17"
+ },
+ {
+  "id": "l1-075",
+  "level": 1,
+  "q": "¿Qué discípulo traicionó a Jesús por treinta piezas de plata?",
+  "options": [
+   "Judas",
+   "Pedro",
+   "Tomás",
+   "Jacobo"
+  ],
+  "answer": 0,
+  "ref": "Mateo 26:14-15"
+ },
+ {
+  "id": "l1-076",
+  "level": 1,
+  "q": "¿En qué fiesta vino el Espíritu Santo sobre los discípulos?",
+  "options": [
+   "En la Pascua",
+   "En la fiesta de los Tabernáculos",
+   "En Pentecostés",
+   "En la fiesta de Purim"
+  ],
+  "answer": 2,
+  "ref": "Hechos 2:1-4"
+ },
+ {
+  "id": "l1-077",
+  "level": 1,
+  "q": "¿Quién llevó al pueblo de Israel a la tierra prometida después de Moisés?",
+  "options": [
+   "Josué",
+   "Aarón",
+   "Caleb",
+   "Elí"
+  ],
+  "answer": 0,
+  "ref": "Josué 1:1-2"
+ },
+ {
+  "id": "l1-078",
+  "level": 1,
+  "q": "¿Qué hizo Dios el séptimo día de la creación?",
+  "options": [
+   "Creó los animales",
+   "Creó las estrellas",
+   "Creó al ser humano",
+   "Reposó de su obra"
+  ],
+  "answer": 3,
+  "ref": "Génesis 2:2"
+ },
+ {
+  "id": "l1-079",
+  "level": 1,
+  "q": "¿Qué mujer oró en la casa de Jehová pidiendo un hijo y recibió a Samuel?",
+  "options": [
+   "Sara",
+   "Raquel",
+   "Ana",
+   "Lea"
+  ],
+  "answer": 2,
+  "ref": "1 Samuel 1:10-20"
+ },
+ {
+  "id": "l1-080",
+  "level": 1,
+  "q": "¿Cómo se llamaba el padre de Esaú y Jacob?",
+  "options": [
+   "Abraham",
+   "Isaac",
+   "Labán",
+   "José"
+  ],
+  "answer": 1,
+  "ref": "Génesis 25:19-26"
+ },
+ {
+  "id": "l2-001",
+  "level": 2,
+  "q": "¿Cómo se llamaba el sobrino que fue con Abraham a Canaán?",
+  "options": [
+   "Labán",
+   "Nacor",
+   "Lot",
+   "Esaú"
+  ],
+  "answer": 2,
+  "ref": "Génesis 12:4-5"
+ },
+ {
+  "id": "l2-002",
+  "level": 2,
+  "q": "¿Cómo se llamaban los padres de Juan el Bautista?",
+  "options": [
+   "Zacarías y Elisabet",
+   "Zebedeo y Salomé",
+   "Simeón y Ana",
+   "Aquila y Priscila"
+  ],
+  "answer": 0,
+  "ref": "Lucas 1:5-13"
+ },
+ {
+  "id": "l2-003",
+  "level": 2,
+  "q": "¿Qué plaga cayó sobre Egipto justo después de la plaga de la sangre en el Nilo?",
+  "options": [
+   "Granizo",
+   "Tinieblas",
+   "Langostas",
+   "Ranas"
+  ],
+  "answer": 3,
+  "ref": "Éxodo 7:25; 8:1-6"
+ },
+ {
+  "id": "l2-004",
+  "level": 2,
+  "q": "¿Quién escondió en Jericó a los dos espías de Josué?",
+  "options": [
+   "Débora",
+   "Rahab",
+   "Rut",
+   "Jael"
+  ],
+  "answer": 1,
+  "ref": "Josué 2:1-4"
+ },
+ {
+  "id": "l2-005",
+  "level": 2,
+  "q": "¿Cómo se llamaba el ángel que fue a ver a María?",
+  "options": [
+   "Miguel",
+   "Gabriel",
+   "Rafael",
+   "Uriel"
+  ],
+  "answer": 1,
+  "ref": "Lucas 1:26-27"
+ },
+ {
+  "id": "l2-006",
+  "level": 2,
+  "q": "¿En qué monte vio Moisés la zarza ardiendo?",
+  "options": [
+   "Nebo",
+   "Carmelo",
+   "Sión",
+   "Horeb"
+  ],
+  "answer": 3,
+  "ref": "Éxodo 3:1-2"
+ },
+ {
+  "id": "l2-007",
+  "level": 2,
+  "q": "¿Por qué viajaron José y María a Belén?",
+  "options": [
+   "El emperador ordenó un censo",
+   "Iban a visitar a unos parientes",
+   "Huían del rey Herodes",
+   "Habían encontrado trabajo"
+  ],
+  "answer": 0,
+  "ref": "Lucas 2:1-5"
+ },
+ {
+  "id": "l2-008",
+  "level": 2,
+  "q": "¿Cuántos años sirvió Jacob primero por Raquel?",
+  "options": [
+   "Tres años",
+   "Doce años",
+   "Siete años",
+   "Diez años"
+  ],
+  "answer": 2,
+  "ref": "Génesis 29:18-20"
+ },
+ {
+  "id": "l2-009",
+  "level": 2,
+  "q": "¿Con cuántos hombres fue Gedeón contra los madianitas?",
+  "options": [
+   "Cien",
+   "Mil",
+   "Tres mil",
+   "Trescientos"
+  ],
+  "answer": 3,
+  "ref": "Jueces 7:7"
+ },
+ {
+  "id": "l2-010",
+  "level": 2,
+  "q": "¿Adónde huyó José con María y el niño para escapar de Herodes?",
+  "options": [
+   "A Siria",
+   "A Samaria",
+   "A Egipto",
+   "A Babilonia"
+  ],
+  "answer": 2,
+  "ref": "Mateo 2:13-14"
+ },
+ {
+  "id": "l2-011",
+  "level": 2,
+  "q": "¿Cómo se llamaba la suegra de Rut, con quien fue a Belén?",
+  "options": [
+   "Orfa",
+   "Noemí",
+   "Ana",
+   "Débora"
+  ],
+  "answer": 1,
+  "ref": "Rut 1:2-4; 1:22"
+ },
+ {
+  "id": "l2-012",
+  "level": 2,
+  "q": "¿Quién fue de noche a hablar con Jesús?",
+  "options": [
+   "Nicodemo",
+   "Zaqueo",
+   "Cornelio",
+   "Caifás"
+  ],
+  "answer": 0,
+  "ref": "Juan 3:1-2"
+ },
+ {
+  "id": "l2-013",
+  "level": 2,
+  "q": "¿Cómo se llamaba el hermano de Moisés que habló por él al pueblo?",
+  "options": [
+   "Aarón",
+   "Hur",
+   "Josué",
+   "Caleb"
+  ],
+  "answer": 0,
+  "ref": "Éxodo 4:14-16"
+ },
+ {
+  "id": "l2-015",
+  "level": 2,
+  "q": "¿Qué buscaba Saúl cuando conoció a Samuel?",
+  "options": [
+   "Las ovejas de su padre",
+   "Los camellos de su padre",
+   "Las asnas de su padre",
+   "Las vacas de su padre"
+  ],
+  "answer": 2,
+  "ref": "1 Samuel 9:3"
+ },
+ {
+  "id": "l2-016",
+  "level": 2,
+  "q": "¿Cómo se llama el lugar donde Jacob soñó con la escalera hasta el cielo?",
+  "options": [
+   "Siquem",
+   "Hebrón",
+   "Silo",
+   "Betel"
+  ],
+  "answer": 3,
+  "ref": "Génesis 28:12-19"
+ },
+ {
+  "id": "l2-017",
+  "level": 2,
+  "q": "¿Qué le llevaron los magos de oriente al niño Jesús?",
+  "options": [
+   "Plata, miel y aceite",
+   "Oro, vino y pan",
+   "Oro, incienso y mirra",
+   "Perlas, sal y trigo"
+  ],
+  "answer": 2,
+  "ref": "Mateo 2:11"
+ },
+ {
+  "id": "l2-018",
+  "level": 2,
+  "q": "¿A casa de quién envió Dios al profeta Jeremías?",
+  "options": [
+   "De un herrero",
+   "De un tejedor",
+   "De un pastor",
+   "De un alfarero"
+  ],
+  "answer": 3,
+  "ref": "Jeremías 18:1-3"
+ },
+ {
+  "id": "l2-020",
+  "level": 2,
+  "q": "¿A qué hombres les explicó José sus sueños en la cárcel?",
+  "options": [
+   "Guardias y jueces",
+   "El copero y el panadero",
+   "Escribas y sacerdotes",
+   "Cocinero y hortelano"
+  ],
+  "answer": 1,
+  "ref": "Génesis 40:1-8"
+ },
+ {
+  "id": "l2-021",
+  "level": 2,
+  "q": "¿En qué montes se detuvo el arca después del diluvio?",
+  "options": [
+   "Sinaí",
+   "Ararat",
+   "Carmelo",
+   "Hermón"
+  ],
+  "answer": 1,
+  "ref": "Génesis 8:4"
+ },
+ {
+  "id": "l2-022",
+  "level": 2,
+  "q": "¿Cuántas tinajas de agua había preparadas en la boda de Caná?",
+  "options": [
+   "Seis",
+   "Cuatro",
+   "Siete",
+   "Doce"
+  ],
+  "answer": 0,
+  "ref": "Juan 2:6"
+ },
+ {
+  "id": "l2-023",
+  "level": 2,
+  "q": "¿Con quién se casó Rut?",
+  "options": [
+   "Obed",
+   "Elimelec",
+   "Isaí",
+   "Booz"
+  ],
+  "answer": 3,
+  "ref": "Rut 4:13"
+ },
+ {
+  "id": "l2-025",
+  "level": 2,
+  "q": "¿Por cuántas piezas de plata fue vendido José a los ismaelitas?",
+  "options": [
+   "Por diez",
+   "Por treinta",
+   "Por cincuenta",
+   "Por veinte"
+  ],
+  "answer": 3,
+  "ref": "Génesis 37:28"
+ },
+ {
+  "id": "l2-027",
+  "level": 2,
+  "q": "¿Con qué sacerdote servía el joven Samuel?",
+  "options": [
+   "Sadoc",
+   "Abiatar",
+   "Elí",
+   "Aarón"
+  ],
+  "answer": 2,
+  "ref": "1 Samuel 2:11; 3:1"
+ },
+ {
+  "id": "l2-028",
+  "level": 2,
+  "q": "¿Cómo se llamaba la profetisa que tomó el pandero y cantó después de cruzar el mar?",
+  "options": [
+   "Miriam",
+   "Débora",
+   "Ana",
+   "Abigail"
+  ],
+  "answer": 0,
+  "ref": "Éxodo 15:20-21"
+ },
+ {
+  "id": "l2-029",
+  "level": 2,
+  "q": "¿Qué prometió Zaqueo a los pobres cuando Jesús entró en su casa?",
+  "options": [
+   "La mitad de sus bienes",
+   "La décima parte de sus bienes",
+   "La tercera parte de sus bienes",
+   "Todo lo que tenía"
+  ],
+  "answer": 0,
+  "ref": "Lucas 19:5-8"
+ },
+ {
+  "id": "l2-030",
+  "level": 2,
+  "q": "¿Quiénes sostuvieron los brazos de Moisés cuando Israel luchaba contra Amalec?",
+  "options": [
+   "Josué y Caleb",
+   "Nadab y Abiú",
+   "Aarón y Hur",
+   "Eldad y Medad"
+  ],
+  "answer": 2,
+  "ref": "Éxodo 17:10-12"
+ },
+ {
+  "id": "l2-031",
+  "level": 2,
+  "q": "¿Cuántas piedras escogió David para su honda?",
+  "options": [
+   "Tres",
+   "Cinco",
+   "Siete",
+   "Doce"
+  ],
+  "answer": 1,
+  "ref": "1 Samuel 17:40"
+ },
+ {
+  "id": "l2-032",
+  "level": 2,
+  "q": "¿Cómo llama Pablo al escudo de la armadura de Dios?",
+  "options": [
+   "Escudo de la verdad",
+   "Escudo de la paz",
+   "Escudo de la esperanza",
+   "Escudo de la fe"
+  ],
+  "answer": 3,
+  "ref": "Efesios 6:16"
+ },
+ {
+  "id": "l2-033",
+  "level": 2,
+  "q": "¿De quién era hijo Jonatán, el mejor amigo de David?",
+  "options": [
+   "De Samuel",
+   "De Saúl",
+   "De Isaí",
+   "De Elí"
+  ],
+  "answer": 1,
+  "ref": "1 Samuel 14:1; 18:1"
+ },
+ {
+  "id": "l2-034",
+  "level": 2,
+  "q": "¿Quiénes pasaron de largo junto al herido en la parábola del buen samaritano?",
+  "options": [
+   "Un pastor y un cobrador de impuestos",
+   "Dos soldados",
+   "Un sacerdote y un levita",
+   "Un fariseo y un pescador"
+  ],
+  "answer": 2,
+  "ref": "Lucas 10:30-32"
+ },
+ {
+  "id": "l2-035",
+  "level": 2,
+  "q": "¿Quién contó a David la historia de la oveja del hombre pobre?",
+  "options": [
+   "Samuel",
+   "Gad",
+   "Elías",
+   "Natán"
+  ],
+  "answer": 3,
+  "ref": "2 Samuel 12:1-7"
+ },
+ {
+  "id": "l2-036",
+  "level": 2,
+  "q": "¿Qué pidió Salomón a Dios cuando se le apareció en sueños?",
+  "options": [
+   "Un corazón entendido",
+   "Grandes riquezas",
+   "Una larga vida",
+   "Victoria sobre sus enemigos"
+  ],
+  "answer": 0,
+  "ref": "1 Reyes 3:5-12"
+ },
+ {
+  "id": "l2-037",
+  "level": 2,
+  "q": "¿Qué semilla se comieron las aves en la parábola del sembrador?",
+  "options": [
+   "La que cayó entre espinos",
+   "La que cayó en pedregales",
+   "La que cayó en buena tierra",
+   "La que cayó junto al camino"
+  ],
+  "answer": 3,
+  "ref": "Mateo 13:3-4"
+ },
+ {
+  "id": "l2-038",
+  "level": 2,
+  "q": "¿Quién visitó a Salomón para ponerlo a prueba con preguntas difíciles?",
+  "options": [
+   "La reina de Sabá",
+   "La reina Ester",
+   "La reina Jezabel",
+   "La reina Atalía"
+  ],
+  "answer": 0,
+  "ref": "1 Reyes 10:1"
+ },
+ {
+  "id": "l2-039",
+  "level": 2,
+  "q": "¿Quién llevaba a Elías pan y carne por la mañana y por la tarde junto al arroyo?",
+  "options": [
+   "Palomas",
+   "Águilas",
+   "Cuervos",
+   "Codornices"
+  ],
+  "answer": 2,
+  "ref": "1 Reyes 17:2-6"
+ },
+ {
+  "id": "l2-040",
+  "level": 2,
+  "q": "¿Cuántas ovejas dejó el pastor para buscar la perdida?",
+  "options": [
+   "Noventa",
+   "Noventa y nueve",
+   "Cincuenta",
+   "Diez"
+  ],
+  "answer": 1,
+  "ref": "Lucas 15:4"
+ },
+ {
+  "id": "l2-041",
+  "level": 2,
+  "q": "¿Con qué compara Jesús el reino de los cielos en la parábola de la semilla que se hace árbol?",
+  "options": [
+   "Con un grano de mostaza",
+   "Con un grano de amapola",
+   "Con un grano de cebada",
+   "Con un grano de mijo"
+  ],
+  "answer": 0,
+  "ref": "Mateo 13:31-32"
+ },
+ {
+  "id": "l2-042",
+  "level": 2,
+  "q": "¿En qué monte se enfrentó Elías a los profetas de Baal?",
+  "options": [
+   "Sinaí",
+   "Tabor",
+   "Ararat",
+   "Carmelo"
+  ],
+  "answer": 3,
+  "ref": "1 Reyes 18:19-20"
+ },
+ {
+  "id": "l2-043",
+  "level": 2,
+  "q": "¿Quién llegó a ser profeta en lugar de Elías?",
+  "options": [
+   "Isaías",
+   "Eliseo",
+   "Amós",
+   "Jonás"
+  ],
+  "answer": 1,
+  "ref": "2 Reyes 2:9-15"
+ },
+ {
+  "id": "l2-044",
+  "level": 2,
+  "q": "¿Cuántas de las diez vírgenes de la parábola eran prudentes?",
+  "options": [
+   "Tres",
+   "Siete",
+   "Cinco",
+   "Cuatro"
+  ],
+  "answer": 2,
+  "ref": "Mateo 25:1-2"
+ },
+ {
+  "id": "l2-045",
+  "level": 2,
+  "q": "¿En qué río debía lavarse Naamán siete veces?",
+  "options": [
+   "En el Nilo",
+   "En el Éufrates",
+   "En el Jordán",
+   "En el Cedrón"
+  ],
+  "answer": 2,
+  "ref": "2 Reyes 5:10"
+ },
+ {
+  "id": "l2-046",
+  "level": 2,
+  "q": "¿Qué hizo con su talento el siervo que recibió solo uno?",
+  "options": [
+   "Lo regaló",
+   "Lo enterró",
+   "Lo perdió",
+   "Lo vendió"
+  ],
+  "answer": 1,
+  "ref": "Mateo 25:18"
+ },
+ {
+  "id": "l2-047",
+  "level": 2,
+  "q": "¿Adónde mandó Dios a Jonás?",
+  "options": [
+   "A Nínive",
+   "A Tarsis",
+   "A Babilonia",
+   "A Damasco"
+  ],
+  "answer": 0,
+  "ref": "Jonás 1:1-2"
+ },
+ {
+  "id": "l2-049",
+  "level": 2,
+  "q": "¿Qué mandamiento llamó Jesús el más grande de la ley?",
+  "options": [
+   "Amar a Dios con todo el corazón",
+   "Santificar el día de reposo",
+   "Honrar al padre y a la madre",
+   "No matar y no hurtar"
+  ],
+  "answer": 0,
+  "ref": "Mateo 22:35-38"
+ },
+ {
+  "id": "l2-050",
+  "level": 2,
+  "q": "¿Cuántas veces al día oraba Daniel a Dios?",
+  "options": [
+   "Una",
+   "Siete",
+   "Cinco",
+   "Tres"
+  ],
+  "answer": 3,
+  "ref": "Daniel 6:10"
+ },
+ {
+  "id": "l2-051",
+  "level": 2,
+  "q": "¿Qué rey vio una mano escribir en la pared?",
+  "options": [
+   "Nabucodonosor",
+   "Ciro",
+   "Belsasar",
+   "Darío"
+  ],
+  "answer": 2,
+  "ref": "Daniel 5:1-5"
+ },
+ {
+  "id": "l2-052",
+  "level": 2,
+  "q": "Según el Sermón del Monte, ¿quiénes recibirán la tierra por heredad?",
+  "options": [
+   "Los misericordiosos",
+   "Los mansos",
+   "Los pacificadores",
+   "Los que lloran"
+  ],
+  "answer": 1,
+  "ref": "Mateo 5:5"
+ },
+ {
+  "id": "l2-053",
+  "level": 2,
+  "q": "¿Quién acogió como hija a Ester, que ya no tenía padres?",
+  "options": [
+   "Amán",
+   "Esdras",
+   "Mardoqueo",
+   "Asuero"
+  ],
+  "answer": 2,
+  "ref": "Ester 2:5-7"
+ },
+ {
+  "id": "l2-054",
+  "level": 2,
+  "q": "¿Cómo se llamaban las hermanas de Lázaro?",
+  "options": [
+   "María y Marta",
+   "María y Salomé",
+   "Marta y Juana",
+   "Raquel y Lea"
+  ],
+  "answer": 0,
+  "ref": "Juan 11:1-2"
+ },
+ {
+  "id": "l2-055",
+  "level": 2,
+  "q": "¿Qué se terminó en Jerusalén en solo 52 días bajo Nehemías?",
+  "options": [
+   "El templo",
+   "El muro de la ciudad",
+   "El palacio del rey",
+   "El altar de los sacrificios"
+  ],
+  "answer": 1,
+  "ref": "Nehemías 6:15; 2:17"
+ },
+ {
+  "id": "l2-056",
+  "level": 2,
+  "q": "¿Qué pusieron en el camino cuando Jesús entró en Jerusalén?",
+  "options": [
+   "Alfombras y flores",
+   "Redes y cuerdas",
+   "Piedras y madera",
+   "Mantos y ramas"
+  ],
+  "answer": 3,
+  "ref": "Mateo 21:8"
+ },
+ {
+  "id": "l2-057",
+  "level": 2,
+  "q": "¿Qué salmo empieza con «Jehová es mi pastor»?",
+  "options": [
+   "Salmo 1",
+   "Salmo 23",
+   "Salmo 100",
+   "Salmo 121"
+  ],
+  "answer": 1,
+  "ref": "Salmo 23:1"
+ },
+ {
+  "id": "l2-058",
+  "level": 2,
+  "q": "¿Qué pidió Jesús a la mujer junto al pozo en Samaria?",
+  "options": [
+   "Pan",
+   "Posada para la noche",
+   "Una oración",
+   "Algo de beber"
+  ],
+  "answer": 3,
+  "ref": "Juan 4:5-7"
+ },
+ {
+  "id": "l2-059",
+  "level": 2,
+  "q": "¿En qué lugar oró Jesús la noche antes de ser arrestado?",
+  "options": [
+   "Gólgota",
+   "Betania",
+   "Getsemaní",
+   "Capernaum"
+  ],
+  "answer": 2,
+  "ref": "Mateo 26:36"
+ },
+ {
+  "id": "l2-060",
+  "level": 2,
+  "q": "¿Quién vivió 969 años?",
+  "options": [
+   "Matusalén",
+   "Adán",
+   "Noé",
+   "Enoc"
+  ],
+  "answer": 0,
+  "ref": "Génesis 5:25-27"
+ },
+ {
+  "id": "l2-062",
+  "level": 2,
+  "q": "¿Qué pasó después de que Pedro negó a Jesús tres veces?",
+  "options": [
+   "La tierra tembló",
+   "Empezó a llover",
+   "Cantó el gallo",
+   "Apareció un ángel"
+  ],
+  "answer": 2,
+  "ref": "Mateo 26:74-75"
+ },
+ {
+  "id": "l2-063",
+  "level": 2,
+  "q": "¿Qué nombre nuevo recibió Jacob después de luchar junto al río Jaboc?",
+  "options": [
+   "Israel",
+   "Judá",
+   "Ismael",
+   "Benjamín"
+  ],
+  "answer": 0,
+  "ref": "Génesis 32:24-28"
+ },
+ {
+  "id": "l2-065",
+  "level": 2,
+  "q": "Según el profeta Miqueas, ¿de qué lugar saldría el gobernante de Israel?",
+  "options": [
+   "Nazaret",
+   "Belén",
+   "Jerusalén",
+   "Hebrón"
+  ],
+  "answer": 1,
+  "ref": "Miqueas 5:2"
+ },
+ {
+  "id": "l2-066",
+  "level": 2,
+  "q": "¿Quién reconoció junto a la tumba al resucitado cuando la llamó por su nombre?",
+  "options": [
+   "María Magdalena",
+   "Salomé",
+   "Juana",
+   "Marta"
+  ],
+  "answer": 0,
+  "ref": "Juan 20:1; 20:11-16"
+ },
+ {
+  "id": "l2-067",
+  "level": 2,
+  "q": "¿De qué hizo Dios a la primera mujer?",
+  "options": [
+   "Del polvo de la tierra",
+   "Del aliento de Dios",
+   "De una costilla de Adán",
+   "De agua y barro"
+  ],
+  "answer": 2,
+  "ref": "Génesis 2:21-22"
+ },
+ {
+  "id": "l2-069",
+  "level": 2,
+  "q": "¿Qué animal habló con Balaam?",
+  "options": [
+   "Su asna",
+   "Su camello",
+   "Su mula",
+   "Su caballo"
+  ],
+  "answer": 0,
+  "ref": "Números 22:28"
+ },
+ {
+  "id": "l2-070",
+  "level": 2,
+  "q": "¿Adónde iban dos discípulos el día de la resurrección cuando Jesús se les unió?",
+  "options": [
+   "A Betania",
+   "A Capernaum",
+   "A Emaús",
+   "A Naín"
+  ],
+  "answer": 2,
+  "ref": "Lucas 24:13-15"
+ },
+ {
+  "id": "l2-071",
+  "level": 2,
+  "q": "¿Qué vivió cada uno de la multitud cuando los discípulos hablaron en Pentecostés?",
+  "options": [
+   "Todos oían un solo idioma",
+   "No entendía ni una palabra",
+   "Solo oía canciones y cantos",
+   "Los oía en su propia lengua"
+  ],
+  "answer": 3,
+  "ref": "Hechos 2:1-6"
+ },
+ {
+  "id": "l2-072",
+  "level": 2,
+  "q": "¿Qué mandamiento sigue en los Diez Mandamientos justo después de «No matarás»?",
+  "options": [
+   "No hurtarás",
+   "No cometerás adulterio",
+   "No codiciarás",
+   "No darás falso testimonio"
+  ],
+  "answer": 1,
+  "ref": "Éxodo 20:13-14"
+ },
+ {
+  "id": "l2-073",
+  "level": 2,
+  "q": "¿Qué leía el funcionario etíope en su carro?",
+  "options": [
+   "Los Salmos",
+   "El libro de Moisés",
+   "El profeta Jeremías",
+   "El profeta Isaías"
+  ],
+  "answer": 3,
+  "ref": "Hechos 8:27-30"
+ },
+ {
+  "id": "l2-074",
+  "level": 2,
+  "q": "¿A quién llamó la jueza Débora para ir a la batalla contra Sísara?",
+  "options": [
+   "Gedeón",
+   "Barac",
+   "Abner",
+   "Joab"
+  ],
+  "answer": 1,
+  "ref": "Jueces 4:4-9"
+ },
+ {
+  "id": "l2-075",
+  "level": 2,
+  "q": "¿Adónde viajó Saulo para perseguir a los cristianos?",
+  "options": [
+   "A Damasco",
+   "A Antioquía",
+   "A Éfeso",
+   "A Roma"
+  ],
+  "answer": 0,
+  "ref": "Hechos 9:1-3"
+ },
+ {
+  "id": "l2-076",
+  "level": 2,
+  "q": "¿En casa de qué matrimonio se quedó Pablo al principio en Corinto?",
+  "options": [
+   "Ananías y Safira",
+   "Abraham y Sara",
+   "Aquila y Priscila",
+   "José y María"
+  ],
+  "answer": 2,
+  "ref": "Hechos 18:1-3"
+ },
+ {
+  "id": "l2-077",
+  "level": 2,
+  "q": "¿Dónde se detuvo el sol cuando Josué le habló?",
+  "options": [
+   "En Jericó",
+   "En Hebrón",
+   "En Gabaón",
+   "En Betel"
+  ],
+  "answer": 2,
+  "ref": "Josué 10:12-13"
+ },
+ {
+  "id": "l2-078",
+  "level": 2,
+  "q": "¿Qué tres cosas permanecen para siempre, según Pablo?",
+  "options": [
+   "Sabiduría, poder, paz",
+   "Verdad, justicia, gracia",
+   "Valor, lealtad, paciencia",
+   "Fe, esperanza, amor"
+  ],
+  "answer": 3,
+  "ref": "1 Corintios 13:13"
+ },
+ {
+  "id": "l2-079",
+  "level": 2,
+  "q": "¿Con qué dos hombres habló Jesús en el monte de la transfiguración?",
+  "options": [
+   "Abraham y Jacob",
+   "Moisés y Elías",
+   "David y Salomón",
+   "Isaías y Jeremías"
+  ],
+  "answer": 1,
+  "ref": "Mateo 17:1-3"
+ },
+ {
+  "id": "l2-080",
+  "level": 2,
+  "q": "¿Cuántos amigos visitaron a Job en su sufrimiento?",
+  "options": [
+   "Tres",
+   "Dos",
+   "Cuatro",
+   "Siete"
+  ],
+  "answer": 0,
+  "ref": "Job 2:11"
+ },
+ {
+  "id": "l3-001",
+  "level": 3,
+  "q": "¿Cómo se llamaba la esposa de Moisés, con quien se casó en Madián?",
+  "options": [
+   "Séfora",
+   "Miriam",
+   "Rahab",
+   "Débora"
+  ],
+  "answer": 0,
+  "ref": "Éxodo 2:21"
+ },
+ {
+  "id": "l3-002",
+  "level": 3,
+  "q": "¿De quién eran las ovejas que cuidaba Moisés cuando vio la zarza ardiendo en el monte Horeb?",
+  "options": [
+   "De Jetro",
+   "De Labán",
+   "De Nabal",
+   "De Isaí"
+  ],
+  "answer": 0,
+  "ref": "Éxodo 3:1-2"
+ },
+ {
+  "id": "l3-003",
+  "level": 3,
+  "q": "¿Qué hombre de la tribu de Judá recibió de Dios habilidad para la obra del tabernáculo?",
+  "options": [
+   "Hiram",
+   "Bezaleel",
+   "Nadab",
+   "Urías"
+  ],
+  "answer": 1,
+  "ref": "Éxodo 31:2-3"
+ },
+ {
+  "id": "l3-004",
+  "level": 3,
+  "q": "¿Cuáles dos de los doce espías animaron al pueblo?",
+  "options": [
+   "Aarón y Hur",
+   "Eldad y Medad",
+   "Eleazar y Finees",
+   "Josué y Caleb"
+  ],
+  "answer": 3,
+  "ref": "Números 14:6-9"
+ },
+ {
+  "id": "l3-005",
+  "level": 3,
+  "q": "¿Quién vio primero al ángel de Jehová en el camino de Balaam?",
+  "options": [
+   "Balaam",
+   "Balac",
+   "Los siervos de Balaam",
+   "El asna"
+  ],
+  "answer": 3,
+  "ref": "Números 22:23"
+ },
+ {
+  "id": "l3-006",
+  "level": 3,
+  "q": "¿Qué rey de Moab mandó llamar a Balaam para que maldijera a Israel?",
+  "options": [
+   "Og",
+   "Balac",
+   "Sehón",
+   "Eglón"
+  ],
+  "answer": 1,
+  "ref": "Números 22:4-6"
+ },
+ {
+  "id": "l3-007",
+  "level": 3,
+  "q": "¿De qué color era el cordón que Rahab debía atar en su ventana?",
+  "options": [
+   "Blanco",
+   "Azul",
+   "Rojo",
+   "Amarillo"
+  ],
+  "answer": 2,
+  "ref": "Josué 2:18"
+ },
+ {
+  "id": "l3-008",
+  "level": 3,
+  "q": "¿Qué profetisa juzgaba a Israel debajo de una palmera?",
+  "options": [
+   "Débora",
+   "Jael",
+   "Hulda",
+   "Miriam"
+  ],
+  "answer": 0,
+  "ref": "Jueces 4:4-5"
+ },
+ {
+  "id": "l3-009",
+  "level": 3,
+  "q": "¿De qué tribu era Sansón?",
+  "options": [
+   "Dan",
+   "Judá",
+   "Benjamín",
+   "Efraín"
+  ],
+  "answer": 0,
+  "ref": "Jueces 13:2"
+ },
+ {
+  "id": "l3-010",
+  "level": 3,
+  "q": "¿Qué nombre eligió Noemí para sí misma, porque Dios le había enviado amargura?",
+  "options": [
+   "Orfa",
+   "Ana",
+   "Mara",
+   "Raquel"
+  ],
+  "answer": 2,
+  "ref": "Rut 1:20"
+ },
+ {
+  "id": "l3-011",
+  "level": 3,
+  "q": "¿Cómo se llamaban los dos hijos del sacerdote Elí?",
+  "options": [
+   "Joel y Abías",
+   "Ofni y Finees",
+   "Nadab y Abiú",
+   "Jonatán y Abinadab"
+  ],
+  "answer": 1,
+  "ref": "1 Samuel 1:3"
+ },
+ {
+  "id": "l3-012",
+  "level": 3,
+  "q": "¿Cómo se llamaba el padre de Samuel?",
+  "options": [
+   "Elí",
+   "Cis",
+   "Abinadab",
+   "Elcana"
+  ],
+  "answer": 3,
+  "ref": "1 Samuel 1:1"
+ },
+ {
+  "id": "l3-014",
+  "level": 3,
+  "q": "¿Cómo se llamaba el hijo de Jonatán al que David invitó a su mesa?",
+  "options": [
+   "Abner",
+   "Mefi-boset",
+   "Joab",
+   "Ahimelec"
+  ],
+  "answer": 1,
+  "ref": "2 Samuel 9:6-7"
+ },
+ {
+  "id": "l3-015",
+  "level": 3,
+  "q": "¿Cuál era el único animal que tenía el hombre pobre en la historia que Natán contó a David?",
+  "options": [
+   "Un becerrito",
+   "Una cabra",
+   "Una corderita",
+   "Una paloma"
+  ],
+  "answer": 2,
+  "ref": "2 Samuel 12:3"
+ },
+ {
+  "id": "l3-016",
+  "level": 3,
+  "q": "¿En casa de quién estuvo el arca del pacto tres meses, antes de que David la llevara a Jerusalén?",
+  "options": [
+   "De Obed-edom",
+   "De Sadoc",
+   "De Ahimelec",
+   "De Hiram"
+  ],
+  "answer": 0,
+  "ref": "2 Samuel 6:10-12"
+ },
+ {
+  "id": "l3-017",
+  "level": 3,
+  "q": "¿Cuántos años tardó Salomón en construir el templo en Jerusalén?",
+  "options": [
+   "7 años",
+   "3 años",
+   "12 años",
+   "40 años"
+  ],
+  "answer": 0,
+  "ref": "1 Reyes 6:37-38"
+ },
+ {
+  "id": "l3-018",
+  "level": 3,
+  "q": "¿Quién fue el primer rey del reino del norte, Israel, después de la muerte de Salomón?",
+  "options": [
+   "Roboam",
+   "Acab",
+   "Jeroboam",
+   "Jehú"
+  ],
+  "answer": 2,
+  "ref": "1 Reyes 12:20"
+ },
+ {
+  "id": "l3-019",
+  "level": 3,
+  "q": "¿En qué arroyo bebía Elías mientras los cuervos lo alimentaban?",
+  "options": [
+   "Cedrón",
+   "Querit",
+   "Jaboc",
+   "Arnón"
+  ],
+  "answer": 1,
+  "ref": "1 Reyes 17:3-6"
+ },
+ {
+  "id": "l3-020",
+  "level": 3,
+  "q": "¿Cuántos profetas de Baal había, según las palabras de Elías, en el Carmelo?",
+  "options": [
+   "300",
+   "120",
+   "700",
+   "450"
+  ],
+  "answer": 3,
+  "ref": "1 Reyes 18:22"
+ },
+ {
+  "id": "l3-021",
+  "level": 3,
+  "q": "¿A qué monte caminó Elías cuarenta días y cuarenta noches?",
+  "options": [
+   "Carmelo",
+   "Nebo",
+   "Ebal",
+   "Horeb"
+  ],
+  "answer": 3,
+  "ref": "1 Reyes 19:8"
+ },
+ {
+  "id": "l3-022",
+  "level": 3,
+  "q": "¿De quién era la viña que el rey Acab quería tener?",
+  "options": [
+   "De Nabal",
+   "De Nabot",
+   "De Urías",
+   "De Hiram"
+  ],
+  "answer": 1,
+  "ref": "1 Reyes 21:1-2"
+ },
+ {
+  "id": "l3-023",
+  "level": 3,
+  "q": "¿Qué edad tenía Josías cuando fue rey de Judá?",
+  "options": [
+   "12 años",
+   "16 años",
+   "8 años",
+   "20 años"
+  ],
+  "answer": 2,
+  "ref": "2 Reyes 22:1"
+ },
+ {
+  "id": "l3-024",
+  "level": 3,
+  "q": "¿Cuántos años añadió Dios a la vida del rey Ezequías?",
+  "options": [
+   "15 años",
+   "10 años",
+   "7 años",
+   "40 años"
+  ],
+  "answer": 0,
+  "ref": "2 Reyes 20:6"
+ },
+ {
+  "id": "l3-025",
+  "level": 3,
+  "q": "¿En cuántos días se terminó el muro de Jerusalén bajo Nehemías?",
+  "options": [
+   "52 días",
+   "40 días",
+   "70 días",
+   "100 días"
+  ],
+  "answer": 0,
+  "ref": "Nehemías 6:15"
+ },
+ {
+  "id": "l3-026",
+  "level": 3,
+  "q": "¿Qué cargo tenía Nehemías en la corte del rey de Persia?",
+  "options": [
+   "Escriba",
+   "Portero",
+   "Copero",
+   "General"
+  ],
+  "answer": 2,
+  "ref": "Nehemías 1:11"
+ },
+ {
+  "id": "l3-027",
+  "level": 3,
+  "q": "¿Quién crió a Ester, que no tenía padres, como a su propia hija?",
+  "options": [
+   "Amán",
+   "Mardoqueo",
+   "Hatac",
+   "Asuero"
+  ],
+  "answer": 1,
+  "ref": "Ester 2:7"
+ },
+ {
+  "id": "l3-028",
+  "level": 3,
+  "q": "¿En qué tierra vivía Job?",
+  "options": [
+   "Canaán",
+   "Moab",
+   "Madián",
+   "Uz"
+  ],
+  "answer": 3,
+  "ref": "Job 1:1"
+ },
+ {
+  "id": "l3-029",
+  "level": 3,
+  "q": "¿Qué salmo empieza: «Alzaré mis ojos a los montes»?",
+  "options": [
+   "Salmo 23",
+   "Salmo 100",
+   "Salmo 150",
+   "Salmo 121"
+  ],
+  "answer": 3,
+  "ref": "Salmo 121:1"
+ },
+ {
+  "id": "l3-030",
+  "level": 3,
+  "q": "¿De qué animal debe aprender el perezoso, según los Proverbios de Salomón?",
+  "options": [
+   "La abeja",
+   "La hormiga",
+   "La paloma",
+   "La cigüeña"
+  ],
+  "answer": 1,
+  "ref": "Proverbios 6:6"
+ },
+ {
+  "id": "l3-031",
+  "level": 3,
+  "q": "¿A qué artesano envió Dios al profeta Jeremías?",
+  "options": [
+   "Herrero",
+   "Tejedor",
+   "Alfarero",
+   "Carpintero"
+  ],
+  "answer": 2,
+  "ref": "Jeremías 18:2-3"
+ },
+ {
+  "id": "l3-032",
+  "level": 3,
+  "q": "¿Qué nombre babilónico recibió Ananías, uno de los amigos de Daniel?",
+  "options": [
+   "Sadrac",
+   "Mesac",
+   "Abed-nego",
+   "Beltsasar"
+  ],
+  "answer": 0,
+  "ref": "Daniel 1:7"
+ },
+ {
+  "id": "l3-034",
+  "level": 3,
+  "q": "¿Adónde quería huir Jonás del encargo de Dios?",
+  "options": [
+   "Nínive",
+   "Tiro",
+   "Tarsis",
+   "Sidón"
+  ],
+  "answer": 2,
+  "ref": "Jonás 1:3"
+ },
+ {
+  "id": "l3-036",
+  "level": 3,
+  "q": "¿Contra qué pueblo va el breve libro de Abdías?",
+  "options": [
+   "Moab",
+   "Amón",
+   "Los filisteos",
+   "Edom"
+  ],
+  "answer": 3,
+  "ref": "Abdías 1"
+ },
+ {
+  "id": "l3-037",
+  "level": 3,
+  "q": "¿Cómo se llamaba el hermano de Rebeca?",
+  "options": [
+   "Lot",
+   "Betuel",
+   "Ismael",
+   "Labán"
+  ],
+  "answer": 3,
+  "ref": "Génesis 24:29"
+ },
+ {
+  "id": "l3-038",
+  "level": 3,
+  "q": "¿Qué nombre dio Jacob al lugar donde soñó con la escalera al cielo?",
+  "options": [
+   "Mizpa",
+   "Bet-el",
+   "Gilgal",
+   "Hebrón"
+  ],
+  "answer": 1,
+  "ref": "Génesis 28:19"
+ },
+ {
+  "id": "l3-040",
+  "level": 3,
+  "q": "¿Cómo se llamaba la mujer con quien se casó José en Egipto?",
+  "options": [
+   "Asenat",
+   "Raquel",
+   "Séfora",
+   "Tamar"
+  ],
+  "answer": 0,
+  "ref": "Génesis 41:45"
+ },
+ {
+  "id": "l3-041",
+  "level": 3,
+  "q": "¿Qué hermano quiso salvar a José y devolverlo a su padre?",
+  "options": [
+   "Rubén",
+   "Judá",
+   "Simeón",
+   "Leví"
+  ],
+  "answer": 0,
+  "ref": "Génesis 37:21-22"
+ },
+ {
+  "id": "l3-042",
+  "level": 3,
+  "q": "¿A qué hermano dejó José en Egipto cuando los demás volvieron a casa?",
+  "options": [
+   "Rubén",
+   "Leví",
+   "Simeón",
+   "Judá"
+  ],
+  "answer": 2,
+  "ref": "Génesis 42:24"
+ },
+ {
+  "id": "l3-043",
+  "level": 3,
+  "q": "¿Quién bendijo a Abram después de que liberó a Lot?",
+  "options": [
+   "Lot",
+   "Melquisedec",
+   "Abimelec",
+   "Eliezer"
+  ],
+  "answer": 1,
+  "ref": "Génesis 14:18-19"
+ },
+ {
+  "id": "l3-044",
+  "level": 3,
+  "q": "¿Cuántos hombres dejó Dios a Gedeón después de la prueba del agua?",
+  "options": [
+   "100",
+   "1000",
+   "3000",
+   "300"
+  ],
+  "answer": 3,
+  "ref": "Jueces 7:6-7"
+ },
+ {
+  "id": "l3-045",
+  "level": 3,
+  "q": "¿Qué emperador mandó empadronar a todo el mundo cuando nació Jesús?",
+  "options": [
+   "Tiberio",
+   "Nerón",
+   "Claudio",
+   "Augusto"
+  ],
+  "answer": 3,
+  "ref": "Lucas 2:1"
+ },
+ {
+  "id": "l3-046",
+  "level": 3,
+  "q": "¿Después de cuántos días encontraron María y José al niño Jesús de doce años en el templo?",
+  "options": [
+   "Después de un día",
+   "Después de tres días",
+   "Después de siete días",
+   "Después de dos semanas"
+  ],
+  "answer": 1,
+  "ref": "Lucas 2:46"
+ },
+ {
+  "id": "l3-048",
+  "level": 3,
+  "q": "¿Quién apareció junto a Moisés con Jesús en el monte de la transfiguración?",
+  "options": [
+   "Elías",
+   "Isaías",
+   "Abraham",
+   "David"
+  ],
+  "answer": 0,
+  "ref": "Mateo 17:3"
+ },
+ {
+  "id": "l3-049",
+  "level": 3,
+  "q": "¿Dónde debía encontrar Pedro, según Jesús, el dinero para pagar el impuesto?",
+  "options": [
+   "En la boca de un pez",
+   "Debajo de una piedra",
+   "Dentro de su red",
+   "Dentro de una jarra"
+  ],
+  "answer": 0,
+  "ref": "Mateo 17:24-27"
+ },
+ {
+  "id": "l3-051",
+  "level": 3,
+  "q": "¿A qué hombre obligaron a llevar la cruz de Jesús?",
+  "options": [
+   "José de Arimatea",
+   "Simón de Cirene",
+   "Nicodemo",
+   "Simón Pedro"
+  ],
+  "answer": 1,
+  "ref": "Mateo 27:32"
+ },
+ {
+  "id": "l3-052",
+  "level": 3,
+  "q": "¿Cómo se llamaba el mendigo ciego que estaba sentado junto al camino cerca de Jericó?",
+  "options": [
+   "Lázaro",
+   "Barrabás",
+   "Bernabé",
+   "Bartimeo"
+  ],
+  "answer": 3,
+  "ref": "Marcos 10:46"
+ },
+ {
+  "id": "l3-053",
+  "level": 3,
+  "q": "¿Sobre qué dormía Jesús en la barca cuando llegó la tormenta?",
+  "options": [
+   "Sobre una vela",
+   "Sobre una red",
+   "Sobre una estera",
+   "Sobre un cojín"
+  ],
+  "answer": 3,
+  "ref": "Marcos 4:38"
+ },
+ {
+  "id": "l3-055",
+  "level": 3,
+  "q": "¿Qué mandó matar el padre para el hijo que volvió a casa?",
+  "options": [
+   "Un cordero joven",
+   "Un macho cabrío",
+   "Un becerro gordo",
+   "Un buey grande"
+  ],
+  "answer": 2,
+  "ref": "Lucas 15:23"
+ },
+ {
+  "id": "l3-056",
+  "level": 3,
+  "q": "¿Cuántas monedas tenía la mujer de la parábola que perdió una de ellas?",
+  "options": [
+   "Diez",
+   "Cinco",
+   "Siete",
+   "Doce"
+  ],
+  "answer": 0,
+  "ref": "Lucas 15:8"
+ },
+ {
+  "id": "l3-057",
+  "level": 3,
+  "q": "¿Quién fue el único de los diez sanados que volvió y dio gracias a Jesús?",
+  "options": [
+   "Un samaritano",
+   "Un romano",
+   "Un fariseo",
+   "Un griego"
+  ],
+  "answer": 0,
+  "ref": "Lucas 17:15-16"
+ },
+ {
+  "id": "l3-058",
+  "level": 3,
+  "q": "¿Cuánto quería devolver Zaqueo a los que había engañado?",
+  "options": [
+   "El doble",
+   "El triple",
+   "El cuádruple",
+   "El décuplo"
+  ],
+  "answer": 2,
+  "ref": "Lucas 19:8"
+ },
+ {
+  "id": "l3-059",
+  "level": 3,
+  "q": "¿Debajo de qué árbol vio Jesús a Natanael, según sus palabras?",
+  "options": [
+   "Un olivo",
+   "Una higuera",
+   "Una palmera",
+   "Una vid"
+  ],
+  "answer": 1,
+  "ref": "Juan 1:48"
+ },
+ {
+  "id": "l3-061",
+  "level": 3,
+  "q": "¿A qué hora del día fue Nicodemo a ver a Jesús?",
+  "options": [
+   "Al mediodía",
+   "Por la mañana",
+   "Por la tarde",
+   "De noche"
+  ],
+  "answer": 3,
+  "ref": "Juan 3:2"
+ },
+ {
+  "id": "l3-062",
+  "level": 3,
+  "q": "¿Cuántos años llevaba enfermo el hombre junto al estanque de Betesda?",
+  "options": [
+   "12 años",
+   "38 años",
+   "18 años",
+   "40 años"
+  ],
+  "answer": 1,
+  "ref": "Juan 5:5"
+ },
+ {
+  "id": "l3-063",
+  "level": 3,
+  "q": "¿Qué discípulo señaló a Jesús a un muchacho con cinco panes y dos peces?",
+  "options": [
+   "Felipe",
+   "Tomás",
+   "Andrés",
+   "Jacobo"
+  ],
+  "answer": 2,
+  "ref": "Juan 6:8-9"
+ },
+ {
+  "id": "l3-064",
+  "level": 3,
+  "q": "¿En qué estanque debía lavarse el ciego de nacimiento?",
+  "options": [
+   "Siloé",
+   "Betesda",
+   "Gihón",
+   "Hesbón"
+  ],
+  "answer": 0,
+  "ref": "Juan 9:7"
+ },
+ {
+  "id": "l3-065",
+  "level": 3,
+  "q": "¿Cuántos días llevaba Lázaro en el sepulcro cuando Jesús llegó a Betania?",
+  "options": [
+   "Cuatro días",
+   "Tres días",
+   "Siete días",
+   "Dos días"
+  ],
+  "answer": 0,
+  "ref": "Juan 11:17"
+ },
+ {
+  "id": "l3-066",
+  "level": 3,
+  "q": "¿Qué discípulo pidió: «Señor, muéstranos el Padre»?",
+  "options": [
+   "Tomás",
+   "Andrés",
+   "Felipe",
+   "Juan"
+  ],
+  "answer": 2,
+  "ref": "Juan 14:8"
+ },
+ {
+  "id": "l3-067",
+  "level": 3,
+  "q": "¿Con qué palabra respondió María Magdalena a Jesús cuando la llamó por su nombre en la mañana de Pascua?",
+  "options": [
+   "Hosanna",
+   "Raboni",
+   "Abba",
+   "Amén"
+  ],
+  "answer": 1,
+  "ref": "Juan 20:16"
+ },
+ {
+  "id": "l3-068",
+  "level": 3,
+  "q": "¿Cuántos peces grandes había en la red que Pedro sacó a tierra?",
+  "options": [
+   "100",
+   "77",
+   "12",
+   "153"
+  ],
+  "answer": 3,
+  "ref": "Juan 21:11"
+ },
+ {
+  "id": "l3-069",
+  "level": 3,
+  "q": "¿Quién fue elegido por suertes como apóstol número doce, después de Judas?",
+  "options": [
+   "Silas",
+   "Timoteo",
+   "Esteban",
+   "Matías"
+  ],
+  "answer": 3,
+  "ref": "Hechos 1:26"
+ },
+ {
+  "id": "l3-070",
+  "level": 3,
+  "q": "¿Cuántas personas se bautizaron el día de Pentecostés?",
+  "options": [
+   "Unas 120",
+   "Unas 3000",
+   "Unas 500",
+   "Unas 5000"
+  ],
+  "answer": 1,
+  "ref": "Hechos 2:41"
+ },
+ {
+  "id": "l3-071",
+  "level": 3,
+  "q": "¿Cómo se llamaba la puerta del templo donde mendigaba un cojo al que sanó Pedro?",
+  "options": [
+   "La puerta de las Ovejas",
+   "La puerta del Pescado",
+   "La puerta Hermosa",
+   "La puerta de los Caballos"
+  ],
+  "answer": 2,
+  "ref": "Hechos 3:2"
+ },
+ {
+  "id": "l3-073",
+  "level": 3,
+  "q": "¿En qué ciudad vivía la discípula Tabita, a quien Pedro resucitó?",
+  "options": [
+   "Jope",
+   "Lida",
+   "Cesarea",
+   "Antioquía"
+  ],
+  "answer": 0,
+  "ref": "Hechos 9:36"
+ },
+ {
+  "id": "l3-074",
+  "level": 3,
+  "q": "¿Cómo se llamaba la muchacha que, de pura alegría, olvidó abrirle la puerta a Pedro?",
+  "options": [
+   "Lidia",
+   "Priscila",
+   "Rode",
+   "Febe"
+  ],
+  "answer": 2,
+  "ref": "Hechos 12:13-14"
+ },
+ {
+  "id": "l3-075",
+  "level": 3,
+  "q": "¿A qué se dedicaba Lidia, de Tiatira?",
+  "options": [
+   "Vendedora de pescado",
+   "Vendedora de púrpura",
+   "Alfarera",
+   "Tejedora"
+  ],
+  "answer": 1,
+  "ref": "Hechos 16:14"
+ },
+ {
+  "id": "l3-076",
+  "level": 3,
+  "q": "¿Quién estaba con Pablo en la cárcel de Filipos cantando himnos?",
+  "options": [
+   "Bernabé",
+   "Apolos",
+   "Tito",
+   "Silas"
+  ],
+  "answer": 3,
+  "ref": "Hechos 16:25"
+ },
+ {
+  "id": "l3-077",
+  "level": 3,
+  "q": "¿Qué inscripción tenía un altar que Pablo vio en Atenas?",
+  "options": [
+   "Al Dios de la sabiduría",
+   "Al Dios de la ciudad",
+   "Al Dios de los antepasados",
+   "Al Dios no conocido"
+  ],
+  "answer": 3,
+  "ref": "Hechos 17:23"
+ },
+ {
+  "id": "l3-078",
+  "level": 3,
+  "q": "¿Qué llama Pablo en la carta a los Efesios la espada del Espíritu?",
+  "options": [
+   "La oración",
+   "La palabra de Dios",
+   "La verdad",
+   "La fe"
+  ],
+  "answer": 1,
+  "ref": "Efesios 6:17"
+ },
+ {
+  "id": "l3-079",
+  "level": 3,
+  "q": "¿A qué iglesia escribió Pablo: «Regocijaos en el Señor siempre»?",
+  "options": [
+   "Corinto",
+   "Roma",
+   "Filipos",
+   "Éfeso"
+  ],
+  "answer": 2,
+  "ref": "Filipenses 4:4"
+ },
+ {
+  "id": "l3-080",
+  "level": 3,
+  "q": "¿Por qué siervo intercedió Pablo ante Filemón?",
+  "options": [
+   "Onésimo",
+   "Epafras",
+   "Tíquico",
+   "Arquipo"
+  ],
+  "answer": 0,
+  "ref": "Filemón 10-16"
+ }
+]

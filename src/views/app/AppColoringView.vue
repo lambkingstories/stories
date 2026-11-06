@@ -37,6 +37,7 @@ import { useToolbarDock } from '@/use/useToolbarDock'
 import { installPenTaps } from '@/use/usePenTaps'
 import useAdventure from '@/use/useAdventure'
 import useJournal, { drawingFrom, readDraft, writeDraft } from '@/use/useJournal'
+import { clearPaintHandoff, loadPaintHandoff, paintSecondsLeft, type PaintHandoff } from '@/utils/familyActivity'
 import { LOG_SCALE, MIN_STEPS, TimelapseLog, packTimelapse, recordStep, unpackTimelapse, type TimelapseData } from '@/utils/timelapse'
 import { floodFillPaint } from '@/utils/coloringFill'
 import { requireParent } from '@/use/useParentalGate'
@@ -166,6 +167,75 @@ async function toJournal(keep: boolean) {
   hasImage.value = false
   identity = null
   void router.replace(ok ? { name: 'app-journal' } : { name: 'app-journal', query: { failed: '1' } })
+}
+
+/**
+ * A word painted for the family activity (`?activity=1`): a blank sheet with a band on top (the word, the sand, "Done"); the other
+ * teams watch the device and guess. The word, the seconds and the start come from the game in `sessionStorage` (see
+ * `utils/familyActivity.ts`), and the sand is counted from that start, so it stays right when the screen sleeps. Nothing of the
+ * picture is kept: no entry in "my pictures", no time-lapse. When the time is out or "Done" is pressed, the game asks who guessed it.
+ */
+const activityCtx = computed(() => route.query.activity === '1')
+const cue = ref<PaintHandoff | null>(null)
+const cueLeft = ref(0)
+const cueOver = ref(false)
+const bandEl = ref<HTMLElement | null>(null)
+let cueTimer: ReturnType<typeof setInterval> | undefined
+let cueLeave: ReturnType<typeof setTimeout> | undefined
+let cueEnding = false
+const BAND_HEIGHT = 76
+const bandSize = computed(() => {
+  const n = cue.value?.word.length ?? 0
+  return n <= 10 ? 2.1 : n <= 16 ? 1.7 : n <= 24 ? 1.35 : 1.1
+})
+
+function tickCue() {
+  const h = cue.value
+  if (!h || cueEnding) return
+  cueLeft.value = paintSecondsLeft(h)
+  if (cueLeft.value <= 0) endPainting(true)
+}
+
+function backToActivity() {
+  // one real step back to the game when it is the page before (it finds the hand-over and asks who guessed), otherwise the game is opened with the sign
+  goBackTo(router, { name: 'app-family-activity', query: { from: 'paint' } })
+}
+
+/** The word is done: "Done" was pressed, the way back was taken (`timeUp` false) or the sand has run out (`timeUp` true: a moment of "time is up", then back). */
+function endPainting(timeUp: boolean) {
+  if (cueEnding) return
+  cueEnding = true
+  clearInterval(cueTimer)
+  abortStroke()
+  cueOver.value = timeUp
+  if (timeUp) {
+    sfx.play('clunk')
+    cueLeave = setTimeout(backToActivity, 1500)
+  } else {
+    backToActivity()
+  }
+}
+
+function beginActivity() {
+  const h = loadPaintHandoff()
+  if (!h) {
+    // nothing to paint (the address was opened by hand, or the hand-over is old): back to the game
+    void router.replace({ name: 'app-family-activity' })
+    return
+  }
+  cue.value = h
+  tickCue()
+  cueTimer = setInterval(tickCue, 250)
+  document.addEventListener('visibilitychange', tickCue)
+  // the device lies in the middle of the table: a wide sheet on a wide screen
+  const sheet = window.innerWidth > window.innerHeight ? BLANK_LANDSCAPE : BLANK_PORTRAIT
+  void startBlank(sheet.w, sheet.h, undefined, true)
+}
+
+function stopActivity() {
+  clearInterval(cueTimer)
+  clearTimeout(cueLeave)
+  document.removeEventListener('visibilitychange', tickCue)
 }
 
 /** Back to the stage; `done` shows the finished picture there ("well done") with its stars, otherwise the stage goes on with the questions. */
@@ -686,21 +756,24 @@ function startBlankSheet(shape: 'portrait' | 'landscape') {
   void startBlank(size.w, size.h)
 }
 
-async function startBlank(w: number, h: number, existing?: ArtworkMeta) {
+async function startBlank(w: number, h: number, existing?: ArtworkMeta, unsaved = false) {
   const c = document.createElement('canvas')
   c.width = w
   c.height = h
   const ctx = c.getContext('2d')!
   ctx.fillStyle = '#ffffff'
   ctx.fillRect(0, 0, w, h)
-  identity = {
-    id: existing?.id ?? `blank:${Date.now()}`,
-    title: existing?.title ?? t('app.coloring.blankTitle'),
-    kind: 'blank',
-    sourceUrl: '',
-    sourceType: '',
-    page: 1
-  }
+  // a sheet for the family activity has no identity: it is never saved (no "my pictures", no time-lapse)
+  identity = unsaved
+    ? null
+    : {
+        id: existing?.id ?? `blank:${Date.now()}`,
+        title: existing?.title ?? t('app.coloring.blankTitle'),
+        kind: 'blank',
+        sourceUrl: '',
+        sourceType: '',
+        page: 1
+      }
   isLoading.value = true
   try {
     await openImageUrl(c.toDataURL('image/png'))
@@ -1379,6 +1452,10 @@ async function backToStats() {
 
 async function onBack() {
   if (savedFlash.value) return
+  if (activityCtx.value) {
+    endPainting(false)
+    return
+  }
   if (journalCtx.value) {
     await toJournal(false)
     return
@@ -1407,6 +1484,10 @@ async function onBack() {
 /** Back to the choose-a-picture screen; the picture is saved first. */
 async function closePicture() {
   if (savedFlash.value) return
+  if (activityCtx.value) {
+    endPainting(false)
+    return
+  }
   if (journalCtx.value) {
     await toJournal(false)
     return
@@ -1806,7 +1887,7 @@ function fitCanvas() {
 
 // Breathing room around the paper; the top bar floats over the top edge, so the paper starts below it.
 const PAGE_INSET = 10
-const topInset = () => (isFullscreen.value ? PAGE_INSET : 62)
+const topInset = () => (isFullscreen.value ? PAGE_INSET : 62 + (activityCtx.value ? bandEl.value?.offsetHeight || BAND_HEIGHT : 0))
 
 // The colour box at the bottom edge lies over the paper; only its little tab keeps room (and not in fullscreen).
 /** Room for the little arrow tab that stays at the bottom edge while the colour box is hidden. */
@@ -1845,10 +1926,15 @@ function toggleShelf() {
 }
 
 // ── The tool bar: where it sits and how it is moved (see `use/useToolbarDock.ts`) ------------------------------
-const { dock, carry, justCarried, toolbarStyle, onHandleDown, onHandleMove, onHandleUp, setDock, swallowCarryClick } = useToolbarDock({
+const { dock, carry, justCarried, toolbarStyle: dockStyle, onHandleDown, onHandleMove, onHandleUp, setDock, swallowCarryClick } = useToolbarDock({
   room: () => shelfRoom(),
   fullscreen: isFullscreen
 })
+
+/** The tool bar sits under the band of the family activity (its room at the top is the band as well). */
+const toolbarStyle = computed<Record<string, string>>(() =>
+  activityCtx.value && !isFullscreen.value ? { ...dockStyle.value, '--top': 'calc(52px + var(--act-h))' } : dockStyle.value
+)
 
 /** The zoom buttons show with a mouse, and on a touch screen as soon as the sheet is zoomed. */
 const showZoom = computed(() => finePointer.value || zoomPct.value !== 100 || zoomBarKept.value)
@@ -3639,7 +3725,7 @@ function commitHistory(b?: { x0: number; y0: number; x1: number; y1: number }, t
       trackTool(base, dc, tool)
       scheduleJobCheck()
     }
-    recordStep(timelapse, dc, x0, y0, x1, y1)
+    if (!activityCtx.value) recordStep(timelapse, dc, x0, y0, x1, y1)
   }
   // only the glitter places inside the changed area are looked at again (a whole-picture change has no area)
   twinkling.settle(b && x1 > x0 && y1 > y0 ? { x0, y0, x1, y1 } : undefined)
@@ -4026,7 +4112,9 @@ function onMainDrop(e: DragEvent) {
 
 // Leaving the page saves the picture first, so nothing is ever lost and there is
 // nothing to ask the child about.
-onBeforeRouteLeave(async () => {
+onBeforeRouteLeave(async (to) => {
+  // the hand-over of the family activity waits only for the way back to the game
+  if (activityCtx.value && to.name !== 'app-family-activity') clearPaintHandoff()
   await persistNow()
   await flushTimelapse()
 })
@@ -4070,7 +4158,9 @@ onMounted(() => {
 
   updateCursorRing()
 
-  if (journalCtx.value) {
+  if (activityCtx.value) {
+    beginActivity()
+  } else if (journalCtx.value) {
     startBlankSheet('portrait')
   } else if (queryBook.value) {
     void openBook(queryBook.value, queryBookPage.value)
@@ -4090,6 +4180,7 @@ onMounted(() => {
   }
 })
 onBeforeUnmount(() => {
+  stopActivity()
   twinkling.stop()
   clearTimeout(saveNoticeTimer)
   mainResizeObserver?.disconnect()
@@ -4137,7 +4228,7 @@ watch(queryBook, (id) => {
 <template lang="pug">
   div(
     class="ac-app"
-    :class="{ 'has-image': hasImage, 'is-painting': isPainting, 'ui-hidden': isFullscreen }"
+    :class="{ 'has-image': hasImage, 'is-painting': isPainting, 'ui-hidden': isFullscreen, 'is-activity': activityCtx }"
     :style="backdropVars"
   )
     //- ───────── The picture gets the whole screen ─────────
@@ -4222,6 +4313,19 @@ watch(queryBook, (id) => {
           span {{ j.hint }}
           span(class="ac-vh") {{ jobStatus[i] === 'met' ? t('app.adventure.paintJobDone') : t('app.adventure.paintJobOpen') }}
 
+    //- the word for the family activity: big and easy to read for the teams around the device, with the sand and "Done"
+    div(v-if="activityCtx && cue" ref="bandEl" class="ac-act" :class="{ 'is-low': cueLeft <= 10 && !cueOver, 'is-over': cueOver }")
+      p(class="ac-act-word" :style="{ fontSize: bandSize + 'rem' }") {{ t('app.activity.paintBand', { word: cue.word }) }}
+      p(class="ac-act-time" role="timer" :aria-label="t('app.activity.secondsLeft', { n: cueLeft })")
+        | {{ cueLeft }}
+        small s
+      AdvButton(class="ac-act-done" tone="gold" small @click="endPainting(false)") {{ t('app.activity.paintDone') }}
+      span(class="ac-act-track" aria-hidden="true")
+        span(class="ac-act-fill" :style="{ width: Math.round((cueLeft / Math.max(1, cue.seconds)) * 100) + '%' }")
+    //- the time is out: a moment of "time is up" over the sheet (it takes the touches), then back to the game
+    div(v-if="cueOver" class="ac-act-veil" role="status")
+      p {{ t('app.activity.paintTimeUp') }}
+
     //- ───────── Floating top bar ─────────
     header(v-if="hasImage" class="ac-top")
       button(type="button" class="ac-btn" :aria-label="t('app.coloring.back')" @click="onBack")
@@ -4278,7 +4382,7 @@ watch(queryBook, (id) => {
         span(class="ac-pg-info") {{ navCurrent }} / {{ navTotal }}
         button(class="ac-pg-btn" :disabled="navCurrent >= navTotal" :aria-label="t('app.coloring.nextPage')" @click="gotoPage(1)") ›
 
-      template(v-if="hasImage")
+      template(v-if="hasImage && !activityCtx")
         button(type="button" class="ac-btn" :class="{ on: menuOpen }" :aria-label="t('app.coloring.menu')" :aria-expanded="menuOpen" @click="toggleMenu")
           img(:src="LINE_ICONS.more" alt="" draggable="false")
 
@@ -4826,6 +4930,114 @@ $accent-dark: $accent
 
   > *
     pointer-events: auto
+
+// ── The word of the family activity: a band over the top, the top bar sits under it ───────────────────────
+.ac-app.is-activity
+  --act-h: 76px
+
+  @media (max-height: 480px)
+    --act-h: 58px
+
+  .ac-top
+    top: calc(var(--act-h) + env(safe-area-inset-top, 0px))
+    padding-top: 8px
+
+  .ac-hint-chip
+    top: calc(var(--act-h) + env(safe-area-inset-top, 0px) + 62px)
+
+.ac-act
+  position: absolute
+  top: 0
+  left: 0
+  right: 0
+  z-index: 32
+  box-sizing: border-box
+  height: calc(var(--act-h) + env(safe-area-inset-top, 0px))
+  display: flex
+  align-items: center
+  gap: 12px
+  padding: env(safe-area-inset-top, 0px) 14px 4px
+  background: linear-gradient(180deg, #fff4d2, #ffe6a6)
+  border-bottom: 3px solid #d4a83e
+  box-shadow: 0 4px 14px rgba(40, 25, 5, 0.3)
+  color: #3a2810
+
+.ac-act-word
+  flex: 1
+  min-width: 0
+  margin: 0
+  font-size: min(2.1rem, 6.4vw)
+  font-weight: 900
+  line-height: 1.1
+  overflow-wrap: anywhere
+  display: -webkit-box
+  -webkit-line-clamp: 2
+  -webkit-box-orient: vertical
+  overflow: hidden
+
+.ac-act-time
+  flex: none
+  min-width: 4.2rem
+  margin: 0
+  padding: 4px 12px
+  border-radius: 999px
+  background: #fffdf6
+  border: 2px solid #d4a83e
+  text-align: center
+  font-size: 1.7rem
+  font-weight: 900
+  line-height: 1.2
+  font-variant-numeric: tabular-nums
+
+  small
+    margin-left: 2px
+    font-size: 0.55em
+    font-weight: 800
+
+.ac-act.is-low .ac-act-time
+  color: #b3471b
+  border-color: #e08a4a
+
+.ac-act-done
+  flex: none
+
+.ac-act-track
+  position: absolute
+  left: 0
+  right: 0
+  bottom: 0
+  height: 5px
+  background: rgba(60, 40, 10, 0.18)
+
+.ac-act-fill
+  display: block
+  height: 100%
+  background: linear-gradient(90deg, #b98a35, #f0b84a)
+  transition: width 260ms linear
+
+.ac-act.is-low .ac-act-fill
+  background: linear-gradient(90deg, #a5521f, #e08a4a)
+
+.ac-act-veil
+  position: fixed
+  inset: 0
+  z-index: 90
+  display: grid
+  place-items: center
+  background: rgba(30, 20, 5, 0.45)
+  touch-action: none
+
+  p
+    margin: 0
+    padding: 20px 34px
+    border-radius: 24px
+    border: 3px solid #d4a83e
+    background: #fff7e0
+    color: #8a3a12
+    font-size: min(2.4rem, 9vw)
+    font-weight: 900
+    text-align: center
+    box-shadow: 0 16px 40px rgba(20, 24, 32, 0.4)
 
 .ac-spacer
   flex: 1

@@ -1,0 +1,2901 @@
+[
+  {
+    "id": "l1-001",
+    "level": 1,
+    "q": "What did Noah build at God's command?",
+    "options": [
+      "A tower",
+      "A temple",
+      "An ark",
+      "A bridge"
+    ],
+    "answer": 2,
+    "ref": "Genesis 6:14"
+  },
+  {
+    "id": "l1-002",
+    "level": 1,
+    "q": "Which bird brought Noah a fresh olive leaf?",
+    "options": [
+      "A dove",
+      "A raven",
+      "An eagle",
+      "A swallow"
+    ],
+    "answer": 0,
+    "ref": "Genesis 8:10-11"
+  },
+  {
+    "id": "l1-003",
+    "level": 1,
+    "q": "What did God set in the sky as a sign after the flood?",
+    "options": [
+      "A bright star",
+      "Northern lights",
+      "A shooting star",
+      "A rainbow"
+    ],
+    "answer": 3,
+    "ref": "Genesis 9:13"
+  },
+  {
+    "id": "l1-004",
+    "level": 1,
+    "q": "What was the name of the son Abraham had when he was a hundred years old?",
+    "options": [
+      "Ishmael",
+      "Isaac",
+      "Jacob",
+      "Esau"
+    ],
+    "answer": 1,
+    "ref": "Genesis 21:5"
+  },
+  {
+    "id": "l1-005",
+    "level": 1,
+    "q": "What did Jacob give his son Joseph that made his brothers jealous?",
+    "options": [
+      "A shepherd's staff",
+      "A coat of many colors",
+      "A sword",
+      "A silver ring"
+    ],
+    "answer": 1,
+    "ref": "Genesis 37:3-4"
+  },
+  {
+    "id": "l1-006",
+    "level": 1,
+    "q": "To which land did traders take Joseph?",
+    "options": [
+      "Babylon",
+      "Canaan",
+      "Syria",
+      "Egypt"
+    ],
+    "answer": 3,
+    "ref": "Genesis 37:28"
+  },
+  {
+    "id": "l1-007",
+    "level": 1,
+    "q": "What did Moses' mother put her baby in by the bank of the Nile?",
+    "options": [
+      "A basket made of reeds",
+      "A cave by the river",
+      "A big clay jar",
+      "A fishing net"
+    ],
+    "answer": 0,
+    "ref": "Exodus 2:3"
+  },
+  {
+    "id": "l1-008",
+    "level": 1,
+    "q": "What burned without burning up while Moses tended sheep?",
+    "options": [
+      "A cedar tree",
+      "An olive tree",
+      "A bush",
+      "A fig tree"
+    ],
+    "answer": 2,
+    "ref": "Exodus 3:1-2"
+  },
+  {
+    "id": "l1-009",
+    "level": 1,
+    "q": "What happened to the sea when Moses stretched out his hand over it?",
+    "options": [
+      "The water froze",
+      "The water turned to blood",
+      "The water boiled",
+      "The water divided"
+    ],
+    "answer": 3,
+    "ref": "Exodus 14:21"
+  },
+  {
+    "id": "l1-010",
+    "level": 1,
+    "q": "What did God write the Ten Commandments on for Moses?",
+    "options": [
+      "On papyrus scrolls",
+      "On pieces of leather",
+      "On two stone tablets",
+      "On wooden boards"
+    ],
+    "answer": 2,
+    "ref": "Deuteronomy 4:13"
+  },
+  {
+    "id": "l1-011",
+    "level": 1,
+    "q": "Whom should you honor, according to the Ten Commandments?",
+    "options": [
+      "The mayor",
+      "Your father and mother",
+      "The priest",
+      "The king"
+    ],
+    "answer": 1,
+    "ref": "Exodus 20:12"
+  },
+  {
+    "id": "l1-012",
+    "level": 1,
+    "q": "Who defeated the giant Goliath?",
+    "options": [
+      "David",
+      "Saul",
+      "Jonathan",
+      "Samson"
+    ],
+    "answer": 0,
+    "ref": "1 Samuel 17:50"
+  },
+  {
+    "id": "l1-013",
+    "level": 1,
+    "q": "What did the young shepherd use to defeat the giant Goliath?",
+    "options": [
+      "A sling",
+      "A spear",
+      "A bow and arrow",
+      "A sword"
+    ],
+    "answer": 0,
+    "ref": "1 Samuel 17:50"
+  },
+  {
+    "id": "l1-014",
+    "level": 1,
+    "q": "Which animals did David look after when he was young?",
+    "options": [
+      "Camels",
+      "Donkeys",
+      "Sheep",
+      "Cattle"
+    ],
+    "answer": 2,
+    "ref": "1 Samuel 16:11"
+  },
+  {
+    "id": "l1-015",
+    "level": 1,
+    "q": "Where was Daniel thrown because he kept praying to his God?",
+    "options": [
+      "Into a prison",
+      "Into the lions' den",
+      "Into a fiery furnace",
+      "Into a deep pit"
+    ],
+    "answer": 1,
+    "ref": "Daniel 6:10-16"
+  },
+  {
+    "id": "l1-016",
+    "level": 1,
+    "q": "How long was Jonah in the belly of the great fish?",
+    "options": [
+      "One day and one night",
+      "Seven days and nights",
+      "Forty days and nights",
+      "Three days and three nights"
+    ],
+    "answer": 3,
+    "ref": "Jonah 1:17"
+  },
+  {
+    "id": "l1-017",
+    "level": 1,
+    "q": "In which town was Jesus born?",
+    "options": [
+      "Nazareth",
+      "Jerusalem",
+      "Bethlehem",
+      "Jericho"
+    ],
+    "answer": 2,
+    "ref": "Luke 2:4-7"
+  },
+  {
+    "id": "l1-018",
+    "level": 1,
+    "q": "Who told Mary she would give birth to Jesus?",
+    "options": [
+      "The angel Michael",
+      "The angel Gabriel",
+      "The priest Zechariah",
+      "The prophet Isaiah"
+    ],
+    "answer": 1,
+    "ref": "Luke 1:26-31"
+  },
+  {
+    "id": "l1-019",
+    "level": 1,
+    "q": "How did four men bring a paralyzed man to Jesus when the house was full of people?",
+    "options": [
+      "Through the back door",
+      "Through a window",
+      "Through a cellar",
+      "Through the roof"
+    ],
+    "answer": 3,
+    "ref": "Mark 2:1-4"
+  },
+  {
+    "id": "l1-020",
+    "level": 1,
+    "q": "To whom did an angel announce Jesus' birth in the fields near Bethlehem?",
+    "options": [
+      "Shepherds",
+      "Priests",
+      "Kings",
+      "Fishermen"
+    ],
+    "answer": 0,
+    "ref": "Luke 2:8-11"
+  },
+  {
+    "id": "l1-021",
+    "level": 1,
+    "q": "How did the wise men from the East know that a new king had been born?",
+    "options": [
+      "By a dream",
+      "By a cloud",
+      "By an eclipse of the moon",
+      "By a star"
+    ],
+    "answer": 3,
+    "ref": "Matthew 2:2"
+  },
+  {
+    "id": "l1-022",
+    "level": 1,
+    "q": "Who baptized Jesus in the Jordan?",
+    "options": [
+      "John the Baptist",
+      "Peter",
+      "James",
+      "Andrew"
+    ],
+    "answer": 0,
+    "ref": "Matthew 3:13"
+  },
+  {
+    "id": "l1-023",
+    "level": 1,
+    "q": "What was Simon Peter's job when Jesus called him?",
+    "options": [
+      "Tax collector",
+      "Carpenter",
+      "Fisherman",
+      "Shepherd"
+    ],
+    "answer": 2,
+    "ref": "Matthew 4:18"
+  },
+  {
+    "id": "l1-024",
+    "level": 1,
+    "q": "How many disciples did Jesus choose as his apostles?",
+    "options": [
+      "Seven",
+      "Twelve",
+      "Ten",
+      "Twenty"
+    ],
+    "answer": 1,
+    "ref": "Luke 6:13"
+  },
+  {
+    "id": "l1-025",
+    "level": 1,
+    "q": "What did the disciples have when Jesus fed five thousand people?",
+    "options": [
+      "Three loaves and five fish",
+      "Five loaves and two fish",
+      "Seven loaves and three fish",
+      "Two loaves and three fish"
+    ],
+    "answer": 1,
+    "ref": "Matthew 14:17-21"
+  },
+  {
+    "id": "l1-026",
+    "level": 1,
+    "q": "What was Jesus doing in the boat when the great storm broke out?",
+    "options": [
+      "Rowing",
+      "Fishing",
+      "Sleeping",
+      "Steering"
+    ],
+    "answer": 2,
+    "ref": "Mark 4:37-38"
+  },
+  {
+    "id": "l1-027",
+    "level": 1,
+    "q": "Which parable tells of a man who fell among robbers?",
+    "options": [
+      "The Good Samaritan",
+      "The Prodigal Son",
+      "The Good Shepherd",
+      "The Rich Fool"
+    ],
+    "answer": 0,
+    "ref": "Luke 10:30-37"
+  },
+  {
+    "id": "l1-028",
+    "level": 1,
+    "q": "What did the prodigal son have to feed after he lost all his money?",
+    "options": [
+      "Sheep",
+      "Camels",
+      "Goats",
+      "Pigs"
+    ],
+    "answer": 3,
+    "ref": "Luke 15:13-15"
+  },
+  {
+    "id": "l1-029",
+    "level": 1,
+    "q": "Why did Zacchaeus climb a tree?",
+    "options": [
+      "He was short and wanted to see Jesus",
+      "He wanted to hide from Jesus",
+      "He wanted to pick some fruit",
+      "He wanted to shout to the crowd"
+    ],
+    "answer": 0,
+    "ref": "Luke 19:2-4"
+  },
+  {
+    "id": "l1-030",
+    "level": 1,
+    "q": "Who did Mary Magdalene think the man at the tomb was?",
+    "options": [
+      "A soldier",
+      "A priest",
+      "A fisherman",
+      "The gardener"
+    ],
+    "answer": 3,
+    "ref": "John 20:15"
+  },
+  {
+    "id": "l1-031",
+    "level": 1,
+    "q": "Which disciple denied Jesus three times before the rooster crowed?",
+    "options": [
+      "John",
+      "Peter",
+      "Judas",
+      "Thomas"
+    ],
+    "answer": 1,
+    "ref": "Luke 22:56-61"
+  },
+  {
+    "id": "l1-032",
+    "level": 1,
+    "q": "Which disciple doubted that Jesus was alive until he saw him himself?",
+    "options": [
+      "Philip",
+      "Matthew",
+      "Thomas",
+      "Andrew"
+    ],
+    "answer": 2,
+    "ref": "John 20:24-29"
+  },
+  {
+    "id": "l1-033",
+    "level": 1,
+    "q": "What did God create on the first day?",
+    "options": [
+      "The stars",
+      "The animals",
+      "Light",
+      "The mountains"
+    ],
+    "answer": 2,
+    "ref": "Genesis 1:3-5"
+  },
+  {
+    "id": "l1-034",
+    "level": 1,
+    "q": "What did Adam call his wife?",
+    "options": [
+      "Sarah",
+      "Rebekah",
+      "Leah",
+      "Eve"
+    ],
+    "answer": 3,
+    "ref": "Genesis 3:20"
+  },
+  {
+    "id": "l1-035",
+    "level": 1,
+    "q": "What were the names of Adam and Eve's first two sons?",
+    "options": [
+      "Cain and Abel",
+      "Esau and Jacob",
+      "Isaac and Ishmael",
+      "Seth and Enoch"
+    ],
+    "answer": 0,
+    "ref": "Genesis 4:1-2"
+  },
+  {
+    "id": "l1-036",
+    "level": 1,
+    "q": "What did the people of Babel want to build?",
+    "options": [
+      "A dam against the flood",
+      "A tower up to heaven",
+      "A palace for the king",
+      "A harbor by the sea"
+    ],
+    "answer": 1,
+    "ref": "Genesis 11:4"
+  },
+  {
+    "id": "l1-037",
+    "level": 1,
+    "q": "To which land did Abraham go when God called him?",
+    "options": [
+      "Egypt",
+      "Canaan",
+      "Babylonia",
+      "Assyria"
+    ],
+    "answer": 1,
+    "ref": "Genesis 12:1-5"
+  },
+  {
+    "id": "l1-038",
+    "level": 1,
+    "q": "What was the name of Abraham's wife?",
+    "options": [
+      "Sarah",
+      "Leah",
+      "Rebekah",
+      "Rachel"
+    ],
+    "answer": 0,
+    "ref": "Genesis 17:15"
+  },
+  {
+    "id": "l1-039",
+    "level": 1,
+    "q": "What did Esau sell his birthright to Jacob for?",
+    "options": [
+      "For a tent",
+      "For a camel",
+      "For a sheep",
+      "For lentil stew"
+    ],
+    "answer": 3,
+    "ref": "Genesis 25:33-34"
+  },
+  {
+    "id": "l1-040",
+    "level": 1,
+    "q": "What did Jacob see in a dream while sleeping with his head on a stone?",
+    "options": [
+      "A golden tower",
+      "A bridge of light",
+      "A ladder up to heaven",
+      "A giant tree"
+    ],
+    "answer": 2,
+    "ref": "Genesis 28:11-12"
+  },
+  {
+    "id": "l1-041",
+    "level": 1,
+    "q": "Which animals did Pharaoh dream about before Joseph explained the dream?",
+    "options": [
+      "Sheep",
+      "Horses",
+      "Camels",
+      "Cows"
+    ],
+    "answer": 3,
+    "ref": "Genesis 41:1-4"
+  },
+  {
+    "id": "l1-042",
+    "level": 1,
+    "q": "How many sons did Jacob have?",
+    "options": [
+      "Ten",
+      "Twelve",
+      "Seven",
+      "Fourteen"
+    ],
+    "answer": 1,
+    "ref": "Genesis 35:22"
+  },
+  {
+    "id": "l1-043",
+    "level": 1,
+    "q": "What did the Israelites call the bread God gave them from heaven in the desert?",
+    "options": [
+      "Matzah",
+      "Honey cakes",
+      "Manna",
+      "Desert bread"
+    ],
+    "answer": 2,
+    "ref": "Exodus 16:15; 16:31"
+  },
+  {
+    "id": "l1-044",
+    "level": 1,
+    "q": "What happened to the walls of Jericho when the people shouted?",
+    "options": [
+      "They fell down",
+      "They stood unharmed",
+      "They were washed away",
+      "They were burned"
+    ],
+    "answer": 0,
+    "ref": "Joshua 6:20"
+  },
+  {
+    "id": "l1-045",
+    "level": 1,
+    "q": "What was never to be cut from Samson?",
+    "options": [
+      "His hair",
+      "His beard",
+      "His fingernails",
+      "His eyebrows"
+    ],
+    "answer": 0,
+    "ref": "Judges 16:17"
+  },
+  {
+    "id": "l1-046",
+    "level": 1,
+    "q": "Who heard God's voice at night as a boy in the temple with Eli?",
+    "options": [
+      "Elijah",
+      "Samuel",
+      "Nathan",
+      "Jeremiah"
+    ],
+    "answer": 1,
+    "ref": "1 Samuel 3:3-10"
+  },
+  {
+    "id": "l1-047",
+    "level": 1,
+    "q": "Which birds brought the prophet Elijah bread and meat?",
+    "options": [
+      "Doves",
+      "Eagles",
+      "Swallows",
+      "Ravens"
+    ],
+    "answer": 3,
+    "ref": "1 Kings 17:4-6"
+  },
+  {
+    "id": "l1-048",
+    "level": 1,
+    "q": "Which prophet went up to heaven in a chariot of fire?",
+    "options": [
+      "Isaiah",
+      "Samuel",
+      "Elijah",
+      "Daniel"
+    ],
+    "answer": 2,
+    "ref": "2 Kings 2:11"
+  },
+  {
+    "id": "l1-049",
+    "level": 1,
+    "q": "Which king asked God for a wise and understanding heart?",
+    "options": [
+      "David",
+      "Saul",
+      "Solomon",
+      "Rehoboam"
+    ],
+    "answer": 2,
+    "ref": "1 Kings 3:9-12"
+  },
+  {
+    "id": "l1-050",
+    "level": 1,
+    "q": "What did King Solomon build for God in Jerusalem?",
+    "options": [
+      "A temple",
+      "A tower",
+      "A harbor",
+      "A fortress"
+    ],
+    "answer": 0,
+    "ref": "1 Kings 6:1-2"
+  },
+  {
+    "id": "l1-051",
+    "level": 1,
+    "q": "Which queen saved her people from destruction?",
+    "options": [
+      "Ruth",
+      "Esther",
+      "Hannah",
+      "Sarah"
+    ],
+    "answer": 1,
+    "ref": "Esther 7:3-4"
+  },
+  {
+    "id": "l1-052",
+    "level": 1,
+    "q": "How does Psalm 23 begin? “The Lord is my …”",
+    "options": [
+      "Rock",
+      "Light",
+      "Shield",
+      "Shepherd"
+    ],
+    "answer": 3,
+    "ref": "Psalm 23:1"
+  },
+  {
+    "id": "l1-053",
+    "level": 1,
+    "q": "What happened to the water of the Nile in the first plague?",
+    "options": [
+      "It dried up",
+      "It froze",
+      "It turned salty",
+      "It turned to blood"
+    ],
+    "answer": 3,
+    "ref": "Exodus 7:20"
+  },
+  {
+    "id": "l1-054",
+    "level": 1,
+    "q": "To whom did Ruth say, “Where you go, I will go”?",
+    "options": [
+      "To her mother",
+      "To her sister",
+      "To her mother-in-law",
+      "To her husband"
+    ],
+    "answer": 2,
+    "ref": "Ruth 1:16"
+  },
+  {
+    "id": "l1-055",
+    "level": 1,
+    "q": "Who led the rebuilding of the wall of Jerusalem?",
+    "options": [
+      "Nehemiah",
+      "Ezra",
+      "Jeremiah",
+      "Ezekiel"
+    ],
+    "answer": 0,
+    "ref": "Nehemiah 2:17-18"
+  },
+  {
+    "id": "l1-056",
+    "level": 1,
+    "q": "What was the second son of Adam and Eve by trade?",
+    "options": [
+      "Fisherman",
+      "Shepherd",
+      "Carpenter",
+      "Hunter"
+    ],
+    "answer": 1,
+    "ref": "Genesis 4:2"
+  },
+  {
+    "id": "l1-057",
+    "level": 1,
+    "q": "How does the prayer Jesus taught his disciples begin?",
+    "options": [
+      "Lord, hear my prayer",
+      "Our Father in heaven",
+      "God, you are great",
+      "Dear God in heaven"
+    ],
+    "answer": 1,
+    "ref": "Matthew 6:9"
+  },
+  {
+    "id": "l1-058",
+    "level": 1,
+    "q": "What did Jesus turn into something else at the wedding in Cana?",
+    "options": [
+      "Wine into water",
+      "Water into oil",
+      "Bread into wine",
+      "Water into wine"
+    ],
+    "answer": 3,
+    "ref": "John 2:1-9"
+  },
+  {
+    "id": "l1-059",
+    "level": 1,
+    "q": "Which brother of Mary and Martha did Jesus call out of the tomb?",
+    "options": [
+      "Nicodemus",
+      "Bartimaeus",
+      "Lazarus",
+      "Zacchaeus"
+    ],
+    "answer": 2,
+    "ref": "John 11:1-2; 11:43-44"
+  },
+  {
+    "id": "l1-060",
+    "level": 1,
+    "q": "On which animal did Jesus ride into Jerusalem?",
+    "options": [
+      "A donkey",
+      "A horse",
+      "A camel",
+      "A mule"
+    ],
+    "answer": 0,
+    "ref": "Matthew 21:7"
+  },
+  {
+    "id": "l1-061",
+    "level": 1,
+    "q": "Which tax collector followed Jesus when he said to him, “Follow me”?",
+    "options": [
+      "Matthew",
+      "Philip",
+      "Andrew",
+      "Thomas"
+    ],
+    "answer": 0,
+    "ref": "Matthew 9:9"
+  },
+  {
+    "id": "l1-062",
+    "level": 1,
+    "q": "What happened when the disciples cast the net on the right side of the boat?",
+    "options": [
+      "The net stayed empty again",
+      "The net tore at once",
+      "The net was full of fish",
+      "Only one fish went in"
+    ],
+    "answer": 2,
+    "ref": "John 21:6"
+  },
+  {
+    "id": "l1-063",
+    "level": 1,
+    "q": "By what other name is Paul also called?",
+    "options": [
+      "Simon",
+      "Silas",
+      "Stephen",
+      "Saul"
+    ],
+    "answer": 3,
+    "ref": "Acts 13:9"
+  },
+  {
+    "id": "l1-064",
+    "level": 1,
+    "q": "On the road to which city did Paul meet Jesus in a light from heaven?",
+    "options": [
+      "To Rome",
+      "To Damascus",
+      "To Athens",
+      "To Antioch"
+    ],
+    "answer": 1,
+    "ref": "Acts 9:1-5"
+  },
+  {
+    "id": "l1-065",
+    "level": 1,
+    "q": "What did John the Baptist eat in the wilderness?",
+    "options": [
+      "Dates and goat's milk",
+      "Bread and roasted fish",
+      "Locusts and wild honey",
+      "Berries and goat cheese"
+    ],
+    "answer": 2,
+    "ref": "Matthew 3:4"
+  },
+  {
+    "id": "l1-066",
+    "level": 1,
+    "q": "What did the Spirit of God look like when it came down at Jesus' baptism?",
+    "options": [
+      "Like an eagle",
+      "Like a dove",
+      "Like a flame",
+      "Like a whirlwind"
+    ],
+    "answer": 1,
+    "ref": "Matthew 3:16"
+  },
+  {
+    "id": "l1-067",
+    "level": 1,
+    "q": "On what did the wise man in Jesus' parable build his house?",
+    "options": [
+      "On a rock",
+      "On sand",
+      "On clay",
+      "On wooden posts"
+    ],
+    "answer": 0,
+    "ref": "Matthew 7:24-25"
+  },
+  {
+    "id": "l1-068",
+    "level": 1,
+    "q": "What happened to the seed that fell on good soil in the parable of the sower?",
+    "options": [
+      "Birds ate it",
+      "It withered in the sun",
+      "Thorns choked it",
+      "It bore much fruit"
+    ],
+    "answer": 3,
+    "ref": "Matthew 13:8"
+  },
+  {
+    "id": "l1-069",
+    "level": 1,
+    "q": "How many sheep did the shepherd have in the parable of the lost sheep?",
+    "options": [
+      "Fifty",
+      "A hundred",
+      "Ten",
+      "Twenty"
+    ],
+    "answer": 1,
+    "ref": "Luke 15:4"
+  },
+  {
+    "id": "l1-070",
+    "level": 1,
+    "q": "How old was Jesus when he talked with the teachers in the temple?",
+    "options": [
+      "Twelve years old",
+      "Eight years old",
+      "Fifteen years old",
+      "Twenty years old"
+    ],
+    "answer": 0,
+    "ref": "Luke 2:42-46"
+  },
+  {
+    "id": "l1-071",
+    "level": 1,
+    "q": "What did Peter do when Jesus called “Come!” out on the lake?",
+    "options": [
+      "He rowed to Jesus",
+      "He swam to Jesus",
+      "He walked on the water",
+      "He cast out his net"
+    ],
+    "answer": 2,
+    "ref": "Matthew 14:28-29"
+  },
+  {
+    "id": "l1-072",
+    "level": 1,
+    "q": "Whom did Jesus tell his disciples to let come to him?",
+    "options": [
+      "The priests",
+      "The soldiers",
+      "The kings",
+      "The children"
+    ],
+    "answer": 3,
+    "ref": "Mark 10:13-14"
+  },
+  {
+    "id": "l1-073",
+    "level": 1,
+    "q": "In which town did Jesus grow up?",
+    "options": [
+      "Capernaum",
+      "Bethlehem",
+      "Jerusalem",
+      "Nazareth"
+    ],
+    "answer": 3,
+    "ref": "Luke 4:16"
+  },
+  {
+    "id": "l1-074",
+    "level": 1,
+    "q": "How many of the ten healed lepers came back to thank Jesus?",
+    "options": [
+      "Nine",
+      "One",
+      "Five",
+      "Three"
+    ],
+    "answer": 1,
+    "ref": "Luke 17:15-17"
+  },
+  {
+    "id": "l1-075",
+    "level": 1,
+    "q": "Which disciple betrayed Jesus for thirty pieces of silver?",
+    "options": [
+      "Judas",
+      "Peter",
+      "Thomas",
+      "James"
+    ],
+    "answer": 0,
+    "ref": "Matthew 26:14-15"
+  },
+  {
+    "id": "l1-076",
+    "level": 1,
+    "q": "At which feast did the Holy Spirit come upon the disciples?",
+    "options": [
+      "At Passover",
+      "At the Feast of Tabernacles",
+      "At Pentecost",
+      "At Purim"
+    ],
+    "answer": 2,
+    "ref": "Acts 2:1-4"
+  },
+  {
+    "id": "l1-077",
+    "level": 1,
+    "q": "Who led Israel into the promised land after Moses?",
+    "options": [
+      "Joshua",
+      "Aaron",
+      "Caleb",
+      "Eli"
+    ],
+    "answer": 0,
+    "ref": "Joshua 1:1-2"
+  },
+  {
+    "id": "l1-078",
+    "level": 1,
+    "q": "What did God do on the seventh day of creation?",
+    "options": [
+      "He made the animals",
+      "He made the stars",
+      "He made people",
+      "He rested from his work"
+    ],
+    "answer": 3,
+    "ref": "Genesis 2:2"
+  },
+  {
+    "id": "l1-079",
+    "level": 1,
+    "q": "Which woman prayed in the house of the Lord for a son and received Samuel?",
+    "options": [
+      "Sarah",
+      "Rachel",
+      "Hannah",
+      "Leah"
+    ],
+    "answer": 2,
+    "ref": "1 Samuel 1:10-20"
+  },
+  {
+    "id": "l1-080",
+    "level": 1,
+    "q": "What was the name of the father of Esau and Jacob?",
+    "options": [
+      "Abraham",
+      "Isaac",
+      "Laban",
+      "Joseph"
+    ],
+    "answer": 1,
+    "ref": "Genesis 25:19-26"
+  },
+  {
+    "id": "l2-001",
+    "level": 2,
+    "q": "What was the name of the nephew who went with Abraham to Canaan?",
+    "options": [
+      "Laban",
+      "Nahor",
+      "Lot",
+      "Esau"
+    ],
+    "answer": 2,
+    "ref": "Genesis 12:4-5"
+  },
+  {
+    "id": "l2-002",
+    "level": 2,
+    "q": "What were the names of the parents of John the Baptist?",
+    "options": [
+      "Zechariah and Elizabeth",
+      "Zebedee and Salome",
+      "Simeon and Anna",
+      "Aquila and Priscilla"
+    ],
+    "answer": 0,
+    "ref": "Luke 1:5-13"
+  },
+  {
+    "id": "l2-003",
+    "level": 2,
+    "q": "Which plague struck Egypt right after the Nile turned to blood?",
+    "options": [
+      "Hail",
+      "Darkness",
+      "Locusts",
+      "Frogs"
+    ],
+    "answer": 3,
+    "ref": "Exodus 7:25; 8:1-6"
+  },
+  {
+    "id": "l2-004",
+    "level": 2,
+    "q": "Who hid Joshua's two spies in Jericho?",
+    "options": [
+      "Deborah",
+      "Rahab",
+      "Ruth",
+      "Jael"
+    ],
+    "answer": 1,
+    "ref": "Joshua 2:1-4"
+  },
+  {
+    "id": "l2-005",
+    "level": 2,
+    "q": "What was the name of the angel who came to Mary?",
+    "options": [
+      "Michael",
+      "Gabriel",
+      "Raphael",
+      "Uriel"
+    ],
+    "answer": 1,
+    "ref": "Luke 1:26-27"
+  },
+  {
+    "id": "l2-006",
+    "level": 2,
+    "q": "On which mountain did Moses see the burning bush?",
+    "options": [
+      "Mount Nebo",
+      "Mount Carmel",
+      "Mount Zion",
+      "Mount Horeb"
+    ],
+    "answer": 3,
+    "ref": "Exodus 3:1-2"
+  },
+  {
+    "id": "l2-007",
+    "level": 2,
+    "q": "Why did Joseph and Mary travel to Bethlehem?",
+    "options": [
+      "The emperor ordered a census",
+      "They visited relatives",
+      "They fled from Herod",
+      "They had found work"
+    ],
+    "answer": 0,
+    "ref": "Luke 2:1-5"
+  },
+  {
+    "id": "l2-008",
+    "level": 2,
+    "q": "How many years did Jacob first work for Rachel?",
+    "options": [
+      "Three years",
+      "Twelve years",
+      "Seven years",
+      "Ten years"
+    ],
+    "answer": 2,
+    "ref": "Genesis 29:18-20"
+  },
+  {
+    "id": "l2-009",
+    "level": 2,
+    "q": "With how many men did Gideon go against the Midianites?",
+    "options": [
+      "A hundred",
+      "A thousand",
+      "Three thousand",
+      "Three hundred"
+    ],
+    "answer": 3,
+    "ref": "Judges 7:7"
+  },
+  {
+    "id": "l2-010",
+    "level": 2,
+    "q": "Where did Joseph flee with Mary and the child to escape Herod?",
+    "options": [
+      "To Syria",
+      "To Samaria",
+      "To Egypt",
+      "To Babylon"
+    ],
+    "answer": 2,
+    "ref": "Matthew 2:13-14"
+  },
+  {
+    "id": "l2-011",
+    "level": 2,
+    "q": "What was the name of Ruth's mother-in-law, with whom she went to Bethlehem?",
+    "options": [
+      "Orpah",
+      "Naomi",
+      "Hannah",
+      "Deborah"
+    ],
+    "answer": 1,
+    "ref": "Ruth 1:2-4; 1:22"
+  },
+  {
+    "id": "l2-012",
+    "level": 2,
+    "q": "Who came to Jesus at night to talk with him?",
+    "options": [
+      "Nicodemus",
+      "Zacchaeus",
+      "Cornelius",
+      "Caiaphas"
+    ],
+    "answer": 0,
+    "ref": "John 3:1-2"
+  },
+  {
+    "id": "l2-013",
+    "level": 2,
+    "q": "What was the name of Moses' brother, who spoke to the people for him?",
+    "options": [
+      "Aaron",
+      "Hur",
+      "Joshua",
+      "Caleb"
+    ],
+    "answer": 0,
+    "ref": "Exodus 4:14-16"
+  },
+  {
+    "id": "l2-015",
+    "level": 2,
+    "q": "What was Saul looking for when he met Samuel?",
+    "options": [
+      "His father's sheep",
+      "His father's camels",
+      "His father's donkeys",
+      "His father's cattle"
+    ],
+    "answer": 2,
+    "ref": "1 Samuel 9:3"
+  },
+  {
+    "id": "l2-016",
+    "level": 2,
+    "q": "What was the name of the place where Jacob saw the ladder to heaven in a dream?",
+    "options": [
+      "Shechem",
+      "Hebron",
+      "Shiloh",
+      "Bethel"
+    ],
+    "answer": 3,
+    "ref": "Genesis 28:12-19"
+  },
+  {
+    "id": "l2-017",
+    "level": 2,
+    "q": "What did the wise men from the East bring to the child Jesus?",
+    "options": [
+      "Silver, honey and oil",
+      "Gold, wine and bread",
+      "Gold, frankincense and myrrh",
+      "Pearls, salt and wheat"
+    ],
+    "answer": 2,
+    "ref": "Matthew 2:11"
+  },
+  {
+    "id": "l2-018",
+    "level": 2,
+    "q": "Whose house did God send the prophet Jeremiah to?",
+    "options": [
+      "A blacksmith's",
+      "A weaver's",
+      "A shepherd's",
+      "A potter's"
+    ],
+    "answer": 3,
+    "ref": "Jeremiah 18:1-3"
+  },
+  {
+    "id": "l2-020",
+    "level": 2,
+    "q": "Whose dreams did Joseph explain in prison?",
+    "options": [
+      "A guard and a judge",
+      "A cupbearer and a baker",
+      "A scribe and a priest",
+      "A cook and a gardener"
+    ],
+    "answer": 1,
+    "ref": "Genesis 40:1-8"
+  },
+  {
+    "id": "l2-021",
+    "level": 2,
+    "q": "Where did the ark come to rest after the flood?",
+    "options": [
+      "On Mount Sinai",
+      "On Mount Ararat",
+      "On Mount Carmel",
+      "On Mount Hermon"
+    ],
+    "answer": 1,
+    "ref": "Genesis 8:4"
+  },
+  {
+    "id": "l2-022",
+    "level": 2,
+    "q": "How many water jars stood ready at the wedding in Cana?",
+    "options": [
+      "Six",
+      "Four",
+      "Seven",
+      "Twelve"
+    ],
+    "answer": 0,
+    "ref": "John 2:6"
+  },
+  {
+    "id": "l2-023",
+    "level": 2,
+    "q": "Whom did Ruth marry?",
+    "options": [
+      "Obed",
+      "Elimelech",
+      "Jesse",
+      "Boaz"
+    ],
+    "answer": 3,
+    "ref": "Ruth 4:13"
+  },
+  {
+    "id": "l2-025",
+    "level": 2,
+    "q": "For how many pieces of silver was Joseph sold to the Ishmaelites?",
+    "options": [
+      "For ten",
+      "For thirty",
+      "For fifty",
+      "For twenty"
+    ],
+    "answer": 3,
+    "ref": "Genesis 37:28"
+  },
+  {
+    "id": "l2-027",
+    "level": 2,
+    "q": "Which priest did the young Samuel serve?",
+    "options": [
+      "Zadok",
+      "Abiathar",
+      "Eli",
+      "Aaron"
+    ],
+    "answer": 2,
+    "ref": "1 Samuel 2:11; 3:1"
+  },
+  {
+    "id": "l2-028",
+    "level": 2,
+    "q": "What was the name of the prophetess who took a tambourine and sang after the crossing of the sea?",
+    "options": [
+      "Miriam",
+      "Deborah",
+      "Hannah",
+      "Abigail"
+    ],
+    "answer": 0,
+    "ref": "Exodus 15:20-21"
+  },
+  {
+    "id": "l2-029",
+    "level": 2,
+    "q": "What did Zacchaeus promise the poor when Jesus came to his house?",
+    "options": [
+      "Half of his goods",
+      "A tenth of his goods",
+      "A third of his goods",
+      "Everything he owned"
+    ],
+    "answer": 0,
+    "ref": "Luke 19:5-8"
+  },
+  {
+    "id": "l2-030",
+    "level": 2,
+    "q": "Who held up Moses' arms when Israel fought against Amalek?",
+    "options": [
+      "Joshua and Caleb",
+      "Nadab and Abihu",
+      "Aaron and Hur",
+      "Eldad and Medad"
+    ],
+    "answer": 2,
+    "ref": "Exodus 17:10-12"
+  },
+  {
+    "id": "l2-031",
+    "level": 2,
+    "q": "How many stones did David pick out for his sling?",
+    "options": [
+      "Three",
+      "Five",
+      "Seven",
+      "Twelve"
+    ],
+    "answer": 1,
+    "ref": "1 Samuel 17:40"
+  },
+  {
+    "id": "l2-032",
+    "level": 2,
+    "q": "What does Paul call the shield in the armor of God?",
+    "options": [
+      "Shield of truth",
+      "Shield of peace",
+      "Shield of hope",
+      "Shield of faith"
+    ],
+    "answer": 3,
+    "ref": "Ephesians 6:16"
+  },
+  {
+    "id": "l2-033",
+    "level": 2,
+    "q": "Whose son was Jonathan, David's best friend?",
+    "options": [
+      "Samuel's",
+      "Saul's",
+      "Jesse's",
+      "Eli's"
+    ],
+    "answer": 1,
+    "ref": "1 Samuel 14:1; 18:1"
+  },
+  {
+    "id": "l2-034",
+    "level": 2,
+    "q": "Who passed by the wounded man in the parable of the Good Samaritan?",
+    "options": [
+      "A shepherd and a tax collector",
+      "Two soldiers",
+      "A priest and a Levite",
+      "A Pharisee and a fisherman"
+    ],
+    "answer": 2,
+    "ref": "Luke 10:30-32"
+  },
+  {
+    "id": "l2-035",
+    "level": 2,
+    "q": "Who told David the story about the poor man's lamb?",
+    "options": [
+      "Samuel",
+      "Gad",
+      "Elijah",
+      "Nathan"
+    ],
+    "answer": 3,
+    "ref": "2 Samuel 12:1-7"
+  },
+  {
+    "id": "l2-036",
+    "level": 2,
+    "q": "What did Solomon ask God for when God appeared to him in a dream?",
+    "options": [
+      "An understanding heart",
+      "Great riches",
+      "A long life",
+      "Victory over his enemies"
+    ],
+    "answer": 0,
+    "ref": "1 Kings 3:5-12"
+  },
+  {
+    "id": "l2-037",
+    "level": 2,
+    "q": "Which seed did the birds eat in the parable of the sower?",
+    "options": [
+      "The one that fell among thorns",
+      "The one that fell on rocky ground",
+      "The one that fell on good soil",
+      "The one that fell on the path"
+    ],
+    "answer": 3,
+    "ref": "Matthew 13:3-4"
+  },
+  {
+    "id": "l2-038",
+    "level": 2,
+    "q": "Who came to test Solomon with hard questions?",
+    "options": [
+      "The Queen of Sheba",
+      "Queen Esther",
+      "Queen Jezebel",
+      "Queen Athaliah"
+    ],
+    "answer": 0,
+    "ref": "1 Kings 10:1"
+  },
+  {
+    "id": "l2-039",
+    "level": 2,
+    "q": "Who brought Elijah bread and meat in the morning and evening by the brook?",
+    "options": [
+      "Doves",
+      "Eagles",
+      "Ravens",
+      "Quail"
+    ],
+    "answer": 2,
+    "ref": "1 Kings 17:2-6"
+  },
+  {
+    "id": "l2-040",
+    "level": 2,
+    "q": "How many sheep did the shepherd leave behind to look for the one lost sheep?",
+    "options": [
+      "Ninety",
+      "Ninety-nine",
+      "Fifty",
+      "Ten"
+    ],
+    "answer": 1,
+    "ref": "Luke 15:4"
+  },
+  {
+    "id": "l2-041",
+    "level": 2,
+    "q": "What does Jesus compare the kingdom of heaven to in the parable of the seed that grows into a tree?",
+    "options": [
+      "A mustard seed",
+      "A poppy seed",
+      "A barley grain",
+      "A millet seed"
+    ],
+    "answer": 0,
+    "ref": "Matthew 13:31-32"
+  },
+  {
+    "id": "l2-042",
+    "level": 2,
+    "q": "On which mountain did Elijah face the prophets of Baal?",
+    "options": [
+      "Mount Sinai",
+      "Mount Tabor",
+      "Mount Ararat",
+      "Mount Carmel"
+    ],
+    "answer": 3,
+    "ref": "1 Kings 18:19-20"
+  },
+  {
+    "id": "l2-043",
+    "level": 2,
+    "q": "Who became prophet in Elijah's place?",
+    "options": [
+      "Isaiah",
+      "Elisha",
+      "Amos",
+      "Jonah"
+    ],
+    "answer": 1,
+    "ref": "2 Kings 2:9-15"
+  },
+  {
+    "id": "l2-044",
+    "level": 2,
+    "q": "How many of the ten virgins in the parable were wise?",
+    "options": [
+      "Three",
+      "Seven",
+      "Five",
+      "Four"
+    ],
+    "answer": 2,
+    "ref": "Matthew 25:1-2"
+  },
+  {
+    "id": "l2-045",
+    "level": 2,
+    "q": "In which river was Naaman told to wash seven times?",
+    "options": [
+      "In the Nile",
+      "In the Euphrates",
+      "In the Jordan",
+      "In the Kidron"
+    ],
+    "answer": 2,
+    "ref": "2 Kings 5:10"
+  },
+  {
+    "id": "l2-046",
+    "level": 2,
+    "q": "What did the servant in the parable do with his one talent?",
+    "options": [
+      "He gave it away",
+      "He buried it",
+      "He lost it",
+      "He sold it"
+    ],
+    "answer": 1,
+    "ref": "Matthew 25:18"
+  },
+  {
+    "id": "l2-047",
+    "level": 2,
+    "q": "Where did God tell Jonah to go?",
+    "options": [
+      "To Nineveh",
+      "To Tarshish",
+      "To Babylon",
+      "To Damascus"
+    ],
+    "answer": 0,
+    "ref": "Jonah 1:1-2"
+  },
+  {
+    "id": "l2-049",
+    "level": 2,
+    "q": "Which commandment did Jesus call the greatest in the law?",
+    "options": [
+      "Love God with all your heart",
+      "Keep the Sabbath day holy",
+      "Honor your father and mother",
+      "Do not kill and do not steal"
+    ],
+    "answer": 0,
+    "ref": "Matthew 22:35-38"
+  },
+  {
+    "id": "l2-050",
+    "level": 2,
+    "q": "How many times a day did Daniel pray to God?",
+    "options": [
+      "Once",
+      "Seven times",
+      "Five times",
+      "Three times"
+    ],
+    "answer": 3,
+    "ref": "Daniel 6:10"
+  },
+  {
+    "id": "l2-051",
+    "level": 2,
+    "q": "Which king saw a hand write on the wall?",
+    "options": [
+      "Nebuchadnezzar",
+      "Cyrus",
+      "Belshazzar",
+      "Darius"
+    ],
+    "answer": 2,
+    "ref": "Daniel 5:1-5"
+  },
+  {
+    "id": "l2-052",
+    "level": 2,
+    "q": "According to the Sermon on the Mount, who will inherit the earth?",
+    "options": [
+      "The merciful",
+      "The meek",
+      "The peacemakers",
+      "Those who mourn"
+    ],
+    "answer": 1,
+    "ref": "Matthew 5:5"
+  },
+  {
+    "id": "l2-053",
+    "level": 2,
+    "q": "Who took in Esther, who had no parents, as his own daughter?",
+    "options": [
+      "Haman",
+      "Ezra",
+      "Mordecai",
+      "Ahasuerus"
+    ],
+    "answer": 2,
+    "ref": "Esther 2:5-7"
+  },
+  {
+    "id": "l2-054",
+    "level": 2,
+    "q": "What were the names of Lazarus' sisters?",
+    "options": [
+      "Mary and Martha",
+      "Mary and Salome",
+      "Martha and Joanna",
+      "Rachel and Leah"
+    ],
+    "answer": 0,
+    "ref": "John 11:1-2"
+  },
+  {
+    "id": "l2-055",
+    "level": 2,
+    "q": "What was finished in Jerusalem in just 52 days under Nehemiah?",
+    "options": [
+      "The temple",
+      "The city wall",
+      "The king's palace",
+      "The sacrificial altar"
+    ],
+    "answer": 1,
+    "ref": "Nehemiah 6:15; 2:17"
+  },
+  {
+    "id": "l2-056",
+    "level": 2,
+    "q": "What did the people lay on the road when Jesus entered Jerusalem?",
+    "options": [
+      "Carpets and flowers",
+      "Nets and ropes",
+      "Stones and wood",
+      "Clothes and branches"
+    ],
+    "answer": 3,
+    "ref": "Matthew 21:8"
+  },
+  {
+    "id": "l2-057",
+    "level": 2,
+    "q": "Which psalm begins with “The Lord is my shepherd”?",
+    "options": [
+      "Psalm 1",
+      "Psalm 23",
+      "Psalm 100",
+      "Psalm 121"
+    ],
+    "answer": 1,
+    "ref": "Psalm 23:1"
+  },
+  {
+    "id": "l2-058",
+    "level": 2,
+    "q": "What did Jesus ask the woman at the well in Samaria for?",
+    "options": [
+      "Some bread",
+      "A place to sleep",
+      "A prayer",
+      "A drink"
+    ],
+    "answer": 3,
+    "ref": "John 4:5-7"
+  },
+  {
+    "id": "l2-059",
+    "level": 2,
+    "q": "Where did Jesus pray on the night before he was arrested?",
+    "options": [
+      "Golgotha",
+      "Bethany",
+      "Gethsemane",
+      "Capernaum"
+    ],
+    "answer": 2,
+    "ref": "Matthew 26:36"
+  },
+  {
+    "id": "l2-060",
+    "level": 2,
+    "q": "Who lived to be 969 years old?",
+    "options": [
+      "Methuselah",
+      "Adam",
+      "Noah",
+      "Enoch"
+    ],
+    "answer": 0,
+    "ref": "Genesis 5:25-27"
+  },
+  {
+    "id": "l2-062",
+    "level": 2,
+    "q": "What happened after Peter denied Jesus three times?",
+    "options": [
+      "The earth shook",
+      "It began to rain",
+      "The rooster crowed",
+      "An angel appeared"
+    ],
+    "answer": 2,
+    "ref": "Matthew 26:74-75"
+  },
+  {
+    "id": "l2-063",
+    "level": 2,
+    "q": "What new name did Jacob receive after wrestling at the river Jabbok?",
+    "options": [
+      "Israel",
+      "Judah",
+      "Ishmael",
+      "Benjamin"
+    ],
+    "answer": 0,
+    "ref": "Genesis 32:24-28"
+  },
+  {
+    "id": "l2-065",
+    "level": 2,
+    "q": "According to the prophet Micah, from which town would the ruler of Israel come?",
+    "options": [
+      "Nazareth",
+      "Bethlehem",
+      "Jerusalem",
+      "Hebron"
+    ],
+    "answer": 1,
+    "ref": "Micah 5:2"
+  },
+  {
+    "id": "l2-066",
+    "level": 2,
+    "q": "Who recognized the risen Jesus at the tomb when he called her name?",
+    "options": [
+      "Mary Magdalene",
+      "Salome",
+      "Joanna",
+      "Martha"
+    ],
+    "answer": 0,
+    "ref": "John 20:1; 20:11-16"
+  },
+  {
+    "id": "l2-067",
+    "level": 2,
+    "q": "What did God make the first woman from?",
+    "options": [
+      "Dust of the earth",
+      "The breath of God",
+      "One of Adam's ribs",
+      "Water and clay"
+    ],
+    "answer": 2,
+    "ref": "Genesis 2:21-22"
+  },
+  {
+    "id": "l2-069",
+    "level": 2,
+    "q": "Which animal spoke to Balaam?",
+    "options": [
+      "His donkey",
+      "His camel",
+      "His mule",
+      "His horse"
+    ],
+    "answer": 0,
+    "ref": "Numbers 22:28"
+  },
+  {
+    "id": "l2-070",
+    "level": 2,
+    "q": "Where were two disciples going on Easter day when Jesus joined them?",
+    "options": [
+      "To Bethany",
+      "To Capernaum",
+      "To Emmaus",
+      "To Nain"
+    ],
+    "answer": 2,
+    "ref": "Luke 24:13-15"
+  },
+  {
+    "id": "l2-071",
+    "level": 2,
+    "q": "What did each person in the crowd experience when the disciples spoke at Pentecost?",
+    "options": [
+      "They all heard one language",
+      "They understood no word at all",
+      "They heard only songs and singing",
+      "They heard them in their own language"
+    ],
+    "answer": 3,
+    "ref": "Acts 2:1-6"
+  },
+  {
+    "id": "l2-072",
+    "level": 2,
+    "q": "What comes right after “You shall not kill” in the Ten Commandments?",
+    "options": [
+      "You shall not steal",
+      "You shall not commit adultery",
+      "You shall not covet",
+      "You shall not bear false witness"
+    ],
+    "answer": 1,
+    "ref": "Exodus 20:13-14"
+  },
+  {
+    "id": "l2-073",
+    "level": 2,
+    "q": "What was the Ethiopian official reading in his chariot?",
+    "options": [
+      "The Psalms",
+      "The books of Moses",
+      "The prophet Jeremiah",
+      "The prophet Isaiah"
+    ],
+    "answer": 3,
+    "ref": "Acts 8:27-30"
+  },
+  {
+    "id": "l2-074",
+    "level": 2,
+    "q": "Whom did the judge Deborah call to go into battle against Sisera?",
+    "options": [
+      "Gideon",
+      "Barak",
+      "Abner",
+      "Joab"
+    ],
+    "answer": 1,
+    "ref": "Judges 4:4-9"
+  },
+  {
+    "id": "l2-075",
+    "level": 2,
+    "q": "Where did Saul travel to arrest the followers of Jesus?",
+    "options": [
+      "To Damascus",
+      "To Antioch",
+      "To Ephesus",
+      "To Rome"
+    ],
+    "answer": 0,
+    "ref": "Acts 9:1-3"
+  },
+  {
+    "id": "l2-076",
+    "level": 2,
+    "q": "With which couple did Paul first stay in Corinth?",
+    "options": [
+      "Ananias and Sapphira",
+      "Abraham and Sarah",
+      "Aquila and Priscilla",
+      "Joseph and Mary"
+    ],
+    "answer": 2,
+    "ref": "Acts 18:1-3"
+  },
+  {
+    "id": "l2-077",
+    "level": 2,
+    "q": "Where did the sun stand still when Joshua spoke to it?",
+    "options": [
+      "Over Jericho",
+      "Over Hebron",
+      "Over Gibeon",
+      "Over Bethel"
+    ],
+    "answer": 2,
+    "ref": "Joshua 10:12-13"
+  },
+  {
+    "id": "l2-078",
+    "level": 2,
+    "q": "According to Paul, which three things remain forever?",
+    "options": [
+      "Wisdom, strength, peace",
+      "Truth, justice, grace",
+      "Courage, loyalty, patience",
+      "Faith, hope, love"
+    ],
+    "answer": 3,
+    "ref": "1 Corinthians 13:13"
+  },
+  {
+    "id": "l2-079",
+    "level": 2,
+    "q": "Which two men did Jesus talk with on the mountain where he was transfigured?",
+    "options": [
+      "Abraham and Jacob",
+      "Moses and Elijah",
+      "David and Solomon",
+      "Isaiah and Jeremiah"
+    ],
+    "answer": 1,
+    "ref": "Matthew 17:1-3"
+  },
+  {
+    "id": "l2-080",
+    "level": 2,
+    "q": "How many friends came to visit Job in his suffering?",
+    "options": [
+      "Three",
+      "Two",
+      "Four",
+      "Seven"
+    ],
+    "answer": 0,
+    "ref": "Job 2:11"
+  },
+  {
+    "id": "l3-001",
+    "level": 3,
+    "q": "What was the name of Moses' wife, whom he married in Midian?",
+    "options": [
+      "Zipporah",
+      "Miriam",
+      "Rahab",
+      "Deborah"
+    ],
+    "answer": 0,
+    "ref": "Exodus 2:21"
+  },
+  {
+    "id": "l3-002",
+    "level": 3,
+    "q": "Whose sheep was Moses tending when he saw the burning bush at Mount Horeb?",
+    "options": [
+      "Jethro's",
+      "Laban's",
+      "Nabal's",
+      "Jesse's"
+    ],
+    "answer": 0,
+    "ref": "Exodus 3:1-2"
+  },
+  {
+    "id": "l3-003",
+    "level": 3,
+    "q": "Which man of the tribe of Judah did God fill with skill for the work on the tabernacle?",
+    "options": [
+      "Hiram",
+      "Bezalel",
+      "Nadab",
+      "Uriah"
+    ],
+    "answer": 1,
+    "ref": "Exodus 31:2-3"
+  },
+  {
+    "id": "l3-004",
+    "level": 3,
+    "q": "Which two of the twelve spies encouraged the people?",
+    "options": [
+      "Aaron and Hur",
+      "Eldad and Medad",
+      "Eleazar and Phinehas",
+      "Joshua and Caleb"
+    ],
+    "answer": 3,
+    "ref": "Numbers 14:6-9"
+  },
+  {
+    "id": "l3-005",
+    "level": 3,
+    "q": "Who was the first to see the angel of the Lord on Balaam's road?",
+    "options": [
+      "Balaam",
+      "Balak",
+      "Balaam's servants",
+      "The donkey"
+    ],
+    "answer": 3,
+    "ref": "Numbers 22:23"
+  },
+  {
+    "id": "l3-006",
+    "level": 3,
+    "q": "Which king of Moab sent for Balaam to curse Israel?",
+    "options": [
+      "Og",
+      "Balak",
+      "Sihon",
+      "Eglon"
+    ],
+    "answer": 1,
+    "ref": "Numbers 22:4-6"
+  },
+  {
+    "id": "l3-007",
+    "level": 3,
+    "q": "What color was the cord Rahab was to tie in her window?",
+    "options": [
+      "White",
+      "Blue",
+      "Red",
+      "Yellow"
+    ],
+    "answer": 2,
+    "ref": "Joshua 2:18"
+  },
+  {
+    "id": "l3-008",
+    "level": 3,
+    "q": "Which prophetess judged Israel under a palm tree?",
+    "options": [
+      "Deborah",
+      "Jael",
+      "Huldah",
+      "Miriam"
+    ],
+    "answer": 0,
+    "ref": "Judges 4:4-5"
+  },
+  {
+    "id": "l3-009",
+    "level": 3,
+    "q": "Which tribe was Samson from?",
+    "options": [
+      "Dan",
+      "Judah",
+      "Benjamin",
+      "Ephraim"
+    ],
+    "answer": 0,
+    "ref": "Judges 13:2"
+  },
+  {
+    "id": "l3-010",
+    "level": 3,
+    "q": "What name did Naomi choose for herself because the Almighty had dealt bitterly with her?",
+    "options": [
+      "Orpah",
+      "Hannah",
+      "Mara",
+      "Rachel"
+    ],
+    "answer": 2,
+    "ref": "Ruth 1:20"
+  },
+  {
+    "id": "l3-011",
+    "level": 3,
+    "q": "What were the names of the two sons of the priest Eli?",
+    "options": [
+      "Joel and Abijah",
+      "Hophni and Phinehas",
+      "Nadab and Abihu",
+      "Jonathan and Abinadab"
+    ],
+    "answer": 1,
+    "ref": "1 Samuel 1:3"
+  },
+  {
+    "id": "l3-012",
+    "level": 3,
+    "q": "What was the name of Samuel's father?",
+    "options": [
+      "Eli",
+      "Kish",
+      "Abinadab",
+      "Elkanah"
+    ],
+    "answer": 3,
+    "ref": "1 Samuel 1:1"
+  },
+  {
+    "id": "l3-014",
+    "level": 3,
+    "q": "What was the name of Jonathan's son, whom David brought to his table?",
+    "options": [
+      "Abner",
+      "Mephibosheth",
+      "Joab",
+      "Ahimelech"
+    ],
+    "answer": 1,
+    "ref": "2 Samuel 9:6-7"
+  },
+  {
+    "id": "l3-015",
+    "level": 3,
+    "q": "What was the only animal the poor man had in the story Nathan told David?",
+    "options": [
+      "A little calf",
+      "A goat",
+      "A little lamb",
+      "A dove"
+    ],
+    "answer": 2,
+    "ref": "2 Samuel 12:3"
+  },
+  {
+    "id": "l3-016",
+    "level": 3,
+    "q": "With whom did the ark stay for three months before David brought it to Jerusalem?",
+    "options": [
+      "Obed-Edom",
+      "Zadok",
+      "Ahimelech",
+      "Hiram"
+    ],
+    "answer": 0,
+    "ref": "2 Samuel 6:10-12"
+  },
+  {
+    "id": "l3-017",
+    "level": 3,
+    "q": "For how many years did Solomon build the temple in Jerusalem?",
+    "options": [
+      "7 years",
+      "3 years",
+      "12 years",
+      "40 years"
+    ],
+    "answer": 0,
+    "ref": "1 Kings 6:37-38"
+  },
+  {
+    "id": "l3-018",
+    "level": 3,
+    "q": "Who became the first king of the northern kingdom of Israel after Solomon died?",
+    "options": [
+      "Rehoboam",
+      "Ahab",
+      "Jeroboam",
+      "Jehu"
+    ],
+    "answer": 2,
+    "ref": "1 Kings 12:20"
+  },
+  {
+    "id": "l3-019",
+    "level": 3,
+    "q": "At which brook did Elijah drink while the ravens fed him?",
+    "options": [
+      "Kidron",
+      "Cherith",
+      "Jabbok",
+      "Arnon"
+    ],
+    "answer": 1,
+    "ref": "1 Kings 17:3-6"
+  },
+  {
+    "id": "l3-020",
+    "level": 3,
+    "q": "According to Elijah, how many prophets of Baal were there on Mount Carmel?",
+    "options": [
+      "300",
+      "120",
+      "700",
+      "450"
+    ],
+    "answer": 3,
+    "ref": "1 Kings 18:22"
+  },
+  {
+    "id": "l3-021",
+    "level": 3,
+    "q": "To which mountain did Elijah travel for forty days and nights?",
+    "options": [
+      "Carmel",
+      "Nebo",
+      "Ebal",
+      "Horeb"
+    ],
+    "answer": 3,
+    "ref": "1 Kings 19:8"
+  },
+  {
+    "id": "l3-022",
+    "level": 3,
+    "q": "Who owned the vineyard that King Ahab wanted?",
+    "options": [
+      "Nabal",
+      "Naboth",
+      "Uriah",
+      "Hiram"
+    ],
+    "answer": 1,
+    "ref": "1 Kings 21:1-2"
+  },
+  {
+    "id": "l3-023",
+    "level": 3,
+    "q": "How old was Josiah when he became king of Judah?",
+    "options": [
+      "12 years old",
+      "16 years old",
+      "8 years old",
+      "20 years old"
+    ],
+    "answer": 2,
+    "ref": "2 Kings 22:1"
+  },
+  {
+    "id": "l3-024",
+    "level": 3,
+    "q": "By how many years did God add to King Hezekiah's life?",
+    "options": [
+      "15 years",
+      "10 years",
+      "7 years",
+      "40 years"
+    ],
+    "answer": 0,
+    "ref": "2 Kings 20:6"
+  },
+  {
+    "id": "l3-025",
+    "level": 3,
+    "q": "In how many days was the wall of Jerusalem finished under Nehemiah?",
+    "options": [
+      "52 days",
+      "40 days",
+      "70 days",
+      "100 days"
+    ],
+    "answer": 0,
+    "ref": "Nehemiah 6:15"
+  },
+  {
+    "id": "l3-026",
+    "level": 3,
+    "q": "What was Nehemiah's job at the court of the king of Persia?",
+    "options": [
+      "Scribe",
+      "Gatekeeper",
+      "Cupbearer",
+      "General"
+    ],
+    "answer": 2,
+    "ref": "Nehemiah 1:11"
+  },
+  {
+    "id": "l3-027",
+    "level": 3,
+    "q": "Who raised the orphan Esther like his own daughter?",
+    "options": [
+      "Haman",
+      "Mordecai",
+      "Hathach",
+      "Ahasuerus"
+    ],
+    "answer": 1,
+    "ref": "Esther 2:7"
+  },
+  {
+    "id": "l3-028",
+    "level": 3,
+    "q": "In which land did Job live?",
+    "options": [
+      "Canaan",
+      "Moab",
+      "Midian",
+      "Uz"
+    ],
+    "answer": 3,
+    "ref": "Job 1:1"
+  },
+  {
+    "id": "l3-029",
+    "level": 3,
+    "q": "Which psalm begins: “I will lift up my eyes to the hills”?",
+    "options": [
+      "Psalm 23",
+      "Psalm 100",
+      "Psalm 150",
+      "Psalm 121"
+    ],
+    "answer": 3,
+    "ref": "Psalm 121:1"
+  },
+  {
+    "id": "l3-030",
+    "level": 3,
+    "q": "From which animal does Solomon's book of Proverbs tell the lazy person to learn?",
+    "options": [
+      "The bee",
+      "The ant",
+      "The dove",
+      "The stork"
+    ],
+    "answer": 1,
+    "ref": "Proverbs 6:6"
+  },
+  {
+    "id": "l3-031",
+    "level": 3,
+    "q": "To which craftsman did God send the prophet Jeremiah?",
+    "options": [
+      "A blacksmith",
+      "A weaver",
+      "A potter",
+      "A carpenter"
+    ],
+    "answer": 2,
+    "ref": "Jeremiah 18:2-3"
+  },
+  {
+    "id": "l3-032",
+    "level": 3,
+    "q": "Which Babylonian name was given to Hananiah, one of Daniel's friends?",
+    "options": [
+      "Shadrach",
+      "Meshach",
+      "Abednego",
+      "Belteshazzar"
+    ],
+    "answer": 0,
+    "ref": "Daniel 1:7"
+  },
+  {
+    "id": "l3-034",
+    "level": 3,
+    "q": "Where did Jonah try to flee after God gave him his task?",
+    "options": [
+      "Nineveh",
+      "Tyre",
+      "Tarshish",
+      "Sidon"
+    ],
+    "answer": 2,
+    "ref": "Jonah 1:3"
+  },
+  {
+    "id": "l3-036",
+    "level": 3,
+    "q": "Against which nation is the short book of Obadiah directed?",
+    "options": [
+      "Moab",
+      "Ammon",
+      "The Philistines",
+      "Edom"
+    ],
+    "answer": 3,
+    "ref": "Obadiah 1:1"
+  },
+  {
+    "id": "l3-037",
+    "level": 3,
+    "q": "What was the name of Rebekah's brother?",
+    "options": [
+      "Lot",
+      "Bethuel",
+      "Ishmael",
+      "Laban"
+    ],
+    "answer": 3,
+    "ref": "Genesis 24:29"
+  },
+  {
+    "id": "l3-038",
+    "level": 3,
+    "q": "What did Jacob name the place where he saw the ladder to heaven in his dream?",
+    "options": [
+      "Mizpah",
+      "Bethel",
+      "Gilgal",
+      "Hebron"
+    ],
+    "answer": 1,
+    "ref": "Genesis 28:19"
+  },
+  {
+    "id": "l3-040",
+    "level": 3,
+    "q": "What was the name of the woman Joseph married in Egypt?",
+    "options": [
+      "Asenath",
+      "Rachel",
+      "Zipporah",
+      "Tamar"
+    ],
+    "answer": 0,
+    "ref": "Genesis 41:45"
+  },
+  {
+    "id": "l3-041",
+    "level": 3,
+    "q": "Which brother wanted to rescue Joseph and bring him back to his father?",
+    "options": [
+      "Reuben",
+      "Judah",
+      "Simeon",
+      "Levi"
+    ],
+    "answer": 0,
+    "ref": "Genesis 37:21-22"
+  },
+  {
+    "id": "l3-042",
+    "level": 3,
+    "q": "Which brother did Joseph keep in Egypt when the others went home?",
+    "options": [
+      "Reuben",
+      "Levi",
+      "Simeon",
+      "Judah"
+    ],
+    "answer": 2,
+    "ref": "Genesis 42:24"
+  },
+  {
+    "id": "l3-043",
+    "level": 3,
+    "q": "Who blessed Abram after he had rescued Lot?",
+    "options": [
+      "Lot",
+      "Melchizedek",
+      "Abimelech",
+      "Eliezer"
+    ],
+    "answer": 1,
+    "ref": "Genesis 14:18-19"
+  },
+  {
+    "id": "l3-044",
+    "level": 3,
+    "q": "How many men did God leave Gideon with after the water test?",
+    "options": [
+      "100",
+      "1,000",
+      "3,000",
+      "300"
+    ],
+    "answer": 3,
+    "ref": "Judges 7:6-7"
+  },
+  {
+    "id": "l3-045",
+    "level": 3,
+    "q": "Which emperor ordered a census of the whole world when Jesus was born?",
+    "options": [
+      "Tiberius",
+      "Nero",
+      "Claudius",
+      "Augustus"
+    ],
+    "answer": 3,
+    "ref": "Luke 2:1"
+  },
+  {
+    "id": "l3-046",
+    "level": 3,
+    "q": "After how many days did Mary and Joseph find the twelve-year-old Jesus in the temple?",
+    "options": [
+      "After one day",
+      "After three days",
+      "After seven days",
+      "After two weeks"
+    ],
+    "answer": 1,
+    "ref": "Luke 2:46"
+  },
+  {
+    "id": "l3-048",
+    "level": 3,
+    "q": "Who appeared with Moses beside Jesus on the mountain of transfiguration?",
+    "options": [
+      "Elijah",
+      "Isaiah",
+      "Abraham",
+      "David"
+    ],
+    "answer": 0,
+    "ref": "Matthew 17:3"
+  },
+  {
+    "id": "l3-049",
+    "level": 3,
+    "q": "Where was Peter to find the coin for the temple tax, according to Jesus?",
+    "options": [
+      "In a fish's mouth",
+      "Under a stone",
+      "In his net",
+      "In a jar"
+    ],
+    "answer": 0,
+    "ref": "Matthew 17:24-27"
+  },
+  {
+    "id": "l3-051",
+    "level": 3,
+    "q": "Which man was forced to carry Jesus' cross?",
+    "options": [
+      "Joseph of Arimathea",
+      "Simon of Cyrene",
+      "Nicodemus",
+      "Simon Peter"
+    ],
+    "answer": 1,
+    "ref": "Matthew 27:32"
+  },
+  {
+    "id": "l3-052",
+    "level": 3,
+    "q": "What was the name of the blind beggar who sat by the road near Jericho?",
+    "options": [
+      "Lazarus",
+      "Barabbas",
+      "Barnabas",
+      "Bartimaeus"
+    ],
+    "answer": 3,
+    "ref": "Mark 10:46"
+  },
+  {
+    "id": "l3-053",
+    "level": 3,
+    "q": "What did Jesus sleep on in the boat when the storm came?",
+    "options": [
+      "On a sail",
+      "On a net",
+      "On a mat",
+      "On a pillow"
+    ],
+    "answer": 3,
+    "ref": "Mark 4:38"
+  },
+  {
+    "id": "l3-055",
+    "level": 3,
+    "q": "What did the father have slaughtered for the son who came home?",
+    "options": [
+      "A young lamb",
+      "A billy goat",
+      "A fattened calf",
+      "A large ox"
+    ],
+    "answer": 2,
+    "ref": "Luke 15:23"
+  },
+  {
+    "id": "l3-056",
+    "level": 3,
+    "q": "How many coins did the woman in the parable have, one of which she lost?",
+    "options": [
+      "Ten",
+      "Five",
+      "Seven",
+      "Twelve"
+    ],
+    "answer": 0,
+    "ref": "Luke 15:8"
+  },
+  {
+    "id": "l3-057",
+    "level": 3,
+    "q": "Who was the one of the ten healed men who turned back and thanked Jesus?",
+    "options": [
+      "A Samaritan",
+      "A Roman",
+      "A Pharisee",
+      "A Greek"
+    ],
+    "answer": 0,
+    "ref": "Luke 17:15-16"
+  },
+  {
+    "id": "l3-058",
+    "level": 3,
+    "q": "How much did Zacchaeus want to pay back to those he had cheated?",
+    "options": [
+      "Twice as much",
+      "Three times as much",
+      "Four times as much",
+      "Ten times as much"
+    ],
+    "answer": 2,
+    "ref": "Luke 19:8"
+  },
+  {
+    "id": "l3-059",
+    "level": 3,
+    "q": "Under which tree did Jesus say he had seen Nathanael?",
+    "options": [
+      "Olive tree",
+      "Fig tree",
+      "Palm tree",
+      "Grapevine"
+    ],
+    "answer": 1,
+    "ref": "John 1:48"
+  },
+  {
+    "id": "l3-061",
+    "level": 3,
+    "q": "At what time of day did Nicodemus come to Jesus?",
+    "options": [
+      "At noon",
+      "In the morning",
+      "In the evening",
+      "At night"
+    ],
+    "answer": 3,
+    "ref": "John 3:2"
+  },
+  {
+    "id": "l3-062",
+    "level": 3,
+    "q": "How many years had the sick man at the pool of Bethesda been ill?",
+    "options": [
+      "12 years",
+      "38 years",
+      "18 years",
+      "40 years"
+    ],
+    "answer": 1,
+    "ref": "John 5:5"
+  },
+  {
+    "id": "l3-063",
+    "level": 3,
+    "q": "Which disciple pointed Jesus to a boy with five loaves and two fish?",
+    "options": [
+      "Philip",
+      "Thomas",
+      "Andrew",
+      "James"
+    ],
+    "answer": 2,
+    "ref": "John 6:8-9"
+  },
+  {
+    "id": "l3-064",
+    "level": 3,
+    "q": "In which pool was the man born blind told to wash?",
+    "options": [
+      "Siloam",
+      "Bethesda",
+      "Gihon",
+      "Heshbon"
+    ],
+    "answer": 0,
+    "ref": "John 9:7"
+  },
+  {
+    "id": "l3-065",
+    "level": 3,
+    "q": "How many days had Lazarus been in the tomb when Jesus came to Bethany?",
+    "options": [
+      "Four days",
+      "Three days",
+      "Seven days",
+      "Two days"
+    ],
+    "answer": 0,
+    "ref": "John 11:17"
+  },
+  {
+    "id": "l3-066",
+    "level": 3,
+    "q": "Which disciple asked, “Lord, show us the Father”?",
+    "options": [
+      "Thomas",
+      "Andrew",
+      "Philip",
+      "John"
+    ],
+    "answer": 2,
+    "ref": "John 14:8"
+  },
+  {
+    "id": "l3-067",
+    "level": 3,
+    "q": "What word did Mary Magdalene answer when Jesus called her by name on Easter morning?",
+    "options": [
+      "Hosanna",
+      "Rabboni",
+      "Abba",
+      "Amen"
+    ],
+    "answer": 1,
+    "ref": "John 20:16"
+  },
+  {
+    "id": "l3-068",
+    "level": 3,
+    "q": "How many large fish were in the net that Peter dragged ashore?",
+    "options": [
+      "100",
+      "77",
+      "12",
+      "153"
+    ],
+    "answer": 3,
+    "ref": "John 21:11"
+  },
+  {
+    "id": "l3-069",
+    "level": 3,
+    "q": "Who was chosen by lot to be the twelfth apostle after Judas?",
+    "options": [
+      "Silas",
+      "Timothy",
+      "Stephen",
+      "Matthias"
+    ],
+    "answer": 3,
+    "ref": "Acts 1:26"
+  },
+  {
+    "id": "l3-070",
+    "level": 3,
+    "q": "How many people were baptized on the day of Pentecost?",
+    "options": [
+      "About 120",
+      "About 3,000",
+      "About 500",
+      "About 5,000"
+    ],
+    "answer": 1,
+    "ref": "Acts 2:41"
+  },
+  {
+    "id": "l3-071",
+    "level": 3,
+    "q": "What was the name of the temple gate where Peter healed a lame beggar?",
+    "options": [
+      "The Sheep Gate",
+      "The Fish Gate",
+      "The Beautiful Gate",
+      "The Horse Gate"
+    ],
+    "answer": 2,
+    "ref": "Acts 3:2"
+  },
+  {
+    "id": "l3-073",
+    "level": 3,
+    "q": "In which town did the disciple Tabitha, whom Peter raised from the dead, live?",
+    "options": [
+      "Joppa",
+      "Lydda",
+      "Caesarea",
+      "Antioch"
+    ],
+    "answer": 0,
+    "ref": "Acts 9:36"
+  },
+  {
+    "id": "l3-074",
+    "level": 3,
+    "q": "What was the name of the servant girl who was so glad that she forgot to open the door for Peter?",
+    "options": [
+      "Lydia",
+      "Priscilla",
+      "Rhoda",
+      "Phoebe"
+    ],
+    "answer": 2,
+    "ref": "Acts 12:13-14"
+  },
+  {
+    "id": "l3-075",
+    "level": 3,
+    "q": "What was Lydia of Thyatira's trade?",
+    "options": [
+      "Fish seller",
+      "Seller of purple",
+      "Potter",
+      "Weaver"
+    ],
+    "answer": 1,
+    "ref": "Acts 16:14"
+  },
+  {
+    "id": "l3-076",
+    "level": 3,
+    "q": "Who sat in prison in Philippi with Paul and sang praises?",
+    "options": [
+      "Barnabas",
+      "Apollos",
+      "Titus",
+      "Silas"
+    ],
+    "answer": 3,
+    "ref": "Acts 16:25"
+  },
+  {
+    "id": "l3-077",
+    "level": 3,
+    "q": "What was written on an altar that Paul saw in Athens?",
+    "options": [
+      "To the god of wisdom",
+      "To the god of the city",
+      "To the god of the ancestors",
+      "To the unknown god"
+    ],
+    "answer": 3,
+    "ref": "Acts 17:23"
+  },
+  {
+    "id": "l3-078",
+    "level": 3,
+    "q": "What does Paul call the sword of the Spirit in his letter to the Ephesians?",
+    "options": [
+      "Prayer",
+      "The word of God",
+      "Truth",
+      "Faith"
+    ],
+    "answer": 1,
+    "ref": "Ephesians 6:17"
+  },
+  {
+    "id": "l3-079",
+    "level": 3,
+    "q": "To which church did Paul write, “Rejoice in the Lord always”?",
+    "options": [
+      "Corinth",
+      "Rome",
+      "Philippi",
+      "Ephesus"
+    ],
+    "answer": 2,
+    "ref": "Philippians 4:4"
+  },
+  {
+    "id": "l3-080",
+    "level": 3,
+    "q": "For which servant did Paul put in a good word with Philemon?",
+    "options": [
+      "Onesimus",
+      "Epaphras",
+      "Tychicus",
+      "Archippus"
+    ],
+    "answer": 0,
+    "ref": "Philemon 1:10-16"
+  }
+]

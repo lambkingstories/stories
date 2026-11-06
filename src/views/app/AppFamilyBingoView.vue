@@ -1,7 +1,8 @@
 <script setup lang="ts">
 /**
- * Bible bingo (Plus): every player has a card with nine people of the Bible, one person after the other is called (by name, or, harder,
- * by three hints), and whoever has the person on the card ticks it. Whoever has a whole row, column or diagonal calls "Bingo".
+ * Bible bingo (Plus), on the map table: every player has a card with sixteen people of the Bible, one person after the other is called (by
+ * name, or, harder, by three hints), and whoever has the person on the card lets a wax seal fall on it. Whoever has a whole row, column or
+ * diagonal calls "Bingo".
  * Two ways to play, both without any connection between the devices:
  *  - `table`: one person reads aloud on one device (the host: the name, or the hints one by one) and plays with their own card on that
  *    device, too; the others have their cards on their own devices.
@@ -10,29 +11,44 @@
  *    the people that were called by then.
  * The people and their hints are in `data/whoAmI.ts`.
  */
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import LkPageHead from '@/components/molecules/LkPageHead.vue'
-import AdvButton from '@/components/atoms/AdvButton.vue'
+import MapTable from '@/components/molecules/map/MapTable.vue'
+import MapButton from '@/components/molecules/map/MapButton.vue'
+import MapMedallion from '@/components/molecules/map/MapMedallion.vue'
+import MapPaper from '@/components/molecules/map/MapPaper.vue'
+import MapResult from '@/components/molecules/map/MapResult.vue'
+import MapResume from '@/components/molecules/map/MapResume.vue'
 import BingoGrid from '@/components/molecules/BingoGrid.vue'
 import { PREMIUM_TEASER, hasFeature, showUpsell } from '@/use/usePremium'
 import { WHO_PEOPLE } from '@/data/whoAmI'
 import type { ActivityLocale } from '@/data/activityWords'
-import { BINGO_CELLS, drawOrder, hasBingo, isTrueBingo, makeCard } from '@/utils/bibleBingo'
+import { BINGO_CELLS, drawOrder, hasBingo, isTrueBingo, liveIsOver, makeCard, parseBingoSnap, type BingoSnap } from '@/utils/bibleBingo'
 import { mulberry32, newCode, readCode, showCode } from '@/utils/familyCode'
+import useFamilySave from '@/use/useFamilySave'
 import useLandscapePlay from '@/use/useLandscapePlay'
+import useSfx from '@/use/useSfx'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
+const { play } = useSfx()
+const save = useFamilySave<BingoSnap>('bingo', 1)
+// a kept round of another shape (older app) is thrown away at once
+if (save.saved.value && !parseBingoSnap(save.saved.value)) save.clear()
 
+/** Inside a round the arrow leads to the start page of this game (the round stays kept); there it leads to the main menu. */
 function goBack() {
-  if (window.history.length > 1) router.back()
-  else void router.push({ name: 'app-family' })
+  if (phase.value !== 'setup') {
+    stopTimer()
+    phase.value = 'setup'
+    return
+  }
+  void router.push({ name: 'app-family' })
 }
 
 const locked = computed(() => PREMIUM_TEASER && !hasFeature('family'))
-const { landscape, full, canTurn, toggle: rotate } = useLandscapePlay()
+const { landscape, full, canTurn, width, height, toggle: rotate } = useLandscapePlay()
 const lang = computed<ActivityLocale>(() => (locale.value.startsWith('en') ? 'en' : locale.value.startsWith('es') ? 'es' : 'de'))
 const nameOf = (i: number) => WHO_PEOPLE[i]!.name[lang.value]
 const factsOf = (i: number) => WHO_PEOPLE[i]!.facts[lang.value]
@@ -55,16 +71,21 @@ const way = ref<Way>('table')
 const level = ref<Level>('name')
 const codeInput = ref('')
 const codeError = ref(false)
+const showRules = ref(false)
 
 type Phase = 'setup' | 'host' | 'card' | 'ready' | 'live' | 'won' | 'over'
 const phase = ref<Phase>('setup')
-/** The screens with a card: turned on its side they show the call on the left and the card on the right, without the header. */
+/** The screens with a card: the turn button is shown there. */
 const withCard = computed(() => phase.value === 'host' || phase.value === 'card' || phase.value === 'live')
 
 // ── the card (the same for the table and the code game) ─────────────────────────────────────────────────────────
 const card = ref<number[]>(makeCard())
 const marked = ref<boolean[]>(Array.from({ length: BINGO_CELLS }, () => false))
-const toggle = (p: number) => (marked.value = marked.value.map((m, i) => (i === p ? !m : m)))
+function toggle(p: number) {
+  play('tap')
+  marked.value = marked.value.map((m, i) => (i === p ? !m : m))
+  persist()
+}
 function newCard() {
   card.value = makeCard()
   marked.value = Array.from({ length: BINGO_CELLS }, () => false)
@@ -90,21 +111,29 @@ function startHost() {
   hintN.value = 1
   revealed.value = level.value === 'name'
   phase.value = 'host'
+  persist()
 }
 function nextHint() {
+  play('flip')
   hintN.value = Math.min(3, hintN.value + 1)
+  persist()
 }
 function reveal() {
+  play('flip')
   revealed.value = true
+  persist()
 }
 function nextPerson() {
   if (hostLast.value) {
     phase.value = 'over'
+    save.clear()
     return
   }
+  play('flip')
   step.value++
   hintN.value = 1
   revealed.value = level.value === 'name'
+  persist()
 }
 
 function startTable(as: 'host' | 'card') {
@@ -113,12 +142,100 @@ function startTable(as: 'host' | 'card') {
   else {
     newCard()
     phase.value = 'card'
+    persist()
   }
 }
-const sayBingo = () => (tableMessage.value = true)
+
+// ── keep playing: what this phone has of the round is kept whenever it changes ──────────────────────────────────
+/** Keeps this phone's round: the card with its seals, and (at the table) what has been called, or (code) the code and the start. */
+function persist() {
+  const p = phase.value
+  if (p !== 'host' && p !== 'card' && p !== 'ready' && p !== 'live') return
+  save.save({
+    way: p === 'host' || p === 'card' ? 'table' : 'code',
+    level: level.value,
+    phase: p,
+    card: [...card.value],
+    marked: [...marked.value],
+    order: p === 'host' ? [...order.value] : [],
+    step: p === 'host' ? step.value : 0,
+    hintN: p === 'host' ? hintN.value : 1,
+    revealed: p === 'host' ? revealed.value : false,
+    code: p === 'ready' || p === 'live' ? roundCode.value : '',
+    startedAt: p === 'live' ? startedAt.value : 0
+  })
+}
+
+/** The kept round, if it is still good (a round with a code that has run out is not offered: the other phones are done, too). */
+const wallNow = ref(Date.now())
+watch(phase, () => (wallNow.value = Date.now()))
+const kept = computed(() => {
+  const s = parseBingoSnap(save.saved.value)
+  if (!s) return null
+  if (s.phase === 'ready' || s.phase === 'live') {
+    if (!readCode(s.code, sizeFor(s.level)).ok) return null
+    if (s.phase === 'live' && liveIsOver(s.startedAt, wallNow.value, s.level === 'hints' ? HINTS_PERIOD : NAME_PERIOD)) return null
+  }
+  return s
+})
+// a round that cannot be taken up any more (its code has run out) is forgotten
+if (save.saved.value && !kept.value) save.clear()
+const keptInfo = computed(() => {
+  const s = kept.value
+  if (!s) return ''
+  if (s.phase === 'host') return t('app.bingo.callOf', { n: s.step + 1, total: s.order.length })
+  if (s.phase === 'ready') return showCode(s.code)
+  if (s.phase === 'live') {
+    const per = s.level === 'hints' ? HINTS_PERIOD : NAME_PERIOD
+    return t('app.bingo.callOf', { n: Math.min(WHO_PEOPLE.length, Math.floor(Math.max(0, wallNow.value - s.startedAt) / per) + 1), total: WHO_PEOPLE.length })
+  }
+  return ''
+})
+
+function resume() {
+  const s = kept.value
+  if (!s) {
+    save.clear()
+    return
+  }
+  play('tap')
+  stopTimer()
+  way.value = s.way
+  level.value = s.level
+  card.value = [...s.card]
+  marked.value = [...s.marked]
+  tableMessage.value = false
+  hostMessage.value = ''
+  wrongTry.value = false
+  codeError.value = false
+  if (s.phase === 'host') {
+    order.value = [...s.order]
+    step.value = s.step
+    hintN.value = s.hintN
+    revealed.value = s.revealed
+    phase.value = 'host'
+  } else if (s.phase === 'card') {
+    phase.value = 'card'
+  } else {
+    // the same code gives the same order of people as on every other phone
+    const r = readCode(s.code, sizeFor(s.level))
+    if (!r.ok) return
+    roundCode.value = r.code
+    liveOrder.value = drawOrder(mulberry32(r.seed))
+    if (s.phase === 'ready') phase.value = 'ready'
+    else runClock(s.startedAt)
+  }
+}
+function sayBingo() {
+  tableMessage.value = true
+  play(lineOnCard.value ? 'fanfare' : 'wrong')
+}
 /** The reader plays, too: the card is checked against the people called so far. */
 const hostMessage = ref<'' | 'yes' | 'no'>('')
-const hostBingo = () => (hostMessage.value = isTrueBingo(card.value, marked.value, order.value.slice(0, step.value + 1)) ? 'yes' : 'no')
+function hostBingo() {
+  hostMessage.value = isTrueBingo(card.value, marked.value, order.value.slice(0, step.value + 1)) ? 'yes' : 'no'
+  play(hostMessage.value === 'yes' ? 'fanfare' : 'wrong')
+}
 
 // ── the code game ───────────────────────────────────────────────────────────────────────────────────────────────
 const roundCode = ref('')
@@ -142,6 +259,7 @@ function prepare(code: string, seed: number, lv: Level) {
   newCard()
   codeError.value = false
   phase.value = 'ready'
+  persist()
 }
 
 function newRound() {
@@ -162,19 +280,26 @@ function joinRound() {
   codeError.value = true
 }
 
-function go() {
-  wrongTry.value = false
-  startedAt.value = Date.now()
-  now.value = startedAt.value
+/** The clock of the round runs from `from` (the moment of "Go"; after a pause it is the moment kept, so the round is where the other phones are). */
+function runClock(from: number) {
+  startedAt.value = from
+  now.value = Date.now()
   stopTimer()
   timer = setInterval(() => {
     now.value = Date.now()
     if (step2.value >= liveOrder.value.length) {
       stopTimer()
       phase.value = 'over'
+      save.clear()
     }
   }, 500)
   phase.value = 'live'
+}
+
+function go() {
+  wrongTry.value = false
+  runClock(Date.now())
+  persist()
 }
 
 const period = computed(() => (level.value === 'hints' ? HINTS_PERIOD : NAME_PERIOD))
@@ -194,8 +319,11 @@ function callBingo() {
     wonAt.value = Math.min(liveOrder.value.length, step2.value + 1)
     stopTimer()
     phase.value = 'won'
+    save.clear()
+    play('familyResult')
   } else {
     wrongTry.value = true
+    play('familyWrong')
   }
 }
 
@@ -203,373 +331,574 @@ function leave() {
   stopTimer()
   phase.value = 'setup'
 }
+
+// ── what the call shows (the same on the reader's device and in the code game) ──────────────────────────────────
+const live = computed(() => phase.value === 'live')
+const call = computed(() => {
+  if (live.value) {
+    return {
+      step: step2.value,
+      count: `${t('app.bingo.callOf', { n: Math.min(step2.value + 1, liveOrder.value.length), total: liveOrder.value.length })} · ${t('app.bingo.nextIn', { n: secondsLeft.value })}`,
+      person: livePerson.value,
+      name: liveRevealed.value,
+      hintN: liveHints.value,
+      hints: liveRevealed.value ? 3 : liveHints.value,
+      names: revealedLive.value
+    }
+  }
+  return {
+    step: step.value,
+    count: t('app.bingo.callOf', { n: step.value + 1, total: order.value.length }),
+    person: hostPerson.value,
+    name: level.value === 'name' || revealed.value,
+    hintN: hintN.value,
+    hints: revealed.value ? 3 : hintN.value,
+    names: called.value
+  }
+})
+/** The size of the medallion: smaller sideways (the card needs the height) and when hints take room below it. */
+const medal = computed(() => {
+  if (landscape.value && height.value <= 700) return level.value === 'hints' ? 112 : Math.round(Math.max(130, Math.min(170, height.value * 0.4)))
+  const room = Math.max(150, Math.min(width.value - 80, 240))
+  return level.value === 'hints' ? Math.min(room, 180) : room
+})
+const nameSize = computed(() => (medal.value >= 200 ? '1.7rem' : medal.value >= 160 ? '1.4rem' : '1.2rem'))
 </script>
 
 <template lang="pug">
-  div(class="app-page min-h-screen w-full")
-    LkPageHead(v-if="!(landscape && withCard)" :title="t('app.bingo.title')" :subtitle="phase === 'setup' ? t('app.bingo.sub') : ''" :lamb="phase === 'setup'" @back="goBack")
+  MapTable(:title="t('app.bingo.title')" @back="goBack")
+    template(#actions)
+      button(v-if="canTurn && withCard" type="button" class="fb-rotate" @click="rotate") {{ full ? t('app.family.rotateBack') : t('app.family.rotate') }}
 
-    section(class="fb-wrap")
-      div(v-if="canTurn && withCard" class="fb-tools")
-        button(type="button" class="fb-rotate" @click="rotate") {{ full ? t('app.family.rotateBack') : t('app.family.rotate') }}
+    div(class="fb-wrap")
+      //- ===== Plus only =====
+      MapPaper(v-if="locked" kind="card" class="fb-note-card")
+        p(class="fb-lock") {{ t('app.bingo.locked') }}
+        MapButton(@click="showUpsell('family')") {{ t('app.family.lockedButton') }}
 
-      div(v-if="locked" class="fb-card")
-        p(class="fb-explain") {{ t('app.bingo.locked') }}
-        AdvButton(tone="gold" @click="showUpsell('family')") {{ t('app.family.lockedButton') }}
+      //- ===== setup: two pairs of brass marks on the table ... =====
+      div(v-else-if="phase === 'setup'" class="fb-setup")
+        MapResume(v-if="kept" :info="keptInfo" @resume="resume")
+        div(class="fb-col")
+          section(class="fb-sec")
+            h2(class="fb-h") {{ t('app.bingo.wayLabel') }}
+            div(class="fb-marks" role="radiogroup" :aria-label="t('app.bingo.wayLabel')")
+              MapButton(v-for="w in WAYS" :key="w" role="radio" :aria-checked="way === w" :quiet="way !== w" :class="['fb-mark', { 'is-on': way === w }]" @click="way = w") {{ t(`app.bingo.way_${w}`) }}
+            p(class="fb-plate") {{ t(`app.bingo.wayText_${way}`) }}
+          section(class="fb-sec")
+            h2(class="fb-h") {{ t('app.bingo.levelLabel') }}
+            div(class="fb-marks" role="radiogroup" :aria-label="t('app.bingo.levelLabel')")
+              MapButton(v-for="l in LEVELS" :key="l" role="radio" :aria-checked="level === l" :quiet="level !== l" :class="['fb-mark', { 'is-on': level === l }]" @click="level = l") {{ t(`app.bingo.level_${l}`) }}
+            p(class="fb-plate") {{ t(`app.bingo.levelText_${level}`) }}
+          button(type="button" class="fb-link" :aria-expanded="showRules" @click="showRules = !showRules") {{ t('app.bingo.rulesLink') }}
+          p(v-if="showRules" class="fb-plate fb-rules") {{ t('app.bingo.explain') }}
 
-      //- ===== setup =====
-      template(v-else-if="phase === 'setup'")
-        div(class="fb-card")
-          p(class="fb-explain") {{ t('app.bingo.explain') }}
-          h3(class="fb-h") {{ t('app.bingo.wayLabel') }}
-          div(class="fb-chips" role="radiogroup")
-            button(v-for="w in WAYS" :key="w" type="button" role="radio" :aria-checked="way === w" :class="['fb-chip', { 'is-on': way === w }]" @click="way = w") {{ t(`app.bingo.way_${w}`) }}
-          p(class="fb-note") {{ t(`app.bingo.wayText_${way}`) }}
-          template(v-if="way === 'table' || phase === 'setup'")
-            h3(class="fb-h") {{ t('app.bingo.levelLabel') }}
-            div(class="fb-chips" role="radiogroup")
-              button(v-for="l in LEVELS" :key="l" type="button" role="radio" :aria-checked="level === l" :class="['fb-chip', { 'is-on': level === l }]" @click="level = l") {{ t(`app.bingo.level_${l}`) }}
-            p(class="fb-note") {{ t(`app.bingo.levelText_${level}`) }}
+        //- ... then at the table: the reader or a card; or with several phones: a code
+        div(v-if="way === 'table'" class="fb-col fb-col--go")
+          MapButton(@click="startTable('host')") {{ t('app.bingo.iRead') }}
+          MapButton(quiet @click="startTable('card')") {{ t('app.bingo.iPlay') }}
+        div(v-else class="fb-col fb-col--go")
+          section(class="fb-sec")
+            h2(class="fb-h") {{ t('app.bingo.codeNew') }}
+            p(class="fb-plate") {{ t('app.bingo.codeNewText') }}
+            MapButton(@click="newRound") {{ t('app.bingo.codeNewGo') }}
+          section(class="fb-sec")
+            h2(class="fb-h") {{ t('app.bingo.codeJoin') }}
+            MapPaper(kind="strip")
+              input(
+                v-model="codeInput"
+                class="fb-input"
+                type="text"
+                maxlength="8"
+                autocapitalize="characters"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="K7M-4QX"
+                :aria-label="t('app.bingo.codeJoin')"
+                @keyup.enter="joinRound"
+              )
+            p(v-if="codeError" class="fb-error" role="alert") {{ t('app.bingo.codeError') }}
+            MapButton(quiet :disabled="!codeInput.trim()" @click="joinRound") {{ t('app.bingo.codeJoinGo') }}
 
-        //- at the table: the host or a card
-        div(v-if="way === 'table'" class="fb-card")
-          AdvButton(tone="gold" @click="startTable('host')") {{ t('app.bingo.iRead') }}
-          AdvButton(tone="blau" @click="startTable('card')") {{ t('app.bingo.iPlay') }}
+      //- ===== the game: the call (the reader's device, or this phone by itself) and the card =====
+      div(v-else-if="phase === 'host' || phase === 'live'" class="fb-play")
+        div(class="fb-call")
+          p(class="fb-count") {{ call.count }}
+          MapMedallion(:key="call.step" :size="medal" class="fb-medal")
+            template(v-if="call.name")
+              span(class="fb-name" :style="{ fontSize: nameSize }") {{ nameOf(call.person) }}
+            template(v-else)
+              span(class="fb-q") ?
+              span(class="fb-hint-no") {{ t('app.bingo.hintN', { n: call.hintN }) }}
+          div(v-if="level === 'hints'" class="fb-hints")
+            MapPaper(v-for="n in call.hints" :key="call.step + '-' + n" kind="strip" :lit="n === call.hints && !call.name" class="fb-hint") {{ factsOf(call.person)[n - 1] }}
+          template(v-if="phase === 'host'")
+            p(class="fb-plate fb-help") {{ level === 'name' ? t('app.bingo.hostNameHelp') : t('app.bingo.hostHintHelp') }}
+            div(class="fb-actions")
+              MapButton(v-if="level === 'hints' && !revealed && hintN < 3" quiet @click="nextHint") {{ t('app.bingo.nextHint') }}
+              MapButton(v-if="level === 'hints' && !revealed" quiet @click="reveal") {{ t('app.bingo.reveal') }}
+              MapButton(v-if="revealed" @click="nextPerson") {{ hostLast ? t('app.bingo.finish') : t('app.bingo.nextPerson') }}
 
-        //- several phones: a code
-        div(v-else class="fb-card")
-          h3(class="fb-h") {{ t('app.bingo.codeNew') }}
-          p(class="fb-note") {{ t('app.bingo.codeNewText') }}
-          AdvButton(tone="gold" @click="newRound") {{ t('app.bingo.codeNewGo') }}
-          h3(class="fb-h") {{ t('app.bingo.codeJoin') }}
-          input(
-            v-model="codeInput"
-            class="fb-input"
-            type="text"
-            maxlength="8"
-            autocapitalize="characters"
-            autocomplete="off"
-            spellcheck="false"
-            placeholder="K7M-4QX"
-            :aria-label="t('app.bingo.codeJoin')"
-            @keyup.enter="joinRound"
-          )
-          p(v-if="codeError" class="fb-error" role="alert") {{ t('app.bingo.codeError') }}
-          AdvButton(tone="blau" :disabled="!codeInput.trim()" @click="joinRound") {{ t('app.bingo.codeJoinGo') }}
+        div(class="fb-mine")
+          p(v-if="phase === 'host'" class="fb-count") {{ t('app.bingo.hostPlays') }}
+          BingoGrid(class="fb-grid" :card="card" :marked="marked" @toggle="toggle")
+          MapButton(:class="['fb-bingo', { 'is-lit': lineOnCard }]" @click="phase === 'host' ? hostBingo() : callBingo()") {{ t('app.bingo.bingo') }}
+          MapPaper(v-if="phase === 'host' && hostMessage" kind="strip" :lit="hostMessage === 'yes'" class="fb-msg" role="status") {{ hostMessage === 'yes' ? t('app.bingo.callAloud') : t('app.bingo.notYet') }}
+          MapPaper(v-if="phase === 'live' && wrongTry" kind="strip" class="fb-msg fb-msg--bad" role="alert") {{ t('app.bingo.notTrue') }}
 
-      //- ===== the host reads aloud =====
-      div(v-else-if="phase === 'host'" class="fb-card fb-center fb-split")
-        p(class="fb-count") {{ t('app.bingo.callOf', { n: step + 1, total: order.length }) }}
-        template(v-if="level === 'name' || revealed")
-          h2(class="fb-person") {{ nameOf(hostPerson) }}
-        template(v-else)
-          p(class="fb-hint-title") {{ t('app.bingo.hintN', { n: hintN }) }}
-        ul(v-if="level === 'hints'" class="fb-hints")
-          li(v-for="n in (revealed ? 3 : hintN)" :key="n") {{ factsOf(hostPerson)[n - 1] }}
-        p(class="fb-note") {{ level === 'name' ? t('app.bingo.hostNameHelp') : t('app.bingo.hostHintHelp') }}
-        div(class="fb-actions")
-          AdvButton(v-if="level === 'hints' && !revealed && hintN < 3" tone="blau" @click="nextHint") {{ t('app.bingo.nextHint') }}
-          AdvButton(v-if="level === 'hints' && !revealed" tone="blau" @click="reveal") {{ t('app.bingo.reveal') }}
-          AdvButton(v-if="revealed" tone="gold" @click="nextPerson") {{ hostLast ? t('app.bingo.finish') : t('app.bingo.nextPerson') }}
-        div(v-if="called.length" class="fb-called")
-          span(class="fb-called-title") {{ t('app.bingo.calledSoFar') }}
-          span(class="fb-called-list") {{ called.map(nameOf).join(', ') }}
-        div(class="fb-host-card")
-          p(class="fb-count fb-center-text") {{ t('app.bingo.hostPlays') }}
-          BingoGrid(:card="card" :marked="marked" @toggle="toggle")
-          AdvButton(tone="gold" @click="hostBingo") {{ t('app.bingo.bingo') }}
-          p(v-if="hostMessage" class="fb-note fb-center-text" role="status") {{ hostMessage === 'yes' ? t('app.bingo.callAloud') : t('app.bingo.notYet') }}
-        button(type="button" class="fb-link" @click="phase = 'setup'") {{ t('app.bingo.leave') }}
+        div(class="fb-rest")
+          div(v-if="call.names.length" class="fb-plate fb-called")
+            span(class="fb-called-title") {{ t('app.bingo.calledSoFar') }}
+            span(class="fb-called-list") {{ call.names.map(nameOf).join(', ') }}
+          button(type="button" class="fb-link" @click="phase === 'host' ? (phase = 'setup') : leave()") {{ t('app.bingo.leave') }}
 
       //- ===== a card at the table =====
-      div(v-else-if="phase === 'card'" class="fb-card fb-split")
-        p(class="fb-explain") {{ t('app.bingo.cardHelp') }}
-        BingoGrid(class="fb-grid-slot" :card="card" :marked="marked" @toggle="toggle")
-        AdvButton(tone="gold" @click="sayBingo") {{ t('app.bingo.bingo') }}
-        p(v-if="tableMessage" class="fb-note fb-center-text" role="status") {{ lineOnCard ? t('app.bingo.callAloud') : t('app.bingo.notYet') }}
-        div(class="fb-row")
-          button(type="button" class="fb-link" @click="newCard") {{ t('app.bingo.newCard') }}
+      div(v-else-if="phase === 'card'" class="fb-play fb-play--card")
+        div(class="fb-call")
+          p(class="fb-plate") {{ t('app.bingo.cardHelp') }}
+        div(class="fb-mine")
+          BingoGrid(class="fb-grid" :card="card" :marked="marked" @toggle="toggle")
+          MapButton(:class="['fb-bingo', { 'is-lit': lineOnCard }]" @click="sayBingo") {{ t('app.bingo.bingo') }}
+          MapPaper(v-if="tableMessage" kind="strip" :lit="lineOnCard" class="fb-msg" role="status") {{ lineOnCard ? t('app.bingo.callAloud') : t('app.bingo.notYet') }}
+        div(class="fb-rest")
+          button(type="button" class="fb-link" @click="newCard(); persist()") {{ t('app.bingo.newCard') }}
           button(type="button" class="fb-link" @click="phase = 'setup'") {{ t('app.bingo.leave') }}
 
-      //- ===== several phones: ready ... =====
-      div(v-else-if="phase === 'ready'" class="fb-card fb-center")
-        p(class="fb-count") {{ t('app.bingo.roundCode') }}
-        p(class="fb-code") {{ showCode(roundCode) }}
-        p(class="fb-explain") {{ t(`app.bingo.levelText_${level}`) }}
-        p(class="fb-explain") {{ t('app.bingo.readyText') }}
-        BingoGrid(class="fb-preview" :card="card" :marked="marked" readonly)
-        AdvButton(tone="gold" @click="go") {{ t('app.bingo.go') }}
-        button(type="button" class="fb-link" @click="phase = 'setup'") {{ t('app.bingo.leave') }}
+      //- ===== several phones: the code, the card, "Go" =====
+      div(v-else-if="phase === 'ready'" class="fb-play fb-play--card")
+        div(class="fb-call")
+          p(class="fb-count") {{ t('app.bingo.roundCode') }}
+          MapPaper(kind="strip" lit class="fb-codeplate")
+            span(class="fb-code") {{ showCode(roundCode) }}
+          p(class="fb-plate") {{ t(`app.bingo.levelText_${level}`) }}
+          p(class="fb-plate") {{ t('app.bingo.readyText') }}
+        div(class="fb-mine")
+          BingoGrid(class="fb-grid" :card="card" :marked="marked" readonly)
+          MapButton(class="fb-go" @click="go") {{ t('app.bingo.go') }}
+        div(class="fb-rest")
+          button(type="button" class="fb-link" @click="phase = 'setup'") {{ t('app.bingo.leave') }}
 
-      //- ... and the game: this phone calls the people by itself
-      div(v-else-if="phase === 'live'" class="fb-card fb-split")
-        div(class="fb-live")
-          p(class="fb-count") {{ t('app.bingo.callOf', { n: Math.min(step2 + 1, liveOrder.length), total: liveOrder.length }) }} · {{ t('app.bingo.nextIn', { n: secondsLeft }) }}
-          template(v-if="liveRevealed")
-            h2(class="fb-person") {{ nameOf(livePerson) }}
-          p(v-else class="fb-hint-title") {{ t('app.bingo.hintN', { n: liveHints }) }}
-          ul(v-if="level === 'hints'" class="fb-hints")
-            li(v-for="n in (liveRevealed ? 3 : liveHints)" :key="n") {{ factsOf(livePerson)[n - 1] }}
-        BingoGrid(class="fb-grid-slot" :card="card" :marked="marked" @toggle="toggle")
-        AdvButton(tone="gold" @click="callBingo") {{ t('app.bingo.bingo') }}
-        p(v-if="wrongTry" class="fb-error fb-center-text" role="alert") {{ t('app.bingo.notTrue') }}
-        div(v-if="revealedLive.length" class="fb-called")
-          span(class="fb-called-title") {{ t('app.bingo.calledSoFar') }}
-          span(class="fb-called-list") {{ revealedLive.map(nameOf).join(', ') }}
-        button(type="button" class="fb-link" @click="leave") {{ t('app.bingo.leave') }}
+      //- ===== the end =====
+      MapResult(v-else-if="phase === 'won'" :headline="t('app.bingo.won')" :winner-index="0")
+        p(class="fb-plate fb-center") {{ t('app.bingo.wonText', { n: wonAt }) }}
+        BingoGrid(class="fb-grid fb-grid--small" :card="card" :marked="marked" readonly)
+        MapButton(@click="phase = 'setup'") {{ t('app.bingo.again') }}
 
-      div(v-else-if="phase === 'won'" class="fb-card fb-center")
-        h2(class="fb-person") {{ t('app.bingo.won') }}
-        p(class="fb-explain") {{ t('app.bingo.wonText', { n: wonAt }) }}
-        BingoGrid(class="fb-preview" :card="card" :marked="marked" readonly)
-        AdvButton(tone="gold" @click="phase = 'setup'") {{ t('app.bingo.again') }}
-
-      div(v-else class="fb-card fb-center")
-        h2(class="fb-person") {{ t('app.bingo.over') }}
-        p(class="fb-explain") {{ t('app.bingo.overText') }}
-        AdvButton(tone="gold" @click="phase = 'setup'") {{ t('app.bingo.again') }}
-
-    div(class="h-32")
+      MapPaper(v-else kind="card" class="fb-note-card")
+        h2(class="fb-over") {{ t('app.bingo.over') }}
+        p(class="fb-lock") {{ t('app.bingo.overText') }}
+        MapButton(@click="phase = 'setup'") {{ t('app.bingo.again') }}
 </template>
 
 <style scoped lang="sass">
-.app-page
-  background-color: var(--color-bg-main)
-  color: var(--color-text-primary)
-
 .fb-wrap
-  display: grid
-  grid-template-columns: minmax(0, 1fr)
-  gap: 12px
-  max-width: 36rem
-  margin: 14px auto 0
+  width: 100%
+  max-width: 34rem
+  margin: 0 auto
+  padding-bottom: 12px
+
+// ── the turn button: a small brass plate in the corner ──
+.fb-rotate
+  min-height: 44px
   padding: 0 16px
-
-.fb-card
-  display: flex
-  flex-direction: column
-  gap: 8px
-  padding: 18px 16px 20px
-  border-radius: 24px
-  background: var(--lk-surface)
-  border: 1px solid var(--lk-line)
-  box-shadow: var(--lk-shadow)
-
-.fb-center
-  align-items: center
-  text-align: center
-
-.fb-center-text
-  text-align: center
-
-.fb-explain
-  margin: 0
-  line-height: 1.5
-
-.fb-h
-  margin: 10px 0 0
-  font-size: 1rem
-  font-weight: 800
-
-.fb-note
-  margin: 4px 0 6px
-  color: var(--lk-muted)
-  line-height: 1.4
-
-.fb-error
-  margin: 0
-  color: #c8553d
-  font-weight: 700
-  line-height: 1.4
-
-.fb-chips
-  display: flex
-  flex-wrap: wrap
-  gap: 8px
-
-.fb-chip
-  flex: 1 1 120px
-  min-height: 48px
-  padding: 4px 10px
-  border: 1px solid var(--lk-line)
-  border-radius: 16px
-  background: var(--lk-surface-2)
-  color: var(--lk-text)
+  border: 2px solid #9a6b1c
+  border-radius: 10px
+  background: linear-gradient(180deg, #fff8e0 0%, #efd89c 100%)
+  box-shadow: 0 0 0 2px rgba(255, 246, 214, 0.92), 0 4px 8px rgba(60, 35, 5, 0.45), inset 0 1px 0 #ffffff
+  color: #3a2812
   font: inherit
-  font-weight: 800
+  font-size: 0.95rem
+  font-weight: 700
+  letter-spacing: 0.04em
   cursor: pointer
   -webkit-tap-highlight-color: transparent
 
-  &.is-on
-    background: var(--lk-accent)
-    border-color: var(--lk-accent)
-    color: var(--lk-on-accent)
-
-.fb-input
-  width: 100%
-  min-height: 46px
-  padding: 0 14px
-  border: 1px solid var(--lk-line)
-  border-radius: 14px
-  background: var(--lk-bg)
-  color: var(--lk-text)
-  font: inherit
-  font-size: 1.3rem
-  font-weight: 800
-  letter-spacing: 0.12em
+// ── text on the table: a dark leather plate, so that it reads on the map ──
+.fb-plate
+  margin: 0
+  padding: 9px 14px
+  border: 1px solid rgba(226, 189, 102, 0.35)
+  border-radius: 8px
+  background: rgba(28, 19, 10, 0.78)
+  color: var(--mp-cream, #f6ead0)
+  font-family: var(--mp-serif, Georgia, serif)
+  font-size: 1.02rem
+  font-weight: 600
+  line-height: 1.35
   text-align: center
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.35)
+
+.fb-center
+  text-align: center
+
+.fb-h
+  margin: 0
+  font-family: var(--mp-serif, Georgia, serif)
+  font-size: 1.15rem
+  font-weight: 700
+  letter-spacing: 0.1em
   text-transform: uppercase
+  text-align: center
+  color: var(--mp-cream, #f6ead0)
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.6)
 
 .fb-count
   margin: 0
-  font-size: 0.85rem
-  color: var(--lk-muted)
+  text-align: center
+  font-size: 1rem
+  font-weight: 700
+  letter-spacing: 0.05em
+  color: var(--mp-cream, #f6ead0)
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95), 0 0 8px rgba(0, 0, 0, 0.6)
 
-.fb-code
+.fb-error
   margin: 0
-  padding: 8px 26px
-  border-radius: 999px
-  background: rgba(230, 184, 64, 0.25)
-  box-shadow: inset 0 0 0 1px #e0bd62
-  font-size: 2rem
-  font-weight: 900
-  letter-spacing: 0.14em
+  padding: 8px 12px
+  border-radius: 8px
+  background: rgba(60, 14, 8, 0.85)
+  color: #ffd9c9
+  font-weight: 700
+  line-height: 1.35
+  text-align: center
 
-.fb-person
-  margin: 8px 0
-  font-size: 2rem
-  font-weight: 900
-  line-height: 1.15
-  overflow-wrap: anywhere
-
-.fb-hint-title
-  margin: 6px 0 0
-  padding: 3px 14px
-  border-radius: 999px
-  background: rgba(230, 184, 64, 0.25)
-  font-weight: 800
-
-.fb-hints
-  width: 100%
-  margin: 6px 0
-  padding: 10px 14px 10px 32px
-  border-radius: 16px
-  background: rgba(230, 184, 64, 0.2)
-  text-align: left
-  display: grid
-  gap: 4px
+.fb-lock,
+.fb-over
+  margin: 0 0 14px
+  text-align: center
   line-height: 1.4
 
-.fb-live
+.fb-over
+  font-size: 1.5rem
+
+.fb-note-card
+  margin-top: 8px
+  :deep(.mpa-in)
+    display: flex
+    flex-direction: column
+    align-items: center
+
+.fb-link
+  align-self: center
+  min-height: 44px
+  padding: 0 12px
+  border: 0
+  background: transparent
+  color: var(--mp-cream, #f6ead0)
+  font-family: var(--mp-serif, Georgia, serif)
+  font-size: 1rem
+  font-weight: 700
+  text-decoration: underline
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95)
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+
+// ── setup ──
+.fb-setup
+  padding-top: 10px
+  display: flex
+  flex-direction: column
+  gap: 18px
+  align-items: stretch
+
+.fb-col
+  display: flex
+  flex-direction: column
+  gap: 16px
+  align-items: stretch
+
+.fb-col--go
+  align-items: center
+
+.fb-sec
+  display: flex
+  flex-direction: column
+  gap: 10px
+  align-items: stretch
+
+.fb-col--go .fb-sec
+  align-items: center
+  width: 100%
+
+.fb-marks
+  display: grid
+  grid-template-columns: repeat(2, minmax(0, 1fr))
+  gap: 10px
+
+// the marks are brass when chosen, dark bronze when not
+.fb-mark.fb-mark
+  min-width: 0
+  width: 100%
+  height: 60px
+  padding: 0 8px
+  font-size: 1.05rem
+  letter-spacing: 0.03em
+
+  &.is-on
+    filter: drop-shadow(0 0 10px rgba(255, 210, 110, 0.8)) drop-shadow(0 5px 6px rgba(10, 5, 0, 0.6))
+
+.fb-input
+  width: 100%
+  min-height: 44px
+  border: 0
+  border-bottom: 1px solid rgba(58, 40, 18, 0.5)
+  background: transparent
+  color: var(--mp-ink, #3a2812)
+  font-family: var(--mp-serif, Georgia, serif)
+  font-size: 1.5rem
+  font-weight: 800
+  letter-spacing: 0.14em
+  text-align: center
+  text-transform: uppercase
+  outline: none
+
+  &::placeholder
+    color: rgba(58, 40, 18, 0.4)
+
+.fb-col--go .fb-sec :deep(.mpa)
+  max-width: 22rem
+
+// ── the game ──
+.fb-play
+  display: flex
+  flex-direction: column
+  gap: 14px
+  align-items: stretch
+
+.fb-call
   display: flex
   flex-direction: column
   align-items: center
-  text-align: center
-  min-height: 170px
+  gap: 10px
 
-.fb-preview
-  width: 100%
+.fb-mine
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: 12px
 
-.fb-host-card
-  display: grid
+.fb-rest
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: 8px
+
+.fb-medal
+  animation: fb-turn 0.45s ease-out both
+
+.fb-name
+  display: block
+  max-width: 100%
+  font-family: var(--mp-serif, Georgia, serif)
+  font-weight: 800
+  line-height: 1.05
+  letter-spacing: 0.02em
+  overflow-wrap: anywhere
+  hyphens: auto
+
+.fb-q
+  display: block
+  font-size: 3rem
+  font-weight: 800
+  line-height: 1
+
+.fb-hint-no
+  display: block
+  margin-top: 2px
+  font-size: 1rem
+  letter-spacing: 0.08em
+  text-transform: uppercase
+
+.fb-hints
+  display: flex
+  flex-direction: column
   gap: 8px
   width: 100%
-  margin-top: 6px
 
-.fb-tools
-  display: flex
-  justify-content: flex-end
+.fb-hints .fb-hint
+  min-height: 46px
+  animation: fb-rise 0.4s ease-out both
 
-.fb-rotate
-  min-height: 40px
-  padding: 0 14px
-  border: 1px solid var(--lk-line)
-  border-radius: 999px
-  background: var(--lk-surface)
-  color: var(--lk-text)
-  font: inherit
-  font-size: 0.82rem
-  font-weight: 800
-  cursor: pointer
+  :deep(.mpa-in)
+    justify-content: center
+    min-height: 46px
+    font-size: 1.05rem
+    line-height: 1.25
+    padding-top: 5px
+    padding-bottom: 5px
 
-// the phone lies on its side: the call (and the buttons) on the left, the card, as big as the height allows, on the right
-@media (orientation: landscape) and (max-height: 700px)
-  .fb-wrap
-    max-width: none
-    margin-top: 6px
-    padding: 0 10px
+.fb-help
+  display: none
+  font-size: 0.95rem
 
-  .fb-split
-    display: grid
-    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr)
-    column-gap: 14px
-    align-content: start
-    align-items: start
-    text-align: left
-    padding: 10px 12px
-    gap: 6px
-
-    > *
-      grid-column: 1
-
-    // the explaining lines make room for the card
-    .fb-note:not(.fb-center-text)
-      display: none
-
-    .fb-person
-      margin: 2px 0
-      font-size: 1.5rem
-
-    > .fb-grid-slot,
-    > .fb-host-card
-      grid-column: 2
-      grid-row: 1 / span 30
-      --bg-ratio: 1.15 / 1
-      width: min(100%, calc((100dvh - 60px) * 1.1))
-      justify-self: center
-      margin-top: 0
-      position: sticky
-      top: 6px
+@media (min-height: 900px)
+  .fb-help
+    display: block
 
 .fb-actions
-  display: grid
-  gap: 10px
+  display: flex
+  flex-wrap: wrap
+  justify-content: center
+  gap: 8px
   width: 100%
+
+  :deep(.mb.mb)
+    min-width: 0
+    flex: 1 1 150px
+    padding: 0 12px
+
+.fb-grid
+  width: 100%
+
+.fb-grid--small
+  max-width: 24rem
+
+// the brass plate glows when a whole line is sealed
+.fb-bingo
+  &.is-lit
+    animation: fb-shine 1.8s ease-in-out infinite
+
+.fb-msg
+  :deep(.mpa-in)
+    justify-content: center
+    font-size: 1.05rem
+
+.fb-msg--bad
+  color: #7d2418
+
+.fb-codeplate
+  max-width: 20rem
+  :deep(.mpa-in)
+    justify-content: center
+
+.fb-code
+  display: block
+  width: 100%
+  font-size: 2rem
+  font-weight: 800
+  letter-spacing: 0.14em
+  text-align: center
 
 .fb-called
   display: grid
   gap: 2px
   width: 100%
-  padding: 8px 12px
-  border-radius: 14px
-  background: var(--lk-surface-2)
   text-align: left
 
 .fb-called-title
-  font-size: 0.74rem
-  font-weight: 800
-  letter-spacing: 0.04em
+  font-size: 0.78rem
+  font-weight: 700
+  letter-spacing: 0.1em
   text-transform: uppercase
-  color: var(--lk-muted)
+  color: var(--mp-gold, #e2bd66)
 
 .fb-called-list
-  font-size: 0.9rem
+  font-size: 0.95rem
   line-height: 1.4
 
-.fb-row
-  display: flex
-  justify-content: center
-  gap: 18px
+@keyframes fb-turn
+  0%
+    opacity: 0
+    transform: rotateY(90deg) scale(0.9)
+  100%
+    opacity: 1
+    transform: none
 
-.fb-link
-  align-self: center
-  min-height: 36px
-  padding: 0 10px
-  border: none
-  background: transparent
-  color: var(--lk-muted)
-  font: inherit
-  font-weight: 700
-  text-decoration: underline
-  cursor: pointer
+@keyframes fb-rise
+  0%
+    opacity: 0
+    transform: translateY(8px)
+  100%
+    opacity: 1
+    transform: none
+
+@keyframes fb-shine
+  0%, 100%
+    filter: drop-shadow(0 0 6px rgba(255, 205, 100, 0.55)) drop-shadow(0 5px 6px rgba(10, 5, 0, 0.6))
+  50%
+    filter: drop-shadow(0 0 18px rgba(255, 225, 130, 1)) drop-shadow(0 5px 6px rgba(10, 5, 0, 0.6))
+
+@media (prefers-reduced-motion: reduce)
+  .fb-medal,
+  .fb-hints .fb-hint,
+  .fb-bingo.is-lit
+    animation: none
+
+// the phone lies on its side: the call on the left, the card, as big as the height allows, on the right
+@media (orientation: landscape) and (max-height: 700px)
+  .fb-wrap
+    max-width: none
+
+  .fb-setup
+    display: grid
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)
+    column-gap: 22px
+    align-items: start
+    max-width: 52rem
+    margin: 0 auto
+
+  .fb-play
+    display: grid
+    grid-template-columns: minmax(0, 1fr) auto
+    column-gap: 18px
+    row-gap: 8px
+    align-items: start
+    justify-content: center
+
+  .fb-wrap
+    padding-bottom: 0
+
+  .fb-call
+    grid-column: 1
+    grid-row: 1
+
+  // the card (as wide as it is high: the screen height minus the top bar) stays while the left side scrolls; the button goes to the left
+  .fb-mine
+    display: contents
+
+  .fb-mine > .fb-count
+    display: none
+
+  .fb-grid
+    grid-column: 2
+    grid-row: 1 / span 6
+    width: calc(100dvh - 108px)
+    max-width: 52vw
+    --bg-ratio: 1 / 1
+    position: sticky
+    top: 0
+    align-self: start
+
+  .fb-bingo.fb-bingo,
+  .fb-go.fb-go
+    grid-column: 1
+    grid-row: 2
+    justify-self: center
+    min-width: 0
+    width: 100%
+    max-width: 18rem
+    height: 52px
+
+  .fb-msg
+    grid-column: 1
+    grid-row: 3
+
+  .fb-rest
+    grid-column: 1
+    grid-row: 4
+
+  .fb-actions :deep(.mb.mb)
+    height: 46px
+
+  .fb-hints .fb-hint
+    min-height: 40px
+
+    :deep(.mpa-in)
+      min-height: 40px
+      font-size: 0.95rem
+
+  .fb-medal
+    margin: 0
+
+  .fb-grid--small
+    max-width: 17rem
 </style>

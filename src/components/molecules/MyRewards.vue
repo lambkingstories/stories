@@ -84,7 +84,7 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
                 path(d="M8 5.2v13.6a1 1 0 0 0 1.5.86l11-6.8a1 1 0 0 0 0-1.72l-11-6.8A1 1 0 0 0 8 5.2z")
             span(v-else class="rw-lock") {{ t('app.bigGames.locked', { n: s.missing }, s.missing) }}
           span(class="rw-name") {{ t(`app.bigGames.${s.game.id}.title`) }}
-          span(v-if="s.open" class="rw-from") {{ t('app.bigGames.levelStars', { n: bigGames.stars(s.game.id), max: 15 }) }}
+          span(v-if="s.open" class="rw-from") {{ t('app.bigGames.levelStars', { n: bigGames.stars(s.game.id), max: s.game.maxStars }) }}
           span(v-else class="rw-bar" aria-hidden="true")
             span(class="rw-bar-fill" :style="{ width: Math.round(s.share * 100) + '%' }")
 

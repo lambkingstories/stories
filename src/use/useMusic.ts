@@ -10,7 +10,7 @@
 import { effectScope, watch } from 'vue'
 import useSoundSettings from '@/use/useSoundSettings'
 import { prependBaseUrl } from '@/utils/function'
-import { DAVID_MUSIC, MAP_MUSIC, moodOfGame, pickGameMusic, type MusicPiece } from '@/utils/sfxFiles'
+import { DAVID_MUSIC, ELIA_MUSIC, FAMILY_MUSIC, MAP_MUSIC, moodOfGame, pickGameMusic, type MusicPiece } from '@/utils/sfxFiles'
 
 /** One piece: a seamless loop of `loop` seconds (general pieces), or a whole piece that is crossfaded into the next one. */
 interface Track {
@@ -284,6 +284,18 @@ function playDavid() {
   start({ kind: 'game', pool: [asTrack(DAVID_MUSIC)] })
 }
 
+/** The music of the runner game of Elijah. */
+function playElia() {
+  if (wanted?.kind === 'game' && running) return
+  start({ kind: 'game', pool: ELIA_MUSIC.map((f) => ({ src: `audio/abenteuer/${f}.mp3` })) })
+}
+
+/** The music of the family games on the map table: three calm pieces one after the other. */
+function playFamily() {
+  if (wanted?.kind === 'game' && running) return
+  start({ kind: 'game', pool: FAMILY_MUSIC.map((f) => ({ src: `audio/abenteuer/${f}.mp3` })) })
+}
+
 /**
  * Stops the music. With `only` ('map' or 'game') it stops just when that kind is the one playing (a view that closes later must not
  * stop the music of the next view).
@@ -298,5 +310,5 @@ function stop(only?: 'map' | 'game') {
 }
 
 export default function useMusic() {
-  return { playMap, playGame, playDavid, stop }
+  return { playMap, playGame, playDavid, playElia, playFamily, stop }
 }

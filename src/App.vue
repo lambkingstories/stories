@@ -153,11 +153,6 @@ const NAV_ROUTES = new Set([
   'app-awards',
   'app-parents',
   'app-collection',
-  'app-family',
-  'app-family-quiz',
-  'app-family-activity',
-  'app-family-who',
-  'app-family-order',
   'app-journal',
   'app-voices'
 ])

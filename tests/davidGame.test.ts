@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { GROUND, KINDS, LEVELS, SLING, W, body, clampPull, forehead, newGame, preview, shoot, shotVelocity, starsFor, step, type Game } from '../src/utils/davidGame'
+import { EAGLE_HIGH, EAGLE_LOW, GROUND, KINDS, LEVELS, SHEEP_LINE, SLING, W, body, clampPull, eagleLift, forehead, newGame, preview, shoot, shotVelocity, starsFor, step, type Game } from '../src/utils/davidGame'
 
 const run = (g: Game, seconds: number, dt = 1 / 60) => {
   for (let t = 0; t < seconds; t += dt) step(g, dt)
@@ -89,7 +89,7 @@ describe('the animals', () => {
 describe('Goliath', () => {
   afterEach(() => vi.restoreAllMocks())
   const goliath = () => {
-    const g = newGame({ ...LEVELS[4]!, wind: 0, gust: false, waves: [{ kind: 'goliath', after: 0.01 }] })
+    const g = newGame({ ...LEVELS[LEVELS.length - 1]!, waves: [{ kind: 'goliath', after: 0.01 }] })
     run(g, 0.1)
     return g
   }
@@ -156,6 +156,36 @@ describe('Goliath', () => {
     expect(a.mode).toBe('fall')
   })
 
+  it('a stone on the shield is thrown back once and does not stick to the head', () => {
+    const g = goliath()
+    const a = g.animals[0]!
+    a.shield = 5
+    a.shieldIn = 99
+    const f = forehead(a)
+    // right into the middle of the forehead circle, as the old bug needed
+    g.stones.push({ x: f.x - 10, y: f.y, vx: 900, vy: 0, bounces: 3, age: 0 })
+    let blocks = 0
+    for (let i = 0; i < 90; i++) {
+      step(g, 1 / 60)
+      blocks += g.events.filter((e) => e.type === 'block').length
+    }
+    expect(blocks).toBe(1)
+    const s = g.stones[0]
+    if (s) expect(Math.hypot(s.x - forehead(a).x, s.y - forehead(a).y)).toBeGreaterThan(26)
+  })
+
+  it('Goliath sways, and the forehead sways with him', () => {
+    const g = goliath()
+    const a = g.animals[0]!
+    const ys = new Set<number>()
+    for (let i = 0; i < 60; i++) {
+      step(g, 1 / 20)
+      ys.add(Math.round(forehead(a).y - (GROUND - 391)))
+    }
+    expect(Math.max(...ys)).toBeGreaterThan(5)
+    expect(Math.min(...ys)).toBeLessThan(-5)
+  })
+
   it('a stone on the armour bounces off', () => {
     const g = goliath()
     const a = g.animals[0]!
@@ -178,8 +208,9 @@ describe('the stars of a level', () => {
     expect(starsFor(won(1, 6))).toBe(2)
   })
 
-  it('has five levels and every animal is inside the scene when it comes', () => {
-    expect(LEVELS).toHaveLength(5)
+  it('has ten levels, Goliath last with five stones and every animal is inside the scene when it comes', () => {
+    expect(LEVELS).toHaveLength(10)
+    expect(LEVELS[9]!.stones).toBe(5)
     expect(W).toBe(1600)
     expect(GROUND).toBeGreaterThan(SLING.y)
   })
@@ -211,7 +242,73 @@ describe('the shots can reach every place', () => {
     expect(canHit(1450)).toBe(true)
   })
 
-  it('also in the wind', () => {
+  it('also past the boulders of a later level', () => {
     expect(canHit(1100, LEVELS[3]!)).toBe(true)
+  })
+})
+
+describe('the eagles', () => {
+  const eagleGame = () => {
+    // a wolf much later keeps the round going after the eagle
+    const g = newGame({ ...LEVELS[0]!, waves: [{ kind: 'eagle', after: 0.0001 }, { kind: 'wolf', after: 60 }], boulders: [] })
+    step(g, 0.01)
+    return g
+  }
+
+  it('come only from the fifth level on', () => {
+    LEVELS.forEach((lv, i) => {
+      const n = lv.waves.filter((w) => w.kind === 'eagle').length
+      if (i < 4 || i === LEVELS.length - 1) expect(n, `level ${i + 1}`).toBe(0)
+      else expect(n, `level ${i + 1}`).toBeGreaterThanOrEqual(2)
+    })
+  })
+
+  it('come in high and glide down toward the sheep', () => {
+    const g = eagleGame()
+    const a = g.animals[0]!
+    expect(a.lift).toBeGreaterThan(EAGLE_HIGH - 20)
+    const before = a.lift
+    run(g, 4)
+    expect(a.x).toBeLessThan(W)
+    expect(a.lift).toBeLessThan(before - 50)
+    expect(eagleLift(SHEEP_LINE)).toBe(EAGLE_LOW)
+  })
+
+  it('take a sheep when they get there', () => {
+    const g = eagleGame()
+    run(g, 14)
+    expect(g.lostSheep).toBe(1)
+  })
+
+  it('can be hit in the air, and fly away upward', () => {
+    for (const x of [700, 1100, 1400]) {
+      let hit = false
+      for (let px = -170; px <= 0 && !hit; px += 10) {
+        for (let py = -100; py <= 170 && !hit; py += 10) {
+          const g = eagleGame()
+          const a = g.animals[0]!
+          a.x = x
+          a.speed = 0
+          a.lift = eagleLift(x)
+          if (!shoot(g, px, py)) continue
+          for (let t = 0; t < 4 && g.stones.length; t += 1 / 60) {
+            step(g, 1 / 60)
+            a.x = x
+            if (a.mode === 'flee') {
+              hit = true
+              const up = a.lift
+              run(g, 0.5)
+              expect(a.lift).toBeGreaterThan(up)
+              expect(body(a).y).toBeLessThan(GROUND - 100)
+            }
+          }
+        }
+      }
+      expect(hit, `eagle at ${x}`).toBe(true)
+    }
+  })
+
+  it('give the same score as a lion', () => {
+    expect(KINDS.eagle.points).toBe(KINDS.lion.points)
   })
 })

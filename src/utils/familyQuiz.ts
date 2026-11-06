@@ -14,6 +14,9 @@ export interface FamilyQuestion {
   /** The adventure it comes from ("Josef") and its stage (empty for a question of the exam); both are shown with the question. */
   journey: string
   stage: string
+  /** A question of the Bible quiz: its level (1 easy, 2 medium, 3 hard) and the Bible passage that holds the answer ("1. Mose 7,12"). */
+  level?: 1 | 2 | 3
+  ref?: string
 }
 
 export const MIN_PLAYERS = 2

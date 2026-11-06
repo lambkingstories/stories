@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { MEMORY_SIZES, MEMORY_SIZE_LIST, bestColumns, buildMemory, isMatch, nextPlayer } from '../src/utils/memoryGame'
+import { MEMORY_SIZES, MEMORY_SIZE_LIST, bestColumns, buildMemory, isMatch, nextPlayer, parseMemorySnap } from '../src/utils/memoryGame'
 import { MEMORY_SCENES } from '../src/data/memoryScenes'
 import { mulberry32 } from '../src/utils/familyCode'
 
@@ -57,6 +57,34 @@ describe('memory game', () => {
     expect(nextPlayer(1, 3, false)).toBe(2)
     expect(nextPlayer(2, 3, false)).toBe(0)
     expect(nextPlayer(0, 1, false)).toBe(0)
+  })
+
+  it('a kept round is read back only when it has the right shape', () => {
+    const cards = buildMemory(MEMORY_SIZES.small.pairs, mulberry32(4))
+    const twin = (id: number) => cards.find((c) => c.scene === cards[id]!.scene && c.id !== id)!.id
+    const base = { size: 'small', playerCount: 2, names: ['Anna', ''], cards, open: [] as number[], found: [] as number[], turn: 0, scores: [0, 0], moves: 0 }
+    expect(parseMemorySnap(JSON.parse(JSON.stringify(base)))).toEqual(base)
+    // a found pair (with its point) and one card turned over
+    const a = 0
+    const b = twin(0)
+    const other = cards.find((c) => c.scene !== cards[0]!.scene)!.id
+    const mid = { ...base, found: [a, b], open: [other], scores: [1, 0], moves: 1, turn: 0 }
+    expect(parseMemorySnap(JSON.parse(JSON.stringify(mid)))).toEqual(mid)
+    // a miss that was not turned back yet is allowed ...
+    const third = cards.find((c) => c.scene !== cards[0]!.scene && c.scene !== cards[other]!.scene)!.id
+    expect(parseMemorySnap({ ...mid, open: [other, third] })).not.toBeNull()
+    // ... but two turned cards that are a pair, a point that does not match the found pairs, other numbers of cards, scenes or players are not
+    expect(parseMemorySnap({ ...base, open: [a, b] })).toBeNull()
+    expect(parseMemorySnap({ ...mid, scores: [0, 0] })).toBeNull()
+    expect(parseMemorySnap({ ...mid, found: [a] })).toBeNull()
+    expect(parseMemorySnap({ ...base, cards: cards.slice(1) })).toBeNull()
+    expect(parseMemorySnap({ ...base, cards: cards.map((c) => ({ ...c, scene: 999 })) })).toBeNull()
+    expect(parseMemorySnap({ ...base, size: 'huge' })).toBeNull()
+    expect(parseMemorySnap({ ...base, turn: 2 })).toBeNull()
+    expect(parseMemorySnap({ ...base, playerCount: 3 })).toBeNull()
+    expect(parseMemorySnap({ ...base, open: [1, 1] })).toBeNull()
+    expect(parseMemorySnap(null)).toBeNull()
+    expect(parseMemorySnap('x')).toBeNull()
   })
 
   it('on a turned phone the cards are as big as they can be and all of them fit', () => {

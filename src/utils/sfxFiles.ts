@@ -20,6 +20,9 @@ export type SfxName =
   | 'clunk'
   | 'cardOpen'
   | 'cardTurn'
+  | 'familyRight'
+  | 'familyWrong'
+  | 'familyResult'
 
 /** The file of each sound below `public/audio/abenteuer/` (a replaced sound gets a new name, so that phones do not keep the old one). */
 export const SFX_FILE: Record<SfxName, string> = {
@@ -42,7 +45,10 @@ export const SFX_FILE: Record<SfxName, string> = {
   hit: 'klang-treffer',
   clunk: 'klang-schild',
   cardOpen: 'klang-karte-auf',
-  cardTurn: 'klang-karte-dreh'
+  cardTurn: 'klang-karte-dreh',
+  familyRight: 'klang-familie-richtig',
+  familyWrong: 'klang-familie-falsch',
+  familyResult: 'klang-familie-ergebnis'
 }
 /** Every sound file (`journeyFiles` puts them into the download pack). */
 export const SFX_FILES = Object.values(SFX_FILE).map((n) => `audio/abenteuer/${n}.mp3`)
@@ -116,4 +122,17 @@ export function pickGameMusic(mood: Mood, last?: string, rnd: () => number = Mat
 /** The music of the big game of David (a fighting, brave piece: frame drum, lyre, a little bell; D Dorian, 108 beats a minute, 16 bars). */
 export const DAVID_MUSIC: MusicPiece = { file: 'musik-david', loop: (64 * 60) / 108, mood: 'mittel' }
 
-export const MUSIC_FILES = [MAP_MUSIC, ...GAME_MUSIC, DAVID_MUSIC].map((m) => `audio/abenteuer/${m.file}.mp3`)
+/**
+ * The music of the runner game "Elia läuft": whole pieces made with Google Lyria 3.5 (about 90 seconds, folk with flute, harp and frame
+ * drum, about 110 beats a minute), which follow one another at random and are crossfaded (the first self-built piece sounded bad).
+ */
+export const ELIA_MUSIC = ['musik-elia-lauf-c', 'musik-elia-bach', 'musik-elia-weg']
+
+/** The background music of the family games on the map table (the quiz, activity, ...). */
+export const FAMILY_MUSIC = ['musik-familie-lampe', 'musik-familie-karawane', 'musik-familie-schreibstube']
+
+export const MUSIC_FILES = [
+  ...[MAP_MUSIC, ...GAME_MUSIC, DAVID_MUSIC].map((m) => `audio/abenteuer/${m.file}.mp3`),
+  ...ELIA_MUSIC.map((f) => `audio/abenteuer/${f}.mp3`),
+  ...FAMILY_MUSIC.map((f) => `audio/abenteuer/${f}.mp3`)
+]

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { MAX_QUESTIONS, buildWhoDeck, cardsFor, guesserOf, pointsFor } from '../src/utils/whoAmI'
+import { MAX_QUESTIONS, buildWhoDeck, cardsFor, guesserOf, pointsFor, readWhoSnap, whoSnapDeck, type WhoSnap } from '../src/utils/whoAmI'
 import { WHO_PEOPLE } from '../src/data/whoAmI'
 import { mulberry32 } from '../src/utils/familyCode'
 
@@ -49,5 +49,44 @@ describe('who am I', () => {
     expect(cardsFor(3, 2)).toBe(6)
     expect(cardsFor(8, 3, 20)).toBe(20)
     expect(cardsFor(0, 2)).toBe(0)
+  })
+
+  describe('keep playing', () => {
+    const good = (): WhoSnap => ({
+      phase: 'card',
+      playerCount: 3,
+      rounds: 2,
+      names: ['Anna', 'Ben', '', '', '', '', '', ''],
+      deck: whoSnapDeck(buildWhoDeck(6, mulberry32(9))),
+      index: 1,
+      scores: [3, 0, 2],
+      asked: 3,
+      trail: ['yes', 'no', 'maybe'],
+      lastPoints: 0
+    })
+
+    it('takes up the cards, the questions asked, the answers and the points exactly as they were', () => {
+      const snap = good()
+      const back = readWhoSnap(JSON.parse(JSON.stringify(snap)))
+      expect(back?.snap).toEqual(snap)
+      expect(back?.deck.map((p) => p.name.de)).toEqual(snap.deck)
+      expect(back?.snap.trail).toEqual(['yes', 'no', 'maybe'])
+      expect(back?.snap.scores).toEqual([3, 0, 2])
+    })
+
+    it('throws away anything of another shape', () => {
+      expect(readWhoSnap(null)).toBeNull()
+      expect(readWhoSnap({ ...good(), phase: 'result' })).toBeNull()
+      expect(readWhoSnap({ ...good(), playerCount: 9 })).toBeNull()
+      expect(readWhoSnap({ ...good(), rounds: 5 })).toBeNull()
+      expect(readWhoSnap({ ...good(), deck: ['Niemand'] })).toBeNull()
+      expect(readWhoSnap({ ...good(), deck: ['Adam', 'Adam'] })).toBeNull()
+      expect(readWhoSnap({ ...good(), index: 6 })).toBeNull()
+      expect(readWhoSnap({ ...good(), scores: [1] })).toBeNull()
+      expect(readWhoSnap({ ...good(), asked: 2 })).toBeNull()
+      expect(readWhoSnap({ ...good(), asked: 3, trail: ['yes', 'no', 'x'] })).toBeNull()
+      expect(readWhoSnap({ ...good(), asked: MAX_QUESTIONS + 1 })).toBeNull()
+      expect(readWhoSnap({ ...good(), lastPoints: 7 })).toBeNull()
+    })
   })
 })

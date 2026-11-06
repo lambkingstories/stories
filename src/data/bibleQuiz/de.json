@@ -1,0 +1,2901 @@
+[
+ {
+  "id": "l1-001",
+  "level": 1,
+  "q": "Was baute Noah nach Gottes Anweisung?",
+  "options": [
+   "Einen Turm",
+   "Einen Tempel",
+   "Eine Arche",
+   "Eine Brücke"
+  ],
+  "answer": 2,
+  "ref": "1. Mose 6,14"
+ },
+ {
+  "id": "l1-002",
+  "level": 1,
+  "q": "Welcher Vogel brachte Noah ein frisches Ölblatt?",
+  "options": [
+   "Eine Taube",
+   "Ein Rabe",
+   "Ein Adler",
+   "Eine Schwalbe"
+  ],
+  "answer": 0,
+  "ref": "1. Mose 8,10-11"
+ },
+ {
+  "id": "l1-003",
+  "level": 1,
+  "q": "Was setzte Gott nach der Sintflut als Zeichen an den Himmel?",
+  "options": [
+   "Einen hellen Stern",
+   "Ein Nordlicht",
+   "Eine Sternschnuppe",
+   "Einen Regenbogen"
+  ],
+  "answer": 3,
+  "ref": "1. Mose 9,13"
+ },
+ {
+  "id": "l1-004",
+  "level": 1,
+  "q": "Wie hieß der Sohn, den Abraham mit hundert Jahren bekam?",
+  "options": [
+   "Ismael",
+   "Isaak",
+   "Jakob",
+   "Esau"
+  ],
+  "answer": 1,
+  "ref": "1. Mose 21,5"
+ },
+ {
+  "id": "l1-005",
+  "level": 1,
+  "q": "Was schenkte Jakob seinem Sohn Josef, worauf die Brüder neidisch wurden?",
+  "options": [
+   "Einen Hirtenstab",
+   "Einen bunten Rock",
+   "Ein Schwert",
+   "Einen Silberring"
+  ],
+  "answer": 1,
+  "ref": "1. Mose 37,3-4"
+ },
+ {
+  "id": "l1-006",
+  "level": 1,
+  "q": "In welches Land brachten Kaufleute Josef?",
+  "options": [
+   "Babylon",
+   "Kanaan",
+   "Syrien",
+   "Ägypten"
+  ],
+  "answer": 3,
+  "ref": "1. Mose 37,28"
+ },
+ {
+  "id": "l1-007",
+  "level": 1,
+  "q": "Worin legte Moses Mutter ihr Baby am Ufer des Nils?",
+  "options": [
+   "In ein Körbchen aus Schilf",
+   "In eine Höhle am Ufer",
+   "In einen großen Tonkrug",
+   "In ein Fischernetz"
+  ],
+  "answer": 0,
+  "ref": "2. Mose 2,3"
+ },
+ {
+  "id": "l1-008",
+  "level": 1,
+  "q": "Was brannte, ohne zu verbrennen, als Mose Schafe hütete?",
+  "options": [
+   "Eine Zeder",
+   "Ein Ölbaum",
+   "Ein Dornbusch",
+   "Ein Feigenbaum"
+  ],
+  "answer": 2,
+  "ref": "2. Mose 3,1-2"
+ },
+ {
+  "id": "l1-009",
+  "level": 1,
+  "q": "Was geschah mit dem Meer, als Israel am Ufer stand und Mose die Hand darüber ausstreckte?",
+  "options": [
+   "Das Wasser fror zu",
+   "Das Wasser wurde zu Blut",
+   "Das Wasser kochte",
+   "Das Wasser teilte sich"
+  ],
+  "answer": 3,
+  "ref": "2. Mose 14,21"
+ },
+ {
+  "id": "l1-010",
+  "level": 1,
+  "q": "Worauf schrieb Gott die Zehn Gebote für Mose?",
+  "options": [
+   "Auf Papyrusrollen",
+   "Auf Lederstücke",
+   "Auf zwei Steintafeln",
+   "Auf Holzbretter"
+  ],
+  "answer": 2,
+  "ref": "5. Mose 4,13"
+ },
+ {
+  "id": "l1-011",
+  "level": 1,
+  "q": "Wen sollst du nach den Zehn Geboten ehren?",
+  "options": [
+   "Den Bürgermeister",
+   "Vater und Mutter",
+   "Den Priester",
+   "Den König"
+  ],
+  "answer": 1,
+  "ref": "2. Mose 20,12"
+ },
+ {
+  "id": "l1-012",
+  "level": 1,
+  "q": "Wer besiegte den Riesen Goliat?",
+  "options": [
+   "David",
+   "Saul",
+   "Jonatan",
+   "Simson"
+  ],
+  "answer": 0,
+  "ref": "1. Samuel 17,50"
+ },
+ {
+  "id": "l1-013",
+  "level": 1,
+  "q": "Womit besiegte der junge Hirte den Riesen Goliat?",
+  "options": [
+   "Mit einer Steinschleuder",
+   "Mit einem Speer",
+   "Mit Pfeil und Bogen",
+   "Mit einem Schwert"
+  ],
+  "answer": 0,
+  "ref": "1. Samuel 17,50"
+ },
+ {
+  "id": "l1-014",
+  "level": 1,
+  "q": "Welche Tiere hütete David, als er jung war?",
+  "options": [
+   "Kamele",
+   "Esel",
+   "Schafe",
+   "Rinder"
+  ],
+  "answer": 2,
+  "ref": "1. Samuel 16,11"
+ },
+ {
+  "id": "l1-015",
+  "level": 1,
+  "q": "Wohin wurde Daniel geworfen, weil er weiter zu seinem Gott betete?",
+  "options": [
+   "In ein Gefängnis",
+   "In die Löwengrube",
+   "In einen Feuerofen",
+   "In eine tiefe Zisterne"
+  ],
+  "answer": 1,
+  "ref": "Daniel 6,11-17"
+ },
+ {
+  "id": "l1-016",
+  "level": 1,
+  "q": "Wie lange war Jona im Bauch des großen Fisches?",
+  "options": [
+   "Einen Tag und eine Nacht",
+   "Sieben Tage und Nächte",
+   "Vierzig Tage und Nächte",
+   "Drei Tage und drei Nächte"
+  ],
+  "answer": 3,
+  "ref": "Jona 2,1"
+ },
+ {
+  "id": "l1-017",
+  "level": 1,
+  "q": "In welcher Stadt wurde Jesus geboren?",
+  "options": [
+   "Nazareth",
+   "Jerusalem",
+   "Bethlehem",
+   "Jericho"
+  ],
+  "answer": 2,
+  "ref": "Lukas 2,4-7"
+ },
+ {
+  "id": "l1-018",
+  "level": 1,
+  "q": "Wer überbrachte Maria die Nachricht, dass sie Jesus zur Welt bringen wird?",
+  "options": [
+   "Der Engel Michael",
+   "Der Engel Gabriel",
+   "Der Priester Zacharias",
+   "Der Prophet Jesaja"
+  ],
+  "answer": 1,
+  "ref": "Lukas 1,26-31"
+ },
+ {
+  "id": "l1-019",
+  "level": 1,
+  "q": "Wie brachten vier Männer einen Gelähmten zu Jesus, als das Haus voller Menschen war?",
+  "options": [
+   "Durch die Hintertür",
+   "Durch ein Fenster",
+   "Durch einen Keller",
+   "Durch das Dach"
+  ],
+  "answer": 3,
+  "ref": "Markus 2,1-4"
+ },
+ {
+  "id": "l1-020",
+  "level": 1,
+  "q": "Wem erschien auf dem Feld bei Bethlehem ein Engel und verkündete die Geburt Jesu?",
+  "options": [
+   "Hirten",
+   "Priestern",
+   "Königen",
+   "Fischern"
+  ],
+  "answer": 0,
+  "ref": "Lukas 2,8-11"
+ },
+ {
+  "id": "l1-021",
+  "level": 1,
+  "q": "Woran erkannten die Weisen aus dem Morgenland, dass ein neuer König geboren war?",
+  "options": [
+   "An einem Traum",
+   "An einer Wolke",
+   "An einer Mondfinsternis",
+   "An einem Stern"
+  ],
+  "answer": 3,
+  "ref": "Matthäus 2,2"
+ },
+ {
+  "id": "l1-022",
+  "level": 1,
+  "q": "Wer taufte Jesus im Jordan?",
+  "options": [
+   "Johannes der Täufer",
+   "Petrus",
+   "Jakobus",
+   "Andreas"
+  ],
+  "answer": 0,
+  "ref": "Matthäus 3,13"
+ },
+ {
+  "id": "l1-023",
+  "level": 1,
+  "q": "Was war Simon Petrus von Beruf, als Jesus ihn rief?",
+  "options": [
+   "Zöllner",
+   "Zimmermann",
+   "Fischer",
+   "Hirte"
+  ],
+  "answer": 2,
+  "ref": "Matthäus 4,18"
+ },
+ {
+  "id": "l1-024",
+  "level": 1,
+  "q": "Wie viele Jünger wählte Jesus als seine Apostel?",
+  "options": [
+   "Sieben",
+   "Zwölf",
+   "Zehn",
+   "Zwanzig"
+  ],
+  "answer": 1,
+  "ref": "Lukas 6,13"
+ },
+ {
+  "id": "l1-025",
+  "level": 1,
+  "q": "Was hatten die Jünger bei sich, als Jesus fünftausend Menschen satt machte?",
+  "options": [
+   "Drei Brote und fünf Fische",
+   "Fünf Brote und zwei Fische",
+   "Sieben Brote und drei Fische",
+   "Zwei Brote und drei Fische"
+  ],
+  "answer": 1,
+  "ref": "Matthäus 14,17-21"
+ },
+ {
+  "id": "l1-026",
+  "level": 1,
+  "q": "Was tat Jesus, als im Boot der große Sturm losbrach?",
+  "options": [
+   "Er ruderte",
+   "Er fischte",
+   "Er schlief",
+   "Er steuerte"
+  ],
+  "answer": 2,
+  "ref": "Markus 4,37-38"
+ },
+ {
+  "id": "l1-027",
+  "level": 1,
+  "q": "Wie heißt das Gleichnis vom Mann, der unter die Räuber fiel?",
+  "options": [
+   "Der barmherzige Samariter",
+   "Der verlorene Sohn",
+   "Der gute Hirte",
+   "Der reiche Kornbauer"
+  ],
+  "answer": 0,
+  "ref": "Lukas 10,30-37"
+ },
+ {
+  "id": "l1-028",
+  "level": 1,
+  "q": "Was musste der verlorene Sohn hüten, nachdem er alles Geld verloren hatte?",
+  "options": [
+   "Schafe",
+   "Kamele",
+   "Ziegen",
+   "Schweine"
+  ],
+  "answer": 3,
+  "ref": "Lukas 15,13-15"
+ },
+ {
+  "id": "l1-029",
+  "level": 1,
+  "q": "Warum stieg Zachäus auf einen Baum?",
+  "options": [
+   "Er war klein und wollte Jesus sehen",
+   "Er wollte sich vor Jesus verstecken",
+   "Er wollte Früchte pflücken",
+   "Er wollte dem Volk etwas zurufen"
+  ],
+  "answer": 0,
+  "ref": "Lukas 19,2-4"
+ },
+ {
+  "id": "l1-030",
+  "level": 1,
+  "q": "Für wen hielt Maria Magdalena am Ostermorgen den Mann am Grab?",
+  "options": [
+   "Für einen Soldaten",
+   "Für einen Priester",
+   "Für einen Fischer",
+   "Für den Gärtner"
+  ],
+  "answer": 3,
+  "ref": "Johannes 20,15"
+ },
+ {
+  "id": "l1-031",
+  "level": 1,
+  "q": "Welcher Jünger verleugnete Jesus dreimal, bevor der Hahn krähte?",
+  "options": [
+   "Johannes",
+   "Petrus",
+   "Judas",
+   "Thomas"
+  ],
+  "answer": 1,
+  "ref": "Lukas 22,56-61"
+ },
+ {
+  "id": "l1-032",
+  "level": 1,
+  "q": "Welcher Jünger zweifelte, dass Jesus lebt, bis er ihn selbst sah?",
+  "options": [
+   "Philippus",
+   "Matthäus",
+   "Thomas",
+   "Andreas"
+  ],
+  "answer": 2,
+  "ref": "Johannes 20,24-29"
+ },
+ {
+  "id": "l1-033",
+  "level": 1,
+  "q": "Was schuf Gott am ersten Tag?",
+  "options": [
+   "Die Sterne",
+   "Die Tiere",
+   "Das Licht",
+   "Die Berge"
+  ],
+  "answer": 2,
+  "ref": "1. Mose 1,3-5"
+ },
+ {
+  "id": "l1-034",
+  "level": 1,
+  "q": "Wie nannte Adam seine Frau?",
+  "options": [
+   "Sara",
+   "Rebekka",
+   "Lea",
+   "Eva"
+  ],
+  "answer": 3,
+  "ref": "1. Mose 3,20"
+ },
+ {
+  "id": "l1-035",
+  "level": 1,
+  "q": "Wie hießen die zwei ersten Söhne von Adam und Eva?",
+  "options": [
+   "Kain und Abel",
+   "Esau und Jakob",
+   "Isaak und Ismael",
+   "Set und Henoch"
+  ],
+  "answer": 0,
+  "ref": "1. Mose 4,1-2"
+ },
+ {
+  "id": "l1-036",
+  "level": 1,
+  "q": "Was wollten die Menschen in Babel bauen?",
+  "options": [
+   "Einen Damm gegen die Flut",
+   "Einen Turm bis zum Himmel",
+   "Einen Palast für den König",
+   "Einen Hafen am Meer"
+  ],
+  "answer": 1,
+  "ref": "1. Mose 11,4"
+ },
+ {
+  "id": "l1-037",
+  "level": 1,
+  "q": "In welches Land zog Abraham, als Gott ihn rief?",
+  "options": [
+   "Ägypten",
+   "Kanaan",
+   "Babylonien",
+   "Assyrien"
+  ],
+  "answer": 1,
+  "ref": "1. Mose 12,1-5"
+ },
+ {
+  "id": "l1-038",
+  "level": 1,
+  "q": "Wie hieß die Frau von Abraham?",
+  "options": [
+   "Sara",
+   "Lea",
+   "Rebekka",
+   "Rahel"
+  ],
+  "answer": 0,
+  "ref": "1. Mose 17,15"
+ },
+ {
+  "id": "l1-039",
+  "level": 1,
+  "q": "Wofür verkaufte Esau sein Erstgeburtsrecht an Jakob?",
+  "options": [
+   "Für ein Zelt",
+   "Für ein Kamel",
+   "Für ein Schaf",
+   "Für ein Linsengericht"
+  ],
+  "answer": 3,
+  "ref": "1. Mose 25,33-34"
+ },
+ {
+  "id": "l1-040",
+  "level": 1,
+  "q": "Was sah Jakob im Traum, als er mit dem Kopf auf einem Stein schlief?",
+  "options": [
+   "Einen goldenen Turm",
+   "Eine Brücke aus Licht",
+   "Eine Leiter bis zum Himmel",
+   "Einen riesigen Baum"
+  ],
+  "answer": 2,
+  "ref": "1. Mose 28,11-12"
+ },
+ {
+  "id": "l1-041",
+  "level": 1,
+  "q": "Von welchen Tieren träumte der Pharao, bevor Josef ihm den Traum deutete?",
+  "options": [
+   "Von Schafen",
+   "Von Pferden",
+   "Von Kamelen",
+   "Von Kühen"
+  ],
+  "answer": 3,
+  "ref": "1. Mose 41,1-4"
+ },
+ {
+  "id": "l1-042",
+  "level": 1,
+  "q": "Wie viele Söhne hatte Jakob?",
+  "options": [
+   "Zehn",
+   "Zwölf",
+   "Sieben",
+   "Vierzehn"
+  ],
+  "answer": 1,
+  "ref": "1. Mose 35,22"
+ },
+ {
+  "id": "l1-043",
+  "level": 1,
+  "q": "Wie nannten die Israeliten das Brot, das Gott in der Wüste vom Himmel gab?",
+  "options": [
+   "Mazze",
+   "Honigfladen",
+   "Manna",
+   "Wüstenbrot"
+  ],
+  "answer": 2,
+  "ref": "2. Mose 16,15.31"
+ },
+ {
+  "id": "l1-044",
+  "level": 1,
+  "q": "Was geschah mit Jerichos Mauern, als das Volk laut rief?",
+  "options": [
+   "Sie stürzten ein",
+   "Sie blieben unversehrt stehen",
+   "Sie wurden weggespült",
+   "Sie wurden verbrannt"
+  ],
+  "answer": 0,
+  "ref": "Josua 6,20"
+ },
+ {
+  "id": "l1-045",
+  "level": 1,
+  "q": "Was durfte bei Simson nie abgeschnitten werden?",
+  "options": [
+   "Seine Haare",
+   "Sein Bart",
+   "Seine Fingernägel",
+   "Seine Augenbrauen"
+  ],
+  "answer": 0,
+  "ref": "Richter 16,17"
+ },
+ {
+  "id": "l1-046",
+  "level": 1,
+  "q": "Wer hörte als Junge nachts Gottes Stimme im Tempel bei Eli?",
+  "options": [
+   "Elia",
+   "Samuel",
+   "Nathan",
+   "Jeremia"
+  ],
+  "answer": 1,
+  "ref": "1. Samuel 3,3-10"
+ },
+ {
+  "id": "l1-047",
+  "level": 1,
+  "q": "Welche Vögel versorgten den Propheten Elia mit Brot und Fleisch?",
+  "options": [
+   "Tauben",
+   "Adler",
+   "Schwalben",
+   "Raben"
+  ],
+  "answer": 3,
+  "ref": "1. Könige 17,4-6"
+ },
+ {
+  "id": "l1-048",
+  "level": 1,
+  "q": "Welcher Prophet fuhr mit einem feurigen Wagen in den Himmel?",
+  "options": [
+   "Jesaja",
+   "Samuel",
+   "Elia",
+   "Daniel"
+  ],
+  "answer": 2,
+  "ref": "2. Könige 2,11"
+ },
+ {
+  "id": "l1-049",
+  "level": 1,
+  "q": "Welcher König bat Gott um ein weises Herz?",
+  "options": [
+   "David",
+   "Saul",
+   "Salomo",
+   "Rehabeam"
+  ],
+  "answer": 2,
+  "ref": "1. Könige 3,9-12"
+ },
+ {
+  "id": "l1-050",
+  "level": 1,
+  "q": "Was ließ König Salomo für Gott in Jerusalem bauen?",
+  "options": [
+   "Einen Tempel",
+   "Einen Turm",
+   "Einen Hafen",
+   "Eine Burg"
+  ],
+  "answer": 0,
+  "ref": "1. Könige 6,1-2"
+ },
+ {
+  "id": "l1-051",
+  "level": 1,
+  "q": "Welche Königin rettete ihr Volk vor der Vernichtung?",
+  "options": [
+   "Rut",
+   "Ester",
+   "Hanna",
+   "Sara"
+  ],
+  "answer": 1,
+  "ref": "Ester 7,3-4"
+ },
+ {
+  "id": "l1-052",
+  "level": 1,
+  "q": "Wie beginnt Psalm 23? „Der Herr ist mein …“",
+  "options": [
+   "Fels",
+   "Licht",
+   "Schild",
+   "Hirte"
+  ],
+  "answer": 3,
+  "ref": "Psalm 23,1"
+ },
+ {
+  "id": "l1-053",
+  "level": 1,
+  "q": "Was geschah bei der ersten Plage mit dem Wasser im Nil?",
+  "options": [
+   "Es versiegte",
+   "Es gefror",
+   "Es wurde salzig",
+   "Es wurde zu Blut"
+  ],
+  "answer": 3,
+  "ref": "2. Mose 7,20"
+ },
+ {
+  "id": "l1-054",
+  "level": 1,
+  "q": "Zu wem sagte Rut: „Wo du hingehst, da will ich auch hingehen“?",
+  "options": [
+   "Zu ihrer Mutter",
+   "Zu ihrer Schwester",
+   "Zu ihrer Schwiegermutter",
+   "Zu ihrem Mann"
+  ],
+  "answer": 2,
+  "ref": "Rut 1,16"
+ },
+ {
+  "id": "l1-055",
+  "level": 1,
+  "q": "Wer leitete den Wiederaufbau der Mauer von Jerusalem?",
+  "options": [
+   "Nehemia",
+   "Esra",
+   "Jeremia",
+   "Hesekiel"
+  ],
+  "answer": 0,
+  "ref": "Nehemia 2,17-18"
+ },
+ {
+  "id": "l1-056",
+  "level": 1,
+  "q": "Was war der zweite Sohn von Adam und Eva von Beruf?",
+  "options": [
+   "Fischer",
+   "Schafhirte",
+   "Zimmermann",
+   "Jäger"
+  ],
+  "answer": 1,
+  "ref": "1. Mose 4,2"
+ },
+ {
+  "id": "l1-057",
+  "level": 1,
+  "q": "Wie beginnt das Gebet, das Jesus seine Jünger lehrte?",
+  "options": [
+   "Herr, höre mein Gebet",
+   "Unser Vater im Himmel",
+   "Gott, du bist groß",
+   "Lieber Gott im Himmel"
+  ],
+  "answer": 1,
+  "ref": "Matthäus 6,9"
+ },
+ {
+  "id": "l1-058",
+  "level": 1,
+  "q": "Was verwandelte Jesus bei der Hochzeit in Kana?",
+  "options": [
+   "Wein in Wasser",
+   "Wasser in Öl",
+   "Brot in Wein",
+   "Wasser in Wein"
+  ],
+  "answer": 3,
+  "ref": "Johannes 2,1-9"
+ },
+ {
+  "id": "l1-059",
+  "level": 1,
+  "q": "Welchen Bruder von Maria und Marta rief Jesus aus dem Grab?",
+  "options": [
+   "Nikodemus",
+   "Bartimäus",
+   "Lazarus",
+   "Zachäus"
+  ],
+  "answer": 2,
+  "ref": "Johannes 11,1-2.43-44"
+ },
+ {
+  "id": "l1-060",
+  "level": 1,
+  "q": "Auf welchem Tier ritt Jesus in Jerusalem ein?",
+  "options": [
+   "Auf einem Esel",
+   "Auf einem Pferd",
+   "Auf einem Kamel",
+   "Auf einem Maultier"
+  ],
+  "answer": 0,
+  "ref": "Matthäus 21,7"
+ },
+ {
+  "id": "l1-061",
+  "level": 1,
+  "q": "Welcher Zöllner folgte Jesus, als er zu ihm sagte: „Folge mir!“",
+  "options": [
+   "Matthäus",
+   "Philippus",
+   "Andreas",
+   "Thomas"
+  ],
+  "answer": 0,
+  "ref": "Matthäus 9,9"
+ },
+ {
+  "id": "l1-062",
+  "level": 1,
+  "q": "Was geschah, als die Jünger das Netz auf der rechten Seite des Bootes auswarfen?",
+  "options": [
+   "Das Netz blieb wieder leer",
+   "Das Netz zerriss sofort",
+   "Das Netz wurde übervoll",
+   "Nur ein Fisch ging ins Netz"
+  ],
+  "answer": 2,
+  "ref": "Johannes 21,6"
+ },
+ {
+  "id": "l1-063",
+  "level": 1,
+  "q": "Unter welchem anderen Namen wird Paulus auch genannt?",
+  "options": [
+   "Simon",
+   "Silas",
+   "Stephanus",
+   "Saulus"
+  ],
+  "answer": 3,
+  "ref": "Apostelgeschichte 13,9"
+ },
+ {
+  "id": "l1-064",
+  "level": 1,
+  "q": "Auf dem Weg nach welcher Stadt traf Paulus Jesus in einem Licht vom Himmel?",
+  "options": [
+   "Nach Rom",
+   "Nach Damaskus",
+   "Nach Athen",
+   "Nach Antiochia"
+  ],
+  "answer": 1,
+  "ref": "Apostelgeschichte 9,1-5"
+ },
+ {
+  "id": "l1-065",
+  "level": 1,
+  "q": "Wovon ernährte sich Johannes der Täufer in der Wüste?",
+  "options": [
+   "Von Datteln und Ziegenmilch",
+   "Von Brot und gebratenem Fisch",
+   "Von Heuschrecken und wildem Honig",
+   "Von Beeren und Ziegenkäse"
+  ],
+  "answer": 2,
+  "ref": "Matthäus 3,4"
+ },
+ {
+  "id": "l1-066",
+  "level": 1,
+  "q": "Wie sah der Geist Gottes aus, der bei Jesu Taufe herabkam?",
+  "options": [
+   "Wie ein Adler",
+   "Wie eine Taube",
+   "Wie eine Flamme",
+   "Wie ein Wirbelwind"
+  ],
+  "answer": 1,
+  "ref": "Matthäus 3,16"
+ },
+ {
+  "id": "l1-067",
+  "level": 1,
+  "q": "Worauf baute der kluge Mann in Jesu Gleichnis sein Haus?",
+  "options": [
+   "Auf einen Felsen",
+   "Auf Sand",
+   "Auf Lehm",
+   "Auf Holzpfähle"
+  ],
+  "answer": 0,
+  "ref": "Matthäus 7,24-25"
+ },
+ {
+  "id": "l1-068",
+  "level": 1,
+  "q": "Was wurde aus dem Samen, der im Gleichnis vom Sämann auf guten Boden fiel?",
+  "options": [
+   "Er wurde von Vögeln gefressen",
+   "Er verdorrte in der Sonne",
+   "Die Dornen erstickten ihn",
+   "Er brachte viel Frucht"
+  ],
+  "answer": 3,
+  "ref": "Matthäus 13,8"
+ },
+ {
+  "id": "l1-069",
+  "level": 1,
+  "q": "Wie viele Schafe hatte der Hirte im Gleichnis vom verlorenen Schaf?",
+  "options": [
+   "Fünfzig",
+   "Hundert",
+   "Zehn",
+   "Zwanzig"
+  ],
+  "answer": 1,
+  "ref": "Lukas 15,4"
+ },
+ {
+  "id": "l1-070",
+  "level": 1,
+  "q": "Wie alt war Jesus, als er im Tempel mit den Lehrern sprach?",
+  "options": [
+   "Zwölf Jahre",
+   "Acht Jahre",
+   "Fünfzehn Jahre",
+   "Zwanzig Jahre"
+  ],
+  "answer": 0,
+  "ref": "Lukas 2,42-46"
+ },
+ {
+  "id": "l1-071",
+  "level": 1,
+  "q": "Was tat Petrus auf Jesu Ruf „Komm her!“ mitten auf dem See?",
+  "options": [
+   "Er ruderte zu Jesus",
+   "Er schwamm zu Jesus",
+   "Er ging auf dem Wasser",
+   "Er warf das Netz aus"
+  ],
+  "answer": 2,
+  "ref": "Matthäus 14,28-29"
+ },
+ {
+  "id": "l1-072",
+  "level": 1,
+  "q": "Wen sollten die Jünger zu Jesus kommen lassen?",
+  "options": [
+   "Die Priester",
+   "Die Soldaten",
+   "Die Könige",
+   "Die Kinder"
+  ],
+  "answer": 3,
+  "ref": "Markus 10,13-14"
+ },
+ {
+  "id": "l1-073",
+  "level": 1,
+  "q": "In welcher Stadt wuchs Jesus auf?",
+  "options": [
+   "Kapernaum",
+   "Bethlehem",
+   "Jerusalem",
+   "Nazareth"
+  ],
+  "answer": 3,
+  "ref": "Lukas 4,16"
+ },
+ {
+  "id": "l1-074",
+  "level": 1,
+  "q": "Wie viele der zehn geheilten Aussätzigen kamen zurück, um Jesus zu danken?",
+  "options": [
+   "Neun",
+   "Einer",
+   "Fünf",
+   "Drei"
+  ],
+  "answer": 1,
+  "ref": "Lukas 17,15-17"
+ },
+ {
+  "id": "l1-075",
+  "level": 1,
+  "q": "Welcher Jünger verriet Jesus für dreißig Silberlinge?",
+  "options": [
+   "Judas",
+   "Petrus",
+   "Thomas",
+   "Jakobus"
+  ],
+  "answer": 0,
+  "ref": "Matthäus 26,14-15"
+ },
+ {
+  "id": "l1-076",
+  "level": 1,
+  "q": "An welchem Fest kam der Heilige Geist auf die Jünger?",
+  "options": [
+   "Am Passafest",
+   "Am Laubhüttenfest",
+   "Am Pfingstfest",
+   "Am Purimfest"
+  ],
+  "answer": 2,
+  "ref": "Apostelgeschichte 2,1-4"
+ },
+ {
+  "id": "l1-077",
+  "level": 1,
+  "q": "Wer führte das Volk Israel nach Mose ins verheißene Land?",
+  "options": [
+   "Josua",
+   "Aaron",
+   "Kaleb",
+   "Eli"
+  ],
+  "answer": 0,
+  "ref": "Josua 1,1-2"
+ },
+ {
+  "id": "l1-078",
+  "level": 1,
+  "q": "Was tat Gott am siebenten Tag der Schöpfung?",
+  "options": [
+   "Er schuf die Tiere",
+   "Er schuf die Sterne",
+   "Er schuf den Menschen",
+   "Er ruhte von seinem Werk"
+  ],
+  "answer": 3,
+  "ref": "1. Mose 2,2"
+ },
+ {
+  "id": "l1-079",
+  "level": 1,
+  "q": "Welche Frau betete im Haus des Herrn um einen Sohn und bekam Samuel?",
+  "options": [
+   "Sara",
+   "Rahel",
+   "Hanna",
+   "Lea"
+  ],
+  "answer": 2,
+  "ref": "1. Samuel 1,10-20"
+ },
+ {
+  "id": "l1-080",
+  "level": 1,
+  "q": "Wie hieß der Vater von Esau und Jakob?",
+  "options": [
+   "Abraham",
+   "Isaak",
+   "Laban",
+   "Josef"
+  ],
+  "answer": 1,
+  "ref": "1. Mose 25,19-26"
+ },
+ {
+  "id": "l2-001",
+  "level": 2,
+  "q": "Wie hieß der Neffe, der mit Abraham nach Kanaan zog?",
+  "options": [
+   "Laban",
+   "Nahor",
+   "Lot",
+   "Esau"
+  ],
+  "answer": 2,
+  "ref": "1. Mose 12,4-5"
+ },
+ {
+  "id": "l2-002",
+  "level": 2,
+  "q": "Wie hießen die Eltern von Johannes dem Täufer?",
+  "options": [
+   "Zacharias und Elisabeth",
+   "Zebedäus und Salome",
+   "Simeon und Hanna",
+   "Aquila und Priszilla"
+  ],
+  "answer": 0,
+  "ref": "Lukas 1,5-13"
+ },
+ {
+  "id": "l2-003",
+  "level": 2,
+  "q": "Welche Plage traf Ägypten gleich nach der Plage mit dem Blut im Nil?",
+  "options": [
+   "Hagel",
+   "Finsternis",
+   "Heuschrecken",
+   "Frösche"
+  ],
+  "answer": 3,
+  "ref": "2. Mose 7,25; 8,1-2"
+ },
+ {
+  "id": "l2-004",
+  "level": 2,
+  "q": "Wer versteckte in Jericho die beiden Kundschafter Josuas?",
+  "options": [
+   "Debora",
+   "Rahab",
+   "Rut",
+   "Jael"
+  ],
+  "answer": 1,
+  "ref": "Josua 2,1-4"
+ },
+ {
+  "id": "l2-005",
+  "level": 2,
+  "q": "Wie hieß der Engel, der zu Maria kam?",
+  "options": [
+   "Michael",
+   "Gabriel",
+   "Raphael",
+   "Uriel"
+  ],
+  "answer": 1,
+  "ref": "Lukas 1,26-27"
+ },
+ {
+  "id": "l2-006",
+  "level": 2,
+  "q": "An welchem Berg sah Mose den brennenden Dornbusch?",
+  "options": [
+   "Nebo",
+   "Karmel",
+   "Zion",
+   "Horeb"
+  ],
+  "answer": 3,
+  "ref": "2. Mose 3,1-2"
+ },
+ {
+  "id": "l2-007",
+  "level": 2,
+  "q": "Warum reisten Josef und Maria nach Bethlehem?",
+  "options": [
+   "Der Kaiser ließ alle zählen",
+   "Sie besuchten Verwandte",
+   "Sie flohen vor Herodes",
+   "Sie hatten Arbeit gefunden"
+  ],
+  "answer": 0,
+  "ref": "Lukas 2,1-5"
+ },
+ {
+  "id": "l2-008",
+  "level": 2,
+  "q": "Wie viele Jahre diente Jakob zuerst um Rahel?",
+  "options": [
+   "Drei Jahre",
+   "Zwölf Jahre",
+   "Sieben Jahre",
+   "Zehn Jahre"
+  ],
+  "answer": 2,
+  "ref": "1. Mose 29,18-20"
+ },
+ {
+  "id": "l2-009",
+  "level": 2,
+  "q": "Mit wie vielen Männern zog Gideon gegen die Midianiter?",
+  "options": [
+   "Hundert",
+   "Tausend",
+   "Dreitausend",
+   "Dreihundert"
+  ],
+  "answer": 3,
+  "ref": "Richter 7,7"
+ },
+ {
+  "id": "l2-010",
+  "level": 2,
+  "q": "Wohin floh Josef mit Maria und dem Kind vor Herodes?",
+  "options": [
+   "Nach Syrien",
+   "Nach Samaria",
+   "Nach Ägypten",
+   "Nach Babylon"
+  ],
+  "answer": 2,
+  "ref": "Matthäus 2,13-14"
+ },
+ {
+  "id": "l2-011",
+  "level": 2,
+  "q": "Wie hieß Ruts Schwiegermutter, mit der sie nach Bethlehem zog?",
+  "options": [
+   "Orpa",
+   "Noomi",
+   "Hanna",
+   "Debora"
+  ],
+  "answer": 1,
+  "ref": "Rut 1,2-4; 1,22"
+ },
+ {
+  "id": "l2-012",
+  "level": 2,
+  "q": "Wer kam bei Nacht zu Jesus, um mit ihm zu reden?",
+  "options": [
+   "Nikodemus",
+   "Zachäus",
+   "Kornelius",
+   "Kaiphas"
+  ],
+  "answer": 0,
+  "ref": "Johannes 3,1-2"
+ },
+ {
+  "id": "l2-013",
+  "level": 2,
+  "q": "Wie hieß Moses Bruder, der für ihn zum Volk sprach?",
+  "options": [
+   "Aaron",
+   "Hur",
+   "Josua",
+   "Kaleb"
+  ],
+  "answer": 0,
+  "ref": "2. Mose 4,14-16"
+ },
+ {
+  "id": "l2-015",
+  "level": 2,
+  "q": "Was suchte Saul, als er Samuel kennenlernte?",
+  "options": [
+   "Die Schafe seines Vaters",
+   "Die Kamele seines Vaters",
+   "Die Eselinnen seines Vaters",
+   "Die Rinder seines Vaters"
+  ],
+  "answer": 2,
+  "ref": "1. Samuel 9,3"
+ },
+ {
+  "id": "l2-016",
+  "level": 2,
+  "q": "Wie hieß der Ort, an dem Jakob im Traum die Leiter bis zum Himmel sah?",
+  "options": [
+   "Sichem",
+   "Hebron",
+   "Silo",
+   "Bethel"
+  ],
+  "answer": 3,
+  "ref": "1. Mose 28,12-19"
+ },
+ {
+  "id": "l2-017",
+  "level": 2,
+  "q": "Was brachten die Weisen aus dem Morgenland dem Kind Jesus?",
+  "options": [
+   "Silber, Honig und Öl",
+   "Gold, Wein und Brot",
+   "Gold, Weihrauch und Myrrhe",
+   "Perlen, Salz und Weizen"
+  ],
+  "answer": 2,
+  "ref": "Matthäus 2,11"
+ },
+ {
+  "id": "l2-018",
+  "level": 2,
+  "q": "In wessen Haus schickte Gott den Propheten Jeremia?",
+  "options": [
+   "Eines Schmieds",
+   "Eines Webers",
+   "Eines Hirten",
+   "Eines Töpfers"
+  ],
+  "answer": 3,
+  "ref": "Jeremia 18,1-3"
+ },
+ {
+  "id": "l2-020",
+  "level": 2,
+  "q": "Welchen Männern deutete Josef im Gefängnis ihre Träume?",
+  "options": [
+   "Wächter und Richter",
+   "Mundschenk und Bäcker",
+   "Schreiber und Priester",
+   "Koch und Gärtner"
+  ],
+  "answer": 1,
+  "ref": "1. Mose 40,1-8"
+ },
+ {
+  "id": "l2-021",
+  "level": 2,
+  "q": "Auf welchem Gebirge setzte die Arche nach der Sintflut auf?",
+  "options": [
+   "Sinai",
+   "Ararat",
+   "Karmel",
+   "Hermon"
+  ],
+  "answer": 1,
+  "ref": "1. Mose 8,4"
+ },
+ {
+  "id": "l2-022",
+  "level": 2,
+  "q": "Wie viele Wasserkrüge standen bei der Hochzeit zu Kana bereit?",
+  "options": [
+   "Sechs",
+   "Vier",
+   "Sieben",
+   "Zwölf"
+  ],
+  "answer": 0,
+  "ref": "Johannes 2,6"
+ },
+ {
+  "id": "l2-023",
+  "level": 2,
+  "q": "Wen heiratete Rut?",
+  "options": [
+   "Obed",
+   "Elimelech",
+   "Isai",
+   "Boas"
+  ],
+  "answer": 3,
+  "ref": "Rut 4,13"
+ },
+ {
+  "id": "l2-025",
+  "level": 2,
+  "q": "Für wie viele Silberlinge wurde Josef an die Ismaeliten verkauft?",
+  "options": [
+   "Für zehn",
+   "Für dreißig",
+   "Für fünfzig",
+   "Für zwanzig"
+  ],
+  "answer": 3,
+  "ref": "1. Mose 37,28"
+ },
+ {
+  "id": "l2-027",
+  "level": 2,
+  "q": "Bei welchem Priester diente der junge Samuel?",
+  "options": [
+   "Zadok",
+   "Abjatar",
+   "Eli",
+   "Aaron"
+  ],
+  "answer": 2,
+  "ref": "1. Samuel 2,11; 3,1"
+ },
+ {
+  "id": "l2-028",
+  "level": 2,
+  "q": "Wie hieß die Prophetin, die nach dem Durchzug durchs Meer die Pauke nahm und sang?",
+  "options": [
+   "Mirjam",
+   "Debora",
+   "Hanna",
+   "Abigail"
+  ],
+  "answer": 0,
+  "ref": "2. Mose 15,20-21"
+ },
+ {
+  "id": "l2-029",
+  "level": 2,
+  "q": "Was versprach Zachäus den Armen, als Jesus bei ihm einkehrte?",
+  "options": [
+   "Die Hälfte seines Gutes",
+   "Ein Zehntel seines Gutes",
+   "Ein Drittel seines Gutes",
+   "Alles, was er besaß"
+  ],
+  "answer": 0,
+  "ref": "Lukas 19,5-8"
+ },
+ {
+  "id": "l2-030",
+  "level": 2,
+  "q": "Wer hielt Moses Arme hoch, als Israel gegen Amalek kämpfte?",
+  "options": [
+   "Josua und Kaleb",
+   "Nadab und Abihu",
+   "Aaron und Hur",
+   "Eldad und Medad"
+  ],
+  "answer": 2,
+  "ref": "2. Mose 17,10-12"
+ },
+ {
+  "id": "l2-031",
+  "level": 2,
+  "q": "Wie viele Steine suchte David für seine Schleuder aus?",
+  "options": [
+   "Drei",
+   "Fünf",
+   "Sieben",
+   "Zwölf"
+  ],
+  "answer": 1,
+  "ref": "1. Samuel 17,40"
+ },
+ {
+  "id": "l2-032",
+  "level": 2,
+  "q": "Wie nennt Paulus den Schild in der Waffenrüstung Gottes?",
+  "options": [
+   "Schild der Wahrheit",
+   "Schild des Friedens",
+   "Schild der Hoffnung",
+   "Schild des Glaubens"
+  ],
+  "answer": 3,
+  "ref": "Epheser 6,16"
+ },
+ {
+  "id": "l2-033",
+  "level": 2,
+  "q": "Wessen Sohn war Jonatan, Davids bester Freund?",
+  "options": [
+   "Samuels",
+   "Sauls",
+   "Isais",
+   "Elis"
+  ],
+  "answer": 1,
+  "ref": "1. Samuel 14,1; 18,1"
+ },
+ {
+  "id": "l2-034",
+  "level": 2,
+  "q": "Wer ging im Gleichnis vom barmherzigen Samariter an dem Verletzten vorbei?",
+  "options": [
+   "Ein Hirte und ein Zöllner",
+   "Zwei Soldaten",
+   "Ein Priester und ein Levit",
+   "Ein Pharisäer und ein Fischer"
+  ],
+  "answer": 2,
+  "ref": "Lukas 10,30-32"
+ },
+ {
+  "id": "l2-035",
+  "level": 2,
+  "q": "Wer erzählte David die Geschichte vom Schaf des armen Mannes?",
+  "options": [
+   "Samuel",
+   "Gad",
+   "Elia",
+   "Nathan"
+  ],
+  "answer": 3,
+  "ref": "2. Samuel 12,1-7"
+ },
+ {
+  "id": "l2-036",
+  "level": 2,
+  "q": "Worum bat Salomo Gott, als dieser ihm im Traum erschien?",
+  "options": [
+   "Um ein verständiges Herz",
+   "Um großen Reichtum",
+   "Um ein langes Leben",
+   "Um Sieg über Feinde"
+  ],
+  "answer": 0,
+  "ref": "1. Könige 3,5-12"
+ },
+ {
+  "id": "l2-037",
+  "level": 2,
+  "q": "Welcher Same wurde im Gleichnis vom Sämann von den Vögeln gefressen?",
+  "options": [
+   "Der unter die Dornen fiel",
+   "Der auf felsigen Boden fiel",
+   "Der ins gute Land fiel",
+   "Der auf den Weg fiel"
+  ],
+  "answer": 3,
+  "ref": "Matthäus 13,3-4"
+ },
+ {
+  "id": "l2-038",
+  "level": 2,
+  "q": "Wer besuchte Salomo, um ihn mit Rätseln zu prüfen?",
+  "options": [
+   "Die Königin von Saba",
+   "Die Königin Ester",
+   "Die Königin Isebel",
+   "Die Königin Atalja"
+  ],
+  "answer": 0,
+  "ref": "1. Könige 10,1"
+ },
+ {
+  "id": "l2-039",
+  "level": 2,
+  "q": "Wer brachte Elia am Bach morgens und abends Brot und Fleisch?",
+  "options": [
+   "Tauben",
+   "Adler",
+   "Raben",
+   "Wachteln"
+  ],
+  "answer": 2,
+  "ref": "1. Könige 17,2-6"
+ },
+ {
+  "id": "l2-040",
+  "level": 2,
+  "q": "Wie viele Schafe ließ der Hirte zurück, um das eine verlorene zu suchen?",
+  "options": [
+   "Neunzig",
+   "Neunundneunzig",
+   "Fünfzig",
+   "Zehn"
+  ],
+  "answer": 1,
+  "ref": "Lukas 15,4"
+ },
+ {
+  "id": "l2-041",
+  "level": 2,
+  "q": "Womit vergleicht Jesus das Himmelreich im Gleichnis vom Samen, der zum Baum wird?",
+  "options": [
+   "Mit einem Senfkorn",
+   "Mit einem Mohnkorn",
+   "Mit einem Gerstenkorn",
+   "Mit einem Hirsekorn"
+  ],
+  "answer": 0,
+  "ref": "Matthäus 13,31-32"
+ },
+ {
+  "id": "l2-042",
+  "level": 2,
+  "q": "Auf welchem Berg trat Elia gegen die Baalspropheten an?",
+  "options": [
+   "Sinai",
+   "Tabor",
+   "Ararat",
+   "Karmel"
+  ],
+  "answer": 3,
+  "ref": "1. Könige 18,19-20"
+ },
+ {
+  "id": "l2-043",
+  "level": 2,
+  "q": "Wer wurde nach Elia Prophet an seiner Stelle?",
+  "options": [
+   "Jesaja",
+   "Elisa",
+   "Amos",
+   "Jona"
+  ],
+  "answer": 1,
+  "ref": "2. Könige 2,9-15"
+ },
+ {
+  "id": "l2-044",
+  "level": 2,
+  "q": "Wie viele der zehn Jungfrauen im Gleichnis waren klug?",
+  "options": [
+   "Drei",
+   "Sieben",
+   "Fünf",
+   "Vier"
+  ],
+  "answer": 2,
+  "ref": "Matthäus 25,1-2"
+ },
+ {
+  "id": "l2-045",
+  "level": 2,
+  "q": "In welchem Fluss sollte sich Naaman siebenmal waschen?",
+  "options": [
+   "Im Nil",
+   "Im Euphrat",
+   "Im Jordan",
+   "Im Kidron"
+  ],
+  "answer": 2,
+  "ref": "2. Könige 5,10"
+ },
+ {
+  "id": "l2-046",
+  "level": 2,
+  "q": "Was tat der Knecht im Gleichnis mit dem einen Talent?",
+  "options": [
+   "Er verschenkte es",
+   "Er vergrub es",
+   "Er verlor es",
+   "Er verkaufte es"
+  ],
+  "answer": 1,
+  "ref": "Matthäus 25,18"
+ },
+ {
+  "id": "l2-047",
+  "level": 2,
+  "q": "Wohin sollte Jona im Auftrag Gottes gehen?",
+  "options": [
+   "Nach Ninive",
+   "Nach Tarsis",
+   "Nach Babylon",
+   "Nach Damaskus"
+  ],
+  "answer": 0,
+  "ref": "Jona 1,1-2"
+ },
+ {
+  "id": "l2-049",
+  "level": 2,
+  "q": "Welches Gebot nannte Jesus das höchste im Gesetz?",
+  "options": [
+   "Gott von ganzem Herzen lieben",
+   "Den Sabbat halten und heiligen",
+   "Vater und Mutter in Ehren halten",
+   "Nicht töten und nicht stehlen"
+  ],
+  "answer": 0,
+  "ref": "Matthäus 22,35-38"
+ },
+ {
+  "id": "l2-050",
+  "level": 2,
+  "q": "Wie oft am Tag betete Daniel zu Gott?",
+  "options": [
+   "Einmal",
+   "Siebenmal",
+   "Fünfmal",
+   "Dreimal"
+  ],
+  "answer": 3,
+  "ref": "Daniel 6,11"
+ },
+ {
+  "id": "l2-051",
+  "level": 2,
+  "q": "Welcher König sah eine Hand an die Wand schreiben?",
+  "options": [
+   "Nebukadnezar",
+   "Kyrus",
+   "Belsazar",
+   "Darius"
+  ],
+  "answer": 2,
+  "ref": "Daniel 5,1-5"
+ },
+ {
+  "id": "l2-052",
+  "level": 2,
+  "q": "Wer wird laut der Bergpredigt das Erdreich besitzen?",
+  "options": [
+   "Die Barmherzigen",
+   "Die Sanftmütigen",
+   "Die Friedfertigen",
+   "Die Trauernden"
+  ],
+  "answer": 1,
+  "ref": "Matthäus 5,5"
+ },
+ {
+  "id": "l2-053",
+  "level": 2,
+  "q": "Wer nahm Ester, die keine Eltern mehr hatte, als Tochter auf?",
+  "options": [
+   "Haman",
+   "Esra",
+   "Mordechai",
+   "Ahasveros"
+  ],
+  "answer": 2,
+  "ref": "Ester 2,5-7"
+ },
+ {
+  "id": "l2-054",
+  "level": 2,
+  "q": "Wie hießen die Schwestern des Lazarus?",
+  "options": [
+   "Maria und Marta",
+   "Maria und Salome",
+   "Marta und Johanna",
+   "Rahel und Lea"
+  ],
+  "answer": 0,
+  "ref": "Johannes 11,1-2"
+ },
+ {
+  "id": "l2-055",
+  "level": 2,
+  "q": "Was wurde unter Nehemia in Jerusalem in nur 52 Tagen fertig?",
+  "options": [
+   "Der Tempel",
+   "Die Stadtmauer",
+   "Der Königspalast",
+   "Der Opferaltar"
+  ],
+  "answer": 1,
+  "ref": "Nehemia 6,15; 2,17"
+ },
+ {
+  "id": "l2-056",
+  "level": 2,
+  "q": "Was legten die Menschen beim Einzug Jesu in Jerusalem auf den Weg?",
+  "options": [
+   "Teppiche und Blumen",
+   "Netze und Seile",
+   "Steine und Holz",
+   "Kleider und Zweige"
+  ],
+  "answer": 3,
+  "ref": "Matthäus 21,8"
+ },
+ {
+  "id": "l2-057",
+  "level": 2,
+  "q": "Welcher Psalm beginnt mit „Der HERR ist mein Hirte“?",
+  "options": [
+   "Psalm 1",
+   "Psalm 23",
+   "Psalm 100",
+   "Psalm 121"
+  ],
+  "answer": 1,
+  "ref": "Psalm 23,1"
+ },
+ {
+  "id": "l2-058",
+  "level": 2,
+  "q": "Um was bat Jesus die Frau am Brunnen in Samarien?",
+  "options": [
+   "Um Brot",
+   "Um ein Nachtlager",
+   "Um ein Gebet",
+   "Um etwas zu trinken"
+  ],
+  "answer": 3,
+  "ref": "Johannes 4,5-7"
+ },
+ {
+  "id": "l2-059",
+  "level": 2,
+  "q": "An welchem Ort betete Jesus in der Nacht vor seiner Gefangennahme?",
+  "options": [
+   "Golgatha",
+   "Bethanien",
+   "Gethsemane",
+   "Kapernaum"
+  ],
+  "answer": 2,
+  "ref": "Matthäus 26,36"
+ },
+ {
+  "id": "l2-060",
+  "level": 2,
+  "q": "Wer wurde 969 Jahre alt?",
+  "options": [
+   "Methusalem",
+   "Adam",
+   "Noah",
+   "Henoch"
+  ],
+  "answer": 0,
+  "ref": "1. Mose 5,25-27"
+ },
+ {
+  "id": "l2-062",
+  "level": 2,
+  "q": "Was geschah, nachdem Petrus Jesus dreimal verleugnet hatte?",
+  "options": [
+   "Die Erde bebte",
+   "Es begann zu regnen",
+   "Der Hahn krähte",
+   "Ein Engel erschien"
+  ],
+  "answer": 2,
+  "ref": "Matthäus 26,74-75"
+ },
+ {
+  "id": "l2-063",
+  "level": 2,
+  "q": "Welchen neuen Namen bekam Jakob nach dem Ringen am Fluss Jabbok?",
+  "options": [
+   "Israel",
+   "Juda",
+   "Ismael",
+   "Benjamin"
+  ],
+  "answer": 0,
+  "ref": "1. Mose 32,25-29"
+ },
+ {
+  "id": "l2-065",
+  "level": 2,
+  "q": "Aus welchem Ort sollte nach dem Propheten Micha der Herrscher in Israel kommen?",
+  "options": [
+   "Nazareth",
+   "Bethlehem",
+   "Jerusalem",
+   "Hebron"
+  ],
+  "answer": 1,
+  "ref": "Micha 5,1"
+ },
+ {
+  "id": "l2-066",
+  "level": 2,
+  "q": "Wer erkannte den Auferstandenen am Grab, als er ihren Namen rief?",
+  "options": [
+   "Maria Magdalena",
+   "Salome",
+   "Johanna",
+   "Marta"
+  ],
+  "answer": 0,
+  "ref": "Johannes 20,1; 20,11-16"
+ },
+ {
+  "id": "l2-067",
+  "level": 2,
+  "q": "Woraus machte Gott die erste Frau?",
+  "options": [
+   "Aus Staub der Erde",
+   "Aus dem Atem Gottes",
+   "Aus einer Rippe Adams",
+   "Aus Wasser und Lehm"
+  ],
+  "answer": 2,
+  "ref": "1. Mose 2,21-22"
+ },
+ {
+  "id": "l2-069",
+  "level": 2,
+  "q": "Welches Tier sprach zu Bileam?",
+  "options": [
+   "Seine Eselin",
+   "Sein Kamel",
+   "Sein Maultier",
+   "Sein Pferd"
+  ],
+  "answer": 0,
+  "ref": "4. Mose 22,28"
+ },
+ {
+  "id": "l2-070",
+  "level": 2,
+  "q": "Wohin gingen zwei Jünger am Ostertag, als sich Jesus zu ihnen gesellte?",
+  "options": [
+   "Nach Bethanien",
+   "Nach Kapernaum",
+   "Nach Emmaus",
+   "Nach Nain"
+  ],
+  "answer": 2,
+  "ref": "Lukas 24,13-15"
+ },
+ {
+  "id": "l2-071",
+  "level": 2,
+  "q": "Was erlebte jeder in der Menge, als die Jünger an Pfingsten sprachen?",
+  "options": [
+   "Alle hörten nur eine Sprache",
+   "Er verstand kein einziges Wort",
+   "Er hörte nur Lieder und Gesang",
+   "Er hörte sie in seiner Sprache"
+  ],
+  "answer": 3,
+  "ref": "Apostelgeschichte 2,1-6"
+ },
+ {
+  "id": "l2-072",
+  "level": 2,
+  "q": "Was folgt in den Zehn Geboten direkt auf „Du sollst nicht töten“?",
+  "options": [
+   "Du sollst nicht stehlen",
+   "Du sollst nicht ehebrechen",
+   "Du sollst nicht begehren",
+   "Du sollst kein falsch Zeugnis reden"
+  ],
+  "answer": 1,
+  "ref": "2. Mose 20,13-14"
+ },
+ {
+  "id": "l2-073",
+  "level": 2,
+  "q": "Was las der Kämmerer aus Äthiopien in seinem Wagen?",
+  "options": [
+   "Die Psalmen",
+   "Das Buch Mose",
+   "Den Propheten Jeremia",
+   "Den Propheten Jesaja"
+  ],
+  "answer": 3,
+  "ref": "Apostelgeschichte 8,27-30"
+ },
+ {
+  "id": "l2-074",
+  "level": 2,
+  "q": "Wen rief die Richterin Debora, um gegen Sisera in den Kampf zu ziehen?",
+  "options": [
+   "Gideon",
+   "Barak",
+   "Abner",
+   "Joab"
+  ],
+  "answer": 1,
+  "ref": "Richter 4,4-9"
+ },
+ {
+  "id": "l2-075",
+  "level": 2,
+  "q": "Wohin reiste Saulus, um Christen zu verfolgen?",
+  "options": [
+   "Nach Damaskus",
+   "Nach Antiochia",
+   "Nach Ephesus",
+   "Nach Rom"
+  ],
+  "answer": 0,
+  "ref": "Apostelgeschichte 9,1-3"
+ },
+ {
+  "id": "l2-076",
+  "level": 2,
+  "q": "Bei welchem Ehepaar blieb Paulus zuerst in Korinth?",
+  "options": [
+   "Ananias und Saphira",
+   "Abraham und Sara",
+   "Aquila und Priszilla",
+   "Josef und Maria"
+  ],
+  "answer": 2,
+  "ref": "Apostelgeschichte 18,1-3"
+ },
+ {
+  "id": "l2-077",
+  "level": 2,
+  "q": "Wo stand die Sonne still, als Josua zu ihr sprach?",
+  "options": [
+   "Bei Jericho",
+   "Bei Hebron",
+   "Bei Gibeon",
+   "Bei Bethel"
+  ],
+  "answer": 2,
+  "ref": "Josua 10,12-13"
+ },
+ {
+  "id": "l2-078",
+  "level": 2,
+  "q": "Welche drei Dinge bleiben nach Paulus für immer?",
+  "options": [
+   "Weisheit, Kraft, Friede",
+   "Wahrheit, Recht, Gnade",
+   "Mut, Treue, Geduld",
+   "Glaube, Hoffnung, Liebe"
+  ],
+  "answer": 3,
+  "ref": "1. Korinther 13,13"
+ },
+ {
+  "id": "l2-079",
+  "level": 2,
+  "q": "Mit welchen zwei Männern sprach Jesus auf dem Berg der Verklärung?",
+  "options": [
+   "Abraham und Jakob",
+   "Mose und Elia",
+   "David und Salomo",
+   "Jesaja und Jeremia"
+  ],
+  "answer": 1,
+  "ref": "Matthäus 17,1-3"
+ },
+ {
+  "id": "l2-080",
+  "level": 2,
+  "q": "Wie viele Freunde besuchten Hiob in seinem Leid?",
+  "options": [
+   "Drei",
+   "Zwei",
+   "Vier",
+   "Sieben"
+  ],
+  "answer": 0,
+  "ref": "Hiob 2,11"
+ },
+ {
+  "id": "l3-001",
+  "level": 3,
+  "q": "Wie hieß die Frau des Mose, die er in Midian heiratete?",
+  "options": [
+   "Zippora",
+   "Mirjam",
+   "Rahab",
+   "Debora"
+  ],
+  "answer": 0,
+  "ref": "2. Mose 2,21"
+ },
+ {
+  "id": "l3-002",
+  "level": 3,
+  "q": "Wessen Schafe hütete Mose, als er am Berg Horeb den brennenden Busch sah?",
+  "options": [
+   "Jethros",
+   "Labans",
+   "Nabals",
+   "Isais"
+  ],
+  "answer": 0,
+  "ref": "2. Mose 3,1-2"
+ },
+ {
+  "id": "l3-003",
+  "level": 3,
+  "q": "Welcher Mann aus dem Stamm Juda wurde von Gott für die Arbeit an der Stiftshütte begabt?",
+  "options": [
+   "Hiram",
+   "Bezaleel",
+   "Nadab",
+   "Uria"
+  ],
+  "answer": 1,
+  "ref": "2. Mose 31,2-3"
+ },
+ {
+  "id": "l3-004",
+  "level": 3,
+  "q": "Welche zwei der zwölf Kundschafter machten dem Volk Mut?",
+  "options": [
+   "Aaron und Hur",
+   "Eldad und Medad",
+   "Eleasar und Pinehas",
+   "Josua und Kaleb"
+  ],
+  "answer": 3,
+  "ref": "4. Mose 14,6-9"
+ },
+ {
+  "id": "l3-005",
+  "level": 3,
+  "q": "Wer sah zuerst den Engel des Herrn auf Bileams Weg?",
+  "options": [
+   "Bileam",
+   "Balak",
+   "Bileams Knechte",
+   "Die Eselin"
+  ],
+  "answer": 3,
+  "ref": "4. Mose 22,23"
+ },
+ {
+  "id": "l3-006",
+  "level": 3,
+  "q": "Welcher König der Moabiter ließ Bileam rufen, damit er Israel verfluchte?",
+  "options": [
+   "Og",
+   "Balak",
+   "Sihon",
+   "Eglon"
+  ],
+  "answer": 1,
+  "ref": "4. Mose 22,4-6"
+ },
+ {
+  "id": "l3-007",
+  "level": 3,
+  "q": "Welche Farbe hatte das Seil, das Rahab in ihr Fenster knüpfen sollte?",
+  "options": [
+   "Weiß",
+   "Blau",
+   "Rot",
+   "Gelb"
+  ],
+  "answer": 2,
+  "ref": "Josua 2,18"
+ },
+ {
+  "id": "l3-008",
+  "level": 3,
+  "q": "Welche Prophetin sprach unter der Palme Recht in Israel?",
+  "options": [
+   "Debora",
+   "Jael",
+   "Hulda",
+   "Mirjam"
+  ],
+  "answer": 0,
+  "ref": "Richter 4,4-5"
+ },
+ {
+  "id": "l3-009",
+  "level": 3,
+  "q": "Aus welchem Stamm kam Simson?",
+  "options": [
+   "Dan",
+   "Juda",
+   "Benjamin",
+   "Ephraim"
+  ],
+  "answer": 0,
+  "ref": "Richter 13,2"
+ },
+ {
+  "id": "l3-010",
+  "level": 3,
+  "q": "Welchen Namen wählte Noomi für sich, weil Gott ihr Bitteres gesandt hatte?",
+  "options": [
+   "Orpa",
+   "Hanna",
+   "Mara",
+   "Rahel"
+  ],
+  "answer": 2,
+  "ref": "Rut 1,20"
+ },
+ {
+  "id": "l3-011",
+  "level": 3,
+  "q": "Wie hießen die beiden Söhne des Priesters Eli?",
+  "options": [
+   "Joel und Abia",
+   "Hophni und Pinehas",
+   "Nadab und Abihu",
+   "Jonathan und Abinadab"
+  ],
+  "answer": 1,
+  "ref": "1. Samuel 1,3"
+ },
+ {
+  "id": "l3-012",
+  "level": 3,
+  "q": "Wie hieß Samuels Vater?",
+  "options": [
+   "Eli",
+   "Kisch",
+   "Abinadab",
+   "Elkana"
+  ],
+  "answer": 3,
+  "ref": "1. Samuel 1,1"
+ },
+ {
+  "id": "l3-014",
+  "level": 3,
+  "q": "Wie hieß Jonatans Sohn, den David an seinen Tisch holte?",
+  "options": [
+   "Abner",
+   "Mephiboseth",
+   "Joab",
+   "Ahimelech"
+  ],
+  "answer": 1,
+  "ref": "2. Samuel 9,6-7"
+ },
+ {
+  "id": "l3-015",
+  "level": 3,
+  "q": "Welches einzige Tier besaß der arme Mann in der Geschichte, die Nathan David erzählte?",
+  "options": [
+   "Ein Kälbchen",
+   "Eine Ziege",
+   "Ein Schäflein",
+   "Eine Taube"
+  ],
+  "answer": 2,
+  "ref": "2. Samuel 12,3"
+ },
+ {
+  "id": "l3-016",
+  "level": 3,
+  "q": "Bei wem stand die Bundeslade drei Monate, bevor David sie nach Jerusalem holte?",
+  "options": [
+   "Obed-Edom",
+   "Zadok",
+   "Ahimelech",
+   "Hiram"
+  ],
+  "answer": 0,
+  "ref": "2. Samuel 6,10-12"
+ },
+ {
+  "id": "l3-017",
+  "level": 3,
+  "q": "Wie viele Jahre baute Salomo am Tempel in Jerusalem?",
+  "options": [
+   "7 Jahre",
+   "3 Jahre",
+   "12 Jahre",
+   "40 Jahre"
+  ],
+  "answer": 0,
+  "ref": "1. Könige 6,37-38"
+ },
+ {
+  "id": "l3-018",
+  "level": 3,
+  "q": "Wer wurde der erste König des Nordreichs Israel nach Salomos Tod?",
+  "options": [
+   "Rehabeam",
+   "Ahab",
+   "Jerobeam",
+   "Jehu"
+  ],
+  "answer": 2,
+  "ref": "1. Könige 12,20"
+ },
+ {
+  "id": "l3-019",
+  "level": 3,
+  "q": "An welchem Bach trank Elia, während die Raben ihn versorgten?",
+  "options": [
+   "Kidron",
+   "Krith",
+   "Jabbok",
+   "Arnon"
+  ],
+  "answer": 1,
+  "ref": "1. Könige 17,3-6"
+ },
+ {
+  "id": "l3-020",
+  "level": 3,
+  "q": "Wie viele Propheten Baals gab es nach Elias Worten auf dem Karmel?",
+  "options": [
+   "300",
+   "120",
+   "700",
+   "450"
+  ],
+  "answer": 3,
+  "ref": "1. Könige 18,22"
+ },
+ {
+  "id": "l3-021",
+  "level": 3,
+  "q": "Zu welchem Berg wanderte Elia vierzig Tage und Nächte?",
+  "options": [
+   "Karmel",
+   "Nebo",
+   "Ebal",
+   "Horeb"
+  ],
+  "answer": 3,
+  "ref": "1. Könige 19,8"
+ },
+ {
+  "id": "l3-022",
+  "level": 3,
+  "q": "Wem gehörte der Weinberg, den König Ahab gern haben wollte?",
+  "options": [
+   "Nabal",
+   "Naboth",
+   "Uria",
+   "Hiram"
+  ],
+  "answer": 1,
+  "ref": "1. Könige 21,1-2"
+ },
+ {
+  "id": "l3-023",
+  "level": 3,
+  "q": "Wie alt war Josia, als er König von Juda wurde?",
+  "options": [
+   "12 Jahre",
+   "16 Jahre",
+   "8 Jahre",
+   "20 Jahre"
+  ],
+  "answer": 2,
+  "ref": "2. Könige 22,1"
+ },
+ {
+  "id": "l3-024",
+  "level": 3,
+  "q": "Um wie viele Jahre verlängerte Gott das Leben König Hiskias?",
+  "options": [
+   "15 Jahre",
+   "10 Jahre",
+   "7 Jahre",
+   "40 Jahre"
+  ],
+  "answer": 0,
+  "ref": "2. Könige 20,6"
+ },
+ {
+  "id": "l3-025",
+  "level": 3,
+  "q": "In wie vielen Tagen wurde die Mauer Jerusalems unter Nehemia fertig?",
+  "options": [
+   "52 Tage",
+   "40 Tage",
+   "70 Tage",
+   "100 Tage"
+  ],
+  "answer": 0,
+  "ref": "Nehemia 6,15"
+ },
+ {
+  "id": "l3-026",
+  "level": 3,
+  "q": "Welches Amt hatte Nehemia am Hof des Königs von Persien?",
+  "options": [
+   "Schreiber",
+   "Torwächter",
+   "Mundschenk",
+   "Feldherr"
+  ],
+  "answer": 2,
+  "ref": "Nehemia 1,11"
+ },
+ {
+  "id": "l3-027",
+  "level": 3,
+  "q": "Wer zog die elternlose Ester wie eine eigene Tochter auf?",
+  "options": [
+   "Haman",
+   "Mordechai",
+   "Hatach",
+   "Ahasveros"
+  ],
+  "answer": 1,
+  "ref": "Ester 2,7"
+ },
+ {
+  "id": "l3-028",
+  "level": 3,
+  "q": "In welchem Land lebte Hiob?",
+  "options": [
+   "Kanaan",
+   "Moab",
+   "Midian",
+   "Uz"
+  ],
+  "answer": 3,
+  "ref": "Hiob 1,1"
+ },
+ {
+  "id": "l3-029",
+  "level": 3,
+  "q": "Welcher Psalm beginnt: „Ich hebe meine Augen auf zu den Bergen“?",
+  "options": [
+   "Psalm 23",
+   "Psalm 100",
+   "Psalm 150",
+   "Psalm 121"
+  ],
+  "answer": 3,
+  "ref": "Psalm 121,1"
+ },
+ {
+  "id": "l3-030",
+  "level": 3,
+  "q": "Von welchem Tier soll der Faule nach den Sprüchen Salomos lernen?",
+  "options": [
+   "Biene",
+   "Ameise",
+   "Taube",
+   "Storch"
+  ],
+  "answer": 1,
+  "ref": "Sprüche 6,6"
+ },
+ {
+  "id": "l3-031",
+  "level": 3,
+  "q": "Zu welchem Handwerker schickte Gott den Propheten Jeremia?",
+  "options": [
+   "Schmied",
+   "Weber",
+   "Töpfer",
+   "Zimmermann"
+  ],
+  "answer": 2,
+  "ref": "Jeremia 18,2-3"
+ },
+ {
+  "id": "l3-032",
+  "level": 3,
+  "q": "Welchen babylonischen Namen erhielt Hananja, einer von Daniels Freunden?",
+  "options": [
+   "Sadrach",
+   "Mesach",
+   "Abed-Nego",
+   "Beltsazar"
+  ],
+  "answer": 0,
+  "ref": "Daniel 1,7"
+ },
+ {
+  "id": "l3-034",
+  "level": 3,
+  "q": "Wohin wollte Jona vor dem Auftrag Gottes fliehen?",
+  "options": [
+   "Ninive",
+   "Tyrus",
+   "Tharsis",
+   "Sidon"
+  ],
+  "answer": 2,
+  "ref": "Jona 1,3"
+ },
+ {
+  "id": "l3-036",
+  "level": 3,
+  "q": "Gegen welches Volk richtet sich das kurze Buch Obadja?",
+  "options": [
+   "Moab",
+   "Ammon",
+   "Philister",
+   "Edom"
+  ],
+  "answer": 3,
+  "ref": "Obadja 1"
+ },
+ {
+  "id": "l3-037",
+  "level": 3,
+  "q": "Wie hieß Rebekkas Bruder?",
+  "options": [
+   "Lot",
+   "Bethuel",
+   "Ismael",
+   "Laban"
+  ],
+  "answer": 3,
+  "ref": "1. Mose 24,29"
+ },
+ {
+  "id": "l3-038",
+  "level": 3,
+  "q": "Wie nannte Jakob den Ort, an dem er im Traum die Himmelsleiter sah?",
+  "options": [
+   "Mizpa",
+   "Beth-El",
+   "Gilgal",
+   "Hebron"
+  ],
+  "answer": 1,
+  "ref": "1. Mose 28,19"
+ },
+ {
+  "id": "l3-040",
+  "level": 3,
+  "q": "Wie hieß die Frau, die Josef in Ägypten heiratete?",
+  "options": [
+   "Asnath",
+   "Rahel",
+   "Zippora",
+   "Tamar"
+  ],
+  "answer": 0,
+  "ref": "1. Mose 41,45"
+ },
+ {
+  "id": "l3-041",
+  "level": 3,
+  "q": "Welcher Bruder wollte Josef retten und zum Vater zurückbringen?",
+  "options": [
+   "Ruben",
+   "Juda",
+   "Simeon",
+   "Levi"
+  ],
+  "answer": 0,
+  "ref": "1. Mose 37,21-22"
+ },
+ {
+  "id": "l3-042",
+  "level": 3,
+  "q": "Welchen Bruder ließ Josef in Ägypten zurück, als die anderen heimzogen?",
+  "options": [
+   "Ruben",
+   "Levi",
+   "Simeon",
+   "Juda"
+  ],
+  "answer": 2,
+  "ref": "1. Mose 42,24"
+ },
+ {
+  "id": "l3-043",
+  "level": 3,
+  "q": "Wer segnete Abram, nachdem er Lot befreit hatte?",
+  "options": [
+   "Lot",
+   "Melchisedek",
+   "Abimelech",
+   "Elieser"
+  ],
+  "answer": 1,
+  "ref": "1. Mose 14,18-19"
+ },
+ {
+  "id": "l3-044",
+  "level": 3,
+  "q": "Wie viele Männer ließ Gott bei Gideon nach der Wasserprobe übrig?",
+  "options": [
+   "100",
+   "1000",
+   "3000",
+   "300"
+  ],
+  "answer": 3,
+  "ref": "Richter 7,6-7"
+ },
+ {
+  "id": "l3-045",
+  "level": 3,
+  "q": "Welcher Kaiser ließ alle Welt schätzen, als Jesus geboren wurde?",
+  "options": [
+   "Tiberius",
+   "Nero",
+   "Claudius",
+   "Augustus"
+  ],
+  "answer": 3,
+  "ref": "Lukas 2,1"
+ },
+ {
+  "id": "l3-046",
+  "level": 3,
+  "q": "Nach wie vielen Tagen fanden Maria und Josef den zwölfjährigen Jesus im Tempel?",
+  "options": [
+   "Nach einem Tag",
+   "Nach drei Tagen",
+   "Nach sieben Tagen",
+   "Nach zwei Wochen"
+  ],
+  "answer": 1,
+  "ref": "Lukas 2,46"
+ },
+ {
+  "id": "l3-048",
+  "level": 3,
+  "q": "Wer erschien auf dem Berg der Verklärung neben Mose bei Jesus?",
+  "options": [
+   "Elia",
+   "Jesaja",
+   "Abraham",
+   "David"
+  ],
+  "answer": 0,
+  "ref": "Matthäus 17,3"
+ },
+ {
+  "id": "l3-049",
+  "level": 3,
+  "q": "Wo sollte Petrus nach Jesu Worten das Geld für den Zinsgroschen finden?",
+  "options": [
+   "Im Maul eines Fisches",
+   "Unter einem Stein",
+   "In seinem Netz",
+   "In einem Krug"
+  ],
+  "answer": 0,
+  "ref": "Matthäus 17,24-27"
+ },
+ {
+  "id": "l3-051",
+  "level": 3,
+  "q": "Welchen Mann zwang man, Jesu Kreuz zu tragen?",
+  "options": [
+   "Josef von Arimathia",
+   "Simon von Kyrene",
+   "Nikodemus",
+   "Simon Petrus"
+  ],
+  "answer": 1,
+  "ref": "Matthäus 27,32"
+ },
+ {
+  "id": "l3-052",
+  "level": 3,
+  "q": "Wie hieß der blinde Bettler, der bei Jericho am Weg saß?",
+  "options": [
+   "Lazarus",
+   "Barabbas",
+   "Barnabas",
+   "Bartimäus"
+  ],
+  "answer": 3,
+  "ref": "Markus 10,46"
+ },
+ {
+  "id": "l3-053",
+  "level": 3,
+  "q": "Worauf schlief Jesus im Boot, als der Sturm kam?",
+  "options": [
+   "Auf einem Segel",
+   "Auf einem Netz",
+   "Auf einer Matte",
+   "Auf einem Kissen"
+  ],
+  "answer": 3,
+  "ref": "Markus 4,38"
+ },
+ {
+  "id": "l3-055",
+  "level": 3,
+  "q": "Was ließ der Vater für den heimgekehrten Sohn schlachten?",
+  "options": [
+   "Ein junges Lamm",
+   "Einen Ziegenbock",
+   "Ein gemästetes Kalb",
+   "Einen großen Ochsen"
+  ],
+  "answer": 2,
+  "ref": "Lukas 15,23"
+ },
+ {
+  "id": "l3-056",
+  "level": 3,
+  "q": "Wie viele Münzen besaß die Frau im Gleichnis, die eine davon verlor?",
+  "options": [
+   "Zehn",
+   "Fünf",
+   "Sieben",
+   "Zwölf"
+  ],
+  "answer": 0,
+  "ref": "Lukas 15,8"
+ },
+ {
+  "id": "l3-057",
+  "level": 3,
+  "q": "Wer war der eine von zehn Geheilten, der umkehrte und Jesus dankte?",
+  "options": [
+   "Ein Samariter",
+   "Ein Römer",
+   "Ein Pharisäer",
+   "Ein Grieche"
+  ],
+  "answer": 0,
+  "ref": "Lukas 17,15-16"
+ },
+ {
+  "id": "l3-058",
+  "level": 3,
+  "q": "Wie viel wollte Zachäus denen zurückgeben, die er betrogen hatte?",
+  "options": [
+   "Das Doppelte",
+   "Das Dreifache",
+   "Das Vierfache",
+   "Das Zehnfache"
+  ],
+  "answer": 2,
+  "ref": "Lukas 19,8"
+ },
+ {
+  "id": "l3-059",
+  "level": 3,
+  "q": "Unter welchem Baum sah Jesus nach seinen Worten den Nathanael?",
+  "options": [
+   "Ölbaum",
+   "Feigenbaum",
+   "Palme",
+   "Weinstock"
+  ],
+  "answer": 1,
+  "ref": "Johannes 1,48"
+ },
+ {
+  "id": "l3-061",
+  "level": 3,
+  "q": "Zu welcher Tageszeit kam Nikodemus zu Jesus?",
+  "options": [
+   "Am Mittag",
+   "Am Morgen",
+   "Am Abend",
+   "In der Nacht"
+  ],
+  "answer": 3,
+  "ref": "Johannes 3,2"
+ },
+ {
+  "id": "l3-062",
+  "level": 3,
+  "q": "Wie viele Jahre war der Kranke am Teich Bethesda schon krank?",
+  "options": [
+   "12 Jahre",
+   "38 Jahre",
+   "18 Jahre",
+   "40 Jahre"
+  ],
+  "answer": 1,
+  "ref": "Johannes 5,5"
+ },
+ {
+  "id": "l3-063",
+  "level": 3,
+  "q": "Welcher Jünger wies Jesus auf einen Knaben mit fünf Broten und zwei Fischen hin?",
+  "options": [
+   "Philippus",
+   "Thomas",
+   "Andreas",
+   "Jakobus"
+  ],
+  "answer": 2,
+  "ref": "Johannes 6,8-9"
+ },
+ {
+  "id": "l3-064",
+  "level": 3,
+  "q": "In welchem Teich sollte sich der Blindgeborene waschen?",
+  "options": [
+   "Siloah",
+   "Bethesda",
+   "Gihon",
+   "Hesbon"
+  ],
+  "answer": 0,
+  "ref": "Johannes 9,7"
+ },
+ {
+  "id": "l3-065",
+  "level": 3,
+  "q": "Wie viele Tage lag Lazarus schon im Grab, als Jesus nach Bethanien kam?",
+  "options": [
+   "Vier Tage",
+   "Drei Tage",
+   "Sieben Tage",
+   "Zwei Tage"
+  ],
+  "answer": 0,
+  "ref": "Johannes 11,17"
+ },
+ {
+  "id": "l3-066",
+  "level": 3,
+  "q": "Welcher Jünger bat: „Herr, zeige uns den Vater!“?",
+  "options": [
+   "Thomas",
+   "Andreas",
+   "Philippus",
+   "Johannes"
+  ],
+  "answer": 2,
+  "ref": "Johannes 14,8"
+ },
+ {
+  "id": "l3-067",
+  "level": 3,
+  "q": "Mit welchem Wort antwortete Maria Magdalena Jesus, als er sie am Ostermorgen beim Namen rief?",
+  "options": [
+   "Hosianna",
+   "Rabbuni",
+   "Abba",
+   "Amen"
+  ],
+  "answer": 1,
+  "ref": "Johannes 20,16"
+ },
+ {
+  "id": "l3-068",
+  "level": 3,
+  "q": "Wie viele große Fische waren im Netz, das Petrus an Land zog?",
+  "options": [
+   "100",
+   "77",
+   "12",
+   "153"
+  ],
+  "answer": 3,
+  "ref": "Johannes 21,11"
+ },
+ {
+  "id": "l3-069",
+  "level": 3,
+  "q": "Wer wurde nach Judas per Los zum zwölften Apostel gewählt?",
+  "options": [
+   "Silas",
+   "Timotheus",
+   "Stephanus",
+   "Matthias"
+  ],
+  "answer": 3,
+  "ref": "Apostelgeschichte 1,26"
+ },
+ {
+  "id": "l3-070",
+  "level": 3,
+  "q": "Wie viele Menschen ließen sich am Pfingsttag taufen?",
+  "options": [
+   "Etwa 120",
+   "Etwa 3000",
+   "Etwa 500",
+   "Etwa 5000"
+  ],
+  "answer": 1,
+  "ref": "Apostelgeschichte 2,41"
+ },
+ {
+  "id": "l3-071",
+  "level": 3,
+  "q": "Wie hieß die Tempeltür, an der ein Gelähmter bettelte, den Petrus heilte?",
+  "options": [
+   "Das Schaftor",
+   "Das Fischtor",
+   "Die schöne Tür",
+   "Das Rosstor"
+  ],
+  "answer": 2,
+  "ref": "Apostelgeschichte 3,2"
+ },
+ {
+  "id": "l3-073",
+  "level": 3,
+  "q": "In welcher Stadt lebte die Jüngerin Tabea, die Petrus auferweckte?",
+  "options": [
+   "Joppe",
+   "Lydda",
+   "Cäsarea",
+   "Antiochia"
+  ],
+  "answer": 0,
+  "ref": "Apostelgeschichte 9,36"
+ },
+ {
+  "id": "l3-074",
+  "level": 3,
+  "q": "Wie hieß die Magd, die vor Freude vergaß, Petrus die Tür zu öffnen?",
+  "options": [
+   "Lydia",
+   "Priszilla",
+   "Rhode",
+   "Phöbe"
+  ],
+  "answer": 2,
+  "ref": "Apostelgeschichte 12,13-14"
+ },
+ {
+  "id": "l3-075",
+  "level": 3,
+  "q": "Welchen Beruf hatte Lydia aus Thyatira?",
+  "options": [
+   "Fischhändlerin",
+   "Purpurhändlerin",
+   "Töpferin",
+   "Weberin"
+  ],
+  "answer": 1,
+  "ref": "Apostelgeschichte 16,14"
+ },
+ {
+  "id": "l3-076",
+  "level": 3,
+  "q": "Wer saß mit Paulus im Gefängnis zu Philippi und sang Lobgesänge?",
+  "options": [
+   "Barnabas",
+   "Apollos",
+   "Titus",
+   "Silas"
+  ],
+  "answer": 3,
+  "ref": "Apostelgeschichte 16,25"
+ },
+ {
+  "id": "l3-077",
+  "level": 3,
+  "q": "Welche Aufschrift trug ein Altar, den Paulus in Athen sah?",
+  "options": [
+   "Dem Gott der Weisheit",
+   "Dem Gott der Stadt",
+   "Dem Gott der Ahnen",
+   "Dem unbekannten Gott"
+  ],
+  "answer": 3,
+  "ref": "Apostelgeschichte 17,23"
+ },
+ {
+  "id": "l3-078",
+  "level": 3,
+  "q": "Was nennt Paulus im Epheserbrief das Schwert des Geistes?",
+  "options": [
+   "Das Gebet",
+   "Das Wort Gottes",
+   "Die Wahrheit",
+   "Den Glauben"
+  ],
+  "answer": 1,
+  "ref": "Epheser 6,17"
+ },
+ {
+  "id": "l3-079",
+  "level": 3,
+  "q": "An welche Gemeinde schrieb Paulus: „Freuet euch in dem Herrn allewege“?",
+  "options": [
+   "Korinth",
+   "Rom",
+   "Philippi",
+   "Ephesus"
+  ],
+  "answer": 2,
+  "ref": "Philipper 4,4"
+ },
+ {
+  "id": "l3-080",
+  "level": 3,
+  "q": "Für welchen Knecht legte Paulus bei Philemon ein gutes Wort ein?",
+  "options": [
+   "Onesimus",
+   "Epaphras",
+   "Tychikus",
+   "Archippus"
+  ],
+  "answer": 0,
+  "ref": "Philemon 10-16"
+ }
+]

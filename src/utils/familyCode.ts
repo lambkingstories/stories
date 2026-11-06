@@ -35,7 +35,7 @@ export function hashText(text: string): number {
   return h >>> 0
 }
 
-const checkChar = (body: string, poolSize: number) => CODE_ALPHABET[hashText(`${body}:${poolSize}`) % CODE_ALPHABET.length]!
+export const checkChar = (body: string, poolSize: number) => CODE_ALPHABET[hashText(`${body}:${poolSize}`) % CODE_ALPHABET.length]!
 
 /** A new code for a round (five characters from `rand`, one check character for `poolSize` questions). */
 export function newCode(poolSize: number, rand: () => number = Math.random): string {

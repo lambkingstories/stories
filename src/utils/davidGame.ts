@@ -1,8 +1,9 @@
 /**
  * "Davids Schleuder": the rules and the physics of the big game, without any drawing (so they can be tested).
  *
- * David stands on the left with his sling, his sheep behind him. Wolves, bears and lions come from the right. The child pulls the sling
- * back and lets go: the stone flies in an arc (gravity, a little wind), bounces off the ground and the boulders, and scares the
+ * David stands on the left with his sling, his sheep behind him. Wolves, bears and lions come from the right, from the fifth level on
+ * also eagles, which glide down through the air toward the sheep and must be hit in flight. The child pulls the sling
+ * back and lets go: the stone flies in an arc (gravity), bounces off the ground and the boulders, and scares the
  * animal it hits away (the bear needs three hits, the lion jumps). An animal that gets to the sheep scares one of them away. The last level
  * is Goliath: he walks slowly, holds his shield up from time to time, and only a stone on his forehead brings him down.
  * Nothing is hurt: the animals run away, and Goliath falls over.
@@ -25,7 +26,7 @@ export const STONE_R = 14
 /** The scale of the Goliath picture (so that he towers over David). */
 export const GOLIATH_K = 0.78
 
-export type Kind = 'wolf' | 'bear' | 'lion' | 'goliath'
+export type Kind = 'wolf' | 'bear' | 'lion' | 'eagle' | 'goliath'
 
 export interface KindInfo {
   hp: number
@@ -41,6 +42,7 @@ export const KINDS: Record<Kind, KindInfo> = {
   wolf: { hp: 1, speed: 125, r: 52, h: 52, points: 10 },
   lion: { hp: 1, speed: 150, r: 62, h: 62, points: 20 },
   bear: { hp: 3, speed: 70, r: 82, h: 82, points: 30 },
+  eagle: { hp: 1, speed: 135, r: 46, h: 85, points: 20 },
   goliath: { hp: 1, speed: 24, r: 112, h: 240, points: 100 }
 }
 
@@ -55,9 +57,6 @@ export interface LevelDef {
   /** The animals of the level, in the order they come: `kind` and the seconds after the one before. */
   waves: { kind: Kind; after: number }[]
   stones: number
-  /** The wind pushes the stone sideways (units per second squared); `gust` swings it between +- the value. */
-  wind: number
-  gust: boolean
   boulders: Boulder[]
 }
 
@@ -72,8 +71,6 @@ export const LEVELS: LevelDef[] = [
       { kind: 'wolf', after: 3 }
     ],
     stones: 11,
-    wind: 0,
-    gust: false,
     boulders: []
   },
   {
@@ -86,8 +83,6 @@ export const LEVELS: LevelDef[] = [
       { kind: 'bear', after: 5 }
     ],
     stones: 14,
-    wind: 0,
-    gust: false,
     boulders: [{ x: 780, y: GROUND - 55, r: 55 }]
   },
   {
@@ -101,8 +96,6 @@ export const LEVELS: LevelDef[] = [
       { kind: 'lion', after: 2.5 }
     ],
     stones: 14,
-    wind: 90,
-    gust: false,
     boulders: [
       { x: 700, y: GROUND - 45, r: 45 },
       { x: 1050, y: GROUND - 70, r: 70 }
@@ -120,8 +113,6 @@ export const LEVELS: LevelDef[] = [
       { kind: 'wolf', after: 2 }
     ],
     stones: 16,
-    wind: 160,
-    gust: true,
     boulders: [
       { x: 640, y: GROUND - 50, r: 50 },
       { x: 960, y: GROUND - 85, r: 85 }
@@ -129,10 +120,119 @@ export const LEVELS: LevelDef[] = [
   },
   {
     id: 5,
+    // the pack: many wolves, quick one after the other
+    waves: [
+      { kind: 'wolf', after: 1.2 },
+      { kind: 'wolf', after: 2.5 },
+      { kind: 'wolf', after: 2 },
+      { kind: 'wolf', after: 2 },
+      { kind: 'eagle', after: 2.5 },
+      { kind: 'wolf', after: 1.8 },
+      { kind: 'wolf', after: 2.2 },
+      { kind: 'wolf', after: 1.5 },
+      { kind: 'wolf', after: 1.8 },
+      { kind: 'eagle', after: 2.5 },
+      { kind: 'wolf', after: 2 },
+      { kind: 'wolf', after: 1.5 }
+    ],
+    stones: 22,
+    boulders: [{ x: 720, y: GROUND - 45, r: 45 }]
+  },
+  {
+    id: 6,
+    waves: [
+      { kind: 'bear', after: 1.5 },
+      { kind: 'wolf', after: 4 },
+      { kind: 'bear', after: 4 },
+      { kind: 'eagle', after: 3 },
+      { kind: 'wolf', after: 3 },
+      { kind: 'wolf', after: 2 },
+      { kind: 'bear', after: 4 },
+      { kind: 'eagle', after: 3 },
+      { kind: 'bear', after: 5 }
+    ],
+    stones: 27,
+    boulders: [
+      { x: 760, y: GROUND - 60, r: 60 },
+      { x: 1100, y: GROUND - 45, r: 45 }
+    ]
+  },
+  {
+    id: 7,
+    waves: [
+      { kind: 'lion', after: 1.5 },
+      { kind: 'lion', after: 3.5 },
+      { kind: 'eagle', after: 2.5 },
+      { kind: 'wolf', after: 2.5 },
+      { kind: 'lion', after: 3 },
+      { kind: 'lion', after: 2.5 },
+      { kind: 'eagle', after: 2.5 },
+      { kind: 'wolf', after: 2 },
+      { kind: 'lion', after: 3 },
+      { kind: 'lion', after: 2.5 },
+      { kind: 'eagle', after: 2 }
+    ],
+    stones: 26,
+    boulders: [
+      { x: 690, y: GROUND - 50, r: 50 },
+      { x: 1000, y: GROUND - 75, r: 75 }
+    ]
+  },
+  {
+    id: 8,
+    waves: [
+      { kind: 'wolf', after: 1.5 },
+      { kind: 'lion', after: 2.5 },
+      { kind: 'bear', after: 3 },
+      { kind: 'eagle', after: 2.5 },
+      { kind: 'wolf', after: 2.5 },
+      { kind: 'wolf', after: 1.5 },
+      { kind: 'lion', after: 2.5 },
+      { kind: 'eagle', after: 2.5 },
+      { kind: 'bear', after: 3.5 },
+      { kind: 'lion', after: 2.5 },
+      { kind: 'wolf', after: 2 },
+      { kind: 'eagle', after: 2 },
+      { kind: 'bear', after: 3.5 }
+    ],
+    stones: 31,
+    boulders: [
+      { x: 620, y: GROUND - 45, r: 45 },
+      { x: 880, y: GROUND - 80, r: 80 },
+      { x: 1180, y: GROUND - 50, r: 50 }
+    ]
+  },
+  {
+    id: 9,
+    waves: [
+      { kind: 'lion', after: 1.5 },
+      { kind: 'wolf', after: 2 },
+      { kind: 'eagle', after: 2 },
+      { kind: 'bear', after: 2.5 },
+      { kind: 'lion', after: 2.5 },
+      { kind: 'wolf', after: 1.5 },
+      { kind: 'eagle', after: 2.5 },
+      { kind: 'lion', after: 2 },
+      { kind: 'bear', after: 3 },
+      { kind: 'wolf', after: 1.5 },
+      { kind: 'eagle', after: 2 },
+      { kind: 'lion', after: 2.5 },
+      { kind: 'bear', after: 3 },
+      { kind: 'lion', after: 2 },
+      { kind: 'eagle', after: 2 },
+      { kind: 'wolf', after: 2 }
+    ],
+    stones: 35,
+    boulders: [
+      { x: 640, y: GROUND - 55, r: 55 },
+      { x: 960, y: GROUND - 85, r: 85 }
+    ]
+  },
+  {
+    id: 10,
     waves: [{ kind: 'goliath', after: 2 }],
-    stones: 10,
-    wind: 60,
-    gust: true,
+    // five stones only: every one counts
+    stones: 5,
     boulders: [{ x: 850, y: GROUND - 40, r: 40 }]
   }
 ]
@@ -192,7 +292,6 @@ export interface Game {
   score: number
   hits: number
   nextId: number
-  windNow: number
   events: GameEvent[]
 }
 
@@ -223,7 +322,6 @@ export function newGame(level: LevelDef): Game {
     score: 0,
     hits: 0,
     nextId: 1,
-    windNow: level.gust ? 0 : level.wind,
     events: []
   }
 }
@@ -267,7 +365,6 @@ export function preview(g: Game, pullX: number, pullY: number, seconds = 0.7, ev
   const dt = 1 / 120
   let acc = 0
   for (let t = 0; t < seconds; t += dt) {
-    vx += g.windNow * dt
     vy += GRAVITY * dt
     x += vx * dt
     y += vy * dt
@@ -281,13 +378,23 @@ export function preview(g: Game, pullX: number, pullY: number, seconds = 0.7, ev
   return out
 }
 
+/** The eagle comes in this high above the ground and glides down to this height just above the sheep. */
+export const EAGLE_HIGH = 430
+export const EAGLE_LOW = 70
+
+/** How high the eagle flies at a place: it comes high in from the right and glides down toward the sheep. */
+export function eagleLift(x: number): number {
+  const k = Math.max(0, Math.min(1, (x - SHEEP_LINE) / (W - SHEEP_LINE)))
+  return EAGLE_LOW + (EAGLE_HIGH - EAGLE_LOW) * k
+}
+
 function spawn(g: Game, kind: Kind) {
   const info = KINDS[kind]
   g.animals.push({
     id: g.nextId++,
     kind,
     x: W + 120,
-    lift: 0,
+    lift: kind === 'eagle' ? EAGLE_HIGH : 0,
     vlift: 0,
     hp: info.hp,
     mode: 'come',
@@ -309,12 +416,20 @@ export function body(a: Animal): { x: number; y: number; r: number } {
   return { x: a.x, y: GROUND - info.h - a.lift, r: info.r }
 }
 
-/** Goliath: the forehead is a small circle high on the body. */
-export function forehead(a: Animal): { x: number; y: number; r: number } {
-  return { x: a.x - 13, y: GROUND - 391, r: 30 }
+/** The index of the last level (Goliath). */
+export const GOLIATH_LEVEL = LEVELS.length - 1
+
+/** Goliath sways a little while he walks (the forehead moves with the picture), so that the aim has to follow him. */
+export function sway(a: Animal): number {
+  return a.kind === 'goliath' && a.mode === 'come' ? Math.sin(a.t * 2.6) * 11 : 0
 }
 
-/** A stone in the air that would reach Goliath's head (the path is worked out without the wind): he reacts to it. */
+/** Goliath: the forehead is a small circle high on the body. */
+export function forehead(a: Animal): { x: number; y: number; r: number } {
+  return { x: a.x - 13, y: GROUND - 391 + sway(a), r: 26 }
+}
+
+/** A stone in the air that would reach Goliath's head: he reacts to it. */
 function threatened(g: Game, a: Animal): boolean {
   const f = forehead(a)
   for (const s of g.stones) {
@@ -360,7 +475,6 @@ export function step(g: Game, dt: number) {
   if (g.phase !== 'play') return
   g.time += dt
   const lv = g.level
-  g.windNow = lv.gust ? lv.wind * Math.sin(g.time * 0.55) : lv.wind
 
   // the animals come
   if (g.next < lv.waves.length) {
@@ -381,7 +495,9 @@ export function step(g: Game, dt: number) {
     }
     if (a.mode === 'flee') {
       a.x += 420 * dt
-      a.lift = Math.max(0, a.lift + a.vlift * dt)
+      // the eagle flies away upward
+      if (a.kind === 'eagle') a.lift += 300 * dt
+      else a.lift = Math.max(0, a.lift + a.vlift * dt)
       continue
     }
     // knock back after a hit, then on again
@@ -405,6 +521,10 @@ export function step(g: Game, dt: number) {
           a.vlift = 0
         }
       }
+    }
+    if (a.kind === 'eagle') {
+      // it glides down along its path, with a gentle up and down of the wing beats
+      a.lift = eagleLift(a.x) + Math.sin(a.t * 3.2) * 14
     }
     if (a.kind === 'goliath') {
       a.shieldIn -= dt
@@ -451,7 +571,6 @@ export function step(g: Game, dt: number) {
     const n = 3
     for (let i = 0; i < n; i++) {
       const h = dt / n
-      s.vx += g.windNow * h
       s.vy += GRAVITY * h
       s.x += s.vx * h
       s.y += s.vy * h
@@ -475,11 +594,24 @@ export function step(g: Game, dt: number) {
         if (a.mode !== 'come') continue
         if (a.kind === 'goliath') {
           const f = forehead(a)
-          if (Math.hypot(s.x - f.x, s.y - f.y) < f.r + STONE_R) {
+          const fdx = s.x - f.x
+          const fdy = s.y - f.y
+          const fd = Math.hypot(fdx, fdy)
+          if (fd < f.r + STONE_R) {
             if (a.shield > 0) {
-              g.events.push({ type: 'block', x: s.x, y: s.y })
-              s.vx = -s.vx * 0.4
-              s.vy = -Math.abs(s.vy) * 0.3
+              // The shield stops the stone: it is put outside the circle and thrown back once (a stone that stayed inside bounced again and
+              // again and stuck to his head, with a dull sound every step).
+              const nx = fd > 0 ? fdx / fd : -1
+              const ny = fd > 0 ? fdy / fd : 0
+              s.x = f.x + nx * (f.r + STONE_R + 1)
+              s.y = f.y + ny * (f.r + STONE_R + 1)
+              const vn = s.vx * nx + s.vy * ny
+              if (vn < 0) {
+                s.vx = (s.vx - 1.4 * vn * nx) * 0.5
+                s.vy = (s.vy - 1.4 * vn * ny) * 0.5
+                if (s.vx > -40) s.vx = -40
+                g.events.push({ type: 'block', x: s.x, y: s.y })
+              }
             } else {
               a.mode = 'fall'
               g.score += KINDS.goliath.points

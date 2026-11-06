@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { GAME_MUSIC, MUSIC_FILES, moodOfGame, pickGameMusic } from '@/utils/sfxFiles'
+import { ELIA_MUSIC, FAMILY_MUSIC, GAME_MUSIC, MUSIC_FILES, moodOfGame, pickGameMusic } from '@/utils/sfxFiles'
 
 describe('music for the mini games', () => {
   it('has pieces for every mood and a file for each', () => {
     for (const mood of ['ruhig', 'mittel', 'lebhaft'] as const) expect(GAME_MUSIC.filter((p) => p.mood === mood).length).toBeGreaterThanOrEqual(2)
     expect(GAME_MUSIC).toHaveLength(10)
     // the map piece, the ten mini game pieces and the piece of the big David game
-    expect(MUSIC_FILES).toHaveLength(12)
+    expect(MUSIC_FILES).toHaveLength(2 + GAME_MUSIC.length + ELIA_MUSIC.length + FAMILY_MUSIC.length)
   })
 
   it('picks a piece of the mood and never the same twice in a row', () => {
