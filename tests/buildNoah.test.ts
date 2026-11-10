@@ -37,7 +37,8 @@ import { pfingsten } from '@/data/adventures/pfingsten'
 import { paulus } from '@/data/adventures/paulus'
 import { paulusrom } from '@/data/adventures/paulusrom'
 import { offenbarung } from '@/data/adventures/offenbarung'
-import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, GIDEON_ONLY_DIRS, JAKOB_ONLY_DIRS, JONA_ONLY_DIRS, JOSUA_ONLY_DIRS, MOSE_ONLY_DIRS, NOAH_ONLY_DIRS, RUT_ONLY_DIRS, SAMUEL_ONLY_DIRS, DAVID_ONLY_DIRS, SALOMO_ONLY_DIRS, ELISA_ONLY_DIRS, ESTER_ONLY_DIRS, NEHEMIA_ONLY_DIRS, PROPHETEN_ONLY_DIRS, WEIHNACHTEN_ONLY_DIRS, TAUFE_ONLY_DIRS, FREUNDE_ONLY_DIRS, WUESTE_ONLY_DIRS, WUNDER_ONLY_DIRS, HEILUNG_ONLY_DIRS, GLEICHNISSE_ONLY_DIRS, ZACHAEUS_ONLY_DIRS, LETZTEWOCHE_ONLY_DIRS, OSTERN_ONLY_DIRS, stripOsternFiles, PFINGSTEN_ONLY_DIRS, stripPfingstenFiles, PAULUS_ONLY_DIRS, PAULUSROM_ONLY_DIRS, OFFENBARUNG_ONLY_DIRS, stripPaulusFiles, stripPaulusromFiles, stripOffenbarungFiles, stripLetztewocheFiles, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles, stripGleichnisseFiles, stripZachaeusFiles, stripDavidFiles } from '../vite.config.noah'
+import { sohn } from '@/data/adventures/sohn'
+import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, GIDEON_ONLY_DIRS, JAKOB_ONLY_DIRS, JONA_ONLY_DIRS, JOSUA_ONLY_DIRS, MOSE_ONLY_DIRS, NOAH_ONLY_DIRS, RUT_ONLY_DIRS, SAMUEL_ONLY_DIRS, DAVID_ONLY_DIRS, SALOMO_ONLY_DIRS, ELISA_ONLY_DIRS, ESTER_ONLY_DIRS, NEHEMIA_ONLY_DIRS, PROPHETEN_ONLY_DIRS, WEIHNACHTEN_ONLY_DIRS, TAUFE_ONLY_DIRS, FREUNDE_ONLY_DIRS, WUESTE_ONLY_DIRS, WUNDER_ONLY_DIRS, HEILUNG_ONLY_DIRS, GLEICHNISSE_ONLY_DIRS, ZACHAEUS_ONLY_DIRS, LETZTEWOCHE_ONLY_DIRS, OSTERN_ONLY_DIRS, stripOsternFiles, PFINGSTEN_ONLY_DIRS, stripPfingstenFiles, PAULUS_ONLY_DIRS, PAULUSROM_ONLY_DIRS, OFFENBARUNG_ONLY_DIRS, SOHN_ONLY_DIRS, stripSohnFiles, stripPaulusFiles, stripPaulusromFiles, stripOffenbarungFiles, stripLetztewocheFiles, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles, stripGleichnisseFiles, stripZachaeusFiles, stripDavidFiles } from '../vite.config.noah'
 
 const inNoahDir = (f: string) => NOAH_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
 
@@ -1474,6 +1475,49 @@ describe('a build without Alles wird neu ships nothing of it', () => {
       for (const f of offenbarungFiles) expect(existsSync(join(out, f)), f).toBe(false)
       for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
       expect(() => stripOffenbarungFiles(out)).not.toThrow()
+    } finally {
+      rmSync(out, { recursive: true, force: true })
+    }
+  })
+})
+
+const inSohnDir = (f: string) => SOHN_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
+
+describe('a build without Der verlorene Sohn ships nothing of it', () => {
+  it('every file that only Der verlorene Sohn uses lies in a folder that the normal build removes', () => {
+    const others = new Set([...journeys, noah, adamEva, babel, abraham, jakob, josua, gideon, mose, jona, daniel, elia, rut, samuel, david, salomo, elisa, ester, nehemia, propheten, weihnachten, taufe, freunde, wueste, wunder, heilung, gleichnisse, zachaeus, letztewoche, ostern, pfingsten, paulus, paulusrom, offenbarung].flatMap((j) => journeyFiles(j)))
+    const app = /^audio\/abenteuer\/(klang|musik)-/
+    const only = journeyFiles(sohn).filter((f) => !others.has(f) && !app.test(f))
+    const leaks = only.filter((f) => !inSohnDir(f))
+    expect(leaks, `files of Der verlorene Sohn outside the folders that are removed: ${leaks.join(', ')}`).toEqual([])
+  })
+
+  it('the folders of Der verlorene Sohn are only the three places that belong to it, none is on the lists of the others, and no folder with "sohn" in its name is missing', () => {
+    expect([...SOHN_ONLY_DIRS].sort()).toEqual(['audio/abenteuer/sohn', 'images/abenteuer/sohn', 'images/abenteuer/spiele/sohn'])
+    for (const d of SOHN_ONLY_DIRS) {
+      for (const list of [OFFENBARUNG_ONLY_DIRS, PAULUSROM_ONLY_DIRS, PAULUS_ONLY_DIRS, PFINGSTEN_ONLY_DIRS, OSTERN_ONLY_DIRS, LETZTEWOCHE_ONLY_DIRS, ZACHAEUS_ONLY_DIRS, GLEICHNISSE_ONLY_DIRS, HEILUNG_ONLY_DIRS, WUNDER_ONLY_DIRS, NOAH_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, ABRAHAM_ONLY_DIRS, JAKOB_ONLY_DIRS, JOSUA_ONLY_DIRS, GIDEON_ONLY_DIRS, MOSE_ONLY_DIRS, JONA_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, RUT_ONLY_DIRS, SAMUEL_ONLY_DIRS, DAVID_ONLY_DIRS, SALOMO_ONLY_DIRS, ELISA_ONLY_DIRS, ESTER_ONLY_DIRS, NEHEMIA_ONLY_DIRS, PROPHETEN_ONLY_DIRS, WEIHNACHTEN_ONLY_DIRS, TAUFE_ONLY_DIRS, FREUNDE_ONLY_DIRS, WUESTE_ONLY_DIRS]) expect(list, d).not.toContain(d)
+    }
+    const found: string[] = []
+    for (const base of ['public/images/abenteuer', 'public/audio/abenteuer', 'public/images/abenteuer/spiele']) {
+      for (const n of readdirSync(base)) if (/^sohn$/i.test(n) && !n.includes('.')) found.push(`${base.replace('public/', '')}/${n}`)
+    }
+    for (const d of found) expect(SOHN_ONLY_DIRS, d).toContain(d)
+    for (const j of [...journeys, noah, adamEva, babel, abraham, jakob, josua, gideon, mose, jona, daniel, elia, rut, samuel, david, salomo, elisa, ester, nehemia, propheten, weihnachten, taufe, freunde, wueste, wunder, heilung, gleichnisse, zachaeus, letztewoche, ostern, pfingsten, paulus, paulusrom, offenbarung]) for (const f of journeyFiles(j)) expect(inSohnDir(f), `${j.id}: ${f}`).toBe(false)
+  })
+
+  it('removing takes the folders of Der verlorene Sohn out of a build and leaves everything else (the other journeys, the sounds)', () => {
+    const out = mkdtempSync(join(tmpdir(), 'lk-build-sohn-'))
+    try {
+      const sohnFiles = ['audio/abenteuer/sohn/geschichte-01-v1.mp3', 'images/abenteuer/sohn/etappe-bild-01.webp', 'images/abenteuer/spiele/sohn/lob/welt.webp']
+      const keep = ['images/abenteuer/josef/etappe-01.webp', 'images/abenteuer/ostern/etappe-bild-02.webp', 'images/abenteuer/spiele/ostern/fischzug/see.webp', 'images/abenteuer/spiele/pfingsten/wagen/fern.webp', 'audio/abenteuer/klang-stern.mp3']
+      for (const f of [...sohnFiles, ...keep]) {
+        mkdirSync(join(out, f, '..'), { recursive: true })
+        writeFileSync(join(out, f), 'x')
+      }
+      stripSohnFiles(out)
+      for (const f of sohnFiles) expect(existsSync(join(out, f)), f).toBe(false)
+      for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
+      expect(() => stripSohnFiles(out)).not.toThrow()
     } finally {
       rmSync(out, { recursive: true, force: true })
     }

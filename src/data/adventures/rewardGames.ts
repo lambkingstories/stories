@@ -37,5 +37,6 @@ export const REWARD_GAMES: Record<string, number[]> = {
   pfingsten: [7, 2],
   paulus: [5, 9],
   paulusrom: [7, 2],
-  offenbarung: [7, 9]
+  offenbarung: [7, 9],
+  sohn: [5, 6]
 }

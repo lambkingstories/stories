@@ -64,7 +64,8 @@ export const TIMELINE: TimelineEntry[] = [
   { id: 'pfingsten', de: 'Pfingsten', en: 'Pentecost', epoch: 'gemeinde' },
   { id: 'paulus', de: 'Paulus', en: 'Paul', epoch: 'gemeinde' },
   { id: 'paulusrom', de: 'Bis nach Rom', en: 'All the Way to Rome', epoch: 'gemeinde' },
-  { id: 'offenbarung', de: 'Alles wird neu', en: 'All Things New', epoch: 'gemeinde' }
+  { id: 'offenbarung', de: 'Alles wird neu', en: 'All Things New', epoch: 'gemeinde' },
+  { id: 'sohn', de: 'Der verlorene Sohn', en: 'The Lost Son', epoch: 'jesus' }
 ]
 
 /** The place of an adventure on the time line (1 to 31), 0 when it is not on the list. */

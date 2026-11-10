@@ -1789,3 +1789,53 @@ describe('the hidden journey Alles wird neu (id offenbarung)', () => {
     expect(m.journeys.filter((j) => j.id === 'offenbarung')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Der verlorene Sohn (id sohn)', () => {
+  it('a normal build (without Der verlorene Sohn) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_SOHN', 'false')
+    open('?sohn=sohn-vorschau-m3x7')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('sohn')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_SOHN', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?sohn=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.SOHN_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?sohn=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_SOHN', 'true')
+    const first = await load()
+    open(`?sohn=${first.SOHN_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.SOHN_UNLOCK_CODE).toBe('sohn-vorschau-m3x7')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'sohn'])
+    expect(localStorage.getItem('lk-preview-sohn')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('sohn')?.stages.length).toBe(7)
+    open('?sohn=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-sohn')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_SOHN) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_SOHN', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'sohn')).toHaveLength(1)
+  })
+})

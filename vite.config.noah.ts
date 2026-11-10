@@ -291,3 +291,11 @@ export const OFFENBARUNG_ONLY_DIRS = ['images/abenteuer/offenbarung', 'images/ab
 export function stripOffenbarungFiles(outDir: string) {
   strip(outDir, OFFENBARUNG_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Der verlorene Sohn" (id `sohn`) alone, in the same three places as Adam and Eve. */
+export const SOHN_ONLY_DIRS = ['images/abenteuer/sohn', 'images/abenteuer/spiele/sohn', 'audio/abenteuer/sohn']
+
+/** Takes the folders of "Der verlorene Sohn" out of a finished build. */
+export function stripSohnFiles(outDir: string) {
+  strip(outDir, SOHN_ONLY_DIRS)
+}
