@@ -19,6 +19,8 @@ const props = defineProps<{
   special?: boolean
   art?: boolean
   backImage?: string
+  /** The memory verse of the adventure (the back of the card). */
+  verse?: { text: string; ref: string }
   /** The card is new: reveal it. */
   reveal?: boolean
 }>()
@@ -162,6 +164,7 @@ onBeforeUnmount(() => {
           :special="special"
           :art="art"
           :back-image="backImage"
+          :verse="verse"
           :flipped="flipped"
           :dragging="dragging"
         )

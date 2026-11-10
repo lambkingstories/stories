@@ -1,7 +1,8 @@
 <script setup lang="ts">
 /**
  * A collection card: a thin gold frame, the painted hero picture of the adventure (the picture is the card), its name and the three stars; the back
- * shows the hero at the end of the story. The card is only drawn here. Its turn, its tilt and the glint that runs over it come from the page that
+ * shows the memory verse of the adventure on the blue back with the crowned lamb (one picture on a card, not two; Anton 10.11.2026), or, without a
+ * verse, the hero at the end of the story. The card is only drawn here. Its turn, its tilt and the glint that runs over it come from the page that
  * holds it, as the CSS variables `--rx`, `--ry` (degrees; `--ry` is the turn of the card, 0 = front, 180 = back) and `--mx`, `--my` (percent).
  * The glint is a light that makes the colours glow (it never covers the picture with a veil): a rainbow foil in a band and a thin white sheen.
  */
@@ -20,6 +21,8 @@ withDefaults(
     special?: boolean
     /** The picture of the back: the hero at the end of the story (without it the back shows the crowned lamb). */
     backImage?: string
+    /** The memory verse of the adventure: it is written on the back (instead of the second picture). */
+    verse?: { text: string; ref: string }
     /** The picture is a painted hero picture that fills the card (else it is a medal on a blue ground). */
     art?: boolean
     /** The card is shown from its back. */
@@ -34,6 +37,7 @@ withDefaults(
     special: false,
     art: false,
     backImage: undefined,
+    verse: undefined,
     flipped: false,
     dragging: false,
     still: false,
@@ -43,6 +47,8 @@ withDefaults(
   }
 )
 
+/** Long verses get smaller letters so that every verse fits on the back of the card. */
+const verseSize = (text: string) => (text.length < 60 ? '7.4cqw' : text.length < 100 ? '6.4cqw' : text.length < 140 ? '5.6cqw' : text.length < 185 ? '4.9cqw' : '4.4cqw')
 const ui = (f: string) => prependBaseUrl(`images/abenteuer/ui/${f}`)
 const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
 </script>
@@ -64,8 +70,14 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
         img(class="cc-frame" :src="ui('karte-rahmen.webp')" alt="" draggable="false")
         span(class="cc-shine" aria-hidden="true")
       //- back
-      div(:class="['cc-face', 'cc-back', { 'has-back-art': !!backImage }]")
-        template(v-if="backImage")
+      div(:class="['cc-face', 'cc-back', { 'has-back-art': !!backImage && !verse }]")
+        template(v-if="verse")
+          img(class="cc-back-img" :src="ui('karte-rueckseite.webp')" alt="" draggable="false")
+          div(class="cc-verse")
+            span(class="cc-verse-title") {{ title }}
+            span(class="cc-verse-text" :style="{ fontSize: verseSize(verse.text) }") {{ verse.text }}
+            span(class="cc-verse-ref") {{ verse.ref }}
+        template(v-else-if="backImage")
           //- the hero at the end of the story, in the same frame as the front
           div(class="cc-window")
             span(class="cc-pic")
@@ -319,6 +331,42 @@ $wh: 96.8%
 .cc-back-journey
   font-size: 5cqw
   opacity: 0.85
+
+// the memory verse on the back: a dark blue plate with a fine gold line, over the lower part of the card (the crown of the lamb looks over its rim)
+.cc-verse
+  position: absolute
+  left: $wx + 5%
+  right: $wx + 5%
+  top: 42%
+  bottom: $wy + 6%
+  display: flex
+  flex-direction: column
+  align-items: center
+  justify-content: center
+  gap: 3cqw
+  padding: 4cqw 4cqw
+  border-radius: 4cqw
+  background: linear-gradient(180deg, rgba(14, 24, 58, 0.94), rgba(10, 18, 44, 0.97))
+  border: 0.5cqw solid rgba(240, 190, 70, 0.85)
+  color: #fff3cf
+  text-align: center
+
+.cc-verse-title
+  font-size: 4.4cqw
+  font-weight: 800
+  letter-spacing: 0.08em
+  text-transform: uppercase
+  color: #f5c84a
+
+.cc-verse-text
+  font-weight: 700
+  line-height: 1.32
+  text-wrap: balance
+
+.cc-verse-ref
+  font-size: 5cqw
+  font-weight: 800
+  color: #f5c84a
 
 // The glint: light that brings the colours out. It never greys the picture: the rainbow foil only lifts the colours inside a band (soft light),
 // and a thin white sheen runs on its edge. Both follow --mx / --my, so the light moves with the finger and with the tilt of the phone.

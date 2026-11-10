@@ -2430,6 +2430,9 @@ export default {
         backToMap: 'Back to the map',
         plusNext: 'The journey goes on with “{title}”. With LambKing Plus you can play all the other adventures.',
         plusNextButton: 'About LambKing Plus',
+        verseKicker: 'Your memory verse',
+        verseOnCard: 'It is written on the back of your golden card.',
+        verseWinCard: 'Win the golden card with three stars in every stage. The verse is written on its back.',
         statsTitle: 'Your stars',
         statsTotal: 'Altogether {n} of {max} points',
         statsNext: 'For the {medal}: {n} more points',
@@ -2549,7 +2552,7 @@ export default {
         specialLocked: '1 stage still needs three stars | {n} stages still need three stars',
         setBack: 'All {n} stages with three stars',
         close: 'Close',
-        flipHint: 'Hold the card with your finger and move it: it shines. Swipe to the side and it turns round.'
+        flipHint: 'Hold the card with your finger and move it: it shines. Swipe to the side and it turns round: on the back is your memory verse.'
       },
       bigGames: {
         title: 'Bonus games',
@@ -6335,6 +6338,9 @@ export default {
         backToMap: 'Zur Karte',
         plusNext: 'Die Reise geht weiter mit „{title}“. Mit LambKing Plus kannst du alle weiteren Abenteuer spielen.',
         plusNextButton: 'Mehr über LambKing Plus',
+        verseKicker: 'Dein Merkvers',
+        verseOnCard: 'Er steht auf der Rückseite deiner goldenen Karte.',
+        verseWinCard: 'Mit drei Sternen in jeder Etappe gewinnst du die goldene Karte. Der Vers steht auf ihrer Rückseite.',
         statsTitle: 'Deine Sterne',
         statsTotal: 'Zusammen {n} von {max} Punkten',
         statsNext: 'Für den {medal}: noch {n} Punkte',
@@ -6454,7 +6460,7 @@ export default {
         specialLocked: 'Noch 1 Etappe braucht drei Sterne | Noch {n} Etappen brauchen drei Sterne',
         setBack: 'Alle {n} Etappen mit drei Sternen',
         close: 'Schließen',
-        flipHint: 'Halte die Karte mit dem Finger und bewege sie: dann schimmert sie. Wische zur Seite, dann dreht sie sich um.'
+        flipHint: 'Halte die Karte mit dem Finger und bewege sie: dann schimmert sie. Wische zur Seite, dann dreht sie sich um: auf der Rückseite steht dein Merkvers.'
       },
       bigGames: {
         title: 'Bonusspiele',

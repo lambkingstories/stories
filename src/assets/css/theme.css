@@ -172,21 +172,22 @@ body {
  * look change; the artwork and the tile colours stay. The night look ignores the choice.
  */
 /* cream and gold, like the shop page: warm cream ground, dark blue words, gold for everything that can be tapped.
-   The gold of the buttons is deep enough for white words on it; the bars shine in a lighter gold. */
+   Everything that can be tapped is a bright gold with dark blue words on it (no brown). */
 :root[data-theme='day'][data-palette='gold'] {
   --lk-bg: #faf5ea;
   --lk-surface: #fffdf7;
   --lk-surface-2: #f3ead3;
   --lk-text: #1c2a4a;
   --lk-muted: #55607a;
-  --lk-accent: #a06e00;
+  --lk-accent: #d6a21c;
+  --lk-on-accent: #1c2a4a;
   --lk-accent-soft: rgba(217, 165, 33, 0.2);
   --lk-line: rgba(28, 42, 74, 0.14);
   --lk-track: #eadfc2;
   --lk-fill: #d9a521;
   --lk-nav-bg: #fffdf7;
   --lk-nav-line: rgba(28, 42, 74, 0.12);
-  --lk-nav-active: #a06e00;
+  --lk-nav-active: #d6a21c;
   --lk-shadow: 0 6px 18px -10px rgba(90, 65, 10, 0.35);
 }
 

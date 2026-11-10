@@ -22,6 +22,8 @@ import { albumCards, albumSetCard, cupStats } from '@/utils/collection'
 import { CARD_ART } from '@/data/cardArt'
 import useCardsSeen, { cardKey } from '@/use/useCardsSeen'
 import { prependBaseUrl } from '@/utils/function'
+import { memoryVerseOf } from '@/data/memoryVerses'
+import { adventureLanguage } from '@/use/adventureLanguage'
 
 const { t } = useI18n({ useScope: 'global' })
 const router = useRouter()
@@ -67,6 +69,8 @@ interface Opened {
   art: boolean
   /** The painted picture of the back of the card (the hero at the end of the story). */
   back?: string
+  /** The memory verse of the adventure: it stands on the back instead of the second picture. */
+  verse?: { text: string; ref: string }
   reveal: boolean
 }
 const opened = ref<Opened | null>(null)
@@ -83,6 +87,7 @@ function openSet(a: (typeof albums.value)[number]) {
     title: a.journey.title,
     image: a.art?.front ?? a.journey.medal,
     back: a.art?.back,
+    verse: memoryVerseOf(a.journey.id, adventureLanguage.value) ?? undefined,
     reference: a.journey.subtitle,
     journeyTitle: t('app.collection.setBack', { n: a.set.all }),
     art: !!a.art,
@@ -165,6 +170,7 @@ function openJourney(id: string) {
       :journey-title="opened.journeyTitle"
       :art="opened.art"
       :back-image="opened.back"
+      :verse="opened.verse"
       special
       :reveal="opened.reveal"
       @close="closeCard"

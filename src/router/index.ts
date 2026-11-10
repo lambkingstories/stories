@@ -38,6 +38,7 @@ const AppFamilyOrderView = () => import('@/views/app/AppFamilyOrderView.vue')
 const AppFamilyBingoView = () => import('@/views/app/AppFamilyBingoView.vue')
 const AppFamilyMemoryView = () => import('@/views/app/AppFamilyMemoryView.vue')
 const AppCollectionView = () => import('@/views/app/AppCollectionView.vue')
+const AppJesusView = () => import('@/views/app/AppJesusView.vue')
 const AppGoodNightView = () => import('@/views/app/AppGoodNightView.vue')
 const AppParentOverviewView = () => import('@/views/app/AppParentOverviewView.vue')
 
@@ -104,6 +105,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/app/memory', name: 'app-family-memory', component: AppFamilyMemoryView },
   // the cabinet with the cups and the card album
   { path: '/app/sammlung', name: 'app-collection', component: AppCollectionView },
+  { path: '/app/wer-ist-jesus', name: 'app-jesus', component: AppJesusView },
   { path: '/app/spielzimmer', name: 'app-gameroom', component: () => import('@/views/app/AppGameRoomView.vue') },
   { path: '/app/spiel/:gameId', name: 'app-big-game', component: () => import('@/views/app/AppBigGameView.vue') },
   // the good-night mode: a story with a timer and a darkening screen

@@ -35,6 +35,8 @@ import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
 import { openExternal } from '@/utils/openExternal'
 import { prependBaseUrl } from '@/utils/function'
 import { contentLocale } from '@/utils/contentLocale'
+import { JESUS_PATH } from '@/data/jesusPath'
+import { adventureLanguage } from '@/use/adventureLanguage'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
@@ -93,6 +95,9 @@ async function openPlus() {
   if (!(await requireParent())) return
   void router.push({ name: 'app-plus' })
 }
+
+// ── "Wer ist Jesus?": a quiet card that leads to the way in five steps ─────
+const jesusText = computed(() => JESUS_PATH[adventureLanguage.value])
 
 // ── the journey through the Bible (a row of medals to open an adventure) ─────
 
@@ -262,6 +267,13 @@ function openBook(bookId: string) {
                 PlusBadge(size="small")
             span(class="journey-name") {{ j.title }}
 
+      //- who is Jesus: a way in five steps
+      button(type="button" class="jesus-card" @click="router.push({ name: 'app-jesus' })")
+        span(class="jesus-card-text")
+          span(class="jesus-card-title") {{ jesusText.homeCardTitle }}
+          span(class="jesus-card-sub") {{ jesusText.homeCardText }}
+        ZIconography(name="chevron-right" :size="24")
+
       //- 4. new
       section(v-if="newBooks.length" class="block")
         div(class="block-head")
@@ -375,6 +387,37 @@ button
   font-weight: 800
   font-size: 1rem
   cursor: pointer
+
+// ── who is Jesus ──
+.jesus-card
+  display: flex
+  align-items: center
+  justify-content: space-between
+  gap: 12px
+  padding: 16px 18px
+  border: 1px solid var(--lk-line)
+  border-radius: var(--lk-r-card)
+  background: var(--lk-accent-soft)
+  color: var(--lk-text)
+  text-align: left
+  cursor: pointer
+  touch-action: manipulation
+
+  &:active
+    transform: translateY(1px)
+
+.jesus-card-text
+  display: flex
+  flex-direction: column
+  gap: 2px
+
+.jesus-card-title
+  font-size: 1.2rem
+  font-weight: 800
+
+.jesus-card-sub
+  color: var(--lk-muted)
+  font-size: 0.95rem
 
 // ── go on: the big card on top ──
 .go-hero

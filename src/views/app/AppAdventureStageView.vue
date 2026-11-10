@@ -230,6 +230,10 @@ import SoundPanel from '@/components/molecules/SoundPanel.vue'
 import ReadAloud from '@/components/molecules/ReadAloud.vue'
 import { journeyById, journeys } from '@/data/adventures'
 import { inBibleOrder } from '@/utils/continueJourney'
+import { albumCards, albumSetCard } from '@/utils/collection'
+import { memoryVerseOf } from '@/data/memoryVerses'
+import { JESUS_PATH } from '@/data/jesusPath'
+import { adventureLanguage } from '@/use/adventureLanguage'
 import { isJourneyPlusLocked } from '@/utils/adventureAccess'
 import useAdventure from '@/use/useAdventure'
 import usePremium from '@/use/usePremium'
@@ -484,6 +488,16 @@ async function buildPainted() {
 }
 
 const { showUpsell } = usePremium()
+
+/** The memory verse of the adventure, shown at its end; it stands on the back of the golden card (which the child has won once every stage has three stars). */
+/** At the end of Easter: the way "Who is Jesus?" is offered quietly. */
+const jesusText = computed(() => JESUS_PATH[adventureLanguage.value])
+const memoryVerse = computed(() => (journey.value ? memoryVerseOf(journey.value.id, adventureLanguage.value) : null))
+const cardWon = computed(() => {
+  const j = journey.value
+  if (!j) return false
+  return albumSetCard(j, albumCards(j, (stageId) => adv.stageOf(j.id, stageId))).have
+})
 
 /** At the end of a free adventure: the next adventure in the order of the Bible, when it is behind LambKing Plus (a friendly hint, never a wall). */
 const nextPlusJourney = computed(() => {
@@ -1210,8 +1224,17 @@ function openGift() {
           p(v-if="!medal" class="result-line") {{ t('app.adventure.noMedal') }}
           //- the end of the adventure: what all the stars and answers gave, and what is still to win
           AdventureRewards(v-if="journey" :journey="journey")
+          //- the memory verse of the adventure
+          div(v-if="memoryVerse" class="verse-slip")
+            span(class="verse-kicker") {{ t('app.adventure.verseKicker') }}
+            p(class="verse-line") {{ memoryVerse.line }}
+            blockquote(class="verse-text") {{ memoryVerse.text }}
+            span(class="verse-ref") {{ memoryVerse.ref }}
+            p(class="verse-card") {{ cardWon ? t('app.adventure.verseOnCard') : t('app.adventure.verseWinCard') }}
+          p(v-if="journey?.id === 'ostern'" class="result-line result-plus") {{ jesusText.homeCardText }}
           p(v-if="nextPlusJourney" class="result-line result-plus") {{ t('app.adventure.plusNext', { title: nextPlusJourney.title }) }}
           div(class="stage-actions")
+            AdvButton(v-if="journey?.id === 'ostern'" tone="gold" @click="router.push({ name: 'app-jesus' })") {{ jesusText.homeCardTitle }}
             AdvButton(v-if="nextPlusJourney" tone="gold" @click="showUpsell('adventure')") {{ t('app.adventure.plusNextButton') }}
             AdvButton(v-if="medal" tone="gold" @click="openGift") {{ t('app.adventure.gift', { title: journey.gift.title }) }}
             AdvButton(tone="blau" @click="retry") {{ t('app.adventure.retry') }}
@@ -1701,6 +1724,47 @@ $ink: var(--lk-text)
   font-weight: 800
   font-size: 2rem
   color: var(--lk-text)
+
+// the memory verse at the end of an adventure: a card-like slip
+.verse-slip
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: 8px
+  margin: 14px 0
+  padding: 16px 18px
+  border: 1.5px solid var(--lk-gold, #e6b840)
+  border-radius: 22px
+  background: var(--lk-accent-soft)
+  text-align: center
+
+.verse-kicker
+  font-size: 0.78rem
+  font-weight: 800
+  letter-spacing: 0.08em
+  text-transform: uppercase
+  color: var(--lk-muted)
+
+.verse-line
+  margin: 0
+  color: var(--lk-muted)
+  line-height: 1.4
+
+.verse-text
+  margin: 0
+  font-size: 1.2rem
+  font-weight: 700
+  line-height: 1.4
+  color: var(--lk-text)
+
+.verse-ref
+  font-weight: 800
+  color: var(--lk-text)
+
+.verse-card
+  margin: 4px 0 0
+  font-size: 0.92rem
+  color: var(--lk-muted)
 
 .result-line
   margin: 8px 0
