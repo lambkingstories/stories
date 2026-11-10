@@ -738,6 +738,46 @@ const counterText = computed(() => {
   return t('app.reader.finished')
 })
 
+// ----- Size of the letters (the child or the parent chooses; it is kept on the device) -----
+
+const SIZE_KEY = 'lk-reader-size'
+const SIZES = [
+  { id: 'm', scale: 1 },
+  { id: 'l', scale: 1.2 },
+  { id: 'xl', scale: 1.4 }
+] as const
+type SizeId = (typeof SIZES)[number]['id']
+
+function loadSize(): SizeId {
+  try {
+    const v = localStorage.getItem(SIZE_KEY)
+    if (v === 'l' || v === 'xl') return v
+  } catch {
+    // no storage: the normal size
+  }
+  return 'm'
+}
+
+const readerSize = ref<SizeId>(loadSize())
+const readerScale = computed(() => SIZES.find((s) => s.id === readerSize.value)?.scale ?? 1)
+
+function setReaderSize(id: SizeId) {
+  readerSize.value = id
+  try {
+    localStorage.setItem(SIZE_KEY, id)
+  } catch {
+    // the choice only lasts until the app is closed
+  }
+}
+
+// ----- One question to talk about at the end of a story -----
+
+const askIndex = computed(() => {
+  let sum = 0
+  for (const ch of String(bookId.value ?? '')) sum += ch.charCodeAt(0)
+  return (sum % 6) + 1
+})
+
 function goBack() {
   if (window.history.length > 1) router.back()
   else router.push({ name: 'app-book', params: { bookId: bookId.value } })
@@ -750,7 +790,7 @@ function goToBookDetail() {
 </script>
 
 <template lang="pug">
-  div(class="reader-root")
+  div(class="reader-root" :style="{ '--rd-scale': readerScale }")
     button(
       type="button"
       class="back-btn"
@@ -760,8 +800,22 @@ function goToBookDetail() {
       ZIconography(name="chevron-left" :size="20")
       span {{ t('app.read.back') }}
 
+    //- the size of the letters
+    div(v-if="book" class="size-bar" role="group" :aria-label="t('app.reader.letterSize')")
+      button(
+        v-for="s in SIZES"
+        :key="s.id"
+        type="button"
+        class="size-btn"
+        :class="[`is-${s.id}`, { on: readerSize === s.id }]"
+        :aria-pressed="readerSize === s.id"
+        :aria-label="t(`app.reader.size_${s.id}`)"
+        @click="setReaderSize(s.id)"
+      ) A
+
     div(
       ref="stageRef"
+
       class="stage"
       :class="{ swiping: isDragging }"
       @mousedown="startSwipe"
@@ -869,6 +923,9 @@ function goToBookDetail() {
                 div(v-else class="celebration-burst" aria-hidden="true") 🎉
                 h3(class="celebration-title") {{ t('app.reader.congratsTitle') }}
                 p(v-if="readAwards.booksReadCount.value > 0" class="celebration-star") ★ {{ t('app.reader.readStar', { n: readAwards.booksReadCount.value }) }}
+                p(class="celebration-ask")
+                  span(class="celebration-ask-kicker") {{ t('app.reader.askKicker') }}
+                  | {{ t(`app.reader.ask${askIndex}`) }}
                 p(v-if="readWon.length" class="celebration-star") {{ t('app.awards.newAward') }}: {{ readWon.map((w) => t(`app.awards.items.${w}.title`)).join(', ') }}
 
                 //- Open the book's first coloring sheet in the coloring app
@@ -1179,14 +1236,14 @@ function goToBookDetail() {
   line-height: 1.5
 
 .page-title
-  font-size: 20px
+  font-size: calc(20px * var(--rd-scale, 1))
   font-weight: 700
   line-height: 1.18
   color: var(--lk-text)
   margin: 0
 
 .page-body
-  font-size: 20px
+  font-size: calc(20px * var(--rd-scale, 1))
   line-height: 1.5
   color: var(--lk-text)
   font-weight: 400
@@ -1328,6 +1385,66 @@ function goToBookDetail() {
 
 .celebration-lamb
   margin: 0 auto -10px
+
+.size-bar
+  position: absolute
+  top: calc(env(safe-area-inset-top, 0px) + 18px)
+  right: 12px
+  z-index: 20
+  display: flex
+  align-items: flex-end
+  gap: 4px
+  padding: 4px 8px
+  border-radius: 999px
+  background: var(--lk-surface)
+  border: 1px solid var(--lk-line)
+  box-shadow: var(--lk-shadow)
+
+.size-btn
+  display: grid
+  place-items: center
+  min-width: 36px
+  min-height: 36px
+  padding: 0
+  border: none
+  border-radius: 12px
+  background: transparent
+  color: var(--lk-muted)
+  font-weight: 800
+  line-height: 1
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+
+  &.is-m
+    font-size: 0.95rem
+
+  &.is-l
+    font-size: 1.2rem
+
+  &.is-xl
+    font-size: 1.5rem
+
+  &.on
+    background: var(--lk-accent)
+    color: var(--lk-on-accent)
+
+.celebration-ask
+  margin: 10px 0 0
+  padding: 10px 14px
+  border-radius: 16px
+  background: var(--lk-accent-soft)
+  font-weight: 700
+  line-height: 1.4
+  text-align: center
+
+.celebration-ask-kicker
+  display: block
+  margin-bottom: 2px
+  font-size: 0.75rem
+  font-weight: 800
+  letter-spacing: 0.08em
+  text-transform: uppercase
+  color: var(--lk-muted)
 
 .celebration-star
   margin: 4px 0 0
