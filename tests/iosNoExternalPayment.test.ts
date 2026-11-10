@@ -2,7 +2,8 @@
  * The iOS build must never show a PayPal or Ko-fi link, nor the bank account (App Review Guideline 3.1.1(a): no buttons or
  * calls to action to payment outside in-app purchase, except on the US storefront). On iOS the support buttons are the StoreKit
  * tip instead (`TipButton`). Two guards:
- *  1. the start page and the parents' window are mounted as the iOS build and must contain no such link;
+ *  1. the start page (which asks for no gifts on any platform) and the parents' window (the small line at its end, opened)
+ *     are mounted as the iOS build and must contain no such link;
  *  2. every source file that mentions one of the links must also know `isIOS`, so a new place with a PayPal / Ko-fi button
  *     cannot slip in without the iOS switch.
  */
@@ -65,18 +66,21 @@ async function mountParents(ios: boolean) {
     attachTo: document.body
   })
   await flushPromises()
+  // voluntary support is folded away behind one small line at the end: open it
+  await wrapper.find('.give-toggle').trigger('click')
+  await flushPromises()
   return wrapper
 }
 
 describe('iOS build: no payment outside in-app purchase', () => {
-  it('start page: no PayPal, no Ko-fi on iOS (control: they are there off iOS)', async () => {
+  it('start page: no PayPal, no Ko-fi, on iOS and off iOS (the start page does not ask for gifts)', async () => {
     const ios = await mountHome(true)
     expect(pageText(ios.html())).not.toMatch(SHOWN)
     ios.unmount()
     vi.resetModules()
     document.body.innerHTML = ''
     const other = await mountHome(false)
-    expect(pageText(other.html())).toMatch(SHOWN)
+    expect(pageText(other.html())).not.toMatch(SHOWN)
   })
 
   it("parents' window: no PayPal, no Ko-fi and no bank account on iOS (control: all there off iOS)", async () => {

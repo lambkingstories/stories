@@ -29,6 +29,7 @@ export default {
     close: 'Cerrar',
     intro: 'Qué bueno que estás con LambKing. Aquí encuentras opciones útiles sobre la app.',
     supportTitle: 'Apoyo',
+    giveLine: 'Apoyar a LambKing de forma voluntaria',
     supportText: 'Ayuda a que LambKing crezca.',
     plusText: 'Lo que ofrece Plus y lo que sigue siendo gratis.',
     featuresText: 'Todo lo que hay en la aplicación, con imágenes.',

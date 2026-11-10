@@ -4,7 +4,7 @@
  *   1. "Go on": one big card with the adventure the child is in (or the first one), so playing starts with one tap
  *   2. "Continue": the last book and the last picture (with a real cover when nothing was begun yet)
  *   3. the journey through the Bible, then the newest books
- *   4. last: the card for grown-ups (the shop, the sponsors, Plus or support)
+ *   4. last: the card for grown-ups (the shop, the sponsors, LambKing Plus)
  * (Anton 10.11.2026: the page began with advertising instead of playing; the three doors only repeated the bar below.)
  * The look follows the day/night theme (assets/css/theme.css). Support and shop links leave the app: they go through
  * `openExternal`, which asks the parents first. The design is neutral so that other publishers can have shelves, too.
@@ -15,9 +15,6 @@ import { useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import AppHeader from '@/components/molecules/AppHeader.vue'
 import HomeHero, { type HeroSlide } from '@/components/molecules/HomeHero.vue'
-import KoFiButton from '@/components/molecules/KoFiButton.vue'
-import BankTransfer from '@/components/molecules/BankTransfer.vue'
-import TipButton from '@/components/molecules/TipButton.vue'
 import useModels from '@/use/useModels'
 import useApiBooks from '@/use/useApiBooks'
 import useReadingProgress from '@/use/useReadingProgress'
@@ -27,7 +24,6 @@ import { journeys } from '@/data/adventures'
 import { sponsors } from '@/data/sponsors'
 import { nextStageIndex } from '@/utils/adventureScore'
 import { inBibleOrder, journeyToBegin, journeyToContinue } from '@/utils/continueJourney'
-import { isIOS } from '@/utils/platform'
 import { isColoringBook } from '@/utils/coloringBook'
 import usePremium, { PREMIUM_TEASER } from '@/use/usePremium'
 import { isJourneyPlusLocked } from '@/utils/adventureAccess'
@@ -68,7 +64,7 @@ onMounted(() => {
 
 // ── 1. welcome card ──────────────────────────────────────────────────────────
 
-// The slides at the end of the page: the shop (and the sponsors when there are some), then Plus or asking for support.
+// The slides at the end of the page: the shop (and the sponsors when there are some), then LambKing Plus.
 const slides = computed(() => {
   const list: HeroSlide[] = [
     { id: 'shop', image: prependBaseUrl('images/bg/welcome-bg-3.webp'), title: t('app.main.welcomeTitle2'), text: t('app.home.shopText') }
@@ -76,12 +72,10 @@ const slides = computed(() => {
   if (sponsors.length) {
     list.push({ id: 'sponsors', image: prependBaseUrl('images/bg/welcome-bg-2.webp'), title: t('app.home.sponsorsTitle'), text: t('app.home.sponsorsText') })
   }
-  // asking for support: while Plus is shown this slide tells about LambKing Plus instead (the donation moves to the window for parents)
-  // (the welcome slider stays short: LambKing Plus gets one slide, the rest is on the Plus page)
+  // LambKing Plus gets one slide, the rest is on the Plus page. The app does not ask for gifts here any more (Anton 10.11.2026):
+  // voluntary support is one small line at the end of the window for parents.
   if (PREMIUM_TEASER) {
-    list.push({ id: 'support', image: prependBaseUrl('images/bg/willkommen-plus-2.webp'), title: t('app.main.plusTitle'), text: t('app.main.plusText') })
-  } else {
-    list.push({ id: 'support', image: prependBaseUrl('images/bg/welcome-bg-2.webp'), title: t('app.main.welcomeTitle1'), text: t('app.home.supportText') })
+    list.push({ id: 'plus', image: prependBaseUrl('images/bg/willkommen-plus-2.webp'), title: t('app.main.plusTitle'), text: t('app.main.plusText') })
   }
   return list
 })
@@ -293,21 +287,12 @@ function openBook(bookId: string) {
               )
               span(v-if="i === 0" class="new-badge") {{ t('app.read.newBadge') }}
 
-      //- last: for grown-ups (the shop, the sponsors, Plus or support)
+      //- last: for grown-ups (the shop, the sponsors, LambKing Plus)
       HomeHero(:slides="slides" :label="t('app.home.slideLabel')")
         template(#actions="{ id }")
-          button(v-if="id === 'support' && PREMIUM_TEASER" type="button" class="lk-btn hero-shop" @click="openPlus")
+          button(v-if="id === 'plus'" type="button" class="lk-btn hero-shop" @click="openPlus")
             span(class="hero-shop-label") {{ t('app.main.plusMore') }}
             ZIconography(name="chevron-right" :size="22")
-          template(v-else-if="id === 'support'")
-            TipButton(v-if="isIOS")
-            template(v-else)
-              //- both buttons equally wide, side by side over the whole width
-              div(class="donate-row")
-                KoFiButton(href="https://www.paypal.com/ncp/payment/5CWTQPB6NGWLU" tone="paypal" label="PayPal")
-                KoFiButton(href="https://ko-fi.com/U6U21YO0Z5" tone="kofi" label="Ko-fi")
-              //- a normal bank transfer: only there when the account is filled in (data/donation.ts)
-              BankTransfer
           button(v-else-if="id === 'shop'" type="button" class="lk-btn hero-shop" @click="openStore")
             ZIconography(name="shop" :size="24")
             span(class="hero-shop-label") {{ t('app.home.slide3Button') }}
@@ -361,17 +346,6 @@ button
     height: 32px
     width: auto
     display: block
-
-.donate-row
-  width: 100%
-  display: grid
-  grid-template-columns: 1fr 1fr
-  gap: 12px
-
-  :deep(.kofi-btn)
-    width: 100%
-    padding: 0 12px
-    font-size: 1rem
 
 .hero-shop
   width: 100%

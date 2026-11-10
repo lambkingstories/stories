@@ -1,7 +1,8 @@
 <script setup lang="ts">
 /**
  * The parents' window, opened by the "Eltern" button: a floating, softly rounded window with the companion lamb on its rim.
- * It collects everything that is meant for grown-ups: support us (PayPal, Ko-fi, on iOS the in-app tip), the shop, the settings
+ * It collects everything that is meant for grown-ups: LambKing Plus, the shop, the settings (and, as one small line at the end,
+ * voluntary support: PayPal, Ko-fi, on iOS the in-app tip)
  * and the legal texts. Everything that leaves the app goes through `openExternal`, which asks the parental gate first.
  * The symbols (PayPal, Ko-fi, shop, settings, shield) are pictures in `public/images/icons/ui/`.
  */
@@ -32,6 +33,8 @@ const KOFI_URL = 'https://ko-fi.com/U6U21YO0Z5'
 // a normal bank transfer: shown only when the account is filled in (data/donation.ts)
 const showBank = computed(() => !isIOS && bank.iban.trim().length > 0 && bank.holder.trim().length > 0)
 const copied = ref('')
+/** The ways to give are folded away behind one small line. */
+const giveOpen = ref(false)
 
 async function copy(what: string, text: string) {
   try {
@@ -92,13 +95,6 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
 
             div(class="sheet-rule")
 
-            button(type="button" class="sheet-row" @click="go('app-features')")
-              ZIconography(name="star" :size="30" class="row-icon")
-              span(class="row-text")
-                span(class="row-title") {{ t('app.features.title') }}
-                span(class="row-sub") {{ t('app.parent.featuresText') }}
-              ZIconography(name="chevron-right" :size="22")
-
             button(v-if="PREMIUM_TEASER" type="button" class="sheet-row" @click="go('app-plus')")
               ZIconography(name="star" :size="30" class="row-icon")
               span(class="row-text")
@@ -106,39 +102,12 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
                 span(class="row-sub") {{ t('app.parent.plusText') }}
               ZIconography(name="chevron-right" :size="22")
 
-            section(class="support")
-              h3(class="support-title") {{ t('app.parent.supportTitle') }}
-              p(class="support-text") {{ t('app.parent.supportText') }}
-              div(class="support-actions")
-                TipButton(v-if="isIOS")
-                template(v-else)
-                  button(type="button" class="support-btn is-main" @click="openExternal(PAYPAL_URL)")
-                    img(:src="brand('paypal')" alt="" class="brand-img" draggable="false" @error="hideBroken")
-                    span {{ t('app.parent.viaPaypal') }}
-                  button(type="button" class="support-btn is-second" @click="openExternal(KOFI_URL)")
-                    img(:src="brand('kofi')" alt="" class="brand-img" draggable="false" @error="hideBroken")
-                    span {{ t('app.parent.viaKofi') }}
-
-            section(v-if="showBank" class="bank")
-              h3(class="bank-title") {{ t('app.parent.bankTitle') }}
-              dl(class="bank-list")
-                div(class="bank-line")
-                  dt {{ t('app.parent.bankHolder') }}
-                  dd {{ bank.holder }}
-                div(class="bank-line")
-                  dt IBAN
-                  dd
-                    span(class="bank-iban") {{ bank.iban }}
-                    button(type="button" class="bank-copy" @click="copy('iban', bank.iban.replace(/\s/g, ''))") {{ copied === 'iban' ? t('app.parent.bankCopied') : t('app.parent.bankCopy') }}
-                div(v-if="bank.bic" class="bank-line")
-                  dt BIC
-                  dd {{ bank.bic }}
-                div(v-if="bank.bankName" class="bank-line")
-                  dt {{ t('app.parent.bankName') }}
-                  dd {{ bank.bankName }}
-                div(class="bank-line")
-                  dt {{ t('app.parent.bankPurpose') }}
-                  dd {{ bank.purpose }}
+            button(type="button" class="sheet-row" @click="go('app-features')")
+              ZIconography(name="star" :size="30" class="row-icon")
+              span(class="row-text")
+                span(class="row-title") {{ t('app.features.title') }}
+                span(class="row-sub") {{ t('app.parent.featuresText') }}
+              ZIconography(name="chevron-right" :size="22")
 
             button(type="button" class="sheet-row" @click="openExternal(STORE_URL)")
               ZIconography(name="shop" :size="30" class="row-icon")
@@ -176,6 +145,41 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
               ZIconography(name="chevron-right" :size="22")
 
             ContactLinks
+
+            //- voluntary support: one small line at the very end; a tap opens the ways to give (Anton 10.11.2026)
+            div(class="give")
+              button(type="button" class="give-toggle" :aria-expanded="giveOpen" @click="giveOpen = !giveOpen") {{ t('app.parent.giveLine') }}
+              div(v-if="giveOpen" class="give-body")
+                p(class="support-text") {{ t('app.parent.supportText') }}
+                div(class="support-actions")
+                  TipButton(v-if="isIOS")
+                  template(v-else)
+                    button(type="button" class="support-btn is-main" @click="openExternal(PAYPAL_URL)")
+                      img(:src="brand('paypal')" alt="" class="brand-img" draggable="false" @error="hideBroken")
+                      span {{ t('app.parent.viaPaypal') }}
+                    button(type="button" class="support-btn is-second" @click="openExternal(KOFI_URL)")
+                      img(:src="brand('kofi')" alt="" class="brand-img" draggable="false" @error="hideBroken")
+                      span {{ t('app.parent.viaKofi') }}
+                section(v-if="showBank" class="bank")
+                  h3(class="bank-title") {{ t('app.parent.bankTitle') }}
+                  dl(class="bank-list")
+                    div(class="bank-line")
+                      dt {{ t('app.parent.bankHolder') }}
+                      dd {{ bank.holder }}
+                    div(class="bank-line")
+                      dt IBAN
+                      dd
+                        span(class="bank-iban") {{ bank.iban }}
+                        button(type="button" class="bank-copy" @click="copy('iban', bank.iban.replace(/\s/g, ''))") {{ copied === 'iban' ? t('app.parent.bankCopied') : t('app.parent.bankCopy') }}
+                    div(v-if="bank.bic" class="bank-line")
+                      dt BIC
+                      dd {{ bank.bic }}
+                    div(v-if="bank.bankName" class="bank-line")
+                      dt {{ t('app.parent.bankName') }}
+                      dd {{ bank.bankName }}
+                    div(class="bank-line")
+                      dt {{ t('app.parent.bankPurpose') }}
+                      dd {{ bank.purpose }}
 </template>
 
 <style scoped lang="sass">
@@ -264,10 +268,29 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   height: 1px
   background: var(--lk-line)
 
-.support-title
-  margin: 0
-  font-size: 1.4rem
-  font-weight: 800
+// voluntary support: a quiet line of text, not a button that asks
+.give
+  margin-top: 4px
+  text-align: center
+
+.give-toggle
+  min-height: 44px
+  padding: 0 12px
+  border: none
+  background: transparent
+  color: var(--lk-muted)
+  font: inherit
+  font-size: 0.9rem
+  text-decoration: underline
+  text-underline-offset: 3px
+  cursor: pointer
+
+.give-body
+  margin-top: 6px
+  text-align: left
+  display: flex
+  flex-direction: column
+  gap: 14px
 
 .support-text
   margin: 2px 0 0

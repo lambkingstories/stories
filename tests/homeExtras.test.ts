@@ -54,10 +54,10 @@ describe('start page extras', () => {
     const wrapper = mount(Home, { global: { plugins: [i18n], stubs: { RouterLink: true } }, attachTo: document.body })
     await flushPromises()
     const slides = wrapper.findAll('.hero-slide')
-    expect(slides).toHaveLength(3)
-    // the sponsors come after the shop, then asking for support
+    expect(slides).toHaveLength(2)
+    // the sponsors come after the shop; the start page does not ask for gifts
     expect(slides[1]!.text()).toContain('Unsere Sponsoren')
     expect(slides[1]!.text()).toContain('Beispiel GmbH')
-    expect(slides[2]!.text()).toContain('Unterstütze unsere Mission')
+    expect(wrapper.text()).not.toContain('Unterstütze unsere Mission')
   })
 })

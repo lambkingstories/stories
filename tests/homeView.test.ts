@@ -64,11 +64,12 @@ describe('the start page', () => {
     expect(warnings.filter((w) => /not defined on instance|is not a function|ERROR/.test(w))).toEqual([])
   })
 
-  it('the card for grown-ups comes last, has two slides (the shop, then Plus or support) and none of them is a partner slide', async () => {
+  it('the card for grown-ups comes last, shows the shop (and Plus in a build with Plus), asks for no gifts and has no partner slide', async () => {
     const { default: Home } = await import('@/views/app/AppHomeView.vue')
     const wrapper = mount(Home, { global: { plugins: [i18n], stubs: { RouterLink: true } }, attachTo: document.body })
     await flushPromises()
-    expect(wrapper.findAll('.hero-slide')).toHaveLength(2)
+    expect(wrapper.findAll('.hero-slide')).toHaveLength(1)
+    expect(wrapper.html()).not.toMatch(/paypal|ko-?fi/i)
     expect(wrapper.find('.home-body > *:last-child').classes()).toContain('hero')
     expect(wrapper.text()).not.toMatch(/Reach/i)
   })
