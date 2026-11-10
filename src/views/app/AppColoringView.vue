@@ -104,6 +104,7 @@ import { maxPoints, medalFor, pointsOf } from '@/utils/adventureScore'
 import { useActivity } from '@/use/useActivity'
 import type { RewardItem } from '@/types/coloringMenu'
 import { contentLocale } from '@/utils/contentLocale'
+import { printedBookUrl } from '@/data/bookPages'
 import {
   type ArtworkMeta,
   deleteArtwork,
@@ -1605,7 +1606,7 @@ async function openBook(bookId: string, page: number) {
       pages,
       freePages: (book as ApiBook).freePages ?? null,
       index: 0,
-      shopLink: pickLocalizedImage((book as ApiBook).etsyLink, contentLocale(locale.value)) || undefined
+      shopLink: printedBookUrl(bookId, pickLocalizedImage((book as ApiBook).etsyLink, contentLocale(locale.value)), contentLocale(locale.value)) || undefined
     }
   } catch (err) {
     console.error('coloring book load error', err)

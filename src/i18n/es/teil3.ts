@@ -1185,7 +1185,7 @@ export default {
     resetTitle: '¿Empezar esta hoja de nuevo?',
     resetBody: 'Se borrarán los colores de esta hoja. El dibujo se queda.',
     resetYes: 'Borrar colores',
-    printedAt: 'Impreso en Amazon',
+    printedAt: 'Pedir el libro impreso',
     pageOf: 'Página {n} de {total}',
     prevPage: 'Página anterior',
     nextPage: 'Página siguiente',

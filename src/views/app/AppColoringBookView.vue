@@ -28,6 +28,7 @@ import { pickLocalizedImage } from '@/types/apiBook'
 import { openExternal } from '@/utils/openExternal'
 import ColoringSpread from '@/components/molecules/ColoringSpread.vue'
 import { contentLocale } from '@/utils/contentLocale'
+import { printedBookUrl } from '@/data/bookPages'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
@@ -239,8 +240,10 @@ async function start() {
     title.value = (loc[locale.value]?.title || loc.de?.title || bookId.value).replace(/^Buch\s*\d+\s*[–-]\s*/i, '')
     pages.value = list
     ownFree.value = (book as ApiBook).freePages ?? null
-    shopLink.value = pickLocalizedImage((book as ApiBook).etsyLink, contentLocale(locale.value))
-    printedLink.value = (book as ApiBook).etsyLink?.[contentLocale(locale.value)] ?? ''
+    // the page of the book on lambking.store (the old link of the backend only when the book has no page there)
+    const printed = printedBookUrl(bookId.value, (book as ApiBook).etsyLink?.[contentLocale(locale.value)] ?? '', contentLocale(locale.value))
+    shopLink.value = printed || pickLocalizedImage((book as ApiBook).etsyLink, contentLocale(locale.value))
+    printedLink.value = printed
     // Back from the editor the page that was painted last is open (or the one named in the address);
     // a new book starts at page one.
     const wanted = Number(route.query.p)

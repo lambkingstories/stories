@@ -25,6 +25,7 @@ import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
 import { openExternal } from '@/utils/openExternal'
 import { prependBaseUrl } from '@/utils/function'
 import { contentLocale } from '@/utils/contentLocale'
+import { printedBookUrl } from '@/data/bookPages'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
@@ -77,7 +78,7 @@ const cards = computed<BookCardData[]>(() => {
     text: b.localizations?.[lang.value]?.shortDescription || b.localizations?.de?.shortDescription || '',
     cover: withPlaceholder(pickLocalizedImage(b.previewImage, lang.value)),
     ratio: 1,
-    url: pickLocalizedImage(b.etsyLink, lang.value) || STORE_URL,
+    url: printedBookUrl(b.bookId, pickLocalizedImage(b.etsyLink, lang.value), lang.value) || STORE_URL,
     comingSoon: false,
     preview: false,
     digital: false

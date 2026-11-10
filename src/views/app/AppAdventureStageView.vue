@@ -233,6 +233,8 @@ import { inBibleOrder } from '@/utils/continueJourney'
 import { albumCards, albumSetCard } from '@/utils/collection'
 import { memoryVerseOf } from '@/data/memoryVerses'
 import { JESUS_PATH } from '@/data/jesusPath'
+import { journeyBookUrl } from '@/data/bookPages'
+import { openExternal } from '@/utils/openExternal'
 import useAwards from '@/use/useAwards'
 import { adventureLanguage } from '@/use/adventureLanguage'
 import { isJourneyPlusLocked } from '@/utils/adventureAccess'
@@ -501,6 +503,9 @@ watch(
     else wonNow.value = []
   }
 )
+
+/** The coloring book that goes with this adventure (its page on lambking.store; the way out asks the parents first). */
+const coloringBookUrl = computed(() => journeyBookUrl(journey.value?.id, adventureLanguage.value))
 
 /** At the end of Easter: the way "Who is Jesus?" is offered quietly. */
 const jesusText = computed(() => JESUS_PATH[adventureLanguage.value])
@@ -1244,9 +1249,11 @@ function openGift() {
             span(class="verse-ref") {{ memoryVerse.ref }}
             p(class="verse-card") {{ cardWon ? t('app.adventure.verseOnCard') : t('app.adventure.verseWinCard') }}
           p(v-if="wonNow.length" class="result-line result-plus") {{ t('app.awards.newAward') }}: {{ wonNow.map((w) => t(`app.awards.items.${w}.title`)).join(', ') }}
+          p(v-if="coloringBookUrl" class="result-line result-plus") {{ t('app.adventure.coloringBook') }}
           p(v-if="journey?.id === 'ostern'" class="result-line result-plus") {{ jesusText.homeCardText }}
           p(v-if="nextPlusJourney" class="result-line result-plus") {{ t('app.adventure.plusNext', { title: nextPlusJourney.title }) }}
           div(class="stage-actions")
+            AdvButton(v-if="coloringBookUrl" tone="blau" @click="openExternal(coloringBookUrl as string)") {{ t('app.adventure.coloringBookButton') }}
             AdvButton(v-if="journey?.id === 'ostern'" tone="gold" @click="router.push({ name: 'app-jesus' })") {{ jesusText.homeCardTitle }}
             AdvButton(v-if="nextPlusJourney" tone="gold" @click="showUpsell('adventure')") {{ t('app.adventure.plusNextButton') }}
             AdvButton(v-if="medal" tone="gold" @click="openGift") {{ t('app.adventure.gift', { title: journey.gift.title }) }}

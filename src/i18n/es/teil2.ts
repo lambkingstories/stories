@@ -1911,6 +1911,8 @@ export default {
   backToMap: 'Volver al mapa',
   plusNext: 'El viaje sigue con «{title}». Con LambKing Plus puedes jugar todas las demás aventuras.',
   plusNextButton: 'Más sobre LambKing Plus',
+  coloringBook: 'Hay un libro para colorear de esta aventura.',
+  coloringBookButton: 'Ver el libro para colorear',
   verseKicker: 'Tu versículo',
   verseOnCard: 'Está escrito en el reverso de tu carta dorada.',
   verseWinCard: 'Gana la carta dorada con tres estrellas en cada etapa. El versículo está escrito en su reverso.',

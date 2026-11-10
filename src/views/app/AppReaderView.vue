@@ -31,6 +31,7 @@ import { coloringPagesOfBook, isColoringBook, pageCaptionOf, pageImageOf } from 
 import { hasVerticalCenter, markdownToHtml, renderInline } from '@/utils/markdownToHtml'
 import { onImgFallback, PLACEHOLDER_IMAGE } from '@/utils/placeholder'
 import { contentLocale } from '@/utils/contentLocale'
+import { printedBookUrl } from '@/data/bookPages'
 
 const route = useRoute()
 const router = useRouter()
@@ -153,7 +154,7 @@ const displayEntries = computed<DisplayEntry[]>(() => {
 function openUpsell() {
   const b = book.value
   if (!b) return
-  const shop = pickLocalizedImage(b.etsyLink, lang.value)
+  const shop = printedBookUrl(b.bookId, pickLocalizedImage(b.etsyLink, lang.value), lang.value)
   showUpsell('allBooks', {
     bookId: b.bookId,
     kind: bookKind,

@@ -5,6 +5,8 @@
  * "coming soon": it shows only the preview, and the last page of the preview says that it comes soon. Books of the backend series
  * "Einzelne Bücher" are shown there as well.
  */
+import { printedBookUrl } from '@/data/bookPages'
+
 export const STORE_URL = 'https://lambking.store'
 
 /** One picture of a preview; `ratio` is its width divided by its height (a double page is 1.5, a single page 0.75). */
@@ -51,7 +53,7 @@ export const storeBooks: StoreBook[] = [
       en: 'A picture book about Zacchaeus in Jericho. Jesus sees every single person, and his love can change every heart. With a QR code for the story song.'
     },
     cover: 'images/buecher/zachaeus-cover.webp',
-    url: STORE_URL,
+    url: printedBookUrl('der-mann-im-baum-zachaeus', STORE_URL),
     // five sample pages (the sixth of the landing page is left out, so that the end of the story stays a surprise); with the cover and
     // the page about buying the preview has seven pages
     preview: { pages: [1, 2, 3, 4, 5].map((n) => ({ src: `images/buecher/zachaeus-vorschau/seite-${n}.webp`, ratio: 1 })) },
@@ -69,7 +71,7 @@ export const storeBooks: StoreBook[] = [
     },
     cover: 'images/buecher/voelker-der-bibel/cover.webp',
     coverRatio: 0.75,
-    url: STORE_URL,
+    url: printedBookUrl('voelker-der-bibel-band-1', STORE_URL),
     comingSoon: true,
     // two single pages and double pages of the book: the land of the pharaohs, a warrior, the Red Sea, David and Goliath, Sinai, the ark
     preview: {
