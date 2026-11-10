@@ -147,6 +147,11 @@ export const MEMORY_VERSES: Record<string, MemoryVerse> = {
     en: { ref: 'Luke 15:6', text: `Rejoice with me; for I have found my sheep which was lost.` },
     line: { de: `Jesus erzählte vom Hirten, der ein verlorenes Schaf sucht.`, en: `Jesus told of the shepherd who looks for a lost sheep.` }
   },
+  sohn: {
+    de: { ref: 'Lukas 15,20', text: `Da er aber noch ferne von dannen war, sah ihn sein Vater, und es jammerte ihn, lief und fiel ihm um seinen Hals und küsste ihn.` },
+    en: { ref: 'Luke 15:20', text: `But when he was yet a great way off, his father saw him, and had compassion, and ran, and fell on his neck, and kissed him.` },
+    line: { de: `Der jüngere Sohn ging weit weg und kam mit leeren Händen zurück. Der Vater sah ihn schon von Weitem und lief ihm entgegen.`, en: `The younger son went far away and came back with empty hands. His father saw him from far off and ran to meet him.` }
+  },
   zachaeus: {
     de: { ref: 'Lukas 19,10', text: `Denn des Menschen Sohn ist gekommen, zu suchen und selig zu machen, das verloren ist.` },
     en: { ref: 'Luke 19:10', text: `For the Son of man is come to seek and to save that which was lost.` },

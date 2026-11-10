@@ -1,11 +1,11 @@
 /**
  * A small diary of what the child did, for the grown-ups' overview: per day how long the app was in use (split into reading,
- * adventure, painting and the rest), how many pages were read, stages played and pictures finished. Only numbers are kept, only on
+ * adventure, painting, games and the rest), how many pages were read, stages played and pictures finished. Only numbers are kept, only on
  * the device, and only the last 60 days (nothing is sent anywhere).
  */
 import { computed, reactive } from 'vue'
 
-export type Section = 'home' | 'read' | 'adventure' | 'paint' | 'other'
+export type Section = 'home' | 'read' | 'adventure' | 'paint' | 'play' | 'other'
 export type Counter = 'pages' | 'stages' | 'pictures'
 
 export interface DayRecord {
@@ -21,9 +21,9 @@ const KEEP_DAYS = 60
 /** After this long without a touch the app counts as "not in use" (a story that is being listened to still counts for a while). */
 export const IDLE_MS = 3 * 60_000
 
-const SECTIONS: Section[] = ['home', 'read', 'adventure', 'paint', 'other']
+const SECTIONS: Section[] = ['home', 'read', 'adventure', 'paint', 'play', 'other']
 
-const emptyDay = (): DayRecord => ({ sec: { home: 0, read: 0, adventure: 0, paint: 0, other: 0 }, pages: 0, stages: 0, pictures: 0 })
+const emptyDay = (): DayRecord => ({ sec: { home: 0, read: 0, adventure: 0, paint: 0, play: 0, other: 0 }, pages: 0, stages: 0, pictures: 0 })
 
 /** yyyy-mm-dd in the local time zone (a day ends at midnight where the child is). */
 export function dayKey(date: Date = new Date()): string {
@@ -110,7 +110,7 @@ export function useActivity() {
 
   /** Minutes per section over the last `n` days. */
   function sectionMinutes(n: number, from: Date = new Date()): Record<Section, number> {
-    const total: Record<Section, number> = { home: 0, read: 0, adventure: 0, paint: 0, other: 0 }
+    const total: Record<Section, number> = { home: 0, read: 0, adventure: 0, paint: 0, play: 0, other: 0 }
     for (let i = 0; i < n; i++) {
       const d = new Date(from)
       d.setDate(d.getDate() - i)

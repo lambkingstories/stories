@@ -16,6 +16,15 @@ describe('activity diary', () => {
     expect(a.sectionMinutes(7).paint).toBe(1)
   })
 
+  it('keeps playing (family games, game room) apart from the rest', () => {
+    const a = useActivity()
+    a.addSeconds('play', 120)
+    a.addSeconds('other', 60)
+    expect(a.sectionMinutes(7).play).toBe(2)
+    expect(a.sectionMinutes(7).other).toBe(1)
+    expect(a.todayMinutes.value).toBe(3)
+  })
+
   it('counts pages, stages and pictures on the day they happened', () => {
     const a = useActivity()
     a.count('pages')

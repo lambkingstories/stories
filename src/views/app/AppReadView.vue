@@ -4,7 +4,7 @@
  * books from the store) and Malbücher (the coloring books). Each tile has a picture on top and its name and a short line below.
  * The look follows the day/night theme (assets/css/theme.css).
  */
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
@@ -22,12 +22,15 @@ interface Door {
   image?: string
 }
 
+/** The painted picture of the good-night tile; while it is missing the tile shows the golden moon on night blue. */
+const nightPicOk = ref(true)
+
 const doors = computed<Door[]>(() => [
   { id: 'stories', title: t('app.read.storiesTitle'), sub: t('app.read.storiesSub'), route: 'app-all-books', image: prependBaseUrl('images/bg/series_landscape.webp') },
   { id: 'books', title: t('app.read.booksTitle'), sub: t('app.read.booksSub'), route: 'app-books', image: prependBaseUrl('images/bg/welcome-bg-3.webp') },
   { id: 'coloring', title: t('app.read.coloringTitle'), sub: t('app.read.coloringSub'), route: 'app-coloring-books', image: prependBaseUrl('images/lesen/malbuecher-kachel.webp') },
-  // for bedtime: a night-blue tile with the moon (no picture needed)
-  { id: 'goodnight', title: t('app.read.goodnightTitle'), sub: t('app.read.goodnightSub'), route: 'app-goodnight' }
+  // for bedtime: a painted night picture; without it a night-blue tile with the moon
+  { id: 'goodnight', title: t('app.read.goodnightTitle'), sub: t('app.read.goodnightSub'), route: 'app-goodnight', image: nightPicOk.value ? prependBaseUrl('images/lesen/gute-nacht-kachel.webp') : undefined }
 ])
 </script>
 
@@ -50,7 +53,7 @@ const doors = computed<Door[]>(() => [
           @click="router.push({ name: d.route })"
         )
           span(class="door-pic")
-            img(v-if="d.image" :src="d.image" alt="" draggable="false" decoding="async")
+            img(v-if="d.image" :src="d.image" alt="" draggable="false" decoding="async" @error="d.id === 'goodnight' ? (nightPicOk = false) : undefined")
             ZIconography(v-else name="moon" :size="72" class="door-moon")
           span(class="door-body")
             span(class="door-text")

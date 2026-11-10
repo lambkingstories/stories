@@ -12,6 +12,8 @@ import { prependBaseUrl } from '@/utils/function'
 import LkPageHead from '@/components/molecules/LkPageHead.vue'
 import AdvButton from '@/components/atoms/AdvButton.vue'
 import useApiBooks from '@/use/useApiBooks'
+import useApiSeries from '@/use/useApiSeries'
+import useCatalogNames from '@/use/useCatalogNames'
 import {
   MAX_IMPORT_BYTES,
   audioDuration,
@@ -35,6 +37,8 @@ import { contentLocale } from '@/utils/contentLocale'
 const { t, tm, rt, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
 const apiBooks = useApiBooks()
+const apiSeries = useApiSeries()
+const { seriesName } = useCatalogNames()
 
 function goBack() {
   stopAll()
@@ -49,7 +53,24 @@ const stories = computed<ApiBook[]>(() => {
   const q = query.value.trim().toLocaleLowerCase(locale.value)
   return ((apiBooks.state.all ?? []) as ApiBook[])
     .filter((b) => !isColoringBook(b) && (!q || titleOf(b).toLocaleLowerCase(locale.value).includes(q)))
-    .sort((a, b) => titleOf(a).localeCompare(titleOf(b), locale.value))
+    .sort((a, b) => titleOf(a).localeCompare(titleOf(b), locale.value, { numeric: true }))
+})
+/** The stories one series after the other (in the order of the AdminUI), each series with its name and its numbers in order. */
+const groups = computed(() => {
+  void apiSeries.state.all
+  const by = new Map<string, ApiBook[]>()
+  for (const b of stories.value) {
+    const id = b.bookSeriesId || 'misc'
+    by.set(id, [...(by.get(id) ?? []), b])
+  }
+  return [...by.entries()]
+    .map(([id, books]) => ({
+      id,
+      name: seriesName(id, apiSeries.getById(id)?.name || id),
+      order: apiSeries.getById(id)?.sortOrder && apiSeries.getById(id)!.sortOrder! > 0 ? apiSeries.getById(id)!.sortOrder! : Number.MAX_SAFE_INTEGER,
+      books
+    }))
+    .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.name.localeCompare(b.name, locale.value)))
 })
 
 const canRecord = typeof navigator !== 'undefined' && !!navigator.mediaDevices?.getUserMedia && !!recordingMime()
@@ -68,6 +89,7 @@ async function refresh() {
 }
 onMounted(() => {
   void apiBooks.loadAllBooks()
+  void apiSeries.loadAll()
   void refresh()
 })
 
@@ -348,7 +370,9 @@ const dateOf = (ms: number) => new Date(ms).toLocaleDateString(locale.value, { d
           h3(class="vo-h") {{ importing ? t('app.voices.importPick') : t('app.voices.pickTitle') }}
           input(v-model="query" class="vo-input" type="search" :placeholder="t('app.voices.search')" :aria-label="t('app.voices.search')")
           div(v-if="stories.length" class="vo-stories")
-            button(v-for="b in stories" :key="b.bookId" type="button" class="vo-story" @click="pick(b)") {{ titleOf(b) }}
+            template(v-for="g in groups" :key="g.id")
+              p(class="vo-group") {{ g.name }}
+              button(v-for="b in g.books" :key="b.bookId" type="button" class="vo-story" @click="pick(b)") {{ titleOf(b) }}
           p(v-else class="vo-note") {{ t('app.voices.noStories') }}
           AdvButton(tone="blau" @click="cancel") {{ t('app.voices.cancel') }}
 
@@ -570,6 +594,13 @@ const dateOf = (ms: number) => new Date(ms).toLocaleDateString(locale.value, { d
   gap: 8px
   max-height: 46vh
   overflow-y: auto
+
+.vo-group
+  margin: 8px 2px 0
+  font-size: 0.9rem
+  font-weight: 800
+  letter-spacing: 0.02em
+  color: var(--lk-muted)
 
 .vo-story
   min-height: 48px

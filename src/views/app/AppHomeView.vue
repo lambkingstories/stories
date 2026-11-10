@@ -68,16 +68,15 @@ onMounted(() => {
 
 // The slides at the end of the page: the shop (and the sponsors when there are some), then LambKing Plus.
 const slides = computed(() => {
-  const list: HeroSlide[] = [
-    { id: 'shop', image: prependBaseUrl('images/bg/welcome-bg-3.webp'), title: t('app.main.welcomeTitle2'), text: t('app.home.shopText') }
-  ]
-  if (sponsors.length) {
-    list.push({ id: 'sponsors', image: prependBaseUrl('images/bg/welcome-bg-2.webp'), title: t('app.home.sponsorsTitle'), text: t('app.home.sponsorsText') })
-  }
-  // LambKing Plus gets one slide, the rest is on the Plus page. The app does not ask for gifts here any more (Anton 10.11.2026):
-  // voluntary support is one small line at the end of the window for parents.
+  const list: HeroSlide[] = []
+  // LambKing Plus comes first and has one slide, the rest is on the Plus page. The app does not ask for gifts here any more
+  // (Anton 10.11.2026): voluntary support is one small line at the end of the window for parents.
   if (PREMIUM_TEASER) {
     list.push({ id: 'plus', image: prependBaseUrl('images/bg/willkommen-plus-2.webp'), title: t('app.main.plusTitle'), text: t('app.main.plusText') })
+  }
+  list.push({ id: 'shop', image: prependBaseUrl('images/bg/welcome-bg-3.webp'), title: t('app.main.welcomeTitle2'), text: t('app.home.shopText') })
+  if (sponsors.length) {
+    list.push({ id: 'sponsors', image: prependBaseUrl('images/bg/welcome-bg-2.webp'), title: t('app.home.sponsorsTitle'), text: t('app.home.sponsorsText') })
   }
   return list
 })
@@ -98,6 +97,9 @@ async function openPlus() {
 
 // ── "Wer ist Jesus?": a quiet card that leads to the way in five steps ─────
 const jesusText = computed(() => JESUS_PATH[adventureLanguage.value])
+/** The painted picture of the card (a missing one is simply left out; the card stays a night-blue card with gold). */
+const jesusPic = prependBaseUrl('images/jesus/karte.webp')
+const jesusPicOk = ref(true)
 
 // ── the journey through the Bible (a row of medals to open an adventure) ─────
 
@@ -180,6 +182,8 @@ const hero = computed(() => {
     begun: !!begun,
     title: journey.title,
     image: prependBaseUrl(journey.cover ?? journey.medal),
+    // an adventure without a wide picture shows its round medal: whole, not cut off
+    isMedal: !journey.cover,
     medal: prependBaseUrl(journey.medal),
     meta: t('app.home.chapterOf', { n: next + 1, total }),
     progress: next / total,
@@ -211,9 +215,10 @@ function openBook(bookId: string) {
     main(class="home-body")
       //- 1. go on: the adventure, one tap to play
       button(v-if="hero" type="button" class="go-hero" @click="hero.go()")
-        span(class="go-hero-art")
-          img(:src="hero.image" alt="" draggable="false" @error="onImgFallback")
-          img(class="go-hero-medal" :src="hero.medal" alt="" draggable="false")
+        span(:class="['go-hero-art', { 'is-medal': hero.isMedal }]")
+          img(v-if="hero.isMedal" class="go-hero-blur" :src="hero.image" alt="" draggable="false" aria-hidden="true")
+          img(class="go-hero-pic" :src="hero.image" alt="" draggable="false" @error="onImgFallback")
+          img(v-if="!hero.isMedal" class="go-hero-medal" :src="hero.medal" alt="" draggable="false")
         span(class="go-hero-body")
           span(class="go-hero-kicker") {{ hero.begun ? t('app.adventure.continueJourney') : t('app.home.discoverAdventure') }}
           span(class="go-hero-title") {{ hero.title }}
@@ -269,10 +274,15 @@ function openBook(bookId: string) {
 
       //- who is Jesus: a way in five steps
       button(type="button" class="jesus-card" @click="router.push({ name: 'app-jesus' })")
+        span(v-if="jesusPicOk" class="jesus-card-art")
+          img(:src="jesusPic" alt="" draggable="false" @error="jesusPicOk = false")
         span(class="jesus-card-text")
           span(class="jesus-card-title") {{ jesusText.homeCardTitle }}
           span(class="jesus-card-sub") {{ jesusText.homeCardText }}
-        ZIconography(name="chevron-right" :size="24")
+          span(class="jesus-card-dots" aria-hidden="true")
+            span(v-for="n in 5" :key="n")
+        span(class="jesus-card-go")
+          ZIconography(name="chevron-right" :size="26")
 
       //- 4. new
       section(v-if="newBooks.length" class="block")
@@ -391,33 +401,84 @@ button
 // ── who is Jesus ──
 .jesus-card
   display: flex
-  align-items: center
-  justify-content: space-between
-  gap: 12px
-  padding: 16px 18px
-  border: 1px solid var(--lk-line)
+  align-items: stretch
+  gap: 0
+  padding: 0
+  overflow: hidden
+  border: 1px solid rgba(233, 196, 106, 0.45)
   border-radius: var(--lk-r-card)
-  background: var(--lk-accent-soft)
-  color: var(--lk-text)
+  // always night blue with a golden glow, in the day and the night theme
+  background: radial-gradient(120% 140% at 0% 0%, #34508a 0%, #1c2a4a 55%, #121c33 100%)
+  color: #fff
   text-align: left
+  box-shadow: var(--lk-shadow)
   cursor: pointer
   touch-action: manipulation
 
   &:active
     transform: translateY(1px)
 
+.jesus-card-art
+  flex: none
+  position: relative
+  width: 38%
+  min-height: 112px
+
+  > img
+    position: absolute
+    inset: 0
+    width: 100%
+    height: 100%
+    object-fit: cover
+    display: block
+
 .jesus-card-text
+  flex: 1
+  min-width: 0
   display: flex
   flex-direction: column
-  gap: 2px
+  justify-content: center
+  gap: 4px
+  padding: 18px 8px 18px 20px
 
 .jesus-card-title
-  font-size: 1.2rem
+  font-size: 1.5rem
   font-weight: 800
+  line-height: 1.15
+  color: #f3d58a
 
 .jesus-card-sub
-  color: var(--lk-muted)
-  font-size: 0.95rem
+  color: rgba(255, 255, 255, 0.86)
+  font-size: 1rem
+  line-height: 1.3
+
+.jesus-card-dots
+  display: flex
+  gap: 7px
+  margin-top: 6px
+
+  > span
+    width: 9px
+    height: 9px
+    border-radius: 50%
+    background: #e9c46a
+    opacity: 0.85
+
+.jesus-card-go
+  flex: none
+  align-self: center
+  margin: 0 16px 0 8px
+  width: 48px
+  height: 48px
+  border-radius: 50%
+  display: flex
+  align-items: center
+  justify-content: center
+  background: #e9c46a
+  color: #1c2a4a
+
+  :deep(.z-icon-outline)
+    color: currentColor
 
 // ── go on: the big card on top ──
 .go-hero
@@ -447,13 +508,24 @@ button
   aspect-ratio: 16 / 9
   background: var(--lk-surface-2)
 
-  > img:first-child
+  > img:not(.go-hero-medal)
     position: absolute
     inset: 0
     width: 100%
     height: 100%
     object-fit: cover
     display: block
+
+  // the round medal stands whole in the middle, on a soft blur of itself (it is not cropped any more)
+  &.is-medal > .go-hero-blur
+    transform: scale(1.4)
+    filter: blur(22px) saturate(1.1)
+    opacity: 0.55
+
+  &.is-medal > .go-hero-pic
+    object-fit: contain
+    padding: 10px 0
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.3))
 
 .go-hero-medal
   position: absolute
@@ -482,6 +554,9 @@ button
   font-size: 1.7rem
   font-weight: 800
   line-height: 1.15
+
+.go-hero-art.is-medal ~ .go-hero-body > .go-hero-kicker, .go-hero-art.is-medal ~ .go-hero-body > .go-hero-title
+  padding-right: 0
 
 .go-hero-row
   display: flex

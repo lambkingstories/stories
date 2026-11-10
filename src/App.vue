@@ -253,7 +253,12 @@ onUnmounted(() => {
 const SECTION_OF_NAV: Record<string, Section> = { home: 'home', series: 'read', hoeren: 'read', abenteuer: 'adventure', malen: 'paint', profile: 'other' }
 let stopTracking: (() => void) | undefined
 onMounted(() => {
-  stopTracking = startActivityTracking(() => SECTION_OF_NAV[routeToNav(String(route.name ?? ''))] ?? 'other')
+  stopTracking = startActivityTracking(() => {
+    const name = String(route.name ?? '')
+    // the family games and the game room count as playing, wherever the way leads through
+    if (name.startsWith('app-family') || name === 'app-gameroom' || name === 'app-big-game') return 'play'
+    return SECTION_OF_NAV[routeToNav(name)] ?? 'other'
+  })
 })
 onUnmounted(() => stopTracking?.())
 

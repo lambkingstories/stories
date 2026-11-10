@@ -19,7 +19,6 @@ const at = ref(0)
 const total = computed(() => texts.value.steps.length)
 const step = computed(() => texts.value.steps[at.value]!)
 const isLast = computed(() => at.value === total.value - 1)
-const talkOpen = ref(false)
 const picture = computed(() => prependBaseUrl(`images/jesus/schritt-${at.value + 1}.webp`))
 const pictureOk = ref(true)
 
@@ -31,7 +30,6 @@ function goBack() {
 function go(delta: number) {
   at.value = Math.max(0, Math.min(total.value - 1, at.value + delta))
   pictureOk.value = true
-  talkOpen.value = false
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
@@ -62,11 +60,10 @@ function toAdventures() {
         blockquote(class="jp-verse")
           p {{ step.verse.text }}
           cite {{ step.verse.ref }}
+        p(v-if="step.verseNote" class="jp-note") {{ step.verseNote }}
 
       div(v-if="isLast" class="jp-end")
         button(type="button" class="lk-btn lk-btn--full" @click="toAdventures") {{ texts.toAdventures }}
-        button(type="button" class="lk-btn lk-btn--outline lk-btn--full" :aria-expanded="talkOpen" @click="talkOpen = !talkOpen") {{ texts.talkParents }}
-        p(v-if="talkOpen" class="jp-talk") {{ texts.talkParentsText }}
 
       div(class="jp-nav")
         button(v-if="at > 0" type="button" class="lk-btn lk-btn--outline" @click="go(-1)") {{ texts.back }}
@@ -181,13 +178,6 @@ function toAdventures() {
   display: flex
   flex-direction: column
   gap: 10px
-
-.jp-talk
-  margin: 0
-  padding: 12px 14px
-  border-radius: 14px
-  background: var(--lk-surface-2)
-  line-height: 1.45
 
 .jp-nav
   display: flex

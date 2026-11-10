@@ -639,6 +639,7 @@ export default {
     part_read: 'Lectura y escucha',
     part_adventure: 'Aventuras',
     part_paint: 'Pintura',
+    part_play: 'Juegos',
     part_home: 'Inicio y otros',
     did: 'Lo que se hizo',
     pages: 'página leída | páginas leídas',

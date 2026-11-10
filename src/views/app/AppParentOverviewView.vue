@@ -34,6 +34,7 @@ const parts = computed(() => {
     { id: 'read', minutes: m.read },
     { id: 'adventure', minutes: m.adventure },
     { id: 'paint', minutes: m.paint },
+    { id: 'play', minutes: m.play },
     { id: 'home', minutes: m.home + m.other }
   ]
   const sum = Math.max(1, rows.reduce((n, r) => n + r.minutes, 0))
@@ -232,6 +233,9 @@ function clearAll() {
 
   &.is-paint
     background: #c8553d
+
+  &.is-play
+    background: #4f7fb8
 
   &.is-home
     background: var(--lk-muted)
