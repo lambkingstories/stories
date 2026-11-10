@@ -68,11 +68,11 @@ describe('what a person may use', () => {
     expect(m.hasFeature('adventure')).toBe(false)
   })
 
-  it('opens eight adventures in full (Josef, Adam und Eva, Noah, Babel, Abraham, Jakob, Weihnachten, Ostern) and every stage of any other one is behind Plus', async () => {
+  it('opens four adventures in full (Adam und Eva, Noah, Weihnachten, Ostern) and every stage of any other one is behind Plus', async () => {
     const m = await load({ VITE_PREMIUM_TEASER: 'true' })
-    expect(m.FREE_JOURNEYS).toHaveLength(8)
-    for (const id of ['josef', 'adam-eva', 'noah', 'babel', 'abraham', 'jakob', 'weihnachten', 'ostern']) expect([0, 5, 11].map((i) => m.isStagePlusLocked(id, i)), id).toEqual([false, false, false])
-    for (const id of ['mose', 'jona', 'david']) expect([0, 1, 2, 3, 11].map((i) => m.isStagePlusLocked(id, i)), id).toEqual([true, true, true, true, true])
+    expect(m.FREE_JOURNEYS).toHaveLength(4)
+    for (const id of ['adam-eva', 'noah', 'weihnachten', 'ostern']) expect([0, 5, 11].map((i) => m.isStagePlusLocked(id, i)), id).toEqual([false, false, false])
+    for (const id of ['josef', 'mose', 'jona', 'david']) expect([0, 1, 2, 3, 11].map((i) => m.isStagePlusLocked(id, i)), id).toEqual([true, true, true, true, true])
   })
 
   it('opens everything for a person with Plus (the test switch of the test build)', async () => {

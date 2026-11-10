@@ -1,5 +1,5 @@
 /**
- * Which adventures are free. Six adventures are free in full (all their stages and the exam at the end); every other adventure
+ * Which adventures are free. Four adventures are free in full (Anton 10.11.2026: four, so that Plus stays worth it) (all their stages and the exam at the end); every other adventure
  * comes with LambKing Plus as a whole. Only applies with `VITE_PREMIUM_TEASER=true` (see `usePremium`). To change them, change
  * `FREE_JOURNEYS` (the ids of the adventures, see the `id` of every file in `data/adventures`).
  */
@@ -7,7 +7,7 @@ import { PREMIUM_TEASER, hasFeature } from '@/use/usePremium'
 
 /** The adventures that are free in full. */
 // (Anton 10.11.2026: the birth and the resurrection of Jesus are free for every child, the app is there to tell of him)
-export const FREE_JOURNEYS: readonly string[] = ['josef', 'adam-eva', 'noah', 'babel', 'abraham', 'jakob', 'weihnachten', 'ostern']
+export const FREE_JOURNEYS: readonly string[] = ['adam-eva', 'noah', 'weihnachten', 'ostern']
 
 /** True when the whole adventure may be played without Plus. */
 export const isJourneyFree = (journeyId: string): boolean => FREE_JOURNEYS.includes(journeyId)

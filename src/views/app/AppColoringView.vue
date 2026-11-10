@@ -1077,6 +1077,8 @@ function spriteFor(k: KitDef): string {
 const TOOL_ORDER: KitId[] = ['pencil', 'graphite', 'marker', 'watercolor', 'oil', 'chalk', 'glitter']
 const toolbarTools = computed<ToolbarTool[]>(() => {
   const list: ToolbarTool[] = [
+    // the eraser pen comes first: it is always in reach, whatever the height of the bar (Anton, 10.11.2026)
+    { id: 'eraser', label: t('app.coloring.toolName.eraser'), sprite: TOOL_SPRITES.eraser },
     ...TOOL_ORDER.map((id) => KITS.find((k) => k.id === id)!).map((k) => ({ id: k.tool, label: t(`app.coloring.toolName.${k.tool}`), sprite: spriteFor(k) })),
     { id: 'fill', label: t('app.coloring.toolName.fill'), sprite: spriteFor(KITS.find((k) => k.id === 'bucket')!) || TOOL_SPRITES.fill },
     { id: 'pipette', label: t('app.coloring.toolName.pipette'), sprite: TOOL_SPRITES.pipette }
@@ -1086,7 +1088,6 @@ const toolbarTools = computed<ToolbarTool[]>(() => {
   const at = list.findIndex((x) => x.id === 'glitter')
   return [...list.slice(0, at), ...list.slice(at + 1), list[at]!]
 })
-// the eraser is no pen of the bar, but the folded tab shows it while it is chosen
 /** The tool the bar shows as chosen: the white pencil is a pencil of the pencil tool, so that one is lit. */
 const barTool = computed<ToolId>(() => (tool.value === 'whitepencil' ? 'graphite' : tool.value))
 const currentSprite = computed(() => (tool.value === 'eraser' ? TOOL_SPRITES.eraser : tool.value === 'stamp' ? LINE_ICONS.stamp : (toolbarTools.value.find((x) => x.id === barTool.value)?.sprite ?? '')))
