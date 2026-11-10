@@ -644,16 +644,18 @@ $ink: var(--lk-text)
 // four square tiles
 .tiles
   display: grid
-  grid-template-columns: 1fr 1fr
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)
   gap: 10px
 
+// no fixed aspect ratio: with tall content it made the tile wider than its column (right column cut off on phones)
 .tile4
   display: flex
   flex-direction: column
   align-items: center
   justify-content: center
   gap: 3px
-  aspect-ratio: 1 / 1
+  min-width: 0
+  min-height: 150px
   padding: 12px 12px 14px
   border: 1px solid var(--lk-line)
   border-radius: 24px
