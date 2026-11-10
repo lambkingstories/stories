@@ -7,17 +7,19 @@ import { computed, ref } from 'vue'
 export type ThemeChoice = 'day' | 'night' | 'auto'
 export type ThemeName = 'day' | 'night'
 /** The three colours of the day look (mint is the first look of the app). */
-export type PaletteName = 'mint' | 'beige' | 'creme'
+export type PaletteName = 'mint' | 'gold' | 'creme'
 
 const KEY = 'lk-theme'
 const BAR_COLORS: Record<ThemeName, string> = { day: '#edf3f1', night: '#162433' }
-const PALETTE_BAR: Record<PaletteName, string> = { mint: '#edf3f1', beige: '#f0e9db', creme: '#f8f4e9' }
+const PALETTE_BAR: Record<PaletteName, string> = { mint: '#edf3f1', gold: '#faf5ea', creme: '#f8f4e9' }
 const PALETTE_KEY = 'lk-palette'
 
 function readPalette(): PaletteName {
   try {
     const v = localStorage.getItem(PALETTE_KEY)
-    if (v === 'mint' || v === 'beige' || v === 'creme') return v
+    if (v === 'mint' || v === 'gold' || v === 'creme') return v
+    // the beige look became cream and gold
+    if (v === 'beige') return 'gold'
   } catch {
     // private window: nothing remembered
   }

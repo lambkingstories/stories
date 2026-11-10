@@ -649,7 +649,7 @@ export default {
     title: 'Aspecto',
     paletteTitle: 'Color',
     mint: 'Menta',
-    beige: 'Beige',
+    gold: 'Oro',
     creme: 'Crema',
     day: 'Día',
     night: 'Noche',

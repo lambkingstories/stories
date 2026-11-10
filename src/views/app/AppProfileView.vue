@@ -116,7 +116,7 @@ const settingsOpen = ref(true)
 const { choice: themeChoice, setChoice: setThemeChoice, palette, setPalette, isNight } = useTheme()
 const paletteOptions = computed<{ id: PaletteName; label: string }[]>(() => [
   { id: 'mint', label: t('app.theme.mint') },
-  { id: 'beige', label: t('app.theme.beige') },
+  { id: 'gold', label: t('app.theme.gold') },
   { id: 'creme', label: t('app.theme.creme') }
 ])
 const themeOptions = computed<{ id: ThemeChoice; label: string; icon: 'sun' | 'moon' | 'auto' }[]>(() => [
@@ -1147,8 +1147,8 @@ button
   .is-mint &
     background: linear-gradient(135deg, #edf3f1 50%, #1d666a 50%)
 
-  .is-beige &
-    background: linear-gradient(135deg, #f0e9db 50%, #7a5530 50%)
+  .is-gold &
+    background: linear-gradient(135deg, #faf5ea 50%, #d9a521 50%)
 
   .is-creme &
     background: linear-gradient(135deg, #f8f4e9 50%, #1d666a 50%)
