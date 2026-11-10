@@ -3,7 +3,7 @@ import { dailyFor, dayNumber, taskDone } from '@/use/useDaily'
 import { MEMORY_VERSES } from '@/data/memoryVerses'
 import { PAINT_TOOLS, awardProgress, newlyEarned, type AwardStats } from '@/utils/awards'
 
-const none: AwardStats = { finishedPictures: 0, finishedBooks: 0, toolsUsed: [], paintDays: 0, booksRead: 0, stagesDone: 0, adventuresDone: 0, quizCorrect: 0, cardsWon: 0, dailyDays: 0 }
+const none: AwardStats = { finishedPictures: 0, finishedBooks: 0, toolsUsed: [], paintDays: 0, booksRead: 0, stagesDone: 0, adventuresDone: 0, quizCorrect: 0, cardsWon: 0 }
 
 describe('"Heute für dich"', () => {
   it('the verse changes every day and the three kinds of task follow one another', () => {
@@ -35,9 +35,7 @@ describe('"Heute für dich"', () => {
     expect(p({ quizCorrect: 49 })['quiz-fifty']).toBe(false)
     expect(p({ booksRead: 5 })['five-reads']).toBe(true)
     expect(p({ cardsWon: 1 })['first-card']).toBe(true)
-    expect(p({ dailyDays: 3 })['daily-three']).toBe(true)
-    expect(p({ dailyDays: 9 })['daily-ten']).toBe(false)
-    expect(newlyEarned(none, { ...none, dailyDays: 3 })).toEqual(['daily-three'])
+    expect(newlyEarned(none, { ...none, cardsWon: 5 })).toEqual(['first-card', 'five-cards'])
     expect(PAINT_TOOLS).toHaveLength(6)
   })
 })

@@ -21,8 +21,6 @@ export type AwardId =
   | 'quiz-fifty'
   | 'first-card'
   | 'five-cards'
-  | 'daily-three'
-  | 'daily-ten'
 
 /** What the app has counted so far. */
 export interface AwardStats {
@@ -44,8 +42,6 @@ export interface AwardStats {
   quizCorrect: number
   /** Golden cards of the adventures that are won. */
   cardsWon: number
-  /** Days on which the star of "Heute für dich" was won. */
-  dailyDays: number
 }
 
 /** The six painting tools; "all tools" needs every one of them. */
@@ -78,9 +74,7 @@ export const AWARDS: AwardDef[] = [
   { id: 'quiz-ten', image: 'quiz-ten', goal: 10, progress: (s) => s.quizCorrect },
   { id: 'quiz-fifty', image: 'quiz-fifty', goal: 50, progress: (s) => s.quizCorrect },
   { id: 'first-card', image: 'first-card', goal: 1, progress: (s) => s.cardsWon },
-  { id: 'five-cards', image: 'five-cards', goal: 5, progress: (s) => s.cardsWon },
-  { id: 'daily-three', image: 'daily-three', goal: 3, progress: (s) => s.dailyDays },
-  { id: 'daily-ten', image: 'daily-ten', goal: 10, progress: (s) => s.dailyDays }
+  { id: 'five-cards', image: 'five-cards', goal: 5, progress: (s) => s.cardsWon }
 ]
 
 export interface AwardProgress {

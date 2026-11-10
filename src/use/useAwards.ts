@@ -6,7 +6,6 @@
 import { computed, reactive } from 'vue'
 import useReadingProgress from '@/use/useReadingProgress'
 import useAdventure from '@/use/useAdventure'
-import { dailyStarCount } from '@/use/useDaily'
 import { journeys } from '@/data/adventures'
 import { albumCards, albumSetCard } from '@/utils/collection'
 import { PAINT_TOOLS, awardProgress, newlyEarned, type AwardId, type AwardStats } from '@/utils/awards'
@@ -92,7 +91,6 @@ function stats(): AwardStats {
     toolsUsed: state.tools,
     paintDays: state.days.length,
     booksRead: readBooks(),
-    dailyDays: dailyStarCount(),
     ...adventureStats()
   }
 }

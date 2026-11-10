@@ -1387,9 +1387,7 @@ export default {
       'quiz-ten': { title: 'Cabecita lista', desc: 'Respondiste diez preguntas bien.' },
       'quiz-fifty': { title: 'Conocedor de la Biblia', desc: 'Respondiste cincuenta preguntas bien.' },
       'first-card': { title: 'Primera carta dorada', desc: 'Ganaste tu primera carta dorada.' },
-      'five-cards': { title: 'Coleccionista de cartas', desc: 'Reuniste cinco cartas doradas.' },
-      'daily-three': { title: 'Tres estrellas del día', desc: 'Ganaste la estrella de «Hoy para ti» en tres días.' },
-      'daily-ten': { title: 'Diez estrellas del día', desc: 'Ganaste la estrella de «Hoy para ti» en diez días.' }
+      'five-cards': { title: 'Coleccionista de cartas', desc: 'Reuniste cinco cartas doradas.' }
     }
   },
   gate: {

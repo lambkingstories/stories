@@ -3847,9 +3847,7 @@ export default {
           'quiz-ten': { title: 'Clever head', desc: 'You answered ten questions right.' },
           'quiz-fifty': { title: 'Bible expert', desc: 'You answered fifty questions right.' },
           'first-card': { title: 'First golden card', desc: 'You won your first golden card.' },
-          'five-cards': { title: 'Card collector', desc: 'You collected five golden cards.' },
-          'daily-three': { title: 'Three day stars', desc: 'You won the star of “Today for you” on three days.' },
-          'daily-ten': { title: 'Ten day stars', desc: 'You won the star of “Today for you” on ten days.' }
+          'five-cards': { title: 'Card collector', desc: 'You collected five golden cards.' }
         }
       },
       // In-app tip, iOS only — the App Store build cannot link out to
@@ -7778,9 +7776,7 @@ export default {
           'quiz-ten': { title: 'Schlaues Köpfchen', desc: 'Du hast zehn Fragen richtig beantwortet.' },
           'quiz-fifty': { title: 'Bibel-Kenner', desc: 'Du hast fünfzig Fragen richtig beantwortet.' },
           'first-card': { title: 'Erste goldene Karte', desc: 'Du hast deine erste goldene Karte gewonnen.' },
-          'five-cards': { title: 'Kartensammler', desc: 'Du hast fünf goldene Karten gesammelt.' },
-          'daily-three': { title: 'Drei Tages-Sterne', desc: 'Du hast an drei Tagen den Stern von „Heute für dich“ gewonnen.' },
-          'daily-ten': { title: 'Zehn Tages-Sterne', desc: 'Du hast an zehn Tagen den Stern von „Heute für dich“ gewonnen.' }
+          'five-cards': { title: 'Kartensammler', desc: 'Du hast fünf goldene Karten gesammelt.' }
         }
       },
       // In-app tip, iOS only — the App Store build cannot link out to
