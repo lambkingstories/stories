@@ -1,17 +1,21 @@
 /**
- * Abenteuer "Geschichten von Jesus" (Matthäus 13, Lukas 10 und 15) für 8 bis 10 Jahre: 12 Etappen, Untertitel "Vom Sämann bis zum verlorenen Sohn". Entstanden nach dem Skill "LambKing Abenteuer Skill" (Leitung, 3.11.2026).
+ * Abenteuer "Geschichten von Jesus" (Matthäus 13, 18 und 7, Lukas 10, 15 und 14) für 8 bis 10 Jahre: 12 Etappen, Untertitel "Vom Sämann bis zum großen Fest". Entstanden nach dem Skill "LambKing Abenteuer Skill" (Leitung, 3.11.2026),
+ * umgebaut am 10.11.2026: Etappe 10 bis 12 sind jetzt der unbarmherzige Diener, das Haus auf dem Felsen und das große Festessen (der verlorene Sohn wird ein eigenes Abenteuer).
  * Anton (31.10.2026): Jesus wird mit Gesicht gezeigt (ohne Heiligenschein). Gott der Vater, Engel, böse Geister und Lichtgestalten sind nie im Bild.
- * Quelle der Texte: D:/Claude/Abenteuer-Gleichnisse/ENTWURF_Gleichnisse.md (Luther 1912 von bibeltext.com gelesen, nichts abgeschrieben), Plan: ETAPPENPLAN.md, Figuren: FIGUREN.md, Spiele: SPIELE.md.
+ * Quelle der Texte: D:/Claude/Abenteuer-Gleichnisse/ENTWURF_Gleichnisse.md (Etappe 1 bis 9) und UMBAU-2026-11/ENTWURF_Etappen_10-12.md (Etappe 10 bis 12); Luther 1912 von bibeltext.com gelesen, nichts abgeschrieben.
+ * Plan: ETAPPENPLAN.md und UMBAU-2026-11/PLAN.md, Figuren: FIGUREN.md, Spiele: SPIELE.md und UMBAU-2026-11/SPIELE_10-12.md.
  * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
  * Spiele nach Antons Regel (5.11.2026: höchstens zwei bekannte Spiele, nie zwei hintereinander): 1 Lückenvers (bekannt), 2 Hundertfach (neu, hundertfach), 3 Reihenfolge (bekannt),
  * 4 Der Schatz im Acker (neu, graben), 5 nur Quiz, 6 Anhalten (neu, anhalten), 7 Zur Herberge (neu, herberge), 8 Heimtragen (neu, heimtragen), 9 Die verlorene Münze (neu, muenze),
- * 10 Heimweg (neu, heimweg), 11 Der Vater läuft ihm entgegen (neu, entgegen), 12 nur Quiz. Die Spiele vom 5.11.2026: Typen und Prüfer in `@/utils/gleichnisseNeu`.
+ * 10 Hab Geduld mit mir (nur Quiz, ernste Stelle), 11 Das Haus auf dem Felsen (neu, baugrund), 12 Es ist noch Platz da (neu, einladen). Die Spiele vom 5.11.2026: Typen und Prüfer in `@/utils/gleichnisseNeu`,
+ * die zwei Spiele des Umbaus (baugrund, einladen) in `@/utils/gleichnisseNeuC`. Die alten Spiele heimweg und entgegen (Typen, Bilder, Komponenten) bleiben im Repo, werden hier aber nicht mehr benutzt.
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/gleichnisse/, images/abenteuer/spiele/gleichnisse/<spiel>/, audio/abenteuer/gleichnisse/.
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
  */
-import type { CoinGame, DigGame, Journey, MeetGame, OrderGame, VerseGame } from '@/types/adventure'
-import type { CarryGame, HaltGame, HomeGame, InnGame, YieldGame } from '@/utils/gleichnisseNeu'
+import type { CoinGame, DigGame, Journey, OrderGame, VerseGame } from '@/types/adventure'
+import type { CarryGame, HaltGame, InnGame, YieldGame } from '@/utils/gleichnisseNeu'
+import type { GroundGame, InviteGame } from '@/utils/gleichnisseNeuC'
 import { josef } from './josef'
 import { GLEICHNISSE_PATH } from './gleichnissePath'
 import { localize } from './localize'
@@ -102,32 +106,6 @@ const MUENZE: CoinGame = {
 }
 
 /**
- * Etappe 11, "Der Vater läuft ihm entgegen" (neu, `entgegen`, Lk 15,20-24): Runde 1 die Landstraße, zwei große Füße als Knöpfe, der Vater läuft zwölf Schritte, wenn man abwechselnd links und rechts tippt, und fällt dem Sohn um den Hals;
- * Runde 2 der Hof, Kleid, Ring und Schuhe werden zum Sohn gezogen. Bilder (Bildauftrag): `entgegen/weg.webp`, `hof.webp`, `vater`, `sohn`, `umarmung`, `sohn-lumpen`, `sohn-kleid`, `sohn-fertig`, `kleid`, `ring`, `schuhe`.
- */
-const ENTGEGEN: MeetGame = {
-  road: `${G}entgegen/weg.webp`,
-  yard: `${G}entgegen/hof.webp`,
-  father: { image: `${G}entgegen/vater.webp`, label: 'Der Vater im Tor des Hofguts', w: 12, x: 80, y: 82 },
-  son: { image: `${G}entgegen/sohn.webp`, label: 'Der Sohn, müde, in zerrissenen Kleidern', w: 11, x: 14, y: 86 },
-  embrace: { image: `${G}entgegen/umarmung.webp`, label: 'Vater und Sohn in Umarmung', w: 18 },
-  meet: 34,
-  steps: 12,
-  ragged: { image: `${G}entgegen/sohn-lumpen.webp`, label: 'Der Sohn in zerrissenen Kleidern', w: 20, x: 50, y: 92 },
-  robed: { image: `${G}entgegen/sohn-kleid.webp`, label: 'Der Sohn im neuen Kleid', w: 20 },
-  dressed: { image: `${G}entgegen/sohn-fertig.webp`, label: 'Der Sohn mit Kleid, Ring und Schuhen', w: 20 },
-  gifts: [
-    { id: 'kleid', image: `${G}entgegen/kleid.webp`, label: 'Das Kleid', w: 10 },
-    { id: 'ring', image: `${G}entgegen/ring.webp`, label: 'Der Ring', w: 10 },
-    { id: 'schuhe', image: `${G}entgegen/schuhe.webp`, label: 'Die Schuhe', w: 10 }
-  ],
-  rounds: [
-    { kind: 'run', hint: 'Tippe abwechselnd auf die Füße, damit der Vater zu seinem Sohn läuft.' },
-    { kind: 'gifts', hint: 'Ziehe das Kleid, den Ring und die Schuhe zum Sohn.' }
-  ]
-}
-
-/**
  * Etappe 2, "Hundertfach" (neu, `hundertfach`, Mt 13,8.23): auf dem gepflügten Acker stehen Ähren auf gutem Land (klein, mittel, groß: dreißig, sechzig, hundert Körner) und Saat, die nichts brachte
  * (verdorrt auf dem Fels, erstickt in den Dornen, der Vogel auf dem Weg). Ein Tipp auf eine Ähre macht sie zu ihren Körnern, sie fliegen in den Sack. Runde 2 in der Reihenfolge der Bibel (hundert, sechzig, dreißig).
  * Bilder (Bildauftrag S90): `hundertfach/acker.webp`, `aehre-30`, `aehre-60`, `aehre-100`, `fels`, `dorn`, `weg`, `korn`, `sack`. Typen und Prüfer: `@/utils/gleichnisseNeu`.
@@ -211,36 +189,126 @@ const HEIMTRAGEN: CarryGame = {
 }
 
 /**
- * Etappe 10, "Heimweg" (neu, `heimweg`, Lk 15,18.20): der Sohn geht Schritt für Schritt im Takt nach Hause; mit jedem Schlag kommt eine Fußspur, das Kind tippt, wenn sie ganz da ist.
- * Das Bild wächst zum Haus des Vaters hin. Runde 2: schneller, und die richtige Spur (links, rechts) muss getroffen werden. Bilder (Bildauftrag S94): `heimweg/strasse.webp`, `sohn`, `fuss`.
+ * Etappe 11, "Das Haus auf dem Felsen" (neu, `baugrund`, Mt 7,24-27): das stille Tal mit Bauplätzen; ein Tipp lässt den Holzhammer klopfen (Fels klingt hart, Sand weich; kein Fehler), dann wird das Haus auf einen Platz gesetzt
+ * (ziehen, oder antippen und den Platz antippen) und Regen, Wasser und Wind kommen nacheinander. Auf dem Fels steht das Haus; im Sand sinkt es ein (heil, ohne Schutt) und geht zurück in die Ablage (ein Fehler).
+ * Runde 1 vier Plätze, ein Fels, so viele Klopfer wie man mag, das Ergebnis bleibt als Zeichen am Platz; Runde 2 sechs Plätze, zwei Felsen unter dünnem Sand, vier Klopfer, nur Ton und Wort.
+ * Bilder (Bildauftrag, Codex): `baugrund/tal.webp`, `platz-fels`, `platz-sand`, `platz-verdeckt`, `haus`, `haus-schief`, `hammer`, `staub`, `funke`, `regen`, `wasser`, `wind`. Lagen: am gemalten Bild gemessen.
  */
-const HEIMWEG: HomeGame = {
-  background: `${G}heimweg/strasse.webp`,
-  ratio: 0.75,
-  house: { x: 51, y: 31 },
-  zoom: 2.2,
-  son: { image: `${G}heimweg/sohn.webp`, label: 'Der Sohn auf dem Weg nach Hause', w: 34, x: 50, y: 99 },
-  print: { image: `${G}heimweg/fuss.webp`, label: 'Eine Fußspur', w: 18 },
-  left: { x: 37, y: 62 },
-  right: { x: 63, y: 62 },
+const BAUGRUND: GroundGame = {
+  background: `${G}baugrund/tal.webp`,
+  tray: { x: 14, y: 97, w: 26 },
+  sprites: {
+    rock: { image: `${G}baugrund/platz-fels.webp`, label: 'Ein Bauplatz aus hartem Fels', w: 14 },
+    sand: { image: `${G}baugrund/platz-sand.webp`, label: 'Ein Bauplatz aus weichem Sand', w: 14 },
+    covered: { image: `${G}baugrund/platz-verdeckt.webp`, label: 'Ein Bauplatz, auf dem Sand liegt', w: 14 },
+    house: { image: `${G}baugrund/haus.webp`, label: 'Das kleine Steinhaus', w: 22 },
+    tilted: { image: `${G}baugrund/haus-schief.webp`, label: 'Das Haus, schief in den Sand gesunken', w: 22 },
+    mallet: { image: `${G}baugrund/hammer.webp`, label: 'Der Holzhammer', w: 8 },
+    puff: { image: `${G}baugrund/staub.webp`, label: 'Eine Staubwolke', w: 9 },
+    spark: { image: `${G}baugrund/funke.webp`, label: 'Funken', w: 7 },
+    rain: { image: `${G}baugrund/regen.webp`, label: 'Leichter Regen', w: 100 },
+    water: { image: `${G}baugrund/wasser.webp`, label: 'Flaches klares Wasser', w: 100 },
+    wind: { image: `${G}baugrund/wind.webp`, label: 'Wind mit Blättern', w: 100 }
+  },
   rounds: [
-    { hint: 'Der Sohn macht sich auf den Weg zu seinem Vater. Tippe immer dann, wenn die Fußspur ganz klar ist.', beat: 900, window: 260, steps: 10 },
-    { hint: 'Jetzt geht er schneller. Tippe genau auf die Fußspur, die kommt: links, rechts, links …', beat: 720, window: 200, steps: 14, feet: true }
+    {
+      hint: 'Klopfe den Boden ab und setze das Haus dorthin, wo es fest steht.',
+      mark: true,
+      plots: [
+        { id: 'a', x: 62, y: 50, w: 14, ground: 'rock' },
+        { id: 'b', x: 36, y: 56, w: 14, ground: 'sand' },
+        { id: 'c', x: 82, y: 68, w: 14, ground: 'sand' },
+        { id: 'd', x: 50, y: 84, w: 14, ground: 'sand' }
+      ]
+    },
+    {
+      hint: 'Du hast nur vier Klopfer. Wo ist der Fels?',
+      mark: false, knocks: 4,
+      plots: [
+        { id: 'a', x: 32, y: 52, w: 14, ground: 'sand' },
+        { id: 'b', x: 50, y: 43, w: 14, ground: 'sand' },
+        { id: 'c', x: 69, y: 52, w: 14, ground: 'sand' },
+        { id: 'd', x: 86, y: 64, w: 14, ground: 'rock', hidden: true },
+        { id: 'e', x: 40, y: 70, w: 14, ground: 'rock', hidden: true },
+        { id: 'f', x: 66, y: 82, w: 14, ground: 'sand' }
+      ]
+    }
+  ]
+}
+
+/**
+ * Etappe 12, "Es ist noch Platz da" (neu, `einladen`, Lk 14,17.21-23): Gäste winken kurz aus Türen, Toren und hinter Hecken; ein Tipp lädt einen ein, der Diener ruft „Kommt!“, der Gast hüpft an den langen Tisch und setzt sich,
+ * die Lampe über seinem Platz geht an. Nichts geht verloren: wer nicht angetippt wird, geht weg und kommt nach einer Weile an anderer Stelle wieder. Zwölf Plätze (Mutter und Kind nehmen zwei).
+ * Runde 1 „Straßen und Gassen“: sechs Gäste, zwei zugleich, fünf Sekunden; dann „Es ist noch Platz da!“. Runde 2 „Landstraßen und Zäune“: vier Gäste und ein Paar hinter Hecken und Zäunen, drei zugleich, dreieinhalb Sekunden; am Ende „Das Haus ist voll!“.
+ * Bilder (Bildauftrag, Codex): `einladen/stadt.webp`, `land`, `tafel`, `hecke`, `zaun`, `lampe-aus`, `lampe-an`, `diener`, `gast-1..10` und `gast-N-sitzt`, `paar`, `paar-sitzt`. Lagen: am gemalten Bild gemessen.
+ */
+const EINLADEN: InviteGame = {
+  tableSeats: [{ x: 5.3, y: 99.5 }, { x: 13.17, y: 99.5 }, { x: 21.04, y: 99.5 }, { x: 28.91, y: 99.5 }, { x: 36.78, y: 99.5 }, { x: 44.65, y: 99.5 }, { x: 52.52, y: 99.5 }, { x: 60.39, y: 99.5 }, { x: 68.26, y: 99.5 }, { x: 76.13, y: 99.5 }, { x: 84, y: 99.5 }, { x: 91.87, y: 99.5 }],
+  table: { image: `${G}einladen/tafel.webp`, label: 'Der lange Tisch mit zwölf Plätzen', w: 100, x: 50, y: 100 },
+  sprites: {
+    g1: { wait: { image: `${G}einladen/gast-1.webp`, label: 'Eine Frau mit Korb winkt', w: 16 }, sit: { image: `${G}einladen/gast-1-sitzt.webp`, label: 'Eine Frau mit Korb sitzt am Tisch', w: 11.5 }, seats: 1 },
+    g2: { wait: { image: `${G}einladen/gast-2.webp`, label: 'Ein Mann am Stock winkt', w: 16 }, sit: { image: `${G}einladen/gast-2-sitzt.webp`, label: 'Ein Mann am Stock sitzt am Tisch', w: 11.5 }, seats: 1 },
+    g3: { wait: { image: `${G}einladen/gast-3.webp`, label: 'Ein Mann mit Wanderstab winkt', w: 16 }, sit: { image: `${G}einladen/gast-3-sitzt.webp`, label: 'Ein Mann mit Wanderstab sitzt am Tisch', w: 11.5 }, seats: 1 },
+    g4: { wait: { image: `${G}einladen/gast-4.webp`, label: 'Ein Junge im geflickten Mantel winkt', w: 16 }, sit: { image: `${G}einladen/gast-4-sitzt.webp`, label: 'Ein Junge im geflickten Mantel sitzt am Tisch', w: 11.5 }, seats: 1 },
+    g5: { wait: { image: `${G}einladen/gast-5.webp`, label: 'Eine alte Frau mit Kopftuch winkt', w: 16 }, sit: { image: `${G}einladen/gast-5-sitzt.webp`, label: 'Eine alte Frau mit Kopftuch sitzt am Tisch', w: 11.5 }, seats: 1 },
+    g6: { wait: { image: `${G}einladen/gast-6.webp`, label: 'Ein Mann mit Wasserkrug winkt', w: 16 }, sit: { image: `${G}einladen/gast-6-sitzt.webp`, label: 'Ein Mann mit Wasserkrug sitzt am Tisch', w: 11.5 }, seats: 1 },
+    g7: { wait: { image: `${G}einladen/gast-7.webp`, label: 'Ein Wanderer mit Reisebündel winkt', w: 16 }, sit: { image: `${G}einladen/gast-7-sitzt.webp`, label: 'Ein Wanderer mit Reisebündel sitzt am Tisch', w: 11.5 }, seats: 1 },
+    g8: { wait: { image: `${G}einladen/gast-8.webp`, label: 'Ein Hirtenjunge mit Flöte winkt', w: 16 }, sit: { image: `${G}einladen/gast-8-sitzt.webp`, label: 'Ein Hirtenjunge mit Flöte sitzt am Tisch', w: 11.5 }, seats: 1 },
+    g9: { wait: { image: `${G}einladen/gast-9.webp`, label: 'Eine Bäuerin mit Garbe winkt', w: 16 }, sit: { image: `${G}einladen/gast-9-sitzt.webp`, label: 'Eine Bäuerin mit Garbe sitzt am Tisch', w: 11.5 }, seats: 1 },
+    g10: { wait: { image: `${G}einladen/gast-10.webp`, label: 'Ein Fischer mit Netz winkt', w: 16 }, sit: { image: `${G}einladen/gast-10-sitzt.webp`, label: 'Ein Fischer mit Netz sitzt am Tisch', w: 11.5 }, seats: 1 },
+    pair: { wait: { image: `${G}einladen/paar.webp`, label: 'Eine Mutter mit ihrem Kind winkt', w: 21 }, sit: { image: `${G}einladen/paar-sitzt.webp`, label: 'Eine Mutter mit ihrem Kind sitzt am Tisch', w: 15 }, seats: 2 }
+  },
+  servant: { image: `${G}einladen/diener.webp`, label: 'Der Diener des Gastgebers winkt', w: 14, x: 91, y: 70 },
+  lamp: { off: { image: `${G}einladen/lampe-aus.webp`, label: 'Eine Lampe, aus', w: 5.5 }, on: { image: `${G}einladen/lampe-an.webp`, label: 'Eine Lampe, an', w: 5.5 }, y: 71 },
+  hedge: { image: `${G}einladen/hecke.webp`, label: 'Eine Hecke', w: 27 },
+  fence: { image: `${G}einladen/zaun.webp`, label: 'Ein Zaun', w: 27 },
+  rounds: [
+    {
+      hint: 'Tippe die Gäste an, die dir zuwinken.',
+      scene: `${G}einladen/stadt.webp`,
+      show: 5000,
+      gap: 3000,
+      atOnce: 2,
+      spots: [{ x: 14, y: 76 }, { x: 28, y: 63 }, { x: 41, y: 74 }, { x: 55, y: 67 }, { x: 69, y: 75 }],
+      guests: [
+        { sprite: 'g1', spot: 0 },
+        { sprite: 'g2', spot: 1 },
+        { sprite: 'g3', spot: 2 },
+        { sprite: 'g4', spot: 3 },
+        { sprite: 'g5', spot: 4 },
+        { sprite: 'g6', spot: 0 }
+      ]
+    },
+    {
+      hint: 'Jetzt hinaus auf die Landstraßen: Wer hinter einer Hecke winkt, kommt auch zum Tisch.',
+      scene: `${G}einladen/land.webp`,
+      show: 3500,
+      gap: 2500,
+      atOnce: 3,
+      spots: [{ x: 12, y: 62, cover: 'hedge' }, { x: 26, y: 53, cover: 'fence' }, { x: 40, y: 62, cover: 'hedge' }, { x: 54, y: 54, cover: 'fence' }, { x: 68, y: 64, cover: 'hedge' }, { x: 80, y: 52, cover: 'fence' }],
+      guests: [
+        { sprite: 'g7', spot: 0, hidden: true },
+        { sprite: 'g8', spot: 1, hidden: true },
+        { sprite: 'pair', spot: 2, hidden: true },
+        { sprite: 'g9', spot: 3, hidden: true },
+        { sprite: 'g10', spot: 4, hidden: true }
+      ]
+    }
   ]
 }
 
 export const gleichnisse: Journey = {
   id: 'gleichnisse',
   title: 'Geschichten von Jesus',
-  subtitle: 'Vom Sämann bis zum verlorenen Sohn',
+  subtitle: 'Vom Sämann bis zum großen Fest',
   age: '8-10',
-  downloadMb: 18, // wird nach dem Bau gemessen (Bilder, Karte, Spielbilder, Musik, Aufnahmen), ohne die gemeinsamen Oberflächendateien
-  medal: `${PICS}medaille-v3.webp`, // Medaille 1 bis zu Antons Wahl
+  downloadMb: 16, // gemessen am 10.11.2026 nach dem Umbau: journeyFiles() = 16,1 MB (davon 15,2 MB dieses Abenteuers; deutsche Aufnahmen, Karte, Spielbilder, Musik; vorher 18 geschaetzt)
+  medal: `${PICS}medaille-v1.webp`, // Medaille 1 bis zu Antons Wahl
   // Geschenk-Ausmalbild: der große Senfbaum mit Vögeln und einem Beet (Konturzeichnung)
   gift: { title: 'Der Senfbaum', image: `${PICS}geschenk.webp` },
   // die gemalte Karte (Panorama in drei Stücken, 9920 × 1648 px, OpenAI-Bildmodell, Qualität max, mit zwölf Orten und dem Ziel) mit Stationen und Perlenweg aus gleichnissePath.ts
   map: {
-    images: [1, 2, 3].map((n) => `images/abenteuer/gleichnisse/karte-pano-v1-${n}.webp`),
+    images: ['karte-pano-v1-1.webp', 'karte-pano-v1-2.webp', 'karte-pano-v2-3.webp'].map((f) => `images/abenteuer/gleichnisse/${f}`),
     ring: josef.map.ring,
     aspect: 9920 / 1648,
     widthPx: 9920,
@@ -254,11 +322,11 @@ export const gleichnisse: Journey = {
       { x: 0.6179, y: 0.5856, d: 0.0339 },
       { x: 0.6714, y: 0.6007, d: 0.0339 },
       { x: 0.7389, y: 0.5947, d: 0.0339 },
-      { x: 0.8347, y: 0.6735, d: 0.0339 },
-      { x: 0.8871, y: 0.6735, d: 0.0339 },
-      { x: 0.9365, y: 0.6553, d: 0.0339 }
+      { x: 0.7964, y: 0.6189, d: 0.0339 },
+      { x: 0.8770, y: 0.6675, d: 0.0339 },
+      { x: 0.9345, y: 0.6614, d: 0.0339 }
     ],
-    exam: { x: 0.9829, y: 0.6857, d: 0.0339 },
+    exam: { x: 0.9829, y: 0.7282, d: 0.0339 },
     path: GLEICHNISSE_PATH
   },
   stages: [
@@ -421,54 +489,59 @@ export const gleichnisse: Journey = {
     },
     {
       id: 10,
-      image: `${PICS}etappe-bild-10.webp`,
-      title: 'Ich will mich aufmachen',
-      ref: 'Lukas 15,11–18',
+      image: `${PICS}etappe-bild-10-v2.webp`,
+      title: 'Hab Geduld mit mir',
+      ref: 'Matthäus 18,21–34',
       text: [
-        '„Ein Mann hatte zwei Söhne“, erzählt Jesus. Der jüngere sagt: „Vater, gib mir mein Erbe.“ Der Vater teilt sein Gut unter den Söhnen auf. Wenig später packt der Jüngere alles zusammen und zieht in ein fernes Land. Dort gibt er sein ganzes Geld aus.',
-        'Dann kommt eine große Hungersnot. Der Sohn hütet bei einem Mann des Landes die Schweine. Er hat so großen Hunger, dass er gern vom Schweinefutter äße, aber niemand gibt ihm etwas.',
-        'Da denkt er nach: „Bei meinem Vater haben sogar die Arbeiter Brot genug, und ich verhungere hier! Ich will mich aufmachen und zu meinem Vater gehen. Ich will sagen: Vater, ich habe mich versündigt gegen den Himmel und vor dir.“'
+        'Petrus fragt Jesus: „Herr, wie oft muss ich meinem Bruder vergeben, wenn er mir Unrecht tut? Genügt es siebenmal?“ „Nein“, sagt Jesus, „nicht siebenmal, sondern siebzigmal siebenmal.“ Dann erzählt Jesus eine Geschichte.',
+        '„Ein König will wissen, wie viel Geld ihm seine Diener schulden“, erzählt Jesus. „Man bringt ihm einen Diener, der schuldet ihm zehntausend Pfund, unvorstellbar viel Geld. Er kann es nicht bezahlen. Er wirft sich vor dem König nieder. ‚Herr, hab Geduld mit mir!‘, bittet er. ‚Ich will dir alles bezahlen.‘ Da hat der König Mitleid und vergibt ihm alle Schulden.“',
+        '„Als der Diener hinausgeht, trifft er einen zweiten Diener. Der schuldet ihm nur hundert Groschen. Der erste Diener packt ihn am Kragen. ‚Bezahle, was du mir schuldig bist!‘, ruft er. Der zweite Diener fällt nieder. ‚Hab Geduld mit mir!‘, bittet er. ‚Ich will dir alles bezahlen.‘ Aber der erste Diener will nicht warten. Er bringt ihn ins Gefängnis, bis alles bezahlt ist.“',
+        '„Andere Diener sehen es und werden sehr traurig. Sie gehen zum König und erzählen ihm alles. Da lässt der König den ersten Diener rufen. ‚Du böser Diener!‘, sagt er. ‚Alle deine Schulden habe ich dir vergeben. Hättest du nicht auch Mitleid mit dem zweiten Diener haben sollen, wie ich mit dir?‘“',
+        '„Der König ist sehr zornig. Er schickt den ersten Diener ins Gefängnis, bis alles bezahlt ist.“'
       ],
-      // Spiel: Heimweg (heimweg, neu 5.11.2026)
-      task: { kind: 'heimweg', hint: 'Tippe im Takt, wenn die Fußspur ganz da ist.', homeward: HEIMWEG },
+      // nur Quiz (ernste Stelle)
+      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
       questions: [
-        { q: 'Wohin zieht der jüngere Sohn?', options: ['in ein fernes Land', 'auf einen Berg', 'in die Stadt Jerusalem'], answer: 0 },
-        { q: 'Welche Arbeit bekommt er?', options: ['Er hütet Schweine.', 'Er fischt im See.', 'Er baut ein Haus.'], answer: 0 }
+        { q: 'Wie oft soll man vergeben, sagt Jesus?', options: ['siebzigmal siebenmal', 'nur siebenmal', 'nur einmal'], answer: 0 },
+        { q: 'Was tut der König, als der Diener ihn bittet?', options: ['Er vergibt ihm alle Schulden.', 'Er schickt ihn fort.', 'Er verlangt noch mehr Geld.'], answer: 0 },
+        { q: 'Was tut der erste Diener mit dem zweiten Diener?', options: ['Er bringt ihn ins Gefängnis.', 'Er lädt ihn zum Essen ein.', 'Er schenkt ihm viel Geld.'], answer: 0 }
       ]
     },
     {
       id: 11,
-      image: `${PICS}etappe-bild-11-b.webp`,
-      title: 'Der Vater läuft ihm entgegen',
-      ref: 'Lukas 15,20–24',
+      image: `${PICS}etappe-bild-11-v2.webp`,
+      title: 'Das Haus auf dem Felsen',
+      ref: 'Matthäus 7,24–29',
       text: [
-        'Jesus erzählt weiter. Der Sohn macht sich auf den Weg nach Hause. Als er noch weit weg ist, sieht ihn sein Vater schon. Er hat Mitleid mit ihm. Er läuft dem Sohn entgegen, fällt ihm um den Hals und küsst ihn.',
-        '„Vater“, sagt der Sohn, „ich habe mich versündigt gegen den Himmel und vor dir. Ich bin es nicht mehr wert, dein Sohn zu heißen.“',
-        'Aber der Vater ruft seinen Knechten zu: „Holt das beste Kleid und zieht es ihm an! Gebt ihm einen Ring an die Hand und Schuhe an die Füße! Wir wollen essen und fröhlich sein. Mein Sohn war tot und lebt wieder, er war verloren und ist gefunden.“'
+        'Jesus sitzt auf einem Berg. Viele Menschen haben ihm zugehört, und nun erzählt er ihnen noch von zwei Männern. Beide bauen ein Haus.',
+        '„Der eine Mann ist klug“, sagt Jesus. „Er baut sein Haus auf einen Felsen, auf einen großen, harten Stein. Dann fällt ein Regen, Wasser kommt heran, und der Wind stößt an das Haus. Aber das Haus bleibt stehen, denn es steht auf dem Felsen.“',
+        '„Der andere Mann ist nicht klug. Er baut sein Haus auf Sand. Wieder fällt Regen, wieder kommt Wasser, wieder stößt der Wind an das Haus. Da stürzt es ein.“',
+        '„Wer meine Worte hört und tut sie“, sagt Jesus, „der ist wie der kluge Mann. Und wer sie hört und tut sie nicht, der ist wie der andere Mann.“ Als Jesus aufhört zu reden, staunen alle Menschen. Jesus spricht nicht wie ihre Lehrer, sondern mit Macht.'
       ],
-      // Spiel: Der Vater läuft ihm entgegen (entgegen, neu)
-      task: { kind: 'entgegen', hint: 'Tippe abwechselnd auf die Füße, damit der Vater zu seinem Sohn läuft.', meet: ENTGEGEN },
+      // Spiel: Wo steht das Haus sicher? (baugrund, neu 10.11.2026)
+      task: { kind: 'baugrund', hint: 'Klopfe den Boden ab und setze das Haus dorthin, wo es fest steht.', ground: BAUGRUND },
       questions: [
-        { q: 'Wer sieht den Sohn zuerst von weitem?', options: ['sein Vater', 'sein Bruder', 'ein Knecht'], answer: 0 },
-        { q: 'Was tut der Vater, als er seinen Sohn sieht?', options: ['Er läuft ihm entgegen und umarmt ihn.', 'Er schickt ihn fort.', 'Er schließt die Tür.'], answer: 0 }
+        { q: 'Wo sitzt Jesus, als er die Geschichte erzählt?', options: ['auf einem Berg', 'in einem Boot', 'in einem Haus'], answer: 0 },
+        { q: 'Wer ist wie der kluge Mann, sagt Jesus?', options: ['wer seine Worte hört und tut', 'wer am meisten Geld hat', 'wer am lautesten redet'], answer: 0 }
       ]
     },
     {
       id: 12,
-      image: `${PICS}etappe-bild-12.webp`,
-      title: 'Der ältere Bruder',
-      ref: 'Lukas 15,25–32',
+      image: `${PICS}etappe-bild-12-v2.webp`,
+      title: 'Es ist noch Platz da',
+      ref: 'Lukas 14,15–23',
       text: [
-        'Jesus erzählt weiter. Der ältere Sohn ist noch auf dem Feld. Als er sich dem Haus nähert, hört er Musik und Tanz. Er ruft einen Knecht und fragt, was los ist. „Dein Bruder ist heimgekommen“, sagt der Knecht. „Dein Vater hat ein Fest für ihn gegeben.“',
-        'Da wird der ältere Sohn zornig und will nicht ins Haus gehen. Der Vater kommt heraus und bittet ihn. Der Sohn antwortet: „So viele Jahre diene ich dir, und nie hast du mir ein Böckchen gegeben, damit ich mit meinen Freunden feiere. Und für diesen deinen Sohn, der dein Geld verschleudert hat, machst du ein Fest!“',
-        '„Mein Sohn“, sagt der Vater, „du bist immer bei mir, und alles, was mein ist, gehört auch dir. Wir wollen uns freuen. Dein Bruder war tot und lebt wieder, er war verloren und ist gefunden.“'
+        'Jesus ist bei einem Essen zu Gast. Ein anderer Gast sagt: „Glücklich ist, wer bei Gott am Tisch sitzen darf!“ Da erzählt Jesus: „Ein Mann gab ein großes Festessen und lud viele Gäste ein.“',
+        '„Als alles bereit ist, schickt der Gastgeber seinen Diener zu den Gästen: ‚Kommt, es ist alles bereit!‘ Aber einer nach dem anderen sagt ab.“',
+        '„‚Ich habe einen Acker gekauft und muss ihn ansehen‘, sagt der erste. ‚Ich habe fünf Paar Ochsen gekauft und will sie ausprobieren‘, sagt der zweite. ‚Ich habe geheiratet, darum kann ich nicht kommen‘, sagt der dritte.“',
+        '„Der Diener erzählt dem Gastgeber alles. Da wird der Gastgeber zornig. ‚Geh schnell auf die Straßen und Gassen der Stadt‘, sagt er. ‚Hol die Armen, die Lahmen und die Blinden herein!‘ Der Diener geht und tut es.“',
+        '„‚Herr, es ist geschehen, was du befohlen hast‘, sagt der Diener. ‚Aber es ist noch Platz da.‘ ‚Dann geh hinaus auf die Landstraßen und an die Zäune‘, sagt der Gastgeber. ‚Bitte alle dringend, hereinzukommen. Mein Haus soll voll werden!‘“'
       ],
-      // nur Quiz (ruhig)
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      // Spiel: Kommt, es ist alles bereit! (einladen, neu 10.11.2026)
+      task: { kind: 'einladen', hint: 'Lade die Gäste ein, bis der Tisch voll ist.', invite: EINLADEN },
       questions: [
-        { q: 'Wo ist der ältere Sohn, als das Fest beginnt?', options: ['auf dem Feld', 'im Haus', 'in der Stadt'], answer: 0 },
-        { q: 'Warum wird er zornig?', options: ['Für seinen Bruder gibt es ein Fest.', 'Der Vater schickt ihn weg.', 'Das Essen ist kalt.'], answer: 0 },
-        { q: 'Was sagt der Vater zu ihm?', options: ['Du bist immer bei mir, und alles, was mein ist, gehört auch dir.', 'Geh weg!', 'Bleib draußen.'], answer: 0 }
+        { q: 'Was ruft der Diener den Gästen zu?', options: ['„Kommt, es ist alles bereit!“', '„Bringt Brot mit!“', '„Wartet noch einen Tag!“'], answer: 0 },
+        { q: 'Wen soll der Diener von den Straßen und Gassen holen?', options: ['die Armen, die Lahmen und die Blinden', 'die Soldaten und die Hirten', 'die Nachbarn und die Freunde'], answer: 0 }
       ]
     }
   ],
@@ -478,7 +551,7 @@ export const gleichnisse: Journey = {
     { q: 'Was tut der Mann, der den Schatz im Acker findet?', options: ['Er verkauft alles und kauft den Acker.', 'Er läuft davon.', 'Er verschenkt den Schatz.'], answer: 0 },
     { q: 'Wer hilft dem überfallenen Mann?', options: ['ein Samariter', 'ein Priester', 'ein Levit'], answer: 0 },
     { q: 'Wie sucht die Frau ihre verlorene Münze?', options: ['Sie zündet ein Licht an und kehrt das Haus.', 'Sie gräbt im Garten.', 'Sie wartet bis zum Morgen.'], answer: 0 },
-    { q: 'Was tut der Vater, als er seinen Sohn von weitem sieht?', options: ['Er läuft ihm entgegen.', 'Er schließt die Tür.', 'Er schickt einen Knecht.'], answer: 0 }
+    { q: 'Was sagt der Gastgeber, als noch Platz im Haus ist?', options: ['Mein Haus soll voll werden.', 'Schließt die Tür.', 'Das Fest ist vorbei.'], answer: 0 }
   ]
 }
 
@@ -487,10 +560,12 @@ for (const st of gleichnisse.stages) {
   if (st.task.verse) st.task.verse.background = backdropOr(st.task.verse.background, st.image ?? st.task.verse.background)
 }
 
-// the German recordings of the stories (voice Achernar, files "geschichte-NN-v1.mp3"); until they are made the app reads with the voice of the device. Remove a number from this list when its file is in.
+// the German recordings of the stories (voice Achernar, files "geschichte-NN-v1.mp3", "-v2" for the rebuilt stages 10 to 12: a new name for the cache of the phone); until they are made the app reads with the voice of the device.
+// Remove a number from this list when its file is in.
 const WITHOUT_RECORDING = new Set<number>([])
+const RECORDING_VERSION: Record<number, string> = { 10: 'v2', 11: 'v2', 12: 'v2' }
 for (const s of gleichnisse.stages) {
-  const file = `audio/abenteuer/gleichnisse/geschichte-${String(s.id).padStart(2, '0')}-v1.mp3`
+  const file = `audio/abenteuer/gleichnisse/geschichte-${String(s.id).padStart(2, '0')}-${RECORDING_VERSION[s.id] ?? 'v1'}.mp3`
   Object.defineProperty(s, 'audio', { get: () => (adventureLanguage.value === 'en' || WITHOUT_RECORDING.has(s.id) ? undefined : file), enumerable: true, configurable: true })
 }
 

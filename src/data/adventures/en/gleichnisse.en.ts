@@ -1,7 +1,7 @@
 /**
  * English texts of the adventure "Stories of Jesus" (8 to 10 years): the same shape as `../gleichnisse.ts`, only the words. Laid over the German data by
  * `localize()`; the right answer is the first option, exactly as in the German data. Names and wording follow the public-domain King James Version
- * (Matthew 13, Luke 10 and 15: Samaritan, Levite, Jericho); the stories are retold in our own words. The source as a readable file: D:/Claude/Abenteuer-Gleichnisse/ENGLISCH
+ * (Matthew 13, 18 and 7, Luke 10, 15 and 14: Samaritan, Levite, Jericho, servants, talents, pence, wise man, rock, sand, supper, highways and hedges); the stories are retold in our own words. The source as a readable file: D:/Claude/Abenteuer-Gleichnisse/ENGLISCH
  * Generated from the readable file by D:/Claude/Abenteuer-Gleichnisse/tools/bauen_gleichnisse.py.
  */
 import type { Journey } from '@/types/adventure'
@@ -9,7 +9,7 @@ import type { TextOverlay } from '../localize'
 
 export const gleichnisseEn: TextOverlay<Journey> = {
   title: 'Stories of Jesus',
-  subtitle: 'From the Sower to the Lost Son',
+  subtitle: 'From the Sower to the Great Feast',
   gift: { title: 'The Mustard Tree' },
   stages: [
     {
@@ -201,64 +201,65 @@ export const gleichnisseEn: TextOverlay<Journey> = {
       ]
     },
     {
-      title: 'I Will Arise',
-      ref: 'Luke 15:11–18',
+      title: 'Have Patience with Me',
+      ref: 'Matthew 18:21–34',
       text: [
-        '“A man had two sons,” says Jesus. The younger says: “Father, give me my share of the inheritance.” The father divides his property between his sons. Not long after, the younger packs everything and travels to a far country. There he spends all his money.',
-        'Then a great famine comes. The son keeps pigs for a man of that country. He is so hungry that he would gladly eat the pigs’ food, but nobody gives him anything.',
-        'Then he thinks: “At my father’s house even the workers have bread enough, and I am starving here! I will get up and go to my father. I will say: Father, I have sinned against heaven and before you.”'
-      ],
-      task: {
-        hint: 'Tap in time when the footprint is fully there.',
-        homeward: { son: { label: 'The son on the way home' }, print: { label: 'A footprint' }, rounds: [{ hint: 'The son sets out for his father. Tap each time the footprint is quite clear.' }, { hint: 'Now he walks faster. Tap exactly on the footprint that comes: left, right, left …' }] }
-      },
-      questions: [
-        { q: 'Where does the younger son travel to?', options: ['to a far country', 'up a mountain', 'to the city of Jerusalem'] },
-        { q: 'What work does he get?', options: ['He keeps pigs.', 'He fishes in the lake.', 'He builds a house.'] }
-      ]
-    },
-    {
-      title: 'The Father Runs to Meet Him',
-      ref: 'Luke 15:20–24',
-      text: [
-        'Jesus goes on. The son sets out for home. While he is still far away, his father sees him. He has compassion. He runs to meet his son, falls on his neck and kisses him.',
-        '“Father,” says the son, “I have sinned against heaven and before you. I am no longer worthy to be called your son.”',
-        'But the father calls to his servants: “Bring the best robe and put it on him! Put a ring on his hand and shoes on his feet! Let us eat and be merry. My son was dead and is alive again, he was lost and is found.”'
-      ],
-      task: {
-        hint: 'Tap the feet in turn so that the father runs to his son.',
-        meet: {
-          father: { label: 'The father in the gate of the estate' },
-          son: { label: 'The son, tired, in torn clothes' },
-          embrace: { label: 'Father and son in an embrace' },
-          ragged: { label: 'The son in torn clothes' },
-          robed: { label: 'The son in the new robe' },
-          dressed: { label: 'The son with robe, ring and shoes' },
-          gifts: [{ label: 'The robe' }, { label: 'The ring' }, { label: 'The shoes' }],
-          rounds: [
-            { hint: 'Tap the feet in turn so that the father runs to his son.' },
-            { hint: 'Drag the robe, the ring and the shoes to the son.' }
-          ]
-        }
-      },
-      questions: [
-        { q: 'Who sees the son first from far away?', options: ['his father', 'his brother', 'a servant'] },
-        { q: 'What does the father do when he sees his son?', options: ['He runs to meet him and hugs him.', 'He sends him away.', 'He shuts the door.'] }
-      ]
-    },
-    {
-      title: 'The Older Brother',
-      ref: 'Luke 15:25–32',
-      text: [
-        'Jesus goes on. The older son is still in the field. As he comes near the house, he hears music and dancing. He calls a servant and asks what is going on. “Your brother has come home,” says the servant. “Your father has given a feast for him.”',
-        'Then the older son becomes angry and will not go into the house. The father comes out and begs him. The son answers: “All these years I have served you, and you never gave me even a young goat, so that I could celebrate with my friends. And for this son of yours, who wasted your money, you give a feast!”',
-        '“My son,” says the father, “you are always with me, and everything I have is yours. Let us be glad. Your brother was dead and is alive again, he was lost and is found.”'
+        'Peter asks Jesus, “Lord, how often must I forgive my brother when he does me wrong? Is seven times enough?” “No,” says Jesus, “not seven times, but seventy times seven.” Then Jesus tells a story.',
+        '“A king wants to know how much his servants owe him,” says Jesus. “They bring him a servant who owes him ten thousand talents, a huge amount of money. The servant cannot pay it. He throws himself down before the king. ‘Lord, have patience with me!’ he begs. ‘I will pay you everything.’ The king takes pity and forgives him all his debts.”',
+        '“Going out, the servant meets a second servant, who owes him only a hundred pence. The first servant grabs him by the collar. ‘Pay what you owe me!’ he shouts. The second servant falls down. ‘Have patience with me!’ he begs. ‘I will pay you everything.’ But the first servant will not wait. He takes him to prison until everything is paid.”',
+        '“Other servants see it and are very sad. They go to the king and tell him everything. Then the king sends for the first servant. ‘You wicked servant!’ he says. ‘I forgave you all your debts. Should you not also have had pity on the second servant, as I had pity on you?’”',
+        '“The king is very angry. He sends the first servant to prison until everything is paid.”'
       ],
       task: { hint: 'Listen carefully and answer the questions.' },
       questions: [
-        { q: 'Where is the older son when the feast begins?', options: ['in the field', 'in the house', 'in the city'] },
-        { q: 'Why does he become angry?', options: ['There is a feast for his brother.', 'The father sends him away.', 'The food is cold.'] },
-        { q: 'What does the father say to him?', options: ['You are always with me, and everything I have is yours.', 'Go away!', 'Stay outside.'] }
+        { q: 'How often should we forgive, says Jesus?', options: ['seventy times seven', 'only seven times', 'only once'] },
+        { q: 'What does the king do when the servant begs him?', options: ['He forgives him all his debts.', 'He sends him away.', 'He asks for even more money.'] },
+        { q: 'What does the first servant do to the second servant?', options: ['He takes him to prison.', 'He invites him to supper.', 'He gives him a lot of money.'] }
+      ]
+    },
+    {
+      title: 'The House on the Rock',
+      ref: 'Matthew 7:24–29',
+      text: [
+        'Jesus sits on a mountain. Many people have been listening to him, and now he tells them about two men. Both build a house.',
+        '“The first man is wise,” says Jesus. “He builds his house on a rock, a big, hard stone. Then the rain falls, water comes, and the wind beats on the house. But the house stays standing, because it stands on the rock.”',
+        '“The other man is not wise. He builds his house on sand. Again the rain falls, again the water comes, again the wind beats on the house. Then it falls down.”',
+        '“Whoever hears these words of mine and does them,” says Jesus, “is like the wise man. And whoever hears them and does not do them is like the other man.” When Jesus stops speaking, all the people are amazed. Jesus does not speak like their teachers, but with power.'
+      ],
+      task: {
+        hint: 'Knock on the ground and set the house where it stands firm.',
+        ground: { sprites: { rock: { label: 'A building plot of hard rock' }, sand: { label: 'A building plot of soft sand' }, covered: { label: 'A building plot with sand on top' }, house: { label: 'The little stone house' }, tilted: { label: 'The house, tilted and sunk into the sand' }, mallet: { label: 'The wooden mallet' }, puff: { label: 'A cloud of dust' }, spark: { label: 'Sparks' }, rain: { label: 'Light rain' }, water: { label: 'Shallow clear water' }, wind: { label: 'Wind with leaves' } }, rounds: [{ hint: 'Knock on the ground and set the house where it stands firm.' }, { hint: 'You only have four knocks. Where is the rock?' }] }
+      },
+      questions: [
+        { q: 'Where does Jesus sit when he tells the story?', options: ['on a mountain', 'in a boat', 'in a house'] },
+        { q: 'Who is like the wise man, says Jesus?', options: ['whoever hears his words and does them', 'whoever has the most money', 'whoever talks the loudest'] }
+      ]
+    },
+    {
+      title: 'There Is Still Room',
+      ref: 'Luke 14:15–23',
+      text: [
+        'Jesus is a guest at a meal. Another guest says, “Happy is the one who may sit at the table with God!” Then Jesus tells a story: “A man gave a great supper and invited many guests.”',
+        '“When everything is ready, the host sends his servant to the guests: ‘Come, for all things are now ready!’ But one after another they make excuses.”',
+        '“‘I have bought a field and must go and see it,’ says the first. ‘I have bought five pairs of oxen and want to try them out,’ says the second. ‘I have just married a wife, so I cannot come,’ says the third.”',
+        '“The servant tells the host everything. Then the host is angry. ‘Go out quickly into the streets and lanes of the city,’ he says. ‘Bring in the poor, the lame and the blind!’ The servant goes and does it.”',
+        '“‘Lord, it is done as you commanded,’ says the servant. ‘But there is still room.’ ‘Then go out into the highways and hedges,’ says the host. ‘Urge everyone to come in. My house shall be full!’”'
+      ],
+      task: {
+        hint: 'Invite the guests until the table is full.',
+        invite: {
+          table: { label: 'The long table with twelve places' },
+          sprites: { g1: { wait: { label: 'A woman with a basket waves' }, sit: { label: 'A woman with a basket sits at the table' } }, g2: { wait: { label: 'A man with a walking stick waves' }, sit: { label: 'A man with a walking stick sits at the table' } }, g3: { wait: { label: 'A man with a traveler’s staff waves' }, sit: { label: 'A man with a traveler’s staff sits at the table' } }, g4: { wait: { label: 'A boy in a patched coat waves' }, sit: { label: 'A boy in a patched coat sits at the table' } }, g5: { wait: { label: 'An old woman with a head scarf waves' }, sit: { label: 'An old woman with a head scarf sits at the table' } }, g6: { wait: { label: 'A man with a water jug waves' }, sit: { label: 'A man with a water jug sits at the table' } }, g7: { wait: { label: 'A traveler with a bundle waves' }, sit: { label: 'A traveler with a bundle sits at the table' } }, g8: { wait: { label: 'A shepherd boy with a flute waves' }, sit: { label: 'A shepherd boy with a flute sits at the table' } }, g9: { wait: { label: 'A farm woman with a sheaf waves' }, sit: { label: 'A farm woman with a sheaf sits at the table' } }, g10: { wait: { label: 'A fisherman with a net waves' }, sit: { label: 'A fisherman with a net sits at the table' } }, pair: { wait: { label: 'A mother with her child waves' }, sit: { label: 'A mother with her child sits at the table' } } },
+          servant: { label: 'The servant of the host waves' },
+          lamp: { off: { label: 'A lamp, unlit' }, on: { label: 'A lamp, lit' } },
+          hedge: { label: 'A hedge' },
+          fence: { label: 'A fence' },
+          rounds: [{ hint: 'Tap the guests who wave at you.' }, { hint: 'Now out on the highways: whoever waves from behind a hedge comes to the table too.' }]
+        }
+      },
+      questions: [
+        { q: 'What does the servant call out to the guests?', options: ['“Come, for all things are now ready!”', '“Bring bread with you!”', '“Wait one more day!”'] },
+        { q: 'Whom should the servant bring in from the streets and lanes?', options: ['the poor, the lame and the blind', 'the soldiers and the shepherds', 'the neighbours and the friends'] }
       ]
     }
   ],
@@ -268,12 +269,13 @@ export const gleichnisseEn: TextOverlay<Journey> = {
     { q: 'What does the man who finds the treasure in the field do?', options: ['He sells everything and buys the field.', 'He runs away.', 'He gives the treasure away.'] },
     { q: 'Who helps the man who was attacked?', options: ['a Samaritan', 'a priest', 'a Levite'] },
     { q: 'How does the woman look for her lost coin?', options: ['She lights a lamp and sweeps the house.', 'She digs in the garden.', 'She waits until morning.'] },
-    { q: 'What does the father do when he sees his son from far away?', options: ['He runs to meet him.', 'He shuts the door.', 'He sends a servant.'] }
+    { q: 'What does the host say when there is still room in the house?', options: ['My house shall be full.', 'Shut the door.', 'The feast is over.'] }
   ]
 }
 
-// the English recordings of the stories (voice Achernar, Gemini): geschichte-NN-en-v1.mp3; a stage without a number in this list is read with the voice of the device
+// the English recordings of the stories (voice Achernar, Gemini): geschichte-NN-en-v1.mp3 (-v2 for the rebuilt stages 10 to 12: a new name for the cache of the phone); a stage without a number in this list is read with the voice of the device
 const WITH_ENGLISH_RECORDING = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+const RECORDING_VERSION: Record<number, string> = { 10: 'v2', 11: 'v2', 12: 'v2' }
 gleichnisseEn.stages!.forEach((s, i) => {
-  if (WITH_ENGLISH_RECORDING.includes(i + 1)) s.audio = `audio/abenteuer/gleichnisse/geschichte-${String(i + 1).padStart(2, '0')}-en-v1.mp3`
+  if (WITH_ENGLISH_RECORDING.includes(i + 1)) s.audio = `audio/abenteuer/gleichnisse/geschichte-${String(i + 1).padStart(2, '0')}-en-${RECORDING_VERSION[i + 1] ?? 'v1'}.mp3`
 })

@@ -3,7 +3,10 @@
  * [x, y] is the middle of a bead as a share of the whole picture (width 9920, height 1648), counted from the top left.
  * Rules (Anton): the way comes into every medal from the LEFT and leaves it on the RIGHT (so the name and the button under the medal stay free),
  * it is always a smooth curve (never straight), at least 10 beads lie between two medals, nothing lies in the lowest 20 % (y > 1318 px).
- * Found by `panorama_weg.py` over the roads of the painting; the stretches swing a little upward (`D:/Claude/Abenteuer-Gleichnisse/tools/weg_schwingen.py`).
+ * Stretches 1 to 8 are unchanged (found by `panorama_weg.py` over the roads of the painting, swung by `weg_schwingen.py`); after the rebuild (stations 10 to 12 and the exam moved to the king's court,
+ * the house on the rock and the feast house) stretches 9 to 12 are shaped by hand (support points in UMBAU-2026-11/ergebnis/panorama/werkzeuge/weg_kontrolle_v2.py, Catmull-Rom, equal spacing):
+ * 9->10 runs under the lamp house to the sand in front of the king's court, 10->11 crosses the sand below the sunken house,
+ * 11->12 swings under the boulders to the sand in front of the feast house, 12->exam passes below the wanderers on the country road.
  */
 export const GLEICHNISSE_PATH: [number, number][][] = [
   // station 1 to 2
@@ -23,11 +26,11 @@ export const GLEICHNISSE_PATH: [number, number][][] = [
   // station 8 to 9
   [[0.6893, 0.6007], [0.6928, 0.6112], [0.6964, 0.62], [0.7001, 0.6276], [0.7038, 0.6337], [0.7077, 0.6367], [0.7115, 0.633], [0.7152, 0.6252], [0.7184, 0.6122], [0.721, 0.5947]],
   // station 9 to 10
-  [[0.7569, 0.5947], [0.7625, 0.5888], [0.7682, 0.5832], [0.7739, 0.5805], [0.7795, 0.5862], [0.7851, 0.5948], [0.7906, 0.6035], [0.7959, 0.6169], [0.8009, 0.6332], [0.8063, 0.6458], [0.8117, 0.6568], [0.8167, 0.6735]],
+  [[0.7569, 0.5947], [0.7584, 0.6212], [0.7603, 0.6468], [0.763, 0.6697], [0.7664, 0.689], [0.7707, 0.699], [0.7753, 0.6974], [0.7781, 0.6756], [0.7791, 0.6483], [0.779, 0.6201]],
   // station 10 to 11
-  [[0.8526, 0.6735], [0.8541, 0.6612], [0.8557, 0.6491], [0.8575, 0.6381], [0.8596, 0.6302], [0.8621, 0.6301], [0.8643, 0.638], [0.8661, 0.6488], [0.8676, 0.6609], [0.8691, 0.6735]],
+  [[0.8143, 0.6189], [0.8187, 0.6263], [0.8231, 0.6341], [0.8274, 0.6434], [0.8317, 0.6537], [0.8359, 0.665], [0.8399, 0.6784], [0.8438, 0.6923], [0.848, 0.7028], [0.8525, 0.7044], [0.8563, 0.6894], [0.8597, 0.6705]],
   // station 11 to 12
-  [[0.905, 0.6735], [0.9062, 0.6613], [0.9073, 0.6492], [0.9086, 0.6374], [0.9101, 0.6265], [0.912, 0.6194], [0.9142, 0.6223], [0.9158, 0.6322], [0.9172, 0.6435], [0.9185, 0.6553]],
-  // station 12 to 13
-  [[0.9544, 0.6553], [0.9555, 0.6443], [0.9567, 0.6338], [0.9583, 0.6258], [0.9603, 0.628], [0.9616, 0.6384], [0.9626, 0.6497], [0.9634, 0.6617], [0.9641, 0.6737], [0.9649, 0.6857]]
+  [[0.895, 0.6675], [0.8968, 0.6888], [0.899, 0.7088], [0.9018, 0.7261], [0.905, 0.7404], [0.9089, 0.7431], [0.9121, 0.7295], [0.914, 0.7082], [0.9153, 0.6855], [0.9165, 0.6626]],
+  // station 12 to the exam
+  [[0.9524, 0.6614], [0.9523, 0.6821], [0.9526, 0.7028], [0.9534, 0.7229], [0.9547, 0.7422], [0.9565, 0.7596], [0.9589, 0.7744], [0.962, 0.7824], [0.9641, 0.7663], [0.9655, 0.7476]]
 ]

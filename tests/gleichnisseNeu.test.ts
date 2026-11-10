@@ -40,6 +40,7 @@ import {
   yieldTotal
 } from '@/utils/gleichnisseNeu'
 import type { CarryGame, HaltGame, HomeGame, InnGame, YieldGame, YieldRound } from '@/utils/gleichnisseNeu'
+import { HEIMWEG_OLD } from './gleichnisseOldGames'
 
 vi.mock('@/use/useSfx', () => ({
   default: () => ({ play: vi.fn(), preload: vi.fn(), stopAll: vi.fn(), lengthOf: () => 0, enabled: { value: true }, setEnabled: vi.fn(), toggle: vi.fn(), playedSince: () => true })
@@ -443,6 +444,7 @@ describe('the real data of "Geschichten von Jesus"', () => {
     expect(haltProblems(task(6).halt as HaltGame)).toEqual([])
     expect(innProblems(task(7).inn as InnGame)).toEqual([])
     expect(carryProblems(task(8).carryHome as CarryGame)).toEqual([])
-    expect(homeProblems(task(10).homeward as HomeGame)).toEqual([])
+    // the game of the lost son (`heimweg`) is not in the data of the adventure any more (rebuild of 10.11.2026): its data as they were
+    expect(homeProblems(HEIMWEG_OLD)).toEqual([])
   })
 })

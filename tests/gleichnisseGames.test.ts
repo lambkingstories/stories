@@ -37,6 +37,7 @@ import {
 } from '@/utils/gleichnisseGames'
 import { COLS, ROWS, makeGrid, wipeAt } from '@/utils/wipe'
 import { gleichnisse } from '@/data/adventures/gleichnisse'
+import { ENTGEGEN_OLD } from './gleichnisseOldGames'
 import type { CoinGame, DigGame, DigRound, MeetGame } from '@/types/adventure'
 
 const CELLS: [number, number][] = [
@@ -279,7 +280,8 @@ describe('meet: the run and the gifts', () => {
   })
 
   it('finds a father who stops beside the son or behind the gate, wrong gifts and wrong rounds', () => {
-    const g: MeetGame = gleichnisse.stages[10]!.task.meet!
+    // the game of the lost son is not in the data of the adventure any more (rebuild of 10.11.2026): its data as they were
+    const g: MeetGame = ENTGEGEN_OLD
     expect(meetProblems(g)).toEqual([])
     expect(meetProblems({ ...g, meet: g.son.x }).join(' ')).toMatch(/stops left of the son/)
     expect(meetProblems({ ...g, meet: g.father.x + 1 }).join(' ')).toMatch(/right of the gate/)
