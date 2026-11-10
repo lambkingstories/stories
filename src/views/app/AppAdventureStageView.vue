@@ -228,7 +228,9 @@ import GameWay from '@/components/molecules/games/GameWay.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
 import SoundPanel from '@/components/molecules/SoundPanel.vue'
 import ReadAloud from '@/components/molecules/ReadAloud.vue'
-import { journeyById } from '@/data/adventures'
+import { journeyById, journeys } from '@/data/adventures'
+import { inBibleOrder } from '@/utils/continueJourney'
+import { isJourneyPlusLocked } from '@/utils/adventureAccess'
 import useAdventure from '@/use/useAdventure'
 import usePremium from '@/use/usePremium'
 import { isStagePlusLocked } from '@/utils/adventureAccess'
@@ -482,6 +484,16 @@ async function buildPainted() {
 }
 
 const { showUpsell } = usePremium()
+
+/** At the end of a free adventure: the next adventure in the order of the Bible, when it is behind LambKing Plus (a friendly hint, never a wall). */
+const nextPlusJourney = computed(() => {
+  const j = journey.value
+  if (!j || isJourneyPlusLocked(j.id)) return null
+  const order = inBibleOrder(journeys)
+  const at = order.findIndex((x) => x.id === j.id)
+  const next = at >= 0 ? order.slice(at + 1).find((x) => isJourneyPlusLocked(x.id)) : undefined
+  return next ?? null
+})
 
 onMounted(() => {
   // a stage behind LambKing Plus cannot be reached by a link either: back to the map, with the Plus sheet
@@ -1198,7 +1210,9 @@ function openGift() {
           p(v-if="!medal" class="result-line") {{ t('app.adventure.noMedal') }}
           //- the end of the adventure: what all the stars and answers gave, and what is still to win
           AdventureRewards(v-if="journey" :journey="journey")
+          p(v-if="nextPlusJourney" class="result-line result-plus") {{ t('app.adventure.plusNext', { title: nextPlusJourney.title }) }}
           div(class="stage-actions")
+            AdvButton(v-if="nextPlusJourney" tone="gold" @click="showUpsell('adventure')") {{ t('app.adventure.plusNextButton') }}
             AdvButton(v-if="medal" tone="gold" @click="openGift") {{ t('app.adventure.gift', { title: journey.gift.title }) }}
             AdvButton(tone="blau" @click="retry") {{ t('app.adventure.retry') }}
             AdvButton(tone="blau" @click="goMap()") {{ t('app.adventure.backToMap') }}
@@ -1692,6 +1706,10 @@ $ink: var(--lk-text)
   margin: 8px 0
   font-size: 1.05rem
   color: var(--lk-muted)
+
+  &.result-plus
+    color: var(--lk-text)
+    font-weight: 700
 
   &.lost
     color: #a93d2e

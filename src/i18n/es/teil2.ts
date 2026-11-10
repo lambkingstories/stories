@@ -1909,6 +1909,8 @@ export default {
   bestSoFar: 'Tu mejor resultado hasta ahora: {n} estrella | Tu mejor resultado hasta ahora: {n} estrellas',
   toExam: 'Al quiz',
   backToMap: 'Volver al mapa',
+  plusNext: 'El viaje sigue con «{title}». Con LambKing Plus puedes jugar todas las demás aventuras.',
+  plusNextButton: 'Más sobre LambKing Plus',
   statsTitle: 'Tus estrellas',
   statsTotal: 'En total {n} de {max} puntos',
   statsNext: 'Para la {medal}: {n} puntos más',
