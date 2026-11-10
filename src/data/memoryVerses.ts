@@ -25,7 +25,7 @@ export const MEMORY_VERSES: Record<string, MemoryVerse> = {
   babel: {
     de: { ref: 'Psalm 127,1', text: `Wo der HERR nicht das Haus baut, so arbeiten umsonst, die daran bauen.` },
     en: { ref: 'Psalm 127:1', text: `Except the LORD build the house, they labour in vain that build it.` },
-    line: { de: `Die Menschen bauten ihre Stadt ohne Gott. Der Turm wurde nie fertig.`, en: `The people built their city without God. The tower was never finished.` }
+    line: { de: `Die Menschen wollten einen Turm bis zum Himmel bauen. Dann sprachen sie verschiedene Sprachen, und der Turm blieb unfertig.`, en: `The people wanted to build a tower up to heaven. Then they spoke different languages, and the tower was left unfinished.` }
   },
   abraham: {
     de: { ref: '1. Mose 12,2', text: `Und ich will dich zum großen Volk machen und will dich segnen und dir einen großen Namen machen, und sollst ein Segen sein.` },
@@ -45,7 +45,7 @@ export const MEMORY_VERSES: Record<string, MemoryVerse> = {
   mose: {
     de: { ref: '2. Mose 14,14', text: `Der HERR wird für euch streiten, und ihr werdet still sein.` },
     en: { ref: 'Exodus 14:14', text: `The LORD shall fight for you, and ye shall hold your peace.` },
-    line: { de: `Am Schilfmeer standen die Israeliten vor dem Wasser, und hinter ihnen kamen die Ägypter.`, en: `At the Red Sea the Israelites stood in front of the water, and the Egyptians were coming behind them.` }
+    line: { de: `Am Meer standen die Israeliten vor dem Wasser, und hinter ihnen kamen die Ägypter.`, en: `At the sea the Israelites stood in front of the water, and the Egyptians were coming behind them.` }
   },
   wueste: {
     de: { ref: '5. Mose 31,6', text: `Seid getrost und unverzagt, fürchtet euch nicht und lasst euch nicht vor ihnen grauen; denn der HERR, dein Gott, wird selber mit dir wandeln und wird die Hand nicht abtun noch dich verlassen.` },
@@ -68,24 +68,24 @@ export const MEMORY_VERSES: Record<string, MemoryVerse> = {
     line: { de: `Rut hätte in ihr Heimatland zurückgehen können. Sie blieb bei Noomi.`, en: `Ruth could have gone back to her own country. She stayed with Naomi.` }
   },
   samuel: {
-    de: { ref: '1. Samuel 16,7', text: `Denn es geht nicht, wie ein Mensch sieht: ein Mensch sieht, was vor Augen ist; der HERR aber sieht das Herz an.` },
-    en: { ref: '1 Samuel 16:7', text: `For the LORD seeth not as man seeth; for man looketh on the outward appearance, but the LORD looketh on the heart.` },
-    line: { de: `Samuel suchte den neuen König aus. Gott sagte ihm, worauf er schaut.`, en: `Samuel was to choose the new king. God told him what he looks at.` }
+    de: { ref: '1. Samuel 3,10', text: `Rede, denn dein Knecht hört.` },
+    en: { ref: '1 Samuel 3:10', text: `Speak; for thy servant heareth.` },
+    line: { de: `Mitten in der Nacht rief Gott den Jungen Samuel, und Samuel hörte zu.`, en: `In the middle of the night God called the boy Samuel, and Samuel listened.` }
   },
   david: {
-    de: { ref: 'Psalm 23,1', text: `Der HERR ist mein Hirte; mir wird nichts mangeln.` },
-    en: { ref: 'Psalm 23:1', text: `The LORD is my shepherd; I shall not want.` },
-    line: { de: `David war Hirte und kannte das Leben mit Schafen. Er schrieb Lieder für Gott.`, en: `David was a shepherd and knew life with sheep. He wrote songs for God.` }
+    de: { ref: '1. Samuel 16,7', text: `Denn es geht nicht, wie ein Mensch sieht: ein Mensch sieht, was vor Augen ist; der HERR aber sieht das Herz an.` },
+    en: { ref: '1 Samuel 16:7', text: `For the LORD seeth not as man seeth; for man looketh on the outward appearance, but the LORD looketh on the heart.` },
+    line: { de: `Gott wählte den jüngsten Sohn Isais, den Hirtenjungen, zum König.`, en: `God chose the youngest son of Jesse, the shepherd boy, to be king.` }
   },
   salomo: {
-    de: { ref: 'Sprüche 3,5–6', text: `Verlass dich auf den HERRN von ganzem Herzen und verlass dich nicht auf deinen Verstand; sondern gedenke an ihn in allen deinen Wegen, so wird er dich recht führen.` },
-    en: { ref: 'Proverbs 3:5–6', text: `Trust in the LORD with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths.` },
-    line: { de: `Salomo baute den Tempel. Von ihm stammen viele Sprüche.`, en: `Solomon built the temple. Many proverbs come from him.` }
+    de: { ref: '1. Könige 3,9', text: `So wollest du deinem Knecht geben ein gehorsames Herz, dass er dein Volk richten möge und verstehen, was gut und böse ist.` },
+    en: { ref: '1 Kings 3:9', text: `Give therefore thy servant an understanding heart to judge thy people, that I may discern between good and bad.` },
+    line: { de: `In der Nacht bei Gibeon durfte sich Salomo etwas wünschen. Er wünschte sich ein gehorsames Herz.`, en: `At night at Gibeon Solomon was allowed to wish for something. He wished for an obedient heart.` }
   },
   elia: {
     de: { ref: '1. Könige 19,12', text: `Und nach dem Feuer kam ein stilles, sanftes Sausen.` },
     en: { ref: '1 Kings 19:12', text: `And after the fire a still small voice.` },
-    line: { de: `Am Berg kamen ein Sturm, ein Erdbeben und ein Feuer. Gott war in keinem davon.`, en: `On the mountain came a storm, an earthquake and a fire. God was in none of them.` }
+    line: { de: `Am Berg kamen ein starker Wind, ein Erdbeben und ein Feuer. Gott war in keinem davon.`, en: `On the mountain came a strong wind, an earthquake and a fire. God was in none of them.` }
   },
   elisa: {
     de: { ref: '2. Könige 5,15', text: `Siehe, ich weiß, dass kein Gott ist in allen Landen, außer in Israel.` },
@@ -128,9 +128,9 @@ export const MEMORY_VERSES: Record<string, MemoryVerse> = {
     line: { de: `Als Jesus getauft wurde, sprach eine Stimme vom Himmel.`, en: `When Jesus was baptized, a voice spoke from heaven.` }
   },
   freunde: {
-    de: { ref: 'Matthäus 4,19', text: `Folget mir nach; ich will euch zu Menschenfischern machen!` },
-    en: { ref: 'Matthew 4:19', text: `Follow me, and I will make you fishers of men.` },
-    line: { de: `Jesus rief Fischer vom Ufer. Sie ließen die Netze liegen und gingen mit.`, en: `Jesus called fishermen from the shore. They left their nets and went with him.` }
+    de: { ref: 'Lukas 5,10', text: `Fürchte dich nicht; denn von nun an wirst du Menschen fangen.` },
+    en: { ref: 'Luke 5:10', text: `Fear not; from henceforth thou shalt catch men.` },
+    line: { de: `Jesus rief Fischer vom Ufer. Sie ließen alles zurück und gingen mit ihm.`, en: `Jesus called fishermen from the shore. They left everything behind and went with him.` }
   },
   wunder: {
     de: { ref: 'Markus 4,39', text: `Schweig und verstumme! Und der Wind legte sich, und es ward eine große Stille.` },
@@ -138,9 +138,9 @@ export const MEMORY_VERSES: Record<string, MemoryVerse> = {
     line: { de: `Im Sturm schlief Jesus im Boot. Er sprach, und es wurde still.`, en: `In the storm Jesus was asleep in the boat. He spoke, and it grew calm.` }
   },
   heilung: {
-    de: { ref: 'Markus 5,34', text: `Meine Tochter, dein Glaube hat dich gesund gemacht; gehe hin mit Frieden und sei gesund von deiner Plage!` },
-    en: { ref: 'Mark 5:34', text: `Daughter, thy faith hath made thee whole; go in peace, and be whole of thy plague.` },
-    line: { de: `Eine Frau, die zwölf Jahre krank war, berührte Jesu Kleid.`, en: `A woman who had been ill for twelve years touched Jesus’ clothes.` }
+    de: { ref: 'Markus 10,14', text: `Lasset die Kindlein zu mir kommen und wehret ihnen nicht; denn solcher ist das Reich Gottes.` },
+    en: { ref: 'Mark 10:14', text: `Suffer the little children to come unto me, and forbid them not: for of such is the kingdom of God.` },
+    line: { de: `Kinder wurden zu Jesus gebracht. Die Jünger wollten sie wegschicken, aber Jesus rief sie zu sich.`, en: `Children were brought to Jesus. The disciples wanted to send them away, but Jesus called them to him.` }
   },
   gleichnisse: {
     de: { ref: 'Lukas 15,6', text: `Freuet euch mit mir; denn ich habe mein Schaf gefunden, das verloren war.` },
@@ -153,14 +153,14 @@ export const MEMORY_VERSES: Record<string, MemoryVerse> = {
     line: { de: `Zachäus saß auf dem Baum. Jesus sah ihn und ging mit ihm nach Hause.`, en: `Zacchaeus sat in the tree. Jesus saw him and went home with him.` }
   },
   letztewoche: {
-    de: { ref: 'Johannes 3,16', text: `Also hat Gott die Welt geliebt, dass er seinen eingeborenen Sohn gab, auf dass alle, die an ihn glauben, nicht verloren werden, sondern das ewige Leben haben.` },
-    en: { ref: 'John 3:16', text: `For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.` },
-    line: { de: `Jesus ging nach Jerusalem, obwohl er wusste, was kommen würde.`, en: `Jesus went to Jerusalem although he knew what was coming.` }
+    de: { ref: 'Matthäus 22,37–39', text: `Du sollst lieben Gott, deinen HERRN, von ganzem Herzen, von ganzer Seele und von ganzem Gemüte. Du sollst deinen Nächsten lieben wie dich selbst.` },
+    en: { ref: 'Matthew 22:37, 39', text: `Thou shalt love the Lord thy God with all thy heart, and with all thy soul, and with all thy mind. Thou shalt love thy neighbour as thyself.` },
+    line: { de: `Jesus ritt auf einem Esel in Jerusalem ein, und die Leute jubelten ihm zu. Später sagte er, welches Gebot das wichtigste ist.`, en: `Jesus rode into Jerusalem on a donkey, and the people cheered him. Later he said which commandment is the most important.` }
   },
   ostern: {
-    de: { ref: 'Lukas 24,6', text: `Er ist nicht hier; er ist auferstanden.` },
-    en: { ref: 'Luke 24:6', text: `He is not here, but is risen.` },
-    line: { de: `Die Frauen kamen zum Grab. Es war leer.`, en: `The women came to the tomb. It was empty.` }
+    de: { ref: 'Lukas 24,34', text: `Der HERR ist wahrhaftig auferstanden.` },
+    en: { ref: 'Luke 24:34', text: `The Lord is risen indeed.` },
+    line: { de: `Maria Magdalena kam früh zum Grab. Der Stein war weggerollt, das Grab war leer.`, en: `Mary Magdalene came to the tomb early. The stone was rolled away, the tomb was empty.` }
   },
   pfingsten: {
     de: { ref: 'Apostelgeschichte 1,8', text: `Ihr werdet die Kraft des Heiligen Geistes empfangen, welcher auf euch kommen wird, und werdet meine Zeugen sein zu Jerusalem und in ganz Judäa und Samarien und bis an das Ende der Erde.` },
@@ -173,8 +173,8 @@ export const MEMORY_VERSES: Record<string, MemoryVerse> = {
     line: { de: `Im Gefängnis von Philippi sangen Paulus und Silas. Der Wärter fragte, was er tun soll.`, en: `In the prison at Philippi Paul and Silas sang. The jailer asked what he should do.` }
   },
   paulusrom: {
-    de: { ref: 'Römer 8,31', text: `Ist Gott für uns, wer mag wider uns sein?` },
-    en: { ref: 'Romans 8:31', text: `If God be for us, who can be against us?` },
+    de: { ref: 'Apostelgeschichte 27,25', text: `Darum, liebe Männer, seid unverzagt; denn ich glaube Gott, es wird also geschehen, wie mir gesagt ist.` },
+    en: { ref: 'Acts 27:25', text: `Wherefore, sirs, be of good cheer: for I believe God, that it shall be even as it was told me.` },
     line: { de: `Paulus fuhr im Sturm und strandete. Er kam trotzdem in Rom an.`, en: `Paul sailed through a storm and was shipwrecked. He still reached Rome.` }
   },
   offenbarung: {
