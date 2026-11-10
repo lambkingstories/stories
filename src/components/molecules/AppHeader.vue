@@ -7,6 +7,7 @@
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import useAvatar from '@/use/useAvatar'
+import useUserName from '@/use/useUserName'
 import { prependBaseUrl } from '@/utils/function'
 
 const { t } = useI18n({ useScope: 'global' })
@@ -17,6 +18,8 @@ function goHome() {
 }
 // the picture the child chose in "Ich" is also shown here, and a tap leads to "Ich"
 const { avatarSrc } = useAvatar()
+// "Hallo, Name!" next to the picture, when the child gave a name (it stays on the device)
+const { userName } = useUserName()
 </script>
 
 <template lang="pug">
@@ -26,6 +29,7 @@ const { avatarSrc } = useAvatar()
       img(class="brand-word is-day" :src="prependBaseUrl('images/logo/lk-wort-tag.webp')" alt="" draggable="false" decoding="async")
       img(class="brand-word is-night" :src="prependBaseUrl('images/logo/lk-wort-nacht.webp')" alt="" draggable="false" decoding="async")
     div(class="head-right")
+      span(v-if="userName" class="hello") {{ t('app.main.helloName', { name: userName }) }}
       button(type="button" class="me-btn" :aria-label="t('app.nav.profile')" @click="router.push({ name: 'app-profile' })")
         img(:src="avatarSrc" alt="" class="me-img" draggable="false")
 </template>
@@ -64,6 +68,20 @@ const { avatarSrc } = useAvatar()
   display: flex
   align-items: center
   gap: 10px
+
+.hello
+  min-width: 0
+  max-width: 34vw
+  overflow: hidden
+  white-space: nowrap
+  text-overflow: ellipsis
+  font-weight: 800
+  font-size: 1.05rem
+  color: var(--lk-text)
+
+@media (max-width: 340px)
+  .hello
+    display: none
 
 .me-btn
   flex: 0 0 auto

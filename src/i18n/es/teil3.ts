@@ -2,7 +2,7 @@ export default {
   welcome: {
     title: 'Te damos la bienvenida a LambKing Stories.',
     chooseLanguage: 'Elige tu idioma',
-    whoTitle: '¿Quién eres?',
+    whoTitle: '¿Cómo te llamas?',
     pickAvatar: 'Elige tu personaje',
     namePlaceholder: 'Tu nombre',
     nameNote: 'Tu nombre se queda solo en este dispositivo. Puedes cambiarlo en «Yo».',
