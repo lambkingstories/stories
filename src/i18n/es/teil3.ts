@@ -758,6 +758,7 @@ export default {
     resumePicture: 'Tu dibujo',
     resumeAdventure: 'Tu aventura',
     startHere: 'Empieza aquí',
+    playOn: 'Seguir jugando',
     pickBook: 'Elige una historia',
     pickPicture: 'Pinta un dibujo',
     pickAdventure: 'Empieza la aventura',

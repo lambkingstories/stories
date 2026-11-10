@@ -1,10 +1,11 @@
 <script setup lang="ts">
 /**
  * The start page: a hub that shows what the app can do and where the child stands.
- *   1. the welcome card (welcome, support us, the shop) with a picture on top and the text below
- *   2. three main doors: Paint, Read, Adventure
- *   3. "Continue": the last book, the last picture, the current adventure
- *   4. "New": the newest books
+ *   1. "Go on": one big card with the adventure the child is in (or the first one), so playing starts with one tap
+ *   2. "Continue": the last book and the last picture (with a real cover when nothing was begun yet)
+ *   3. the journey through the Bible, then the newest books
+ *   4. last: the card for grown-ups (the shop, the sponsors, Plus or support)
+ * (Anton 10.11.2026: the page began with advertising instead of playing; the three doors only repeated the bar below.)
  * The look follows the day/night theme (assets/css/theme.css). Support and shop links leave the app: they go through
  * `openExternal`, which asks the parents first. The design is neutral so that other publishers can have shelves, too.
  */
@@ -27,6 +28,7 @@ import { sponsors } from '@/data/sponsors'
 import { nextStageIndex } from '@/utils/adventureScore'
 import { journeyToContinue } from '@/utils/continueJourney'
 import { isIOS } from '@/utils/platform'
+import { isColoringBook } from '@/utils/coloringBook'
 import usePremium, { PREMIUM_TEASER } from '@/use/usePremium'
 import { isJourneyPlusLocked } from '@/utils/adventureAccess'
 import PlusBadge from '@/components/atoms/PlusBadge.vue'
@@ -66,17 +68,9 @@ onMounted(() => {
 
 // ── 1. welcome card ──────────────────────────────────────────────────────────
 
-// Three slides, as before: the welcome, the shop (and the sponsors when there are some), then Plus or asking for support.
-const symbol = (name: string) => prependBaseUrl(`images/icons/navi/${name}.webp`)
-
+// The slides at the end of the page: the shop (and the sponsors when there are some), then Plus or asking for support.
 const slides = computed(() => {
   const list: HeroSlide[] = [
-    { id: 'welcome', image: prependBaseUrl('images/bg/welcome-bg-1.webp'), title: t('app.home.welcomeTitle'), slogan: t('app.home.slogan'), text: t('app.home.welcomeText'), points: [
-      { icon: 'series', image: symbol('lesen'), label: t('app.home.pointReadLabel'), text: t('app.home.pointReadText') },
-      { icon: 'compass', image: symbol('abenteuer'), label: t('app.home.pointAdventureLabel'), text: t('app.home.pointAdventureText') },
-      { icon: 'brush', image: symbol('malen'), label: t('app.home.pointColorLabel'), text: t('app.home.pointColorText') },
-      { icon: 'star', image: symbol('pokal'), label: t('app.home.pointStarsLabel'), text: t('app.home.pointStarsText') }
-    ] },
     { id: 'shop', image: prependBaseUrl('images/bg/welcome-bg-3.webp'), title: t('app.main.welcomeTitle2'), text: t('app.home.shopText') }
   ]
   if (sponsors.length) {
@@ -106,14 +100,6 @@ async function openPlus() {
   void router.push({ name: 'app-plus' })
 }
 
-// ── 2. the three main doors ──────────────────────────────────────────────────
-
-const bigButtons = computed(() => [
-  { id: 'color', label: t('app.home.bigColor'), sub: t('app.home.bigColorSub'), image: symbol('malen'), route: 'app-coloring' },
-  { id: 'read', label: t('app.home.bigRead'), sub: t('app.home.bigReadSub'), image: symbol('lesen'), route: 'app-read' },
-  { id: 'adventure', label: t('app.home.bigAdventure'), sub: t('app.home.bigAdventureSub'), image: symbol('abenteuer'), route: 'app-adventure' }
-])
-
 // ── the journey through the Bible (a row of medals to open an adventure) ─────
 
 const journeyTiles = computed(() =>
@@ -127,7 +113,7 @@ function openJourney(id: string) {
 // ── 3. continue ──────────────────────────────────────────────────────────────
 
 interface ResumeCard {
-  id: 'book' | 'picture' | 'adventure'
+  id: 'book' | 'picture'
   /** The small line above the title: book, painting or adventure. */
   kind: string
   title: string
@@ -151,7 +137,10 @@ const bookCard = computed<ResumeCard>(() => {
   const kind = t('app.home.kindBook')
   const book = lastReadId.value ? apiBooks.getById(lastReadId.value) : null
   if (!book) {
-    return { id: 'book', kind, title: t('app.home.discoverBook'), meta: t('app.home.pickBook'), image: '', progress: -1, empty: true, go: () => void router.push({ name: 'app-all-books' }) }
+    // a real cover; when no story is loaded (yet), the painted picture of the children reading
+    const first = newBooks.value.find((b) => !isColoringBook(b)) ?? allBooks.value.find((b) => !isColoringBook(b))
+    const image = first ? withPlaceholder(pickLocalizedImage(first.previewImage, lang.value)) : prependBaseUrl('images/bg/welcome-bg-3.webp')
+    return { id: 'book', kind, title: t('app.home.discoverBook'), meta: t('app.home.pickBook'), image, progress: -1, empty: true, go: () => void router.push({ name: 'app-all-books' }) }
   }
   const total = bookPages(book)
   const pct = getPct(book.bookId, total)
@@ -173,38 +162,32 @@ const pictureCard = computed<ResumeCard>(() => {
   const work = list.find((w) => !w.done) ?? list[0]
   const go = () => void router.push(work ? { name: 'app-coloring', query: { work: work.id } } : { name: 'app-coloring' })
   if (!work) {
-    return { id: 'picture', kind, title: t('app.home.discoverPicture'), meta: t('app.home.pickPicture'), image: '', progress: -1, empty: true, go }
+    const first = allBooks.value.find((b) => isColoringBook(b))
+    const image = first ? withPlaceholder(pickLocalizedImage(first.previewImage, lang.value)) : ''
+    return { id: 'picture', kind, title: t('app.home.discoverPicture'), meta: t('app.home.pickPicture'), image, progress: -1, empty: true, go }
   }
   return { id: 'picture', kind, title: work.title, meta: t('app.home.begun'), image: work.thumb, progress: -1, empty: false, go }
 })
 
-const adventureCard = computed<ResumeCard>(() => {
-  const kind = t('app.home.kindAdventure')
-  // the same adventure that the adventure page goes on with; if none was begun, the first one is offered
+/** The big card on top: the adventure the child is in; if none was begun, the first one. */
+const hero = computed(() => {
   const begun = journeyToContinue(journeys, adventure.progressOf)
   const journey = begun ?? journeys[0]
-  if (!journey) {
-    return { id: 'adventure', kind, title: t('app.home.startHere'), meta: '', image: '', progress: -1, empty: true, go: () => void router.push({ name: 'app-adventure' }) }
-  }
-  const prog = adventure.progressOf(journey.id)
-  const go = () => void router.push({ name: 'app-adventure-map', params: { journeyId: journey.id } })
-  if (!begun) {
-    return { id: 'adventure', kind, title: t('app.home.discoverAdventure'), meta: t('app.home.pickAdventure'), image: prependBaseUrl(journey.cover ?? journey.medal), progress: -1, empty: true, go }
-  }
-  const next = nextStageIndex(journey, prog) ?? 0
+  if (!journey) return null
+  const total = journey.stages.length
+  const next = begun ? (nextStageIndex(journey, adventure.progressOf(journey.id)) ?? 0) : 0
   return {
-    id: 'adventure',
-    kind,
+    begun: !!begun,
     title: journey.title,
-    meta: t('app.home.chapterOf', { n: next + 1, total: journey.stages.length }),
     image: prependBaseUrl(journey.cover ?? journey.medal),
-    progress: next / journey.stages.length,
-    empty: false,
-    go
+    medal: prependBaseUrl(journey.medal),
+    meta: t('app.home.chapterOf', { n: next + 1, total }),
+    progress: next / total,
+    go: () => void router.push({ name: 'app-adventure-map', params: { journeyId: journey.id } })
   }
 })
 
-const resumeCards = computed<ResumeCard[]>(() => [bookCard.value, pictureCard.value, adventureCard.value])
+const resumeCards = computed<ResumeCard[]>(() => [bookCard.value, pictureCard.value])
 
 // ── 4. new ───────────────────────────────────────────────────────────────────
 
@@ -226,49 +209,21 @@ function openBook(bookId: string) {
     AppHeader
 
     main(class="home-body")
-      //- 1. welcome card (picture on top, text below)
-      HomeHero(:slides="slides" :label="t('app.home.slideLabel')")
-        template(#actions="{ id }")
-          button(v-if="id === 'support' && PREMIUM_TEASER" type="button" class="lk-btn hero-shop" @click="openPlus")
-            span(class="hero-shop-label") {{ t('app.main.plusMore') }}
+      //- 1. go on: the adventure, one tap to play
+      button(v-if="hero" type="button" class="go-hero" @click="hero.go()")
+        span(class="go-hero-art")
+          img(:src="hero.image" alt="" draggable="false" @error="onImgFallback")
+          img(class="go-hero-medal" :src="hero.medal" alt="" draggable="false")
+        span(class="go-hero-body")
+          span(class="go-hero-kicker") {{ hero.begun ? t('app.adventure.continueJourney') : t('app.home.discoverAdventure') }}
+          span(class="go-hero-title") {{ hero.title }}
+          span(v-if="hero.begun" class="go-hero-row")
+            span(class="go-hero-bar" aria-hidden="true")
+              span(class="go-hero-fill" :style="{ width: Math.round(hero.progress * 100) + '%' }")
+            span(class="go-hero-meta") {{ hero.meta }}
+          span(class="lk-btn go-hero-btn")
+            span {{ hero.begun ? t('app.home.playOn') : t('app.home.startHere') }}
             ZIconography(name="chevron-right" :size="22")
-          template(v-else-if="id === 'support'")
-            TipButton(v-if="isIOS")
-            template(v-else)
-              //- both buttons equally wide, side by side over the whole width
-              div(class="donate-row")
-                KoFiButton(href="https://www.paypal.com/ncp/payment/5CWTQPB6NGWLU" tone="paypal" label="PayPal")
-                KoFiButton(href="https://ko-fi.com/U6U21YO0Z5" tone="kofi" label="Ko-fi")
-              //- a normal bank transfer: only there when the account is filled in (data/donation.ts)
-              BankTransfer
-          button(v-else-if="id === 'shop'" type="button" class="lk-btn hero-shop" @click="openStore")
-            ZIconography(name="shop" :size="24")
-            span(class="hero-shop-label") {{ t('app.home.slide3Button') }}
-            ZIconography(name="chevron-right" :size="22")
-          template(v-else-if="id === 'sponsors'")
-            button(
-              v-for="sp in sponsors"
-              :key="sp.id"
-              type="button"
-              class="sponsor"
-              :aria-label="sp.name"
-              @click="openSponsor(sp.url)"
-            )
-              img(v-if="sp.logo" :src="prependBaseUrl(sp.logo)" :alt="sp.name" draggable="false")
-              span(v-else) {{ sp.name }}
-
-      //- 2. the three main doors
-      nav(class="big-row")
-        button(
-          v-for="b in bigButtons"
-          :key="b.id"
-          type="button"
-          :class="['big-btn', 'is-' + b.id]"
-          @click="router.push({ name: b.route })"
-        )
-          img(class="big-art" :src="b.image" alt="" draggable="false")
-          span(class="big-label") {{ b.label }}
-          span(class="big-sub") {{ b.sub }}
 
       //- 3. where the child stands
       section(class="block")
@@ -284,9 +239,9 @@ function openBook(bookId: string) {
           )
             span(class="resume-thumb")
               img(v-if="c.image" :src="c.image" alt="" draggable="false" @error="onImgFallback")
-              ZIconography(v-else :name="c.id === 'book' ? 'series' : c.id === 'picture' ? 'brush' : 'compass'" :size="40")
+              ZIconography(v-else :name="c.id === 'book' ? 'series' : 'brush'" :size="40")
               span(class="resume-kind")
-                ZIconography(:name="c.id === 'book' ? 'series' : c.id === 'picture' ? 'brush' : 'compass'" :size="16")
+                ZIconography(:name="c.id === 'book' ? 'series' : 'brush'" :size="16")
                 span {{ c.kind }}
             span(class="resume-body")
               span(class="resume-title") {{ c.title }}
@@ -336,6 +291,37 @@ function openBook(bookId: string) {
                 @error="onImgFallback"
               )
               span(v-if="i === 0" class="new-badge") {{ t('app.read.newBadge') }}
+
+      //- last: for grown-ups (the shop, the sponsors, Plus or support)
+      HomeHero(:slides="slides" :label="t('app.home.slideLabel')")
+        template(#actions="{ id }")
+          button(v-if="id === 'support' && PREMIUM_TEASER" type="button" class="lk-btn hero-shop" @click="openPlus")
+            span(class="hero-shop-label") {{ t('app.main.plusMore') }}
+            ZIconography(name="chevron-right" :size="22")
+          template(v-else-if="id === 'support'")
+            TipButton(v-if="isIOS")
+            template(v-else)
+              //- both buttons equally wide, side by side over the whole width
+              div(class="donate-row")
+                KoFiButton(href="https://www.paypal.com/ncp/payment/5CWTQPB6NGWLU" tone="paypal" label="PayPal")
+                KoFiButton(href="https://ko-fi.com/U6U21YO0Z5" tone="kofi" label="Ko-fi")
+              //- a normal bank transfer: only there when the account is filled in (data/donation.ts)
+              BankTransfer
+          button(v-else-if="id === 'shop'" type="button" class="lk-btn hero-shop" @click="openStore")
+            ZIconography(name="shop" :size="24")
+            span(class="hero-shop-label") {{ t('app.home.slide3Button') }}
+            ZIconography(name="chevron-right" :size="22")
+          template(v-else-if="id === 'sponsors'")
+            button(
+              v-for="sp in sponsors"
+              :key="sp.id"
+              type="button"
+              class="sponsor"
+              :aria-label="sp.name"
+              @click="openSponsor(sp.url)"
+            )
+              img(v-if="sp.logo" :src="prependBaseUrl(sp.logo)" :alt="sp.name" draggable="false")
+              span(v-else) {{ sp.name }}
 
 </template>
 
@@ -415,72 +401,105 @@ button
   font-size: 1rem
   cursor: pointer
 
-// ── the three main doors ──
-.big-row
-  display: grid
-  grid-template-columns: repeat(3, 1fr)
-  gap: 10px
-
-// a calm coloured tile: the symbol on a white disc, the word under it
-.big-btn
-  position: relative
+// ── go on: the big card on top ──
+.go-hero
   display: flex
   flex-direction: column
-  align-items: center
-  justify-content: flex-end
-  gap: 4px
-  min-height: 132px
-  padding: 12px 6px 12px
-  border: none
-  border-radius: 24px
-  background: linear-gradient(165deg, color-mix(in srgb, var(--tone) 80%, #fff) 0%, var(--tone) 52%, color-mix(in srgb, var(--tone) 82%, #000) 100%)
-  color: #fff
+  padding: 0
+  overflow: hidden
+  text-align: left
+  border: 1px solid var(--lk-line)
+  border-radius: var(--lk-r-card)
+  background: var(--lk-surface)
+  color: var(--lk-text)
+  box-shadow: var(--lk-shadow)
   cursor: pointer
   touch-action: manipulation
-  box-shadow: 0 10px 18px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.08)
-  transition: transform 120ms ease-out
 
   &:active
-    transform: scale(0.97)
+    transform: translateY(1px)
 
   &:focus-visible
     outline: 3px solid var(--lk-text)
     outline-offset: 3px
 
-  &.is-color
-    --tone: var(--lk-paint)
-
-  &.is-read
-    --tone: var(--lk-read)
-
-  &.is-adventure
-    --tone: var(--lk-adventure)
-
-.big-art
+.go-hero-art
+  position: relative
   display: block
-  box-sizing: content-box
-  width: 40px
-  height: 40px
-  padding: 8px
+  aspect-ratio: 16 / 9
+  background: var(--lk-surface-2)
+
+  > img:first-child
+    position: absolute
+    inset: 0
+    width: 100%
+    height: 100%
+    object-fit: cover
+    display: block
+
+.go-hero-medal
+  position: absolute
+  right: 14px
+  bottom: -30px
+  width: 84px
+  height: 84px
   border-radius: 50%
-  background: radial-gradient(circle at 35% 30%, #fffefb, #f4ecd8)
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.45), 0 6px 12px -4px rgba(0, 0, 0, 0.4)
   object-fit: contain
-  margin-bottom: 4px
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35))
+
+.go-hero-body
+  display: flex
+  flex-direction: column
+  gap: 6px
+  padding: 14px 16px 16px
+
+.go-hero-kicker
+  padding-right: 96px
+  font-size: 0.95rem
+  font-weight: 800
+  color: var(--lk-adventure)
+
+.go-hero-title
+  padding-right: 96px
+  font-size: 1.7rem
+  font-weight: 800
+  line-height: 1.15
+
+.go-hero-row
+  display: flex
+  align-items: center
+  gap: 10px
+  margin-top: 4px
+
+.go-hero-bar
+  flex: 1
+  height: 10px
+  border-radius: 999px
+  background: var(--lk-track)
+  overflow: hidden
+
+.go-hero-fill
+  display: block
+  height: 100%
+  border-radius: 999px
+  background: var(--lk-fill)
+
+.go-hero-meta
+  flex: none
+  font-size: 0.95rem
+  font-weight: 700
+
+.go-hero-btn
+  margin-top: 8px
+  width: 100%
+  justify-content: center
+  gap: 8px
+  font-size: 1.2rem
+  font-weight: 800
   pointer-events: none
 
-.big-label
-  font-weight: 800
-  font-size: 1.08rem
-  line-height: 1.1
-  white-space: nowrap
-
-.big-sub
-  font-weight: 600
-  font-size: 0.7rem
-  line-height: 1.15
-  text-align: center
-  opacity: 0.94
+  :deep(.z-icon-outline)
+    color: currentColor
 
 // ── blocks ──
 .block
@@ -516,23 +535,12 @@ button
 
 // ── continue ──
 .resume-grid
-  display: flex
+  display: grid
+  grid-template-columns: repeat(2, minmax(0, 1fr))
   gap: 12px
-  align-items: stretch
-  overflow-x: auto
-  scroll-snap-type: x proximity
-  margin: 0 -16px
-  padding: 2px 16px 8px
-  scroll-padding-left: 16px
-  scrollbar-width: none
-
-  &::-webkit-scrollbar
-    display: none
 
 // a white card: the picture fills the top edge to edge, the title and the bar sit below it
 .resume-card
-  flex: 0 0 min(46%, 260px)
-  scroll-snap-align: start
   display: flex
   flex-direction: column
   min-width: 0
@@ -757,6 +765,16 @@ button
 
 // ── tablet and wide ──
 @media (min-width: 720px)
+  .go-hero
+    flex-direction: row
+
+  .go-hero-art
+    flex: 0 0 52%
+
+  .go-hero-body
+    flex: 1
+    justify-content: center
+
   .home-body
     padding: 24px 24px 0
     gap: 28px
