@@ -6,7 +6,8 @@
 import { PREMIUM_TEASER, hasFeature } from '@/use/usePremium'
 
 /** The adventures that are free in full. */
-export const FREE_JOURNEYS: readonly string[] = ['josef', 'adam-eva', 'noah', 'babel', 'abraham', 'jakob']
+// (Anton 10.11.2026: the birth and the resurrection of Jesus are free for every child, the app is there to tell of him)
+export const FREE_JOURNEYS: readonly string[] = ['josef', 'adam-eva', 'noah', 'babel', 'abraham', 'jakob', 'weihnachten', 'ostern']
 
 /** True when the whole adventure may be played without Plus. */
 export const isJourneyFree = (journeyId: string): boolean => FREE_JOURNEYS.includes(journeyId)

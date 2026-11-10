@@ -14,6 +14,7 @@ import CollectionCardViewer from '@/components/molecules/CollectionCardViewer.vu
 import MyRewards from '@/components/molecules/MyRewards.vue'
 import LkPageHead from '@/components/molecules/LkPageHead.vue'
 import { journeys } from '@/data/adventures'
+import { inBibleOrder } from '@/utils/continueJourney'
 import useAdventure from '@/use/useAdventure'
 import { cupOf } from '@/utils/rewards'
 import { maxPoints, pointsOf } from '@/utils/adventureScore'
@@ -35,7 +36,7 @@ type Tab = 'cabinet' | 'album' | 'gifts'
 // the stack of cards comes first (it is the special thing), the cabinet second
 const tab = ref<Tab>('album')
 
-const cups = computed(() => journeys.map((j) => ({ journey: j, ...cupStats(j, adv.progressOf(j.id), cupOf, pointsOf, maxPoints) })))
+const cups = computed(() => inBibleOrder(journeys).map((j) => ({ journey: j, ...cupStats(j, adv.progressOf(j.id), cupOf, pointsOf, maxPoints) })))
 const wonCups = computed(() => cups.value.filter((c) => c.cup).length)
 // the coloring pictures that the cups gave (one for every cup)
 const giftCount = computed(() => wonCups.value)
@@ -44,7 +45,7 @@ const cupImage = (cup: string) => prependBaseUrl(`images/abenteuer/ui/pokal-${cu
 const { isNew, markSeen } = useCardsSeen()
 /** One card for every adventure: it is won with all its stages at three stars. */
 const albums = computed(() =>
-  journeys
+  inBibleOrder(journeys)
     .map((j) => {
       const cards = albumCards(j, (stageId) => adv.stageOf(j.id, stageId))
       return { journey: j, cards, set: albumSetCard(j, cards), art: CARD_ART[j.id] }

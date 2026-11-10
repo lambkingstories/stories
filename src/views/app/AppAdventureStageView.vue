@@ -1176,7 +1176,8 @@ function openGift() {
 
       //- 3. the overview between the game and the questions: the game is done, the stage is not
       section(v-else-if="phase === 'bridge'" class="stage-card stage-result")
-        h2(class="stage-h2") {{ t('app.adventure.bridgeTitle') }}
+        //- no praise for a game that was skipped
+        h2(class="stage-h2") {{ gameStars ? t('app.adventure.bridgeTitle') : t('app.adventure.bridgeTitleSkipped') }}
         p(class="result-line") {{ gameStars ? t('app.adventure.bridgeText') : t('app.adventure.bridgeSkipped') }}
         AdventureOverview(:rows="overviewRows(true)")
         div(class="stage-actions")

@@ -26,7 +26,7 @@ import { listArtworks, type ArtworkMeta } from '@/use/useArtworks'
 import { journeys } from '@/data/adventures'
 import { sponsors } from '@/data/sponsors'
 import { nextStageIndex } from '@/utils/adventureScore'
-import { journeyToContinue } from '@/utils/continueJourney'
+import { inBibleOrder, journeyToBegin, journeyToContinue } from '@/utils/continueJourney'
 import { isIOS } from '@/utils/platform'
 import { isColoringBook } from '@/utils/coloringBook'
 import usePremium, { PREMIUM_TEASER } from '@/use/usePremium'
@@ -103,7 +103,7 @@ async function openPlus() {
 // ── the journey through the Bible (a row of medals to open an adventure) ─────
 
 const journeyTiles = computed(() =>
-  journeys.map((j) => ({ id: j.id, title: j.title, image: prependBaseUrl(j.medal), plus: isJourneyPlusLocked(j.id) }))
+  inBibleOrder(journeys).map((j) => ({ id: j.id, title: j.title, image: prependBaseUrl(j.medal), plus: isJourneyPlusLocked(j.id) }))
 )
 
 function openJourney(id: string) {
@@ -172,7 +172,8 @@ const pictureCard = computed<ResumeCard>(() => {
 /** The big card on top: the adventure the child is in; if none was begun, the first one. */
 const hero = computed(() => {
   const begun = journeyToContinue(journeys, adventure.progressOf)
-  const journey = begun ?? journeys[0]
+  // none under way: the first adventure of the Bible that is open and not finished (a new child begins with Adam and Eve)
+  const journey = begun ?? journeyToBegin(journeys, adventure.progressOf, isJourneyPlusLocked)
   if (!journey) return null
   const total = journey.stages.length
   const next = begun ? (nextStageIndex(journey, adventure.progressOf(journey.id)) ?? 0) : 0

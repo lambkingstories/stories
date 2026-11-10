@@ -33,22 +33,17 @@ afterEach(() => {
 })
 
 describe('the start page', () => {
-  it('shows the three big buttons and they open Paint, Read and Adventure', async () => {
+  it('begins with one big card that opens an adventure (playing first; the three doors only repeated the bar below)', async () => {
     const { default: Home } = await import('@/views/app/AppHomeView.vue')
     const wrapper = mount(Home, { global: { plugins: [i18n], stubs: { RouterLink: true } }, attachTo: document.body })
     await flushPromises()
-    const big = wrapper.findAll('.big-btn')
-    expect(big.map((b) => b.text())).toEqual([
-      expect.stringContaining('Malen'),
-      expect.stringContaining('Lesen'),
-      expect.stringContaining('Abenteuer')
-    ])
-    const routes = ['app-coloring', 'app-read', 'app-adventure']
-    for (let i = 0; i < big.length; i++) {
-      push.mockClear()
-      await big[i]!.trigger('click')
-      expect(push).toHaveBeenCalledWith({ name: routes[i] })
-    }
+    expect(wrapper.findAll('.big-btn')).toHaveLength(0)
+    const first = wrapper.find('.home-body > *')
+    expect(first.classes()).toContain('go-hero')
+    expect(first.text()).toMatch(/Fang hier an/)
+    push.mockClear()
+    await first.trigger('click')
+    expect(push).toHaveBeenCalledWith(expect.objectContaining({ name: 'app-adventure-map' }))
     expect(warnings.filter((w) => /not defined on instance|is not a function|ERROR/.test(w))).toEqual([])
   })
 
@@ -57,7 +52,8 @@ describe('the start page', () => {
     const wrapper = mount(Home, { global: { plugins: [i18n], stubs: { RouterLink: true } }, attachTo: document.body })
     await flushPromises()
     const cards = wrapper.findAll('.resume-card')
-    expect(cards).toHaveLength(3)
+    // the book and the picture (the adventure has the big card on top)
+    expect(cards).toHaveLength(2)
     for (const c of cards) {
       push.mockClear()
       await c.trigger('click')
@@ -68,12 +64,12 @@ describe('the start page', () => {
     expect(warnings.filter((w) => /not defined on instance|is not a function|ERROR/.test(w))).toEqual([])
   })
 
-  it('the welcome iPad has three slides and none of them is a partner slide', async () => {
+  it('the card for grown-ups comes last, has two slides (the shop, then Plus or support) and none of them is a partner slide', async () => {
     const { default: Home } = await import('@/views/app/AppHomeView.vue')
     const wrapper = mount(Home, { global: { plugins: [i18n], stubs: { RouterLink: true } }, attachTo: document.body })
     await flushPromises()
-    expect(wrapper.findAll('.hero-slide')).toHaveLength(3)
-    expect(wrapper.text()).toContain('Willkommen')
+    expect(wrapper.findAll('.hero-slide')).toHaveLength(2)
+    expect(wrapper.find('.home-body > *:last-child').classes()).toContain('hero')
     expect(wrapper.text()).not.toMatch(/Reach/i)
   })
 })

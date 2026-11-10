@@ -4,12 +4,15 @@
  * the language, and one button that goes to the start page. The companion lamb sits on the rim of the greeting card.
  * The language is written through `setSettingValue('language', …)` only; App.vue syncs it to i18n and localStorage.
  */
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import LkCompanion from '@/components/atoms/LkCompanion.vue'
 import AppHeader from '@/components/molecules/AppHeader.vue'
+import AvatarPickerModal from '@/components/molecules/AvatarPickerModal.vue'
+import useAvatar, { onAvatarFallback } from '@/use/useAvatar'
+import useUserName from '@/use/useUserName'
 import useUser from '@/use/useUser'
 import { prependBaseUrl } from '@/utils/function'
 import { contentLocale } from '@/utils/contentLocale'
@@ -41,7 +44,14 @@ function pick(code: 'de' | 'en' | 'es') {
   if (current.value !== code) setSettingValue('language', code)
 }
 
+// who the child is: a name and a figure, both free to leave out (they stay on the device and can be changed in "Ich")
+const { userName, setUserName } = useUserName()
+const { avatarSrc } = useAvatar()
+const name = ref(userName.value)
+const avatarOpen = ref(false)
+
 function onStart() {
+  setUserName(name.value)
   try {
     localStorage.setItem('lk-welcome-seen', '1')
   } catch {
@@ -100,9 +110,30 @@ function onStart() {
                 circle(v-for="d in stars" :key="d.k" :cx="d.x" :cy="d.y" r="1.1" fill="#ffffff")
             span(class="lang-name") {{ l.label }}
 
+      section(class="who")
+        h2(class="lang-title") {{ t('app.welcome.whoTitle') }}
+        div(class="who-row")
+          button(type="button" class="who-avatar" :aria-label="t('app.welcome.pickAvatar')" @click="avatarOpen = true")
+            img(:src="avatarSrc" alt="" draggable="false" @error="onAvatarFallback")
+            span(class="who-pen" aria-hidden="true")
+              ZIconography(name="brush" :size="16")
+          input(
+            v-model="name"
+            class="who-name"
+            type="text"
+            maxlength="20"
+            autocomplete="off"
+            autocapitalize="words"
+            enterkeyhint="done"
+            :placeholder="t('app.welcome.namePlaceholder')"
+            :aria-label="t('app.welcome.namePlaceholder')"
+          )
+        p(class="who-note") {{ t('app.welcome.nameNote') }}
+
       button(type="button" class="lk-btn lk-btn--full" @click="onStart")
         span {{ t('app.welcome.cta') }}
         ZIconography(name="chevron-right" :size="22")
+    AvatarPickerModal(:open="avatarOpen" @close="avatarOpen = false")
 </template>
 
 <style scoped lang="sass">
@@ -155,6 +186,69 @@ function onStart() {
   margin: 0 0 10px
   font-size: 1.3rem
   font-weight: 800
+
+// who are you: the figure to tap and the field for the name
+.who-row
+  display: flex
+  align-items: center
+  gap: 12px
+
+.who-avatar
+  position: relative
+  flex: none
+  width: 64px
+  height: 64px
+  padding: 0
+  border: 2px solid var(--lk-accent)
+  border-radius: 50%
+  background: var(--lk-surface)
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+
+  img
+    display: block
+    width: 100%
+    height: 100%
+    border-radius: 50%
+    object-fit: cover
+
+.who-pen
+  position: absolute
+  right: -4px
+  bottom: -4px
+  display: flex
+  align-items: center
+  justify-content: center
+  width: 26px
+  height: 26px
+  border-radius: 50%
+  background: var(--lk-accent)
+  color: var(--lk-on-accent)
+
+  :deep(.z-icon-outline)
+    color: currentColor
+
+.who-name
+  flex: 1
+  min-width: 0
+  min-height: 56px
+  padding: 0 18px
+  border: 1.5px solid var(--lk-line)
+  border-radius: 999px
+  background: var(--lk-surface)
+  color: var(--lk-text)
+  font: inherit
+  font-size: 1.15rem
+  font-weight: 700
+
+  &:focus-visible
+    outline: none
+    border-color: var(--lk-accent)
+
+.who-note
+  margin: 8px 0 0
+  font-size: 0.9rem
+  color: var(--lk-muted)
 
 .lang-list
   display: flex

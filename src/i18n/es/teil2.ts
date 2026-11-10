@@ -1808,6 +1808,7 @@ export default {
   findCount: 'Encontrados: {n} de {total}',
   findDone: '¡Encontraste a los once hermanos!',
   bridgeTitle: '¡Muy bien!',
+  bridgeTitleSkipped: '¡Seguimos!',
   bridgeText: 'El juego terminó, pero la etapa todavía no. Ahora vienen unas preguntas sobre la historia. Cada respuesta equivocada te quita una estrella.',
   starsLost: 'La respuesta equivocada te quitó {n} estrella. | Las respuestas equivocadas te quitaron {n} estrellas.',
   starsGained: 'Las respuestas correctas te devolvieron {n} estrella. | Las respuestas correctas te devolvieron {n} estrellas.',

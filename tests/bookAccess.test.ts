@@ -68,10 +68,10 @@ describe('what a person may use', () => {
     expect(m.hasFeature('adventure')).toBe(false)
   })
 
-  it('opens six adventures in full (Josef, Adam und Eva, Noah, Babel, Abraham, Jakob) and every stage of any other one is behind Plus', async () => {
+  it('opens eight adventures in full (Josef, Adam und Eva, Noah, Babel, Abraham, Jakob, Weihnachten, Ostern) and every stage of any other one is behind Plus', async () => {
     const m = await load({ VITE_PREMIUM_TEASER: 'true' })
-    expect(m.FREE_JOURNEYS).toHaveLength(6)
-    for (const id of ['josef', 'adam-eva', 'noah', 'babel', 'abraham', 'jakob']) expect([0, 5, 11].map((i) => m.isStagePlusLocked(id, i)), id).toEqual([false, false, false])
+    expect(m.FREE_JOURNEYS).toHaveLength(8)
+    for (const id of ['josef', 'adam-eva', 'noah', 'babel', 'abraham', 'jakob', 'weihnachten', 'ostern']) expect([0, 5, 11].map((i) => m.isStagePlusLocked(id, i)), id).toEqual([false, false, false])
     for (const id of ['mose', 'jona', 'david']) expect([0, 1, 2, 3, 11].map((i) => m.isStagePlusLocked(id, i)), id).toEqual([true, true, true, true, true])
   })
 

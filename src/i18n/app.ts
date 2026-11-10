@@ -2327,6 +2327,7 @@ export default {
         findCount: 'Found: {n} of {total}',
         findDone: 'You found all eleven brothers!',
         bridgeTitle: 'Well done!',
+        bridgeTitleSkipped: 'On we go!',
         bridgeText: 'The game is done, but the stage is not finished yet. Now come a few questions about the story. Every wrong answer takes one star away.',
         starsLost: 'The wrong answer took {n} star away. | The wrong answers took {n} stars away.',
         starsGained: 'The right answers brought {n} star back. | The right answers brought {n} stars back.',
@@ -2443,6 +2444,10 @@ export default {
       welcome: {
         title: 'Welcome to LambKing Stories.',
         chooseLanguage: 'Choose your language',
+        whoTitle: 'Who are you?',
+        pickAvatar: 'Choose your character',
+        namePlaceholder: 'Your name',
+        nameNote: 'Your name stays on this device only. You can change it under "Me".',
         cta: 'Let\'s go!',
         // The heading and subtitle are part of the artwork, so the alt text
         // repeats them for screen readers.
@@ -3324,7 +3329,7 @@ export default {
         bookLabel: 'book | books'
       },
       newBooks: {
-        sub: 'Discover new stories, pictures and adventures.',
+        sub: 'This is new.',
         title: 'New Books',
         breadcrumb: 'NEW IN THE LIBRARY',
         empty: 'No new books in the past 3 months.'
@@ -3699,10 +3704,10 @@ export default {
         area2Get2: 'The golden cards of all the other adventures',
         area2Get3: 'The quiz with all adventures',
         area2Get4: 'New adventures as soon as they exist',
-        area2Get5: 'Family games: quiz in all forms, Activity, Who am I?, order race, Bible bingo and memory',
-        area2Free1: 'Six adventures in full: Joseph, Adam and Eve, Noah, the Tower of Babel, Abraham and Jacob',
-        area2Free2: 'Stars, cups and the cup cabinet',
-        area2Free3: 'Six golden collector cards (those of the free adventures)',
+        area2Get5: 'Family games: Activity, Who am I?, order race, Bible bingo and memory',
+        area2Free1: 'Eight adventures in full: Adam and Eve, Noah, the Tower of Babel, Abraham, Jacob, Joseph, Christmas and Easter',
+        area2Free2: 'Stars, cups, the cup cabinet and the family Bible quiz',
+        area2Free3: 'Eight golden collector cards (those of the free adventures)',
         area3Title: 'Painting',
         area3Get1: 'All pictures of all coloring books while Plus runs',
         area3Get2: '36 colors in every box, your own colors and the glitter pencils',
@@ -3722,7 +3727,7 @@ export default {
         plusGet5: 'New adventures and coloring books as they come.',
         freeTitle: 'What stays free for ever',
         plusFree1: 'All stories to read yourself.',
-        plusFree2: 'Six adventures in full: Joseph, Adam and Eve, Noah, the Tower of Babel, Abraham and Jacob.',
+        plusFree2: 'Eight adventures in full: Adam and Eve, Noah, the Tower of Babel, Abraham, Jacob, Joseph, Christmas and Easter.',
         plusFree3: 'Volume 1 of the Buntstift series in full, and one picture of every other coloring book.',
         plusFree4: 'The coloring app with all its tools and the 12 basic colors of every box. Paintings your child made always stay.',
         plusFree5: 'Stars and awards.',
@@ -6213,6 +6218,7 @@ export default {
         findCount: 'Gefunden: {n} von {total}',
         findDone: 'Du hast alle elf Brüder gefunden!',
         bridgeTitle: 'Gut gemacht!',
+        bridgeTitleSkipped: 'Weiter geht es!',
         bridgeText: 'Das Spiel ist geschafft, aber die Etappe noch nicht. Jetzt kommen noch ein paar Fragen zur Geschichte. Jede falsche Antwort nimmt dir einen Stern weg.',
         starsLost: 'Die falsche Antwort hat dir {n} Stern weggenommen. | Die falschen Antworten haben dir {n} Sterne weggenommen.',
         starsGained: 'Die richtigen Antworten haben dir {n} Stern zurückgebracht. | Die richtigen Antworten haben dir {n} Sterne zurückgebracht.',
@@ -6329,6 +6335,10 @@ export default {
       welcome: {
         title: 'Willkommen bei LambKing Stories.',
         chooseLanguage: 'Sprache wählen',
+        whoTitle: 'Wer bist du?',
+        pickAvatar: 'Figur aussuchen',
+        namePlaceholder: 'Dein Name',
+        nameNote: 'Dein Name bleibt nur auf diesem Gerät. Unter „Ich“ kannst du ihn ändern.',
         cta: 'Los geht\'s!',
         // Überschrift und Untertitel stecken im Bild — der Alt-Text
         // wiederholt sie für Screenreader.
@@ -7025,9 +7035,9 @@ export default {
         booksInSeries: 'In dieser Serie gibt es noch keine Bücher.',
         hubTitle: 'Lesen',
         hubSub: 'Was möchtest du heute lesen?',
-        storiesTitle: 'Stories',
+        storiesTitle: 'Geschichten',
         storiesSub: 'Geschichten zum Lesen und Hören',
-        booksTitle: 'Books',
+        booksTitle: 'Bücher',
         booksSub: 'Gedruckte Bücher aus unserem Store',
         coloringTitle: 'Malbücher',
         coloringSub: 'Blättere und male weiter',
@@ -7208,7 +7218,7 @@ export default {
         bookLabel: 'Buch | Bücher'
       },
       newBooks: {
-        sub: 'Entdecke neue Geschichten, Bilder und Abenteuer.',
+        sub: 'Das ist neu dazugekommen.',
         title: 'Neue Bücher',
         breadcrumb: 'NEU IN DER BIBLIOTHEK',
         empty: 'Keine neuen Bücher in den letzten 3 Monaten.'
@@ -7583,10 +7593,10 @@ export default {
         area2Get2: 'Die goldenen Karten aller weiteren Abenteuer',
         area2Get3: 'Das Quiz mit allen Abenteuern',
         area2Get4: 'Neue Abenteuer, sobald es sie gibt',
-        area2Get5: 'Familien-Spiele: Quiz in allen Arten, Activity, Wer bin ich?, Reihenfolge-Rennen, Bibel-Bingo und Memory',
-        area2Free1: 'Sechs Abenteuer ganz: Josef, Adam und Eva, Noah, der Turm zu Babel, Abraham und Jakob',
-        area2Free2: 'Sterne, Pokale und die Pokal-Vitrine',
-        area2Free3: 'Sechs goldene Sammelkarten (die der freien Abenteuer)',
+        area2Get5: 'Familien-Spiele: Activity, Wer bin ich?, Reihenfolge-Rennen, Bibel-Bingo und Memory',
+        area2Free1: 'Acht Abenteuer ganz: Adam und Eva, Noah, der Turm zu Babel, Abraham, Jakob, Josef, Weihnachten und Ostern',
+        area2Free2: 'Sterne, Pokale, die Pokal-Vitrine und das Bibel-Quiz für die Familie',
+        area2Free3: 'Acht goldene Sammelkarten (die der freien Abenteuer)',
         area3Title: 'Malen',
         area3Get1: 'Alle Bilder aller Malbücher, solange Plus läuft',
         area3Get2: '36 Farben in jedem Kasten, eigene Farben und die Glitzerstifte',
@@ -7606,7 +7616,7 @@ export default {
         plusGet5: 'Neue Abenteuer und Malbücher, sobald es sie gibt.',
         freeTitle: 'Das bleibt für immer gratis',
         plusFree1: 'Alle Geschichten zum Selberlesen.',
-        plusFree2: 'Sechs Abenteuer ganz: Josef, Adam und Eva, Noah, der Turm zu Babel, Abraham und Jakob.',
+        plusFree2: 'Acht Abenteuer ganz: Adam und Eva, Noah, der Turm zu Babel, Abraham, Jakob, Josef, Weihnachten und Ostern.',
         plusFree3: 'Band 1 der Buntstift-Reihe ganz, und ein Bild jedes weiteren Malbuchs.',
         plusFree4: 'Die Mal-App mit allen Werkzeugen und den 12 Grundfarben jedes Kastens. Bilder, die dein Kind gemalt hat, bleiben immer.',
         plusFree5: 'Sterne und Auszeichnungen.',

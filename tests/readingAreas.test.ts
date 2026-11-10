@@ -77,7 +77,7 @@ describe('Lesen: the front door', () => {
     const wrapper = mount(View, { global: { plugins: [i18n] }, attachTo: document.body })
     await flushPromises()
     const doors = wrapper.findAll('.door')
-    expect(doors.map((d) => d.find('.door-title').text())).toEqual(['Stories', 'Books', 'Malbücher', 'Gute Nacht'])
+    expect(doors.map((d) => d.find('.door-title').text())).toEqual(['Geschichten', 'Bücher', 'Malbücher', 'Gute Nacht'])
     const routes = ['app-all-books', 'app-books', 'app-coloring-books', 'app-goodnight']
     for (let i = 0; i < doors.length; i++) {
       push.mockClear()
