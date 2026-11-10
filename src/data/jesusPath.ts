@@ -62,12 +62,11 @@ export const JESUS_PATH: Record<'de' | 'en', JesusPathTexts> = {
         title: 'Du kannst jederzeit zu Jesus kommen',
         text: 'Du musst nicht erst alles richtig machen. Jesus steht an der Tür und klopft an, so wie ein Freund. Du kannst jederzeit zu ihm kommen, morgens, abends, überall. Sag ihm, was dir leid tut, und bitte ihn, bei dir zu sein. Du kannst mit eigenen Worten sprechen. Wenn du nicht weißt, was du sagen sollst, kannst du so beten:',
         verse: { text: 'Siehe, ich stehe vor der Tür und klopfe an. So jemand meine Stimme hören wird und die Tür auftun, zu dem werde ich eingehen und das Abendmahl mit ihm halten und er mit mir.', ref: 'Offenbarung 3,20' },
-        prayer: 'Jesus, ich möchte zu dir gehören. Es tut mir leid, was ich falsch gemacht habe. Danke, dass du für mich gestorben und auferstanden bist. Komm in mein Leben. Amen.',
-        prayerNote: 'Wenn du noch nicht so weit bist, ist das in Ordnung. Du kannst jederzeit wiederkommen.'
+        prayer: 'Jesus, ich möchte zu dir gehören. Es tut mir leid, was ich falsch gemacht habe. Danke, dass du für mich gestorben und auferstanden bist. Komm in mein Leben. Amen.'
       },
       {
         title: 'Er bleibt bei dir',
-        text: 'Jesus hat versprochen: Ich bin bei euch. Du kannst mit ihm reden, abends im Bett, auf dem Schulweg, überall. Lies in der Bibel, was er erlebt hat; hier in LambKing findest du seine Geschichten. Und erzähl jemandem, dem du vertraust, was du heute gelesen hast.',
+        text: 'Jesus hat versprochen: Ich bin bei euch. Du kannst mit ihm reden, abends im Bett, auf dem Schulweg, überall. Lies in der Bibel, was Jesus getan und gesagt hat; hier in LambKing findest du seine Geschichten. Und erzähl jemandem, dem du vertraust, was du heute gelesen hast.',
         verse: { text: 'Und siehe, ich bin bei euch alle Tage bis an der Welt Ende.', ref: 'Matthäus 28,20' }
       }
     ]
@@ -104,12 +103,11 @@ export const JESUS_PATH: Record<'de' | 'en', JesusPathTexts> = {
         title: 'You can come to Jesus any time',
         text: 'You do not have to get everything right first. Jesus stands at the door and knocks, like a friend. You can come to him any time, morning, evening, anywhere. Tell him what you are sorry for and ask him to be with you. You can use your own words. If you do not know what to say, you can pray like this:',
         verse: { text: 'Behold, I stand at the door, and knock: if any man hear my voice, and open the door, I will come in to him, and will sup with him, and he with me.', ref: 'Revelation 3:20' },
-        prayer: 'Jesus, I want to belong to you. I am sorry for what I have done wrong. Thank you that you died for me and rose again. Come into my life. Amen.',
-        prayerNote: 'If you are not ready yet, that is fine. You can come back any time.'
+        prayer: 'Jesus, I want to belong to you. I am sorry for what I have done wrong. Thank you that you died for me and rose again. Come into my life. Amen.'
       },
       {
         title: 'He stays with you',
-        text: 'Jesus promised: I am with you. You can talk to him in bed at night, on the way to school, anywhere. Read in the Bible what he did; here in LambKing you find his stories. And tell someone you trust what you read today.',
+        text: 'Jesus promised: I am with you. You can talk to him in bed at night, on the way to school, anywhere. Read in the Bible what Jesus did and said; here in LambKing you find his stories. And tell someone you trust what you read today.',
         verse: { text: 'And, lo, I am with you alway, even unto the end of the world.', ref: 'Matthew 28:20' }
       }
     ]
