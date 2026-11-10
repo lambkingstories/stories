@@ -3803,10 +3803,24 @@ export default {
         finished: 'Done',
         congratsTitle: 'You did it!',
         congratsSub: 'You finished the story.',
+        readStar: 'That is your reading star number {n}.',
         nextStoryWaiting: 'The next story is waiting for you!',
         openColoring: 'Open coloring page',
         paintThis: 'Color this page',
         unlockBook: 'Unlock the whole book'
+      },
+      daily: {
+        title: 'Today for you',
+        verseKicker: 'The verse of the day',
+        taskRead: 'Today: read a story.',
+        taskPlay: 'Today: play a stage of an adventure.',
+        taskPaint: 'Today: paint a picture.',
+        goRead: 'To the stories',
+        goPlay: 'To the adventures',
+        goPaint: 'To painting',
+        doneLine: 'Done! That is your star for today.',
+        starsLine: 'Your day stars: {n}',
+        calm: 'No rush. Tomorrow there is a new verse.'
       },
       awards: {
         sub: 'Your collected moments.',
@@ -3824,7 +3838,18 @@ export default {
           'all-tools': { title: 'All the tools', desc: 'You tried colored pencil, marker, watercolor, oil paint, graphite and chalk.' },
           'brush-artist': { title: 'Brush artist', desc: 'You painted with watercolor and with oil paint.' },
           'three-days': { title: 'Sticking with it', desc: 'You painted on three different days.' },
-          'first-read': { title: 'First story', desc: 'You read a story to the end.' }
+          'first-read': { title: 'First story', desc: 'You read a story to the end.' },
+          'five-reads': { title: 'Five stories', desc: 'You read five stories to the end.' },
+          'twenty-reads': { title: 'Bookworm', desc: 'You read twenty stories to the end.' },
+          'first-stage': { title: 'First step', desc: 'You went through your first stage of an adventure.' },
+          'first-adventure': { title: 'A whole adventure', desc: 'You went through an adventure to its exam.' },
+          'five-adventures': { title: 'Bible wanderer', desc: 'You went through five adventures.' },
+          'quiz-ten': { title: 'Clever head', desc: 'You answered ten questions right.' },
+          'quiz-fifty': { title: 'Bible expert', desc: 'You answered fifty questions right.' },
+          'first-card': { title: 'First golden card', desc: 'You won your first golden card.' },
+          'five-cards': { title: 'Card collector', desc: 'You collected five golden cards.' },
+          'daily-three': { title: 'Three day stars', desc: 'You won the star of “Today for you” on three days.' },
+          'daily-ten': { title: 'Ten day stars', desc: 'You won the star of “Today for you” on ten days.' }
         }
       },
       // In-app tip, iOS only — the App Store build cannot link out to
@@ -7709,10 +7734,24 @@ export default {
         finished: 'Fertig',
         congratsTitle: 'Geschafft!',
         congratsSub: 'Du hast die Geschichte zu Ende gelesen.',
+        readStar: 'Das ist dein Lesestern Nummer {n}.',
         nextStoryWaiting: 'Die nächste Geschichte wartet auf dich!',
         openColoring: 'Ausmalbild öffnen',
         paintThis: 'Diese Seite ausmalen',
         unlockBook: 'Das ganze Buch freischalten'
+      },
+      daily: {
+        title: 'Heute für dich',
+        verseKicker: 'Der Vers des Tages',
+        taskRead: 'Heute: Lies eine Geschichte.',
+        taskPlay: 'Heute: Spiele eine Etappe im Abenteuer.',
+        taskPaint: 'Heute: Male ein Bild.',
+        goRead: 'Zu den Geschichten',
+        goPlay: 'Zu den Abenteuern',
+        goPaint: 'Zum Malen',
+        doneLine: 'Geschafft! Das ist dein Stern für heute.',
+        starsLine: 'Deine Tages-Sterne: {n}',
+        calm: 'Kein Druck. Morgen gibt es einen neuen Vers.'
       },
       awards: {
         sub: 'Deine gesammelten Momente.',
@@ -7730,7 +7769,18 @@ export default {
           'all-tools': { title: 'Alle Werkzeuge', desc: 'Du hast Buntstift, Filzstift, Wasserfarbe, Ölfarbe, Bleistift und Kreide ausprobiert.' },
           'brush-artist': { title: 'Pinselkünstler', desc: 'Du hast mit Wasserfarbe und mit Ölfarbe gemalt.' },
           'three-days': { title: 'Dranbleiber', desc: 'Du hast an drei verschiedenen Tagen gemalt.' },
-          'first-read': { title: 'Erste Geschichte', desc: 'Du hast eine Geschichte bis zum Ende gelesen.' }
+          'first-read': { title: 'Erste Geschichte', desc: 'Du hast eine Geschichte bis zum Ende gelesen.' },
+          'five-reads': { title: 'Fünf Geschichten', desc: 'Du hast fünf Geschichten bis zum Ende gelesen.' },
+          'twenty-reads': { title: 'Leseratte', desc: 'Du hast zwanzig Geschichten bis zum Ende gelesen.' },
+          'first-stage': { title: 'Erster Schritt', desc: 'Du hast deine erste Etappe in einem Abenteuer geschafft.' },
+          'first-adventure': { title: 'Ein ganzes Abenteuer', desc: 'Du hast ein Abenteuer bis zur Prüfung geschafft.' },
+          'five-adventures': { title: 'Bibel-Wanderer', desc: 'Du hast fünf Abenteuer geschafft.' },
+          'quiz-ten': { title: 'Schlaues Köpfchen', desc: 'Du hast zehn Fragen richtig beantwortet.' },
+          'quiz-fifty': { title: 'Bibel-Kenner', desc: 'Du hast fünfzig Fragen richtig beantwortet.' },
+          'first-card': { title: 'Erste goldene Karte', desc: 'Du hast deine erste goldene Karte gewonnen.' },
+          'five-cards': { title: 'Kartensammler', desc: 'Du hast fünf goldene Karten gesammelt.' },
+          'daily-three': { title: 'Drei Tages-Sterne', desc: 'Du hast an drei Tagen den Stern von „Heute für dich“ gewonnen.' },
+          'daily-ten': { title: 'Zehn Tages-Sterne', desc: 'Du hast an zehn Tagen den Stern von „Heute für dich“ gewonnen.' }
         }
       },
       // In-app tip, iOS only — the App Store build cannot link out to

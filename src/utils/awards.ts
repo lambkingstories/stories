@@ -12,6 +12,17 @@ export type AwardId =
   | 'three-days'
   | 'first-read'
   | 'brush-artist'
+  | 'five-reads'
+  | 'twenty-reads'
+  | 'first-stage'
+  | 'first-adventure'
+  | 'five-adventures'
+  | 'quiz-ten'
+  | 'quiz-fifty'
+  | 'first-card'
+  | 'five-cards'
+  | 'daily-three'
+  | 'daily-ten'
 
 /** What the app has counted so far. */
 export interface AwardStats {
@@ -25,6 +36,16 @@ export interface AwardStats {
   paintDays: number
   /** Books read to the end. */
   booksRead: number
+  /** Stages of the adventures that were gone through. */
+  stagesDone: number
+  /** Adventures with the exam at the end done. */
+  adventuresDone: number
+  /** Questions answered right in the stages. */
+  quizCorrect: number
+  /** Golden cards of the adventures that are won. */
+  cardsWon: number
+  /** Days on which the star of "Heute für dich" was won. */
+  dailyDays: number
 }
 
 /** The six painting tools; "all tools" needs every one of them. */
@@ -48,7 +69,18 @@ export const AWARDS: AwardDef[] = [
   { id: 'all-tools', image: 'all-tools', goal: PAINT_TOOLS.length, progress: toolCount },
   { id: 'brush-artist', image: 'brush-artist', goal: 2, progress: (s) => ['watercolor', 'oil'].filter((t) => s.toolsUsed.includes(t)).length },
   { id: 'three-days', image: 'three-days', goal: 3, progress: (s) => s.paintDays },
-  { id: 'first-read', image: 'first-read', goal: 1, progress: (s) => s.booksRead }
+  { id: 'first-read', image: 'first-read', goal: 1, progress: (s) => s.booksRead },
+  { id: 'five-reads', image: 'five-reads', goal: 5, progress: (s) => s.booksRead },
+  { id: 'twenty-reads', image: 'twenty-reads', goal: 20, progress: (s) => s.booksRead },
+  { id: 'first-stage', image: 'first-stage', goal: 1, progress: (s) => s.stagesDone },
+  { id: 'first-adventure', image: 'first-adventure', goal: 1, progress: (s) => s.adventuresDone },
+  { id: 'five-adventures', image: 'five-adventures', goal: 5, progress: (s) => s.adventuresDone },
+  { id: 'quiz-ten', image: 'quiz-ten', goal: 10, progress: (s) => s.quizCorrect },
+  { id: 'quiz-fifty', image: 'quiz-fifty', goal: 50, progress: (s) => s.quizCorrect },
+  { id: 'first-card', image: 'first-card', goal: 1, progress: (s) => s.cardsWon },
+  { id: 'five-cards', image: 'five-cards', goal: 5, progress: (s) => s.cardsWon },
+  { id: 'daily-three', image: 'daily-three', goal: 3, progress: (s) => s.dailyDays },
+  { id: 'daily-ten', image: 'daily-ten', goal: 10, progress: (s) => s.dailyDays }
 ]
 
 export interface AwardProgress {

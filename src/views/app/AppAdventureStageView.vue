@@ -233,6 +233,7 @@ import { inBibleOrder } from '@/utils/continueJourney'
 import { albumCards, albumSetCard } from '@/utils/collection'
 import { memoryVerseOf } from '@/data/memoryVerses'
 import { JESUS_PATH } from '@/data/jesusPath'
+import useAwards from '@/use/useAwards'
 import { adventureLanguage } from '@/use/adventureLanguage'
 import { isJourneyPlusLocked } from '@/utils/adventureAccess'
 import useAdventure from '@/use/useAdventure'
@@ -490,6 +491,17 @@ async function buildPainted() {
 const { showUpsell } = usePremium()
 
 /** The memory verse of the adventure, shown at its end; it stands on the back of the golden card (which the child has won once every stage has three stars). */
+/** Awards that a finished stage or exam has brought (the line "new award" in the result). */
+const stageAwards = useAwards()
+const wonNow = ref<string[]>([])
+watch(
+  () => phase.value,
+  (p) => {
+    if (p === 'result') wonNow.value = stageAwards.check()
+    else wonNow.value = []
+  }
+)
+
 /** At the end of Easter: the way "Who is Jesus?" is offered quietly. */
 const jesusText = computed(() => JESUS_PATH[adventureLanguage.value])
 const memoryVerse = computed(() => (journey.value ? memoryVerseOf(journey.value.id, adventureLanguage.value) : null))
@@ -1231,6 +1243,7 @@ function openGift() {
             blockquote(class="verse-text") {{ memoryVerse.text }}
             span(class="verse-ref") {{ memoryVerse.ref }}
             p(class="verse-card") {{ cardWon ? t('app.adventure.verseOnCard') : t('app.adventure.verseWinCard') }}
+          p(v-if="wonNow.length" class="result-line result-plus") {{ t('app.awards.newAward') }}: {{ wonNow.map((w) => t(`app.awards.items.${w}.title`)).join(', ') }}
           p(v-if="journey?.id === 'ostern'" class="result-line result-plus") {{ jesusText.homeCardText }}
           p(v-if="nextPlusJourney" class="result-line result-plus") {{ t('app.adventure.plusNext', { title: nextPlusJourney.title }) }}
           div(class="stage-actions")
@@ -1256,6 +1269,7 @@ function openGift() {
               strong {{ tryWrong > 0 ? '−' + tryWrong : '0' }}
           //- everything the stars give, in one place: stars of the adventure, collector card, mini game, bonus game, cup
           AdventureRewards(v-if="journey && stage" :journey="journey" :stage-id="stage.id")
+          p(v-if="wonNow.length" class="result-line result-plus") {{ t('app.awards.newAward') }}: {{ wonNow.map((w) => t(`app.awards.items.${w}.title`)).join(', ') }}
           AdventureOverview(:rows="overviewRows(false)")
           div(class="stage-actions")
             AdvButton(tone="gold" @click="goMap(stage?.id, lastWasFirst)") {{ isLastStage ? t('app.adventure.toExam') : t('app.adventure.backToMap') }}

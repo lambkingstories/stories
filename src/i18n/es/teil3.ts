@@ -1343,10 +1343,24 @@ export default {
     finished: 'Listo',
     congratsTitle: '¡Lo lograste!',
     congratsSub: 'Terminaste la historia.',
+    readStar: 'Esa es tu estrella de lectura número {n}.',
     nextStoryWaiting: '¡La siguiente historia te está esperando!',
     openColoring: 'Abrir hoja para colorear',
     paintThis: 'Colorear esta hoja',
     unlockBook: 'Desbloquear todo el libro'
+  },
+  daily: {
+    title: 'Hoy para ti',
+    verseKicker: 'El versículo del día',
+    taskRead: 'Hoy: lee una historia.',
+    taskPlay: 'Hoy: juega una etapa de una aventura.',
+    taskPaint: 'Hoy: pinta un dibujo.',
+    goRead: 'A las historias',
+    goPlay: 'A las aventuras',
+    goPaint: 'A pintar',
+    doneLine: '¡Listo! Esa es tu estrella de hoy.',
+    starsLine: 'Tus estrellas del día: {n}',
+    calm: 'Sin prisa. Mañana hay un versículo nuevo.'
   },
   awards: {
     sub: 'Tus momentos reunidos.',
@@ -1364,7 +1378,18 @@ export default {
       'all-tools': { title: 'Todas las herramientas', desc: 'Probaste lápiz de color, marcador, acuarela, óleo, grafito y tiza.' },
       'brush-artist': { title: 'Artista del pincel', desc: 'Pintaste con acuarela y con óleo.' },
       'three-days': { title: 'Constancia', desc: 'Pintaste en tres días distintos.' },
-      'first-read': { title: 'Primera historia', desc: 'Leíste una historia hasta el final.' }
+      'first-read': { title: 'Primera historia', desc: 'Leíste una historia hasta el final.' },
+      'five-reads': { title: 'Cinco historias', desc: 'Leíste cinco historias hasta el final.' },
+      'twenty-reads': { title: 'Ratón de biblioteca', desc: 'Leíste veinte historias hasta el final.' },
+      'first-stage': { title: 'Primer paso', desc: 'Completaste tu primera etapa de una aventura.' },
+      'first-adventure': { title: 'Una aventura entera', desc: 'Completaste una aventura hasta su examen.' },
+      'five-adventures': { title: 'Caminante de la Biblia', desc: 'Completaste cinco aventuras.' },
+      'quiz-ten': { title: 'Cabecita lista', desc: 'Respondiste diez preguntas bien.' },
+      'quiz-fifty': { title: 'Conocedor de la Biblia', desc: 'Respondiste cincuenta preguntas bien.' },
+      'first-card': { title: 'Primera carta dorada', desc: 'Ganaste tu primera carta dorada.' },
+      'five-cards': { title: 'Coleccionista de cartas', desc: 'Reuniste cinco cartas doradas.' },
+      'daily-three': { title: 'Tres estrellas del día', desc: 'Ganaste la estrella de «Hoy para ti» en tres días.' },
+      'daily-ten': { title: 'Diez estrellas del día', desc: 'Ganaste la estrella de «Hoy para ti» en diez días.' }
     }
   },
   gate: {

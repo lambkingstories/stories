@@ -5,6 +5,10 @@
  */
 import { computed, reactive } from 'vue'
 import useReadingProgress from '@/use/useReadingProgress'
+import useAdventure from '@/use/useAdventure'
+import { dailyStarCount } from '@/use/useDaily'
+import { journeys } from '@/data/adventures'
+import { albumCards, albumSetCard } from '@/utils/collection'
 import { PAINT_TOOLS, awardProgress, newlyEarned, type AwardId, type AwardStats } from '@/utils/awards'
 
 const KEY = 'lk-awards-v1'
@@ -53,11 +57,32 @@ function save() {
 }
 
 const reading = useReadingProgress()
+const adventure = useAdventure()
 
 function readBooks(): number {
   const done = new Set(state.read)
   for (const [id, p] of Object.entries(reading.progressMap.value)) if (p.completedAt) done.add(id)
   return done.size
+}
+
+/** What was done in the adventures: stages, exams, questions answered right and golden cards. */
+function adventureStats() {
+  let stagesDone = 0
+  let adventuresDone = 0
+  let quizCorrect = 0
+  for (const jp of Object.values(adventure.state)) {
+    if (jp.exam) adventuresDone++
+    for (const s of Object.values(jp.stages)) {
+      if (s.done) stagesDone++
+      quizCorrect += s.quizCorrect ?? 0
+    }
+  }
+  let cardsWon = 0
+  for (const j of journeys) {
+    const cards = albumCards(j, (stageId) => adventure.stageOf(j.id, stageId))
+    if (albumSetCard(j, cards).have) cardsWon++
+  }
+  return { stagesDone, adventuresDone, quizCorrect, cardsWon }
 }
 
 function stats(): AwardStats {
@@ -66,7 +91,9 @@ function stats(): AwardStats {
     finishedBooks: state.books.length,
     toolsUsed: state.tools,
     paintDays: state.days.length,
-    booksRead: readBooks()
+    booksRead: readBooks(),
+    dailyDays: dailyStarCount(),
+    ...adventureStats()
   }
 }
 
@@ -116,7 +143,26 @@ export function useAwards() {
     return settle(() => state.read.push(bookId))
   }
 
-  return { list, pictureFinished, toolUsed, paintedToday, bookRead }
+  /**
+   * Gives out what has become earned since the last look (after a stage, a story or the star of the day) and returns it, for the "new
+   * award" message. An award that was handed out before is not reported again.
+   */
+  function check(): AwardId[] {
+    const won = awardProgress(stats())
+      .filter((a) => a.earned && !state.earned[a.id])
+      .map((a) => a.id)
+    if (won.length) {
+      const now = Date.now()
+      for (const id of won) state.earned[id] = now
+      save()
+    }
+    return won
+  }
+
+  /** The stories that were read to the end (for the star after a story). */
+  const booksReadCount = computed(() => readBooks())
+
+  return { list, pictureFinished, toolUsed, paintedToday, bookRead, check, booksReadCount }
 }
 
 export default useAwards

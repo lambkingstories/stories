@@ -17,6 +17,12 @@ function goBack() {
 const { list } = useAwards()
 const earnedCount = computed(() => list.value.filter((a) => a.earned).length)
 const imageOf = (name: string) => prependBaseUrl(`images/awards/${name}.webp`)
+/** A medal that is not painted yet shows the golden star. */
+const starFallback = prependBaseUrl('images/awards/star.webp')
+function onMedalError(e: Event) {
+  const el = e.target
+  if (el instanceof HTMLImageElement && el.src !== starFallback) el.src = starFallback
+}
 const dateOf = (ms: number | null) => (ms ? new Date(ms).toLocaleDateString(locale.value) : '')
 </script>
 
@@ -33,7 +39,7 @@ const dateOf = (ms: number | null) => (ms ? new Date(ms).toLocaleDateString(loca
           class="award-tile relative p-4 text-center"
           :class="{ earned: award.earned }"
         )
-          img(class="award-medal mx-auto" :src="imageOf(award.image)" alt="" draggable="false")
+          img(class="award-medal mx-auto" :src="imageOf(award.image)" alt="" draggable="false" @error="onMedalError")
           h3(class="mt-2 text-sm md:text-base font-black award-title") {{ t(`app.awards.items.${award.id}.title`) }}
           p(class="mt-1 text-[11px] md:text-xs award-desc") {{ t(`app.awards.items.${award.id}.desc`) }}
           p(v-if="award.earned && award.earnedAt" class="mt-2 text-[11px] award-date") {{ t('app.awards.earnedOn', { date: dateOf(award.earnedAt) }) }}

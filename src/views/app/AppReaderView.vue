@@ -22,6 +22,7 @@ import AttachmentContextMenu from '@/components/molecules/AttachmentContextMenu.
 import useApiBooks from '@/use/useApiBooks'
 import useBookCache from '@/use/useBookCache'
 import useReadingProgress from '@/use/useReadingProgress'
+import useAwards from '@/use/useAwards'
 import { allowedPages, freePageCount } from '@/use/useBookAccess'
 import usePremium from '@/use/usePremium'
 import type { ApiBook, ApiLocalizedPage, Locale } from '@/types/apiBook'
@@ -535,6 +536,9 @@ onBeforeUnmount(() => {
 
 const isOnCelebration = computed(() => displayEntries.value[currentIndex.value]?.kind === 'celebration')
 const celebrationFiredFor = ref<string | null>(null)
+/** The star for a story read to the end, and the awards it brought. */
+const readAwards = useAwards()
+const readWon = ref<string[]>([])
 
 function fireConfetti() {
   // Two short bursts from each side — keeps it festive without overwhelming
@@ -564,6 +568,7 @@ watch(isOnCelebration, (yes) => {
   if (celebrationFiredFor.value !== bookId.value) {
     celebrationFiredFor.value = bookId.value
     nextTick(() => fireConfetti())
+    readWon.value = readAwards.check()
   }
 })
 
@@ -863,6 +868,8 @@ function goToBookDetail() {
                 )
                 div(v-else class="celebration-burst" aria-hidden="true") 🎉
                 h3(class="celebration-title") {{ t('app.reader.congratsTitle') }}
+                p(v-if="readAwards.booksReadCount.value > 0" class="celebration-star") ★ {{ t('app.reader.readStar', { n: readAwards.booksReadCount.value }) }}
+                p(v-if="readWon.length" class="celebration-star") {{ t('app.awards.newAward') }}: {{ readWon.map((w) => t(`app.awards.items.${w}.title`)).join(', ') }}
 
                 //- Open the book's first coloring sheet in the coloring app
                 //- (only when the book ships at least one coloring attachment).
@@ -1321,6 +1328,11 @@ function goToBookDetail() {
 
 .celebration-lamb
   margin: 0 auto -10px
+
+.celebration-star
+  margin: 4px 0 0
+  font-weight: 800
+  color: var(--color-text-primary)
 
 .celebration-title
   font-size: 32px

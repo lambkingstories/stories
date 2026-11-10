@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { PAINT_TOOLS, awardProgress, newlyEarned, type AwardStats } from '@/utils/awards'
 
-const none: AwardStats = { finishedPictures: 0, finishedBooks: 0, toolsUsed: [], paintDays: 0, booksRead: 0 }
+const none: AwardStats = { finishedPictures: 0, finishedBooks: 0, toolsUsed: [], paintDays: 0, booksRead: 0, stagesDone: 0, adventuresDone: 0, quizCorrect: 0, cardsWon: 0, dailyDays: 0 }
 
 describe('awards', () => {
   it('starts with nothing earned', () => {

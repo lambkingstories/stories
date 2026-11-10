@@ -9,7 +9,7 @@
  * The look follows the day/night theme (assets/css/theme.css). Support and shop links leave the app: they go through
  * `openExternal`, which asks the parents first. The design is neutral so that other publishers can have shelves, too.
  */
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
@@ -36,6 +36,8 @@ import { openExternal } from '@/utils/openExternal'
 import { prependBaseUrl } from '@/utils/function'
 import { contentLocale } from '@/utils/contentLocale'
 import { JESUS_PATH } from '@/data/jesusPath'
+import useDaily from '@/use/useDaily'
+import useAwards from '@/use/useAwards'
 import { adventureLanguage } from '@/use/adventureLanguage'
 
 const { t, locale } = useI18n({ useScope: 'global' })
@@ -95,6 +97,19 @@ async function openPlus() {
   if (!(await requireParent())) return
   void router.push({ name: 'app-plus' })
 }
+
+// ── "Heute für dich": the verse of the day and one small task; the star for the day is given when it is done ─────
+const daily = useDaily(() => adventureLanguage.value)
+const dailyAwards = useAwards()
+const dailyRoute = { read: 'app-read', play: 'app-adventure', paint: 'app-coloring' } as const
+const dailyJustWon = ref<string[]>([])
+watch(
+  () => daily.done.value,
+  () => {
+    if (daily.settle()) dailyJustWon.value = dailyAwards.check()
+  },
+  { immediate: true }
+)
 
 // ── "Wer ist Jesus?": a quiet card that leads to the way in five steps ─────
 const jesusText = computed(() => JESUS_PATH[adventureLanguage.value])
@@ -224,6 +239,20 @@ function openBook(bookId: string) {
           span(class="lk-btn go-hero-btn")
             span {{ hero.begun ? t('app.home.playOn') : t('app.home.startHere') }}
             ZIconography(name="chevron-right" :size="22")
+
+      //- today for you: the verse of the day and one small task
+      section(v-if="daily.verse.value" class="daily" :class="{ 'is-done': daily.claimed.value }")
+        span(class="daily-kicker") {{ t('app.daily.title') }}
+        blockquote(class="daily-verse")
+          p {{ daily.verse.value.text }}
+          cite {{ daily.verse.value.ref }}
+        div(class="daily-task")
+          span(class="daily-check" aria-hidden="true") {{ daily.claimed.value ? '★' : '' }}
+          span(class="daily-task-text") {{ daily.claimed.value ? t('app.daily.doneLine') : t(`app.daily.task${daily.today.value.kind === 'read' ? 'Read' : daily.today.value.kind === 'play' ? 'Play' : 'Paint'}`) }}
+        button(v-if="!daily.claimed.value" type="button" class="lk-btn lk-btn--small daily-go" @click="router.push({ name: dailyRoute[daily.today.value.kind] })") {{ t(`app.daily.go${daily.today.value.kind === 'read' ? 'Read' : daily.today.value.kind === 'play' ? 'Play' : 'Paint'}`) }}
+        p(v-else class="daily-count") {{ t('app.daily.starsLine', { n: daily.total.value }) }}
+        p(v-if="dailyJustWon.length" class="daily-count") {{ t('app.awards.newAward') }}: {{ dailyJustWon.map((w) => t(`app.awards.items.${w}.title`)).join(', ') }}
+        p(v-if="!daily.claimed.value" class="daily-calm") {{ t('app.daily.calm') }}
 
       //- 3. where the child stands
       section(class="block")
@@ -387,6 +416,76 @@ button
   font-weight: 800
   font-size: 1rem
   cursor: pointer
+
+// ── today for you ──
+.daily
+  display: flex
+  flex-direction: column
+  gap: 10px
+  padding: 16px 18px
+  border: 1px solid var(--lk-line)
+  border-radius: var(--lk-r-card)
+  background: var(--lk-surface)
+  box-shadow: var(--lk-shadow)
+
+  &.is-done
+    background: var(--lk-accent-soft)
+
+.daily-kicker
+  font-size: 0.78rem
+  font-weight: 800
+  letter-spacing: 0.08em
+  text-transform: uppercase
+  color: var(--lk-muted)
+
+.daily-verse
+  margin: 0
+
+  p
+    margin: 0
+    font-size: 1.12rem
+    font-weight: 700
+    line-height: 1.45
+
+  cite
+    display: block
+    margin-top: 4px
+    font-style: normal
+    font-weight: 800
+    color: var(--lk-muted)
+
+.daily-task
+  display: flex
+  align-items: center
+  gap: 10px
+  font-weight: 700
+
+.daily-check
+  flex: none
+  display: grid
+  place-items: center
+  width: 28px
+  height: 28px
+  border: 2px solid var(--lk-accent)
+  border-radius: 50%
+  color: var(--lk-on-accent)
+  background: transparent
+  font-size: 1rem
+
+.daily.is-done .daily-check
+  background: var(--lk-accent)
+
+.daily-go
+  align-self: flex-start
+
+.daily-count
+  margin: 0
+  font-weight: 700
+
+.daily-calm
+  margin: 0
+  color: var(--lk-muted)
+  font-size: 0.88rem
 
 // ── who is Jesus ──
 .jesus-card
