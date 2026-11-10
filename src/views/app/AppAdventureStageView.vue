@@ -1253,7 +1253,7 @@ function openGift() {
           p(v-if="journey?.id === 'ostern'" class="result-line result-plus") {{ jesusText.homeCardText }}
           p(v-if="nextPlusJourney" class="result-line result-plus") {{ t('app.adventure.plusNext', { title: nextPlusJourney.title }) }}
           div(class="stage-actions")
-            AdvButton(v-if="coloringBookUrl" tone="blau" @click="openExternal(coloringBookUrl as string)") {{ t('app.adventure.coloringBookButton') }}
+            AdvButton(v-if="coloringBookUrl" tone="blau" @click="openExternal(coloringBookUrl ?? '')") {{ t('app.adventure.coloringBookButton') }}
             AdvButton(v-if="journey?.id === 'ostern'" tone="gold" @click="router.push({ name: 'app-jesus' })") {{ jesusText.homeCardTitle }}
             AdvButton(v-if="nextPlusJourney" tone="gold" @click="showUpsell('adventure')") {{ t('app.adventure.plusNextButton') }}
             AdvButton(v-if="medal" tone="gold" @click="openGift") {{ t('app.adventure.gift', { title: journey.gift.title }) }}

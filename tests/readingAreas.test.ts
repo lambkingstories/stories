@@ -104,7 +104,7 @@ describe('Books', () => {
     expect(wrapper.text()).toContain('Diese Bücher finden Sie auch in unserem Store')
     await wrapper.find('.book-store').trigger('click')
     expect(openExternal).toHaveBeenCalledWith(storeBooks[0]!.url)
-    expect(storeBooks[0]!.url).toBe('https://lambking.store')
+    expect(storeBooks[0]!.url).toBe('https://lambking.store/buch/der-mann-im-baum-zachaeus-begegnet-jesus/')
     expect(warnings.filter((w) => /not defined on instance|is not a function|ERROR/.test(w))).toEqual([])
     vi.doUnmock('@/use/useApiBooks')
   })

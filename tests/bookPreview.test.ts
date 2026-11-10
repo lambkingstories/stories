@@ -63,7 +63,7 @@ describe('the preview of "Zachäus begegnet Jesus"', () => {
     expect(next().attributes('disabled')).toBeDefined()
     // the printed book is in the store
     await wrapper.find('.bp-store').trigger('click')
-    expect(openExternal).toHaveBeenCalledWith('https://lambking.store')
+    expect(openExternal).toHaveBeenCalledWith('https://lambking.store/buch/der-mann-im-baum-zachaeus-begegnet-jesus/')
     // back with the first arrow
     await wrapper.findAll('.bp-arrow')[0]!.trigger('click')
     expect(wrapper.find('.bp-count').text()).toBe('6 / 7')
