@@ -38,15 +38,12 @@ const busy = computed(() => status.value === 'purchasing')
 
 // every line has the symbol of the part of the app it belongs to (the same ones as in the bar at the bottom)
 const symbol = (name: string) => prependBaseUrl(`images/icons/navi/${name}.webp`)
-/**
- * The four areas of the app, each with what Plus adds and what stays free (the texts are `app.plus.area<N>Get<M>` / `area<N>Free<M>`).
- * The family area is free for everybody: that is a promise, so it has no "with Plus" part.
- */
-const areas = [
-  { n: 1, icon: 'lesen', gets: 2, free: 2 },
-  { n: 2, icon: 'abenteuer', gets: 5, free: 3 },
-  { n: 3, icon: 'malen', gets: 2, free: 3 },
-  { n: 4, icon: 'ich', gets: 0, free: 4 }
+/** What Plus brings, as three pictures (the texts are `app.plus.card<N>Title` / `card<N>Text`). */
+const cards = [
+  { n: 1, icon: 'abenteuer' },
+  { n: 2, icon: 'malen' },
+  { n: 3, icon: 'ich' },
+  { n: 4, icon: 'lesen' }
 ]
 const hero = prependBaseUrl('images/bg/willkommen-plus-2.webp')
 </script>
@@ -59,35 +56,12 @@ const hero = prependBaseUrl('images/bg/willkommen-plus-2.webp')
       div(class="plus-hero")
         img(:src="hero" alt="" draggable="false")
 
-      p(class="plus-state" :class="{ 'is-on': plusOn }" role="status")
+      p(v-if="plusOn" class="plus-state is-on" role="status")
         ZIconography(name="star" :size="22")
-        span {{ plusOn ? t('app.plus.stateOn') : t('app.plus.stateOff') }}
+        span {{ t('app.plus.stateOn') }}
+      p(v-else class="plus-lead") {{ t('app.plus.lead') }}
 
-      router-link(:to="{ name: 'app-features' }" class="lk-btn lk-btn--outline lk-btn--full") {{ t('app.features.title') }}
-
-      //- why it exists: the work behind the stories, and that Plus is a way to help
-      div(class="plus-why")
-        h2(class="plus-h") {{ t('app.plus.whyTitle') }}
-        p {{ t('app.plus.whyText1') }}
-        p {{ t('app.plus.whyText2') }}
-        p(class="plus-why-free") {{ t('app.plus.whyText3') }}
-
-      h2(class="plus-h") {{ t('app.plus.areasTitle') }}
-      div(class="plus-areas")
-        section(v-for="a in areas" :key="a.n" :class="['plus-area', { 'is-family': a.gets === 0 }]")
-          header(class="plus-area-head")
-            img(:src="symbol(a.icon)" alt="" draggable="false")
-            h3 {{ t(`app.plus.area${a.n}Title`) }}
-          div(v-if="a.gets" class="plus-block")
-            span(class="plus-tag is-plus") {{ t('app.plus.tagPlus') }}
-            ul(class="plus-list")
-              li(v-for="m in a.gets" :key="m" class="is-plus") {{ t(`app.plus.area${a.n}Get${m}`) }}
-          div(class="plus-block")
-            span(class="plus-tag is-free") {{ t('app.plus.tagFree') }}
-            ul(class="plus-list")
-              li(v-for="m in a.free" :key="m" class="is-free") {{ t(`app.plus.area${a.n}Free${m}`) }}
-
-      h2(class="plus-h") {{ t('app.plus.priceTitle') }}
+      //- the prices come first: a parent who is here wants to know what it costs
       div(class="plus-plans")
         div(class="plus-plan is-year")
           span(class="plus-badge") {{ t('app.plus.cheaper') }}
@@ -102,6 +76,23 @@ const hero = prependBaseUrl('images/bg/willkommen-plus-2.webp')
           strong(class="plus-plan-price") {{ priceOf('month') }}
           button(v-if="available" type="button" class="lk-btn lk-btn--outline lk-btn--full lk-btn--small" :disabled="busy" @click="buyPlus('month')") {{ t('app.plus.chooseMonth') }}
       p(v-if="introRuns()" class="plus-intro") {{ t('app.plus.priceIntro', { intro: plusOffer.introPrice, year: plusOffer.year }) }}
+      p(v-if="!available && !PLUS_TEST" class="plus-soon") {{ t('app.plus.webHint') }}
+      p(v-else-if="!available" class="plus-soon") {{ t('app.plus.soon') }}
+
+      //- what Plus brings: three pictures instead of long lists
+      h2(class="plus-h") {{ t('app.plus.getsTitle') }}
+      div(class="plus-cards")
+        article(v-for="c in cards" :key="c.n" class="plus-card")
+          img(:src="symbol(c.icon)" alt="" draggable="false")
+          div(class="plus-card-text")
+            h3 {{ t(`app.plus.card${c.n}Title`) }}
+            p {{ t(`app.plus.card${c.n}Text`) }}
+
+      //- what stays free: one honest line
+      div(class="plus-freeline")
+        span(class="plus-tag is-free") {{ t('app.plus.tagFree') }}
+        p {{ t('app.plus.freeLine') }}
+
       //- the family: up to five people, one price
       h3(class="plus-family-title") {{ t('app.plus.familyTitle') }}
       p(class="plus-family-text") {{ t('app.plus.familyText') }}
@@ -120,9 +111,15 @@ const hero = prependBaseUrl('images/bg/willkommen-plus-2.webp')
           button(v-if="available" type="button" class="lk-btn lk-btn--outline lk-btn--full lk-btn--small" :disabled="busy" @click="buyPlus('familyMonth')") {{ t('app.plus.chooseFamilyMonth') }}
       p(v-if="introRuns() && plusOffer.familyIntroPrice" class="plus-intro") {{ t('app.plus.priceIntro', { intro: plusOffer.familyIntroPrice, year: plusOffer.familyYear }) }}
       p(class="plus-note") {{ t('app.plus.familyHow') }}
+
+      //- why it exists, short
+      div(class="plus-why")
+        h2(class="plus-h") {{ t('app.plus.whyTitle') }}
+        p {{ t('app.plus.whyShort') }}
+
+      //- the small print
       p(class="plus-note") {{ t('app.plus.priceBook') }}: {{ plusOffer.book }}. {{ t('app.plus.priceNote') }}
-      p(v-if="!available && !PLUS_TEST" class="plus-soon") {{ t('app.plus.webHint') }}
-      p(v-else-if="!available" class="plus-soon") {{ t('app.plus.soon') }}
+      router-link(:to="{ name: 'app-features' }" class="plus-link plus-more") {{ t('app.features.title') }}
 
       //- the rest of the purchase (only in the app from the store): every button asks the parental gate first
       div(v-if="available" class="plus-buy")
@@ -134,8 +131,6 @@ const hero = prependBaseUrl('images/bg/willkommen-plus-2.webp')
           button(type="button" class="plus-link" @click="openExternal(manageUrl)") {{ t('app.plus.manage') }}
           button(type="button" class="plus-link" @click="router.push({ name: 'app-legal' })") {{ t('app.plus.privacy') }}
           button(type="button" class="plus-link" @click="openExternal(TERMS_URL)") {{ t('app.plus.terms') }}
-
-      p(class="plus-help") {{ t('app.plus.donateHint') }}
 
       //- only in the test build: try the app with and without Plus
       div(v-if="PLUS_TEST" class="plus-test lk-panel")
@@ -162,7 +157,7 @@ const hero = prependBaseUrl('images/bg/willkommen-plus-2.webp')
   img
     display: block
     width: 100%
-    height: 200px
+    height: 150px
     object-fit: cover
     object-position: 50% 50%
 
@@ -182,6 +177,62 @@ const hero = prependBaseUrl('images/bg/willkommen-plus-2.webp')
   &.is-on
     border-color: var(--lk-gold)
     background: var(--lk-accent-soft)
+
+.plus-lead
+  margin: 0
+  font-size: 1.12rem
+  font-weight: 700
+  line-height: 1.4
+  text-align: center
+
+// what Plus brings: three cards with the symbol of the part of the app
+.plus-cards
+  display: grid
+  gap: 10px
+
+.plus-card
+  display: flex
+  align-items: center
+  gap: 14px
+  padding: 14px 16px
+  border: 1px solid var(--lk-line)
+  border-radius: 22px
+  background: var(--lk-surface)
+  box-shadow: var(--lk-shadow)
+
+  > img
+    flex: none
+    width: 52px
+    height: 52px
+    object-fit: contain
+
+  h3
+    margin: 0 0 2px
+    font-size: 1.12rem
+    font-weight: 800
+
+  p
+    margin: 0
+    color: var(--lk-muted)
+    font-size: 0.98rem
+    line-height: 1.4
+
+// what stays free
+.plus-freeline
+  display: flex
+  flex-direction: column
+  gap: 6px
+  padding: 12px 16px
+  border-radius: 18px
+  background: var(--lk-surface-2)
+
+  p
+    margin: 0
+    font-size: 0.98rem
+    line-height: 1.45
+
+.plus-more
+  align-self: flex-start
 
 // why Plus exists
 .plus-why
