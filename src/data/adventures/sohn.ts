@@ -133,20 +133,20 @@ export const sohn: Journey = {
   title: 'Der verlorene Sohn',
   subtitle: 'Das Gleichnis vom Vater und seinen zwei Söhnen',
   age: '8-10',
-  downloadMb: 14, // grob geschätzt (Bilder, Karte, Spielbilder, Musik, Aufnahmen), die Leitung misst nach dem Einbau nach
+  downloadMb: 11, // grob geschätzt (Bilder, Karte, Spielbilder, Musik, Aufnahmen), die Leitung misst nach dem Einbau nach
   medal: `${PICS}medaille-v1.webp`, // Medaille 1 bis zu Antons Wahl
   // Geschenk-Ausmalbild: Kleid, Ring und Schuhe (ein gefaltetes Festkleid, ein Ring und ein Paar Sandalen auf einem Kissen, Olivenzweig als Rahmen; ohne Menschen, ohne Schrift; Konturzeichnung)
   gift: { title: 'Kleid, Ring und Schuhe', image: `${PICS}geschenk.webp` },
   // die gemalte Karte (Panorama in drei Stücken, 9920 × 1648 px, OpenAI-Bildmodell): vom Hofgut des Vaters in die Ferne, zum Schweinefeld und auf dem Rückweg zum Fest und zum Feldrand;
-  // Stationen aus ergebnis/panorama/map-sohn.json, Perlenweg aus sohnPath.ts
+  // Stationen aus ergebnis/panorama-fest/map-sohn.json (Panorama mit dem Fest mit Freunden, Lk 15,13), Perlenweg aus sohnPath.ts
   map: {
-    images: [1, 2, 3].map((n) => `images/abenteuer/sohn/karte-pano-v1-${n}.webp`),
+    images: ['images/abenteuer/sohn/karte-pano-v2-1.webp', 'images/abenteuer/sohn/karte-pano-v2-2.webp', 'images/abenteuer/sohn/karte-pano-v1-3.webp'],
     ring: josef.map.ring,
     aspect: 9920 / 1648,
     widthPx: 9920,
     stages: [
-      { x: 0.1331, y: 0.5947, d: 0.0339 },
-      { x: 0.3528, y: 0.4733, d: 0.0339 },
+      { x: 0.1300, y: 0.6675, d: 0.0339 },
+      { x: 0.2520, y: 0.7646, d: 0.0339 },
       { x: 0.3891, y: 0.7221, d: 0.0339 },
       { x: 0.5494, y: 0.5461, d: 0.0339 },
       { x: 0.6300, y: 0.5947, d: 0.0339 },

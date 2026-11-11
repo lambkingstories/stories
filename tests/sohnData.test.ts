@@ -210,8 +210,9 @@ describe('Der verlorene Sohn: map, files, English', () => {
     for (const seg of SOHN_PATH) expect(seg.length).toBeGreaterThanOrEqual(10)
     expect(m.path).toBe(SOHN_PATH)
     expect(m.aspect).toBeCloseTo(9920 / 1648, 6)
-    expect(m.images).toEqual([1, 2, 3].map((n) => `images/abenteuer/sohn/karte-pano-v1-${n}.webp`))
-    if (existsSync('public/images/abenteuer/sohn/karte-pano-v1-1.webp')) for (const f of m.images) expect(existsSync(`public/${f}`), f).toBe(true)
+    // Panorama mit dem Fest mit Freunden (Lk 15,13): Kachel 1 und 2 neu (v2), Kachel 3 unverändert (v1)
+    expect(m.images).toEqual(['karte-pano-v2-1', 'karte-pano-v2-2', 'karte-pano-v1-3'].map((n) => `images/abenteuer/sohn/${n}.webp`))
+    if (existsSync('public/images/abenteuer/sohn/karte-pano-v2-1.webp')) for (const f of m.images) expect(existsSync(`public/${f}`), f).toBe(true)
   })
 
   it('the medal and the gift lie in the folder of the adventure; music of its own only when its files are in', () => {
