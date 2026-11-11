@@ -403,7 +403,7 @@ export const jakob: Journey = {
     },
     {
       id: 9,
-      image: `${IMG}etappe-bild-09.webp`,
+      image: `${IMG}etappe-bild-09-v2.webp`,
       title: 'Engel und Geschenke',
       ref: '1. Mose 32,1–21',
       text: [

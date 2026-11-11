@@ -49,7 +49,7 @@ describe('Jakob: stories and questions', () => {
       expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/jakob/geschichte-${String(s.id).padStart(2, '0')}-${RECORDED_AGAIN.includes(s.id) ? 'v4' : 'v3'}.mp3`)
       expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
       // stages 5 to 9 and 12 use an existing picture until their own picture is built in (PLATZHALTER)
-      expect(s.image).toBe(`images/abenteuer/jakob/etappe-bild-${String(PICTURE[s.id - 1]).padStart(2, '0')}${s.id === 3 ? '-v2' : ''}.webp`)
+      expect(s.image).toBe(`images/abenteuer/jakob/etappe-bild-${String(PICTURE[s.id - 1]).padStart(2, '0')}${s.id === 3 || s.id === 9 ? '-v2' : ''}.webp`)
     }
   })
 
