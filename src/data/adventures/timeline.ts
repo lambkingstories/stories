@@ -57,6 +57,7 @@ export const TIMELINE: TimelineEntry[] = [
   { id: 'freunde', de: 'Jesus ruft seine Freunde', en: 'Jesus calls his friends', epoch: 'jesus' },
   { id: 'wunder', de: 'Jesu Wunder am See', en: 'The miracles at the lake', epoch: 'jesus' },
   { id: 'heilung', de: 'Jesus heilt', en: 'Jesus heals', epoch: 'jesus' },
+  { id: 'ichbin', de: 'Jesus erzählt von sich', en: 'Jesus Tells About Himself', epoch: 'jesus' },
   { id: 'gleichnisse', de: 'Geschichten von Jesus', en: 'Stories of Jesus', epoch: 'jesus' },
   { id: 'zachaeus', de: 'Zachäus und Lazarus', en: 'Zacchaeus and Lazarus', epoch: 'jesus' },
   { id: 'letztewoche', de: 'Die letzte Woche', en: 'The last week', epoch: 'jesus' },

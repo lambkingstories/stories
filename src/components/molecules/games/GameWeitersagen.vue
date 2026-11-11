@@ -218,7 +218,7 @@ function onKey(e: KeyboardEvent) {
     e.preventDefault()
     if (cursor.value < 0) {
       cursor.value = last.value
-      say(t('app.adventure.tellKeys'), 3600)
+      say(props.game.texts?.keys ?? t('app.adventure.tellKeys'), 3600)
       return
     }
     go(cursor.value)
@@ -237,7 +237,7 @@ function helpMe() {
   if (!h) return
   if ('undo' in h) {
     undo()
-    say(t('app.adventure.tellHelpUndo'), 4000)
+    say(props.game.texts?.helpUndo ?? t('app.adventure.tellHelpUndo'), 4000)
     return
   }
   hintPlace.value = h.next
@@ -291,7 +291,7 @@ const placeLabel = (i: number) => {
         :style="{ backgroundImage: `url(${src(game.background)})`, aspectRatio: String(TELL_RATIO) }"
         role="group"
         tabindex="0"
-        :aria-label="t('app.adventure.tellField')"
+        :aria-label="game.texts?.field ?? t('app.adventure.tellField')"
         @pointerdown="down"
         @keydown="onKey"
       )
@@ -312,7 +312,7 @@ const placeLabel = (i: number) => {
             GameMark(kind="good")
         div(v-if="hintPlace >= 0" class="gm-ring hint" :style="ringStyle(pts[hintPlace])" aria-hidden="true")
         div(v-if="cursor >= 0" class="gm-ring cursor" :style="ringStyle(pts[cursor])" aria-hidden="true")
-        div(class="gm-walker" :style="walkerStyle" role="img" :aria-label="t('app.adventure.tellShepherds')")
+        div(class="gm-walker" :style="walkerStyle" role="img" :aria-label="game.texts?.walkers ?? t('app.adventure.tellShepherds')")
           GameImage(:src="game.walker" :ratio="400 / 420" colour="#8a7a62" label="hirten")
         div(v-if="markAt" class="gm-mark" :style="markStyle" aria-hidden="true")
           GameMark(:kind="markAt.kind")
@@ -321,7 +321,7 @@ const placeLabel = (i: number) => {
         AdvButton(v-if="route.length > 1 && !between" tone="blau" @click="undo") {{ t('app.adventure.tellUndo') }}
         AdvButton(v-if="idle > IDLE_SECONDS && !between" tone="gold" @click="helpMe") {{ t('app.adventure.tellHelp') }}
       p(class="gm-fb" role="status") {{ message }}
-    GameDone(v-else :stars="stars" :text="t('app.adventure.tellDone')" @next="emit('done', stars)")
+    GameDone(v-else :stars="stars" :text="game.texts?.done ?? t('app.adventure.tellDone')" @next="emit('done', stars)")
 </template>
 
 <style scoped lang="sass">

@@ -299,3 +299,11 @@ export const SOHN_ONLY_DIRS = ['images/abenteuer/sohn', 'images/abenteuer/spiele
 export function stripSohnFiles(outDir: string) {
   strip(outDir, SOHN_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Jesus erzählt von sich" (id `ichbin`) alone, in the same three places as Adam and Eve. */
+export const ICHBIN_ONLY_DIRS = ['images/abenteuer/ichbin', 'images/abenteuer/spiele/ichbin', 'audio/abenteuer/ichbin']
+
+/** Takes the folders of "Jesus erzählt von sich" out of a finished build. */
+export function stripIchbinFiles(outDir: string) {
+  strip(outDir, ICHBIN_ONLY_DIRS)
+}

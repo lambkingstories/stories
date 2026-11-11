@@ -1839,3 +1839,53 @@ describe('the hidden journey Der verlorene Sohn (id sohn)', () => {
     expect(m.journeys.filter((j) => j.id === 'sohn')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Jesus erzählt von sich (id ichbin)', () => {
+  it('a normal build (without Jesus erzählt von sich) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_ICHBIN', 'false')
+    open('?ichbin=ichbin-vorschau-t6n4')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('ichbin')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_ICHBIN', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?ichbin=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.ICHBIN_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?ichbin=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_ICHBIN', 'true')
+    const first = await load()
+    open(`?ichbin=${first.ICHBIN_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.ICHBIN_UNLOCK_CODE).toBe('ichbin-vorschau-t6n4')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'ichbin'])
+    expect(localStorage.getItem('lk-preview-ichbin')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('ichbin')?.stages.length).toBe(14)
+    open('?ichbin=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-ichbin')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_ICHBIN) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_ICHBIN', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'ichbin')).toHaveLength(1)
+  })
+})

@@ -96,6 +96,8 @@ export const OFFENBARUNG_PREVIEW_KEY = 'lk-preview-offenbarung'
 export const OFFENBARUNG_UNLOCK_CODE = 'offenbarung-vorschau-q4m8'
 export const SOHN_PREVIEW_KEY = 'lk-preview-sohn'
 export const SOHN_UNLOCK_CODE = 'sohn-vorschau-m3x7'
+export const ICHBIN_PREVIEW_KEY = 'lk-preview-ichbin'
+export const ICHBIN_UNLOCK_CODE = 'ichbin-vorschau-t6n4'
 
 /** A journey that is shown only on unlocked devices: the name of its link (`?<param>=<code>`), where the unlock is kept, and how it is loaded. */
 interface PreviewJourney {
@@ -442,6 +444,16 @@ function previewJourneys(): PreviewJourney[] {
       key: SOHN_PREVIEW_KEY,
       always: import.meta.env.VITE_SHOW_SOHN === 'true',
       load: async () => (await import('@/data/adventures/sohn')).sohn
+    })
+  }
+  if (import.meta.env.VITE_INCLUDE_ICHBIN === 'true' || import.meta.env.VITE_SHOW_ICHBIN === 'true') {
+    list.push({
+      id: 'ichbin',
+      param: 'ichbin',
+      code: ICHBIN_UNLOCK_CODE,
+      key: ICHBIN_PREVIEW_KEY,
+      always: import.meta.env.VITE_SHOW_ICHBIN === 'true',
+      load: async () => (await import('@/data/adventures/ichbin')).ichbin
     })
   }
   if (import.meta.env.VITE_INCLUDE_NOAH === 'true' || import.meta.env.VITE_SHOW_NOAH === 'true') {

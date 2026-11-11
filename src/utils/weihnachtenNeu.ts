@@ -320,6 +320,8 @@ export interface TellGame {
   walker: string
   walkerW: number
   rounds: TellRound[]
+  /** Optional words of the game for another story (default: those of Christmas, `app.adventure.tell…`): the description of the field, the name of the walkers, the line about the keys, the line when a way is taken back and the verse at the end. */
+  texts?: { field?: string; walkers?: string; keys?: string; helpUndo?: string; done?: string }
 }
 
 /** The house pictures are 340 x 290 (width / height). */
