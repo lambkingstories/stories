@@ -2509,7 +2509,7 @@ export default {
       welcome: {
         title: 'Welcome to LambKing Stories.',
         chooseLanguage: 'Choose your language',
-        whoTitle: 'What is your name?',
+        whoTitle: 'Hello, what is your name?',
         pickAvatar: 'Choose your character',
         namePlaceholder: 'Your name',
         nameNote: 'Your name stays on this device only. You can change it under "Me".',
@@ -6517,7 +6517,7 @@ export default {
       welcome: {
         title: 'Willkommen bei LambKing Stories.',
         chooseLanguage: 'Sprache wählen',
-        whoTitle: 'Wie heißt du?',
+        whoTitle: 'Hallo, wie heißt du?',
         pickAvatar: 'Figur aussuchen',
         namePlaceholder: 'Dein Name',
         nameNote: 'Dein Name bleibt nur auf diesem Gerät. Unter „Ich“ kannst du ihn ändern.',

@@ -74,9 +74,11 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
         template(v-if="verse")
           img(class="cc-back-img" :src="ui('karte-rueckseite.webp')" alt="" draggable="false")
           div(class="cc-verse")
-            span(class="cc-verse-title") {{ title }}
-            span(class="cc-verse-text" :style="{ fontSize: verseSize(verse.text) }") {{ verse.text }}
-            span(class="cc-verse-ref") {{ verse.ref }}
+            img(class="cc-verse-lamb" :src="prependBaseUrl('images/logo/lk-lamm.webp')" alt="" draggable="false")
+            span(class="cc-verse-body")
+              span(class="cc-verse-title") {{ title }}
+              span(class="cc-verse-text" :style="{ fontSize: verseSize(verse.text) }") {{ verse.text }}
+              span(class="cc-verse-ref") {{ verse.ref }}
         template(v-else-if="backImage")
           //- the hero at the end of the story, in the same frame as the front
           div(class="cc-window")
@@ -332,24 +334,38 @@ $wh: 96.8%
   font-size: 5cqw
   opacity: 0.85
 
-// the memory verse on the back: a dark blue plate with a fine gold line, over the lower part of the card (the crown of the lamb looks over its rim)
+// the memory verse on the back: a dark blue plate with a fine gold line over the inside of the card; the small lamb stands at the very top, the verse below
 .cc-verse
   position: absolute
-  left: $wx + 5%
-  right: $wx + 5%
-  top: 42%
-  bottom: $wy + 6%
+  left: $wx + 4%
+  right: $wx + 4%
+  top: $wy + 3%
+  bottom: $wy + 3%
   display: flex
   flex-direction: column
   align-items: center
-  justify-content: center
-  gap: 3cqw
-  padding: 4cqw 4cqw
+  gap: 2cqw
+  padding: 6cqw 5cqw 5cqw
   border-radius: 4cqw
   background: linear-gradient(180deg, rgba(14, 24, 58, 0.94), rgba(10, 18, 44, 0.97))
   border: 0.5cqw solid rgba(240, 190, 70, 0.85)
   color: #fff3cf
   text-align: center
+
+.cc-verse-lamb
+  flex: none
+  height: 17cqw
+  width: auto
+  display: block
+
+.cc-verse-body
+  flex: 1
+  min-height: 0
+  display: flex
+  flex-direction: column
+  align-items: center
+  justify-content: center
+  gap: 3cqw
 
 .cc-verse-title
   font-size: 4.4cqw

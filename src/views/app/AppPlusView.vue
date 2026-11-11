@@ -404,10 +404,10 @@ const hero = prependBaseUrl('images/bg/willkommen-plus-2.webp')
     background: var(--lk-accent-soft)
 
 .plus-badge
-  position: absolute
-  top: -11px
-  left: 50%
-  transform: translateX(-50%)
+  // a small gold label above the name, in the flow of the card (it covers nothing)
+  align-self: center
+  white-space: nowrap
+  margin-bottom: 2px
   padding: 2px 12px
   border-radius: 999px
   background: var(--lk-gold)
