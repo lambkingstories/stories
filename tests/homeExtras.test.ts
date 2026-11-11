@@ -43,7 +43,7 @@ describe('start page extras', () => {
     const { default: Home } = await import('@/views/app/AppHomeView.vue')
     const wrapper = mount(Home, { global: { plugins: [i18n], stubs: { RouterLink: true } }, attachTo: document.body })
     await flushPromises()
-    const card = wrapper.findAll('.resume-card')[1]!
+    const card = wrapper.findAll('.resume-card')[2]!
     expect(card.text()).toContain('Neu')
     await card.trigger('click')
     expect(push).toHaveBeenCalledWith({ name: 'app-coloring', query: { work: 'src:b#1' } })

@@ -27,7 +27,10 @@ import useJourneyPack from '@/use/useJourneyPack'
 import { maxPoints, medalFor, nextStageIndex, pointsOf } from '@/utils/adventureScore'
 import { journeyToContinue } from '@/utils/continueJourney'
 import { prependBaseUrl } from '@/utils/function'
+import { JESUS_PATH } from '@/data/jesusPath'
+import { adventureLanguage } from '@/use/adventureLanguage'
 
+const jesusText = computed(() => JESUS_PATH[adventureLanguage.value])
 const { t } = useI18n({ useScope: 'global' })
 const router = useRouter()
 const adv = useAdventure()
@@ -290,6 +293,12 @@ async function doDelete() {
             span(v-if="cupsOf(g)" class="epoch-cups")
               img(:src="ui('pokal-gold')" alt="" draggable="false")
               | {{ cupsOf(g) }} / {{ g.entries.length }}
+          //- "Who is Jesus?": a quiet line where the adventures with Jesus begin
+          router-link(v-if="g.epoch.id === 'jesus'" :to="{ name: 'app-jesus' }" class="jesus-row")
+            span(class="jesus-row-text")
+              span(class="jesus-row-title") {{ jesusText.homeCardTitle }}
+              span(class="jesus-row-sub") {{ jesusText.homeCardText }}
+            ZIconography(name="chevron-right" :size="20")
           div(class="tile-grid")
             template(v-for="e in g.entries" :key="e.id")
               button(v-if="e.item" type="button" class="tile" @click="detailId = e.item.journey.id")
@@ -608,6 +617,36 @@ $ink: var(--lk-text)
   margin: 6px 4px 10px
   font-size: 1.2rem
   font-weight: 800
+
+.jesus-row
+  display: flex
+  align-items: center
+  justify-content: space-between
+  gap: 10px
+  margin: 0 0 12px
+  padding: 10px 14px
+  border: 1px solid var(--lk-line)
+  border-left: 4px solid var(--lk-accent)
+  border-radius: 12px
+  background: transparent
+  color: var(--lk-text)
+  text-decoration: none
+
+  :deep(.z-icon-outline)
+    color: var(--lk-muted)
+
+.jesus-row-text
+  display: flex
+  flex-direction: column
+  min-width: 0
+
+.jesus-row-title
+  font-weight: 800
+  font-size: 1rem
+
+.jesus-row-sub
+  font-size: 0.85rem
+  color: var(--lk-muted)
 
 .epoch-sub
   margin-left: 8px

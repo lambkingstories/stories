@@ -1,5 +1,5 @@
 /**
- * The start page, mounted and used: the three big buttons and the three "continue" cards must lead somewhere, and Vue must not
+ * The start page, mounted and used: the slides come first, then the four big cards (adventure, reading, painting, games) that must lead somewhere, and Vue must not
  * complain that the template uses something the script does not have (Pug templates are not checked by the type checker).
  */
 import { flushPromises, mount } from '@vue/test-utils'
@@ -33,13 +33,13 @@ afterEach(() => {
 })
 
 describe('the start page', () => {
-  it('begins with one big card that opens an adventure (playing first; the three doors only repeated the bar below)', async () => {
+  it('begins with the slides, then the adventure card that opens an adventure (playing first)', async () => {
     const { default: Home } = await import('@/views/app/AppHomeView.vue')
     const wrapper = mount(Home, { global: { plugins: [i18n], stubs: { RouterLink: true } }, attachTo: document.body })
     await flushPromises()
     expect(wrapper.findAll('.big-btn')).toHaveLength(0)
-    const first = wrapper.find('.home-body > *')
-    expect(first.classes()).toContain('go-hero')
+    expect(wrapper.find('.home-body > *').classes()).toContain('hero')
+    const first = wrapper.findAll('.resume-card')[0]!
     expect(first.text()).toMatch(/Fang hier an/)
     push.mockClear()
     await first.trigger('click')
@@ -52,25 +52,32 @@ describe('the start page', () => {
     const wrapper = mount(Home, { global: { plugins: [i18n], stubs: { RouterLink: true } }, attachTo: document.body })
     await flushPromises()
     const cards = wrapper.findAll('.resume-card')
-    // the book and the picture (the adventure has the big card on top)
-    expect(cards).toHaveLength(2)
+    // the adventure, the book, the picture and the games
+    expect(cards).toHaveLength(4)
     for (const c of cards) {
       push.mockClear()
       await c.trigger('click')
       expect(push).toHaveBeenCalledTimes(1)
+    }
+    for (const c of cards.slice(0, 3)) {
       expect(c.classes()).toContain('is-empty')
       expect(c.text()).toMatch(/Fang hier an/)
     }
+    // the games: the bonus games, the way leads to the game room
+    push.mockClear()
+    await cards[3]!.trigger('click')
+    expect(cards[3]!.text()).toMatch(/Spiele/)
+    expect(push).toHaveBeenCalledWith({ name: 'app-gameroom' })
     expect(warnings.filter((w) => /not defined on instance|is not a function|ERROR/.test(w))).toEqual([])
   })
 
-  it('the card for grown-ups comes last, shows the shop (and Plus in a build with Plus), asks for no gifts and has no partner slide', async () => {
+  it('the slides for grown-ups come first, show the shop (and Plus in a build with Plus), asks for no gifts and has no partner slide', async () => {
     const { default: Home } = await import('@/views/app/AppHomeView.vue')
     const wrapper = mount(Home, { global: { plugins: [i18n], stubs: { RouterLink: true } }, attachTo: document.body })
     await flushPromises()
     expect(wrapper.findAll('.hero-slide')).toHaveLength(1)
     expect(wrapper.html()).not.toMatch(/paypal|ko-?fi/i)
-    expect(wrapper.find('.home-body > *:last-child').classes()).toContain('hero')
+    expect(wrapper.find('.home-body > *:first-child').classes()).toContain('hero')
     expect(wrapper.text()).not.toMatch(/Reach/i)
   })
 })

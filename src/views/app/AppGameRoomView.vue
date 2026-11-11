@@ -15,7 +15,7 @@ const router = useRouter()
 const route = useRoute()
 
 const section = computed<'all' | 'mini' | 'bonus'>(() => (route.query.z === 'mini' ? 'mini' : route.query.z === 'bonus' ? 'bonus' : 'all'))
-const title = computed(() => (section.value === 'mini' ? t('app.profile.miniTitle') : section.value === 'bonus' ? t('app.bigGames.title') : t('app.profile.gameRoom')))
+const title = computed(() => (section.value === 'mini' ? t('app.profile.miniTitle') : section.value === 'bonus' ? t('app.bigGames.title') : t('app.home.kindGames')))
 
 function goBack() {
   if (window.history.length > 1) router.back()
