@@ -48,7 +48,7 @@ describe('Der verlorene Sohn: stories and questions', () => {
       expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(65)
       expect(words, `words ${s.id}`).toBeLessThanOrEqual(175)
       expect(text, `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.image, `stage ${s.id}`).toMatch(new RegExp(`^images/abenteuer/sohn/etappe-bild-${String(s.id).padStart(2, '0')}(-b)?\\.webp$`))
+      expect(s.image, `stage ${s.id}`).toMatch(new RegExp(`^images/abenteuer/sohn/etappe-bild-${String(s.id).padStart(2, '0')}(-b|-v2)?\\.webp$`))
     }
     expect(sohn.stages.map((s) => s.ref)).toEqual(['Lukas 15,11–13a', 'Lukas 15,13b–14', 'Lukas 15,15–16', 'Lukas 15,17–20a', 'Lukas 15,20b–21', 'Lukas 15,22–25a', 'Lukas 15,25–32'])
   })

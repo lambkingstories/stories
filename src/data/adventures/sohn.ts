@@ -177,7 +177,7 @@ export const sohn: Journey = {
     },
     {
       id: 2,
-      image: `${PICS}etappe-bild-02.webp`,
+      image: `${PICS}etappe-bild-02-v2.webp`,
       title: 'Im fernen Land',
       ref: 'Lukas 15,13b–14',
       text: [
