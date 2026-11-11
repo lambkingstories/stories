@@ -271,7 +271,7 @@ export const pfingsten: Journey = {
   stages: [
     {
       id: 1,
-      image: `${PICS}etappe-bild-01-b.webp`,
+      image: `${PICS}etappe-bild-01-v2.webp`,
       title: 'Bis an das Ende der Erde',
       ref: 'Apostelgeschichte 1,3–14',
       text: [
@@ -416,7 +416,7 @@ export const pfingsten: Journey = {
     },
     {
       id: 9,
-      image: `${PICS}etappe-bild-09.webp`,
+      image: `${PICS}etappe-bild-09-v2.webp`,
       title: 'Rhode an der Tür',
       ref: 'Apostelgeschichte 12,1–17',
       text: [
