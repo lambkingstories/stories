@@ -605,7 +605,7 @@ export const salomo: Journey = {
     },
     {
       id: 9,
-      image: `${PICS}etappe-bild-09.webp`,
+      image: `${PICS}etappe-bild-09-v2.webp`,
       title: 'Die Lade zieht ein',
       ref: '1. Könige 8,1–11',
       text: [

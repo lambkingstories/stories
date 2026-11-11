@@ -55,7 +55,7 @@ describe('Salomo: stories and questions', () => {
       expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(text, `stage ${s.id}`).not.toMatch(FORBIDDEN)
       if (s.id !== 3) expect(text, `stage ${s.id}`).not.toMatch(FORBIDDEN_EXCEPT_3)
-      expect(s.image, `stage ${s.id}`).toBe(`images/abenteuer/salomo/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
+      expect(s.image, `stage ${s.id}`).toBe(`images/abenteuer/salomo/etappe-bild-${String(s.id).padStart(2, '0')}${s.id === 9 ? '-v2' : ''}.webp`)
     }
   })
 
