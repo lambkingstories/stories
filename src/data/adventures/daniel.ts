@@ -344,7 +344,7 @@ export const daniel: Journey = {
     },
     {
       id: 9,
-      image: `${PICS}etappe-bild-09.webp`,
+      image: `${PICS}etappe-bild-09-v2.webp`,
       title: 'In der Löwengrube',
       ref: 'Daniel 6,14–28',
       text: [
