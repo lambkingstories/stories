@@ -47,7 +47,7 @@ describe('Offenbarung: stories and questions', () => {
       expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(100)
       expect(words, `words ${s.id}`).toBeLessThanOrEqual(190)
       expect(text, `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.image, `stage ${s.id}`).toMatch(new RegExp(`^images/abenteuer/offenbarung/etappe-bild-${String(s.id).padStart(2, '0')}(-b)?\\.webp$`))
+      expect(s.image, `stage ${s.id}`).toMatch(new RegExp(`^images/abenteuer/offenbarung/etappe-bild-${String(s.id).padStart(2, '0')}(-b|-v2)?\\.webp$`))
     }
     expect(offenbarung.stages.map((s) => s.ref.split(',')[0])).toEqual(['Offenbarung 1', 'Offenbarung 1', 'Offenbarung 2–3', 'Offenbarung 3', 'Offenbarung 4', 'Offenbarung 5', 'Offenbarung 7', 'Offenbarung 21', 'Offenbarung 21'])
   })

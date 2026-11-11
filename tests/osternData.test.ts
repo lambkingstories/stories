@@ -43,7 +43,7 @@ describe('Ostern: stories and questions', () => {
       expect(words / sentences, `words per sentence ${s.id}`).toBeGreaterThan(5)
       expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(16)
       expect(text, `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.image, `stage ${s.id}`).toMatch(new RegExp(`^images/abenteuer/ostern/etappe-bild-${String(s.id).padStart(2, '0')}(-b)?\\.webp$`))
+      expect(s.image, `stage ${s.id}`).toMatch(new RegExp(`^images/abenteuer/ostern/etappe-bild-${String(s.id).padStart(2, '0')}(-b|-v2)?\\.webp$`))
     }
     expect(ostern.stages.map((s) => s.ref.split(',')[0]!.split('–')[0])).toEqual(['Johannes 20', 'Johannes 20', 'Lukas 24', 'Lukas 24', 'Lukas 24', 'Johannes 20', 'Johannes 21', 'Johannes 21', 'Lukas 24'])
   })

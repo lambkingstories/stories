@@ -374,7 +374,7 @@ export const ostern: Journey = {
     },
     {
       id: 2,
-      image: `${PICS}etappe-bild-02.webp`,
+      image: `${PICS}etappe-bild-02-v2.webp`,
       title: 'Maria!',
       ref: 'Johannes 20,11–18',
       text: [

@@ -240,7 +240,7 @@ export const weihnachten: Journey = {
   stages: [
     {
       id: 1,
-      image: `${PICS}etappe-bild-01.webp`,
+      image: `${PICS}etappe-bild-01-v2.webp`,
       title: 'Der Engel kommt zu Maria',
       ref: 'Lukas 1,26–38',
       text: [
@@ -275,7 +275,7 @@ export const weihnachten: Journey = {
     },
     {
       id: 3,
-      image: `${PICS}etappe-bild-03.webp`,
+      image: `${PICS}etappe-bild-03-v2.webp`,
       title: 'Josefs Traum',
       ref: 'Matthäus 1,18–24',
       text: [
@@ -326,7 +326,7 @@ export const weihnachten: Journey = {
     },
     {
       id: 6,
-      image: `${PICS}etappe-bild-06.webp`,
+      image: `${PICS}etappe-bild-06-v2.webp`,
       title: 'Die Hirten und der Engel',
       ref: 'Lukas 2,8–14',
       text: [
@@ -377,7 +377,7 @@ export const weihnachten: Journey = {
     },
     {
       id: 9,
-      image: `${PICS}etappe-bild-09.webp`,
+      image: `${PICS}etappe-bild-09-v2.webp`,
       title: 'Nach Ägypten und wieder heim',
       ref: 'Matthäus 2,13–15.19–23',
       text: [

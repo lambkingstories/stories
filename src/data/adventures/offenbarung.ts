@@ -241,7 +241,7 @@ export const offenbarung: Journey = {
     },
     {
       id: 2,
-      image: `${PICS}etappe-bild-02.webp`,
+      image: `${PICS}etappe-bild-02-v2.webp`,
       title: 'Fürchte dich nicht',
       ref: 'Offenbarung 1,12–20',
       text: [
@@ -369,7 +369,7 @@ export const offenbarung: Journey = {
     },
     {
       id: 9,
-      image: `${PICS}etappe-bild-09.webp`,
+      image: `${PICS}etappe-bild-09-v2.webp`,
       title: 'Die Stadt und der Strom',
       ref: 'Offenbarung 21,10–25; 22,1–5.20',
       text: [
