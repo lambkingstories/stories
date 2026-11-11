@@ -370,7 +370,7 @@ export const taufe: Journey = {
     },
     {
       id: 6,
-      image: `${PICS}etappe-bild-06.webp`,
+      image: `${PICS}etappe-bild-06-v2.webp`,
       title: 'Auf dem Tempel und auf dem Berg',
       ref: 'Matthäus 4,5–11',
       text: [

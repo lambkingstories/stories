@@ -48,7 +48,7 @@ describe('Taufe: stories and questions', () => {
       expect(words / sentences, `words per sentence ${s.id}`).toBeGreaterThan(7)
       expect(words / sentences, `words per sentence ${s.id}`).toBeLessThan(12.5)
       expect(text, `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.image, `stage ${s.id}`).toBe(`images/abenteuer/taufe/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
+      expect(s.image, `stage ${s.id}`).toBe(`images/abenteuer/taufe/etappe-bild-${String(s.id).padStart(2, '0')}${s.id === 6 ? '-v2' : ''}.webp`)
     }
   })
 
