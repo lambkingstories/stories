@@ -347,7 +347,7 @@ $wh: 96.8%
   gap: 2cqw
   padding: 6cqw 5cqw 5cqw
   border-radius: 4cqw
-  background: linear-gradient(180deg, rgba(14, 24, 58, 0.94), rgba(10, 18, 44, 0.97))
+  background: linear-gradient(180deg, rgb(14, 24, 58), rgb(10, 18, 44))
   border: 0.5cqw solid rgba(240, 190, 70, 0.85)
   color: #fff3cf
   text-align: center

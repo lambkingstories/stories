@@ -391,7 +391,7 @@ const hero = prependBaseUrl('images/bg/willkommen-plus-2.webp')
   display: flex
   flex-direction: column
   align-items: center
-  justify-content: flex-end
+  justify-content: center
   gap: 6px
   padding: 22px 12px 14px
   border: 1px solid var(--lk-line)
