@@ -327,7 +327,7 @@ export const elia: Journey = {
     },
     {
       id: 8,
-      image: `${PICS}etappe-bild-08.webp`,
+      image: `${PICS}etappe-bild-08-v2.webp`,
       title: 'Das stille Sausen',
       ref: '1. Könige 19,1–18',
       text: [
