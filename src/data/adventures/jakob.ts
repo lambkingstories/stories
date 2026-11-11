@@ -56,7 +56,7 @@ const SUPPE: StewGame = {
  * `seed`), zwei Felder sind frei (`gaps: 2`, so lässt sich die Kachel leicht verschieben; mit nur einer freien Lücke war das Spiel für Kinder zu schwer, Anton 29.10.2026). Runde 1 3 × 2 (vier Kacheln), Runde 2 4 × 2 (sechs Kacheln); die Mischungen (`seed`) brauchen sechs und acht Züge. Es ist kein Spielbild neu zu malen; das Bild ist das Etappenbild und folgt, wenn es ersetzt wird.
  */
 const SCHIEBEN: SlideGame = {
-  image: `${IMG}etappe-bild-03.webp`,
+  image: `${IMG}etappe-bild-03-v2.webp`,
   rounds: [
     { hint: 'Schiebe eine Kachel in eine freie Lücke.', cols: 3, rows: 2, moves: 10, seed: 4, gaps: 2 },
     { hint: 'Jetzt sind es mehr Kacheln.', cols: 4, rows: 2, moves: 14, seed: 10, gaps: 2 }
@@ -295,7 +295,7 @@ export const jakob: Journey = {
     },
     {
       id: 3,
-      image: `${IMG}etappe-bild-03.webp`,
+      image: `${IMG}etappe-bild-03-v2.webp`,
       title: 'Die Himmelsleiter',
       ref: '1. Mose 28,10–19',
       text: [
