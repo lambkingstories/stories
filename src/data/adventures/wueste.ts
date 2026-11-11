@@ -278,7 +278,7 @@ export const wueste: Journey = {
     },
     {
       id: 12,
-      image: `${PICS}etappe-bild-12-v1.webp`,
+      image: `${PICS}etappe-bild-12-v2.webp`,
       title: 'Bileam und die Eselin',
       ref: '4. Mose 22,1–35; 23,7–9; 24,5',
       text: [

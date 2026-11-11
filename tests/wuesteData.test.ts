@@ -51,7 +51,7 @@ describe('Das Volk in der Wüste: stories and questions', () => {
       expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(80)
       expect(words, `words ${s.id}`).toBeLessThanOrEqual(175)
       expect(text, `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.image, `stage ${s.id}`).toMatch(new RegExp(`^images/abenteuer/wueste/etappe-bild-${String(s.id).padStart(2, '0')}(-v1)?\.webp$`))
+      expect(s.image, `stage ${s.id}`).toMatch(new RegExp(`^images/abenteuer/wueste/etappe-bild-${String(s.id).padStart(2, '0')}(-v[12])?\.webp$`))
     }
   })
 
