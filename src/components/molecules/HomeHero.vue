@@ -146,7 +146,7 @@ onBeforeUnmount(() => {
   flex-direction: column
 
 .hero-img-wrap
-  aspect-ratio: 4 / 3.5
+  aspect-ratio: 16 / 9
   background: var(--lk-surface-2)
   overflow: hidden
 
