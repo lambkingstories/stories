@@ -558,7 +558,7 @@ export const mose: Journey = {
     },
     {
       id: 15,
-      image: `${PICS}etappe-bild-15.webp`,
+      image: `${PICS}etappe-bild-15-v2.webp`,
       title: 'Gott geht mit',
       ref: '2. Mose 33,7–17; 34,1–4.29; 40,34–38',
       text: [

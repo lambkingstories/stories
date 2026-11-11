@@ -63,7 +63,7 @@ describe('Mose: stories and questions', () => {
       // text changed after the check against the Bible (21.10.2026, list NEUAUFNAHME-BIBELTREUE-2026-10-21.md): recorded again as "-v4"
       expect(s.audio, `German recording ${s.id}`).toBe(`audio/abenteuer/mose/geschichte-${String(s.id).padStart(2, '0')}-${MOSE_RECORDED_AGAIN.includes(s.id) ? 'v4' : 'v3'}.mp3`)
       expect(existsSync(`public/${s.audio}`), `file ${s.audio}`).toBe(true)
-      expect(s.image, `stage ${s.id}`).toBe(`images/abenteuer/mose/etappe-bild-${String(s.id).padStart(2, '0')}.webp`)
+      expect(s.image, `stage ${s.id}`).toBe(`images/abenteuer/mose/etappe-bild-${String(s.id).padStart(2, '0')}${s.id === 15 ? '-v2' : ''}.webp`)
     }
   })
 
