@@ -318,15 +318,18 @@ describe('bread, jugs and the feather', () => {
 })
 
 describe('the end', () => {
-  it('is won at the goal, with stars for never being hungry and for no stumble', () => {
+  it('is won at the goal: three stars for a run without a stumble, two for one stumble, one for more; hunger does not count', () => {
     const g = bare()
     g.goal = 100
     run(g, 30)
     expect(g.phase).toBe('won')
     expect(starsFor(g)).toBe(3)
+    // a bad moment of hunger does not take a star away
+    g.minHunger = 0.1
+    expect(starsFor(g)).toBe(3)
     g.stumbles = 1
     expect(starsFor(g)).toBe(2)
-    g.minHunger = 0.1
+    g.stumbles = 2
     expect(starsFor(g)).toBe(1)
   })
 

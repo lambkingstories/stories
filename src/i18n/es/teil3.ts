@@ -184,7 +184,7 @@ export default {
       howBread: 'Elías tiene hambre. Come pan o irá más lento y se detendrá.',
       howFeather: 'Recoge una pluma de cuervo: un cuervo llega volando y tira pan en un carril. ¡Corre hacia él!',
       go: '¡Vamos!',
-      starRules: 'Una estrella por la meta, otra si Elías nunca tuvo mucha hambre, otra por correr sin tropezar.'
+      starRules: 'Una estrella por la meta, dos estrellas con un solo tropiezo como máximo, tres estrellas por una carrera sin ningún tropiezo.'
     }
   },
   family: {

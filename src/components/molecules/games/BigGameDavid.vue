@@ -7,7 +7,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AdvButton from '@/components/atoms/AdvButton.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
-import useBigGames from '@/use/useBigGames'
+import useBigGames, { howSeen, markHowSeen } from '@/use/useBigGames'
 import useSfx from '@/use/useSfx'
 import useMusic from '@/use/useMusic'
 import { prependBaseUrl } from '@/utils/function'
@@ -132,7 +132,7 @@ function start(i: number) {
   screen.value = 'play'
   paused.value = false
   // in the first rounds the card explains the game first (the game waits)
-  how.value = progress.plays(ID) < 3
+  how.value = !howSeen(ID)
   paused.value = how.value
   tipShown.value = !how.value && (i === 0 || i === EAGLE_TIP_LEVEL || i === GOLIATH_LEVEL)
   window.setTimeout(() => (tipShown.value = false), 6500)
@@ -149,6 +149,7 @@ const hideBroken = (e: Event) => {
 }
 function closeHow() {
   how.value = false
+  markHowSeen(ID)
   if (screen.value === 'play') paused.value = false
 }
 

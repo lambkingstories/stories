@@ -81,15 +81,17 @@ describe('BigGameElia', () => {
     w.unmount()
   })
 
-  it('does not explain again after three rounds, but the menu has the explanation', async () => {
-    const bg = useBigGames()
-    bg.record('elia', 0, 1)
-    bg.record('elia', 0, 1)
-    bg.record('elia', 0, 1)
+  it('explains the controls only the first time (not at every level), but the menu has the explanation', async () => {
+    localStorage.removeItem('lk-biggames-how-v1')
     const w = await open()
     await w.find('[data-test="elia-level-0"]').trigger('click')
-    expect(w.find('[data-test="elia-go"]').exists()).toBe(false)
+    expect(w.find('[data-test="elia-go"]').exists()).toBe(true)
+    await w.find('[data-test="elia-go"]').trigger('click')
     w.unmount()
+    const again = await open()
+    await again.find('[data-test="elia-level-1"]').trigger('click')
+    expect(again.find('[data-test="elia-go"]').exists()).toBe(false)
+    again.unmount()
     const m = await open()
     await m.find('[data-test="elia-how"]').trigger('click')
     expect(m.find('[data-test="elia-go"]').exists()).toBe(true)

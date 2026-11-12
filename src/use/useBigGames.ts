@@ -29,6 +29,27 @@ function save() {
   }
 }
 
+const HOW_KEY = 'lk-biggames-how-v1'
+
+/** The card that explains the controls is shown only once for a game (Anton, 12.11.2026), not at every level; the question mark brings it back. */
+export function howSeen(id: string): boolean {
+  try {
+    return (JSON.parse(localStorage.getItem(HOW_KEY) ?? '{}') as Record<string, boolean>)[id] === true
+  } catch {
+    return false
+  }
+}
+
+export function markHowSeen(id: string): void {
+  try {
+    const all = JSON.parse(localStorage.getItem(HOW_KEY) ?? '{}') as Record<string, boolean>
+    all[id] = true
+    localStorage.setItem(HOW_KEY, JSON.stringify(all))
+  } catch {
+    // not remembered: the card comes again next time
+  }
+}
+
 export default function useBigGames() {
   return {
     /** The best stars of every level of a game (0 for a level not won). */

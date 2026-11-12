@@ -2779,7 +2779,7 @@ export default {
           howBread: 'Elijah gets hungry. Eat bread, or he slows down and stops.',
           howFeather: 'Pick up a raven feather: a raven flies in and drops bread into one lane. Run through it!',
           go: 'Go!',
-          starRules: 'One star for the goal, one if Elijah was never really hungry, one for no stumble at all.'
+          starRules: 'One star for the goal, two stars with no more than one stumble, three stars for a run without any stumble.'
         }
       },
       family: {
@@ -6874,7 +6874,7 @@ export default {
           howBread: 'Elia bekommt Hunger. Iss Brot, sonst wird er langsamer und bleibt stehen.',
           howFeather: 'Sammle eine Rabenfeder: dann fliegt ein Rabe heran und wirft Brot in eine Spur. Lauf hinein!',
           go: 'Los!',
-          starRules: 'Ein Stern fürs Ziel, einer wenn Elia nie richtig Hunger hatte, einer fürs Laufen ohne Stolpern.'
+          starRules: 'Ein Stern fürs Ziel, zwei Sterne mit höchstens einem Stolpern, drei Sterne für einen Lauf ganz ohne Stolpern.'
         }
       },
       family: {

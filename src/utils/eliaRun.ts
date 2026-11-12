@@ -714,13 +714,14 @@ function collect(g: Run, from: number, to: number) {
   }
 }
 
-/** The stars of a won level: 1 for the goal, 1 if Elijah never got really hungry, 1 for no stumble at all. */
+/**
+ * The stars of a won level (Anton, 12.11.2026: a run without a mistake is three stars): 1 for the goal, 2 with no more than one stumble,
+ * 3 with no stumble at all. Hunger is not part of the stars any more (it only slows Elijah down and can stop him).
+ */
 export function starsFor(g: Run): number {
   if (g.phase !== 'won') return 0
-  let n = 1
-  if (g.minHunger >= HUNGRY) n++
-  if (g.stumbles === 0) n++
-  return n
+  if (g.stumbles === 0) return 3
+  return g.stumbles === 1 ? 2 : 1
 }
 
 /** The score of the free run: metres and three points a piece of bread. */

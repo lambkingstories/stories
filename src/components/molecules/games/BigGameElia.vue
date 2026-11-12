@@ -10,7 +10,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AdvButton from '@/components/atoms/AdvButton.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
-import useBigGames from '@/use/useBigGames'
+import useBigGames, { howSeen, markHowSeen } from '@/use/useBigGames'
 import useSfx from '@/use/useSfx'
 import useMusic from '@/use/useMusic'
 import { prependBaseUrl } from '@/utils/function'
@@ -60,8 +60,8 @@ const NAMES = [
   'hindernis-1', 'hindernis-2', 'hindernis-3', 'hindernis-4', 'hindernis-5', 'hindernis-6', 'hindernis-7',
   'hindernis-9', 'hindernis-10', 'hindernis-11', 'hindernis-12', 'hindernis-13', 'hindernis-14',
   'brot', 'krug', 'feder', 'mehl', 'oel', 'raben-1', 'raben-2', 'raben-3', 'ziel-krit',
-  // the brook (clear in the first world, a dry stream bed in the others) across the whole track
-  'bach-quer', 'bach-trocken'
+  // the brook across the whole track, with water in it in every world (the mountain worlds have a rocky one)
+  'bach-quer', 'bach-quer-berg'
 ]
 /** What every world after the first brings of its own: sky, ground, the things at the side, the obstacles and the goal (folder `welt2` to `welt5`). */
 const WORLD_NAMES = [
@@ -226,7 +226,7 @@ async function start(i: number) {
   tipShown.value = false
   banner.value = ''
   hungryAt = 0
-  how.value = progress.plays(ID) < 3
+  how.value = !howSeen(ID)
   paused.value = how.value
   screen.value = 'play'
   syncHud(true)
@@ -238,6 +238,7 @@ function toMenu() {
 
 function closeHow() {
   how.value = false
+  markHowSeen(ID)
   if (screen.value === 'play') paused.value = false
 }
 
@@ -561,11 +562,12 @@ function drawGround() {
   }
 }
 
-const WATER_FALLBACK = ['#4d9bc4', '#b49b72']
-const waterName = () => (curWorld.value === 0 ? 'bach-quer' : 'bach-trocken')
+const WATER_FALLBACK = ['#4d9bc4']
+/** The brook of the world: Carmel and the mountain of God have a rocky mountain stream (while its picture is missing, the first brook stands in). */
+const waterName = () => (curWorld.value >= 3 && imgs.has('bach-quer-berg') ? 'bach-quer-berg' : 'bach-quer')
 
 /**
- * The brooks across the track (clear in the first world, the dry bed of a stream in the others, for the brook Cherith has dried up): a ground strip, drawn line by
+ * The brooks across the track (with water in every world): a ground strip, drawn line by
  * line like the ground. One picture is laid across the whole width. Without the picture a flat strip stands in, so that it can be seen and jumped.
  */
 function drawWater() {
@@ -592,7 +594,7 @@ function drawWater() {
       const z = run.dist + d - DCAM
       const v = Math.max(0, Math.min(1, (z1 - z) / WATER_LEN))
       if (!im) {
-        ctx.fillStyle = WATER_FALLBACK[curWorld.value === 0 ? 0 : 1]!
+        ctx.fillStyle = WATER_FALLBACK[0]!
         ctx.fillRect(0, y, VW, stepPx)
         continue
       }
