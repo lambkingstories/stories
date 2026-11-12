@@ -834,7 +834,7 @@ $ink: var(--lk-text)
 .tile-check
   position: absolute
   right: 6px
-  top: 6px
+  bottom: 8px
   width: 22px
   height: 22px
   border-radius: 50%

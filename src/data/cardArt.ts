@@ -34,5 +34,17 @@ export const CARD_ART: Record<string, CardArt> = {
   'weihnachten': { front: 'images/abenteuer/weihnachten/karte-vorn.webp', back: 'images/abenteuer/weihnachten/karte-hinten.webp' },
   'taufe': { front: 'images/abenteuer/taufe/karte-vorn.webp', back: 'images/abenteuer/taufe/karte-hinten.webp' },
   'freunde': { front: 'images/abenteuer/freunde/karte-vorn.webp', back: 'images/abenteuer/freunde/karte-hinten.webp' },
-  'wunder': { front: 'images/abenteuer/wunder/karte-vorn.webp', back: 'images/abenteuer/wunder/karte-hinten.webp' }
+  'wunder': { front: 'images/abenteuer/wunder/karte-vorn.webp', back: 'images/abenteuer/wunder/karte-hinten.webp' },
+  'bergpredigt': { front: 'images/abenteuer/bergpredigt/karte-vorn.webp', back: 'images/abenteuer/bergpredigt/karte-hinten.webp' },
+  'gleichnisse': { front: 'images/abenteuer/gleichnisse/karte-vorn.webp', back: 'images/abenteuer/gleichnisse/karte-hinten.webp' },
+  'heilung': { front: 'images/abenteuer/heilung/karte-vorn.webp', back: 'images/abenteuer/heilung/karte-hinten.webp' },
+  'ichbin': { front: 'images/abenteuer/ichbin/karte-vorn.webp', back: 'images/abenteuer/ichbin/karte-hinten.webp' },
+  'letztewoche': { front: 'images/abenteuer/letztewoche/karte-vorn.webp', back: 'images/abenteuer/letztewoche/karte-hinten.webp' },
+  'offenbarung': { front: 'images/abenteuer/offenbarung/karte-vorn.webp', back: 'images/abenteuer/offenbarung/karte-hinten.webp' },
+  'ostern': { front: 'images/abenteuer/ostern/karte-vorn.webp', back: 'images/abenteuer/ostern/karte-hinten.webp' },
+  'paulus': { front: 'images/abenteuer/paulus/karte-vorn.webp', back: 'images/abenteuer/paulus/karte-hinten.webp' },
+  'paulusrom': { front: 'images/abenteuer/paulusrom/karte-vorn.webp', back: 'images/abenteuer/paulusrom/karte-hinten.webp' },
+  'pfingsten': { front: 'images/abenteuer/pfingsten/karte-vorn.webp', back: 'images/abenteuer/pfingsten/karte-hinten.webp' },
+  'sohn': { front: 'images/abenteuer/sohn/karte-vorn.webp', back: 'images/abenteuer/sohn/karte-hinten.webp' },
+  'zachaeus': { front: 'images/abenteuer/zachaeus/karte-vorn.webp', back: 'images/abenteuer/zachaeus/karte-hinten.webp' }
 }
