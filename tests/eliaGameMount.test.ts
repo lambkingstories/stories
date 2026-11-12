@@ -39,30 +39,27 @@ describe('BigGameElia', () => {
     return w
   }
 
-  it('lists five worlds of three levels, only the very first open, the free run locked', async () => {
+  it('lists five worlds of three levels, all open, the free run locked', async () => {
     const w = await open()
-    const levels = w.findAll('.eg-level')
-    expect(levels).toHaveLength(15)
-    expect(levels[0]!.attributes('disabled')).toBeUndefined()
-    expect(levels[1]!.attributes('disabled')).toBeDefined()
-    expect(levels[3]!.attributes('disabled')).toBeDefined()
+    expect(w.findAll('.eg-world')).toHaveLength(5)
+    expect(w.findAll('.eg-level')).toHaveLength(15)
     expect(w.find('[data-test="elia-free"]').attributes('disabled')).toBeDefined()
     w.unmount()
   })
 
-  it('opens the next levels of the first world after a star, and the free run after the third', async () => {
+  it('every level can be played at once (also after one that was not managed); the free run opens after the third level has a star', async () => {
+    let w = await open()
+    const levels = w.findAll('.eg-level')
+    expect(levels).toHaveLength(15)
+    for (const l of levels) expect(l.attributes('disabled')).toBeUndefined()
+    expect(w.find('[data-test="elia-free"]').attributes('disabled')).toBeDefined()
+    w.unmount()
     const bg = useBigGames()
     bg.record('elia', 0, 1)
-    let w = await open()
-    expect(w.findAll('.eg-level')[1]!.attributes('disabled')).toBeUndefined()
-    expect(w.findAll('.eg-level')[2]!.attributes('disabled')).toBeDefined()
-    w.unmount()
     bg.record('elia', 1, 2)
     bg.record('elia', 2, 3)
     w = await open()
     expect(w.find('[data-test="elia-free"]').attributes('disabled')).toBeUndefined()
-    // the second world is built, too, and opens with the first one: its first level is closed until the last of the first world has a star
-    expect(w.findAll('.eg-level')[3]!.attributes('disabled')).toBeUndefined()
     w.unmount()
   })
 

@@ -58,6 +58,7 @@ const NAMES = [
   'horizont', 'boden', 'bach',
   'kulisse-1', 'kulisse-2', 'kulisse-3', 'kulisse-4', 'kulisse-5', 'kulisse-6',
   'hindernis-1', 'hindernis-2', 'hindernis-3', 'hindernis-4', 'hindernis-5', 'hindernis-6', 'hindernis-7',
+  'hindernis-9', 'hindernis-10', 'hindernis-11', 'hindernis-12', 'hindernis-13', 'hindernis-14',
   'brot', 'krug', 'feder', 'mehl', 'oel', 'raben-1', 'raben-2', 'raben-3', 'ziel-krit',
   // the brook (clear in the first world, a dry stream bed in the others) across the whole track
   'bach-quer', 'bach-trocken'
@@ -65,7 +66,8 @@ const NAMES = [
 /** What every world after the first brings of its own: sky, ground, the things at the side, the obstacles and the goal (folder `welt2` to `welt5`). */
 const WORLD_NAMES = [
   'horizont', 'boden', 'kulisse-1', 'kulisse-2', 'kulisse-3', 'kulisse-4', 'kulisse-5', 'kulisse-6',
-  'hindernis-1', 'hindernis-2', 'hindernis-3', 'hindernis-4', 'hindernis-5', 'hindernis-6', 'hindernis-7', 'ziel'
+  'hindernis-1', 'hindernis-2', 'hindernis-3', 'hindernis-4', 'hindernis-5', 'hindernis-6', 'hindernis-7',
+  'hindernis-9', 'hindernis-10', 'hindernis-11', 'hindernis-12', 'hindernis-13', 'hindernis-14', 'ziel'
 ]
 const imgs = new Map<string, HTMLImageElement>()
 /** The pictures of the worlds 1 to 4 (the second to the fifth), loaded when a level of that world begins. */
@@ -123,7 +125,23 @@ function loadAll(): Promise<void> {
 
 /** How big the things are in the world: height or width in metres (the other side follows the picture). */
 // 0-2 low (fallen trunk, thorn bush, brushwood), 3 the trunk on two stumps (slide under it), 4-6 trees (cypress, olive, dead tree)
-const OBST: { h?: number; w?: number }[] = [{ w: 2.0 }, { w: 1.6 }, { w: 1.7 }, { h: 2.0 }, { h: 4.4 }, { h: 3.9 }, { h: 4.2 }, { w: 1 }]
+// 8-10 more low ones, 11 a second narrow beam, 12 and 13 more tall ones (the beams 3 and 11 are drawn one lane wide, see `obstacleDraw`)
+const OBST: { h?: number; w?: number }[] = [{ w: 2.0 }, { w: 1.6 }, { w: 1.7 }, { h: 2.2 }, { h: 4.4 }, { h: 3.9 }, { h: 4.2 }, { w: 1 }, { w: 1.8 }, { w: 1.7 }, { w: 1.8 }, { h: 2.2 }, { h: 4.2 }, { h: 3.9 }]
+/** The picture of an obstacle: the new ones fall back on an older one of the same kind while a world does not have them. */
+function obstacleName(sprite: number): string {
+  const own = `hindernis-${sprite + 1}`
+  if (getImg(own)) return own
+  const base = sprite >= 12 ? sprite - 8 : sprite === 11 ? 3 : sprite >= 8 ? sprite - 8 : sprite
+  return `hindernis-${base + 1}`
+}
+/** How big an obstacle is drawn. A beam stands in ONE lane (it is never wider than the lane, so that it cannot look as if it stood on the next one). */
+function obstacleDraw(sprite: number): { h?: number; w?: number } {
+  const size = OBST[sprite] ?? { w: 1.5 }
+  if (sprite !== 3 && sprite !== 11) return size
+  const im = getImg(obstacleName(sprite))
+  const asp = im ? im.width / im.height : 0.65
+  return { h: Math.min(2.2, 1.4 / asp) }
+}
 const KUL: { h?: number; w?: number }[] = [{ h: 8 }, { h: 5 }, { w: 3.6 }, { h: 1.9 }, { w: 4.6 }, { h: 1.3 }]
 /** The brook: one picture is laid along the left side of the track like the ground (its middle lies this far to the left). */
 const BACH_X = -5.4
@@ -138,7 +156,8 @@ const paused = ref(false)
 const worldNames = computed(() => ((tm('app.bigGames.elia.worlds') as unknown as Parameters<typeof rt>[0][]) ?? []).map((m) => rt(m)))
 const worldRefs = computed(() => ((tm('app.bigGames.elia.refs') as unknown as Parameters<typeof rt>[0][]) ?? []).map((m) => rt(m)))
 const levelStars = computed(() => progress.levels(ID))
-const unlocked = (i: number) => !!LEVELS[i]?.ready && (i === 0 || (levelStars.value[i - 1] ?? 0) >= 1)
+// every level can be played at once: whoever does not manage one may go on to the next (Anton, 12.11.2026)
+const unlocked = (i: number) => !!LEVELS[i]?.ready
 const freeOpen = computed(() => (levelStars.value[FREE_AFTER - 1] ?? 0) >= 1)
 const isFree = computed(() => level.value === FREE_LEVEL)
 const worldOf = (i: number) => LEVELS[i]?.world ?? 0
@@ -700,7 +719,20 @@ function draw(time: number) {
     // a brook is a strip of the ground, drawn with the ground
     if (o.kind === 'water' || o.z < zFrom || o.z > zTo) continue
     const d = o.z - r.dist + DCAM
-    items.push({ d, draw: () => drawSprite(`hindernis-${o.sprite + 1}`, laneX(o.lane), 0, d, camX, OBST[o.sprite] ?? { w: 1.5 }, { fallback: o.kind === 'block' ? '#8a6a45' : o.kind === 'high' ? '#a06a2a' : '#7d7466' }) })
+    items.push({
+      d,
+      draw: () => {
+        // a soft shadow on the ground in its own lane, so that it is clear where it stands
+        if (ctx) {
+          const k = sc(d)
+          ctx.fillStyle = 'rgba(50, 30, 10, 0.3)'
+          ctx.beginPath()
+          ctx.ellipse(sXOf(laneX(o.lane), d, camX), sYOf(d), (o.kind === 'high' ? 0.62 : 0.8) * k, 0.15 * k, 0, 0, Math.PI * 2)
+          ctx.fill()
+        }
+        drawSprite(obstacleName(o.sprite), laneX(o.lane), 0, d, camX, obstacleDraw(o.sprite), { fallback: o.kind === 'block' ? '#8a6a45' : o.kind === 'high' ? '#a06a2a' : '#7d7466' })
+      }
+    })
   }
   for (const p of r.pickups) {
     if (p.got || p.z < zFrom || p.z > zTo) continue

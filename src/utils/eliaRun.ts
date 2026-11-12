@@ -78,7 +78,7 @@ export interface Obstacle {
   z: number
   lane: number
   kind: ObstacleKind
-  /** Which picture: 0 to 2 low (stone, thorns, slabs), 3 the beam, 4 to 6 blocking (tall things), 7 the water (one picture over the whole track). */
+  /** Which picture (see `LOW_SPRITES`, `BEAM_SPRITES`, `BLOCK_SPRITES`); 7 is the water (one picture over the whole track). */
   sprite: number
   hit: boolean
 }
@@ -404,21 +404,21 @@ function put(g: Run, c: CellChar, z: number, lane: number, rand: () => number) {
       g.pickups.push({ z, lane, y: 1.0, type: 'feder', got: false })
       break
     case 'L':
-      stone('low', Math.floor(rand() * 3))
+      stone('low', LOW_SPRITES[Math.floor(rand() * LOW_SPRITES.length)]!)
       break
     case 'l':
-      stone('low', Math.floor(rand() * 3))
+      stone('low', LOW_SPRITES[Math.floor(rand() * LOW_SPRITES.length)]!)
       breadAt(2.6)
       break
     case 'H':
-      stone('high', 3)
+      stone('high', BEAM_SPRITES[Math.floor(rand() * BEAM_SPRITES.length)]!)
       break
     case 'h':
-      stone('high', 3)
+      stone('high', BEAM_SPRITES[Math.floor(rand() * BEAM_SPRITES.length)]!)
       breadAt(0.6)
       break
     case 'B':
-      stone('block', 4 + Math.floor(rand() * 3))
+      stone('block', BLOCK_SPRITES[Math.floor(rand() * BLOCK_SPRITES.length)]!)
       break
     case 'W':
       stone('water', 7)
@@ -427,6 +427,15 @@ function put(g: Run, c: CellChar, z: number, lane: number, rand: () => number) {
       break
   }
 }
+
+/**
+ * The pictures of the obstacles (the number is the picture `hindernis-<number + 1>` of the world): several of every kind, so that the track does not
+ * look the same all the time. 0 to 2 and 8 to 10 low things (jump), 3 and 11 the narrow beams (slide under, one lane wide), 4 to 6 and 12 and 13 tall
+ * things (change the lane). 7 is not used (the brook is one picture over the whole track).
+ */
+export const LOW_SPRITES: readonly number[] = [0, 1, 2, 8, 9, 10]
+export const BEAM_SPRITES: readonly number[] = [3, 11]
+export const BLOCK_SPRITES: readonly number[] = [4, 5, 6, 12, 13]
 
 /** A jug counts as this many pieces of bread. */
 export const KRUG_VALUE = 5
