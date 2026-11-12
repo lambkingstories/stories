@@ -48,11 +48,14 @@ describe('collection', () => {
     expect(cards[2]!.stars).toBe(0)
   })
 
-  it('the special card comes with all the cards of the journey', () => {
+  it('the golden card comes when the journey is finished, whatever the stars are', () => {
     const open = albumCards(journey, (id) => progress[id])
-    expect(albumSetCard(journey, open)).toMatchObject({ have: false, count: 1, all: 3, image: 'm.webp' })
+    expect(albumSetCard(journey, open)).toMatchObject({ have: false, count: 2, all: 3, image: 'm.webp' })
     const all = albumCards(journey, () => ({ stars: 3, finalStars: 3, done: true }))
     expect(albumSetCard(journey, all)).toMatchObject({ have: true, count: 3, all: 3 })
+    // one star in every stage is enough, the stars do not matter for the card
+    const low = albumCards(journey, () => ({ stars: 1, finalStars: 1, done: true }))
+    expect(albumSetCard(journey, low)).toMatchObject({ have: true, count: 3, all: 3 })
   })
 
   it('counts cards and special cards over all journeys', () => {

@@ -47,7 +47,8 @@ describe('AdventureRewards', () => {
     const t = text(make(1))
     expect(t).toContain('Noch 5 Sterne fehlen.')
     expect(t).toContain('4 von 9')
-    expect(t).toContain('Noch 5 Sterne, dann gehört sie dir.')
+    // the card does not ask for stars: one stage is still open
+    expect(t).toContain('Noch 1 Etappe, dann gehört sie dir.')
   })
 
   it('says the card is won when every stage has three stars', () => {
@@ -58,6 +59,14 @@ describe('AdventureRewards', () => {
     const w = make(3)
     expect(text(w)).toContain('Gewonnen! Sie liegt in deiner Sammlung.')
     expect(text(w)).toContain('Alle Sterne sind gesammelt')
+  })
+
+  it('the card is won when the adventure is finished, also with few stars', () => {
+    const adv = useAdventure()
+    adv.state['testreise'] = {
+      stages: { 1: { stars: 1, bestStars: 1, done: true }, 2: { stars: 0, bestStars: 0, done: true }, 3: { stars: 2, bestStars: 2, done: true } }
+    }
+    expect(text(make(3))).toContain('Gewonnen! Sie liegt in deiner Sammlung.')
   })
 
   it('opens the mini game of its stage with three stars and tells how many stars it still needs', () => {

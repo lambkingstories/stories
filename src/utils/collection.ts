@@ -38,23 +38,27 @@ export function albumCards(journey: Journey, stageOf: (stageId: number) => Stage
     })
 }
 
-/** The special card of a journey: it is won with all the cards of that journey. */
+/** The special card of a journey: it is won when the journey is finished (every stage gone through). */
 export interface AlbumSetCard {
   journeyId: string
   title: string
   image: string
   have: boolean
-  /** Cards of the journey that are won, and how many there are. */
+  /** Stages of the journey that were gone through, and how many there are. */
   count: number
   all: number
 }
 
+/**
+ * The golden card of an adventure is won when the adventure is finished: every stage was gone through to the end, with any number of
+ * stars (Anton, 12.11.2026). The stars count for the cups and the bonus games, not for the card. `count` = stages gone through.
+ */
 export function albumSetCard(journey: Journey, cards: AlbumCard[]): AlbumSetCard {
-  const count = cards.filter((c) => c.have).length
+  const count = cards.filter((c) => c.played).length
   return { journeyId: journey.id, title: journey.title, image: journey.medal, have: cards.length > 0 && count === cards.length, count, all: cards.length }
 }
 
-/** `have`: cards won; `all`: cards there are; `sets`: special cards won. */
+/** `have`: stage cards with three stars; `all`: stage cards there are; `sets`: golden cards won (adventures finished). */
 export function albumTotals(sets: AlbumCard[][]): { have: number; all: number; sets: number } {
   let have = 0
   let all = 0
@@ -64,7 +68,7 @@ export function albumTotals(sets: AlbumCard[][]): { have: number; all: number; s
       all++
       if (c.have) have++
     }
-    if (cards.length > 0 && cards.every((c) => c.have)) complete++
+    if (cards.length > 0 && cards.every((c) => c.played)) complete++
   }
   return { have, all, sets: complete }
 }

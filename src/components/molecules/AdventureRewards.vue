@@ -35,13 +35,14 @@ const starsMax = computed(() => playable.value.length * MAX_STARS)
 const starsMissing = computed(() => Math.max(0, starsMax.value - starsNow.value))
 const stageNow = computed(() => (props.stageId !== undefined ? stageStarsOf(adv.stageOf(props.journey.id, props.stageId)) : 0))
 
-// the collector card: one per adventure, won with all three stars in every stage
+// the collector card: one per adventure, won when the adventure is finished (every stage gone through, whatever the stars are)
 const set = computed(() =>
   albumSetCard(
     props.journey,
     albumCards(props.journey, (id) => adv.stageOf(props.journey.id, id))
   )
 )
+const stagesLeft = computed(() => Math.max(0, set.value.all - set.value.count))
 // a card that is not won yet shows its back; a won one shows the hero of the adventure
 const cardPicture = computed(() => (set.value.have ? prependBaseUrl(CARD_ART[props.journey.id]?.front ?? props.journey.medal) : ui('karte-rueckseite')))
 
@@ -105,7 +106,7 @@ const rows = computed<Row[]>(() => {
     icon: cardPicture.value,
     isCard: true,
     title: t('app.adventure.rCard'),
-    text: set.value.have ? t('app.adventure.rCardHave') : t('app.adventure.rCardNeed', { n: starsMissing.value }, starsMissing.value),
+    text: set.value.have ? t('app.adventure.rCardHave') : t('app.adventure.rCardNeed', { n: stagesLeft.value }, stagesLeft.value),
     hint: set.value.have ? undefined : t('app.adventure.rCardHint'),
     done: set.value.have
   })
