@@ -2258,13 +2258,13 @@ function sampleColor(x: number, y: number): string | null {
 
 // ── Fields of the line art: stay inside the lines, and the bucket that does not leak -------------
 
-/** "In den Linien bleiben": a stroke only paints in the field where it started. Off at the start; remembered between visits. */
+/** "In den Linien bleiben": a stroke only paints in the field where it started. On at the start (Anton, 12.11.2026); remembered between visits. */
 const STAY_KEY = 'lk-coloring-stay-inside-v3'
 function readStay(): boolean {
   try {
-    return localStorage.getItem(STAY_KEY) === '1'
+    return localStorage.getItem(STAY_KEY) !== '0'
   } catch {
-    return false
+    return true
   }
 }
 const stayInside = ref(readStay())

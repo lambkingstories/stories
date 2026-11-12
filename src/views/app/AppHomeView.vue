@@ -174,7 +174,7 @@ const pictureCard = computed<ResumeCard>(() => {
 
 /** The big card on top: the adventure the child is in; if none was begun, the first one. */
 const hero = computed(() => {
-  const begun = journeyToContinue(journeys, adventure.progressOf)
+  const begun = journeyToContinue(journeys, adventure.progressOf, isJourneyPlusLocked)
   // none under way: the first adventure of the Bible that is open and not finished (a new child begins with Adam and Eve)
   const journey = begun ?? journeyToBegin(journeys, adventure.progressOf, isJourneyPlusLocked)
   if (!journey) return null

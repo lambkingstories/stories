@@ -22,12 +22,17 @@ export function journeyToBegin(list: Journey[], progressOf: (id: string) => Jour
   return sorted.find((j) => !locked(j.id) && nextStageIndex(j, progressOf(j.id)) !== null) ?? sorted[0] ?? null
 }
 
-export function journeyToContinue(list: Journey[], progressOf: (id: string) => JourneyProgress | undefined): Journey | null {
+export function journeyToContinue(
+  list: Journey[],
+  progressOf: (id: string) => JourneyProgress | undefined,
+  locked: (id: string) => boolean = () => false
+): Journey | null {
   const order = (j: Journey) => timelineNumber(j.id) || Number.MAX_SAFE_INTEGER
   for (const j of [...list].sort((a, b) => order(a) - order(b))) {
     const p = progressOf(j.id)
     const begun = !!p && Object.keys(p.stages).length > 0
-    if (begun && nextStageIndex(j, p) !== null) return j
+    // an adventure that is closed for this child (Plus) is not offered to go on with; the start card then suggests a free one
+    if (begun && !locked(j.id) && nextStageIndex(j, p) !== null) return j
   }
   return null
 }

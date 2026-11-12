@@ -78,7 +78,7 @@ const groups = computed(() => groupByEpoch(items.value))
 
 // the adventure to go on with: the first one that was begun and is not finished (in the order of the time line)
 const goOn = computed(() => {
-  const j = journeyToContinue(journeys, adv.progressOf)
+  const j = journeyToContinue(journeys, adv.progressOf, isJourneyPlusLocked)
   return items.value.find((i) => i.journey.id === j?.id) ?? null
 })
 
