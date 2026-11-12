@@ -28,8 +28,8 @@ export const BLOCK_H = 2.4
  * as `WATER_LEN` metres on the track; the water itself, where Elijah must be in the air, is the middle `2 * WATER_HALF` metres of it
  * (Anton, 12.11.2026).
  */
-export const WATER_LEN = 3.6
-export const WATER_HALF = 1.0
+export const WATER_LEN = 5
+export const WATER_HALF = 1.4
 /** Elijah must be higher than this over the water. */
 export const WATER_CLEAR = 0.45
 export const SLIDE_TIME = 0.65
