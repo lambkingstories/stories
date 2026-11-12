@@ -36,8 +36,6 @@ import { openExternal } from '@/utils/openExternal'
 import { prependBaseUrl } from '@/utils/function'
 import { contentLocale } from '@/utils/contentLocale'
 import { BIG_GAMES } from '@/data/bigGames'
-import { JESUS_PATH } from '@/data/jesusPath'
-import { adventureLanguage } from '@/use/adventureLanguage'
 import { bigGameStates, nextBigGame, totalStars } from '@/utils/bigGames'
 
 const { t, locale } = useI18n({ useScope: 'global' })
@@ -50,8 +48,6 @@ const { plusOn } = usePremium()
 
 const STORE_URL = 'https://lambking.store'
 
-/** "Who is Jesus?": only a quiet line at the very end of the page (Anton 11.11.2026). */
-const jesusText = computed(() => JESUS_PATH[adventureLanguage.value])
 
 const lang = computed<Locale>(() => (contentLocale(locale.value)))
 const allBooks = computed<ApiBook[]>(() => (apiBooks.state.all ?? []) as ApiBook[])
@@ -332,12 +328,6 @@ function openBook(bookId: string) {
                 @error="onImgFallback"
               )
               span(v-if="i === 0" class="new-badge") {{ t('app.read.newBadge') }}
-
-      //- very last, quietly: who is Jesus
-      button(type="button" class="jesus-line" @click="router.push({ name: 'app-jesus' })")
-        span(class="jesus-line-title") {{ jesusText.homeCardTitle }}
-        span(class="jesus-line-sub") {{ jesusText.homeCardText }}
-        ZIconography(name="chevron-right" :size="16")
 </template>
 
 <style scoped lang="sass">
@@ -404,28 +394,6 @@ button
   font-weight: 800
   font-size: 1rem
   cursor: pointer
-
-// ── who is Jesus: a quiet line at the end of the page ──
-.jesus-line
-  align-self: center
-  display: inline-flex
-  align-items: center
-  flex-wrap: wrap
-  justify-content: center
-  gap: 4px 8px
-  padding: 8px 12px
-  border: 0
-  background: transparent
-  color: var(--lk-muted)
-  font-size: 0.9rem
-  cursor: pointer
-
-  :deep(.z-icon-outline)
-    color: currentColor
-
-.jesus-line-title
-  font-weight: 800
-  color: var(--lk-text)
 
 // ── blocks ──
 .block
