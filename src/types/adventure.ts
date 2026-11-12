@@ -3125,6 +3125,11 @@ export interface AdventureStage {
   image?: string
   task: StageTask
   questions: AdventureQuestion[]
+  /**
+   * A fixed piece of music for this stage (a path below `public/`, like the entries of `Journey.music`). With it the map and the mini game of
+   * this stage play exactly this piece; without it the journey's list (at random) or the general pieces play, as before.
+   */
+  music?: string
   /** The stage is not ready yet (texts or pictures are still missing): it shows "soon", cannot be opened, and its files are not downloaded. */
   soon?: boolean
 }

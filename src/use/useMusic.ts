@@ -259,20 +259,24 @@ function start(w: Wish) {
   if (musicVolume.value > 0) void begin(w)
 }
 
-const own = (music?: string[]): Track[] | undefined => (music?.length ? music.map((src) => ({ src })) : undefined)
+const own = (music?: string[], fixed?: string): Track[] | undefined =>
+  fixed ? [{ src: fixed }] : music?.length ? music.map((src) => ({ src })) : undefined
 
-/** The music of the map: the pieces of the journey, or the general map piece. */
-function playMap(music?: string[]) {
-  start({ kind: 'map', pool: own(music) ?? [asTrack(MAP_MUSIC)] })
+/**
+ * The music of the map: the pieces of the journey, or the general map piece. `fixed` is the piece that belongs to one stage
+ * (`AdventureStage.music`); with it exactly this piece plays.
+ */
+function playMap(music?: string[], fixed?: string) {
+  start({ kind: 'map', pool: own(music, fixed) ?? [asTrack(MAP_MUSIC)] })
 }
 
 /**
  * The music of a mini game (`kind` is the game: `puzzle`, `memory` ...): the journey's own pieces, or a general piece of the mood that
  * fits the game.
  */
-function playGame(kind?: string, music?: string[]) {
+function playGame(kind?: string, music?: string[], fixed?: string) {
   if (wanted?.kind === 'game' && running) return // a piece is already playing in this game
-  const pool = own(music)
+  const pool = own(music, fixed)
   if (pool) return start({ kind: 'game', pool })
   const piece = pickGameMusic(moodOfGame(kind), lastSrc?.replace(/^audio\/abenteuer\//, '').replace(/\.mp3$/, ''))
   start({ kind: 'game', pool: [asTrack(piece)] })

@@ -32,7 +32,13 @@ const { play, preload, stopAll } = useSfx()
 // the soft map music (switched off with the speaker switch)
 useButtonSounds()
 const music = useMusic()
-onMounted(() => music.playMap(journey.value.music))
+// a stage with its own fixed piece (`AdventureStage.music`): the map plays the piece of the stage the child is at (the next one to play, or the last)
+const mapPiece = () => {
+  const list = journey.value.stages
+  const i = nextStageIndex(journey.value, progress.value)
+  return (i === null ? list[list.length - 1] : list[i])?.music
+}
+onMounted(() => music.playMap(journey.value.music, mapPiece()))
 onBeforeUnmount(() => music.stop('map'))
 
 const journey = computed(() => journeyById(String(route.params.journeyId)) ?? journeys[0]!)

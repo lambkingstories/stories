@@ -160,6 +160,10 @@ const HIRTENRUF: HerdCallGame = {
   ]
 }
 
+const MUSIK_NACHT = 'audio/abenteuer/ichbin/musik-nacht-v1.mp3'
+const MUSIK_BRUNNEN = 'audio/abenteuer/ichbin/musik-brunnen-v1.mp3'
+const MUSIK_HIRTE = 'audio/abenteuer/ichbin/musik-hirte-v1.mp3'
+
 export const ichbin: Journey = {
   id: 'ichbin',
   title: 'Jesus erzählt von sich',
@@ -199,6 +203,7 @@ export const ichbin: Journey = {
     {
       id: 1,
       image: `${PICS}etappe-bild-01.webp`,
+      music: MUSIK_NACHT,
       title: 'Der Besuch bei Nacht',
       ref: 'Johannes 3,1–7',
       text: [
@@ -219,6 +224,7 @@ export const ichbin: Journey = {
     {
       id: 2,
       image: `${PICS}etappe-bild-02.webp`,
+      music: MUSIK_NACHT,
       title: 'Wie der Wind',
       ref: 'Johannes 3,8–15',
       text: [
@@ -239,6 +245,7 @@ export const ichbin: Journey = {
     {
       id: 3,
       image: `${PICS}etappe-bild-03.webp`,
+      music: MUSIK_NACHT,
       title: 'So sehr hat Gott die Welt geliebt',
       ref: 'Johannes 3,16–21',
       text: [
@@ -258,6 +265,7 @@ export const ichbin: Journey = {
     {
       id: 4,
       image: `${PICS}etappe-bild-04.webp`,
+      music: MUSIK_BRUNNEN,
       title: 'Gib mir zu trinken',
       ref: 'Johannes 4,1–9',
       text: [
@@ -277,6 +285,7 @@ export const ichbin: Journey = {
     {
       id: 5,
       image: `${PICS}etappe-bild-05.webp`,
+      music: MUSIK_BRUNNEN,
       title: 'Lebendiges Wasser',
       ref: 'Johannes 4,10–15',
       text: [
@@ -296,6 +305,7 @@ export const ichbin: Journey = {
     {
       id: 6,
       image: `${PICS}etappe-bild-06.webp`,
+      music: MUSIK_BRUNNEN,
       title: 'Die Frau und ihr Leben',
       ref: 'Johannes 4,16–24',
       text: [
@@ -316,6 +326,7 @@ export const ichbin: Journey = {
     {
       id: 7,
       image: `${PICS}etappe-bild-07.webp`,
+      music: MUSIK_BRUNNEN,
       title: 'Ich bin es',
       ref: 'Johannes 4,25–34',
       text: [
@@ -335,6 +346,7 @@ export const ichbin: Journey = {
     {
       id: 8,
       image: `${PICS}etappe-bild-08.webp`,
+      music: MUSIK_BRUNNEN,
       title: 'Die Felder sind weiß',
       ref: 'Johannes 4,35–42',
       text: [
@@ -355,6 +367,7 @@ export const ichbin: Journey = {
     {
       id: 9,
       image: `${PICS}etappe-bild-09.webp`,
+      music: MUSIK_NACHT,
       title: 'Wer sagt ihr, dass ich bin?',
       ref: 'Matthäus 16,13–20',
       text: [
@@ -378,6 +391,7 @@ export const ichbin: Journey = {
     {
       id: 10,
       image: `${PICS}etappe-bild-10.webp`,
+      music: MUSIK_NACHT,
       title: 'Auf dem Berg',
       ref: 'Matthäus 17,1–5',
       text: [
@@ -397,6 +411,7 @@ export const ichbin: Journey = {
     {
       id: 11,
       image: `${PICS}etappe-bild-11.webp`,
+      music: MUSIK_NACHT,
       title: 'Steht auf und fürchtet euch nicht',
       ref: 'Matthäus 17,6–13',
       text: [
@@ -417,6 +432,7 @@ export const ichbin: Journey = {
     {
       id: 12,
       image: `${PICS}etappe-bild-12.webp`,
+      music: MUSIK_HIRTE,
       title: 'Er ruft sie beim Namen',
       ref: 'Johannes 10,1–10',
       text: [
@@ -437,6 +453,7 @@ export const ichbin: Journey = {
     {
       id: 13,
       image: `${PICS}etappe-bild-13.webp`,
+      music: MUSIK_HIRTE,
       title: 'Ich bin der gute Hirte',
       ref: 'Johannes 10,11–18',
       text: [
@@ -456,6 +473,7 @@ export const ichbin: Journey = {
     {
       id: 14,
       image: `${PICS}etappe-bild-14.webp`,
+      music: MUSIK_HIRTE,
       title: 'Aus meiner Hand',
       ref: 'Johannes 10,19–30',
       text: [

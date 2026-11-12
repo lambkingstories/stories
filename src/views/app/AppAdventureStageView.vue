@@ -877,7 +877,7 @@ const gameKind = computed(() => {
 })
 watch(
   () => phase.value === 'task' && !isPaint.value && !!gameKind.value,
-  (on) => (on ? music.playGame(gameKind.value, journey.value?.music) : music.stop('game')),
+  (on) => (on ? music.playGame(gameKind.value, journey.value?.music, stage.value?.music) : music.stop('game')),
   { immediate: true }
 )
 onBeforeUnmount(() => music.stop('game'))
