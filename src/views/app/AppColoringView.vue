@@ -1442,13 +1442,15 @@ function onVisibilityHidden() {
 /** The picture was opened from the statistics (the present): the way back leads there, with nothing started afresh. */
 const retStats = computed(() => {
   const v = route.query.ret
-  return typeof v === 'string' && v.startsWith('stats:') ? v.slice('stats:'.length) : null
+  return typeof v === 'string' && v.startsWith('stats:') ? v.slice('stats:'.length).split(':')[0]! : null
 })
+/** The picture was opened from the overview at the end of an adventure: back there it is that overview again. */
+const retFinale = computed(() => typeof route.query.ret === 'string' && route.query.ret.endsWith(':finale'))
 async function backToStats() {
   const id = retStats.value
   if (!id) return false
   await persistWithNote()
-  void router.replace({ name: 'app-adventure-stats', params: { journeyId: id } })
+  void router.replace({ name: 'app-adventure-stats', params: { journeyId: id }, query: retFinale.value ? { finale: '1' } : {} })
   return true
 }
 

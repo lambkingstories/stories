@@ -238,17 +238,56 @@ describe('the statistics page', () => {
     expect(push).toHaveBeenLastCalledWith({ name: 'app-adventure-stage', params: { journeyId: 'josef', stageId: 'pruefung' } })
   })
 
-  it('the present can be looked at as often as you like; "back" in the painting program is to lead back here (it carries the way back)', async () => {
+  it('the present is shown first (not the painting program at once); "Color it" opens the painting program and carries the way back here, "Back" stays', async () => {
     await play(Array(12).fill(3), 6)
     const w = await mountStats()
-    const gift = w.findAll('button').find((b) => /^Geschenk/.test(b.text()))!
-    await gift.trigger('click')
-    await gift.trigger('click')
-    expect(push).toHaveBeenCalledTimes(2)
-    const to = push.mock.calls[1]![0] as { name: string; query: Record<string, string> }
+    expect(w.find('[data-test="gift-preview"]').exists()).toBe(false)
+    await w.find('.stats-gift-btn').trigger('click')
+    expect(push).not.toHaveBeenCalled()
+    expect(w.find('[data-test="gift-preview"]').exists()).toBe(true)
+    // back: the picture closes, the page stays
+    await w.find('[data-test="gift-back"]').trigger('click')
+    expect(w.find('[data-test="gift-preview"]').exists()).toBe(false)
+    expect(push).not.toHaveBeenCalled()
+    // as often as you like
+    await w.find('.stats-gift-btn').trigger('click')
+    await w.find('[data-test="gift-color"]').trigger('click')
+    expect(push).toHaveBeenCalledTimes(1)
+    const to = push.mock.calls[0]![0] as { name: string; query: Record<string, string> }
     expect(to.name).toBe('app-coloring')
     expect(to.query).toMatchObject({ type: 'image', ret: 'stats:josef' })
     expect(to.query.source).toContain(josef.gift.image)
+  })
+
+  it('the overview of the end (finale): the card, the picture, the stars of all stages, what was won, no way out but "Done", which leads to the map', async () => {
+    await play(Array(12).fill(3), 6)
+    route.query = { finale: '1' }
+    try {
+      const w = await mountStats()
+      expect(w.find('.stats-back').exists()).toBe(false)
+      expect(w.find('h1').text()).toBe('Abenteuer geschafft!')
+      expect(w.find('[data-test="stats-card"]').exists()).toBe(true)
+      expect(w.find('[data-test="stats-gift"]').exists()).toBe(true)
+      expect(w.findAll('.stats-row').length).toBe(13)
+      expect(w.find('[data-test="stats-rewards"]').exists()).toBe(true)
+      // the picture to color carries "finale" on the way back
+      await w.find('.stats-gift-btn').trigger('click')
+      await w.find('[data-test="gift-color"]').trigger('click')
+      expect((push.mock.calls.at(-1)![0] as { query: Record<string, string> }).query.ret).toBe('stats:josef:finale')
+      await w.find('[data-test="stats-done"]').trigger('click')
+      expect(replace).toHaveBeenLastCalledWith({ name: 'app-adventure-map', params: { journeyId: 'josef' } })
+    } finally {
+      route.query = {}
+    }
+  })
+
+  it('the card of the adventure is shown when it is won (every stage gone through), and a tap shows it big', async () => {
+    await play([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 3)
+    const w = await mountStats()
+    expect(w.find('[data-test="stats-card"]').exists()).toBe(true)
+    await w.find('.stats-card-btn').trigger('click')
+    expect(document.body.querySelector('.cv')).not.toBeNull()
+    w.unmount()
   })
 
   it('"back to the map" goes to the map; the page is a page of the journeys (a no-journey address shows nothing)', async () => {

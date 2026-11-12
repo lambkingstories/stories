@@ -57,6 +57,8 @@ const items = computed(() =>
       doneCount: next === null ? j.stages.length : next,
       total: j.stages.length,
       begun,
+      /** every stage is gone through: the tile gets its own colour (Anton, 12.11.2026) */
+      finished: begun && next === null,
       /** the adventure comes with LambKing Plus: it is marked in the list, before it is opened */
       plus: isJourneyPlusLocked(j.id)
     }
@@ -301,8 +303,9 @@ async function doDelete() {
             ZIconography(name="chevron-right" :size="20")
           div(class="tile-grid")
             template(v-for="e in g.entries" :key="e.id")
-              button(v-if="e.item" type="button" class="tile" @click="detailId = e.item.journey.id")
+              button(v-if="e.item" type="button" class="tile" :class="{ 'is-finished': e.item.finished }" @click="detailId = e.item.journey.id")
                 span(class="tile-no") {{ e.nr }}
+                span(v-if="e.item.finished" class="tile-check" aria-hidden="true") ✓
                 span(v-if="e.item.plus" class="tile-plus")
                   PlusBadge(size="small")
                 span(class="tile-art")
@@ -821,6 +824,28 @@ $ink: var(--lk-text)
   &.is-closed
     cursor: default
     opacity: 0.8
+
+  // an adventure that is finished: a fresh green, so that the child sees at once what is done
+  &.is-finished
+    background: color-mix(in srgb, #3f9d5a 20%, var(--lk-surface))
+    border-color: #3f9d5a
+    border-width: 2px
+
+.tile-check
+  position: absolute
+  right: 6px
+  top: 6px
+  width: 22px
+  height: 22px
+  border-radius: 50%
+  display: inline-flex
+  align-items: center
+  justify-content: center
+  background: #3f9d5a
+  color: #fff
+  font-size: 0.8rem
+  font-weight: 800
+  line-height: 1
 
 .tile-no
   position: absolute

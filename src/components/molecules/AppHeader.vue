@@ -29,7 +29,10 @@ const { userName } = useUserName()
       img(class="brand-word is-day" :src="prependBaseUrl('images/logo/lk-wort-tag.webp')" alt="" draggable="false" decoding="async")
       img(class="brand-word is-night" :src="prependBaseUrl('images/logo/lk-wort-nacht.webp')" alt="" draggable="false" decoding="async")
     div(class="head-right")
-      span(v-if="userName" class="hello") {{ t('app.main.helloName', { name: userName }) }}
+      //- always there, next to the picture: "Hallo" and the name of the child (without a name: "Entdecker")
+      span(class="hello" data-test="header-hello")
+        span(class="hello-word") {{ t('app.main.helloWord') }}
+        span(class="hello-name") {{ userName || t('app.main.helloExplorer') }}
       button(type="button" class="me-btn" :aria-label="t('app.nav.profile')" @click="router.push({ name: 'app-profile' })")
         img(:src="avatarSrc" alt="" class="me-img" draggable="false")
 </template>
@@ -70,18 +73,31 @@ const { userName } = useUserName()
   gap: 10px
 
 .hello
+  display: flex
+  flex-direction: column
+  align-items: flex-end
   min-width: 0
-  max-width: 34vw
+  max-width: 38vw
+  line-height: 1.15
+  text-align: right
+  color: var(--lk-text)
+
+.hello-word
+  font-weight: 600
+  font-size: 0.85rem
+  color: var(--lk-muted)
+
+.hello-name
+  max-width: 100%
   overflow: hidden
   white-space: nowrap
   text-overflow: ellipsis
   font-weight: 800
-  font-size: 1.05rem
-  color: var(--lk-text)
+  font-size: 1.1rem
 
 @media (max-width: 340px)
-  .hello
-    display: none
+  .hello-name
+    font-size: 0.95rem
 
 .me-btn
   flex: 0 0 auto

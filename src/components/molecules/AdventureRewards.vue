@@ -19,13 +19,13 @@ import { albumCards, albumSetCard } from '@/utils/collection'
 import { prependBaseUrl } from '@/utils/function'
 import type { Journey, Medal } from '@/types/adventure'
 
-const props = defineProps<{ journey: Journey; stageId?: number }>()
+const props = defineProps<{ journey: Journey; stageId?: number; startOpen?: boolean }>()
 const { t } = useI18n({ useScope: 'global' })
 const adv = useAdventure()
 
 const ui = (name: string) => prependBaseUrl(`images/abenteuer/ui/${name}.webp`)
 /** The account starts folded on every page: only the head line with the stars shows until the child taps it. */
-const open = ref(false)
+const open = ref(!!props.startOpen)
 const progress = computed(() => adv.progressOf(props.journey.id))
 const playable = computed(() => props.journey.stages.filter((s) => !s.soon))
 

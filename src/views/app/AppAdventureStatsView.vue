@@ -5,15 +5,22 @@
  * played again from here (the new result replaces the old one); the way back from it leads to this page, and the cup is updated, with
  * the celebration once more when a better cup was won. The present opens the painting program; "back" there comes back to this page.
  */
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import AdvButton from '@/components/atoms/AdvButton.vue'
+import AdventureRewards from '@/components/molecules/AdventureRewards.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
+import CollectionCard from '@/components/molecules/CollectionCard.vue'
+import CollectionCardViewer from '@/components/molecules/CollectionCardViewer.vue'
 import AppHeader from '@/components/molecules/AppHeader.vue'
 import SoundPanel from '@/components/molecules/SoundPanel.vue'
 import { journeyById } from '@/data/adventures'
+import { CARD_ART } from '@/data/cardArt'
+import { memoryVerseOf } from '@/data/memoryVerses'
+import { adventureLanguage } from '@/use/adventureLanguage'
+import { albumCards, albumSetCard } from '@/utils/collection'
 import useAdventure from '@/use/useAdventure'
 import useButtonSounds from '@/use/useButtonSounds'
 import useCelebration from '@/use/useCelebration'
@@ -55,13 +62,27 @@ function again(stageKey: string) {
   void router.push({ name: 'app-adventure-stage', params: { journeyId: journey.value.id, stageId: stageKey } })
 }
 
-function openGift() {
+/** The overview of the end of an adventure (after the quiz): the child stays here, looks at the card, the picture and the stars, and leaves with "Done". */
+const finale = computed(() => route.query.finale === '1')
+const set = computed(() => albumSetCard(journey.value, albumCards(journey.value, (id) => adv.stageOf(journey.value.id, id))))
+const art = computed(() => CARD_ART[journey.value?.id ?? ''])
+const cardOpen = ref(false)
+const verse = computed(() => memoryVerseOf(journey.value?.id ?? '', adventureLanguage.value) ?? undefined)
+const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : undefined)
+
+/** The picture that was won: first it is shown big, and only "Color it" opens the painting program (the way back leads here again). */
+const giftOpen = ref(false)
+function colorGift() {
   const g = journey.value?.gift
-  if (g) void router.push({ name: 'app-coloring', query: { source: prependBaseUrl(g.image), type: 'image', ret: `stats:${journey.value.id}` } })
+  if (g) void router.push({ name: 'app-coloring', query: { source: prependBaseUrl(g.image), type: 'image', ret: `stats:${journey.value.id}${finale.value ? ':finale' : ''}` } })
 }
 
 function toMap() {
   void router.push({ name: 'app-adventure-map', params: { journeyId: journey.value.id } })
+}
+/** "Done": on to the map of the adventure, where the child may look around, and leave from there. */
+function done() {
+  void router.replace({ name: 'app-adventure-map', params: { journeyId: journey.value.id } })
 }
 
 onMounted(() => {
@@ -78,12 +99,13 @@ onMounted(() => {
       AppHeader
       div(class="stats-head-body")
         div(class="stats-top")
-          button(type="button" class="stats-back lk-btn lk-btn--outline lk-btn--small" :aria-label="t('app.adventure.backToMap')" @click="toMap")
+          button(v-if="!finale" type="button" class="stats-back lk-btn lk-btn--outline lk-btn--small" :aria-label="t('app.adventure.backToMap')" @click="toMap")
             ZIconography(name="chevron-left" :size="20")
             span {{ t('app.adventure.backToMap') }}
           SoundPanel
         p(class="stats-kind") {{ journey.title }}
-        h1(class="stats-title") {{ t('app.adventure.statsTitle') }}
+        h1(class="stats-title") {{ finale ? t('app.adventure.statsFinaleTitle') : t('app.adventure.statsTitle') }}
+        p(v-if="finale" class="stats-sub") {{ t('app.adventure.statsFinaleSub') }}
 
     main(class="stats-body")
       section(class="stats-card stats-cup")
@@ -92,8 +114,20 @@ onMounted(() => {
         p(v-else class="stats-line") {{ exam ? t('app.adventure.noMedal') : t('app.adventure.statsNoExam') }}
         p(class="stats-total") {{ t('app.adventure.statsTotal', { n: points, max }) }}
         p(v-if="next" class="stats-line stats-next") {{ t('app.adventure.statsNext', { medal: t(`app.adventure.medal_${next.medal}`), n: next.missing }) }}
-        div(class="stats-actions")
-          AdvButton(v-if="medal" tone="gold" @click="openGift") {{ t('app.adventure.gift', { title: journey.gift.title }) }}
+
+      //- the collector card of the adventure: it glows, a tap shows it big
+      section(v-if="set.have" class="stats-card stats-won" data-test="stats-card")
+        h2(class="stats-h2") {{ t('app.adventure.statsCardTitle') }}
+        button(type="button" class="stats-card-btn" :aria-label="journey.title" @click="cardOpen = true")
+          CollectionCard(:title="journey.title" :image="pic(art?.front ?? journey.medal)" :back-image="pic(art?.back)" :art="!!art" special still)
+        p(class="stats-line") {{ t('app.adventure.statsCardTap') }}
+
+      //- the picture to color that the cup gave: shown first, colored on demand
+      section(v-if="medal" class="stats-card stats-won" data-test="stats-gift")
+        h2(class="stats-h2") {{ t('app.adventure.statsGiftTitle') }}
+        button(type="button" class="stats-gift-btn" :aria-label="journey.gift.title" @click="giftOpen = true")
+          img(:src="prependBaseUrl(journey.gift.image)" alt="" draggable="false")
+        p(class="stats-line") {{ journey.gift.title }} · {{ t('app.adventure.statsGiftTap') }}
 
       section(class="stats-card")
         ol(class="stats-list")
@@ -109,6 +143,35 @@ onMounted(() => {
             span(v-else class="stats-score stats-quiet") {{ t('app.adventure.statsNotYet') }}
             button(v-if="examAgain" type="button" class="stats-again lk-btn lk-btn--outline lk-btn--small" :aria-label="`${t('app.adventure.statsAgain')}: ${t('app.adventure.exam')}`" @click="again('pruefung')") {{ t('app.adventure.statsAgain') }}
         p(class="stats-sum") {{ t('app.adventure.statsTotal', { n: points, max }) }}
+
+      //- what the stars, the answers and the cup unlocked and won: stars, card, mini game, bonus game, cup
+      section(v-if="finale" class="stats-card" data-test="stats-rewards")
+        h2(class="stats-h2") {{ t('app.adventure.statsRewards') }}
+        AdventureRewards(:journey="journey" start-open)
+
+      div(v-if="finale" class="stats-finish")
+        AdvButton(tone="gold" data-test="stats-done" @click="done") {{ t('app.adventure.statsDone') }}
+
+    CollectionCardViewer(
+      v-if="cardOpen"
+      :title="journey.title"
+      :image="pic(art?.front ?? journey.medal)"
+      :back-image="pic(art?.back)"
+      :art="!!art"
+      :reference="journey.subtitle"
+      :journey-title="t('app.collection.setBack', { n: set.all })"
+      :verse="verse"
+      special
+      @close="cardOpen = false"
+    )
+
+    //- the won picture, big, with "Color it" and "Back" under it
+    div(v-if="giftOpen && medal" class="gp" role="dialog" aria-modal="true" :aria-label="journey.gift.title" data-test="gift-preview")
+      div(class="gp-paper")
+        img(:src="prependBaseUrl(journey.gift.image)" alt="" draggable="false")
+      div(class="gp-actions")
+        AdvButton(tone="gold" data-test="gift-color" @click="colorGift") {{ t('app.adventure.giftColor') }}
+        AdvButton(tone="blau" data-test="gift-back" @click="giftOpen = false") {{ t('app.adventure.giftBack') }}
 </template>
 
 <style scoped lang="sass">
@@ -191,11 +254,99 @@ onMounted(() => {
   color: var(--lk-muted)
   font-size: 1rem
 
-.stats-actions
+.stats-sub
+  margin: 0 0 8px
+  color: var(--lk-muted)
+  font-size: 1.05rem
+
+.stats-h2
+  margin: 0 0 10px
+  font-family: 'Fraunces', serif
+  font-weight: 800
+  font-size: 1.25rem
+  text-align: center
+
+.stats-won
+  text-align: center
+
+.stats-card-btn
+  display: block
+  width: min(62%, 240px)
+  margin: 0 auto 8px
+  padding: 0
+  border: 0
+  border-radius: 16px
+  background: transparent
+  cursor: pointer
+  // the card glows: it is the thing that was just won
+  animation: stats-glow 2.2s ease-in-out infinite alternate
+  -webkit-tap-highlight-color: transparent
+
+@keyframes stats-glow
+  from
+    filter: drop-shadow(0 0 6px rgba(255, 205, 60, 0.55))
+  to
+    filter: drop-shadow(0 0 22px rgba(255, 190, 40, 1))
+
+.stats-gift-btn
+  display: block
+  width: min(78%, 320px)
+  margin: 0 auto 8px
+  padding: 10px
+  border: 2px solid rgba(212, 168, 62, 0.6)
+  border-radius: 14px
+  background: #fffdf7
+  box-shadow: var(--lk-shadow)
+  cursor: pointer
+
+  img
+    display: block
+    width: 100%
+    height: auto
+    border-radius: 6px
+
+.stats-finish
   display: flex
+  justify-content: center
+  padding: 6px 0 12px
+
+.gp
+  position: fixed
+  inset: 0
+  z-index: 200
+  display: flex
+  flex-direction: column
   align-items: center
   justify-content: center
-  margin-top: 12px
+  gap: 16px
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px))
+  background: rgba(30, 24, 12, 0.88)
+
+.gp-paper
+  flex: 0 1 auto
+  max-width: min(94vw, 640px)
+  max-height: calc(100dvh - 140px)
+  padding: 10px
+  border-radius: 12px
+  background: #fffdf7
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5)
+
+  img
+    display: block
+    max-width: 100%
+    max-height: calc(100dvh - 170px)
+    object-fit: contain
+
+.gp-actions
+  display: flex
+  gap: 12px
+  flex-wrap: wrap
+  justify-content: center
+
+@media (prefers-reduced-motion: reduce)
+  .stats-card-btn
+    animation: none
+    filter: drop-shadow(0 0 12px rgba(255, 190, 40, 0.8))
 
 .stats-list
   margin: 0

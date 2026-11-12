@@ -19,6 +19,8 @@ export interface TimelineItem {
   stars: number
   plus: boolean
   begun: boolean
+  /** every stage is gone through */
+  finished?: boolean
   doneCount: number
   total: number
 }
@@ -122,7 +124,8 @@ defineExpose({ scrollToEpoch, scrollToCurrent })
               div(v-for="(e, i) in g.entries" :key="e.id" :data-id="e.id" :class="['tl-node', i % 2 ? 'is-down' : 'is-up', { 'is-current': e.id === currentId, 'is-closed': !e.item, 'is-done': !!e.item?.medal }]")
                 span(class="tl-dot") {{ e.nr }}
                 span(class="tl-stem" aria-hidden="true")
-                button(v-if="e.item" type="button" class="tl-card" @click="emit('pick', e.item.journey.id)")
+                button(v-if="e.item" type="button" class="tl-card" :class="{ 'is-finished': e.item.finished }" @click="emit('pick', e.item.journey.id)")
+                  span(v-if="e.item.finished" class="tl-check" aria-hidden="true") ✓
                   span(v-if="e.id === currentId" class="tl-flag") {{ t('app.adventure.timelineHere') }}
                   span(v-if="e.item.plus" class="tl-plus")
                     PlusBadge(size="small")
@@ -307,6 +310,26 @@ $gap: 30px
 
 .is-down .tl-stem
   top: calc(50% + 14px + 12px)
+
+.tl-card.is-finished
+  background: color-mix(in srgb, #3f9d5a 20%, var(--lk-surface))
+  border: 2px solid #3f9d5a
+
+.tl-check
+  position: absolute
+  right: 8px
+  top: 8px
+  width: 22px
+  height: 22px
+  border-radius: 50%
+  display: inline-flex
+  align-items: center
+  justify-content: center
+  background: #3f9d5a
+  color: #fff
+  font-size: 0.8rem
+  font-weight: 800
+  line-height: 1
 
 .tl-card
   position: absolute

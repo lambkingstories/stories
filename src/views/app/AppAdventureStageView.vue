@@ -12,6 +12,7 @@ import AppHeader from '@/components/molecules/AppHeader.vue'
 import AdvButton from '@/components/atoms/AdvButton.vue'
 import AdventureCount from '@/components/molecules/AdventureCount.vue'
 import AdventureOverview, { type OverviewRow } from '@/components/molecules/AdventureOverview.vue'
+import AdventureCardReveal from '@/components/molecules/AdventureCardReveal.vue'
 import AdventureRewards from '@/components/molecules/AdventureRewards.vue'
 import AdventureQuiz from '@/components/molecules/AdventureQuiz.vue'
 import GameBuild from '@/components/molecules/games/GameBuild.vue'
@@ -927,9 +928,13 @@ const cup = computed(() => (medal.value ? ui(`pokal-${medal.value === 'silver' ?
 
 const isLastStage = computed(() => !!journey.value && !!stage.value && stage.value.id === journey.value.stages.length)
 
-function openGift() {
-  const g = journey.value?.gift
-  if (g) void router.push({ name: 'app-coloring', query: { source: prependBaseUrl(g.image), type: 'image' } })
+/** The end of the adventure: the overview with the stars of all stages, the card, the cup and the picture to color (the child stays there as long as it likes). */
+function toFinale() {
+  const j = journey.value
+  if (!j) return
+  leaving.value = true
+  stopAll()
+  void router.replace({ name: 'app-adventure-stats', params: { journeyId: j.id }, query: { finale: '1' } })
 }
 </script>
 
@@ -1283,9 +1288,11 @@ function openGift() {
             AdvButton(v-if="coloringBookUrl" tone="blau" @click="openExternal(coloringBookUrl ?? '')") {{ t('app.adventure.coloringBookButton') }}
             AdvButton(v-if="journey?.id === 'ostern'" tone="gold" @click="router.push({ name: 'app-jesus' })") {{ jesusText.homeCardTitle }}
             AdvButton(v-if="nextPlusJourney" tone="gold" @click="showUpsell('adventure')") {{ t('app.adventure.plusNextButton') }}
-            AdvButton(v-if="medal" tone="gold" @click="openGift") {{ t('app.adventure.gift', { title: journey.gift.title }) }}
+            AdvButton(tone="gold" data-test="to-finale" @click="toFinale") {{ t('app.adventure.toOverview') }}
             AdvButton(tone="blau" @click="retry") {{ t('app.adventure.retry') }}
             AdvButton(tone="blau" @click="goMap()") {{ t('app.adventure.backToMap') }}
+          //- the card lights up (once) when it has just been won
+          AdventureCardReveal(v-if="journey" :journey="journey")
         template(v-else)
           h2(class="stage-h2") {{ t('app.adventure.stageDone') }}
           AdventureStars(:stars="shownStars" :size="60" celebrate :hush="leaving" class="burst-stars")
@@ -1303,6 +1310,8 @@ function openGift() {
               strong {{ tryWrong > 0 ? '−' + tryWrong : '0' }}
           //- everything the stars give, in one place: stars of the adventure, collector card, mini game, bonus game, cup
           AdventureRewards(v-if="journey && stage" :journey="journey" :stage-id="stage.id")
+          //- the last stage: the collector card of the adventure is won, it lights up
+          AdventureCardReveal(v-if="journey && isLastStage" :journey="journey")
           p(v-if="wonNow.length" class="result-line result-plus") {{ t('app.awards.newAward') }}: {{ wonNow.map((w) => t(`app.awards.items.${w}.title`)).join(', ') }}
           AdventureOverview(:rows="overviewRows(false)")
           div(class="stage-actions")

@@ -804,6 +804,8 @@ export default {
   main: {
     hello: '¡Hola, explorador!',
     helloName: '¡Hola, {name}!',
+    helloWord: 'Hola',
+    helloExplorer: 'explorador',
     subtitle: '¿Listo para una nueva historia?',
     searchPlaceholder: 'Buscar historia …',
     unlock: 'Desbloquear',

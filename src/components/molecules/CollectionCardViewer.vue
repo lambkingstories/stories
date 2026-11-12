@@ -23,6 +23,8 @@ const props = defineProps<{
   verse?: { text: string; ref: string }
   /** The card is new: reveal it. */
   reveal?: boolean
+  /** A line of light over the card ("New collector card!"). */
+  caption?: string
 }>()
 const emit = defineEmits<{ (e: 'close'): void }>()
 
@@ -147,6 +149,7 @@ onBeforeUnmount(() => {
   Teleport(to="body")
     div(ref="root" class="cv" role="dialog" aria-modal="true" :aria-label="title" tabindex="-1" @click.self="emit('close')")
       button(type="button" class="cv-close" :aria-label="t('app.collection.close')" @click="emit('close')") ×
+      p(v-if="caption" class="cv-caption") {{ caption }}
       div(
         class="cv-card"
         :style="{ '--rx': `${tilt.rx}deg`, '--ry': `${turn() + tilt.ry}deg`, '--mx': tilt.mx, '--my': tilt.my }"
@@ -186,6 +189,23 @@ onBeforeUnmount(() => {
   outline: none
 
 // the card is as big as the screen allows: nearly the whole width, or the height minus the hint and the close button
+.cv-caption
+  margin: 0
+  padding: 0 16px
+  text-align: center
+  font-family: 'Fraunces', serif
+  font-weight: 800
+  font-size: 1.35rem
+  color: #ffe9a6
+  text-shadow: 0 0 14px rgba(255, 214, 90, 0.9), 0 0 32px rgba(255, 190, 40, 0.6)
+  animation: cv-caption-glow 1.8s ease-in-out infinite alternate
+
+@keyframes cv-caption-glow
+  from
+    text-shadow: 0 0 8px rgba(255, 214, 90, 0.6), 0 0 18px rgba(255, 190, 40, 0.3)
+  to
+    text-shadow: 0 0 18px rgba(255, 214, 90, 1), 0 0 40px rgba(255, 190, 40, 0.8)
+
 .cv-card
   width: min(94vw, 600px, calc((100dvh - 120px) * 2 / 3))
   touch-action: none
