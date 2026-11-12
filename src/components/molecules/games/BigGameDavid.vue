@@ -81,7 +81,8 @@ const portrait = ref(false)
 const showRotateAnyway = ref(false)
 const levelNames = computed(() => ((tm('app.bigGames.david.levels') as unknown as Parameters<typeof rt>[0][]) ?? []).map((m) => rt(m)))
 const levelStars = computed(() => progress.levels(ID))
-const unlocked = (i: number) => i === 0 || (levelStars.value[i - 1] ?? 0) >= 1
+// every level can be played at once (Anton, 12.11.2026)
+const unlocked = (_i: number) => true
 
 // what the page shows while it plays (the game itself is not reactive)
 const hud = reactive({ sheep: 3, stones: 0 })
@@ -150,7 +151,12 @@ const hideBroken = (e: Event) => {
 function closeHow() {
   how.value = false
   markHowSeen(ID)
-  if (screen.value === 'play') paused.value = false
+  if (screen.value === 'play') {
+    paused.value = false
+    // the card is gone for good: a short hint in the game takes its place
+    tipShown.value = true
+    window.setTimeout(() => (tipShown.value = false), 6500)
+  }
 }
 
 function tryLandscape() {
