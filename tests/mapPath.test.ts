@@ -35,6 +35,7 @@ import { paulusrom } from '../src/data/adventures/paulusrom'
 import { offenbarung } from '../src/data/adventures/offenbarung'
 import { sohn } from '../src/data/adventures/sohn'
 import { ichbin } from '../src/data/adventures/ichbin'
+import { bergpredigt } from '../src/data/adventures/bergpredigt'
 import type { Journey } from '../src/types/adventure'
 
 /** Rules for the dotted way on the maps (Anton, 19.10.2026): into every medal from the left, out of it on the right, always curved, 10 beads between two medals. */
@@ -76,7 +77,8 @@ describe.each([
   ['Bis nach Rom', paulusrom],
   ['Alles wird neu', offenbarung],
   ['Der verlorene Sohn', sohn],
-  ['Jesus erzählt von sich', ichbin]
+  ['Jesus erzählt von sich', ichbin],
+  ['Die Bergpredigt', bergpredigt]
 ] as [string, Journey][])('the dotted way of %s', (_name, j) => {
   const m = j.map
   const spots = [...m.stages, m.exam]

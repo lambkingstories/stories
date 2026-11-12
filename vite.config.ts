@@ -1,4 +1,4 @@
-import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripDavidFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles, stripGleichnisseFiles, stripZachaeusFiles, stripLetztewocheFiles, stripOsternFiles, stripPfingstenFiles, stripPaulusFiles, stripPaulusromFiles, stripOffenbarungFiles, stripSohnFiles, stripIchbinFiles } from './vite.config.noah'
+import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripDavidFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles, stripGleichnisseFiles, stripZachaeusFiles, stripLetztewocheFiles, stripOsternFiles, stripPfingstenFiles, stripPaulusFiles, stripPaulusromFiles, stripOffenbarungFiles, stripSohnFiles, stripIchbinFiles, stripBergpredigtFiles } from './vite.config.noah'
 import { fileURLToPath, URL } from 'node:url'
 import { resolve, dirname } from 'node:path'
 import { rmSync } from 'node:fs'
@@ -198,6 +198,10 @@ export default defineConfig(({ mode }) => {
       // The same for "Jesus erzählt von sich" (`VITE_INCLUDE_ICHBIN=true` / `vite --mode ichbin`).
       if (env.VITE_SHOW_ICHBIN !== 'true' && env.VITE_INCLUDE_ICHBIN !== 'true') {
         stripIchbinFiles(outDir)
+      }
+      // The same for "Die Bergpredigt" (`VITE_INCLUDE_BERGPREDIGT=true` / `vite --mode bergpredigt`).
+      if (env.VITE_SHOW_BERGPREDIGT !== 'true' && env.VITE_INCLUDE_BERGPREDIGT !== 'true') {
+        stripBergpredigtFiles(outDir)
       }
     }
   }

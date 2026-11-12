@@ -307,3 +307,11 @@ export const ICHBIN_ONLY_DIRS = ['images/abenteuer/ichbin', 'images/abenteuer/sp
 export function stripIchbinFiles(outDir: string) {
   strip(outDir, ICHBIN_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Die Bergpredigt" (id `bergpredigt`) alone, in the same three places as Adam and Eve. */
+export const BERGPREDIGT_ONLY_DIRS = ['images/abenteuer/bergpredigt', 'images/abenteuer/spiele/bergpredigt', 'audio/abenteuer/bergpredigt']
+
+/** Takes the folders of "Die Bergpredigt" out of a finished build. */
+export function stripBergpredigtFiles(outDir: string) {
+  strip(outDir, BERGPREDIGT_ONLY_DIRS)
+}

@@ -152,6 +152,11 @@ export const MEMORY_VERSES: Record<string, MemoryVerse> = {
     en: { ref: 'Luke 15:20', text: `But when he was yet a great way off, his father saw him, and had compassion, and ran, and fell on his neck, and kissed him.` },
     line: { de: `Der jüngere Sohn ging weit weg und kam mit leeren Händen zurück. Der Vater sah ihn schon von Weitem und lief ihm entgegen.`, en: `The younger son went far away and came back with empty hands. His father saw him from far off and ran to meet him.` }
   },
+  bergpredigt: {
+    de: { ref: 'Matthäus 7,7', text: `Bittet, so wird euch gegeben; suchet, so werdet ihr finden; klopfet an, so wird euch aufgetan.` },
+    en: { ref: 'Matthew 7:7', text: `Ask, and it shall be given you; seek, and ye shall find; knock, and it shall be opened unto you.` },
+    line: { de: `Jesus saß mit vielen Menschen auf einer Wiese am Berg und sprach zu ihnen.`, en: `Jesus sat on a meadow on the mountain with many people and spoke to them.` }
+  },
   ichbin: {
     de: { ref: 'Johannes 3,16', text: `Also hat Gott die Welt geliebt, dass er seinen eingeborenen Sohn gab, auf dass alle, die an ihn glauben, nicht verloren werden, sondern das ewige Leben haben.` },
     en: { ref: 'John 3:16', text: `For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.` },

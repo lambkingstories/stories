@@ -1889,3 +1889,53 @@ describe('the hidden journey Jesus erzählt von sich (id ichbin)', () => {
     expect(m.journeys.filter((j) => j.id === 'ichbin')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Die Bergpredigt (id bergpredigt)', () => {
+  it('a normal build (without Die Bergpredigt) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_BERGPREDIGT', 'false')
+    open('?bergpredigt=bergpredigt-vorschau-v7r3')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('bergpredigt')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_BERGPREDIGT', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?bergpredigt=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.BERGPREDIGT_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?bergpredigt=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_BERGPREDIGT', 'true')
+    const first = await load()
+    open(`?bergpredigt=${first.BERGPREDIGT_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.BERGPREDIGT_UNLOCK_CODE).toBe('bergpredigt-vorschau-v7r3')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'bergpredigt'])
+    expect(localStorage.getItem('lk-preview-bergpredigt')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('bergpredigt')?.stages.length).toBe(9)
+    open('?bergpredigt=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-bergpredigt')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_BERGPREDIGT) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_BERGPREDIGT', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'bergpredigt')).toHaveLength(1)
+  })
+})
