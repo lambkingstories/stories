@@ -147,7 +147,7 @@ function openJourney(id: string) {
             :key="a.journey.id"
             type="button"
             :class="['co-card', { 'is-have': a.set.have }]"
-            :aria-label="a.set.have ? a.journey.title : t('app.collection.specialLocked', { n: a.set.all - a.set.count }, a.set.all - a.set.count)"
+            :aria-label="a.set.have ? a.journey.title : t('app.collection.specialLocked')"
             @click="openSet(a)"
           )
             template(v-if="a.set.have")
@@ -160,7 +160,7 @@ function openJourney(id: string) {
                 span(class="co-slot-title") {{ a.journey.title }}
                 span(class="co-slot-bar" aria-hidden="true")
                   span(class="co-slot-fill" :style="{ width: Math.round((a.set.count / a.set.all) * 100) + '%' }")
-                span(class="co-slot-text") {{ t('app.collection.specialLocked', { n: a.set.all - a.set.count }, a.set.all - a.set.count) }}
+                span(class="co-slot-text") {{ t('app.collection.specialLocked') }}
 
     CollectionCardViewer(
       v-if="opened"

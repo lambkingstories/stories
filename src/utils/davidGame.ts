@@ -9,18 +9,21 @@
  * Nothing is hurt: the animals run away, and Goliath falls over.
  */
 
-/** The size of the scene (16:9). */
-export const W = 1600
-export const H = 900
-export const GROUND = 735
-/** The sling: where the stone sits before the shot. */
-export const SLING = { x: 262, y: 548 }
+/**
+ * The size of the scene (16:9). Zoomed out by a quarter (Anton, 12.11.2026): the field is 2000 wide, so the animals can be seen and hit
+ * from further away; everything keeps its size, there is just more field to the right and more sky above.
+ */
+export const W = 2000
+export const H = 1125
+export const GROUND = 960
+/** The sling: where the stone sits before the shot (187 above the ground, as before). */
+export const SLING = { x: 262, y: GROUND - 187 }
 /** The sheep stand left of this line; an animal that gets here scares a sheep. */
 export const SHEEP_LINE = 330
 export const GRAVITY = 1500
 /** How far the sling can be pulled, and how fast a full pull shoots. */
 export const MAX_PULL = 170
-export const MAX_SPEED = 1750
+export const MAX_SPEED = 1950
 export const STONE_R = 14
 
 /** The scale of the Goliath picture (so that he towers over David). */
@@ -43,7 +46,7 @@ export const KINDS: Record<Kind, KindInfo> = {
   lion: { hp: 1, speed: 150, r: 62, h: 62, points: 20 },
   bear: { hp: 3, speed: 70, r: 82, h: 82, points: 30 },
   eagle: { hp: 1, speed: 135, r: 46, h: 85, points: 20 },
-  goliath: { hp: 1, speed: 24, r: 112, h: 240, points: 100 }
+  goliath: { hp: 1, speed: 30, r: 112, h: 240, points: 100 }
 }
 
 export interface Boulder {
@@ -58,6 +61,8 @@ export interface LevelDef {
   waves: { kind: Kind; after: number }[]
   stones: number
   boulders: Boulder[]
+  /** How much faster than usual the animals of this level run (the last levels get harder). 1 when left out. */
+  pace?: number
 }
 
 export const LEVELS: LevelDef[] = [
@@ -180,20 +185,24 @@ export const LEVELS: LevelDef[] = [
   },
   {
     id: 8,
+    // the wild herd: faster, closer together, and not a stone to spare
+    pace: 1.12,
     waves: [
       { kind: 'wolf', after: 1.5 },
-      { kind: 'lion', after: 2.5 },
-      { kind: 'bear', after: 3 },
-      { kind: 'eagle', after: 2.5 },
-      { kind: 'wolf', after: 2.5 },
-      { kind: 'wolf', after: 1.5 },
-      { kind: 'lion', after: 2.5 },
-      { kind: 'eagle', after: 2.5 },
-      { kind: 'bear', after: 3.5 },
-      { kind: 'lion', after: 2.5 },
+      { kind: 'lion', after: 2.2 },
+      { kind: 'bear', after: 2.8 },
+      { kind: 'eagle', after: 2.2 },
       { kind: 'wolf', after: 2 },
-      { kind: 'eagle', after: 2 },
-      { kind: 'bear', after: 3.5 }
+      { kind: 'wolf', after: 1.3 },
+      { kind: 'lion', after: 2.2 },
+      { kind: 'eagle', after: 2.2 },
+      { kind: 'bear', after: 3 },
+      { kind: 'lion', after: 2 },
+      { kind: 'wolf', after: 1.6 },
+      { kind: 'eagle', after: 1.8 },
+      { kind: 'eagle', after: 1.6 },
+      { kind: 'bear', after: 3 },
+      { kind: 'lion', after: 2 }
     ],
     stones: 31,
     boulders: [
@@ -204,34 +213,43 @@ export const LEVELS: LevelDef[] = [
   },
   {
     id: 9,
+    // the long day: many animals, two eagles at once, two bears together, quick
+    pace: 1.2,
     waves: [
       { kind: 'lion', after: 1.5 },
-      { kind: 'wolf', after: 2 },
+      { kind: 'wolf', after: 1.8 },
+      { kind: 'eagle', after: 1.8 },
+      { kind: 'eagle', after: 0.9 },
+      { kind: 'bear', after: 2.2 },
+      { kind: 'lion', after: 2 },
+      { kind: 'wolf', after: 1.2 },
+      { kind: 'wolf', after: 1 },
       { kind: 'eagle', after: 2 },
+      { kind: 'lion', after: 1.8 },
+      { kind: 'bear', after: 2.4 },
+      { kind: 'bear', after: 1.4 },
+      { kind: 'wolf', after: 1.4 },
+      { kind: 'eagle', after: 1.8 },
+      { kind: 'lion', after: 2 },
+      { kind: 'lion', after: 1.2 },
       { kind: 'bear', after: 2.5 },
-      { kind: 'lion', after: 2.5 },
-      { kind: 'wolf', after: 1.5 },
-      { kind: 'eagle', after: 2.5 },
-      { kind: 'lion', after: 2 },
-      { kind: 'bear', after: 3 },
-      { kind: 'wolf', after: 1.5 },
-      { kind: 'eagle', after: 2 },
-      { kind: 'lion', after: 2.5 },
-      { kind: 'bear', after: 3 },
-      { kind: 'lion', after: 2 },
-      { kind: 'eagle', after: 2 },
-      { kind: 'wolf', after: 2 }
+      { kind: 'eagle', after: 1.6 },
+      { kind: 'eagle', after: 1 },
+      { kind: 'wolf', after: 1.6 },
+      { kind: 'lion', after: 1.8 }
     ],
-    stones: 35,
+    stones: 42,
     boulders: [
       { x: 640, y: GROUND - 55, r: 55 },
-      { x: 960, y: GROUND - 85, r: 85 }
+      { x: 960, y: GROUND - 85, r: 85 },
+      { x: 1280, y: GROUND - 60, r: 60 }
     ]
   },
   {
     id: 10,
     waves: [{ kind: 'goliath', after: 2 }],
-    // five stones only: every one counts
+    // five stones only, as in the Bible: every one counts. Goliath is harder than before: he raises the shield more often and quicker,
+    // longer, and sways more (see `step` and `sway`)
     stones: 5,
     boulders: [{ x: 850, y: GROUND - 40, r: 40 }]
   }
@@ -400,7 +418,8 @@ function spawn(g: Game, kind: Kind) {
     mode: 'come',
     hit: 9,
     stun: 0,
-    speed: info.speed,
+    // Goliath keeps his slow stride (the level's pace is for the animals that run)
+    speed: kind === 'goliath' ? info.speed : info.speed * (g.level.pace ?? 1),
     shield: 0,
     shieldIn: 2.2,
     react: -1,
@@ -421,7 +440,7 @@ export const GOLIATH_LEVEL = LEVELS.length - 1
 
 /** Goliath sways a little while he walks (the forehead moves with the picture), so that the aim has to follow him. */
 export function sway(a: Animal): number {
-  return a.kind === 'goliath' && a.mode === 'come' ? Math.sin(a.t * 2.6) * 11 : 0
+  return a.kind === 'goliath' && a.mode === 'come' ? Math.sin(a.t * 2.6) * 16 : 0
 }
 
 /** Goliath: the forehead is a small circle high on the body. */
@@ -530,15 +549,15 @@ export function step(g: Game, dt: number) {
       a.shieldIn -= dt
       if (a.shield > 0) {
         a.shield -= dt
-        if (a.shield <= 0) a.shieldIn = 0.5 + Math.random() * 0.4
+        if (a.shield <= 0) a.shieldIn = 0.3 + Math.random() * 0.35
       } else if (a.shieldIn <= 0) {
-        a.shield = 1.4
+        a.shield = 1.6
       }
       // He watches the stones: one that flies at his head makes him lift the shield, not always and not at once, so that a quick or a
       // surprising shot can still get through (a stone aimed at the body is no threat to him)
       if (a.shield <= 0 && a.shieldIn < 50 && a.mode === 'come') {
         if (threatened(g, a)) {
-          if (a.react === -1) a.react = Math.random() < 0.86 ? 0.08 + Math.random() * 0.14 : 99
+          if (a.react === -1) a.react = Math.random() < 0.92 ? 0.06 + Math.random() * 0.1 : 99
           else if (a.react < 50) {
             a.react -= dt
             if (a.react <= 0) {

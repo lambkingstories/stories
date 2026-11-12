@@ -48,7 +48,7 @@ describe('AdventureRewards', () => {
     expect(t).toContain('Noch 5 Sterne fehlen.')
     expect(t).toContain('4 von 9')
     // the card does not ask for stars: one stage is still open
-    expect(t).toContain('Noch 1 Etappe, dann gehört sie dir.')
+    expect(t).toContain('Schließe das Abenteuer ab und schalte eine Sammelkarte mit Bibelvers frei.')
   })
 
   it('says the card is won when every stage has three stars', () => {

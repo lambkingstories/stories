@@ -42,7 +42,6 @@ const set = computed(() =>
     albumCards(props.journey, (id) => adv.stageOf(props.journey.id, id))
   )
 )
-const stagesLeft = computed(() => Math.max(0, set.value.all - set.value.count))
 // a card that is not won yet shows its back; a won one shows the hero of the adventure
 const cardPicture = computed(() => (set.value.have ? prependBaseUrl(CARD_ART[props.journey.id]?.front ?? props.journey.medal) : ui('karte-rueckseite')))
 
@@ -106,7 +105,7 @@ const rows = computed<Row[]>(() => {
     icon: cardPicture.value,
     isCard: true,
     title: t('app.adventure.rCard'),
-    text: set.value.have ? t('app.adventure.rCardHave') : t('app.adventure.rCardNeed', { n: stagesLeft.value }, stagesLeft.value),
+    text: set.value.have ? t('app.adventure.rCardHave') : t('app.adventure.rCardNeed'),
     hint: set.value.have ? undefined : t('app.adventure.rCardHint'),
     done: set.value.have
   })

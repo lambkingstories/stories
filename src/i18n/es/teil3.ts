@@ -98,7 +98,7 @@ export default {
     missing: 'Falta 1 estrella | Faltan {n} estrellas',
     notYet: 'Aún sin jugar',
     special: 'Carta de aventura',
-    specialLocked: 'Falta 1 etapa | Faltan {n} etapas',
+    specialLocked: 'Termina la aventura para ganar esta carta',
     setBack: 'Las {n} etapas con tres estrellas',
     close: 'Cerrar',
     flipHint: 'Sujeta la carta con el dedo y muévela: brilla. Desliza hacia un lado y se da la vuelta.'

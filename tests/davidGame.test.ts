@@ -211,7 +211,7 @@ describe('the stars of a level', () => {
   it('has ten levels, Goliath last with five stones and every animal is inside the scene when it comes', () => {
     expect(LEVELS).toHaveLength(10)
     expect(LEVELS[9]!.stones).toBe(5)
-    expect(W).toBe(1600)
+    expect(W).toBe(2000)
     expect(GROUND).toBeGreaterThan(SLING.y)
   })
 })
@@ -239,7 +239,7 @@ describe('the shots can reach every place', () => {
   it('a wolf close by and one far away can be hit', () => {
     expect(canHit(520)).toBe(true)
     expect(canHit(900)).toBe(true)
-    expect(canHit(1450)).toBe(true)
+    expect(canHit(1850)).toBe(true)
   })
 
   it('also past the boulders of a later level', () => {
