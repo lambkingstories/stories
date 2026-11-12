@@ -161,9 +161,9 @@ export const bergpredigt: Journey = {
   // Geschenk-Ausmalbild: Lilien auf dem Feld (eine Wiese mit Lilien und anderen Blumen, ein Vogel im Flug, im Hintergrund der Berg und die Stadt auf dem Hügel; ohne Menschen, ohne Schrift; Konturzeichnung)
   gift: { title: 'Lilien auf dem Feld', image: `${PICS}geschenk.webp` },
   // die gemalte Karte (Panorama in drei Stücken, 9920 × 1648 px, OpenAI-Bildmodell): ein einziger Berg und der Tag, der darüber läuft, vom Pfad am Fuß des Berges bis zum Abstieg ins Tal;
-  // Stationen aus ergebnis/panorama-v5/map-bergpredigt-v5.json, Perlenweg aus bergpredigtPath.ts
+  // Stationen aus ergebnis/panorama-v6/map-bergpredigt-v6.json, Perlenweg aus bergpredigtPath.ts
   map: {
-    images: [1, 2, 3].map((n) => `images/abenteuer/bergpredigt/karte-pano-v5-${n}.webp`),
+    images: [1, 2, 3].map((n) => `images/abenteuer/bergpredigt/karte-pano-v6-${n}.webp`),
     ring: josef.map.ring,
     aspect: 9920 / 1648,
     widthPx: 9920,
@@ -171,14 +171,14 @@ export const bergpredigt: Journey = {
       { x: 0.0958, y: 0.6857, d: 0.0339 },
       { x: 0.1966, y: 0.6159, d: 0.0339 },
       { x: 0.2974, y: 0.6584, d: 0.0339 },
-      { x: 0.4506, y: 0.5947, d: 0.0339 },
-      { x: 0.5444, y: 0.6796, d: 0.0339 },
-      { x: 0.6300, y: 0.6371, d: 0.0339 },
-      { x: 0.7107, y: 0.6796, d: 0.0339 },
-      { x: 0.8216, y: 0.7051, d: 0.0339 },
-      { x: 0.8972, y: 0.7251, d: 0.0339 }
+      { x: 0.4441, y: 0.6705, d: 0.0339 },
+      { x: 0.5292, y: 0.6808, d: 0.0339 },
+      { x: 0.6149, y: 0.6705, d: 0.0339 },
+      { x: 0.7339, y: 0.7373, d: 0.0339 },
+      { x: 0.8457, y: 0.7373, d: 0.0339 },
+      { x: 0.9173, y: 0.7494, d: 0.0339 }
     ],
-    exam: { x: 0.9819, y: 0.7282, d: 0.0339 },
+    exam: { x: 0.9839, y: 0.7282, d: 0.0339 },
     path: BERGPREDIGT_PATH
   },
   stages: [

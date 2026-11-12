@@ -27,7 +27,7 @@ const task = (n: number) => stage(n).task as unknown as NewTask
 /** Words that no German text, question or answer may use: nothing gruesome, no cross, no wounds, no weapons (the snake of stage 8 and the oven of stage 7 are words of Jesus and stand only there). */
 const FORBIDDEN = /\b(Teufel|Hölle|Leiche|Leichen|Blut|blutig|Kreuz|Kreuze|Kreuzigung|Schwert|Messer|Mörder|Steine|Wunden|Waffen|Heiligenschein|töten|getötet|umbringen)\b/i
 const PICTURES_IN = existsSync('public/images/abenteuer/spiele/bergpredigt/nahblick/dunst.webp')
-const PANORAMA_IN = existsSync('public/images/abenteuer/bergpredigt/karte-pano-v5-1.webp')
+const PANORAMA_IN = existsSync('public/images/abenteuer/bergpredigt/karte-pano-v6-1.webp')
 const LUTHER_77 = 'Bittet, so wird euch gegeben; suchet, so werdet ihr finden; klopfet an, so wird euch aufgetan.'
 
 describe('Die Bergpredigt: stories and questions', () => {
@@ -257,7 +257,7 @@ describe('Die Bergpredigt: map, files, English', () => {
     for (const seg of BERGPREDIGT_PATH) for (const [, y] of seg) expect(y * 1648, 'no bead in the lowest fifth').toBeLessThanOrEqual(1318)
     expect(m.path).toBe(BERGPREDIGT_PATH)
     expect(m.aspect).toBeCloseTo(W / 1648, 6)
-    expect(m.images.map((f) => f.replace(/\d+\.webp$/, ''))).toEqual(m.images.map(() => 'images/abenteuer/bergpredigt/karte-pano-v5-'))
+    expect(m.images.map((f) => f.replace(/\d+\.webp$/, ''))).toEqual(m.images.map(() => 'images/abenteuer/bergpredigt/karte-pano-v6-'))
     if (PANORAMA_IN) for (const f of m.images) expect(existsSync(`public/${f}`), f).toBe(true)
   })
 
