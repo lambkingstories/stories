@@ -19,13 +19,13 @@ export const bergpredigtEn: TextOverlay<Journey> = {
         'Many people follow Jesus. They come from Galilee and from Jerusalem, from Judea and from the other side of the Jordan. Some have a long way behind them.',
         'When Jesus sees the crowds, he goes up onto a mountain. The path is narrow, and the people climb one behind the other, the children by the hand.',
         'At the top there is a meadow. Jesus sits down in the grass, and his disciples come to him and sit close beside him. All around, the people settle down, old and young, mothers with their children in their laps.',
-        'The wind moves through the grass. Then it grows quiet. Jesus opens his mouth and begins to speak.'
+        'Jesus opens his mouth and begins to speak.'
       ],
       task: { hint: 'Listen well and answer the questions.' },
       questions: [
         { q: 'Where does Jesus go when he sees the crowds?', options: ['up onto a mountain', 'into a boat', 'up a tower'] },
         { q: 'Who sits down close beside Jesus in the grass?', options: ['his disciples', 'the soldiers', 'the priests'] },
-        { q: 'What does Jesus do when it grows quiet?', options: ['He opens his mouth and begins to speak.', 'He sings a song.', 'He walks back down the mountain.'] }
+        { q: 'What does Jesus do when he sits on the meadow above?', options: ['He opens his mouth and begins to speak.', 'He sings a song.', 'He walks back down the mountain.'] }
       ]
     },
     {
@@ -56,7 +56,7 @@ export const bergpredigtEn: TextOverlay<Journey> = {
       title: 'Rejoice and Be Glad',
       ref: 'Matthew 5:7–12',
       text: [
-        'The sun climbs higher, and Jesus goes on speaking. In the crowd no one whispers any more.',
+        'The sun climbs higher, and Jesus goes on speaking.',
         '“Blessed are the merciful, for they shall obtain mercy.”',
         'A little girl in the front row looks into Jesus’ face the whole time. “Blessed are the pure in heart, for they shall see God.”',
         '“Blessed are the peacemakers, for they shall be called the children of God. Blessed are those who are persecuted because they do what is right, for theirs is the kingdom of heaven.”',
@@ -94,12 +94,11 @@ export const bergpredigtEn: TextOverlay<Journey> = {
       title: 'Our Father',
       ref: 'Matthew 6:6 and 6:8–13',
       text: [
-        'It has grown quiet on the meadow. Only the wind can be heard. Jesus speaks about praying.',
+        'Jesus speaks about praying.',
         '“When you pray, go into your little room and shut the door. Pray there to your Father, who is in secret. Your Father sees you there, too.”',
         '“Your Father knows what you need before you ask him. So pray like this:”',
         '“Our Father which art in heaven, Hallowed be thy name. Thy kingdom come. Thy will be done in earth, as it is in heaven.”',
-        '“Give us this day our daily bread. And forgive us our debts, as we forgive our debtors. And lead us not into temptation, but deliver us from evil: For thine is the kingdom, and the power, and the glory, for ever. Amen.”',
-        'For a long time no one says a word.'
+        '“Give us this day our daily bread. And forgive us our debts, as we forgive our debtors. And lead us not into temptation, but deliver us from evil: For thine is the kingdom, and the power, and the glory, for ever. Amen.”'
       ],
       task: { hint: 'Listen well and answer the questions.' },
       questions: [
@@ -132,7 +131,7 @@ export const bergpredigtEn: TextOverlay<Journey> = {
         '“But I say to you: even Solomon in all his glory was not dressed like one of these.”',
         '“The grass in the field is here today, and tomorrow it is thrown into the oven. And God clothes it like this. Will he not much more clothe you?”',
         '“So do not worry about tomorrow. Tomorrow will take care of itself.”',
-        'A gust of wind bends the flowers, and a bee hums on from blossom to blossom.'
+        'A bee hums from blossom to blossom.'
       ],
       task: {
         hint: 'Look through the wreath of olive twigs and find who sits in the flowers.',
@@ -176,7 +175,7 @@ export const bergpredigtEn: TextOverlay<Journey> = {
       text: [
         'The sun stands low over the land. The shadows of the people fall long across the meadow.',
         '“So whatever you want people to do for you, do the same for them,” says Jesus.',
-        'Jesus goes on speaking. Then he has finished his speech. It stays quiet for a long time. The people still sit there, looking at Jesus. They are amazed at his words. For he has spoken like one who has authority, and not like their scribes.',
+        'Jesus goes on speaking. Then he has finished his speech. The people still sit there, looking at Jesus. They are amazed at his words. For he has spoken like one who has authority, and not like their scribes.',
         'Slowly they get up and go down the mountain, the mothers with their children by the hand. Jesus goes down with them, and many follow him. Over on the hill, the first lights come on in the city.'
       ],
       task: { hint: 'Listen well and answer the questions.' },
@@ -198,7 +197,7 @@ export const bergpredigtEn: TextOverlay<Journey> = {
 }
 
 // the English recordings of the stories (voice Achernar, Gemini): geschichte-NN-en-vK.mp3 (K = version); a stage without a number in this list is read with the voice of the device
-const ENGLISH_RECORDING_VERSION: Record<number, number> = { 1: 2, 2: 1, 3: 2, 4: 2, 5: 2, 6: 1, 7: 1, 8: 2, 9: 1 }
+const ENGLISH_RECORDING_VERSION: Record<number, number> = { 1: 4, 2: 1, 3: 4, 4: 2, 5: 4, 6: 1, 7: 3, 8: 2, 9: 2 }
 bergpredigtEn.stages!.forEach((s, i) => {
   const version = ENGLISH_RECORDING_VERSION[i + 1]
   if (version) s.audio = `audio/abenteuer/bergpredigt/geschichte-${String(i + 1).padStart(2, '0')}-en-v${version}.mp3`

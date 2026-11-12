@@ -192,14 +192,14 @@ export const bergpredigt: Journey = {
         'Viele Menschen laufen hinter Jesus her. Sie kommen aus Galiläa und aus Jerusalem, aus Judäa und von der anderen Seite des Jordans. Manche haben einen weiten Weg hinter sich.',
         'Als Jesus die vielen Leute sieht, steigt er auf einen Berg. Der Pfad ist schmal, und sie gehen hintereinander hinauf, die Kinder an der Hand.',
         'Oben liegt eine Wiese. Jesus setzt sich ins Gras, und seine Jünger kommen zu ihm und setzen sich dicht neben ihn. Ringsum lassen sich die Leute nieder, Alte und Junge, Mütter mit ihren Kindern auf dem Schoß.',
-        'Der Wind streicht durchs Gras. Dann wird es still. Jesus öffnet den Mund und beginnt zu sprechen.'
+        'Jesus öffnet den Mund und beginnt zu sprechen.'
       ],
       // nur Fragen
       task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Wohin steigt Jesus, als er die vielen Menschen sieht?', options: ['auf einen Berg', 'in ein Boot', 'auf einen Turm'], answer: 0 },
         { q: 'Wer setzt sich dicht neben Jesus ins Gras?', options: ['seine Jünger', 'die Soldaten', 'die Priester'], answer: 0 },
-        { q: 'Was tut Jesus, als es still wird?', options: ['Er öffnet den Mund und beginnt zu sprechen.', 'Er singt ein Lied.', 'Er geht den Berg wieder hinunter.'], answer: 0 }
+        { q: 'Was tut Jesus, als er oben auf der Wiese sitzt?', options: ['Er öffnet den Mund und beginnt zu sprechen.', 'Er singt ein Lied.', 'Er geht den Berg wieder hinunter.'], answer: 0 }
       ]
     },
     {
@@ -229,7 +229,7 @@ export const bergpredigt: Journey = {
       title: 'Seid fröhlich und getrost',
       ref: 'Matthäus 5,7–12',
       text: [
-        'Die Sonne steigt höher, und Jesus spricht weiter. In der Menge flüstert keiner mehr.',
+        'Die Sonne steigt höher, und Jesus spricht weiter.',
         '„Selig sind die Barmherzigen. Denn sie werden Barmherzigkeit erfahren.“',
         'Ein kleines Mädchen in der ersten Reihe sieht Jesus die ganze Zeit ins Gesicht. „Selig sind, die reinen Herzens sind. Denn sie werden Gott schauen.“',
         '„Selig sind die Friedfertigen. Denn sie werden Gottes Kinder heißen. Selig sind, die verfolgt werden, weil sie tun, was recht ist. Denn das Himmelreich gehört ihnen.“',
@@ -270,12 +270,11 @@ export const bergpredigt: Journey = {
       title: 'Unser Vater',
       ref: 'Matthäus 6,6 und 6,8–13',
       text: [
-        'Es ist still geworden auf der Wiese. Nur der Wind ist zu hören. Jesus spricht vom Beten.',
+        'Jesus spricht vom Beten.',
         '„Wenn du betest, dann geh in deine kleine Kammer und schließ die Tür zu. Bete dort zu deinem Vater, der im Verborgenen ist. Dein Vater sieht dich auch dort.“',
         '„Euer Vater weiß, was ihr braucht, noch ehe ihr ihn bittet. Darum sollt ihr so beten:“',
         '„Unser Vater in dem Himmel! Dein Name werde geheiligt. Dein Reich komme. Dein Wille geschehe auf Erden wie im Himmel.“',
-        '„Unser täglich Brot gib uns heute. Und vergib uns unsere Schuld, wie wir unseren Schuldigern vergeben. Und führe uns nicht in Versuchung, sondern erlöse uns von dem Übel. Denn dein ist das Reich und die Kraft und die Herrlichkeit in Ewigkeit. Amen.“',
-        'Lange spricht keiner ein Wort.'
+        '„Unser täglich Brot gib uns heute. Und vergib uns unsere Schuld, wie wir unseren Schuldigern vergeben. Und führe uns nicht in Versuchung, sondern erlöse uns von dem Übel. Denn dein ist das Reich und die Kraft und die Herrlichkeit in Ewigkeit. Amen.“'
       ],
       // nur Fragen (Gebet)
       task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
@@ -316,7 +315,7 @@ export const bergpredigt: Journey = {
         '„Aber ich sage euch: Auch Salomo in all seiner Pracht war nicht so schön gekleidet wie eine von ihnen.“',
         '„Das Gras auf dem Feld steht heute da und wird morgen in den Ofen geworfen. Und Gott kleidet es doch so. Sollte er nicht viel mehr euch kleiden?“',
         '„Darum sorgt nicht um den morgigen Tag. Der morgige Tag wird für sich selber sorgen.“',
-        'Ein Windstoß biegt die Blumen, und eine Biene summt weiter von Blüte zu Blüte.'
+        'Eine Biene summt von Blüte zu Blüte.'
       ],
       // Spiel: Schau genau hin (nahblick, neu)
       task: { kind: 'nahblick', hint: 'Schau durch den Zweigkranz genau hin und finde, wer in den Blumen sitzt.', nearView: NAHBLICK },
@@ -354,7 +353,7 @@ export const bergpredigt: Journey = {
       text: [
         'Die Sonne steht tief über dem Land. Die Schatten der Menschen fallen lang über die Wiese.',
         '„Alles nun, was ihr wollt, dass euch die Leute tun sollen, das tut ihr ihnen auch“, sagt Jesus.',
-        'Jesus spricht noch weiter. Dann hat er seine Rede vollendet. Es bleibt lange still. Die Menschen sitzen noch da und sehen Jesus an. Sie staunen über seine Worte. Denn er hat gesprochen wie einer, der Macht hat, und nicht wie ihre Schriftgelehrten.',
+        'Jesus spricht noch weiter. Dann hat er seine Rede vollendet. Die Menschen sitzen noch da und sehen Jesus an. Sie staunen über seine Worte. Denn er hat gesprochen wie einer, der Macht hat, und nicht wie ihre Schriftgelehrten.',
         'Langsam stehen sie auf und gehen den Berg hinunter, die Mütter mit den Kindern an der Hand. Jesus geht mit ihnen hinab, und viele folgen ihm. Drüben auf dem Hügel gehen in der Stadt die ersten Lichter an.'
       ],
       // nur Fragen
@@ -383,7 +382,7 @@ for (const st of bergpredigt.stages) {
 
 // the German recordings of the stories (voice Achernar, files "geschichte-NN-vK.mp3"; K is the version, a re-recorded story gets a new number); until a recording is made the app reads with the voice of the device.
 // stage -> version of the file in public/audio/abenteuer/bergpredigt/ (written by bauen_bergpredigt.py from the files that exist)
-const RECORDING_VERSION: Record<number, number> = { 1: 1, 2: 1, 3: 1, 4: 2, 5: 2, 6: 2, 7: 1, 8: 2, 9: 2 }
+const RECORDING_VERSION: Record<number, number> = { 1: 3, 2: 1, 3: 3, 4: 2, 5: 4, 6: 2, 7: 2, 8: 2, 9: 4 }
 for (const s of bergpredigt.stages) {
   const version = RECORDING_VERSION[s.id]
   const file = version ? `audio/abenteuer/bergpredigt/geschichte-${String(s.id).padStart(2, '0')}-v${version}.mp3` : undefined

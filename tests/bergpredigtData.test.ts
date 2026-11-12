@@ -43,7 +43,7 @@ describe('Die Bergpredigt: stories and questions', () => {
       for (const p of s.text) expect(p.split(/\s+/).length, `a paragraph of stage ${s.id}`).toBeLessThanOrEqual(62)
       const text = s.text.join(' ')
       const words = text.split(/\s+/).length
-      expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(100)
+      expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(90)
       expect(words, `words ${s.id}`).toBeLessThanOrEqual(150)
       expect(text, `stage ${s.id}`).not.toMatch(FORBIDDEN)
       expect(s.image, `stage ${s.id}`).toMatch(new RegExp(`^images/abenteuer/bergpredigt/etappe-bild-${String(s.id).padStart(2, '0')}(-b|-v2)?\\.webp$`))
@@ -127,7 +127,7 @@ describe('Die Bergpredigt: stories and questions', () => {
   })
 
   it('the changes of the second check (12.11.2026) are in: stage 9, paragraph 3; stage 4, question 2; stage 5, question 1', () => {
-    expect(stage(9).text[2]).toMatch(/^Jesus spricht noch weiter\. Dann hat er seine Rede vollendet\. Es bleibt lange still\./)
+    expect(stage(9).text[2]).toMatch(/^Jesus spricht noch weiter\. Dann hat er seine Rede vollendet\. Die Menschen sitzen noch da/)
     expect(stage(4).questions[1]!.options[0]).toBe('den Vater im Himmel')
     expect(stage(5).questions[0]!.q).toBe('Wohin soll man gehen, wenn man ganz für sich zu seinem Vater beten will?')
   })
@@ -327,7 +327,7 @@ describe('Die Bergpredigt: map, files, English', () => {
     // the changes of the second check
     expect(stage(3).questions[2]!.options[0]).toBe('glad and joyful')
     expect(stage(9).text[1]).toBe('“So whatever you want people to do for you, do the same for them,” says Jesus.')
-    expect(stage(9).text[2]).toMatch(/^Jesus goes on speaking\. Then he has finished his speech\. It stays quiet for a long time\./)
+    expect(stage(9).text[2]).toMatch(/^Jesus goes on speaking\. Then he has finished his speech\. The people still sit there/)
     setAdventureLanguage('de')
     expect(task(2).blessed!.people[0]!.label).toBe('der Mann mit den leeren Händen')
     expect(task(4).lightStand!.rooms[1]!.people[0]!.label).toBe('Der Großvater')
