@@ -26,7 +26,7 @@ interface Door {
 const nightPicOk = ref(true)
 
 const doors = computed<Door[]>(() => [
-  { id: 'stories', title: t('app.read.storiesTitle'), sub: t('app.read.storiesSub'), route: 'app-all-books', image: prependBaseUrl('images/bg/series_landscape.webp') },
+  { id: 'stories', title: t('app.read.storiesTitle'), sub: t('app.read.storiesSub'), route: 'app-all-books', image: prependBaseUrl('images/lesen/geschichten-kachel.webp') },
   { id: 'books', title: t('app.read.booksTitle'), sub: t('app.read.booksSub'), route: 'app-books', image: prependBaseUrl('images/bg/welcome-bg-3.webp') },
   { id: 'coloring', title: t('app.read.coloringTitle'), sub: t('app.read.coloringSub'), route: 'app-coloring-books', image: prependBaseUrl('images/lesen/malbuecher-kachel.webp') },
   // for bedtime: a painted night picture; without it a night-blue tile with the moon

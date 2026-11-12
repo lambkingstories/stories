@@ -258,21 +258,21 @@ async function doDelete() {
       //- four square tiles: what the stars give (cards, mini games, bonus games) and the family quiz
       div(class="tiles")
         router-link(:to="{ name: 'app-collection' }" class="tile4")
-          img(:src="prependBaseUrl('images/icons/kacheln/kachel-karten-b.webp')" alt="" class="tile4-img" draggable="false")
+          img(:src="prependBaseUrl('images/icons/kacheln/kachel-karten-c.webp')" alt="" class="tile4-img" draggable="false")
           span(class="tile4-title") {{ t('app.adventure.tileCards') }}
           span(class="tile4-sub") {{ t('app.adventure.tileCardsSub') }}
         router-link(:to="{ name: 'app-gameroom', query: { z: 'mini' } }" class="tile4")
-          img(:src="prependBaseUrl('images/icons/kacheln/kachel-mini-b.webp')" alt="" class="tile4-img" draggable="false")
+          img(:src="prependBaseUrl('images/icons/kacheln/kachel-mini-c.webp')" alt="" class="tile4-img" draggable="false")
           span(class="tile4-title") {{ t('app.adventure.tileMini') }}
           span(class="tile4-count") {{ miniOpen }} / {{ miniTotal }}
           span(class="tile4-sub") {{ t('app.adventure.tileMiniSub') }}
         router-link(:to="{ name: 'app-gameroom', query: { z: 'bonus' } }" class="tile4")
-          img(:src="prependBaseUrl('images/icons/kacheln/kachel-bonus-b.webp')" alt="" class="tile4-img" draggable="false")
+          img(:src="prependBaseUrl('images/icons/kacheln/kachel-bonus-c.webp')" alt="" class="tile4-img" draggable="false")
           span(class="tile4-title") {{ t('app.adventure.tileBonus') }}
           span(class="tile4-count") {{ bonusOpen }} / {{ BIG_GAMES.length }}
           span(class="tile4-sub") {{ t('app.adventure.tileBonusSub') }}
         router-link(:to="{ name: 'app-family' }" class="tile4")
-          img(:src="prependBaseUrl('images/icons/kacheln/kachel-familie-b.webp')" alt="" class="tile4-img" draggable="false")
+          img(:src="prependBaseUrl('images/icons/kacheln/kachel-familie-c.webp')" alt="" class="tile4-img" draggable="false")
           span(class="tile4-title") {{ t('app.family.hubTitle') }}
           span(class="tile4-sub") {{ t('app.adventure.tileFamilySub') }}
 
@@ -709,8 +709,8 @@ $ink: var(--lk-text)
     transform: translateY(1px)
 
 .tile4-img
-  width: 92px
-  height: 92px
+  width: 104px
+  height: 104px
   margin-bottom: 2px
   object-fit: contain
   filter: drop-shadow(0 4px 6px rgba(20, 24, 32, 0.22))
