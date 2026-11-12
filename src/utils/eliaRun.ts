@@ -23,6 +23,15 @@ export const LOW_H = 0.8
 /** A beam hangs between this height and 2.2 m. */
 export const HIGH_BOTTOM = 1.0
 export const BLOCK_H = 2.4
+/**
+ * A brook (or a dry stream bed, or a swollen stream in the rain) across all three lanes: it cannot be dodged, only jumped. It is as long
+ * as `WATER_LEN` metres on the track; the water itself, where Elijah must be in the air, is the middle `2 * WATER_HALF` metres of it
+ * (Anton, 12.11.2026).
+ */
+export const WATER_LEN = 3.6
+export const WATER_HALF = 1.0
+/** Elijah must be higher than this over the water. */
+export const WATER_CLEAR = 0.45
 export const SLIDE_TIME = 0.65
 /** Lane change: metres per second sideways (one lane in 0.14 s). */
 export const LANE_SPEED = 11
@@ -57,18 +66,19 @@ export const START_FREE = 24
 
 /**
  * What a cell of a pattern holds (one character per lane):
- * `.` nothing, `k` jug, `f` raven feather (not used in the patterns), `L` low obstacle, `H` high beam, `B` a blocked lane (the patterns no longer put bread
+ * `.` nothing, `k` jug, `f` raven feather (not used in the patterns), `L` low obstacle, `H` high beam, `W` water across the lane (a whole row of `WWW` is a brook
+ * that has to be jumped), `B` a blocked lane (the patterns no longer put bread
  * on the ground, the ravens bring it; `o`, `a`, `l` and `h` are bread variants that still work).
  */
-export type CellChar = '.' | 'o' | 'a' | 'k' | 'f' | 'L' | 'l' | 'H' | 'h' | 'B'
+export type CellChar = '.' | 'o' | 'a' | 'k' | 'f' | 'L' | 'l' | 'H' | 'h' | 'B' | 'W'
 
-export type ObstacleKind = 'low' | 'high' | 'block'
+export type ObstacleKind = 'low' | 'high' | 'block' | 'water'
 
 export interface Obstacle {
   z: number
   lane: number
   kind: ObstacleKind
-  /** Which picture: 0 to 2 low (stone, thorns, slabs), 3 the beam, 4 to 6 blocking (tall things). */
+  /** Which picture: 0 to 2 low (stone, thorns, slabs), 3 the beam, 4 to 6 blocking (tall things), 7 the water (one picture over the whole track). */
   sprite: number
   hit: boolean
 }
@@ -124,21 +134,27 @@ export const PATTERNS: readonly Pattern[] = [
   { tier: 2, rows: ['BL.', '...', '.LB'] },
   { tier: 2, rows: ['B.B', '...', '.L.', '...'] },
   { tier: 2, rows: ['.BB', '...', 'B.L', '...'] },
+  // tier 2: a brook across the whole track: only a jump gets over it
+  { tier: 2, rows: ['WWW', '...', '...'] },
+  { tier: 2, rows: ['WWW', '...', '.B.', '...'] },
   // tier 3: beams to slide under
   { tier: 3, rows: ['HHH', '...', '...'] },
   { tier: 3, rows: ['H..', '.H.', '..H', '...'] },
   { tier: 3, rows: ['H.B', '...', 'B.H', '...'] },
   { tier: 3, rows: ['LBL', '...', 'HHH', '...'] },
   { tier: 3, rows: ['L.H', '...', '.L.', '...', 'H.L'] },
+  { tier: 3, rows: ['WWW', '...', 'HHH', '...'] },
+  { tier: 3, rows: ['L.L', '...', 'WWW', '...'] },
   // tier 4: closer together
   { tier: 4, rows: ['BLB', '.B.', 'LBL', '...'] },
   { tier: 4, rows: ['L.L', '.B.', 'H.H', '...'] },
   { tier: 4, rows: ['HBH', '...', 'LBL', '...', 'BHB'] },
   { tier: 4, rows: ['.L.', '.L.', '...'] },
-  { tier: 4, rows: ['.B.', 'B.B', '.B.', '...'] }
+  { tier: 4, rows: ['.B.', 'B.B', '.B.', '...'] },
+  { tier: 4, rows: ['WWW', '...', 'BLB', '...', 'WWW', '...'] }
 ]
 
-const isHazard = (c: string) => c === 'L' || c === 'l' || c === 'H' || c === 'h'
+const isHazard = (c: string) => c === 'L' || c === 'l' || c === 'H' || c === 'h' || c === 'W'
 
 /**
  * True when a runner can get through the rows: one lane change per row at most, nothing blocked, and never a jump or slide in two rows
@@ -182,7 +198,7 @@ export interface LevelDef {
   v1: number
   /** The hardest tier of patterns the level uses. */
   tier: number
-  /** The world is built; the others show "soon". */
+  /** The world is built (all five are, since 12.11.2026); a world that is not shows "soon". */
   ready: boolean
 }
 
@@ -192,18 +208,18 @@ export const LEVELS: readonly LevelDef[] = [
   { world: 0, goal: 600, v0: 13, v1: 17, tier: 2, ready: true },
   { world: 0, goal: 700, v0: 14, v1: 19, tier: 3, ready: true },
   { world: 0, goal: 800, v0: 15, v1: 20, tier: 3, ready: true },
-  { world: 1, goal: 800, v0: 15, v1: 20, tier: 3, ready: false },
-  { world: 1, goal: 900, v0: 16, v1: 21, tier: 3, ready: false },
-  { world: 1, goal: 1000, v0: 16, v1: 22, tier: 4, ready: false },
-  { world: 2, goal: 900, v0: 16, v1: 22, tier: 3, ready: false },
-  { world: 2, goal: 1000, v0: 17, v1: 22, tier: 4, ready: false },
-  { world: 2, goal: 1100, v0: 17, v1: 23, tier: 4, ready: false },
-  { world: 3, goal: 1000, v0: 17, v1: 23, tier: 4, ready: false },
-  { world: 3, goal: 1100, v0: 18, v1: 24, tier: 4, ready: false },
-  { world: 3, goal: 1200, v0: 18, v1: 24, tier: 4, ready: false },
-  { world: 4, goal: 1100, v0: 18, v1: 24, tier: 4, ready: false },
-  { world: 4, goal: 1300, v0: 19, v1: 25, tier: 4, ready: false },
-  { world: 4, goal: 1500, v0: 19, v1: 26, tier: 4, ready: false }
+  { world: 1, goal: 800, v0: 15, v1: 20, tier: 3, ready: true },
+  { world: 1, goal: 900, v0: 16, v1: 21, tier: 3, ready: true },
+  { world: 1, goal: 1000, v0: 16, v1: 22, tier: 4, ready: true },
+  { world: 2, goal: 900, v0: 16, v1: 22, tier: 3, ready: true },
+  { world: 2, goal: 1000, v0: 17, v1: 22, tier: 4, ready: true },
+  { world: 2, goal: 1100, v0: 17, v1: 23, tier: 4, ready: true },
+  { world: 3, goal: 1000, v0: 17, v1: 23, tier: 4, ready: true },
+  { world: 3, goal: 1100, v0: 18, v1: 24, tier: 4, ready: true },
+  { world: 3, goal: 1200, v0: 18, v1: 24, tier: 4, ready: true },
+  { world: 4, goal: 1100, v0: 18, v1: 24, tier: 4, ready: true },
+  { world: 4, goal: 1300, v0: 19, v1: 25, tier: 4, ready: true },
+  { world: 4, goal: 1500, v0: 19, v1: 26, tier: 4, ready: true }
 ]
 /** The "level" number of the free run (after the last one). */
 export const FREE_LEVEL = LEVELS.length
@@ -355,7 +371,7 @@ function layFeathers(g: Run, rand: () => number) {
   while (g.planTo < g.genTo - ROW) {
     const z = g.planTo
     const order = [0, 1, 2].sort(() => rand() - 0.5)
-    const lane = order.find((l) => !g.obstacles.some((o) => o.lane === l && Math.abs(o.z - z) <= 4))
+    const lane = order.find((l) => !g.obstacles.some((o) => o.lane === l && Math.abs(o.z - z) <= 4 + (o.kind === 'water' ? WATER_LEN : 0)))
     if (lane === undefined) {
       // every lane has something there: a little further on
       g.planTo += ROW
@@ -403,6 +419,9 @@ function put(g: Run, c: CellChar, z: number, lane: number, rand: () => number) {
       break
     case 'B':
       stone('block', 4 + Math.floor(rand() * 3))
+      break
+    case 'W':
+      stone('water', 7)
       break
     default:
       break
@@ -546,7 +565,7 @@ function settle(g: Run, dt: number) {
 
 /** True when something stands in the lane within `margin` metres of the place `z` (a piece of bread must not fall onto it). */
 function blockedAt(g: Run, lane: number, z: number, margin: number): boolean {
-  return g.obstacles.some((o) => o.lane === lane && Math.abs(o.z - z) <= margin)
+  return g.obstacles.some((o) => o.lane === lane && Math.abs(o.z - z) <= margin + (o.kind === 'water' ? WATER_HALF : 0))
 }
 
 /** The lane a raven brings its bread to: one that is free where the pieces will fall (about: the speed changes a little). */
@@ -557,7 +576,7 @@ function ravenLane(g: Run, n: number, rand: () => number): number {
   for (let lane = 0; lane < LANES; lane++) {
     let ok = true
     for (const o of g.obstacles) {
-      if (o.lane === lane && o.z >= from - 3 && o.z <= to + 3) {
+      if (o.lane === lane && o.z >= from - 3 - (o.kind === 'water' ? WATER_LEN : 0) && o.z <= to + 3 + (o.kind === 'water' ? WATER_LEN : 0)) {
         ok = false
         break
       }
@@ -628,11 +647,13 @@ function ravens(g: Run, dt: number, rand: () => number) {
 function collide(g: Run, from: number, to: number) {
   for (const o of g.obstacles) {
     if (o.hit) continue
-    if (o.z < from - 0.55 || o.z > to + 0.55) continue
+    const reach = o.kind === 'water' ? WATER_HALF : 0.55
+    if (o.z < from - reach || o.z > to + reach) continue
     const dx = Math.abs(g.x - laneX(o.lane))
     if (dx >= 1.0) continue
     let hurts = false
-    if (o.kind === 'low') hurts = g.y < LOW_H
+    if (o.kind === 'water') hurts = g.y < WATER_CLEAR
+    else if (o.kind === 'low') hurts = g.y < LOW_H
     else if (o.kind === 'high') hurts = g.slide <= 0
     else hurts = g.y < BLOCK_H
     if (!hurts) continue

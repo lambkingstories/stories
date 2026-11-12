@@ -180,6 +180,7 @@ export default {
       howJump: 'Desliza hacia arriba: Elías salta sobre troncos y zarzas.',
       howSlide: 'Desliza hacia abajo: Elías se desliza bajo el tronco.',
       howWall: 'Los árboles no se pueden saltar: ¡cambia de carril!',
+      howBach: 'Un arroyo cruza todo el camino: no puedes rodearlo. ¡Desliza hacia arriba y salta por encima!',
       howBread: 'Elías tiene hambre. Come pan o irá más lento y se detendrá.',
       howFeather: 'Recoge una pluma de cuervo: un cuervo llega volando y tira pan en un carril. ¡Corre hacia él!',
       go: '¡Vamos!',

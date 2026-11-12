@@ -61,8 +61,8 @@ describe('BigGameElia', () => {
     bg.record('elia', 2, 3)
     w = await open()
     expect(w.find('[data-test="elia-free"]').attributes('disabled')).toBeUndefined()
-    // the second world is not built yet
-    expect(w.findAll('.eg-level')[3]!.attributes('disabled')).toBeDefined()
+    // the second world is built, too, and opens with the first one: its first level is closed until the last of the first world has a star
+    expect(w.findAll('.eg-level')[3]!.attributes('disabled')).toBeUndefined()
     w.unmount()
   })
 

@@ -21,6 +21,7 @@ import {
   LANE_W,
   LEVELS,
   STUMBLE_WINDOW,
+  WATER_LEN,
   WORLDS,
   input,
   laneX,
@@ -57,9 +58,48 @@ const NAMES = [
   'horizont', 'boden', 'bach',
   'kulisse-1', 'kulisse-2', 'kulisse-3', 'kulisse-4', 'kulisse-5', 'kulisse-6',
   'hindernis-1', 'hindernis-2', 'hindernis-3', 'hindernis-4', 'hindernis-5', 'hindernis-6', 'hindernis-7',
-  'brot', 'krug', 'feder', 'raben-1', 'raben-2', 'raben-3', 'ziel-krit'
+  'brot', 'krug', 'feder', 'mehl', 'oel', 'raben-1', 'raben-2', 'raben-3', 'ziel-krit',
+  // the brook (clear, dry bed, swollen) across the whole track, Ahab's chariot, the rain
+  'bach-quer', 'bach-trocken', 'bach-braun', 'ahab-wagen', 'regen'
+]
+/** What every world after the first brings of its own: sky, ground, the things at the side, the obstacles and the goal (folder `welt2` to `welt5`). */
+const WORLD_NAMES = [
+  'horizont', 'boden', 'kulisse-1', 'kulisse-2', 'kulisse-3', 'kulisse-4', 'kulisse-5', 'kulisse-6',
+  'hindernis-1', 'hindernis-2', 'hindernis-3', 'hindernis-4', 'hindernis-5', 'hindernis-6', 'hindernis-7', 'ziel'
 ]
 const imgs = new Map<string, HTMLImageElement>()
+/** The pictures of the worlds 1 to 4 (the second to the fifth), loaded when a level of that world begins. */
+const worldImgs = new Map<number, Map<string, HTMLImageElement>>()
+/** The world that is played now (0 to 4). */
+const curWorld = ref(0)
+/** The picture of a name in the world that is played: its own one, else the one of the first world. */
+function getImg(name: string): HTMLImageElement | undefined {
+  if (curWorld.value > 0) {
+    const own = worldImgs.get(curWorld.value)?.get(name)
+    if (own) return own
+  }
+  return imgs.get(name)
+}
+function loadWorld(w: number): Promise<void> {
+  if (w <= 0 || worldImgs.has(w)) return Promise.resolve()
+  const map = new Map<string, HTMLImageElement>()
+  worldImgs.set(w, map)
+  return new Promise((resolve) => {
+    let left = WORLD_NAMES.length
+    const done = () => {
+      if (--left === 0) resolve()
+    }
+    for (const n of WORLD_NAMES) {
+      const im = new Image()
+      im.onload = () => {
+        map.set(n, im)
+        done()
+      }
+      im.onerror = done
+      im.src = prependBaseUrl(`images/spiele-gross/elia/welt${w + 1}/${n}.webp`)
+    }
+  })
+}
 const pic = (n: string) => prependBaseUrl(`images/spiele-gross/elia/${n}.webp`)
 const loaded = ref(false)
 
@@ -83,7 +123,7 @@ function loadAll(): Promise<void> {
 
 /** How big the things are in the world: height or width in metres (the other side follows the picture). */
 // 0-2 low (fallen trunk, thorn bush, brushwood), 3 the trunk on two stumps (slide under it), 4-6 trees (cypress, olive, dead tree)
-const OBST: { h?: number; w?: number }[] = [{ w: 2.0 }, { w: 1.6 }, { w: 1.7 }, { h: 2.0 }, { h: 4.4 }, { h: 3.9 }, { h: 4.2 }]
+const OBST: { h?: number; w?: number }[] = [{ w: 2.0 }, { w: 1.6 }, { w: 1.7 }, { h: 2.0 }, { h: 4.4 }, { h: 3.9 }, { h: 4.2 }, { w: 1 }]
 const KUL: { h?: number; w?: number }[] = [{ h: 8 }, { h: 5 }, { w: 3.6 }, { h: 1.9 }, { w: 4.6 }, { h: 1.3 }]
 /** The brook: one picture is laid along the left side of the track like the ground (its middle lies this far to the left). */
 const BACH_X = -5.4
@@ -139,11 +179,28 @@ let combo = 0
 let comboAt = 0
 let shake = 0
 let stumbleShow = 0
+/** How near Ahab's chariot is in the last world: 0 = not to be seen, about 0.55 after a stumble, 1 = it has caught up. */
+let chariotK = 0
 const particles: { x: number; y: number; vx: number; vy: number; life: number; max: number; size: number; color: string }[] = []
 
-function start(i: number) {
+/** True while the pictures of a world are loaded (a second tap on a level does nothing). */
+let starting = false
+
+async function start(i: number) {
+  if (starting) return
+  starting = true
+  // the world of the level (the free run runs in the first one); its own pictures come first
+  curWorld.value = i === FREE_LEVEL ? 0 : worldOf(i)
+  try {
+    await loadWorld(curWorld.value)
+  } finally {
+    starting = false
+  }
   level.value = i
   run = newRun(i)
+  chariotK = 0
+  // with `?probe=1` the run can be looked at from the console (to try the pictures of the worlds)
+  if (window.location.hash.includes('probe=1')) (window as unknown as { __elia?: unknown }).__elia = { get run() { return run } }
   paused.value = false
   endTimer = 0
   combo = 0
@@ -268,9 +325,15 @@ function frame(now: number) {
       if (endTimer > (run.phase === 'won' ? 0.9 : 1.3)) finish()
     }
     updateParticles(dt)
+    easeChariot(dt)
     syncHud(false, now)
   }
   draw(now / 1000)
+}
+
+function easeChariot(dt: number) {
+  const target = run.phase === 'over' ? (run.cause === 'hunger' ? 0 : 1) : run.sinceStumble < STUMBLE_WINDOW ? 0.55 : 0
+  chariotK += (target - chariotK) * Math.min(1, dt * 3)
 }
 
 function handleEvents() {
@@ -373,7 +436,7 @@ interface Item {
 
 function drawSprite(name: string, X: number, y: number, d: number, camX: number, size: { h?: number; w?: number }, opts: { alpha?: number; flip?: boolean; fallback?: string; squash?: number } = {}) {
   if (!ctx) return
-  const im = imgs.get(name)
+  const im = getImg(name)
   const k = sc(d)
   const x = sXOf(X, d, camX)
   const footY = sYOf(d) - y * k
@@ -412,7 +475,7 @@ function drawSprite(name: string, X: number, y: number, d: number, camX: number,
 
 function drawSky(time: number) {
   if (!ctx) return
-  const im = imgs.get('horizont')
+  const im = getImg('horizont')
   const h = YH + 70
   if (!im) {
     const g = ctx.createLinearGradient(0, 0, 0, YH)
@@ -442,7 +505,7 @@ function drawSky(time: number) {
 
 function drawGround() {
   if (!ctx) return
-  const im = imgs.get('boden')
+  const im = getImg('boden')
   if (!im) {
     ctx.fillStyle = '#c9a15a'
     ctx.fillRect(0, YH, VW, VH - YH)
@@ -457,7 +520,8 @@ function drawGround() {
   const tw = im.width
   const th = im.height
   const camX = camXOf()
-  const bach = imgs.get('bach')
+  // the brook along the left side belongs to the first world (Cherith) only
+  const bach = curWorld.value === 0 ? imgs.get('bach') : undefined
   const stepPx = 2
   for (let y = YH + 1; y < VH; y += stepPx) {
     const d = (F * CAMH) / (y - YH)
@@ -485,6 +549,89 @@ function drawGround() {
       ctx.drawImage(bach, 0, Math.min(bach.height - sh, vb * bach.height), bach.width, sh, sXOf(BACH_X - BACH_SIZE / 2, d, camX), y, (BACH_SIZE * F) / d + 1, stepPx)
     }
   }
+}
+
+const WATER_FALLBACK = ['#4d9bc4', '#b49b72', '#5d6b43']
+const waterName = () => (curWorld.value === 0 ? 'bach-quer' : curWorld.value === 4 ? 'bach-braun' : 'bach-trocken')
+
+/**
+ * The brooks across the track (the dry bed of a stream in the dry worlds, a swollen brown one in the rain): a ground strip, drawn line by
+ * line like the ground. One picture is laid across the whole width. Without the picture a flat strip stands in, so that it can be seen and jumped.
+ */
+function drawWater() {
+  if (!ctx) return
+  const im = imgs.get(waterName())
+  const camX = camXOf()
+  const stepPx = 2
+  // the picture is as long along the track as WATER_LEN; how wide it is across follows from the picture (it can be laid side by side)
+  const WATER_TILE_W = im ? WATER_LEN * (im.width / im.height) : 9.6
+  for (const o of run.obstacles) {
+    if (o.kind !== 'water' || o.lane !== 1) continue
+    const z0 = o.z - WATER_LEN / 2
+    const z1 = o.z + WATER_LEN / 2
+    const dNear = Math.max(NEAR + 0.2, z0 - run.dist + DCAM)
+    const dFar = Math.min(FAR, z1 - run.dist + DCAM)
+    if (dFar <= dNear) continue
+    const yFar = sYOf(dFar)
+    const yNear = Math.min(VH, sYOf(dNear))
+    ctx.save()
+    ctx.globalAlpha = Math.max(0, Math.min(1, (FAR - dFar) / 50))
+    for (let y = Math.floor(yFar); y < yNear; y += stepPx) {
+      const d = (F * CAMH) / (y - YH)
+      const d2 = (F * CAMH) / (y + stepPx - YH)
+      const z = run.dist + d - DCAM
+      const v = Math.max(0, Math.min(1, (z1 - z) / WATER_LEN))
+      if (!im) {
+        ctx.fillStyle = WATER_FALLBACK[curWorld.value === 0 ? 0 : curWorld.value === 4 ? 2 : 1]!
+        ctx.fillRect(0, y, VW, stepPx)
+        continue
+      }
+      const vNext = Math.max(0, Math.min(1, (z1 - (run.dist + d2 - DCAM)) / WATER_LEN))
+      const srcH = Math.max(1, Math.abs(vNext - v) * im.height)
+      const sy0 = Math.max(0, Math.min(im.height - srcH, v * im.height))
+      const half = (VW / 2 / F) * d
+      const first = Math.floor((camX - half + WATER_TILE_W / 2) / WATER_TILE_W)
+      const last = Math.floor((camX + half + WATER_TILE_W / 2) / WATER_TILE_W)
+      const wpx = (WATER_TILE_W * F) / d
+      for (let i = first; i <= last; i++) {
+        const X0 = i * WATER_TILE_W - WATER_TILE_W / 2
+        ctx.drawImage(im, 0, sy0, im.width, srcH, VW / 2 + (F * (X0 - camX)) / d, y, wpx + 1, stepPx)
+      }
+    }
+    ctx.restore()
+  }
+}
+
+/** The rain of the last world: two layers of a painted rain picture, the near one faster, laid over the whole scene. */
+function drawRain(time: number) {
+  const c = ctx
+  const im = imgs.get('regen')
+  if (!c || !im) return
+  c.save()
+  c.globalCompositeOperation = 'screen'
+  for (const [size, speed, alpha] of [[760, 1100, 0.5], [500, 1700, 0.32]] as const) {
+    c.globalAlpha = alpha
+    const off = (time * speed) % size
+    for (let x = 0; x < VW; x += size) for (let y = -size + off; y < VH; y += size) c.drawImage(im, x, y, size, size)
+  }
+  c.restore()
+  c.fillStyle = 'rgba(40, 62, 92, 0.1)'
+  c.fillRect(0, 0, VW, VH)
+}
+
+/** Ahab's chariot in the last world: after a stumble it comes up behind Elijah at the lower edge of the screen, and at a fall it has caught up. */
+function drawChariot(time: number) {
+  const c = ctx
+  const im = imgs.get('ahab-wagen')
+  if (!c || !im || chariotK < 0.03) return
+  const w = VW * (0.55 + 0.4 * chariotK)
+  const h = w * (im.height / im.width)
+  const x = VW / 2 + Math.sin(time * 11) * 7 * chariotK
+  const bottom = VH + h * (0.32 - 0.34 * chariotK) + Math.abs(Math.sin(time * 13)) * 9
+  c.save()
+  c.globalAlpha = Math.min(1, chariotK * 2.2)
+  c.drawImage(im, x - w / 2, bottom - h, w, h)
+  c.restore()
 }
 
 function drawHaze() {
@@ -524,6 +671,7 @@ function draw(time: number) {
 
   drawSky(time)
   drawGround()
+  drawWater()
   drawHaze()
 
   // everything that stands on the track, far to near
@@ -579,16 +727,19 @@ function draw(time: number) {
     })
   }
 
-  // the goal of the first world: the brook Krit (1 Kings 17,3-5), behind the end of the way
-  if (r.goal > 0 && LEVELS[level.value]?.world === 0) {
+  // the goal behind the end of the way: the brook Krit (1 Kings 17,3-5) in the first world, in the others the gate of Zarephath, the widow's house,
+  // the altar on Carmel and the gate of Jezreel (the picture `ziel` of the world)
+  if (r.goal > 0 && !isFree.value) {
     const d = r.goal + 16 - r.dist + DCAM
+    const goalName = curWorld.value === 0 ? 'ziel-krit' : 'ziel'
     // it comes softly out of the haze, so that it does not pop up
-    if (d > NEAR && d < FAR) items.push({ d, draw: () => drawSprite('ziel-krit', 0, 0, d, camX, { w: 16 }, { alpha: Math.max(0, Math.min(1, (FAR - d) / 45)) }) })
+    if (d > NEAR && d < FAR) items.push({ d, draw: () => drawSprite(goalName, 0, 0, d, camX, { w: 16 }, { alpha: Math.max(0, Math.min(1, (FAR - d) / 45)) }) })
   }
 
   // obstacles and pickups
   for (const o of r.obstacles) {
-    if (o.z < zFrom || o.z > zTo) continue
+    // a brook is a strip of the ground, drawn with the ground
+    if (o.kind === 'water' || o.z < zFrom || o.z > zTo) continue
     const d = o.z - r.dist + DCAM
     items.push({ d, draw: () => drawSprite(`hindernis-${o.sprite + 1}`, laneX(o.lane), 0, d, camX, OBST[o.sprite] ?? { w: 1.5 }, { fallback: o.kind === 'block' ? '#8a6a45' : o.kind === 'high' ? '#a06a2a' : '#7d7466' }) })
   }
@@ -596,8 +747,10 @@ function draw(time: number) {
     if (p.got || p.z < zFrom || p.z > zTo) continue
     const d = p.z - r.dist + DCAM
     const bob = Math.sin(time * 5 + p.z) * 0.08
-    const name = p.type === 'brot' ? 'brot' : p.type === 'krug' ? 'krug' : 'feder'
-    const w = p.type === 'brot' ? 0.75 : p.type === 'krug' ? 0.8 : 1.15
+    // in Zarephath the jugs are the jar of flour and the jug of oil that never ran empty (1 Kings 17,14-16)
+    const zarpat = curWorld.value === 2 && p.type === 'krug'
+    const name = p.type === 'brot' ? 'brot' : p.type === 'krug' ? (zarpat ? (hash(p.z * 1.7) < 0.5 ? 'mehl' : 'oel') : 'krug') : 'feder'
+    const w = p.type === 'brot' ? 0.75 : p.type === 'krug' ? (name === 'oel' ? 0.55 : 0.8) : 1.15
     items.push({
       d,
       draw: () => {
@@ -659,6 +812,10 @@ function draw(time: number) {
 
   items.sort((a, b) => b.d - a.d)
   for (const it of items) it.draw()
+  if (curWorld.value === 4) {
+    drawRain(time)
+    drawChariot(time)
+  }
 
   // dust and sparkles
   for (const p of particles) {
@@ -872,6 +1029,9 @@ onBeforeUnmount(() => {
         div(class="eg-how-row")
           span(class="eg-how-key") !
           span {{ t('app.bigGames.elia.howWall') }}
+        div(class="eg-how-row")
+          span(class="eg-how-key") ≈
+          span {{ t('app.bigGames.elia.howBach') }}
         div(class="eg-how-row")
           img(:src="breadSrc" alt="" class="eg-how-pic" @error="hideBroken")
           span {{ t('app.bigGames.elia.howBread') }}
@@ -1204,7 +1364,7 @@ onBeforeUnmount(() => {
   inset: auto
   z-index: 6
   display: grid
-  place-items: center
+  place-items: safe center
   padding: 10px
   background: rgba(24, 14, 6, 0.7)
   overflow-y: auto
@@ -1215,18 +1375,18 @@ onBeforeUnmount(() => {
 
 .eg-how-cross
   display: block
-  width: 44%
-  max-width: 200px
+  width: 34%
+  max-width: 130px
   height: auto
-  margin: 0 auto 6px
+  margin: 0 auto 2px
 
 .eg-how-row
   display: flex
   align-items: center
-  gap: 12px
+  gap: 10px
   width: 100%
-  font-size: 0.95rem
-  line-height: 1.3
+  font-size: 0.9rem
+  line-height: 1.25
 
 .eg-how-key
   flex: none
