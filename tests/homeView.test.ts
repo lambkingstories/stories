@@ -75,7 +75,9 @@ describe('the start page', () => {
     const { default: Home } = await import('@/views/app/AppHomeView.vue')
     const wrapper = mount(Home, { global: { plugins: [i18n], stubs: { RouterLink: true } }, attachTo: document.body })
     await flushPromises()
-    expect(wrapper.findAll('.hero-slide')).toHaveLength(1)
+    // the welcome (a short greeting) and the shop
+    expect(wrapper.findAll('.hero-slide')).toHaveLength(2)
+    expect(wrapper.find('.hero-slide').text()).toContain('Willkommen bei LambKing')
     expect(wrapper.html()).not.toMatch(/paypal|ko-?fi/i)
     expect(wrapper.find('.home-body > *:first-child').classes()).toContain('hero')
     expect(wrapper.text()).not.toMatch(/Reach/i)

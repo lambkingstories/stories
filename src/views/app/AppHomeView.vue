@@ -19,6 +19,7 @@ import useModels from '@/use/useModels'
 import useApiBooks from '@/use/useApiBooks'
 import useReadingProgress from '@/use/useReadingProgress'
 import useAdventure from '@/use/useAdventure'
+import useUserName from '@/use/useUserName'
 import { listArtworks, type ArtworkMeta } from '@/use/useArtworks'
 import { journeys } from '@/data/adventures'
 import { sponsors } from '@/data/sponsors'
@@ -67,9 +68,18 @@ onMounted(() => {
 
 // ── 1. welcome card ──────────────────────────────────────────────────────────
 
-// The slides at the end of the page: the shop (and the sponsors when there are some), then LambKing Plus.
+const { userName } = useUserName()
+
+// The slides on top of the page: first the welcome (a short greeting, Anton 12.11.2026), then the shop, LambKing Plus and the sponsors when there are some.
 const slides = computed(() => {
   const list: HeroSlide[] = [
+    {
+      id: 'welcome',
+      image: prependBaseUrl('images/bg/welcome-bg-1.webp'),
+      title: t('app.home.welcomeTitle'),
+      slogan: t('app.home.slogan'),
+      text: userName.value ? t('app.home.welcomeShortName', { name: userName.value }) : t('app.home.welcomeShort')
+    },
     { id: 'shop', image: prependBaseUrl('images/bg/welcome-bg-3.webp'), title: t('app.main.welcomeTitle2'), text: t('app.home.shopText') }
   ]
   // LambKing Plus is the second slide (Anton 11.11.2026), the rest is on the Plus page. The app does not ask for gifts here any more

@@ -735,6 +735,8 @@ export default {
     welcomeTitle: '¡Te damos la bienvenida a LambKing!',
     slogan: 'Lee · Escucha · Colorea · Asómbrate',
     welcomeText: '¡Ven a explorar! Esto es lo que puedes hacer:',
+    welcomeShort: '¡Qué bueno que estés aquí!',
+    welcomeShortName: '¡Qué bueno que estés aquí, {name}!',
     pointReadLabel: 'Leer y escuchar',
     pointReadText: 'Historias de la Biblia para leer y oír',
     pointAdventureLabel: 'Aventuras',
