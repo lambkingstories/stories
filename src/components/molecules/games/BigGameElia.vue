@@ -59,8 +59,8 @@ const NAMES = [
   'kulisse-1', 'kulisse-2', 'kulisse-3', 'kulisse-4', 'kulisse-5', 'kulisse-6',
   'hindernis-1', 'hindernis-2', 'hindernis-3', 'hindernis-4', 'hindernis-5', 'hindernis-6', 'hindernis-7',
   'brot', 'krug', 'feder', 'mehl', 'oel', 'raben-1', 'raben-2', 'raben-3', 'ziel-krit',
-  // the brook (clear, dry bed, swollen) across the whole track, Ahab's chariot, the rain
-  'bach-quer', 'bach-trocken', 'bach-braun', 'ahab-wagen', 'regen'
+  // the brook (clear in the first world, a dry stream bed in the others) across the whole track
+  'bach-quer', 'bach-trocken'
 ]
 /** What every world after the first brings of its own: sky, ground, the things at the side, the obstacles and the goal (folder `welt2` to `welt5`). */
 const WORLD_NAMES = [
@@ -179,8 +179,6 @@ let combo = 0
 let comboAt = 0
 let shake = 0
 let stumbleShow = 0
-/** How near Ahab's chariot is in the last world: 0 = not to be seen, about 0.55 after a stumble, 1 = it has caught up. */
-let chariotK = 0
 const particles: { x: number; y: number; vx: number; vy: number; life: number; max: number; size: number; color: string }[] = []
 
 /** True while the pictures of a world are loaded (a second tap on a level does nothing). */
@@ -198,7 +196,6 @@ async function start(i: number) {
   }
   level.value = i
   run = newRun(i)
-  chariotK = 0
   // with `?probe=1` the run can be looked at from the console (to try the pictures of the worlds)
   if (window.location.hash.includes('probe=1')) (window as unknown as { __elia?: unknown }).__elia = { get run() { return run } }
   paused.value = false
@@ -325,15 +322,9 @@ function frame(now: number) {
       if (endTimer > (run.phase === 'won' ? 0.9 : 1.3)) finish()
     }
     updateParticles(dt)
-    easeChariot(dt)
     syncHud(false, now)
   }
   draw(now / 1000)
-}
-
-function easeChariot(dt: number) {
-  const target = run.phase === 'over' ? (run.cause === 'hunger' ? 0 : 1) : run.sinceStumble < STUMBLE_WINDOW ? 0.55 : 0
-  chariotK += (target - chariotK) * Math.min(1, dt * 3)
 }
 
 function handleEvents() {
@@ -551,11 +542,11 @@ function drawGround() {
   }
 }
 
-const WATER_FALLBACK = ['#4d9bc4', '#b49b72', '#5d6b43']
-const waterName = () => (curWorld.value === 0 ? 'bach-quer' : curWorld.value === 4 ? 'bach-braun' : 'bach-trocken')
+const WATER_FALLBACK = ['#4d9bc4', '#b49b72']
+const waterName = () => (curWorld.value === 0 ? 'bach-quer' : 'bach-trocken')
 
 /**
- * The brooks across the track (the dry bed of a stream in the dry worlds, a swollen brown one in the rain): a ground strip, drawn line by
+ * The brooks across the track (clear in the first world, the dry bed of a stream in the others, for the brook Cherith has dried up): a ground strip, drawn line by
  * line like the ground. One picture is laid across the whole width. Without the picture a flat strip stands in, so that it can be seen and jumped.
  */
 function drawWater() {
@@ -582,7 +573,7 @@ function drawWater() {
       const z = run.dist + d - DCAM
       const v = Math.max(0, Math.min(1, (z1 - z) / WATER_LEN))
       if (!im) {
-        ctx.fillStyle = WATER_FALLBACK[curWorld.value === 0 ? 0 : curWorld.value === 4 ? 2 : 1]!
+        ctx.fillStyle = WATER_FALLBACK[curWorld.value === 0 ? 0 : 1]!
         ctx.fillRect(0, y, VW, stepPx)
         continue
       }
@@ -600,38 +591,6 @@ function drawWater() {
     }
     ctx.restore()
   }
-}
-
-/** The rain of the last world: two layers of a painted rain picture, the near one faster, laid over the whole scene. */
-function drawRain(time: number) {
-  const c = ctx
-  const im = imgs.get('regen')
-  if (!c || !im) return
-  c.save()
-  c.globalCompositeOperation = 'screen'
-  for (const [size, speed, alpha] of [[760, 1100, 0.5], [500, 1700, 0.32]] as const) {
-    c.globalAlpha = alpha
-    const off = (time * speed) % size
-    for (let x = 0; x < VW; x += size) for (let y = -size + off; y < VH; y += size) c.drawImage(im, x, y, size, size)
-  }
-  c.restore()
-  c.fillStyle = 'rgba(40, 62, 92, 0.1)'
-  c.fillRect(0, 0, VW, VH)
-}
-
-/** Ahab's chariot in the last world: after a stumble it comes up behind Elijah at the lower edge of the screen, and at a fall it has caught up. */
-function drawChariot(time: number) {
-  const c = ctx
-  const im = imgs.get('ahab-wagen')
-  if (!c || !im || chariotK < 0.03) return
-  const w = VW * (0.55 + 0.4 * chariotK)
-  const h = w * (im.height / im.width)
-  const x = VW / 2 + Math.sin(time * 11) * 7 * chariotK
-  const bottom = VH + h * (0.32 - 0.34 * chariotK) + Math.abs(Math.sin(time * 13)) * 9
-  c.save()
-  c.globalAlpha = Math.min(1, chariotK * 2.2)
-  c.drawImage(im, x - w / 2, bottom - h, w, h)
-  c.restore()
 }
 
 function drawHaze() {
@@ -812,10 +771,6 @@ function draw(time: number) {
 
   items.sort((a, b) => b.d - a.d)
   for (const it of items) it.draw()
-  if (curWorld.value === 4) {
-    drawRain(time)
-    drawChariot(time)
-  }
 
   // dust and sparkles
   for (const p of particles) {
