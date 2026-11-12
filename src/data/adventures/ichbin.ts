@@ -508,7 +508,7 @@ for (const st of ichbin.stages) {
 
 // the German recordings of the stories (voice Achernar, files "geschichte-NN-vK.mp3"; K is the version, a re-recorded story gets a new number); until a recording is made the app reads with the voice of the device.
 // stage -> version of the file in public/audio/abenteuer/ichbin/ (written by bauen_ichbin.py from the files that exist)
-const RECORDING_VERSION: Record<number, number> = { 1: 1, 2: 1, 3: 1, 4: 3, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 2, 13: 1, 14: 1 }
+const RECORDING_VERSION: Record<number, number> = { 1: 1, 2: 2, 3: 2, 4: 3, 5: 1, 6: 1, 7: 2, 8: 1, 9: 2, 10: 1, 11: 2, 12: 3, 13: 2, 14: 1 }
 for (const s of ichbin.stages) {
   const version = RECORDING_VERSION[s.id]
   const file = version ? `audio/abenteuer/ichbin/geschichte-${String(s.id).padStart(2, '0')}-v${version}.mp3` : undefined

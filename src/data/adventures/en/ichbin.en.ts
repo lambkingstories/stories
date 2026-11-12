@@ -286,7 +286,7 @@ export const ichbinEn: TextOverlay<Journey> = {
 }
 
 // the English recordings of the stories (voice Achernar, Gemini): geschichte-NN-en-vK.mp3 (K = version); a stage without a number in this list is read with the voice of the device
-const ENGLISH_RECORDING_VERSION: Record<number, number> = { 1: 1, 2: 1, 3: 1, 4: 1, 5: 2, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1, 13: 1, 14: 1 }
+const ENGLISH_RECORDING_VERSION: Record<number, number> = { 1: 1, 2: 2, 3: 1, 4: 2, 5: 2, 6: 1, 7: 2, 8: 2, 9: 1, 10: 2, 11: 1, 12: 1, 13: 1, 14: 2 }
 ichbinEn.stages!.forEach((s, i) => {
   const version = ENGLISH_RECORDING_VERSION[i + 1]
   if (version) s.audio = `audio/abenteuer/ichbin/geschichte-${String(i + 1).padStart(2, '0')}-en-v${version}.mp3`

@@ -253,8 +253,8 @@ describe('Jesus erzählt von sich: map, files, English', () => {
     for (const f of ichbin.music ?? []) expect(existsSync(`public/${f}`), f).toBe(true)
   })
 
-  it('the valid recording of every story is named (after the transcription with OpenAI: German 4 = v3 and 12 = v2, English 5 = v2, everything else v1); a worse, higher file is not taken', () => {
-    const valid = (n: number, en: boolean) => (en ? ({ 5: 2 } as Record<number, number>)[n] : ({ 4: 3, 12: 2 } as Record<number, number>)[n]) ?? 1
+  it('the valid recording of every story is named (after the transcription with OpenAI and the cut of the noise burst at the end: the table below); a worse, higher file is not taken', () => {
+    const valid = (n: number, en: boolean) => (en ? ({ 2: 2, 4: 2, 5: 2, 7: 2, 8: 2, 10: 2, 14: 2 } as Record<number, number>)[n] : ({ 2: 2, 3: 2, 4: 3, 7: 2, 9: 2, 11: 2, 12: 3, 13: 2 } as Record<number, number>)[n]) ?? 1
     for (const s of ichbin.stages) {
       const nn = String(s.id).padStart(2, '0')
       const file = `audio/abenteuer/ichbin/geschichte-${nn}-v${valid(s.id, false)}.mp3`
@@ -263,7 +263,7 @@ describe('Jesus erzählt von sich: map, files, English', () => {
     }
     // the rejected recording of stage 4 (v2 reads on into stage 5) lies beside it, but is not named
     expect(stage(4).audio).toBe('audio/abenteuer/ichbin/geschichte-04-v3.mp3')
-    expect(stage(12).audio).toBe('audio/abenteuer/ichbin/geschichte-12-v2.mp3')
+    expect(stage(12).audio).toBe('audio/abenteuer/ichbin/geschichte-12-v3.mp3')
     setAdventureLanguage('en')
     for (const s of ichbin.stages) {
       const nn = String(s.id).padStart(2, '0')
