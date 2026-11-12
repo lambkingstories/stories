@@ -27,7 +27,7 @@ const task = (n: number) => stage(n).task as unknown as NewTask
 /** Words that no German text, question or answer may use: nothing gruesome, no cross, no wounds, no weapons (the snake of stage 8 and the oven of stage 7 are words of Jesus and stand only there). */
 const FORBIDDEN = /\b(Teufel|Hölle|Leiche|Leichen|Blut|blutig|Kreuz|Kreuze|Kreuzigung|Schwert|Messer|Mörder|Steine|Wunden|Waffen|Heiligenschein|töten|getötet|umbringen)\b/i
 const PICTURES_IN = existsSync('public/images/abenteuer/spiele/bergpredigt/nahblick/dunst.webp')
-const PANORAMA_IN = existsSync('public/images/abenteuer/bergpredigt/karte-pano-v1-1.webp')
+const PANORAMA_IN = existsSync('public/images/abenteuer/bergpredigt/karte-pano-v4-1.webp')
 const LUTHER_77 = 'Bittet, so wird euch gegeben; suchet, so werdet ihr finden; klopfet an, so wird euch aufgetan.'
 
 describe('Die Bergpredigt: stories and questions', () => {
@@ -46,7 +46,7 @@ describe('Die Bergpredigt: stories and questions', () => {
       expect(words, `words ${s.id}`).toBeGreaterThanOrEqual(100)
       expect(words, `words ${s.id}`).toBeLessThanOrEqual(150)
       expect(text, `stage ${s.id}`).not.toMatch(FORBIDDEN)
-      expect(s.image, `stage ${s.id}`).toMatch(new RegExp(`^images/abenteuer/bergpredigt/etappe-bild-${String(s.id).padStart(2, '0')}(-b)?\\.webp$`))
+      expect(s.image, `stage ${s.id}`).toMatch(new RegExp(`^images/abenteuer/bergpredigt/etappe-bild-${String(s.id).padStart(2, '0')}(-b|-v2)?\\.webp$`))
     }
     expect(bergpredigt.stages.map((s) => s.ref)).toEqual([
       'Matthäus 4,25 bis 5,2', 'Matthäus 5,3–6', 'Matthäus 5,7–12', 'Matthäus 5,13–16', 'Matthäus 6,6 und 6,8–13',
@@ -257,7 +257,7 @@ describe('Die Bergpredigt: map, files, English', () => {
     for (const seg of BERGPREDIGT_PATH) for (const [, y] of seg) expect(y * 1648, 'no bead in the lowest fifth').toBeLessThanOrEqual(1318)
     expect(m.path).toBe(BERGPREDIGT_PATH)
     expect(m.aspect).toBeCloseTo(W / 1648, 6)
-    expect(m.images.map((f) => f.replace(/\d+\.webp$/, ''))).toEqual(m.images.map(() => 'images/abenteuer/bergpredigt/karte-pano-v1-'))
+    expect(m.images.map((f) => f.replace(/\d+\.webp$/, ''))).toEqual(m.images.map(() => 'images/abenteuer/bergpredigt/karte-pano-v4-'))
     if (PANORAMA_IN) for (const f of m.images) expect(existsSync(`public/${f}`), f).toBe(true)
   })
 

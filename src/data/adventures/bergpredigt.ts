@@ -161,24 +161,24 @@ export const bergpredigt: Journey = {
   // Geschenk-Ausmalbild: Lilien auf dem Feld (eine Wiese mit Lilien und anderen Blumen, ein Vogel im Flug, im Hintergrund der Berg und die Stadt auf dem Hügel; ohne Menschen, ohne Schrift; Konturzeichnung)
   gift: { title: 'Lilien auf dem Feld', image: `${PICS}geschenk.webp` },
   // die gemalte Karte (Panorama in drei Stücken, 9920 × 1648 px, OpenAI-Bildmodell): ein einziger Berg und der Tag, der darüber läuft, vom Pfad am Fuß des Berges bis zum Abstieg ins Tal;
-  // Stationen aus ergebnis/panorama/map-bergpredigt.json, Perlenweg aus bergpredigtPath.ts
+  // Stationen aus ergebnis/panorama-v4/map-bergpredigt-v4.json, Perlenweg aus bergpredigtPath.ts
   map: {
-    images: [1, 2, 3].map((n) => `images/abenteuer/bergpredigt/karte-pano-v1-${n}.webp`),
+    images: [1, 2, 3].map((n) => `images/abenteuer/bergpredigt/karte-pano-v4-${n}.webp`),
     ring: josef.map.ring,
     aspect: 9920 / 1648,
     widthPx: 9920,
     stages: [
-      { x: 0.1129, y: 0.6189, d: 0.0339 },
-      { x: 0.1966, y: 0.6311, d: 0.0339 },
-      { x: 0.2722, y: 0.5643, d: 0.0339 },
-      { x: 0.4415, y: 0.4854, d: 0.0339 },
-      { x: 0.5292, y: 0.6068, d: 0.0339 },
-      { x: 0.5948, y: 0.6007, d: 0.0339 },
-      { x: 0.7177, y: 0.6523, d: 0.0339 },
-      { x: 0.7964, y: 0.6432, d: 0.0339 },
-      { x: 0.8871, y: 0.6796, d: 0.0339 }
+      { x: 0.0907, y: 0.6614, d: 0.0339 },
+      { x: 0.1915, y: 0.6129, d: 0.0339 },
+      { x: 0.2913, y: 0.5583, d: 0.0339 },
+      { x: 0.5101, y: 0.7100, d: 0.0339 },
+      { x: 0.5806, y: 0.6675, d: 0.0339 },
+      { x: 0.6472, y: 0.7160, d: 0.0339 },
+      { x: 0.7208, y: 0.7039, d: 0.0339 },
+      { x: 0.8417, y: 0.6917, d: 0.0339 },
+      { x: 0.9123, y: 0.7160, d: 0.0339 }
     ],
-    exam: { x: 0.9647, y: 0.7100, d: 0.0339 },
+    exam: { x: 0.9819, y: 0.7585, d: 0.0339 },
     path: BERGPREDIGT_PATH
   },
   stages: [
@@ -245,7 +245,7 @@ export const bergpredigt: Journey = {
     },
     {
       id: 4,
-      image: `${PICS}etappe-bild-04.webp`,
+      image: `${PICS}etappe-bild-04-v2.webp`,
       music: 'audio/abenteuer/bergpredigt/musik-wiese-v1.mp3',
       title: 'Salz und Licht',
       ref: 'Matthäus 5,13–16',
