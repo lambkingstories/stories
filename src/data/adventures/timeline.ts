@@ -60,14 +60,14 @@ export const TIMELINE: TimelineEntry[] = [
   { id: 'heilung', de: 'Jesus heilt', en: 'Jesus heals', epoch: 'jesus' },
   { id: 'ichbin', de: 'Jesus erzählt von sich', en: 'Jesus Tells About Himself', epoch: 'jesus' },
   { id: 'gleichnisse', de: 'Geschichten von Jesus', en: 'Stories of Jesus', epoch: 'jesus' },
+  { id: 'sohn', de: 'Der verlorene Sohn', en: 'The Lost Son', epoch: 'jesus' },
   { id: 'zachaeus', de: 'Zachäus und Lazarus', en: 'Zacchaeus and Lazarus', epoch: 'jesus' },
   { id: 'letztewoche', de: 'Die letzte Woche', en: 'The last week', epoch: 'jesus' },
   { id: 'ostern', de: 'Ostern', en: 'Easter', epoch: 'jesus' },
   { id: 'pfingsten', de: 'Pfingsten', en: 'Pentecost', epoch: 'gemeinde' },
   { id: 'paulus', de: 'Paulus', en: 'Paul', epoch: 'gemeinde' },
   { id: 'paulusrom', de: 'Bis nach Rom', en: 'All the Way to Rome', epoch: 'gemeinde' },
-  { id: 'offenbarung', de: 'Alles wird neu', en: 'All Things New', epoch: 'gemeinde' },
-  { id: 'sohn', de: 'Der verlorene Sohn', en: 'The Lost Son', epoch: 'jesus' }
+  { id: 'offenbarung', de: 'Alles wird neu', en: 'All Things New', epoch: 'gemeinde' }
 ]
 
 /** The place of an adventure on the time line (1 to 31), 0 when it is not on the list. */
