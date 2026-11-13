@@ -15,6 +15,7 @@ import baseTranslations from '@/i18n/translations'
 import bookTranslations from '@/i18n/books'
 import appTranslations from '@/i18n/app'
 import appSpanish from '@/i18n/app.es'
+import { gameTextTree } from '@/i18n/bigGames'
 import { defaultLanguage } from '@/utils/defaultLanguage'
 import { offeredLanguage } from '@/utils/languages'
 import { mergeObjectsRecursive } from '@/utils/function'
@@ -51,10 +52,14 @@ if (import.meta.env.VITE_DEBUG_CONSOLE === 'true') {
 
 const translations = mergeObjectsRecursive(
   mergeObjectsRecursive(
-    mergeObjectsRecursive({}, bookTranslations),
-    baseTranslations
+    mergeObjectsRecursive(
+      mergeObjectsRecursive({}, bookTranslations),
+      baseTranslations
+    ),
+    mergeObjectsRecursive(appTranslations, appSpanish)
   ),
-  mergeObjectsRecursive(appTranslations, appSpanish)
+  // the texts of the newer big games live in their own files (`i18n/bigGames/`), the plugin of the big text files wants plain objects there
+  gameTextTree()
 )
 
 // Without a stored preference the website starts in German and the native

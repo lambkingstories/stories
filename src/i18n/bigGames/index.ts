@@ -11,3 +11,25 @@ export const BIG_GAME_TEXTS = {
   en: { wasser: wasser.en, arche: arche.en, karawane: karawane.en },
   es: { wasser: wasser.es, arche: arche.es, karawane: karawane.es }
 } as Record<'de' | 'en' | 'es', Record<string, Record<string, unknown>>>
+
+/**
+ * The texts of the games laid over the big text files. `unplugin-vue-i18n` only accepts `export default { … }` as an object in `app.ts` and
+ * `app.es.ts`, so the games' texts are merged where the messages are put together (`main.ts`) and in the tests (`withGameTexts`).
+ */
+export function gameTextTree(): Record<'de' | 'en' | 'es', { app: { bigGames: Record<string, Record<string, unknown>> } }> {
+  return {
+    de: { app: { bigGames: BIG_GAME_TEXTS.de } },
+    en: { app: { bigGames: BIG_GAME_TEXTS.en } },
+    es: { app: { bigGames: BIG_GAME_TEXTS.es } }
+  }
+}
+
+/** The big text file `app.ts` (de, en) with the games' texts in it, for tests. */
+export function withGameTexts<T extends object>(messages: T): T {
+  const copy = JSON.parse(JSON.stringify(messages)) as Record<string, { app?: { bigGames?: Record<string, unknown> } }>
+  for (const lang of ['de', 'en'] as const) {
+    const app = (copy[lang] ??= {}).app ?? (copy[lang]!.app = {})
+    app.bigGames = { ...(app.bigGames ?? {}), ...BIG_GAME_TEXTS[lang] }
+  }
+  return copy as T
+}

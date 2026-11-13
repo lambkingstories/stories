@@ -1,6 +1,4 @@
-import { BIG_GAME_TEXTS } from '@/i18n/bigGames'
-
-const messages = {
+export default {
   en: {
     app: {
       nav: {
@@ -8218,9 +8216,3 @@ const messages = {
     }
   }
 }
-
-// the texts of the newer big games live in their own files (`bigGames/`)
-Object.assign(messages.de.app.bigGames, BIG_GAME_TEXTS.de)
-Object.assign(messages.en.app.bigGames, BIG_GAME_TEXTS.en)
-
-export default messages

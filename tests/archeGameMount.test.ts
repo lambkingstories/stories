@@ -5,7 +5,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
-import app from '../src/i18n/app'
+import rawApp from '../src/i18n/app'
+import { withGameTexts } from '../src/i18n/bigGames'
 
 vi.mock('@/use/useSfx', () => ({ default: () => ({ play: vi.fn(), preload: vi.fn() }) }))
 vi.mock('@/use/useMusic', () => ({ default: () => ({ playGame: vi.fn(), stop: vi.fn() }) }))
@@ -14,6 +15,7 @@ import BigGameArche from '@/components/molecules/games/BigGameArche.vue'
 import useBigGames from '@/use/useBigGames'
 import { LEVELS } from '../src/utils/archeLevels'
 
+const app = withGameTexts(rawApp)
 const i18n = createI18n({ legacy: false, locale: 'de', fallbackLocale: 'en', messages: { de: (app as { de?: object }).de ?? {}, en: (app as { en?: object }).en ?? {} } })
 
 /** jsdom does not load pictures: every one "fails" at once, so the game goes on without them. */
