@@ -264,7 +264,7 @@ async function doDelete() {
           span(class="tile4-title") {{ t('app.adventure.tileCards') }}
           span(class="tile4-sub") {{ t('app.adventure.tileCardsSub') }}
         router-link(:to="{ name: 'app-gameroom', query: { z: 'mini' } }" class="tile4")
-          img(:src="prependBaseUrl('images/icons/kacheln/kachel-mini-c.webp')" alt="" class="tile4-img" draggable="false")
+          img(:src="prependBaseUrl('images/icons/kacheln/kachel-mini-c.webp')" alt="" class="tile4-img is-small" draggable="false")
           span(class="tile4-title") {{ t('app.adventure.tileMini') }}
           span(class="tile4-count") {{ miniOpen }} / {{ miniTotal }}
           span(class="tile4-sub") {{ t('app.adventure.tileMiniSub') }}
@@ -718,6 +718,12 @@ $ink: var(--lk-text)
   object-fit: contain
   filter: drop-shadow(0 4px 6px rgba(20, 24, 32, 0.22))
 
+// the puzzle fills its square, so it is a little smaller than the other symbols (Anton, 13.11.2026)
+.tile4-img.is-small
+  width: 84px
+  height: 84px
+  margin: 10px 0 12px
+
 .tile4-title
   font-size: 1.05rem
   font-weight: 800
@@ -825,10 +831,10 @@ $ink: var(--lk-text)
     cursor: default
     opacity: 0.8
 
-  // an adventure that is finished: a fresh green, so that the child sees at once what is done
+  // an adventure that is finished: a warm honey gold, so that the child sees at once what is done
   &.is-finished
-    background: color-mix(in srgb, #3f9d5a 20%, var(--lk-surface))
-    border-color: #3f9d5a
+    background: color-mix(in srgb, #f0c850 28%, var(--lk-surface))
+    border-color: #d4a83e
     border-width: 2px
 
 .tile-check
@@ -841,7 +847,7 @@ $ink: var(--lk-text)
   display: inline-flex
   align-items: center
   justify-content: center
-  background: #3f9d5a
+  background: #c9962a
   color: #fff
   font-size: 0.8rem
   font-weight: 800
@@ -880,6 +886,10 @@ $ink: var(--lk-text)
   display: block
   width: 82%
   max-width: 110px
+  // the round symbols are a little bigger (Anton, 13.11.2026); the square of the tile stays as it was, so only the picture grows
+  transform: scale(1.2)
+  transform-origin: 50% 46%
+  margin-bottom: 6px
 
   img
     display: block

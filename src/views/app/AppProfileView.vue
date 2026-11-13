@@ -272,19 +272,19 @@ const tileImg = (path: string) => prependBaseUrl(`images/${path}.webp`)
       //- the child's own places: four tiles of the same kind
       nav(class="my-tiles" :aria-label="t('app.profile.myPlaces')")
         router-link(:to="{ name: 'app-awards' }" class="my-tile")
-          img(:src="tileImg('abenteuer/ui/stern-gold-3')" alt="" class="my-tile-img" draggable="false")
+          img(:src="tileImg('icons/kacheln/kachel-ich-auszeichnungen')" alt="" class="my-tile-img" draggable="false")
           span(class="my-tile-title") {{ t('app.profile.myAwards') }}
           span(class="my-tile-sub") {{ t('app.profile.tileAwardsSub') }}
         router-link(:to="{ name: 'app-collection' }" class="my-tile")
-          img(:src="tileImg('icons/navi/pokal')" alt="" class="my-tile-img" draggable="false")
+          img(:src="tileImg('icons/kacheln/kachel-karten-c')" alt="" class="my-tile-img" draggable="false")
           span(class="my-tile-title") {{ t('app.collection.title') }}
           span(class="my-tile-sub") {{ t('app.collection.quickSub') }}
         router-link(:to="{ name: 'app-gameroom' }" class="my-tile")
-          img(:src="tileImg('icons/spielzimmer-4')" alt="" class="my-tile-img" draggable="false")
+          img(:src="tileImg('icons/kacheln/kachel-mini-c')" alt="" class="my-tile-img is-small" draggable="false")
           span(class="my-tile-title") {{ t('app.profile.gameRoom') }}
           span(class="my-tile-sub") {{ t('app.profile.tileGameRoomSub') }}
         router-link(:to="{ name: 'app-journal' }" class="my-tile")
-          img(:src="tileImg('icons/favorites')" alt="" class="my-tile-img" draggable="false")
+          img(:src="tileImg('icons/kacheln/kachel-ich-tagebuch')" alt="" class="my-tile-img" draggable="false")
           span(class="my-tile-title") {{ t('app.journal.title') }}
           span(class="my-tile-sub") {{ t('app.profile.tileJournalSub') }}
 
@@ -554,8 +554,10 @@ button
   flex-direction: column
   align-items: center
   text-align: center
-  gap: 2px
-  padding: 14px 14px 16px
+  justify-content: center
+  gap: 3px
+  min-height: 150px
+  padding: 12px 12px 14px
   border: 1px solid var(--lk-line)
   border-radius: 24px
   background: var(--lk-surface)
@@ -573,10 +575,17 @@ button
     color: #3a2c10
 
 .my-tile-img
-  width: 56px
-  height: 56px
-  margin-bottom: 6px
+  width: 104px
+  height: 104px
+  margin-bottom: 2px
   object-fit: contain
+  filter: drop-shadow(0 4px 6px rgba(20, 24, 32, 0.22))
+
+// the puzzle fills its square: a little smaller, as in the adventure menu
+.my-tile-img.is-small
+  width: 84px
+  height: 84px
+  margin: 10px 0 12px
 
 .my-tile-title
   font-size: 1.02rem

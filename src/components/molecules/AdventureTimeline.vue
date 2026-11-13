@@ -312,8 +312,8 @@ $gap: 30px
   top: calc(50% + 14px + 12px)
 
 .tl-card.is-finished
-  background: color-mix(in srgb, #3f9d5a 20%, var(--lk-surface))
-  border: 2px solid #3f9d5a
+  background: color-mix(in srgb, #f0c850 28%, var(--lk-surface))
+  border: 2px solid #d4a83e
 
 .tl-check
   position: absolute
@@ -325,7 +325,7 @@ $gap: 30px
   display: inline-flex
   align-items: center
   justify-content: center
-  background: #3f9d5a
+  background: #c9962a
   color: #fff
   font-size: 0.8rem
   font-weight: 800
@@ -408,6 +408,9 @@ $gap: 30px
   display: block
   width: 86px
   height: 86px
+  // a little bigger, the card stays as it was (Anton, 13.11.2026)
+  transform: scale(1.18)
+  transform-origin: 50% 46%
 
   img
     display: block
