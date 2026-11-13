@@ -2,7 +2,7 @@
  * The big games of the game corner (profile page): real games, not mini games. Each one opens when the child has gathered enough stars on
  * the adventures (the stars of all stages together). The games are played on the whole screen.
  */
-export type BigGameId = 'david' | 'elia' | 'arche' | 'wasser'
+export type BigGameId = 'david' | 'elia' | 'arche' | 'wasser' | 'karawane'
 
 export interface BigGame {
   id: BigGameId
@@ -17,6 +17,7 @@ export interface BigGame {
 export const BIG_GAMES: BigGame[] = [
   { id: 'david', at: 20, image: 'images/spiele-gross/david/kachel.webp', maxStars: 30 },
   { id: 'elia', at: 40, image: 'images/spiele-gross/elia/kachel.webp', maxStars: 45 },
+  { id: 'arche', at: 80, image: 'images/spiele-gross/arche/kachel.webp', maxStars: 180 },
   { id: 'wasser', at: 60, image: 'images/spiele-gross/wasser/kachel.webp', maxStars: 108 },
-  { id: 'arche', at: 80, image: 'images/spiele-gross/arche/kachel.webp', maxStars: 180 }
+  { id: 'karawane', at: 100, image: 'images/spiele-gross/karawane/kachel.webp', maxStars: 18 }
 ]

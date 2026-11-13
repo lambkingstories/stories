@@ -1,6 +1,270 @@
 /** The texts of the big game "karawane" (german, english, spanish), merged into `app.bigGames.karawane` (see `index.ts`). */
+const de = {
+  title: 'Karawane über die Dünen',
+  ref: '1. Mose 37 und Lukas 2',
+  intro: 'Fahre mit dem Karren über Hügel und Dünen. Sammle Münzen und kaufe dir in der Werkstatt Verbesserungen!',
+  route: {
+    egypt: 'Die Karawane nach Ägypten',
+    bethlehem: 'Der Weg nach Bethlehem',
+    magi: 'Die Weisen aus dem Morgenland',
+    jordan: 'Durch das Jordantal',
+    judea: 'Die Berge von Judäa',
+    jerusalem: 'Auf nach Jerusalem'
+  },
+  routeRef: {
+    egypt: '1. Mose 37,25–28',
+    bethlehem: 'Lukas 2,4–5',
+    magi: 'Matthäus 2,1–2',
+    jordan: 'Josua 3,17',
+    judea: 'Psalm 121,1',
+    jerusalem: 'Psalm 122,1'
+  },
+  starRules: 'Ein Stern für den weiten Weg, zwei für noch weiter, drei fürs Ziel.',
+  best: 'Rekord',
+  meters: 'm',
+  coins: 'Münzen',
+  stamina: 'Ausdauer',
+  pause: 'Pause',
+  resume: 'Weiter',
+  again: 'Nochmal!',
+  fromOasis: 'Von der Oase weiter',
+  menu: 'Strecken',
+  next: 'Nächste Strecke',
+  leave: 'Zurück',
+  workshop: 'Werkstatt',
+  workshopIntro: 'Bezahle mit deinen Münzen. Das Spielgeld gibt es nur im Spiel.',
+  levelShort: 'Stufe',
+  buy: 'Kaufen',
+  harness: 'Anspannen',
+  inUse: 'Im Einsatz',
+  maxed: 'Voll ausgebaut',
+  tooPoor: 'Dir fehlen noch Münzen.',
+  parts: {
+    wheels: 'Räder',
+    suspension: 'Federung',
+    water: 'Wasserschlauch',
+    cover: 'Planen und Ladung'
+  },
+  partInfo: {
+    wheels: 'Mehr Halt am Berg.',
+    suspension: 'Weicher und ruhiger fahren.',
+    water: 'Das Tier hält länger durch.',
+    cover: 'Mehr Münzen bei jedem Fund.'
+  },
+  animals: {
+    donkey: 'Esel',
+    ox: 'Ochse',
+    camel: 'Kamel'
+  },
+  animalInfo: {
+    donkey: 'Leicht und flink.',
+    ox: 'Stark am Berg und ausdauernd, aber langsamer.',
+    camel: 'Schnell und ausdauernd.'
+  },
+  won: 'Geschafft! Das Ziel ist erreicht.',
+  lostLoad: 'Uups, die Krüge sind umgekippt!',
+  lostAnimal: 'Uups, das Tier ist gestolpert!',
+  tired: 'Das Tier ist müde. Es braucht Wasser und eine Pause.',
+  record: 'Neuer Rekord!',
+  reached: 'Gefahren',
+  found: 'Gefunden',
+  bonus: 'Weg-Bonus',
+  total: 'Zusammen',
+  floatJump: 'Weiter Sprung!',
+  floatFlip: 'Salto!',
+  floatOasis: 'Oase! Wasser für alle!',
+  floatLow: 'Das Tier wird müde. Suche Wasser!',
+  tip: 'Rechts Gas, links Bremse.',
+  howTitle: 'So fährst du',
+  howGas: 'Rechts auf dem Bildschirm: Gas. Das Tier zieht den Karren.',
+  howBrake: 'Links: Bremse. Steht der Karren, fährt er rückwärts.',
+  howAir: 'In der Luft: Gas hebt die Nase, Bremse senkt sie. Lande auf den Rädern!',
+  howWater: 'Sammle Wasserschläuche und halte an den Oasen: Das Tier braucht Wasser.',
+  howCoins: 'Mit Münzen kaufst du in der Werkstatt bessere Räder und mehr.',
+  go: 'Los geht’s!',
+  howOpen: '?',
+  rotate: 'Dreh dein Handy quer, dann siehst du weiter.',
+  rotateAnyway: 'Trotzdem spielen'
+}
+
+const en = {
+  title: 'Caravan over the Dunes',
+  ref: 'Genesis 37 and Luke 2',
+  intro: 'Drive the cart over hills and dunes. Collect coins and buy better parts in the workshop!',
+  route: {
+    egypt: 'The caravan to Egypt',
+    bethlehem: 'The road to Bethlehem',
+    magi: 'The wise men from the east',
+    jordan: 'Through the Jordan valley',
+    judea: 'The mountains of Judea',
+    jerusalem: 'Up to Jerusalem'
+  },
+  routeRef: {
+    egypt: 'Genesis 37:25–28',
+    bethlehem: 'Luke 2:4–5',
+    magi: 'Matthew 2:1–2',
+    jordan: 'Joshua 3:17',
+    judea: 'Psalm 121:1',
+    jerusalem: 'Psalm 122:1'
+  },
+  starRules: 'One star for a long way, two for even further, three for the goal.',
+  best: 'Record',
+  meters: 'm',
+  coins: 'Coins',
+  stamina: 'Stamina',
+  pause: 'Pause',
+  resume: 'Go on',
+  again: 'Again!',
+  fromOasis: 'Go on from the oasis',
+  menu: 'Routes',
+  next: 'Next route',
+  leave: 'Back',
+  workshop: 'Workshop',
+  workshopIntro: 'Pay with your coins. The play money only exists in the game.',
+  levelShort: 'Level',
+  buy: 'Buy',
+  harness: 'Harness',
+  inUse: 'In use',
+  maxed: 'Fully upgraded',
+  tooPoor: 'You need more coins.',
+  parts: {
+    wheels: 'Wheels',
+    suspension: 'Suspension',
+    water: 'Water skin',
+    cover: 'Tarp and load'
+  },
+  partInfo: {
+    wheels: 'More grip on hills.',
+    suspension: 'A softer, calmer ride.',
+    water: 'The animal keeps going longer.',
+    cover: 'More coins with every find.'
+  },
+  animals: {
+    donkey: 'Donkey',
+    ox: 'Ox',
+    camel: 'Camel'
+  },
+  animalInfo: {
+    donkey: 'Light and quick.',
+    ox: 'Strong uphill and lasting, but slower.',
+    camel: 'Fast and lasting.'
+  },
+  won: 'Well done! You reached the goal.',
+  lostLoad: 'Oops, the jars tipped over!',
+  lostAnimal: 'Oops, the animal stumbled!',
+  tired: 'The animal is tired. It needs water and a rest.',
+  record: 'New record!',
+  reached: 'Driven',
+  found: 'Found',
+  bonus: 'Way bonus',
+  total: 'Together',
+  floatJump: 'Long jump!',
+  floatFlip: 'Flip!',
+  floatOasis: 'Oasis! Water for all!',
+  floatLow: 'The animal gets tired. Find water!',
+  tip: 'Right is gas, left is brake.',
+  howTitle: 'How to drive',
+  howGas: 'Right side of the screen: gas. The animal pulls the cart.',
+  howBrake: 'Left side: brake. When the cart stands, it drives backwards.',
+  howAir: 'In the air: gas lifts the nose, brake lowers it. Land on the wheels!',
+  howWater: 'Collect water skins and stop at the oases: the animal needs water.',
+  howCoins: 'With coins you buy better wheels and more in the workshop.',
+  go: 'Let’s go!',
+  howOpen: '?',
+  rotate: 'Turn your phone sideways to see further.',
+  rotateAnyway: 'Play anyway'
+}
+
+const es = {
+  title: 'Caravana sobre las dunas',
+  ref: 'Génesis 37 y Lucas 2',
+  intro: 'Conduce la carreta por colinas y dunas. Recoge monedas y compra mejoras en el taller.',
+  route: {
+    egypt: 'La caravana a Egipto',
+    bethlehem: 'El camino a Belén',
+    magi: 'Los sabios de oriente',
+    jordan: 'Por el valle del Jordán',
+    judea: 'Las montañas de Judea',
+    jerusalem: 'Subimos a Jerusalén'
+  },
+  routeRef: {
+    egypt: 'Génesis 37:25–28',
+    bethlehem: 'Lucas 2:4–5',
+    magi: 'Mateo 2:1–2',
+    jordan: 'Josué 3:17',
+    judea: 'Salmo 121:1',
+    jerusalem: 'Salmo 122:1'
+  },
+  starRules: 'Una estrella por un camino largo, dos por llegar más lejos, tres por la meta.',
+  best: 'Récord',
+  meters: 'm',
+  coins: 'Monedas',
+  stamina: 'Aguante',
+  pause: 'Pausa',
+  resume: 'Seguir',
+  again: '¡Otra vez!',
+  fromOasis: 'Seguir desde el oasis',
+  menu: 'Rutas',
+  next: 'Siguiente ruta',
+  leave: 'Atrás',
+  workshop: 'Taller',
+  workshopIntro: 'Paga con tus monedas. El dinero de juego solo existe en el juego.',
+  levelShort: 'Nivel',
+  buy: 'Comprar',
+  harness: 'Enganchar',
+  inUse: 'En uso',
+  maxed: 'Al máximo',
+  tooPoor: 'Te faltan monedas.',
+  parts: {
+    wheels: 'Ruedas',
+    suspension: 'Suspensión',
+    water: 'Odre de agua',
+    cover: 'Toldo y carga'
+  },
+  partInfo: {
+    wheels: 'Más agarre en las cuestas.',
+    suspension: 'Un viaje más suave y tranquilo.',
+    water: 'El animal aguanta más.',
+    cover: 'Más monedas en cada hallazgo.'
+  },
+  animals: {
+    donkey: 'Burro',
+    ox: 'Buey',
+    camel: 'Camello'
+  },
+  animalInfo: {
+    donkey: 'Ligero y ágil.',
+    ox: 'Fuerte en la subida y resistente, pero más lento.',
+    camel: 'Rápido y resistente.'
+  },
+  won: '¡Lo lograste! Llegaste a la meta.',
+  lostLoad: '¡Ups, las jarras se volcaron!',
+  lostAnimal: '¡Ups, el animal tropezó!',
+  tired: 'El animal está cansado. Necesita agua y descanso.',
+  record: '¡Nuevo récord!',
+  reached: 'Recorrido',
+  found: 'Encontrado',
+  bonus: 'Bono de camino',
+  total: 'En total',
+  floatJump: '¡Salto largo!',
+  floatFlip: '¡Voltereta!',
+  floatOasis: '¡Oasis! ¡Agua para todos!',
+  floatLow: 'El animal se cansa. ¡Busca agua!',
+  tip: 'A la derecha el gas, a la izquierda el freno.',
+  howTitle: 'Cómo se conduce',
+  howGas: 'Lado derecho de la pantalla: gas. El animal tira de la carreta.',
+  howBrake: 'Lado izquierdo: freno. Si la carreta está parada, va hacia atrás.',
+  howAir: 'En el aire: el gas levanta la nariz, el freno la baja. ¡Aterriza sobre las ruedas!',
+  howWater: 'Recoge odres de agua y para en los oasis: el animal necesita agua.',
+  howCoins: 'Con las monedas compras mejores ruedas y más en el taller.',
+  go: '¡Vamos!',
+  howOpen: '?',
+  rotate: 'Gira el móvil para ver más lejos.',
+  rotateAnyway: 'Jugar así'
+}
+
 export default {
-  de: {} as Record<string, unknown>,
-  en: {} as Record<string, unknown>,
-  es: {} as Record<string, unknown>
+  de: de as Record<string, unknown>,
+  en: en as Record<string, unknown>,
+  es: es as Record<string, unknown>
 }
