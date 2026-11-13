@@ -104,8 +104,8 @@ export default {
     flipHint: 'Sujeta la carta con el dedo y muévela: brilla. Desliza hacia un lado y se da la vuelta.'
   },
   bigGames: {
-    title: 'Juegos bonus',
-    hint: 'Reúne estrellas en tus aventuras. Con suficientes estrellas se abre un juego bonus.',
+    title: 'Juegos de aventura',
+    hint: 'Reúne estrellas en tus aventuras. Con suficientes estrellas se abre un juego de aventura.',
     locked: 'Aún 1 estrella | Aún {n} estrellas',
     starsNow: '{n} estrellas hasta ahora',
     play: 'Jugar',
@@ -774,7 +774,7 @@ export default {
     kindAdventure: 'Aventura',
     kindGames: 'Juegos',
     todayTitle: '¿Qué quieres hacer?',
-    gamesTitle: 'Juegos extra',
+    gamesTitle: 'Juegos de aventura',
     gamesOpen: '{n} de {total} abiertos',
     gamesNext: 'Faltan {n} estrellas',
     begun: 'Empezado',
@@ -1478,7 +1478,7 @@ export default {
     tileFeaturesSub: 'Todo en la aplicación',
     tileGameRoomSub: 'Colecciona juegos',
     gameRoomSub: 'Cuantas más estrellas ganes, más juegos se abren.',
-    allBigOpen: 'Todos los juegos bonus están abiertos.',
+    allBigOpen: 'Todos los juegos de aventura están abiertos.',
     miniTitle: 'Minijuegos',
     miniHint: 'Gana las tres estrellas de una etapa y su juego se muda aquí.',
     miniLocked: 'Etapa {n}: gana tres estrellas',
