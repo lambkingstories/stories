@@ -23,8 +23,8 @@ export const decorPic = (d: DecorId): string => `d-${d}`
 
 /** Everything the game draws (loaded when it opens; a missing picture is drawn as a coloured box, so the game never breaks). */
 export const ALL_PICTURES: string[] = [
-  'kachel-boden', 'kachel-wiese', 'kachel-sand', 'kachel-weg', 'kachel-furche', 'kachel-pflaster', 'kachel-wasser', 'kachel-ufer',
-  'leer-trocken', 'leer-nass', 'leer-beet', 'leer-stroh',
+  'kachel-wiese', 'kachel-sand', 'kachel-weg', 'kachel-pflaster',
+  'leer-trocken', 'leer-beet', 'leer-stroh',
   ...[0, 1, 2].flatMap((i) => [`scheune-${i}`, `speicher-${i}`]),
   ...BUILDING_IDS.flatMap((b) => [0, 1].map((i) => `${BUILDING_FILE[b]}-${i}`)),
   'brett', 'brunnen', 'zaun', 'pfosten', 'tor', 'futtertrog', 'heu', 'wassertrog', 'karawane',

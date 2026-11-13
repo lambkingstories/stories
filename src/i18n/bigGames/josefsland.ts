@@ -123,7 +123,7 @@ const de = {
   specialDream: 'Ein Bote vom Palast ist da: Pharaos Traum!',
   specialBrothers: 'Aus Kanaan sind Brüder gekommen. Sie wollen Korn kaufen!',
   goalDone: 'Ziel erreicht: {text}',
-  chapterStars: 'Kapitel „{chapter}“: {n} Stern(e)!',
+  chapterStars: 'Kapitel „{chapter}“: {n} von 3 Sternen!',
   dailyDone: 'Tagesaufgabe geschafft!',
   welcomeBack: 'Willkommen zurück! {n} Sachen sind fertig.',
   tip: {
@@ -367,7 +367,7 @@ const en = {
   specialDream: 'A messenger from the palace is here: Pharaoh’s dream!',
   specialBrothers: 'Brothers have come from Canaan. They want to buy grain!',
   goalDone: 'Goal reached: {text}',
-  chapterStars: 'Chapter “{chapter}”: {n} star(s)!',
+  chapterStars: 'Chapter “{chapter}”: {n} of 3 stars!',
   dailyDone: 'Daily task done!',
   welcomeBack: 'Welcome back! {n} things are ready.',
   tip: {
@@ -611,7 +611,7 @@ const es = {
   specialDream: 'Ha llegado un mensajero del palacio: ¡el sueño del faraón!',
   specialBrothers: 'Han llegado hermanos de Canaán. ¡Quieren comprar grano!',
   goalDone: 'Meta cumplida: {text}',
-  chapterStars: 'Capítulo «{chapter}»: ¡{n} estrella(s)!',
+  chapterStars: 'Capítulo «{chapter}»: ¡{n} de 3 estrellas!',
   dailyDone: '¡Tarea del día hecha!',
   welcomeBack: '¡Bienvenido de nuevo! {n} cosas están listas.',
   tip: {

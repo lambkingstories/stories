@@ -263,7 +263,7 @@ function spotsOf(id: number, role: ParcelRole, animal?: AnimalId): Spot[] {
     return [s('b0', 'bed', 100, 135), s('b1', 'bed', 280, 135), s('b2', 'bed', 100, 255), s('b3', 'bed', 280, 255), s('d0', 'decor', 190, 205)]
   }
   if (role === 'yard') {
-    return [s('barn', 'barn', 92, 178, 'barn'), s('granary', 'granary', 288, 178, 'granary'), s('board', 'board', 190, 282), s('d0', 'decor', 38, 288), s('d1', 'decor', 345, 288)]
+    return [s('barn', 'barn', 92, 178, 'barn'), s('granary', 'granary', 288, 178, 'granary'), s('board', 'board', 190, 262), s('d0', 'decor', 38, 288), s('d1', 'decor', 345, 288)]
   }
   if (role === 'works') {
     return [s('mill', 'building', 80, 165, 'mill'), s('bakery', 'building', 290, 165, 'bakery'), s('weaver', 'building', 185, 275, 'weaver'), s('d0', 'decor', 36, 280), s('d1', 'decor', 345, 280)]

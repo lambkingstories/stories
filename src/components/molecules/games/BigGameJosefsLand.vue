@@ -335,7 +335,7 @@ function homeView() {
   cam.z = Math.min(1, Math.max(0.4, fit * 0.9))
   cam.x = (x0 + x1) / 2
   // a little of the painted Nile is seen above the land
-  cam.y = (y0 + y1) / 2 - 50 / cam.z
+  cam.y = (y0 + y1) / 2 - 20 / cam.z
   clampCam()
 }
 
@@ -405,7 +405,7 @@ function buildTerrain() {
     const rh = PARCEL_H - 8
     if (p.role === 'yard') {
       softGround(x, 'kachel-weg', '#c8a472', rx, ry, rw, rh, 26, 18)
-      softGround(x, 'kachel-pflaster', '#d9c9a0', rx + 40, ry + 190, rw - 80, 70, 24, 16)
+      softGround(x, 'kachel-pflaster', '#d9c9a0', rx + 60, ry + 196, rw - 120, 84, 24, 16)
     } else if (p.role === 'works' || p.role === 'works2') {
       softGround(x, 'kachel-weg', '#c8a472', rx, ry, rw, rh, 26, 18)
       softGround(x, 'kachel-pflaster', '#d9c9a0', rx + 14, ry + 14, rw - 28, rh - 28, 20, 14)
@@ -629,13 +629,13 @@ function addSpot(sp: Spot, now: number) {
     // the fence: two pieces at the back, two at the front with the gate in the middle, posts at the sides
     const fy = oy + 112
     for (const fx of [ox + 90, ox + 190, ox + 290]) items.push({ y: fy, fn: () => sprite('zaun', fx, fy) })
-    items.push({ y: y + 2, fn: () => sprite('zaun', ox + 78, y + 2) })
+    items.push({ y: y + 2, fn: () => sprite('zaun', ox + 88, y + 2) })
     items.push({ y: y + 2, fn: () => sprite('tor', ox + 190, y + 2) })
-    items.push({ y: y + 2, fn: () => sprite('zaun', ox + 302, y + 2) })
+    items.push({ y: y + 2, fn: () => sprite('zaun', ox + 292, y + 2) })
     for (const px of [ox + 36, ox + 344]) items.push({ y: oy + 205, fn: () => sprite('pfosten', px, oy + 205) })
-    items.push({ y: oy + 162, fn: () => sprite('futtertrog', ox + 190, oy + 162) })
-    items.push({ y: oy + 220, fn: () => sprite('heu', ox + 190, oy + 220) })
-    items.push({ y: oy + 266, fn: () => sprite('wassertrog', ox + 190, oy + 266) })
+    items.push({ y: oy + 150, fn: () => sprite('futtertrog', ox + 190, oy + 150) })
+    items.push({ y: oy + 190, fn: () => sprite('wassertrog', ox + 190, oy + 190) })
+    items.push({ y: oy + 154, fn: () => sprite('heu', ox + 64, oy + 154) })
     addBox({ x0: ox + 36, y0: oy + 80, x1: ox + 344, y1: y + 4, prio: 1, kind: 'pen', id: sp.id, ref: a })
     for (let i = 0; i < cap; i++) {
       const [dx, dy] = PEN_PLACES[i]!
@@ -909,7 +909,8 @@ const BAND_ANCHOR = 30
 
 function drawBackdrop() {
   if (!ctx) return
-  const lush = G.level >= 14 || G.parcels.length >= 6
+  // the view grows greener with the level and with the land (from level 6 to 16)
+  const lush = Math.min(1, Math.max(0, (Math.max(G.level, G.parcels.length * 2 + 2) - 6) / 10))
   const a = img['fern-1']
   const b = img['fern-2']
   // the sky when no picture is there yet
@@ -934,7 +935,7 @@ function drawBackdrop() {
     ctx.restore()
   }
   draw(a ?? b, 1)
-  if (a && b) draw(b, lush ? 1 : 0)
+  if (a && b) draw(b, lush)
 }
 
 function drawLockedParcels() {
@@ -2506,8 +2507,8 @@ const yearNth = computed(() => ((view.value.year.index % CYCLE_YEARS) % FAT_YEAR
   width: auto
 
 .jl-x
-  width: 40px
-  height: 40px
+  width: 46px
+  height: 46px
   border: none
   border-radius: 50%
   background: #e9dcc0
