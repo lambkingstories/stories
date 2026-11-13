@@ -4,7 +4,7 @@
  */
 import { describe, expect, it } from 'vitest'
 import { BIG_GAMES } from '../src/data/bigGames'
-import { COLS, ROWS, checkMap, dig, newWorld, playSolution, step, SIM_HZ } from '../src/utils/wasserGame'
+import { COLS, ROWS, checkMap, dig, newWorld, nextTipStep, playSolution, step, tipSteps, SIM_HZ } from '../src/utils/wasserGame'
 import { LEVELS, WORLDS } from '../src/utils/wasserLevels'
 
 describe('the list of levels', () => {
@@ -64,4 +64,22 @@ describe.each(LEVELS.map((l, i) => [i + 1, l] as const))('level %i', (_n, def) =
       expect(out.stars, `${def.id}: ${s.name} (eff ${out.eff.toFixed(2)})`).toBeGreaterThanOrEqual(s.stars)
     }
   }, 60000)
+})
+
+describe.each(LEVELS.map((l, i) => [i + 1, l] as const))('tip of level %i', (_n, def) => {
+  it('shows the way step by step, and the steps together win all three stars (all three plants can be reached)', () => {
+    const steps = tipSteps(def)
+    expect(steps.length).toBeGreaterThanOrEqual(2)
+    // every point of the kept solution is in a step
+    const all = def.solutions[0]!.strokes.length
+    expect(steps.reduce((n, s) => n + s.length, 0)).toBeGreaterThanOrEqual(all)
+    const { out, w } = playSolution(def, steps.map((pts) => ({ pts })), 90)
+    expect(out.phase).toBe('won')
+    expect(out.bloomed).toBe(w.plants.length)
+    expect(out.stars).toBe(3)
+    // at the start the first step is the next one; after all of it is dug nothing is left
+    const fresh = newWorld(def)
+    expect(nextTipStep(fresh, steps)).toBeGreaterThanOrEqual(0)
+    expect(nextTipStep(w, steps)).toBe(-1)
+  })
 })

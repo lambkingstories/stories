@@ -896,3 +896,52 @@ export function dump(w: World): string {
   }
   return rows.join('\n')
 }
+
+// ── the tip ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+/** The length of one tip step (in signs of the map). */
+const TIP_LEN = 8
+
+/**
+ * The first kept solution of a level cut into short steps (every stroke of it, in pieces of about eight signs, the pieces meet in one point).
+ * The tip button shows them one after the other. Digging the steps in this order is the solution itself.
+ */
+export function tipSteps(def: LevelDef): Pt[][] {
+  const out: Pt[][] = []
+  for (const s of def.solutions[0]?.strokes ?? []) {
+    // the stroke in points one sign apart
+    const pts: Pt[] = []
+    for (let i = 0; i < s.pts.length; i++) {
+      const b = s.pts[i]!
+      if (i === 0) {
+        pts.push(b)
+        continue
+      }
+      const a = s.pts[i - 1]!
+      const n = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1])))
+      for (let k = 1; k <= n; k++) pts.push([a[0] + ((b[0] - a[0]) * k) / n, a[1] + ((b[1] - a[1]) * k) / n])
+    }
+    if (pts.length < 2) {
+      out.push([pts[0]!, pts[0]!])
+      continue
+    }
+    for (let i = 0; i < pts.length - 1; i += TIP_LEN) out.push(pts.slice(i, Math.min(pts.length, i + TIP_LEN + 1)))
+  }
+  return out
+}
+
+/** How much of a tip step is dug already (0..1): the share of its points that lie in open cells. */
+export function stepDug(w: World, pts: Pt[]): number {
+  let n = 0
+  for (const [x, y] of pts) {
+    const cx = Math.min(W - 1, Math.max(0, Math.floor(x * K)))
+    const cy = Math.min(H - 1, Math.max(0, Math.floor(y * K)))
+    if (w.mat[cy * W + cx] === AIR) n++
+  }
+  return pts.length ? n / pts.length : 1
+}
+
+/** The next step that is not dug yet (-1: the whole way is dug). */
+export function nextTipStep(w: World, steps: Pt[][]): number {
+  for (let i = 0; i < steps.length; i++) if (stepDug(w, steps[i]!) < 0.8) return i
+  return -1
+}

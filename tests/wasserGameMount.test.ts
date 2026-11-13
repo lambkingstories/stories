@@ -72,6 +72,7 @@ describe('BigGameWasser', () => {
 
   it('has pause, restart and tip in the game, and the pause leads back to the list', async () => {
     localStorage.setItem('lk-biggames-how-v1', JSON.stringify({ wasser: true }))
+    localStorage.setItem('lk-wasser-story-v1', JSON.stringify({ 0: true, 1: true, 2: true }))
     const w = await open()
     await w.find('[data-test="wasser-level-1"]').trigger('click')
     expect(w.find('.wg-hud').exists()).toBe(true)
@@ -89,6 +90,7 @@ describe('BigGameWasser', () => {
 
   it('a won round ends with its stars, keeps them and offers the next level', async () => {
     localStorage.setItem('lk-biggames-how-v1', JSON.stringify({ wasser: true }))
+    localStorage.setItem('lk-wasser-story-v1', JSON.stringify({ 0: true, 1: true, 2: true }))
     const w = await open()
     await w.find('[data-test="wasser-level-0"]').trigger('click')
     const probe = (window as unknown as { __wasser: { w: import('../src/utils/wasserGame').World; begin: (i: number) => void; advance: (s: number) => void } }).__wasser
@@ -112,6 +114,7 @@ describe('BigGameWasser', () => {
 
   it('a round without enough water ends friendly: again, no stars', async () => {
     localStorage.setItem('lk-biggames-how-v1', JSON.stringify({ wasser: true }))
+    localStorage.setItem('lk-wasser-story-v1', JSON.stringify({ 0: true, 1: true, 2: true }))
     const w = await open()
     await w.find('[data-test="wasser-level-2"]').trigger('click')
     const probe = (window as unknown as { __wasser: { w: import('../src/utils/wasserGame').World; advance: (s: number) => void } }).__wasser
@@ -126,5 +129,30 @@ describe('BigGameWasser', () => {
     expect(w.find('[data-test="wasser-next"]').exists()).toBe(false)
     expect(useBigGames().levels('wasser')[2] ?? 0).toBe(0)
     w.unmount()
+  })
+
+  it('tells the story of a world once (at its first level), again from the banner, and the tip shows the way step by step', async () => {
+    localStorage.setItem('lk-biggames-how-v1', JSON.stringify({ wasser: true }))
+    const w = await open()
+    await w.find('[data-test="wasser-level-0"]').trigger('click')
+    expect(w.find('[data-test="wasser-story-go"]').exists()).toBe(true)
+    expect(w.text()).toContain('Mose')
+    expect(w.text()).toContain('Deine Aufgabe')
+    await w.find('[data-test="wasser-story-go"]').trigger('click')
+    expect(w.find('[data-test="wasser-story-go"]').exists()).toBe(false)
+    // the tip: a line for the first piece of the way (the text says so), pressing again does not break anything
+    await w.find('[data-test="wasser-tip"]').trigger('click')
+    expect(w.find('.wg-tip').exists()).toBe(true)
+    await w.find('[data-test="wasser-tip"]').trigger('click')
+    await w.find('[data-test="wasser-menu"]').exists()
+    await w.find('[data-test="wasser-restart"]').trigger('click')
+    expect(w.find('[data-test="wasser-story-go"]').exists()).toBe(false)
+    // the second world has its own story
+    w.unmount()
+    const again = await open()
+    await again.find('[data-test="wasser-level-12"]').trigger('click')
+    expect(again.find('[data-test="wasser-story-go"]').exists()).toBe(true)
+    expect(again.text()).toContain('Elia')
+    again.unmount()
   })
 })

@@ -2,7 +2,17 @@
 export default {
   de: {
     title: 'Wasser für das Volk',
-    intro: 'Grabe mit dem Finger einen Weg durch Erde und Sand. Das Wasser läuft in dein Gefäß!',
+    intro: 'Ohne Wasser kann niemand leben. Mit dem Finger gräbst du Wege durch die Erde, damit das Wasser dorthin läuft, wo die Menschen und Tiere es brauchen.',
+    taskLabel: 'Deine Aufgabe:',
+    tipDone: 'Du bist schon auf dem richtigen Weg. Warte, bis das Wasser ankommt!',
+    story: [
+      { text: 'Das Volk Israel ist durstig in der Wüste. Da sagt Gott zu Mose: Schlag auf den Felsen. Mose tut es, und Wasser kommt heraus (2. Mose 17).',
+        task: 'Grabe einen Weg, damit das Wasser in den Krug läuft.' },
+      { text: 'Es hat lange nicht geregnet, das Land ist trocken. Elia betet, und sein Diener sieht eine kleine Wolke aufsteigen. Dann kommt der Regen (1. Könige 18).',
+        task: 'Fang den Regen auf und leite ihn in das Gefäß.' },
+      { text: 'Isaak lässt die Brunnen seines Vaters Abraham wieder aufgraben. Rebekka schöpft Wasser für die Kamele, und Jakob wälzt den Stein vom Brunnen, damit Rahels Schafe trinken können (1. Mose 24, 26 und 29).',
+        task: 'Grabe Wege zum Brunnen und zur Tränke, damit alle trinken können.' }
+    ],
     worlds: [
       { name: 'Wasser aus dem Felsen', ref: '2. Mose 17,1–7' },
       { name: 'Der Regen kommt', ref: '1. Könige 18,41–46' },
@@ -41,7 +51,7 @@ export default {
       thorn: 'Dornenbüsche brauchen nur wenig Wasser. Überflute sie nicht!'
     },
     tip: 'Tipp',
-    tipText: 'Wische wie auf der Linie durch die Erde.',
+    tipText: 'Wische wie auf der goldenen Linie durch die Erde. Tippe nochmal für das nächste Stück.',
     jar: 'Gefäß',
     stars: 'Sterne',
     won1: 'Das Gefäß ist voll. Das Volk kann trinken!',
@@ -54,7 +64,17 @@ export default {
   } as Record<string, unknown>,
   en: {
     title: 'Water for the People',
-    intro: 'Dig a way with your finger through earth and sand. The water runs into your vessel!',
+    intro: 'Nobody can live without water. With your finger you dig ways through the earth, so that the water runs where people and animals need it.',
+    taskLabel: 'Your task:',
+    tipDone: 'You are already on the right way. Wait until the water arrives!',
+    story: [
+      { text: 'The people of Israel are thirsty in the desert. God says to Moses: Strike the rock. Moses does it, and water comes out (Exodus 17).',
+        task: 'Dig a way so that the water runs into the jug.' },
+      { text: 'It has not rained for a long time, the land is dry. Elijah prays, and his servant sees a little cloud rising. Then the rain comes (1 Kings 18).',
+        task: 'Catch the rain and lead it into the vessel.' },
+      { text: 'Isaac has the wells of his father Abraham dug again. Rebekah draws water for the camels, and Jacob rolls the stone from the well so that Rachel\'s sheep can drink (Genesis 24, 26 and 29).',
+        task: 'Dig ways to the well and the trough, so that everyone can drink.' }
+    ],
     worlds: [
       { name: 'Water from the Rock', ref: 'Exodus 17:1–7' },
       { name: 'The Rain Is Coming', ref: '1 Kings 18:41–46' },
@@ -93,7 +113,7 @@ export default {
       thorn: 'Thorn bushes need only a little water. Do not flood them!'
     },
     tip: 'Tip',
-    tipText: 'Swipe through the earth along the line.',
+    tipText: 'Swipe through the earth along the golden line. Tap again for the next piece.',
     jar: 'Vessel',
     stars: 'Stars',
     won1: 'The vessel is full. The people can drink!',
@@ -106,7 +126,17 @@ export default {
   } as Record<string, unknown>,
   es: {
     title: 'Agua para el pueblo',
-    intro: 'Cava un camino con el dedo por la tierra y la arena. ¡El agua corre hasta tu vasija!',
+    intro: 'Nadie puede vivir sin agua. Con el dedo cavas caminos por la tierra para que el agua corra adonde las personas y los animales la necesitan.',
+    taskLabel: 'Tu tarea:',
+    tipDone: 'Ya estás en el buen camino. ¡Espera a que llegue el agua!',
+    story: [
+      { text: 'El pueblo de Israel tiene sed en el desierto. Dios le dice a Moisés: Golpea la roca. Moisés lo hace, y sale agua (Éxodo 17).',
+        task: 'Cava un camino para que el agua corra hasta la jarra.' },
+      { text: 'Hace mucho que no llueve y la tierra está seca. Elías ora, y su siervo ve subir una pequeña nube. Entonces llega la lluvia (1 Reyes 18).',
+        task: 'Recoge la lluvia y llévala hasta la vasija.' },
+      { text: 'Isaac hace cavar de nuevo los pozos de su padre Abraham. Rebeca saca agua para los camellos, y Jacob quita la piedra del pozo para que beban las ovejas de Raquel (Génesis 24, 26 y 29).',
+        task: 'Cava caminos hasta el pozo y el abrevadero para que todos puedan beber.' }
+    ],
     worlds: [
       { name: 'Agua de la roca', ref: 'Éxodo 17:1–7' },
       { name: 'Viene la lluvia', ref: '1 Reyes 18:41–46' },
@@ -145,7 +175,7 @@ export default {
       thorn: 'Los arbustos de espinas necesitan poca agua. ¡No los inundes!'
     },
     tip: 'Pista',
-    tipText: 'Pasa el dedo por la tierra siguiendo la línea.',
+    tipText: 'Pasa el dedo por la tierra siguiendo la línea dorada. Toca otra vez para el siguiente tramo.',
     jar: 'Vasija',
     stars: 'Estrellas',
     won1: 'La vasija está llena. ¡El pueblo puede beber!',

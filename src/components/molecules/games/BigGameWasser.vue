@@ -15,7 +15,7 @@ import useBigGames, { howSeen, markHowSeen } from '@/use/useBigGames'
 import useSfx from '@/use/useSfx'
 import useMusic from '@/use/useMusic'
 import { prependBaseUrl } from '@/utils/function'
-import { AIR, DIG_R, DIRT, H, K, MUD, ROCK, SAND, SALT, SIM_HZ, W, WALL, WOOD, digLine, dig, efficiency, finished, newWorld, start, step, type Stroke, type World } from '@/utils/wasserGame'
+import { AIR, DIG_R, DIRT, H, K, MUD, ROCK, SAND, SALT, SIM_HZ, W, WALL, WOOD, digLine, dig, efficiency, finished, newWorld, nextTipStep, start, step, tipSteps, type Pt, type World } from '@/utils/wasserGame'
 import { LEVELS, WORLDS } from '@/utils/wasserLevels'
 
 const emit = defineEmits<{ leave: [] }>()
@@ -29,6 +29,7 @@ const ID = 'wasser'
 const TILES = ['erde-1', 'erde-2', 'erde-3', 'fels-1', 'fels-2', 'fels-3', 'sand', 'schlamm', 'salz', 'holz', 'ton', 'stein']
 const SPRITES = [
   'bg-mose', 'bg-elia', 'bg-vaeter', 'krug', 'trog', 'brunnen', 'becken', 'rad', 'hebel-aus', 'hebel-an', 'quelle', 'wolke',
+  'fels-zu', 'fels-auf', 'stab', 'detail-1', 'detail-2', 'detail-3', 'detail-4', 'detail-5', 'detail-6', 'detail-7', 'detail-8',
   'blume-1-durstig', 'blume-1-bluehend', 'dorn-1-durstig', 'dorn-1-bluehend', 'blume-2-durstig', 'blume-2-bluehend', 'dorn-2-durstig', 'dorn-2-bluehend', 'blume-3-durstig', 'blume-3-bluehend', 'dorn-3-durstig', 'dorn-3-bluehend'
 ]
 const img: Record<string, HTMLImageElement | undefined> = {}
@@ -110,6 +111,9 @@ let dpr = 1
 let fx = 0
 let fy = 0
 let cell = 1
+let cellY = 1
+/** The most a tall screen stretches the field upwards. */
+const STRETCH = 1.3
 let cvW = 1
 let cvH = 1
 
@@ -123,6 +127,7 @@ let waterCtx: CanvasRenderingContext2D | null = null
 let waterData: ImageData | null = null
 let water32: Uint32Array | null = null
 let waterBox = { x0: 0, y0: 0, x1: -1, y1: -1 }
+const depth = new Uint8Array(W * H)
 let seenTerrain = 0
 
 function makeLayers() {
@@ -156,22 +161,67 @@ function textureFor(mat: number): Uint32Array | undefined {
   return undefined
 }
 
-/** Draws the earth picture again inside a rectangle of cells. */
+// ── noise for the earth: a soft one (patches, strata that wave) and a fine one (grains) ──────────────────────────────────────
+const NS = 256
+const noiseLow = new Float32Array(NS * NS)
+const noiseHi = new Uint8Array(NS * NS)
+;(() => {
+  let seed = 987654321
+  const r = () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0
+    return seed / 4294967296
+  }
+  const G = 16
+  const grid = Array.from({ length: G * G }, () => r())
+  for (let y = 0; y < NS; y++) {
+    for (let x = 0; x < NS; x++) {
+      const u = (x / NS) * G
+      const v = (y / NS) * G
+      const i0 = Math.floor(u)
+      const j0 = Math.floor(v)
+      const fx = u - i0
+      const fy = v - j0
+      const sx = fx * fx * (3 - 2 * fx)
+      const sy = fy * fy * (3 - 2 * fy)
+      const a = grid[(j0 % G) * G + (i0 % G)]!
+      const b = grid[(j0 % G) * G + ((i0 + 1) % G)]!
+      const c = grid[((j0 + 1) % G) * G + (i0 % G)]!
+      const d = grid[((j0 + 1) % G) * G + ((i0 + 1) % G)]!
+      noiseLow[y * NS + x] = a + (b - a) * sx + (c - a) * sy + (a - b - c + d) * sx * sy
+      noiseHi[y * NS + x] = Math.floor(r() * 256)
+    }
+  }
+})()
+
+/** Draws the earth picture again inside a rectangle of cells: painted textures that vary from patch to patch, strata that go with the depth, light on the edges (from the upper left), soft shadow in the tunnels. */
 function paintTerrain(cx0: number, cy0: number, cx1: number, cy1: number) {
   if (!terr32 || !terrCtx || !terrData) return
-  const px0 = Math.max(0, (cx0 - 1) * TS)
-  const py0 = Math.max(0, (cy0 - 1) * TS)
-  const px1 = Math.min(W * TS - 1, (cx1 + 2) * TS)
-  const py1 = Math.min(H * TS - 1, (cy1 + 2) * TS)
+  const px0 = Math.max(0, (cx0 - 2) * TS)
+  const py0 = Math.max(0, (cy0 - 2) * TS)
+  const px1 = Math.min(W * TS - 1, (cx1 + 3) * TS)
+  const py1 = Math.min(H * TS - 1, (cy1 + 3) * TS)
   const mat = w.mat
   const tex: (Uint32Array | undefined)[] = []
   for (let m = 0; m < 8; m++) tex[m] = textureFor(m)
   const rowW = W * TS
+  const total = H * TS
+  /** The share of solid cells around a point of the picture (a bilinear field). */
+  const dens = (px: number, py: number): number => {
+    const u = (px + 0.5) / TS - 0.5
+    const v = (py + 0.5) / TS - 0.5
+    const i0 = Math.floor(u)
+    const j0 = Math.floor(v)
+    const fxx = u - i0
+    const fyy = v - j0
+    const s = (i: number, j: number) => (i < 0 || j < 0 || i >= W || j >= H ? 1 : mat[j * W + i] !== AIR ? 1 : 0)
+    return (1 - fxx) * (1 - fyy) * s(i0, j0) + fxx * (1 - fyy) * s(i0 + 1, j0) + (1 - fxx) * fyy * s(i0, j0 + 1) + fxx * fyy * s(i0 + 1, j0 + 1)
+  }
+  const matAt = (i: number, j: number) => (i < 0 || j < 0 || i >= W || j >= H ? ROCK : mat[j * W + i]!)
   for (let py = py0; py <= py1; py++) {
     const v = (py + 0.5) / TS - 0.5
     const j0 = Math.floor(v)
     const fyy = v - j0
-    const ty = (py % TW) * TW
+    const yFrac = py / total
     for (let px = px0; px <= px1; px++) {
       const u = (px + 0.5) / TS - 0.5
       const i0 = Math.floor(u)
@@ -180,22 +230,34 @@ function paintTerrain(cx0: number, cy0: number, cx1: number, cy1: number) {
       const w10 = fxx * (1 - fyy)
       const w01 = (1 - fxx) * fyy
       const w11 = fxx * fyy
-      const m00 = i0 < 0 || j0 < 0 || i0 >= W || j0 >= H ? ROCK : mat[j0 * W + i0]!
-      const m10 = i0 + 1 < 0 || j0 < 0 || i0 + 1 >= W || j0 >= H ? ROCK : mat[j0 * W + i0 + 1]!
-      const m01 = i0 < 0 || j0 + 1 < 0 || i0 >= W || j0 + 1 >= H ? ROCK : mat[(j0 + 1) * W + i0]!
-      const m11 = i0 + 1 < 0 || j0 + 1 < 0 || i0 + 1 >= W || j0 + 1 >= H ? ROCK : mat[(j0 + 1) * W + i0 + 1]!
+      const m00 = matAt(i0, j0)
+      const m10 = matAt(i0 + 1, j0)
+      const m01 = matAt(i0, j0 + 1)
+      const m11 = matAt(i0 + 1, j0 + 1)
       const a00 = m00 !== AIR ? w00 : 0
       const a10 = m10 !== AIR ? w10 : 0
       const a01 = m01 !== AIR ? w01 : 0
       const a11 = m11 !== AIR ? w11 : 0
       const d = a00 + a10 + a01 + a11
       const o = py * rowW + px
+      const ni = ((py & (NS - 1)) << 8) | (px & (NS - 1))
       if (d < 0.42) {
-        terr32[o] = 0
+        // air: a soft shadow next to the earth (the tunnels look deep)
+        if (d > 0.04) {
+          const sh = Math.min(1, d / 0.42)
+          const al = Math.round(sh * sh * 150)
+          terr32[o] = (al << 24) | (8 << 16) | (14 << 8) | 24
+        } else terr32[o] = 0
         continue
       }
       const alpha = d < 0.5 ? (d - 0.42) / 0.08 : 1
+      const low = noiseLow[ni]!
+      const hi = noiseHi[ni]! / 255
+      // the patches: the picture is also taken from a place moved against it, and the two are mixed by the soft noise (no tile pattern shows)
       const tx = px % TW
+      const ty = (py % TW) * TW
+      const tx2 = (px + 131) % TW
+      const ty2 = ((py + 97) % TW) * TW
       let r = 0
       let g = 0
       let b = 0
@@ -204,15 +266,58 @@ function paintTerrain(cx0: number, cy0: number, cx1: number, cy1: number) {
         if (wt <= 0) continue
         const m = k === 0 ? m00 : k === 1 ? m10 : k === 2 ? m01 : m11
         const tl = tex[m]
-        const c = tl ? tl[ty + tx]! : FLAT[m]!
+        let c = FLAT[m]!
+        if (tl) {
+          const c1 = tl[ty + tx]!
+          const c2 = tl[ty2 + tx2]!
+          const mix = Math.min(1, Math.max(0, (low - 0.35) * 3))
+          const rr = (c1 & 255) * (1 - mix) + (c2 & 255) * mix
+          const gg = ((c1 >> 8) & 255) * (1 - mix) + ((c2 >> 8) & 255) * mix
+          const bb = ((c1 >> 16) & 255) * (1 - mix) + ((c2 >> 16) & 255) * mix
+          c = (255 << 24) | (Math.round(bb) << 16) | (Math.round(gg) << 8) | Math.round(rr)
+        }
         r += wt * (c & 255)
         g += wt * ((c >> 8) & 255)
         b += wt * ((c >> 16) & 255)
       }
-      // the rim is darker (a soft outline), the inside keeps the colours of the painting
-      const shade = 0.62 + 0.38 * Math.min(1, Math.max(0, (d - 0.5) / 0.42))
-      const kk = shade / d
-      terr32[o] = (Math.round(alpha * 255) << 24) | (Math.min(255, Math.round(b * kk)) << 16) | (Math.min(255, Math.round(g * kk)) << 8) | Math.min(255, Math.round(r * kk))
+      r /= d
+      g /= d
+      b /= d
+      const mc = d > 0.5 ? (a00 >= a10 && a00 >= a01 && a00 >= a11 ? m00 : a10 >= a01 && a10 >= a11 ? m10 : a01 >= a11 ? m01 : m11) : m00
+      // strata: soft bands go with the depth (humus, loam, gravel), they wave with the noise; deeper is darker and cooler
+      let light = 1.1 - 0.3 * yFrac + 0.1 * low - 0.05
+      if (mc === DIRT) {
+        const band = Math.sin(yFrac * 38 + low * 5)
+        light += 0.045 * band
+        r *= 1 + 0.03 * band
+        b *= 1 - 0.03 * band
+        // fine grains and a few dark specks
+        light += (hi - 0.5) * 0.1 + (hi > 0.985 ? -0.2 : 0)
+      } else if (mc === SAND) {
+        // loose sand: grains that glitter, ripples
+        light += (hi - 0.5) * 0.2 + (hi > 0.975 ? 0.25 : 0) + 0.05 * Math.sin(px * 0.35 + low * 8)
+      } else if (mc === ROCK) {
+        light -= 0.05
+        light += (hi - 0.5) * 0.06
+      } else if (mc === MUD) {
+        light += (hi > 0.97 ? 0.3 : 0) - 0.05
+      }
+      // light on the edges: from the upper left; a lit top edge, a dark underside, an inner edge that is a little darker
+      const edge = 1 - Math.min(1, Math.max(0, (d - 0.5) / 0.4))
+      if (edge > 0.01) {
+        const gy = dens(px, py + 3) - dens(px, py - 3)
+        const gx = dens(px + 3, py) - dens(px - 3, py)
+        // an edge that faces up or left is lit
+        const lit = -(gy * 0.8 + gx * 0.45)
+        light += edge * (lit > 0 ? 0.55 * lit : 0.7 * lit)
+        light -= edge * 0.18
+        if (mc === ROCK) light += edge * (lit > 0 ? 0.35 * lit : 0)
+      }
+      const k = light
+      r = Math.min(255, Math.max(0, r * k))
+      g = Math.min(255, Math.max(0, g * k))
+      b = Math.min(255, Math.max(0, b * k))
+      terr32[o] = (Math.round(alpha * 255) << 24) | (Math.round(b) << 16) | (Math.round(g) << 8) | Math.round(r)
     }
   }
   terrCtx.putImageData(terrData, 0, 0, px0, py0, px1 - px0 + 1, py1 - py0 + 1)
@@ -273,6 +378,14 @@ function paintWater(time: number) {
   const py1 = Math.min(H * WS - 1, (uy1 + 3) * WS)
   const rowW = W * WS
   const shimmer = time * 3
+  // how deep the water is under the surface (the cells of water above, counted down a column)
+  for (let x = Math.max(0, ux0 - 3); x <= Math.min(W - 1, ux1 + 3); x++) {
+    let dd = 0
+    for (let y = Math.max(0, uy0 - 3); y <= Math.min(H - 1, uy1 + 3); y++) {
+      dd = m[y * W + x]! > 0.3 ? Math.min(60, dd + 1) : 0
+      depth[y * W + x] = dd
+    }
+  }
   for (let py = py0; py <= py1; py++) {
     const v = (py + 0.5) / WS - 0.5
     const j0 = Math.floor(v)
@@ -302,17 +415,30 @@ function paintWater(time: number) {
       up = cj > 0 ? m[(cj - 1) * W + ci]! : 1
       const air = up > 1 ? 0 : 1 - up
       const alpha = d >= 0.4 ? 1 : (d - 0.09) / 0.31
-      let r = 34 + 40 * air
-      let g = 112 + 56 * air
-      let b = 196 + 30 * air
-      // a soft shine on the rim and moving glints
-      const rim = d < 0.62 ? (0.62 - d) * 1.4 : 0
-      const glint = air > 0.5 ? 0.06 * Math.sin(shimmer + px * 0.35) : 0
-      const add = (rim + glint) * 255
-      r = Math.min(255, r + add * 0.6)
-      g = Math.min(255, g + add * 0.8)
-      b = Math.min(255, b + add)
-      water32[o] = (Math.round(alpha * 235) << 24) | (Math.round(b) << 16) | (Math.round(g) << 8) | Math.round(r)
+      // shallow water is light and green-blue, deep water dark blue
+      const dp = Math.min(1, depth[cj * W + ci]! / 22)
+      let r = 70 - 52 * dp
+      let g = 190 - 100 * dp
+      let b = 235 - 60 * dp
+      // thin water (a stream, a film) is bright and streaky
+      if (d < 0.5) {
+        const th = (0.5 - d) / 0.4
+        r += 120 * th
+        g += 60 * th
+        b += 20 * th
+      }
+      // foam at the surface, a glassy shine below it, moving glints
+      const foam = air * (d < 0.8 ? 1 - Math.max(0, (d - 0.4) / 0.4) : 0)
+      const glint = air > 0.5 ? 0.5 + 0.5 * Math.sin(shimmer + px * 0.35 + py * 0.1) : 0
+      const sheen = air > 0.5 && d >= 0.5 ? 0.25 * glint : 0
+      const wh = Math.min(1, foam * 0.75 + sheen)
+      r += (240 - r) * wh
+      g += (250 - g) * wh
+      b += (255 - b) * wh
+      // a darker, bluer rim where the water touches the earth (the water is in the earth's shadow)
+      const wall = d < 0.7 ? 0 : 0
+      void wall
+      water32[o] = (Math.round(alpha * 238) << 24) | (Math.round(Math.min(255, b)) << 16) | (Math.round(Math.min(255, g)) << 8) | Math.round(Math.min(255, r))
     }
   }
   waterCtx.putImageData(waterData, 0, 0, px0, py0, px1 - px0 + 1, py1 - py0 + 1)
@@ -364,7 +490,9 @@ function onEvents(now: number) {
     } else if (e.type === 'drown') play('wrong')
     else if (e.type === 'gate') play('clunk')
     else if (e.type === 'sensor') play('snap')
-    else if (e.type === 'goal') {
+    else if (e.type === 'first') {
+      if (hasRock() && !struck) strikeT = 0.0001
+    } else if (e.type === 'goal') {
       play('fanfare')
       hud.won = true
     } else if (e.type === 'end') finish(e.phase)
@@ -388,10 +516,59 @@ function finish(phase: 'won' | 'lost') {
   }, phase === 'won' ? 500 : 900)
 }
 
+// ── the strike of Moses: the staff hits the rock, the cleft opens, then the water comes ─────────────────────────────────────
+/** Seconds since the staff began to swing (0: not struck yet); the water waits for STRIKE seconds. */
+let strikeT = 0
+let struck = false
+const SWING = 0.4
+const STRIKE = 0.95
+const hasRock = () => w.def.world === 0 && w.sources.some((s) => !s.cloud) && !!img['fels-zu'] && !!img['fels-auf']
+
+// ── little things in the earth (pebbles, roots, a fossil, a shard): painted, put in at random, gone when the earth is dug away ──
+interface Detail {
+  x: number
+  y: number
+  n: number
+  size: number
+  rot: number
+  cx: number
+  cy: number
+}
+let details: Detail[] = []
+function makeDetails() {
+  details = []
+  let seed = 0
+  for (const ch of w.def.id) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0
+  const rnd = () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0
+    return seed / 4294967296
+  }
+  for (let tries = 0; tries < 400 && details.length < 34; tries++) {
+    const x = 6 + rnd() * (W - 12)
+    const y = 30 + rnd() * (H - 38)
+    const cx = Math.floor(x)
+    const cy = Math.floor(y)
+    // only deep inside earth or rock (not at an edge: all around is solid)
+    let solid = true
+    for (let dy = -4; dy <= 4 && solid; dy += 2) for (let dx = -4; dx <= 4; dx += 2) if (w.mat[(cy + dy) * W + cx + dx] === AIR || w.vmask[(cy + dy) * W + cx + dx]) solid = false
+    const m = w.mat[cy * W + cx]
+    if (!solid || (m !== DIRT && m !== ROCK && m !== SAND)) continue
+    const n = Math.floor(rnd() * 8) + 1
+    details.push({ x, y, n, size: 3.2 + rnd() * 3.2, rot: (rnd() - 0.5) * 1.6, cx, cy })
+  }
+}
+
 // ── starting a level ────────────────────────────────────────────────────────────────────────────────────────────────────────
 function begin(i: number) {
   level.value = i
   w = newWorld(LEVELS[i]!)
+  tipStepsOf = tipSteps(w.def)
+  tipDraw = []
+  tipExtra = 0
+  lastTipIdx = -2
+  strikeT = 0
+  struck = false
+  makeDetails()
   parts.length = 0
   waterBox = { x0: 0, y0: 0, x1: -1, y1: -1 }
   if (water32) water32.fill(0)
@@ -406,16 +583,59 @@ function begin(i: number) {
   screen.value = 'play'
   how.value = !howSeen(ID)
   paused.value = how.value
+  story.value = null
+  if (!how.value) maybeStory()
   tipShown.value = false
   tipT = 0
   hintAfter = 0
   setProbe()
-  if (!how.value) hintOnce(w.def.intro)
+  if (!how.value && !story.value) hintOnce(w.def.intro)
 }
 
 function closeHow() {
   how.value = false
   markHowSeen(ID)
+  if (screen.value === 'play') {
+    if (maybeStory()) return
+    paused.value = false
+    hintOnce(w.def.intro)
+  }
+}
+
+// ── the story of a world (what it is about, what the task is): shown at the first level of a world once, and from the banner of the list ──
+const STORY_KEY = 'lk-wasser-story-v1'
+const story = ref<{ world: number } | null>(null)
+const storyTexts = computed(() => ((tm('app.bigGames.wasser.story') as unknown as { text: Parameters<typeof rt>[0]; task: Parameters<typeof rt>[0] }[]) ?? []).map((m) => ({ text: rt(m.text), task: rt(m.task) })))
+function storySeen(wi: number): boolean {
+  try {
+    return (JSON.parse(localStorage.getItem(STORY_KEY) ?? '{}') as Record<string, boolean>)[String(wi)] === true
+  } catch {
+    return false
+  }
+}
+function markStory(wi: number) {
+  try {
+    const all = JSON.parse(localStorage.getItem(STORY_KEY) ?? '{}') as Record<string, boolean>
+    all[String(wi)] = true
+    localStorage.setItem(STORY_KEY, JSON.stringify(all))
+  } catch {
+    // not remembered: the story comes again
+  }
+}
+/** The first level of a world that was not seen yet tells the story first (the game waits). */
+function maybeStory(): boolean {
+  const wi = w.def.world
+  if (level.value !== LEVELS.findIndex((l) => l.world === wi) || storySeen(wi)) return false
+  story.value = { world: wi }
+  paused.value = true
+  return true
+}
+function openStory(wi: number) {
+  story.value = { world: wi }
+}
+function closeStory() {
+  if (story.value) markStory(story.value.world)
+  story.value = null
   if (screen.value === 'play') {
     paused.value = false
     hintOnce(w.def.intro)
@@ -431,14 +651,29 @@ function toMenu() {
 let tipT = 0
 let hintAfter = 0
 /** The line of the tip button (a short way that can be dug) is shown for a few seconds. */
-function showTip(sec = 4.5) {
-  tipT = sec
-  tipText.value = t('app.bigGames.wasser.tipText')
+function showTip(sec = 5) {
+  // the next piece of the kept way that is not dug yet; a second press without progress adds the piece after it
+  const idx = nextTipStep(w, tipStepsOf)
+  if (idx < 0) {
+    tipT = 0
+    tipDraw = []
+    tipText.value = t('app.bigGames.wasser.tipDone')
+  } else {
+    tipExtra = idx === lastTipIdx ? Math.min(tipExtra + 1, 3) : 0
+    lastTipIdx = idx
+    tipDraw = tipStepsOf.slice(idx, idx + 1 + tipExtra)
+    tipT = sec
+    tipText.value = t('app.bigGames.wasser.tipText')
+  }
   tipShown.value = true
   window.clearTimeout(tipTimer)
   tipTimer = window.setTimeout(() => (tipShown.value = false), sec * 1000)
 }
 let tipTimer = 0
+let tipStepsOf: Pt[][] = []
+let tipDraw: Pt[][] = []
+let tipExtra = 0
+let lastTipIdx = -2
 const tipText = ref('')
 
 /** The first level of a thing says a word about it (once on a device). */
@@ -463,9 +698,6 @@ function hintOnce(intro: string | undefined) {
   window.clearTimeout(tipTimer)
   tipTimer = window.setTimeout(() => (tipShown.value = false), 8000)
 }
-function tipLine(): Stroke {
-  return w.def.tip
-}
 
 // ── the touch ───────────────────────────────────────────────────────────────────────────────────────────────────────────────
 let pressing = false
@@ -475,7 +707,7 @@ let pointer: { x: number; y: number } | null = null
 function cellPos(e: PointerEvent): { x: number; y: number } {
   const c = canvas.value!
   const r = c.getBoundingClientRect()
-  return { x: (e.clientX - r.left - fx) / cell, y: (e.clientY - r.top - fy) / cell }
+  return { x: (e.clientX - r.left - fx) / cell, y: (e.clientY - r.top - fy) / cellY }
 }
 function onDown(e: PointerEvent) {
   if (screen.value !== 'play' || paused.value) return
@@ -510,9 +742,16 @@ function resize() {
   cvH = box.height || window.innerHeight
   c.width = Math.round(cvW * dpr)
   c.height = Math.round(cvH * dpr)
-  cell = Math.min(cvW / W, cvH / H)
+  // the field fills the screen: on a tall screen it is a little stretched upwards (the pictures keep their shape) and sits at the top, under it the bedrock
+  const base = Math.min(cvW / W, cvH / H)
+  cell = base
+  cellY = base
   fx = (cvW - W * cell) / 2
-  fy = (cvH - H * cell) / 2
+  fy = (cvH - H * cellY) / 2
+  if (base === cvW / W && cvH / H > base * 1.02) {
+    cellY = Math.min(cvH / H, base * STRETCH)
+    fy = 0
+  }
 }
 
 function frame(now: number) {
@@ -526,6 +765,23 @@ function frame(now: number) {
 /** Runs the simulation for the time that has passed (fixed steps). */
 function advance(dt: number, now: number) {
   if (screen.value !== 'play' || paused.value) return
+  // the strike of Moses: the water waits until the cleft is open
+  if (strikeT > 0 && strikeT < STRIKE) {
+    strikeT += dt
+    if (!struck && strikeT >= SWING) {
+      struck = true
+      play('hit')
+      const s0 = w.sources.find((s) => !s.cloud)
+      if (s0) for (let i = 0; i < 26; i++) spawn({ x: s0.x0 + K / 2 + (rand() - 0.5) * 8, y: s0.y0 + 6, vx: (rand() - 0.5) * 50, vy: -10 - rand() * 40, life: 0.5 + rand() * 0.5, r: 0.8 + rand() * 1.4, kind: i % 3 === 0 ? 'spark' : 'dust', color: i % 3 === 0 ? '#ffe9a0' : '#cdbb98' })
+    }
+    for (const p of parts) {
+      p.t += dt
+      p.x += p.vx * dt
+      p.y += p.vy * dt
+      p.vy += 60 * dt
+    }
+    return
+  }
   acc += dt
   let n = 0
   while (acc >= 1 / SIM_HZ && n < 8) {
@@ -559,6 +815,8 @@ function sprite(c: CanvasRenderingContext2D, name: string, cx: number, bottom: n
   const wd = (i.width / i.height) * height
   c.save()
   c.translate(cx, bottom)
+  // the field may be stretched upwards: the pictures keep their shape
+  c.scale(1, cell / cellY)
   if (rot) c.rotate(rot)
   if (alpha < 1) c.globalAlpha = alpha
   c.drawImage(i, -wd / 2, -height, wd, height)
@@ -585,11 +843,32 @@ function draw(time: number, dt: number) {
     c.fillStyle = 'rgba(20,12,6,0.45)'
     c.fillRect(0, 0, cvW, cvH)
   }
+  // under the field (on a tall screen) lies the bedrock
+  const fieldBottom = fy + H * cellY
+  if (fieldBottom < cvH - 1) {
+    const rock = img[`fels-${wi + 1}`]
+    if (rock) {
+      c.save()
+      c.beginPath()
+      c.rect(fx, fieldBottom - 1, W * cell, cvH - fieldBottom + 1)
+      c.clip()
+      c.fillStyle = c.createPattern(rock, 'repeat') ?? '#555'
+      c.translate(fx, fieldBottom)
+      c.scale(cell * 0.45, cell * 0.45)
+      c.fillRect(0, 0, (W * cell) / (cell * 0.45), (cvH - fieldBottom) / (cell * 0.45))
+      c.restore()
+    }
+    const g = c.createLinearGradient(0, fieldBottom, 0, cvH)
+    g.addColorStop(0, 'rgba(10,6,3,0.15)')
+    g.addColorStop(1, 'rgba(10,6,3,0.8)')
+    c.fillStyle = g
+    c.fillRect(fx, fieldBottom, W * cell, cvH - fieldBottom)
+  }
   c.save()
   c.beginPath()
-  c.rect(fx, fy, W * cell, H * cell)
+  c.rect(fx, fy, W * cell, H * cellY)
   c.clip()
-  c.setTransform(dpr * cell, 0, 0, dpr * cell, dpr * fx, dpr * fy)
+  c.setTransform(dpr * cell, 0, 0, dpr * cellY, dpr * fx, dpr * fy)
   if (bg) c.drawImage(bg, 0, 0, W, H)
   else {
     c.fillStyle = '#7a5a3c'
@@ -610,14 +889,50 @@ function draw(time: number, dt: number) {
   }
   if (terrCanvas) c.drawImage(terrCanvas, 0, 0, W, H)
 
-  // the sources: a spring rock, a cloud
+  // little things in the earth: only where the earth is still there
+  for (const d of details) {
+    if (w.mat[d.cy * W + d.cx] === AIR) continue
+    const i = img[`detail-${d.n}`]
+    if (!i) continue
+    const h = d.size
+    c.save()
+    c.translate(d.x, d.y)
+    c.scale(1, cell / cellY)
+    c.rotate(d.rot)
+    c.globalAlpha = 0.92
+    c.drawImage(i, (-i.width / i.height) * h * 0.5, -h * 0.5, (i.width / i.height) * h, h)
+    c.restore()
+  }
+  // the sources: the cloven rock of Moses, a spring rock, a cloud, and the stream that leaves them (right under them)
+  const flowing = w.started && w.phase === 'play' && w.supplyLeft > 0 && !(strikeT > 0 && strikeT < STRIKE)
   for (const s of w.sources) {
+    const cx = s.x0 + K / 2
     if (s.cloud) {
       const grow = 0.72 + 0.4 * Math.min(1, w.clock / 6)
-      sprite(c, 'wolke', s.x0 + K / 2, s.y0 + 8 + Math.sin(time * 0.8) * 0.8, 20 * grow)
+      sprite(c, 'wolke', cx, s.y0 + 8 + Math.sin(time * 0.8) * 0.8, 20 * grow)
+    } else if (hasRock()) {
+      const open = strikeT >= SWING || w.started
+      const shake = strikeT > SWING && strikeT < STRIKE ? Math.sin(strikeT * 90) * 0.5 : 0
+      sprite(c, open ? 'fels-auf' : 'fels-zu', cx + shake, s.y0 + K + 1, 25)
+      // the staff: leans beside the rock, swings over and hits it
+      const i = img.stab
+      if (i) {
+        const t = strikeT <= 0 ? 0 : Math.min(1, strikeT / SWING)
+        const ease = t * t * (3 - 2 * t)
+        const ang = 1.3 - 1.65 * ease
+        c.save()
+        c.translate(cx + 10, s.y0 - 6)
+        c.scale(1, cell / cellY)
+        c.rotate(ang)
+        c.globalAlpha = strikeT >= STRIKE ? Math.max(0, 1 - (strikeT - STRIKE) * 4) : 1
+        const hh = 22
+        c.drawImage(i, -((i.width / i.height) * hh) / 2, 0, (i.width / i.height) * hh, hh)
+        c.restore()
+      }
     } else {
-      sprite(c, 'quelle', s.x0 + K / 2, s.y0 + K + 3, 14)
+      sprite(c, 'quelle', cx, s.y0 + K + 3, 14)
     }
+    if (flowing && w.m[s.cells[0]!]! > 0.05) drawStream(c, s, cx, time)
   }
   // the mark of the vessel
   drawMark(c, time)
@@ -679,6 +994,27 @@ function draw(time: number, dt: number) {
   c.restore()
 }
 
+/** The jet or the rain: a bright falling stream from the hole of the rock (or the underside of the cloud) down to where it lands, with a spray at the foot. */
+function drawStream(c: CanvasRenderingContext2D, s: { x0: number; y0: number; cloud: boolean }, cx: number, time: number) {
+  const top = s.cloud ? s.y0 + 9 : s.y0 + K - 1
+  let y = Math.floor(top)
+  const col = Math.floor(cx)
+  while (y < H - 1 && w.mat[(y + 1) * W + col] === AIR && w.m[(y + 1) * W + col]! < 0.5) y++
+  const wd = s.cloud ? 2.2 : 3
+  const g = c.createLinearGradient(0, top, 0, y)
+  g.addColorStop(0, 'rgba(190,230,255,0.85)')
+  g.addColorStop(1, 'rgba(120,190,245,0.6)')
+  c.fillStyle = g
+  c.fillRect(cx - wd / 2, top, wd, Math.max(0, y - top))
+  // bright streaks run down it
+  c.fillStyle = 'rgba(255,255,255,0.75)'
+  for (let k = 0; k < 4; k++) {
+    const yy = top + (((time * 90 + k * 17) % 68) / 68) * Math.max(1, y - top)
+    c.fillRect(cx - wd / 2 + (k % 2) * (wd / 2), yy, wd / 2.2, 3.5)
+  }
+  if (rand() < 0.5) spawn({ x: cx + (rand() - 0.5) * 3, y, vx: (rand() - 0.5) * 36, vy: -8 - rand() * 16, life: 0.4 + rand() * 0.3, r: 0.4 + rand() * 0.5, kind: 'drop', color: '#d8f0ff' })
+}
+
 function drawMark(c: CanvasRenderingContext2D, time: number) {
   // the vessel: the line up to which it must be filled
   const y = w.markY
@@ -715,35 +1051,38 @@ function drawMark(c: CanvasRenderingContext2D, time: number) {
 }
 
 function drawTip(c: CanvasRenderingContext2D, time: number) {
-  const pts = tipLine().pts
-  if (pts.length < 2) return
-  c.fillStyle = 'rgba(255,245,200,0.95)'
-  let len = 0
-  const segs: number[] = []
-  for (let i = 1; i < pts.length; i++) {
-    const l = Math.hypot((pts[i]![0] - pts[i - 1]![0]) * K, (pts[i]![1] - pts[i - 1]![1]) * K)
-    segs.push(l)
-    len += l
-  }
-  const head = ((time * 40) % (len + 20))
-  for (let d = 0; d < len; d += 5) {
-    let rem = d
-    let i = 0
-    while (i < segs.length && rem > segs[i]!) {
-      rem -= segs[i]!
-      i++
+  const head0 = time * 40
+  let base = 0
+  for (const pts of tipDraw) {
+    const segs: number[] = []
+    let len = 0
+    for (let i = 1; i < pts.length; i++) {
+      const l = Math.hypot((pts[i]![0] - pts[i - 1]![0]) * K, (pts[i]![1] - pts[i - 1]![1]) * K)
+      segs.push(l)
+      len += l
     }
-    if (i >= segs.length) break
-    const a = pts[i]!
-    const b = pts[i + 1]!
-    const f = segs[i]! > 0 ? rem / segs[i]! : 0
-    const x = (a[0] + (b[0] - a[0]) * f) * K
-    const y = (a[1] + (b[1] - a[1]) * f) * K
-    const near = Math.abs(d - head)
-    c.globalAlpha = near < 14 ? 1 : 0.55
-    c.beginPath()
-    c.arc(x, y, near < 14 ? 1.6 : 1.0, 0, Math.PI * 2)
-    c.fill()
+    const head = head0 % (len + 20)
+    // the dots glow golden and the one that travels is bigger
+    for (let d = 0; d <= len; d += 4.5) {
+      let rem = d
+      let i = 0
+      while (i < segs.length - 1 && rem > segs[i]!) {
+        rem -= segs[i]!
+        i++
+      }
+      const a = pts[i]!
+      const b = pts[i + 1] ?? a
+      const f = segs[i] ? Math.min(1, rem / segs[i]!) : 0
+      const x = (a[0] + (b[0] - a[0]) * f) * K
+      const y = (a[1] + (b[1] - a[1]) * f) * K
+      const near = Math.abs(d - head)
+      c.globalAlpha = near < 12 ? 1 : 0.7
+      c.fillStyle = near < 12 ? '#fff6c8' : '#ffd86a'
+      c.beginPath()
+      c.arc(x, y, near < 12 ? 1.8 : 1.2, 0, Math.PI * 2)
+      c.fill()
+    }
+    base += len
   }
   c.globalAlpha = 1
 }
@@ -835,7 +1174,7 @@ onBeforeUnmount(() => {
         h1(class="wg-title") {{ t('app.bigGames.wasser.title') }}
         p(class="wg-text") {{ t('app.bigGames.wasser.intro') }}
         div(v-for="(wt, wi) in worldTexts" :key="wi" class="wg-world")
-          div(class="wg-banner")
+          div(class="wg-banner" :data-test="'wasser-banner-' + wi" @click="openStory(wi)")
             img(:src="bannerSrc(wi)" alt="" class="wg-banner-pic" @error="hideBroken")
             div(class="wg-banner-text")
               span(class="wg-world-name") {{ wt.name }}
@@ -869,12 +1208,12 @@ onBeforeUnmount(() => {
           span(class="wg-level-label") {{ levelTitle(level) }}
           div(class="wg-flowers")
             img(v-for="(on, i) in hud.flowers" :key="i" :src="flowerSrc(i, on)" alt="" :class="['wg-flower', { 'is-on': on }]" @error="hideBroken")
+          div(class="wg-stars-live" :aria-label="t('app.bigGames.wasser.stars')")
+            span(v-for="n in 3" :key="n" :class="['wg-star', { 'is-on': n <= starsLive }]") ★
         div(class="wg-hud-right")
           div(class="wg-jar" :aria-label="t('app.bigGames.wasser.jar')")
             img(:src="vesselSrc" alt="" class="wg-jar-base" @error="hideBroken")
             img(:src="vesselSrc" alt="" class="wg-jar-fill" :style="fillStyle" @error="hideBroken")
-          div(class="wg-stars-live" :aria-label="t('app.bigGames.wasser.stars')")
-            span(v-for="n in 3" :key="n" :class="['wg-star', { 'is-on': n <= starsLive }]") ★
       div(v-if="tipShown" class="wg-tip") {{ tipText }}
 
       div(v-if="paused && !how" class="wg-menu wg-menu--dim")
@@ -898,10 +1237,24 @@ onBeforeUnmount(() => {
         AdvButton(:tone="outcome.phase === 'won' && hasNext ? 'blau' : 'gold'" data-test="wasser-again" @click="begin(level)") {{ t('app.bigGames.wasser.again') }}
         AdvButton(tone="blau" data-test="wasser-menu" @click="toMenu") {{ t('app.bigGames.wasser.menu') }}
 
+    //- the story of a world: what it is about and what the task is
+    div(v-if="story && loaded" class="wg-menu wg-menu--dim")
+      div(class="wg-card wg-story")
+        div(class="wg-story-pic")
+          img(:src="bannerSrc(story.world)" alt="" class="wg-banner-pic" @error="hideBroken")
+        h2(class="wg-title") {{ worldTexts[story.world]?.name }}
+        p(class="wg-world-ref wg-story-ref") {{ worldTexts[story.world]?.ref }}
+        p(class="wg-story-text") {{ storyTexts[story.world]?.text }}
+        p(class="wg-story-task")
+          span(class="wg-story-label") {{ t('app.bigGames.wasser.taskLabel') }}
+          |  {{ storyTexts[story.world]?.task }}
+        AdvButton(data-test="wasser-story-go" @click="closeStory") {{ t('app.bigGames.wasser.go') }}
+
     //- the explanation (once; the question mark in the menu brings it back)
     div(v-if="how && loaded" class="wg-menu wg-menu--dim")
       div(class="wg-card wg-how")
         h2(class="wg-title") {{ t('app.bigGames.wasser.howTitle') }}
+        p(class="wg-story-text") {{ t('app.bigGames.wasser.intro') }}
         div(class="wg-how-row")
           span(class="wg-how-sign") 👆
           p(class="wg-how-line") {{ t('app.bigGames.wasser.howDig') }}
@@ -1111,12 +1464,12 @@ onBeforeUnmount(() => {
 
 .wg-hud-left
   display: flex
-  flex-direction: column
-  gap: 8px
+  flex-direction: row
+  gap: 6px
 
 .wg-btn
-  width: 48px
-  height: 48px
+  width: 46px
+  height: 46px
   border: none
   border-radius: 50%
   background: rgba(255, 250, 235, 0.9)
@@ -1130,12 +1483,12 @@ onBeforeUnmount(() => {
   display: flex
   flex-direction: column
   align-items: center
-  gap: 4px
-  padding: 4px 12px
+  gap: 2px
+  padding: 3px 10px
   border-radius: 16px
   background: rgba(255, 250, 235, 0.86)
   font-weight: 800
-  max-width: 44vw
+  max-width: 40vw
   text-align: center
 
 .wg-level-label
@@ -1145,10 +1498,10 @@ onBeforeUnmount(() => {
 .wg-flowers
   display: flex
   gap: 4px
-  min-height: 30px
+  min-height: 26px
 
 .wg-flower
-  height: 30px
+  height: 26px
   width: auto
   filter: grayscale(0.55) brightness(0.9)
   transition: filter 0.4s, transform 0.4s
@@ -1165,8 +1518,8 @@ onBeforeUnmount(() => {
 
 .wg-jar
   position: relative
-  width: 54px
-  height: 54px
+  width: 50px
+  height: 50px
   padding: 4px
   border-radius: 14px
   background: rgba(255, 250, 235, 0.86)
@@ -1175,8 +1528,8 @@ onBeforeUnmount(() => {
   position: absolute
   left: 4px
   top: 4px
-  width: 46px
-  height: 46px
+  width: 42px
+  height: 42px
   object-fit: contain
 
 .wg-jar-base
@@ -1185,12 +1538,11 @@ onBeforeUnmount(() => {
 .wg-stars-live
   display: flex
   gap: 1px
-  padding: 2px 8px
-  border-radius: 999px
-  background: rgba(255, 250, 235, 0.86)
+  padding: 0
 
 .wg-star
-  font-size: 1.15rem
+  font-size: 1rem
+  line-height: 1
   color: #b9ae96
 
   &.is-on
@@ -1252,4 +1604,44 @@ onBeforeUnmount(() => {
   text-align: left
   font-size: 0.95rem
   line-height: 1.35
+.wg-banner
+  cursor: pointer
+
+.wg-story
+  gap: 8px
+
+.wg-story-pic
+  position: relative
+  width: 100%
+  height: 120px
+  border-radius: 16px
+  overflow: hidden
+  background: #4a3320
+
+.wg-story-ref
+  margin: -4px 0 0
+  color: var(--lk-muted, #7a6b4f)
+
+.wg-story-text
+  margin: 0
+  line-height: 1.45
+  font-size: 1rem
+
+.wg-story-task
+  margin: 0
+  line-height: 1.45
+  font-size: 1rem
+  padding: 8px 12px
+  border-radius: 14px
+  background: var(--lk-surface-2, #f6efdc)
+
+.wg-story-label
+  font-weight: 800
+  color: #b87a10
+
+@media (orientation: landscape) and (max-height: 520px)
+  .wg-hud-left
+    flex-direction: column
+  .wg-hud
+    padding-top: 6px
 </style>
