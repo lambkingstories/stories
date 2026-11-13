@@ -589,7 +589,9 @@ function draw(time: number, dt: number) {
   c.fillRect(0, 0, cvW, cvH)
   if (screen.value === 'menu') return
   const chap = chapterOf(level.value)
-  const bg = img[`szene-${chap + 1}`]
+  let bg = img[`szene-${chap + 1}`]
+  for (let k = chap; !bg && k >= 0; k--) bg = img[`szene-${k + 1}`]
+  for (let k = chap + 2; !bg && k <= 6; k++) bg = img[`szene-${k}`]
   if (bg) {
     const k = Math.max(cvW / bg.width, cvH / bg.height)
     c.drawImage(bg, (cvW - bg.width * k) / 2, (cvH - bg.height * k) / 2, bg.width * k, bg.height * k)
@@ -877,7 +879,8 @@ onBeforeUnmount(() => {
           button(type="button" class="nm-btn" :aria-label="t('app.bigGames.nehemia.pause')" data-test="nehemia-pause" @click="paused = true") ❚❚
           button(type="button" class="nm-btn" :aria-label="t('app.bigGames.nehemia.restart')" data-test="nehemia-restart" @click="begin(level)") ↻
           button(type="button" class="nm-btn" :aria-label="t('app.bigGames.nehemia.tip')" data-test="nehemia-tip" @click="aTip")
-            img(:src="sym('tip')" alt="" class="nm-btn-pic" @error="hideBroken")
+            span(class="nm-glyph") ✦
+            img(:src="sym('tip')" alt="" class="nm-btn-pic nm-btn-pic--over" @error="hideBroken")
         div(class="nm-info")
           span(class="nm-level-label") {{ chapterTexts[chapterOf(level)]?.name }} · {{ levelLabel(level) }}
           div(class="nm-stars-live" :aria-label="t('app.bigGames.nehemia.starRules')")
@@ -898,17 +901,23 @@ onBeforeUnmount(() => {
 
       div(class="nm-ctrl")
         button(type="button" class="nm-cbtn" :aria-label="t('app.bigGames.nehemia.rotL')" data-test="nehemia-rotl" @click="aRotate(-1)")
+          span(class="nm-glyph") ↺
           img(:src="sym('rotl')" alt="" class="nm-cpic" @error="hideBroken")
         button(type="button" class="nm-cbtn nm-cbtn--big" :aria-label="t('app.bigGames.nehemia.drop')" data-test="nehemia-drop" @click="aDrop")
+          span(class="nm-glyph") ⤓
           img(:src="sym('drop')" alt="" class="nm-cpic" @error="hideBroken")
         button(type="button" class="nm-cbtn" :aria-label="t('app.bigGames.nehemia.rotR')" data-test="nehemia-rotr" @click="aRotate(1)")
+          span(class="nm-glyph") ↻
           img(:src="sym('rotr')" alt="" class="nm-cpic" @error="hideBroken")
         button(type="button" :class="['nm-cbtn', { 'is-glow': hud.stuck && hud.undoLeft > 0 }]" :disabled="hud.undoLeft <= 0" :aria-label="t('app.bigGames.nehemia.undo')" data-test="nehemia-undo" @click="aUndo")
+          span(class="nm-glyph") ↶
           img(:src="sym('undo')" alt="" class="nm-cpic" @error="hideBroken")
           span(class="nm-count") {{ hud.undoLeft }}
         button(v-if="hud.decoy" type="button" class="nm-cbtn is-glow" :aria-label="t('app.bigGames.nehemia.discard')" data-test="nehemia-discard" @click="aDiscard")
+          span(class="nm-glyph") ✕
           img(:src="sym('trash')" alt="" class="nm-cpic" @error="hideBroken")
         div(v-else class="nm-cbtn nm-cbtn--info" :aria-label="t('app.bigGames.nehemia.clay')")
+          span(class="nm-glyph") ■
           img(:src="sym('clay')" alt="" class="nm-cpic" @error="hideBroken")
           span(class="nm-count") {{ hud.clay }}
       div(v-if="hud.stuck" class="nm-stuck" data-test="nehemia-stuck") {{ t('app.bigGames.nehemia.stuck') }}
@@ -1189,6 +1198,7 @@ onBeforeUnmount(() => {
   gap: 6px
 
 .nm-btn
+  position: relative
   display: grid
   place-items: center
   width: 48px
@@ -1305,9 +1315,21 @@ onBeforeUnmount(() => {
     animation: nm-glow 1s ease-in-out infinite
 
 .nm-cpic
+  position: absolute
+  inset: 8%
   width: 84%
   height: 84%
   object-fit: contain
+
+.nm-glyph
+  font-size: 1.6rem
+  font-weight: 800
+  color: #6b4a1a
+
+.nm-btn-pic--over
+  position: absolute
+  left: 7px
+  top: 7px
 
 .nm-count
   position: absolute
