@@ -80,8 +80,45 @@ function loadAll(): Promise<void> {
         })
     )
   ).then(() => {
+    buildShine()
     loaded.value = true
   })
+}
+
+/**
+ * The soft gloss that wanders over the animals: for every picture a few frames in which only a light band shows, cut to the shape of the
+ * animal (made once from the painted picture, drawn over it while the band passes).
+ */
+const SHINE_FRAMES = 6
+const shine: Record<string, HTMLCanvasElement[]> = {}
+function buildShine() {
+  for (const n of NAMES) {
+    if (!(n.startsWith('tier-') || n.startsWith('sp-'))) continue
+    const i = img[n]
+    if (!i || !i.width) continue
+    const k = Math.min(1, 150 / Math.max(i.width, i.height))
+    const w = Math.max(1, Math.round(i.width * k))
+    const h = Math.max(1, Math.round(i.height * k))
+    const frames: HTMLCanvasElement[] = []
+    for (let f = 0; f < SHINE_FRAMES; f++) {
+      const cv = document.createElement('canvas')
+      cv.width = w
+      cv.height = h
+      const x = cv.getContext('2d')
+      if (!x) continue
+      x.drawImage(i, 0, 0, w, h)
+      x.globalCompositeOperation = 'source-in'
+      const gx = -0.35 * w + 1.7 * w * ((f + 0.5) / SHINE_FRAMES)
+      const gr = x.createLinearGradient(gx - w * 0.22, 0, gx + w * 0.22, h * 0.45)
+      gr.addColorStop(0, 'rgba(255,255,255,0)')
+      gr.addColorStop(0.5, 'rgba(255,255,255,0.75)')
+      gr.addColorStop(1, 'rgba(255,255,255,0)')
+      x.fillStyle = gr
+      x.fillRect(0, 0, w, h)
+      frames.push(cv)
+    }
+    if (frames.length === SHINE_FRAMES) shine[n] = frames
+  }
 }
 
 // ── the screens and what the page shows ─────────────────────────────────────────────────────────────────────────────────────
@@ -100,6 +137,9 @@ const firstOpen = () => {
 const chapterView = ref(Math.floor(firstOpen() / LEVELS_PER_CHAPTER))
 const chapterNames = computed(() => ((tm('app.bigGames.arche.chapters') as unknown as Parameters<typeof rt>[0][]) ?? []).map((m) => rt(m)))
 const chapterRefs = computed(() => ((tm('app.bigGames.arche.chapterRefs') as unknown as Parameters<typeof rt>[0][]) ?? []).map((m) => rt(m)))
+const chapterStories = computed(() => ((tm('app.bigGames.arche.chapterStories') as unknown as Parameters<typeof rt>[0][]) ?? []).map((m) => rt(m)))
+const chapterTasks = computed(() => ((tm('app.bigGames.arche.chapterTasks') as unknown as Parameters<typeof rt>[0][]) ?? []).map((m) => rt(m)))
+const barStyle = computed(() => ({ backgroundImage: `url(${pic('feld-dunkel')})` }))
 const cheers = computed(() => ((tm('app.bigGames.arche.cheer') as unknown as Parameters<typeof rt>[0][]) ?? []).map((m) => rt(m)))
 const chapterPairs = (c: number) => levelStars.value.slice(c * LEVELS_PER_CHAPTER, (c + 1) * LEVELS_PER_CHAPTER).filter((s) => (s ?? 0) > 0).length
 const allWon = computed(() => pairs.value >= LEVELS.length)
@@ -128,6 +168,7 @@ let cell = 40
 let bx = 0
 let by = 0
 let ft = 10
+let vignette: CanvasGradient | null = null
 const side = ref(false)
 
 interface Sprite {
@@ -161,6 +202,7 @@ let dispHp = new Uint8Array(0)
 let cellPop = new Float32Array(0)
 let cellShake = new Float32Array(0)
 
+type Shape = 'dot' | 'star' | 'leaf' | 'drop'
 interface Particle {
   x: number
   y: number
@@ -170,7 +212,9 @@ interface Particle {
   life: number
   size: number
   color: string
-  star: boolean
+  shape: Shape
+  rot: number
+  vr: number
 }
 const particles: Particle[] = []
 interface Fx {
@@ -192,6 +236,9 @@ let selected = -1
 let hintPair: { a: number; b: number } | null = null
 let idle = 0
 let clock = 0
+let blinkId = -1
+let blinkT = 0
+let blinkCd = 2
 
 const KIND_COLOR = ['#9db2d0', '#f2bf45', '#e48d33', '#f4ecd6', '#a87546', '#d8d8d8', '#78c850', '#d89a3a']
 
@@ -297,12 +344,13 @@ function runPhases(dt: number) {
 }
 
 // ── effects ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-function burst(x: number, y: number, color: string, n: number, speed = 260, star = false) {
+function burst(x: number, y: number, color: string, n: number, speed = 260, shape: Shape | boolean = 'dot') {
+  const sh: Shape = shape === true ? 'star' : shape === false ? 'dot' : shape
   for (let i = 0; i < n; i++) {
-    if (particles.length > 260) particles.shift()
+    if (particles.length > 300) particles.shift()
     const a = Math.random() * Math.PI * 2
     const v = speed * (0.35 + Math.random() * 0.75)
-    particles.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 90, t: 0, life: 0.45 + Math.random() * 0.4, size: (star ? 5 : 3) + Math.random() * 4, color, star })
+    particles.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 90, t: 0, life: 0.45 + Math.random() * 0.45, size: (sh === 'star' ? 6 : sh === 'dot' ? 3 : 4.5) + Math.random() * 4, color, shape: sh, rot: Math.random() * 6, vr: (Math.random() - 0.5) * 12 })
   }
 }
 const cellXY = (idx: number) => ({ x: colOf(g, idx) + 0.5, y: rowOf(g, idx) + 0.5 })
@@ -368,6 +416,7 @@ function playStep(step: Step, bonusStep = false) {
         play('flip', 0.9)
       } else if (e.type === 'olive' || e.type === 'bigolive') {
         fxs.push({ type: 'ring', x0: c.x, y0: c.y, x1: e.type === 'olive' ? 2.6 : 4.2, y1: 0, t: 0, dur: 0.45, delay: 0 })
+        burst(px(c.x), py(c.y), '#8fcf5a', 18, 340, 'leaf')
         play('snap', 0.9)
         if (e.type === 'bigolive') shake(1.2)
       } else if (e.type === 'cross' || e.type === 'bigcross') {
@@ -406,7 +455,8 @@ function playStep(step: Step, bonusStep = false) {
       s.ddelay = delay
       maxDelay = Math.max(maxDelay, delay)
       const c = cellXY(cl.idx)
-      burst(px(c.x), py(c.y), KIND_COLOR[cl.kind] ?? '#fff', 7 + step.cascade * 2)
+      burst(px(c.x), py(c.y), KIND_COLOR[cl.kind] ?? '#fff', 6 + step.cascade * 2)
+      burst(px(c.x), py(c.y), '#fff3b0', 3, 230, 'star')
       if (cl.cage) burst(px(c.x), py(c.y), '#d9a441', 10, 200, true)
     }
     for (const h of step.hits) {
@@ -431,7 +481,7 @@ function playStep(step: Step, bonusStep = false) {
       } else if (h.what === 'water') {
         dispType[h.idx] = FLOOR
         cellPop[h.idx] = 0
-        burst(px(c.x), py(c.y), '#7fd0ee', 12, 240)
+        burst(px(c.x), py(c.y), '#7fd0ee', 12, 240, 'drop')
         play('right', 0.5)
       } else {
         dispType[h.idx] = FLOOR
@@ -465,6 +515,8 @@ function playStep(step: Step, bonusStep = false) {
         s = newSprite(f.id, f.kind, f.special, f.cage, false, f.fc, f.fr)
         addSprite(s)
       }
+      // (in a long chain the rules may have given a falling animal another kind)
+      s.kind = f.kind
       const dist = Math.hypot(f.tr - s.y, f.tc - s.x)
       if (dist < 0.01) continue
       const n = spawnDelay.get(f.fc) ?? 0
@@ -518,7 +570,7 @@ function enqueueTurn(turn: Turn) {
       dispType[f.idx] = WATER
       cellPop[f.idx] = 0
       const c = cellXY(f.idx)
-      burst(px(c.x), py(c.y), '#7fd0ee', 14, 240)
+      burst(px(c.x), py(c.y), '#7fd0ee', 14, 240, 'drop')
       say(T('flood'), 0.9)
       play('wrong', 0.4)
     }, () => { for (const s of [...list]) if (s.dying) dropSprite(s) })
@@ -804,23 +856,30 @@ function resize() {
   side.value = vw > vh && vh <= 560
   const hudR = hudEl.value?.getBoundingClientRect()
   const boostR = boostEl.value?.getBoundingClientRect()
-  let left = 6
-  let right = vw - 6
-  let top = 6
-  let bottom = vh - 6
+  let left = 2
+  let right = vw - 2
+  let top = 2
+  let bottom = vh - 2
   if (side.value) {
-    left = (hudR?.right ?? 150) + 8
-    right = (boostR?.left ?? vw - 80) - 8
+    left = (hudR?.right ?? 130) + 4
+    right = (boostR?.left ?? vw - 72) - 2
   } else {
-    top = (hudR?.bottom ?? 120) + 6
-    bottom = (boostR?.top ?? vh - 90) - 6
+    top = (hudR?.bottom ?? 100) + 2
+    bottom = (boostR?.top ?? vh - 70) - 2
   }
   const aw = Math.max(100, right - left)
   const ah = Math.max(100, bottom - top)
   const cols = g.cols
   const rows = g.rows
-  cell = Math.max(24, Math.min(Math.floor(aw / (cols + 0.6)), Math.floor(ah / (rows + 0.6)), 104))
-  ft = cell * 0.3
+  cell = Math.max(24, Math.min(Math.floor(aw / (cols + 0.42)), Math.floor(ah / (rows + 0.42)), 124))
+  ft = cell * 0.21
+  // the dark edge of the picture (made once per size)
+  const cc = ctx
+  if (cc) {
+    vignette = cc.createRadialGradient(vw / 2, vh / 2, Math.min(vw, vh) * 0.3, vw / 2, vh / 2, Math.max(vw, vh) * 0.75)
+    vignette.addColorStop(0, 'rgba(10,18,30,0)')
+    vignette.addColorStop(1, 'rgba(10,18,30,0.5)')
+  }
   bx = Math.round(left + (aw - cell * cols) / 2)
   by = Math.round(top + (ah - cell * rows) / 2)
 }
@@ -864,6 +923,7 @@ function update(dt: number) {
     const p = particles[i]!
     p.t += dt
     p.x += p.vx * dt
+    p.rot += p.vr * dt
     p.y += p.vy * dt
     p.vy += 700 * dt
     if (p.t >= p.life) particles.splice(i, 1)
@@ -879,6 +939,14 @@ function update(dt: number) {
     if (banner.t >= banner.dur) banner = null
   }
   if (shakeT > 0) shakeT = Math.max(0, shakeT - dt)
+  // now and then an animal blinks (it squints for a moment)
+  if (blinkT > 0) blinkT = Math.max(0, blinkT - dt)
+  blinkCd -= dt
+  if (blinkCd <= 0 && list.length) {
+    blinkId = list[Math.floor(Math.random() * list.length)]!.id
+    blinkT = 0.22
+    blinkCd = 0.9 + Math.random() * 1.6
+  }
   // a hint after a while of waiting
   if (screen.value === 'play' && !paused.value && !busy() && g.phase === 'play' && !down && mode.value === '') {
     idle += dt
@@ -894,7 +962,7 @@ function frame(now: number) {
   draw()
 }
 
-function fitDraw(c: CanvasRenderingContext2D, name: string, cx: number, cy: number, box: number, sx = 1, sy = 1, rot = 0, alpha = 1) {
+function fitDraw(c: CanvasRenderingContext2D, name: string, cx: number, cy: number, box: number, sx = 1, sy = 1, rot = 0, alpha = 1, glint = 0) {
   const i = img[name]
   if (!i) return
   const k = Math.min(box / i.width, box / i.height)
@@ -906,7 +974,26 @@ function fitDraw(c: CanvasRenderingContext2D, name: string, cx: number, cy: numb
   if (rot) c.rotate(rot)
   c.scale(sx, sy)
   c.drawImage(i, -w / 2, -h / 2, w, h)
+  if (glint > 0) {
+    const fr = shine[name]?.[Math.min(SHINE_FRAMES - 1, Math.floor(glint * SHINE_FRAMES))]
+    if (fr) {
+      c.globalAlpha = alpha * 0.9
+      c.drawImage(fr, -w / 2, -h / 2, w, h)
+    }
+  }
   c.restore()
+}
+
+/** A little four-pointed star (a sparkle). */
+function starPath(c: CanvasRenderingContext2D, x: number, y: number, r: number, rot: number) {
+  c.beginPath()
+  for (let k = 0; k < 8; k++) {
+    const a = rot + (k * Math.PI) / 4
+    const rr = k % 2 === 0 ? r : r * 0.3
+    if (k === 0) c.moveTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr)
+    else c.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr)
+  }
+  c.closePath()
 }
 
 /** A frame made of nine pieces: the corners stay as they are, the sides are stretched. */
@@ -940,7 +1027,7 @@ function glowAt(c: CanvasRenderingContext2D, x: number, y: number, r: number, co
 
 function drawTile(c: CanvasRenderingContext2D, s: Sprite) {
   let a = 1
-  let sc = 1 + 0.22 * s.pop
+  let sc = (1 + 0.22 * s.pop) * (s.dying || s.moving ? 1 : 1 + 0.016 * Math.sin(clock * 2.2 + s.id * 1.7))
   if (s.dying) {
     if (s.ddelay > 0) sc = 1
     else {
@@ -959,8 +1046,14 @@ function drawTile(c: CanvasRenderingContext2D, s: Sprite) {
     cy += w * cell * 0.05
     sc *= 1 + 0.06 * Math.abs(w)
   }
-  const sx = sc * (1 + 0.1 * s.squash)
-  const sy = sc * (1 - 0.13 * s.squash)
+  const blink = s.id === blinkId && blinkT > 0 ? Math.sin(Math.PI * (1 - blinkT / 0.22)) : 0
+  const sx = sc * (1 + 0.1 * s.squash + 0.03 * blink)
+  const sy = sc * (1 - 0.13 * s.squash - 0.1 * blink)
+  // the glossy band wanders over the board from corner to corner
+  const gph = (((clock * 0.34 - (s.x + s.y) * 0.2) % 1) + 1) % 1
+  const gl = gph < 0.2 && !s.dying ? gph / 0.2 : 0
+  // the animals that can be tapped with a helper glow softly
+  if (mode.value && !s.dying && s.kind !== BASKET && !(mode.value === 'swap' && (s.net || s.cage))) glowAt(c, cx, cy, cell * 0.56, 'rgba(255,244,170,0.95)', 0.28 + 0.14 * Math.sin(clock * 5 + s.id))
   c.globalAlpha = a
   // a soft shadow
   c.fillStyle = 'rgba(40,20,0,0.16)'
@@ -971,10 +1064,19 @@ function drawTile(c: CanvasRenderingContext2D, s: Sprite) {
     fitDraw(c, 'hi-korb', cx, cy, cell * 0.94, sx, sy, 0, a)
   } else if (s.special === RAINBOW) {
     glowAt(c, cx, cy, cell * 0.7, 'rgba(255,255,210,0.9)', 0.55 + 0.25 * Math.sin(clock * 5))
-    fitDraw(c, 'sp-regenbogen', cx, cy, cell * 1.0, sx, sy, 0, a)
+    fitDraw(c, 'sp-regenbogen', cx, cy, cell * 1.0, sx, sy, 0, a, gl)
   } else {
-    if (s.special !== 0) glowAt(c, cx, cy, cell * 0.66, s.special === OLIVE ? 'rgba(190,255,150,0.95)' : 'rgba(255,240,150,0.95)', 0.5 + 0.25 * Math.sin(clock * 5 + s.id))
-    fitDraw(c, `tier-${KIND_NAMES[s.kind] ?? 'schaf'}`, cx, cy, cell * (s.special ? 0.8 : 0.9), sx, sy, 0, a)
+    if (s.special !== 0) glowAt(c, cx, cy, cell * 0.72, s.special === OLIVE ? 'rgba(190,255,150,0.95)' : 'rgba(255,240,150,0.95)', 0.6 + 0.3 * Math.sin(clock * 5 + s.id))
+    fitDraw(c, `tier-${KIND_NAMES[s.kind] ?? 'schaf'}`, cx, cy, cell * (s.special ? 0.8 : 0.9), sx, sy, 0, a, s.special ? 0.5 + 0.25 * Math.sin(clock * 3 + s.id) : gl)
+    if (s.special !== 0) {
+      // two sparkles circle around a special stone
+      c.fillStyle = s.special === OLIVE ? 'rgba(220,255,190,0.95)' : 'rgba(255,248,200,0.95)'
+      for (let k = 0; k < 2; k++) {
+        const an = clock * 2.4 + s.id + k * Math.PI
+        starPath(c, cx + Math.cos(an) * cell * 0.44, cy + Math.sin(an) * cell * 0.4, cell * 0.09, an)
+        c.fill()
+      }
+    }
     if (s.special === DOVE_H || s.special === DOVE_V) {
       fitDraw(c, 'sp-taube', cx + cell * 0.22, cy + cell * 0.2, cell * 0.46, sx, sy, 0, a)
       // two little arrows show the way it flies
@@ -1023,8 +1125,12 @@ function draw() {
     c.fillRect(0, 0, vw, vh)
     return
   }
-  c.fillStyle = 'rgba(12,22,34,0.2)'
+  c.fillStyle = 'rgba(12,22,34,0.16)'
   c.fillRect(0, 0, vw, vh)
+  if (vignette) {
+    c.fillStyle = vignette
+    c.fillRect(0, 0, vw, vh)
+  }
   const ox = shakeT > 0 ? (Math.random() - 0.5) * 6 * shakeT : 0
   const oy = shakeT > 0 ? (Math.random() - 0.5) * 6 * shakeT : 0
   c.save()
@@ -1032,7 +1138,16 @@ function draw() {
   const bw = cell * g.cols
   const bh = cell * g.rows
   // the plate under the board and the frame
-  c.fillStyle = 'rgba(60,34,12,0.55)'
+  // the board stands on the picture: a soft shadow under the frame, a dark plate inside
+  c.shadowColor = 'rgba(0,0,0,0.5)'
+  c.shadowBlur = cell * 0.4
+  c.shadowOffsetY = cell * 0.12
+  c.fillStyle = 'rgba(70,40,14,0.95)'
+  c.fillRect(bx - ft, by - ft, bw + 2 * ft, bh + 2 * ft)
+  c.shadowColor = 'transparent'
+  c.shadowBlur = 0
+  c.shadowOffsetY = 0
+  c.fillStyle = 'rgba(50,28,10,0.6)'
   c.fillRect(bx - ft * 0.4, by - ft * 0.4, bw + ft * 0.8, bh + ft * 0.8)
   for (let r = 0; r < g.rows; r++) {
     for (let col = 0; col < g.cols; col++) {
@@ -1048,6 +1163,13 @@ function draw() {
       c.globalAlpha = 1
     }
   }
+  // light falls from above: the top of the plate is a little lighter, the bottom darker
+  const lg = c.createLinearGradient(0, by, 0, by + bh)
+  lg.addColorStop(0, 'rgba(255,240,200,0.14)')
+  lg.addColorStop(0.5, 'rgba(255,240,200,0)')
+  lg.addColorStop(1, 'rgba(20,10,0,0.2)')
+  c.fillStyle = lg
+  c.fillRect(bx, by, bw, bh)
   drawFrame(c, bx - ft, by - ft, bw + 2 * ft, bh + 2 * ft, ft)
   // the obstacles on their cells
   for (let r = 0; r < g.rows; r++) {
@@ -1128,8 +1250,14 @@ function draw() {
     const k = 1 - p.t / p.life
     c.globalAlpha = Math.max(0, k)
     c.fillStyle = p.color
-    c.beginPath()
-    c.arc(p.x, p.y, p.size * k, 0, Math.PI * 2)
+    if (p.shape === 'star') {
+      starPath(c, p.x, p.y, p.size * (0.4 + k), p.rot)
+    } else {
+      c.beginPath()
+      if (p.shape === 'leaf') c.ellipse(p.x, p.y, p.size * 1.5 * (0.4 + k * 0.6), p.size * 0.7, p.rot, 0, Math.PI * 2)
+      else if (p.shape === 'drop') c.ellipse(p.x, p.y, p.size * 0.6, p.size * 0.95, p.rot * 0.2, 0, Math.PI * 2)
+      else c.arc(p.x, p.y, p.size * k, 0, Math.PI * 2)
+    }
     c.fill()
   }
   c.globalAlpha = 1
@@ -1242,11 +1370,15 @@ onBeforeUnmount(() => {
       div(class="ag-card ag-card--wide")
         h1(class="ag-title") {{ T('title') }}
         p(class="ag-ref") {{ T('ref') }}
+        p(class="ag-lead") {{ T('story') }}
+        p(class="ag-task") {{ T('taskWord') }} {{ T('task') }}
         div(class="ag-hero")
           img(:src="heroSrc" alt="" class="ag-hero-img" @error="hideBroken")
           div(class="ag-hero-label")
             span(class="ag-hero-chapter") {{ chapterNames[chapterView] }}
             span(class="ag-hero-ref") {{ chapterRefs[chapterView] }}
+        p(class="ag-story") {{ chapterStories[chapterView] }}
+        p(class="ag-task ag-task--chapter") {{ T('taskWord') }} {{ chapterTasks[chapterView] }}
         div(class="ag-deck" :class="{ 'is-full': chapterPairs(chapterView) >= 10 }")
           span(class="ag-deck-title") {{ T('deck', { n: chapterView + 1 }) }}
             span(v-if="chapterPairs(chapterView) >= 10" class="ag-deck-full")  · {{ T('deckFull') }}
@@ -1286,7 +1418,10 @@ onBeforeUnmount(() => {
           div(class="ag-moves" :aria-label="T('moves')")
             span(class="ag-moves-n" :key="hud.moves") {{ hud.moves }}
             span(class="ag-moves-t") {{ T('moves') }}
-        div(class="ag-goals")
+        div(v-if="mode" class="ag-hintbar" :style="barStyle")
+          span(class="ag-hintbar-text") {{ mode === 'hammer' ? T('hammerHint') : T('swapHint') }}
+          button(type="button" class="ag-hintbar-x" :aria-label="T('cancel')" data-test="arche-cancel" @click="mode = ''") ✕
+        div(v-else class="ag-goals")
           div(v-for="(gl, i) in goals" :key="i" :class="['ag-goal', { 'is-done': (hud.left[i] ?? 1) === 0 }]" :title="goalLabel(gl)")
             img(v-if="goalIcon(gl)" :src="goalIcon(gl)" alt="" class="ag-goal-img" @error="hideBroken")
             span(v-else class="ag-goal-score") ★
@@ -1303,9 +1438,6 @@ onBeforeUnmount(() => {
         )
           img(:src="boosterPic(b)" alt="" class="ag-boost-img" @error="hideBroken")
           span(class="ag-boost-n") {{ stock[b] }}
-      div(v-if="mode" class="ag-mode")
-        span {{ mode === 'hammer' ? T('hammerHint') : T('swapHint') }}
-        button(type="button" class="ag-mode-x" @click="mode = ''") {{ T('cancel') }}
       div(v-if="tip && !mode" class="ag-tip") {{ tip }}
 
       div(v-if="paused && !how" class="ag-menu ag-menu--dim")
@@ -1336,7 +1468,8 @@ onBeforeUnmount(() => {
     div(v-if="how && loaded" class="ag-menu ag-menu--dim")
       div(class="ag-card ag-how")
         h2(class="ag-title") {{ T('howTitle') }}
-        p(class="ag-text") {{ T('intro') }}
+        p(class="ag-text") {{ T('story') }}
+        p(class="ag-text ag-text--strong") {{ T('taskWord') }} {{ T('task') }}
         div(class="ag-how-row")
           img(:src="pic('tier-schaf')" alt="" class="ag-how-img" @error="hideBroken")
           img(:src="pic('tier-schaf')" alt="" class="ag-how-img" @error="hideBroken")
@@ -1517,6 +1650,28 @@ onBeforeUnmount(() => {
   &--two
     transform: translate(18%, 12%) scale(0.75)
 
+.ag-lead
+  margin: 0
+  line-height: 1.4
+  font-weight: 600
+
+.ag-task
+  margin: 0
+  padding: 6px 12px
+  border-radius: 12px
+  background: #fdf0c8
+  line-height: 1.35
+  font-weight: 800
+  font-size: 0.92rem
+
+  &--chapter
+    background: var(--lk-surface-2, #f6efdc)
+
+.ag-story
+  margin: 0
+  line-height: 1.4
+  font-size: 0.95rem
+
 .ag-pairs
   margin: 0
   font-weight: 800
@@ -1607,14 +1762,14 @@ onBeforeUnmount(() => {
   right: 0
   display: flex
   flex-direction: column
-  gap: 6px
-  padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) 6px max(10px, env(safe-area-inset-left))
+  gap: 4px
+  padding: max(6px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) 4px max(8px, env(safe-area-inset-left))
   pointer-events: none
 
   &.is-side
     right: auto
     bottom: 0
-    width: 150px
+    width: 132px
     justify-content: flex-start
 
 .ag-hud > *
@@ -1630,8 +1785,8 @@ onBeforeUnmount(() => {
   flex-wrap: wrap
 
 .ag-btn
-  width: 48px
-  height: 48px
+  width: 40px
+  height: 40px
   border: none
   border-radius: 50%
   background: rgba(255, 255, 255, 0.9)
@@ -1640,7 +1795,8 @@ onBeforeUnmount(() => {
   cursor: pointer
 
 .ag-level-label
-  padding: 6px 14px
+  padding: 4px 12px
+  font-size: 0.92rem
   border-radius: 14px
   background: rgba(255, 255, 255, 0.85)
   font-weight: 800
@@ -1650,8 +1806,8 @@ onBeforeUnmount(() => {
   display: flex
   flex-direction: column
   align-items: center
-  min-width: 64px
-  padding: 4px 12px
+  min-width: 54px
+  padding: 2px 10px
   border-radius: 14px
   background: rgba(255, 244, 214, 0.95)
   color: #4a2a08
@@ -1659,28 +1815,28 @@ onBeforeUnmount(() => {
   line-height: 1.05
 
 .ag-moves-n
-  font-size: 1.5rem
+  font-size: 1.25rem
   animation: ag-pop 0.25s ease-out
 
 .ag-moves-t
-  font-size: 0.65rem
+  font-size: 0.58rem
   text-transform: uppercase
   letter-spacing: 0.04em
 
 .ag-goals
   display: flex
   flex-wrap: wrap
-  gap: 6px
+  gap: 5px
   justify-content: center
-  padding: 5px 8px
-  border-radius: 16px
-  background: rgba(40, 24, 8, 0.55)
+  padding: 3px 6px
+  border-radius: 14px
+  background: rgba(40, 24, 8, 0.5)
 
 .ag-goal
   display: flex
   align-items: center
-  gap: 4px
-  padding: 2px 8px 2px 4px
+  gap: 3px
+  padding: 1px 7px 1px 3px
   border-radius: 999px
   background: rgba(255, 248, 225, 0.94)
   color: #3a2208
@@ -1690,8 +1846,8 @@ onBeforeUnmount(() => {
     background: #d5f0b8
 
 .ag-goal-img
-  width: 30px
-  height: 30px
+  width: 26px
+  height: 26px
   object-fit: contain
 
 .ag-goal-score
@@ -1700,9 +1856,9 @@ onBeforeUnmount(() => {
   font-size: 1.3rem
 
 .ag-goal-n
-  min-width: 22px
+  min-width: 20px
   text-align: center
-  font-size: 1.15rem
+  font-size: 1.05rem
   animation: ag-pop 0.25s ease-out
 
 .ag-boost
@@ -1712,13 +1868,13 @@ onBeforeUnmount(() => {
   bottom: 0
   display: flex
   justify-content: center
-  gap: 18px
-  padding: 6px 10px max(10px, env(safe-area-inset-bottom))
+  gap: 22px
+  padding: 3px 10px max(6px, env(safe-area-inset-bottom))
 
   &.is-side
     left: auto
     top: 0
-    width: 84px
+    width: 72px
     flex-direction: column
     justify-content: center
     align-items: center
@@ -1726,8 +1882,8 @@ onBeforeUnmount(() => {
 
 .ag-boost-btn
   position: relative
-  width: 64px
-  height: 64px
+  width: 54px
+  height: 54px
   padding: 0
   border: none
   border-radius: 50%
@@ -1762,29 +1918,41 @@ onBeforeUnmount(() => {
   font-size: 0.85rem
   line-height: 24px
 
-.ag-mode
-  position: absolute
-  left: 50%
-  bottom: 88px
-  transform: translateX(-50%)
+.ag-hintbar
   display: flex
   align-items: center
-  gap: 10px
-  max-width: 92vw
-  padding: 8px 8px 8px 16px
-  border-radius: 999px
-  background: rgba(255, 250, 235, 0.95)
-  color: #2a2418
-  font-weight: 700
+  justify-content: space-between
+  gap: 8px
+  padding: 3px 4px 3px 14px
+  border-radius: 14px
+  border: 2px solid #9a5a1c
+  background-color: #d9a45c
+  background-size: cover
+  background-position: center
+  box-shadow: inset 0 2px 4px rgba(255, 240, 200, 0.5), inset 0 -3px 6px rgba(90, 45, 5, 0.35), 0 3px 8px rgba(0, 0, 0, 0.3)
+  color: #3a1f06
+  font-weight: 800
+  font-size: 0.95rem
+  white-space: nowrap
 
-.ag-mode-x
-  min-height: 40px
-  padding: 0 14px
+.ag-hud.is-side .ag-hintbar
+  white-space: normal
+  font-size: 0.8rem
+  line-height: 1.2
+
+.ag-hintbar-text
+  overflow: hidden
+  text-overflow: ellipsis
+
+.ag-hintbar-x
+  flex: none
+  width: 36px
+  height: 36px
   border: none
-  border-radius: 999px
-  background: #2a2418
-  color: #fff6dc
-  font: inherit
+  border-radius: 50%
+  background: #4a2a08
+  color: #ffeab0
+  font-size: 1rem
   font-weight: 800
   cursor: pointer
 

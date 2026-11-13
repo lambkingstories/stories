@@ -98,82 +98,82 @@ export const KIND_SETS = { k4, k5, k5b, k5c, k6, k6b, k7 }
 
 /** One list per chapter: Aufbruch, Regen, Flut, Auf dem Wasser, Taube, Regenbogen. */
 export const CHAPTERS: Def[][] = [
-  // 1 Aufbruch: the first rows, then the special stones, then the first obstacles
+  // chapter 1
   [
-    { map: 'r5x6', kinds: k4, goals: [kind(S, 12)], moves: 14 },
-    { map: 'r5x6', kinds: k4, goals: [kind(S, 10), kind(E, 10)], moves: 16 },
-    { map: 'r6x7', kinds: k4, goals: [dove(1), kind(G, 10)], moves: 16 },
-    { map: 'r6x7', kinds: k4, goals: [olive(1), kind(L, 12)], moves: 18 },
-    { map: 'r6x7', kinds: k4, goals: [rainbow(1), kind(E, 10)], moves: 22 },
-    { map: 'kisten5', kinds: k4, goals: [crates], moves: 14 },
+    { map: 'r5x6', kinds: k4, goals: [kind(S, 12)], moves: 10 },
+    { map: 'r5x6', kinds: k4, goals: [kind(S, 10), kind(E, 10)], moves: 12 },
+    { map: 'r6x7', kinds: k4, goals: [dove(1), kind(G, 10)], moves: 10 },
+    { map: 'r6x7', kinds: k4, goals: [olive(1), kind(L, 12)], moves: 12 },
+    { map: 'r6x7', kinds: k4, goals: [rainbow(1), kind(E, 10)], moves: 40 },
+    { map: 'kisten5', kinds: k4, goals: [crates], moves: 10 },
     { map: 'steine6', kinds: k5, goals: [kind(G, 12), kind(L, 10)], moves: 18 },
-    { map: 'korb7', kinds: k5, goals: [kind(D, 20), kind(S, 20)], moves: 18 },
-    { map: 'koerbe6', kinds: k5, goals: [basket(2)], moves: 34, dropEvery: 6, dropTotal: 2 },
-    { map: 'kisten7', kinds: k5, goals: [crates, kind(E, 20)], moves: 18 }
+    { map: 'korb7', kinds: k5, goals: [kind(D, 20), kind(S, 20)], moves: 20 },
+    { map: 'koerbe6', kinds: k5, goals: [basket(2)], moves: 36, dropEvery: 6, dropTotal: 2 },
+    { map: 'kisten7', kinds: k5, goals: [crates, kind(E, 20)], moves: 20 }
   ],
-  // 2 Regen: water fields, nets, pairs
+  // chapter 2
   [
-    { map: 'wasser5', kinds: k5, goals: [water], moves: 14 },
+    { map: 'wasser5', kinds: k5, goals: [water], moves: 12 },
     { map: 'wasserseite', kinds: k5, goals: [water, kind(G, 24)], moves: 20 },
-    { map: 'netze6', kinds: k5, goals: [nets], moves: 14 },
+    { map: 'netze6', kinds: k5, goals: [nets], moves: 12 },
     { map: 'wasserecken', kinds: k5b, goals: [water, kind(F, 12)], moves: 20 },
-    { map: 'r7x7', kinds: k5, goals: pairs([S, E, G, L], 18), moves: 20 },
-    { map: 'r7x8', kinds: k5, goals: [dove(3), olive(2)], moves: 30 },
-    { map: 'wassernetz', kinds: k5c, goals: [water, nets, kind(Z, 16)], moves: 18 },
-    { map: 'koerbe7', kinds: k5, goals: [basket(3), kind(L, 10)], moves: 36, dropEvery: 5, dropTotal: 3 },
-    { map: 'mix1', kinds: k5, goals: [crates, water, kind(E, 16)], moves: 16 },
+    { map: 'r7x7', kinds: k5, goals: [kind(S, 18), kind(E, 18), kind(G, 18), kind(L, 18)], moves: 18 },
+    { map: 'r7x8', kinds: k5, goals: [dove(3), olive(2)], moves: 24 },
+    { map: 'wassernetz', kinds: k5c, goals: [water, nets, kind(Z, 16)], moves: 20 },
+    { map: 'koerbe7', kinds: k5, goals: [basket(2), kind(L, 10)], moves: 28, dropEvery: 5, dropTotal: 2 },
+    { map: 'mix1', kinds: k5, goals: [crates, water, kind(E, 16)], moves: 14 },
     { map: 'mix1', kinds: k5b, goals: [crates, water, nets], moves: 16 }
   ],
-  // 3 Flut: the water rises, cages
+  // chapter 3
   [
-    { map: 'wasser5', kinds: k5, goals: [water], moves: 14, rise: 3 },
+    { map: 'wasser5', kinds: k5, goals: [water], moves: 12, rise: 3 },
     { map: 'kaefige6', kinds: k5, goals: [cages], moves: 16 },
-    { map: 'wasserseite', kinds: k5c, goals: [water, kind(E, 26)], moves: 22, rise: 3 },
-    { map: 'kaefige7', kinds: k6, goals: [cages, kind(G, 10)], moves: 26 },
+    { map: 'wasserseite', kinds: k5c, goals: [water, kind(E, 26)], moves: 24, rise: 3 },
+    { map: 'kaefige7', kinds: k6, goals: [cages, kind(G, 10)], moves: 28 },
     { map: 'wasserecken', kinds: k5b, goals: [water, kind(L, 24)], moves: 24, rise: 3 },
     { map: 'mix2', kinds: k5, goals: [cages, water], moves: 24, rise: 4 },
-    { map: 'koerbewasser', kinds: k5c, goals: [basket(3), water], moves: 32, dropEvery: 5, dropTotal: 3, rise: 4 },
-    { map: 'mix3', kinds: k5, goals: [cages, nets, crates], moves: 14 },
+    { map: 'koerbewasser', kinds: k5c, goals: [basket(2), water], moves: 26, dropEvery: 5, dropTotal: 2, rise: 4 },
+    { map: 'mix3', kinds: k5, goals: [cages, nets, crates], moves: 16 },
     { map: 'wassermitte', kinds: k6, goals: [water, kind(S, 18), kind(D, 14)], moves: 24, rise: 2 },
-    { map: 'mix4', kinds: k5b, goals: [cages, water, crates], moves: 16, rise: 4 }
+    { map: 'mix4', kinds: k5b, goals: [cages, water, crates], moves: 14, rise: 4 }
   ],
-  // 4 Auf dem Wasser: mazes of stones and crates, several goals
+  // chapter 4
   [
-    { map: 'gasse', kinds: k5b, goals: [kind(E, 28), kind(Z, 28)], moves: 26 },
-    { map: 'saeulen', kinds: k5, goals: [dove(4), kind(S, 28)], moves: 24 },
+    { map: 'gasse', kinds: k5b, goals: [kind(E, 28), kind(Z, 28)], moves: 28 },
+    { map: 'saeulen', kinds: k5, goals: [dove(4), kind(S, 28)], moves: 22 },
     { map: 'kistenring', kinds: k6, goals: [crates], moves: 26 },
-    { map: 'steine7', kinds: k6b, goals: pairs([E, L, D, Z], 16), moves: 28 },
-    { map: 'mix5', kinds: k5, goals: [water, cages, crates], moves: 28 },
-    { map: 'kistenreihe', kinds: k5c, goals: [crates, basket(3)], moves: 34, dropEvery: 5, dropTotal: 3 },
-    { map: 'mix6', kinds: k5b, goals: [water, cages, nets, crates], moves: 20 },
-    { map: 'raute', kinds: k5b, goals: [olive(2), kind(Z, 12)], moves: 44 },
-    { map: 'mix7', kinds: k5, goals: [water, cages, nets], moves: 42, rise: 4 },
+    { map: 'steine7', kinds: k6b, goals: [kind(E, 16), kind(L, 16), kind(D, 16), kind(Z, 16)], moves: 28 },
+    { map: 'mix5', kinds: k5, goals: [water, cages, crates], moves: 22 },
+    { map: 'kistenreihe', kinds: k5c, goals: [crates, basket(3)], moves: 28, dropEvery: 5, dropTotal: 3 },
+    { map: 'mix6', kinds: k5b, goals: [water, cages, nets, crates], moves: 14 },
+    { map: 'raute', kinds: k5b, goals: [olive(1), kind(Z, 8)], moves: 22 },
+    { map: 'mix7', kinds: k5, goals: [water, cages, nets], moves: 52, rise: 4 },
     { map: 'mix6', kinds: k6b, goals: [water, cages, nets, crates, kind(F, 20)], moves: 28, rise: 5 }
   ],
-  // 5 Taube: special stones as goals, cages and baskets
+  // chapter 5
   [
-    { map: 'r7x8', kinds: k5, goals: [dove(4), olive(3)], moves: 24 },
-    { map: 'korb7', kinds: k5c, goals: [olive(3), dove(3)], moves: 26 },
-    { map: 'kaefige7', kinds: k6, goals: [cages, dove(4)], moves: 28 },
-    { map: 'koerbe7', kinds: k5, goals: [basket(4), olive(2)], moves: 32, dropEvery: 4, dropTotal: 4 },
-    { map: 'mix3', kinds: k6b, goals: [cages, nets, olive(1)], moves: 34 },
-    { map: 'wassermitte', kinds: k5b, goals: [water, dove(4), olive(2)], moves: 24 },
-    { map: 'mix4', kinds: k6, goals: [cages, water, crates, olive(1)], moves: 36, rise: 5 },
-    { map: 'steine7', kinds: k5, goals: [rainbow(1), dove(3)], moves: 34 },
-    { map: 'mix5', kinds: k6b, goals: [water, cages, nets, dove(4)], moves: 30 },
+    { map: 'r7x8', kinds: k5, goals: [dove(4), olive(3)], moves: 22 },
+    { map: 'korb7', kinds: k5c, goals: [olive(3), dove(3)], moves: 24 },
+    { map: 'kaefige7', kinds: k6, goals: [cages, dove(4)], moves: 26 },
+    { map: 'koerbe7', kinds: k5, goals: [basket(4), olive(2)], moves: 34, dropEvery: 4, dropTotal: 4 },
+    { map: 'mix3', kinds: k6b, goals: [cages, nets, olive(1)], moves: 40 },
+    { map: 'wassermitte', kinds: k5b, goals: [water, dove(4), olive(2)], moves: 22 },
+    { map: 'mix4', kinds: k6, goals: [cages, water, crates, olive(1)], moves: 28, rise: 5 },
+    { map: 'steine7', kinds: k5, goals: [rainbow(1), dove(3)], moves: 36 },
+    { map: 'mix5', kinds: k6b, goals: [water, cages, nets, dove(4)], moves: 28 },
     { map: 'mix7', kinds: k5, goals: [water, cages, nets, olive(1)], moves: 34, rise: 5 }
   ],
-  // 6 Regenbogen: everything together, tight moves
+  // chapter 6
   [
-    { map: 'mix1', kinds: k6b, goals: [crates, water, nets, kind(F, 30)], moves: 30 },
-    { map: 'mix2', kinds: k6, goals: [cages, water, basket(2)], moves: 50, dropEvery: 5, dropTotal: 2, rise: 5 },
-    { map: 'mix3', kinds: k5, goals: [cages, nets, crates, rainbow(1)], moves: 32 },
-    { map: 'mix4', kinds: k6b, goals: [cages, water, crates, dove(4)], moves: 30, rise: 5 },
-    { map: 'mix5', kinds: k6, goals: [water, cages, crates, basket(2)], moves: 48, dropEvery: 6, dropTotal: 2 },
-    { map: 'mix6', kinds: k6b, goals: [water, cages, nets, crates, olive(2)], moves: 50, rise: 5 },
-    { map: 'mix7', kinds: k5b, goals: [water, cages, nets, rainbow(1)], moves: 40, rise: 4 },
-    { map: 'kistenring', kinds: k7, goals: [crates, ...pairs([E, G, L, D, Z, F], 14)], moves: 34 },
-    { map: 'mix5', kinds: k6, goals: [water, cages, nets, crates, olive(2), dove(2)], moves: 44, rise: 5 },
+    { map: 'mix1', kinds: k6b, goals: [crates, water, nets, kind(F, 30)], moves: 32 },
+    { map: 'mix2', kinds: k6, goals: [cages, water, basket(1)], moves: 46, dropEvery: 5, dropTotal: 1, rise: 5 },
+    { map: 'mix3', kinds: k5, goals: [cages, nets, crates, rainbow(1)], moves: 38 },
+    { map: 'mix4', kinds: k6b, goals: [cages, water, crates, dove(4)], moves: 24, rise: 5 },
+    { map: 'mix5', kinds: k6, goals: [water, cages, crates, basket(1)], moves: 52, dropEvery: 6, dropTotal: 1 },
+    { map: 'mix6', kinds: k6b, goals: [water, cages, nets, crates, olive(1)], moves: 32, rise: 5 },
+    { map: 'mix7', kinds: k5b, goals: [water, cages, nets, rainbow(1)], moves: 36, rise: 4 },
+    { map: 'kistenring', kinds: k7, goals: [crates, kind(E, 14), kind(G, 14), kind(L, 14), kind(D, 14), kind(Z, 14), kind(F, 14)], moves: 34 },
+    { map: 'mix5', kinds: k6, goals: [water, cages, nets, crates, olive(1), dove(1)], moves: 44, rise: 5 },
     { map: 'mix4', kinds: k6, goals: [cages, water, crates, basket(2), dove(2)], moves: 46, dropEvery: 6, dropTotal: 2, rise: 6 }
   ]
 ]

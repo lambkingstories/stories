@@ -718,3 +718,64 @@ describe('the whole game is deterministic', () => {
     expect(run()).toEqual(run())
   })
 })
+
+describe('the new animals do not clear themselves (controlled refill)', () => {
+  it('after the free chain of chance the animals that come in are quiet: the next step never clears them', async () => {
+    const { MAX_FREE_CASCADES } = await import('../src/utils/archeGame')
+    let checked = 0
+    for (let seed = 1; seed <= 60; seed++) {
+      const g = newGame({ id: 1, chapter: 0, moves: 99, map: Array(8).fill('#######'), kinds: [0, 1, 2, 3], goals: [{ t: 'score', n: 1e9 }], seed })
+      for (let i = 0; i < 25 && g.phase === 'play'; i++) {
+        const mv = findMoves(g)
+        const m = mv[(seed + i * 3) % mv.length]
+        if (!m) break
+        const t = trySwap(g, m.a, m.b)
+        t.steps.forEach((step, k) => {
+          if (step.cascade <= MAX_FREE_CASCADES) return
+          const next = t.steps[k + 1]
+          if (!next || next.effects.length) return
+          const spawned = new Set(step.falls.filter((f) => f.spawned).map((f) => f.id))
+          for (const c of next.clears) expect(spawned.has(c.id)).toBe(false)
+          for (const mk of next.made) expect(spawned.has(mk.id)).toBe(false)
+          checked++
+        })
+      }
+    }
+    expect(checked).toBeGreaterThan(20)
+  })
+
+  it('a move rarely runs on for long: on four kinds the average number of steps is small and no move runs on for more than a handful of steps', () => {
+    let total = 0
+    let moves = 0
+    let longest = 0
+    for (let seed = 1; seed <= 60; seed++) {
+      const g = newGame({ id: 1, chapter: 0, moves: 99, map: Array(8).fill('#######'), kinds: [0, 1, 2, 3], goals: [{ t: 'score', n: 1e9 }], seed })
+      for (let i = 0; i < 25 && g.phase === 'play'; i++) {
+        const mv = findMoves(g)
+        const m = mv[(seed + i * 3) % mv.length]
+        if (!m) break
+        const t = trySwap(g, m.a, m.b)
+        total += t.steps.length
+        moves++
+        longest = Math.max(longest, t.steps.length)
+      }
+    }
+    expect(total / moves).toBeLessThan(2.2)
+    expect(longest).toBeLessThanOrEqual(6)
+  })
+
+  it('a first move on a simple level does not win it by chance: the child has to play several moves', () => {
+    const lv = LEVELS_FOR_TEST
+    let early = 0
+    for (let seed = 1; seed <= 80; seed++) {
+      const g = newGame(lv, seed)
+      const m = findMoves(g)[0]
+      if (!m) continue
+      trySwap(g, m.a, m.b)
+      if (g.phase === 'won') early++
+    }
+    expect(early).toBe(0)
+  })
+})
+
+const LEVELS_FOR_TEST: Level = { id: 1, chapter: 0, moves: 14, map: ['#####', '#####', '#####', '#####', '#####', '#####'], kinds: [3, 0, 1, 2], goals: [{ t: 'kind', kind: 3, n: 12 }], seed: 1 }

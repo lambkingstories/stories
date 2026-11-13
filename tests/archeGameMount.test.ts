@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
 import rawApp from '../src/i18n/app'
-import { withGameTexts } from '../src/i18n/bigGames'
+import { BIG_GAME_TEXTS, withGameTexts } from '../src/i18n/bigGames'
 
 vi.mock('@/use/useSfx', () => ({ default: () => ({ play: vi.fn(), preload: vi.fn() }) }))
 vi.mock('@/use/useMusic', () => ({ default: () => ({ playGame: vi.fn(), stop: vi.fn() }) }))
@@ -50,6 +50,10 @@ describe('BigGameArche', () => {
     expect(w.findAll('.ag-level')).toHaveLength(10)
     expect(w.findAll('.ag-slot')).toHaveLength(10)
     expect(w.text()).toContain('Tierpaare an Bord: 0 von 60')
+    // the story of the game and of the chapter, and the task
+    expect(w.text()).toContain('Noah hat die Arche gebaut')
+    expect(w.text()).toContain('Deine Aufgabe:')
+    expect(w.find('.ag-story').text()).toContain('Arche bauen')
     w.unmount()
   })
 
@@ -110,9 +114,12 @@ describe('BigGameArche', () => {
     await w.find('[data-test="arche-level-1"]').trigger('click')
     await w.find('[data-test="arche-go"]').trigger('click')
     await w.find('[data-test="arche-booster-hammer"]').trigger('click')
-    expect(w.find('.ag-mode').exists()).toBe(true)
-    await w.find('.ag-mode-x').trigger('click')
-    expect(w.find('.ag-mode').exists()).toBe(false)
+    expect(w.find('.ag-hintbar').exists()).toBe(true)
+    expect(w.find('.ag-hintbar').text()).toContain('Tippe auf das')
+    expect(w.find('.ag-goals').exists()).toBe(false)
+    await w.find('[data-test="arche-cancel"]').trigger('click')
+    expect(w.find('.ag-hintbar').exists()).toBe(false)
+    expect(w.find('.ag-goals').exists()).toBe(true)
     w.unmount()
   })
 
@@ -130,7 +137,12 @@ describe('BigGameArche', () => {
     const en = msgs.en.app.bigGames.arche!
     expect(Object.keys(en).sort()).toEqual(Object.keys(de).sort())
     expect((de.chapters as string[]).length).toBe(6)
+    expect((de.chapterStories as string[]).length).toBe(6)
+    expect((de.chapterTasks as string[]).length).toBe(6)
+    expect((en.chapterStories as string[]).length).toBe(6)
     expect((en.chapters as string[]).length).toBe(6)
+    const es = BIG_GAME_TEXTS.es.arche as Record<string, unknown>
+    expect(Object.keys(es).sort()).toEqual(Object.keys(de).sort())
     const tipLevels = [1, 3, 4, 5, 6, 7, 9, 11, 13, 21, 22]
     for (const l of tipLevels) expect(typeof de[`tip${l}`]).toBe('string')
   })

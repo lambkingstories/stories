@@ -5,6 +5,25 @@ export default {
     sub: 'Bringe die Tiere an Bord',
     ref: '1. Mose 6 bis 9',
     intro: 'Noah brachte von jeder Tierart ein Paar in die Arche (1. Mose 6,19–20). Tausche zwei Tiere, bis drei gleiche in einer Reihe stehen: dann gehen sie an Bord.',
+    story: 'Noah hat die Arche gebaut, und die Tiere kommen paarweise zu ihm (1. Mose 6,19–20).',
+    taskWord: 'Deine Aufgabe:',
+    task: 'Tausche die Tiere, bis drei gleiche in einer Reihe stehen, und bringe die Paare sicher an Bord.',
+    chapterStories: [
+      'Gott sagt Noah, dass er eine Arche bauen soll. Noah tut alles, was Gott ihm aufgetragen hat (1. Mose 6,22).',
+      'Noah geht mit seiner Familie in die Arche, und die Tiere kommen paarweise hinein. Dann schließt Gott hinter ihnen zu (1. Mose 7,16).',
+      'Das Wasser steigt und trägt die Arche hoch über die Erde. In der Arche sind alle sicher (1. Mose 7,17–18).',
+      'Die Arche schwimmt viele Tage auf dem Wasser. Dann denkt Gott an Noah und an alle Tiere in der Arche, und das Wasser sinkt (1. Mose 8,1).',
+      'Noah lässt eine Taube fliegen. Am Abend kommt sie mit einem frischen Ölzweig im Schnabel zurück (1. Mose 8,11).',
+      'Gott verspricht, nie wieder eine solche Flut zu schicken. Als Zeichen setzt er den Regenbogen in die Wolken (1. Mose 9,13–15).'
+    ],
+    chapterTasks: [
+      'Bringe die Tierpaare an Bord.',
+      'Räume die Wasserfelder und löse die Netze.',
+      'Das Wasser steigt: räume es, bevor es mehr wird, und befreie die Tiere aus den Käfigen.',
+      'Räume Kisten und Körbe zwischen den Steinen, oft mit mehreren Zielen auf einmal.',
+      'Baue Tauben und Ölzweige: Sie räumen für dich.',
+      'Alles zusammen. Dann ist das neue Land nah.'
+    ],
     chapters: ['Aufbruch', 'Regen', 'Flut', 'Auf dem Wasser', 'Die Taube', 'Der Regenbogen'],
     chapterRefs: ['1. Mose 6,13–22', '1. Mose 7,1–16', '1. Mose 7,17–24', '1. Mose 7,24 bis 8,5', '1. Mose 8,6–12', '1. Mose 9,8–17'],
     chapterWord: 'Kapitel {n}',
@@ -71,6 +90,25 @@ export default {
     sub: 'Bring the animals on board',
     ref: 'Genesis 6 to 9',
     intro: 'Noah brought a pair of every kind of animal into the ark (Genesis 6:19–20). Swap two animals until three of a kind are in a row: then they go on board.',
+    story: 'Noah has built the ark, and the animals come to him in pairs (Genesis 6:19–20).',
+    taskWord: 'Your task:',
+    task: 'Swap the animals until three of a kind are in a row, and bring the pairs safely on board.',
+    chapterStories: [
+      'God tells Noah to build an ark. Noah does everything God has told him (Genesis 6:22).',
+      'Noah goes into the ark with his family, and the animals come in by pairs. Then God shuts the door behind them (Genesis 7:16).',
+      'The water rises and lifts the ark high above the earth. Everyone in the ark is safe (Genesis 7:17–18).',
+      'The ark floats on the water for many days. Then God remembers Noah and all the animals in the ark, and the water sinks (Genesis 8:1).',
+      'Noah lets a dove fly. In the evening it comes back with a fresh olive leaf in its beak (Genesis 8:11).',
+      'God promises never to send such a flood again. As a sign he sets the rainbow in the clouds (Genesis 9:13–15).'
+    ],
+    chapterTasks: [
+      'Bring the pairs of animals on board.',
+      'Clear the water fields and free the nets.',
+      'The water is rising: clear it before there is more, and free the animals from the cages.',
+      'Clear crates and baskets between the stones, often with several goals at once.',
+      'Make doves and olive branches: they clear for you.',
+      'Everything together. Then the new land is near.'
+    ],
     chapters: ['Setting out', 'Rain', 'The flood', 'On the water', 'The dove', 'The rainbow'],
     chapterRefs: ['Genesis 6:13–22', 'Genesis 7:1–16', 'Genesis 7:17–24', 'Genesis 7:24 to 8:5', 'Genesis 8:6–12', 'Genesis 9:8–17'],
     chapterWord: 'Chapter {n}',
@@ -137,6 +175,25 @@ export default {
     sub: 'Lleva los animales a bordo',
     ref: 'Génesis 6 a 9',
     intro: 'Noé llevó al arca una pareja de cada clase de animal (Génesis 6:19–20). Cambia dos animales de sitio hasta que haya tres iguales en fila: entonces suben a bordo.',
+    story: 'Noé construyó el arca y los animales vienen hacia él de dos en dos (Génesis 6:19–20).',
+    taskWord: 'Tu tarea:',
+    task: 'Cambia los animales de sitio hasta que haya tres iguales en fila y lleva las parejas a bordo sanas y salvas.',
+    chapterStories: [
+      'Dios le dice a Noé que construya un arca. Noé hace todo lo que Dios le mandó (Génesis 6:22).',
+      'Noé entra en el arca con su familia y los animales entran de dos en dos. Luego Dios cierra la puerta tras ellos (Génesis 7:16).',
+      'El agua sube y levanta el arca por encima de la tierra. Dentro del arca todos están a salvo (Génesis 7:17–18).',
+      'El arca flota sobre el agua muchos días. Entonces Dios se acuerda de Noé y de todos los animales del arca, y el agua baja (Génesis 8:1).',
+      'Noé deja volar una paloma. Por la tarde vuelve con una hoja fresca de olivo en el pico (Génesis 8:11).',
+      'Dios promete no enviar nunca más un diluvio así. Como señal pone el arcoíris en las nubes (Génesis 9:13–15).'
+    ],
+    chapterTasks: [
+      'Lleva las parejas de animales a bordo.',
+      'Limpia los campos de agua y suelta las redes.',
+      'El agua sube: límpiala antes de que haya más y libera a los animales de las jaulas.',
+      'Limpia cajas y cestas entre las piedras, a menudo con varias metas a la vez.',
+      'Haz palomas y ramas de olivo: limpian por ti.',
+      'Todo junto. Entonces la tierra nueva está cerca.'
+    ],
     chapters: ['La partida', 'La lluvia', 'El diluvio', 'Sobre el agua', 'La paloma', 'El arcoíris'],
     chapterRefs: ['Génesis 6:13–22', 'Génesis 7:1–16', 'Génesis 7:17–24', 'Génesis 7:24 a 8:5', 'Génesis 8:6–12', 'Génesis 9:8–17'],
     chapterWord: 'Capítulo {n}',

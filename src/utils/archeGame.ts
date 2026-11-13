@@ -849,8 +849,60 @@ function runTurn(g: Game, turn: Turn, combo: { combo: Combo; a: number; b: numbe
   endOfTurn(g, turn, booster)
 }
 
+/** How many times new animals may fall in by chance and make a chain by themselves in one move; after that only "quiet" animals come in. */
+export const MAX_FREE_CASCADES = 1
+
+/** Would an animal of kind `k` in cell `idx` make a row of three with the animals that stand around it now? */
+function formsRun(g: Game, idx: number, k: number): boolean {
+  const r = rowOf(g, idx)
+  const c = colOf(g, idx)
+  let h = 1
+  for (let x = c - 1; x >= 0 && matchKind(g, r * g.cols + x) === k; x--) h++
+  for (let x = c + 1; x < g.cols && matchKind(g, r * g.cols + x) === k; x++) h++
+  if (h >= 3) return true
+  let v = 1
+  for (let y = r - 1; y >= 0 && matchKind(g, y * g.cols + c) === k; y--) v++
+  for (let y = r + 1; y < g.rows && matchKind(g, y * g.cols + c) === k; y++) v++
+  return v >= 3
+}
+
+/**
+ * Makes the animals that fell in new in this step "quiet": none of them stands in a row of three (their kinds are changed where needed). So the
+ * new animals never clear themselves, and a level is won by the moves of the child, not by a chain of chance.
+ */
+function neutralize(g: Game, step: Step): void {
+  const fresh = new Map<number, Step['falls'][number]>()
+  // in a long chain the animals that only fell down count as new as well (they take another look: a chain must not go on and on)
+  const deep = step.cascade > MAX_FREE_CASCADES + 1
+  for (const f of step.falls) if ((f.spawned || deep) && f.kind < BASKET && f.special === NONE) fresh.set(f.id, f)
+  if (!fresh.size) return
+  const kinds = g.level.kinds
+  for (let pass = 0; pass < 16; pass++) {
+    let changed = false
+    for (const grp of findMatchGroups(g)) {
+      for (const cell of grp.cells) {
+        const t = g.tiles[cell]
+        const f = t ? fresh.get(t.id) : undefined
+        if (!t || !f) continue
+        const start = Math.floor(rnd(g) * kinds.length)
+        for (let i = 0; i < kinds.length; i++) {
+          const k = kinds[(start + i) % kinds.length]!
+          if (k !== t.kind && !formsRun(g, cell, k)) {
+            t.kind = k
+            f.kind = k
+            changed = true
+            break
+          }
+        }
+      }
+    }
+    if (!changed) break
+  }
+}
+
 function finishStep(g: Game, step: Step): void {
   settle(g, step)
+  if (step.cascade > MAX_FREE_CASCADES) neutralize(g, step)
   // a chain reaction is worth more
   step.points = Math.round(step.points * (1 + 0.5 * (step.cascade - 1)))
   g.score += step.points
