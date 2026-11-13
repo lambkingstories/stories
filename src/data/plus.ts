@@ -4,6 +4,12 @@
  * offer that is switched on in App Store Connect / Play Console (the store charges it, not the app). The page only says so while the
  * offer runs: put the last day of the offer into `introUntil` (the same day as in the stores), and the sentence goes by itself.
  */
+/**
+ * Is the family plan offered? Off in the Android build for now (Anton, 13.11.2026: only the single plans, monthly and yearly):
+ * `VITE_PLUS_FAMILY: "false"` in `android-build.yml` hides it on the Plus page. Everywhere else it is on.
+ */
+export const PLUS_FAMILY: boolean = import.meta.env.VITE_PLUS_FAMILY !== 'false'
+
 export const plusOffer = {
   /** Price per month and per year, as text. */
   month: '3,99 €',

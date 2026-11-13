@@ -10,7 +10,7 @@ import { useRouter } from 'vue-router'
 import LkPageHead from '@/components/molecules/LkPageHead.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import usePremium, { PLUS_TEST } from '@/use/usePremium'
-import { introRuns, plusOffer } from '@/data/plus'
+import { introRuns, plusOffer, PLUS_FAMILY } from '@/data/plus'
 import { MANAGE_URL, TERMS_URL } from '@/data/plusProducts'
 import usePurchases from '@/use/usePurchases'
 import { isIOS } from '@/utils/platform'
@@ -93,24 +93,25 @@ const hero = prependBaseUrl('images/bg/willkommen-plus-2.webp')
         span(class="plus-tag is-free") {{ t('app.plus.tagFree') }}
         p {{ t('app.plus.freeLine') }}
 
-      //- the family: up to five people, one price
-      h3(class="plus-family-title") {{ t('app.plus.familyTitle') }}
-      p(class="plus-family-text") {{ t('app.plus.familyText') }}
-      div(class="plus-plans")
-        div(class="plus-plan is-year")
-          span(class="plus-badge") {{ t('app.plus.familySave') }}
-          span(class="plus-plan-name") {{ t('app.plus.familyYear') }}
-          strong(v-if="introRuns() && plusOffer.familyIntroPrice" class="plus-plan-price")
-            s(class="plus-old") {{ priceOf('familyYear') }}
-            span(class="plus-new") {{ plusOffer.familyIntroPrice }}
-          strong(v-else class="plus-plan-price") {{ priceOf('familyYear') }}
-          button(v-if="available" type="button" class="lk-btn lk-btn--full lk-btn--small" :disabled="busy" @click="buyPlus('familyYear')") {{ t('app.plus.chooseFamilyYear') }}
-        div(class="plus-plan")
-          span(class="plus-plan-name") {{ t('app.plus.familyMonth') }}
-          strong(class="plus-plan-price") {{ priceOf('familyMonth') }}
-          button(v-if="available" type="button" class="lk-btn lk-btn--outline lk-btn--full lk-btn--small" :disabled="busy" @click="buyPlus('familyMonth')") {{ t('app.plus.chooseFamilyMonth') }}
-      p(v-if="introRuns() && plusOffer.familyIntroPrice" class="plus-intro") {{ t('app.plus.priceIntro', { intro: plusOffer.familyIntroPrice, year: plusOffer.familyYear }) }}
-      p(class="plus-note") {{ t('app.plus.familyHow') }}
+      //- the family: up to five people, one price (switched off in the Android build for now)
+      template(v-if="PLUS_FAMILY")
+        h3(class="plus-family-title") {{ t('app.plus.familyTitle') }}
+        p(class="plus-family-text") {{ t('app.plus.familyText') }}
+        div(class="plus-plans")
+          div(class="plus-plan is-year")
+            span(class="plus-badge") {{ t('app.plus.familySave') }}
+            span(class="plus-plan-name") {{ t('app.plus.familyYear') }}
+            strong(v-if="introRuns() && plusOffer.familyIntroPrice" class="plus-plan-price")
+              s(class="plus-old") {{ priceOf('familyYear') }}
+              span(class="plus-new") {{ plusOffer.familyIntroPrice }}
+            strong(v-else class="plus-plan-price") {{ priceOf('familyYear') }}
+            button(v-if="available" type="button" class="lk-btn lk-btn--full lk-btn--small" :disabled="busy" @click="buyPlus('familyYear')") {{ t('app.plus.chooseFamilyYear') }}
+          div(class="plus-plan")
+            span(class="plus-plan-name") {{ t('app.plus.familyMonth') }}
+            strong(class="plus-plan-price") {{ priceOf('familyMonth') }}
+            button(v-if="available" type="button" class="lk-btn lk-btn--outline lk-btn--full lk-btn--small" :disabled="busy" @click="buyPlus('familyMonth')") {{ t('app.plus.chooseFamilyMonth') }}
+        p(v-if="introRuns() && plusOffer.familyIntroPrice" class="plus-intro") {{ t('app.plus.priceIntro', { intro: plusOffer.familyIntroPrice, year: plusOffer.familyYear }) }}
+        p(class="plus-note") {{ t('app.plus.familyHow') }}
 
       //- why it exists, short
       div(class="plus-why")

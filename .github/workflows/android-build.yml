@@ -2,7 +2,7 @@ name: Android Build & Sign
 
 # Builds the signed Play Store bundle (.aab) and an installable .apk.
 # Upload the .aab by hand in the Play Console (Test and release -> Closed testing).
-# Last build request: 2026-11-06 (family games on the old map: Bible quiz, token choice, keep playing, music; new adventures).
+# Last build request: 2026-11-13 (new end-of-adventure overview, collector cards, Elia and David changes; family plan switched off for now).
 #
 # Needs the repository secrets ANDROID_KEYSTORE_BASE64 (the release keystore,
 # base64) and ANDROID_KEYSTORE_PASSWORD (store = key password; alias `lambking`).
@@ -41,6 +41,8 @@ jobs:
       # Every adventure adds about 17 MB; Apple allows 500 MB for the executable, Google about 200 MB per download. Do not add more without measuring (vite build, du -sm dist).
       # Release 1.2 (2026-11-04): purchases on (LambKing Plus). Free: Josef, Adam und Eva, Noah, Babel, Abraham, Jakob (FREE_JOURNEYS); Mose is Plus.
       VITE_PREMIUM_TEASER: "true"
+      # the family plan is not offered on Android for now (single plans only: monthly and yearly)
+      VITE_PLUS_FAMILY: "false"
       VITE_SHOW_NOAH: "true"
       VITE_SHOW_ADAM: "true"
       VITE_SHOW_BABEL: "true"
