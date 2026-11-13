@@ -20,5 +20,6 @@ export const BIG_GAMES: BigGame[] = [
   { id: 'arche', at: 80, image: 'images/spiele-gross/arche/kachel.webp', maxStars: 180 },
   { id: 'wasser', at: 60, image: 'images/spiele-gross/wasser/kachel.webp', maxStars: 108 },
   { id: 'karawane', at: 100, image: 'images/spiele-gross/karawane/kachel.webp', maxStars: 18 },
-  { id: 'nehemia', at: 140, image: 'images/spiele-gross/nehemia/kachel.webp', maxStars: 180 }
+  { id: 'nehemia', at: 140, image: 'images/spiele-gross/nehemia/kachel.webp', maxStars: 180 },
+  { id: 'josefsland', at: 120, image: 'images/spiele-gross/josefsland/kachel.webp', maxStars: 24 }
 ]

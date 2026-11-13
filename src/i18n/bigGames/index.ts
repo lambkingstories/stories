@@ -9,9 +9,9 @@ import nehemia from './nehemia'
 import wasser from './wasser'
 
 export const BIG_GAME_TEXTS = {
-  de: { wasser: wasser.de, arche: arche.de, karawane: karawane.de, nehemia: nehemia.de },
-  en: { wasser: wasser.en, arche: arche.en, karawane: karawane.en, nehemia: nehemia.en },
-  es: { wasser: wasser.es, arche: arche.es, karawane: karawane.es, nehemia: nehemia.es }
+  de: { wasser: wasser.de, arche: arche.de, karawane: karawane.de, nehemia: nehemia.de, josefsland: josefsland.de },
+  en: { wasser: wasser.en, arche: arche.en, karawane: karawane.en, nehemia: nehemia.en, josefsland: josefsland.en },
+  es: { wasser: wasser.es, arche: arche.es, karawane: karawane.es, nehemia: nehemia.es, josefsland: josefsland.es }
 } as Record<'de' | 'en' | 'es', Record<string, Record<string, unknown>>>
 
 /**
