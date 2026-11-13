@@ -11,6 +11,7 @@ import {
   botInput,
   generateTrack,
   heightAt,
+  hop,
   newRun,
   rng,
   slopeAt,
@@ -19,7 +20,7 @@ import {
   type Input,
   type Run
 } from '../src/utils/karawaneGame'
-import { ANIMAL_IDS, UPGRADES, UPGRADE_IDS, addCoins, buyAnimal, buyUpgrade, canBuyUpgrade, fullSave, loadSave, newSave, persist, recordBest, selectAnimal, statsFor, upgradeCost } from '../src/utils/karawaneUpgrades'
+import { ANIMAL_IDS, ANIMALS, UPGRADES, UPGRADE_IDS, addCoins, buyAnimal, buyUpgrade, canBuyUpgrade, fullSave, loadSave, newSave, persist, recordBest, selectAnimal, statsFor, upgradeCost, wagonTier, wheelLook } from '../src/utils/karawaneUpgrades'
 
 function memoryStore(init?: string) {
   const m = new Map<string, string>()
@@ -98,9 +99,15 @@ describe('the routes', () => {
   it('starts gently: the first 150 metres are not steep', () => {
     for (let i = 0; i < ROUTE_COUNT; i++) {
       const t = generateTrack(i)
-      let worst = 0
-      for (let x = START_X; x < 150; x += 0.5) worst = Math.max(worst, Math.abs(slopeAt(t, x)))
-      expect(Math.atan(worst)).toBeLessThan((18 * Math.PI) / 180)
+      let up = 0
+      let down = 0
+      for (let x = START_X; x < 150; x += 0.5) {
+        up = Math.max(up, slopeAt(t, x))
+        down = Math.max(down, -slopeAt(t, x))
+      }
+      // uphill is gentle, only the short drop behind a first little jump is steeper
+      expect(Math.atan(up)).toBeLessThan((18 * Math.PI) / 180)
+      expect(Math.atan(down)).toBeLessThan((38 * Math.PI) / 180)
     }
   })
 
@@ -265,7 +272,7 @@ describe('the workshop', () => {
       const c = UPGRADES[id].costs
       expect(c.length).toBe(UPGRADES[id].max)
       for (let i = 1; i < c.length; i++) expect(c[i]!).toBeGreaterThan(c[i - 1]!)
-      expect(UPGRADES[id].max).toBeGreaterThanOrEqual(4)
+      expect(UPGRADES[id].max).toBeGreaterThanOrEqual(3)
     }
   })
 
@@ -359,5 +366,161 @@ describe('the workshop', () => {
     expect(l.owned).toEqual(['donkey', 'camel'])
     expect(l.animal).toBe('donkey')
     expect(l.best).toEqual([10, 0])
+  })
+})
+
+describe('the character of the routes', () => {
+  it('gives every route its own character (grip, sand, wind, hills) and symbols', () => {
+    const grips = new Set(ROUTES.map((r) => r.grip))
+    expect(grips.size).toBeGreaterThanOrEqual(4)
+    for (const r of ROUTES) {
+      expect(r.chars.length).toBeGreaterThan(0)
+      expect(r.grip).toBeGreaterThan(0.6)
+      expect(r.sand).toBeGreaterThanOrEqual(1)
+    }
+    expect(ROUTES.find((r) => r.id === 'jordan')!.chars).toContain('slippery')
+    expect(ROUTES.find((r) => r.id === 'judea')!.chars).toContain('steep')
+  })
+
+  it('deep sand slows the cart down, slippery ground holds it less', () => {
+    const speedAfter = (route: number) => {
+      const r = newRun(generateTrack(0), statsFor(newSave()))
+      // the same flat start with the character of another route
+      ;(r as { route: number }).route = route
+      drive(r, 6, () => ({ gas: true, brake: false }))
+      return r.vx
+    }
+    // egypt has deep sand, bethlehem none
+    expect(speedAfter(0)).toBeLessThan(speedAfter(1))
+    // jordan is slippery: it gets going more slowly than a dry way
+    expect(speedAfter(3)).toBeLessThan(speedAfter(1))
+  })
+
+  it('starts the first two routes lively: a little jump and bigger hills in the first hundred metres, an early oasis', () => {
+    for (const i of [0, 1]) {
+      const t = generateTrack(i)
+      expect(ROUTES[i]!.lively).toBe(true)
+      expect(t.oases[0]).toBeLessThan(220)
+      let lo = 99
+      let hi = -99
+      for (let x = START_X; x < 160; x += 1) {
+        lo = Math.min(lo, heightAt(t, x))
+        hi = Math.max(hi, heightAt(t, x))
+      }
+      expect(hi - lo).toBeGreaterThan(2.2)
+      // a crest with coins above it inside the first 200 metres
+      expect(t.pickups.some((p) => p.x < 200 && p.y > heightAt(t, p.x) + 2.5)).toBe(true)
+    }
+  })
+})
+
+describe('the hop', () => {
+  it('is not there without the part, then gives a push up with a pause between two hops', () => {
+    const none = newRun(generateTrack(0), statsFor(newSave()))
+    expect(hop(none)).toBe(false)
+    const s = newSave()
+    s.up.hop = 1
+    const r = newRun(generateTrack(0), statsFor(s))
+    expect(hop(r)).toBe(true)
+    expect(r.vy).toBeGreaterThan(3)
+    expect(r.events.some((e) => e.type === 'hop')).toBe(true)
+    // a second hop at once is refused (the pause), and it works again after it
+    expect(hop(r)).toBe(false)
+    r.hopCd = 0
+    r.touching = 1
+    expect(hop(r)).toBe(true)
+  })
+
+  it('lifts the cart off the ground for a moment, higher with a stronger spring', () => {
+    const air = (lvl: number) => {
+      const s = newSave()
+      s.up.hop = lvl
+      const r = newRun(generateTrack(0), statsFor(s))
+      hop(r)
+      let t = 0
+      let up = 0
+      const y0 = r.y
+      while (t < 2) {
+        stepRun(r, 1 / 60, { gas: false, brake: false })
+        r.events.length = 0
+        up = Math.max(up, r.y - y0)
+        t += 1 / 60
+      }
+      return up
+    }
+    expect(air(1)).toBeGreaterThan(0.25)
+    expect(air(3)).toBeGreaterThan(air(1))
+  })
+
+  it('cannot be used high in the air, only from the ground or just after leaving it', () => {
+    const s = newSave()
+    s.up.hop = 2
+    const r = newRun(generateTrack(0), statsFor(s))
+    r.y += 5
+    for (let i = 0; i < 30; i++) {
+      stepRun(r, 1 / 60, { gas: false, brake: false })
+      r.events.length = 0
+    }
+    expect(r.touching).toBe(0)
+    expect(hop(r)).toBe(false)
+  })
+})
+
+describe('the wagon and the animals grow', () => {
+  it('the cart looks better with every group of parts, up to the gilded wagon', () => {
+    const s = newSave()
+    expect(wagonTier(s)).toBe(0)
+    s.up.wheels = 3
+    expect(wagonTier(s)).toBe(1)
+    s.up.suspension = 3
+    s.up.cover = 2
+    expect(wagonTier(s)).toBe(2)
+    expect(wagonTier(fullSave())).toBe(3)
+    expect(wheelLook(newSave())).toBe(0)
+    const w = newSave()
+    w.up.wheels = 2
+    expect(wheelLook(w)).toBe(1)
+    w.up.wheels = 4
+    expect(wheelLook(w)).toBe(2)
+    w.up.wheels = 5
+    expect(wheelLook(w)).toBe(3)
+  })
+
+  it('the Egyptian horse is the top animal: fastest, strong, lasting, and the most expensive', () => {
+    expect(ANIMAL_IDS).toContain('horse')
+    for (const a of ANIMAL_IDS) {
+      if (a === 'horse') continue
+      expect(ANIMALS.horse.vmax).toBeGreaterThan(ANIMALS[a].vmax)
+      expect(ANIMALS.horse.cost).toBeGreaterThan(ANIMALS[a].cost)
+    }
+    expect(ANIMALS.horse.power).toBeGreaterThan(ANIMALS.donkey.power)
+    expect(ANIMALS.horse.stamina).toBeGreaterThan(ANIMALS.camel.stamina)
+    const s = newSave()
+    s.coins = 3000
+    expect(buyAnimal(s, 'horse')).toBe(true)
+    expect(statsFor(s).vmax).toBe(ANIMALS.horse.vmax)
+  })
+
+  it('the harness gives more pull, the spring part opens the hop and strengthens it', () => {
+    const base = statsFor(newSave())
+    const h = newSave()
+    h.up.harness = 4
+    expect(statsFor(h).power).toBeGreaterThan(base.power * 1.2)
+    expect(base.hopV).toBe(0)
+    const a = newSave()
+    a.up.hop = 1
+    const b = newSave()
+    b.up.hop = 3
+    expect(statsFor(a).hopV).toBeGreaterThan(0)
+    expect(statsFor(b).hopV).toBeGreaterThan(statsFor(a).hopV)
+    expect(statsFor(b).hopCool).toBeLessThan(statsFor(a).hopCool)
+  })
+
+  it('keeps which story cards were seen', () => {
+    const store = memoryStore()
+    const s = newSave()
+    s.seen.push(0, 3)
+    persist(s, store)
+    expect(loadSave(store).seen).toEqual([0, 3])
   })
 })

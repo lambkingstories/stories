@@ -1,5 +1,29 @@
 /** The texts of the big game "karawane" (german, english, spanish), merged into `app.bigGames.karawane` (see `index.ts`). */
 const de = {
+  story: 'Zur Zeit der Bibel zogen Händler und Pilger mit Tieren und Karren über Sand, Hügel und Berge. Hier fährst du sechs Wege aus der Bibel nach. Deine Aufgabe: Bring den Karren mit den Krügen heil ins Ziel. Sammle Münzen, halte an den Oasen und sorge dafür, dass das Tier Wasser bekommt.',
+  taskLabel: 'Deine Aufgabe',
+  routeStory: {
+    egypt: 'Händler zogen mit Kamelen und Waren durch die Wüste nach Ägypten. Sie nahmen auch Josef mit (1. Mose 37,25–28).',
+    bethlehem: 'Josef und Maria mussten nach Bethlehem reisen, weil alle Menschen gezählt wurden. Es war ein langer Weg (Lukas 2,1–5).',
+    magi: 'Weise Männer aus dem Osten sahen einen besonderen Stern. Sie machten sich auf und suchten den neuen König (Matthäus 2,1–2).',
+    jordan: 'Der Jordan ist der große Fluss im Heiligen Land. An seinem Ufer ließen sich viele Menschen taufen (Markus 1,5).',
+    judea: 'Nach Jerusalem führt der Weg durch die Berge von Judäa. Ein Psalmbeter schaut zu den Bergen und denkt an Gottes Hilfe (Psalm 121,1–2).',
+    jerusalem: 'Zu den großen Festen zogen die Familien nach Jerusalem. Der Psalmbeter freut sich: Wir gehen zum Haus des Herrn! (Psalm 122,1)'
+  },
+  routeTask: {
+    egypt: 'Fahre den Karren heil bis zum Ziel in Ägypten. Der Sand ist tief und bremst.',
+    bethlehem: 'Bring den Karren sicher bis nach Bethlehem. Es geht über sanfte Hügel in den Abend.',
+    magi: 'Folge dem Stern durch die Nacht. Der Wind schiebt, und der Sand bremst.',
+    jordan: 'Fahre durch das grüne Tal. Der Boden ist feucht und rutschig, fahre ruhig.',
+    judea: 'Die Hänge sind steil. Hole Schwung und bring den Karren heil über die Berge.',
+    jerusalem: 'Fahre im Festzug bis zum Tor von Jerusalem. Du schaffst die längste Strecke!'
+  },
+  routeGo: 'Los!',
+  chars: { sand: 'Tiefer Sand', hills: 'Hügelig', steep: 'Steil', wind: 'Windig', slippery: 'Rutschig', festive: 'Festzug' },
+  wagon: 'Dein Wagen',
+  tier: { wood: 'Holzkarren', strong: 'Verstärkter Karren', painted: 'Bemalter Karren mit Plane', gilded: 'Prachtwagen' },
+  hopHint: 'Federkraft: Tippe links auf die Feder, dann hüpft der Karren!',
+  hopButton: 'Hüpfer',
   title: 'Karawane über die Dünen',
   ref: '1. Mose 37 und Lukas 2',
   intro: 'Fahre mit dem Karren über Hügel und Dünen. Sammle Münzen und kaufe dir in der Werkstatt Verbesserungen!',
@@ -43,23 +67,29 @@ const de = {
     wheels: 'Räder',
     suspension: 'Federung',
     water: 'Wasserschlauch',
-    cover: 'Planen und Ladung'
+    cover: 'Planen und Ladung',
+    harness: 'Geschirr',
+    hop: 'Federkraft'
   },
   partInfo: {
     wheels: 'Mehr Halt am Berg.',
     suspension: 'Weicher und ruhiger fahren.',
     water: 'Das Tier hält länger durch.',
-    cover: 'Mehr Münzen bei jedem Fund.'
+    cover: 'Mehr Münzen bei jedem Fund.',
+    harness: 'Das Tier zieht kräftiger an.',
+    hop: 'Der Karren kann hüpfen. Stufe 1 schaltet den Hüpfer frei.'
   },
   animals: {
     donkey: 'Esel',
     ox: 'Ochse',
-    camel: 'Kamel'
+    camel: 'Kamel',
+    horse: 'Ägyptisches Pferd'
   },
   animalInfo: {
     donkey: 'Leicht und flink.',
     ox: 'Stark am Berg und ausdauernd, aber langsamer.',
-    camel: 'Schnell und ausdauernd.'
+    camel: 'Schnell und ausdauernd.',
+    horse: 'Das Prachtpferd: am schnellsten, stark und sehr ausdauernd.'
   },
   won: 'Geschafft! Das Ziel ist erreicht.',
   lostLoad: 'Uups, die Krüge sind umgekippt!',
@@ -88,6 +118,30 @@ const de = {
 }
 
 const en = {
+  story: 'In Bible times, merchants and pilgrims travelled with animals and carts over sand, hills and mountains. Here you drive six ways from the Bible. Your task: bring the cart with the jars safely to the goal. Collect coins, stop at the oases and make sure the animal gets water.',
+  taskLabel: 'Your task',
+  routeStory: {
+    egypt: 'Merchants travelled with camels and goods through the desert to Egypt. They took Joseph with them (Genesis 37:25–28).',
+    bethlehem: 'Joseph and Mary had to travel to Bethlehem because everyone was to be counted. It was a long way (Luke 2:1–5).',
+    magi: 'Wise men from the east saw a special star. They set out and looked for the new king (Matthew 2:1–2).',
+    jordan: 'The Jordan is the great river of the Holy Land. Many people were baptized on its banks (Mark 1:5).',
+    judea: 'The way to Jerusalem leads through the mountains of Judea. A psalm writer looks to the mountains and thinks of God’s help (Psalm 121:1–2).',
+    jerusalem: 'Families travelled to Jerusalem for the great feasts. The psalm writer is glad: we are going to the house of the Lord! (Psalm 122:1)'
+  },
+  routeTask: {
+    egypt: 'Drive the cart safely to the goal in Egypt. The sand is deep and slows you down.',
+    bethlehem: 'Bring the cart safely to Bethlehem. It goes over soft hills into the evening.',
+    magi: 'Follow the star through the night. The wind pushes and the sand slows you down.',
+    jordan: 'Drive through the green valley. The ground is wet and slippery, so drive calmly.',
+    judea: 'The slopes are steep. Get up speed and bring the cart safely over the mountains.',
+    jerusalem: 'Drive in the festival procession to the gate of Jerusalem. You can do the longest route!'
+  },
+  routeGo: 'Go!',
+  chars: { sand: 'Deep sand', hills: 'Hilly', steep: 'Steep', wind: 'Windy', slippery: 'Slippery', festive: 'Festival' },
+  wagon: 'Your wagon',
+  tier: { wood: 'Wooden cart', strong: 'Reinforced cart', painted: 'Painted cart with cover', gilded: 'Splendid wagon' },
+  hopHint: 'Spring power: tap the spring on the left and the cart hops!',
+  hopButton: 'Hop',
   title: 'Caravan over the Dunes',
   ref: 'Genesis 37 and Luke 2',
   intro: 'Drive the cart over hills and dunes. Collect coins and buy better parts in the workshop!',
@@ -131,23 +185,29 @@ const en = {
     wheels: 'Wheels',
     suspension: 'Suspension',
     water: 'Water skin',
-    cover: 'Tarp and load'
+    cover: 'Tarp and load',
+    harness: 'Harness',
+    hop: 'Spring power'
   },
   partInfo: {
     wheels: 'More grip on hills.',
     suspension: 'A softer, calmer ride.',
     water: 'The animal keeps going longer.',
-    cover: 'More coins with every find.'
+    cover: 'More coins with every find.',
+    harness: 'The animal pulls harder.',
+    hop: 'The cart can hop. Level 1 unlocks the hop.'
   },
   animals: {
     donkey: 'Donkey',
     ox: 'Ox',
-    camel: 'Camel'
+    camel: 'Camel',
+    horse: 'Egyptian horse'
   },
   animalInfo: {
     donkey: 'Light and quick.',
     ox: 'Strong uphill and lasting, but slower.',
-    camel: 'Fast and lasting.'
+    camel: 'Fast and lasting.',
+    horse: 'The splendid horse: fastest, strong and very lasting.'
   },
   won: 'Well done! You reached the goal.',
   lostLoad: 'Oops, the jars tipped over!',
@@ -176,6 +236,30 @@ const en = {
 }
 
 const es = {
+  story: 'En tiempos de la Biblia, mercaderes y peregrinos viajaban con animales y carretas por arena, colinas y montañas. Aquí recorres seis caminos de la Biblia. Tu tarea: lleva la carreta con las jarras sana y salva a la meta. Recoge monedas, para en los oasis y cuida de que el animal tenga agua.',
+  taskLabel: 'Tu tarea',
+  routeStory: {
+    egypt: 'Unos mercaderes viajaban con camellos y mercancías por el desierto hacia Egipto. Se llevaron también a José (Génesis 37:25–28).',
+    bethlehem: 'José y María tuvieron que viajar a Belén porque todos iban a ser censados. Fue un camino largo (Lucas 2:1–5).',
+    magi: 'Unos sabios de oriente vieron una estrella especial. Se pusieron en camino y buscaron al nuevo rey (Mateo 2:1–2).',
+    jordan: 'El Jordán es el gran río de la Tierra Santa. En sus orillas mucha gente se bautizaba (Marcos 1:5).',
+    judea: 'El camino a Jerusalén pasa por las montañas de Judea. Un salmista mira a los montes y piensa en la ayuda de Dios (Salmo 121:1–2).',
+    jerusalem: 'Las familias iban a Jerusalén para las grandes fiestas. El salmista se alegra: ¡vamos a la casa del Señor! (Salmo 122:1)'
+  },
+  routeTask: {
+    egypt: 'Lleva la carreta sana y salva a la meta en Egipto. La arena es profunda y frena.',
+    bethlehem: 'Lleva la carreta con cuidado hasta Belén. Pasas por colinas suaves hacia la tarde.',
+    magi: 'Sigue la estrella por la noche. El viento empuja y la arena frena.',
+    jordan: 'Conduce por el valle verde. El suelo está húmedo y resbala, ve con calma.',
+    judea: 'Las cuestas son empinadas. Coge impulso y lleva la carreta sana y salva por las montañas.',
+    jerusalem: 'Conduce en la procesión de fiesta hasta la puerta de Jerusalén. ¡Puedes con el camino más largo!'
+  },
+  routeGo: '¡Vamos!',
+  chars: { sand: 'Arena profunda', hills: 'Con colinas', steep: 'Empinado', wind: 'Con viento', slippery: 'Resbaladizo', festive: 'De fiesta' },
+  wagon: 'Tu carreta',
+  tier: { wood: 'Carreta de madera', strong: 'Carreta reforzada', painted: 'Carreta pintada con toldo', gilded: 'Carreta de lujo' },
+  hopHint: 'Fuerza del muelle: toca el muelle a la izquierda y la carreta salta.',
+  hopButton: 'Salto',
   title: 'Caravana sobre las dunas',
   ref: 'Génesis 37 y Lucas 2',
   intro: 'Conduce la carreta por colinas y dunas. Recoge monedas y compra mejoras en el taller.',
@@ -219,23 +303,29 @@ const es = {
     wheels: 'Ruedas',
     suspension: 'Suspensión',
     water: 'Odre de agua',
-    cover: 'Toldo y carga'
+    cover: 'Toldo y carga',
+    harness: 'Arnés',
+    hop: 'Fuerza del muelle'
   },
   partInfo: {
     wheels: 'Más agarre en las cuestas.',
     suspension: 'Un viaje más suave y tranquilo.',
     water: 'El animal aguanta más.',
-    cover: 'Más monedas en cada hallazgo.'
+    cover: 'Más monedas en cada hallazgo.',
+    harness: 'El animal tira con más fuerza.',
+    hop: 'La carreta puede saltar. El nivel 1 desbloquea el salto.'
   },
   animals: {
     donkey: 'Burro',
     ox: 'Buey',
-    camel: 'Camello'
+    camel: 'Camello',
+    horse: 'Caballo egipcio'
   },
   animalInfo: {
     donkey: 'Ligero y ágil.',
     ox: 'Fuerte en la subida y resistente, pero más lento.',
-    camel: 'Rápido y resistente.'
+    camel: 'Rápido y resistente.',
+    horse: 'El caballo de lujo: el más rápido, fuerte y muy resistente.'
   },
   won: '¡Lo lograste! Llegaste a la meta.',
   lostLoad: '¡Ups, las jarras se volcaron!',

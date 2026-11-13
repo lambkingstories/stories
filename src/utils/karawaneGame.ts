@@ -43,15 +43,26 @@ export interface RouteDef {
   oasisGap: number
   /** The look of the way: the files `fern-N`, `mitte-N`, `boden-N`, `deko-N` and the mood of the sky. */
   mood: 'day' | 'dusk' | 'night' | 'morning' | 'bright' | 'gold'
+  /** The character of the way: the grip of the ground (a factor), how deep the sand is (rolling resistance, 1 = none), the strength of the wind gusts (m/s squared), how big the hills are (a factor). */
+  grip: number
+  sand: number
+  wind: number
+  hillAmp: number
+  /** Where the first oasis lies (a lively start has it early). */
+  firstOasis?: number
+  /** A lively start: a first small jump and bigger hills within the first hundred metres. */
+  lively?: boolean
+  /** The symbols shown on the card of the route. */
+  chars: ('sand' | 'hills' | 'steep' | 'wind' | 'slippery' | 'festive')[]
 }
 
 export const ROUTES: RouteDef[] = [
-  { id: 'egypt', length: 900, goals: [250, 550, 900], seed: 1337, angles: [10, 20], relief: 14, oasisGap: 270, mood: 'day' },
-  { id: 'bethlehem', length: 1000, goals: [280, 620, 1000], seed: 2024, angles: [11, 22], relief: 24, oasisGap: 280, mood: 'dusk' },
-  { id: 'magi', length: 1100, goals: [300, 700, 1100], seed: 7771, angles: [11, 22], relief: 16, oasisGap: 290, mood: 'night' },
-  { id: 'jordan', length: 1200, goals: [320, 760, 1200], seed: 4242, angles: [12, 24], relief: 20, oasisGap: 300, mood: 'morning' },
-  { id: 'judea', length: 1300, goals: [340, 820, 1300], seed: 9001, angles: [13, 26], relief: 46, oasisGap: 310, mood: 'bright' },
-  { id: 'jerusalem', length: 1500, goals: [360, 900, 1500], seed: 5150, angles: [13, 26], relief: 36, oasisGap: 330, mood: 'gold' }
+  { id: 'egypt', length: 900, goals: [250, 550, 900], seed: 1337, angles: [10, 20], relief: 14, oasisGap: 270, mood: 'day', grip: 1, sand: 1.4, wind: 0, hillAmp: 1.35, firstOasis: 120, lively: true, chars: ['sand', 'hills'] },
+  { id: 'bethlehem', length: 1000, goals: [280, 620, 1000], seed: 2024, angles: [11, 22], relief: 24, oasisGap: 280, mood: 'dusk', grip: 1.05, sand: 1, wind: 0, hillAmp: 1.45, firstOasis: 130, lively: true, chars: ['hills'] },
+  { id: 'magi', length: 1100, goals: [300, 700, 1100], seed: 7771, angles: [11, 22], relief: 16, oasisGap: 290, mood: 'night', grip: 0.95, sand: 1.25, wind: 1.1, hillAmp: 1, chars: ['sand', 'wind'] },
+  { id: 'jordan', length: 1200, goals: [320, 760, 1200], seed: 4242, angles: [12, 24], relief: 20, oasisGap: 300, mood: 'morning', grip: 0.85, sand: 1, wind: 0.4, hillAmp: 0.85, chars: ['slippery'] },
+  { id: 'judea', length: 1300, goals: [340, 820, 1300], seed: 9001, angles: [13, 26], relief: 46, oasisGap: 310, mood: 'bright', grip: 1.1, sand: 1, wind: 0.6, hillAmp: 1.2, chars: ['steep', 'wind'] },
+  { id: 'jerusalem', length: 1500, goals: [360, 900, 1500], seed: 5150, angles: [13, 26], relief: 36, oasisGap: 330, mood: 'gold', grip: 1, sand: 1, wind: 0.3, hillAmp: 1.1, chars: ['festive'] }
 ]
 
 export const ROUTE_COUNT = ROUTES.length
@@ -139,19 +150,52 @@ export function generateTrack(route: number, seed?: number): Track {
   }
   const flat = (len: number) => put(len, () => 0)
 
-  // the start: a long flat run-up and a very gentle first hill
-  flat(34)
-  put(36, (u) => 0.7 * (1 - Math.cos(2 * Math.PI * u)) * 0.5)
-  flat(10)
+  /** A ramp, a short top and a steep drop behind it: the cart takes off and lands on a long gentle slope (a "jump"). */
+  const jump = (a1: number, l1: number, extraDrop: number) => {
+    const up = a1 * l1
+    const dy = Math.max(0.9, up - 0.8 + range(0.3, 1.3) + extraDrop)
+    const ld = dy / 0.7
+    const landing = 0.18
+    const ll = 9
+    const total = l1 + 1.2 + ld + ll
+    put(total, (u) => {
+      const m = u * total
+      if (m < l1) return a1 * m
+      if (m < l1 + 1.2) return up
+      if (m < l1 + 1.2 + ld) return up - 0.7 * (m - l1 - 1.2)
+      return up - dy - landing * (m - l1 - 1.2 - ld)
+    })
+    crests.push(i * STEP - ld - ll - 1.2)
+  }
+  const hill = (len: number, amp: number, sign = 1) => put(len, (u) => sign * amp * (1 - Math.cos(2 * Math.PI * u)) * 0.5)
 
-  let nextOasis = R.oasisGap * range(0.8, 0.95)
+  if (R.lively) {
+    // a lively start: soft hills with dips, a first little jump within the first hundred metres, bigger hills after it
+    flat(24)
+    hill(30, 1.1)
+    flat(6)
+    hill(24, 0.9, -1)
+    flat(8)
+    jump(Math.tan(rad(11)), 8, 0.3)
+    flat(8)
+    hill(34, 1.6)
+    hill(30, 1.2, -1)
+    flat(8)
+  } else {
+    // the start: a long flat run-up and a very gentle first hill
+    flat(34)
+    hill(36, 0.7)
+    flat(10)
+  }
+
+  let nextOasis = R.firstOasis ?? R.oasisGap * range(0.8, 0.95)
   let placedFinish = false
   let last = ''
   let guard = 0
   while (i < n && guard++ < 4000) {
     const x = i * STEP
     const d = Math.min(1, x / R.length)
-    const easy = x < 160 ? 0.55 : 1
+    const easy = x < 160 ? (R.lively ? 0.8 : 0.55) : 1
     const A = Math.tan(rad(lerp(R.angles[0], R.angles[1], d)) * easy)
     if (x >= R.length - 20) {
       // the finish: a long flat stretch, the gate stands exactly at the goal
@@ -179,12 +223,12 @@ export function generateTrack(route: number, seed?: number): Track {
     add('flat', 1.2, () => flat(range(10, 24)))
     add('hill', low ? 1 : 3, () => {
       const len = range(24, 46)
-      const amp = Math.min(range(1.2, 2.7) * (0.6 + 0.9 * d), (len * A * 0.9) / Math.PI)
+      const amp = Math.min(range(1.2, 2.7) * (0.6 + 0.9 * d) * R.hillAmp, (len * A * 0.9) / Math.PI)
       put(len, (u) => amp * (1 - Math.cos(2 * Math.PI * u)) * 0.5)
     })
     add('valley', high ? 3 : y > -6 ? 1.6 : 0, () => {
       const len = range(26, 48)
-      const amp = Math.min(range(1.2, 2.6) * (0.6 + 0.9 * d), (len * A * 0.9) / Math.PI)
+      const amp = Math.min(range(1.2, 2.6) * (0.6 + 0.9 * d) * R.hillAmp, (len * A * 0.9) / Math.PI)
       put(len, (u) => -amp * (1 - Math.cos(2 * Math.PI * u)) * 0.5)
     })
     add('bumps', 1.2 + 1.6 * d, () => {
@@ -203,25 +247,9 @@ export function generateTrack(route: number, seed?: number): Track {
       const dy = (A * 0.78 * len) / 1.5
       put(len, (u) => -dy * smooth(u))
     })
-    add('crest', x > 90 ? 1 + 2.4 * d : 0, () => {
-      // a ramp, a short top and a steep drop behind it: the cart takes off and lands on a long gentle slope (a "jump")
-      const a1 = Math.tan(rad(lerp(12, 29, d)))
-      const l1 = range(8, 13)
+    add('crest', x > (R.lively ? 45 : 90) ? 1 + 2.4 * d + (R.lively ? 0.6 : 0) : 0, () => {
       flat(range(12, 18))
-      const up = a1 * l1
-      const dy = Math.max(0.9, up - 0.8 + range(0.3, 1.3) + d * range(0.5, 2.2))
-      const ld = dy / 0.7
-      const landing = 0.18
-      const ll = 9
-      const total = l1 + 1.2 + ld + ll
-      put(total, (u) => {
-        const m = u * total
-        if (m < l1) return a1 * m
-        if (m < l1 + 1.2) return up
-        if (m < l1 + 1.2 + ld) return up - 0.7 * (m - l1 - 1.2)
-        return up - dy - landing * (m - l1 - 1.2 - ld)
-      })
-      crests.push(i * STEP - ld - ll - 1.2)
+      jump(Math.tan(rad(lerp(R.lively ? 10 : 12, 29, d))), range(8, 13), d * range(0.5, 2.2))
       flat(range(8, 14))
     })
     add('climb', d > 0.1 && !high ? 0.6 + 1.8 * d : 0, () => {
@@ -405,10 +433,17 @@ export type GameEvent =
   | { type: 'won' }
   | { type: 'tired' }
   | { type: 'low' }
+  | { type: 'hop' }
 
 export type Phase = 'play' | 'crash' | 'won' | 'tired'
 
+const R_OF = (r: Run): RouteDef => ROUTES[r.route]!
+
 export interface Run {
+  /** The seconds until the next hop is possible (a hop is a short push up from the ground). */
+  hopCd: number
+  /** Whether a support touches the ground in this step. */
+  touching: number
   track: Track
   stats: Stats
   route: number
@@ -493,6 +528,8 @@ export function newRun(track: Track, stats: Stats, from = 0): Run {
     pendFlips: 0,
     pendT: 0,
     pendDist: 0,
+    hopCd: 0,
+    touching: 0,
     taken: new Uint8Array(track.pickups.length),
     checkpoint: from,
     idle: 0,
@@ -611,7 +648,7 @@ function physics(r: Run, dt: number, input: Input, quiet = false): void {
     const vpx = r.vx - r.w * pry
     const vpy = r.vy + r.w * prx
     const vt = vpx * tx + vpy * ty
-    const grip = st.mu * Math.min(F, 14)
+    const grip = st.mu * R_OF(r).grip * Math.min(F, 14)
     let ft = 0
     if (si === 1) {
       if (gas) ft += Math.min(st.power * (1 - Math.min(1.4, Math.max(0, vt) / st.vmax)), grip)
@@ -625,7 +662,7 @@ function physics(r: Run, dt: number, input: Input, quiet = false): void {
     // the animal holds the cart when nobody pulls or brakes (it stands, or trots slower), the wheel rolls freely
     if (si === 1 && !gas && !brake) ft -= Math.max(-2.2, Math.min(2.2, vt * 2.5))
     // rolling and air friction
-    ft -= vt * 0.02 + (vt > 0 ? 0.0015 : -0.0015) * vt * vt
+    ft -= vt * (0.02 + 0.1 * (R_OF(r).sand - 1)) + (vt > 0 ? 0.0015 : -0.0015) * vt * vt
     fx += ft * tx
     fy += ft * ty
     torque += prx * ft * ty - pry * ft * tx
@@ -677,6 +714,12 @@ function physics(r: Run, dt: number, input: Input, quiet = false): void {
     const wy = r.y + HEAD_POINT[0] * s + HEAD_POINT[1] * c
     if (heightAt(tr, wx) - wy > 0.12) touchHead = true
   }
+
+  r.touching = touching
+  if (r.hopCd > 0) r.hopCd -= dt
+  // gusts of wind (a slow push to and fro, stronger on some ways)
+  const wind = R_OF(r).wind
+  if (wind > 0 && running) fx += wind * Math.sin(r.t * 0.45 + r.route) * (0.6 + 0.4 * Math.sin(r.t * 1.3))
 
   // the integration
   r.vx += fx * dt
@@ -836,6 +879,20 @@ export function stepRun(r: Run, dt: number, input: Input): void {
     n++
   }
   if (n === 14) r.acc = 0
+}
+
+/** A hop: a short push up from the ground (only with the part "Federkraft", then every so many seconds). True when it jumped. */
+export function hop(r: Run): boolean {
+  if (r.phase !== 'play' || r.stats.hopV <= 0 || r.hopCd > 0) return false
+  // from the ground, or a moment after leaving it
+  if (r.touching === 0 && r.airT > 0.18) return false
+  const c = Math.cos(r.a)
+  const s = Math.sin(r.a)
+  r.vx += -s * r.stats.hopV * 0.5
+  r.vy = Math.max(r.vy, 0) + c * r.stats.hopV
+  r.hopCd = r.stats.hopCool
+  r.events.push({ type: 'hop' })
+  return true
 }
 
 /** The speed along the ground (m/s), for the counters and the dust. */

@@ -10,14 +10,17 @@ export const DIR = 'images/spiele-gross/karawane/'
 
 /** The pictures every route needs. */
 export const COMMON_IMAGES = [
-  'karren', 'rad', 'esel-a', 'esel-b', 'kamel-a', 'kamel-b', 'ochse-a', 'ochse-b',
+  'karren', 'karren-2', 'karren-3', 'karren-4', 'rad', 'rad-2', 'rad-3', 'rad-4',
+  'esel-a', 'esel-b', 'kamel-a', 'kamel-b', 'ochse-a', 'ochse-b',
+  ...['esel', 'ochse', 'kamel', 'pferd'].flatMap((a) => [1, 2, 3, 4, 5, 6].map((k) => `${a}-teil-${k}`)),
   'krug-gross', 'krug-klein', 'sack', 'korb', 'plane', 'scherben',
-  'dattel', 'schlauch', 'muenze', 'beutel', 'feder', 'oase', 'ziel'
+  'dattel', 'schlauch', 'muenze', 'beutel', 'feder', 'oase', 'ziel',
+  ...[1, 2, 3, 4, 5, 6].map((k) => `sym-${k}`)
 ]
 
 /** The pictures of one route (n counts from 1): sky with far mountains, mid hills, the strip of ground and the six decor things. */
 export function routeImages(n: number): string[] {
-  return [`fern-${n}`, `mitte-${n}`, `boden-${n}`, ...[1, 2, 3, 4, 5, 6].map((k) => `deko-${n}-${k}`)]
+  return [`fern-${n}`, `mitte-${n}`, `boden-${n}`, ...[1, 2, 3, 4, 5, 6].map((k) => `deko-${n}-${k}`), ...[1, 2, 3, 4, 5].map((k) => `vorn-${n}-${k}`)]
 }
 
 /** The number from `META` (or a fallback), for pictures whose measures were not made yet. */
@@ -55,7 +58,8 @@ export interface AnimalArt {
 export const ANIMAL_ART: Record<AnimalId, AnimalArt> = {
   donkey: { file: 'esel', h: 1.45, footX: 0.54, ringX: 0.53, ringY: 0.55 },
   ox: { file: 'ochse', h: 1.5, footX: 0.5, ringX: 0.65, ringY: 0.41 },
-  camel: { file: 'kamel', h: 1.85, footX: 0.49, ringX: 0.61, ringY: 0.44 }
+  camel: { file: 'kamel', h: 1.85, footX: 0.49, ringX: 0.61, ringY: 0.44 },
+  horse: { file: 'pferd', h: 1.9, footX: 0.5, ringX: 0.6, ringY: 0.5 }
 }
 
 // ── things on the way ──────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -106,3 +110,63 @@ export const LOOKS: Look[] = [
 
 /** How many metres of the ground picture fit into its width (the picture repeats along the way). */
 export const BAND_M = 6.4
+
+/**
+ * Where the layers of the background are on a screen of `hPx` pixels with the camera at height `camY` (metres). The mid hills end at their bottom
+ * edge, and everything below it down to the bottom of the screen is filled with their colour: without that fill a jump (the ground far below the
+ * screen) showed a broad bar of the sky picture there. The sky picture always covers the whole screen.
+ */
+export function backgroundBands(look: Look, hPx: number, camY: number, ppm: number) {
+  const skyHpx = hPx * look.skyH
+  let skyTop = hPx * look.skyTop + Math.max(-1.2, Math.min(1.2, (camY - 3) * 0.04)) * hPx * 0.04
+  skyTop = Math.min(0, Math.max(hPx - skyHpx, skyTop))
+  const midH = hPx * look.midH
+  const midBottom = hPx * look.midBottom + Math.max(-2, Math.min(2, (camY - 3) * 0.5)) * ppm * 0.18
+  return { skyTop, skyH: skyHpx, midH, midBottom, fillFrom: Math.min(hPx, midBottom - 1), fillTo: hPx }
+}
+
+// ── the cart grows with the parts ──────────────────────────────────────────────────────────────────────────────────────────
+/** The cart pictures from the plain wooden cart (0) to the gilded wagon (3), and the wheels from wood to gold. */
+export const CART_IMAGES = ['karren', 'karren-2', 'karren-3', 'karren-4']
+export const WHEEL_IMAGES = ['rad', 'rad-2', 'rad-3', 'rad-4']
+
+/** Measures of a cart picture (a missing one falls back to the plain cart). */
+export function cartMeta(name: string) {
+  return {
+    mw: meta(name, 'mw', CART.mw),
+    mh: meta(name, 'mh', CART.mh),
+    ax: meta(name, 'ax', CART.ax),
+    ay: meta(name, 'ay', CART.ay),
+    tx: meta(name, 'tx', CART.tx),
+    ty: meta(name, 'ty', CART.ty),
+    /** The share of the picture height where the loading board lies. */
+    bed: meta(name, 'bed', 0.49)
+  }
+}
+
+/** The names of the cart levels in the workshop (text keys). */
+export const TIER_KEYS = ['wood', 'strong', 'painted', 'gilded']
+
+// ── the paper-doll animals ─────────────────────────────────────────────────────────────────────────────────────────────────
+/**
+ * How the painted pieces of an animal fit together (shares of each picture). `prefix` + 1 is the body, +2 the tail, +3 to +6 the legs (near fore,
+ * far fore, near hind, far hind). `fore` and `hind` are the places on the body where the legs are fixed, `ring` the collar ring where the strap of the
+ * pole is tied, `tailAt` where the tail is fixed on the body, `tailPivot` the top of the tail, `legX` the fixing on each leg (share of its width),
+ * `knee` the share of the leg height where the knee or hock bends.
+ */
+export interface RigArt {
+  prefix: string
+  fore: { x: number; y: number }
+  hind: { x: number; y: number }
+  ring: { x: number; y: number }
+  tailAt: { x: number; y: number }
+  tailPivot: { x: number; y: number }
+  legX: number[]
+  knee: number[]
+}
+export const RIG_ART: Record<AnimalId, RigArt> = {
+  donkey: { prefix: 'esel-teil-', fore: { x: 0.567, y: 0.855 }, hind: { x: 0.153, y: 0.836 }, ring: { x: 0.49, y: 0.755 }, tailAt: { x: 0.033, y: 0.7 }, tailPivot: { x: 0.7, y: 0.02 }, legX: [0.49, 0.49, 0.55, 0.55], knee: [0.46, 0.46, 0.42, 0.42] },
+  ox: { prefix: 'ochse-teil-', fore: { x: 0.6, y: 0.85 }, hind: { x: 0.18, y: 0.84 }, ring: { x: 0.62, y: 0.7 }, tailAt: { x: 0.03, y: 0.6 }, tailPivot: { x: 0.5, y: 0.02 }, legX: [0.5, 0.5, 0.55, 0.55], knee: [0.46, 0.46, 0.42, 0.42] },
+  camel: { prefix: 'kamel-teil-', fore: { x: 0.64, y: 0.85 }, hind: { x: 0.2, y: 0.84 }, ring: { x: 0.64, y: 0.7 }, tailAt: { x: 0.03, y: 0.6 }, tailPivot: { x: 0.5, y: 0.02 }, legX: [0.5, 0.5, 0.55, 0.55], knee: [0.46, 0.46, 0.42, 0.42] },
+  horse: { prefix: 'pferd-teil-', fore: { x: 0.62, y: 0.85 }, hind: { x: 0.2, y: 0.84 }, ring: { x: 0.62, y: 0.7 }, tailAt: { x: 0.03, y: 0.6 }, tailPivot: { x: 0.5, y: 0.02 }, legX: [0.5, 0.5, 0.55, 0.55], knee: [0.46, 0.46, 0.42, 0.42] }
+}

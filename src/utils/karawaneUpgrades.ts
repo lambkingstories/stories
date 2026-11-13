@@ -4,19 +4,23 @@
  * and buys other draught animals. Everything here is plain calculation (no Vue), so that it can be tested; the save lives on the device only.
  */
 
-export type UpgradeId = 'wheels' | 'suspension' | 'water' | 'cover'
-export const UPGRADE_IDS: UpgradeId[] = ['wheels', 'suspension', 'water', 'cover']
+export type UpgradeId = 'wheels' | 'suspension' | 'water' | 'cover' | 'harness' | 'hop'
+export const UPGRADE_IDS: UpgradeId[] = ['wheels', 'suspension', 'water', 'cover', 'harness', 'hop']
 
 /** The levels one can buy (level 0 is what one starts with) and the coins each step costs. */
 export const UPGRADES: Record<UpgradeId, { max: number; costs: number[] }> = {
   wheels: { max: 5, costs: [100, 220, 450, 800, 1400] },
   suspension: { max: 5, costs: [100, 220, 450, 800, 1400] },
   water: { max: 5, costs: [90, 200, 400, 750, 1300] },
-  cover: { max: 4, costs: [150, 350, 700, 1300] }
+  cover: { max: 4, costs: [150, 350, 700, 1300] },
+  /** A better harness: more pull (the animal starts faster and climbs better). */
+  harness: { max: 4, costs: [110, 240, 480, 900] },
+  /** The spring strength: the hop (a short push up from the ground, for dips and little jumps); level 1 gives the hop itself. */
+  hop: { max: 3, costs: [120, 260, 520] }
 }
 
-export type AnimalId = 'donkey' | 'ox' | 'camel'
-export const ANIMAL_IDS: AnimalId[] = ['donkey', 'ox', 'camel']
+export type AnimalId = 'donkey' | 'ox' | 'camel' | 'horse'
+export const ANIMAL_IDS: AnimalId[] = ['donkey', 'ox', 'camel', 'horse']
 
 export interface AnimalStats {
   /** The pull from a standstill (metres per second squared). */
@@ -34,7 +38,9 @@ export interface AnimalStats {
 export const ANIMALS: Record<AnimalId, AnimalStats> = {
   donkey: { power: 7.2, vmax: 14, stamina: 0, grip: 0, cost: 0 },
   ox: { power: 9, vmax: 10.5, stamina: 30, grip: 0.25, cost: 400 },
-  camel: { power: 7.6, vmax: 17, stamina: 15, grip: 0.1, cost: 900 }
+  camel: { power: 7.6, vmax: 17, stamina: 15, grip: 0.1, cost: 900 },
+  /** The Egyptian horse: the top of the animals (fast, strong, lasting, expensive). */
+  horse: { power: 8.2, vmax: 19, stamina: 28, grip: 0.18, cost: 2400 }
 }
 
 /** What the vehicle is like with the bought parts: everything the physics needs. */
@@ -54,6 +60,9 @@ export interface Stats {
   power: number
   vmax: number
   grip: number
+  /** The strength of the hop (m/s upwards, 0 = no hop yet) and the seconds before the next one. */
+  hopV: number
+  hopCool: number
   /** How strongly the cart rights itself on the ground (the strength of the help for the youngest). */
   assist: number
   animal: AnimalId
@@ -70,12 +79,14 @@ export interface Save {
   /** All coins ever collected and all rounds played (for the pride of it). */
   earned: number
   rounds: number
+  /** The routes whose story card was shown (it comes once). */
+  seen: number[]
 }
 
 export const SAVE_KEY = 'lk-karawane-v1'
 
 export function newSave(): Save {
-  return { v: 1, coins: 0, up: { wheels: 0, suspension: 0, water: 0, cover: 0 }, owned: ['donkey'], animal: 'donkey', best: [], earned: 0, rounds: 0 }
+  return { v: 1, coins: 0, up: { wheels: 0, suspension: 0, water: 0, cover: 0, harness: 0, hop: 0 }, owned: ['donkey'], animal: 'donkey', best: [], earned: 0, rounds: 0, seen: [] }
 }
 
 type Store = Pick<Storage, 'getItem' | 'setItem'>
@@ -102,6 +113,7 @@ export function loadSave(store: Store | null = defaultStore()): Save {
     s.best = (Array.isArray(raw.best) ? raw.best : []).map((m) => Math.max(0, Math.floor(Number(m) || 0)))
     s.earned = Math.max(0, Math.floor(Number(raw.earned) || 0))
     s.rounds = Math.max(0, Math.floor(Number(raw.rounds) || 0))
+    s.seen = (Array.isArray(raw.seen) ? raw.seen : []).map((n) => Math.floor(Number(n))).filter((n) => Number.isFinite(n) && n >= 0)
   } catch {
     return newSave()
   }
@@ -181,9 +193,11 @@ export function statsFor(s: Save): Stats {
     travel: 0.36 + 0.04 * s.up.suspension,
     staminaSec: 55 + 9 * s.up.water + a.stamina,
     coinMult: 1 + 0.25 * s.up.cover,
-    power: a.power,
+    power: a.power * (1 + 0.07 * s.up.harness),
     vmax: a.vmax,
     grip: a.grip,
+    hopV: s.up.hop > 0 ? 2.6 + 0.8 * s.up.hop : 0,
+    hopCool: 2.3 - 0.3 * s.up.hop,
     assist: 2.6,
     animal: s.animal
   }
@@ -196,4 +210,16 @@ export function fullSave(): Save {
   s.owned = [...ANIMAL_IDS]
   s.animal = 'camel'
   return s
+}
+
+/** How the cart looks: the bought parts make it grow from a plain wooden cart (0) through a reinforced one (1) and a painted one with a cover (2) to a gilded wagon (3). */
+export function wagonTier(s: Save): number {
+  const sum = s.up.wheels + s.up.suspension + s.up.cover + s.up.harness
+  return sum >= 13 ? 3 : sum >= 8 ? 2 : sum >= 3 ? 1 : 0
+}
+
+/** The look of the wheel (0 wood, 1 iron, 2 painted, 3 gilded) from the wheel part. */
+export function wheelLook(s: Save): number {
+  const w = s.up.wheels
+  return w >= 5 ? 3 : w >= 4 ? 2 : w >= 2 ? 1 : 0
 }

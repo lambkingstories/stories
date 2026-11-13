@@ -20,6 +20,7 @@ import {
   ROUTE_COUNT,
   generateTrack,
   heightAt,
+  hop,
   newRun,
   starsFor,
   stepRun,
@@ -43,16 +44,19 @@ import {
   selectAnimal,
   statsFor,
   upgradeCost,
+  wagonTier,
+  wheelLook,
   type AnimalId,
   type UpgradeId
 } from '@/utils/karawaneUpgrades'
+import { RIG_PARAMS, newRigState, stepRig } from '@/utils/karawaneRig'
+import { drawLight, drawRigAnimal, drawStars, hasRig } from '@/utils/karawaneRender'
 import {
   ANIMAL_ART,
   AXLE_X,
   AXLE_Y,
   BAND_M,
-  BED_Y,
-  CART,
+  CART_IMAGES,
   COMMON_IMAGES,
   DECOR_H,
   DIR,
@@ -60,6 +64,10 @@ import {
   LOOKS,
   PICKUP_H,
   PICKUP_IMAGE,
+  TIER_KEYS,
+  WHEEL_IMAGES,
+  backgroundBands,
+  cartMeta,
   meta,
   routeImages
 } from '@/utils/karawaneArt'
@@ -134,7 +142,9 @@ const routeRef = (i: number) => t(`app.bigGames.karawane.routeRef.${ROUTES[i]!.i
 const thumb = (i: number) => pic(`karte-${i + 1}`)
 
 // what the page shows while it plays (the game itself is not reactive)
-const hud = reactive({ meters: 0, coins: 0, stamina: 1, best: 0, gas: false, brake: false, low: false, poppedCoins: 0 })
+const hud = reactive({ meters: 0, coins: 0, stamina: 1, best: 0, gas: false, brake: false, low: false, poppedCoins: 0, hasHop: false, hopReady: 1 })
+/** The route whose story card is open (-1: none). */
+const storyRoute = ref(-1)
 const outcome = reactive({
   phase: 'play' as 'won' | 'crash' | 'tired',
   crashKind: 'load' as 'load' | 'animal',
@@ -168,6 +178,15 @@ let wheelAng = 0
 let dustClock = 0
 let endTimer = 0
 let ended = false
+const rigState = newRigState()
+const ringOut = { x: 0, y: 0 }
+/** How the cart looks (from the bought parts): the cart picture and the wheel picture. */
+const wagon = { tier: 0, wheel: 0 }
+function updateWagon() {
+  wagon.tier = wagonTier(save)
+  wagon.wheel = wheelLook(save)
+}
+updateWagon()
 
 const input: Input = { gas: false, brake: false }
 const keys = { gas: false, brake: false }
@@ -232,7 +251,10 @@ async function start(i: number, fromCheckpoint = 0) {
   await load(routeImages(i + 1))
   makeBand(i)
   track = generateTrack(i)
+  updateWagon()
   run = newRun(track, statsFor(save), fromCheckpoint)
+  hud.hasHop = run.stats.hopV > 0
+  hud.hopReady = 1
   hud.meters = Math.max(0, Math.floor(run.meters))
   hud.coins = 0
   hud.stamina = 1
@@ -378,6 +400,9 @@ function handle(e: GameEvent): void {
   } else if (e.type === 'won') {
     play('fanfare', 0.7)
     for (let k = 0; k < 30; k++) emitParticle('spark', x + (Math.random() - 0.5) * 6, y + 1 + Math.random() * 3, (Math.random() - 0.5) * 6, 2 + Math.random() * 5, 1.2, 0.22)
+  } else if (e.type === 'hop') {
+    play('flip', 0.7, 1.5)
+    for (let k = 0; k < 5; k++) emitParticle('dust', run.rear.cx, heightAt(track, run.rear.cx) + 0.1, (Math.random() - 0.5) * 3, Math.random() * 1.4, 0.6, 0.3)
   } else if (e.type === 'low') {
     play('wrong', 0.3)
     floatText(t('app.bigGames.karawane.floatLow'), x, y + 2.8, '#ffd9b0')
@@ -407,9 +432,19 @@ function onDown(e: PointerEvent) {
 function onUp(e: PointerEvent) {
   if (touches.delete(e.pointerId)) refreshInput()
 }
+/** The hop (the part "Federkraft"): a short push up. */
+function doHop() {
+  if (screen.value !== 'play' || paused.value || how.value) return
+  hop(run)
+}
 function onKey(e: KeyboardEvent) {
   const down = e.type === 'keydown'
-  if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D' || e.key === ' ' || e.key === 'ArrowUp') {
+  if (down && !e.repeat && (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W')) {
+    doHop()
+    e.preventDefault()
+    return
+  }
+  if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D' || e.key === ' ') {
     keys.gas = down
     e.preventDefault()
   } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A' || e.key === 'ArrowDown') {
@@ -472,6 +507,10 @@ function advance(dt: number) {
       bob.y[i] = Math.max(-0.25, Math.min(0.3, bob.y[i]!))
     }
     // the counters
+    if (hud.hasHop) {
+      const rdy = run.hopCd > 0 ? 1 - run.hopCd / run.stats.hopCool : 1
+      if (Math.abs(hud.hopReady - rdy) > 0.02) hud.hopReady = rdy
+    }
     const m = Math.max(0, Math.floor(run.meters))
     if (hud.meters !== m) hud.meters = m
     if (hud.coins !== run.coins) hud.coins = run.coins
@@ -484,6 +523,8 @@ function advance(dt: number) {
       if (!ended && endTimer > (run.phase === 'crash' ? 1.5 : 1.1)) finish()
     }
   }
+  // the legs of the animal (they rest while it stands, also behind the menu)
+  stepRig(rigState, RIG_PARAMS[run.stats.animal], dt * (run.phase === 'crash' ? timeScale : 1), playing ? run.vx : 0, playing && run.touching === 0 && run.airT > 0.08)
   if (shake > 0) shake = Math.max(0, shake - dt * 1.6)
   updateCamera(dt)
   for (const p of particles) {
@@ -524,27 +565,37 @@ function sprite(c: CanvasRenderingContext2D, name: string, x: number, y: number,
 }
 
 function layerSky(c: CanvasRenderingContext2D, look: (typeof LOOKS)[number], r: number) {
+  const b = backgroundBands(look, hPx, camY, ppm)
   const s = img[`fern-${r + 1}`]
   c.fillStyle = look.skyColor
   c.fillRect(0, 0, wPx, hPx)
   if (!s) return
-  const h = hPx * look.skyH
-  const w = h * (s.width / s.height)
-  const shiftY = (camY - run.y) * 0
-  let top = hPx * look.skyTop + shiftY + Math.max(-1.2, Math.min(1.2, (camY - 3) * 0.04)) * hPx * 0.04
-  top = Math.min(0, Math.max(hPx - h, top))
-  const scroll = (((camX * ppm * look.skyPar) % w) + w) % w
-  for (let x = -scroll; x < wPx; x += w) c.drawImage(s, x, top, w + 1, h)
+  const w = b.skyH * (s.width / s.height)
+  // the clouds drift a little by themselves
+  const scroll = ((((camX * ppm * look.skyPar) + clock * 5) % w) + w) % w
+  for (let x = -scroll; x < wPx; x += w) c.drawImage(s, x, b.skyTop, w + 1, b.skyH)
 }
 
+/** Two layers of hills (a far, pale, small one and a near one) and, below their bottom edge, a fill in their colour down to the bottom of the screen: no bar shows in a jump. */
 function layerMid(c: CanvasRenderingContext2D, look: (typeof LOOKS)[number], r: number) {
   const m = img[`mitte-${r + 1}`]
   if (!m) return
-  const h = hPx * look.midH
-  const w = h * (m.width / m.height)
-  const bottom = hPx * look.midBottom + Math.max(-2, Math.min(2, (camY - 3) * 0.5)) * ppm * 0.18
+  const b = backgroundBands(look, hPx, camY, ppm)
+  const col = (META[`mitte-${r + 1}`]?.bottom as number[] | undefined) ?? [200, 150, 90]
+  // the far layer: smaller, slower, paler
+  const hf = b.midH * 0.68
+  const wf = hf * (m.width / m.height)
+  const sf = (((camX * ppm * look.midPar * 0.45) % wf) + wf) % wf
+  c.globalAlpha = 0.6
+  for (let x = -sf; x < wPx; x += wf) c.drawImage(m, x, b.midBottom - hf - b.midH * 0.16, wf + 1, hf)
+  c.globalAlpha = 1
+  const w = b.midH * (m.width / m.height)
   const scroll = (((camX * ppm * look.midPar) % w) + w) % w
-  for (let x = -scroll; x < wPx; x += w) c.drawImage(m, x, bottom - h, w + 1, h)
+  for (let x = -scroll; x < wPx; x += w) c.drawImage(m, x, b.midBottom - b.midH, w + 1, b.midH)
+  if (b.fillTo > b.fillFrom) {
+    c.fillStyle = `rgb(${col[0]},${col[1]},${col[2]})`
+    c.fillRect(0, b.fillFrom, wPx, b.fillTo - b.fillFrom + 1)
+  }
 }
 
 function drawTerrain(c: CanvasRenderingContext2D, r: number) {
@@ -560,14 +611,18 @@ function drawTerrain(c: CanvasRenderingContext2D, r: number) {
   const first = Math.floor(x0 / stepM) * stepM
   path.moveTo(toX(first), hPx + 4)
   let minY = hPx
+  let last = first
   for (let x = first; x <= x1 + stepM; x += stepM) {
     const sy = toY(heightAt(track, x))
     if (sy < minY) minY = sy
     path.lineTo(toX(x), sy)
+    last = x
   }
-  path.lineTo(toX(first + Math.ceil((x1 - first) / stepM + 1) * stepM), hPx + 4)
+  path.lineTo(toX(last), hPx + 4)
   path.closePath()
-  const g = c.createLinearGradient(0, Math.max(0, minY), 0, hPx)
+  // the ground is out of sight (a high jump): nothing to draw
+  if (minY > hPx + 8) return
+  const g = c.createLinearGradient(0, Math.max(0, minY), 0, Math.max(hPx, minY + 1))
   g.addColorStop(0, `rgb(${top[0]},${top[1]},${top[2]})`)
   g.addColorStop(1, `rgb(${bottom[0]},${bottom[1]},${bottom[2]})`)
   c.fillStyle = g
@@ -588,6 +643,7 @@ function drawTerrain(c: CanvasRenderingContext2D, r: number) {
   for (let x = first; x <= x1; x += dw) {
     const cx = x + dw / 2
     const sy = toY(heightAt(track, cx))
+    if (sy > hPx + dh) continue
     const slope = (heightAt(track, cx + 0.3) - heightAt(track, cx - 0.3)) / 0.6
     const ang = -Math.atan(slope)
     const sx = (((x * pxPerM) % b.width) + b.width) % b.width
@@ -598,7 +654,7 @@ function drawTerrain(c: CanvasRenderingContext2D, r: number) {
     c.restore()
   }
   // the ground is a little darker than the dunes behind it, deeper down more so, and its edge is drawn with a soft brown line
-  const shade = c.createLinearGradient(0, Math.max(0, minY), 0, hPx)
+  const shade = c.createLinearGradient(0, Math.max(0, minY), 0, Math.max(hPx, minY + 1))
   shade.addColorStop(0, 'rgba(110,55,10,0.10)')
   shade.addColorStop(0.5, 'rgba(90,40,5,0.28)')
   shade.addColorStop(1, 'rgba(60,25,0,0.5)')
@@ -627,61 +683,70 @@ function drawCart(c: CanvasRenderingContext2D) {
   const f = run.front
   const fx = f.cx
   const fy = f.cy - FOOT_R
-  const ai = img[`${a.file}-${useB ? 'b' : 'a'}`] ?? img[`${a.file}-a`]
+  const ang = run.a * 0.45 + f.slope * 0.55
   let ringWX = fx + 0.6
   let ringWY = fy + 0.8
-  if (ai) {
-    const hh = a.h
-    const ww = (ai.width / ai.height) * hh
-    const ang = run.a * 0.45 + f.slope * 0.55
-    const bobY = walking ? Math.abs(Math.sin(run.x * 1.4)) * 0.05 : 0
-    c.save()
-    c.translate(fx, -(fy + bobY))
-    c.rotate(-ang)
-    c.drawImage(ai, -a.footX * ww, -hh, ww, hh)
-    c.restore()
-    // the collar ring in the world
-    const lx = (a.ringX - a.footX) * ww
-    const ly = (1 - a.ringY) * hh
-    ringWX = fx + lx * Math.cos(ang) - ly * Math.sin(ang)
-    ringWY = fy + bobY + lx * Math.sin(ang) + ly * Math.cos(ang)
+  if (hasRig(img, st.animal)) {
+    drawRigAnimal(c, img, st.animal, rigState, fx, fy, ang, ringOut)
+    ringWX = ringOut.x
+    ringWY = ringOut.y
+  } else {
+    // the two pictures of a walking animal, while the pieces are not there
+    const ai = img[`${a.file}-${useB ? 'b' : 'a'}`] ?? img[`${a.file}-a`]
+    if (ai) {
+      const hh = a.h
+      const ww = (ai.width / ai.height) * hh
+      const bobY = walking ? Math.abs(Math.sin(run.x * 1.4)) * 0.05 : 0
+      c.save()
+      c.translate(fx, -(fy + bobY))
+      c.rotate(-ang)
+      c.drawImage(ai, -a.footX * ww, -hh, ww, hh)
+      c.restore()
+      const lx = (a.ringX - a.footX) * ww
+      const ly = (1 - a.ringY) * hh
+      ringWX = fx + lx * Math.cos(ang) - ly * Math.sin(ang)
+      ringWY = fy + bobY + lx * Math.sin(ang) + ly * Math.cos(ang)
+    }
   }
 
-  // the cart body
+  // the cart body: it grows with the parts that were bought
   const cs = Math.cos(run.a)
   const sn = Math.sin(run.a)
   const toW = (lx: number, ly: number): [number, number] => [run.x + lx * cs - ly * sn, run.y + lx * sn + ly * cs]
-  const car = img.karren
+  const cartName = img[CART_IMAGES[wagon.tier]!] ? CART_IMAGES[wagon.tier]! : 'karren'
+  const cm = cartMeta(cartName)
+  const car = img[cartName]
+  const bedY = AXLE_Y + (cm.ay - cm.bed) * cm.mh
   c.save()
   c.translate(run.x, -run.y)
   c.rotate(-run.a)
   if (car) {
-    c.drawImage(car, AXLE_X - CART.ax * CART.mw, -AXLE_Y - CART.ay * CART.mh, CART.mw, CART.mh)
+    c.drawImage(car, AXLE_X - cm.ax * cm.mw, -AXLE_Y - cm.ay * cm.mh, cm.mw, cm.mh)
   } else {
     c.fillStyle = '#a8742f'
     c.fillRect(-2.1, 0, 2.1, 0.4)
   }
-  // the load on the bed: more of it with a better tarp
-  if (!jarsGone) {
+  // the load on the bed: more of it with a better tarp (a covered wagon hides it)
+  if (!jarsGone && wagon.tier < 2) {
     const n = Math.min(LOAD_ITEMS.length, 2 + save.up.cover)
-    const bedLeft = AXLE_X - CART.ax * CART.mw
+    const bedLeft = AXLE_X - cm.ax * cm.mw
     for (let i = 0; i < n; i++) {
       const it = LOAD_ITEMS[i]!
-      sprite(c, it.image, bedLeft + it.x + 0.0, BED_Y + 0.03 + bob.y[i]!, it.h, 0.5, 1)
+      sprite(c, it.image, bedLeft + it.x + 0.0, bedY + 0.03 + bob.y[i]!, it.h, 0.5, 1)
     }
     if (save.up.cover >= 3) {
       const pl = img.plane
       if (pl) {
         const w = 1.9
         const h = (pl.height / pl.width) * w
-        c.drawImage(pl, bedLeft + 0.2, -(BED_Y + 0.02) - h + 0.08, w, h)
+        c.drawImage(pl, bedLeft + 0.2, -(bedY + 0.02) - h + 0.08, w, h)
       }
     }
   }
   c.restore()
 
   // the pole is tied to the collar with a strap
-  const [tx, ty] = toW(AXLE_X - CART.ax * CART.mw + CART.tx * CART.mw, AXLE_Y + (CART.ay - CART.ty) * CART.mh)
+  const [tx, ty] = toW(AXLE_X - cm.ax * cm.mw + cm.tx * cm.mw, AXLE_Y + (cm.ay - cm.ty) * cm.mh)
   c.strokeStyle = '#7a4a22'
   c.lineWidth = 0.07
   c.lineCap = 'round'
@@ -692,7 +757,7 @@ function drawCart(c: CanvasRenderingContext2D) {
 
   // the wheel
   const wr = st.wheelR
-  const wi = img.rad
+  const wi = img[WHEEL_IMAGES[wagon.wheel]!] ?? img.rad
   c.save()
   c.translate(run.rear.cx, -run.rear.cy)
   c.rotate(wheelAng)
@@ -707,6 +772,68 @@ function drawCart(c: CanvasRenderingContext2D) {
   c.restore()
 }
 
+/** The things that stand on the ground behind the cart: the oases, the gate, and the decor, with their feet in the ground (the ground is drawn after them and covers their lower edge). */
+function drawStanding(c: CanvasRenderingContext2D, r: number, xMin: number, xMax: number) {
+  for (const o of track.oases) {
+    if (o > xMin - 8 && o < xMax + 8) sprite(c, 'oase', o, heightAt(track, o) - 0.2, 3.6, 0.5, 1)
+  }
+  if (track.finishX > xMin - 6 && track.finishX < xMax + 6) sprite(c, 'ziel', track.finishX, heightAt(track, track.finishX) - 0.2, 5.2, 0.5, 1)
+  const heights = DECOR_H[r + 1] ?? []
+  for (const d of track.decor) {
+    if (d.x < xMin - 6 || d.x > xMax + 6) continue
+    const im = img[`deko-${r + 1}-${d.kind + 1}`]
+    if (!im) continue
+    const h = (heights[d.kind] ?? 2) * d.scale
+    const w = (im.width / im.height) * h
+    // the lowest and the highest ground under the foot of the thing: it stands on the lowest point, and the higher ground covers its lower edge
+    let lo = 1e9
+    let hi = -1e9
+    for (let q = -2; q <= 2; q++) {
+      const gy = heightAt(track, d.x + q * w * 0.2)
+      if (gy < lo) lo = gy
+      if (gy > hi) hi = gy
+    }
+    // a thing on a steep slope would stand crooked: it is left out there
+    if (hi - lo > Math.max(0.5, h * 0.55)) continue
+    c.save()
+    c.translate(d.x, -(lo - Math.min(0.3, h * 0.07)))
+    if (d.flip) c.scale(-1, 1)
+    c.drawImage(im, -w / 2, -h, w, h)
+    c.restore()
+  }
+}
+
+/** Plants and stones in front of the cart, a little bigger and faster than the ground (a near layer that gives depth). */
+function drawForeground(c: CanvasRenderingContext2D, r: number, xMin: number, xMax: number) {
+  const names = [1, 2, 3, 4, 5].map((k) => img[`vorn-${r + 1}-${k}`])
+  if (!names[0] && !names[1]) return
+  const Z = 1.22
+  c.save()
+  // scale about the middle of the view: things move faster than the ground
+  c.translate(camX, -camY)
+  c.scale(Z, Z)
+  c.translate(-camX, camY)
+  const lo = Math.floor((camX + (xMin - camX) / Z) / 9)
+  const hi = Math.ceil((camX + (xMax - camX) / Z) / 9)
+  for (let cell = lo; cell <= hi; cell++) {
+    // one or two things in every cell of nine metres, at fixed places (a hash of the cell, no random numbers at run time)
+    for (let n = 0; n < 2; n++) {
+      const hsh = Math.sin((cell * 2 + n) * 12.9898 + r * 4.1) * 43758.5453
+      const u = hsh - Math.floor(hsh)
+      const v = Math.sin((cell * 2 + n) * 78.233 + r) * 9127.31
+      const w2 = v - Math.floor(v)
+      if (u < 0.35) continue
+      const im = names[Math.floor(w2 * 5)]
+      if (!im) continue
+      const x = cell * 9 + n * 4.5 + u * 3
+      const h = 0.5 + w2 * 0.6
+      const wImg = (im.width / im.height) * h
+      c.drawImage(im, x - wImg / 2, -(heightAt(track, x) - 0.15 - w2 * 0.5), wImg, h)
+    }
+  }
+  c.restore()
+}
+
 function draw(time: number) {
   const c = ctx
   const cv = canvas.value
@@ -715,35 +842,22 @@ function draw(time: number) {
   const look = LOOKS[r]!
   c.setTransform(dpr, 0, 0, dpr, 0, 0)
   layerSky(c, look, r)
+  if (ROUTES[r]!.mood === 'night') drawStars(c, wPx, hPx * 0.55, time)
   layerMid(c, look, r)
-  drawTerrain(c, r)
 
   // the world (y points up in the game, so the picture is drawn at -y)
   const k = ppm * dpr
   const sh = shake > 0 ? (Math.random() - 0.5) * shake * 0.25 : 0
   const shy = shake > 0 ? (Math.random() - 0.5) * shake * 0.25 : 0
-  c.setTransform(k, 0, 0, k, k * (wPx / ppm / 2 - camX + sh), k * (hPx / ppm / 2 + camY + shy))
+  const worldT = () => c.setTransform(k, 0, 0, k, k * (wPx / ppm / 2 - camX + sh), k * (hPx / ppm / 2 + camY + shy))
   const xMin = camX - wPx / ppm / 2 - 6
   const xMax = camX + wPx / ppm / 2 + 6
-
-  // oases, the gate and the things along the way
-  for (const o of track.oases) {
-    if (o > xMin - 8 && o < xMax + 8) sprite(c, 'oase', o, heightAt(track, o) - 0.1, 3.6, 0.5, 1)
-  }
-  if (track.finishX > xMin - 6 && track.finishX < xMax + 6) sprite(c, 'ziel', track.finishX, heightAt(track, track.finishX) - 0.1, 5.2, 0.5, 1)
-  const heights = DECOR_H[r + 1] ?? []
-  for (const d of track.decor) {
-    if (d.x < xMin - 6 || d.x > xMax + 6) continue
-    const im = img[`deko-${r + 1}-${d.kind + 1}`]
-    if (!im) continue
-    const h = (heights[d.kind] ?? 2) * d.scale
-    const w = (im.width / im.height) * h
-    c.save()
-    c.translate(d.x, -(heightAt(track, d.x) - 0.06))
-    if (d.flip) c.scale(-1, 1)
-    c.drawImage(im, -w / 2, -h, w, h)
-    c.restore()
-  }
+  worldT()
+  drawStanding(c, r, xMin, xMax)
+  // the ground covers the feet of everything that stands behind the cart
+  c.setTransform(dpr, 0, 0, dpr, 0, 0)
+  drawTerrain(c, r)
+  worldT()
 
   // the pickups
   for (let i = 0; i < track.pickups.length; i++) {
@@ -798,9 +912,11 @@ function draw(time: number) {
     }
   }
   c.globalAlpha = 1
+  drawForeground(c, r, xMin, xMax)
 
-  // the words that rise
+  // the light over everything, then the words that rise
   c.setTransform(dpr, 0, 0, dpr, 0, 0)
+  drawLight(c, ROUTES[r]!.mood, wPx, hPx, time)
   c.textAlign = 'center'
   c.lineJoin = 'round'
   for (const f of floaters) {
@@ -833,6 +949,49 @@ const resultText = computed(() => {
 const canResume = computed(() => outcome.checkpoint > 0 && outcome.phase !== 'won')
 const nextRoute = computed(() => (outcome.phase === 'won' && route.value < ROUTE_COUNT - 1 ? route.value + 1 : -1))
 
+/** Picks a route: the first time its story card comes (what it is about and what the task is), after that the route starts at once. */
+function pick(i: number) {
+  if (!save.seen.includes(i)) {
+    storyRoute.value = i
+    return
+  }
+  void start(i)
+}
+function storyGo() {
+  const i = storyRoute.value
+  storyRoute.value = -1
+  if (i < 0) return
+  if (!save.seen.includes(i)) save.seen.push(i)
+  persist(save)
+  void start(i)
+}
+const SYMBOL: Record<string, string> = { sand: 'sym-1', steep: 'sym-2', wind: 'sym-3', slippery: 'sym-4', hills: 'sym-5', festive: 'sym-6' }
+const symbol = (ch: string) => pic(SYMBOL[ch] ?? 'sym-5')
+const storyOf = (i: number) => t(`app.bigGames.karawane.routeStory.${ROUTES[i]!.id}`)
+const taskOf = (i: number) => t(`app.bigGames.karawane.routeTask.${ROUTES[i]!.id}`)
+
+// the wagon in the workshop: the cart with its wheel, drawn from the painted pictures
+const wagonView = computed(() => {
+  const st = save
+  const tier = wagonTier(st)
+  const name = CART_IMAGES[tier]!
+  const m = cartMeta(name)
+  const wr = statsFor(st).wheelR
+  const W = 170
+  const k = W / m.mw
+  const yMin = Math.min(0, m.ay * m.mh - wr)
+  const yMax = Math.max(m.mh, m.ay * m.mh + wr)
+  return {
+    tier,
+    cart: pic(name),
+    wheel: pic(WHEEL_IMAGES[wheelLook(st)]!),
+    box: { width: `${W}px`, height: `${(yMax - yMin) * k}px` },
+    cartStyle: { width: `${W}px`, top: `${-yMin * k}px` },
+    wheelStyle: { width: `${2 * wr * k}px`, left: `${(m.ax * m.mw - wr) * k}px`, top: `${(m.ay * m.mh - wr - yMin) * k}px` }
+  }
+})
+const tierName = computed(() => t(`app.bigGames.karawane.tier.${TIER_KEYS[wagonView.value.tier]}`))
+
 const stamBar = computed(() => `${Math.round(hud.stamina * 100)}%`)
 
 function levelOf(id: UpgradeId): number {
@@ -843,6 +1002,7 @@ function pips(id: UpgradeId): number[] {
 }
 /** Behind the menu and the workshop the cart stands with the parts that were bought. */
 function refreshScene() {
+  updateWagon()
   if (screen.value !== 'play') run = newRun(track, statsFor(save))
 }
 function buyPart(id: UpgradeId) {
@@ -865,8 +1025,8 @@ function animalAction(id: AnimalId) {
     play('found', 0.7)
   } else play('wrong', 0.3)
 }
-const animalThumb = (id: AnimalId) => pic(`${ANIMAL_ART[id].file}-a`)
-const partThumb = (id: UpgradeId) => pic({ wheels: 'rad', suspension: 'feder', water: 'schlauch', cover: 'krug-gross' }[id])
+const animalThumb = (id: AnimalId) => pic(`${ANIMAL_ART[id].file}-stand`)
+const partThumb = (id: UpgradeId) => pic({ wheels: 'rad-2', suspension: 'feder', water: 'schlauch', cover: 'krug-gross', harness: 'esel-a', hop: 'sym-5' }[id])
 
 function leave() {
   leaveFullscreen()
@@ -936,10 +1096,10 @@ onBeforeUnmount(() => {
       div(class="kg-spinner")
 
     //- the routes
-    div(v-else-if="screen === 'menu'" v-show="!shop && !how" class="kg-menu")
+    div(v-else-if="screen === 'menu'" v-show="!shop && !how && storyRoute < 0" class="kg-menu")
       div(class="kg-card")
         h1(class="kg-title") {{ t('app.bigGames.karawane.title') }}
-        p(class="kg-text kg-intro") {{ t('app.bigGames.karawane.intro') }}
+        p(class="kg-text kg-intro") {{ t('app.bigGames.karawane.story') }}
         div(class="kg-purse")
           img(:src="coinIcon" alt="" class="kg-coin" @error="hideBroken")
           span(class="kg-purse-n") {{ save.coins }}
@@ -951,12 +1111,16 @@ onBeforeUnmount(() => {
             type="button"
             class="kg-route"
             :data-test="`karawane-route-${i}`"
-            @click="start(i)"
+            @click="pick(i)"
           )
             img(:src="thumb(i)" alt="" class="kg-route-pic" loading="lazy" @error="hideBroken")
             span(class="kg-route-no") {{ i + 1 }}
             span(class="kg-route-name") {{ routeName(i) }}
             span(class="kg-route-ref") {{ routeRef(i) }}
+            span(class="kg-chips")
+              span(v-for="ch in r.chars" :key="ch" class="kg-chip")
+                img(:src="symbol(ch)" alt="" @error="hideBroken")
+                | {{ t('app.bigGames.karawane.chars.' + ch) }}
             span(class="kg-route-foot")
               AdventureStars(:stars="levelStars[i] ?? 0" :size="18")
               span(v-if="(save.best[i] ?? 0) > 0" class="kg-route-best") {{ t('app.bigGames.karawane.best') }} {{ save.best[i] }} {{ t('app.bigGames.karawane.meters') }}
@@ -987,9 +1151,20 @@ onBeforeUnmount(() => {
             span(:key="hud.poppedCoins" class="kg-coins-n" :class="{ 'kg-pop': hud.poppedCoins > 0 }") {{ hud.coins }}
           div(v-if="hud.best > 0" class="kg-best") {{ t('app.bigGames.karawane.best') }} {{ hud.best }} {{ t('app.bigGames.karawane.meters') }}
       //- the two pedals (the whole halves of the screen work; these only show what is pressed)
+      button(
+        v-if="hud.hasHop"
+        type="button"
+        class="kg-hop"
+        :class="{ 'is-ready': hud.hopReady >= 1 }"
+        :style="{ '--ready': hud.hopReady }"
+        :aria-label="t('app.bigGames.karawane.hopButton')"
+        data-test="karawane-hop"
+        @pointerdown.stop.prevent="doHop"
+      )
+        img(:src="pic('feder')" alt="" @error="hideBroken")
       img(:src="arrowLeft" alt="" class="kg-pedal kg-pedal--brake" :class="{ 'is-on': hud.brake }" @error="hideBroken")
       img(:src="arrowLeft" alt="" class="kg-pedal kg-pedal--gas" :class="{ 'is-on': hud.gas }" @error="hideBroken")
-      div(v-if="tipShown" class="kg-tip") {{ t('app.bigGames.karawane.tip') }}
+      div(v-if="tipShown" class="kg-tip") {{ hud.hasHop ? t('app.bigGames.karawane.hopHint') : t('app.bigGames.karawane.tip') }}
 
       div(v-if="paused && !how" class="kg-menu kg-menu--dim")
         div(class="kg-card kg-card--small")
@@ -1023,14 +1198,32 @@ onBeforeUnmount(() => {
           AdvButton(tone="blau" small @click="shop = true") {{ t('app.bigGames.karawane.workshop') }}
           AdvButton(tone="blau" small @click="toMenu") {{ t('app.bigGames.karawane.menu') }}
 
-    //- the workshop
+    //- the story card of a route (the first time): what it is about and what the task is
+    div(v-if="storyRoute >= 0 && loaded" class="kg-menu kg-menu--dim" data-test="karawane-story")
+      div(class="kg-card kg-story")
+        img(:src="thumb(storyRoute)" alt="" class="kg-story-pic" @error="hideBroken")
+        h2(class="kg-title") {{ routeName(storyRoute) }}
+        p(class="kg-text") {{ storyOf(storyRoute) }}
+        p(class="kg-task")
+          b {{ t('app.bigGames.karawane.taskLabel') }}:
+          |  {{ taskOf(storyRoute) }}
+        AdvButton(data-test="karawane-story-go" @click="storyGo") {{ t('app.bigGames.karawane.routeGo') }}
+
+    //- the workshop: the wagon grows with the parts, six parts and four animals
     div(v-if="shop && loaded" class="kg-menu kg-menu--dim" data-test="karawane-workshop")
       div(class="kg-card kg-shop")
-        h2(class="kg-title") {{ t('app.bigGames.karawane.workshop') }}
-        div(class="kg-purse")
-          img(:src="coinIcon" alt="" class="kg-coin" @error="hideBroken")
-          span(class="kg-purse-n") {{ save.coins }}
-        p(class="kg-rules") {{ t('app.bigGames.karawane.workshopIntro') }}
+        div(class="kg-shop-head")
+          div(class="kg-wagon" data-test="karawane-wagon" :data-tier="wagonView.tier")
+            div(class="kg-wagon-fig" :style="wagonView.box")
+              img(:src="wagonView.cart" alt="" class="kg-wagon-cart" :style="wagonView.cartStyle" @error="hideBroken")
+              img(:src="wagonView.wheel" alt="" class="kg-wagon-wheel" :style="wagonView.wheelStyle" @error="hideBroken")
+            span(class="kg-wagon-name") {{ tierName }}
+          div(class="kg-shop-title")
+            h2(class="kg-title") {{ t('app.bigGames.karawane.workshop') }}
+            div(class="kg-purse")
+              img(:src="coinIcon" alt="" class="kg-coin" @error="hideBroken")
+              span(class="kg-purse-n") {{ save.coins }}
+            p(class="kg-rules") {{ t('app.bigGames.karawane.workshopIntro') }}
         div(class="kg-parts")
           div(v-for="id in UPGRADE_IDS" :key="id" class="kg-part")
             img(:src="partThumb(id)" alt="" class="kg-part-pic" @error="hideBroken")
@@ -1625,7 +1818,9 @@ onBeforeUnmount(() => {
     min-height: 40px
 
   .kg-intro
-    display: none
+    font-size: 0.72rem
+    line-height: 1.25
+    max-width: 760px
 
   .kg-routes
     grid-template-columns: repeat(6, minmax(0, 1fr))
@@ -1656,7 +1851,7 @@ onBeforeUnmount(() => {
     gap: 4px
 
   .kg-parts
-    grid-template-columns: repeat(4, minmax(0, 1fr))
+    grid-template-columns: repeat(6, minmax(0, 1fr))
 
   .kg-part
     flex-direction: column
@@ -1680,4 +1875,181 @@ onBeforeUnmount(() => {
 
   .kg-animal span
     display: none
+
+// the character of a route (small painted symbols with a word), the story card, the wagon preview in the workshop, the hop button
+.kg-chips
+  display: flex
+  flex-wrap: wrap
+  gap: 3px
+  padding: 2px 8px 0
+
+.kg-chip
+  display: inline-flex
+  align-items: center
+  gap: 3px
+  padding: 1px 6px 1px 2px
+  border-radius: 999px
+  background: rgba(224, 160, 48, 0.18)
+  font-size: 0.66rem
+  font-weight: 700
+  white-space: nowrap
+
+  img
+    height: 16px
+    width: auto
+
+.kg-story
+  width: min(560px, 100%)
+  gap: 8px
+
+.kg-story-pic
+  width: 100%
+  max-height: 150px
+  object-fit: cover
+  border-radius: 14px
+
+.kg-task
+  margin: 0
+  padding: 8px 12px
+  border-radius: 14px
+  background: rgba(224, 160, 48, 0.2)
+  line-height: 1.35
+
+.kg-shop-head
+  display: flex
+  align-items: center
+  justify-content: center
+  gap: 16px
+  width: 100%
+
+.kg-shop-title
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: 4px
+
+.kg-wagon
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: 2px
+
+.kg-wagon-fig
+  position: relative
+
+.kg-wagon-cart
+  position: absolute
+  left: 0
+  height: auto
+
+.kg-wagon-wheel
+  position: absolute
+  height: auto
+
+.kg-wagon-name
+  font-size: 0.8rem
+  font-weight: 800
+
+.kg-hop
+  position: absolute
+  left: max(24px, env(safe-area-inset-left))
+  bottom: calc(max(18px, env(safe-area-inset-bottom)) + 78px)
+  width: 64px
+  height: 64px
+  padding: 8px
+  border: none
+  border-radius: 50%
+  background: rgba(255, 250, 235, 0.55)
+  opacity: 0.55
+  cursor: pointer
+  touch-action: none
+
+  img
+    width: 100%
+    height: 100%
+    object-fit: contain
+    pointer-events: none
+
+  &.is-ready
+    opacity: 1
+    background: rgba(255, 250, 235, 0.9)
+    box-shadow: 0 0 0 3px rgba(224, 160, 48, 0.8)
+
+// a slimmer top bar: the play field takes the room
+.kg-hud
+  padding-top: max(4px, env(safe-area-inset-top))
+  padding-bottom: 2px
+
+.kg-pause
+  width: 38px
+  height: 38px
+  font-size: 0.8rem
+
+.kg-meters
+  padding: 0 12px
+
+.kg-meters-n
+  font-size: 1.25rem
+
+.kg-meters-u
+  font-size: 0.8rem
+
+.kg-track
+  height: 7px
+
+.kg-mark
+  top: -8px
+  font-size: 0.95rem
+
+.kg-stam
+  padding: 1px 8px 1px 4px
+
+.kg-stam-ico
+  height: 20px
+
+.kg-stam-bar
+  height: 9px
+
+.kg-coins
+  padding: 1px 10px 1px 6px
+  font-size: 1.05rem
+
+.kg-coins .kg-coin
+  height: 20px
+
+.kg-best
+  font-size: 0.68rem
+  padding: 0 8px
+
+.kg-pedal
+  width: 64px
+  bottom: max(10px, env(safe-area-inset-bottom))
+
+.kg-tip
+  bottom: 14px
+  padding: 6px 14px
+  font-size: 0.85rem
+
+@media (max-height: 520px) and (min-width: 560px)
+  .kg-shop-head
+    gap: 10px
+
+  .kg-wagon-fig
+    transform: scale(0.75)
+    transform-origin: top center
+    margin-bottom: -34px
+
+  .kg-story-pic
+    max-height: 70px
+
+  .kg-story
+    gap: 4px
+    padding: 10px 16px
+
+  .kg-story .kg-text, .kg-task
+    font-size: 0.82rem
+    line-height: 1.25
+
+  .kg-animals
+    grid-template-columns: repeat(4, minmax(0, 1fr))
 </style>
