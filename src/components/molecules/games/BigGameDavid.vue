@@ -11,9 +11,11 @@ import useBigGames, { howSeen, markHowSeen } from '@/use/useBigGames'
 import useSfx from '@/use/useSfx'
 import useMusic from '@/use/useMusic'
 import { prependBaseUrl } from '@/utils/function'
+import { approach, stepCount, walkPose } from '@/utils/davidWalk'
+import { RIG_PICTURES, createRig } from '@/utils/davidRig'
 import {
-  GOLIATH_K,
   GOLIATH_LEVEL,
+  KINDS,
   GROUND,
   H,
   LEVELS,
@@ -30,7 +32,7 @@ import {
   shoot,
   starsFor,
   step,
-  sway,
+  walked,
   type Animal,
   type Game,
   type Kind
@@ -46,7 +48,9 @@ const ID = 'david'
 // ── the pictures ────────────────────────────────────────────────────────────────────────────────────────────────────────────
 const NAMES = [
   'wiese', 'david-bereit', 'david-spannt', 'david-spannt-koerper', 'david-arm', 'david-schiesst', 'stein', 'schaf', 'schaf-grasen', 'lamm', 'busch', 'fels-gross', 'fels-mittel', 'fels-klein',
-  'wolf-a', 'wolf-b', 'wolf-treffer', 'baer-a', 'baer-b', 'baer-treffer', 'loewe-a', 'loewe-b', 'loewe-treffer', 'adler-a', 'adler-b', 'adler-treffer', 'goliat-a', 'goliat-b', 'goliat-schild', 'goliat-1', 'goliat-2', 'goliat-3', 'goliat-4'
+  'wolf-a', 'wolf-b', 'wolf-treffer', 'baer-a', 'baer-b', 'baer-treffer', 'loewe-a', 'loewe-b', 'loewe-treffer', 'adler-a', 'adler-b', 'adler-treffer',
+  // the painted parts of Goliath
+  ...RIG_PICTURES
 ]
 const img: Record<string, HTMLImageElement | undefined> = {}
 const loaded = ref(false)
@@ -124,6 +128,8 @@ function start(i: number) {
   aim = null
   puffs = []
   runners = []
+  gait = new Map()
+  goliath = { shieldK: 0, steps: 0, shake: 0 }
   throwPose = 0
   outcome.phase = 'play'
   outcome.stars = 0
@@ -134,12 +140,27 @@ function start(i: number) {
   paused.value = false
   // in the first rounds the card explains the game first (the game waits)
   how.value = !howSeen(ID)
-  paused.value = how.value
-  tipShown.value = !how.value && (i === 0 || i === EAGLE_TIP_LEVEL || i === GOLIATH_LEVEL)
+  goliathCard.value = false
+  maybeGoliathStory()
+  paused.value = how.value || goliathCard.value
+  tipShown.value = !paused.value && (i === 0 || i === EAGLE_TIP_LEVEL || i === GOLIATH_LEVEL)
   window.setTimeout(() => (tipShown.value = false), 6500)
   tryLandscape()
 }
 const tipShown = ref(false)
+/** Before Goliath comes (the first time): who he is and what the task is, on a card (not at every level). */
+const goliathCard = ref(false)
+function maybeGoliathStory() {
+  goliathCard.value = !how.value && level.value === GOLIATH_LEVEL && !howSeen(`${ID}-goliath`)
+  if (goliathCard.value) paused.value = true
+}
+function closeGoliathStory() {
+  markHowSeen(`${ID}-goliath`)
+  goliathCard.value = false
+  paused.value = false
+  tipShown.value = true
+  window.setTimeout(() => (tipShown.value = false), 6500)
+}
 /** The first level with eagles gets a word about them. */
 const EAGLE_TIP_LEVEL = LEVELS.findIndex((l) => l.waves.some((w) => w.kind === 'eagle'))
 /** The card that explains the game: pull back and let go (in the first rounds, and from the button in the levels list). */
@@ -152,6 +173,8 @@ function closeHow() {
   how.value = false
   markHowSeen(ID)
   if (screen.value === 'play') {
+    maybeGoliathStory()
+    if (goliathCard.value) return
     paused.value = false
     // the card is gone for good: a short hint in the game takes its place
     tipShown.value = true
@@ -260,24 +283,29 @@ function resize() {
   oy = (vh - H * scale) / 2
 }
 
+/** One step of the whole game (rules, legs, puffs), `dt` seconds. */
+function update(dt: number) {
+  step(g, dt)
+  stepGait()
+  stepGoliath(dt)
+  sound(g.events)
+  if (throwPose > 0) throwPose -= dt
+  for (const p of puffs) p.t += dt
+  puffs = puffs.filter((p) => p.t < 0.6)
+  for (const r of runners) {
+    r.t += dt
+    r.x -= 300 * dt
+  }
+  runners = runners.filter((r) => r.x > -150)
+  if (hud.sheep !== g.sheep) hud.sheep = g.sheep
+  if (hud.stones !== g.stonesLeft) hud.stones = g.stonesLeft
+}
+
 function frame(now: number) {
   raf = requestAnimationFrame(frame)
   const dt = Math.min(0.033, (now - last) / 1000 || 0)
   last = now
-  if (screen.value === 'play' && !paused.value && !(portrait.value && !showRotateAnyway.value)) {
-    step(g, dt)
-    sound(g.events)
-    if (throwPose > 0) throwPose -= dt
-    for (const p of puffs) p.t += dt
-    puffs = puffs.filter((p) => p.t < 0.6)
-    for (const r of runners) {
-      r.t += dt
-      r.x -= 300 * dt
-    }
-    runners = runners.filter((r) => r.x > -150)
-    if (hud.sheep !== g.sheep) hud.sheep = g.sheep
-    if (hud.stones !== g.stonesLeft) hud.stones = g.stonesLeft
-  }
+  if (screen.value === 'play' && !paused.value && !(portrait.value && !showRotateAnyway.value)) update(dt)
   draw(now / 1000)
 }
 
@@ -311,32 +339,74 @@ const KIND_SPRITE: Record<Exclude<Kind, 'goliath'>, { a: string; b: string; hit:
   eagle: { a: 'adler-a', b: 'adler-b', hit: 'adler-treffer', k: 0.42 }
 }
 
-/**
- * The picture of Goliath's stride: four phases of a walk cycle (left foot forward, legs passing, right foot forward, legs passing), one step
- * per 0.55 seconds. While those pictures are not painted yet, the two old ones take over.
- */
-function goliathStep(a: Animal): string {
-  if (img['goliat-1'] && img['goliat-2'] && img['goliat-3'] && img['goliat-4']) return `goliat-${(Math.floor(a.t / 0.55) % 4) + 1}`
-  return Math.floor(a.t * 1.6) % 2 ? 'goliat-b' : 'goliat-a'
+/** Goliath is a puppet of painted parts (see `utils/davidRig.ts` and `utils/davidWalk.ts`): the feet stand still on the ground while he walks. */
+const rig = createRig(img)
+/** What happens around Goliath: how far his shield is raised (0 to 1, softly), the steps counted, the shake of the ground. */
+let goliath = { shieldK: 0, steps: 0, shake: 0 }
+
+function stepGoliath(dt: number) {
+  const a = g.animals.find((x) => x.kind === 'goliath')
+  goliath.shake = Math.max(0, goliath.shake - dt * 3.2)
+  if (!a) return
+  goliath.shieldK = approach(goliath.shieldK, a.shield > 0 ? 1 : 0, 11, dt)
+  if (a.mode !== 'come') return
+  const n = stepCount(walked(a), KINDS.goliath.speed)
+  if (n > goliath.steps) {
+    goliath.steps = n
+    // a heavy foot comes down: dust at the foot, the ground trembles a little
+    const pose = walkPose(walked(a), KINDS.goliath.speed)
+    const leg = n % 2 === 1 ? pose.far : pose.near
+    const fx = a.x + 3 - leg.footX
+    puffs.push({ x: fx, y: GROUND - 6, t: 0, kind: 'dust' }, { x: fx + 26, y: GROUND - 2, t: 0.12, kind: 'dust' })
+    goliath.shake = 1
+  }
 }
 
 function drawAnimal(c: CanvasRenderingContext2D, a: Animal) {
   const bottom = GROUND - a.lift + 8
   if (a.kind === 'goliath') {
-    const name = a.shield > 0 ? 'goliat-schild' : goliathStep(a)
-    // when he falls he tips forward, towards David
     const ease = a.fall * a.fall * (3 - 2 * a.fall)
-    spr(c, name, a.x, bottom + sway(a), GOLIATH_K, false, -ease * (Math.PI / 2) * 0.96)
+    rig.draw(c, { x: a.x + 3, ground: GROUND + 8, walked: walked(a), speed: KINDS.goliath.speed, fall: ease, shield: goliath.shieldK })
     return
   }
   const s = KIND_SPRITE[a.kind]
   const flee = a.mode === 'flee'
   const hurt = a.hit < 0.25
-  const name = hurt ? s.hit : Math.floor(a.t * (flee ? 9 : 5)) % 2 ? s.b : s.a
-  // the eagle beats its wings slower than a runner steps, and has no steps to bob
-  const wings = a.kind === 'eagle' ? (Math.floor(a.t * (flee ? 8 : 3.5)) % 2 ? s.b : s.a) : name
-  const bob = a.kind === 'eagle' ? 0 : Math.sin(a.t * 12) * 3
-  spr(c, hurt ? s.hit : wings, a.x, bottom + bob, s.k, flee)
+  if (a.kind === 'eagle') {
+    // the eagle beats its wings slower than a runner steps, and has no steps to bob
+    const wings = Math.floor(a.t * (flee ? 8 : 3.5)) % 2 ? s.b : s.a
+    spr(c, hurt ? s.hit : wings, a.x, bottom, s.k, flee)
+    return
+  }
+  // The legs of the runners: one phase that grows with the DISTANCE the animal really ran (so the feet follow the ground at any speed, also
+  // when it is knocked back or runs off), the two leg pictures change at the turning points of the stride, and the body hops and rocks with
+  // the same phase (so nothing twitches against anything else).
+  const ph = gait.get(a.id)?.ph ?? 0
+  const air = a.lift > 4
+  const w = Math.sin(ph * Math.PI * 2)
+  const name = hurt ? s.hit : air ? s.a : w >= 0 ? s.a : s.b
+  const hop = air || hurt ? 0 : Math.abs(w) * GAIT_HOP[a.kind]
+  const rock = air || hurt ? 0 : Math.sin(ph * Math.PI * 4 + 0.6) * 0.03
+  spr(c, name, a.x, bottom - hop, s.k, flee, flee ? -rock : rock)
+}
+
+/** The length of one stride (two leg pictures) of the runners, and how high the body hops with it. */
+const STRIDE: Record<Exclude<Kind, 'goliath' | 'eagle'>, number> = { wolf: 64, bear: 88, lion: 78 }
+const GAIT_HOP: Record<Exclude<Kind, 'goliath' | 'eagle'>, number> = { wolf: 5, bear: 3, lion: 6 }
+/** The phase of the stride of every running animal (in strides), by its id. */
+let gait = new Map<number, { ph: number; x: number }>()
+function stepGait() {
+  for (const a of g.animals) {
+    if (a.kind === 'goliath' || a.kind === 'eagle') continue
+    let s = gait.get(a.id)
+    if (!s) {
+      s = { ph: 0, x: a.x }
+      gait.set(a.id, s)
+    }
+    s.ph += Math.abs(a.x - s.x) / STRIDE[a.kind]
+    s.x = a.x
+  }
+  if (gait.size > 40) gait = new Map([...gait].filter(([id]) => g.animals.some((a) => a.id === id)))
 }
 
 function draw(time: number) {
@@ -351,6 +421,8 @@ function draw(time: number) {
   c.beginPath()
   c.rect(0, 0, W, H)
   c.clip()
+  // a heavy step of Goliath makes the ground tremble a little
+  if (goliath.shake > 0.01) c.translate(0, Math.sin(time * 70) * goliath.shake * 2.4)
 
   // the meadow (the picture is 3:2, the scene 16:9: the ground line of the picture is put on the ground of the scene)
   const bg = img.wiese
@@ -507,6 +579,8 @@ onMounted(async () => {
   bodyOverflow = document.body.style.overflow
   document.body.style.overflow = 'hidden'
   ctx = canvas.value?.getContext('2d') ?? null
+  // with `?probe=1` the game can be looked at from the console (to check the pictures and the stride)
+  if (window.location.href.includes('probe=1')) (window as unknown as { __david?: unknown }).__david = { start, advance(seconds: number) { for (let t = 0; t < seconds; t += 1 / 60) update(1 / 60); draw(performance.now() / 1000) }, get game() { return g }, get goliath() { return goliath }, get paused() { return paused.value }, set paused(v: boolean) { paused.value = v } }
   resize()
   window.addEventListener('resize', resize)
   // the fighting music of the game (it stops with the game)
@@ -544,7 +618,11 @@ onBeforeUnmount(() => {
       div(class="dg-card")
         h1(class="dg-title") {{ t('app.bigGames.david.title') }}
         p(class="dg-ref") {{ t('app.bigGames.david.ref') }}
-        p(class="dg-text") {{ t('app.bigGames.david.intro') }}
+        div(class="dg-story" data-test="david-story")
+          span(class="dg-story-head") {{ t('app.bigGames.david.storyHead') }}
+          p(class="dg-story-text") {{ t('app.bigGames.david.story') }}
+          span(class="dg-story-ref") {{ t('app.bigGames.david.storyRef') }}
+          p(class="dg-story-task") {{ t('app.bigGames.david.task') }}
         div(class="dg-levels")
           button(
             v-for="(n, i) in levelNames"
@@ -575,7 +653,16 @@ onBeforeUnmount(() => {
           img(v-for="n in stonesRow" :key="n" :src="pic('stein')" alt="" class="dg-ico dg-ico--stone")
       div(v-if="tipShown" class="dg-tip") {{ level === GOLIATH_LEVEL ? t('app.bigGames.david.tipGoliath') : level === EAGLE_TIP_LEVEL ? t('app.bigGames.david.tipEagle') : t('app.bigGames.david.tip') }}
 
-      div(v-if="paused && !how" class="dg-menu dg-menu--dim")
+      //- before Goliath (once): who he is, and the task
+      div(v-if="goliathCard && !how" class="dg-menu dg-menu--dim")
+        div(class="dg-card dg-card--small dg-story-card" data-test="david-goliath-story")
+          span(class="dg-story-head") {{ levelTitle(level) }}
+          p(class="dg-story-text") {{ t('app.bigGames.david.goliathStory') }}
+          span(class="dg-story-ref") {{ t('app.bigGames.david.goliathRef') }}
+          p(class="dg-story-task") {{ t('app.bigGames.david.goliathTask') }}
+          AdvButton(data-test="david-goliath-go" @click="closeGoliathStory") {{ t('app.bigGames.david.go') }}
+
+      div(v-else-if="paused && !how" class="dg-menu dg-menu--dim")
         div(class="dg-card dg-card--small")
           h2(class="dg-title") {{ t('app.bigGames.david.pause') }}
           AdvButton(@click="paused = false") {{ t('app.bigGames.david.resume') }}
@@ -596,6 +683,7 @@ onBeforeUnmount(() => {
     div(v-if="how && loaded" class="dg-menu dg-menu--dim")
       div(class="dg-card dg-how")
         h2(class="dg-title") {{ t('app.bigGames.david.howTitle') }}
+        p(class="dg-story-task dg-how-task") {{ t('app.bigGames.david.task') }}
         //- the golden arrow of the swipe cross of Elijah's game, turned to the left: pull back
         img(:src="arrowSrc" alt="" class="dg-how-pic" @error="hideBroken")
         p(class="dg-how-line") {{ t('app.bigGames.david.howPull') }}
@@ -694,6 +782,52 @@ onBeforeUnmount(() => {
   margin: 0
   font-size: 0.85rem
   color: var(--lk-muted, #7a6b4f)
+
+// the box with the background story: what the game is about and the task
+.dg-story
+  width: 100%
+  display: flex
+  flex-direction: column
+  gap: 4px
+  padding: 10px 16px
+  border-radius: 16px
+  border: 2px solid #d9a93a
+  background: linear-gradient(180deg, #fff6d9, #fbeab8)
+  text-align: left
+
+.dg-story-head
+  font-size: 0.72rem
+  font-weight: 800
+  letter-spacing: 0.08em
+  text-transform: uppercase
+  color: #8a5a12
+
+.dg-story-text
+  margin: 0
+  font-size: 0.92rem
+  line-height: 1.35
+  color: #3a2c12
+
+.dg-story-ref
+  font-size: 0.75rem
+  font-weight: 700
+  font-style: italic
+  color: #8a5a12
+
+.dg-story-task
+  margin: 2px 0 0
+  padding-top: 6px
+  border-top: 1px dashed #d9a93a
+  font-size: 0.92rem
+  font-weight: 800
+  line-height: 1.3
+  color: #2a2418
+
+.dg-story-card
+  text-align: left
+
+  .dg-story-text
+    font-size: 1rem
 
 .dg-levels
   display: grid

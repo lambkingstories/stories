@@ -8,6 +8,7 @@
  * is Goliath: he walks slowly, holds his shield up from time to time, and only a stone on his forehead brings him down.
  * Nothing is hurt: the animals run away, and Goliath falls over.
  */
+import { bobAt } from '@/utils/davidWalk'
 
 /**
  * The size of the scene (16:9). Zoomed out by a quarter (Anton, 12.11.2026): the field is 2000 wide, so the animals can be seen and hit
@@ -26,8 +27,8 @@ export const MAX_PULL = 170
 export const MAX_SPEED = 1950
 export const STONE_R = 14
 
-/** The scale of the Goliath picture (so that he towers over David). */
-export const GOLIATH_K = 0.78
+/** Where the animals come into the scene. */
+export const SPAWN_X = W + 120
 
 export type Kind = 'wolf' | 'bear' | 'lion' | 'eagle' | 'goliath'
 
@@ -46,7 +47,8 @@ export const KINDS: Record<Kind, KindInfo> = {
   lion: { hp: 1, speed: 150, r: 62, h: 62, points: 20 },
   bear: { hp: 3, speed: 70, r: 82, h: 82, points: 30 },
   eagle: { hp: 1, speed: 135, r: 46, h: 85, points: 20 },
-  goliath: { hp: 1, speed: 30, r: 112, h: 240, points: 100 }
+  // (a little quicker than before, 30 to 36: with slower steps the feet could not stand still on the ground between the steps)
+  goliath: { hp: 1, speed: 36, r: 125, h: 280, points: 100 }
 }
 
 export interface Boulder {
@@ -411,7 +413,7 @@ function spawn(g: Game, kind: Kind) {
   g.animals.push({
     id: g.nextId++,
     kind,
-    x: W + 120,
+    x: SPAWN_X,
     lift: kind === 'eagle' ? EAGLE_HIGH : 0,
     vlift: 0,
     hp: info.hp,
@@ -440,12 +442,18 @@ export const GOLIATH_LEVEL = LEVELS.length - 1
 
 /** Goliath sways a little while he walks (the forehead moves with the picture), so that the aim has to follow him. */
 export function sway(a: Animal): number {
-  return a.kind === 'goliath' && a.mode === 'come' ? Math.sin(a.t * 2.6) * 16 : 0
+  // his head rides on the body, which rises over a standing leg and sinks when both feet stand: the same up and down as in the picture
+  return a.kind === 'goliath' && a.mode === 'come' ? -bobAt(SPAWN_X - a.x, KINDS.goliath.speed) : 0
+}
+
+/** How far an animal has walked since it came into the scene (the stride of Goliath runs on this distance). */
+export function walked(a: Animal): number {
+  return Math.max(0, SPAWN_X - a.x)
 }
 
 /** Goliath: the forehead is a small circle high on the body. */
 export function forehead(a: Animal): { x: number; y: number; r: number } {
-  return { x: a.x - 13, y: GROUND - 391 + sway(a), r: 26 }
+  return { x: a.x - 17, y: GROUND - 452 + sway(a), r: 27 }
 }
 
 /** A stone in the air that would reach Goliath's head: he reacts to it. */

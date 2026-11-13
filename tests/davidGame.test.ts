@@ -180,7 +180,7 @@ describe('Goliath', () => {
     const ys = new Set<number>()
     for (let i = 0; i < 60; i++) {
       step(g, 1 / 20)
-      ys.add(Math.round(forehead(a).y - (GROUND - 391)))
+      ys.add(Math.round(forehead(a).y - (GROUND - 452)))
     }
     expect(Math.max(...ys)).toBeGreaterThan(5)
     expect(Math.min(...ys)).toBeLessThan(-5)

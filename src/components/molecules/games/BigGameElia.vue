@@ -155,6 +155,9 @@ const level = ref(0)
 const paused = ref(false)
 const worldNames = computed(() => ((tm('app.bigGames.elia.worlds') as unknown as Parameters<typeof rt>[0][]) ?? []).map((m) => rt(m)))
 const worldRefs = computed(() => ((tm('app.bigGames.elia.refs') as unknown as Parameters<typeof rt>[0][]) ?? []).map((m) => rt(m)))
+const worldStories = computed(() => ((tm('app.bigGames.elia.worldStories') as unknown as Parameters<typeof rt>[0][]) ?? []).map((m) => rt(m)))
+/** The world whose short story is shown on a card (the first time its first level begins). */
+const storyWorld = ref(-1)
 const levelStars = computed(() => progress.levels(ID))
 // every level can be played at once: whoever does not manage one may go on to the next (Anton, 12.11.2026)
 const unlocked = (i: number) => !!LEVELS[i]?.ready
@@ -230,16 +233,35 @@ async function start(i: number) {
   paused.value = how.value
   screen.value = 'play'
   syncHud(true)
+  maybeWorldStory()
+}
+
+/** The first level of a world: once, a short card says what happens in this part of the story (not at every level). */
+function maybeWorldStory() {
+  storyWorld.value = -1
+  if (how.value || level.value === FREE_LEVEL || level.value % 3 !== 0) return
+  const w = worldOf(level.value)
+  if (howSeen(`${ID}-w${w}`) || !worldStories.value[w]) return
+  storyWorld.value = w
+  paused.value = true
+}
+
+function closeWorldStory() {
+  if (storyWorld.value >= 0) markHowSeen(`${ID}-w${storyWorld.value}`)
+  storyWorld.value = -1
+  if (screen.value === 'play') paused.value = false
 }
 
 function toMenu() {
   screen.value = 'menu'
+  storyWorld.value = -1
 }
 
 function closeHow() {
   how.value = false
   markHowSeen(ID)
   if (screen.value === 'play') paused.value = false
+  maybeWorldStory()
 }
 
 function leave() {
@@ -915,7 +937,11 @@ onBeforeUnmount(() => {
         div(class="eg-card")
           h1(class="eg-title") {{ t('app.bigGames.elia.title') }}
           p(class="eg-ref") {{ t('app.bigGames.elia.ref') }}
-          p(class="eg-text") {{ t('app.bigGames.elia.intro') }}
+          div(class="eg-story" data-test="elia-story")
+            span(class="eg-story-head") {{ t('app.bigGames.elia.storyHead') }}
+            p(class="eg-story-text") {{ t('app.bigGames.elia.story') }}
+            span(class="eg-story-ref") {{ t('app.bigGames.elia.storyRef') }}
+            p(class="eg-story-task") {{ t('app.bigGames.elia.task') }}
           div(class="eg-worlds")
             div(v-for="(w, wi) in WORLDS" :key="w" class="eg-world")
               div(class="eg-world-head")
@@ -971,7 +997,14 @@ onBeforeUnmount(() => {
             div(class="eg-risk-bar" :style="riskStyle")
         div(v-if="tipShown" class="eg-tip") {{ t('app.bigGames.elia.tip') }}
 
-        div(v-if="paused" class="eg-menu eg-menu--dim")
+        //- the first level of a world: what happens in this part of the story
+        div(v-if="storyWorld >= 0 && !how" class="eg-menu eg-menu--dim")
+          div(class="eg-card eg-card--small eg-story-card" data-test="elia-world-story")
+            span(class="eg-story-head") {{ worldNames[storyWorld] }}
+            p(class="eg-story-text") {{ worldStories[storyWorld] }}
+            AdvButton(data-test="elia-world-go" @click="closeWorldStory") {{ t('app.bigGames.elia.go') }}
+
+        div(v-else-if="paused" class="eg-menu eg-menu--dim")
           div(class="eg-card eg-card--small")
             h2(class="eg-title") {{ t('app.bigGames.elia.pause') }}
             AdvButton(@click="paused = false") {{ t('app.bigGames.elia.resume') }}
@@ -1000,6 +1033,7 @@ onBeforeUnmount(() => {
     div(v-if="how" class="eg-how-wrap" :style="{ width: box.w + 'px', height: box.h + 'px' }")
       div(class="eg-card eg-how")
         h2(class="eg-title") {{ t('app.bigGames.elia.howTitle') }}
+        p(class="eg-story-task eg-how-task") {{ t('app.bigGames.elia.task') }}
         //- a cross of four arrows: where one can swipe
         img(:src="crossSrc" alt="" class="eg-how-cross" @error="hideBroken")
         div(class="eg-how-row")
@@ -1123,6 +1157,52 @@ onBeforeUnmount(() => {
   margin: 0
   font-size: 0.8rem
   color: var(--lk-muted, #7a6b4f)
+
+// the box with the background story: what the game is about and the task
+.eg-story
+  width: 100%
+  display: flex
+  flex-direction: column
+  gap: 4px
+  padding: 10px 14px 10px
+  border-radius: 16px
+  border: 2px solid #d9a93a
+  background: linear-gradient(180deg, #fff6d9, #fbeab8)
+  text-align: left
+
+.eg-story-head
+  font-size: 0.72rem
+  font-weight: 800
+  letter-spacing: 0.08em
+  text-transform: uppercase
+  color: #8a5a12
+
+.eg-story-text
+  margin: 0
+  font-size: 0.9rem
+  line-height: 1.35
+  color: #3a2c12
+
+.eg-story-ref
+  font-size: 0.75rem
+  font-weight: 700
+  font-style: italic
+  color: #8a5a12
+
+.eg-story-task
+  margin: 2px 0 0
+  padding-top: 6px
+  border-top: 1px dashed #d9a93a
+  font-size: 0.9rem
+  font-weight: 800
+  line-height: 1.3
+  color: #2a2418
+
+.eg-story-card
+  text-align: left
+
+  .eg-story-text
+    font-size: 1rem
 
 .eg-worlds
   display: flex
