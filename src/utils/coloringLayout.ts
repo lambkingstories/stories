@@ -5,6 +5,9 @@
  * (the screen is hardly 375 px high) the top bar would take 62 px of the little height for nothing: its buttons sit in the two
  * corners and the paper in the middle is narrow, so there the paper may rise up to the top edge as long as the buttons do not
  * reach into the paper's column.
+ *
+ * On such a phone the colour box does not lie over the lower edge of the paper either: it stands at the side as a vertical strip, on
+ * the side away from the tool bar, and folds away to the edge (`colorBoxPlacement`). So the paper keeps the whole height.
  */
 
 /** Breathing room around the paper at the sides (and at the top/bottom where nothing floats). */
@@ -21,6 +24,21 @@ export const FLAT_TOP_INSET = 8
 /** A phone held wide: wider than high and hardly more than 450 px high. */
 export function isFlatLandscape(width: number, height: number): boolean {
   return width > height && height <= FLAT_MAX_HEIGHT
+}
+
+/** The side strip of the colour box starts below the buttons of the top bar (44 px buttons, 8 px from the top, a little air). */
+export const COLOR_BOX_SIDE_TOP = 62
+
+/** Where the colour box stands: at the bottom edge, or as a strip at the left or right edge (a phone held wide). */
+export type ColorBoxPlacement = 'bottom' | 'side-left' | 'side-right'
+
+/**
+ * Where the colour box stands. On a phone held wide it is a strip at the side, on the side away from the tool bar (the bar docks at
+ * `dockEdge`), so that nothing of the paper is covered; otherwise it is the box at the bottom edge.
+ */
+export function colorBoxPlacement(width: number, height: number, dockEdge: 'left' | 'right'): ColorBoxPlacement {
+  if (!isFlatLandscape(width, height)) return 'bottom'
+  return dockEdge === 'left' ? 'side-right' : 'side-left'
 }
 
 export interface TopBarContent {
@@ -79,9 +97,11 @@ const BAR_GAP = 8
 export function paperInsets(i: InsetInput): Insets {
   const sideRoom = i.width - PAGE_INSET * 2
   if (i.fullscreen) return { top: PAGE_INSET, bottom: PAGE_INSET, maxWidth: sideRoom }
-  const bottom = i.hasImage ? FOLDED_TAB : PAGE_INSET
+  const flat = isFlatLandscape(i.width, i.height)
+  // the colour box of a phone held wide stands at the side: no tab at the bottom edge to keep room for
+  const bottom = i.hasImage && !flat ? FOLDED_TAB : PAGE_INSET
   const lower = { top: TOP_BAR_ROOM + i.band, bottom, maxWidth: sideRoom }
-  if (!isFlatLandscape(i.width, i.height)) return lower
+  if (!flat) return lower
   // Paper right up to the top edge, but only between the two groups of buttons: is it then bigger than below the bar?
   const between = i.width - 2 * (i.reach + BAR_GAP)
   const raised = { top: FLAT_TOP_INSET + i.band, bottom, maxWidth: Math.max(1, between) }

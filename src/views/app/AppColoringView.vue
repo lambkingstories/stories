@@ -31,7 +31,8 @@ import { isIOS } from '@/utils/platform'
 import { goBackTo } from '@/utils/navBack'
 import { screenToSheet } from '@/utils/sheetMath'
 import { PatchHistory } from '@/utils/patchHistory'
-import { PAGE_INSET, fitPaper, paperInsets, topBarReach, type InsetInput, type Insets } from '@/utils/coloringLayout'
+import { PAGE_INSET, colorBoxPlacement, fitPaper, paperInsets, topBarReach, type InsetInput, type Insets } from '@/utils/coloringLayout'
+import useViewportSize from '@/use/useViewportSize'
 import { StickerCover } from '@/utils/stickerCover'
 import useSfx from '@/use/useSfx'
 import { useToolbarDock } from '@/use/useToolbarDock'
@@ -1961,10 +1962,12 @@ const toolbarStyle = computed<Record<string, string>>(() =>
 const showZoom = computed(() => finePointer.value || zoomPct.value !== 100 || zoomBarKept.value)
 /** The corner of the picture where undo and redo sit: the one away from the tool bar. */
 const cornerSide = computed(() => (dock.value.edge === 'right' ? 'left' : 'right'))
-/** On a phone held wide the tool bar runs down to the bottom edge at the side: the colour box then starts beside it (see its styles). */
-const shelfBesideBar = computed(() => (toolbarOpen.value && !isFullscreen.value ? `bar-${dock.value.edge}` : ''))
+/** On a phone held wide the colour box is a strip at the side, away from the tool bar: it covers nothing of the paper. */
+const { width: viewW, height: viewH } = useViewportSize()
+const shelfPlacement = computed(() => colorBoxPlacement(viewW.value, viewH.value, dock.value.edge))
+const shelfSide = computed<'left' | 'right' | null>(() => (shelfPlacement.value === 'bottom' ? null : shelfPlacement.value === 'side-left' ? 'left' : 'right'))
 /** The room of the colour box at the bottom edge is always kept free for the tool bar, so the bar never moves when the box comes out. */
-const shelfRoom = () => (isFullscreen.value ? 0 : (shelfEl.value?.height() || 134) + 6)
+const shelfRoom = () => (isFullscreen.value || shelfSide.value ? 0 : (shelfEl.value?.height() || 134) + 6)
 const cornerStyle = computed<Record<string, string>>(() => ({ '--lift': `${shelfRoom()}px` }))
 const pickerLift = computed(() => shelfRoom())
 
@@ -4597,7 +4600,7 @@ watch(queryBook, (id) => {
     ColoringShelf(
       v-if="hasImage"
       ref="shelfEl"
-      :class="shelfBesideBar"
+      :side="shelfSide"
       :variant="kitDef.variant"
       :items="kitDef.base"
       :extra="kitDef.extra"
@@ -5071,6 +5074,7 @@ $accent-dark: $accent
   box-shadow: 0 2px 10px rgba(20, 24, 32, 0.15)
 
 .ac-btn
+  position: relative
   flex: 0 0 auto
   width: 42px
   height: 42px
@@ -5089,6 +5093,12 @@ $accent-dark: $accent
     height: 22px
     object-fit: contain
     pointer-events: none
+
+  // the touch area is at least 44 px, also where the button looks smaller
+  &::after
+    content: ''
+    position: absolute
+    inset: -1px
 
   &:active:not(:disabled)
     transform: scale(0.94)
@@ -5220,6 +5230,7 @@ $accent-dark: $accent
   box-shadow: 0 2px 10px rgba(20, 24, 32, 0.15)
 
 .ac-pg-btn
+  position: relative
   width: 30px
   height: 30px
   border: 0
@@ -5229,6 +5240,12 @@ $accent-dark: $accent
   font-size: 1.1rem
   font-weight: 800
   cursor: pointer
+
+  // the arrow is small to look at: its touch area is 44 px
+  &::after
+    content: ''
+    position: absolute
+    inset: -7px -8px
 
   &:disabled
     opacity: 0.35
@@ -5243,7 +5260,7 @@ $accent-dark: $accent
 // showing), the bar can be swiped sideways and the last button (the menu) is reached.
 @media (max-width: 520px)
   .ac-top
-    gap: 4px
+    gap: 8px
     padding-left: 8px
     padding-right: 8px
     padding-bottom: 14px
@@ -5264,12 +5281,16 @@ $accent-dark: $accent
     height: 36px
     border-radius: 10px
 
+    // 36 px to look at; with 8 px between the buttons every touch area is 44 px
+    &::after
+      inset: -4.5px
+
     img
       width: 20px
       height: 20px
 
   .ac-quick
-    gap: 4px
+    gap: 8px
 
   .ac-pages
     gap: 2px
@@ -5305,7 +5326,7 @@ $accent-dark: $accent
 
 .ac-finish-label
   display: block
-  font-size: 0.7rem
+  font-size: 0.75rem
   font-weight: 800
   letter-spacing: 0.08em
   text-transform: uppercase
@@ -5350,7 +5371,7 @@ $accent-dark: $accent
 
   strong
     display: block
-    font-size: 0.7rem
+    font-size: 0.75rem
     letter-spacing: 0.06em
     text-transform: uppercase
     color: #f5d27a
@@ -5463,7 +5484,7 @@ $accent-dark: $accent
     font-weight: 800
 
   small
-    font-size: 0.74rem
+    font-size: 0.82rem
     font-weight: 600
     opacity: 0.82
     line-height: 1.25
@@ -5471,7 +5492,7 @@ $accent-dark: $accent
 // small group headings
 .ac-mg
   margin: 14px 4px 6px
-  font-size: 0.68rem
+  font-size: 0.75rem
   font-weight: 800
   letter-spacing: 0.08em
   text-transform: uppercase
@@ -5516,7 +5537,7 @@ $accent-dark: $accent
     opacity: 0.9
 
 .ac-tile-name
-  font-size: 0.74rem
+  font-size: 0.75rem
   font-weight: 700
   line-height: 1.2
   text-align: center
@@ -5533,6 +5554,7 @@ $accent-dark: $accent
   display: flex
   align-items: center
   gap: 10px
+  min-height: 44px
   padding: 10px 8px
   border: 0
   border-radius: 12px

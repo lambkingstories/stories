@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import {
+  COLOR_BOX_SIDE_TOP,
   FLAT_MAX_HEIGHT,
   FLAT_TOP_INSET,
   FOLDED_TAB,
   PAGE_INSET,
   TOP_BAR_ROOM,
+  colorBoxPlacement,
   fitPaper,
   isFlatLandscape,
   paperInsets,
@@ -22,6 +24,48 @@ const base = (w: number, h: number, extra: Partial<InsetInput> = {}): InsetInput
   band: 0,
   reach: topBarReach(plain),
   ...extra
+})
+
+describe('where the colour box stands', () => {
+  it('is the box at the bottom edge on a phone held upright and on tablets', () => {
+    for (const [w, h] of [
+      [375, 812],
+      [820, 1180],
+      [1180, 820],
+      [1024, 768]
+    ]) {
+      expect(colorBoxPlacement(w, h, 'left')).toBe('bottom')
+      expect(colorBoxPlacement(w, h, 'right')).toBe('bottom')
+    }
+  })
+
+  it('is a strip at the side away from the tool bar on a phone held wide', () => {
+    for (const [w, h] of [
+      [812, 375],
+      [667, 375],
+      [844, 390],
+      [932, 430],
+      [568, 320]
+    ]) {
+      expect(colorBoxPlacement(w, h, 'left')).toBe('side-right')
+      expect(colorBoxPlacement(w, h, 'right')).toBe('side-left')
+    }
+  })
+
+  it('never covers the paper: the strip stays outside the column of the paper and below the buttons of the top bar', () => {
+    // the strip is at most 108 px deep (the deepest kit); the paper is centred
+    for (const [W, H] of [
+      [812, 375],
+      [667, 375],
+      [844, 390],
+      [736, 414],
+      [568, 320]
+    ]) {
+      const { w } = fitPaper(base(W, H))
+      expect((W - w) / 2).toBeGreaterThanOrEqual(108)
+    }
+    expect(COLOR_BOX_SIDE_TOP).toBeGreaterThanOrEqual(8 + 44)
+  })
 })
 
 describe('the paper of the painting screen', () => {
@@ -56,11 +100,13 @@ describe('the paper of the painting screen', () => {
   it('lets the paper rise to the top edge on a phone held wide', () => {
     const { w, h, insets } = fitPaper(base(812, 375))
     expect(insets.top).toBe(FLAT_TOP_INSET)
-    expect(h).toBe(375 - FLAT_TOP_INSET - FOLDED_TAB)
+    // no tab of the colour box at the bottom edge: it stands at the side
+    expect(insets.bottom).toBe(PAGE_INSET)
+    expect(h).toBe(375 - FLAT_TOP_INSET - PAGE_INSET)
     expect(w).toBe(Math.round(h * 0.75))
-    // before: 212 × 283
-    expect(w).toBeGreaterThan(212)
-    expect(h).toBeGreaterThan(283)
+    // before: 212 × 283, and with the tab 253 × 337
+    expect(w).toBeGreaterThan(253)
+    expect(h).toBeGreaterThan(337)
   })
 
   it('is bigger than before on every phone held wide, and never reaches into the buttons', () => {
@@ -112,7 +158,7 @@ describe('the paper of the painting screen', () => {
   it('fits a sheet that lies wide too', () => {
     const { w, h } = fitPaper(base(812, 375, { ratio: 4 / 3 }))
     expect(w / h).toBeCloseTo(4 / 3, 1)
-    expect(h).toBeLessThanOrEqual(375 - FLAT_TOP_INSET - FOLDED_TAB)
+    expect(h).toBeLessThanOrEqual(375 - FLAT_TOP_INSET - PAGE_INSET)
   })
 
   it('counts the width of the top bar buttons', () => {
