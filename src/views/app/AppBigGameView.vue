@@ -14,7 +14,6 @@ import BigGameElia from '@/components/molecules/games/BigGameElia.vue'
 import BigGameArche from '@/components/molecules/games/BigGameArche.vue'
 import BigGameWasser from '@/components/molecules/games/BigGameWasser.vue'
 import BigGameKarawane from '@/components/molecules/games/BigGameKarawane.vue'
-import BigGameJosefsLand from '@/components/molecules/games/BigGameJosefsLand.vue'
 import BigGameNehemia from '@/components/molecules/games/BigGameNehemia.vue'
 
 const route = useRoute()
@@ -36,7 +35,6 @@ function leave() {
   BigGameArche(v-else-if="game?.id === 'arche' && open" @leave="leave")
   BigGameWasser(v-else-if="game?.id === 'wasser' && open" @leave="leave")
   BigGameKarawane(v-else-if="game?.id === 'karawane' && open" @leave="leave")
-  BigGameJosefsLand(v-else-if="game?.id === 'josefsland' && open" @leave="leave")
   BigGameNehemia(v-else-if="game?.id === 'nehemia' && open" @leave="leave")
   div(v-else class="bg-closed")
     button(type="button" class="bg-closed-btn" @click="leave") ←
