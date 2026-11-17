@@ -7,6 +7,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AdvButton from '@/components/atoms/AdvButton.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
+import GameIntroBox from '@/components/molecules/games/GameIntroBox.vue'
 import useBigGames, { howSeen, markHowSeen } from '@/use/useBigGames'
 import useSfx from '@/use/useSfx'
 import useMusic from '@/use/useMusic'
@@ -618,13 +619,14 @@ onBeforeUnmount(() => {
     //- the levels
     div(v-else-if="screen === 'menu'" class="dg-menu")
       div(class="dg-card")
-        h1(class="dg-title") {{ t('app.bigGames.david.title') }}
-        p(class="dg-ref") {{ t('app.bigGames.david.ref') }}
-        div(class="dg-story" data-test="david-story")
-          span(class="dg-story-head") {{ t('app.bigGames.david.storyHead') }}
-          p(class="dg-story-text") {{ t('app.bigGames.david.story') }}
-          span(class="dg-story-ref") {{ t('app.bigGames.david.storyRef') }}
-          p(class="dg-story-task") {{ t('app.bigGames.david.task') }}
+        GameIntroBox(
+          :title="t('app.bigGames.david.title')"
+          :label="t('app.bigGames.david.storyHead')"
+          :story="t('app.bigGames.david.story')"
+          :story-ref="t('app.bigGames.david.storyRef')"
+          :task="t('app.bigGames.david.task')"
+          test-id="david-story"
+        )
         div(class="dg-levels")
           button(
             v-for="(n, i) in levelNames"
@@ -774,11 +776,6 @@ onBeforeUnmount(() => {
   font-size: 1.6rem
   font-weight: 800
 
-.dg-ref
-  margin: -6px 0 0
-  font-weight: 700
-  color: var(--lk-muted, #7a6b4f)
-
 .dg-text
   margin: 0
   line-height: 1.4
@@ -788,18 +785,7 @@ onBeforeUnmount(() => {
   font-size: 0.85rem
   color: var(--lk-muted, #7a6b4f)
 
-// the box with the background story: what the game is about and the task
-.dg-story
-  width: 100%
-  display: flex
-  flex-direction: column
-  gap: 4px
-  padding: 10px 16px
-  border-radius: 16px
-  border: 2px solid #d9a93a
-  background: linear-gradient(180deg, #fff6d9, #fbeab8)
-  text-align: left
-
+// the story box of the first Goliath level (the box of the menu is `GameIntroBox`)
 .dg-story-head
   font-size: 0.72rem
   font-weight: 800

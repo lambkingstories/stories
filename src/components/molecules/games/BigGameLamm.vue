@@ -11,6 +11,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AdvButton from '@/components/atoms/AdvButton.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
+import GameIntroBox from '@/components/molecules/games/GameIntroBox.vue'
 import useBigGames, { howSeen, markHowSeen } from '@/use/useBigGames'
 import useSfx from '@/use/useSfx'
 import useMusic from '@/use/useMusic'
@@ -1274,11 +1275,12 @@ onBeforeUnmount(() => {
     //- the chapters and levels
     div(v-else-if="screen === 'menu'" class="lg-menu")
       div(class="lg-card")
-        h1(class="lg-title") {{ t('app.bigGames.lamm.title') }}
-        p(class="lg-text") {{ t('app.bigGames.lamm.intro') }}
-        p(class="lg-story-task lg-story-task--menu")
-          span(class="lg-story-label") {{ t('app.bigGames.lamm.taskLabel') }}
-          |  {{ t('app.bigGames.lamm.task') }}
+        GameIntroBox(
+          :title="t('app.bigGames.lamm.title')"
+          :label="t('app.bigGames.common.intro')"
+          :story="t('app.bigGames.lamm.intro')"
+          :task="t('app.bigGames.lamm.taskLabel') + ' ' + t('app.bigGames.lamm.task')"
+        )
         div(v-for="(ct, ci) in chapterTexts" :key="ci" class="lg-world")
           div(class="lg-banner" :data-test="'lamm-banner-' + ci" @click="openStory(ci)")
             img(:src="bannerSrc(ci)" alt="" class="lg-banner-pic" @error="hideBroken")

@@ -9,6 +9,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AdvButton from '@/components/atoms/AdvButton.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
+import GameIntroBox from '@/components/molecules/games/GameIntroBox.vue'
 import useBigGames, { howSeen, markHowSeen } from '@/use/useBigGames'
 import useSfx from '@/use/useSfx'
 import useMusic from '@/use/useMusic'
@@ -1444,9 +1445,12 @@ onBeforeUnmount(() => {
     //- the overview: the story, the chapters and the levels
     div(v-else-if="screen === 'menu'" class="bo-menu")
       div(class="bo-card")
-        h1(class="bo-title") {{ t('app.bigGames.bogen.title') }}
-        p(class="bo-text") {{ t('app.bigGames.bogen.story') }}
-        p(class="bo-text bo-text--task") {{ t('app.bigGames.bogen.task') }}
+        GameIntroBox(
+          :title="t('app.bigGames.bogen.title')"
+          :label="t('app.bigGames.common.intro')"
+          :story="t('app.bigGames.bogen.story')"
+          :task="t('app.bigGames.bogen.task')"
+        )
         p(v-if="allDone" class="bo-done") {{ t('app.bigGames.bogen.ending.done') }}
         div(v-for="(ct, c) in chapterTexts" :key="c" class="bo-chapter")
           div(class="bo-banner")

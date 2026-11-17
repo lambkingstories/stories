@@ -11,6 +11,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AdvButton from '@/components/atoms/AdvButton.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
+import GameIntroBox from '@/components/molecules/games/GameIntroBox.vue'
 import useBigGames, { howSeen, markHowSeen } from '@/use/useBigGames'
 import useSfx from '@/use/useSfx'
 import useMusic from '@/use/useMusic'
@@ -1253,8 +1254,11 @@ onBeforeUnmount(() => {
     //- the worlds and levels
     div(v-else-if="screen === 'menu'" class="wg-menu")
       div(class="wg-card")
-        h1(class="wg-title") {{ t('app.bigGames.wasser.title') }}
-        p(class="wg-text") {{ t('app.bigGames.wasser.intro') }}
+        GameIntroBox(
+          :title="t('app.bigGames.wasser.title')"
+          :label="t('app.bigGames.common.intro')"
+          :story="t('app.bigGames.wasser.intro')"
+        )
         div(v-for="(wt, wi) in worldTexts" :key="wi" class="wg-world")
           div(class="wg-banner" :data-test="'wasser-banner-' + wi" @click="openStory(wi)")
             img(:src="bannerSrc(wi)" alt="" class="wg-banner-pic" @error="hideBroken")

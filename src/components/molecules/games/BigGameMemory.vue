@@ -10,6 +10,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'v
 import { useI18n } from 'vue-i18n'
 import AdvButton from '@/components/atoms/AdvButton.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
+import GameIntroBox from '@/components/molecules/games/GameIntroBox.vue'
 import { journeys } from '@/data/adventures'
 import { EPOCHS, TIMELINE } from '@/data/adventures/timeline'
 import { adventureLanguage } from '@/use/adventureLanguage'
@@ -397,9 +398,12 @@ const STAND = ['#c98a52', '#6f9fc2', '#7fb069', '#e0c25a', '#b58ac4', '#7fc4b8',
     //- the overview: the story and one card for every adventure, in the order of the Bible
     div(v-if="screen === 'menu'" class="mm-menu" data-test="memory-menu")
       div(class="mm-sheet")
-        h1(class="mm-title") {{ t('app.bigGames.memory.title') }}
-        p(class="mm-text") {{ t('app.bigGames.memory.story') }}
-        p(class="mm-text mm-text--task") {{ t('app.bigGames.memory.task') }}
+        GameIntroBox(
+          :title="t('app.bigGames.memory.title')"
+          :label="t('app.bigGames.common.intro')"
+          :story="t('app.bigGames.memory.story')"
+          :task="t('app.bigGames.memory.task')"
+        )
         p(class="mm-progress" data-test="memory-progress") {{ t('app.bigGames.memory.progress', { n: doneCount, all: boards.length }) }}
         div(v-if="everyDone" class="mm-allDone" data-test="memory-alldone")
           h2(class="mm-allDone-title") ★ {{ t('app.bigGames.memory.allDoneTitle') }}

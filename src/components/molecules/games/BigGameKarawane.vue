@@ -9,6 +9,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AdvButton from '@/components/atoms/AdvButton.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
+import GameIntroBox from '@/components/molecules/games/GameIntroBox.vue'
 import useBigGames, { howSeen, markHowSeen } from '@/use/useBigGames'
 import useSfx from '@/use/useSfx'
 import useMusic from '@/use/useMusic'
@@ -1288,11 +1289,12 @@ onBeforeUnmount(() => {
     //- the routes
     div(v-else-if="screen === 'menu'" v-show="!shop && !how && storyRoute < 0" class="kg-menu")
       div(class="kg-card")
-        h1(class="kg-title") {{ t('app.bigGames.karawane.title') }}
-        p(class="kg-text kg-intro") {{ t('app.bigGames.karawane.story') }}
-        p(class="kg-task kg-task--menu")
-          b {{ t('app.bigGames.karawane.taskLabel') }}:
-          |  {{ t('app.bigGames.karawane.task') }}
+        GameIntroBox(
+          :title="t('app.bigGames.karawane.title')"
+          :label="t('app.bigGames.common.intro')"
+          :story="t('app.bigGames.karawane.story')"
+          :task="t('app.bigGames.karawane.taskLabel') + ': ' + t('app.bigGames.karawane.task')"
+        )
         div(class="kg-purse")
           img(:src="coinIcon" alt="" class="kg-coin" @error="hideBroken")
           span(class="kg-purse-n") {{ save.coins }}
@@ -2035,15 +2037,6 @@ onBeforeUnmount(() => {
 
   .kg-card--small :deep(.adv-btn)
     min-height: 40px
-
-  .kg-intro
-    font-size: 0.95rem
-    line-height: 1.25
-    max-width: 760px
-
-  .kg-task--menu
-    padding: 4px 12px
-    font-size: 0.95rem
 
   .kg-routes
     grid-template-columns: repeat(6, minmax(0, 1fr))

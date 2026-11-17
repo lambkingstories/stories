@@ -9,6 +9,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AdvButton from '@/components/atoms/AdvButton.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
+import GameIntroBox from '@/components/molecules/games/GameIntroBox.vue'
 import useBigGames, { howSeen, markHowSeen } from '@/use/useBigGames'
 import useSfx from '@/use/useSfx'
 import useMusic from '@/use/useMusic'
@@ -1398,9 +1399,12 @@ void LIGHT_R
     //- the overview: the story, the chapters and the levels
     div(v-else-if="screen === 'menu'" class="gd-menu")
       div(class="gd-card")
-        h1(class="gd-title") {{ TX('title') }}
-        p(class="gd-text") {{ TX('story') }}
-        p(class="gd-text gd-text--task") {{ TX('task') }}
+        GameIntroBox(
+          :title="TX('title')"
+          :label="t('app.bigGames.common.intro')"
+          :story="TX('story')"
+          :task="TX('task')"
+        )
         p(v-if="allDone" class="gd-done") {{ TX('allDone') }}
         div(v-for="(ct, c) in chapterTexts" :key="c" class="gd-chapter")
           div(class="gd-banner")

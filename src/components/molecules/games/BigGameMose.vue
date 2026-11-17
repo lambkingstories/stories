@@ -9,6 +9,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AdvButton from '@/components/atoms/AdvButton.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
+import GameIntroBox from '@/components/molecules/games/GameIntroBox.vue'
 import useBigGames, { howSeen, markHowSeen } from '@/use/useBigGames'
 import useSfx from '@/use/useSfx'
 import useMusic from '@/use/useMusic'
@@ -1108,9 +1109,12 @@ onBeforeUnmount(() => {
     //- the overview: the story, the chapters and the ropes
     div(v-else-if="screen === 'menu'" class="mk-menu")
       div(class="mk-card")
-        h1(class="mk-title") {{ t('app.bigGames.mose.title') }}
-        p(class="mk-text") {{ t('app.bigGames.mose.story') }}
-        p(class="mk-text mk-text--task") {{ t('app.bigGames.mose.task') }}
+        GameIntroBox(
+          :title="t('app.bigGames.mose.title')"
+          :label="t('app.bigGames.common.intro')"
+          :story="t('app.bigGames.mose.story')"
+          :task="t('app.bigGames.mose.task')"
+        )
         p(v-if="allDone" class="mk-done") {{ t('app.bigGames.mose.allDone') }}
         div(v-for="(ct, c) in chapterTexts" :key="c" class="mk-chapter")
           div(class="mk-banner")

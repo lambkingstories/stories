@@ -4,7 +4,7 @@
  * The round picture at the top is the stage's scene cut out of the painted map. The coloring task opens the coloring screen and
  * comes back here (`?back=task`) with the stars it earned.
  */
-import { computed, onBeforeUnmount, onMounted, ref, watch, defineAsyncComponent } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
@@ -596,6 +596,8 @@ const hasPart = computed(() => partStars.value > 0 && !progress.finished.value)
 const gameKey = ref(0)
 const GAME_FIELDS = ['puzzle', 'way', 'harvest', 'memory', 'sort', 'find', 'share', 'build', 'dots', 'fly', 'order', 'water', 'lights', 'verse', 'echo', 'channels', 'mirror', 'sow', 'herd', 'missing', 'wipe', 'chain', 'stack', 'trace', 'balance', 'constellation', 'slide', 'crank', 'hold', 'guess', 'cycle', 'cairn', 'ring', 'catch', 'relay', 'silver', 'birds', 'clues', 'rings', 'step', 'lower', 'pack', 'bake', 'hide', 'hush', 'word', 'dew', 'winnow', 'swit', 'cue', 'cave', 'sneak', 'words', 'diff', 'manna', 'cloud', 'weave', 'glow', 'beat', 'focus', 'cross', 'stew', 'overboard', 'shore', 'sacks', 'shade', 'days', 'statue', 'lamp', 'hours', 'ravens', 'caves', 'rain', 'whisper', 'glean', 'measure', 'elders', 'cradle', 'coat', 'cows', 'stone', 'search', 'baggage', 'gather', 'harp', 'shepherd', 'pebbles', 'sling', 'arrow', 'hem', 'quiet', 'throne', 'jars', 'dive', 'decor', 'honor', 'ride', 'post', 'peace', 'forge', 'crib', 'sign', 'road', 'net', 'boats', 'roof', 'bail', 'crowd', 'bundle', 'bread', 'row', 'turnBack', 'shout', 'dig', 'coin', 'meet', 'climb', 'halve', 'unwrap', 'prepare', 'lamps', 'help','arms', 'judges', 'signal', 'grapes', 'jugs', 'enough', 'quails', 'staffs', 'serpent', 'donkey', 'commission', 'fischzug', 'graze', 'errand', 'wander', 'table', 'shutters', 'synagogue', 'ten', 'children', 'plumb', 'seats', 'twelve', 'census', 'fire', 'tell', 'star', 'stepStones', 'commandment', 'gateWatch', 'sceptre', 'riders', 'scroll', 'shadowWalk', 'sunrise', 'hemTouch', 'bankPath', 'frogFlick', 'cupCarry', 'pledges', 'booths', 'wishCards', 'rafts', 'carving', 'pomegranates', 'stairs', 'treasury', 'lanterns', 'shootGrow', 'zionPaths', 'handMill', 'sealTurn', 'earthLoad', 'sheavesBow', 'winePress', 'nileCows', 'embrace2', 'meeting', 'witness', 'tongues', 'fill', 'hop', 'chariot', 'peek', 'donkeyLoad', 'gateTime', 'festMarch', 'straightStreet', 'refind', 'sailTrim', 'dye', 'tentShop', 'wallShadows', 'quietSpot', 'planks', 'brushwood', 'visitors', 'write', 'letters', 'praise', 'palms', 'gates', 'lookout', 'dance', 'ground', 'invite', 'breeze', 'herdCall', 'blessed', 'lightStand', 'nearView', 'flame', 'yieldGame', 'halt', 'inn', 'carryHome', 'homeward'] as const
 const hasGame = computed(() => hasCountGame.value || GAME_FIELDS.some((f) => !!gameTask.value?.[f]))
+/** The page of a game (before and while it is played): the head is short (back, one line, the title once), so that the game begins high up. */
+const gameMode = computed(() => phase.value === 'task' && hasGame.value)
 /** A game begins only when the child taps "play" (many games run on their own clock: the text and the hint are read first). */
 const started = ref(false)
 watch(phase, (p) => {
@@ -604,6 +606,38 @@ watch(phase, (p) => {
 function startGame() {
   started.value = true
 }
+
+// Some games say the task themselves in their first round ("Runde 1: Lege die Bilder …"). Then the hint of the page is not shown a second time
+// (the same sentence twice, and the game begins lower than it has to). Only the text is compared, the game itself is not touched.
+const taskCardEl = ref<HTMLElement | null>(null)
+const hintDouble = ref(false)
+let hintWatch: MutationObserver | null = null
+const squash = (x: string) => x.replace(/s+/g, ' ').trim().toLowerCase()
+function checkHintDouble() {
+  const card = taskCardEl.value
+  const hint = squash(stage.value?.task.hint ?? '')
+  if (!card || hint.length < 12) return
+  const found = Array.from(card.children).some((c) => !c.classList.contains('stage-h2') && !c.classList.contains('stage-hint') && squash(c.textContent ?? '').includes(hint))
+  if (!found) return
+  hintDouble.value = true
+  hintWatch?.disconnect()
+}
+watch(
+  [started, gameKey],
+  async ([on]) => {
+    hintWatch?.disconnect()
+    hintDouble.value = false
+    if (!on) return
+    await nextTick()
+    checkHintDouble()
+    if (!hintDouble.value && taskCardEl.value && typeof MutationObserver !== 'undefined') {
+      hintWatch = new MutationObserver(checkHintDouble)
+      hintWatch.observe(taskCardEl.value, { subtree: true, childList: true, characterData: true })
+    }
+  },
+  { flush: 'post' }
+)
+onBeforeUnmount(() => hintWatch?.disconnect())
 function restartGame() {
   progress.reset()
   gameKey.value++
@@ -942,27 +976,27 @@ function toFinale() {
 
 <template lang="pug">
   div(v-if="journey && (stage || isExam)" class="stage")
-    header(class="stage-head")
-      AppHeader
+    header(class="stage-head" :class="{ 'stage-head--game': gameMode }")
+      AppHeader(v-if="!gameMode")
       div(class="stage-head-body")
         div(class="stage-top")
           button(type="button" class="stage-back lk-btn lk-btn--outline lk-btn--small" :aria-label="backLabel" @click="onBack")
             ZIconography(name="chevron-left" :size="20")
             span {{ backLabel }}
           SoundPanel
-        p(class="stage-kind") {{ isExam ? t('app.adventure.exam') : t('app.adventure.stageOf', { n: stage?.id ?? 0, total: journey.stages.length }) }}
+        p(class="stage-kind") {{ isExam ? t('app.adventure.exam') : t('app.adventure.stageOf', { n: stage?.id ?? 0, total: journey.stages.length }) }}{{ gameMode && stage ? ' · ' + stage.ref : '' }}
         h1(class="stage-title") {{ isExam ? t('app.adventure.examTitle', { title: journey.title }) : stage?.title }}
-        p(v-if="stage" class="stage-ref") {{ stage.ref }}
-        ol(v-if="stage && !freePlay && !(phase === 'task' && hasGame)" class="stage-steps")
+        p(v-if="stage && !gameMode" class="stage-ref") {{ stage.ref }}
+        ol(v-if="stage && !freePlay && !gameMode" class="stage-steps")
           li(v-for="(s, k) in steps" :key="s" :class="stepState(s)")
             span(class="step-dot")
               ZIconography(v-if="stepState(s) === 'done'" name="check" :size="22")
               template(v-else) {{ k + 1 }}
             span(class="step-label") {{ stepLabel(s) }}
         //- while a game is played the big picture steps aside: the game gets the screen
-        img(v-if="heroSrc && !freePlay && !(phase === 'task' && hasGame)" :src="heroSrc" alt="" class="stage-pic" draggable="false")
+        img(v-if="heroSrc && !freePlay && !gameMode" :src="heroSrc" alt="" class="stage-pic" draggable="false")
 
-    main(class="stage-body" :class="{ 'stage-body--game': phase === 'task' && hasGame }")
+    main(class="stage-body" :class="{ 'stage-body--game': gameMode }")
       //- 1. the text
       section(v-if="phase === 'text' && stage" class="stage-card")
         ReadAloud(:key="stage.id" :text="stage.text" :audio="stage.audio")
@@ -971,9 +1005,9 @@ function toFinale() {
           AdvButton(tone="gold" @click="fromText") {{ backFrom ? t('app.adventure.next') : isQuizStage ? t('app.adventure.toQuestions') : t('app.adventure.toTask') }}
 
       //- 2. the task
-      section(v-else-if="phase === 'task' && stage" class="stage-card" :class="{ 'stage-card--game': hasGame }")
-        h2(class="stage-h2") {{ t('app.adventure.task') }}
-        p(class="stage-hint") {{ stage.task.hint }}
+      section(v-else-if="phase === 'task' && stage" ref="taskCardEl" class="stage-card" :class="{ 'stage-card--game': hasGame }")
+        h2(v-show="!hintDouble" class="stage-h2") {{ t('app.adventure.task') }}
+        p(v-show="!hintDouble" class="stage-hint" :class="{ 'stage-hint--run': hasGame && started }") {{ stage.task.hint }}
         ul(v-if="paintJobs.length" class="stage-jobs" :aria-label="t('app.adventure.paintJobsTitle')")
           li(v-for="(j, i) in paintJobs" :key="i" class="stage-job") {{ j.hint }}
         div(v-if="hasGame && !started" class="stage-ready")
@@ -1214,11 +1248,8 @@ function toFinale() {
             AdvButton(tone="gold" @click="taskDone(0)") {{ t('app.adventure.next') }}
         button(v-if="hasPart" type="button" class="stage-skip stage-part" @click="partTask") {{ t('app.adventure.partial', { n: partStars }, partStars) }}
         button(v-else-if="!progress.finished.value" type="button" class="stage-skip" @click="skipTask") {{ t('app.adventure.skip') }}
-        //- the signs at the bottom: play (begins the game) and play the game again from the start (text and questions stay)
-        div(v-if="hasGame" class="stage-ctrl")
-          button(type="button" class="stage-play" :class="{ pulse: !started }" :disabled="started" :aria-label="t('app.adventure.playGame')" :title="t('app.adventure.playGame')" @click="startGame")
-            svg(viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true")
-              path(d="M8 5.2v13.6a1 1 0 0 0 1.5.86l11-6.8a1 1 0 0 0 0-1.72l-11-6.8A1 1 0 0 0 8 5.2z")
+        //- the sign at the bottom: play the game again from the start (text and questions stay); before the start the big play button is the only way
+        div(v-if="hasGame && started" class="stage-ctrl")
           button(type="button" class="stage-restart" :aria-label="t('app.adventure.restartGame')" :title="t('app.adventure.restartGame')" @click="restartGame")
             svg(viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true")
               path(d="M20 12a8 8 0 1 1-2.6-5.9")
@@ -1368,6 +1399,18 @@ $ink: var(--lk-text)
   font-size: 1.9rem
   line-height: 1.12
 
+// the head of a game page: back and sound, then one line (stage and Bible place) and the title once
+.stage-head--game
+  padding-top: calc(env(safe-area-inset-top, 0px) + 8px)
+
+  .stage-kind
+    margin: 8px 0 0
+    font-size: 0.95rem
+
+  .stage-title
+    margin: 0
+    font-size: 1.5rem
+
 .stage-ref
   margin: 4px 0 0
   font-size: 1rem
@@ -1463,7 +1506,7 @@ $ink: var(--lk-text)
   padding-right: 4px
 
 .stage-card--game
-  padding: 16px 4px 18px
+  padding: 12px 4px 16px
 
   > .stage-h2, > .stage-hint, > .stage-jobs
     padding-left: 14px
@@ -1546,6 +1589,25 @@ $ink: var(--lk-text)
   margin: 0 0 14px
   font-size: 1.1rem
   color: var(--lk-muted)
+
+// the page of a game: "Aufgabe" is a small label over its sentence, the game gets the room
+.stage-card--game > .stage-h2
+  margin: 0 0 2px
+  font-size: 0.75rem
+  letter-spacing: 0.08em
+  text-transform: uppercase
+  color: var(--lk-muted)
+
+.stage-card--game > .stage-hint
+  margin: 0 0 8px
+  font-size: 1.05rem
+  line-height: 1.3
+  color: var(--lk-text)
+
+  &.stage-hint--run
+    font-size: 0.95rem
+    margin-bottom: 4px
+    color: var(--lk-muted)
 
 .stage-actions
   display: flex
@@ -1630,16 +1692,16 @@ $ink: var(--lk-text)
   display: flex
   flex-direction: column
   align-items: center
-  gap: 14px
-  padding: 28px 14px
-  margin: 10px 4px 0
+  gap: 10px
+  padding: 18px 14px
+  margin: 6px 4px 0
   border-radius: var(--lk-r-group)
   background: var(--lk-surface-2)
   border: 2px dashed var(--lk-line)
 
 .stage-play-big
-  width: 104px
-  height: 104px
+  width: 96px
+  height: 96px
   display: flex
   align-items: center
   justify-content: center
@@ -1667,6 +1729,20 @@ $ink: var(--lk-text)
 @media (prefers-reduced-motion: reduce)
   .stage-play, .stage-play-big
     animation: none
+
+// a phone on its side: the play button and its sentence are smaller, so that they fit above the tab bar
+@media (max-height: 450px)
+  .stage-ready
+    gap: 6px
+    padding: 8px 14px
+
+  .stage-play-big
+    width: 68px
+    height: 68px
+
+    svg
+      width: 36px
+      height: 36px
 
 .stage-restart
   display: flex

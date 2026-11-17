@@ -10,6 +10,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AdvButton from '@/components/atoms/AdvButton.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
+import GameIntroBox from '@/components/molecules/games/GameIntroBox.vue'
 import useBigGames, { howSeen, markHowSeen } from '@/use/useBigGames'
 import useSfx from '@/use/useSfx'
 import useMusic from '@/use/useMusic'
@@ -945,13 +946,14 @@ onBeforeUnmount(() => {
       //- the levels
       div(v-else-if="screen === 'menu'" class="eg-menu")
         div(class="eg-card")
-          h1(class="eg-title") {{ t('app.bigGames.elia.title') }}
-          p(class="eg-ref") {{ t('app.bigGames.elia.ref') }}
-          div(class="eg-story" data-test="elia-story")
-            span(class="eg-story-head") {{ t('app.bigGames.elia.storyHead') }}
-            p(class="eg-story-text") {{ t('app.bigGames.elia.story') }}
-            span(class="eg-story-ref") {{ t('app.bigGames.elia.storyRef') }}
-            p(class="eg-story-task") {{ t('app.bigGames.elia.task') }}
+          GameIntroBox(
+            :title="t('app.bigGames.elia.title')"
+            :label="t('app.bigGames.elia.storyHead')"
+            :story="t('app.bigGames.elia.story')"
+            :story-ref="t('app.bigGames.elia.storyRef')"
+            :task="t('app.bigGames.elia.task')"
+            test-id="elia-story"
+          )
           div(class="eg-worlds")
             div(v-for="(w, wi) in WORLDS" :key="w" class="eg-world")
               div(class="eg-world-head")
@@ -1140,11 +1142,6 @@ onBeforeUnmount(() => {
   font-size: 1.5rem
   font-weight: 800
 
-.eg-ref
-  margin: -4px 0 0
-  font-weight: 700
-  color: var(--lk-muted, #7a6b4f)
-
 .eg-text
   margin: 0
   line-height: 1.35
@@ -1155,18 +1152,7 @@ onBeforeUnmount(() => {
   font-size: 0.8rem
   color: var(--lk-muted, #7a6b4f)
 
-// the box with the background story: what the game is about and the task
-.eg-story
-  width: 100%
-  display: flex
-  flex-direction: column
-  gap: 4px
-  padding: 10px 14px 10px
-  border-radius: 16px
-  border: 2px solid #d9a93a
-  background: linear-gradient(180deg, #fff6d9, #fbeab8)
-  text-align: left
-
+// the story card of a world (the box of the menu is `GameIntroBox`)
 .eg-story-head
   font-size: 0.72rem
   font-weight: 800
