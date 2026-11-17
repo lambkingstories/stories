@@ -11,12 +11,12 @@
 import { bobAt } from '@/utils/davidWalk'
 
 /**
- * The size of the scene (16:9). Zoomed out by a quarter (Anton, 12.11.2026): the field is 2000 wide, so the animals can be seen and hit
+ * The size of the scene (16:9). Zoomed out twice (Anton, 12.11. and 14.11.2026): the field is 2400 wide, so the animals can be seen and hit
  * from further away; everything keeps its size, there is just more field to the right and more sky above.
  */
-export const W = 2000
-export const H = 1125
-export const GROUND = 960
+export const W = 2400
+export const H = 1350
+export const GROUND = 1150
 /** The sling: where the stone sits before the shot (187 above the ground, as before). */
 export const SLING = { x: 262, y: GROUND - 187 }
 /** The sheep stand left of this line; an animal that gets here scares a sheep. */
@@ -471,6 +471,7 @@ function threatened(g: Game, a: Animal): boolean {
 
 function scareAway(g: Game, a: Animal) {
   a.mode = 'flee'
+  if (a.kind !== 'eagle') a.vlift = Math.min(0, a.vlift)
   g.score += KINDS[a.kind].points
   g.events.push({ type: 'scare', x: a.x, y: GROUND - a.lift, kind: a.kind })
 }
@@ -524,7 +525,12 @@ export function step(g: Game, dt: number) {
       a.x += 420 * dt
       // the eagle flies away upward
       if (a.kind === 'eagle') a.lift += 300 * dt
-      else a.lift = Math.max(0, a.lift + a.vlift * dt)
+      else {
+        // a hit animal runs off along the ground: whatever leap it was in falls back down, it never goes up (only the eagle flies)
+        a.vlift = Math.min(0, a.vlift) - 1500 * dt
+        a.lift = Math.max(0, a.lift + a.vlift * dt)
+        if (a.lift === 0) a.vlift = 0
+      }
       continue
     }
     // knock back after a hit, then on again

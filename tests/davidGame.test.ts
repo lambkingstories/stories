@@ -211,7 +211,7 @@ describe('the stars of a level', () => {
   it('has ten levels, Goliath last with five stones and every animal is inside the scene when it comes', () => {
     expect(LEVELS).toHaveLength(10)
     expect(LEVELS[9]!.stones).toBe(5)
-    expect(W).toBe(2000)
+    expect(W).toBe(2400)
     expect(GROUND).toBeGreaterThan(SLING.y)
   })
 })
@@ -276,7 +276,7 @@ describe('the eagles', () => {
 
   it('take a sheep when they get there', () => {
     const g = eagleGame()
-    run(g, 14)
+    run(g, 20)
     expect(g.lostSheep).toBe(1)
   })
 
@@ -310,5 +310,35 @@ describe('the eagles', () => {
 
   it('give the same score as a lion', () => {
     expect(KINDS.eagle.points).toBe(KINDS.lion.points)
+  })
+})
+
+describe('a hit animal runs off along the ground', () => {
+  afterEach(() => vi.restoreAllMocks())
+
+  it('no animal but the eagle ever goes up after a hit, also a lion in the middle of its leap', () => {
+    for (const kind of ['wolf', 'bear', 'lion'] as const) {
+      const g = newGame({ ...LEVELS[0]!, waves: [{ kind, after: 0.01 }, { kind: 'wolf', after: 999 }], stones: 20 })
+      run(g, 0.1)
+      const a = g.animals[0]!
+      a.x = 700
+      // in the air, going up
+      a.lift = 120
+      a.vlift = 620
+      a.hp = 1
+      const b = body(a)
+      g.stones.push({ x: b.x - b.r + 5, y: b.y, vx: 900, vy: 0, bounces: 3, age: 0 })
+      let prev = Infinity
+      for (let i = 0; i < 180; i++) {
+        step(g, 1 / 60)
+        if (a.mode === 'flee') {
+          // from the first frame of the flight on it only goes down (or stays on the ground)
+          expect(a.lift).toBeLessThanOrEqual(prev)
+          prev = a.lift
+        }
+      }
+      expect(a.mode).toBe('flee')
+      expect(a.lift).toBe(0)
+    }
   })
 })

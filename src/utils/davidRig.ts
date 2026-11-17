@@ -24,7 +24,7 @@ export interface RigState {
 /** Where the shoulder sits in the picture of the raised arm. */
 const RAISED = { pivot: [398, 252] as [number, number], dx: 120, dy: 0 }
 
-export const RIG_PICTURES = ['gol-torso', 'gol-arm-speer', 'gol-arm-schild', 'gol-arm-hoch', 'gol-bein-ober', 'gol-bein-unter', 'gol-fuss', 'gol-speer']
+export const RIG_PICTURES = ['gol-torso', 'gol-arm-speer', 'gol-arm-schild', 'gol-arm-hoch', 'gol-bein-ober', 'gol-bein-unter', 'gol-fuss', 'gol-speer', 'gol-rock']
 const REQUIRED = ['gol-torso', 'gol-arm-speer', 'gol-arm-schild', 'gol-bein-ober', 'gol-bein-unter', 'gol-speer']
 
 export function createRig(img: RigImages) {
@@ -119,13 +119,22 @@ export function createRig(img: RigImages) {
       c.scale(aS.k, aS.k)
       c.save()
       c.translate(aS.hand[0] - aS.pivot[0], aS.hand[1] - aS.pivot[1])
-      c.rotate(-swingS * 0.92)
+      c.rotate(-swingS * 0.92 - 0.1)
       c.scale(P.spear.k / aS.k, P.spear.k / aS.k)
       c.drawImage(img[P.spear.img]!, -P.spear.grip[0], -P.spear.grip[1])
       c.restore()
       c.drawImage(img[aS.img]!, -aS.pivot[0], -aS.pivot[1])
       c.restore()
       c.drawImage(img[P.torso.img]!, -P.torso.hip[0], -P.torso.hip[1])
+      // the knee-long skirt hangs from the belt over the thighs and swings a little with the legs (the short kilt of the body is behind it)
+      const skirt = img[P.rock.img]
+      if (skirt) {
+        c.save()
+        c.translate(P.rock.at[0] - P.torso.hip[0], P.rock.at[1] - P.torso.hip[1])
+        c.rotate((pose.near.thigh + pose.far.thigh) * 0.22 + 0.02)
+        c.drawImage(skirt, -P.rock.pivot[0], -P.rock.pivot[1])
+        c.restore()
+      }
       // the near arm with the shield hangs and swings, and goes up in front of the face when he raises the shield
       const aH = P.armShield
       const k = s.shield

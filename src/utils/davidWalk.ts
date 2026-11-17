@@ -52,7 +52,8 @@ export const PARTS = {
   thigh: { img: 'gol-bein-ober', w: 174, h: 375, hip: [92, 55], knee: [95, 325], rest: -0.011, kx: 0.78 },
   shin: { img: 'gol-bein-unter', w: 135, h: 369, knee: [62, 33], ankle: [56, 327], rest: 0.02, kx: 1 },
   foot: { img: 'gol-fuss', w: 185, h: 119, ankle: [135, 20] },
-  spear: { img: 'gol-speer', w: 40, h: 465, grip: [20, 250], k: 1 }
+  rock: { img: 'gol-rock', w: 239, h: 352, pivot: [120, 6], at: [120, 362] },
+  spear: { img: 'gol-speer', w: 40, h: 465, grip: [20, 330], k: 2.8 }
 } as const
 
 export const DEFAULT_DIMS: WalkDims = {
