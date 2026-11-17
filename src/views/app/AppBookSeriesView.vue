@@ -18,6 +18,7 @@ import type { ApiBook, Locale } from '@/types/apiBook'
 import { pickLocalizedImage } from '@/types/apiBook'
 import { onImgFallback, withPlaceholder, PLACEHOLDER_IMAGE } from '@/utils/placeholder'
 import { contentLocale } from '@/utils/contentLocale'
+import { displayTitles } from '@/utils/seriesNumbering'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
@@ -81,14 +82,17 @@ function titleOf(book: ApiBook): string {
   return book.localizations?.[lang.value]?.title || book.localizations?.de?.title || ''
 }
 
+// the numbers of the titles are numbered again in the order of the list when one number stands twice (old books that are still published)
+const shownTitles = computed<string[]>(() => displayTitles(books.value.map(titleOf)))
+
 const cells = computed<Cell[]>(() =>
-  books.value.map((book) => {
+  books.value.map((book, i) => {
     const pages = book.localizations?.[lang.value]?.content?.length || book.localizations?.de?.content?.length || 0
     const pct = getPct(book.bookId, pages)
     const age = Date.now() - new Date(book.releaseDate).getTime()
     return {
       book,
-      title: titleOf(book),
+      title: shownTitles.value[i] ?? titleOf(book),
       isNew: age >= 0 && age < NEW_DAYS * 86400000,
       state: pct >= 0.98 ? 'done' : pct > 0 ? 'going' : 'open',
       pct,

@@ -22,6 +22,7 @@ import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
 import { booksOfArea } from '@/utils/readingAreas'
 import { goBackTo } from '@/utils/navBack'
 import { contentLocale } from '@/utils/contentLocale'
+import { displayTitles } from '@/utils/seriesNumbering'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
@@ -34,16 +35,15 @@ const { seriesName } = useCatalogNames()
 const online = ref(typeof navigator === 'undefined' ? true : navigator.onLine)
 const setOnline = () => {
   online.value = navigator.onLine
-}
   // the net is back: the list is fetched again and the page changes from "readable without a net" to the shelves
   if (online.value) reload()
+}
 
 function reload() {
   void apiBooks.loadAllBooks().then(loadOfflineList)
   void apiSeries.loadAll()
 }
 
-onMounted(() => {
 // ----- Without a net: the stories that lie on the device (text and cover) -----
 const offlineStories = useOfflineStories()
 const offlineItems = ref<OfflineItem[]>([])
@@ -79,22 +79,23 @@ async function loadOfflineList() {
   }
 }
 
+onMounted(() => {
   reload()
   window.addEventListener('online', setOnline)
   window.addEventListener('offline', setOnline)
-})
   if (offlineMode.value) void loadOfflineList()
+})
 onBeforeUnmount(() => {
   window.removeEventListener('online', setOnline)
   window.removeEventListener('offline', setOnline)
-})
   releaseCovers()
+})
 
 const lang = computed<Locale>(() => (contentLocale(locale.value)))
-// only the stories: coloring books are in "Malbücher", printed store books in "Books"
 watch(offlineMode, (off) => {
   if (off) void loadOfflineList()
 })
+// only the stories: coloring books are in "Malbücher", printed store books in "Books"
 const allBooks = computed<ApiBook[]>(() => booksOfArea((apiBooks.state.all ?? []) as ApiBook[], 'stories'))
 
 interface Shelf {
@@ -163,7 +164,6 @@ const results = computed<ApiBook[]>(() => {
   })
 })
 
-function isNew(book: ApiBook): boolean {
 // without a net the search runs over the stories on the device
 const offlineShown = computed<OfflineItem[]>(() => {
   const term = query.value.trim().toLowerCase()
@@ -177,12 +177,27 @@ const offlineShown = computed<OfflineItem[]>(() => {
 const showOffline = computed(() => offlineMode.value && offlineItems.value.length > 0)
 const offlineText = computed(() => (online.value ? t('app.offline.listTextServer') : t('app.offline.listText')))
 
+function isNew(book: ApiBook): boolean {
   const age = Date.now() - new Date(book.releaseDate).getTime()
   return age >= 0 && age < NEW_DAYS * 86400000
 }
 
-function bookTitle(book: ApiBook): string {
+function rawTitle(book: ApiBook): string {
   return book.localizations?.[lang.value]?.title || book.localizations?.de?.title || ''
+}
+
+// a series whose numbers stand twice is numbered again in the order of its shelf (old books that are still published)
+const shownTitle = computed(() => {
+  const map = new Map<string, string>()
+  for (const sh of shelves.value) {
+    const shown = displayTitles(sh.books.map(rawTitle))
+    sh.books.forEach((b, i) => map.set(b.bookId, shown[i] ?? rawTitle(b)))
+  }
+  return map
+})
+
+function bookTitle(book: ApiBook): string {
+  return shownTitle.value.get(book.bookId) ?? rawTitle(book)
 }
 
 function goBack() {
@@ -224,21 +239,6 @@ function openBook(bookId: string) {
           ZIconography(name="plus" :size="20" class="close-x")
         ZIconography(v-else name="search" :size="22" class="ask-search")
 
-      //- results replace the shelves while something is typed
-      section(v-else-if="isSearching" class="results")
-        p(v-if="!results.length" class="results-empty") {{ t('app.main.searchEmpty') }}
-        div(v-else class="results-grid")
-          button(
-            v-for="book in results"
-            :key="book.bookId"
-            type="button"
-            class="result"
-            @click="openBook(book.bookId)"
-          )
-            span(class="result-cover")
-              img(
-                :src="withPlaceholder(pickLocalizedImage(book.previewImage, lang))"
-                :alt="bookTitle(book)"
       //- without a net (or with a server that does not answer): the stories that lie on the device, instead of shelves that cannot be opened
       section(v-if="showOffline" class="offline-list lk-panel" data-test="offline-list")
         h2(class="offline-title") {{ t('app.offline.listTitle') }}
@@ -267,6 +267,21 @@ function openBook(bookId: string) {
           ZIconography(name="restart" :size="22")
           span {{ t('app.state.reconnect') }}
 
+      //- results replace the shelves while something is typed
+      section(v-else-if="isSearching" class="results")
+        p(v-if="!results.length" class="results-empty") {{ t('app.main.searchEmpty') }}
+        div(v-else class="results-grid")
+          button(
+            v-for="book in results"
+            :key="book.bookId"
+            type="button"
+            class="result"
+            @click="openBook(book.bookId)"
+          )
+            span(class="result-cover")
+              img(
+                :src="withPlaceholder(pickLocalizedImage(book.previewImage, lang))"
+                :alt="bookTitle(book)"
                 loading="lazy"
                 draggable="false"
                 @error="onImgFallback"
@@ -383,21 +398,6 @@ button
   text-align: center
   color: var(--lk-muted)
 
-.results-grid
-  display: grid
-  grid-template-columns: repeat(3, minmax(0, 1fr))
-  gap: 16px 12px
-
-.result
-  display: flex
-  flex-direction: column
-  gap: 6px
-  min-width: 0
-  padding: 0
-  border: none
-  background: transparent
-  color: var(--lk-text)
-  text-align: left
 .offline-list
   padding: 16px 14px 18px
 
@@ -433,6 +433,21 @@ button
   :deep(.z-icon-outline)
     color: currentColor
 
+.results-grid
+  display: grid
+  grid-template-columns: repeat(3, minmax(0, 1fr))
+  gap: 16px 12px
+
+.result
+  display: flex
+  flex-direction: column
+  gap: 6px
+  min-width: 0
+  padding: 0
+  border: none
+  background: transparent
+  color: var(--lk-text)
+  text-align: left
   cursor: pointer
 
 .result-cover
