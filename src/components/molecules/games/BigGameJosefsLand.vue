@@ -14,6 +14,7 @@ import useBigGames, { howSeen, markHowSeen } from '@/use/useBigGames'
 import useSfx from '@/use/useSfx'
 import useMusic from '@/use/useMusic'
 import { prependBaseUrl } from '@/utils/function'
+import { clientToLocal, localToWorld, pickBox, worldToLocal } from '@/utils/josefslandView'
 import {
   ALL_PICTURES,
   ANIMAL_FILE,
@@ -290,15 +291,16 @@ function clampCam() {
   const y1 = WORLD_H + 30 - hh
   cam.y = y0 > y1 ? (y0 + y1) / 2 : Math.max(y0, Math.min(y1, cam.y))
 }
-const toWorld = (sx: number, sy: number): [number, number] => [(sx - W / 2) / cam.z + cam.x, (sy - H / 2) / cam.z + cam.y]
-const toScreen = (wx: number, wy: number): [number, number] => [(wx - cam.x) * cam.z + W / 2, (wy - cam.y) * cam.z + H / 2]
+const toWorld = (sx: number, sy: number): [number, number] => localToWorld(cam, W, H, sx, sy)
+const toScreen = (wx: number, wy: number): [number, number] => worldToLocal(cam, W, H, wx, wy)
 
 function resize() {
   const c = canvas.value
   if (!c) return
   dpr = Math.min(2, window.devicePixelRatio || 1)
-  W = c.clientWidth || 800
-  H = c.clientHeight || 600
+  const box = c.getBoundingClientRect()
+  W = box.width || c.clientWidth || 800
+  H = box.height || c.clientHeight || 600
   c.width = Math.round(W * dpr)
   c.height = Math.round(H * dpr)
   clampCam()
@@ -1239,18 +1241,14 @@ const painted = new Set<string>()
 let pinch: null | { d: number; z: number } = null
 let vel = { x: 0, y: 0 }
 
-function hit(wx: number, wy: number): Box | null {
-  let best: Box | null = null
-  for (const b of boxes) {
-    if (wx < b.x0 || wx > b.x1 || wy < b.y0 || wy > b.y1) continue
-    if (!best || b.prio > best.prio || (b.prio === best.prio && b.y1 > best.y1)) best = b
-  }
-  return best
-}
+const hit = (wx: number, wy: number): Box | null => pickBox(boxes, wx, wy)
 
+/** The touch as a point of the canvas. The size of the canvas is measured again first: if it changed without a resize event, the picture is made new at once. */
 function localPoint(e: PointerEvent): [number, number] {
-  const r = canvas.value!.getBoundingClientRect()
-  return [e.clientX - r.left, e.clientY - r.top]
+  const c = canvas.value!
+  const r = c.getBoundingClientRect()
+  if (Math.abs(r.width - W) > 0.5 || Math.abs(r.height - H) > 0.5) resize()
+  return clientToLocal(r, W, H, e.clientX, e.clientY)
 }
 
 function onDown(e: PointerEvent) {
@@ -1352,7 +1350,7 @@ function onUp(e: PointerEvent) {
 }
 
 function onWheel(e: WheelEvent) {
-  const [sx, sy] = [e.offsetX, e.offsetY]
+  const [sx, sy] = clientToLocal(canvas.value!.getBoundingClientRect(), W, H, e.clientX, e.clientY)
   zoomAt(sx, sy, e.deltaY < 0 ? 1.12 : 1 / 1.12)
 }
 
@@ -1828,6 +1826,7 @@ function onKey(e: KeyboardEvent) {
 }
 
 let bodyOverflow = ''
+let observer: ResizeObserver | null = null
 const onVisibility = () => {
   if (document.hidden) save()
 }
@@ -1839,6 +1838,11 @@ onMounted(async () => {
   how.value = false
   resize()
   window.addEventListener('resize', resize)
+  window.visualViewport?.addEventListener('resize', resize)
+  if (typeof ResizeObserver !== 'undefined' && canvas.value) {
+    observer = new ResizeObserver(() => resize())
+    observer.observe(canvas.value)
+  }
   window.addEventListener('keydown', onKey)
   document.addEventListener('visibilitychange', onVisibility)
   music.playGame('graze')
@@ -1886,6 +1890,8 @@ onBeforeUnmount(() => {
   cancelAnimationFrame(raf)
   music.stop('game')
   window.removeEventListener('resize', resize)
+  window.visualViewport?.removeEventListener('resize', resize)
+  observer?.disconnect()
   window.removeEventListener('keydown', onKey)
   document.removeEventListener('visibilitychange', onVisibility)
   document.body.style.overflow = bodyOverflow
