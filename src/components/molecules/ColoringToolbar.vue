@@ -1080,4 +1080,128 @@ $tint: rgba(31, 58, 95, 0.055)
     img
       width: 30px
       height: 28px
+
+// A phone held wide (hardly 375 px high): the bar uses the whole height beside the paper and has two columns, the tools (they
+// scroll) and the buttons (undo, bucket, colours, stamp…), so that no tool is lost and every button is 44 px big. The corner
+// buttons of the top bar stay above it; the stamp and the size panels scroll inside the screen.
+@media (max-height: 450px) and (orientation: landscape)
+  .tb
+    --tile-l: 84px
+    --tile-w: 44px
+    --len: 58px
+    --len-on: 78px
+    --sw: 26px
+
+  .tb.edge-left,
+  .tb.edge-right
+    top: calc(58px + var(--act-h, 0px) + env(safe-area-inset-top, 0px))
+    bottom: calc(8px + env(safe-area-inset-bottom, 0px))
+
+  .tb.edge-left .tb-pill,
+  .tb.edge-right .tb-pill
+    display: grid
+    grid-template-columns: var(--tile-l) 98px
+    grid-template-rows: auto auto auto minmax(0, 1fr)
+    column-gap: 6px
+    row-gap: 6px
+    align-content: start
+    top: 0
+    height: 100%
+    transform: none
+
+  .tb.edge-left.collapsed .tb-pill
+    transform: translate(calc(-100% - 12px), 0)
+
+  .tb.edge-right.collapsed .tb-pill
+    transform: translate(calc(100% + 12px), 0)
+
+  .tb.edge-right .tb-pill
+    grid-template-columns: 98px var(--tile-l)
+
+  // the tools: the whole height, scrolling
+  .tb-list
+    grid-column: 1
+    grid-row: 1 / -1
+    height: 100%
+    padding: 2px 0
+    overflow-y: auto
+
+  .tb.edge-right .tb-list
+    grid-column: 2
+
+  .tb-top,
+  .tb-pair,
+  .tb-bottom
+    grid-column: 2
+    margin: 0 !important
+
+  .tb.edge-right .tb-top,
+  .tb.edge-right .tb-pair,
+  .tb.edge-right .tb-bottom
+    grid-column: 1
+
+  .tb-top
+    grid-row: 1
+    flex-direction: column
+
+  .tb-pair
+    grid-row: 2
+    padding-top: 0
+    gap: 6px
+
+  .tb-bottom
+    grid-row: 3
+
+  .tb.edge-left .tb-bottom,
+  .tb.edge-right .tb-bottom
+    padding-top: 6px
+    gap: 6px
+
+  .tb-head
+    gap: 4px
+
+  .tb-hist
+    width: 100%
+    justify-content: space-between
+
+  .tb-btn,
+  .tb-grip
+    width: 44px
+    height: 44px
+
+  .tb.edge-left .tb-grip,
+  .tb.edge-right .tb-grip
+    flex: 1 1 auto
+    min-width: 44px
+    height: 44px
+
+  .tb-helper
+    width: 46px
+    height: 44px
+
+  .tb-act
+    height: 44px
+    justify-content: center
+    padding: 2px
+
+  .tb-ico-color
+    width: 36px
+    height: 30px
+
+    img
+      width: 34px
+      height: 30px
+
+  // the panels of size, stamp and turning: never taller than the screen, scrolling inside
+  .tb.edge-left .tb-pop,
+  .tb.edge-right .tb-pop
+    top: auto
+    bottom: 0
+    transform: none
+    max-height: calc(100vh - 16px - env(safe-area-inset-bottom, 0px))
+    overflow-y: auto
+    overscroll-behavior: contain
+
+  .tb-stamps
+    max-height: 132px
 </style>

@@ -304,6 +304,13 @@ watch(() => props.open, (o) => {
     --vis: 70px
     --lift: 12px
 
+// a phone held wide: the tool bar runs down to the bottom edge at the side, so the box starts beside it
+@media (max-height: 450px) and (orientation: landscape)
+  .sh.bar-left
+    left: 202px
+  .sh.bar-right
+    right: 202px
+
 @media (prefers-reduced-motion: reduce)
   .sh
     transition-duration: 1ms
@@ -329,6 +336,12 @@ watch(() => props.open, (o) => {
   box-shadow: 0 -2px 10px rgba(20, 24, 32, 0.14)
   cursor: pointer
   -webkit-tap-highlight-color: transparent
+
+  // the tab is small to look at, but a finger needs 44 px: the touch area reaches up and to the sides
+  &::before
+    content: ''
+    position: absolute
+    inset: -18px -10px 0
 
   img
     width: 16px

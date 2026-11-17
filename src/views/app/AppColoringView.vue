@@ -31,6 +31,7 @@ import { isIOS } from '@/utils/platform'
 import { goBackTo } from '@/utils/navBack'
 import { screenToSheet } from '@/utils/sheetMath'
 import { PatchHistory } from '@/utils/patchHistory'
+import { PAGE_INSET, fitPaper, paperInsets, topBarReach, type InsetInput, type Insets } from '@/utils/coloringLayout'
 import { StickerCover } from '@/utils/stickerCover'
 import useSfx from '@/use/useSfx'
 import { useToolbarDock } from '@/use/useToolbarDock'
@@ -1889,13 +1890,34 @@ function fitCanvas() {
   })
 }
 
-// Breathing room around the paper; the top bar floats over the top edge, so the paper starts below it.
-const PAGE_INSET = 10
-const topInset = () => (isFullscreen.value ? PAGE_INSET : 62 + (activityCtx.value ? bandEl.value?.offsetHeight || BAND_HEIGHT : 0))
-
-// The colour box at the bottom edge lies over the paper; only its little tab keeps room (and not in fullscreen).
-/** Room for the little arrow tab that stays at the bottom edge while the colour box is hidden. */
-const FOLDED_TAB = 30
+// Breathing room around the paper; the top bar floats over the top edge, so the paper starts below it (on a phone held wide the
+// paper rises up to the top edge, see `utils/coloringLayout.ts`). The colour box at the bottom edge lies over the paper; only
+// its little tab keeps room (and not in fullscreen).
+/** What the top bar shows now: how far its buttons reach into the screen decides whether the paper may rise to the top edge. */
+function barReach(): number {
+  return topBarReach({
+    doneButton: !!(advCtx.value || journalCtx.value),
+    pages: navTotal.value > 1,
+    // (the zoom buttons that a touch screen shows once the sheet is zoomed do not count: the paper must not jump when they come)
+    zoom: finePointer.value,
+    text: !!pageInfo.value
+  })
+}
+/** The inputs of the layout rule for a picture area of W × H (the layout box of `.ac-main`). */
+function layoutInput(W: number, H: number, ratio = 0.75): InsetInput {
+  return {
+    width: W,
+    height: H,
+    ratio,
+    fullscreen: isFullscreen.value,
+    hasImage: hasImage.value,
+    band: activityCtx.value ? bandEl.value?.offsetHeight || BAND_HEIGHT : 0,
+    reach: barReach()
+  }
+}
+/** Room over and under the paper. */
+const paperRoom = (W: number, H: number, ratio?: number): Insets => paperInsets(layoutInput(W, H, ratio))
+const sheetRatio = () => (bgCanvas.value && bgCanvas.value.height ? bgCanvas.value.width / bgCanvas.value.height : 0.75)
 const SHELF_KEY = 'lk-coloring-box-open'
 function readShelfOpen(): boolean {
   try {
@@ -1906,11 +1928,6 @@ function readShelfOpen(): boolean {
 }
 const shelfOpen = ref(readShelfOpen())
 const shelfEl = ref<InstanceType<typeof ColoringShelf> | null>(null)
-function bottomInset(): number {
-  // The colour box lies over the picture when it is pulled out: the paper never gets smaller (or moves) for it.
-  if (isFullscreen.value || !hasImage.value) return PAGE_INSET
-  return FOLDED_TAB
-}
 
 /** In fullscreen the box is not part of the layout: it is pulled out over the picture and goes away again. */
 const shelfPeek = ref(false)
@@ -1944,6 +1961,8 @@ const toolbarStyle = computed<Record<string, string>>(() =>
 const showZoom = computed(() => finePointer.value || zoomPct.value !== 100 || zoomBarKept.value)
 /** The corner of the picture where undo and redo sit: the one away from the tool bar. */
 const cornerSide = computed(() => (dock.value.edge === 'right' ? 'left' : 'right'))
+/** On a phone held wide the tool bar runs down to the bottom edge at the side: the colour box then starts beside it (see its styles). */
+const shelfBesideBar = computed(() => (toolbarOpen.value && !isFullscreen.value ? `bar-${dock.value.edge}` : ''))
 /** The room of the colour box at the bottom edge is always kept free for the tool bar, so the bar never moves when the box comes out. */
 const shelfRoom = () => (isFullscreen.value ? 0 : (shelfEl.value?.height() || 134) + 6)
 const cornerStyle = computed<Record<string, string>>(() => ({ '--lift': `${shelfRoom()}px` }))
@@ -1960,16 +1979,8 @@ function fitCanvasInner(bg: HTMLCanvasElement, wrap: HTMLDivElement, r: DOMRect)
   // Contain-fit dimensions — the largest the unscaled artwork can be
   // while staying entirely inside the canvas area. Centering is then
   // handled inside applyTransform based on whether we're in fullscreen.
-  const aw = r.width - PAGE_INSET * 2
-  const ah = r.height - topInset() - bottomInset()
-  const ratio = bg.width / bg.height
-  let w = aw, h = aw / ratio
-  if (h > ah) {
-    h = ah
-    w = ah * ratio
-  }
-  w = Math.max(1, Math.round(w))
-  h = Math.max(1, Math.round(h))
+  // the colour box lies over the picture when it is pulled out: the paper never gets smaller (or moves) for it
+  const { w, h } = fitPaper(layoutInput(r.width, r.height, bg.width / bg.height))
   zoom.baseW = w
   zoom.baseH = h
   wrap.style.width = `${w}px`
@@ -1991,8 +2002,9 @@ function applyTransform() {
   // geometric middle of the canvas area in every mode.
   const sw = zoom.baseW * zoom.scale
   const sh = zoom.baseH * zoom.scale
+  const room = paperRoom(r.width, r.height, sheetRatio())
   const baseLeft = PAGE_INSET + (r.width - PAGE_INSET * 2 - sw) / 2
-  const baseTop = topInset() + (r.height - topInset() - bottomInset() - sh) / 2
+  const baseTop = room.top + (r.height - room.top - room.bottom - sh) / 2
   // the sheet turns about its middle: the same list of functions in both positions, so it turns smoothly
   const cx = baseLeft + zoom.panX + sw / 2
   const cy = baseTop + zoom.panY + sh / 2
@@ -2110,7 +2122,8 @@ function clampPan() {
   const sw = zoom.baseW * zoom.scale
   const sh = zoom.baseH * zoom.scale
   // where the sheet lies when it is not moved (see applyTransform), measured from the middle of the whole screen
-  const homeY = topInset() + (H - topInset() - bottomInset()) / 2 - H / 2
+  const room = paperRoom(W, H, sheetRatio())
+  const homeY = room.top + (H - room.top - room.bottom) / 2 - H / 2
   const keepX = Math.min(sw, W) * 0.4
   const keepY = Math.min(sh, H) * 0.4
   const maxX = Math.max(0, (W + sw) / 2 - keepX)
@@ -3122,7 +3135,8 @@ function commitStamp() {
 const stampFrameStyle = computed<Record<string, string>>(() => {
   const l = live.value
   const d = sheetDims.value
-  if (!l || !d.w || !d.h) return {}
+  const none: Record<string, string> = {}
+  if (!l || !d.w || !d.h) return none
   return {
     left: `${(l.x / d.w) * 100}%`,
     top: `${(l.y / d.h) * 100}%`,
@@ -4583,6 +4597,7 @@ watch(queryBook, (id) => {
     ColoringShelf(
       v-if="hasImage"
       ref="shelfEl"
+      :class="shelfBesideBar"
       :variant="kitDef.variant"
       :items="kitDef.base"
       :extra="kitDef.extra"
@@ -5887,4 +5902,30 @@ $accent-dark: $accent
   to
     opacity: 1
     transform: scale(1)
+
+// A phone held wide (hardly 375 px high): the buttons of the top bar are 44 px big and sit in the two corners, the paper in the
+// middle rises up to the top edge (see `utils/coloringLayout.ts`).
+@media (max-height: 450px) and (orientation: landscape)
+  .ac-top
+    padding-bottom: 0
+
+  .ac-btn
+    width: 44px
+    height: 44px
+
+  .ac-pg-btn
+    width: 36px
+    height: 36px
+
+  .ac-jobs
+    top: 8px
+    width: min(360px, calc(100% - 460px))
+
+  // the menu of the picture may use the whole height under the buttons (the colour box is not in the way of a menu)
+  .ac-menu
+    max-height: calc(100vh - 64px)
+
+  .ac-corner-btn
+    min-width: 44px
+    height: 44px
 </style>
