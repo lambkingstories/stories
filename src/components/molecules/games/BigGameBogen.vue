@@ -13,9 +13,9 @@ import useBigGames, { howSeen, markHowSeen } from '@/use/useBigGames'
 import useSfx from '@/use/useSfx'
 import useMusic from '@/use/useMusic'
 import { prependBaseUrl } from '@/utils/function'
-import { aimPoints, advance as advanceGame, arrowsLeft, itemPos, needsAll, needsLeft, previewPath, shoot, starsOf, windAt, type Game, type ItemDef, type Poly } from '@/utils/bogenGame'
-import { CHAPTER_COUNT, LEVELS, LEVELS_PER_CHAPTER, MAX_STARS, levelGame } from '@/utils/bogenLevels'
-import { findHint } from '@/utils/bogenSolve'
+import { aimPoints, advance as advanceGame, arrowsLeft, cloneGame, itemPos, needsAll, needsLeft, previewPath, shoot, starsOf, windAt, type Game, type ItemDef, type Poly } from '@/utils/bogenGame'
+import { CHAPTER_COUNT, LEVELS, LEVELS_PER_CHAPTER, levelGame } from '@/utils/bogenLevels'
+import { findHintAsync } from '@/utils/bogenSolve'
 import { MIN_PULL_PX, clientToLocal, maxPullOf, pullToAim } from '@/utils/bogenView'
 
 const emit = defineEmits<{ leave: [] }>()
@@ -67,6 +67,8 @@ const hintText = ref('')
 const hintShown = ref(false)
 let hintTimer = 0
 const tipBusy = ref(false)
+/** The phone stands upright: a little note asks to turn it. */
+const portrait = ref(false)
 type ChapterText = { name: Parameters<typeof rt>[0]; ref: Parameters<typeof rt>[0]; story: Parameters<typeof rt>[0]; task: Parameters<typeof rt>[0] }
 const chapterTexts = computed(() => ((tm('app.bigGames.bogen.chapters') as unknown as ChapterText[]) ?? []).map((m) => ({ name: rt(m.name), ref: rt(m.ref), story: rt(m.story), task: rt(m.task) })))
 const names = computed(() => ((tm('app.bigGames.bogen.names') as unknown as Parameters<typeof rt>[0][]) ?? []).map((m) => rt(m)))
@@ -141,7 +143,7 @@ interface Part {
   t: number
   life: number
   r: number
-  kind: 'dust' | 'spark' | 'chip' | 'shard' | 'ring' | 'leaf'
+  kind: 'dust' | 'spark' | 'chip' | 'shard' | 'ring'
   rot: number
   vr: number
 }
@@ -170,7 +172,6 @@ const bow = { angle: 35, pull: 0, drawn: false, shotT: 9, shotPull: 0, shotAngle
 /** The finger. */
 let pt: { id: number; x0: number; y0: number; x: number; y: number; ok: boolean; angle: number; f: number } | null = null
 const previewPts: number[] = []
-let previewFor = 0
 /** The hint: where to aim and when. */
 let tipShot: { a: number; f: number; at: number; until: number; path: number[] } | null = null
 let endTimer = 0
@@ -322,6 +323,7 @@ function onEvents() {
       timeScale = 0.28
       slowT = 1.3
       winSlowAt = 0
+      if (g.lastHit) burst('spark', g.lastHit.x, g.lastHit.y, 20, 5.5, 1.4, 1.1)
       play('fanfare')
       finish()
     } else if (e.t === 'lost') {
@@ -361,7 +363,11 @@ function pos(e: PointerEvent): { x: number; y: number } {
 
 function onDown(e: PointerEvent) {
   if (!live() || pt) return
-  ;(e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId)
+  try {
+    ;(e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId)
+  } catch {
+    // a finger that is not known to the page: the touch still works without the capture
+  }
   const p = pos(e)
   pt = { id: e.pointerId, x0: p.x, y0: p.y, x: p.x, y: p.y, ok: false, angle: bow.angle, f: 0 }
 }
@@ -421,19 +427,24 @@ function askTip() {
   if (!live() || tipBusy.value) return
   tipBusy.value = true
   say(t('app.bigGames.bogen.tipThink'), 2500)
-  window.setTimeout(() => {
-    const h = findHint(g)
+  const level0 = level.value
+  const shots0 = g.shots
+  // the search runs on a copy (the game goes on meanwhile); its time axis is the game's own
+  const snap = cloneGame(g)
+  void findHintAsync(snap).then((h) => {
     tipBusy.value = false
+    // the child may have shot or left meanwhile: then the hint is old
+    if (level.value !== level0 || g.shots !== shots0 || screen.value !== 'play') return
     if (!h) {
       say(t('app.bigGames.bogen.tipNone'), 5000)
       return
     }
-    const path = previewPath(g, h.a, h.f, 5, [])
-    tipShot = { a: h.a, f: h.f, at: g.t + h.wait, until: g.t + h.wait + 14, path }
+    const path = previewPath(snap, h.a, h.f, 5, [])
+    tipShot = { a: h.a, f: h.f, at: snap.t + h.wait, until: g.t + h.wait + 14, path }
     bow.angle = h.a
     if (h.wait > 0.4) say(t('app.bigGames.bogen.tipWait'), 6000)
     else hintShown.value = false
-  }, 30)
+  })
 }
 
 // ── the layout and the loop ─────────────────────────────────────────────────────────────────────────────────────────────────
@@ -447,8 +458,12 @@ function layout() {
   c.width = Math.round(cvW * dpr)
   c.height = Math.round(cvH * dpr)
   viewW = Math.min(g.def.w, VIEW_MAX)
+  const p = cvH > cvW * 1.15
+  if (portrait.value !== p) portrait.value = p
+  groundY = cvH * (p ? 0.7 : 0.86)
   S = cvW / viewW
-  groundY = cvH * (cvH > cvW ? 0.66 : 0.8)
+  // sideways the top of the tallest things (the hooks of the gallows) must stay below the bar of the buttons
+  if (!p) S = Math.min(S, (groundY - 78) / 11.7)
 }
 
 function frame(now: number) {
@@ -501,7 +516,6 @@ function step(dt: number, real: number) {
   if (pt && pt.ok && live()) {
     const secs = LEVELS[level.value]!.def.preview * (g.shots >= 3 && g.items.every((i) => !i.done) ? 1.7 : 1)
     previewPath(g, pt.angle, pt.f, secs, previewPts)
-    previewFor = g.t
   } else previewPts.length = 0
   if (tipShot && g.t > tipShot.until) tipShot = null
   moveCamera(real)
@@ -597,11 +611,9 @@ function drawGround(c: CanvasRenderingContext2D, chap: number) {
   const th = (strip.height / strip.width) * tileW
   // below the strip: the colour of its lower edge
   c.fillRect(0, y + th * 0.7, cvW, cvH)
-  const first = Math.floor((sx(-60) < 0 ? -camCx * u() + cvW / 2 : 0) / tileW)
   const x0 = cvW / 2 - camCx * u()
   const k0 = Math.floor((0 - x0) / tileW) - 1
   const k1 = Math.floor((cvW - x0) / tileW) + 1
-  void first
   for (let k = k0; k <= k1; k++) {
     const x = x0 + k * tileW
     c.save()
@@ -974,14 +986,12 @@ function drawArcher(c: CanvasRenderingContext2D, angDeg: number, pull: number, g
   const nock = { x: grip.x - dirx * back, y: grip.y - diry * back }
   const rearSh = { x: sh.x - 0.14, y: sh.y - 0.05 }
   // the bow
-  const tipUp = { x: grip.x - diry * -1.12 - dirx * 0.2, y: grip.y + dirx * -1.12 - diry * 0.2 }
-  const tipDown = { x: grip.x - diry * 1.12 - dirx * 0.2, y: grip.y + dirx * 1.12 - diry * 0.2 }
   // (the tips: one on each side of the grip, perpendicular to the aim)
-  const upTip = { x: grip.x - diry * 1.12 - dirx * 0.18, y: grip.y + dirx * 1.12 - diry * 0.18 }
-  const dnTip = { x: grip.x + diry * 1.12 - dirx * 0.18, y: grip.y - dirx * 1.12 - diry * 0.18 }
-  void tipUp
-  void tipDown
-  if (!spr(c, 'bogen', sx(grip.x), sy(grip.y), (2.5 / 6.2) * 2.6 * u() * 1.0, 2.6 * u(), -ang + 0)) {
+  const upTip = { x: grip.x - diry * 1.2 - dirx * 0.2, y: grip.y + dirx * 1.2 - diry * 0.2 }
+  const dnTip = { x: grip.x + diry * 1.2 - dirx * 0.2, y: grip.y - dirx * 1.2 - diry * 0.2 }
+  const bi = picOf('bogen')
+  const bh = 2.5 * u()
+  if (!spr(c, 'bogen', sx(grip.x), sy(grip.y), bi && bi.width ? (bi.width / bi.height) * bh : 0.5 * bh, bh, -ang)) {
     c.strokeStyle = tint || '#7a4a22'
     c.lineWidth = Math.max(3, u() * 0.16)
     c.beginPath()
@@ -1204,7 +1214,6 @@ function draw(time: number) {
       c.stroke()
     }
   }
-  void previewFor
 
   // the pull: the rubber band from where the finger went down
   if (pt && pt.ok) {
@@ -1340,7 +1349,6 @@ const windFlagStyle = computed(() => {
 })
 const flagSrc = pic('fahne-auf')
 const arrowSrc = pic('pfeil')
-const totalStars = computed(() => progress.stars(ID))
 const quiver = computed(() => Array.from({ length: hud.supply }, (_, k) => k < hud.left))
 
 function leave() {
@@ -1417,8 +1425,6 @@ onBeforeUnmount(() => {
   document.body.style.overflow = bodyOverflow
   leaveFullscreen()
 })
-void totalStars
-void MAX_STARS
 </script>
 
 <template lang="pug">
@@ -1486,6 +1492,7 @@ void MAX_STARS
           img(:src="flagSrc" alt="" class="bo-wind-flag" :style="windFlagStyle" @error="hideBroken")
           span(class="bo-wind-text") {{ t('app.bigGames.bogen.wind') }} {{ windText }}
       div(v-if="hintShown" class="bo-tip") {{ hintText }}
+      div(v-if="portrait && !paused" class="bo-turn") ⟳ {{ t('app.bigGames.bogen.turn') }}
 
       div(v-if="paused && !how && chapterCard < 0" class="bo-menu bo-menu--dim")
         div(class="bo-card bo-card--small")
@@ -1855,6 +1862,20 @@ void MAX_STARS
   background: rgba(255, 250, 235, 0.95)
   color: #2a2418
   font-weight: 700
+  text-align: center
+  pointer-events: none
+
+.bo-turn
+  position: absolute
+  left: 50%
+  bottom: max(14px, env(safe-area-inset-bottom))
+  transform: translateX(-50%)
+  padding: 8px 16px
+  border-radius: 16px
+  background: rgba(255, 250, 235, 0.92)
+  color: #2a2418
+  font-weight: 700
+  font-size: 0.9rem
   text-align: center
   pointer-events: none
 

@@ -595,6 +595,15 @@ function stepArrow(g: Game, a: ArrowState, dry: boolean): boolean {
       itemPos(it, g.t, _p)
       a.ox = hx - _p.x
       a.oy = hy - _p.y
+      // the arrow sits inside the thing, not on its rim
+      const d = Math.hypot(a.ox, a.oy)
+      const deep = it.r * 0.7
+      if (d > deep) {
+        a.ox *= deep / d
+        a.oy *= deep / d
+        a.x = _p.x + a.ox
+        a.y = _p.y + a.oy
+      }
       if (!dry) {
         g.events.push({ t: 'stick', x: hx, y: hy, mat: 'item' })
         doneItem(g, bitem, hx, hy)

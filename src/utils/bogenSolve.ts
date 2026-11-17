@@ -54,6 +54,8 @@ export interface SearchOpts {
   waits?: number[]
   /** How many different classes of shots to return. */
   top?: number
+  /** Shots that must not be used (the tool looks for a second way that does not use the first one). */
+  exclude?: (a: number, f: number) => boolean
 }
 
 /** The shots that bring something, one (the most robust) for every class of result, the biggest gain first. A coarse grid finds the places, the fine grid is tried only around them. */
@@ -99,6 +101,7 @@ export function searchShots(g: Game, o: SearchOpts = {}): Candidate[] {
       const me = ev(i, j)
       if (me.gain <= 0) continue
       const f = fMin + j * fStep
+      if (o.exclude?.(aMin + i * aStep, f)) continue
       const fSteps = Math.max(1, Math.ceil((TOL_POWER * f) / fStep))
       // how far along both axes (angle and power) the same result holds
       let m = 0
@@ -158,14 +161,14 @@ export interface Solution {
 }
 
 /** Looks for a list of shots that wins the level; tries the best class first and deepens when needed. */
-export function solveLevel(def: LevelDef, o: { maxDepth?: number; width?: number; waits?: number[]; aStep?: number; fStep?: number } = {}): Shot[] | null {
+export function solveLevel(def: LevelDef, o: { maxDepth?: number; width?: number; waits?: number[]; aStep?: number; fStep?: number; excludeFirst?: (a: number, f: number) => boolean } = {}): Shot[] | null {
   const maxDepth = o.maxDepth ?? 8
   const hasMotion = def.items.some((i) => i.motion)
   const waits = o.waits ?? (hasMotion ? [0, 0.4, 0.8, 1.2, 1.6, 2, 2.4, 2.8, 3.2, 3.6, 4, 4.4, 4.8, 5.2] : [0])
   const deepen = (g: Game, depth: number, limit: number, width: number): Shot[] | null => {
     if (g.status === 'won') return []
     if (depth >= limit) return null
-    const cands = searchShots(g, { waits, top: width, aStep: o.aStep, fStep: o.fStep })
+    const cands = searchShots(g, { waits, top: width, aStep: o.aStep, fStep: o.fStep, exclude: depth === 0 ? o.excludeFirst : undefined })
     for (const c of cands) {
       const r = runShot(g, c.a, c.f, c.wait)
       const rest = deepen(r, depth + 1, limit, width)
@@ -181,13 +184,26 @@ export function solveLevel(def: LevelDef, o: { maxDepth?: number; width?: number
   return null
 }
 
+const HINT_OPTS = { aStep: 1, fStep: 0.025, top: 1, aMin: -15 }
+const hintWaits = (g: Game) => (g.def.items.some((i) => i.motion) ? [0, 0.7, 1.4, 2.1, 2.8, 3.5, 4.2, 4.9] : [0])
+const better = (x: Candidate, y: Candidate) => (x.won ? 1 : 0) - (y.won ? 1 : 0) || x.gain - y.gain || x.margin - x.a / 6 - (y.margin - y.a / 6) || y.wait - x.wait
+
 /** A shot for the hint button: the best robust shot that brings something in the game as it is now (coarser and quicker than the tool's search). */
 export function findHint(g: Game): { a: number; f: number; wait: number } | null {
-  const hasMotion = g.def.items.some((i) => i.motion)
-  const waits = hasMotion ? [0, 0.7, 1.4, 2.1, 2.8, 3.5, 4.2, 4.9] : [0]
-  const c = searchShots(g, { aStep: 1, fStep: 0.025, waits, top: 1, aMin: -15 })[0]
-  if (!c) return null
-  return { a: c.a, f: c.f, wait: c.wait }
+  const c = searchShots(g, { ...HINT_OPTS, waits: hintWaits(g) })[0]
+  return c ? { a: c.a, f: c.f, wait: c.wait } : null
+}
+
+/** The same, but it hands the thread back between the moments of a moving level, so that the screen does not freeze on a slow phone. */
+export async function findHintAsync(g: Game): Promise<{ a: number; f: number; wait: number } | null> {
+  const waits = hintWaits(g)
+  let best: Candidate | null = null
+  for (const w of waits) {
+    const c = searchShots(g, { ...HINT_OPTS, waits: [w] })[0]
+    if (c && (!best || better(c, best) > 0)) best = c
+    if (waits.length > 1) await new Promise<void>((r) => setTimeout(r, 0))
+  }
+  return best ? { a: best.a, f: best.f, wait: best.wait } : null
 }
 
 export { F_MIN }

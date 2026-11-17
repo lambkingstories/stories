@@ -9,7 +9,7 @@ import { BIG_GAME_TEXTS, withGameTexts } from '../src/i18n/bigGames'
 import { BIG_GAMES } from '../src/data/bigGames'
 import { newGame, playShots, shoot, starsOf, step, type Shot } from '../src/utils/bogenGame'
 import { CHAPTER_COUNT, LEVELS, LEVELS_PER_CHAPTER, MAX_STARS } from '../src/utils/bogenLevels'
-import { SOLUTIONS } from '../src/utils/bogenSolutions'
+import { ALT_SOLUTIONS, SOLUTIONS } from '../src/utils/bogenSolutions'
 import { toleranceFails } from '../src/utils/bogenSolve'
 
 const app = withGameTexts(rawApp) as unknown as Record<'de' | 'en', { app: { bigGames: { bogen: Record<string, unknown> } } }>
@@ -77,6 +77,20 @@ describe('the levels of Jonatan\'s arrows', () => {
         if (playShots(l.def, l.par, shots).status !== 'won') bad.push(`${l.id} ${l.def.key}#${k}`)
       }
     expect(bad).toEqual([])
+  })
+
+  it('can be won in a second, different way (another first shot) in almost every level, and that way is just as forgiving', () => {
+    const ids = Object.keys(ALT_SOLUTIONS)
+    expect(ids.length).toBeGreaterThanOrEqual(40)
+    for (const l of LEVELS) {
+      const alt = ALT_SOLUTIONS[l.id]
+      if (!alt) continue
+      const g = playShots(l.def, alt.length, alt)
+      expect(g.status, `${l.id} alternative`).toBe('won')
+      const main = l.solution[0]!
+      expect(Math.abs(alt[0]!.a - main.a) >= 7 || Math.abs(alt[0]!.f - main.f) >= 0.14 * Math.max(0.5, main.f), `${l.id} different first shot`).toBe(true)
+      expect(toleranceFails(l.def, alt.length, alt), `${l.id} alternative tolerance`).toEqual([])
+    }
   })
 
   it('cannot be won without a shot, and a bad shot does nothing bad', () => {

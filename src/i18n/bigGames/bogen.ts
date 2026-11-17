@@ -10,25 +10,25 @@ export default {
         name: 'Der Übungsplatz',
         ref: '1. Samuel 18,1–4',
         story: 'Jonatan und David wurden Freunde. Jonatan hatte David lieb wie sich selbst. Auf dem Übungsplatz schießt Jonatan mit dem Bogen auf Ziele.',
-        task: 'Übe mit dem Bogen. Triff die Scheiben, die Glocke, die Krüge und die Fahnen. Öffne die Tore mit den Schaltern.'
+        task: 'Deine Aufgabe: Übe mit dem Bogen. Triff die Scheiben, die Glocke, die Krüge und die Fahnen. Öffne die Tore mit den Schaltern.'
       },
       {
         name: 'Der Hügel bei Gibea',
         ref: '1. Samuel 19,1–7',
         story: 'Jonatan lebte mit seinem Vater, König Saul, in Gibea. Saul war böse auf David geworden. Da sprach Jonatan mit seinem Vater und sagte Gutes über David. Saul hörte auf ihn.',
-        task: 'Auf den Hügeln liegen Berge und Steine im Weg. Schieße darüber hinweg oder lass den Pfeil von Steinen und Schilden abprallen.'
+        task: 'Deine Aufgabe: Hügel und Steine liegen im Weg. Schieße darüber hinweg oder lass den Pfeil von Steinen und Schilden abprallen.'
       },
       {
         name: 'Wind und Steine',
         ref: '1. Samuel 20,1–23',
         story: 'Bald war David wieder in Gefahr. Jonatan und David machten ein Zeichen aus: Jonatan würde auf dem Feld Pfeile schießen. So würde David erfahren, ob er bleiben darf oder gehen muss (1. Samuel 20,20–22). Auf dem Feld weht der Wind.',
-        task: 'Der Wind schiebt den Pfeil zur Seite. Lies die Windfahne oben rechts und ziele dagegen.'
+        task: 'Deine Aufgabe: Der Wind schiebt den Pfeil zur Seite. Lies die Windfahne oben rechts und ziele dagegen.'
       },
       {
         name: 'Das Zeichen für David',
         ref: '1. Samuel 20,35–42',
         story: 'Am Morgen ging Jonatan aufs Feld, so wie er es mit David ausgemacht hatte. Ein kleiner Junge war bei ihm. Jonatan schoss die Pfeile weit hinaus.',
-        task: 'Zeige, was du gelernt hast. Im letzten Level schießt du das Zeichen für David.'
+        task: 'Deine Aufgabe: Zeige, was du gelernt hast. Im letzten Level schießt du das Zeichen für David.'
       }
     ],
     names: [
@@ -72,6 +72,7 @@ export default {
     lost: 'Die Pfeile sind alle. Versuche es noch einmal.',
     leftLine: 'Pfeile übrig: {n}',
     tooWeak: 'Zieh noch ein Stück weiter, dann fliegt der Pfeil.',
+    turn: 'Quer macht es mehr Spaß: Dreh dein Handy.',
     hint: {
       pull: 'Ziehe den Finger nach hinten und lass los. Der Pfeil fliegt in die andere Richtung. Triff die Scheibe.',
       power: 'Je weiter du ziehst, desto weiter fliegt der Pfeil.',
@@ -102,25 +103,25 @@ export default {
         name: 'The Practice Ground',
         ref: '1 Samuel 18:1–4',
         story: 'Jonathan and David became friends. Jonathan loved David as himself. On the practice ground Jonathan shoots his bow at targets.',
-        task: 'Practise with the bow. Hit the targets, the bell, the jars and the flags. Open the gates with the switches.'
+        task: 'Your task: Practise with the bow. Hit the targets, the bell, the jars and the flags. Open the gates with the switches.'
       },
       {
         name: 'The Hill at Gibeah',
         ref: '1 Samuel 19:1–7',
         story: 'Jonathan lived with his father, King Saul, in Gibeah. Saul had become angry with David. So Jonathan spoke to his father and said good things about David. Saul listened to him.',
-        task: 'Hills and stones are in the way. Shoot over them, or let the arrow bounce off stones and shields.'
+        task: 'Your task: Hills and stones are in the way. Shoot over them, or let the arrow bounce off stones and shields.'
       },
       {
         name: 'Wind and Stones',
         ref: '1 Samuel 20:1–23',
         story: 'Soon David was in danger again. Jonathan and David agreed on a sign: Jonathan would shoot arrows in the field. That way David would learn whether he could stay or had to go (1 Samuel 20:20–22). In the field the wind blows.',
-        task: 'The wind pushes the arrow sideways. Read the wind flag at the top right and aim against it.'
+        task: 'Your task: The wind pushes the arrow sideways. Read the wind flag at the top right and aim against it.'
       },
       {
         name: 'The Sign for David',
         ref: '1 Samuel 20:35–42',
         story: 'In the morning Jonathan went out into the field, just as he had agreed with David. A small boy was with him. Jonathan shot the arrows far out.',
-        task: 'Show what you have learned. In the last level you shoot the sign for David.'
+        task: 'Your task: Show what you have learned. In the last level you shoot the sign for David.'
       }
     ],
     names: [
@@ -164,6 +165,7 @@ export default {
     lost: 'No arrows left. Try again.',
     leftLine: 'Arrows left: {n}',
     tooWeak: 'Pull a little farther and the arrow flies.',
+    turn: 'It is more fun sideways: turn your phone.',
     hint: {
       pull: 'Pull your finger back and let go. The arrow flies the other way. Hit the target.',
       power: 'The farther you pull, the farther the arrow flies.',
@@ -194,25 +196,25 @@ export default {
         name: 'El campo de práctica',
         ref: '1 Samuel 18:1–4',
         story: 'Jonatán y David se hicieron amigos. Jonatán amaba a David como a sí mismo. En el campo de práctica Jonatán dispara su arco a los blancos.',
-        task: 'Practica con el arco. Acierta en los blancos, la campana, las jarras y las banderas. Abre las puertas con los interruptores.'
+        task: 'Tu tarea: Practica con el arco. Acierta en los blancos, la campana, las jarras y las banderas. Abre las puertas con los interruptores.'
       },
       {
         name: 'La colina de Gabaa',
         ref: '1 Samuel 19:1–7',
         story: 'Jonatán vivía con su padre, el rey Saúl, en Gabaa. Saúl se había enojado con David. Entonces Jonatán habló con su padre y dijo cosas buenas de David. Saúl lo escuchó.',
-        task: 'Colinas y piedras estorban el camino. Dispara por encima o deja que la flecha rebote en piedras y escudos.'
+        task: 'Tu tarea: Colinas y piedras estorban el camino. Dispara por encima o deja que la flecha rebote en piedras y escudos.'
       },
       {
         name: 'Viento y piedras',
         ref: '1 Samuel 20:1–23',
         story: 'Pronto David estuvo otra vez en peligro. Jonatán y David acordaron una señal: Jonatán dispararía flechas en el campo. Así David sabría si podía quedarse o tenía que irse (1 Samuel 20:20–22). En el campo sopla el viento.',
-        task: 'El viento empuja la flecha hacia un lado. Mira la bandera de viento arriba a la derecha y apunta en contra.'
+        task: 'Tu tarea: El viento empuja la flecha hacia un lado. Mira la bandera de viento arriba a la derecha y apunta en contra.'
       },
       {
         name: 'La señal para David',
         ref: '1 Samuel 20:35–42',
         story: 'Por la mañana Jonatán salió al campo, como había acordado con David. Un muchacho pequeño iba con él. Jonatán disparó las flechas lejos.',
-        task: 'Muestra lo que has aprendido. En el último nivel disparas la señal para David.'
+        task: 'Tu tarea: Muestra lo que has aprendido. En el último nivel disparas la señal para David.'
       }
     ],
     names: [
@@ -256,6 +258,7 @@ export default {
     lost: 'No quedan flechas. Inténtalo otra vez.',
     leftLine: 'Flechas de sobra: {n}',
     tooWeak: 'Tira un poco más y la flecha vuela.',
+    turn: 'Es más divertido en horizontal: gira tu móvil.',
     hint: {
       pull: 'Tira del dedo hacia atrás y suelta. La flecha vuela hacia el otro lado. Acierta el blanco.',
       power: 'Cuanto más tiras, más lejos vuela la flecha.',

@@ -45,7 +45,7 @@ const CH1: LevelDef[] = [
   }),
   lv(0, 10, {
     key: 'pruefung',
-    deco: [g11a, g11b],
+    deco: [g11a, chain(g11a, hook(g11a)[0], hook(g11a)[1] - 2.0), g11b],
     polys: [box(25.5, 6.4, 33.5, 7.0), box(32.8, 0, 33.5, 6.4)],
     gates: [gate('g1', 25.9, 6.4)],
     ropes: [rope('r', ...hook(g11b), hook(g11b)[0], hook(g11b)[1] - 3.3, { holds: 'w', then: [{ t: 'open', id: 'g1' }] })],

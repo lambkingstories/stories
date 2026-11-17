@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest'
 import { newGame, progressOf } from '../src/utils/bogenGame'
 import { LEVELS, levelGame } from '../src/utils/bogenLevels'
-import { findHint, runShot, searchShots, signature } from '../src/utils/bogenSolve'
+import { findHint, findHintAsync, runShot, searchShots, signature } from '../src/utils/bogenSolve'
 
 describe('the search for shots', () => {
   it('finds shots that bring something, the most robust one of each class first', () => {
@@ -35,7 +35,7 @@ describe('the search for shots', () => {
     expect(r.status).toBe('won')
   })
 
-  it('gives different words for different situations and does not touch the game', () => {
+  it('does not touch the game it looks at', () => {
     const g = levelGame(6)
     const before = signature(g)
     findHint(g)
@@ -43,7 +43,17 @@ describe('the search for shots', () => {
     expect(g.shots).toBe(0)
   })
 
-  it('answers quickly enough for a button (one second on this machine at most, also with moving things)', () => {
+  it('the hint that hands the thread back between moments gives a helping shot too, also with moving things', async () => {
+    for (const no of [4, 15]) {
+      const g = levelGame(no)
+      const h = await findHintAsync(g)
+      expect(h, LEVELS[no]!.def.key).toBeTruthy()
+      const r = runShot(g, h!.a, h!.f, h!.wait)
+      expect(progressOf(r), LEVELS[no]!.def.key).toBeGreaterThan(progressOf(g))
+    }
+  })
+
+  it('answers quickly enough for a button (a few seconds at the most, also with moving things)', () => {
     const t0 = Date.now()
     findHint(levelGame(15)) // the swinging bell
     findHint(levelGame(10))
