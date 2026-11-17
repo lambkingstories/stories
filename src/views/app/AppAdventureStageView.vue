@@ -4,7 +4,7 @@
  * The round picture at the top is the stage's scene cut out of the painted map. The coloring task opens the coloring screen and
  * comes back here (`?back=task`) with the stars it earned.
  */
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
@@ -15,226 +15,226 @@ import AdventureOverview, { type OverviewRow } from '@/components/molecules/Adve
 import AdventureCardReveal from '@/components/molecules/AdventureCardReveal.vue'
 import AdventureRewards from '@/components/molecules/AdventureRewards.vue'
 import AdventureQuiz from '@/components/molecules/AdventureQuiz.vue'
-import GameBuild from '@/components/molecules/games/GameBuild.vue'
-import GameDots from '@/components/molecules/games/GameDots.vue'
-import GameFly from '@/components/molecules/games/GameFly.vue'
-import GameFind from '@/components/molecules/games/GameFind.vue'
-import GameHarvest from '@/components/molecules/games/GameHarvest.vue'
-import GameMemory from '@/components/molecules/games/GameMemory.vue'
-import GameOrder from '@/components/molecules/games/GameOrder.vue'
-import GameWater from '@/components/molecules/games/GameWater.vue'
-import GameLights from '@/components/molecules/games/GameLights.vue'
-import GameVerse from '@/components/molecules/games/GameVerse.vue'
-import GameEcho from '@/components/molecules/games/GameEcho.vue'
-import GameChannels from '@/components/molecules/games/GameChannels.vue'
-import GameMirror from '@/components/molecules/games/GameMirror.vue'
-import GameSow from '@/components/molecules/games/GameSow.vue'
-import GameMissing from '@/components/molecules/games/GameMissing.vue'
-import GameWipe from '@/components/molecules/games/GameWipe.vue'
-import GameChain from '@/components/molecules/games/GameChain.vue'
-import GameStack from '@/components/molecules/games/GameStack.vue'
-import GameTrace from '@/components/molecules/games/GameTrace.vue'
-import GameBalance from '@/components/molecules/games/GameBalance.vue'
-import GameConstellation from '@/components/molecules/games/GameConstellation.vue'
-import GameSlide from '@/components/molecules/games/GameSlide.vue'
-import GameCrank from '@/components/molecules/games/GameCrank.vue'
-import GameHold from '@/components/molecules/games/GameHold.vue'
-import GameStew from '@/components/molecules/games/GameStew.vue'
-import GameCross from '@/components/molecules/games/GameCross.vue'
-import GameFocus from '@/components/molecules/games/GameFocus.vue'
-import GameBeat from '@/components/molecules/games/GameBeat.vue'
-import GameGlow from '@/components/molecules/games/GameGlow.vue'
-import GameWeave from '@/components/molecules/games/GameWeave.vue'
-import GameCloud from '@/components/molecules/games/GameCloud.vue'
-import GameManna from '@/components/molecules/games/GameManna.vue'
-import GameDiff from '@/components/molecules/games/GameDiff.vue'
-import GameWords from '@/components/molecules/games/GameWords.vue'
-import GameSneak from '@/components/molecules/games/GameSneak.vue'
-import GameCave from '@/components/molecules/games/GameCave.vue'
-import GameCue from '@/components/molecules/games/GameCue.vue'
-import GameSwitch from '@/components/molecules/games/GameSwitch.vue'
-import GameWinnow from '@/components/molecules/games/GameWinnow.vue'
-import GameDew from '@/components/molecules/games/GameDew.vue'
-import GameOverboard from '@/components/molecules/games/GameOverboard.vue'
-import GameShore from '@/components/molecules/games/GameShore.vue'
-import GameSacks from '@/components/molecules/games/GameSacks.vue'
-import GameShade from '@/components/molecules/games/GameShade.vue'
-import GameDays from '@/components/molecules/games/GameDays.vue'
-import GameStatue from '@/components/molecules/games/GameStatue.vue'
-import GameLamp from '@/components/molecules/games/GameLamp.vue'
-import GameHours from '@/components/molecules/games/GameHours.vue'
-import GameRavens from '@/components/molecules/games/GameRavens.vue'
-import GameCaves from '@/components/molecules/games/GameCaves.vue'
-import GameRain from '@/components/molecules/games/GameRain.vue'
-import GameWhisper from '@/components/molecules/games/GameWhisper.vue'
-import GameGlean from '@/components/molecules/games/GameGlean.vue'
-import GameMeasure from '@/components/molecules/games/GameMeasure.vue'
-import GameElders from '@/components/molecules/games/GameElders.vue'
-import GameCradle from '@/components/molecules/games/GameCradle.vue'
-import GameCoat from '@/components/molecules/games/GameCoat.vue'
-import GameCows from '@/components/molecules/games/GameCows.vue'
-import GameStone from '@/components/molecules/games/GameStone.vue'
-import GameSearch from '@/components/molecules/games/GameSearch.vue'
-import GameBaggage from '@/components/molecules/games/GameBaggage.vue'
-import GameGather from '@/components/molecules/games/GameGather.vue'
-import GameHarp from '@/components/molecules/games/GameHarp.vue'
-import GameShepherd from '@/components/molecules/games/GameShepherd.vue'
-import GamePebbles from '@/components/molecules/games/GamePebbles.vue'
-import GameSling from '@/components/molecules/games/GameSling.vue'
-import GameArrow from '@/components/molecules/games/GameArrow.vue'
-import GameHem from '@/components/molecules/games/GameHem.vue'
-import GameQuiet from '@/components/molecules/games/GameQuiet.vue'
-import GameThrone from '@/components/molecules/games/GameThrone.vue'
-import GameJars from '@/components/molecules/games/GameJars.vue'
-import GameDive from '@/components/molecules/games/GameDive.vue'
-import GameDecor from '@/components/molecules/games/GameDecor.vue'
-import GameHonor from '@/components/molecules/games/GameHonor.vue'
-import GameRide from '@/components/molecules/games/GameRide.vue'
-import GamePost from '@/components/molecules/games/GamePost.vue'
-import GamePeace from '@/components/molecules/games/GamePeace.vue'
-import GameForge from '@/components/molecules/games/GameForge.vue'
-import GameCrib from '@/components/molecules/games/GameCrib.vue'
-import GameSign from '@/components/molecules/games/GameSign.vue'
-import GameRoad from '@/components/molecules/games/GameRoad.vue'
-import GameNet from '@/components/molecules/games/GameNet.vue'
-import GameBoats from '@/components/molecules/games/GameBoats.vue'
-import GameRoof from '@/components/molecules/games/GameRoof.vue'
-import GameBail from '@/components/molecules/games/GameBail.vue'
-import GameCrowd from '@/components/molecules/games/GameCrowd.vue'
-import GameBundle from '@/components/molecules/games/GameBundle.vue'
-import GameBread from '@/components/molecules/games/GameBread.vue'
-import GameRow from '@/components/molecules/games/GameRow.vue'
-import GameTurnBack from '@/components/molecules/games/GameTurnBack.vue'
-import GameShout from '@/components/molecules/games/GameShout.vue'
-import GameDig from '@/components/molecules/games/GameDig.vue'
-import GameCoin from '@/components/molecules/games/GameCoin.vue'
-import GameMeet from '@/components/molecules/games/GameMeet.vue'
-import GameClimb from '@/components/molecules/games/GameClimb.vue'
-import GameHalve from '@/components/molecules/games/GameHalve.vue'
-import GameUnwrap from '@/components/molecules/games/GameUnwrap.vue'
-import GamePrepare from '@/components/molecules/games/GamePrepare.vue'
-import GameLamps from '@/components/molecules/games/GameLamps.vue'
-import GameHelp from '@/components/molecules/games/GameHelp.vue'
-import GameFischzug from '@/components/molecules/games/GameFischzug.vue'
-import GameGraze from '@/components/molecules/games/GameGraze.vue'
-import GameBotengang from '@/components/molecules/games/GameBotengang.vue'
-import GameWanderweg from '@/components/molecules/games/GameWanderweg.vue'
-import GameTischdecken from '@/components/molecules/games/GameTischdecken.vue'
-import GameFensterlaeden from '@/components/molecules/games/GameFensterlaeden.vue'
-import GameLichtweg from '@/components/molecules/games/GameLichtweg.vue'
-import GameSelig from '@/components/molecules/games/GameSelig.vue'
-import GameScheffel from '@/components/molecules/games/GameScheffel.vue'
-import GameNahblick from '@/components/molecules/games/GameNahblick.vue'
-import GameWehen from '@/components/molecules/games/GameWehen.vue'
-import GameHirtenruf from '@/components/molecules/games/GameHirtenruf.vue'
-import GameBaugrund from '@/components/molecules/games/GameBaugrund.vue'
-import GameEinladen from '@/components/molecules/games/GameEinladen.vue'
-import GameAusschau from '@/components/molecules/games/GameAusschau.vue'
-import GameReigen from '@/components/molecules/games/GameReigen.vue'
-import GameSchreiben from '@/components/molecules/games/GameSchreiben.vue'
-import GameBriefe from '@/components/molecules/games/GameBriefe.vue'
-import GameLob from '@/components/molecules/games/GameLob.vue'
-import GamePalmen from '@/components/molecules/games/GamePalmen.vue'
-import GamePerlentore from '@/components/molecules/games/GamePerlentore.vue'
-import GameWandschatten from '@/components/molecules/games/GameWandschatten.vue'
-import GameBeiseite from '@/components/molecules/games/GameBeiseite.vue'
-import GameBretter from '@/components/molecules/games/GameBretter.vue'
-import GameReisig from '@/components/molecules/games/GameReisig.vue'
-import GameBesuch from '@/components/molecules/games/GameBesuch.vue'
-import GameGerade from '@/components/molecules/games/GameGerade.vue'
-import GameWiederfinden from '@/components/molecules/games/GameWiederfinden.vue'
-import GameSegel from '@/components/molecules/games/GameSegel.vue'
-import GamePurpur from '@/components/molecules/games/GamePurpur.vue'
-import GameWerkstatt from '@/components/molecules/games/GameWerkstatt.vue'
-import GameEselLaden from '@/components/molecules/games/GameEselLaden.vue'
-import GameHebrontor from '@/components/molecules/games/GameHebrontor.vue'
-import GameFestzug from '@/components/molecules/games/GameFestzug.vue'
-import GameZeugen from '@/components/molecules/games/GameZeugen.vue'
-import GameSprachen from '@/components/molecules/games/GameSprachen.vue'
-import GameKoerbe from '@/components/molecules/games/GameKoerbe.vue'
-import GameHuepfen from '@/components/molecules/games/GameHuepfen.vue'
-import GameWagen from '@/components/molecules/games/GameWagen.vue'
-import GameSpaehen from '@/components/molecules/games/GameSpaehen.vue'
-import GameGarben from '@/components/molecules/games/GameGarben.vue'
-import GameKeltern from '@/components/molecules/games/GameKeltern.vue'
-import GameKuehenil from '@/components/molecules/games/GameKuehenil.vue'
-import GameUmarmen from '@/components/molecules/games/GameUmarmen.vue'
-import GameBegegnung from '@/components/molecules/games/GameBegegnung.vue'
-import GameHandmuehle from '@/components/molecules/games/GameHandmuehle.vue'
-import GameSiegel from '@/components/molecules/games/GameSiegel.vue'
-import GameNaamanerde from '@/components/molecules/games/GameNaamanerde.vue'
-import GameLaternen from '@/components/molecules/games/GameLaternen.vue'
-import GameSpross from '@/components/molecules/games/GameSpross.vue'
-import GameZionwege from '@/components/molecules/games/GameZionwege.vue'
-import GameWunschkarten from '@/components/molecules/games/GameWunschkarten.vue'
-import GameFloesse from '@/components/molecules/games/GameFloesse.vue'
-import GameSchnitzen from '@/components/molecules/games/GameSchnitzen.vue'
-import GameGranatapfel from '@/components/molecules/games/GameGranatapfel.vue'
-import GameStufen from '@/components/molecules/games/GameStufen.vue'
-import GameSchatzkammer from '@/components/molecules/games/GameSchatzkammer.vue'
-import GameBecher from '@/components/molecules/games/GameBecher.vue'
-import GamePfand from '@/components/molecules/games/GamePfand.vue'
-import GameLaubhuetten from '@/components/molecules/games/GameLaubhuetten.vue'
-import GameFroesche from '@/components/molecules/games/GameFroesche.vue'
-import GameSaum from '@/components/molecules/games/GameSaum.vue'
-import GameUfer from '@/components/molecules/games/GameUfer.vue'
-import GameSchriftrolle from '@/components/molecules/games/GameSchriftrolle.vue'
-import GameSchattenweg from '@/components/molecules/games/GameSchattenweg.vue'
-import GameSonnenaufgang from '@/components/molecules/games/GameSonnenaufgang.vue'
-import GameTor from '@/components/molecules/games/GameTor.vue'
-import GameZepter from '@/components/molecules/games/GameZepter.vue'
-import GameBoten from '@/components/molecules/games/GameBoten.vue'
-import GameGebote from '@/components/molecules/games/GameGebote.vue'
-import GameBachsteine from '@/components/molecules/games/GameBachsteine.vue'
-import GameZaehlung from '@/components/molecules/games/GameZaehlung.vue'
-import GameHirtenfeuer from '@/components/molecules/games/GameHirtenfeuer.vue'
-import GameWeitersagen from '@/components/molecules/games/GameWeitersagen.vue'
-import GameStern from '@/components/molecules/games/GameStern.vue'
-import GameLot from '@/components/molecules/games/GameLot.vue'
-import GameSitzplaetze from '@/components/molecules/games/GameSitzplaetze.vue'
-import GameZwoelf from '@/components/molecules/games/GameZwoelf.vue'
-import GameSynagoge from '@/components/molecules/games/GameSynagoge.vue'
-import GameZehn from '@/components/molecules/games/GameZehn.vue'
-import GameKinder from '@/components/molecules/games/GameKinder.vue'
-import GameHundertfach from '@/components/molecules/games/GameHundertfach.vue'
-import GameAnhalten from '@/components/molecules/games/GameAnhalten.vue'
-import GameHerberge from '@/components/molecules/games/GameHerberge.vue'
-import GameHeimtragen from '@/components/molecules/games/GameHeimtragen.vue'
-import GameHeimweg from '@/components/molecules/games/GameHeimweg.vue'
-import GameJugs from '@/components/molecules/games/GameJugs.vue'
-import GameEnough from '@/components/molecules/games/GameEnough.vue'
-import GameQuails from '@/components/molecules/games/GameQuails.vue'
-import GameStaffs from '@/components/molecules/games/GameStaffs.vue'
-import GameSerpent from '@/components/molecules/games/GameSerpent.vue'
-import GameDonkey from '@/components/molecules/games/GameDonkey.vue'
-import GameCommission from '@/components/molecules/games/GameCommission.vue'
-import GameArms from '@/components/molecules/games/GameArms.vue'
-import GameJudges from '@/components/molecules/games/GameJudges.vue'
-import GameSignal from '@/components/molecules/games/GameSignal.vue'
-import GameGrapes from '@/components/molecules/games/GameGrapes.vue'
-import GameWord from '@/components/molecules/games/GameWord.vue'
-import GameHush from '@/components/molecules/games/GameHush.vue'
-import GameHide from '@/components/molecules/games/GameHide.vue'
-import GameBake from '@/components/molecules/games/GameBake.vue'
-import GamePack from '@/components/molecules/games/GamePack.vue'
-import GameLower from '@/components/molecules/games/GameLower.vue'
-import GameStep from '@/components/molecules/games/GameStep.vue'
-import GameRings from '@/components/molecules/games/GameRings.vue'
-import GameClues from '@/components/molecules/games/GameClues.vue'
-import GameBirds from '@/components/molecules/games/GameBirds.vue'
-import GameSilver from '@/components/molecules/games/GameSilver.vue'
-import GameRelay from '@/components/molecules/games/GameRelay.vue'
-import GameCatch from '@/components/molecules/games/GameCatch.vue'
-import GameRing from '@/components/molecules/games/GameRing.vue'
-import GameCairn from '@/components/molecules/games/GameCairn.vue'
-import GameCycle from '@/components/molecules/games/GameCycle.vue'
-import GameGuess from '@/components/molecules/games/GameGuess.vue'
-import GameHerd from '@/components/molecules/games/GameHerd.vue'
-import GamePuzzle from '@/components/molecules/games/GamePuzzle.vue'
-import GameShare from '@/components/molecules/games/GameShare.vue'
-import GameSort from '@/components/molecules/games/GameSort.vue'
-import GameStones from '@/components/molecules/games/GameStones.vue'
-import GameWay from '@/components/molecules/games/GameWay.vue'
+const GameBuild = defineAsyncComponent(() => import('@/components/molecules/games/GameBuild.vue'))
+const GameDots = defineAsyncComponent(() => import('@/components/molecules/games/GameDots.vue'))
+const GameFly = defineAsyncComponent(() => import('@/components/molecules/games/GameFly.vue'))
+const GameFind = defineAsyncComponent(() => import('@/components/molecules/games/GameFind.vue'))
+const GameHarvest = defineAsyncComponent(() => import('@/components/molecules/games/GameHarvest.vue'))
+const GameMemory = defineAsyncComponent(() => import('@/components/molecules/games/GameMemory.vue'))
+const GameOrder = defineAsyncComponent(() => import('@/components/molecules/games/GameOrder.vue'))
+const GameWater = defineAsyncComponent(() => import('@/components/molecules/games/GameWater.vue'))
+const GameLights = defineAsyncComponent(() => import('@/components/molecules/games/GameLights.vue'))
+const GameVerse = defineAsyncComponent(() => import('@/components/molecules/games/GameVerse.vue'))
+const GameEcho = defineAsyncComponent(() => import('@/components/molecules/games/GameEcho.vue'))
+const GameChannels = defineAsyncComponent(() => import('@/components/molecules/games/GameChannels.vue'))
+const GameMirror = defineAsyncComponent(() => import('@/components/molecules/games/GameMirror.vue'))
+const GameSow = defineAsyncComponent(() => import('@/components/molecules/games/GameSow.vue'))
+const GameMissing = defineAsyncComponent(() => import('@/components/molecules/games/GameMissing.vue'))
+const GameWipe = defineAsyncComponent(() => import('@/components/molecules/games/GameWipe.vue'))
+const GameChain = defineAsyncComponent(() => import('@/components/molecules/games/GameChain.vue'))
+const GameStack = defineAsyncComponent(() => import('@/components/molecules/games/GameStack.vue'))
+const GameTrace = defineAsyncComponent(() => import('@/components/molecules/games/GameTrace.vue'))
+const GameBalance = defineAsyncComponent(() => import('@/components/molecules/games/GameBalance.vue'))
+const GameConstellation = defineAsyncComponent(() => import('@/components/molecules/games/GameConstellation.vue'))
+const GameSlide = defineAsyncComponent(() => import('@/components/molecules/games/GameSlide.vue'))
+const GameCrank = defineAsyncComponent(() => import('@/components/molecules/games/GameCrank.vue'))
+const GameHold = defineAsyncComponent(() => import('@/components/molecules/games/GameHold.vue'))
+const GameStew = defineAsyncComponent(() => import('@/components/molecules/games/GameStew.vue'))
+const GameCross = defineAsyncComponent(() => import('@/components/molecules/games/GameCross.vue'))
+const GameFocus = defineAsyncComponent(() => import('@/components/molecules/games/GameFocus.vue'))
+const GameBeat = defineAsyncComponent(() => import('@/components/molecules/games/GameBeat.vue'))
+const GameGlow = defineAsyncComponent(() => import('@/components/molecules/games/GameGlow.vue'))
+const GameWeave = defineAsyncComponent(() => import('@/components/molecules/games/GameWeave.vue'))
+const GameCloud = defineAsyncComponent(() => import('@/components/molecules/games/GameCloud.vue'))
+const GameManna = defineAsyncComponent(() => import('@/components/molecules/games/GameManna.vue'))
+const GameDiff = defineAsyncComponent(() => import('@/components/molecules/games/GameDiff.vue'))
+const GameWords = defineAsyncComponent(() => import('@/components/molecules/games/GameWords.vue'))
+const GameSneak = defineAsyncComponent(() => import('@/components/molecules/games/GameSneak.vue'))
+const GameCave = defineAsyncComponent(() => import('@/components/molecules/games/GameCave.vue'))
+const GameCue = defineAsyncComponent(() => import('@/components/molecules/games/GameCue.vue'))
+const GameSwitch = defineAsyncComponent(() => import('@/components/molecules/games/GameSwitch.vue'))
+const GameWinnow = defineAsyncComponent(() => import('@/components/molecules/games/GameWinnow.vue'))
+const GameDew = defineAsyncComponent(() => import('@/components/molecules/games/GameDew.vue'))
+const GameOverboard = defineAsyncComponent(() => import('@/components/molecules/games/GameOverboard.vue'))
+const GameShore = defineAsyncComponent(() => import('@/components/molecules/games/GameShore.vue'))
+const GameSacks = defineAsyncComponent(() => import('@/components/molecules/games/GameSacks.vue'))
+const GameShade = defineAsyncComponent(() => import('@/components/molecules/games/GameShade.vue'))
+const GameDays = defineAsyncComponent(() => import('@/components/molecules/games/GameDays.vue'))
+const GameStatue = defineAsyncComponent(() => import('@/components/molecules/games/GameStatue.vue'))
+const GameLamp = defineAsyncComponent(() => import('@/components/molecules/games/GameLamp.vue'))
+const GameHours = defineAsyncComponent(() => import('@/components/molecules/games/GameHours.vue'))
+const GameRavens = defineAsyncComponent(() => import('@/components/molecules/games/GameRavens.vue'))
+const GameCaves = defineAsyncComponent(() => import('@/components/molecules/games/GameCaves.vue'))
+const GameRain = defineAsyncComponent(() => import('@/components/molecules/games/GameRain.vue'))
+const GameWhisper = defineAsyncComponent(() => import('@/components/molecules/games/GameWhisper.vue'))
+const GameGlean = defineAsyncComponent(() => import('@/components/molecules/games/GameGlean.vue'))
+const GameMeasure = defineAsyncComponent(() => import('@/components/molecules/games/GameMeasure.vue'))
+const GameElders = defineAsyncComponent(() => import('@/components/molecules/games/GameElders.vue'))
+const GameCradle = defineAsyncComponent(() => import('@/components/molecules/games/GameCradle.vue'))
+const GameCoat = defineAsyncComponent(() => import('@/components/molecules/games/GameCoat.vue'))
+const GameCows = defineAsyncComponent(() => import('@/components/molecules/games/GameCows.vue'))
+const GameStone = defineAsyncComponent(() => import('@/components/molecules/games/GameStone.vue'))
+const GameSearch = defineAsyncComponent(() => import('@/components/molecules/games/GameSearch.vue'))
+const GameBaggage = defineAsyncComponent(() => import('@/components/molecules/games/GameBaggage.vue'))
+const GameGather = defineAsyncComponent(() => import('@/components/molecules/games/GameGather.vue'))
+const GameHarp = defineAsyncComponent(() => import('@/components/molecules/games/GameHarp.vue'))
+const GameShepherd = defineAsyncComponent(() => import('@/components/molecules/games/GameShepherd.vue'))
+const GamePebbles = defineAsyncComponent(() => import('@/components/molecules/games/GamePebbles.vue'))
+const GameSling = defineAsyncComponent(() => import('@/components/molecules/games/GameSling.vue'))
+const GameArrow = defineAsyncComponent(() => import('@/components/molecules/games/GameArrow.vue'))
+const GameHem = defineAsyncComponent(() => import('@/components/molecules/games/GameHem.vue'))
+const GameQuiet = defineAsyncComponent(() => import('@/components/molecules/games/GameQuiet.vue'))
+const GameThrone = defineAsyncComponent(() => import('@/components/molecules/games/GameThrone.vue'))
+const GameJars = defineAsyncComponent(() => import('@/components/molecules/games/GameJars.vue'))
+const GameDive = defineAsyncComponent(() => import('@/components/molecules/games/GameDive.vue'))
+const GameDecor = defineAsyncComponent(() => import('@/components/molecules/games/GameDecor.vue'))
+const GameHonor = defineAsyncComponent(() => import('@/components/molecules/games/GameHonor.vue'))
+const GameRide = defineAsyncComponent(() => import('@/components/molecules/games/GameRide.vue'))
+const GamePost = defineAsyncComponent(() => import('@/components/molecules/games/GamePost.vue'))
+const GamePeace = defineAsyncComponent(() => import('@/components/molecules/games/GamePeace.vue'))
+const GameForge = defineAsyncComponent(() => import('@/components/molecules/games/GameForge.vue'))
+const GameCrib = defineAsyncComponent(() => import('@/components/molecules/games/GameCrib.vue'))
+const GameSign = defineAsyncComponent(() => import('@/components/molecules/games/GameSign.vue'))
+const GameRoad = defineAsyncComponent(() => import('@/components/molecules/games/GameRoad.vue'))
+const GameNet = defineAsyncComponent(() => import('@/components/molecules/games/GameNet.vue'))
+const GameBoats = defineAsyncComponent(() => import('@/components/molecules/games/GameBoats.vue'))
+const GameRoof = defineAsyncComponent(() => import('@/components/molecules/games/GameRoof.vue'))
+const GameBail = defineAsyncComponent(() => import('@/components/molecules/games/GameBail.vue'))
+const GameCrowd = defineAsyncComponent(() => import('@/components/molecules/games/GameCrowd.vue'))
+const GameBundle = defineAsyncComponent(() => import('@/components/molecules/games/GameBundle.vue'))
+const GameBread = defineAsyncComponent(() => import('@/components/molecules/games/GameBread.vue'))
+const GameRow = defineAsyncComponent(() => import('@/components/molecules/games/GameRow.vue'))
+const GameTurnBack = defineAsyncComponent(() => import('@/components/molecules/games/GameTurnBack.vue'))
+const GameShout = defineAsyncComponent(() => import('@/components/molecules/games/GameShout.vue'))
+const GameDig = defineAsyncComponent(() => import('@/components/molecules/games/GameDig.vue'))
+const GameCoin = defineAsyncComponent(() => import('@/components/molecules/games/GameCoin.vue'))
+const GameMeet = defineAsyncComponent(() => import('@/components/molecules/games/GameMeet.vue'))
+const GameClimb = defineAsyncComponent(() => import('@/components/molecules/games/GameClimb.vue'))
+const GameHalve = defineAsyncComponent(() => import('@/components/molecules/games/GameHalve.vue'))
+const GameUnwrap = defineAsyncComponent(() => import('@/components/molecules/games/GameUnwrap.vue'))
+const GamePrepare = defineAsyncComponent(() => import('@/components/molecules/games/GamePrepare.vue'))
+const GameLamps = defineAsyncComponent(() => import('@/components/molecules/games/GameLamps.vue'))
+const GameHelp = defineAsyncComponent(() => import('@/components/molecules/games/GameHelp.vue'))
+const GameFischzug = defineAsyncComponent(() => import('@/components/molecules/games/GameFischzug.vue'))
+const GameGraze = defineAsyncComponent(() => import('@/components/molecules/games/GameGraze.vue'))
+const GameBotengang = defineAsyncComponent(() => import('@/components/molecules/games/GameBotengang.vue'))
+const GameWanderweg = defineAsyncComponent(() => import('@/components/molecules/games/GameWanderweg.vue'))
+const GameTischdecken = defineAsyncComponent(() => import('@/components/molecules/games/GameTischdecken.vue'))
+const GameFensterlaeden = defineAsyncComponent(() => import('@/components/molecules/games/GameFensterlaeden.vue'))
+const GameLichtweg = defineAsyncComponent(() => import('@/components/molecules/games/GameLichtweg.vue'))
+const GameSelig = defineAsyncComponent(() => import('@/components/molecules/games/GameSelig.vue'))
+const GameScheffel = defineAsyncComponent(() => import('@/components/molecules/games/GameScheffel.vue'))
+const GameNahblick = defineAsyncComponent(() => import('@/components/molecules/games/GameNahblick.vue'))
+const GameWehen = defineAsyncComponent(() => import('@/components/molecules/games/GameWehen.vue'))
+const GameHirtenruf = defineAsyncComponent(() => import('@/components/molecules/games/GameHirtenruf.vue'))
+const GameBaugrund = defineAsyncComponent(() => import('@/components/molecules/games/GameBaugrund.vue'))
+const GameEinladen = defineAsyncComponent(() => import('@/components/molecules/games/GameEinladen.vue'))
+const GameAusschau = defineAsyncComponent(() => import('@/components/molecules/games/GameAusschau.vue'))
+const GameReigen = defineAsyncComponent(() => import('@/components/molecules/games/GameReigen.vue'))
+const GameSchreiben = defineAsyncComponent(() => import('@/components/molecules/games/GameSchreiben.vue'))
+const GameBriefe = defineAsyncComponent(() => import('@/components/molecules/games/GameBriefe.vue'))
+const GameLob = defineAsyncComponent(() => import('@/components/molecules/games/GameLob.vue'))
+const GamePalmen = defineAsyncComponent(() => import('@/components/molecules/games/GamePalmen.vue'))
+const GamePerlentore = defineAsyncComponent(() => import('@/components/molecules/games/GamePerlentore.vue'))
+const GameWandschatten = defineAsyncComponent(() => import('@/components/molecules/games/GameWandschatten.vue'))
+const GameBeiseite = defineAsyncComponent(() => import('@/components/molecules/games/GameBeiseite.vue'))
+const GameBretter = defineAsyncComponent(() => import('@/components/molecules/games/GameBretter.vue'))
+const GameReisig = defineAsyncComponent(() => import('@/components/molecules/games/GameReisig.vue'))
+const GameBesuch = defineAsyncComponent(() => import('@/components/molecules/games/GameBesuch.vue'))
+const GameGerade = defineAsyncComponent(() => import('@/components/molecules/games/GameGerade.vue'))
+const GameWiederfinden = defineAsyncComponent(() => import('@/components/molecules/games/GameWiederfinden.vue'))
+const GameSegel = defineAsyncComponent(() => import('@/components/molecules/games/GameSegel.vue'))
+const GamePurpur = defineAsyncComponent(() => import('@/components/molecules/games/GamePurpur.vue'))
+const GameWerkstatt = defineAsyncComponent(() => import('@/components/molecules/games/GameWerkstatt.vue'))
+const GameEselLaden = defineAsyncComponent(() => import('@/components/molecules/games/GameEselLaden.vue'))
+const GameHebrontor = defineAsyncComponent(() => import('@/components/molecules/games/GameHebrontor.vue'))
+const GameFestzug = defineAsyncComponent(() => import('@/components/molecules/games/GameFestzug.vue'))
+const GameZeugen = defineAsyncComponent(() => import('@/components/molecules/games/GameZeugen.vue'))
+const GameSprachen = defineAsyncComponent(() => import('@/components/molecules/games/GameSprachen.vue'))
+const GameKoerbe = defineAsyncComponent(() => import('@/components/molecules/games/GameKoerbe.vue'))
+const GameHuepfen = defineAsyncComponent(() => import('@/components/molecules/games/GameHuepfen.vue'))
+const GameWagen = defineAsyncComponent(() => import('@/components/molecules/games/GameWagen.vue'))
+const GameSpaehen = defineAsyncComponent(() => import('@/components/molecules/games/GameSpaehen.vue'))
+const GameGarben = defineAsyncComponent(() => import('@/components/molecules/games/GameGarben.vue'))
+const GameKeltern = defineAsyncComponent(() => import('@/components/molecules/games/GameKeltern.vue'))
+const GameKuehenil = defineAsyncComponent(() => import('@/components/molecules/games/GameKuehenil.vue'))
+const GameUmarmen = defineAsyncComponent(() => import('@/components/molecules/games/GameUmarmen.vue'))
+const GameBegegnung = defineAsyncComponent(() => import('@/components/molecules/games/GameBegegnung.vue'))
+const GameHandmuehle = defineAsyncComponent(() => import('@/components/molecules/games/GameHandmuehle.vue'))
+const GameSiegel = defineAsyncComponent(() => import('@/components/molecules/games/GameSiegel.vue'))
+const GameNaamanerde = defineAsyncComponent(() => import('@/components/molecules/games/GameNaamanerde.vue'))
+const GameLaternen = defineAsyncComponent(() => import('@/components/molecules/games/GameLaternen.vue'))
+const GameSpross = defineAsyncComponent(() => import('@/components/molecules/games/GameSpross.vue'))
+const GameZionwege = defineAsyncComponent(() => import('@/components/molecules/games/GameZionwege.vue'))
+const GameWunschkarten = defineAsyncComponent(() => import('@/components/molecules/games/GameWunschkarten.vue'))
+const GameFloesse = defineAsyncComponent(() => import('@/components/molecules/games/GameFloesse.vue'))
+const GameSchnitzen = defineAsyncComponent(() => import('@/components/molecules/games/GameSchnitzen.vue'))
+const GameGranatapfel = defineAsyncComponent(() => import('@/components/molecules/games/GameGranatapfel.vue'))
+const GameStufen = defineAsyncComponent(() => import('@/components/molecules/games/GameStufen.vue'))
+const GameSchatzkammer = defineAsyncComponent(() => import('@/components/molecules/games/GameSchatzkammer.vue'))
+const GameBecher = defineAsyncComponent(() => import('@/components/molecules/games/GameBecher.vue'))
+const GamePfand = defineAsyncComponent(() => import('@/components/molecules/games/GamePfand.vue'))
+const GameLaubhuetten = defineAsyncComponent(() => import('@/components/molecules/games/GameLaubhuetten.vue'))
+const GameFroesche = defineAsyncComponent(() => import('@/components/molecules/games/GameFroesche.vue'))
+const GameSaum = defineAsyncComponent(() => import('@/components/molecules/games/GameSaum.vue'))
+const GameUfer = defineAsyncComponent(() => import('@/components/molecules/games/GameUfer.vue'))
+const GameSchriftrolle = defineAsyncComponent(() => import('@/components/molecules/games/GameSchriftrolle.vue'))
+const GameSchattenweg = defineAsyncComponent(() => import('@/components/molecules/games/GameSchattenweg.vue'))
+const GameSonnenaufgang = defineAsyncComponent(() => import('@/components/molecules/games/GameSonnenaufgang.vue'))
+const GameTor = defineAsyncComponent(() => import('@/components/molecules/games/GameTor.vue'))
+const GameZepter = defineAsyncComponent(() => import('@/components/molecules/games/GameZepter.vue'))
+const GameBoten = defineAsyncComponent(() => import('@/components/molecules/games/GameBoten.vue'))
+const GameGebote = defineAsyncComponent(() => import('@/components/molecules/games/GameGebote.vue'))
+const GameBachsteine = defineAsyncComponent(() => import('@/components/molecules/games/GameBachsteine.vue'))
+const GameZaehlung = defineAsyncComponent(() => import('@/components/molecules/games/GameZaehlung.vue'))
+const GameHirtenfeuer = defineAsyncComponent(() => import('@/components/molecules/games/GameHirtenfeuer.vue'))
+const GameWeitersagen = defineAsyncComponent(() => import('@/components/molecules/games/GameWeitersagen.vue'))
+const GameStern = defineAsyncComponent(() => import('@/components/molecules/games/GameStern.vue'))
+const GameLot = defineAsyncComponent(() => import('@/components/molecules/games/GameLot.vue'))
+const GameSitzplaetze = defineAsyncComponent(() => import('@/components/molecules/games/GameSitzplaetze.vue'))
+const GameZwoelf = defineAsyncComponent(() => import('@/components/molecules/games/GameZwoelf.vue'))
+const GameSynagoge = defineAsyncComponent(() => import('@/components/molecules/games/GameSynagoge.vue'))
+const GameZehn = defineAsyncComponent(() => import('@/components/molecules/games/GameZehn.vue'))
+const GameKinder = defineAsyncComponent(() => import('@/components/molecules/games/GameKinder.vue'))
+const GameHundertfach = defineAsyncComponent(() => import('@/components/molecules/games/GameHundertfach.vue'))
+const GameAnhalten = defineAsyncComponent(() => import('@/components/molecules/games/GameAnhalten.vue'))
+const GameHerberge = defineAsyncComponent(() => import('@/components/molecules/games/GameHerberge.vue'))
+const GameHeimtragen = defineAsyncComponent(() => import('@/components/molecules/games/GameHeimtragen.vue'))
+const GameHeimweg = defineAsyncComponent(() => import('@/components/molecules/games/GameHeimweg.vue'))
+const GameJugs = defineAsyncComponent(() => import('@/components/molecules/games/GameJugs.vue'))
+const GameEnough = defineAsyncComponent(() => import('@/components/molecules/games/GameEnough.vue'))
+const GameQuails = defineAsyncComponent(() => import('@/components/molecules/games/GameQuails.vue'))
+const GameStaffs = defineAsyncComponent(() => import('@/components/molecules/games/GameStaffs.vue'))
+const GameSerpent = defineAsyncComponent(() => import('@/components/molecules/games/GameSerpent.vue'))
+const GameDonkey = defineAsyncComponent(() => import('@/components/molecules/games/GameDonkey.vue'))
+const GameCommission = defineAsyncComponent(() => import('@/components/molecules/games/GameCommission.vue'))
+const GameArms = defineAsyncComponent(() => import('@/components/molecules/games/GameArms.vue'))
+const GameJudges = defineAsyncComponent(() => import('@/components/molecules/games/GameJudges.vue'))
+const GameSignal = defineAsyncComponent(() => import('@/components/molecules/games/GameSignal.vue'))
+const GameGrapes = defineAsyncComponent(() => import('@/components/molecules/games/GameGrapes.vue'))
+const GameWord = defineAsyncComponent(() => import('@/components/molecules/games/GameWord.vue'))
+const GameHush = defineAsyncComponent(() => import('@/components/molecules/games/GameHush.vue'))
+const GameHide = defineAsyncComponent(() => import('@/components/molecules/games/GameHide.vue'))
+const GameBake = defineAsyncComponent(() => import('@/components/molecules/games/GameBake.vue'))
+const GamePack = defineAsyncComponent(() => import('@/components/molecules/games/GamePack.vue'))
+const GameLower = defineAsyncComponent(() => import('@/components/molecules/games/GameLower.vue'))
+const GameStep = defineAsyncComponent(() => import('@/components/molecules/games/GameStep.vue'))
+const GameRings = defineAsyncComponent(() => import('@/components/molecules/games/GameRings.vue'))
+const GameClues = defineAsyncComponent(() => import('@/components/molecules/games/GameClues.vue'))
+const GameBirds = defineAsyncComponent(() => import('@/components/molecules/games/GameBirds.vue'))
+const GameSilver = defineAsyncComponent(() => import('@/components/molecules/games/GameSilver.vue'))
+const GameRelay = defineAsyncComponent(() => import('@/components/molecules/games/GameRelay.vue'))
+const GameCatch = defineAsyncComponent(() => import('@/components/molecules/games/GameCatch.vue'))
+const GameRing = defineAsyncComponent(() => import('@/components/molecules/games/GameRing.vue'))
+const GameCairn = defineAsyncComponent(() => import('@/components/molecules/games/GameCairn.vue'))
+const GameCycle = defineAsyncComponent(() => import('@/components/molecules/games/GameCycle.vue'))
+const GameGuess = defineAsyncComponent(() => import('@/components/molecules/games/GameGuess.vue'))
+const GameHerd = defineAsyncComponent(() => import('@/components/molecules/games/GameHerd.vue'))
+const GamePuzzle = defineAsyncComponent(() => import('@/components/molecules/games/GamePuzzle.vue'))
+const GameShare = defineAsyncComponent(() => import('@/components/molecules/games/GameShare.vue'))
+const GameSort = defineAsyncComponent(() => import('@/components/molecules/games/GameSort.vue'))
+const GameStones = defineAsyncComponent(() => import('@/components/molecules/games/GameStones.vue'))
+const GameWay = defineAsyncComponent(() => import('@/components/molecules/games/GameWay.vue'))
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
 import SoundPanel from '@/components/molecules/SoundPanel.vue'
 import ReadAloud from '@/components/molecules/ReadAloud.vue'

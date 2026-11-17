@@ -5,23 +5,23 @@
  * A link with `?probe=1` opens a game for testing, but only in the test app and in development (never in a store build).
  * The game itself lives in its own component.
  */
-import { computed } from 'vue'
+import { computed, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { BIG_GAMES } from '@/data/bigGames'
 import useBigGames from '@/use/useBigGames'
 import { PLUS_TEST } from '@/use/usePremium'
 import { prependBaseUrl } from '@/utils/function'
-import BigGameBogen from '@/components/molecules/games/BigGameBogen.vue'
-import BigGameDavid from '@/components/molecules/games/BigGameDavid.vue'
-import BigGameElia from '@/components/molecules/games/BigGameElia.vue'
-import BigGameGideon from '@/components/molecules/games/BigGameGideon.vue'
-import BigGameKarawane from '@/components/molecules/games/BigGameKarawane.vue'
-import BigGameLamm from '@/components/molecules/games/BigGameLamm.vue'
-import BigGameMemory from '@/components/molecules/games/BigGameMemory.vue'
-import BigGameMose from '@/components/molecules/games/BigGameMose.vue'
-import BigGameWasser from '@/components/molecules/games/BigGameWasser.vue'
-import BigGameNehemia from '@/components/molecules/games/BigGameNehemia.vue'
+const BigGameBogen = defineAsyncComponent(() => import('@/components/molecules/games/BigGameBogen.vue'))
+const BigGameDavid = defineAsyncComponent(() => import('@/components/molecules/games/BigGameDavid.vue'))
+const BigGameElia = defineAsyncComponent(() => import('@/components/molecules/games/BigGameElia.vue'))
+const BigGameGideon = defineAsyncComponent(() => import('@/components/molecules/games/BigGameGideon.vue'))
+const BigGameKarawane = defineAsyncComponent(() => import('@/components/molecules/games/BigGameKarawane.vue'))
+const BigGameLamm = defineAsyncComponent(() => import('@/components/molecules/games/BigGameLamm.vue'))
+const BigGameMemory = defineAsyncComponent(() => import('@/components/molecules/games/BigGameMemory.vue'))
+const BigGameMose = defineAsyncComponent(() => import('@/components/molecules/games/BigGameMose.vue'))
+const BigGameWasser = defineAsyncComponent(() => import('@/components/molecules/games/BigGameWasser.vue'))
+const BigGameNehemia = defineAsyncComponent(() => import('@/components/molecules/games/BigGameNehemia.vue'))
 
 const route = useRoute()
 const router = useRouter()

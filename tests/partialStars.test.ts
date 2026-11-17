@@ -5,7 +5,7 @@
  */
 import { flushPromises, mount } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi, beforeAll } from 'vitest'
 import { journeys as baseJourneys } from '@/data/adventures'
 import { noah } from '@/data/adventures/noah'
 import messages from '@/i18n/app'
@@ -30,6 +30,11 @@ vi.mock('@/use/useSfx', () => ({
 const journeys = [...baseJourneys, noah]
 const mk = (locale: 'de' | 'en') => createI18n({ legacy: false, locale, fallbackLocale: 'de', messages: messages as never, missingWarn: false, fallbackWarn: false })
 const opts = (locale: 'de' | 'en' = 'de') => ({ global: { plugins: [mk(locale)], stubs: { RouterLink: true } }, attachTo: document.body })
+
+// the games of the stage page are loaded when one is shown (defineAsyncComponent): load them first, so the page shows them at once
+beforeAll(async () => {
+  await Promise.all(Object.values(import.meta.glob('/src/components/molecules/games/Game*.vue')).map((load) => load().catch(() => undefined)))
+}, 180000)
 
 beforeEach(() => {
   localStorage.clear()
