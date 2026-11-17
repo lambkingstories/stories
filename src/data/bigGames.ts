@@ -2,7 +2,7 @@
  * The big games of the game corner (profile page): real games, not mini games. Each one opens when the child has gathered enough stars on
  * the adventures (the stars of all stages together). The games are played on the whole screen.
  */
-export type BigGameId = 'david' | 'elia' | 'wasser' | 'karawane' | 'nehemia' | 'memory' | 'gideon'
+export type BigGameId = 'david' | 'elia' | 'wasser' | 'karawane' | 'nehemia' | 'memory' | 'gideon' | 'bogen'
 
 export interface BigGame {
   id: BigGameId
@@ -23,5 +23,7 @@ export const BIG_GAMES: BigGame[] = [
   { id: 'gideon', at: 50, image: 'images/spiele-gross/gideon/kachel.webp', maxStars: 108 },
   { id: 'wasser', at: 60, image: 'images/spiele-gross/wasser/kachel.webp', maxStars: 108 },
   { id: 'nehemia', at: 80, image: 'images/spiele-gross/nehemia/kachel.webp', maxStars: 180 },
-  { id: 'karawane', at: 100, image: 'images/spiele-gross/karawane/kachel.webp', maxStars: 18 }
+  { id: 'karawane', at: 100, image: 'images/spiele-gross/karawane/kachel.webp', maxStars: 18 },
+  // the archery game of Jonathan's arrows: 44 levels in 4 chapters, wind, ropes, switches, bounces (see `utils/bogenGame.ts`)
+  { id: 'bogen', at: 110, image: 'images/spiele-gross/bogen/kachel.webp', maxStars: 132 }
 ]
