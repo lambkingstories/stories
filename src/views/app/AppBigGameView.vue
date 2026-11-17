@@ -16,6 +16,7 @@ import BigGameGideon from '@/components/molecules/games/BigGameGideon.vue'
 import BigGameKarawane from '@/components/molecules/games/BigGameKarawane.vue'
 import BigGameLamm from '@/components/molecules/games/BigGameLamm.vue'
 import BigGameMemory from '@/components/molecules/games/BigGameMemory.vue'
+import BigGameMose from '@/components/molecules/games/BigGameMose.vue'
 import BigGameWasser from '@/components/molecules/games/BigGameWasser.vue'
 import BigGameNehemia from '@/components/molecules/games/BigGameNehemia.vue'
 
@@ -37,6 +38,7 @@ function leave() {
   BigGameElia(v-else-if="game?.id === 'elia' && open" @leave="leave")
   BigGameGideon(v-else-if="game?.id === 'gideon' && open" @leave="leave")
   BigGameWasser(v-else-if="game?.id === 'wasser' && open" @leave="leave")
+  BigGameMose(v-else-if="game?.id === 'mose' && open" @leave="leave")
   BigGameKarawane(v-else-if="game?.id === 'karawane' && open" @leave="leave")
   BigGameNehemia(v-else-if="game?.id === 'nehemia' && open" @leave="leave")
   BigGameMemory(v-else-if="game?.id === 'memory' && open" @leave="leave")

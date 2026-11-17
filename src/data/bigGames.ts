@@ -2,7 +2,7 @@
  * The big games of the game corner (profile page): real games, not mini games. Each one opens when the child has gathered enough stars on
  * the adventures (the stars of all stages together). The games are played on the whole screen.
  */
-export type BigGameId = 'david' | 'elia' | 'wasser' | 'karawane' | 'nehemia' | 'memory' | 'lamm' | 'gideon' | 'bogen'
+export type BigGameId = 'david' | 'elia' | 'wasser' | 'karawane' | 'nehemia' | 'memory' | 'lamm' | 'gideon' | 'mose' | 'bogen'
 
 export interface BigGame {
   id: BigGameId
@@ -22,6 +22,8 @@ export const BIG_GAMES: BigGame[] = [
   // the catapult puzzle in the style of the birds-and-towers games: 36 levels in 4 chapters, jars, trumpets and torch jars (see `utils/gideonSim.ts`)
   { id: 'gideon', at: 50, image: 'images/spiele-gross/gideon/kachel.webp', maxStars: 108 },
   { id: 'wasser', at: 60, image: 'images/spiele-gross/wasser/kachel.webp', maxStars: 108 },
+  // the rope puzzle in the style of Cut the Rope: Moses' basket, 40 levels in 4 chapters (see `utils/moseKorbGame.ts`)
+  { id: 'mose', at: 70, image: 'images/spiele-gross/mose/kachel.webp', maxStars: 120 },
   { id: 'nehemia', at: 80, image: 'images/spiele-gross/nehemia/kachel.webp', maxStars: 180 },
   // the path puzzle of the lost lamb (Psalm 23): 5 chapters, three stars each level (see `utils/lammLevels.ts`)
   { id: 'lamm', at: 90, image: 'images/spiele-gross/lamm/kachel.webp', maxStars: 102 },
