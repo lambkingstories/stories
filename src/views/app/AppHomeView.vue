@@ -88,7 +88,7 @@ const slides = computed(() => {
   // LambKing Plus is the second slide (Anton 11.11.2026), the rest is on the Plus page. The app does not ask for gifts here any more
   // (Anton 10.11.2026): voluntary support is one small line at the end of the window for parents.
   if (PREMIUM_TEASER) {
-    list.push({ id: 'plus', image: prependBaseUrl('images/bg/willkommen-plus-2.webp'), title: t('app.main.plusTitle'), text: t('app.main.plusText') })
+    list.push({ id: 'plus', image: prependBaseUrl('images/bg/willkommen-plus-3.webp'), title: t('app.main.plusTitle'), text: t('app.main.plusText') })
   }
   if (sponsors.length) {
     list.push({ id: 'sponsors', image: prependBaseUrl('images/bg/welcome-bg-2.webp'), title: t('app.home.sponsorsTitle'), text: t('app.home.sponsorsText') })

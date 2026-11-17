@@ -45,7 +45,7 @@ const cards = [
   { n: 3, icon: 'ich' },
   { n: 4, icon: 'lesen' }
 ]
-const hero = prependBaseUrl('images/bg/willkommen-plus-2.webp')
+const hero = prependBaseUrl('images/bg/willkommen-plus-3.webp')
 </script>
 
 <template lang="pug">
