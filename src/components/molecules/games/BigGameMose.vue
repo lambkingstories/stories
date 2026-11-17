@@ -1189,9 +1189,7 @@ onBeforeUnmount(() => {
     //- the explanation (once; the question mark in the menu brings it back)
     div(v-if="how && loaded" class="mk-menu mk-menu--dim")
       div(class="mk-card mk-how")
-        h2(class="mk-title") {{ t('app.bigGames.mose.title') }}
-        p(class="mk-text") {{ t('app.bigGames.mose.story') }}
-        p(class="mk-text mk-text--task") {{ t('app.bigGames.mose.task') }}
+        h2(class="mk-title") {{ t('app.bigGames.mose.howTitle') }}
         div(class="mk-how-row")
           span(class="mk-how-sign") ✂
           p(class="mk-how-line") {{ t('app.bigGames.mose.howCut') }}
@@ -1201,9 +1199,6 @@ onBeforeUnmount(() => {
         div(class="mk-how-row")
           span(class="mk-how-sign") ✿
           p(class="mk-how-line") {{ t('app.bigGames.mose.howLotus') }}
-        div(class="mk-how-row")
-          span(class="mk-how-sign") ≈
-          p(class="mk-how-line") {{ t('app.bigGames.mose.howWater') }}
         AdvButton(data-test="mose-go" @click="closeHow") {{ t('app.bigGames.mose.go') }}
 </template>
 
@@ -1283,6 +1278,7 @@ onBeforeUnmount(() => {
 
 .mk-text
   margin: 0
+  font-size: 1.15rem
   line-height: 1.4
 
   &--task
@@ -1531,25 +1527,27 @@ onBeforeUnmount(() => {
     font-weight: 700
 
 .mk-how
-  gap: 10px
+  gap: 20px
 
 .mk-how-row
   display: flex
   align-items: center
-  gap: 12px
+  gap: 16px
   width: 100%
 
 .mk-how-sign
-  width: 44px
+  width: 56px
   flex: none
-  font-size: 1.7rem
-  color: #e0568a
+  font-size: 2.2rem
+  text-align: center
+  color: #f0a812
 
 .mk-how-line
   margin: 0
   text-align: left
-  font-size: 0.95rem
-  line-height: 1.35
+  font-size: 1.2rem
+  font-weight: 700
+  line-height: 1.3
 
 @media (max-height: 520px)
   .mk-card
@@ -1592,4 +1590,16 @@ onBeforeUnmount(() => {
   .mk-tip
     top: 8px
     max-width: min(420px, 50vw)
+
+// short screens: the explanation card closer together
+@media (max-height: 520px)
+  .mk-how
+    gap: 8px
+  .mk-how-row
+    gap: 12px
+  .mk-how-sign
+    width: 40px
+    font-size: 1.5rem
+  .mk-how-line
+    font-size: 1.05rem
 </style>

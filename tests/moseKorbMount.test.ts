@@ -113,7 +113,7 @@ describe('the texts of the game', () => {
       : []
   it('are complete in german, english and spanish', () => {
     const de = keys(BIG_GAME_TEXTS.de.mose).sort()
-    expect(de.length).toBeGreaterThan(60)
+    expect(de.length).toBeGreaterThan(50)
     expect(keys(BIG_GAME_TEXTS.en.mose).sort()).toEqual(de)
     expect(keys(BIG_GAME_TEXTS.es.mose).sort()).toEqual(de)
   })

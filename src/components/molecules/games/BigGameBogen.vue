@@ -1533,9 +1533,7 @@ onBeforeUnmount(() => {
     //- the explanation (once; the button in the overview brings it back)
     div(v-if="how && loaded" class="bo-menu bo-menu--dim")
       div(class="bo-card bo-how")
-        h2(class="bo-title") {{ t('app.bigGames.bogen.title') }}
-        p(class="bo-text") {{ t('app.bigGames.bogen.story') }}
-        p(class="bo-text bo-text--task") {{ t('app.bigGames.bogen.task') }}
+        h2(class="bo-title") {{ t('app.bigGames.bogen.howTitle') }}
         div(class="bo-how-row")
           span(class="bo-how-sign") ☝
           p(class="bo-how-line") {{ t('app.bigGames.bogen.howPull') }}
@@ -1543,14 +1541,8 @@ onBeforeUnmount(() => {
           span(class="bo-how-sign") ➶
           p(class="bo-how-line") {{ t('app.bigGames.bogen.howPower') }}
         div(class="bo-how-row")
-          span(class="bo-how-sign") ≋
-          p(class="bo-how-line") {{ t('app.bigGames.bogen.howWind') }}
-        div(class="bo-how-row")
           span(class="bo-how-sign") ◎
           p(class="bo-how-line") {{ t('app.bigGames.bogen.howGoal') }}
-        div(class="bo-how-row")
-          span(class="bo-how-sign") ★
-          p(class="bo-how-line") {{ t('app.bigGames.bogen.howStars') }}
         AdvButton(data-test="bogen-go" @click="closeHow") {{ t('app.bigGames.bogen.go') }}
 </template>
 
@@ -1632,6 +1624,7 @@ onBeforeUnmount(() => {
 
 .bo-text
   margin: 0
+  font-size: 1.15rem
   line-height: 1.4
 
   &--task
@@ -1904,25 +1897,27 @@ onBeforeUnmount(() => {
     font-weight: 700
 
 .bo-how
-  gap: 10px
+  gap: 20px
 
 .bo-how-row
   display: flex
   align-items: center
-  gap: 12px
+  gap: 16px
   width: 100%
 
 .bo-how-sign
-  width: 44px
+  width: 56px
   flex: none
-  font-size: 1.7rem
+  font-size: 2.2rem
+  text-align: center
   color: #f0a812
 
 .bo-how-line
   margin: 0
   text-align: left
-  font-size: 0.95rem
-  line-height: 1.35
+  font-size: 1.2rem
+  font-weight: 700
+  line-height: 1.3
 
 @media (max-height: 460px)
   .bo-tip
@@ -1934,4 +1929,16 @@ onBeforeUnmount(() => {
     gap: 6px
   .bo-title
     font-size: 1.25rem
+
+// short screens: the explanation card closer together
+@media (max-height: 520px)
+  .bo-how
+    gap: 8px
+  .bo-how-row
+    gap: 12px
+  .bo-how-sign
+    width: 40px
+    font-size: 1.5rem
+  .bo-how-line
+    font-size: 1.05rem
 </style>

@@ -64,7 +64,7 @@ describe('BigGameBogen', () => {
   it('opens with the story, four chapters and forty-four levels', async () => {
     const w = await open()
     expect(w.text()).toContain('Jonatans Pfeile')
-    expect(w.text()).toContain('Hier geht es um Jonatan')
+    expect(w.text()).toContain('Jonatan ist der beste Freund von David')
     expect(w.text()).toContain('Deine Aufgabe')
     expect(w.findAll('.bo-chapter')).toHaveLength(4)
     expect(w.findAll('.bo-level')).toHaveLength(44)

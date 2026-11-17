@@ -4,7 +4,6 @@
  * chapter or world at most 15 words, a hint in the game at most 10 words, a level name at most 3 words. German, english and spanish all keep to it.
  *
  * A new game adds one entry to `SPECS` (the paths of its texts in `app.bigGames.<id>`, `*` stands for every item of a list).
- * `mose` and `bogen` are built by other sessions and are added there when they are done.
  */
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
@@ -44,6 +43,8 @@ const SPECS: Spec[] = [
   { id: 'memory', component: 'BigGameMemory', explain: ['howTurn', 'howPair', 'howMiss'], background: ['story'], tasks: ['task'], chapters: [], hints: ['quiet', 'first', 'miss', 'tipPartner', 'tipKnown', 'tipNone'], levels: [] },
   { id: 'gideon', component: 'BigGameGideon', explain: ['howPull', 'howGuards', 'howStars'], background: ['story'], tasks: ['task', 'chapters.*.task'], chapters: ['chapters.*.story'], hints: ['hint.*', 'rotate'], levels: ['levels.*'] },
   { id: 'lamm', component: 'BigGameLamm', explain: ['howTap', 'howCrank', 'howFlowers'], background: ['intro'], tasks: ['task', 'story.*.task'], chapters: ['story.*.text'], hints: ['hint.*', 'tipWalk', 'tipNone', 'tipRide', 'tipCrank', 'noWay', 'standing', 'inTheWay', 'called'], levels: ['levels.*'] },
+  { id: 'mose', component: 'BigGameMose', explain: ['howCut', 'howTap', 'howLotus'], background: ['story'], tasks: ['task', 'chapters.*.task'], chapters: ['chapters.*.story'], hints: ['hint.*', 'splash', 'stuck', 'tipShown'], levels: [] },
+  { id: 'bogen', component: 'BigGameBogen', explain: ['howPull', 'howPower', 'howGoal'], background: ['story', 'ending.text'], tasks: ['task', 'chapters.*.task'], chapters: ['chapters.*.story'], hints: ['hint.*', 'tipWait', 'tipNone', 'tooWeak', 'turn'], levels: ['names.*'] },
   { id: 'wortreise', component: '', explain: [], background: ['sub', 'rule'], tasks: [], chapters: [], hints: ['startHint', 'drawHint', 'freeLetter', 'freeLetterAlone', 'again', 'no', 'noLens', 'letterShown'], levels: [] }
 ]
 
