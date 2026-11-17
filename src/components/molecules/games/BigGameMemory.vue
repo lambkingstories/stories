@@ -498,9 +498,7 @@ const STAND = ['#c98a52', '#6f9fc2', '#7fb069', '#e0c25a', '#b58ac4', '#7fc4b8',
     //- the explanation: once at the very first start, the question mark of the menu brings it back
     div(v-if="how" class="mm-dim" data-test="memory-howcard")
       div(class="mm-sheet mm-how")
-        h2(class="mm-title") {{ t('app.bigGames.memory.title') }}
-        p(class="mm-text") {{ t('app.bigGames.memory.story') }}
-        p(class="mm-text mm-text--task") {{ t('app.bigGames.memory.task') }}
+        h2(class="mm-title") {{ t('app.bigGames.memory.howTitle') }}
         div(class="mm-how-row")
           span(class="mm-how-sign") 👆
           p(class="mm-how-line") {{ t('app.bigGames.memory.howTurn') }}
@@ -510,12 +508,6 @@ const STAND = ['#c98a52', '#6f9fc2', '#7fb069', '#e0c25a', '#b58ac4', '#7fc4b8',
         div(class="mm-how-row")
           span(class="mm-how-sign") ↺
           p(class="mm-how-line") {{ t('app.bigGames.memory.howMiss') }}
-        div(class="mm-how-row")
-          span(class="mm-how-sign") ★
-          p(class="mm-how-line") {{ t('app.bigGames.memory.howCard') }}
-        div(class="mm-how-row")
-          span(class="mm-how-sign") ✦
-          p(class="mm-how-line") {{ t('app.bigGames.memory.howHint') }}
         AdvButton(data-test="memory-go" @click="closeHow") {{ t('app.bigGames.memory.go') }}
 </template>
 
@@ -578,7 +570,7 @@ const STAND = ['#c98a52', '#6f9fc2', '#7fb069', '#e0c25a', '#b58ac4', '#7fc4b8',
 
 .mm-text
   margin: 0
-  font-size: 1.05rem
+  font-size: 1.15rem
   line-height: 1.45
   text-align: center
 
@@ -1015,26 +1007,30 @@ const STAND = ['#c98a52', '#6f9fc2', '#7fb069', '#e0c25a', '#b58ac4', '#7fc4b8',
   align-items: stretch
   max-height: 100%
   overflow-y: auto
+  gap: 20px
 
 .mm-how-row
   display: flex
   align-items: center
-  gap: 12px
+  gap: 16px
+  width: 100%
 
 .mm-how-sign
   flex: none
-  width: 38px
-  height: 38px
+  width: 56px
+  height: 56px
   border-radius: 50%
   display: grid
   place-items: center
   background: rgba(232, 194, 106, 0.3)
-  font-size: 1.15rem
+  font-size: 1.7rem
 
 .mm-how-line
   margin: 0
-  font-size: 0.98rem
-  line-height: 1.35
+  text-align: left
+  font-size: 1.2rem
+  font-weight: 700
+  line-height: 1.3
 
 // the buttons of a sheet are centred
 .mm-sheet :deep(.adv-btn)
@@ -1126,4 +1122,17 @@ const STAND = ['#c98a52', '#6f9fc2', '#7fb069', '#e0c25a', '#b58ac4', '#7fc4b8',
   .mm-card.is-hint .mm-face
     animation: none
     box-shadow: 0 0 0 4px #f5c84a
+
+// short screens: the explanation card closer together
+@media (max-height: 520px)
+  .mm-how
+    gap: 8px
+  .mm-how-row
+    gap: 12px
+  .mm-how-sign
+    width: 40px
+    font-size: 1.5rem
+    height: 40px
+  .mm-how-line
+    font-size: 1.05rem
 </style>

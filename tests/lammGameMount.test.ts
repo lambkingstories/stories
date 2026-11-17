@@ -84,7 +84,7 @@ describe('BigGameLamm', () => {
     const w = await open()
     await w.find('[data-test="lamm-level-0"]').trigger('click')
     expect(w.find('[data-test="lamm-go"]').exists()).toBe(true)
-    expect(w.text()).toContain('Hirten')
+    expect(w.text()).toContain('Kurbeln')
     await w.find('[data-test="lamm-go"]').trigger('click')
     expect(w.find('[data-test="lamm-go"]').exists()).toBe(false)
     w.unmount()

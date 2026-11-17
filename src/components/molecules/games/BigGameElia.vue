@@ -192,6 +192,9 @@ function say(text: string, ms = 3200) {
   bannerTimer = window.setTimeout(() => (banner.value = ''), ms)
 }
 let hungryAt = 0
+/** The first raven feather and the first stumble of a visit get one short word (the explanation card does not list them). */
+let featherSaid = false
+let stumbleSaid = false
 
 let raf = 0
 let last = 0
@@ -390,7 +393,15 @@ function handleEvents() {
     } else if (ev === 'feder') {
       play('star', 0.7)
       burst('#9cc9ff', 14)
+      if (!featherSaid) {
+        featherSaid = true
+        say(t('app.bigGames.elia.ravenBanner'), 2600)
+      }
     } else if (ev === 'stumble') {
+      if (!stumbleSaid) {
+        stumbleSaid = true
+        say(t('app.bigGames.elia.stumbleBanner'), 2600)
+      }
       play('clunk', 0.8)
       shake = 1
       stumbleShow = 0.55
@@ -878,7 +889,6 @@ const resultText = computed(() => {
 const riskStyle = computed(() => ({ width: `${Math.round(hud.risk * 100)}%` }))
 const nextLevel = computed(() => (!isFree.value && outcome.won && level.value < LEVELS.length - 1 && LEVELS[level.value + 1]?.ready ? level.value + 1 : -1))
 const breadSrc = pic('brot')
-const featherSrc = pic('feder')
 const crossSrc = pic('wisch-kreuz')
 const arrowSrc = pic('wisch-pfeil')
 const resultPic = computed(() => pic(outcome.won ? 'elia-jubel' : 'elia-sturz'))
@@ -1033,7 +1043,6 @@ onBeforeUnmount(() => {
     div(v-if="how" class="eg-how-wrap" :style="{ width: box.w + 'px', height: box.h + 'px' }")
       div(class="eg-card eg-how")
         h2(class="eg-title") {{ t('app.bigGames.elia.howTitle') }}
-        p(class="eg-story-task eg-how-task") {{ t('app.bigGames.elia.task') }}
         //- a cross of four arrows: where one can swipe
         img(:src="crossSrc" alt="" class="eg-how-cross" @error="hideBroken")
         div(class="eg-how-row")
@@ -1049,18 +1058,6 @@ onBeforeUnmount(() => {
           span(class="eg-how-arrows")
             img(:src="arrowSrc" alt="" class="eg-how-arrow is-down" @error="hideBroken")
           span {{ t('app.bigGames.elia.howSlide') }}
-        div(class="eg-how-row")
-          span(class="eg-how-key") !
-          span {{ t('app.bigGames.elia.howWall') }}
-        div(class="eg-how-row")
-          span(class="eg-how-key") ≈
-          span {{ t('app.bigGames.elia.howBach') }}
-        div(class="eg-how-row")
-          img(:src="breadSrc" alt="" class="eg-how-pic" @error="hideBroken")
-          span {{ t('app.bigGames.elia.howBread') }}
-        div(class="eg-how-row")
-          img(:src="featherSrc" alt="" class="eg-how-pic" @error="hideBroken")
-          span {{ t('app.bigGames.elia.howFeather') }}
         AdvButton(data-test="elia-go" @click="closeHow") {{ t('app.bigGames.elia.go') }}
 
     //- sideways: the note to hold the phone upright
@@ -1179,7 +1176,7 @@ onBeforeUnmount(() => {
 
 .eg-story-text
   margin: 0
-  font-size: 0.9rem
+  font-size: 1rem
   line-height: 1.35
   color: #3a2c12
 
@@ -1193,7 +1190,7 @@ onBeforeUnmount(() => {
   margin: 2px 0 0
   padding-top: 6px
   border-top: 1px dashed #d9a93a
-  font-size: 0.9rem
+  font-size: 1rem
   font-weight: 800
   line-height: 1.3
   color: #2a2418
@@ -1439,23 +1436,24 @@ onBeforeUnmount(() => {
   overflow-y: auto
 
 .eg-how
-  gap: 10px
+  gap: 16px
   text-align: left
 
 .eg-how-cross
   display: block
   width: 34%
-  max-width: 130px
+  max-width: 110px
   height: auto
   margin: 0 auto 2px
 
 .eg-how-row
   display: flex
   align-items: center
-  gap: 10px
+  gap: 14px
   width: 100%
-  font-size: 0.9rem
-  line-height: 1.25
+  font-size: 1.15rem
+  font-weight: 700
+  line-height: 1.3
 
 .eg-how-key
   flex: none
@@ -1476,16 +1474,16 @@ onBeforeUnmount(() => {
   align-items: center
   justify-content: center
   gap: 2px
-  width: 40px
-  height: 40px
+  width: 56px
+  height: 56px
 
 .eg-how-arrow
-  width: 20px
+  width: 26px
   height: auto
   &.is-up
-    width: 30px
+    width: 38px
   &.is-down
-    width: 30px
+    width: 38px
     transform: rotate(180deg)
   &.is-left
     transform: rotate(-90deg)
@@ -1590,4 +1588,18 @@ onBeforeUnmount(() => {
     transform: rotate(0)
   60%, 100%
     transform: rotate(-90deg)
+
+// short screens: the explanation card closer together
+@media (max-height: 520px)
+  .eg-how
+    gap: 8px
+  .eg-how-row
+    gap: 12px
+  .eg-how-arrows
+    width: 44px
+    height: 44px
+  .eg-how-cross
+    max-width: 70px
+  .eg-how-row
+    font-size: 1.05rem
 </style>

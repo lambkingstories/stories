@@ -811,9 +811,7 @@ onBeforeUnmount(() => {
     //- the explanation (once; the question mark in the menu brings it back)
     div(v-if="how && loaded" class="nm-menu nm-menu--dim")
       div(class="nm-card nm-how")
-        h2(class="nm-title") {{ t('app.bigGames.nehemia.title') }}
-        p(class="nm-text") {{ t('app.bigGames.nehemia.story') }}
-        p(class="nm-text nm-text--task") {{ t('app.bigGames.nehemia.task') }}
+        h2(class="nm-title") {{ t('app.bigGames.nehemia.howTitle') }}
         div(class="nm-how-row")
           span(class="nm-how-sign") ↔
           p(class="nm-how-line") {{ t('app.bigGames.nehemia.howMove') }}
@@ -823,12 +821,6 @@ onBeforeUnmount(() => {
         div(class="nm-how-row")
           span(class="nm-how-sign") ↓
           p(class="nm-how-line") {{ t('app.bigGames.nehemia.howDrop') }}
-        div(class="nm-how-row")
-          span(class="nm-how-sign") ⚑
-          p(class="nm-how-line") {{ t('app.bigGames.nehemia.howFlags') }}
-        div(class="nm-how-row")
-          span(class="nm-how-sign") ★
-          p(class="nm-how-line") {{ t('app.bigGames.nehemia.howStars') }}
         AdvButton(data-test="nehemia-go" @click="closeHow") {{ t('app.bigGames.nehemia.go') }}
 </template>
 
@@ -905,6 +897,7 @@ onBeforeUnmount(() => {
 
 .nm-text
   margin: 0
+  font-size: 1.1rem
   line-height: 1.4
 
   &--task
@@ -1194,23 +1187,37 @@ onBeforeUnmount(() => {
     font-weight: 700
 
 .nm-how
-  gap: 10px
+  gap: 20px
 
 .nm-how-row
   display: flex
   align-items: center
-  gap: 12px
+  gap: 16px
   width: 100%
 
 .nm-how-sign
-  width: 44px
+  width: 56px
   flex: none
-  font-size: 1.7rem
+  font-size: 2.2rem
+  text-align: center
   color: #f0a812
 
 .nm-how-line
   margin: 0
   text-align: left
-  font-size: 0.95rem
-  line-height: 1.35
+  font-size: 1.2rem
+  font-weight: 700
+  line-height: 1.3
+
+// short screens: the explanation card closer together
+@media (max-height: 520px)
+  .nm-how
+    gap: 8px
+  .nm-how-row
+    gap: 12px
+  .nm-how-sign
+    width: 40px
+    font-size: 1.5rem
+  .nm-how-line
+    font-size: 1.05rem
 </style>

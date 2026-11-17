@@ -1500,15 +1500,10 @@ void LIGHT_R
     //- the explanation (once; the button in the overview brings it back)
     div(v-if="how && loaded" class="gd-menu gd-menu--dim")
       div(class="gd-card gd-how")
-        h2(class="gd-title") {{ TX('title') }}
-        p(class="gd-text") {{ TX('story') }}
-        p(class="gd-text gd-text--task") {{ TX('task') }}
+        h2(class="gd-title") {{ TX('howTitle') }}
         div(class="gd-how-row")
           span(class="gd-how-sign") 👆
           p(class="gd-how-line") {{ TX('howPull') }}
-        div(class="gd-how-row")
-          span(class="gd-how-sign") 🎺
-          p(class="gd-how-line") {{ TX('howTap') }}
         div(class="gd-how-row")
           span(class="gd-how-sign") 💬
           p(class="gd-how-line") {{ TX('howGuards') }}
@@ -1591,6 +1586,7 @@ void LIGHT_R
 
 .gd-text
   margin: 0
+  font-size: 1.15rem
   line-height: 1.4
 
   &--task
@@ -1892,23 +1888,37 @@ void LIGHT_R
     font-weight: 700
 
 .gd-how
-  gap: 10px
+  gap: 20px
 
 .gd-how-row
   display: flex
   align-items: center
-  gap: 12px
+  gap: 16px
   width: 100%
 
 .gd-how-sign
-  width: 44px
+  width: 56px
   flex: none
-  font-size: 1.7rem
+  font-size: 2.2rem
+  text-align: center
   color: #f0a812
 
 .gd-how-line
   margin: 0
   text-align: left
-  font-size: 0.95rem
-  line-height: 1.35
+  font-size: 1.2rem
+  font-weight: 700
+  line-height: 1.3
+
+// short screens: the explanation card closer together
+@media (max-height: 520px)
+  .gd-how
+    gap: 8px
+  .gd-how-row
+    gap: 12px
+  .gd-how-sign
+    width: 40px
+    font-size: 1.5rem
+  .gd-how-line
+    font-size: 1.05rem
 </style>

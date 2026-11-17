@@ -1276,6 +1276,9 @@ onBeforeUnmount(() => {
       div(class="lg-card")
         h1(class="lg-title") {{ t('app.bigGames.lamm.title') }}
         p(class="lg-text") {{ t('app.bigGames.lamm.intro') }}
+        p(class="lg-story-task lg-story-task--menu")
+          span(class="lg-story-label") {{ t('app.bigGames.lamm.taskLabel') }}
+          |  {{ t('app.bigGames.lamm.task') }}
         div(v-for="(ct, ci) in chapterTexts" :key="ci" class="lg-world")
           div(class="lg-banner" :data-test="'lamm-banner-' + ci" @click="openStory(ci)")
             img(:src="bannerSrc(ci)" alt="" class="lg-banner-pic" @error="hideBroken")
@@ -1357,7 +1360,6 @@ onBeforeUnmount(() => {
     div(v-if="how && loaded" class="lg-menu lg-menu--dim")
       div(class="lg-card lg-how")
         h2(class="lg-title") {{ t('app.bigGames.lamm.howTitle') }}
-        p(class="lg-story-text") {{ t('app.bigGames.lamm.intro') }}
         div(class="lg-how-row")
           img(:src="pic('lamm-1')" alt="" class="lg-how-pic" @error="hideBroken")
           p(class="lg-how-line") {{ t('app.bigGames.lamm.howTap') }}
@@ -1367,9 +1369,6 @@ onBeforeUnmount(() => {
         div(class="lg-how-row")
           img(:src="pic('blume-1')" alt="" class="lg-how-pic" @error="hideBroken")
           p(class="lg-how-line") {{ t('app.bigGames.lamm.howFlowers') }}
-        div(class="lg-how-row")
-          span(class="lg-how-sign") ★
-          p(class="lg-how-line") {{ t('app.bigGames.lamm.howStars') }}
         AdvButton(data-test="lamm-go" @click="closeHow") {{ t('app.bigGames.lamm.go') }}
 </template>
 
@@ -1445,6 +1444,7 @@ onBeforeUnmount(() => {
 
 .lg-text
   margin: 0
+  font-size: 1.15rem
   line-height: 1.4
 
 .lg-final
@@ -1662,31 +1662,33 @@ onBeforeUnmount(() => {
     font-weight: 700
 
 .lg-how
-  gap: 10px
+  gap: 20px
 
 .lg-how-row
   display: flex
   align-items: center
-  gap: 12px
+  gap: 16px
   width: 100%
 
 .lg-how-pic
-  width: 44px
-  height: 44px
+  width: 56px
+  height: 56px
   object-fit: contain
   flex: none
 
 .lg-how-sign
-  width: 44px
+  width: 56px
   flex: none
-  font-size: 1.7rem
+  font-size: 2.2rem
+  text-align: center
   color: #f0a812
 
 .lg-how-line
   margin: 0
   text-align: left
-  font-size: 0.95rem
-  line-height: 1.35
+  font-size: 1.2rem
+  font-weight: 700
+  line-height: 1.3
 
 .lg-story
   gap: 8px
@@ -1706,12 +1708,12 @@ onBeforeUnmount(() => {
 .lg-story-text
   margin: 0
   line-height: 1.45
-  font-size: 1rem
+  font-size: 1.15rem
 
 .lg-story-task
   margin: 0
   line-height: 1.45
-  font-size: 1rem
+  font-size: 1.15rem
   padding: 8px 12px
   border-radius: 14px
   background: var(--lk-surface-2, #f6efdc)
@@ -1723,4 +1725,20 @@ onBeforeUnmount(() => {
 @media (orientation: landscape) and (max-height: 520px)
   .lg-hud
     padding-top: 6px
+
+// short screens: the explanation card closer together
+@media (max-height: 520px)
+  .lg-how
+    gap: 8px
+  .lg-how-row
+    gap: 12px
+  .lg-how-pic
+    width: 40px
+    font-size: 1.5rem
+    height: 40px
+  .lg-how-sign
+    width: 40px
+    font-size: 1.5rem
+  .lg-how-line
+    font-size: 1.05rem
 </style>

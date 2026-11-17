@@ -74,8 +74,7 @@ describe('BigGameElia', () => {
   it('explains the game in the first rounds and starts after "Los"', async () => {
     const w = await open()
     await w.find('[data-test="elia-level-0"]').trigger('click')
-    expect(w.text()).toContain('Kurz wischen')
-    expect(w.text()).toContain('Hunger')
+    expect(w.text()).toContain('Spur wechseln')
     await w.find('[data-test="elia-go"]').trigger('click')
     expect(w.find('[data-test="elia-go"]').exists()).toBe(false)
     w.unmount()

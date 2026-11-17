@@ -53,7 +53,7 @@ describe('BigGameGideon', () => {
   it('opens with the story, four chapters and 36 levels', async () => {
     const w = await open()
     expect(w.text()).toContain('Gideons Nacht')
-    expect(w.text()).toContain('Richter 7,12')
+    expect(w.text()).toContain('Richter 7,19')
     expect(w.text()).toContain('Deine Aufgabe')
     expect(w.findAll('.gd-chapter')).toHaveLength(4)
     expect(w.findAll('.gd-level')).toHaveLength(36)

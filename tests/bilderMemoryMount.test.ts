@@ -87,9 +87,8 @@ describe('BigGameMemory', () => {
     await flushPromises()
   }
 
-  it('is a game of the corner, opened with 80 stars, three stars for every adventure', () => {
+  it('is a game of the corner (picked with a wish), three stars for every adventure', () => {
     const g = BIG_GAMES.find((x) => x.id === 'memory')!
-    expect(g.at).toBe(80)
     expect(g.maxStars).toBe(TIMELINE.length * 3)
     expect(g.image).toBe('images/spiele-gross/memory/kachel.webp')
   })
@@ -97,7 +96,7 @@ describe('BigGameMemory', () => {
   it('opens with the story and the explanation, which comes only once', async () => {
     const w = await open()
     expect(w.text()).toContain('Bilder-Memory')
-    expect(w.text()).toContain('Hier geht es um die Bilder deiner Abenteuer. Finde die Paare, dann siehst du das ganze Bild.')
+    expect(w.text()).toContain('Finde zu jedem Abenteuer die Bilderpaare. Dann siehst du das ganze Bild.')
     expect(w.find('[data-test="memory-howcard"]').exists()).toBe(true)
     await closeHow(w)
     expect(w.find('[data-test="memory-howcard"]').exists()).toBe(false)
@@ -259,7 +258,7 @@ describe('BigGameMemory', () => {
     }
     await solve(w, 6)
     await finishBoard(w)
-    expect(w.text()).toContain('Geschafft! Alle Paare sind gefunden.')
+    expect(w.text()).toContain('Alle Paare gefunden!')
     expect(w.text()).toContain('Du hast 26 Versuche gebraucht.')
     expect(useBigGames().levels('memory')[0]).toBe(3)
     w.unmount()
@@ -333,7 +332,7 @@ describe('the texts of the Bilder-Memory', () => {
     const w = mount(BigGameMemory, { global: { plugins: [en] }, attachTo: document.body })
     await flushPromises()
     expect(w.text()).toContain('Picture Memory')
-    expect(w.text()).toContain('Find the pairs')
+    expect(w.text()).toContain('Find the picture pairs')
     w.unmount()
   })
 })

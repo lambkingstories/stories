@@ -143,7 +143,7 @@ function start(i: number) {
   goliathCard.value = false
   maybeGoliathStory()
   paused.value = how.value || goliathCard.value
-  tipShown.value = !paused.value && (i === 0 || i === EAGLE_TIP_LEVEL || i === GOLIATH_LEVEL)
+  tipShown.value = !paused.value && (i === 0 || i === EAGLE_TIP_LEVEL || i === ROCK_TIP_LEVEL || i === GOLIATH_LEVEL)
   window.setTimeout(() => (tipShown.value = false), 6500)
   tryLandscape()
 }
@@ -163,6 +163,8 @@ function closeGoliathStory() {
 }
 /** The first level with eagles gets a word about them. */
 const EAGLE_TIP_LEVEL = LEVELS.findIndex((l) => l.waves.some((w) => w.kind === 'eagle'))
+/** The first level with boulders gets a word about them (the explanation card no longer lists them). */
+const ROCK_TIP_LEVEL = LEVELS.findIndex((l) => l.boulders.length > 0)
 /** The card that explains the game: pull back and let go (in the first rounds, and from the button in the levels list). */
 const how = ref(false)
 /** A picture that is missing is not shown. */
@@ -651,7 +653,7 @@ onBeforeUnmount(() => {
           span(class="dg-level-label") {{ levelTitle(level) }}
         div(class="dg-hud-group dg-hud-stones" :aria-label="t('app.bigGames.david.stones')")
           img(v-for="n in stonesRow" :key="n" :src="pic('stein')" alt="" class="dg-ico dg-ico--stone")
-      div(v-if="tipShown" class="dg-tip") {{ level === GOLIATH_LEVEL ? t('app.bigGames.david.tipGoliath') : level === EAGLE_TIP_LEVEL ? t('app.bigGames.david.tipEagle') : t('app.bigGames.david.tip') }}
+      div(v-if="tipShown" class="dg-tip") {{ level === GOLIATH_LEVEL ? t('app.bigGames.david.tipGoliath') : level === EAGLE_TIP_LEVEL ? t('app.bigGames.david.tipEagle') : level === ROCK_TIP_LEVEL ? t('app.bigGames.david.tipRocks') : t('app.bigGames.david.tip') }}
 
       //- before Goliath (once): who he is, and the task
       div(v-if="goliathCard && !how" class="dg-menu dg-menu--dim")
@@ -683,13 +685,16 @@ onBeforeUnmount(() => {
     div(v-if="how && loaded" class="dg-menu dg-menu--dim")
       div(class="dg-card dg-how")
         h2(class="dg-title") {{ t('app.bigGames.david.howTitle') }}
-        p(class="dg-story-task dg-how-task") {{ t('app.bigGames.david.task') }}
         //- the golden arrow of the swipe cross of Elijah's game, turned to the left: pull back
-        img(:src="arrowSrc" alt="" class="dg-how-pic" @error="hideBroken")
-        p(class="dg-how-line") {{ t('app.bigGames.david.howPull') }}
-        p(class="dg-how-line") {{ t('app.bigGames.david.howFar') }}
-        p(class="dg-how-line") {{ t('app.bigGames.david.howAnimals') }}
-        p(class="dg-how-line") {{ t('app.bigGames.david.howRocks') }}
+        div(class="dg-how-row")
+          img(:src="arrowSrc" alt="" class="dg-how-pic" @error="hideBroken")
+          p(class="dg-how-line") {{ t('app.bigGames.david.howPull') }}
+        div(class="dg-how-row")
+          img(:src="pic('stein')" alt="" class="dg-how-img" @error="hideBroken")
+          p(class="dg-how-line") {{ t('app.bigGames.david.howFar') }}
+        div(class="dg-how-row")
+          img(:src="pic('schaf')" alt="" class="dg-how-img" @error="hideBroken")
+          p(class="dg-how-line") {{ t('app.bigGames.david.howAnimals') }}
         AdvButton(data-test="david-go" @click="closeHow") {{ t('app.bigGames.david.go') }}
 
     //- upright: the note to turn the phone
@@ -804,7 +809,7 @@ onBeforeUnmount(() => {
 
 .dg-story-text
   margin: 0
-  font-size: 0.92rem
+  font-size: 1rem
   line-height: 1.35
   color: #3a2c12
 
@@ -818,7 +823,7 @@ onBeforeUnmount(() => {
   margin: 2px 0 0
   padding-top: 6px
   border-top: 1px dashed #d9a93a
-  font-size: 0.92rem
+  font-size: 1rem
   font-weight: 800
   line-height: 1.3
   color: #2a2418
@@ -933,20 +938,33 @@ onBeforeUnmount(() => {
   gap: 10px
 
 .dg-how
-  gap: 8px
+  gap: 20px
+
+.dg-how-row
+  display: flex
+  align-items: center
+  gap: 16px
+  width: 100%
 
 .dg-how-pic
   display: block
-  width: 64px
+  flex: none
+  width: 56px
   height: auto
-  margin: 0 auto
   transform: rotate(-90deg)
+
+.dg-how-img
+  flex: none
+  width: 56px
+  height: 56px
+  object-fit: contain
 
 .dg-how-line
   margin: 0
   text-align: left
-  font-size: 0.95rem
-  line-height: 1.35
+  font-size: 1.2rem
+  font-weight: 700
+  line-height: 1.3
 
 .dg-tip
   position: absolute
@@ -987,4 +1005,21 @@ onBeforeUnmount(() => {
     transform: rotate(0)
   60%, 100%
     transform: rotate(90deg)
+
+// short screens: the explanation card closer together
+@media (max-height: 520px)
+  .dg-how
+    gap: 8px
+  .dg-how-row
+    gap: 12px
+  .dg-how-pic
+    width: 40px
+    font-size: 1.5rem
+    height: 40px
+  .dg-how-img
+    width: 40px
+    font-size: 1.5rem
+    height: 40px
+  .dg-how-line
+    font-size: 1.05rem
 </style>

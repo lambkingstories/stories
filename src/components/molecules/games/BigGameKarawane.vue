@@ -1290,6 +1290,9 @@ onBeforeUnmount(() => {
       div(class="kg-card")
         h1(class="kg-title") {{ t('app.bigGames.karawane.title') }}
         p(class="kg-text kg-intro") {{ t('app.bigGames.karawane.story') }}
+        p(class="kg-task kg-task--menu")
+          b {{ t('app.bigGames.karawane.taskLabel') }}:
+          |  {{ t('app.bigGames.karawane.task') }}
         div(class="kg-purse")
           img(:src="coinIcon" alt="" class="kg-coin" @error="hideBroken")
           span(class="kg-purse-n") {{ save.coins }}
@@ -1477,17 +1480,15 @@ onBeforeUnmount(() => {
     div(v-if="how && loaded" class="kg-menu kg-menu--dim")
       div(class="kg-card kg-how")
         h2(class="kg-title") {{ t('app.bigGames.karawane.howTitle') }}
-        div(class="kg-how-arrows")
-          img(:src="arrowLeft" alt="" class="kg-how-arrow" @error="hideBroken")
+        div(class="kg-how-row")
           img(:src="arrowLeft" alt="" class="kg-how-arrow kg-how-arrow--gas" @error="hideBroken")
-        p(class="kg-how-line") {{ t('app.bigGames.karawane.howGas') }}
-        p(class="kg-how-line") {{ t('app.bigGames.karawane.howBrake') }}
-        p(class="kg-how-line") {{ t('app.bigGames.karawane.howAir') }}
-        p(class="kg-how-line") {{ t('app.bigGames.karawane.howStop') }}
-        p(class="kg-how-line") {{ t('app.bigGames.karawane.howSlow') }}
-        p(class="kg-how-line") {{ t('app.bigGames.karawane.howSun') }}
-        p(class="kg-how-line") {{ t('app.bigGames.karawane.howWater') }}
-        p(class="kg-how-line") {{ t('app.bigGames.karawane.howCoins') }}
+          p(class="kg-how-line") {{ t('app.bigGames.karawane.howGas') }}
+        div(class="kg-how-row")
+          img(:src="arrowLeft" alt="" class="kg-how-arrow" @error="hideBroken")
+          p(class="kg-how-line") {{ t('app.bigGames.karawane.howBrake') }}
+        div(class="kg-how-row")
+          img(:src="coinIcon" alt="" class="kg-how-arrow" @error="hideBroken")
+          p(class="kg-how-line") {{ t('app.bigGames.karawane.howWater') }}
         AdvButton(data-test="karawane-go" @click="closeHow") {{ t('app.bigGames.karawane.go') }}
 
     //- upright: the note to turn the phone
@@ -1568,6 +1569,7 @@ onBeforeUnmount(() => {
 
 .kg-text
   margin: 0
+  font-size: 1.15rem
   line-height: 1.4
 
 .kg-rules
@@ -1964,16 +1966,20 @@ onBeforeUnmount(() => {
   object-fit: contain
 
 .kg-how
-  gap: 8px
+  gap: 20px
   width: min(520px, 100%)
 
-.kg-how-arrows
+.kg-how-row
   display: flex
-  gap: 40px
+  align-items: center
+  gap: 16px
+  width: 100%
 
 .kg-how-arrow
-  width: 54px
-  height: auto
+  width: 56px
+  height: 56px
+  flex: none
+  object-fit: contain
 
   &--gas
     transform: scaleX(-1)
@@ -1981,8 +1987,9 @@ onBeforeUnmount(() => {
 .kg-how-line
   margin: 0
   text-align: left
-  font-size: 0.95rem
-  line-height: 1.35
+  font-size: 1.2rem
+  font-weight: 700
+  line-height: 1.3
 
 .kg-rotate
   position: absolute
@@ -2030,9 +2037,13 @@ onBeforeUnmount(() => {
     min-height: 40px
 
   .kg-intro
-    font-size: 0.72rem
+    font-size: 0.95rem
     line-height: 1.25
     max-width: 760px
+
+  .kg-task--menu
+    padding: 4px 12px
+    font-size: 0.95rem
 
   .kg-routes
     grid-template-columns: repeat(6, minmax(0, 1fr))
@@ -2125,6 +2136,7 @@ onBeforeUnmount(() => {
   padding: 8px 12px
   border-radius: 14px
   background: rgba(224, 160, 48, 0.2)
+  font-size: 1.15rem
   line-height: 1.35
 
 .kg-shop-head
@@ -2310,4 +2322,17 @@ onBeforeUnmount(() => {
   font-size: 0.7rem
   font-weight: 800
   color: #9a6310
+
+// short screens: the explanation card closer together
+@media (max-height: 520px)
+  .kg-how
+    gap: 8px
+  .kg-how-row
+    gap: 12px
+  .kg-how-arrow
+    width: 40px
+    font-size: 1.5rem
+    height: 40px
+  .kg-how-line
+    font-size: 1.05rem
 </style>

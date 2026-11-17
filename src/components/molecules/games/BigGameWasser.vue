@@ -1336,7 +1336,6 @@ onBeforeUnmount(() => {
     div(v-if="how && loaded" class="wg-menu wg-menu--dim")
       div(class="wg-card wg-how")
         h2(class="wg-title") {{ t('app.bigGames.wasser.howTitle') }}
-        p(class="wg-story-text") {{ t('app.bigGames.wasser.intro') }}
         div(class="wg-how-row")
           span(class="wg-how-sign") 👆
           p(class="wg-how-line") {{ t('app.bigGames.wasser.howDig') }}
@@ -1346,9 +1345,6 @@ onBeforeUnmount(() => {
         div(class="wg-how-row")
           img(:src="pic('blume-1-bluehend')" alt="" class="wg-how-pic" @error="hideBroken")
           p(class="wg-how-line") {{ t('app.bigGames.wasser.howFlowers') }}
-        div(class="wg-how-row")
-          span(class="wg-how-sign") ★
-          p(class="wg-how-line") {{ t('app.bigGames.wasser.howStars') }}
         AdvButton(data-test="wasser-go" @click="closeHow") {{ t('app.bigGames.wasser.go') }}
 </template>
 
@@ -1425,6 +1421,7 @@ onBeforeUnmount(() => {
 
 .wg-text
   margin: 0
+  font-size: 1.15rem
   line-height: 1.4
 
 .wg-rules
@@ -1661,31 +1658,33 @@ onBeforeUnmount(() => {
     font-weight: 700
 
 .wg-how
-  gap: 10px
+  gap: 20px
 
 .wg-how-row
   display: flex
   align-items: center
-  gap: 12px
+  gap: 16px
   width: 100%
 
 .wg-how-pic
-  width: 44px
-  height: 44px
+  width: 56px
+  height: 56px
   object-fit: contain
   flex: none
 
 .wg-how-sign
-  width: 44px
+  width: 56px
   flex: none
-  font-size: 1.7rem
+  font-size: 2.2rem
+  text-align: center
   color: #f0a812
 
 .wg-how-line
   margin: 0
   text-align: left
-  font-size: 0.95rem
-  line-height: 1.35
+  font-size: 1.2rem
+  font-weight: 700
+  line-height: 1.3
 .wg-banner
   cursor: pointer
 
@@ -1707,12 +1706,12 @@ onBeforeUnmount(() => {
 .wg-story-text
   margin: 0
   line-height: 1.45
-  font-size: 1rem
+  font-size: 1.15rem
 
 .wg-story-task
   margin: 0
   line-height: 1.45
-  font-size: 1rem
+  font-size: 1.15rem
   padding: 8px 12px
   border-radius: 14px
   background: var(--lk-surface-2, #f6efdc)
@@ -1726,4 +1725,20 @@ onBeforeUnmount(() => {
     flex-direction: column
   .wg-hud
     padding-top: 6px
+
+// short screens: the explanation card closer together
+@media (max-height: 520px)
+  .wg-how
+    gap: 8px
+  .wg-how-row
+    gap: 12px
+  .wg-how-pic
+    width: 40px
+    font-size: 1.5rem
+    height: 40px
+  .wg-how-sign
+    width: 40px
+    font-size: 1.5rem
+  .wg-how-line
+    font-size: 1.05rem
 </style>

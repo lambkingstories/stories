@@ -52,7 +52,7 @@ describe('BigGameNehemia', () => {
   it('opens with the story, six chapters and sixty levels', async () => {
     const w = await open()
     expect(w.text()).toContain('Nehemias Mauer')
-    expect(w.text()).toContain('Hier geht es um Nehemia')
+    expect(w.text()).toContain('Nehemia ruft')
     expect(w.text()).toContain('Deine Aufgabe')
     expect(w.findAll('.nm-chapter')).toHaveLength(6)
     expect(w.findAll('.nm-level')).toHaveLength(60)
