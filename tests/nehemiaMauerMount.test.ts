@@ -67,7 +67,7 @@ describe('BigGameNehemia', () => {
     expect(w.find('.nm-how').exists()).toBe(false)
     expect(w.text()).toContain('Das Schaftor')
     await w.find('[data-test="nehemia-chapter-go"]').trigger('click')
-    expect(w.find('[data-test="nehemia-undo"]').exists()).toBe(true)
+    expect(w.find('[data-test="nehemia-rotate"]').exists()).toBe(true)
     expect(w.find('[data-test="nehemia-drop"]').exists()).toBe(true)
     // back to the overview and into the level again: neither card comes a second time
     await w.find('[data-test="nehemia-pause"]').trigger('click')

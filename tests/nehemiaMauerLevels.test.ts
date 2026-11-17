@@ -1,39 +1,42 @@
 /**
- * "Nehemias Mauer": the 60 levels. Every level can be solved: the generator cuts the template into stones, and the test plays the solution
- * with the real rules (turn, move, drop) and checks that the template is full.
+ * "Nehemias Mauer": the 60 levels. Every level can be won: a test wall of unit stones (with a long beam over every gate) is put up on the foundation
+ * and the physics has to hold it and touch every flag.
  */
 import { describe, expect, it } from 'vitest'
-import { analyze, checkMap, discard, hardDrop, move, rotate, starsOf, ORIENTS, type Game } from '../src/utils/nehemiaMauerGame'
-import { CHAPTER_COUNT, LEVELS, LEVELS_PER_CHAPTER, buildMap, levelGame, levelProblems, levelStones } from '../src/utils/nehemiaMauerLevels'
+import { dropHand, marksHit, moveHand, rotateHand, starsOf, tick, type Game } from '../src/utils/nehemiaMauerGame'
+import { CHAPTER_COUNT, LEVELS, LEVELS_PER_CHAPTER, levelGame, type LevelDef } from '../src/utils/nehemiaMauerLevels'
+import { makeBody } from '../src/utils/nehemiaMauerPhysics'
 
-function playSolution(i: number): Game {
-  const g = levelGame(i)
-  const sol = levelStones(i).solution
-  let k = 0
-  let guard = 0
-  while (g.status === 'play' && g.cur && guard++ < 500) {
-    if (g.cur.decoy) {
-      expect(discard(g)).toBe(true)
-      continue
-    }
-    const p = sol[k++]!
-    expect(g.cur.shape).toBe(p.shape)
-    if (p.rot === 3) rotate(g, -1)
-    else for (let r = 0; r < p.rot; r++) rotate(g, 1)
-    expect(g.cur.rot).toBe(p.rot)
-    let n = 0
-    while (g.cur.x < p.x && n++ < 40) expect(move(g, 1)).toBe(true)
-    while (g.cur.x > p.x && n++ < 40) expect(move(g, -1)).toBe(true)
-    expect(g.cur.x).toBe(p.x)
-    const before = g.placed.length
-    expect(hardDrop(g)).toBe(true)
-    expect(g.placed).toHaveLength(before + 1)
-    const last = g.placed[g.placed.length - 1]!
-    expect([last.shape, last.rot, last.x, last.y]).toEqual([p.shape, p.rot, p.x, p.y])
-    // the rest of the wall must stay buildable after every stone of the solution
-    expect(g.stuck).toBe(false)
+/** Puts up a full wall for the level: unit stones in every cell, a beam over every gate. */
+function testWall(g: Game, L: LevelDef) {
+  const add = (x: number, y: number, hw: number, hh: number) => {
+    const b = g.world.add(makeBody(g.world.newId(), x, y, hw, hh, 1, 0.9))
+    b.touched = true
+    g.stones.push(b)
   }
-  return g
+  // one beam over each group of gates (gates that share a pillar share a beam): from one column left of the first gate to one column right of the last
+  const groups: { from: number; to: number; gh: number; top: number }[] = []
+  for (const [gx, gw, gh] of L.gates) {
+    const top = Math.min(L.heights[gx]!, L.heights[gx + gw - 1]!)
+    const last = groups[groups.length - 1]
+    if (last && gx - 1 <= last.to) {
+      last.to = gx + gw
+      last.top = Math.min(last.top, top)
+    } else groups.push({ from: gx - 1, to: gx + gw, gh, top })
+  }
+  const inBeam = (c: number, row: number) => groups.some((g0) => c >= g0.from && c <= g0.to && row >= g0.gh && row < g0.top)
+  for (const g0 of groups) {
+    const w = g0.to - g0.from + 1
+    add(L.x0 + g0.from + w / 2, (g0.gh + g0.top) / 2, w / 2, (g0.top - g0.gh) / 2)
+  }
+  for (let c = 0; c < L.heights.length; c++) {
+    const gate = L.gates.find(([gx, gw]) => c >= gx && c < gx + gw)
+    for (let row = 0; row < L.heights[c]!; row++) {
+      if (gate && row < gate[2]) continue
+      if (inBeam(c, row)) continue
+      add(L.x0 + c + 0.5, row + 0.5, 0.5, 0.5)
+    }
+  }
 }
 
 describe('the level table', () => {
@@ -43,70 +46,67 @@ describe('the level table', () => {
     for (let c = 0; c < 6; c++) expect(LEVELS.filter((l) => l.chapter === c)).toHaveLength(10)
   })
 
-  it('has good maps: every column is one run, the fields are not wider than twelve columns', () => {
-    expect(levelProblems()).toEqual([])
+  it('has flags above the foundation and inside the world; gates are two wide and have a pillar at both sides', () => {
     for (const l of LEVELS) {
-      expect(checkMap(l.map)).toEqual([])
-      expect(l.map[0]!.length).toBeLessThanOrEqual(12)
-      expect(l.map.length).toBeLessThanOrEqual(12)
+      expect(l.marks.length).toBeGreaterThan(0)
+      for (const m of l.marks) {
+        expect(m.x).toBeGreaterThan((l.width - l.base) / 2)
+        expect(m.x).toBeLessThan((l.width + l.base) / 2)
+        expect(m.y).toBeGreaterThan(0)
+        expect(m.y).toBeLessThanOrEqual(11)
+      }
+      expect(l.width).toBeLessThanOrEqual(14)
+      for (const [gx, gw] of l.gates) {
+        expect(gw).toBeLessThanOrEqual(2)
+        expect(gx).toBeGreaterThanOrEqual(1)
+        expect(gx + gw).toBeLessThanOrEqual(l.heights.length - 1)
+      }
     }
   })
 
-  it('builds a skyline with a gate', () => {
-    expect(buildMap('3333')).toEqual(['.####.', '.####.', '.####.'])
-    expect(buildMap('353', [[1, 1, 2]])).toEqual(['...#...', '...#...', '..###..', '..#.#..', '..#.#..'])
+  it('gets harder: higher and wider walls, more weather', () => {
+    const area = (c: number) => {
+      const ls = LEVELS.filter((l) => l.chapter === c)
+      return ls.reduce((n, l) => n + l.heights.reduce((a, b) => a + b, 0), 0) / ls.length
+    }
+    expect(area(0)).toBeLessThan(area(2))
+    expect(area(2)).toBeLessThan(area(5))
+    expect(LEVELS[0]!.wind + Number(LEVELS[0]!.rain) + Number(LEVELS[0]!.quake)).toBe(0)
+    expect(LEVELS.filter((l) => l.chapter === 1).every((l) => l.wind > 0)).toBe(true)
+    expect(LEVELS.filter((l) => l.chapter === 2).every((l) => l.rain)).toBe(true)
+    expect(LEVELS.filter((l) => l.chapter === 3).every((l) => l.quake)).toBe(true)
+    expect(LEVELS.filter((l) => l.chapter === 5).every((l) => l.night && l.quake && l.rain && l.wind > 0)).toBe(true)
   })
 
-  it('gets harder: more stones from chapter to chapter, and the stones of the first chapters are few', () => {
-    const count = (c: number) => LEVELS.map((l, i) => ({ l, i })).filter((x) => x.l.chapter === c).map((x) => levelStones(x.i).solution.length)
-    const avg = (a: number[]) => a.reduce((n, v) => n + v, 0) / a.length
-    expect(avg(count(0))).toBeLessThan(avg(count(2)))
-    expect(avg(count(2))).toBeLessThan(avg(count(5)))
-    expect(Math.max(...count(0))).toBeLessThanOrEqual(8)
-    expect(Math.max(...count(5))).toBeGreaterThanOrEqual(20)
-  })
-
-  it('brings the new things one level at a time', () => {
+  it('brings new things one level at a time', () => {
     const intro = LEVELS.filter((l) => l.intro).map((l) => l.intro)
     expect(new Set(intro).size).toBe(intro.length)
-    expect(LEVELS[0]!.decoys).toBe(0)
-    expect(LEVELS.find((l) => l.decoys > 0)!.intro).toBe('rubble')
   })
 })
 
-describe('every level can be solved', () => {
-  LEVELS.forEach((l, i) => {
-    it(`level ${i + 1} (chapter ${l.chapter + 1}.${l.index + 1})`, () => {
-      const info = levelStones(i)
-      // the stones are exactly the cells of the template
-      const cells = l.map.join('').split('#').length - 1
-      const sum = info.solution.reduce((n, p) => n + ORIENTS[p.shape][0]!.cells.length, 0)
-      expect(sum).toBe(cells)
-      for (const m of l.must) expect(info.solution.some((p) => p.shape === m)).toBe(true)
-      expect(info.queue.filter((q) => q.decoy)).toHaveLength(l.decoys)
-      // it plays through with the real rules
-      const g = playSolution(i)
+describe('every level can be built', () => {
+  LEVELS.forEach((L, i) => {
+    it(`level ${i + 1} (chapter ${L.chapter + 1}.${L.index + 1})`, () => {
+      const g = levelGame(i)
+      testWall(g, L)
+      for (let k = 0; k < 6 * 60; k++) tick(g, 1 / 60)
+      expect(marksHit(g)).toBe(g.marks.length)
       expect(g.status).toBe('won')
-      expect(g.slotsLeft).toBe(0)
-      expect(g.patched).toBe(0)
-      expect(starsOf(g)).toBe(3)
+      expect(g.lost).toBe(0)
     })
   })
 })
 
-describe('the generator is deterministic', () => {
-  it('gives the same stones for the same level', () => {
-    const a = levelStones(33)
-    const b = levelGame(33)
-    expect(b.queue.length + 1).toBe(a.queue.length)
-    expect(JSON.stringify(a.solution)).toBe(JSON.stringify(levelStones(33).solution))
-  })
-
-  it('a fresh game is not stuck', () => {
-    for (let i = 0; i < LEVELS.length; i += 7) {
-      const g = levelGame(i)
-      analyze(g)
-      expect(g.stuck).toBe(false)
+describe('playing', () => {
+  it('a child that just drops stones in the middle of the first level gets to the flag', () => {
+    const g = levelGame(0)
+    for (let k = 0; k < 14 && g.status === 'play'; k++) {
+      moveHand(g, g.def.width / 2)
+      if (g.hand && g.hand.type >= 1 && g.hand.type <= 3) rotateHand(g)
+      dropHand(g)
+      for (let t = 0; t < 4 * 60; t++) tick(g, 1 / 60)
     }
+    expect(g.status).toBe('won')
+    expect(starsOf(g)).toBeGreaterThanOrEqual(1)
   })
 })
