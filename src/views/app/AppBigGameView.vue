@@ -11,6 +11,7 @@ import useAdventure from '@/use/useAdventure'
 import { totalStars } from '@/utils/bigGames'
 import BigGameDavid from '@/components/molecules/games/BigGameDavid.vue'
 import BigGameElia from '@/components/molecules/games/BigGameElia.vue'
+import BigGameGideon from '@/components/molecules/games/BigGameGideon.vue'
 import BigGameKarawane from '@/components/molecules/games/BigGameKarawane.vue'
 import BigGameMemory from '@/components/molecules/games/BigGameMemory.vue'
 import BigGameWasser from '@/components/molecules/games/BigGameWasser.vue'
@@ -32,6 +33,7 @@ function leave() {
 <template lang="pug">
   BigGameDavid(v-if="game?.id === 'david' && open" @leave="leave")
   BigGameElia(v-else-if="game?.id === 'elia' && open" @leave="leave")
+  BigGameGideon(v-else-if="game?.id === 'gideon' && open" @leave="leave")
   BigGameWasser(v-else-if="game?.id === 'wasser' && open" @leave="leave")
   BigGameKarawane(v-else-if="game?.id === 'karawane' && open" @leave="leave")
   BigGameNehemia(v-else-if="game?.id === 'nehemia' && open" @leave="leave")

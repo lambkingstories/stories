@@ -2,6 +2,7 @@
  * The texts of the newer big games, one file per game, so that several games can be built side by side without touching the big text files.
  * They are merged into `app.bigGames.<id>` in `app.ts` (german, english) and `app.es.ts` (spanish).
  */
+import gideon from './gideon'
 import karawane from './karawane'
 import memory from './memory'
 import nehemia from './nehemia'
@@ -9,9 +10,9 @@ import wasser from './wasser'
 import wortreise from './wortreise'
 
 export const BIG_GAME_TEXTS = {
-  de: { wasser: wasser.de, karawane: karawane.de, nehemia: nehemia.de, wortreise: wortreise.de, memory: memory.de },
-  en: { wasser: wasser.en, karawane: karawane.en, nehemia: nehemia.en, wortreise: wortreise.en, memory: memory.en },
-  es: { wasser: wasser.es, karawane: karawane.es, nehemia: nehemia.es, wortreise: wortreise.es, memory: memory.es }
+  de: { gideon: gideon.de, wasser: wasser.de, karawane: karawane.de, nehemia: nehemia.de, wortreise: wortreise.de, memory: memory.de },
+  en: { gideon: gideon.en, wasser: wasser.en, karawane: karawane.en, nehemia: nehemia.en, wortreise: wortreise.en, memory: memory.en },
+  es: { gideon: gideon.es, wasser: wasser.es, karawane: karawane.es, nehemia: nehemia.es, wortreise: wortreise.es, memory: memory.es }
 } as Record<'de' | 'en' | 'es', Record<string, Record<string, unknown>>>
 
 /**
