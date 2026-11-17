@@ -11,6 +11,7 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import LkPageHead from '@/components/molecules/LkPageHead.vue'
+import PlusBadge from '@/components/atoms/PlusBadge.vue'
 import { prependBaseUrl } from '@/utils/function'
 
 const { t } = useI18n({ useScope: 'global' })
@@ -119,7 +120,7 @@ const openOf = (a: Area) => a.features.find((f) => idOf(a, f) === openKey.value)
           li
             span(class="feat-tag is-free") {{ t('app.features.tagFree') }}
           li
-            span(class="feat-tag is-plus") {{ t('app.features.tagPlus') }}
+            PlusBadge(size="small")
 
       nav(class="feat-jump" :aria-label="t('app.features.jump')")
         button(v-for="a in AREAS" :key="a.n" type="button" class="feat-jump-btn" @click="jump(a.n)")
@@ -143,7 +144,8 @@ const openOf = (a: Area) => a.features.find((f) => idOf(a, f) === openKey.value)
             @click="toggle(idOf(a, f))"
           )
             span(class="feat-chip-title") {{ t(`app.features.s${a.n}${f.key}Title`) }}
-            span(:class="['feat-tag', `is-${f.tag}`]") {{ t(`app.features.${tagKey(f.tag)}`) }}
+            PlusBadge(v-if="f.tag === 'plus'" size="small")
+            span(v-else :class="['feat-tag', `is-${f.tag}`]") {{ t(`app.features.${tagKey(f.tag)}`) }}
 
         //- what is open: shown under the tiles of its area
         div(v-if="openOf(a)" class="feat-detail" role="region")

@@ -15,6 +15,7 @@ import AdventureOverview, { type OverviewRow } from '@/components/molecules/Adve
 import AdventureCardReveal from '@/components/molecules/AdventureCardReveal.vue'
 import AdventureRewards from '@/components/molecules/AdventureRewards.vue'
 import NewAwards from '@/components/molecules/NewAwards.vue'
+import PlusBadge from '@/components/atoms/PlusBadge.vue'
 import ExamPoints from '@/components/molecules/ExamPoints.vue'
 import AdventureQuiz from '@/components/molecules/AdventureQuiz.vue'
 const GameBuild = defineAsyncComponent(() => import('@/components/molecules/games/GameBuild.vue'))
@@ -1333,7 +1334,7 @@ function toFinale() {
             span(class="next-adv-text")
               span(class="next-adv-kicker") {{ t('app.bigGames.result.nextHead') }}
               span(class="next-adv-title") {{ nextJourney.title }}
-              span(v-if="nextLocked" class="next-adv-plus") {{ t('app.bigGames.result.nextPlus') }}
+              PlusBadge(v-if="nextLocked" size="small" class="next-adv-plus")
               span(v-else class="next-adv-go") {{ t('app.bigGames.result.nextButton') }}
           div(class="stage-actions")
             AdvButton(tone="gold" data-test="to-finale" @click="toFinale") {{ t('app.adventure.toOverview') }}
@@ -1952,12 +1953,7 @@ $ink: var(--lk-text)
 
 .next-adv-plus
   align-self: flex-start
-  padding: 2px 10px
-  border-radius: 999px
-  background: #f3d27a
-  color: #4a3608
-  font-size: 0.82rem
-  font-weight: 800
+  margin-top: 2px
 
 .stage-actions-row
   display: flex

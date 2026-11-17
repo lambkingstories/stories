@@ -2,8 +2,10 @@
 /**
  * The sign on a book that says what the person has of it: Gratis (free), Gekauft (bought), Mit Plus (opened by the subscription),
  * or a plain "Zu kaufen" plate (still to buy). One look at a shelf shows which books are theirs.
+ * "With Plus" is shown as the golden Plus sign (crown and "Plus", the same everywhere in the app; Anton, 18.11.2026).
  */
 import { useI18n } from 'vue-i18n'
+import PlusBadge from '@/components/atoms/PlusBadge.vue'
 import type { Ownership } from '@/utils/bookOwnership'
 
 defineProps<{ state: Ownership }>()
@@ -11,7 +13,8 @@ const { t } = useI18n({ useScope: 'global' })
 </script>
 
 <template lang="pug">
-  span(:class="['own-badge', 'is-' + state]")
+  PlusBadge(v-if="state === 'plus'" size="small" :title="t('app.read.own_plus')")
+  span(v-else :class="['own-badge', 'is-' + state]")
     span(v-if="state !== 'locked'" class="own-check" aria-hidden="true") ✓
     span {{ t('app.read.own_' + state) }}
 </template>
