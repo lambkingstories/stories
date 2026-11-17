@@ -56,7 +56,8 @@ const groups = computed(() => {
   return EPOCHS.map((e) => ({ id: e.id, title: en ? e.en : e.de, sub: en ? e.subEn : e.subDe, boards: boards.value.filter((b) => TIMELINE[b.index]?.epoch === e.id) })).filter((g) => g.boards.length > 0)
 })
 const pic = (p: string) => prependBaseUrl(p)
-const BACK = pic('images/abenteuer/ui/karte-rueckseite.webp')
+/** The back of the cards: the lamb card of the app in a light, friendly cream (made from the dark one, see `rueckseite_bauen.py`). */
+const BACK = pic('images/spiele-gross/memory/rueckseite.webp')
 const mini = (b: Board) => pic(`images/spiele-gross/memory/mini-${b.id}.webp`)
 
 // ── memory of the device (the end of the game was celebrated) ───────────────────────────────────────────────────────────────
@@ -83,6 +84,7 @@ const board = ref<Board | null>(null)
 const game = ref<Game | null>(null)
 const caption = reactive({ kind: 'quiet' as 'quiet' | 'first' | 'miss' | 'found' | 'tip', text: '', ref: '' })
 const hinted = ref<number | null>(null)
+/** The pair that was found last (its two cards glow once). */
 const justFound = ref<number | null>(null)
 const missing = reactive(new Set<string>())
 let settleTimer = 0
@@ -143,7 +145,7 @@ function onCard(id: number) {
   }
   if (r === 'match') {
     const s = stageOfCard(id)
-    justFound.value = id
+    justFound.value = g.cards.find((x) => x.id === id)?.pair ?? null
     caption.kind = 'found'
     caption.text = s ? t('app.bigGames.memory.stageLine', { n: s.id, title: s.title }) : ''
     caption.ref = s?.ref ?? ''
@@ -445,7 +447,7 @@ const STAND = ['#c98a52', '#6f9fc2', '#7fb069', '#e0c25a', '#b58ac4', '#7fc4b8',
             :key="dealKey + '-' + c.id"
             type="button"
             class="mm-card"
-            :class="{ 'is-up': isUp(game, c.id), 'is-found': game.found.includes(c.pair), 'is-hint': hinted === c.id, 'is-just': justFound === c.id }"
+            :class="{ 'is-up': isUp(game, c.id), 'is-found': game.found.includes(c.pair), 'is-hint': hinted === c.id }"
             :style="{ '--i': i }"
             :data-test="'memory-card-' + c.id"
             :data-pair="c.pair"
@@ -456,7 +458,7 @@ const STAND = ['#c98a52', '#6f9fc2', '#7fb069', '#e0c25a', '#b58ac4', '#7fc4b8',
             span(class="mm-flip")
               span(class="mm-face mm-back")
                 img(:src="BACK" alt="" draggable="false" @error="hideBroken")
-              span(class="mm-face mm-front" :style="{ background: STAND[c.pair % STAND.length] }")
+              span(:class="['mm-face', 'mm-front', { 'is-just': justFound === c.pair }]" :style="{ background: STAND[c.pair % STAND.length] }")
                 img(:src="frontOf(c.pair)" alt="" draggable="false" @error="hideBroken")
       p(:class="['mm-caption', 'is-' + caption.kind]" role="status" data-test="memory-caption")
         span(class="mm-caption-text") {{ captionText }}
@@ -640,7 +642,7 @@ const STAND = ['#c98a52', '#6f9fc2', '#7fb069', '#e0c25a', '#b58ac4', '#7fc4b8',
   aspect-ratio: 2 / 3
   border-radius: 9px
   overflow: hidden
-  background: #16204c
+  background: #f3e7c8
   box-shadow: 0 4px 10px rgba(40, 28, 8, 0.35)
   transition: transform 160ms ease
 
@@ -811,7 +813,7 @@ const STAND = ['#c98a52', '#6f9fc2', '#7fb069', '#e0c25a', '#b58ac4', '#7fc4b8',
     pointer-events: none
 
 .mm-back
-  background: #16204c
+  background: #f3e7c8
 
 .mm-front
   transform: rotateY(180deg)
@@ -827,8 +829,9 @@ const STAND = ['#c98a52', '#6f9fc2', '#7fb069', '#e0c25a', '#b58ac4', '#7fc4b8',
 .mm-card.is-found .mm-front
   box-shadow: 0 0 0 3px #f5c84a, 0 0 16px rgba(245, 200, 74, 0.75)
 
-.mm-card.is-just
-  animation: mm-pop 560ms ease both
+// the glow of a pair that was just found runs on the picture only; the card itself never changes its animation (a card that changed it would fly in again and flicker)
+.mm-front.is-just
+  animation: mm-pop 700ms ease-out both
 
 .mm-card.is-hint .mm-face
   animation: mm-hint 900ms ease-in-out infinite
@@ -1090,11 +1093,11 @@ const STAND = ['#c98a52', '#6f9fc2', '#7fb069', '#e0c25a', '#b58ac4', '#7fc4b8',
 
 @keyframes mm-pop
   0%
-    transform: scale(1)
-  40%
-    transform: scale(1.08)
+    box-shadow: 0 0 0 3px #f5c84a, 0 0 16px rgba(245, 200, 74, 0.75)
+  35%
+    box-shadow: 0 0 0 5px #fff1b8, 0 0 38px rgba(255, 232, 150, 1)
   100%
-    transform: scale(1)
+    box-shadow: 0 0 0 3px #f5c84a, 0 0 16px rgba(245, 200, 74, 0.75)
 
 @keyframes mm-hint
   0%, 100%
@@ -1115,7 +1118,7 @@ const STAND = ['#c98a52', '#6f9fc2', '#7fb069', '#e0c25a', '#b58ac4', '#7fc4b8',
     transition-duration: 160ms
   .mm-card
     animation: none
-  .mm-card.is-just
+  .mm-front.is-just
     animation: none
   .mm-piece
     transition-duration: 200ms

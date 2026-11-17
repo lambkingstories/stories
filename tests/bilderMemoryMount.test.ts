@@ -161,6 +161,54 @@ describe('BigGameMemory', () => {
     w.unmount()
   })
 
+  it('cards that are already open do not change at all when a new pair is found (no flicker)', async () => {
+    const w = await open()
+    await closeHow(w)
+    await w.find('[data-test="memory-board-adam-eva"]').trigger('click')
+    const first = pairOf(w, 0)
+    await first[0]!.trigger('click')
+    await first[1]!.trigger('click')
+    const nodes = first.map((c) => c.element)
+    // (only the one-time glow class on the picture may go; its animation ends exactly at the look the card keeps)
+    const calm = (h: string) => h.replace(' is-just', '')
+    const before = first.map((c) => [c.attributes('class'), c.attributes('style'), calm(c.html())])
+    // the glow of the pair that was just found lives on the picture of its cards, not on the card
+    expect(w.findAll('.mm-front.is-just')).toHaveLength(2)
+    expect(first.every((c) => !c.classes().includes('is-just'))).toBe(true)
+    const second = pairOf(w, 1)
+    await second[0]!.trigger('click')
+    await second[1]!.trigger('click')
+    // the same elements, the same classes and styles (so no animation or transition starts again), the same markup
+    const again = pairOf(w, 0)
+    expect(again.map((c) => c.element)).toEqual(nodes)
+    again.forEach((c, i) => {
+      expect(c.element).toBe(nodes[i])
+      expect(c.attributes('class')).toBe(before[i]![0])
+      expect(c.attributes('style')).toBe(before[i]![1])
+      expect(calm(c.html())).toBe(before[i]![2])
+    })
+    // only the new pair glows now
+    const lit = w.findAll('.mm-front.is-just')
+    expect(lit).toHaveLength(2)
+    expect(lit.every((f) => second.some((c) => c.element.contains(f.element)))).toBe(true)
+    // a miss in between does not touch them either
+    const x = pairOf(w, 2)[0]!
+    const y = pairOf(w, 3)[0]!
+    await x.trigger('click')
+    await y.trigger('click')
+    await vi.advanceTimersByTimeAsync(1300)
+    expect(pairOf(w, 0).map((c) => calm(c.html()))).toEqual(before.map((b) => b[2]))
+    w.unmount()
+  })
+
+  it('the cards have a light back', async () => {
+    const w = await open()
+    await closeHow(w)
+    await w.find('[data-test="memory-board-adam-eva"]').trigger('click')
+    expect(w.find('.mm-back img').attributes('src')).toContain('images/spiele-gross/memory/rueckseite.webp')
+    w.unmount()
+  })
+
   it('the hint shows a card the child already knows, and says so when there is none', async () => {
     const w = await open()
     await closeHow(w)
