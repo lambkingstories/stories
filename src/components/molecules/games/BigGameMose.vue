@@ -813,6 +813,8 @@ function drawFigures(c: CanvasRenderingContext2D, time: number) {
     c.save()
     c.translate(fx, tg.y + 30 - hop * 0.6)
     c.rotate(sway * 0.5)
+    // the painted figure faces right with her arms out: on the right bank she turns to the basket
+    if (dir > 0) c.scale(-1, 1)
     if (!sprB(c, name, 0, 0, 104)) {
       c.fillStyle = tg.figure === 'tochter' ? '#f2ecd8' : '#c8b898'
       c.strokeStyle = '#8a7a50'
