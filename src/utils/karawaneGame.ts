@@ -442,6 +442,8 @@ const R_OF = (r: Run): RouteDef => ROUTES[r.route]!
 export interface Run {
   /** The seconds until the next hop is possible (a hop is a short push up from the ground). */
   hopCd: number
+  /** A corner of the cart is deep in the ground (a hard impact): the round ends at once. */
+  deep: boolean
   /** Whether a support touches the ground in this step. */
   touching: number
   track: Track
@@ -529,6 +531,7 @@ export function newRun(track: Track, stats: Stats, from = 0): Run {
     pendT: 0,
     pendDist: 0,
     hopCd: 0,
+    deep: false,
     touching: 0,
     taken: new Uint8Array(track.pickups.length),
     checkpoint: from,
@@ -586,6 +589,32 @@ function solve(r: Run, def: SupportDef, S: Support, rr: number): void {
   S.cy = ay - c * S.ext
 }
 
+/** The ground for a wreck: every corner of the cart is stopped by the ground (no bounce upwards), it slides on and comes to rest. */
+function wreckGround(r: Run, dt: number): void {
+  const tr = r.track
+  const c = Math.cos(r.a)
+  const s = Math.sin(r.a)
+  let worst = 0
+  const check = (px: number, py: number) => {
+    const pen = heightAt(tr, r.x + px * c - py * s) - (r.y + px * s + py * c)
+    if (pen > worst) worst = pen
+  }
+  for (const [px, py] of LOAD_POINTS) check(px, py)
+  for (const [px, py] of BELLY_POINTS) check(px, py)
+  check(HEAD_POINT[0], HEAD_POINT[1])
+  check(REAR.lx, REAR.ly - 0.6)
+  check(FRONT.lx, FRONT.ly - 0.6)
+  if (worst > 0) {
+    // pushed out of the ground slowly (never a jump), the fall is stopped, the slide rubs off
+    r.y += Math.min(worst * 0.3, 0.012)
+    if (r.vy < 0) r.vy = 0
+    r.vx *= 1 - 4 * dt
+    r.w *= 1 - 5 * dt
+  }
+  // never flung upwards
+  if (r.vy > 1) r.vy = 1
+}
+
 function physics(r: Run, dt: number, input: Input, quiet = false): void {
   const st = r.stats
   const tr = r.track
@@ -605,7 +634,9 @@ function physics(r: Run, dt: number, input: Input, quiet = false): void {
   let fy = -GRAVITY
   let torque = 0
   let touching = 0
-  for (let si = 0; si < 2; si++) {
+  // after a crash the cart is a wreck: no springs, no drive, only the ground and gravity (it falls, tips, slides and lies still)
+  const wreck = r.phase === 'crash'
+  for (let si = 0; si < 2 && !wreck; si++) {
     const def = si === 0 ? REAR : FRONT
     const S = si === 0 ? r.rear : r.front
     S.contact = S.comp > 0.002
@@ -673,7 +704,9 @@ function physics(r: Run, dt: number, input: Input, quiet = false): void {
   r.front.prev = r.front.comp
 
   // air: gas lifts the nose, brake lowers it; on the ground the cart levels itself a little with the slope
-  if (touching === 0) {
+  if (wreck) {
+    // nothing steers a wreck
+  } else if (touching === 0) {
     torque += 4.4 * (gasKey - brake) * GYRATION2 * (running ? 1 : 0)
     // a little help in the air: the nose slowly turns towards the slope where the cart will land
     if (running) {
@@ -701,19 +734,25 @@ function physics(r: Run, dt: number, input: Input, quiet = false): void {
       torque += prx * F
     }
   }
-  for (const [px, py] of BELLY_POINTS) belly(px, py, BELLY_K)
+  if (!wreck) for (const [px, py] of BELLY_POINTS) belly(px, py, BELLY_K)
   let touchLoad = false
   let touchHead = false
+  let deep = false
   for (const [px, py] of LOAD_POINTS) {
     const wx = r.x + px * c - py * s
     const wy = r.y + px * s + py * c
-    if (heightAt(tr, wx) - wy > 0.12) touchLoad = true
+    const pe = heightAt(tr, wx) - wy
+    if (pe > 0.12) touchLoad = true
+    if (pe > 0.25) deep = true
   }
   {
     const wx = r.x + HEAD_POINT[0] * c - HEAD_POINT[1] * s
     const wy = r.y + HEAD_POINT[0] * s + HEAD_POINT[1] * c
-    if (heightAt(tr, wx) - wy > 0.12) touchHead = true
+    const pe = heightAt(tr, wx) - wy
+    if (pe > 0.12) touchHead = true
+    if (pe > 0.25) deep = true
   }
+  r.deep = deep
 
   r.touching = touching
   if (r.hopCd > 0) r.hopCd -= dt
@@ -736,6 +775,7 @@ function physics(r: Run, dt: number, input: Input, quiet = false): void {
   r.x += r.vx * dt
   r.y += r.vy * dt
   r.a += r.w * dt
+  if (wreck) wreckGround(r, dt)
   // not back past the start
   if (r.x < 2) {
     r.x = 2
@@ -839,7 +879,7 @@ function physics(r: Run, dt: number, input: Input, quiet = false): void {
     }
     // the end of a round
     const flipped = Math.cos(r.a) < -0.55
-    if (touchLoad || touchHead || flipped) r.crashAcc += dt
+    if (touchLoad || touchHead || flipped) r.crashAcc += r.deep ? 1 : dt
     else r.crashAcc = Math.max(0, r.crashAcc - dt)
     if (r.crashAcc > 0.1 || (flipped && r.crashAcc > 0.04)) {
       r.phase = 'crash'

@@ -524,3 +524,69 @@ describe('the wagon and the animals grow', () => {
     expect(loadSave(store).seen).toEqual([0, 3])
   })
 })
+
+describe('a crash', () => {
+  it('ends on the ground: the wreck is never flung upwards, it slides and lies still', () => {
+    let crashes = 0
+    for (const route of [0, 2, 4]) {
+      const track = generateTrack(route)
+      for (const x0 of [40, 120, 260, 400]) {
+        for (const speed of [0, 6, 12]) {
+          for (const angle of [1.6, 2.4, 3.1, -2.0]) {
+            const r = newRun(track, statsFor(newSave()), 0)
+            r.x = x0
+            r.y = heightAt(track, x0) + 4
+            r.vx = speed
+            r.vy = 0
+            r.a = angle
+            let crashedAt = -1
+            let maxAbove = 0
+            let h0 = 0
+            let maxVy = 0
+            for (let i = 0; i < 60 * 8; i++) {
+              stepRun(r, 1 / 60, { gas: true, brake: false })
+              r.events.length = 0
+              if (r.phase === 'crash') {
+                if (crashedAt < 0) {
+                  crashedAt = i
+                  h0 = r.y - heightAt(track, r.x)
+                } else {
+                  maxAbove = Math.max(maxAbove, r.y - heightAt(track, r.x))
+                  maxVy = Math.max(maxVy, r.vy)
+                }
+              }
+            }
+            if (crashedAt >= 0) {
+              crashes++
+              // after the first impact the cart stays low and is never thrown up
+              expect(maxVy).toBeLessThanOrEqual(1.0001)
+              expect(maxAbove).toBeLessThan(h0 + 0.5)
+              // it comes to rest
+              expect(Math.abs(r.vx)).toBeLessThan(0.6)
+              expect(Math.abs(r.vy)).toBeLessThan(0.6)
+            }
+          }
+        }
+      }
+    }
+    expect(crashes).toBeGreaterThan(20)
+  })
+
+  it('a hop or the gas pedal cannot move a wreck', () => {
+    const s = newSave()
+    s.up.hop = 3
+    const r = newRun(generateTrack(0), statsFor(s))
+    r.a = Math.PI * 0.95
+    r.y += 1
+    drive(r, 3, () => ({ gas: false, brake: false }))
+    expect(r.phase).toBe('crash')
+    const y = r.y
+    expect(hop(r)).toBe(false)
+    for (let i = 0; i < 120; i++) {
+      stepRun(r, 1 / 60, { gas: true, brake: false })
+      r.events.length = 0
+    }
+    expect(r.y).toBeLessThan(y + 0.3)
+  })
+})
+
