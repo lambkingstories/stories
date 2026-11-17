@@ -25,10 +25,22 @@ self.addEventListener('activate', (event) => {
   )
 })
 
-/** The oldest files go first when there are too many. */
+/**
+ * The oldest files go first when there are too many. Pictures go before the files of the app itself (/assets/) and the page: a picture
+ * comes back from the net, but without the app files nothing starts without a net, and the stories on the device could not be read.
+ */
 async function trim(cache) {
   const keys = await cache.keys()
-  for (let i = 0; i < keys.length - MAX_ENTRIES; i++) await cache.delete(keys[i])
+  const extra = keys.length - MAX_ENTRIES
+  if (extra <= 0) return
+  const scope = new URL(self.registration.scope).pathname
+  const rank = (request) => {
+    const path = new URL(request.url).pathname
+    return path === scope ? 2 : path.includes('/assets/') ? 1 : 0
+  }
+  // `sort` keeps the order of the keys (oldest first) inside each group
+  const order = keys.map((key, i) => ({ key, i, r: rank(key) })).sort((a, b) => a.r - b.r || a.i - b.i)
+  for (let i = 0; i < extra; i++) await cache.delete(order[i].key)
 }
 
 async function put(cache, request, response) {

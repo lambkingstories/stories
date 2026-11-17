@@ -23,6 +23,23 @@ export default {
     errorText: 'No se pudieron cargar las historias.',
     retry: 'Intentar de nuevo'
   },
+  offline: {
+    save: 'Guardar para el camino',
+    saving: 'Guardando …',
+    saved: 'Guardado sin conexión',
+    notePinned: 'Puedes leer esta historia sin conexión. Toca otra vez si no debe quedarse.',
+    noteRemembered: 'Puedes leerla sin conexión mientras haya espacio. Toca el botón para guardarla siempre.',
+    noteNoNet: 'No tienes conexión. Puedes leer esta historia. Escuchar necesita conexión.',
+    noteNoNetNotKept: 'No tienes conexión. Para guardar una historia necesitas conexión.',
+    noteFull: 'No hay suficiente espacio en este dispositivo. Libera espacio e inténtalo de nuevo.',
+    noteError: 'Eso no funcionó. Revisa tu conexión e inténtalo de nuevo.',
+    listTitle: 'Para leer sin conexión',
+    listText: 'Estas historias se pueden leer sin conexión. Escuchar y la lectura en voz alta necesitan conexión.',
+    listTextServer: 'El servidor no responde ahora. Aun así puedes leer estas historias.',
+    emptyTitle: 'No tienes conexión.',
+    emptyText: 'Abre historias una vez con conexión. Así podrás leerlas también sin conexión.',
+    pinnedMark: 'Guardada para el camino'
+  },
   parent: {
     button: 'Padres',
     title: 'Para los padres',

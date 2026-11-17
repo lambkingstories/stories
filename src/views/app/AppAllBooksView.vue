@@ -4,7 +4,7 @@
  * board and can be swiped sideways. A tap on a book opens it, a tap on the name or on "Alle" opens the whole series.
  * Publishers other than LambKing get their own shelf with the same look (a series of theirs is a row like any other).
  */
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
@@ -13,6 +13,8 @@ import AppHeader from '@/components/molecules/AppHeader.vue'
 import useModels from '@/use/useModels'
 import useApiBooks from '@/use/useApiBooks'
 import useApiSeries from '@/use/useApiSeries'
+import useOfflineStories, { type OfflineItem } from '@/use/useOfflineStories'
+import { cachedBlobUrl } from '@/use/useBookCache'
 import useCatalogNames from '@/use/useCatalogNames'
 import type { ApiBook, Locale } from '@/types/apiBook'
 import { pickLocalizedImage } from '@/types/apiBook'
@@ -33,24 +35,66 @@ const online = ref(typeof navigator === 'undefined' ? true : navigator.onLine)
 const setOnline = () => {
   online.value = navigator.onLine
 }
+  // the net is back: the list is fetched again and the page changes from "readable without a net" to the shelves
+  if (online.value) reload()
 
 function reload() {
-  void apiBooks.loadAllBooks()
+  void apiBooks.loadAllBooks().then(loadOfflineList)
   void apiSeries.loadAll()
 }
 
 onMounted(() => {
+// ----- Without a net: the stories that lie on the device (text and cover) -----
+const offlineStories = useOfflineStories()
+const offlineItems = ref<OfflineItem[]>([])
+const offlineCovers = ref<Record<string, string>>({})
+/** No net, or the server does not answer: only what lies on the device can be opened. */
+const offlineMode = computed(() => !online.value || !!apiBooks.state.listFailed)
+
+function releaseCovers() {
+  for (const url of Object.values(offlineCovers.value)) {
+    try {
+      URL.revokeObjectURL(url)
+    } catch {
+      // nothing to let go of
+    }
+  }
+  offlineCovers.value = {}
+}
+
+async function loadOfflineList() {
+  if (!offlineMode.value) return
+  try {
+    const items = await offlineStories.list()
+    const covers: Record<string, string> = {}
+    for (const item of items) {
+      const blob = await cachedBlobUrl(pickLocalizedImage(item.book.previewImage, lang.value))
+      if (blob) covers[item.book.bookId] = blob
+    }
+    releaseCovers()
+    offlineItems.value = items
+    offlineCovers.value = covers
+  } catch {
+    offlineItems.value = []
+  }
+}
+
   reload()
   window.addEventListener('online', setOnline)
   window.addEventListener('offline', setOnline)
 })
+  if (offlineMode.value) void loadOfflineList()
 onBeforeUnmount(() => {
   window.removeEventListener('online', setOnline)
   window.removeEventListener('offline', setOnline)
 })
+  releaseCovers()
 
 const lang = computed<Locale>(() => (contentLocale(locale.value)))
 // only the stories: coloring books are in "Malbücher", printed store books in "Books"
+watch(offlineMode, (off) => {
+  if (off) void loadOfflineList()
+})
 const allBooks = computed<ApiBook[]>(() => booksOfArea((apiBooks.state.all ?? []) as ApiBook[], 'stories'))
 
 interface Shelf {
@@ -120,6 +164,19 @@ const results = computed<ApiBook[]>(() => {
 })
 
 function isNew(book: ApiBook): boolean {
+// without a net the search runs over the stories on the device
+const offlineShown = computed<OfflineItem[]>(() => {
+  const term = query.value.trim().toLowerCase()
+  if (!term) return offlineItems.value
+  return offlineItems.value.filter(({ book }) => {
+    const de = book.localizations?.de?.title?.toLowerCase() ?? ''
+    const en = book.localizations?.en?.title?.toLowerCase() ?? ''
+    return de.includes(term) || en.includes(term) || (book.author?.toLowerCase() ?? '').includes(term)
+  })
+})
+const showOffline = computed(() => offlineMode.value && offlineItems.value.length > 0)
+const offlineText = computed(() => (online.value ? t('app.offline.listTextServer') : t('app.offline.listText')))
+
   const age = Date.now() - new Date(book.releaseDate).getTime()
   return age >= 0 && age < NEW_DAYS * 86400000
 }
@@ -168,7 +225,7 @@ function openBook(bookId: string) {
         ZIconography(v-else name="search" :size="22" class="ask-search")
 
       //- results replace the shelves while something is typed
-      section(v-if="isSearching" class="results")
+      section(v-else-if="isSearching" class="results")
         p(v-if="!results.length" class="results-empty") {{ t('app.main.searchEmpty') }}
         div(v-else class="results-grid")
           button(
@@ -182,6 +239,34 @@ function openBook(bookId: string) {
               img(
                 :src="withPlaceholder(pickLocalizedImage(book.previewImage, lang))"
                 :alt="bookTitle(book)"
+      //- without a net (or with a server that does not answer): the stories that lie on the device, instead of shelves that cannot be opened
+      section(v-if="showOffline" class="offline-list lk-panel" data-test="offline-list")
+        h2(class="offline-title") {{ t('app.offline.listTitle') }}
+        p(class="offline-text") {{ offlineText }}
+        p(v-if="isSearching && !offlineShown.length" class="results-empty") {{ t('app.main.searchEmpty') }}
+        div(class="results-grid")
+          button(
+            v-for="item in offlineShown"
+            :key="item.book.bookId"
+            type="button"
+            class="result"
+            data-test="offline-item"
+            @click="openBook(item.book.bookId)"
+          )
+            span(class="result-cover")
+              img(
+                :src="offlineCovers[item.book.bookId] || withPlaceholder(pickLocalizedImage(item.book.previewImage, lang))"
+                :alt="bookTitle(item.book)"
+                draggable="false"
+                @error="onImgFallback"
+              )
+              span(v-if="item.meta.pinned" class="pin-mark" role="img" :aria-label="t('app.offline.pinnedMark')")
+                ZIconography(name="check" :size="16")
+            span(class="result-title") {{ bookTitle(item.book) }}
+        button(type="button" class="lk-btn lk-btn--outline offline-retry" @click="reload")
+          ZIconography(name="restart" :size="22")
+          span {{ t('app.state.reconnect') }}
+
                 loading="lazy"
                 draggable="false"
                 @error="onImgFallback"
@@ -223,11 +308,11 @@ function openBook(bookId: string) {
               span(v-if="isNew(book)" class="new-badge") {{ t('app.read.newBadge') }}
           div(class="shelf-board" aria-hidden="true")
 
-      div(v-if="!shelves.length && !isSearching" class="empty lk-panel")
+      div(v-if="!shelves.length && !isSearching && !showOffline" class="empty lk-panel")
         LkCompanion(class="empty-lamb" :pose="!online ? 'offline' : 'leer'" :size="110")
         template(v-if="!online")
-          h2(class="empty-title") {{ t('app.state.offlineTitle') }}
-          p(class="empty-sub") {{ t('app.state.offlineText') }}
+          h2(class="empty-title") {{ t('app.offline.emptyTitle') }}
+          p(class="empty-sub") {{ t('app.offline.emptyText') }}
           button(type="button" class="lk-btn lk-btn--outline" @click="reload")
             ZIconography(name="restart" :size="22")
             span {{ t('app.state.reconnect') }}
@@ -313,6 +398,41 @@ button
   background: transparent
   color: var(--lk-text)
   text-align: left
+.offline-list
+  padding: 16px 14px 18px
+
+.offline-title
+  margin: 0 0 4px
+  font-weight: 800
+  font-size: 1.3rem
+
+.offline-text
+  margin: 0 0 14px
+  color: var(--lk-muted)
+  font-size: 1rem
+  line-height: 1.35
+
+.offline-retry
+  margin: 16px auto 0
+  display: flex
+
+// a small check on the cover of a story that is saved "for the road"
+.pin-mark
+  position: absolute
+  right: 6px
+  bottom: 6px
+  width: 26px
+  height: 26px
+  border-radius: 50%
+  display: flex
+  align-items: center
+  justify-content: center
+  background: var(--lk-accent)
+  color: var(--lk-on-accent)
+
+  :deep(.z-icon-outline)
+    color: currentColor
+
   cursor: pointer
 
 .result-cover

@@ -2620,6 +2620,24 @@ export default {
         errorTitle: 'That did not work.',
         errorText: 'The stories could not be loaded.',
         retry: 'Try again'
+      // Stories without a net ("for the road"): the button on the book page and the list "Readable without a net".
+      offline: {
+        save: 'Save for the road',
+        saving: 'Saving …',
+        saved: 'Saved offline',
+        notePinned: 'You can read this story without a net. Tap again if it should not stay.',
+        noteRemembered: 'You can read it without a net as long as there is room. Tap the button to keep it for good.',
+        noteNoNet: 'You are offline. You can read this story. Listening needs a net.',
+        noteNoNetNotKept: 'You are offline. You need a net to save a story.',
+        noteFull: 'There is not enough room on this device. Free some space and try again.',
+        noteError: 'That did not work. Check your net and try again.',
+        listTitle: 'Readable without a net',
+        listText: 'You can read these stories without a net. Listening and reading aloud need a net.',
+        listTextServer: 'The server does not answer right now. You can still read these stories.',
+        emptyTitle: 'You are offline.',
+        emptyText: 'Open stories once with a net. Then you can read them without a net, too.',
+        pinnedMark: 'Saved for the road'
+      },
       },
       parent: {
         button: 'Parents',
@@ -6728,6 +6746,24 @@ export default {
         spanish: 'Spanisch'
       },
       state: {
+      // Geschichten ohne Netz („Für unterwegs“): der Knopf auf der Buchseite und die Liste „Ohne Netz lesbar“.
+      offline: {
+        save: 'Für unterwegs speichern',
+        saving: 'Wird gespeichert …',
+        saved: 'Offline gespeichert',
+        notePinned: 'Du kannst die Geschichte ohne Netz lesen. Tippe noch einmal, wenn sie nicht bleiben soll.',
+        noteRemembered: 'Du kannst sie ohne Netz lesen, solange Platz ist. Tippe auf den Knopf, damit sie immer bleibt.',
+        noteNoNet: 'Du bist offline. Diese Geschichte kannst du lesen. Anhören geht nur mit Netz.',
+        noteNoNetNotKept: 'Du bist offline. Zum Speichern brauchst du Netz.',
+        noteFull: 'Auf dem Gerät ist nicht genug Platz. Mach etwas Platz frei und versuche es noch einmal.',
+        noteError: 'Das hat nicht geklappt. Prüfe dein Netz und versuche es noch einmal.',
+        listTitle: 'Ohne Netz lesbar',
+        listText: 'Ohne Netz kannst du diese Geschichten lesen. Anhören und Vorlesen gehen nur mit Netz.',
+        listTextServer: 'Der Server antwortet gerade nicht. Diese Geschichten kannst du trotzdem lesen.',
+        emptyTitle: 'Du bist offline.',
+        emptyText: 'Öffne Geschichten einmal mit Netz. Dann kannst du sie auch ohne Netz lesen.',
+        pinnedMark: 'Für unterwegs gespeichert'
+      },
         offlineTitle: 'Du bist offline.',
         offlineText: 'Heruntergeladene Inhalte kannst du weiter nutzen.',
         reconnect: 'Erneut verbinden',

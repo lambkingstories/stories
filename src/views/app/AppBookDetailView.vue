@@ -23,6 +23,8 @@ import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
 import usePremium, { PREMIUM_TEASER } from '@/use/usePremium'
 import PlusBadge from '@/components/atoms/PlusBadge.vue'
 import { contentLocale } from '@/utils/contentLocale'
+import useOfflineStories from '@/use/useOfflineStories'
+import useBookCache, { cachedBlobUrl } from '@/use/useBookCache'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
@@ -73,6 +75,55 @@ const contentNoteItems = computed<string[]>(() => {
 })
 
 const inWatchList = computed(() => (book.value ? isInWatchList(book.value.bookId) : false))
+
+// ----- "Offline speichern": the story for the road (text and pictures stay on the device; reading aloud needs a net) -----
+const offlineStories = useOfflineStories()
+const bookCache = useBookCache()
+const online = ref(typeof navigator === 'undefined' ? true : navigator.onLine)
+const setOnline = () => {
+  online.value = navigator.onLine
+}
+/** Only stories can be kept (not coloring books); hidden books and locked ones never. */
+const offlineAvailable = computed(() => !!book.value && offlineStories.canKeep(book.value))
+const offlinePinned = computed(() => (book.value ? offlineStories.isPinned(book.value.bookId) : false))
+const offlineStored = computed(() => (book.value ? offlineStories.isStored(book.value.bookId) : false))
+const offlineSaving = computed(() => (book.value ? offlineStories.isSaving(book.value.bookId) : false))
+const offlineProblem = ref<'' | 'full' | 'error'>('')
+/** The line under the button: what is true now, in short words. */
+const offlineNote = computed(() => {
+  if (offlineProblem.value === 'full') return t('app.offline.noteFull')
+  if (offlineProblem.value === 'error') return t('app.offline.noteError')
+  if (!online.value) return offlineStored.value ? t('app.offline.noteNoNet') : t('app.offline.noteNoNetNotKept')
+  if (offlinePinned.value) return t('app.offline.notePinned')
+  if (offlineStored.value) return t('app.offline.noteRemembered')
+  return ''
+})
+
+async function onToggleOffline() {
+  const b = book.value
+  if (!b || offlineSaving.value) return
+  offlineProblem.value = ''
+  if (offlinePinned.value) {
+    await offlineStories.unpin(b.bookId)
+    return
+  }
+  const result = await offlineStories.pin(b)
+  if (result === 'full' || result === 'error') offlineProblem.value = result
+  // the reading page has to be on the device too, or "Lesen" would not open without a net
+  else if (result === 'saved') void preloadReader()
+}
+
+/** Loads the code of the reading page once (the web version keeps it for the road); a failure is harmless. */
+function preloadReader() {
+  return import('@/views/app/AppReaderView.vue').catch(() => undefined)
+}
+
+// the cover from the device when it lies there (also without a net)
+const coverBlob = ref('')
+function releaseCover() {
+  bookCache.releaseBlobUrl(coverBlob.value)
+  coverBlob.value = ''
+}
 
 async function fetchBook() {
   const loaded = await apiBooks.loadBook(bookId.value)
@@ -231,12 +282,18 @@ function savePlayback() {
 }
 
 onMounted(() => {
+  window.addEventListener('online', setOnline)
+  window.addEventListener('offline', setOnline)
+  void offlineStories.init()
   ensureAudio()
   void fetchBook()
   // Series records back the name shown in the eyebrow above the title.
   void apiSeries.loadAll()
 })
 onUnmounted(() => {
+  window.removeEventListener('online', setOnline)
+  window.removeEventListener('offline', setOnline)
+  releaseCover()
   savePlayback()
   stopRaf()
   if (audioEl.value) {
@@ -252,8 +309,21 @@ onUnmounted(() => {
   }
 })
 watch(bookId, () => {
+  offlineProblem.value = ''
   void fetchBook()
 })
+watch(
+  () => (book.value ? pickLocalizedImage(book.value.previewImage, lang.value) : ''),
+  async (url) => {
+    releaseCover()
+    if (!url) return
+    const blob = await cachedBlobUrl(url)
+    if (!blob) return
+    if (url !== (book.value ? pickLocalizedImage(book.value.previewImage, lang.value) : '')) bookCache.releaseBlobUrl(blob)
+    else coverBlob.value = blob
+  },
+  { immediate: true }
+)
 watch(audioSrc, (src) => {
   isPlaying.value = false
   currentTime.value = 0
@@ -445,7 +515,7 @@ const seriesName = computed(() => seriesNameOfBook(book.value))
         div(class="hero-row")
           div(class="hero-cover")
             img(
-              :src="withPlaceholder(pickLocalizedImage(book.previewImage, lang))"
+              :src="coverBlob || withPlaceholder(pickLocalizedImage(book.previewImage, lang))"
               :alt="localizedTitle"
               class="hero-cover-img"
               loading="eager"
@@ -494,6 +564,19 @@ const seriesName = computed(() => seriesNameOfBook(book.value))
                 ZIconography(name="bookmark" :size="22")
                 span(v-if="isColoring") {{ inPaintShelf ? t('app.bookDetail.inShelf') : t('app.bookDetail.toShelf') }}
                 span(v-else) {{ inWatchList ? t('app.bookDetail.saved') : t('app.bookDetail.save') }}
+            //- for the road: the story stays on the device (text and pictures), so it can be read without a net
+            button(
+              v-if="offlineAvailable"
+              type="button"
+              :class="['lk-btn', 'lk-btn--outline', 'lk-btn--full', 'offline-btn', { 'is-on': offlinePinned }]"
+              :aria-pressed="offlinePinned"
+              :disabled="offlineSaving"
+              data-test="offline-save"
+              @click="onToggleOffline"
+            )
+              ZIconography(:name="offlinePinned ? 'check' : 'download'" :size="22")
+              span {{ offlineSaving ? t('app.offline.saving') : offlinePinned ? t('app.offline.saved') : t('app.offline.save') }}
+            p(v-if="offlineAvailable && offlineNote" class="offline-note" data-test="offline-note" role="status") {{ offlineNote }}
 
           //- ===== Reading progress (below the CTAs) =====
           div(
@@ -682,6 +765,22 @@ button
 .cta-second .lk-btn:disabled
   opacity: 0.55
   cursor: default
+
+.offline-btn
+  gap: 8px
+
+  &.is-on
+    border-color: var(--lk-accent)
+
+  :deep(.z-icon-outline)
+    color: currentColor
+
+.offline-note
+  margin: -2px 4px 0
+  font-size: 0.95rem
+  line-height: 1.35
+  color: var(--lk-muted, #6b6b6b)
+  text-align: center
 
 .series-eyebrow
   font-size: 12px

@@ -140,6 +140,20 @@ describe('service worker', () => {
     expect(await cache.match('https://lk.test/assets/f299.js')).toBeDefined()
   })
 
+  it('throws pictures out before the files of the app and the page (the stories on the device need them without a net)', async () => {
+    await sw.ask('https://lk.test/', 'navigate')
+    await sw.ask('https://lk.test/assets/app-abc123.js')
+    for (let i = 0; i < 300; i++) sw.net.files[`/images/p${i}.webp`] = String(i)
+    for (let i = 0; i < 300; i++) await sw.ask(`https://lk.test/images/p${i}.webp`)
+    const cache = [...sw.caches.values()][0]!
+    expect((await cache.keys()).length).toBeLessThanOrEqual(260)
+    expect(await cache.match('https://lk.test/assets/app-abc123.js')).toBeDefined()
+    expect(await cache.match('https://lk.test/')).toBeDefined()
+    // the oldest pictures are the ones that went
+    expect(await cache.match('https://lk.test/images/p0.webp')).toBeUndefined()
+    expect(await cache.match('https://lk.test/images/p299.webp')).toBeDefined()
+  })
+
   it('ignores requests that are not GET', async () => {
     const request = new Request('https://lk.test/assets/app-abc123.js', { method: 'POST' })
     let called = false

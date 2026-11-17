@@ -9,6 +9,7 @@
 import { reactive, readonly } from 'vue'
 import { booksApi } from '@/api/booksApi'
 import useBookCache from '@/use/useBookCache'
+import useOfflineStories from '@/use/useOfflineStories'
 import type { ApiBook } from '@/types/apiBook'
 import { localColoringBooks, localColoringBooksMissingFrom } from '@/data/localColoringBooks'
 import { isHiddenBook, isHiddenBookOrSeries } from '@/data/hiddenBooks'
@@ -18,16 +19,53 @@ const state = reactive<{
   all: ApiBook[] | null
   loading: Record<string, boolean>
   listLoading: boolean
+  /** The last try to fetch the list of all books failed (no net, or the server does not answer): the stories kept on the device are shown. */
+  listFailed: boolean
   error: string | null
 }>({
   byId: {},
   all: null,
   loading: {},
   listLoading: false,
+  listFailed: false,
   error: null
 })
 
 const cache = useBookCache()
+// the stories kept for reading without a net (see `useOfflineStories`); fetched when needed, so that importing this file does nothing
+const offline = () => useOfflineStories()
+
+/** The pictures of a book are fetched into the cache; for a kept story its size is counted afterwards. Never throws. */
+async function prefetchAndMeasure(book: ApiBook): Promise<void> {
+  try {
+    await cache.prefetchBlobs(book)
+    await offline().refreshSize(book.bookId)
+  } catch {
+    // the pictures come with the next opening
+  }
+}
+
+/** A book was opened: a story is kept from now on (text and pictures stay on the device for the road). */
+async function keepOpened(book: ApiBook): Promise<void> {
+  try {
+    await offline().noteOpened(book)
+  } catch {
+    // nothing is kept, everything else works as before
+  }
+  await prefetchAndMeasure(book)
+}
+
+/** No list from the server: what lies on the device is put into the store, so that "continue reading" and "Gemerkt" still find their books. */
+async function hydrateFromDevice(): Promise<void> {
+  try {
+    for (const { book } of await offline().list()) {
+      const known = state.byId[book.bookId]
+      if (!known || known.lean) state.byId[book.bookId] = book
+    }
+  } catch {
+    // nothing kept
+  }
+}
 
 async function refreshBookInBackground(bookId: string): Promise<void> {
   try {
@@ -45,7 +83,7 @@ async function refreshBookInBackground(bookId: string): Promise<void> {
       await cache.invalidateBookBlobs(bookId)
       await cache.saveBook(fresh)
     }
-    void cache.prefetchBlobs(fresh)
+    void prefetchAndMeasure(fresh)
   } catch {
     // offline or server hiccup — cached copy stays authoritative
   }
@@ -63,6 +101,7 @@ async function loadBook(bookId: string): Promise<ApiBook | null> {
     delete state.byId[bookId]
     return null
   }
+  if (book && !book.lean && !localBookById(bookId)) void keepOpened(book)
   return book
 }
 
@@ -87,7 +126,6 @@ async function loadBookUnfiltered(bookId: string): Promise<ApiBook | null> {
     const fresh = await booksApi.getById(bookId)
     await cache.saveBook(fresh)
     state.byId[bookId] = fresh
-    void cache.prefetchBlobs(fresh)
     return fresh
   } catch (err) {
     state.error = (err as Error).message
@@ -106,21 +144,27 @@ async function loadAllBooks(): Promise<ApiBook[]> {
     if (own.length) state.all = own
   }
   try {
+    void offline().init()
     const remote = (await booksApi.list()).filter((b) => !isHiddenBookOrSeries(b))
     const books = [...remote, ...localColoringBooksMissingFrom(remote)]
     state.all = books
+    state.listFailed = false
+    state.error = null
     for (const b of books) {
       // a slim entry (no story text) never replaces a whole book that is already known, and is not kept for offline use:
       // the whole book is fetched and cached when it is opened
       const known = state.byId[b.bookId]
       if (!(b.lean && known && !known.lean)) state.byId[b.bookId] = b
-      if (!b.lean && !localBookById(b.bookId)) void cache.saveBook(b)
+      // a whole book from the list refreshes a copy that is kept already; it does not fill the device with every story of the server
+      if (!b.lean && !localBookById(b.bookId) && offline().isStored(b.bookId)) void cache.saveBook(b)
     }
     return books
   } catch (err) {
     state.error = (err as Error).message
-    // offline: the books that ship with the app are still there
+    state.listFailed = true
+    // offline: the books that ship with the app are still there, and the stories kept on the device
     if (!state.all) state.all = localColoringBooks()
+    void hydrateFromDevice()
     return state.all ?? []
   } finally {
     state.listLoading = false
