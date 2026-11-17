@@ -68,4 +68,20 @@ const { t } = useI18n({ useScope: 'global' })
 .head-lamb
   flex: none
   margin-bottom: -6px
+
+// A phone held wide (hardly 375 px high): no big lamb, a smaller title, so the page itself starts higher.
+@media (max-height: 450px) and (orientation: landscape)
+  .head-row
+    min-height: 0
+    margin-top: 2px
+
+  .head-lamb
+    display: none
+
+  .head-title
+    font-size: 1.45rem
+
+  .head-sub
+    margin-top: 2px
+    font-size: 0.95rem
 </style>

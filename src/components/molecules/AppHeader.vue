@@ -131,6 +131,36 @@ const { userName } = useUserName()
   font-weight: 600
   cursor: pointer
   -webkit-tap-highlight-color: transparent
+
+// A phone held wide (hardly 375 px high): a slim line, 44 px, with the small lamb, the word mark and the picture of the child.
+@media (max-height: 450px) and (orientation: landscape)
+  .app-head
+    min-height: calc(44px + env(safe-area-inset-top, 0px))
+    padding: env(safe-area-inset-top, 0px) max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px))
+
+  .brand-lamb
+    height: 34px
+
+  .brand-word
+    height: 24px
+
+  .hello-word
+    display: none
+
+  .hello-name
+    font-size: 0.95rem
+
+  .me-btn
+    width: 36px
+    height: 36px
+    border-width: 2px
+    // the touch area is still the full line
+    position: relative
+
+    &::after
+      content: ''
+      position: absolute
+      inset: -4px
 </style>
 
 <style lang="sass">

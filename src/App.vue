@@ -370,6 +370,12 @@ img
   // the pages slide sideways: what sticks out must not widen the page (that made the screen shiver)
   overflow-x: clip
 
+// A phone held wide (hardly 375 px high): the tab bar is a slim strip (48 px, see ZBottomNav) instead of 92 px, so the screens
+// that keep room for it at their foot need less. The classes are the page roots of the screens with the tab bar.
+@media (max-height: 450px) and (orientation: landscape)
+  #app-root :is(.home, .read-hub, .books-page, .read-page, .series-page, .cb-page, .stats, .stage, .home-page)
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px))
+
 // ----- Screen changes (like on the iPhone) -----
 // Both screens lie on top of each other while they change (taken out of the flow; the leaving one keeps its scroll spot, see
 // `onBeforeLeave`). The shared ZBottomNav lives outside the <transition>, so it never moves. The screens that slide get a solid

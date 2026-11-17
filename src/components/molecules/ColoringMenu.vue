@@ -257,6 +257,11 @@ button
   padding-left: 0
   padding-right: 0
 
+// a phone held wide: the slim tab bar needs less room at the foot
+@media (max-height: 450px) and (orientation: landscape)
+  .ac-pick
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px))
+
 .ac-body
   max-width: 980px
   margin: 0 auto

@@ -130,4 +130,43 @@ button
 
 .is-active .z-nav-label
   font-weight: 700
+
+// A phone held wide (hardly 375 px high): the bar shrinks to a slim strip of symbols (44 px, with its edge 48 px) so that the
+// screen keeps its height for the content. The words stay as the name of the button for screen readers.
+@media (max-height: 450px) and (orientation: landscape)
+  .z-bottom-nav
+    padding: 0 12px calc(4px + env(safe-area-inset-bottom, 0px))
+
+  .z-bottom-nav-inner
+    max-width: 460px
+    height: 44px
+    padding: 2px
+    border-radius: 22px
+    box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.45)
+
+  .z-nav-btn
+    border-radius: 20px
+
+    &.is-active
+      flex: 1.2 1 0
+
+  .z-nav-icon
+    width: 36px
+    height: 36px
+
+  .z-nav-star
+    width: 34px
+    height: 34px
+
+  .is-active .z-nav-star
+    padding: 4px
+
+  .z-nav-label
+    position: absolute
+    width: 1px
+    height: 1px
+    margin: -1px
+    overflow: hidden
+    clip: rect(0 0 0 0)
+    white-space: nowrap
 </style>

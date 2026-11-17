@@ -458,4 +458,19 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   opacity: 0
   .sheet
     transform: translateY(30px)
+
+// A phone held wide (hardly 375 px high): the window uses the height, without the lamb on its edge, with a smaller title.
+@media (max-height: 450px) and (orientation: landscape)
+  .sheet
+    margin-bottom: calc(8px + env(safe-area-inset-bottom, 0px))
+
+  .sheet-lamb
+    display: none
+
+  .sheet-scroll
+    max-height: calc(100vh - 24px - env(safe-area-inset-bottom, 0px))
+    padding-top: 14px
+
+  .sheet-title
+    font-size: 1.5rem
 </style>

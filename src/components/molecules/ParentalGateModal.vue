@@ -236,6 +236,59 @@ button
   .is-wrong
     animation: none
 
+// A phone held wide (hardly 375 px high): the words on the left, the number pad on the right, so that everything is in view.
+@media (max-height: 450px) and (orientation: landscape)
+  .gate-wrap
+    max-width: min(640px, 94vw)
+    margin-top: 0
+
+  .gate-lamb
+    display: none
+
+  .gate-panel
+    display: grid
+    grid-template-columns: 1fr 1fr
+    column-gap: 22px
+    align-content: center
+    padding: 16px 20px
+    max-height: calc(100dvh - 16px)
+
+  .gate-close
+    top: 8px
+    left: 8px
+    right: auto
+
+  .gate-title,
+  .gate-text,
+  .gate-question,
+  .gate-display
+    grid-column: 1
+
+  .gate-title
+    padding: 0 0 0 44px
+    font-size: 1.25rem
+
+  .gate-text
+    margin-top: 4px
+    font-size: 0.88rem
+    line-height: 1.3
+
+  .gate-question
+    margin-top: 8px
+    font-size: 1.1rem
+
+  .gate-display
+    margin: 8px auto 0
+
+  .gate-pad
+    grid-column: 2
+    grid-row: 1 / span 4
+    margin-top: 0
+    gap: 6px
+
+  .gate-key
+    min-height: 44px
+
 .gate-modal-enter-active, .gate-modal-leave-active
   transition: opacity 180ms ease-out
 
