@@ -5,7 +5,7 @@ export default {
     intro: 'Ein kleines Lamm hat sich verlaufen. Der gute Hirte sucht es und ruft nach ihm (Lukas 15,3–7). Hilf dem Lamm, den Weg zurück zum Hirten zu finden: Tippe, wohin es laufen soll, und drehe und schiebe die Wege, bis sie zusammenpassen.',
     taskLabel: 'Deine Aufgabe:',
     story: [
-      { text: 'König David war als Junge Hirte und hat Schafe gehütet (1. Samuel 16,11). Später schrieb er das Lied vom guten Hirten. Das Lamm hat sich auf den Hügeln verlaufen, und oben wartet schon der Hirte.',
+      { text: 'König David war als Junge Hirte und hat Schafe gehütet (1. Samuel 16,11). Psalm 23, das Lied vom guten Hirten, ist ein Lied von David. Das Lamm hat sich auf den Hügeln verlaufen, und oben wartet schon der Hirte.',
         task: 'Tippe auf eine Stelle, dann läuft das Lamm dorthin. Drehe die Kurbeln, bis ein Weg zum Hirten entsteht.' },
       { text: 'Gute Hirten suchen für ihre Schafe saftiges Gras und sanfte Wiesen, wo sie in Ruhe fressen und ausruhen können. Auf den Wiesen blühen kleine Blumen.',
         task: 'Sammle auf dem Weg die Blümchen und finde den Weg zum Hirten.' },
@@ -81,7 +81,7 @@ export default {
     intro: 'A little lamb has lost its way. The good shepherd looks for it and calls it (Luke 15:3–7). Help the lamb find the way back to the shepherd: tap where it should walk, and turn and slide the paths until they fit together.',
     taskLabel: 'Your task:',
     story: [
-      { text: 'King David was a shepherd boy and looked after sheep (1 Samuel 16:11). Later he wrote the song of the good shepherd. The lamb has lost its way on the hills, and the shepherd is waiting at the top.',
+      { text: 'King David was a shepherd boy and looked after sheep (1 Samuel 16:11). Psalm 23, the song of the good shepherd, is a song of David. The lamb has lost its way on the hills, and the shepherd is waiting at the top.',
         task: 'Tap a spot and the lamb walks there. Turn the cranks until a way to the shepherd opens.' },
       { text: 'Good shepherds look for juicy grass and soft meadows where their sheep can eat and rest in peace. Little flowers bloom in the meadows.',
         task: 'Collect the little flowers on the way and find the way to the shepherd.' },
@@ -157,7 +157,7 @@ export default {
     intro: 'Un corderito se ha perdido. El buen pastor lo busca y lo llama (Lucas 15:3–7). Ayuda al corderito a encontrar el camino de vuelta al pastor: toca dónde debe caminar y gira y desliza los caminos hasta que encajen.',
     taskLabel: 'Tu tarea:',
     story: [
-      { text: 'El rey David fue pastor de joven y cuidaba ovejas (1 Samuel 16:11). Más tarde escribió el canto del buen pastor. El corderito se ha perdido en las colinas, y arriba ya espera el pastor.',
+      { text: 'El rey David fue pastor de joven y cuidaba ovejas (1 Samuel 16:11). El Salmo 23, el canto del buen pastor, es un canto de David. El corderito se ha perdido en las colinas, y arriba ya espera el pastor.',
         task: 'Toca un lugar y el corderito caminará hasta allí. Gira las manivelas hasta que se abra un camino hacia el pastor.' },
       { text: 'Los buenos pastores buscan hierba jugosa y prados suaves donde sus ovejas puedan comer y descansar tranquilas. En los prados florecen florecitas.',
         task: 'Recoge las florecitas del camino y encuentra el camino hacia el pastor.' },

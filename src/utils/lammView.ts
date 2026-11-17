@@ -23,6 +23,9 @@ export function unproject(v: View, px: number, py: number, z: number): [number, 
   return [(u + w) / 2, (w - u) / 2]
 }
 
+/** How high each piece of scenery is, in units of S (the picture is drawn that high). */
+export const DECO_HEIGHT: Record<string, number> = { baum: 2.2, zypresse: 2.8, busch: 1, fels: 0.9, zaun: 0.8, schilf: 1.3 }
+
 export interface Bounds {
   u0: number
   u1: number
@@ -61,7 +64,7 @@ export function levelBounds(m: Model): Bounds {
     }
   }
   for (const c of m.controls) take(c.def.h[0], c.def.h[1], c.def.h[2], 1.3)
-  for (const d of m.def.deco ?? []) take(d.x, d.y, d.z, 1.6 * (d.k ?? 1), 0.3)
+  for (const d of m.def.deco ?? []) take(d.x, d.y, d.z, (DECO_HEIGHT[d.s] ?? 1) * (d.k ?? 1) + 0.1, 0.3)
   return { u0, u1, v0, v1 }
 }
 

@@ -20,7 +20,7 @@ import {
   type Cell, type ControlRT, type Graph, type Model, type Pose, type Space
 } from '@/utils/lammGame'
 import { CHAPTERS, LEVELS } from '@/utils/lammLevels'
-import { depthKey, fitView, levelBounds, project, unproject, type Bounds, type View } from '@/utils/lammView'
+import { DECO_HEIGHT, depthKey, fitView, levelBounds, project, unproject, type Bounds, type View } from '@/utils/lammView'
 import { decoShape, flockShape, flowerShape, gateShape, handleShape, lambShape, shepherdShape } from '@/utils/lammFallback'
 
 const emit = defineEmits<{ leave: [] }>()
@@ -66,7 +66,8 @@ const FLOORS = {
   hof: { top: 't-hof', side: 's-sandstein', topC: '#e8d3a4', sideC: '#c9aa73' }
 }
 const WOOD = { top: 't-holz', side: 's-holz', topC: '#c08a54', sideC: '#7a5230' }
-const BG_COLORS = ['#cfe6c0', '#d6efb8', '#b9dfe4', '#1c2a4e', '#f0d7a0']
+/** The sky and the ground colour of each chapter while its painted background is missing. */
+const BG_COLORS: [string, string][] = [['#bfe0f0', '#dff0c0'], ['#cdeaf5', '#cfe9a8'], ['#b7e0ea', '#a9d4d8'], ['#0f1a3c', '#27406a'], ['#f6d9a0', '#f0c890']]
 
 // ── the screens ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
 type Screen = 'menu' | 'play' | 'result'
@@ -364,7 +365,8 @@ function arrive(r: Run, id: number) {
     play('bead', 1, 1 + 0.12 * (hud.flowers - 1))
     hopT = 0.5
   }
-  if (id === r.m.goal) finish(r)
+  // the round is won when the lamb comes to rest at the shepherd (a flower can lie behind him: walking past him on the way is not the end)
+  if (id === r.m.goal && r.path.length === 0 && r.pending < 0) finish(r)
 }
 
 function finish(r: Run) {
@@ -488,11 +490,16 @@ function walkTo(r: Run, cell: number) {
     return
   }
   if (cell === from && r.stepT >= 1) {
-    hopT = 0.5
+    // standing at the shepherd already (the lamb stopped there on the way): a touch on him ends the round
+    if (cell === r.m.goal) finish(r)
+    else hopT = 0.5
     return
   }
   r.target = cell
   r.path = pathTo(r.graph, from, cell)
+  // a little ring of sparks shows where the lamb goes
+  const [tx, ty] = cellScreen(r, cell)
+  spark(tx, ty, 6, '#ffffff', 32)
   if (r.stepT >= 1) {
     play('tap', 0.5)
     startStep(r)
@@ -754,7 +761,6 @@ const T_FLOWER = 4
 const T_GOAL = 5
 const items: Item[] = []
 
-const DECO_H: Record<string, number> = { baum: 2.2, zypresse: 2.8, busch: 1, fels: 0.9, zaun: 0.8, schilf: 1.3 }
 
 function draw(time: number, dt: number) {
   const c = ctx
@@ -831,7 +837,11 @@ function drawBackground(c: CanvasRenderingContext2D, chapter: number, time: numb
     const h = bg.height * k
     c.drawImage(bg, (cvW - w) / 2, (cvH - h) / 2, w, h)
   } else {
-    c.fillStyle = BG_COLORS[ci - 1] ?? '#cfe6c0'
+    const [top, bottom] = BG_COLORS[ci - 1] ?? BG_COLORS[0]!
+    const g = c.createLinearGradient(0, 0, 0, cvH)
+    g.addColorStop(0, top)
+    g.addColorStop(1, bottom)
+    c.fillStyle = g
     c.fillRect(0, 0, cvW, cvH)
   }
   // a soft veil so that the building stands out
@@ -969,7 +979,10 @@ function drawCell(c: CanvasRenderingContext2D, r: Run, cell: Cell, time: number)
     void dir
     const q = cell.stair + pose.rot
     const n = 4
-    for (let i = 0; i < n; i++) {
+    // the steps that lie further away are drawn first: when the high end points away from us, the high steps are the far ones
+    const away = Math.cos((q * Math.PI) / 2) + Math.sin((q * Math.PI) / 2) < 0
+    for (let k = 0; k < n; k++) {
+      const i = away ? n - 1 - k : k
       const lx = -0.5 + (i + 0.5) / n
       const a = (q * Math.PI) / 2
       const cx = x + lx * Math.cos(a)
@@ -1099,7 +1112,7 @@ function drawHandle(c: CanvasRenderingContext2D, r: Run, ctl: ControlRT, time: n
 function drawDeco(c: CanvasRenderingContext2D, d: { s: string; x: number; y: number; z: number; k?: number; flip?: boolean }) {
   const im = img[d.s]
   const [sx, sy] = project(view, d.x, d.y, d.z)
-  const h = view.s * (DECO_H[d.s] ?? 1) * (d.k ?? 1)
+  const h = view.s * (DECO_HEIGHT[d.s] ?? 1) * (d.k ?? 1)
   c.save()
   c.translate(sx, sy + 2)
   if (d.flip) c.scale(-1, 1)
@@ -1228,7 +1241,8 @@ onMounted(async () => {
     sizeObserver = new ResizeObserver(() => resize())
     sizeObserver.observe(canvas.value)
   }
-  music.playGame('lamm')
+  // the calm pieces (the kind `graze` is one of the calm ones; this game is a quiet one)
+  music.playGame('graze')
   setProbe()
   await loadAll()
   last = performance.now()

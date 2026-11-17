@@ -6,7 +6,7 @@
 import { describe, expect, it } from 'vitest'
 import app from '../src/i18n/app'
 import { BIG_GAMES } from '../src/data/bigGames'
-import { withGameTexts } from '../src/i18n/bigGames'
+import { BIG_GAME_TEXTS, withGameTexts } from '../src/i18n/bigGames'
 import { buildGraph, explore, parseLevel, slack, solveLevel, stateKey, tipFor, tryMove, won, MAX_GROUPS } from '../src/utils/lammGame'
 import { CHAPTERS, LEVELS } from '../src/utils/lammLevels'
 import { fitView, levelBounds } from '../src/utils/lammView'
@@ -65,6 +65,24 @@ describe('the list of levels', () => {
   })
 })
 
+describe('the texts', () => {
+  const keys = (o: unknown, prefix = ''): string[] => {
+    if (Array.isArray(o)) return o.flatMap((v, i) => keys(v, `${prefix}[${i}]`))
+    if (o && typeof o === 'object') return Object.entries(o).flatMap(([k, v]) => keys(v, prefix ? `${prefix}.${k}` : k))
+    return [prefix]
+  }
+  it('german, english and spanish have the same texts, none of them empty', () => {
+    const de = BIG_GAME_TEXTS.de.lamm!
+    const en = BIG_GAME_TEXTS.en.lamm!
+    const es = BIG_GAME_TEXTS.es.lamm!
+    expect(keys(en)).toEqual(keys(de))
+    expect(keys(es)).toEqual(keys(de))
+    const empty = (o: unknown): boolean => (typeof o === 'string' ? o.trim() === '' : o && typeof o === 'object' ? Object.values(o).some(empty) : false)
+    expect(empty(de) || empty(en) || empty(es)).toBe(false)
+    expect((es.levels as string[]).length).toBe(LEVELS.length)
+  })
+})
+
 describe.each(LEVELS.map((l, i) => [i + 1, l] as const))('level %i', (_n, def) => {
   const m = parseLevel(def)
   const space = explore(m)
@@ -90,6 +108,25 @@ describe.each(LEVELS.map((l, i) => [i + 1, l] as const))('level %i', (_n, def) =
     expect(sol.deadEnds).toBe(0)
     expect(sol.collisions).toBe(0)
     expect(space.nodes.length).toBeGreaterThan(0)
+  })
+
+  it('has more than one natural way to win (another order of the cranks, or one more turn)', () => {
+    if (!m.controls.length) return
+    const best = space.dist[0]!
+    const ways = new Set<string>()
+    const rec = (n: number, path: number[], seen: Set<number>) => {
+      if (ways.size >= 2) return
+      if (space.nodes[n]!.win && path.length >= best) ways.add(path.join(','))
+      if (path.length >= best + 2) return
+      for (const e of space.nodes[n]!.out) {
+        if (seen.has(e.to)) continue
+        seen.add(e.to)
+        rec(e.to, [...path, e.g], seen)
+        seen.delete(e.to)
+      }
+    }
+    rec(0, [], new Set([0]))
+    expect(ways.size).toBeGreaterThanOrEqual(2)
   })
 
   it('the tip leads to the goal by the shortest way', () => {

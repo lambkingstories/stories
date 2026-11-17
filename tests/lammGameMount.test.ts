@@ -14,6 +14,7 @@ vi.mock('@/use/useMusic', () => ({ default: () => ({ playGame: vi.fn(), stop: vi
 import BigGameLamm from '@/components/molecules/games/BigGameLamm.vue'
 import useBigGames from '@/use/useBigGames'
 import { LEVELS } from '@/utils/lammLevels'
+import { parseLevel, solveLevel } from '@/utils/lammGame'
 
 const texts = withGameTexts(app) as { de?: object; en?: object }
 const i18n = createI18n({ legacy: false, locale: 'de', fallbackLocale: 'en', messages: { de: texts.de ?? {}, en: texts.en ?? {} } })
@@ -31,7 +32,18 @@ class FailingImage {
 }
 
 interface Probe {
-  run: { moves: number; won: boolean; m: { goal: number; start: number }; st: number[]; lamb: number }
+  run: {
+    moves: number
+    won: boolean
+    got: number
+    stepT: number
+    anim: unknown
+    m: { goal: number; start: number; cells: { id: number; flower: number }[] }
+    st: number[]
+    lamb: number
+    graph: { comp: Int32Array }
+  }
+  begin: (i: number) => void
   advance: (s: number) => void
   touchHandle: (ci: number) => void
   walkTo: (cell: number) => void
@@ -156,6 +168,45 @@ describe('BigGameLamm', () => {
     expect(useBigGames().levels('lamm')[1]).toBeGreaterThanOrEqual(1)
     await w.find('[data-test="lamm-menu"]').trigger('click')
     expect(w.findAll('.lg-level')[1]!.text()).toContain('2')
+    w.unmount()
+  })
+
+  it('every level can be won in the game itself with three stars by the way the solver found (walking, riding, the perspective join, flowers)', async () => {
+    quiet()
+    const w = await open()
+    await w.find('[data-test="lamm-level-0"]').trigger('click')
+    const p = probe()
+    /** Lets the lamb finish walking and the parts finish moving. */
+    const settle = () => {
+      for (let i = 0; i < 400 && (p.run.stepT < 1 || p.run.anim); i++) p.advance(0.05)
+    }
+    const go = (cell: number) => {
+      p.walkTo(cell)
+      settle()
+    }
+    /** Walks to every flower of the part the lamb is in. */
+    const gather = () => {
+      for (const c of p.run.m.cells) {
+        if (c.flower < 0 || p.run.got & (1 << c.flower)) continue
+        if (p.run.graph.comp[c.id]! >= 0 && p.run.graph.comp[c.id] === p.run.graph.comp[p.run.lamb]) go(c.id)
+      }
+    }
+    for (let i = 0; i < LEVELS.length; i++) {
+      const way = solveLevel(parseLevel(LEVELS[i]!)).way
+      p.begin(i)
+      settle()
+      for (const step of way) {
+        gather()
+        go(step.s)
+        p.touchHandle(step.g)
+        settle()
+      }
+      gather()
+      go(p.run.m.goal)
+      settle()
+      expect(p.run.won, `level ${i + 1} is won`).toBe(true)
+      expect(useBigGames().levels('lamm')[i], `level ${i + 1} gives three stars`).toBe(3)
+    }
     w.unmount()
   })
 
