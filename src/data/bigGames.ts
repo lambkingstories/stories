@@ -22,7 +22,7 @@ export interface BigGame {
 export const BIG_GAMES: BigGame[] = [
   { id: 'david', image: 'images/spiele-gross/david/kachel.webp', maxStars: 30 },
   // the memory with the pictures of the adventures: one board for each of the 37 adventures on the time line, three stars each (see `utils/bilderMemory.ts`)
-  { id: 'memory', image: 'images/spiele-gross/memory/kachel.webp', maxStars: 111 },
+  { id: 'memory', image: 'images/spiele-gross/memory/kachel-2.webp', maxStars: 111 },
   { id: 'elia', image: 'images/spiele-gross/elia/kachel.webp', maxStars: 45 },
   { id: 'wasser', image: 'images/spiele-gross/wasser/kachel.webp', maxStars: 108 },
   // the catapult puzzle in the style of the birds-and-towers games: 36 levels in 4 chapters, jars, trumpets and torch jars (see `utils/gideonSim.ts`)

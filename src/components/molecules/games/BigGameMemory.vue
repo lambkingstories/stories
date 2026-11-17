@@ -379,7 +379,7 @@ function bindBox(el: unknown) {
 }
 
 const bgStyle = computed(() => {
-  const src = screen.value === 'menu' || !board.value ? pic('images/spiele-gross/memory/kachel.webp') : mini(board.value)
+  const src = screen.value === 'menu' || !board.value ? pic('images/spiele-gross/memory/kachel-2.webp') : mini(board.value)
   return { backgroundImage: `url("${src}")` }
 })
 function hideBroken(e: Event) {

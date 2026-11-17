@@ -90,7 +90,7 @@ describe('BigGameMemory', () => {
   it('is a game of the corner (picked with a wish), three stars for every adventure', () => {
     const g = BIG_GAMES.find((x) => x.id === 'memory')!
     expect(g.maxStars).toBe(TIMELINE.length * 3)
-    expect(g.image).toBe('images/spiele-gross/memory/kachel.webp')
+    expect(g.image).toBe('images/spiele-gross/memory/kachel-2.webp')
   })
 
   it('opens with the story and the explanation, which comes only once', async () => {
