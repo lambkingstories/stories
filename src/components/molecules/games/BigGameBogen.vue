@@ -849,25 +849,25 @@ function drawItem(c: CanvasRenderingContext2D, i: number, time: number) {
   } else if (it.kind === 'flag') {
     const waving = st.done
     const sway = waving ? Math.sin(time * 5 + x) * 0.05 : 0
-    const name = waving ? 'fahne-auf' : 'fahne-zu'
-    // the pole from the ground up to the cloth
-    c.strokeStyle = '#6b4a2a'
-    c.lineWidth = Math.max(3, u() * 0.16)
-    c.beginPath()
-    c.moveTo(px, sy(0))
-    c.lineTo(px, py - r * u() * (waving ? 1.5 : 1.2))
-    c.stroke()
-    const i = picOf(name)
+    const i = picOf(waving ? 'fahne-auf' : 'fahne-zu')
     if (i && i.width) {
-      const h = r * 3.4 * u()
+      // the picture is a pole with the cloth near its top (both pictures have the foot of the pole in the middle): it stands on the ground
+      const hTop = y + r * 1.5
+      const h = hTop * u()
       const w = (i.width / i.height) * h
-      // the picture is a pole with the cloth at the top: its pole is matched to the drawn one
       c.save()
-      c.translate(px, py - r * u() * 1.2)
+      c.translate(px, sy(0))
       c.rotate(sway)
-      c.drawImage(i, -w * (waving ? 0.12 : 0.5), -h * 0.2, w, h)
+      c.drawImage(i, -w * 0.5, -h, w, h)
       c.restore()
     } else {
+      // no picture: a pole and a cloth
+      c.strokeStyle = '#6b4a2a'
+      c.lineWidth = Math.max(3, u() * 0.16)
+      c.beginPath()
+      c.moveTo(px, sy(0))
+      c.lineTo(px, py - r * u() * 1.2)
+      c.stroke()
       c.fillStyle = waving ? '#c8402a' : '#9a5a4a'
       const cw = r * 1.6 * u() * (waving ? 1 : 0.45)
       c.fillRect(px, py - r * u() * 1.2, cw, r * u() * 1.0)
@@ -1466,7 +1466,7 @@ onBeforeUnmount(() => {
               @click="begin(i)"
             )
               span(class="bo-level-no") {{ i - c * LEVELS_PER_CHAPTER + 1 }}
-              AdventureStars(:stars="levelStars[i] ?? 0" :size="16")
+              AdventureStars(:stars="levelStars[i] ?? 0" :size="13")
         p(class="bo-rules") {{ t('app.bigGames.bogen.starRules') }}
         div(class="bo-menu-buttons")
           AdvButton(tone="blau" small data-test="bogen-how" @click="how = true") {{ t('app.bigGames.bogen.howTitle') }}
@@ -1497,9 +1497,10 @@ onBeforeUnmount(() => {
       div(v-if="paused && !how && chapterCard < 0" class="bo-menu bo-menu--dim")
         div(class="bo-card bo-card--small")
           h2(class="bo-title") {{ t('app.bigGames.bogen.pause') }}
-          AdvButton(data-test="bogen-resume" @click="paused = false") {{ t('app.bigGames.bogen.resume') }}
-          AdvButton(tone="blau" data-test="bogen-pause-again" @click="begin(level)") {{ t('app.bigGames.bogen.again') }}
-          AdvButton(tone="blau" data-test="bogen-menu" @click="toMenu") {{ t('app.bigGames.bogen.menu') }}
+          div(class="bo-btn-row")
+            AdvButton(small data-test="bogen-resume" @click="paused = false") {{ t('app.bigGames.bogen.resume') }}
+            AdvButton(small tone="blau" data-test="bogen-pause-again" @click="begin(level)") {{ t('app.bigGames.bogen.again') }}
+            AdvButton(small tone="blau" data-test="bogen-menu" @click="toMenu") {{ t('app.bigGames.bogen.menu') }}
 
     //- the end of a round
     div(v-else-if="screen === 'result'" class="bo-menu bo-menu--dim")
@@ -1514,9 +1515,10 @@ onBeforeUnmount(() => {
           h3(class="bo-sub") {{ t('app.bigGames.bogen.ending.title') }} · {{ t('app.bigGames.bogen.ending.ref') }}
           p(class="bo-text") {{ t('app.bigGames.bogen.ending.text') }}
           p(class="bo-text bo-text--task") {{ t('app.bigGames.bogen.ending.done') }}
-        AdvButton(v-if="hasNext && outcome.stars > 0" data-test="bogen-next" @click="begin(level + 1)") {{ t('app.bigGames.bogen.next') }}
-        AdvButton(:tone="hasNext && outcome.stars > 0 ? 'blau' : 'gold'" data-test="bogen-again" @click="begin(level)") {{ t('app.bigGames.bogen.again') }}
-        AdvButton(tone="blau" data-test="bogen-menu" @click="toMenu") {{ t('app.bigGames.bogen.menu') }}
+        div(class="bo-btn-row")
+          AdvButton(v-if="hasNext && outcome.stars > 0" small data-test="bogen-next" @click="begin(level + 1)") {{ t('app.bigGames.bogen.next') }}
+          AdvButton(small :tone="hasNext && outcome.stars > 0 ? 'blau' : 'gold'" data-test="bogen-again" @click="begin(level)") {{ t('app.bigGames.bogen.again') }}
+          AdvButton(small tone="blau" data-test="bogen-menu" @click="toMenu") {{ t('app.bigGames.bogen.menu') }}
 
     //- the story of a chapter (once)
     div(v-if="chapterCard >= 0 && loaded && !how" class="bo-menu bo-menu--dim")
@@ -1708,7 +1710,7 @@ onBeforeUnmount(() => {
 
 .bo-levels
   display: grid
-  grid-template-columns: repeat(6, minmax(0, 1fr))
+  grid-template-columns: repeat(auto-fill, minmax(62px, 1fr))
   gap: 8px
   width: 100%
 
@@ -1735,6 +1737,13 @@ onBeforeUnmount(() => {
   background: var(--lk-accent, #1f6a6a)
   color: var(--lk-on-accent, #fff)
   font-weight: 800
+
+.bo-btn-row
+  display: flex
+  flex-wrap: wrap
+  justify-content: center
+  gap: 8px
+  width: 100%
 
 .bo-menu-buttons
   display: flex
@@ -1920,4 +1929,9 @@ onBeforeUnmount(() => {
     top: 96px
   .bo-menu--dim
     place-items: start center
+  .bo-card
+    padding: 12px 14px 12px
+    gap: 6px
+  .bo-title
+    font-size: 1.25rem
 </style>

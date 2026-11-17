@@ -127,8 +127,19 @@ describe('walls', () => {
 describe('things to hit', () => {
   it('a target holds the arrow and counts; the level is won when all are done', () => {
     const def = plain({ items: [target('t', 14, 2.2, 1.5)] })
-    const g = playShots(def, 1, [{ a: 2.5, f: 0.62 }])
-    expect(needsLeft(g)).toBe(g.status === 'won' ? 0 : 1)
+    let won = false
+    for (let a = -3; a <= 12 && !won; a += 0.5) {
+      const g = playShots(def, 1, [{ a, f: 0.62 }])
+      if (g.status !== 'won') continue
+      won = true
+      expect(needsLeft(g)).toBe(0)
+      const arrow = g.arrows[0]!
+      expect(arrow.state).toBe('stuck')
+      expect(arrow.inItem).toBe(0)
+      // the arrow sits inside the target, not on its rim
+      expect(Math.hypot(arrow.x - 14, arrow.y - 2.2)).toBeLessThan(1.5 * 0.75)
+    }
+    expect(won).toBe(true)
   })
 
   it('an arrow flies through a jar and a flag and goes on', () => {
