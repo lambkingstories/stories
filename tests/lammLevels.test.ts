@@ -26,7 +26,7 @@ describe('the list of levels', () => {
   it('is entered as a big game with the stars of all its levels', () => {
     const g = BIG_GAMES.find((x) => x.id === 'lamm')!
     expect(g).toBeDefined()
-    expect(g.at).toBe(90)
+    expect(g.at).toBe(320)
     expect(g.maxStars).toBe(LEVELS.length * 3)
     expect(g.image).toBe('images/spiele-gross/lamm/kachel.webp')
   })

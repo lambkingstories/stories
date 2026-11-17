@@ -45,9 +45,9 @@ describe('BigGameMose', () => {
     return w
   }
 
-  it('is a game of the corner, opened with 70 stars', () => {
+  it('is a game of the corner, opened with 240 stars', () => {
     const g = BIG_GAMES.find((x) => x.id === 'mose')!
-    expect(g.at).toBe(70)
+    expect(g.at).toBe(240)
     expect(g.maxStars).toBe(120)
     expect(g.image).toBe('images/spiele-gross/mose/kachel.webp')
   })

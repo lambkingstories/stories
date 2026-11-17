@@ -20,7 +20,7 @@ describe('the list of levels', () => {
   it('is entered as a big game with the stars of all its levels', () => {
     const g = BIG_GAMES.find((x) => x.id === 'wasser')!
     expect(g).toBeDefined()
-    expect(g.at).toBe(60)
+    expect(g.at).toBe(160)
     expect(g.maxStars).toBe(LEVELS.length * 3)
   })
 

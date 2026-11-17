@@ -87,9 +87,9 @@ describe('BigGameMemory', () => {
     await flushPromises()
   }
 
-  it('is a game of the corner, opened with 30 stars, three stars for every adventure', () => {
+  it('is a game of the corner, opened with 80 stars, three stars for every adventure', () => {
     const g = BIG_GAMES.find((x) => x.id === 'memory')!
-    expect(g.at).toBe(30)
+    expect(g.at).toBe(80)
     expect(g.maxStars).toBe(TIMELINE.length * 3)
     expect(g.image).toBe('images/spiele-gross/memory/kachel.webp')
   })
