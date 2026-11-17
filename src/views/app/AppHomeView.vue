@@ -15,6 +15,9 @@ import { useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import AppHeader from '@/components/molecules/AppHeader.vue'
 import HomeHero, { type HeroSlide } from '@/components/molecules/HomeHero.vue'
+import HomeTileGrid from '@/components/molecules/HomeTileGrid.vue'
+import { HOME_SHORTCUTS } from '@/data/homeShortcuts'
+import type { HomeCard, HomeTileId } from '@/utils/homeTiles'
 import useModels from '@/use/useModels'
 import useApiBooks from '@/use/useApiBooks'
 import useReadingProgress from '@/use/useReadingProgress'
@@ -239,8 +242,33 @@ const familyCard = computed<ResumeCard>(() => ({
   go: () => void router.push({ name: 'app-family' })
 }))
 
-const resumeCards = computed<ResumeCard[]>(() => [adventureCard.value, bookCard.value, pictureCard.value, gamesCard.value, familyCard.value])
 const cardIcon = (id: ResumeCard['id']) => (id === 'adventure' ? 'compass' : id === 'book' ? 'series' : id === 'picture' ? 'brush' : id === 'family' ? 'profile' : 'star')
+
+/**
+ * Every tile that can be on the page (Anton, 18.11.2026: the tiles can be moved, made small or wide, taken away and added): the five main tiles show
+ * where the child stands, the others are shortcuts (see `data/homeShortcuts`). Which of them are shown, and in which order and size, is the layout
+ * of the child (`useHomeLayout`).
+ */
+const tileCards = computed<Partial<Record<HomeTileId, HomeCard>>>(() => {
+  const main: ResumeCard[] = [adventureCard.value, bookCard.value, pictureCard.value, gamesCard.value, familyCard.value]
+  const out: Partial<Record<HomeTileId, HomeCard>> = {}
+  for (const c of main) out[c.id] = { ...c, icon: cardIcon(c.id) }
+  for (const [id, sc] of Object.entries(HOME_SHORTCUTS)) {
+    out[id as HomeTileId] = {
+      id: id as HomeTileId,
+      kind: t(sc.kind),
+      title: t(sc.title),
+      meta: t(sc.meta),
+      image: prependBaseUrl(sc.image),
+      medal: true,
+      progress: -1,
+      empty: false,
+      icon: sc.icon,
+      go: () => (sc.to ? void router.push({ name: sc.to }) : void openPlus())
+    }
+  }
+  return out
+})
 
 // ── 4. new ───────────────────────────────────────────────────────────────────
 
@@ -284,31 +312,10 @@ function openBook(bookId: string) {
               img(v-if="sp.logo" :src="prependBaseUrl(sp.logo)" :alt="sp.name" draggable="false")
               span(v-else) {{ sp.name }}
 
-      //- four big cards: the adventure, reading, painting and the games
-      section(class="block")
-        h2(class="block-title") {{ t('app.home.todayTitle') }}
-        div(class="resume-grid")
-          button(
-            v-for="c in resumeCards"
-            :key="c.id"
-            type="button"
-            :class="['resume-card', 'resume-card--' + c.id, { 'is-empty': c.empty }]"
-            :aria-label="c.kind + ': ' + c.title"
-            @click="c.go()"
-          )
-            span(:class="['resume-thumb', { 'is-medal': c.medal }]")
-              img(v-if="c.medal && c.image" class="resume-blur" :src="c.image" alt="" draggable="false" aria-hidden="true")
-              img(v-if="c.image" class="resume-pic" :src="c.image" alt="" draggable="false" @error="onImgFallback")
-              ZIconography(v-else :name="cardIcon(c.id)" :size="40")
-              span(class="resume-kind")
-                ZIconography(:name="cardIcon(c.id)" :size="16")
-                span {{ c.kind }}
-            span(class="resume-body")
-              span(class="resume-title") {{ c.title }}
-              span(v-if="c.progress >= 0" class="resume-bar")
-                span(class="resume-bar-fill" :style="{ width: Math.round(c.progress * 100) + '%' }")
-              span(v-else-if="c.empty" class="resume-start") {{ t('app.home.startHere') }}
-              span(v-else class="resume-meta") {{ c.meta }}
+      //- the tiles: the adventure, reading, painting, the games and the family, and what else the child has put here (a long press arranges them)
+      HomeTileGrid(:cards="tileCards")
+        template(#title)
+          h2(class="block-title") {{ t('app.home.todayTitle') }}
 
       //- the journey through the Bible
       section(v-if="journeyTiles.length" class="block")
@@ -451,138 +458,6 @@ button
   cursor: pointer
 
 // ── continue ──
-.resume-grid
-  display: grid
-  grid-template-columns: repeat(2, minmax(0, 1fr))
-  gap: 12px
-
-// a white card: the picture fills the top edge to edge, the title and the bar sit below it
-.resume-card
-  display: flex
-  flex-direction: column
-  min-width: 0
-  padding: 0
-  overflow: hidden
-  text-align: left
-  border: 1px solid var(--lk-line)
-  border-radius: var(--lk-r-card)
-  background: var(--lk-surface)
-  color: var(--lk-text)
-  box-shadow: var(--lk-shadow)
-  cursor: pointer
-  touch-action: manipulation
-
-  &:active
-    transform: translateY(1px)
-
-.resume-thumb
-  position: relative
-  aspect-ratio: 16 / 10
-  overflow: hidden
-  background: var(--lk-surface-2)
-  color: var(--lk-muted)
-  display: flex
-  align-items: center
-  justify-content: center
-
-  // the picture fills the box without ever making it taller (a tall book cover would otherwise stretch the card)
-  img
-    position: absolute
-    inset: 0
-    width: 100%
-    height: 100%
-    object-fit: cover
-    display: block
-
-  // an adventure without a wide picture shows its round medal whole, on a soft blur of itself
-  &.is-medal > .resume-blur
-    transform: scale(1.5)
-    filter: blur(20px) saturate(1.1)
-    opacity: 0.55
-
-  &.is-medal > .resume-pic
-    object-fit: contain
-    padding: 6px 0
-    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3))
-
-  :deep(.z-icon-outline)
-    color: currentColor
-
-.resume-kind
-  position: absolute
-  left: 8px
-  top: 8px
-  display: inline-flex
-  align-items: center
-  gap: 5px
-  padding: 3px 10px 3px 7px
-  border-radius: 999px
-  background: var(--lk-surface)
-  color: var(--lk-text)
-  font-size: 0.78rem
-  font-weight: 800
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25)
-
-  :deep(.z-icon-outline)
-    color: currentColor
-
-.resume-body
-  display: flex
-  flex-direction: column
-  gap: 6px
-  flex: 1
-  padding: 8px 12px 10px
-
-// every card has the same body: one line for the title, one fixed line below it (the bar, the start chip or the place)
-.resume-title
-  font-weight: 800
-  font-size: 1rem
-  line-height: 1.25
-  white-space: nowrap
-  overflow: hidden
-  text-overflow: ellipsis
-
-.resume-bar
-  display: block
-  height: 7px
-  margin: 8px 0 7px
-  border-radius: 999px
-  background: var(--lk-track)
-  overflow: hidden
-
-.resume-bar-fill
-  display: block
-  height: 100%
-  border-radius: 999px
-  background: var(--lk-fill)
-
-.resume-meta
-  min-height: 22px
-  line-height: 22px
-  font-size: 0.88rem
-  color: var(--lk-muted)
-
-.resume-start
-  align-self: flex-start
-  min-height: 22px
-  line-height: 14px
-  padding: 4px 12px
-  border-radius: 999px
-  background: var(--lk-accent)
-  color: var(--lk-on-accent)
-  font-size: 0.82rem
-  font-weight: 700
-
-.resume-card.is-empty .resume-thumb
-  background: var(--lk-surface-2)
-
-// the fifth card (the family) stands alone in the last row: it takes the whole width, with a flatter picture
-.resume-card--family
-  grid-column: 1 / -1
-
-  .resume-thumb
-    aspect-ratio: 16 / 6
-
 // ── new ──
 .new-row
   display: flex
@@ -700,15 +575,6 @@ button
 
 // ── tablet and wide ──
 @media (min-width: 720px)
-  .resume-grid
-    grid-template-columns: repeat(5, minmax(0, 1fr))
-
-  .resume-card--family
-    grid-column: auto
-
-    .resume-thumb
-      aspect-ratio: 16 / 10
-
   .home-body
     padding: 24px 24px 0
     gap: 28px
