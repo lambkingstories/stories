@@ -11,7 +11,7 @@ const rest = teil3 as Record<string, Record<string, unknown>>
 export default {
   es: {
     app: {
-      nav: { home: 'Inicio', series: 'Leer', hoeren: 'Escuchar', color: 'Pintar', abenteuer: 'Aventura', profile: 'Yo' },
+      nav: { home: 'Inicio', series: 'Leer', color: 'Pintar', abenteuer: 'Aventura', profile: 'Yo' },
       adventure: { ...teil1, ...teil2 },
       ...rest
     }

@@ -8,7 +8,7 @@ import { useRoute, useRouter } from 'vue-router'
 import type { ComposerTranslation } from 'vue-i18n'
 import { prependBaseUrl } from '@/utils/function'
 
-export type AppNavId = 'home' | 'series' | 'abenteuer' | 'hoeren' | 'malen' | 'profile'
+export type AppNavId = 'home' | 'series' | 'abenteuer' | 'malen' | 'profile'
 
 export interface AppNavItem {
   id: AppNavId
@@ -35,7 +35,6 @@ export function routeToNav(name: string): AppNavId {
     || name === 'app-all-new-books'
   ) return 'series'
   if (name === 'app-adventure' || name === 'app-adventure-map' || name === 'app-adventure-stage' || name === 'app-adventure-stats' || name === 'app-family' || name === 'app-family-quiz' || name === 'app-family-activity' || name === 'app-family-who' || name === 'app-family-order' || name === 'app-family-bingo' || name === 'app-family-memory' || name === 'app-family-wortreise') return 'abenteuer'
-  if (name === 'app-hoeren') return 'hoeren'
   // the good-night stories belong to "Lesen"
   if (name === 'app-goodnight') return 'series'
   if (name === 'app-coloring' || name === 'app-coloring-book') return 'malen'
@@ -47,7 +46,6 @@ const ROUTE_BY_NAV: Record<AppNavId, string> = {
   home: 'app-main',
   series: 'app-read',
   abenteuer: 'app-adventure',
-  hoeren: 'app-hoeren',
   malen: 'app-coloring',
   profile: 'app-profile'
 }

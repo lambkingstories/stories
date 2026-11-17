@@ -15,7 +15,6 @@ const AppAllNewBooksView = () => import('@/views/app/AppAllNewBooksView.vue')
 const AppBookSeriesView = () => import('@/views/app/AppBookSeriesView.vue')
 const AppBookDetailView = () => import('@/views/app/AppBookDetailView.vue')
 const AppReaderView = () => import('@/views/app/AppReaderView.vue')
-const AppHoerenView = () => import('@/views/app/AppHoerenView.vue')
 const AppColoringView = () => import('@/views/app/AppColoringView.vue')
 const AppColoringBookView = () => import('@/views/app/AppColoringBookView.vue')
 const AppAdventureHomeView = () => import('@/views/app/AppAdventureHomeView.vue')
@@ -87,7 +86,8 @@ const routes: RouteRecordRaw[] = [
   { path: '/app/series/:seriesId', name: 'app-series', component: AppBookSeriesView },
   { path: '/app/book/:bookId', name: 'app-book', component: AppBookDetailView },
   { path: '/app/book/:bookId/reader', name: 'app-reader', component: AppReaderView },
-  { path: '/app/hoeren', name: 'app-hoeren', component: AppHoerenView },
+  // the old list of audio stories is gone: listening starts on the page of a book ("Anhören", with Plus), so old addresses lead to "Lesen"
+  { path: '/app/hoeren', redirect: { name: 'app-read' } },
   // stories read aloud by the family into the microphone (grown-ups only, behind the parental gate)
   { path: '/app/familien-stimmen', name: 'app-voices', component: AppVoicesView },
   // the thank-you book: the child's own words and drawings, only on this device

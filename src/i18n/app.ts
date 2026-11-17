@@ -4,7 +4,6 @@ export default {
       nav: {
         home: 'Start',
         series: 'Read',
-        hoeren: 'Listen',
         color: 'Color',
         abenteuer: 'Adventure',
         profile: 'Me'
@@ -3086,7 +3085,7 @@ export default {
         s1f1Where: 'Tap "Read" at the bottom and pick a story or a book.',
         s1f2Title: 'Having it read aloud',
         s1f2Text: 'The app reads a book aloud in a voice. Your child listens, even if they do not want to read yet.',
-        s1f2Where: 'Tap "Read aloud" inside a book.',
+        s1f2Where: 'Tap "Listen" inside a book.',
         s1f2Plan: 'Only with Plus. Reading yourself always stays free.',
         s1f3Title: 'Good night',
         s1f3Text: 'Your child picks a story and sets how long it should run (10, 20 or 30 minutes, or to the end). The app reads aloud, the screen goes dark, and it stops by itself.',
@@ -3125,7 +3124,7 @@ export default {
         s2f7Text: 'The first time you open an adventure the app loads it onto the device. After that it also works without a net, for example in the car.',
         s2f7Where: 'That happens by itself the first time an adventure is opened.',
         s2f8Title: 'Family games',
-        s2f8Text: 'Six games for the whole family: the quiz (your progress, all the questions, or every person on their own phone with a round code), Activity, Who am I?, the order race, Bible bingo (also on several phones with a code) and a memory with big painted Bible pictures (small, medium or large). Everything runs on the device, nothing is sent.',
+        s2f8Text: 'Seven games for the whole family: the quiz (your progress, all the questions, or every person on their own phone with a round code), Activity, Who am I?, the order race, Bible bingo (also on several phones with a code), a memory with big painted Bible pictures (small, medium or large) and the Word Journey, where you take turns finding words from the Bible in a grid of letters. Everything runs on the device, nothing is sent.',
         s2f8Where: 'Tap "Me" at the bottom, then "My games" and "Family games".',
         s2f8Plan: 'With Plus. A family plan covers up to five people, so everybody in the family joins in. Free as a taste: the quiz with your own progress.',
         s3Title: 'Painting',
@@ -3531,11 +3530,6 @@ export default {
         breadcrumb: 'NEW IN THE LIBRARY',
         empty: 'No new books in the past 3 months.'
       },
-      hoeren: {
-        title: 'Listen',
-        breadcrumb: 'Audiobooks',
-        empty: 'No audio stories available yet.'
-      },
       bookSeries: {
         title: 'Series',
         tagline: 'In the King\'s service',
@@ -3888,7 +3882,7 @@ export default {
         card2Title: 'Painting without limits',
         card2Text: 'Every picture of every coloring book and the full painting app: 36 colors in every box, your own colors and glitter pencils.',
         card3Title: 'Games for the whole family',
-        card3Text: 'Activity, Who am I?, order race, Bible bingo and memory. One purchase for up to five people.',
+        card3Text: 'Seven games for the family: quiz, Activity, Who am I?, order race, Bible bingo, memory and Word Journey. One purchase for up to five people.',
         card4Title: 'Listening and Good Night',
         card4Text: 'The books to listen to and Good Night with all the stories.',
         freeLine: 'Free for ever: all stories to read yourself, four adventures (Adam and Eve, Noah, Christmas, Easter), the painting app with all tools and the 12 basic colors, the family Bible quiz and the overview for parents.',
@@ -3912,7 +3906,7 @@ export default {
         area2Get2: 'The golden cards of all the other adventures',
         area2Get3: 'The quiz with all adventures',
         area2Get4: 'New adventures as soon as they exist',
-        area2Get5: 'Family games: Activity, Who am I?, order race, Bible bingo and memory',
+        area2Get5: 'Family games: Activity, Who am I?, order race, Bible bingo, memory and Word Journey',
         area2Free1: 'Four adventures in full: Adam and Eve, Noah, Christmas and Easter',
         area2Free2: 'Stars, cups, the cup cabinet and the family Bible quiz',
         area2Free3: 'Four golden collector cards (those of the free adventures)',
@@ -3946,7 +3940,7 @@ export default {
         priceYear: 'Per year',
         priceMonth: 'Per month',
         familyTitle: 'Plus for the whole family',
-        familyText: 'One purchase for up to five people. Everyone in the family uses LambKing Plus on their own device and plays the family games together: quiz and bingo on several phones, Activity, Who am I? and the order race.',
+        familyText: 'One purchase for up to five people. Everyone in the family uses LambKing Plus on their own device and plays the family games together: quiz and bingo on several phones, Activity, Who am I?, the order race, memory and Word Journey.',
         familyYear: 'Family, per year',
         familyMonth: 'Family, per month',
         familySave: 'Family',
@@ -4136,7 +4130,6 @@ export default {
       nav: {
         home: 'Start',
         series: 'Lesen',
-        hoeren: 'Hören',
         color: 'Malen',
         abenteuer: 'Abenteuer',
         profile: 'Ich'
@@ -7218,7 +7211,7 @@ export default {
         s1f1Where: 'Unten auf „Lesen“ tippen und eine Geschichte oder ein Buch aussuchen.',
         s1f2Title: 'Vorlesen lassen',
         s1f2Text: 'Die App liest ein Buch mit einer Stimme vor. Dein Kind hört zu, auch wenn es noch nicht selbst lesen mag.',
-        s1f2Where: 'In einem Buch auf „Vorlesen“ tippen.',
+        s1f2Where: 'In einem Buch auf „Anhören“ tippen.',
         s1f2Plan: 'Nur mit Plus. Selberlesen bleibt immer gratis.',
         s1f3Title: 'Gute Nacht',
         s1f3Text: 'Dein Kind sucht eine Geschichte aus und stellt ein, wie lange sie laufen soll (10, 20 oder 30 Minuten oder bis zum Ende). Die App liest vor, der Bildschirm wird dunkel, und sie hört von selbst auf.',
@@ -7257,7 +7250,7 @@ export default {
         s2f7Text: 'Beim ersten Öffnen lädt die App ein Abenteuer auf das Gerät. Danach läuft es auch ohne Netz, zum Beispiel im Auto.',
         s2f7Where: 'Das passiert beim ersten Öffnen eines Abenteuers von selbst.',
         s2f8Title: 'Familien-Spiele',
-        s2f8Text: 'Sechs Spiele für die ganze Familie: das Quiz (dein Stand, alle Fragen oder jeder auf dem eigenen Handy mit Rätsel-Code), Activity, Wer bin ich?, das Reihenfolge-Rennen, Bibel-Bingo (auch auf mehreren Handys mit Code) und ein Memory mit großen gemalten Bibel-Bildern (klein, mittel oder groß). Alles läuft auf dem Gerät, es wird nichts verschickt.',
+        s2f8Text: 'Sieben Spiele für die ganze Familie: das Quiz (dein Stand, alle Fragen oder jeder auf dem eigenen Handy mit Rätsel-Code), Activity, Wer bin ich?, das Reihenfolge-Rennen, Bibel-Bingo (auch auf mehreren Handys mit Code), ein Memory mit großen gemalten Bibel-Bildern (klein, mittel oder groß) und die Wortreise, bei der ihr reihum Wörter aus der Bibel in einem Buchstabengitter findet. Alles läuft auf dem Gerät, es wird nichts verschickt.',
         s2f8Where: 'Unten auf „Ich“, dann „Meine Spiele“ und „Familien-Spiele“.',
         s2f8Plan: 'Mit Plus. Ein Familienabo gilt für bis zu fünf Personen, so spielen alle in der Familie mit. Gratis zum Kennenlernen: das Quiz mit deinem Stand.',
         s3Title: 'Malen',
@@ -7661,11 +7654,6 @@ export default {
         breadcrumb: 'NEU IN DER BIBLIOTHEK',
         empty: 'Keine neuen Bücher in den letzten 3 Monaten.'
       },
-      hoeren: {
-        title: 'Hörgeschichten',
-        breadcrumb: 'Hörbücher',
-        empty: 'Es gibt noch keine Hörgeschichten.'
-      },
       bookSeries: {
         title: 'Serie',
         tagline: 'Im Auftrag des Königs',
@@ -8018,7 +8006,7 @@ export default {
         card2Title: 'Malen ohne Grenzen',
         card2Text: 'Jedes Bild jedes Malbuchs und die volle Mal-App: 36 Farben in jedem Kasten, eigene Farben und Glitzerstifte.',
         card3Title: 'Spiele für die ganze Familie',
-        card3Text: 'Activity, Wer bin ich?, Reihenfolge-Rennen, Bibel-Bingo und Memory. Ein Kauf für bis zu fünf Personen.',
+        card3Text: 'Sieben Spiele für die Familie: Quiz, Activity, Wer bin ich?, Reihenfolge-Rennen, Bibel-Bingo, Memory und Wortreise. Ein Kauf für bis zu fünf Personen.',
         card4Title: 'Anhören und Gute Nacht',
         card4Text: 'Die Bücher zum Anhören und Gute Nacht mit allen Geschichten.',
         freeLine: 'Gratis bleiben: alle Geschichten zum Selberlesen, vier Abenteuer (Adam und Eva, Noah, Weihnachten, Ostern), die Mal-App mit allen Werkzeugen und den 12 Grundfarben, das Bibel-Quiz für die Familie und die Übersicht für Eltern.',
@@ -8042,7 +8030,7 @@ export default {
         area2Get2: 'Die goldenen Karten aller weiteren Abenteuer',
         area2Get3: 'Das Quiz mit allen Abenteuern',
         area2Get4: 'Neue Abenteuer, sobald es sie gibt',
-        area2Get5: 'Familien-Spiele: Activity, Wer bin ich?, Reihenfolge-Rennen, Bibel-Bingo und Memory',
+        area2Get5: 'Familien-Spiele: Activity, Wer bin ich?, Reihenfolge-Rennen, Bibel-Bingo, Memory und Wortreise',
         area2Free1: 'Vier Abenteuer ganz: Adam und Eva, Noah, Weihnachten und Ostern',
         area2Free2: 'Sterne, Pokale, die Pokal-Vitrine und das Bibel-Quiz für die Familie',
         area2Free3: 'Vier goldene Sammelkarten (die der freien Abenteuer)',
@@ -8076,7 +8064,7 @@ export default {
         priceYear: 'Pro Jahr',
         priceMonth: 'Pro Monat',
         familyTitle: 'Plus für die ganze Familie',
-        familyText: 'Ein Kauf für bis zu fünf Personen. Alle in der Familie nutzen LambKing Plus auf ihrem eigenen Gerät und spielen zusammen die Familien-Spiele: Quiz und Bingo auf mehreren Handys, Activity, Wer bin ich? und das Reihenfolge-Rennen.',
+        familyText: 'Ein Kauf für bis zu fünf Personen. Alle in der Familie nutzen LambKing Plus auf ihrem eigenen Gerät und spielen zusammen die Familien-Spiele: Quiz und Bingo auf mehreren Handys, Activity, Wer bin ich?, das Reihenfolge-Rennen, Memory und die Wortreise.',
         familyYear: 'Familie, pro Jahr',
         familyMonth: 'Familie, pro Monat',
         familySave: 'Familie',
