@@ -45,7 +45,7 @@ const motion = ref<Motion>('nav-fade')
 
 const DEPTH: Record<string, number> = {
   'app-main': 0, 'app-read': 0, 'app-adventure': 0, 'app-profile': 0, 'app-coloring': 0,
-  'app-books': 1, 'app-coloring-books': 1, 'app-book-preview': 2, 'app-book-read': 2,'app-all-books': 1, 'app-all-new-books': 1, 'app-category': 1, 'app-awards': 1, 'app-parents': 1, 'app-goodnight': 1, 'app-collection': 1, 'app-gameroom': 1, 'app-big-game': 2, 'app-family': 1, 'app-family-quiz': 2, 'app-family-activity': 2, 'app-family-who': 2, 'app-family-order': 2, 'app-family-bingo': 2, 'app-family-memory': 2, 'app-family-wortreise': 2, 'app-journal': 1, 'app-voices': 1,
+  'app-books': 1, 'app-coloring-books': 1, 'app-book-preview': 2, 'app-book-read': 2,'app-all-books': 1, 'app-all-new-books': 1, 'app-category': 1, 'app-awards': 1, 'app-parents': 1, 'app-goodnight': 1, 'app-collection': 1, 'app-gameroom': 1, 'app-games-adventure': 2, 'app-games-stage': 2, 'app-big-game': 2, 'app-family': 1, 'app-family-quiz': 2, 'app-family-activity': 2, 'app-family-who': 2, 'app-family-order': 2, 'app-family-bingo': 2, 'app-family-memory': 2, 'app-family-wortreise': 2, 'app-journal': 1, 'app-voices': 1,
   'app-legal': 1, 'app-plus': 1, 'app-adventure-map': 1, 'app-coloring-book': 1,
   'app-series': 2, 'app-book': 2, 'app-adventure-stage': 2, 'app-adventure-stats': 2,
   'app-reader': 3
@@ -255,7 +255,7 @@ onMounted(() => {
   stopTracking = startActivityTracking(() => {
     const name = String(route.name ?? '')
     // the family games and the game room count as playing, wherever the way leads through
-    if (name.startsWith('app-family') || name === 'app-gameroom' || name === 'app-big-game') return 'play'
+    if (name.startsWith('app-family') || name === 'app-gameroom' || name === 'app-games-adventure' || name === 'app-games-stage' || name === 'app-big-game') return 'play'
     return SECTION_OF_NAV[routeToNav(name)] ?? 'other'
   })
 })

@@ -70,7 +70,7 @@ describe('seven family games', () => {
     const { default: Hub } = await import('@/views/app/AppFamilyGamesView.vue')
     const w = mount(Hub, opts)
     await flushPromises()
-    const places = w.findAll('.fh-place')
+    const places = w.findAll('.fh-box')
     expect(places.length).toBe(7)
     await places[0]!.trigger('click')
     expect(push).toHaveBeenLastCalledWith({ name: 'app-family-quiz' })

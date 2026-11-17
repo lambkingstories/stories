@@ -120,7 +120,7 @@ function openJourney(id: string) {
 // ── 3. continue ──────────────────────────────────────────────────────────────
 
 interface ResumeCard {
-  id: 'adventure' | 'book' | 'picture' | 'games'
+  id: 'adventure' | 'book' | 'picture' | 'games' | 'family'
   /** The small line above the title: book, painting or adventure. */
   kind: string
   title: string
@@ -226,8 +226,21 @@ const gamesCard = computed<ResumeCard>(() => {
   }
 })
 
-const resumeCards = computed<ResumeCard[]>(() => [adventureCard.value, bookCard.value, pictureCard.value, gamesCard.value])
-const cardIcon = (id: ResumeCard['id']) => (id === 'adventure' ? 'compass' : id === 'book' ? 'series' : id === 'picture' ? 'brush' : 'star')
+/** The family games (Anton, 17.11.2026: a card of their own): the painted symbol of the family, one tap to the page of the family games. */
+const familyCard = computed<ResumeCard>(() => ({
+  id: 'family',
+  kind: t('app.bigGames.rooms.kindFamily'),
+  title: t('app.family.hubTitle'),
+  meta: t('app.bigGames.rooms.homeMeta'),
+  image: prependBaseUrl('images/icons/kacheln/kachel-familie-c.webp'),
+  medal: true,
+  progress: -1,
+  empty: false,
+  go: () => void router.push({ name: 'app-family' })
+}))
+
+const resumeCards = computed<ResumeCard[]>(() => [adventureCard.value, bookCard.value, pictureCard.value, gamesCard.value, familyCard.value])
+const cardIcon = (id: ResumeCard['id']) => (id === 'adventure' ? 'compass' : id === 'book' ? 'series' : id === 'picture' ? 'brush' : id === 'family' ? 'profile' : 'star')
 
 // ── 4. new ───────────────────────────────────────────────────────────────────
 
@@ -279,7 +292,7 @@ function openBook(bookId: string) {
             v-for="c in resumeCards"
             :key="c.id"
             type="button"
-            :class="['resume-card', { 'is-empty': c.empty }]"
+            :class="['resume-card', 'resume-card--' + c.id, { 'is-empty': c.empty }]"
             :aria-label="c.kind + ': ' + c.title"
             @click="c.go()"
           )
@@ -563,6 +576,13 @@ button
 .resume-card.is-empty .resume-thumb
   background: var(--lk-surface-2)
 
+// the fifth card (the family) stands alone in the last row: it takes the whole width, with a flatter picture
+.resume-card--family
+  grid-column: 1 / -1
+
+  .resume-thumb
+    aspect-ratio: 16 / 6
+
 // ── new ──
 .new-row
   display: flex
@@ -681,7 +701,13 @@ button
 // ── tablet and wide ──
 @media (min-width: 720px)
   .resume-grid
-    grid-template-columns: repeat(4, minmax(0, 1fr))
+    grid-template-columns: repeat(5, minmax(0, 1fr))
+
+  .resume-card--family
+    grid-column: auto
+
+    .resume-thumb
+      aspect-ratio: 16 / 10
 
   .home-body
     padding: 24px 24px 0

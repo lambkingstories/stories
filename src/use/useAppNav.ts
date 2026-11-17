@@ -33,12 +33,12 @@ export function routeToNav(name: string): AppNavId {
     || name === 'app-series'
     || name === 'app-all-new-books'
   ) return 'series'
-  if (name === 'app-adventure' || name === 'app-adventure-map' || name === 'app-adventure-stage' || name === 'app-adventure-stats' || name === 'app-family' || name === 'app-family-quiz' || name === 'app-family-activity' || name === 'app-family-who' || name === 'app-family-order' || name === 'app-family-bingo' || name === 'app-family-memory' || name === 'app-family-wortreise') return 'abenteuer'
+  if (name === 'app-adventure' || name === 'app-adventure-map' || name === 'app-adventure-stage' || name === 'app-adventure-stats' || name === 'app-family-quiz' || name === 'app-family-activity' || name === 'app-family-who' || name === 'app-family-order' || name === 'app-family-bingo' || name === 'app-family-memory' || name === 'app-family-wortreise') return 'abenteuer'
   // the good-night stories belong to "Lesen"
   if (name === 'app-goodnight') return 'series'
   // the coloring books are one place, and it belongs to "Malen" (the door in "Lesen" leads there, too)
   if (name === 'app-coloring' || name === 'app-coloring-book' || name === 'app-coloring-books') return 'malen'
-  if (name === 'app-profile' || name === 'app-legal' || name === 'app-plus' || name === 'app-awards' || name === 'app-parents' || name === 'app-collection' || name === 'app-gameroom' || name === 'app-journal' || name === 'app-voices') return 'profile'
+  if (name === 'app-profile' || name === 'app-legal' || name === 'app-plus' || name === 'app-awards' || name === 'app-parents' || name === 'app-collection' || name === 'app-gameroom' || name === 'app-games-adventure' || name === 'app-games-stage' || name === 'app-family' || name === 'app-journal' || name === 'app-voices') return 'profile'
   return 'home'
 }
 

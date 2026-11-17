@@ -220,7 +220,7 @@ describe('Family hub', () => {
     push.mockClear()
     const w = mount(AppFamilyGamesView, { global: { plugins: [i18nFor('de')], stubs }, attachTo: document.body })
     await flushPromises()
-    const places = w.findAll('.fh-place')
+    const places = w.findAll('.fh-box')
     expect(places).toHaveLength(7)
     expect(places[6]!.text()).toContain('Wortreise')
     await places[6]!.trigger('click')

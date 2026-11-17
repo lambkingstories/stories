@@ -19,6 +19,7 @@ async function open(path: string, env: Record<string, string | boolean> = {}) {
     history: createMemoryHistory(),
     routes: [
       { path: '/app/spiel/:gameId', name: 'app-biggame', component: View },
+      { path: '/app/spiele/abenteuer', name: 'app-games-adventure', component: { template: '<div id="room">room</div>' } },
       { path: '/app/spielzimmer', name: 'app-gameroom', component: { template: '<div id="room">room</div>' } },
       { path: '/app/profile', name: 'app-profile', component: { template: '<div>profile</div>' } }
     ]
@@ -53,7 +54,7 @@ describe('the page of a game that is not unlocked', () => {
     expect(go.text().length).toBeGreaterThan(3)
     await go.trigger('click')
     await flushPromises()
-    expect(router.currentRoute.value.name).toBe('app-gameroom')
+    expect(router.currentRoute.value.name).toBe('app-games-adventure')
   })
 
   it('does not break on an unknown game (no tile, still the button)', async () => {

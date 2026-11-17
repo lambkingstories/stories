@@ -1,139 +1,210 @@
 <script setup lang="ts">
 /**
- * "Meine Spiele": all the games of the child on one page (Anton, 17.11.2026), in three groups, one below the other:
- *  - the adventure games (the big reward games; the bar "You may pick a game!" and the window to pick one are part of this group),
+ * "Meine Spiele": the overview of the games of the child (Anton, 17.11.2026), three big picture cards, each one leads to a page of its own:
+ *  - the adventure games (the big reward games; a free wish for one shows on the card),
  *  - the stage games (the small games of the stages; one opens with the three stars of its stage),
- *  - the family games (the old-map page with the quiz, activity, memory and the others; one card leads there, nothing of them changed).
- * The first two groups come from `MyRewards`. Three chips at the top jump to the groups (the page is long). The old names "Minispiele",
- * "Bonusspiele" and "Spielzimmer" are gone. This page is reached from "Me" (the tile "My games") and from the games card of the start page.
+ *  - the family games (quiz, activity, memory and the others; nothing of them changed).
+ * Nothing lies one below the other any more (the old single page was eight thousand pixels long). The old names "Minispiele", "Bonusspiele" and
+ * "Spielzimmer" are gone. This page is reached from "Me" (the tile "My games") and from the games card of the start page.
  * The route name is still `app-gameroom` (so every old link arrives), the address is `/app/spiele`.
  */
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import LkPageHead from '@/components/molecules/LkPageHead.vue'
-import MyRewards from '@/components/molecules/MyRewards.vue'
+import { journeys } from '@/data/adventures'
+import useAdventure from '@/use/useAdventure'
+import useGameWishes from '@/use/useGameWishes'
+import { rewardGames } from '@/utils/rewards'
 import { prependBaseUrl } from '@/utils/function'
 
 const { t } = useI18n({ useScope: 'global' })
 const router = useRouter()
+const adv = useAdventure()
+const wish = useGameWishes()
 
 function goBack() {
   if (window.history.length > 1) router.back()
   else void router.push({ name: 'app-profile' })
 }
 
-/** The three groups and the ids of their headings (the first two are in `MyRewards`). */
-const GROUPS = [
-  { id: 'rw-bonus', label: 'app.bigGames.title' },
-  { id: 'rw-mini', label: 'app.profile.stageGamesTitle' },
-  { id: 'gr-family', label: 'app.family.hubTitle' }
-]
+const bigOpen = computed(() => wish.states.value.filter((s) => s.open).length)
+const stage = computed(() => rewardGames(journeys, adv.progressOf))
+const stageOpen = computed(() => stage.value.filter((g) => g.open).length)
 
-function jump(id: string) {
-  const reduced = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  document.getElementById(id)?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' })
+interface Room {
+  key: 'adventure' | 'stage' | 'family'
+  to: string
+  title: string
+  sub: string
+  count: string
+  symbol: string
+  /** A free wish for an adventure game: the card glows and says so. */
+  wish?: boolean
 }
+
+const rooms = computed<Room[]>(() => [
+  {
+    key: 'adventure',
+    to: 'app-games-adventure',
+    title: t('app.bigGames.title'),
+    sub: t('app.bigGames.rooms.adventureSub'),
+    count: t('app.bigGames.rooms.openOf', { n: bigOpen.value, total: wish.states.value.length }),
+    symbol: 'images/icons/kacheln/kachel-bonus-c.webp',
+    wish: wish.wishes.value.free > 0
+  },
+  {
+    key: 'stage',
+    to: 'app-games-stage',
+    title: t('app.profile.stageGamesTitle'),
+    sub: t('app.bigGames.rooms.stageSub'),
+    count: t('app.bigGames.rooms.openOf', { n: stageOpen.value, total: stage.value.length }),
+    symbol: 'images/icons/kacheln/kachel-mini-c.webp'
+  },
+  {
+    key: 'family',
+    to: 'app-family',
+    title: t('app.family.hubTitle'),
+    sub: t('app.bigGames.rooms.familySub'),
+    count: '',
+    symbol: 'images/icons/kacheln/kachel-familie-c.webp'
+  }
+])
 </script>
 
 <template lang="pug">
   div(class="app-page min-h-screen w-full")
     LkPageHead(:title="t('app.profile.myGames')" :subtitle="t('app.profile.myGamesSub')" @back="goBack")
     div(class="gr-wrap")
-      //- one tap to each of the three groups
-      nav(class="gr-chips" :aria-label="t('app.profile.myGames')")
-        button(v-for="g in GROUPS" :key="g.id" type="button" class="gr-chip" :data-jump="g.id" @click="jump(g.id)") {{ t(g.label) }}
-
-      MyRewards(part="games" section="all")
-
-      //- the family games: the page on the old map, one tap away
-      section(class="gr-family")
-        h3(id="gr-family" class="gr-title")
-          img(:src="prependBaseUrl('images/icons/kacheln/kachel-familie-c.webp')" alt="" class="gr-title-img" draggable="false")
-          span {{ t('app.family.hubTitle') }}
-        router-link(:to="{ name: 'app-family' }" class="gr-card")
-          span(class="gr-card-sub") {{ t('app.profile.familyGamesSub') }}
-          span(class="gr-card-go" aria-hidden="true") ›
+      router-link(
+        v-for="r in rooms"
+        :key="r.key"
+        :to="{ name: r.to }"
+        :class="['gr-room', 'gr-room--' + r.key, { 'is-wish': r.wish }]"
+        :data-room="r.key"
+      )
+        span(class="gr-art")
+          img(:src="prependBaseUrl(r.symbol)" alt="" draggable="false")
+        span(class="gr-text")
+          span(class="gr-name") {{ r.title }}
+          span(class="gr-sub") {{ r.sub }}
+          span(v-if="r.wish" class="gr-wish")
+            img(:src="prependBaseUrl('images/abenteuer/ui/stern-gold-1.webp')" alt="" draggable="false")
+            span {{ t('app.bigGames.wishes', { n: wish.wishes.value.free }, wish.wishes.value.free) }}
+          span(v-else-if="r.count" class="gr-count") {{ r.count }}
+        span(class="gr-go" aria-hidden="true") ›
 </template>
 
 <style scoped lang="sass">
 .gr-wrap
   max-width: 760px
   margin: 0 auto
-  padding: 0 16px 120px
-
-.gr-chips
-  display: flex
-  flex-wrap: wrap
-  gap: 8px
-  padding: 4px 0 2px
-
-.gr-chip
-  flex: 1 1 auto
-  min-height: 44px
-  padding: 8px 14px
-  border: 1px solid var(--lk-line)
-  border-radius: 999px
-  background: var(--lk-surface)
-  color: var(--lk-text)
-  font: inherit
-  font-size: 0.92rem
-  font-weight: 800
-  white-space: nowrap
-  cursor: pointer
-  -webkit-tap-highlight-color: transparent
-  touch-action: manipulation
-
-  &:active
-    transform: scale(0.96)
-
-.gr-family
+  padding: 6px 16px 120px
   display: flex
   flex-direction: column
-  gap: 10px
-  margin-top: 28px
-  scroll-margin-top: 12px
-
-.gr-title
-  display: flex
-  align-items: center
-  gap: 12px
-  margin: 0
-  font-size: 1.05rem
-  font-weight: 800
-  color: var(--color-text-primary)
-
-.gr-title-img
-  flex: none
-  width: 40px
-  height: 40px
-  object-fit: contain
-
-.gr-card
-  display: flex
-  align-items: center
-  justify-content: space-between
   gap: 14px
-  min-height: 64px
-  padding: 12px 18px
-  border: 1px solid var(--lk-line)
-  border-radius: 22px
-  background: var(--lk-surface)
+
+.gr-room
+  --room-bg: #f6e3a8
+  --room-ink: #4a3608
+  display: flex
+  align-items: center
+  gap: 14px
+  min-height: 132px
+  padding: 14px 16px 14px 12px
+  border-radius: 26px
+  border: 1px solid rgba(0, 0, 0, 0.06)
+  background: var(--room-bg)
   box-shadow: var(--lk-shadow)
-  color: var(--lk-text)
+  color: var(--room-ink)
   text-decoration: none
   -webkit-tap-highlight-color: transparent
+  transition: transform 0.15s
 
   &:active
-    transform: translateY(1px)
+    transform: scale(0.98)
 
-.gr-card-sub
-  font-size: 1rem
-  font-weight: 700
-  line-height: 1.3
+.gr-room--stage
+  --room-bg: #cfe8e2
+  --room-ink: #17453f
 
-.gr-card-go
+.gr-room--family
+  --room-bg: #d3e2f7
+  --room-ink: #17325f
+
+.gr-room.is-wish
+  border-color: #d4a83e
+  box-shadow: 0 0 0 3px rgba(255, 214, 90, 0.5), var(--lk-shadow)
+
+.gr-art
   flex: none
-  font-size: 2rem
+  display: grid
+  place-items: center
+  width: 96px
+  height: 96px
+
+  img
+    width: 100%
+    height: 100%
+    object-fit: contain
+    filter: drop-shadow(0 4px 5px rgba(0, 0, 0, 0.25))
+
+.gr-text
+  flex: 1 1 auto
+  min-width: 0
+  display: flex
+  flex-direction: column
+  align-items: flex-start
+  gap: 3px
+
+.gr-name
+  font-size: 1.3rem
+  font-weight: 800
+  line-height: 1.15
+
+.gr-sub
+  font-size: 0.98rem
+  font-weight: 600
+  line-height: 1.3
+  opacity: 0.85
+
+.gr-count
+  margin-top: 4px
+  padding: 3px 11px
+  border-radius: 999px
+  background: rgba(255, 255, 255, 0.7)
+  font-size: 0.85rem
+  font-weight: 800
+
+.gr-wish
+  display: inline-flex
+  align-items: center
+  gap: 6px
+  margin-top: 4px
+  padding: 3px 11px 3px 6px
+  border-radius: 999px
+  background: #fff4c4
+  border: 1px solid #d4a83e
+  color: #3d2c00
+  font-size: 0.85rem
+  font-weight: 800
+
+  img
+    width: 22px
+    height: 22px
+    object-fit: contain
+
+.gr-go
+  flex: none
+  font-size: 2.2rem
   line-height: 1
-  color: var(--lk-muted)
+  opacity: 0.55
+
+@media (orientation: landscape) and (max-height: 450px)
+  .gr-room
+    min-height: 100px
+
+  .gr-art
+    width: 72px
+    height: 72px
 </style>

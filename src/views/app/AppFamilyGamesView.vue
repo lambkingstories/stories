@@ -1,14 +1,14 @@
 <script setup lang="ts">
 /**
- * The games for the whole family on the old map: seven places, each a bronze emblem with a parchment strip below it, the quiz (its first
- * form is free, the others come with Plus), the activity, "Wer bin ich?", the order race, Bible bingo, memory and the word journey (Plus). One purchase
- * covers the family, see the Plus page. All of it runs on the device: nothing is sent anywhere and nobody has an account.
+ * The games for the whole family (design C of Anton, 17.11.2026: "colourful game boxes" in the light look of the app, no longer the dark map): the
+ * quiz as a wide blue box on top (its first form is free, the others come with Plus), below it the activity, "Wer bin ich?", the order race,
+ * Bible bingo, memory and the word journey, every game in a box of its own colour with its bronze emblem. One purchase covers the family, see
+ * the Plus page. The games themselves (and their board) are as before; All of it runs on the device: nothing is sent anywhere.
  */
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import MapTable from '@/components/molecules/map/MapTable.vue'
-import MapPaper from '@/components/molecules/map/MapPaper.vue'
+import LkPageHead from '@/components/molecules/LkPageHead.vue'
 import PlusBadge from '@/components/atoms/PlusBadge.vue'
 import useSfx from '@/use/useSfx'
 import { PREMIUM_TEASER, hasFeature, showUpsell } from '@/use/usePremium'
@@ -41,6 +41,8 @@ const GAMES: Game[] = [
   { key: 'memory', to: 'app-family-memory', plus: true },
   { key: 'wortreise', to: 'app-family-wortreise', plus: true }
 ]
+const quiz = GAMES[0]!
+const others = GAMES.slice(1)
 
 /** The title or the line under it; the newer games keep their texts in their own file. */
 function label(g: Game, sub: boolean): string {
@@ -66,192 +68,160 @@ function open(g: Game) {
 </script>
 
 <template lang="pug">
-  MapTable(:title="t('app.family.hubTitle')" @back="goBack")
+  div(class="app-page min-h-screen w-full")
+    LkPageHead(:title="t('app.family.hubTitle')" :subtitle="PREMIUM_TEASER ? t('app.family.hubNote') : ''" @back="goBack")
     div(class="fh")
+      //- the quiz: wide box on top, the free one
+      button(type="button" :class="['fh-box', 'fh-box--hero', 'fh-box--' + quiz.key]" :data-game="quiz.key" @click="open(quiz)")
+        span(class="fh-emblem")
+          img(:src="emblem(quiz.key)" alt="" draggable="false" @error="hide")
+        span(class="fh-text")
+          span(class="fh-title") {{ label(quiz, false) }}
+          span(class="fh-sub") {{ label(quiz, true) }}
+        span(v-if="PREMIUM_TEASER" class="fh-free") {{ t('app.bigGames.rooms.free') }}
       div(class="fh-grid")
         button(
-          v-for="g in GAMES"
+          v-for="g in others"
           :key="g.key"
           type="button"
-          :class="['fh-place', 'fh-place--' + g.key]"
+          :class="['fh-box', 'fh-box--' + g.key]"
+          :data-game="g.key"
           @click="open(g)"
         )
           span(class="fh-emblem")
-            span(v-if="g.key === 'wortreise'" class="fh-glyph" aria-hidden="true") Aa
-            img(:src="emblem(g.key)" alt="" class="fh-img" draggable="false" @error="hide")
-            PlusBadge(v-if="g.plus && PREMIUM_TEASER" size="small" class="fh-badge")
-          MapPaper(kind="strip" class="fh-strip")
-            span(class="fh-label")
-              span(class="fh-title") {{ label(g, false) }}
-              span(class="fh-sub") {{ label(g, true) }}
-
-      MapPaper(kind="strip" class="fh-note")
-        span(class="fh-note-text") {{ t('app.family.hubNote') }}
+            img(:src="emblem(g.key)" alt="" draggable="false" @error="hide")
+          span(class="fh-text")
+            span(class="fh-title") {{ label(g, false) }}
+            span(class="fh-sub") {{ label(g, true) }}
+          PlusBadge(v-if="g.plus && PREMIUM_TEASER" size="small" class="fh-badge")
 </template>
 
 <style scoped lang="sass">
 .fh
-  --em: 104px
+  --em: 84px
   display: flex
   flex-direction: column
-  gap: 16px
-  max-width: 44rem
+  gap: 12px
+  max-width: 760px
   margin: 0 auto
-  padding-top: 6px
+  padding: 6px 16px 120px
 
 .fh-grid
   display: grid
   grid-template-columns: repeat(2, minmax(0, 1fr))
-  gap: 14px 12px
+  gap: 12px
 
-.fh-place
+// one box of a game: its own colour, the round emblem, the name and a line under it
+.fh-box
+  --bx: #2f5fb0
+  position: relative
   min-width: 0
   display: flex
   flex-direction: column
   align-items: center
-  gap: 4px
-  padding: 0
+  justify-content: flex-start
+  gap: 8px
+  padding: 16px 10px 14px
   border: 0
-  background: transparent
-  color: inherit
+  border-radius: 24px
+  background: var(--bx)
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.18), var(--lk-shadow)
+  color: #fff
   font: inherit
+  text-align: center
   cursor: pointer
   -webkit-tap-highlight-color: transparent
-  transition: transform 0.18s
+  transition: transform 0.15s
 
   &:active
-    transform: translateY(1px) scale(0.98)
+    transform: translateY(2px) scale(0.98)
 
-  &:hover .fh-emblem
-    transform: translateY(-3px)
+.fh-box--hero
+  flex-direction: row
+  align-items: center
+  gap: 14px
+  padding: 14px 16px
+  text-align: left
 
-// the round place on the map, every game in another material; the colored disc only shows while the picture is missing
+.fh-box--quiz
+  --bx: #2f5fb0
+
+.fh-box--activity
+  --bx: #23808a
+
+.fh-box--who
+  --bx: #b0402f
+
+.fh-box--order
+  --bx: #3d7f76
+
+.fh-box--bingo
+  --bx: #7d52a6
+
+.fh-box--memory
+  --bx: #7a5a30
+
+.fh-box--wortreise
+  --bx: #b45a1f
+
 .fh-emblem
+  flex: none
   position: relative
-  display: grid
-  place-items: center
   width: var(--em)
   height: var(--em)
   border-radius: 50%
-  background: radial-gradient(circle at 38% 32%, var(--em-a, #c79a45), var(--em-b, #7d5a22) 68%, var(--em-c, #4d3513))
-  box-shadow: inset 0 0 0 3px rgba(255, 224, 150, 0.35)
-  filter: drop-shadow(0 7px 8px rgba(10, 5, 0, 0.6))
-  transition: transform 0.2s
+  background: rgba(255, 255, 255, 0.16)
 
-.fh-place--quiz
-  --em-a: #e6c25a
-  --em-b: #1f3f8a
-  --em-c: #14285c
+  img
+    position: absolute
+    inset: -4%
+    width: 108%
+    height: 108%
+    object-fit: contain
+    filter: drop-shadow(0 4px 5px rgba(0, 0, 0, 0.35))
 
-.fh-place--activity
-  --em-a: #d8dde0
-  --em-b: #2a8f98
-  --em-c: #1a5f66
+.fh-box--hero .fh-emblem
+  --em: 72px
 
-.fh-place--who
-  --em-a: #b8402f
-  --em-b: #7a1f18
-  --em-c: #4a100c
+.fh-text
+  min-width: 0
+  display: flex
+  flex-direction: column
+  gap: 2px
 
-.fh-place--order
-  --em-a: #5fa49a
-  --em-b: #2f6f68
-  --em-c: #1c4540
-
-.fh-place--bingo
-  --em-a: #a06ac0
-  --em-b: #55307a
-  --em-c: #34194f
-
-.fh-place--memory
-  --em-a: #efe3c4
-  --em-b: #6b4a2a
-  --em-c: #3b2713
-
-.fh-place--wortreise
-  --em-a: #e8a15a
-  --em-b: #b0541f
-  --em-c: #6e2f0e
-
-// the letters on the disc of the word journey (shown only while its picture is missing: the picture covers them)
-.fh-glyph
-  position: relative
-  color: #fff3cf
-  font-family: var(--mp-serif, Georgia, serif)
-  font-size: 2.2rem
+.fh-title
+  font-size: 1.1rem
   font-weight: 800
-  text-shadow: 0 2px 4px rgba(40, 14, 2, 0.8)
+  line-height: 1.15
 
-.fh-img
-  position: absolute
-  inset: -3%
-  width: 106%
-  height: 106%
-  object-fit: contain
+.fh-sub
+  font-size: 0.9rem
+  font-weight: 600
+  line-height: 1.25
+  color: rgba(255, 255, 255, 0.9)
+
+.fh-free
+  margin-left: auto
+  flex: none
+  padding: 4px 12px
+  border-radius: 999px
+  background: #f3d27a
+  color: #4a3608
+  font-size: 0.85rem
+  font-weight: 800
 
 .fh-badge
   position: absolute
-  right: -8px
-  bottom: 2px
-  transform: scale(0.82)
-  transform-origin: right bottom
-
-.fh-strip
-  flex: 1
-  min-height: 0
-
-  :deep(.mpa-in)
-    min-height: 0
-    justify-content: center
-    padding: 12px 5% 12px 14%
-
-.fh-label
-  display: flex
-  flex-direction: column
-  gap: 1px
-  min-width: 0
-
-.fh-title
-  font-size: 1.05rem
-  font-weight: 800
-  line-height: 1.12
-  letter-spacing: 0.02em
-
-.fh-sub
-  font-size: 0.92rem
-  font-weight: 600
-  line-height: 1.2
-  color: var(--mp-ink-soft, #6b5230)
-
-.fh-note
-  :deep(.mpa-in)
-    padding: 12px 5% 12px 14%
-
-.fh-note-text
-  font-size: 1rem
-  font-weight: 600
-  line-height: 1.3
-
-// the seventh place stands alone in the last row, in the middle
-.fh-place--wortreise
-  grid-column: 1 / -1
-  justify-self: center
-  width: calc(50% - 6px)
+  top: 8px
+  right: 8px
+  transform: scale(0.85)
+  transform-origin: right top
 
 @media (orientation: landscape)
   .fh
-    --em: clamp(56px, 17vh, 96px)
-    gap: 10px
-    max-width: 62rem
+    --em: clamp(56px, 16vh, 84px)
+    max-width: 980px
 
   .fh-grid
     grid-template-columns: repeat(3, minmax(0, 1fr))
-    gap: 8px 14px
-
-  .fh-sub
-    font-size: 0.85rem
-
-  .fh-place--wortreise
-    grid-column: 2
-    width: auto
 </style>

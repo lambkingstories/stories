@@ -108,6 +108,8 @@ const routes: RouteRecordRaw[] = [
   { path: '/app/wer-ist-jesus', name: 'app-jesus', component: AppJesusView },
   // "My games": the adventure games, the stage games and the family games on one page (the old "game room" address leads here)
   { path: '/app/spiele', name: 'app-gameroom', component: () => import('@/views/app/AppGameRoomView.vue') },
+  { path: '/app/spiele/abenteuer', name: 'app-games-adventure', component: () => import('@/views/app/AppGamesAdventureView.vue') },
+  { path: '/app/spiele/etappen', name: 'app-games-stage', component: () => import('@/views/app/AppGamesStageView.vue') },
   { path: '/app/spielzimmer', redirect: { name: 'app-gameroom' } },
   { path: '/app/spiel/:gameId', name: 'app-big-game', component: () => import('@/views/app/AppBigGameView.vue') },
   // the good-night mode: a story with a timer and a darkening screen

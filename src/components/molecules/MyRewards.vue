@@ -55,6 +55,26 @@ function doPick(id: string) {
 
 const games = computed(() => rewardGames(journeys, adv.progressOf))
 const openCount = computed(() => games.value.filter((g) => g.open).length)
+/** The stage games in the order of the adventures: one group per adventure with its own heading, so the tiles are not one endless grid. */
+const gameGroups = computed(() => {
+  const out: { id: string; title: string; open: number; games: RewardGame[] }[] = []
+  for (const g of games.value) {
+    let grp = out[out.length - 1]
+    if (!grp || grp.id !== g.journeyId) {
+      grp = { id: g.journeyId, title: g.journeyTitle, open: 0, games: [] }
+      out.push(grp)
+    }
+    grp.games.push(g)
+    if (g.open) grp.open += 1
+  }
+  return out
+})
+/** A group of the stage games is folded (75 tiles would be a very long page): the ones with an open game stand open, the child can fold and unfold every one. */
+const unfolded = ref<Record<string, boolean>>({})
+const isUnfolded = (grp: { id: string; open: number }) => unfolded.value[grp.id] ?? grp.open > 0
+function toggleGroup(grp: { id: string; open: number }) {
+  unfolded.value = { ...unfolded.value, [grp.id]: !isUnfolded(grp) }
+}
 const gifts = computed(() =>
   journeys
     .filter((j) => !!cupOf(j, adv.progressOf(j.id)))
@@ -119,23 +139,29 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
         span(class="rw-title-text") {{ t('app.profile.stageGamesTitle') }}
         span(class="rw-count") {{ openCount }} / {{ games.length }}
       p(v-if="section !== 'bonus'" class="rw-hint") {{ t('app.profile.stageGamesHint') }}
-      div(v-if="section !== 'bonus'" class="rw-grid")
-        button(
-          v-for="g in games"
-          :key="`${g.journeyId}-${g.stageId}`"
-          type="button"
-          :class="['rw-tile', { 'is-locked': !g.open }]"
-          :disabled="!g.open"
-          @click="play(g)"
-        )
-          span(class="rw-img")
-            img(v-if="g.image" :src="pic(g.image)" alt="" draggable="false" loading="lazy")
-            span(v-if="g.open" class="rw-play" aria-hidden="true")
-              svg(viewBox="0 0 24 24" width="26" height="26" fill="currentColor")
-                path(d="M8 5.2v13.6a1 1 0 0 0 1.5.86l11-6.8a1 1 0 0 0 0-1.72l-11-6.8A1 1 0 0 0 8 5.2z")
-            span(v-else class="rw-lock") {{ t('app.profile.stageGameLocked', { n: g.stageNo }) }}
-          span(class="rw-name") {{ g.open ? g.title : '?' }}
-          span(class="rw-from") {{ g.journeyTitle }}
+      template(v-if="section !== 'bonus'")
+        section(v-for="grp in gameGroups" :key="grp.id" class="rw-group")
+          h4(class="rw-group-head")
+            button(type="button" class="rw-group-title" :aria-expanded="isUnfolded(grp)" @click="toggleGroup(grp)")
+              span(class="rw-group-name") {{ grp.title }}
+              span(class="rw-count") {{ grp.open }} / {{ grp.games.length }}
+              span(:class="['rw-group-arrow', { 'is-open': isUnfolded(grp) }]" aria-hidden="true") ›
+          div(v-if="isUnfolded(grp)" class="rw-grid")
+            button(
+              v-for="g in grp.games"
+              :key="`${g.journeyId}-${g.stageId}`"
+              type="button"
+              :class="['rw-tile', { 'is-locked': !g.open }]"
+              :disabled="!g.open"
+              @click="play(g)"
+            )
+              span(class="rw-img")
+                img(v-if="g.image" :src="pic(g.image)" alt="" draggable="false" loading="lazy")
+                span(v-if="g.open" class="rw-play" aria-hidden="true")
+                  svg(viewBox="0 0 24 24" width="26" height="26" fill="currentColor")
+                    path(d="M8 5.2v13.6a1 1 0 0 0 1.5.86l11-6.8a1 1 0 0 0 0-1.72l-11-6.8A1 1 0 0 0 8 5.2z")
+                span(v-else class="rw-lock") {{ t('app.profile.stageGameLocked', { n: g.stageNo }) }}
+              span(class="rw-name") {{ g.open ? g.title : '?' }}
 
     template(v-else)
       div(v-if="gifts.length" class="rw-grid")
@@ -167,6 +193,48 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
 
 .rw-title--next
   margin-top: 10px
+
+.rw-group
+  display: flex
+  flex-direction: column
+  gap: 8px
+  margin-top: 2px
+
+.rw-group-head
+  margin: 0
+
+.rw-group-title
+  display: flex
+  align-items: center
+  gap: 10px
+  width: 100%
+  min-height: 48px
+  padding: 8px 12px 8px 14px
+  border: 1px solid var(--lk-line)
+  border-radius: 16px
+  background: var(--lk-surface)
+  color: var(--color-text-primary)
+  font: inherit
+  font-size: 0.98rem
+  font-weight: 800
+  text-align: left
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+  touch-action: manipulation
+
+.rw-group-arrow
+  flex: none
+  font-size: 1.6rem
+  line-height: 1
+  color: var(--lk-muted)
+  transition: transform 0.2s
+
+  &.is-open
+    transform: rotate(90deg)
+
+.rw-group-name
+  flex: 1 1 auto
+  min-width: 0
 
 .rw-title-text
   flex: 1 1 auto

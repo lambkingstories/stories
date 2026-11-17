@@ -42,7 +42,7 @@ describe('Wortreise and Plus', () => {
     push.mockClear()
     const w = mount(AppFamilyGamesView, opts)
     await flushPromises()
-    const places = w.findAll('.fh-place')
+    const places = w.findAll('.fh-box')
     await places[6]!.trigger('click')
     expect(showUpsell).toHaveBeenCalledWith('family')
     expect(push).not.toHaveBeenCalled()

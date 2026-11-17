@@ -90,39 +90,61 @@ describe('"Me": the tiles', () => {
   })
 })
 
-describe('"Meine Spiele": three groups', () => {
-  it('shows the adventure games with the wish bar, the stage games and the family games, and the chips jump to them', async () => {
+describe('"Meine Spiele": three rooms', () => {
+  it('is an overview with three cards, each one leads to a page of its own, and nothing lies one below the other', async () => {
     const { default: GameRoom } = await import('@/views/app/AppGameRoomView.vue')
     giveStars(45)
     const w = mount(GameRoom, opts)
     await flushPromises()
     expect(w.text()).toContain('Meine Spiele')
-    // the wish bar of the adventure games is on this page
-    expect(text(w.get('.gw'))).toBe('Du darfst ein Spiel aussuchen!')
-    // the three groups, in this order
-    const heads = w.findAll('h3').map((h) => h.text().replace(/\s*\d+ \/ \d+$/, '').trim())
-    expect(heads).toEqual(['Abenteuer-Spiele', 'Etappen-Spiele', 'Familien-Spiele'])
-    // the adventure games are tiles that open the window to pick one (data-game), and the stage games come after them
-    expect(w.findAll('button[data-game]').length).toBeGreaterThanOrEqual(10)
-    expect(w.findAll('.rw-tile:not(.rw-big)').length).toBeGreaterThan(0)
-    // the family games: one card leads to the family page
-    expect(targets(w).some((t) => t.name === 'app-family')).toBe(true)
-    // three chips, one per group
-    expect(w.findAll('.gr-chip').map((c) => c.text())).toEqual(['Abenteuer-Spiele', 'Etappen-Spiele', 'Familien-Spiele'])
+    expect(w.findAll('.gr-room').map((r) => r.attributes('data-room'))).toEqual(['adventure', 'stage', 'family'])
+    expect(w.findAll('.gr-name').map((n) => n.text())).toEqual(['Abenteuer-Spiele', 'Etappen-Spiele', 'Familien-Spiele'])
+    expect(targets(w).map((t) => t.name)).toEqual(['app-games-adventure', 'app-games-stage', 'app-family'])
+    // 45 stars: one wish is free and the card says so; no tiles on this page, no chips
+    expect(w.find('.gr-room--adventure .gr-wish').exists()).toBe(true)
+    expect(w.findAll('.rw-tile')).toHaveLength(0)
+    expect(w.find('.gr-chip').exists()).toBe(false)
     expect(w.text()).not.toMatch(/Spielzimmer|Minispiel|Bonusspiel/)
     w.unmount()
   })
 
-  it('a closed adventure game opens the window to pick it (GameWishBar and BigGamePickDialog are on this page)', async () => {
-    const { default: GameRoom } = await import('@/views/app/AppGameRoomView.vue')
+  it('the adventure games have a page of their own: the wish bar and the tiles, a closed one opens the window to pick it', async () => {
+    const { default: Page } = await import('@/views/app/AppGamesAdventureView.vue')
     giveStars(45)
-    const w = mount(GameRoom, opts)
+    const w = mount(Page, opts)
     await flushPromises()
+    expect(text(w.get('.gw'))).toBe('Du darfst ein Spiel aussuchen!')
+    expect(w.findAll('button[data-game]').length).toBeGreaterThanOrEqual(10)
+    expect(w.findAll('.rw-tile:not(.rw-big)')).toHaveLength(0)
     await w.get('button[data-game="david"]').trigger('click')
     await flushPromises()
     expect(w.find('[role="dialog"]').exists()).toBe(true)
     expect(w.find('[data-test="bp-unlock"]').exists()).toBe(true)
     w.unmount()
+  })
+
+  it('the stage games have a page of their own, in groups: one heading per adventure', async () => {
+    const { default: Page } = await import('@/views/app/AppGamesStageView.vue')
+    const w = mount(Page, opts)
+    await flushPromises()
+    expect(w.findAll('button[data-game]')).toHaveLength(0)
+    expect(w.findAll('.rw-group').length).toBeGreaterThan(0)
+    expect(w.findAll('.rw-group-title').every((h) => h.text().length > 2)).toBe(true)
+    // nothing played yet: every group is folded; a tap on its heading unfolds it, and its tiles are inside the group
+    expect(w.findAll('.rw-tile')).toHaveLength(0)
+    const head = w.get('.rw-group-title')
+    expect(head.attributes('aria-expanded')).toBe('false')
+    await head.trigger('click')
+    expect(head.attributes('aria-expanded')).toBe('true')
+    expect(w.findAll('.rw-tile').length).toBeGreaterThan(0)
+    expect(w.findAll('.rw-group .rw-tile')).toHaveLength(w.findAll('.rw-tile').length)
+    w.unmount()
+  })
+
+  it('the routes: the rooms belong to "Me", and the family page too', () => {
+    expect(routeToNav('app-games-adventure')).toBe('profile')
+    expect(routeToNav('app-games-stage')).toBe('profile')
+    expect(routeToNav('app-family')).toBe('profile')
   })
 })
 

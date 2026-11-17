@@ -52,8 +52,8 @@ describe('the start page', () => {
     const wrapper = mount(Home, { global: { plugins: [i18n], stubs: { RouterLink: true } }, attachTo: document.body })
     await flushPromises()
     const cards = wrapper.findAll('.resume-card')
-    // the adventure, the book, the picture and the games
-    expect(cards).toHaveLength(4)
+    // the adventure, the book, the picture, the games and the family
+    expect(cards).toHaveLength(5)
     for (const c of cards) {
       push.mockClear()
       await c.trigger('click')

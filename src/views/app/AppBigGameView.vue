@@ -35,7 +35,7 @@ const open = computed(() => !!game.value && ((PROBE_ALLOWED && route.query.probe
 const gameTitle = computed(() => (game.value ? t(`app.bigGames.${game.value.id}.title`) : ''))
 
 function toGameRoom() {
-  void router.push({ name: 'app-gameroom' })
+  void router.push({ name: 'app-games-adventure' })
 }
 
 function leave() {
