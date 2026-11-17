@@ -15,6 +15,7 @@ import AdventureOverview, { type OverviewRow } from '@/components/molecules/Adve
 import AdventureCardReveal from '@/components/molecules/AdventureCardReveal.vue'
 import AdventureRewards from '@/components/molecules/AdventureRewards.vue'
 import NewAwards from '@/components/molecules/NewAwards.vue'
+import ExamPoints from '@/components/molecules/ExamPoints.vue'
 import AdventureQuiz from '@/components/molecules/AdventureQuiz.vue'
 const GameBuild = defineAsyncComponent(() => import('@/components/molecules/games/GameBuild.vue'))
 const GameDots = defineAsyncComponent(() => import('@/components/molecules/games/GameDots.vue'))
@@ -277,7 +278,8 @@ type Phase = 'text' | 'task' | 'painted' | 'bridge' | 'quiz' | 'result' | 'free'
 /** The game of this stage played again as a reward from "My game room" (profile): no stars, no progress, no story and questions. */
 const freePlay = computed(() => route.query.free === '1')
 const startPhase = (): Phase => {
-  if (isExam.value) return 'quiz'
+  // the exam that was done before: the child lands on the result again (the menu of the end of the adventure), "try again" starts the questions afresh
+  if (isExam.value) return adv.progressOf(String(route.params.journeyId))?.exam ? 'result' : 'quiz'
   if (route.query.free === '1') return 'task'
   // back from the coloring screen: the finished picture ("done"), or on to the questions
   if (route.query.back === 'task') return route.query.done === '1' ? 'painted' : 'bridge'
@@ -530,15 +532,21 @@ const cardWon = computed(() => {
   return albumSetCard(j, albumCards(j, (stageId) => adv.stageOf(j.id, stageId))).have
 })
 
-/** At the end of a free adventure: the next adventure in the order of the Bible, when it is behind LambKing Plus (a friendly hint, never a wall). */
-const nextPlusJourney = computed(() => {
+/** The next adventure in the order of the Bible (Anton, 17.11.2026: after Adam and Eve comes Noah, whether it is free or with Plus): shown at the end. */
+const nextJourney = computed(() => {
   const j = journey.value
-  if (!j || isJourneyPlusLocked(j.id)) return null
+  if (!j) return null
   const order = inBibleOrder(journeys)
   const at = order.findIndex((x) => x.id === j.id)
-  const next = at >= 0 ? order.slice(at + 1).find((x) => isJourneyPlusLocked(x.id)) : undefined
-  return next ?? null
+  return (at >= 0 ? order[at + 1] : undefined) ?? null
 })
+const nextLocked = computed(() => !!nextJourney.value && isJourneyPlusLocked(nextJourney.value.id))
+function openNext() {
+  const n = nextJourney.value
+  if (!n) return
+  if (nextLocked.value) showUpsell('adventure')
+  else void router.push({ name: 'app-adventure-map', params: { journeyId: n.id } })
+}
 
 onMounted(() => {
   // a stage behind LambKing Plus cannot be reached by a link either: back to the map, with the Plus sheet
@@ -1306,26 +1314,27 @@ function toFinale() {
           p(class="result-points") {{ t('app.adventure.points', { n: total, max }) }}
           p(class="result-line") {{ t('app.adventure.examRight', { n: exam?.correct ?? 0, total: exam?.total ?? 0 }) }}
           p(v-if="!medal" class="result-line") {{ t('app.adventure.noMedal') }}
-          //- the end of the adventure: what all the stars and answers gave, and what is still to win
-          AdventureRewards(v-if="journey" :journey="journey")
-          //- the awards just won, as pictures
+          //- 1. the points: the stars and the right answers add up to the cup
+          ExamPoints(v-if="journey" :journey="journey")
+          //- 2. what was won: card, stage games, adventure game, the coloring picture of the gold cup
+          AdventureRewards(v-if="journey" :journey="journey" exam @gift="paintGift")
+          //- 3. the awards just won, as pictures
           NewAwards(:ids="wonNow")
-          //- the coloring picture: a present of the gold cup only
-          button(v-if="medal === 'gold' && journey?.gift" type="button" class="gift-card" data-test="result-gift" @click="paintGift")
-            img(:src="prependBaseUrl(journey.gift.image)" alt="" class="gift-img" draggable="false")
-            span(class="gift-text")
-              span(class="gift-title") {{ t('app.adventure.statsGiftTitle') }}
-              span(class="gift-sub") {{ t('app.adventure.giftColor') }}
-          //- the memory verse of the adventure
+          //- 4. the memory verse of the adventure
           div(v-if="memoryVerse" class="verse-slip")
             span(class="verse-kicker") {{ t('app.adventure.verseKicker') }}
             blockquote(class="verse-text") {{ memoryVerse.text }}
             span(class="verse-ref") {{ memoryVerse.ref }}
             p(class="verse-card") {{ cardWon ? t('app.adventure.verseOnCard') : t('app.adventure.verseWinCard') }}
           p(v-if="journey?.id === 'ostern'" class="result-line result-plus") {{ jesusText.homeCardText }}
-          div(v-if="nextPlusJourney" class="plus-next")
-            p(class="plus-next-text") {{ t('app.adventure.plusNext', { title: nextPlusJourney.title }) }}
-            AdvButton(tone="blau" @click="showUpsell('adventure')") {{ t('app.adventure.plusNextButton') }}
+          //- 5. the next adventure, in the order of the Bible
+          button(v-if="nextJourney" type="button" class="next-adv" data-test="next-adventure" @click="openNext")
+            img(:src="prependBaseUrl(nextJourney.cover ?? nextJourney.medal)" alt="" class="next-adv-img" draggable="false")
+            span(class="next-adv-text")
+              span(class="next-adv-kicker") {{ t('app.bigGames.result.nextHead') }}
+              span(class="next-adv-title") {{ nextJourney.title }}
+              span(v-if="nextLocked" class="next-adv-plus") {{ t('app.bigGames.result.nextPlus') }}
+              span(v-else class="next-adv-go") {{ t('app.bigGames.result.nextButton') }}
           div(class="stage-actions")
             AdvButton(tone="gold" data-test="to-finale" @click="toFinale") {{ t('app.adventure.toOverview') }}
             AdvButton(v-if="journey?.id === 'ostern'" tone="gold" @click="router.push({ name: 'app-jesus' })") {{ jesusText.homeCardTitle }}
@@ -1889,17 +1898,18 @@ $ink: var(--lk-text)
   text-transform: uppercase
   color: var(--lk-muted)
 
-// the coloring picture of the gold cup: one card with the picture, tap to paint
-.gift-card
+// the next adventure: one card with its picture, the name and what the tap does
+.next-adv
   display: flex
   align-items: center
   gap: 14px
   width: 100%
   margin: 12px 0
-  padding: 10px 14px
-  border: 1.5px solid var(--lk-gold, #e6b840)
+  padding: 8px 14px 8px 8px
+  border: 1.5px solid var(--lk-line)
   border-radius: 22px
-  background: #fff8dc
+  background: var(--lk-surface)
+  box-shadow: var(--lk-shadow)
   color: var(--lk-text)
   font: inherit
   text-align: left
@@ -1909,43 +1919,45 @@ $ink: var(--lk-text)
   &:active
     transform: scale(0.98)
 
-.gift-img
+.next-adv-img
   flex: none
-  width: 76px
-  height: 76px
-  object-fit: contain
-  border-radius: 10px
-  background: #fff
+  width: 104px
+  height: 72px
+  border-radius: 14px
+  object-fit: cover
+  background: var(--lk-surface-2)
 
-.gift-text
+.next-adv-text
   display: flex
   flex-direction: column
   gap: 2px
+  min-width: 0
 
-.gift-title
+.next-adv-kicker
+  font-size: 0.78rem
   font-weight: 800
-  font-size: 1.05rem
+  letter-spacing: 0.08em
+  text-transform: uppercase
+  color: var(--lk-muted)
 
-.gift-sub
+.next-adv-title
+  font-size: 1.15rem
+  font-weight: 800
+  line-height: 1.2
+
+.next-adv-go
   font-size: 0.92rem
-  font-weight: 700
+  font-weight: 800
   color: var(--lk-accent)
 
-// the next adventure is only with Plus: text and button together in one quiet card
-.plus-next
-  display: flex
-  flex-direction: column
-  align-items: center
-  gap: 10px
-  margin: 12px 0
-  padding: 14px
-  border-radius: 20px
-  background: var(--lk-surface-2, #eef4f2)
-
-.plus-next-text
-  margin: 0
-  font-weight: 700
-  line-height: 1.35
+.next-adv-plus
+  align-self: flex-start
+  padding: 2px 10px
+  border-radius: 999px
+  background: #f3d27a
+  color: #4a3608
+  font-size: 0.82rem
+  font-weight: 800
 
 .stage-actions-row
   display: flex

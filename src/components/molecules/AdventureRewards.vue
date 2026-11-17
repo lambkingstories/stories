@@ -18,8 +18,13 @@ import { albumCards, albumSetCard } from '@/utils/collection'
 import { prependBaseUrl } from '@/utils/function'
 import type { Journey, Medal } from '@/types/adventure'
 
-/** `slim`: the line says what it holds (the stars of this adventure) and the long list opens only on a tap. */
-const props = defineProps<{ journey: Journey; stageId?: number; startOpen?: boolean; slim?: boolean }>()
+/**
+ * `slim`: the line says what it holds (the stars of this adventure) and the long list opens only on a tap.
+ * `exam`: the end of the adventure (Anton, 17.11.2026): the list is always open and says only what was WON (collector card, stage games,
+ * adventure game, the coloring picture of the gold cup); the stars and the cup are the business of the points block above it (`ExamPoints`).
+ */
+const props = defineProps<{ journey: Journey; stageId?: number; startOpen?: boolean; slim?: boolean; exam?: boolean }>()
+const emit = defineEmits<{ gift: [] }>()
 const { t } = useI18n({ useScope: 'global' })
 const adv = useAdventure()
 
@@ -80,6 +85,8 @@ interface Row {
   icon: string
   /** Shown as a small card picture, not as a round symbol. */
   isCard?: boolean
+  /** The coloring picture (a white sheet), shown whole in a small frame. */
+  isGift?: boolean
   title: string
   text: string
   hint?: string
@@ -92,14 +99,16 @@ interface Row {
 const rows = computed<Row[]>(() => {
   const out: Row[] = []
 
-  out.push({
-    key: 'stars',
-    icon: ui('stern-gold-3'),
-    title: t('app.adventure.rStars'),
-    text: starsMissing.value === 0 ? t('app.adventure.rStarsAll') : t('app.adventure.rStarsMissing', { n: starsMissing.value }, starsMissing.value),
-    bar: { value: starsNow.value, max: starsMax.value, label: t('app.adventure.rOf', { n: starsNow.value, max: starsMax.value }) },
-    done: starsMissing.value === 0
-  })
+  if (!props.exam) {
+    out.push({
+      key: 'stars',
+      icon: ui('stern-gold-3'),
+      title: t('app.adventure.rStars'),
+      text: starsMissing.value === 0 ? t('app.adventure.rStarsAll') : t('app.adventure.rStarsMissing', { n: starsMissing.value }, starsMissing.value),
+      bar: { value: starsNow.value, max: starsMax.value, label: t('app.adventure.rOf', { n: starsNow.value, max: starsMax.value }) },
+      done: starsMissing.value === 0
+    })
+  }
 
   out.push({
     key: 'card',
@@ -124,9 +133,14 @@ const rows = computed<Row[]>(() => {
       key: 'mini',
       icon: prependBaseUrl('images/icons/spielzimmer-4.webp'),
       title: t('app.adventure.rMini'),
-      text: t('app.adventure.rMiniNone'),
+      text: props.exam
+        ? miniOpenCount.value === miniIds.value.length
+          ? t('app.bigGames.result.miniAll')
+          : t('app.bigGames.result.miniSome', { n: miniOpenCount.value, max: miniIds.value.length })
+        : t('app.adventure.rMiniNone'),
       bar: { value: miniOpenCount.value, max: miniIds.value.length, label: t('app.adventure.rMiniCount', { n: miniOpenCount.value, max: miniIds.value.length }) },
-      done: false
+      // all of them open: the row is lit like every other one that is reached
+      done: miniOpenCount.value === miniIds.value.length
     })
   }
 
@@ -152,7 +166,20 @@ const rows = computed<Row[]>(() => {
     out.push({ key: 'bonus', icon: ui('stern-gold-1'), title: t('app.adventure.rBonus'), text: t('app.adventure.rBonusAll', { n: bonusOpenCount.value }, bonusOpenCount.value), done: true })
   }
 
-  if (pointsMax.value > 0 && props.journey.exam.length) {
+  // the coloring picture of the adventure: a present of the gold cup only
+  if (props.exam && props.journey.gift) {
+    const gold = cupNow.value === 'gold'
+    out.push({
+      key: 'gift',
+      icon: prependBaseUrl(props.journey.gift.image),
+      isGift: true,
+      title: t('app.bigGames.result.giftRow'),
+      text: gold ? t('app.bigGames.result.giftHave') : t('app.bigGames.result.giftNeed'),
+      done: gold
+    })
+  }
+
+  if (!props.exam && pointsMax.value > 0 && props.journey.exam.length) {
     const examDone = !!progress.value?.exam
     const medal = cupNow.value
     const text = medal
@@ -179,7 +206,8 @@ const rows = computed<Row[]>(() => {
 <template lang="pug">
   section(class="rw" :class="{ 'is-open': open }" :aria-label="t('app.adventure.rHead')")
     //- folded by default (Anton 5.11.2026): one line with the stars of the adventure; a tap opens the whole account, another closes it
-    h3(class="rw-head")
+    h3(v-if="exam" class="rw-won") {{ t('app.bigGames.result.wonHead') }}
+    h3(v-else class="rw-head")
       button(
         type="button"
         class="rw-toggle"
@@ -191,9 +219,19 @@ const rows = computed<Row[]>(() => {
         span(class="rw-head-title") {{ slim ? t('app.adventure.rHeadStars') : t('app.adventure.rHead') }}
         span(class="rw-head-count") {{ t('app.adventure.rOf', { n: starsNow, max: starsMax }) }}
         span(class="rw-chevron" aria-hidden="true") ▾
-    ul(v-show="open" id="rw-list" class="rw-list")
-      li(v-for="r in rows" :key="r.key" class="rw-row" :class="[`rw-${r.key}`, { 'is-done': r.done }]")
-        span(class="rw-icon" :class="{ 'is-card': r.isCard }")
+    ul(v-show="open || exam" id="rw-list" class="rw-list")
+      li(
+        v-for="r in rows"
+        :key="r.key"
+        class="rw-row"
+        :class="[`rw-${r.key}`, { 'is-done': r.done, 'is-tap': r.isGift && r.done }]"
+        :role="r.isGift && r.done ? 'button' : undefined"
+        :tabindex="r.isGift && r.done ? 0 : undefined"
+        :data-test="r.isGift && r.done ? 'rewards-gift' : undefined"
+        @click="r.isGift && r.done && emit('gift')"
+        @keydown.enter="r.isGift && r.done && emit('gift')"
+      )
+        span(class="rw-icon" :class="{ 'is-card': r.isCard, 'is-gift': r.isGift }")
           img(
             :src="r.icon"
             alt=""
@@ -215,6 +253,15 @@ const rows = computed<Row[]>(() => {
 .rw
   margin: 16px 0 6px
   text-align: left
+
+.rw-won
+  margin: 0 0 10px
+  font-size: 1.05rem
+  font-weight: 800
+  color: var(--lk-text)
+
+.rw-row.is-tap
+  cursor: pointer
 
 .rw-head
   margin: 0
@@ -297,6 +344,11 @@ const rows = computed<Row[]>(() => {
     max-width: 100%
     max-height: 100%
     object-fit: contain
+
+  &.is-gift img
+    border-radius: 6px
+    background: #fff
+    border: 2px solid #d4a83e
 
   &.is-card
     width: 40px

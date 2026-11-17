@@ -10,14 +10,15 @@ import lamm from './lamm'
 import memory from './memory'
 import mose from './mose'
 import nehemia from './nehemia'
+import result from './result'
 import rooms from './rooms'
 import wasser from './wasser'
 import wortreise from './wortreise'
 
 export const BIG_GAME_TEXTS = {
-  de: { common: common.de, bogen: bogen.de, gideon: gideon.de, wasser: wasser.de, mose: mose.de, karawane: karawane.de, nehemia: nehemia.de, wortreise: wortreise.de, memory: memory.de, lamm: lamm.de, rooms: rooms.de },
-  en: { common: common.en, bogen: bogen.en, gideon: gideon.en, wasser: wasser.en, mose: mose.en, karawane: karawane.en, nehemia: nehemia.en, wortreise: wortreise.en, memory: memory.en, lamm: lamm.en, rooms: rooms.en },
-  es: { common: common.es, bogen: bogen.es, gideon: gideon.es, wasser: wasser.es, mose: mose.es, karawane: karawane.es, nehemia: nehemia.es, wortreise: wortreise.es, memory: memory.es, lamm: lamm.es, rooms: rooms.es }
+  de: { common: common.de, bogen: bogen.de, gideon: gideon.de, wasser: wasser.de, mose: mose.de, karawane: karawane.de, nehemia: nehemia.de, wortreise: wortreise.de, memory: memory.de, lamm: lamm.de, rooms: rooms.de, result: result.de },
+  en: { common: common.en, bogen: bogen.en, gideon: gideon.en, wasser: wasser.en, mose: mose.en, karawane: karawane.en, nehemia: nehemia.en, wortreise: wortreise.en, memory: memory.en, lamm: lamm.en, rooms: rooms.en, result: result.en },
+  es: { common: common.es, bogen: bogen.es, gideon: gideon.es, wasser: wasser.es, mose: mose.es, karawane: karawane.es, nehemia: nehemia.es, wortreise: wortreise.es, memory: memory.es, lamm: lamm.es, rooms: rooms.es, result: result.es }
 } as Record<'de' | 'en' | 'es', Record<string, Record<string, unknown>>>
 
 /**

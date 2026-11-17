@@ -142,7 +142,7 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
       template(v-if="section !== 'bonus'")
         section(v-for="grp in gameGroups" :key="grp.id" class="rw-group")
           h4(class="rw-group-head")
-            button(type="button" class="rw-group-title" :aria-expanded="isUnfolded(grp)" @click="toggleGroup(grp)")
+            button(type="button" :class="['rw-group-title', { 'is-full': grp.open === grp.games.length }]" :aria-expanded="isUnfolded(grp)" @click="toggleGroup(grp)")
               span(class="rw-group-name") {{ grp.title }}
               span(class="rw-count") {{ grp.open }} / {{ grp.games.length }}
               span(:class="['rw-group-arrow', { 'is-open': isUnfolded(grp) }]" aria-hidden="true") ›
@@ -221,6 +221,17 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
   cursor: pointer
   -webkit-tap-highlight-color: transparent
   touch-action: manipulation
+
+// every stage game of the adventure is open: the heading is lit in gold, like every reached row
+.rw-group-title.is-full
+  border-color: #d4a83e
+  background: rgba(255, 244, 196, 0.9)
+  box-shadow: 0 0 0 3px rgba(255, 214, 90, 0.35)
+
+  .rw-count
+    background: #f3d27a
+    border-color: #d4a83e
+    color: #4a3608
 
 .rw-group-arrow
   flex: none
