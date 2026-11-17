@@ -78,7 +78,7 @@ import {
 } from '@/utils/karawaneArt'
 
 /** How far down in the bridge picture the deck lies (a share of its height). */
-const DECK_TOP = 0.32
+const DECK_TOP = 0.41
 void zoneAt
 void speedLimit
 type _Z = Zone

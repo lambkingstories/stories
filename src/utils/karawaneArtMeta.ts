@@ -654,6 +654,10 @@ export const META: Record<string, Record<string, number | number[]>> = {
   "mw": 1.219,
   "ratio": 1.008
  },
+ "steg": {
+  "deck": 0.145,
+  "ratio": 3.488
+ },
  "sym-1": {
   "mh": 0.46,
   "mw": 1.145,
@@ -838,5 +842,30 @@ export const META: Record<string, Record<string, number | number[]>> = {
   "mh": 2.386,
   "mw": 3.54,
   "ratio": 1.484
+ },
+ "zonen-1": {
+  "mh": 1.088,
+  "mw": 1.381,
+  "ratio": 1.269
+ },
+ "zonen-2": {
+  "mh": 1.09,
+  "mw": 1.238,
+  "ratio": 1.135
+ },
+ "zonen-3": {
+  "mh": 1.219,
+  "mw": 0.683,
+  "ratio": 0.561
+ },
+ "zonen-4": {
+  "mh": 1.057,
+  "mw": 0.955,
+  "ratio": 0.903
+ },
+ "zonen-5": {
+  "mh": 0.805,
+  "mw": 1.781,
+  "ratio": 2.213
  }
 }
