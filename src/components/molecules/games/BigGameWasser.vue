@@ -203,6 +203,23 @@ function paintTerrain(cx0: number, cy0: number, cx1: number, cy1: number) {
   const mat = w.mat
   const tex: (Uint32Array | undefined)[] = []
   for (let m = 0; m < 8; m++) tex[m] = textureFor(m)
+  // the mean colour of the earth and the sand of this world (the picture is calmed towards it)
+  const means: ([number, number, number] | undefined)[] = []
+  for (const m of [DIRT, SAND]) {
+    const tl = tex[m]
+    if (!tl) continue
+    let r0 = 0
+    let g0 = 0
+    let b0 = 0
+    for (let i = 0; i < TW * TW; i += 97) {
+      const c0 = tl[i]!
+      r0 += c0 & 255
+      g0 += (c0 >> 8) & 255
+      b0 += (c0 >> 16) & 255
+    }
+    const n0 = Math.ceil((TW * TW) / 97)
+    means[m] = [r0 / n0, g0 / n0, b0 / n0]
+  }
   const rowW = W * TS
   const total = H * TS
   /** The share of solid cells around a point of the picture (a bilinear field). */
@@ -285,22 +302,21 @@ function paintTerrain(cx0: number, cy0: number, cx1: number, cy1: number) {
       b /= d
       const mc = d > 0.5 ? (a00 >= a10 && a00 >= a01 && a00 >= a11 ? m00 : a10 >= a01 && a10 >= a11 ? m10 : a01 >= a11 ? m01 : m11) : m00
       // strata: soft bands go with the depth (humus, loam, gravel), they wave with the noise; deeper is darker and cooler
-      let light = 1.1 - 0.3 * yFrac + 0.1 * low - 0.05
+      let light = 1.1 - 0.26 * yFrac + 0.05 * low - 0.03
       if (mc === DIRT) {
         const band = Math.sin(yFrac * 38 + low * 5)
-        light += 0.045 * band
-        r *= 1 + 0.03 * band
-        b *= 1 - 0.03 * band
-        // fine grains and a few dark specks
-        light += (hi - 0.5) * 0.1 + (hi > 0.985 ? -0.2 : 0)
+        light += 0.02 * band
+        r *= 1 + 0.015 * band
+        b *= 1 - 0.015 * band
+        light += (hi - 0.5) * 0.025
       } else if (mc === SAND) {
         // loose sand: grains that glitter, ripples
-        light += (hi - 0.5) * 0.2 + (hi > 0.975 ? 0.25 : 0) + 0.05 * Math.sin(px * 0.35 + low * 8)
+        light += (hi - 0.5) * 0.05 + 0.02 * Math.sin(px * 0.35 + low * 8)
       } else if (mc === ROCK) {
         light -= 0.05
-        light += (hi - 0.5) * 0.06
+        light += (hi - 0.5) * 0.03
       } else if (mc === MUD) {
-        light += (hi > 0.97 ? 0.3 : 0) - 0.05
+        light += (hi > 0.99 ? 0.15 : 0) - 0.05
       }
       // light on the edges: from the upper left; a lit top edge, a dark underside, an inner edge that is a little darker
       const edge = 1 - Math.min(1, Math.max(0, (d - 0.5) / 0.4))
@@ -312,6 +328,14 @@ function paintTerrain(cx0: number, cy0: number, cx1: number, cy1: number) {
         light += edge * (lit > 0 ? 0.55 * lit : 0.7 * lit)
         light -= edge * 0.18
         if (mc === ROCK) light += edge * (lit > 0 ? 0.35 * lit : 0)
+      }
+      if (mc === DIRT || mc === SAND) {
+        const mm = means[mc]
+        if (mm) {
+          r = mm[0] + (r - mm[0]) * 0.3
+          g = mm[1] + (g - mm[1]) * 0.3
+          b = mm[2] + (b - mm[2]) * 0.3
+        }
       }
       const k = light
       r = Math.min(255, Math.max(0, r * k))
@@ -543,7 +567,7 @@ function makeDetails() {
     seed = (seed * 1664525 + 1013904223) >>> 0
     return seed / 4294967296
   }
-  for (let tries = 0; tries < 400 && details.length < 34; tries++) {
+  for (let tries = 0; tries < 400 && details.length < 9; tries++) {
     const x = 6 + rnd() * (W - 12)
     const y = 30 + rnd() * (H - 38)
     const cx = Math.floor(x)
@@ -553,8 +577,13 @@ function makeDetails() {
     for (let dy = -4; dy <= 4 && solid; dy += 2) for (let dx = -4; dx <= 4; dx += 2) if (w.mat[(cy + dy) * W + cx + dx] === AIR || w.vmask[(cy + dy) * W + cx + dx]) solid = false
     const m = w.mat[cy * W + cx]
     if (!solid || (m !== DIRT && m !== ROCK && m !== SAND)) continue
+    // never near a plant or the way of the tip
+    const cxc = x / K
+    const cyc = y / K
+    if (w.plants.some((p) => Math.hypot(p.x - x, p.y - y) < 20)) continue
+    if (tipStepsOf.some((st) => st.some((q) => Math.hypot(q[0] - cxc, q[1] - cyc) < 3.5))) continue
     const n = Math.floor(rnd() * 8) + 1
-    details.push({ x, y, n, size: 3.2 + rnd() * 3.2, rot: (rnd() - 0.5) * 1.6, cx, cy })
+    details.push({ x, y, n, size: 2.4 + rnd() * 1.8, rot: (rnd() - 0.5) * 1.6, cx, cy })
   }
 }
 
@@ -904,7 +933,7 @@ function draw(time: number, dt: number) {
     c.translate(d.x, d.y)
     c.scale(1, cell / cellY)
     c.rotate(d.rot)
-    c.globalAlpha = 0.92
+    c.globalAlpha = 0.38
     c.drawImage(i, (-i.width / i.height) * h * 0.5, -h * 0.5, (i.width / i.height) * h, h)
     c.restore()
   }
@@ -956,13 +985,25 @@ function draw(time: number, dt: number) {
   w.plants.forEach((p, i) => {
     const t = wi + 1
     const kind = p.thorn ? 'dorn' : 'blume'
-    const h = p.thorn ? 9 : 10
+    const h = p.thorn ? 15 : 16
+    // a soft light halo behind the plant (the plants are the aims: they must catch the eye at once)
+    const gl = c.createRadialGradient(p.x, p.y - h * 0.5, 1, p.x, p.y - h * 0.5, h * 0.85)
+    const pulse = p.bloomed ? 0.3 : 0.45 + 0.15 * Math.sin(time * 3 + i)
+    gl.addColorStop(0, p.bloomed ? `rgba(255,245,170,${pulse + 0.2})` : `rgba(255,250,225,${pulse + 0.25})`)
+    gl.addColorStop(1, 'rgba(255,250,225,0)')
+    c.fillStyle = gl
+    c.beginPath()
+    c.ellipse(p.x, p.y - h * 0.5, h * 0.85, h * 0.85 * (cell / cellY) * 1.05, 0, 0, Math.PI * 2)
+    c.fill()
+    c.save()
+    c.shadowColor = 'rgba(255,252,230,0.95)'
+    c.shadowBlur = 7 * dpr
     if (p.bloomed) {
       const k = Math.min(1, p.age / 0.5)
       const pop = 1 + 0.25 * Math.sin(k * Math.PI) * (1 - k)
       sprite(c, `${kind}-${t}-bluehend`, p.x, p.y, h * pop)
     } else sprite(c, `${kind}-${t}-durstig`, p.x, p.y, h, 0, p.drowned ? 0.45 : 1)
-    void i
+    c.restore()
   })
 
   // the tip
@@ -1031,6 +1072,28 @@ function drawMark(c: CanvasRenderingContext2D, time: number) {
       if (x > x1) x1 = x
     }
   if (x1 < x0) return
+  // a clear light edge around the vessel (it is the aim)
+  let vy0 = H
+  let vy1 = 0
+  let vx0 = W
+  let vx1 = 0
+  for (const k of w.vcells) {
+    const vx = k % W
+    const vy = (k - vx) / W
+    if (vx < vx0) vx0 = vx
+    if (vx > vx1) vx1 = vx
+    if (vy < vy0) vy0 = vy
+    if (vy > vy1) vy1 = vy
+  }
+  c.save()
+  c.shadowColor = 'rgba(255,250,215,0.95)'
+  c.shadowBlur = 8 * dpr
+  c.strokeStyle = 'rgba(255,248,215,0.9)'
+  c.lineWidth = 1.1
+  c.beginPath()
+  c.roundRect(vx0 - 5, vy0 - 1.5, vx1 - vx0 + 11, vy1 - vy0 + 7, 3)
+  c.stroke()
+  c.restore()
   const pulse = hud.won ? 0.5 + 0.5 * Math.sin(time * 8) : 0.5
   c.strokeStyle = hud.won ? `rgba(255,226,110,${0.7 + 0.3 * pulse})` : 'rgba(255,236,150,0.9)'
   c.lineWidth = 1
