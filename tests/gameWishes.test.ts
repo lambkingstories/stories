@@ -264,7 +264,7 @@ describe('the page of a game', () => {
     return w
   }
 
-  it('opens only a picked game; otherwise it says so and leads back', async () => {
+  it('opens only a picked game; otherwise it says so kindly and leads to the game page', async () => {
     route.params = { gameId: 'david' }
     const closed = await page()
     expect(closed.find('.game-david-stub').exists()).toBe(false)

@@ -402,7 +402,7 @@ const ui = (name: string) => img(`images/abenteuer/ui/${name}.webp`)
 function onBack() {
   if (freePlay.value) {
     stopAll()
-    void router.push({ name: 'app-profile' })
+    void router.push({ name: 'app-gameroom' })
     return
   }
   if (isExam.value) {
