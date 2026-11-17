@@ -1,6 +1,6 @@
 /**
- * The games a gold cup gives to the child: the best replayable games of a journey (memory, puzzle, finding, ...) stand in "My game room" (the
- * profile page) once the gold cup of that journey is won, and can be played again and again there, without stars and without touching the
+ * The stage games of the journeys (memory, puzzle, finding, ...): the best replayable games of a journey stand in "My games" (the
+ * profile area) once the three stars of their stage are won, and can be played again and again there, without stars and without touching the
  * progress of the journey. The numbers are stage ids of the journey; the game of the stage is played as it is.
  */
 export const REWARD_GAMES: Record<string, number[]> = {

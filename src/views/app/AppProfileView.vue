@@ -10,12 +10,14 @@ import ZIconography from '@/components/atoms/ZIconography.vue'
 import ZLanguageSwitcher from '@/components/atoms/ZLanguageSwitcher.vue'
 import AvatarPickerModal from '@/components/molecules/AvatarPickerModal.vue'
 import TestUnlock from '@/components/molecules/TestUnlock.vue'
+import BuildStamp from '@/components/atoms/BuildStamp.vue'
 import { PLUS_TEST } from '@/use/usePremium'
 import useModels from '@/use/useModels'
 import useApiBooks from '@/use/useApiBooks'
 import useUser from '@/use/useUser'
 import useReadingProgress from '@/use/useReadingProgress'
 import useAvatar, { onAvatarFallback } from '@/use/useAvatar'
+import useGameWishes from '@/use/useGameWishes'
 import useUserName from '@/use/useUserName'
 import useApiConfig from '@/use/useApiConfig'
 import { isMobileLandscape } from '@/use/useUser'
@@ -32,6 +34,8 @@ const apiBooks = useApiBooks()
 const { userLanguage } = useUser()
 const { getPct } = useReadingProgress()
 const { avatarSrc } = useAvatar()
+// a free wish for an adventure game: "My games" lights up and says so
+const gameWishes = useGameWishes().wishes
 const {
   useLocalBackend,
   remoteBase,
@@ -269,24 +273,22 @@ const tileImg = (path: string) => prependBaseUrl(`images/${path}.webp`)
             //  )
 
 
-      //- the child's own places: four tiles of the same kind
+      //- the child's own places: "My rewards" and "My games" (everything the adventures give), and the thank-you book
       nav(class="my-tiles" :aria-label="t('app.profile.myPlaces')")
-        router-link(:to="{ name: 'app-awards' }" class="my-tile")
-          img(:src="tileImg('icons/kacheln/kachel-ich-auszeichnungen')" alt="" class="my-tile-img" draggable="false")
-          span(class="my-tile-title") {{ t('app.profile.myAwards') }}
-          span(class="my-tile-sub") {{ t('app.profile.tileAwardsSub') }}
         router-link(:to="{ name: 'app-collection' }" class="my-tile")
           img(:src="tileImg('icons/kacheln/kachel-karten-c')" alt="" class="my-tile-img" draggable="false")
-          span(class="my-tile-title") {{ t('app.collection.title') }}
+          span(class="my-tile-title") {{ t('app.profile.myRewards') }}
           span(class="my-tile-sub") {{ t('app.collection.quickSub') }}
-        router-link(:to="{ name: 'app-gameroom' }" class="my-tile")
+        router-link(:to="{ name: 'app-gameroom' }" :class="['my-tile', { 'is-wish': gameWishes.free > 0 }]")
           img(:src="tileImg('icons/kacheln/kachel-mini-c')" alt="" class="my-tile-img is-small" draggable="false")
-          span(class="my-tile-title") {{ t('app.profile.gameRoom') }}
-          span(class="my-tile-sub") {{ t('app.profile.tileGameRoomSub') }}
-        router-link(:to="{ name: 'app-journal' }" class="my-tile")
+          span(v-if="gameWishes.free > 0" class="my-tile-badge" aria-hidden="true") {{ gameWishes.free }}
+          span(class="my-tile-title") {{ t('app.profile.myGames') }}
+          span(class="my-tile-sub") {{ gameWishes.free > 0 ? t('app.bigGames.wishes', { n: gameWishes.free }, gameWishes.free) : t('app.profile.tileGamesSub') }}
+        router-link(:to="{ name: 'app-journal' }" class="my-tile my-tile--wide")
           img(:src="tileImg('icons/kacheln/kachel-ich-tagebuch')" alt="" class="my-tile-img" draggable="false")
-          span(class="my-tile-title") {{ t('app.journal.title') }}
-          span(class="my-tile-sub") {{ t('app.profile.tileJournalSub') }}
+          span(class="my-tile-text")
+            span(class="my-tile-title") {{ t('app.journal.title') }}
+            span(class="my-tile-sub") {{ t('app.profile.tileJournalSub') }}
 
       //- only in the test build: unlock all the adventures to try the cards and the big games
       TestUnlock(v-if="PLUS_TEST")
@@ -396,6 +398,8 @@ const tileImg = (path: string) => prependBaseUrl(`images/${path}.webp`)
     //- Outside `.profile-content` so its grid columns stay untouched. App
     //- Review 5.1.1(i) wants the privacy policy reachable inside the app.
     div(class="profile-legal")
+      //- the build number, small and quiet: "is this the new version?"
+      BuildStamp
       button(type="button" class="profile-legal-link" @click="openLegal") {{ t('app.legal.linkLabel') }}
 
     AvatarPickerModal(:open="avatarOpen" @close="closeAvatar")
@@ -573,6 +577,50 @@ button
     background: linear-gradient(160deg, #fbecc2, #f3d484)
     border-color: #e0bd62
     color: #3a2c10
+
+.my-tile--wide
+  grid-column: 1 / -1
+  flex-direction: row
+  justify-content: flex-start
+  text-align: left
+  gap: 16px
+  min-height: 0
+  padding: 10px 18px 10px 14px
+
+  .my-tile-img
+    flex: none
+    width: 72px
+    height: 72px
+    margin: 0
+
+.my-tile-text
+  display: flex
+  flex-direction: column
+  gap: 2px
+
+// a free wish: the tile glows gold and carries the number of games that may be picked
+.my-tile.is-wish
+  position: relative
+  border: 2px solid #d4a83e
+  background: rgba(255, 244, 196, 0.9)
+  box-shadow: 0 0 0 3px rgba(255, 214, 90, 0.35)
+  color: #3d2c00
+
+.my-tile-badge
+  position: absolute
+  top: 10px
+  right: 10px
+  min-width: 28px
+  height: 28px
+  padding: 0 8px
+  display: grid
+  place-items: center
+  border-radius: 999px
+  background: #d4a83e
+  color: #fff
+  font-weight: 800
+  font-size: 0.95rem
+  box-shadow: 0 2px 6px rgba(80, 50, 0, 0.35)
 
 .my-tile-img
   width: 104px

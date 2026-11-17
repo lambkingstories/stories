@@ -1,25 +1,24 @@
 <script setup lang="ts">
 /**
- * "Meine Sammlung": two places for what the child has gathered on the adventures.
- *  - The cabinet: one place per journey with its painted medal; the cup (bronze, silver, gold) stands next to it once it is won.
+ * "Meine Belohnungen": everything the child has won on the adventures, in four parts (the tabs).
  *  - The card album: one card for every adventure (gold frame, a painted hero picture, turns round, glints). It is won when every stage
- *    of the adventure has three stars. A card can be opened big; one that is not won yet shows how far the child is.
+ *    of the adventure has been gone through. A card can be opened big; one that is not won yet shows how far the child is.
+ *  - The cups: one place per journey with its painted medal; the cup (bronze, silver, gold) stands next to it once it is won.
+ *  - The awards (medals for reading, painting, adventures, quiz, cards).
+ *  - The coloring pictures that the cups gave as presents.
+ * The old page "My awards" is gone: its address leads here (`?tab=awards`). The games have their own page, "My games".
  * Everything is worked out from the progress of the adventures (nothing extra is stored).
  */
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import CollectionCard from '@/components/molecules/CollectionCard.vue'
 import CollectionCardViewer from '@/components/molecules/CollectionCardViewer.vue'
+import AwardsGrid from '@/components/molecules/AwardsGrid.vue'
 import MyRewards from '@/components/molecules/MyRewards.vue'
 import LkPageHead from '@/components/molecules/LkPageHead.vue'
-import { journeys } from '@/data/adventures'
-import { inBibleOrder } from '@/utils/continueJourney'
-import useAdventure from '@/use/useAdventure'
-import { cupOf } from '@/utils/rewards'
-import { maxPoints, pointsOf } from '@/utils/adventureScore'
-import { albumCards, albumSetCard, cupStats } from '@/utils/collection'
-import { CARD_ART } from '@/data/cardArt'
+import useAwards from '@/use/useAwards'
+import useRewardCounts from '@/use/useRewardCounts'
 import useCardsSeen, { cardKey } from '@/use/useCardsSeen'
 import { prependBaseUrl } from '@/utils/function'
 import { memoryVerseOf } from '@/data/memoryVerses'
@@ -27,34 +26,28 @@ import { adventureLanguage } from '@/use/adventureLanguage'
 
 const { t } = useI18n({ useScope: 'global' })
 const router = useRouter()
-const adv = useAdventure()
+const route = useRoute()
 
 function goBack() {
   if (window.history.length > 1) router.back()
   else void router.push({ name: 'app-profile' })
 }
 
-type Tab = 'cabinet' | 'album' | 'gifts'
-// the stack of cards comes first (it is the special thing), the cabinet second
-const tab = ref<Tab>('album')
+type Tab = 'cabinet' | 'album' | 'awards' | 'gifts'
+const TABS: Tab[] = ['album', 'cabinet', 'awards', 'gifts']
+// the stack of cards comes first (it is the special thing); a link can ask for another part (`?tab=awards`)
+const asked = String(route.query.tab ?? '')
+const tab = ref<Tab>((TABS as string[]).includes(asked) ? (asked as Tab) : 'album')
 
-const cups = computed(() => inBibleOrder(journeys).map((j) => ({ journey: j, ...cupStats(j, adv.progressOf(j.id), cupOf, pointsOf, maxPoints) })))
-const wonCups = computed(() => cups.value.filter((c) => c.cup).length)
+const { cups, wonCups, albums, wonCards } = useRewardCounts()
 // the coloring pictures that the cups gave (one for every cup)
 const giftCount = computed(() => wonCups.value)
 const cupImage = (cup: string) => prependBaseUrl(`images/abenteuer/ui/pokal-${cup === 'silver' ? 'silber' : cup}.webp`)
 
+const awards = useAwards()
+const awardsEarned = computed(() => awards.list.value.filter((a) => a.earned).length)
+
 const { isNew, markSeen } = useCardsSeen()
-/** One card for every adventure: it is won with all its stages at three stars. */
-const albums = computed(() =>
-  inBibleOrder(journeys)
-    .map((j) => {
-      const cards = albumCards(j, (stageId) => adv.stageOf(j.id, stageId))
-      return { journey: j, cards, set: albumSetCard(j, cards), art: CARD_ART[j.id] }
-    })
-    .filter((a) => a.cards.length > 0)
-)
-const wonCards = computed(() => albums.value.filter((a) => a.set.have).length)
 const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
 const newCount = computed(() => albums.value.filter((a) => isNew(cardKey(a.journey.id, 'set'), a.set.have)).length)
 
@@ -118,9 +111,16 @@ function openJourney(id: string) {
         button(type="button" role="tab" :aria-selected="tab === 'cabinet'" :class="['co-tab', { 'is-on': tab === 'cabinet' }]" @click="tab = 'cabinet'")
           span {{ t('app.collection.cabinet') }}
           span(class="co-count") {{ wonCups }} / {{ cups.length }}
+        button(type="button" role="tab" :aria-selected="tab === 'awards'" :class="['co-tab', { 'is-on': tab === 'awards' }]" @click="tab = 'awards'")
+          span {{ t('app.collection.awards') }}
+          span(class="co-count") {{ awardsEarned }} / {{ awards.list.value.length }}
         button(type="button" role="tab" :aria-selected="tab === 'gifts'" :class="['co-tab', { 'is-on': tab === 'gifts' }]" @click="tab = 'gifts'")
           span {{ t('app.collection.gifts') }}
           span(class="co-count") {{ giftCount }}
+
+      //- ===== the awards =====
+      div(v-if="tab === 'awards'" class="co-cabinet")
+        AwardsGrid
 
       //- ===== the coloring pictures that the cups gave =====
       div(v-if="tab === 'gifts'" class="co-cabinet")
@@ -191,11 +191,15 @@ function openJourney(id: string) {
 
 .co-tabs
   display: grid
-  grid-template-columns: repeat(3, minmax(0, 1fr))
-  gap: 8px
+  // four parts: two by two on a phone, side by side on a wide screen
+  grid-template-columns: repeat(2, minmax(0, 1fr))
+  gap: 6px
   padding: 5px
-  border-radius: 999px
+  border-radius: 28px
   background: var(--lk-surface-2)
+
+  @media (min-width: 560px)
+    grid-template-columns: repeat(4, minmax(0, 1fr))
 
 .co-tab
   display: flex
@@ -209,7 +213,7 @@ function openJourney(id: string) {
   line-height: 1.15
   text-align: center
   border: none
-  border-radius: 999px
+  border-radius: 24px
   background: transparent
   color: var(--lk-text)
   font: inherit

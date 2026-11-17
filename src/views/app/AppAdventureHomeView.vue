@@ -3,7 +3,7 @@
  * The adventure tab: the journeys as painted medals. Josef is the first; the next ones (Adam and Eve, Noah, and on through the
  * whole Bible) stand there closed until they are written. A tap on a medal opens the map of that journey.
  */
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, resolveComponent } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import AdvButton from '@/components/atoms/AdvButton.vue'
@@ -15,10 +15,10 @@ import AdventureHero from '@/components/molecules/AdventureHero.vue'
 import AdventureTimeline from '@/components/molecules/AdventureTimeline.vue'
 import { journeys } from '@/data/adventures'
 import { medalThumb, onThumbError } from '@/utils/medalThumb'
-import { BIG_GAMES, STEP } from '@/data/bigGames'
 import useGameWishes from '@/use/useGameWishes'
-import { rewardGames } from '@/utils/rewards'
+import useRewardCounts from '@/use/useRewardCounts'
 import { isJourneyPlusLocked } from '@/utils/adventureAccess'
+import { showUpsell } from '@/use/usePremium'
 import PlusBadge from '@/components/atoms/PlusBadge.vue'
 import { groupByEpoch } from '@/data/adventures/timeline'
 import useAdventure from '@/use/useAdventure'
@@ -152,28 +152,18 @@ function askFromDetail(kind: 'reset' | 'delete') {
   dialog.value = { kind, id }
 }
 
-// the stars of all journeys together: counted the way the map counts them (the stars of the stages plus the right answers of the exam)
-const starTotal = computed(() => journeys.reduce((n, j) => n + pointsOf(adv.progressOf(j.id)), 0))
-const starMax = computed(() => journeys.reduce((n, j) => n + maxPoints(j), 0))
-const starShare = computed(() => (starMax.value ? Math.min(1, starTotal.value / starMax.value) : 0))
-// the stars that give the wishes for the big games (the stars of the stages): the card says that a game may be picked, or how far the next wish is
-const wish = useGameWishes()
-const gameStars = wish.stars
-const wishes = wish.wishes
-// the link component by its name: a test that mocks the router has none (then it is a plain element)
-const wishLink = resolveComponent('router-link')
-const wishCardText = computed(() =>
+// the slim line "Your rewards": how many cards and cups the child has, and the way to the next adventure game (a free wish, or how many stars are
+// missing). It is the one star counter of this page; the full lists are in "Me" ("My rewards", "My games"), the line leads there.
+const { wonCards, wonCups } = useRewardCounts()
+const wishes = useGameWishes().wishes
+const rewardsCounts = computed(() => `${t('app.adventure.rewardsCards', { n: wonCards.value }, wonCards.value)} · ${t('app.adventure.rewardsCups', { n: wonCups.value }, wonCups.value)}`)
+const rewardsWish = computed(() =>
   wishes.value.free > 0
     ? t('app.bigGames.wishes', { n: wishes.value.free }, wishes.value.free)
     : wishes.value.allOpen
-      ? t('app.home.starsTitle')
-      : t('app.bigGames.nextGame', { n: wishes.value.missing }, wishes.value.missing)
+      ? t('app.profile.allBigOpen')
+      : t('app.adventure.rewardsNext', { n: wishes.value.missing }, wishes.value.missing)
 )
-// the tiles: how many mini games and bonus games are open
-const miniGames = computed(() => rewardGames(journeys, adv.progressOf))
-const miniOpen = computed(() => miniGames.value.filter((g) => g.open).length)
-const miniTotal = computed(() => miniGames.value.length)
-const bonusOpen = computed(() => wish.states.value.filter((s) => s.open).length)
 
 function go(id: string) {
   void router.push({ name: 'app-adventure-map', params: { journeyId: id } })
@@ -186,6 +176,11 @@ const percent = computed(() => Math.round(pack.progress.value * 100))
 
 /** A journey that was downloaded opens at once; otherwise the child is asked first (the download is made once). */
 function open(id: string) {
+  // an adventure of Plus without Plus: the Plus window comes at once, nothing is downloaded first
+  if (isJourneyPlusLocked(id)) {
+    showUpsell('adventure')
+    return
+  }
   if (pack.isReady(id) || !pack.supported) {
     go(id)
     return
@@ -258,42 +253,17 @@ async function doDelete() {
         span(class="go-on-go" aria-hidden="true")
           ZIconography(name="chevron-right" :size="22")
 
-      //- the stars of all journeys together (journeys that come later count in it, too)
-      component(
-        :is="wishes.free > 0 ? wishLink : 'div'"
-        :to="wishes.free > 0 ? { name: 'app-gameroom', query: { z: 'bonus' } } : undefined"
-        :class="['stars-card', { 'is-wish': wishes.free > 0 }]"
-        :role="wishes.free > 0 ? undefined : 'group'"
-        :aria-label="wishCardText"
-      )
-        img(:src="ui('stern-gold-3')" alt="" class="stars-img" draggable="false")
-        span(class="stars-body")
-          span(class="stars-title") {{ wishCardText }}
-          span(class="stars-bar" aria-hidden="true")
-            span(class="stars-fill" :style="{ width: Math.round((wishes.allOpen ? starShare : wishes.share) * 100) + '%' }")
-        span(class="stars-count") {{ wishes.allOpen ? `${starTotal} / ${starMax}` : `${gameStars % STEP} / ${STEP}` }}
-
-      //- four square tiles: what the stars give (cards, mini games, bonus games) and the family quiz
-      div(class="tiles")
-        router-link(:to="{ name: 'app-collection' }" class="tile4")
-          img(:src="prependBaseUrl('images/icons/kacheln/kachel-karten-c.webp')" alt="" class="tile4-img" draggable="false")
-          span(class="tile4-title") {{ t('app.adventure.tileCards') }}
-          span(class="tile4-sub") {{ t('app.adventure.tileCardsSub') }}
-        router-link(:to="{ name: 'app-gameroom', query: { z: 'mini' } }" class="tile4")
-          img(:src="prependBaseUrl('images/icons/kacheln/kachel-mini-c.webp')" alt="" class="tile4-img is-small" draggable="false")
-          span(class="tile4-title") {{ t('app.adventure.tileMini') }}
-          span(class="tile4-count") {{ miniOpen }} / {{ miniTotal }}
-          span(class="tile4-sub") {{ t('app.adventure.tileMiniSub') }}
-        router-link(:to="{ name: 'app-gameroom', query: { z: 'bonus' } }" class="tile4")
-          img(:src="prependBaseUrl('images/icons/kacheln/kachel-bonus-c.webp')" alt="" class="tile4-img" draggable="false")
-          span(class="tile4-title") {{ t('app.adventure.tileBonus') }}
-          span(v-if="wishes.free > 0" class="tile4-badge" aria-hidden="true") {{ wishes.free }}
-          span(class="tile4-count") {{ bonusOpen }} / {{ BIG_GAMES.length }}
-          span(class="tile4-sub") {{ t('app.adventure.tileBonusSub') }}
-        router-link(:to="{ name: 'app-family' }" class="tile4")
-          img(:src="prependBaseUrl('images/icons/kacheln/kachel-familie-c.webp')" alt="" class="tile4-img" draggable="false")
-          span(class="tile4-title") {{ t('app.family.hubTitle') }}
-          span(class="tile4-sub") {{ t('app.adventure.tileFamilySub') }}
+      //- the slim line: the rewards (cards, cups, the next game); a tap leads to "Me", where "My rewards" and "My games" are
+      router-link(:to="{ name: 'app-profile' }" :class="['rewards-line', { 'is-wish': wishes.free > 0 }]")
+        img(:src="ui('stern-gold-3')" alt="" class="rewards-img" draggable="false")
+        span(class="rewards-body")
+          span(class="rewards-title") {{ t('app.adventure.rewardsTitle') }}
+          span(class="rewards-text") {{ rewardsCounts }}
+          span(class="rewards-wish") {{ rewardsWish }}
+          span(v-if="!wishes.allOpen && wishes.free === 0" class="rewards-bar" aria-hidden="true")
+            span(class="rewards-fill" :style="{ width: Math.round(wishes.share * 100) + '%' }")
+        span(class="rewards-go" aria-hidden="true")
+          ZIconography(name="chevron-right" :size="20")
 
       //- the same adventures in two views: the list, or the time line from left to right
       div(class="view-switch" role="group" :aria-label="t('app.adventure.viewLabel')")
@@ -364,7 +334,7 @@ async function doDelete() {
           button(v-if="adv.progressOf(detail.journey.id)" type="button" class="medal-tool" @click="askFromDetail('reset')") {{ t('app.adventure.resetLink') }}
           button(v-if="pack.isReady(detail.journey.id)" type="button" class="medal-tool" @click="askFromDetail('delete')") {{ t('app.adventure.deleteLink') }}
       template(#actions)
-        AdvButton(tone="gold" @click="openFromDetail") {{ detail.begun ? t('app.adventure.continueJourney') : t('app.adventure.beginJourney') }}
+        AdvButton(tone="gold" @click="openFromDetail") {{ detail.plus ? t('app.adventure.plusNextButton') : detail.begun ? t('app.adventure.continueJourney') : t('app.adventure.beginJourney') }}
         button(type="button" class="dlg-link" @click="detailId = ''") {{ t('app.adventure.dlg_close') }}
 
     //- the questions: download once, start again, remove the downloaded files
@@ -425,6 +395,20 @@ $ink: var(--lk-text)
   font-weight: 800
   line-height: 1.1
   text-shadow: 0 1px 6px rgba(0, 0, 0, .35)
+
+// a phone on its side is only about 375 px high: the picture shrinks, so the adventures come into view at once
+@media (max-height: 520px)
+  .home-banner
+    max-width: 300px
+
+  .home-title
+    font-size: 1.4rem
+
+  .banner-text
+    padding: 14px 24px 8px 12px
+
+  .home-hint
+    display: none
 
 .home-hint
   max-width: 560px
@@ -490,58 +474,79 @@ $ink: var(--lk-text)
   color: var(--lk-muted)
   font-size: 0.88rem
 
-.stars-card
+// the slim line with the rewards
+.rewards-line
   display: flex
   align-items: center
-  gap: 14px
-  padding: 12px 18px 12px 12px
+  gap: 12px
+  padding: 8px 14px 8px 10px
   border: 1px solid var(--lk-line)
   border-radius: var(--lk-r-group)
   background: var(--lk-surface)
   box-shadow: var(--lk-shadow)
+  color: var(--lk-text)
+  text-decoration: none
+  -webkit-tap-highlight-color: transparent
 
-.stars-card.is-wish
+  &:active
+    transform: translateY(1px)
+
+// a free wish: the line glows gold
+.rewards-line.is-wish
   border: 2px solid #d4a83e
   background: rgba(255, 244, 196, 0.9)
   box-shadow: 0 0 0 3px rgba(255, 214, 90, 0.35)
   color: #3d2c00
-  text-decoration: none
 
-.stars-img
+.rewards-img
   flex: 0 0 auto
-  height: 44px
+  height: 34px
   width: auto
   display: block
 
-.stars-body
+.rewards-body
   flex: 1
   min-width: 0
   display: flex
   flex-direction: column
-  gap: 8px
+  gap: 1px
 
-.stars-title
+.rewards-title
   font-weight: 800
-  font-size: 1.05rem
+  font-size: 1rem
 
-.stars-bar
+.rewards-text
+  font-size: 0.88rem
+  font-weight: 700
+
+.rewards-wish
+  font-size: 0.88rem
+  line-height: 1.25
+  color: var(--lk-muted)
+
+.rewards-line.is-wish .rewards-wish
+  color: inherit
+  font-weight: 800
+
+.rewards-bar
   display: block
-  height: 9px
+  height: 6px
+  margin-top: 4px
   border-radius: 999px
   background: var(--lk-track)
   overflow: hidden
 
-.stars-fill
+.rewards-fill
   display: block
   height: 100%
   border-radius: 999px
   background: linear-gradient(90deg, #f6c445, #e8a317)
 
-.stars-count
-  flex: 0 0 auto
-  font-weight: 800
-  font-size: 1.1rem
-  font-variant-numeric: tabular-nums
+.rewards-go
+  flex: none
+  display: grid
+  place-items: center
+  color: var(--lk-muted)
 
 .chips
   display: flex
@@ -706,82 +711,6 @@ $ink: var(--lk-text)
   font-weight: 800
   font-size: 0.98rem
   line-height: 1.2
-
-// four square tiles
-.tiles
-  display: grid
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)
-  gap: 10px
-
-// no fixed aspect ratio: with tall content it made the tile wider than its column (right column cut off on phones)
-.tile4
-  display: flex
-  flex-direction: column
-  align-items: center
-  justify-content: center
-  gap: 3px
-  min-width: 0
-  min-height: 150px
-  padding: 12px 12px 14px
-  border: 1px solid var(--lk-line)
-  border-radius: 24px
-  background: var(--lk-surface)
-  box-shadow: var(--lk-shadow)
-  color: var(--lk-text)
-  text-align: center
-  text-decoration: none
-  -webkit-tap-highlight-color: transparent
-
-  &:active
-    transform: translateY(1px)
-
-.tile4-img
-  width: 104px
-  height: 104px
-  margin-bottom: 2px
-  object-fit: contain
-  filter: drop-shadow(0 4px 6px rgba(20, 24, 32, 0.22))
-
-// the puzzle fills its square, so it is a little smaller than the other symbols (Anton, 13.11.2026)
-.tile4-img.is-small
-  width: 84px
-  height: 84px
-  margin: 10px 0 12px
-
-.tile4-title
-  font-size: 1.05rem
-  font-weight: 800
-  line-height: 1.15
-
-.tile4
-  position: relative
-
-.tile4-badge
-  position: absolute
-  top: 10px
-  right: 10px
-  min-width: 28px
-  height: 28px
-  padding: 0 8px
-  display: grid
-  place-items: center
-  border-radius: 999px
-  background: #d4a83e
-  color: #fff
-  font-weight: 800
-  font-size: 0.95rem
-  box-shadow: 0 2px 6px rgba(80, 50, 0, 0.35)
-
-.tile4-count
-  font-size: 0.9rem
-  font-weight: 800
-  color: var(--lk-accent)
-
-.tile4-sub
-  font-size: 0.82rem
-  line-height: 1.3
-  color: var(--lk-muted)
-
 
 .go-on-go
   flex: none

@@ -1,12 +1,14 @@
 <script setup lang="ts">
 /**
  * What the child has won on the adventures, in two parts:
- *  - `games` ("My game room"): the wishes for a big game (every full 40 stars give one; the child picks which game it opens, for good; a closed
- *    tile opens a little window to pick it), the big games and the mini games
+ *  - `games` (the first two groups of the page "My games"): the wishes for an adventure game (every full 40 stars give one; the child picks which
+ *    game it opens, for good; a closed tile opens a little window to pick it), the adventure games, and the stage games
  *    (the best replayable games of every adventure; one opens when its stage has all three stars, the ones not yet won stand there as
  *    locked tiles, so they can be collected). A tile opens the game of that stage in the free mode (`?free=1`: no stars, no progress).
- *  - `gifts` ("My coloring pictures"): every cup (bronze, silver, gold) gives the coloring picture of the journey as a present; a tile
- *    opens the coloring program.
+ *    The third group of the page, the family games, is made by the page itself (see `AppGameRoomView`).
+ *  - `gifts` ("My coloring pictures", a part of "My rewards"): every cup (bronze, silver, gold) gives the coloring picture of the journey as a
+ *    present; a tile opens the coloring program.
+ * `section` (for `part="games"`) tells which group to show: `bonus` = the adventure games, `mini` = the stage games, `all` = both.
  */
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -23,7 +25,7 @@ import GameWishBar from '@/components/molecules/GameWishBar.vue'
 import type { BigGameState } from '@/utils/bigGames'
 import { prependBaseUrl } from '@/utils/function'
 
-/** `section` (for `part="games"`): both lists in one page (`all`), only the mini games or only the bonus games. */
+/** `section` (for `part="games"`): both groups in one page (`all`), only the stage games (`mini`) or only the adventure games (`bonus`). */
 withDefaults(defineProps<{ part?: 'games' | 'gifts'; section?: 'all' | 'mini' | 'bonus' }>(), { part: 'games', section: 'all' })
 
 const { t } = useI18n({ useScope: 'global' })
@@ -82,9 +84,10 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
           span(v-if="!w.allOpen" class="rw-bar" aria-hidden="true")
             span(class="rw-bar-fill" :style="{ width: Math.round(w.share * 100) + '%' }")
 
-      //- the big games: closed ones can be tapped, a free wish opens one of them
+      //- the adventure games: closed ones can be tapped, a free wish opens one of them
       h3(v-if="section !== 'mini'" id="rw-bonus" class="rw-title")
-        span {{ t('app.bigGames.title') }}
+        img(:src="prependBaseUrl('images/icons/kacheln/kachel-bonus-c.webp')" alt="" class="rw-title-img" draggable="false")
+        span(class="rw-title-text") {{ t('app.bigGames.title') }}
         span(class="rw-count") {{ bigStates.filter((s) => s.open).length }} / {{ bigStates.length }}
       p(v-if="section !== 'mini'" class="rw-hint") {{ t('app.bigGames.hint', { n: STEP }) }}
       div(v-if="section !== 'mini'" class="rw-grid")
@@ -110,11 +113,12 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
           span(class="rw-name") {{ t(`app.bigGames.${s.game.id}.title`) }}
           span(v-if="s.open" class="rw-from") {{ t('app.bigGames.levelStars', { n: bigGames.stars(s.game.id), max: s.game.maxStars }) }}
 
-      //- the mini games: they come with the stars of their stage, the others wait as locked tiles
+      //- the stage games: they come with the stars of their stage, the others wait as locked tiles
       h3(v-if="section !== 'bonus'" id="rw-mini" :class="['rw-title', { 'rw-title--next': section === 'all' }]")
-        span {{ t('app.profile.miniTitle') }}
+        img(:src="prependBaseUrl('images/icons/kacheln/kachel-mini-c.webp')" alt="" class="rw-title-img is-small" draggable="false")
+        span(class="rw-title-text") {{ t('app.profile.stageGamesTitle') }}
         span(class="rw-count") {{ openCount }} / {{ games.length }}
-      p(v-if="section !== 'bonus'" class="rw-hint") {{ t('app.profile.miniHint') }}
+      p(v-if="section !== 'bonus'" class="rw-hint") {{ t('app.profile.stageGamesHint') }}
       div(v-if="section !== 'bonus'" class="rw-grid")
         button(
           v-for="g in games"
@@ -129,7 +133,7 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
             span(v-if="g.open" class="rw-play" aria-hidden="true")
               svg(viewBox="0 0 24 24" width="26" height="26" fill="currentColor")
                 path(d="M8 5.2v13.6a1 1 0 0 0 1.5.86l11-6.8a1 1 0 0 0 0-1.72l-11-6.8A1 1 0 0 0 8 5.2z")
-            span(v-else class="rw-lock") {{ t('app.profile.miniLocked', { n: g.stageNo }) }}
+            span(v-else class="rw-lock") {{ t('app.profile.stageGameLocked', { n: g.stageNo }) }}
           span(class="rw-name") {{ g.open ? g.title : '?' }}
           span(class="rw-from") {{ g.journeyTitle }}
 
@@ -163,6 +167,22 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
 
 .rw-title--next
   margin-top: 10px
+
+.rw-title-text
+  flex: 1 1 auto
+  min-width: 0
+
+// the small painted symbol of the group (the same one that was on the tile of the adventure page)
+.rw-title-img
+  flex: none
+  width: 40px
+  height: 40px
+  object-fit: contain
+
+.rw-title-img.is-small
+  width: 32px
+  height: 32px
+  margin: 4px
 
 .rw-hint
   margin: 0

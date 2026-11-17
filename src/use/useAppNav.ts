@@ -39,7 +39,7 @@ export function routeToNav(name: string): AppNavId {
   // the good-night stories belong to "Lesen"
   if (name === 'app-goodnight') return 'series'
   if (name === 'app-coloring' || name === 'app-coloring-book') return 'malen'
-  if (name === 'app-profile' || name === 'app-legal' || name === 'app-plus' || name === 'app-awards' || name === 'app-parents' || name === 'app-collection' || name === 'app-journal' || name === 'app-voices') return 'profile'
+  if (name === 'app-profile' || name === 'app-legal' || name === 'app-plus' || name === 'app-awards' || name === 'app-parents' || name === 'app-collection' || name === 'app-gameroom' || name === 'app-journal' || name === 'app-voices') return 'profile'
   return 'home'
 }
 

@@ -17,7 +17,6 @@ const AppCategoryView = () => import('@/views/app/AppCategoryView.vue')
 const AppBookDetailView = () => import('@/views/app/AppBookDetailView.vue')
 const AppReaderView = () => import('@/views/app/AppReaderView.vue')
 const AppHoerenView = () => import('@/views/app/AppHoerenView.vue')
-const AppAwardsView = () => import('@/views/app/AppAwardsView.vue')
 const AppColoringView = () => import('@/views/app/AppColoringView.vue')
 const AppColoringBookView = () => import('@/views/app/AppColoringBookView.vue')
 const AppAdventureHomeView = () => import('@/views/app/AppAdventureHomeView.vue')
@@ -105,14 +104,18 @@ const routes: RouteRecordRaw[] = [
   { path: '/app/bibel-bingo', name: 'app-family-bingo', component: AppFamilyBingoView },
   { path: '/app/memory', name: 'app-family-memory', component: AppFamilyMemoryView },
   { path: '/app/wortreise', name: 'app-family-wortreise', component: AppFamilyWortreiseView },
-  // the cabinet with the cups and the card album
-  { path: '/app/sammlung', name: 'app-collection', component: AppCollectionView },
+  // "My rewards": the card album, the cups, the awards and the coloring pictures (one page, four parts); the old addresses lead here
+  { path: '/app/belohnungen', name: 'app-collection', component: AppCollectionView },
+  { path: '/app/sammlung', redirect: { name: 'app-collection' } },
   { path: '/app/wer-ist-jesus', name: 'app-jesus', component: AppJesusView },
-  { path: '/app/spielzimmer', name: 'app-gameroom', component: () => import('@/views/app/AppGameRoomView.vue') },
+  // "My games": the adventure games, the stage games and the family games on one page (the old "game room" address leads here)
+  { path: '/app/spiele', name: 'app-gameroom', component: () => import('@/views/app/AppGameRoomView.vue') },
+  { path: '/app/spielzimmer', redirect: { name: 'app-gameroom' } },
   { path: '/app/spiel/:gameId', name: 'app-big-game', component: () => import('@/views/app/AppBigGameView.vue') },
   // the good-night mode: a story with a timer and a darkening screen
   { path: '/app/gute-nacht', name: 'app-goodnight', component: AppGoodNightView },
-  { path: '/app/awards', name: 'app-awards', component: AppAwardsView },
+  // the awards are a part of "My rewards" now (the name stays, so every old link still arrives)
+  { path: '/app/awards', name: 'app-awards', redirect: { name: 'app-collection', query: { tab: 'awards' } } },
   { path: '/app/coloring', name: 'app-coloring', component: AppColoringView },
   { path: '/app/coloring/book/:bookId', name: 'app-coloring-book', component: AppColoringBookView },
   { path: '/app/adventure', name: 'app-adventure', component: AppAdventureHomeView },

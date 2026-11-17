@@ -16,7 +16,7 @@ export interface RewardGame {
   stageNo: number
   title: string
   image: string | undefined
-  /** The stage has all its three stars: the game is in the game room. */
+  /** The stage has all its three stars: the game is in "My games". */
   open: boolean
 }
 

@@ -207,7 +207,7 @@ const adventureCard = computed<ResumeCard>(() => {
   return { id: 'adventure', kind, title: h.title, meta: h.meta, image: h.image, medal: h.isMedal, progress: h.begun ? h.progress : -1, empty: !h.begun, go: h.go }
 })
 
-/** The games: the bonus games the stars have opened (the picture is the newest open one). */
+/** The games (leads to "My games"): the adventure games the stars have opened (the picture is the newest open one). */
 const gamesCard = computed<ResumeCard>(() => {
   const w = wishes.value
   const states = wishStates.value

@@ -268,14 +268,15 @@ describe('the stars of a journey are counted the same way everywhere', () => {
     adv.recordExam('josef', 4, journeys[0]!.exam.length)
     const max = maxPoints(journeys[0]!)
     expect(max).toBe(journeys[0]!.stages.length * 3 + journeys[0]!.exam.length)
-    const home = mount(Home, opts)
+    // the slim line is a router link: here it shows its content (the plain stub of the other tests shows none)
+    const home = mount(Home, { ...opts, global: { ...opts.global, stubs: {}, components: { 'router-link': { template: '<a class="rl"><slot /></a>' } } } })
     await flushPromises()
     route.params = { journeyId: 'josef' }
     const map = mount(MapView, opts)
     await flushPromises()
     // 3 + 2 stars + 4 right answers of the exam
-    // the home page shows the way to the next wish for a big game (the stars of the stages: 3 + 2 of the 40 that give it)
-    expect(home.find('.stars-count').text()).toBe('5 / 40')
+    // the slim line of the home page shows the way to the next wish for an adventure game (the stars of the stages: 3 + 2 of the 40 that give it)
+    expect(home.find('.rewards-wish').text()).toBe('Noch 35 Sterne bis zum nächsten Spiel')
     expect(map.find('.map-points').text()).toBe(`9 / ${max}`)
     adv.reset('josef')
   })

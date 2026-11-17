@@ -306,21 +306,21 @@ describe('the test buttons', () => {
 })
 
 describe('the adventure page and the start page', () => {
-  it('the card on the adventure page names the wish, the bonus tile carries a badge with the free wishes', async () => {
+  it('the slim line on the adventure page names the way to the wish, and it glows with free wishes', async () => {
     const { default: Home } = await import('@/views/app/AppAdventureHomeView.vue')
     giveStars(15)
     const none = mount(Home, opts)
     await flushPromises()
-    expect(text(none.get('.stars-title'))).toBe('Noch 25 Sterne bis zum nächsten Spiel-Wunsch.')
-    expect(none.get('.stars-count').text()).toBe('15 / 40')
-    expect(none.find('.tile4-badge').exists()).toBe(false)
+    expect(text(none.get('.rewards-wish'))).toBe('Noch 25 Sterne bis zum nächsten Spiel')
+    expect(none.get('.rewards-line').classes()).not.toContain('is-wish')
+    expect(none.find('.rewards-bar').exists()).toBe(true)
     none.unmount()
     giveStars(85)
     const two = mount(Home, opts)
     await flushPromises()
-    expect(text(two.get('.stars-title'))).toBe('Du darfst 2 Spiele aussuchen!')
-    expect(two.get('.tile4-badge').text()).toBe('2')
-    expect(two.get('.tile4-count').exists()).toBe(true)
+    expect(text(two.get('.rewards-wish'))).toBe('Du darfst 2 Spiele aussuchen!')
+    expect(two.get('.rewards-line').classes()).toContain('is-wish')
+    expect(two.find('.rewards-bar').exists()).toBe(false)
     two.unmount()
   })
 

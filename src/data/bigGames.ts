@@ -1,5 +1,5 @@
 /**
- * The big games of the game corner (profile page): real games, not mini games. The games are played on the whole screen.
+ * The adventure games ("My games" in the profile area): real games, not small stage games. The games are played on the whole screen.
  * How they open (Anton, 17.11.2026): for every full `STEP` stars on the adventures (the stars of all stages together) the child may pick
  * one game it wants to play, and it picks which one (see `utils/bigGames.ts` and `use/useGameWishes.ts`). The choice is for good.
  */

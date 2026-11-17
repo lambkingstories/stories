@@ -20,9 +20,9 @@ const router = useRouter()
 const { play } = useSfx()
 
 function goBack() {
-  // always to the adventure start page (one real step back when that is the page before, else it replaces this page): a game that
+  // always to "My games" (one real step back when that is the page before, else it replaces this page): a game that
   // pushed this page must not become the way back
-  goBackTo(router, { name: 'app-adventure' })
+  goBackTo(router, { name: 'app-gameroom' })
 }
 
 interface Game {

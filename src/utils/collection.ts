@@ -1,5 +1,5 @@
 /**
- * What the collection page ("Meine Sammlung") shows, worked out from the progress of the adventures: a card for every stage that was
+ * What the page "Meine Belohnungen" (cards and cups) shows, worked out from the progress of the adventures: a card for every stage that was
  * gone through with three stars, and the cup of every journey. Pure functions, so they can be tested.
  */
 import type { Journey, JourneyProgress, Medal, StageProgress } from '@/types/adventure'
@@ -51,7 +51,7 @@ export interface AlbumSetCard {
 
 /**
  * The golden card of an adventure is won when the adventure is finished: every stage was gone through to the end, with any number of
- * stars (Anton, 12.11.2026). The stars count for the cups and the bonus games, not for the card. `count` = stages gone through.
+ * stars (Anton, 12.11.2026). The stars count for the cups and the adventure games, not for the card. `count` = stages gone through.
  */
 export function albumSetCard(journey: Journey, cards: AlbumCard[]): AlbumSetCard {
   const count = cards.filter((c) => c.played).length
