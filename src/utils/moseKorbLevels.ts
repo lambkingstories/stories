@@ -41,26 +41,6 @@ const duck = (x: number, y: number, ax: number, period = 5, phase = 0, hw = 38, 
 const fish = (x: number, y: number, ay: number, period = 3.2, phase = 0, hw = 30, tilt = 0.32): MoverDef => ({ x, y, ax: 0, ay, period, phase, hw, tilt, kind: 'fish' })
 const target = (x: number, figure: 'nest' | 'mirjam' | 'tochter' = 'nest', y = 505) => ({ x, y, r: 44, figure })
 
-/** The same level the other way round (left and right swapped). */
-function mirror(d: Draft): Draft {
-  const mx = (x: number) => 360 - x
-  const sgn = <T extends { x1: number; x2: number }>(s: T): T => ({ ...s, x1: mx(s.x1), x2: mx(s.x2) })
-  return {
-    ...d,
-    basket: [mx(d.basket[0]), d.basket[1]],
-    ropes: d.ropes.map(([x, y]) => [mx(x), y]),
-    segs: d.segs?.map(sgn),
-    circles: d.circles?.map((c) => ({ ...c, x: mx(c.x) })),
-    rotors: d.rotors?.map((r) => ({ ...r, x: mx(r.x), a0: -r.a0, minA: r.maxA !== undefined ? -r.maxA : undefined, maxA: r.minA !== undefined ? -r.minA : undefined, drive: r.drive !== undefined ? -r.drive : undefined, segs: r.segs.map((s) => ({ ...s, x1: -s.x1, x2: -s.x2 })) })),
-    movers: d.movers?.map((m) => ({ ...m, x: mx(m.x), phase: -(m.phase ?? 0) })),
-    bubbles: d.bubbles?.map((b) => ({ ...b, x: mx(b.x), drift: b.drift !== undefined ? -b.drift : undefined })),
-    fans: d.fans?.map((f) => ({ ...f, x: mx(f.x), angle: Math.PI - f.angle })),
-    stars: d.stars?.map(([x, y]) => [mx(x), y]),
-    target: { ...d.target, x: mx(d.target.x) },
-    cheer: d.cheer?.map((c) => ({ ...c, x: mx(c.x) }))
-  }
-}
-
 interface Draft {
   intro?: string
   basket: [number, number]
@@ -212,7 +192,7 @@ const C4: Draft[] = [
   // 38: a swing, a flume and a fan
   { basket: [40, 190], ropes: [[130, 70]], fans: [{ x: 30, y: 380, angle: -0.3 }], segs: [bankL(70), seg(100, 450, 230, 400, 'wood', { t: 6, belt: 110 }), wallV(160, 380), bankR(280)], target: target(315, 'tochter'), ...RIVER },
   // 39: the finale: the garden of Pharaoh
-  { basket: [140, 210], ropes: [[70, 70], [210, 70]], fans: [{ x: 30, y: 180, angle: 0.15 }], segs: [bankL(70), seg(60, 470, 200, 430, 'wood', { t: 6, belt: 100 }), wallV(235, 420), bankR(280)], target: target(318, 'tochter'), ...RIVER }
+  { intro: 'many', basket: [140, 210], ropes: [[70, 70], [210, 70]], fans: [{ x: 30, y: 180, angle: 0.15 }], segs: [bankL(70), seg(60, 470, 200, 430, 'wood', { t: 6, belt: 100 }), wallV(235, 420), bankR(280)], target: target(318, 'tochter'), ...RIVER }
 ]
 
 const DRAFTS: Draft[][] = [C1, C2, C3, C4]

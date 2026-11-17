@@ -808,7 +808,7 @@ function drawFigures(c: CanvasRenderingContext2D, time: number) {
     }
   } else {
     const dir = tg.x > W / 2 ? 1 : -1
-    const fx = tg.x + dir * 30
+    const fx = Math.max(34, Math.min(W - 34, tg.x + dir * 30))
     const name = tg.figure === 'tochter' ? 'tochter' : 'mirjam'
     c.save()
     c.translate(fx, tg.y + 30 - hop * 0.6)
@@ -1483,9 +1483,9 @@ onBeforeUnmount(() => {
   display: flex
   align-items: center
   gap: 12px
-  max-width: min(560px, 94vw)
+  width: min(520px, 94vw)
   padding: 8px 12px 8px 18px
-  border-radius: 999px
+  border-radius: 26px
   background: rgba(255, 250, 235, 0.96)
   color: #2a2418
   font-weight: 700

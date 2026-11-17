@@ -4,7 +4,7 @@
  */
 import { describe, expect, it } from 'vitest'
 import { BIG_GAMES } from '../src/data/bigGames'
-import { BASKET_R, H, W, makeGame, play, starsOf, stepOnce, type LevelDef, type Solution } from '../src/utils/moseKorbGame'
+import { BASKET_R, H, W, cutRope, makeGame, play, starsOf, stepOnce, tap, type LevelDef, type Solution } from '../src/utils/moseKorbGame'
 import { CHAPTER_COUNT, LEVELS, LEVELS_PER_CHAPTER, levelGame, tipRope } from '../src/utils/moseKorbLevels'
 
 describe('the levels of Moses Körbchen', () => {
@@ -133,4 +133,35 @@ describe('every level can be won', () => {
       }
     })
   }
+})
+
+describe('random play', () => {
+  it('never breaks the numbers: cuts, taps and waiting at random moments in every level (the basket stays inside the picture, the game ends in a known state)', () => {
+    let seed = 20261117
+    const rnd = () => {
+      seed = (seed * 1664525 + 1013904223) >>> 0
+      return seed / 4294967296
+    }
+    for (const [i, l] of LEVELS.entries()) {
+      for (let round = 0; round < 4; round++) {
+        const g = makeGame(l)
+        const moments = Array.from({ length: 5 }, () => rnd() * 7).sort((a, b) => a - b)
+        let k = 0
+        for (let step = 0; step < 120 * 9; step++) {
+          while (k < moments.length && moments[k]! <= g.t) {
+            const r = rnd()
+            if (r < 0.5) cutRope(g, Math.floor(rnd() * l.ropes.length))
+            else if (g.bubbles.length && r < 0.75) tap(g, g.bubbles[0]!.x, g.bubbles[0]!.y)
+            else if (g.fans.length) tap(g, g.fans[0]!.def.x, g.fans[0]!.def.y)
+            k++
+          }
+          stepOnce(g)
+          if (!Number.isFinite(g.basket.x) || !Number.isFinite(g.basket.y)) throw new Error(`level ${i + 1}: the basket has no position`)
+          if (g.basket.x < -1 || g.basket.x > W + 1 || g.basket.y < -1) throw new Error(`level ${i + 1}: the basket left the picture (${g.basket.x}, ${g.basket.y})`)
+          if (g.status === 'won' || g.status === 'splash') break
+        }
+        expect(['play', 'caught', 'won', 'splash']).toContain(g.status)
+      }
+    }
+  })
 })
