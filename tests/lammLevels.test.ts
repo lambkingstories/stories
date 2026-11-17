@@ -27,7 +27,7 @@ describe('the list of levels', () => {
     const g = BIG_GAMES.find((x) => x.id === 'lamm')!
     expect(g).toBeDefined()
     expect(g.maxStars).toBe(LEVELS.length * 3)
-    expect(g.image).toBe('images/spiele-gross/lamm/kachel.webp')
+    expect(g.image).toBe('images/spiele-gross/lamm/kachel-2.webp')
   })
 
   it('shows every mechanic first in a level of its own, in a sensible order', () => {
