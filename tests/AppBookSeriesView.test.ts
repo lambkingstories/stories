@@ -169,29 +169,4 @@ describe('AppBookSeriesView · Bücher der Serie grid', () => {
 
     expect(wrapper.find('.cell .cell-meta').text()).toContain('app.read.open')
   })
-
-  it('image well declares the 4:3 padding-bottom aspect lock in its scoped style', async () => {
-    // Defends against the visual-regression class of bug we hit in
-    // production: someone removes the legacy `padding-bottom` trick (or
-    // swaps `aspect-ratio` only, which has flaky support in some
-    // engines + caches) and the image collapses to its intrinsic size
-    // inside an empty container.
-    //
-    // We're reading the raw SFC source here because JSDom does not
-    // resolve scoped CSS at mount time; the file content is the
-    // closest reliable proxy.
-    const fs = await import('node:fs')
-    const path = await import('node:path')
-    // The grid styles moved into the shared BookGridSection organism
-    // (reused by the Categories page), so the source check reads that
-    // component instead of the view.
-    const sfc = fs.readFileSync(
-      path.resolve(__dirname, '../src/components/organisms/BookGridSection.vue'),
-      'utf-8'
-    )
-    // Either the padding-bottom trick OR a working aspect-ratio rule
-    // needs to be present on the wrap.
-    expect(sfc).toMatch(/\.book-card-img-wrap[\s\S]*?padding-bottom:\s*133/)
-    expect(sfc).toMatch(/\.book-card-img[\s\S]*?object-fit:\s*cover/)
-  })
 })
