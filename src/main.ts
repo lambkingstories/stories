@@ -3,7 +3,7 @@ import '@fontsource/source-sans-3/latin-400.css'
 import '@fontsource/source-sans-3/latin-600.css'
 import '@fontsource/source-sans-3/latin-700.css'
 import '@fontsource/source-sans-3/latin-800.css'
-import { createApp, ref } from 'vue'
+import { createApp, ref, watch } from 'vue'
 import App from '@/App.vue'
 import router, { prefetchRoutes } from '@/router'
 import '@/assets/css/tailwind.css'
@@ -14,7 +14,6 @@ import { createI18n } from 'vue-i18n'
 import baseTranslations from '@/i18n/translations'
 import bookTranslations from '@/i18n/books'
 import appTranslations from '@/i18n/app'
-import appSpanish from '@/i18n/app.es'
 import { gameTextTree } from '@/i18n/bigGames'
 import { defaultLanguage } from '@/utils/defaultLanguage'
 import { offeredLanguage } from '@/utils/languages'
@@ -56,8 +55,9 @@ const translations = mergeObjectsRecursive(
       mergeObjectsRecursive({}, bookTranslations),
       baseTranslations
     ),
-    mergeObjectsRecursive(appTranslations, appSpanish)
+    appTranslations
   ),
+  // (the Spanish screens are not in here: they are loaded on demand, see `loadSpanish` below)
   // the texts of the newer big games live in their own files (`i18n/bigGames/`), the plugin of the big text files wants plain objects there
   gameTextTree()
 )
@@ -83,6 +83,37 @@ const i18n: any = createI18n({
   fallbackWarn: false
 })
 
+/**
+ * The Spanish screen texts (about 230 KB of source) are not part of the main file: Spanish is not offered at the moment
+ * (`SPANISH_ENABLED` in `utils/languages.ts`), so they are only fetched when the language is (or becomes) Spanish. A text that is
+ * missing in Spanish is shown in English, then in German (`fallbackLocale`). Same layers and order as before:
+ * books and basic words, the Spanish screens, the texts of the big games on top.
+ */
+let spanishLoading: Promise<void> | undefined
+function loadSpanish(): Promise<void> {
+  spanishLoading ??= import('@/i18n/app.es').then(({ default: appSpanish }) => {
+    const es = mergeObjectsRecursive(
+      mergeObjectsRecursive(
+        mergeObjectsRecursive(
+          mergeObjectsRecursive({}, (bookTranslations as Record<string, object>).es ?? {}),
+          (baseTranslations as Record<string, object>).es ?? {}
+        ),
+        appSpanish.es
+      ),
+      gameTextTree().es
+    )
+    i18n.global.setLocaleMessage('es', es)
+  })
+  return spanishLoading
+}
+// the language can be changed while the app runs (profile, welcome page)
+watch(
+  () => i18n.global.locale as string,
+  (code) => {
+    if (code === 'es') void loadSpanish()
+  }
+)
+
 startTheme()
 const app = createApp(App)
 
@@ -91,7 +122,7 @@ app.use(i18n)
 
 // journeys that are not public yet (Noah) are added on devices that were unlocked, before the first screen is drawn
 // (the first screen waits at most a second for them: later ones are there when a screen is opened again)
-void Promise.race([loadPreviewJourneys(), new Promise((resolve) => setTimeout(resolve, 1000))]).finally(() => app.mount('#app'))
+void Promise.all([Promise.race([loadPreviewJourneys(), new Promise((resolve) => setTimeout(resolve, 1000))]), userLanguage.value === 'es' ? loadSpanish() : undefined]).finally(() => app.mount('#app'))
 
 // In the app from the store: ask the store what the person owns (LambKing Plus, single coloring books). Loaded only there, so the web bundle never carries it.
 if (import.meta.env.VITE_APP_NATIVE === 'true') void import('@/use/usePurchases').then((m) => m.refreshOwned())
