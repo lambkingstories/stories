@@ -34,5 +34,5 @@ export const BIG_GAMES: BigGame[] = [
   { id: 'lamm', image: 'images/spiele-gross/lamm/kachel.webp', maxStars: 102 },
   { id: 'karawane', image: 'images/spiele-gross/karawane/kachel.webp', maxStars: 18 },
   // the archery game of Jonathan's arrows: 44 levels in 4 chapters, wind, ropes, switches, bounces (see `utils/bogenGame.ts`)
-  { id: 'bogen', image: 'images/spiele-gross/bogen/kachel.webp', maxStars: 132 }
+  { id: 'bogen', image: 'images/spiele-gross/bogen/kachel-2.webp', maxStars: 132 }
 ]

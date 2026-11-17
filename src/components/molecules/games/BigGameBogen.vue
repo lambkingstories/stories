@@ -1929,6 +1929,8 @@ onBeforeUnmount(() => {
     gap: 6px
   .bo-title
     font-size: 1.25rem
+  .bo-result-pic
+    max-height: 64px
 
 // short screens: the explanation card closer together
 @media (max-height: 520px)
