@@ -481,6 +481,10 @@ function resetAll() {
   .is-editing .hg-tile:not(.is-dragging)
     animation: none
 
+// the label on the picture gives way to the buttons while arranging
+.is-editing .resume-kind
+  opacity: 0
+
 .hg-btn
   position: absolute
   z-index: 3
