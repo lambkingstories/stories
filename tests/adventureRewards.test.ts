@@ -10,6 +10,7 @@ import messages from '@/i18n/app'
 import esExtra from '@/i18n/es/teil2'
 import AdventureRewards from '@/components/molecules/AdventureRewards.vue'
 import useAdventure from '@/use/useAdventure'
+import useBigGames from '@/use/useBigGames'
 import { REWARD_GAMES } from '@/data/adventures/rewardGames'
 import type { Journey } from '@/types/adventure'
 
@@ -35,6 +36,7 @@ const make = (stageId?: number) => mount(AdventureRewards, { props: { journey, s
 
 beforeEach(() => {
   localStorage.clear()
+  useBigGames().replacePicks([])
   const adv = useAdventure()
   for (const k of Object.keys(adv.state)) delete adv.state[k]
   REWARD_GAMES['testreise'] = [2]
@@ -77,14 +79,29 @@ describe('AdventureRewards', () => {
     expect(text(make(2))).toContain('„Zwei“ ist freigeschaltet')
   })
 
-  it('shows the way to the next bonus game and the way to the cup', () => {
+  it('shows the way to the next game wish and the way to the cup', () => {
     const adv = useAdventure()
     adv.state['testreise'] = { stages: { 1: { stars: 3, bestStars: 3, done: true } } }
     const t = text(make(1))
-    expect(t).toMatch(/Noch \d+ Sterne? bis „Davids Schleuder“/)
+    // the wishes count the stars of the real adventures (the test journey is not one of them): none yet
+    expect(t).toContain('Noch 40 Sterne bis zum nächsten Spiel-Wunsch.')
     // 3 stages x 3 stars + 3 exam questions = 12 points; bronze from 50 % = 6 points
     expect(t).toContain('Noch 3 Punkte bis zum Pokal in Bronze.')
     expect(t).toContain('3 von 12 Punkten')
+  })
+
+  it('lights the bonus row and says a game may be picked when a wish is free', () => {
+    const adv = useAdventure()
+    // the stars of all adventures count (the test build has only Josef, 36 stars): stages with high numbers of Josef's progress add enough for a wish
+    adv.state['josef'] = { stages: Object.fromEntries(Array.from({ length: 14 }, (_, i) => [1001 + i, { stars: 3, bestStars: 3, done: true }])) }
+    const w = make(1)
+    expect(text(w)).toContain('Du darfst ein Spiel aussuchen!')
+    expect(w.find('.rw-bonus').classes()).toContain('is-done')
+    // the wish is used: the row speaks of the next one
+    useBigGames().addPick('david')
+    const again = make(1)
+    expect(text(again)).not.toContain('aussuchen')
+    expect(text(again)).toContain('Noch 38 Sterne bis zum nächsten Spiel-Wunsch.')
   })
 
   it('starts folded with the stars in the head line and opens and closes with a tap', async () => {

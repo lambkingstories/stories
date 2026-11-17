@@ -29,7 +29,7 @@ const canRestore = ref(hasBackup())
 function unlockAll() {
   try {
     // keep the real progress once (a second tap does not overwrite it with the unlocked one)
-    if (!hasBackup()) localStorage.setItem(BACKUP, JSON.stringify({ adventure: adv.state, games: games.snapshot() }))
+    if (!hasBackup()) localStorage.setItem(BACKUP, JSON.stringify({ adventure: adv.state, games: games.snapshot(), picks: games.picked() }))
   } catch {
     // a private window: no backup
   }
@@ -44,6 +44,8 @@ function unlockAll() {
   const won: Record<string, { levels: number[]; plays: number }> = {}
   for (const g of BIG_GAMES) won[g.id] = { levels: [1, 1, 1, 1], plays: 1 }
   games.replaceAll({ ...games.snapshot(), ...won })
+  // every big game is open (the picks are all the games), so each one can be tried at once
+  games.replacePicks(BIG_GAMES.map((g) => g.id))
   canRestore.value = hasBackup()
   note.value = t('app.testUnlock.done')
 }
@@ -51,9 +53,10 @@ function unlockAll() {
 function restore() {
   try {
     const raw = localStorage.getItem(BACKUP)
-    const saved = raw ? (JSON.parse(raw) as { adventure?: Record<string, never>; games?: Record<string, never> }) : {}
+    const saved = raw ? (JSON.parse(raw) as { adventure?: Record<string, never>; games?: Record<string, never>; picks?: string[] }) : {}
     adv.replaceAll(saved.adventure ?? {})
     games.replaceAll(saved.games ?? {})
+    games.replacePicks(saved.picks ?? [])
     localStorage.removeItem(BACKUP)
   } catch {
     // nothing to bring back

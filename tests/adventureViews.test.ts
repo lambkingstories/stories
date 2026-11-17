@@ -224,8 +224,8 @@ describe('the stars of a journey are counted the same way everywhere', () => {
     const map = mount(MapView, opts)
     await flushPromises()
     // 3 + 2 stars + 4 right answers of the exam
-    // the home page shows the way to the next big game (the stars of the stages: 3 + 2 of the 20 that open it)
-    expect(home.find('.stars-count').text()).toBe('5 / 20')
+    // the home page shows the way to the next wish for a big game (the stars of the stages: 3 + 2 of the 40 that give it)
+    expect(home.find('.stars-count').text()).toBe('5 / 40')
     expect(map.find('.map-points').text()).toBe(`9 / ${max}`)
     adv.reset('josef')
   })

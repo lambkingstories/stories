@@ -8,7 +8,7 @@ import { BASKET_R, H, W, cutRope, makeGame, play, starsOf, stepOnce, tap, type L
 import { CHAPTER_COUNT, LEVELS, LEVELS_PER_CHAPTER, levelGame, tipRope } from '../src/utils/moseKorbLevels'
 
 describe('the levels of Moses Körbchen', () => {
-  it('are 40 in 4 chapters of 10 and the game is one of the corner (240 stars, 120 to win)', () => {
+  it('are 40 in 4 chapters of 10 and the game is one of the corner (120 stars to win)', () => {
     expect(CHAPTER_COUNT).toBe(4)
     expect(LEVELS_PER_CHAPTER).toBe(10)
     expect(LEVELS).toHaveLength(40)
@@ -17,7 +17,6 @@ describe('the levels of Moses Körbchen', () => {
       expect(l.index).toBe(i % 10)
     })
     const g = BIG_GAMES.find((x) => x.id === 'mose')!
-    expect(g.at).toBe(240)
     expect(g.maxStars).toBe(LEVELS.length * 3)
   })
 

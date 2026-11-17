@@ -1,21 +1,26 @@
 <script setup lang="ts">
 /**
  * What the child has won on the adventures, in two parts:
- *  - `games` ("My game room"): the next goal in stars, the big games (they open with the stars of all adventures together) and the mini games
+ *  - `games` ("My game room"): the wishes for a big game (every full 40 stars give one; the child picks which game it opens, for good; a closed
+ *    tile opens a little window to pick it), the big games and the mini games
  *    (the best replayable games of every adventure; one opens when its stage has all three stars, the ones not yet won stand there as
  *    locked tiles, so they can be collected). A tile opens the game of that stage in the free mode (`?free=1`: no stars, no progress).
  *  - `gifts` ("My coloring pictures"): every cup (bronze, silver, gold) gives the coloring picture of the journey as a present; a tile
  *    opens the coloring program.
  */
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { journeys } from '@/data/adventures'
 import useAdventure from '@/use/useAdventure'
 import { cupOf, rewardGames, type RewardGame } from '@/utils/rewards'
-import { BIG_GAMES } from '@/data/bigGames'
+import { STEP } from '@/data/bigGames'
 import useBigGames from '@/use/useBigGames'
-import { bigGameStates, nextBigGame, totalStars, type BigGameState } from '@/utils/bigGames'
+import useGameWishes from '@/use/useGameWishes'
+import useCelebration from '@/use/useCelebration'
+import BigGamePickDialog from '@/components/molecules/BigGamePickDialog.vue'
+import GameWishBar from '@/components/molecules/GameWishBar.vue'
+import type { BigGameState } from '@/utils/bigGames'
 import { prependBaseUrl } from '@/utils/function'
 
 /** `section` (for `part="games"`): both lists in one page (`all`), only the mini games or only the bonus games. */
@@ -26,11 +31,24 @@ const router = useRouter()
 const adv = useAdventure()
 
 const bigGames = useBigGames()
-const stars = computed(() => totalStars(journeys, adv.progressOf))
-const bigStates = computed(() => bigGameStates(BIG_GAMES, stars.value))
-const nextBig = computed(() => nextBigGame(BIG_GAMES, stars.value))
-function playBig(s: BigGameState) {
+const wish = useGameWishes()
+const { celebrate } = useCelebration()
+const stars = wish.stars
+const bigStates = wish.states
+const w = wish.wishes
+// the little window of a closed game, and the game that was just opened (its tile pops once)
+const asking = ref<BigGameState | null>(null)
+const justOpened = ref('')
+function tapBig(s: BigGameState) {
   if (s.open) void router.push({ name: 'app-big-game', params: { gameId: s.game.id } })
+  else asking.value = s
+}
+function doPick(id: string) {
+  if (!wish.pick(id)) return
+  asking.value = null
+  justOpened.value = id
+  celebrate('bronze')
+  window.setTimeout(() => (justOpened.value = ''), 1600)
 }
 
 const games = computed(() => rewardGames(journeys, adv.progressOf))
@@ -54,39 +72,43 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
 <template lang="pug">
   section(class="rw")
     template(v-if="part === 'games'")
-      //- the way to the next big game: the stars of all adventures together
+      //- the wishes: every full 40 stars give one game to pick; the bar says how many are free, else how far the next one is
       div(v-if="section !== 'mini'" class="rw-goal" role="group")
         span(class="rw-goal-stars") {{ stars }}
           img(:src="prependBaseUrl('images/abenteuer/ui/stern-gold-3.webp')" alt="" draggable="false")
         span(class="rw-goal-body")
-          span(class="rw-goal-text") {{ nextBig ? t('app.bigGames.nextGame', { game: t(`app.bigGames.${nextBig.game.id}.title`), n: nextBig.missing }) : t('app.profile.allBigOpen') }}
-          span(v-if="nextBig" class="rw-bar" aria-hidden="true")
-            span(class="rw-bar-fill" :style="{ width: Math.round(nextBig.share * 100) + '%' }")
+          GameWishBar(v-if="w.free > 0" :free="w.free")
+          span(v-else class="rw-goal-text") {{ w.allOpen ? t('app.profile.allBigOpen') : t('app.bigGames.nextGame', { n: w.missing }, w.missing) }}
+          span(v-if="!w.allOpen" class="rw-bar" aria-hidden="true")
+            span(class="rw-bar-fill" :style="{ width: Math.round(w.share * 100) + '%' }")
 
-      //- the big games: each one opens with the stars of all adventures together
+      //- the big games: closed ones can be tapped, a free wish opens one of them
       h3(v-if="section !== 'mini'" id="rw-bonus" class="rw-title")
         span {{ t('app.bigGames.title') }}
         span(class="rw-count") {{ bigStates.filter((s) => s.open).length }} / {{ bigStates.length }}
-      p(v-if="section !== 'mini'" class="rw-hint") {{ t('app.bigGames.hint') }}
+      p(v-if="section !== 'mini'" class="rw-hint") {{ t('app.bigGames.hint', { n: STEP }) }}
       div(v-if="section !== 'mini'" class="rw-grid")
         button(
           v-for="s in bigStates"
           :key="s.game.id"
           type="button"
-          :class="['rw-tile', 'rw-big', { 'is-locked': !s.open }]"
-          :disabled="!s.open"
-          @click="playBig(s)"
+          :class="['rw-tile', 'rw-big', { 'is-locked': !s.open, 'is-pick': !s.open && w.free > 0, 'is-new': justOpened === s.game.id }]"
+          :data-game="s.game.id"
+          :aria-label="s.open ? undefined : `${t(`app.bigGames.${s.game.id}.title`)}: ${t('app.bigGames.locked')}`"
+          @click="tapBig(s)"
         )
           span(class="rw-img")
             img(:src="pic(s.game.image)" alt="" draggable="false" loading="lazy")
             span(v-if="s.open" class="rw-play" aria-hidden="true")
               svg(viewBox="0 0 24 24" width="26" height="26" fill="currentColor")
                 path(d="M8 5.2v13.6a1 1 0 0 0 1.5.86l11-6.8a1 1 0 0 0 0-1.72l-11-6.8A1 1 0 0 0 8 5.2z")
-            span(v-else class="rw-lock") {{ t('app.bigGames.locked', { n: s.missing }, s.missing) }}
+            span(v-else-if="w.free > 0" class="rw-lock rw-lock--pick" aria-hidden="true")
+              img(:src="prependBaseUrl('images/abenteuer/ui/stern-gold-1.webp')" alt="" draggable="false")
+            span(v-else class="rw-lock" aria-hidden="true")
+              svg(viewBox="0 0 24 24" width="30" height="30" fill="currentColor")
+                path(d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 0 1 6 0v3H9z")
           span(class="rw-name") {{ t(`app.bigGames.${s.game.id}.title`) }}
           span(v-if="s.open" class="rw-from") {{ t('app.bigGames.levelStars', { n: bigGames.stars(s.game.id), max: s.game.maxStars }) }}
-          span(v-else class="rw-bar" aria-hidden="true")
-            span(class="rw-bar-fill" :style="{ width: Math.round(s.share * 100) + '%' }")
 
       //- the mini games: they come with the stars of their stage, the others wait as locked tiles
       h3(v-if="section !== 'bonus'" id="rw-mini" :class="['rw-title', { 'rw-title--next': section === 'all' }]")
@@ -119,6 +141,7 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
           span(class="rw-name") {{ g.title }}
           span(class="rw-from") {{ g.from }}
       p(v-else class="rw-empty") {{ t('app.profile.myColoringPicturesEmpty') }}
+    BigGamePickDialog(v-if="asking" :game="asking.game" :free="w.free" :missing="w.missing" @close="asking = null" @pick="doPick")
 </template>
 
 <style scoped lang="sass">
@@ -148,10 +171,34 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
   line-height: 1.35
 
 .rw-big.is-locked
-  cursor: default
-
-  .rw-img img
+  .rw-img > img
     filter: grayscale(1) brightness(0.8)
+
+// a free wish: the closed tiles glow a little, so the child sees that it may pick
+.rw-big.is-pick
+  border-color: #d4a83e
+  box-shadow: 0 0 0 3px rgba(255, 214, 90, 0.4)
+
+  .rw-img > img
+    filter: grayscale(0.6) brightness(0.9)
+
+.rw-big.is-new
+  animation: rw-pop 1.2s ease-out
+
+@keyframes rw-pop
+  0%
+    transform: scale(0.94)
+
+  35%
+    transform: scale(1.06)
+    box-shadow: 0 0 0 6px rgba(255, 214, 90, 0.6)
+
+  100%
+    transform: scale(1)
+
+@media (prefers-reduced-motion: reduce)
+  .rw-big.is-new
+    animation: none
 
 .rw-lock
   position: absolute
@@ -164,6 +211,16 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
   font-weight: 800
   font-size: 0.95rem
   text-align: center
+
+.rw-lock--pick
+  background: rgba(20, 30, 50, 0.3)
+
+// the little gold star of a free wish (the picture rule of the tile would stretch it over the whole tile)
+.rw-img .rw-lock--pick img
+  width: 44px
+  height: 44px
+  object-fit: contain
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45))
 
 .rw-bar
   display: block
@@ -298,7 +355,7 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
   font-weight: 800
   line-height: 1.25
 
-.rw-tile.is-locked
+.rw-tile.is-locked:not(.rw-big)
   cursor: default
   opacity: 0.92
 

@@ -100,9 +100,8 @@ describe('the solutions', () => {
     expect(won / total).toBeGreaterThan(0.6)
   })
 
-  it('are listed as a big game of the corner, opened with 200 stars', () => {
+  it('are listed as a big game of the corner (picked with a wish)', () => {
     const g = BIG_GAMES.find((x) => x.id === 'gideon')!
-    expect(g.at).toBe(200)
     expect(g.maxStars).toBe(108)
     expect(g.image).toBe('images/spiele-gross/gideon/kachel.webp')
   })

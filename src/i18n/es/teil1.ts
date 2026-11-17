@@ -23,7 +23,7 @@ export default {
         tileMini: 'Minijuegos',
         tileMiniSub: 'Tres estrellas en una etapa: su juego se abre',
         tileBonus: 'Juegos de aventura',
-        tileBonusSub: 'Reúne muchas estrellas: se abren juegos grandes',
+        tileBonusSub: 'Reúne estrellas y elige tus juegos',
         tileFamilySub: 'Quiz, memoria, bingo y más',
         rewardsTitle: 'Lo que te dan las estrellas',
         rewardCard: 'Carta de colección',

@@ -2040,7 +2040,7 @@ export default {
   rMiniNone: 'Esta etapa no tiene un minijuego propio. Los demás están en la sala de juegos.',
   rMiniCount: '{n} de {max} abiertos',
   rBonus: 'Juego de aventura',
-  rBonusNext: 'Falta 1 estrella para «{game}». | Faltan {n} estrellas para «{game}».',
+  rBonusNext: 'Falta 1 estrella para el próximo deseo de juego. | Faltan {n} estrellas para el próximo deseo de juego.',
   rBonusAll: 'El juego de aventura está abierto. | Los {n} juegos de aventura están abiertos.',
   rCup: 'Copa',
   rCupHave: 'Tienes la {cup}.',

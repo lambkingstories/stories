@@ -43,9 +43,8 @@ describe('BigGameNehemia', () => {
     return w
   }
 
-  it('is a game of the corner, opened with 280 stars', () => {
+  it('is a game of the corner (picked with a wish)', () => {
     const g = BIG_GAMES.find((x) => x.id === 'nehemia')!
-    expect(g.at).toBe(280)
     expect(g.maxStars).toBe(180)
   })
 

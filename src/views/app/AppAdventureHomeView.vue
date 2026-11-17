@@ -3,7 +3,7 @@
  * The adventure tab: the journeys as painted medals. Josef is the first; the next ones (Adam and Eve, Noah, and on through the
  * whole Bible) stand there closed until they are written. A tap on a medal opens the map of that journey.
  */
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, resolveComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import AdvButton from '@/components/atoms/AdvButton.vue'
@@ -15,8 +15,8 @@ import AdventureHero from '@/components/molecules/AdventureHero.vue'
 import AdventureTimeline from '@/components/molecules/AdventureTimeline.vue'
 import { journeys } from '@/data/adventures'
 import { medalThumb, onThumbError } from '@/utils/medalThumb'
-import { BIG_GAMES } from '@/data/bigGames'
-import { bigGameStates, nextBigGame, totalStars } from '@/utils/bigGames'
+import { BIG_GAMES, STEP } from '@/data/bigGames'
+import useGameWishes from '@/use/useGameWishes'
 import { rewardGames } from '@/utils/rewards'
 import { isJourneyPlusLocked } from '@/utils/adventureAccess'
 import PlusBadge from '@/components/atoms/PlusBadge.vue'
@@ -156,14 +156,24 @@ function askFromDetail(kind: 'reset' | 'delete') {
 const starTotal = computed(() => journeys.reduce((n, j) => n + pointsOf(adv.progressOf(j.id)), 0))
 const starMax = computed(() => journeys.reduce((n, j) => n + maxPoints(j), 0))
 const starShare = computed(() => (starMax.value ? Math.min(1, starTotal.value / starMax.value) : 0))
-// the stars that open the big games (the stars of the stages): the bar shows the way to the next game while there is one
-const gameStars = computed(() => totalStars(journeys, adv.progressOf))
-const nextGame = computed(() => nextBigGame(BIG_GAMES, gameStars.value))
+// the stars that give the wishes for the big games (the stars of the stages): the card says that a game may be picked, or how far the next wish is
+const wish = useGameWishes()
+const gameStars = wish.stars
+const wishes = wish.wishes
+// the link component by its name: a test that mocks the router has none (then it is a plain element)
+const wishLink = resolveComponent('router-link')
+const wishCardText = computed(() =>
+  wishes.value.free > 0
+    ? t('app.bigGames.wishes', { n: wishes.value.free }, wishes.value.free)
+    : wishes.value.allOpen
+      ? t('app.home.starsTitle')
+      : t('app.bigGames.nextGame', { n: wishes.value.missing }, wishes.value.missing)
+)
 // the tiles: how many mini games and bonus games are open
 const miniGames = computed(() => rewardGames(journeys, adv.progressOf))
 const miniOpen = computed(() => miniGames.value.filter((g) => g.open).length)
 const miniTotal = computed(() => miniGames.value.length)
-const bonusOpen = computed(() => bigGameStates(BIG_GAMES, gameStars.value).filter((s) => s.open).length)
+const bonusOpen = computed(() => wish.states.value.filter((s) => s.open).length)
 
 function go(id: string) {
   void router.push({ name: 'app-adventure-map', params: { journeyId: id } })
@@ -249,13 +259,19 @@ async function doDelete() {
           ZIconography(name="chevron-right" :size="22")
 
       //- the stars of all journeys together (journeys that come later count in it, too)
-      div(class="stars-card" role="group" :aria-label="nextGame ? t('app.bigGames.nextGame', { game: t(`app.bigGames.${nextGame.game.id}.title`), n: nextGame.missing }) : t('app.home.starsAll', { n: starTotal, max: starMax })")
+      component(
+        :is="wishes.free > 0 ? wishLink : 'div'"
+        :to="wishes.free > 0 ? { name: 'app-gameroom', query: { z: 'bonus' } } : undefined"
+        :class="['stars-card', { 'is-wish': wishes.free > 0 }]"
+        :role="wishes.free > 0 ? undefined : 'group'"
+        :aria-label="wishCardText"
+      )
         img(:src="ui('stern-gold-3')" alt="" class="stars-img" draggable="false")
         span(class="stars-body")
-          span(class="stars-title") {{ nextGame ? t('app.bigGames.nextGame', { game: t(`app.bigGames.${nextGame.game.id}.title`), n: nextGame.missing }) : t('app.home.starsTitle') }}
+          span(class="stars-title") {{ wishCardText }}
           span(class="stars-bar" aria-hidden="true")
-            span(class="stars-fill" :style="{ width: Math.round((nextGame ? nextGame.share : starShare) * 100) + '%' }")
-        span(class="stars-count") {{ nextGame ? gameStars : starTotal }} / {{ nextGame ? nextGame.game.at : starMax }}
+            span(class="stars-fill" :style="{ width: Math.round((wishes.allOpen ? starShare : wishes.share) * 100) + '%' }")
+        span(class="stars-count") {{ wishes.allOpen ? `${starTotal} / ${starMax}` : `${gameStars % STEP} / ${STEP}` }}
 
       //- four square tiles: what the stars give (cards, mini games, bonus games) and the family quiz
       div(class="tiles")
@@ -271,6 +287,7 @@ async function doDelete() {
         router-link(:to="{ name: 'app-gameroom', query: { z: 'bonus' } }" class="tile4")
           img(:src="prependBaseUrl('images/icons/kacheln/kachel-bonus-c.webp')" alt="" class="tile4-img" draggable="false")
           span(class="tile4-title") {{ t('app.adventure.tileBonus') }}
+          span(v-if="wishes.free > 0" class="tile4-badge" aria-hidden="true") {{ wishes.free }}
           span(class="tile4-count") {{ bonusOpen }} / {{ BIG_GAMES.length }}
           span(class="tile4-sub") {{ t('app.adventure.tileBonusSub') }}
         router-link(:to="{ name: 'app-family' }" class="tile4")
@@ -482,6 +499,13 @@ $ink: var(--lk-text)
   border-radius: var(--lk-r-group)
   background: var(--lk-surface)
   box-shadow: var(--lk-shadow)
+
+.stars-card.is-wish
+  border: 2px solid #d4a83e
+  background: rgba(255, 244, 196, 0.9)
+  box-shadow: 0 0 0 3px rgba(255, 214, 90, 0.35)
+  color: #3d2c00
+  text-decoration: none
 
 .stars-img
   flex: 0 0 auto
@@ -728,6 +752,25 @@ $ink: var(--lk-text)
   font-size: 1.05rem
   font-weight: 800
   line-height: 1.15
+
+.tile4
+  position: relative
+
+.tile4-badge
+  position: absolute
+  top: 10px
+  right: 10px
+  min-width: 28px
+  height: 28px
+  padding: 0 8px
+  display: grid
+  place-items: center
+  border-radius: 999px
+  background: #d4a83e
+  color: #fff
+  font-weight: 800
+  font-size: 0.95rem
+  box-shadow: 0 2px 6px rgba(80, 50, 0, 0.35)
 
 .tile4-count
   font-size: 0.9rem

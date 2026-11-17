@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import useBigGames from '../src/use/useBigGames'
-import { bigGameStates, nextBigGame, totalStars } from '../src/utils/bigGames'
+import { bigGameStates, totalStars, wishState } from '../src/utils/bigGames'
 import type { Journey, JourneyProgress } from '../src/types/adventure'
 
 const games = [
-  { id: 'david' as const, at: 20, image: 'a.webp' },
-  { id: 'david' as const, at: 60, image: 'b.webp' }
+  { id: 'david' as const, image: 'a.webp', maxStars: 1 },
+  { id: 'elia' as const, image: 'b.webp', maxStars: 1 }
 ]
 
 describe('big games', () => {
@@ -18,16 +18,17 @@ describe('big games', () => {
     expect(totalStars(journeys, (id) => progress[id])).toBe(6)
   })
 
-  it('a game opens at its stars and says how many are missing', () => {
-    const s = bigGameStates(games, 12)
-    expect(s.map((x) => x.open)).toEqual([false, false])
-    expect(s[0]).toMatchObject({ missing: 8, share: 0.6 })
-    expect(bigGameStates(games, 20)[0]!.open).toBe(true)
+  it('a game is open when it was picked, not by stars (the stars give wishes: see gameWishes.test.ts)', () => {
+    expect(bigGameStates(games, []).map((x) => x.open)).toEqual([false, false])
+    expect(bigGameStates(games, ['elia']).map((x) => x.open)).toEqual([false, true])
+    // an unknown id opens nothing
+    expect(bigGameStates(games, ['nonsense']).map((x) => x.open)).toEqual([false, false])
   })
 
-  it('the next game is the nearest closed one', () => {
-    expect(nextBigGame(games, 25)?.game.at).toBe(60)
-    expect(nextBigGame(games, 99)).toBeNull()
+  it('the way to the next wish: stars missing and share', () => {
+    expect(wishState(games, 12, [])).toMatchObject({ free: 0, missing: 28, share: 0.3, allOpen: false })
+    expect(wishState(games, 45, [])).toMatchObject({ free: 1, missing: 35 })
+    expect(wishState(games, 1000, ['david', 'elia']).allOpen).toBe(true)
   })
 })
 

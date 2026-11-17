@@ -21,7 +21,6 @@ describe('the levels of Jonatan\'s arrows', () => {
     expect(LEVELS_PER_CHAPTER).toBe(11)
     for (let c = 0; c < 4; c++) expect(LEVELS.filter((l) => l.chapter === c)).toHaveLength(11)
     const g = BIG_GAMES.find((x) => x.id === 'bogen')!
-    expect(g.at).toBe(400)
     expect(g.maxStars).toBe(MAX_STARS)
     expect(MAX_STARS).toBe(132)
   })

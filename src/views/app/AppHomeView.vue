@@ -36,8 +36,7 @@ import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
 import { openExternal } from '@/utils/openExternal'
 import { prependBaseUrl } from '@/utils/function'
 import { contentLocale } from '@/utils/contentLocale'
-import { BIG_GAMES } from '@/data/bigGames'
-import { bigGameStates, nextBigGame, totalStars } from '@/utils/bigGames'
+import useGameWishes from '@/use/useGameWishes'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
@@ -45,6 +44,7 @@ const { lastReadId } = useModels()
 const apiBooks = useApiBooks()
 const { getPct } = useReadingProgress()
 const adventure = useAdventure()
+const { wishes, states: wishStates } = useGameWishes()
 const { plusOn } = usePremium()
 
 const STORE_URL = 'https://lambking.store'
@@ -209,16 +209,16 @@ const adventureCard = computed<ResumeCard>(() => {
 
 /** The games: the bonus games the stars have opened (the picture is the newest open one). */
 const gamesCard = computed<ResumeCard>(() => {
-  const stars = totalStars(journeys, adventure.progressOf)
-  const states = bigGameStates(BIG_GAMES, stars)
+  const w = wishes.value
+  const states = wishStates.value
   const open = states.filter((s) => s.open)
-  const next = nextBigGame(BIG_GAMES, stars)
   const shown = open[open.length - 1] ?? states[0]
   return {
     id: 'games',
     kind: t('app.home.kindGames'),
     title: t('app.home.gamesTitle'),
-    meta: open.length ? t('app.home.gamesOpen', { n: open.length, total: states.length }) : t('app.home.gamesNext', { n: next?.missing ?? 0 }),
+    // a free wish comes first ("You may pick a game!"), then the games open so far, else the way to the first wish
+    meta: w.free > 0 ? t('app.bigGames.wishes', { n: w.free }, w.free) : open.length ? t('app.home.gamesOpen', { n: open.length, total: states.length }) : t('app.home.gamesNext', { n: w.missing }, w.missing),
     image: shown ? prependBaseUrl(shown.game.image) : '',
     progress: -1,
     empty: false,

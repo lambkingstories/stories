@@ -10,11 +10,10 @@ import { useI18n } from 'vue-i18n'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
 import useAdventure from '@/use/useAdventure'
 import { REWARD_GAMES } from '@/data/adventures/rewardGames'
-import { journeys as allJourneys } from '@/data/adventures'
-import { BIG_GAMES } from '@/data/bigGames'
+import { STEP } from '@/data/bigGames'
+import useGameWishes from '@/use/useGameWishes'
 import { CARD_ART } from '@/data/cardArt'
 import { MAX_STARS, maxPoints, medalFor, pointsOf, stageStarsOf, starsOf } from '@/utils/adventureScore'
-import { bigGameStates, nextBigGame, totalStars } from '@/utils/bigGames'
 import { albumCards, albumSetCard } from '@/utils/collection'
 import { prependBaseUrl } from '@/utils/function'
 import type { Journey, Medal } from '@/types/adventure'
@@ -51,10 +50,11 @@ const miniOpenCount = computed(() => miniIds.value.filter((id) => stageStarsOf(a
 const miniStage = computed(() => (props.stageId !== undefined && miniIds.value.includes(props.stageId) ? props.journey.stages.find((s) => s.id === props.stageId) : undefined))
 const miniOpen = computed(() => stageNow.value >= MAX_STARS)
 
-// the bonus games hang on the stars of all adventures together
-const allStars = computed(() => totalStars(allJourneys, adv.progressOf))
-const nextBonus = computed(() => nextBigGame(BIG_GAMES, allStars.value))
-const bonusOpenCount = computed(() => bigGameStates(BIG_GAMES, allStars.value).filter((s) => s.open).length)
+// the bonus games: every full 40 stars of all adventures together give a wish to pick one of them
+const wish = useGameWishes()
+const allStars = wish.stars
+const wishes = wish.wishes
+const bonusOpenCount = computed(() => wish.states.value.filter((s) => s.open).length)
 
 // the cup: gold from 90 %, silver from 75 %, bronze from 50 % of the points of stars and exam answers
 const points = computed(() => pointsOf(progress.value))
@@ -129,16 +129,25 @@ const rows = computed<Row[]>(() => {
     })
   }
 
-  if (nextBonus.value) {
+  if (wishes.value.free > 0) {
+    // a wish is free: the row is lit, and says so
     out.push({
       key: 'bonus',
       icon: ui('stern-gold-1'),
       title: t('app.adventure.rBonus'),
-      text: t('app.adventure.rBonusNext', { n: nextBonus.value.missing, game: t(`app.bigGames.${nextBonus.value.game.id}.title`) }, nextBonus.value.missing),
-      bar: { value: allStars.value, max: nextBonus.value.game.at, label: t('app.adventure.rOf', { n: allStars.value, max: nextBonus.value.game.at }) },
+      text: t('app.bigGames.wishes', { n: wishes.value.free }, wishes.value.free),
+      done: true
+    })
+  } else if (!wishes.value.allOpen) {
+    out.push({
+      key: 'bonus',
+      icon: ui('stern-gold-1'),
+      title: t('app.adventure.rBonus'),
+      text: t('app.adventure.rBonusNext', { n: wishes.value.missing }, wishes.value.missing),
+      bar: { value: allStars.value % STEP, max: STEP, label: t('app.adventure.rOf', { n: allStars.value % STEP, max: STEP }) },
       done: false
     })
-  } else if (BIG_GAMES.length) {
+  } else {
     out.push({ key: 'bonus', icon: ui('stern-gold-1'), title: t('app.adventure.rBonus'), text: t('app.adventure.rBonusAll', { n: bonusOpenCount.value }, bonusOpenCount.value), done: true })
   }
 

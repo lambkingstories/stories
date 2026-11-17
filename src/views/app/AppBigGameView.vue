@@ -1,14 +1,13 @@
 <script setup lang="ts">
 /**
- * The page of a big game (`/app/spiel/:gameId`). The game is only opened when the stars of the adventures reach its number
- * (a link with `?probe=1` opens it for testing). The game itself lives in its own component.
+ * The page of a big game (`/app/spiel/:gameId`). The game is only opened when the child picked it with a wish
+ * (a link with `?probe=1` opens it for testing); otherwise the page says so and leads back. The game itself lives in its own component.
  */
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { journeys } from '@/data/adventures'
 import { BIG_GAMES } from '@/data/bigGames'
-import useAdventure from '@/use/useAdventure'
-import { totalStars } from '@/utils/bigGames'
+import useBigGames from '@/use/useBigGames'
 import BigGameBogen from '@/components/molecules/games/BigGameBogen.vue'
 import BigGameDavid from '@/components/molecules/games/BigGameDavid.vue'
 import BigGameElia from '@/components/molecules/games/BigGameElia.vue'
@@ -22,10 +21,11 @@ import BigGameNehemia from '@/components/molecules/games/BigGameNehemia.vue'
 
 const route = useRoute()
 const router = useRouter()
-const adv = useAdventure()
+const { t } = useI18n({ useScope: 'global' })
+const bg = useBigGames()
 
 const game = computed(() => BIG_GAMES.find((g) => g.id === route.params.gameId))
-const open = computed(() => !!game.value && (route.query.probe === '1' || totalStars(journeys, adv.progressOf) >= game.value.at))
+const open = computed(() => !!game.value && (route.query.probe === '1' || bg.isPicked(game.value.id)))
 
 function leave() {
   if (window.history.length > 1) router.back()
@@ -45,15 +45,27 @@ function leave() {
   BigGameLamm(v-else-if="game?.id === 'lamm' && open" @leave="leave")
   BigGameBogen(v-else-if="game?.id === 'bogen' && open" @leave="leave")
   div(v-else class="bg-closed")
-    button(type="button" class="bg-closed-btn" @click="leave") ←
+    p(class="bg-closed-note" role="status") {{ t('app.bigGames.closedNote') }}
+    button(type="button" class="bg-closed-btn" @click="leave") {{ t('app.bigGames.back') }}
 </template>
 
 <style scoped lang="sass">
 .bg-closed
   min-height: 100vh
-  display: grid
-  place-items: center
+  display: flex
+  flex-direction: column
+  align-items: center
+  justify-content: center
+  gap: 16px
+  padding: 20px
   background: var(--lk-bg)
+  color: var(--lk-text)
+
+.bg-closed-note
+  margin: 0
+  font-weight: 800
+  font-size: 1.1rem
+  text-align: center
 
 .bg-closed-btn
   padding: 12px 22px
