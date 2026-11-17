@@ -707,7 +707,11 @@ let pointer: { x: number; y: number } | null = null
 function cellPos(e: PointerEvent): { x: number; y: number } {
   const c = canvas.value!
   const r = c.getBoundingClientRect()
-  return { x: (e.clientX - r.left - fx) / cell, y: (e.clientY - r.top - fy) / cellY }
+  // the size is measured again at every touch (a page that changed without a resize event would shift the finger)
+  if (Math.abs(r.width - cvW) > 0.5 || Math.abs(r.height - cvH) > 0.5) resize()
+  const kx = r.width > 0 ? cvW / r.width : 1
+  const ky = r.height > 0 ? cvH / r.height : 1
+  return { x: ((e.clientX - r.left) * kx - fx) / cell, y: ((e.clientY - r.top) * ky - fy) / cellY }
 }
 function onDown(e: PointerEvent) {
   if (screen.value !== 'play' || paused.value) return
@@ -733,6 +737,7 @@ function onUp() {
 }
 
 // ── the loop ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+let sizeObserver: ResizeObserver | null = null
 function resize() {
   const c = canvas.value
   if (!c) return
@@ -1138,6 +1143,11 @@ onMounted(async () => {
   makeLayers()
   resize()
   window.addEventListener('resize', resize)
+  window.visualViewport?.addEventListener('resize', resize)
+  if (typeof ResizeObserver !== 'undefined' && canvas.value) {
+    sizeObserver = new ResizeObserver(() => resize())
+    sizeObserver.observe(canvas.value)
+  }
   music.playGame('water')
   setProbe()
   await loadAll()
@@ -1149,6 +1159,8 @@ onBeforeUnmount(() => {
   cancelAnimationFrame(raf)
   music.stop('game')
   window.removeEventListener('resize', resize)
+  window.visualViewport?.removeEventListener('resize', resize)
+  sizeObserver?.disconnect()
   document.body.style.overflow = bodyOverflow
 })
 </script>

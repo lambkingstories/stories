@@ -670,7 +670,11 @@ function cellFromPoint(x: number, y: number): number {
 }
 function local(e: PointerEvent) {
   const r = canvas.value!.getBoundingClientRect()
-  return { x: e.clientX - r.left, y: e.clientY - r.top }
+  // the size is measured again at every touch (a page that changed without a resize event would shift the finger)
+  if (Math.abs(r.width - vw) > 0.5 || Math.abs(r.height - vh) > 0.5) resize()
+  const kx = r.width > 0 ? vw / r.width : 1
+  const ky = r.height > 0 ? vh / r.height : 1
+  return { x: (e.clientX - r.left) * kx, y: (e.clientY - r.top) * ky }
 }
 
 function onDown(e: PointerEvent) {
@@ -804,6 +808,7 @@ function useBooster(name: BoosterName) {
 }
 
 // ── the loop and the drawing ────────────────────────────────────────────────────────────────────────────────────────────────
+let sizeObserver: ResizeObserver | null = null
 function resize() {
   const c = canvas.value
   if (!c) return
@@ -1252,6 +1257,11 @@ onMounted(async () => {
   ctx = canvas.value?.getContext('2d') ?? null
   resize()
   window.addEventListener('resize', resize)
+  window.visualViewport?.addEventListener('resize', resize)
+  if (typeof ResizeObserver !== 'undefined' && canvas.value) {
+    sizeObserver = new ResizeObserver(() => resize())
+    sizeObserver.observe(canvas.value)
+  }
   await loadAll()
   last = performance.now()
   raf = requestAnimationFrame(frame)
@@ -1281,6 +1291,8 @@ onBeforeUnmount(() => {
   cancelAnimationFrame(raf)
   music.stop('game')
   window.removeEventListener('resize', resize)
+  window.visualViewport?.removeEventListener('resize', resize)
+  sizeObserver?.disconnect()
   document.body.style.overflow = bodyOverflow
 })
 </script>
