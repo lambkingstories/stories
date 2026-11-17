@@ -924,9 +924,9 @@ function physics(r: Run, dt: number, input: Input, quiet = false): void {
     for (let k = 0; k < tr.zones.length; k++) {
       const z = tr.zones[k]!
       if (z.kind !== 'stop' || r.zoneDone[k] || z.gate === undefined) continue
-      if (r.x > z.gate - 1.8 && r.x < z.gate + 4) {
+      if (r.x > z.gate - 3.2 && r.x < z.gate + 4) {
         const v = r.vx
-        r.x = z.gate - 1.8
+        r.x = z.gate - 3.2
         if (v > 0) {
           r.vx = -v * 0.05
           if (v > 6.5) {

@@ -900,7 +900,7 @@ function drawZonesBack(c: CanvasRenderingContext2D, xMin: number, xMax: number) 
       sprite(c, 'zonen-3', z.x0, heightAt(track, z.x0) - 0.1, 1.9, 0.5, 1)
       sprite(c, 'zonen-3', z.x1, heightAt(track, z.x1) - 0.1, 1.9, 0.5, 1)
       sprite(c, 'zonen-5', z.x0 + 5, heightAt(track, z.x0 + 5) - 0.1, 1.2, 0.5, 1)
-      if (z.gate !== undefined) sprite(c, run.zoneDone[k] ? (img['zonen-2'] ? 'zonen-2' : 'ziel') : img['zonen-1'] ? 'zonen-1' : 'ziel', z.gate + 1.4, heightAt(track, z.gate) - 0.15, 3.2, 0.5, 1)
+      if (z.gate !== undefined) sprite(c, run.zoneDone[k] ? (img['zonen-2'] ? 'zonen-2' : 'ziel') : img['zonen-1'] ? 'zonen-1' : 'ziel', z.gate + 0.9, heightAt(track, z.gate) - 0.15, 2.6, 0.5, 1)
     }
   }
 }
