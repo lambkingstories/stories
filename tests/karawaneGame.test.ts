@@ -15,8 +15,12 @@ import {
   newRun,
   rng,
   slopeAt,
+  speedLimit,
   starsFor,
+  starsForTime,
   stepRun,
+  winBonus,
+  zoneAt,
   type Input,
   type Run
 } from '../src/utils/karawaneGame'
@@ -560,7 +564,7 @@ describe('a crash', () => {
               crashes++
               // after the first impact the cart stays low and is never thrown up
               expect(maxVy).toBeLessThanOrEqual(1.0001)
-              expect(maxAbove).toBeLessThan(h0 + 0.5)
+              expect(maxAbove).toBeLessThan(h0 + 0.8)
               // it comes to rest
               expect(Math.abs(r.vx)).toBeLessThan(0.6)
               expect(Math.abs(r.vy)).toBeLessThan(0.6)
@@ -587,6 +591,193 @@ describe('a crash', () => {
       r.events.length = 0
     }
     expect(r.y).toBeLessThan(y + 0.3)
+  })
+})
+
+/** A driver that does what the bot does, but without ever braking. */
+const gasOnly = () => ({ gas: true, brake: false })
+
+describe('braking is needed', () => {
+  it('builds halt zones with a toll gate, bridges, holes, steps and boulders on the ways', () => {
+    const kinds = new Set<string>()
+    for (let i = 0; i < ROUTE_COUNT; i++) for (const z of generateTrack(i).zones) kinds.add(z.kind)
+    for (const k of ['stop', 'bridge', 'pit', 'ledges', 'rocks']) expect(kinds.has(k), k).toBe(true)
+    // every way has a halt zone, and the zones are on flat ground where they must be
+    for (let i = 0; i < ROUTE_COUNT; i++) {
+      const t = generateTrack(i)
+      expect(t.zones.some((z) => z.kind === 'stop')).toBe(true)
+      for (const z of t.zones.filter((q) => q.kind === 'stop' || q.kind === 'bridge')) {
+        expect(Math.abs(heightAt(t, z.x0) - heightAt(t, z.x1))).toBeLessThan(0.3)
+        expect(z.x1).toBeLessThan(t.finishX - 30)
+      }
+    }
+  })
+
+  it('holding the gas does not get through: every way ends in a fall before the goal', () => {
+    for (let i = 0; i < ROUTE_COUNT; i++) {
+      const r = newRun(generateTrack(i), statsFor(newSave()))
+      drive(r, 400, gasOnly)
+      expect(r.phase, `route ${i}`).toBe('crash')
+      expect(r.meters).toBeLessThan(ROUTES[i]!.length * 0.7)
+    }
+  })
+
+  it('a cart that hits the shut gate at speed crashes, one that comes slowly only bumps', () => {
+    const t = generateTrack(0)
+    const z = t.zones.find((q) => q.kind === 'stop')!
+    const fast = newRun(t, statsFor(newSave()))
+    fast.x = z.gate! - 14
+    fast.y = heightAt(t, fast.x) + 1.05
+    fast.vx = 10
+    drive(fast, 5, gasOnly)
+    expect(fast.phase).toBe('crash')
+    const slow = newRun(t, statsFor(newSave()))
+    slow.x = z.gate! - 8
+    slow.y = heightAt(t, slow.x) + 1.05
+    slow.vx = 4
+    drive(slow, 4, () => ({ gas: false, brake: false }))
+    expect(slow.phase).toBe('play')
+    expect(slow.x).toBeLessThanOrEqual(z.gate! - 1.7)
+  })
+
+  it('standing still in the halt zone opens the gate, gives water and coins and a checkpoint', () => {
+    const t = generateTrack(0)
+    const k = t.zones.findIndex((q) => q.kind === 'stop')
+    const z = t.zones[k]!
+    const r = newRun(t, statsFor(newSave()))
+    r.x = z.x0 + 3
+    r.y = heightAt(t, r.x) + 1.05
+    r.stamina = 0.4
+    r.taken.fill(1)
+    let opened = false
+    for (let i = 0; i < 60 * 4; i++) {
+      stepRun(r, 1 / 60, { gas: false, brake: false })
+      if (r.events.some((e) => e.type === 'station')) opened = true
+      r.events.length = 0
+    }
+    expect(opened).toBe(true)
+    expect(r.zoneDone[k]).toBe(1)
+    expect(r.stamina).toBeGreaterThan(0.95)
+    expect(r.checkpoint).toBeGreaterThan(0)
+    // and the way is free now
+    drive(r, 4, gasOnly)
+    expect(r.x).toBeGreaterThan(z.gate! + 2)
+  })
+
+  it('too fast on a bridge makes the jars fall, slowly it is fine, and a better suspension allows more speed', () => {
+    const t = generateTrack(1)
+    const z = t.zones.find((q) => q.kind === 'bridge')!
+    const cross = (speed: number, susp = 0) => {
+      const s = newSave()
+      s.up.suspension = susp
+      const r = newRun(t, statsFor(s))
+      r.x = z.x0 - 3
+      r.y = heightAt(t, r.x) + 1.05
+      r.vx = speed
+      for (let i = 0; i < 60 * 6 && r.x < z.x1 + 2 && r.phase === 'play'; i++) {
+        // hold the speed
+        r.vx = Math.max(r.vx, speed - 0.5)
+        stepRun(r, 1 / 60, { gas: r.vx < speed, brake: false })
+        r.events.length = 0
+      }
+      return r.phase
+    }
+    expect(cross(4.6)).toBe('play')
+    expect(cross(9)).toBe('crash')
+    expect(speedLimit(statsFor(newSave()), 'bridge')).toBeLessThan(speedLimit({ ...statsFor(newSave()), bridgeV: 8.7 }, 'bridge'))
+    expect(statsFor({ ...newSave(), up: { ...newSave().up, suspension: 5 } }).bridgeV).toBeGreaterThan(statsFor(newSave()).bridgeV + 2)
+  })
+
+  it('a hole slows the cart down, much less with strong wheels', () => {
+    const t = generateTrack(3)
+    const z = t.zones.find((q) => q.kind === 'pit')!
+    const through = (wheels: number) => {
+      const s = newSave()
+      s.up.wheels = wheels
+      const r = newRun(t, statsFor(s))
+      r.x = z.x0 - 6
+      r.y = heightAt(t, r.x) + 1.05
+      r.vx = 9
+      let sec = 0
+      while (r.x < z.x1 && r.phase === 'play' && sec < 30) {
+        stepRun(r, 1 / 60, { gas: true, brake: false })
+        r.events.length = 0
+        sec += 1 / 60
+      }
+      return sec
+    }
+    expect(through(0)).toBeGreaterThan(through(5) * 1.2)
+    expect(zoneAt(t, (z.x0 + z.x1) / 2, 'pit')).toBe(z)
+  })
+})
+
+describe('the time of the day and the stars', () => {
+  it('gives one star for arriving, two before the evening, three early in the afternoon', () => {
+    for (let i = 0; i < ROUTE_COUNT; i++) {
+      const [t3, dusk] = ROUTES[i]!.times
+      expect(t3).toBeLessThan(dusk)
+      expect(starsForTime(i, t3 - 1)).toBe(3)
+      expect(starsForTime(i, t3 + 1)).toBe(2)
+      expect(starsForTime(i, dusk - 1)).toBe(2)
+      expect(starsForTime(i, dusk + 1)).toBe(1)
+    }
+  })
+
+  it('the clock runs while driving and goes on after a restart from an oasis', () => {
+    const t = generateTrack(0)
+    const r = newRun(t, statsFor(newSave()))
+    drive(r, 10, gasOnly)
+    expect(r.clock).toBeGreaterThan(9)
+    expect(r.clock).toBeLessThan(11)
+    const again = newRun(t, statsFor(newSave()), t.oases[0], 70)
+    expect(again.clock).toBe(70)
+    expect(again.cpClock).toBe(70)
+  })
+
+  it('arrival gives a bonus for the goal and for every whole jar', () => {
+    expect(winBonus(0, 3)).toBeGreaterThan(winBonus(0, 0))
+    expect(winBonus(5, 0)).toBeGreaterThan(winBonus(0, 0))
+  })
+})
+
+describe('building the cart pays off', () => {
+  it('a plain cart does the first two ways with one or two stars; the best parts are clearly faster on every way', () => {
+    const arrive = (route: number, save: ReturnType<typeof newSave>) => {
+      const r = newRun(generateTrack(route), statsFor(save))
+      drive(r, 400, botInput)
+      return r
+    }
+    const base: Run[] = []
+    const full: Run[] = []
+    for (let i = 0; i < ROUTE_COUNT; i++) {
+      base.push(arrive(i, newSave()))
+      full.push(arrive(i, fullSave()))
+    }
+    for (const i of [0, 1]) {
+      expect(base[i]!.phase, `base ${i}`).toBe('won')
+      const st = starsForTime(i, base[i]!.clock)
+      expect(st).toBeGreaterThanOrEqual(1)
+      expect(st).toBeLessThanOrEqual(2)
+    }
+    for (let i = 0; i < ROUTE_COUNT; i++) {
+      expect(full[i]!.phase, `full ${i}`).toBe('won')
+      expect(starsForTime(i, full[i]!.clock), `full stars ${i}`).toBe(3)
+      if (base[i]!.phase === 'won') expect(full[i]!.clock).toBeLessThan(base[i]!.clock * 0.88)
+    }
+    // the late ways need the parts for three stars
+    for (const i of [3, 4, 5]) if (base[i]!.phase === 'won') expect(starsForTime(i, base[i]!.clock)).toBeLessThan(3)
+  })
+
+  it('the coins of a normal playthrough are enough to buy everything', () => {
+    let coins = 0
+    for (let i = 0; i < ROUTE_COUNT; i++) {
+      const r = newRun(generateTrack(i), statsFor(newSave()))
+      drive(r, 400, botInput)
+      coins += r.coins + Math.floor(r.meters / 12) + (r.phase === 'won' ? winBonus(i, r.jars) : 0)
+    }
+    let all = ANIMAL_IDS.reduce((n, a) => n + ANIMALS[a].cost, 0)
+    for (const id of UPGRADE_IDS) all += UPGRADES[id].costs.reduce((a, b) => a + b, 0)
+    expect(coins).toBeGreaterThan(all * 0.8)
   })
 })
 

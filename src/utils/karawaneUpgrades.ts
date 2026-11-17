@@ -9,14 +9,14 @@ export const UPGRADE_IDS: UpgradeId[] = ['wheels', 'suspension', 'water', 'cover
 
 /** The levels one can buy (level 0 is what one starts with) and the coins each step costs. */
 export const UPGRADES: Record<UpgradeId, { max: number; costs: number[] }> = {
-  wheels: { max: 5, costs: [100, 220, 450, 800, 1400] },
-  suspension: { max: 5, costs: [100, 220, 450, 800, 1400] },
-  water: { max: 5, costs: [90, 200, 400, 750, 1300] },
-  cover: { max: 4, costs: [150, 350, 700, 1300] },
+  wheels: { max: 5, costs: [40, 90, 180, 320, 560] },
+  suspension: { max: 5, costs: [40, 90, 180, 320, 560] },
+  water: { max: 5, costs: [35, 80, 160, 300, 520] },
+  cover: { max: 4, costs: [60, 140, 280, 520] },
   /** A better harness: more pull (the animal starts faster and climbs better). */
-  harness: { max: 4, costs: [110, 240, 480, 900] },
+  harness: { max: 4, costs: [45, 100, 190, 360] },
   /** The spring strength: the hop (a short push up from the ground, for dips and little jumps); level 1 gives the hop itself. */
-  hop: { max: 3, costs: [120, 260, 520] }
+  hop: { max: 3, costs: [50, 110, 210] }
 }
 
 export type AnimalId = 'donkey' | 'ox' | 'camel' | 'horse'
@@ -37,10 +37,10 @@ export interface AnimalStats {
 
 export const ANIMALS: Record<AnimalId, AnimalStats> = {
   donkey: { power: 7.2, vmax: 14, stamina: 0, grip: 0, cost: 0 },
-  ox: { power: 9, vmax: 10.5, stamina: 30, grip: 0.25, cost: 400 },
-  camel: { power: 7.6, vmax: 17, stamina: 15, grip: 0.1, cost: 900 },
+  ox: { power: 9, vmax: 10.5, stamina: 30, grip: 0.25, cost: 160 },
+  camel: { power: 7.6, vmax: 17, stamina: 15, grip: 0.1, cost: 360 },
   /** The Egyptian horse: the top of the animals (fast, strong, lasting, expensive). */
-  horse: { power: 8.2, vmax: 19, stamina: 28, grip: 0.18, cost: 2400 }
+  horse: { power: 8.2, vmax: 19, stamina: 28, grip: 0.18, cost: 960 }
 }
 
 /** What the vehicle is like with the bought parts: everything the physics needs. */
@@ -63,6 +63,9 @@ export interface Stats {
   /** The strength of the hop (m/s upwards, 0 = no hop yet) and the seconds before the next one. */
   hopV: number
   hopCool: number
+  /** The speed up to which a wooden bridge can be crossed (the suspension carries the load) and the level of the suspension. */
+  bridgeV: number
+  suspLevel: number
   /** How strongly the cart rights itself on the ground (the strength of the help for the youngest). */
   assist: number
   animal: AnimalId
@@ -198,6 +201,8 @@ export function statsFor(s: Save): Stats {
     grip: a.grip,
     hopV: s.up.hop > 0 ? 2.6 + 0.8 * s.up.hop : 0,
     hopCool: 2.3 - 0.3 * s.up.hop,
+    bridgeV: 5.2 + 0.7 * s.up.suspension,
+    suspLevel: s.up.suspension,
     assist: 2.6,
     animal: s.animal
   }

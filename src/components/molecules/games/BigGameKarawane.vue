@@ -22,12 +22,17 @@ import {
   heightAt,
   hop,
   newRun,
-  starsFor,
+  speedLimit,
+  starsForTime,
   stepRun,
+  winBonus,
+  zoneAt,
+  START_X,
   type GameEvent,
   type Input,
   type Run,
-  type Track
+  type Track,
+  type Zone
 } from '@/utils/karawaneGame'
 import {
   ANIMAL_IDS,
@@ -72,6 +77,11 @@ import {
   routeImages
 } from '@/utils/karawaneArt'
 
+/** How far down in the bridge picture the deck lies (a share of its height). */
+const DECK_TOP = 0.32
+void zoneAt
+void speedLimit
+type _Z = Zone
 const emit = defineEmits<{ leave: [] }>()
 const { t } = useI18n({ useScope: 'global' })
 const { play } = useSfx()
@@ -86,6 +96,7 @@ const bandDouble: Record<number, HTMLCanvasElement | undefined> = {}
 const loaded = ref(false)
 const pic = (n: string) => prependBaseUrl(`${DIR}${n}.webp`)
 const coinIcon = prependBaseUrl('images/abenteuer/ui/coin.webp')
+const sunPic = prependBaseUrl('images/abenteuer/ui/sternglanz.webp')
 const arrowLeft = prependBaseUrl('images/abenteuer/ui/pfeil-links.webp')
 const hideBroken = (e: Event) => {
   ;(e.target as HTMLElement).style.display = 'none'
@@ -142,7 +153,7 @@ const routeRef = (i: number) => t(`app.bigGames.karawane.routeRef.${ROUTES[i]!.i
 const thumb = (i: number) => pic(`karte-${i + 1}`)
 
 // what the page shows while it plays (the game itself is not reactive)
-const hud = reactive({ meters: 0, coins: 0, stamina: 1, best: 0, gas: false, brake: false, low: false, poppedCoins: 0, hasHop: false, hopReady: 1 })
+const hud = reactive({ meters: 0, coins: 0, stamina: 1, best: 0, gas: false, brake: false, low: false, poppedCoins: 0, hasHop: false, hopReady: 1, sun: 0, dusk: 0.8, trial: false })
 /** The route whose story card is open (-1: none). */
 const storyRoute = ref(-1)
 const outcome = reactive({
@@ -154,8 +165,19 @@ const outcome = reactive({
   bonus: 0,
   total: 0,
   record: false,
-  checkpoint: 0
+  checkpoint: 0,
+  clock: 0,
+  jars: 0,
+  winBonus: 0,
+  practice: false,
+  trialS: 0,
+  trialV: 0,
+  arrivedText: ''
 })
+/** The time of the day of the last oasis (a restart goes on from there), the best speed of the round, and whether it is a test drive. */
+let lastCpClock = 0
+let topV = 0
+let practiceMode = false
 
 // ── the game ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 let track: Track = generateTrack(0)
@@ -241,19 +263,23 @@ let lastVy = 0
 /** The pieces of the jars that flew off in a crash. */
 let jarsGone = false
 
-async function start(i: number, fromCheckpoint = 0) {
+async function start(i: number, fromCheckpoint = 0, practice = false) {
   if (busy.value) return
   bankRun()
   busy.value = true
   route.value = i
   how.value = !howSeen(ID)
   paused.value = how.value
-  await load(routeImages(i + 1))
+  await load(routeImages((practice ? 0 : i) + 1))
   makeBand(i)
-  track = generateTrack(i)
+  practiceMode = practice
+  track = generateTrack(practice ? 0 : i)
   updateWagon()
-  run = newRun(track, statsFor(save), fromCheckpoint)
+  run = newRun(track, statsFor(save), fromCheckpoint, fromCheckpoint > 0 ? lastCpClock : 0)
+  if (practice) run.goalX = START_X + 160
+  topV = 0
   hud.hasHop = run.stats.hopV > 0
+  hud.sun = run.clock / (ROUTES[practice ? 0 : i]!.times[1] / hud.dusk)
   hud.hopReady = 1
   hud.meters = Math.max(0, Math.floor(run.meters))
   hud.coins = 0
@@ -314,7 +340,7 @@ function leaveFullscreen() {
 
 /** A round that is left on purpose (the pause menu, the back button): what was found and reached is kept all the same. */
 function bankRun() {
-  if (ended || screen.value !== 'play') return
+  if (ended || screen.value !== 'play' || practiceMode) return
   ended = true
   const meters = Math.floor(run.meters)
   const coins = run.coins + Math.floor(meters / 12)
@@ -322,7 +348,6 @@ function bankRun() {
     recordBest(save, route.value, meters)
     addCoins(save, coins)
     persist(save)
-    progress.record(ID, route.value, starsFor(route.value, meters))
   }
 }
 
@@ -337,28 +362,60 @@ function toMenu() {
 }
 
 /** The round is over: the coins are banked, the stars and the record are kept, the result shows. */
+/** The time of the day as a clock time: the sun goes down at six in the evening, the way starts at eight. */
+function clockText(r: number, clock: number): string {
+  const hours = 8 + (clock / ROUTES[r]!.times[1]) * 10
+  const h = Math.floor(hours)
+  const m = Math.floor((hours - h) * 60)
+  return `${h}:${String(m).padStart(2, '0')} ${t('app.bigGames.karawane.clockUnit')}`
+}
+
 function finish() {
   if (ended) return
   ended = true
+  lastCpClock = run.cpClock
+  outcome.practice = practiceMode
+  outcome.checkpoint = run.checkpoint
+  if (practiceMode) {
+    outcome.phase = run.phase === 'won' ? 'won' : 'crash'
+    outcome.crashKind = run.crashKind ?? 'load'
+    outcome.stars = 0
+    outcome.trialS = Math.round(run.t * 10) / 10
+    outcome.trialV = Math.round(topV * 3.6)
+    outcome.found = 0
+    outcome.bonus = 0
+    outcome.winBonus = 0
+    outcome.total = 0
+    outcome.record = false
+    outcome.meters = Math.floor(run.meters)
+    screen.value = 'result'
+    play(run.phase === 'won' ? 'result' : 'wrong', 0.5)
+    return
+  }
+  const won = run.phase === 'won'
   const meters = Math.floor(run.meters)
   const bonus = Math.floor(meters / 12)
   const found = run.coins
-  const stars = starsFor(route.value, run.phase === 'won' ? ROUTES[route.value]!.length : meters)
+  const wb = won ? winBonus(route.value, run.jars) : 0
+  const stars = won ? starsForTime(route.value, run.clock) : 0
   const rec = recordBest(save, route.value, meters)
-  addCoins(save, found + bonus)
+  addCoins(save, found + bonus + wb)
   persist(save)
   progress.record(ID, route.value, stars)
-  outcome.phase = run.phase === 'won' ? 'won' : run.phase === 'tired' ? 'tired' : 'crash'
+  outcome.phase = won ? 'won' : run.phase === 'tired' ? 'tired' : 'crash'
   outcome.crashKind = run.crashKind ?? 'load'
   outcome.stars = stars
   outcome.meters = meters
   outcome.found = found
   outcome.bonus = bonus
-  outcome.total = found + bonus
+  outcome.winBonus = wb
+  outcome.total = found + bonus + wb
   outcome.record = rec && meters > 30
-  outcome.checkpoint = run.checkpoint
+  outcome.clock = run.clock
+  outcome.jars = run.jars
+  outcome.arrivedText = clockText(route.value, run.clock)
   screen.value = 'result'
-  if (run.phase === 'won') play('result')
+  if (won) play('result')
   else play('wrong', 0.5)
 }
 
@@ -400,6 +457,21 @@ function handle(e: GameEvent): void {
   } else if (e.type === 'won') {
     play('fanfare', 0.7)
     for (let k = 0; k < 30; k++) emitParticle('spark', x + (Math.random() - 0.5) * 6, y + 1 + Math.random() * 3, (Math.random() - 0.5) * 6, 2 + Math.random() * 5, 1.2, 0.22)
+  } else if (e.type === 'station') {
+    play('caravan', 0.6)
+    floatText(t('app.bigGames.karawane.stationOpen'), x, y + 2.6, '#c8f4ff')
+    for (let k = 0; k < 12; k++) emitParticle('spark', x + 2 + (Math.random() - 0.5) * 3, y + 1, (Math.random() - 0.5) * 5, 2 + Math.random() * 3, 0.7, 0.2)
+  } else if (e.type === 'warn') {
+    play('tap', 0.5, 0.8)
+    floatText(t(`app.bigGames.karawane.warn.${e.kind}`), x + 3, y + 2.8, '#ffd0a0')
+  } else if (e.type === 'jar') {
+    play('clunk', 0.6)
+    floatText(t('app.bigGames.karawane.jarBroken'), x, y + 2.4, '#ffb090')
+    for (let k = 0; k < 4; k++) emitParticle('shard', x - 1, y + 0.8, (Math.random() - 0.5) * 5, 2 + Math.random() * 3, 1, 0.2)
+  } else if (e.type === 'bump') {
+    play('hit', 0.6)
+    shake = 0.35
+    floatText(t('app.bigGames.karawane.gateBump'), x, y + 2.6, '#ffb090')
   } else if (e.type === 'hop') {
     play('flip', 0.7, 1.5)
     for (let k = 0; k < 5; k++) emitParticle('dust', run.rear.cx, heightAt(track, run.rear.cx) + 0.1, (Math.random() - 0.5) * 3, Math.random() * 1.4, 0.6, 0.3)
@@ -507,6 +579,8 @@ function advance(dt: number) {
       bob.y[i] = Math.max(-0.25, Math.min(0.3, bob.y[i]!))
     }
     // the counters
+    if (run.vx > topV) topV = run.vx
+    hud.sun = run.clock / (ROUTES[run.route]!.times[1] / hud.dusk)
     if (hud.hasHop) {
       const rdy = run.hopCd > 0 ? 1 - run.hopCd / run.stats.hopCool : 1
       if (Math.abs(hud.hopReady - rdy) > 0.02) hud.hopReady = rdy
@@ -598,6 +672,17 @@ function layerMid(c: CanvasRenderingContext2D, look: (typeof LOOKS)[number], r: 
   }
 }
 
+/** The ground as it is drawn: under a bridge it falls away into a ravine (the cart drives on the deck, which is the real ground). */
+function visH(x: number): number {
+  let dip = 0
+  for (const z of track.zones) {
+    if (z.kind !== 'bridge' || x < z.x0 - 3 || x > z.x1 + 3) continue
+    const u = Math.min(1, Math.min(x - (z.x0 - 3), z.x1 + 3 - x) / 3)
+    dip = Math.max(dip, 3.4 * u * u * (3 - 2 * u))
+  }
+  return heightAt(track, x) - dip
+}
+
 function drawTerrain(c: CanvasRenderingContext2D, r: number) {
   const x0 = camX - wPx / ppm / 2 - 1
   const x1 = camX + wPx / ppm / 2 + 1
@@ -613,7 +698,7 @@ function drawTerrain(c: CanvasRenderingContext2D, r: number) {
   let minY = hPx
   let last = first
   for (let x = first; x <= x1 + stepM; x += stepM) {
-    const sy = toY(heightAt(track, x))
+    const sy = toY(visH(x))
     if (sy < minY) minY = sy
     path.lineTo(toX(x), sy)
     last = x
@@ -642,9 +727,9 @@ function drawTerrain(c: CanvasRenderingContext2D, r: number) {
   const dh = (b.height / pxPerM) * ppm
   for (let x = first; x <= x1; x += dw) {
     const cx = x + dw / 2
-    const sy = toY(heightAt(track, cx))
+    const sy = toY(visH(cx))
     if (sy > hPx + dh) continue
-    const slope = (heightAt(track, cx + 0.3) - heightAt(track, cx - 0.3)) / 0.6
+    const slope = (visH(cx + 0.3) - visH(cx - 0.3)) / 0.6
     const ang = -Math.atan(slope)
     const sx = (((x * pxPerM) % b.width) + b.width) % b.width
     c.save()
@@ -665,8 +750,8 @@ function drawTerrain(c: CanvasRenderingContext2D, r: number) {
   c.lineWidth = Math.max(2, ppm * 0.06)
   c.beginPath()
   for (let x = first; x <= x1 + stepM; x += stepM) {
-    if (x === first) c.moveTo(toX(x), toY(heightAt(track, x)))
-    else c.lineTo(toX(x), toY(heightAt(track, x)))
+    if (x === first) c.moveTo(toX(x), toY(visH(x)))
+    else c.lineTo(toX(x), toY(visH(x)))
   }
   c.stroke()
 }
@@ -803,6 +888,57 @@ function drawStanding(c: CanvasRenderingContext2D, r: number, xMin: number, xMax
   }
 }
 
+/** The marks of the special stretches that stand behind the cart: signs before bridges, steps and boulders, the halt zone with its markers, the toll gate (shut or open) and a trough. */
+function drawZonesBack(c: CanvasRenderingContext2D, xMin: number, xMax: number) {
+  for (let k = 0; k < track.zones.length; k++) {
+    const z = track.zones[k]!
+    if (z.x1 < xMin - 10 || z.x0 > xMax + 20) continue
+    if (z.kind === 'bridge' || z.kind === 'ledges' || z.kind === 'rocks') sprite(c, 'zonen-4', z.x0 - 12, heightAt(track, z.x0 - 12) - 0.1, 1.7, 0.5, 1)
+    if (z.kind === 'stop') {
+      sprite(c, 'zonen-4', z.x0 - 22, heightAt(track, z.x0 - 22) - 0.1, 1.7, 0.5, 1)
+      sprite(c, 'zonen-3', z.x0, heightAt(track, z.x0) - 0.1, 1.9, 0.5, 1)
+      sprite(c, 'zonen-3', z.x1, heightAt(track, z.x1) - 0.1, 1.9, 0.5, 1)
+      sprite(c, 'zonen-5', z.x0 + 5, heightAt(track, z.x0 + 5) - 0.1, 1.2, 0.5, 1)
+      if (z.gate !== undefined) sprite(c, run.zoneDone[k] ? (img['zonen-2'] ? 'zonen-2' : 'ziel') : img['zonen-1'] ? 'zonen-1' : 'ziel', z.gate + 1.4, heightAt(track, z.gate) - 0.15, 3.2, 0.5, 1)
+    }
+  }
+}
+
+/** What lies on the ground in front of the terrain: the plank deck of a bridge, the dark patch of a sand or mud hole. */
+function drawZonesFront(c: CanvasRenderingContext2D, xMin: number, xMax: number, r: number) {
+  const mud = ROUTES[r]!.mood === 'morning'
+  for (const z of track.zones) {
+    if (z.x1 < xMin || z.x0 > xMax) continue
+    if (z.kind === 'pit') {
+      c.fillStyle = mud ? 'rgba(70,45,25,0.5)' : 'rgba(150,100,40,0.38)'
+      c.beginPath()
+      c.moveTo(z.x0, -heightAt(track, z.x0))
+      for (let x = z.x0; x <= z.x1; x += 1) c.lineTo(x, -heightAt(track, x))
+      for (let x = z.x1; x >= z.x0; x -= 1) c.lineTo(x, -heightAt(track, x) + 0.9)
+      c.closePath()
+      c.fill()
+    } else if (z.kind === 'bridge') {
+      const im = img.steg
+      if (!im) {
+        // until the painted bridge is there: a plain plank deck
+        c.fillStyle = '#8a5a2b'
+        c.fillRect(z.x0 - 1, -heightAt(track, z.x0) - 0.05, z.x1 - z.x0 + 2, 0.32)
+        c.fillStyle = '#5e3a18'
+        c.fillRect(z.x0 - 1, -heightAt(track, z.x0) + 0.2, z.x1 - z.x0 + 2, 0.08)
+        continue
+      }
+      const h = 1.3
+      const w = (im.width / im.height) * h
+      // the deck line lies this share down in the picture
+      const top = DECK_TOP * h
+      for (let x = z.x0 - 1; x < z.x1 + 1; x += w) {
+        const piece = Math.min(w, z.x1 + 1 - x)
+        c.drawImage(im, 0, 0, im.width * (piece / w), im.height, x, -heightAt(track, x) - top, piece, h)
+      }
+    }
+  }
+}
+
 /** Plants and stones in front of the cart, a little bigger and faster than the ground (a near layer that gives depth). */
 function drawForeground(c: CanvasRenderingContext2D, r: number, xMin: number, xMax: number) {
   const names = [1, 2, 3, 4, 5].map((k) => img[`vorn-${r + 1}-${k}`])
@@ -854,10 +990,12 @@ function draw(time: number) {
   const xMax = camX + wPx / ppm / 2 + 6
   worldT()
   drawStanding(c, r, xMin, xMax)
+  drawZonesBack(c, xMin, xMax)
   // the ground covers the feet of everything that stands behind the cart
   c.setTransform(dpr, 0, 0, dpr, 0, 0)
   drawTerrain(c, r)
   worldT()
+  drawZonesFront(c, xMin, xMax, r)
 
   // the pickups
   for (let i = 0; i < track.pickups.length; i++) {
@@ -917,6 +1055,20 @@ function draw(time: number) {
   // the light over everything, then the words that rise
   c.setTransform(dpr, 0, 0, dpr, 0, 0)
   drawLight(c, ROUTES[r]!.mood, wPx, hPx, time)
+  // the sun goes down: from the late afternoon the picture turns warm, after the evening it darkens
+  if (screen.value === 'play' && ROUTES[r]!.mood !== 'night') {
+    const f = run.clock / ROUTES[r]!.times[1]
+    const warm = Math.max(0, Math.min(1, (f - 0.65) / 0.4))
+    const dark = Math.max(0, Math.min(1, (f - 1.05) / 0.6))
+    if (warm > 0) {
+      c.fillStyle = `rgba(230,110,40,${0.2 * warm})`
+      c.fillRect(0, 0, wPx, hPx)
+    }
+    if (dark > 0) {
+      c.fillStyle = `rgba(20,25,70,${0.4 * dark})`
+      c.fillRect(0, 0, wPx, hPx)
+    }
+  }
   c.textAlign = 'center'
   c.lineJoin = 'round'
   for (const f of floaters) {
@@ -990,6 +1142,44 @@ const wagonView = computed(() => {
     wheelStyle: { width: `${2 * wr * k}px`, left: `${(m.ax * m.mw - wr) * k}px`, top: `${(m.ay * m.mh - wr - yMin) * k}px` }
   }
 })
+/** The numbers of the cart as they are now, and what one more step of a part (or another animal) would make of them. */
+const statNow = computed(() => statsFor(save))
+function statFor(id: UpgradeId): { label: string; from: string; to: string } | null {
+  const before = statsFor(save)
+  if (save.up[id] >= UPGRADES[id].max) return null
+  const next = { ...save, up: { ...save.up, [id]: save.up[id] + 1 }, owned: [...save.owned] }
+  const after = statsFor(next)
+  const kmh = (v: number) => `${Math.round(v * 3.6)} ${t('app.bigGames.karawane.statUnit.kmh')}`
+  switch (id) {
+    case 'wheels':
+      return { label: t('app.bigGames.karawane.stats.grip'), from: String(Math.round(before.mu * 100)), to: String(Math.round(after.mu * 100)) }
+    case 'suspension':
+      return { label: t('app.bigGames.karawane.stats.bridge'), from: kmh(before.bridgeV), to: kmh(after.bridgeV) }
+    case 'water':
+      return { label: t('app.bigGames.karawane.stats.stamina'), from: `${Math.round(before.staminaSec)} ${t('app.bigGames.karawane.statUnit.s')}`, to: `${Math.round(after.staminaSec)} ${t('app.bigGames.karawane.statUnit.s')}` }
+    case 'cover':
+      return { label: t('app.bigGames.karawane.stats.coins'), from: `×${before.coinMult.toFixed(2)}`, to: `×${after.coinMult.toFixed(2)}` }
+    case 'harness':
+      return { label: t('app.bigGames.karawane.stats.pull'), from: before.power.toFixed(1), to: after.power.toFixed(1) }
+    default:
+      return { label: t('app.bigGames.karawane.stats.hop'), from: before.hopV > 0 ? before.hopV.toFixed(1) : '–', to: after.hopV.toFixed(1) }
+  }
+}
+function animalStat(id: AnimalId): { speed: string; pull: string; stamina: string } {
+  const cur = statsFor(save)
+  const other = statsFor({ ...save, animal: id, owned: [...save.owned] })
+  const d = (a: number, b: number, f: (v: number) => string) => (Math.abs(a - b) < 0.01 ? f(b) : `${f(a)} → ${f(b)}`)
+  return {
+    speed: d(cur.vmax * 3.6, other.vmax * 3.6, (v) => `${Math.round(v)} km/h`),
+    pull: d(cur.power, other.power, (v) => v.toFixed(1)),
+    stamina: d(cur.staminaSec, other.staminaSec, (v) => `${Math.round(v)} s`)
+  }
+}
+function startTrial() {
+  shop.value = false
+  void start(0, 0, true)
+}
+const trialText = computed(() => t('app.bigGames.karawane.trialResult', { m: 160, s: outcome.trialS, v: outcome.trialV }))
 const tierName = computed(() => t(`app.bigGames.karawane.tier.${TIER_KEYS[wagonView.value.tier]}`))
 
 const stamBar = computed(() => `${Math.round(hud.stamina * 100)}%`)
@@ -1140,7 +1330,10 @@ onBeforeUnmount(() => {
             span(class="kg-meters-u") {{ t('app.bigGames.karawane.meters') }}
           div(class="kg-track")
             div(class="kg-track-fill" :style="{ width: progressShare * 100 + '%' }")
-            span(v-for="(g, gi) in goalMarks" :key="gi" class="kg-mark" :class="{ 'is-done': g.done }" :style="{ left: g.left + '%' }") ★
+          div(v-if="!hud.trial" class="kg-sun" :aria-label="t('app.bigGames.karawane.sunUp')" data-test="karawane-sun")
+            div(class="kg-sun-track")
+              span(class="kg-sun-dusk" :style="{ left: hud.dusk * 100 + '%' }")
+              img(:src="sunPic" alt="" class="kg-sun-ball" :style="{ left: Math.min(1, hud.sun) * 100 + '%' }" @error="hideBroken")
           div(class="kg-stam" :class="{ 'is-low': hud.low }" :aria-label="t('app.bigGames.karawane.stamina')")
             img(:src="pic('schlauch')" alt="" class="kg-stam-ico" @error="hideBroken")
             div(class="kg-stam-bar")
@@ -1179,8 +1372,10 @@ onBeforeUnmount(() => {
         h2(class="kg-title") {{ routeName(route) }}
         AdventureStars(:stars="outcome.stars" :size="52" celebrate)
         p(class="kg-text") {{ resultText }}
+        p(v-if="outcome.practice && outcome.phase === 'won'" class="kg-record" data-test="karawane-trial-result") {{ trialText }}
         p(v-if="outcome.record" class="kg-record") {{ t('app.bigGames.karawane.record') }}
-        div(class="kg-tally")
+        p(v-if="!outcome.practice && outcome.phase === 'won'" class="kg-text" data-test="karawane-arrived") {{ t('app.bigGames.karawane.arrived') }} {{ outcome.arrivedText }} · {{ t('app.bigGames.karawane.jarsWhole') }}: {{ outcome.jars }} / 3
+        div(v-if="!outcome.practice" class="kg-tally")
           span {{ t('app.bigGames.karawane.reached') }}
           b {{ outcome.meters }} {{ t('app.bigGames.karawane.meters') }}
           span {{ t('app.bigGames.karawane.found') }}
@@ -1191,9 +1386,14 @@ onBeforeUnmount(() => {
           b
             img(:src="coinIcon" alt="" class="kg-coin kg-coin--s" @error="hideBroken")
             | {{ outcome.bonus }}
-        AdvButton(v-if="nextRoute >= 0" data-test="karawane-next" @click="start(nextRoute)") {{ t('app.bigGames.karawane.next') }}
-        AdvButton(:tone="nextRoute >= 0 ? 'blau' : 'gold'" data-test="karawane-again" @click="start(route)") {{ t('app.bigGames.karawane.again') }}
-        AdvButton(v-if="canResume" tone="blau" data-test="karawane-oasis" @click="start(route, outcome.checkpoint)") {{ t('app.bigGames.karawane.fromOasis') }}
+          span(v-if="outcome.winBonus > 0") {{ t('app.bigGames.karawane.winBonus') }}
+          b(v-if="outcome.winBonus > 0")
+            img(:src="coinIcon" alt="" class="kg-coin kg-coin--s" @error="hideBroken")
+            | {{ outcome.winBonus }}
+        AdvButton(v-if="nextRoute >= 0 && !outcome.practice" data-test="karawane-next" @click="start(nextRoute)") {{ t('app.bigGames.karawane.next') }}
+        AdvButton(v-if="outcome.practice" data-test="karawane-trial-again" @click="startTrial") {{ t('app.bigGames.karawane.trial') }}
+        AdvButton(v-else :tone="nextRoute >= 0 ? 'blau' : 'gold'" data-test="karawane-again" @click="start(route)") {{ t('app.bigGames.karawane.again') }}
+        AdvButton(v-if="canResume && !outcome.practice" tone="blau" data-test="karawane-oasis" @click="start(route, outcome.checkpoint)") {{ t('app.bigGames.karawane.fromOasis') }}
         div(class="kg-menu-buttons")
           AdvButton(tone="blau" small @click="shop = true") {{ t('app.bigGames.karawane.workshop') }}
           AdvButton(tone="blau" small @click="toMenu") {{ t('app.bigGames.karawane.menu') }}
@@ -1224,12 +1424,20 @@ onBeforeUnmount(() => {
               img(:src="coinIcon" alt="" class="kg-coin" @error="hideBroken")
               span(class="kg-purse-n") {{ save.coins }}
             p(class="kg-rules") {{ t('app.bigGames.karawane.workshopIntro') }}
+        div(class="kg-now" data-test="karawane-now")
+          span(class="kg-now-chip") {{ t('app.bigGames.karawane.stats.speed') }} {{ Math.round(statNow.vmax * 3.6) }} km/h
+          span(class="kg-now-chip") {{ t('app.bigGames.karawane.stats.pull') }} {{ statNow.power.toFixed(1) }}
+          span(class="kg-now-chip") {{ t('app.bigGames.karawane.stats.grip') }} {{ Math.round(statNow.mu * 100) }}
+          span(class="kg-now-chip") {{ t('app.bigGames.karawane.stats.stamina') }} {{ Math.round(statNow.staminaSec) }} s
+          span(class="kg-now-chip") {{ t('app.bigGames.karawane.stats.coins') }} ×{{ statNow.coinMult.toFixed(2) }}
+          AdvButton(tone="blau" small data-test="karawane-trial" @click="startTrial") {{ t('app.bigGames.karawane.trial') }}
         div(class="kg-parts")
           div(v-for="id in UPGRADE_IDS" :key="id" class="kg-part")
             img(:src="partThumb(id)" alt="" class="kg-part-pic" @error="hideBroken")
             div(class="kg-part-text")
               b {{ t('app.bigGames.karawane.parts.' + id) }}
               span {{ t('app.bigGames.karawane.partInfo.' + id) }}
+              span(v-if="statFor(id)" class="kg-delta" :data-test="`karawane-delta-${id}`") {{ statFor(id).label }}: {{ statFor(id).from }} → {{ statFor(id).to }}
               span(class="kg-pips")
                 i(v-for="p in pips(id)" :key="p" :class="{ 'is-on': p < levelOf(id) }")
             button(
@@ -1249,6 +1457,7 @@ onBeforeUnmount(() => {
             img(:src="animalThumb(id)" alt="" class="kg-animal-pic" @error="hideBroken")
             b {{ t('app.bigGames.karawane.animals.' + id) }}
             span {{ t('app.bigGames.karawane.animalInfo.' + id) }}
+            span(class="kg-delta" :data-test="`karawane-animal-stat-${id}`") {{ animalStat(id).speed }} · {{ animalStat(id).pull }} · {{ animalStat(id).stamina }}
             button(
               type="button"
               class="kg-buy"
@@ -1274,6 +1483,9 @@ onBeforeUnmount(() => {
         p(class="kg-how-line") {{ t('app.bigGames.karawane.howGas') }}
         p(class="kg-how-line") {{ t('app.bigGames.karawane.howBrake') }}
         p(class="kg-how-line") {{ t('app.bigGames.karawane.howAir') }}
+        p(class="kg-how-line") {{ t('app.bigGames.karawane.howStop') }}
+        p(class="kg-how-line") {{ t('app.bigGames.karawane.howSlow') }}
+        p(class="kg-how-line") {{ t('app.bigGames.karawane.howSun') }}
         p(class="kg-how-line") {{ t('app.bigGames.karawane.howWater') }}
         p(class="kg-how-line") {{ t('app.bigGames.karawane.howCoins') }}
         AdvButton(data-test="karawane-go" @click="closeHow") {{ t('app.bigGames.karawane.go') }}
@@ -2052,4 +2264,50 @@ onBeforeUnmount(() => {
 
   .kg-animals
     grid-template-columns: repeat(4, minmax(0, 1fr))
+
+// the sun that wanders (the evening is marked), the numbers of the cart, the before and after of a part
+.kg-sun
+  width: min(300px, 38vw)
+
+.kg-sun-track
+  position: relative
+  height: 9px
+  border-radius: 6px
+  background: linear-gradient(90deg, rgba(255, 214, 110, 0.9), rgba(255, 150, 70, 0.9) 78%, rgba(70, 60, 120, 0.9))
+
+.kg-sun-dusk
+  position: absolute
+  top: -2px
+  width: 2px
+  height: 13px
+  background: rgba(60, 30, 20, 0.7)
+
+.kg-sun-ball
+  position: absolute
+  top: 50%
+  width: 24px
+  height: 24px
+  transform: translate(-50%, -50%)
+  pointer-events: none
+
+.kg-now
+  display: flex
+  flex-wrap: wrap
+  align-items: center
+  justify-content: center
+  gap: 4px 6px
+  width: 100%
+
+.kg-now-chip
+  padding: 1px 8px
+  border-radius: 999px
+  background: rgba(224, 160, 48, 0.2)
+  font-size: 0.72rem
+  font-weight: 700
+  white-space: nowrap
+
+.kg-delta
+  font-size: 0.7rem
+  font-weight: 800
+  color: #9a6310
 </style>
