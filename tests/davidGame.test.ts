@@ -211,7 +211,7 @@ describe('the stars of a level', () => {
   it('has ten levels, Goliath last with five stones and every animal is inside the scene when it comes', () => {
     expect(LEVELS).toHaveLength(10)
     expect(LEVELS[9]!.stones).toBe(5)
-    expect(W).toBe(2400)
+    expect(W).toBe(2000)
     expect(GROUND).toBeGreaterThan(SLING.y)
   })
 })
@@ -276,7 +276,7 @@ describe('the eagles', () => {
 
   it('take a sheep when they get there', () => {
     const g = eagleGame()
-    run(g, 20)
+    run(g, 14)
     expect(g.lostSheep).toBe(1)
   })
 
