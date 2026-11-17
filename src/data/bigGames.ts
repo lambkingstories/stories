@@ -26,7 +26,7 @@ export const BIG_GAMES: BigGame[] = [
   { id: 'elia', image: 'images/spiele-gross/elia/kachel.webp', maxStars: 45 },
   { id: 'wasser', image: 'images/spiele-gross/wasser/kachel.webp', maxStars: 108 },
   // the catapult puzzle in the style of the birds-and-towers games: 36 levels in 4 chapters, jars, trumpets and torch jars (see `utils/gideonSim.ts`)
-  { id: 'gideon', image: 'images/spiele-gross/gideon/kachel.webp', maxStars: 108 },
+  { id: 'gideon', image: 'images/spiele-gross/gideon/kachel-2.webp', maxStars: 108 },
   // the rope puzzle in the style of Cut the Rope: Moses' basket, 40 levels in 4 chapters (see `utils/moseKorbGame.ts`)
   { id: 'mose', image: 'images/spiele-gross/mose/kachel.webp', maxStars: 120 },
   { id: 'nehemia', image: 'images/spiele-gross/nehemia/kachel.webp', maxStars: 180 },
