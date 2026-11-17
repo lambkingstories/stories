@@ -12,6 +12,7 @@ import { totalStars } from '@/utils/bigGames'
 import BigGameDavid from '@/components/molecules/games/BigGameDavid.vue'
 import BigGameElia from '@/components/molecules/games/BigGameElia.vue'
 import BigGameKarawane from '@/components/molecules/games/BigGameKarawane.vue'
+import BigGameMemory from '@/components/molecules/games/BigGameMemory.vue'
 import BigGameWasser from '@/components/molecules/games/BigGameWasser.vue'
 import BigGameNehemia from '@/components/molecules/games/BigGameNehemia.vue'
 
@@ -34,6 +35,7 @@ function leave() {
   BigGameWasser(v-else-if="game?.id === 'wasser' && open" @leave="leave")
   BigGameKarawane(v-else-if="game?.id === 'karawane' && open" @leave="leave")
   BigGameNehemia(v-else-if="game?.id === 'nehemia' && open" @leave="leave")
+  BigGameMemory(v-else-if="game?.id === 'memory' && open" @leave="leave")
   div(v-else class="bg-closed")
     button(type="button" class="bg-closed-btn" @click="leave") ←
 </template>
