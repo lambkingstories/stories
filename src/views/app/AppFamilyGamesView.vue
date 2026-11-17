@@ -2,7 +2,7 @@
 /**
  * The games for the whole family (design C of Anton, 17.11.2026: "colourful game boxes" in the light look of the app, no longer the dark map): the
  * quiz as a wide blue box on top (its first form is free, the others come with Plus), below it the activity, "Wer bin ich?", the order race,
- * Bible bingo, memory and the word journey, every game in a box of its own colour with its bronze emblem. One purchase covers the family, see
+ * Bible bingo, memory and the word journey, every game in a box of its own colour with its own painted symbol (the lamb with a crown, in the style of the tile symbols). One purchase covers the family, see
  * the Plus page. The games themselves (and their board) are as before; All of it runs on the device: nothing is sent anywhere.
  */
 import { computed } from 'vue'
@@ -51,7 +51,7 @@ function label(g: Game, sub: boolean): string {
 }
 
 const locked = computed(() => PREMIUM_TEASER && !hasFeature('family'))
-const emblem = (key: string) => prependBaseUrl(`images/familie/karte/emblem-${key}.webp`)
+const emblem = (key: string) => prependBaseUrl(`images/familie/symbole/${key}.webp`)
 function hide(e: Event) {
   ;(e.target as HTMLElement).style.display = 'none'
 }
@@ -170,15 +170,15 @@ function open(g: Game) {
   width: var(--em)
   height: var(--em)
   border-radius: 50%
-  background: rgba(255, 255, 255, 0.16)
+  background: rgba(255, 255, 255, 0.22)
 
   img
     position: absolute
-    inset: -4%
-    width: 108%
-    height: 108%
+    inset: -8%
+    width: 116%
+    height: 116%
     object-fit: contain
-    filter: drop-shadow(0 4px 5px rgba(0, 0, 0, 0.35))
+    filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.3))
 
 .fh-box--hero .fh-emblem
   --em: 72px
