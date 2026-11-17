@@ -671,7 +671,7 @@ const questionSize = computed(() => {
   font-size: 1.2rem
   font-weight: 800
   color: var(--mp-cream, #f6ead0)
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9)
+  text-shadow: none
 
 .fq-fine
   display: block
@@ -847,7 +847,7 @@ const questionSize = computed(() => {
   font-size: 1.3rem
   font-weight: 800
   color: var(--mp-cream, #f6ead0)
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95)
+  text-shadow: none
 
 .fq-count
   margin: 0
@@ -855,7 +855,7 @@ const questionSize = computed(() => {
   font-size: 0.95rem
   font-weight: 700
   color: var(--mp-cream, #f6ead0)
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95)
+  text-shadow: none
 
 .fq-chip
   align-self: center

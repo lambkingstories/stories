@@ -422,7 +422,7 @@ returnFromPaint()
   letter-spacing: 0.04em
   text-align: center
   color: var(--mp-cream, #f6ead0)
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95)
+  text-shadow: none
 
 .fa-h--center
   margin: 2px 0 0
@@ -438,14 +438,14 @@ returnFromPaint()
   font-weight: 700
   line-height: 1.35
   color: var(--mp-cream, #f6ead0)
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95)
+  text-shadow: none
 
 .fa-error
   margin: 6px 0 0
   text-align: center
   font-weight: 800
   color: #ffd2a0
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95)
+  text-shadow: none
 
 // ── the brass and bronze plates of the setup ───────────────────────────────────────────────────────────────
 .fa-row
@@ -494,7 +494,7 @@ returnFromPaint()
   font-size: 1.08rem
   font-weight: 600
   color: var(--mp-cream, #f6ead0)
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95)
+  text-shadow: none
 
 .fa-pair
   display: grid
@@ -554,7 +554,7 @@ returnFromPaint()
   font-weight: 700
   letter-spacing: 0.06em
   color: var(--mp-cream, #f6ead0)
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95)
+  text-shadow: none
 
 .fa-count--in
   font-size: 0.78rem
@@ -571,7 +571,7 @@ returnFromPaint()
   font-size: 1.7rem
   font-weight: 800
   line-height: 1.15
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95)
+  text-shadow: none
 
 // ── the word ───────────────────────────────────────────────────────────────────────────────────────────────
 .fa-top
@@ -658,7 +658,7 @@ returnFromPaint()
   font-weight: 800
   letter-spacing: 0.03em
   color: var(--mp-cream, #f6ead0)
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95)
+  text-shadow: none
 
 .fa-clock.is-low .fa-left
   color: #ffcf8a
@@ -689,7 +689,7 @@ returnFromPaint()
   border: 1px solid rgba(226, 189, 102, 0.4)
   border-radius: 12px
   background: rgba(28, 19, 10, 0.72)
-  color: var(--mp-cream, #f6ead0)
+  color: #f6ead0
   font: inherit
   cursor: pointer
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.5)
@@ -757,7 +757,7 @@ returnFromPaint()
 
 @keyframes fa-glow
   0%, 100%
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95)
+    text-shadow: none
   50%
     text-shadow: 0 0 14px rgba(255, 180, 90, 0.9), 0 1px 4px rgba(0, 0, 0, 0.95)
 

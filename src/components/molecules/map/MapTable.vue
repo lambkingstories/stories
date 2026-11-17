@@ -1,22 +1,19 @@
 <script setup lang="ts">
 /**
- * The table of the family games: an old map of the lands of the Bible on a dark walnut table in the light of a lamp. Every family game
- * (quiz, activity, who am I, order race, Bible bingo, memory) is played on it, with the pieces of `Map*.vue` (parchment, bronze medallion,
- * answer coins, travel tokens, brass button). It fills the whole screen (also above the tab bar), has a quiet round back button and an
- * optional small title, and turns with the phone: one picture for upright, one for sideways.
+ * The table of the family games, in the light look of the app (Anton, 17.11.2026; before: an old map on a dark walnut table). Every family game
+ * (quiz, activity, who am I, order race, Bible bingo, memory, word journey) is played on it, with the pieces of `Map*.vue` (parchment, bronze
+ * medallion, answer coins, travel tokens, brass button: the painted game material stays). The board is the soft background of the app, the text
+ * on it is dark (`--mp-cream`, the old name, now holds the ink of the board). It fills the whole screen (also above the tab bar), has a quiet
+ * round back button and an optional small title.
  */
 import { onBeforeUnmount, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { prependBaseUrl } from '@/utils/function'
 import useMusic from '@/use/useMusic'
 import useSoundSettings, { DEFAULT_MUSIC, DEFAULT_SFX } from '@/use/useSoundSettings'
 
 withDefaults(defineProps<{ title?: string; back?: boolean }>(), { title: '', back: true })
 const emit = defineEmits<{ back: [] }>()
 const { t } = useI18n({ useScope: 'global' })
-const img = (n: string) => `url(${prependBaseUrl(`images/familie/karte/${n}.webp`)})`
-const bgHigh = img('karte-hoch')
-const bgWide = img('karte-quer')
 
 // the background music of the family games, with a switch for the music and one for the little sounds (the same ones as in the sound window)
 const music = useMusic()
@@ -29,9 +26,6 @@ const toggleSfx = () => sound.setSfxVolume(sound.sfxVolume.value > 0 ? 0 : DEFAU
 
 <template lang="pug">
   div(class="mt")
-    div(class="mt-bg mt-bg--high" :style="{ backgroundImage: bgHigh }")
-    div(class="mt-bg mt-bg--wide" :style="{ backgroundImage: bgWide }")
-    div(class="mt-shade")
     header(class="mt-top")
       button(v-if="back" type="button" class="mt-back" :aria-label="t('app.read.back')" @click="emit('back')")
         span(aria-hidden="true") ‹
@@ -57,7 +51,9 @@ const toggleSfx = () => sound.setSfxVolume(sound.sfxVolume.value > 0 ? 0 : DEFAU
   --mp-ink-soft: #6b5230
   --mp-gold: #e2bd66
   --mp-gold-deep: #a9802d
-  --mp-cream: #f6ead0
+  // the ink of the board (text lying directly on the light background); the parchment pieces keep their own brown ink
+  --mp-cream: #1f3a36
+  --mp-board: #1f3a36
   --mp-night: #1c130a
   --mp-serif: 'Cormorant Garamond', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif
   position: fixed
@@ -66,32 +62,8 @@ const toggleSfx = () => sound.setSfxVolume(sound.sfxVolume.value > 0 ? 0 : DEFAU
   display: flex
   flex-direction: column
   overflow: hidden
-  background: var(--mp-night)
-  color: var(--mp-cream)
-  font-family: var(--mp-serif)
-
-.mt-bg
-  position: absolute
-  inset: 0
-  background-size: cover
-  background-position: center
-  background-color: #6d5230
-
-.mt-bg--wide
-  display: none
-
-@media (orientation: landscape)
-  .mt-bg--high
-    display: none
-  .mt-bg--wide
-    display: block
-
-// a soft dark edge and the warm lamp at the upper left, so that pieces and text stand out from the map
-.mt-shade
-  position: absolute
-  inset: 0
-  pointer-events: none
-  background: radial-gradient(120% 90% at 50% 45%, rgba(20, 12, 4, 0) 40%, rgba(20, 12, 4, 0.55) 100%), radial-gradient(60% 40% at 8% 0%, rgba(255, 190, 90, 0.22), rgba(255, 190, 90, 0) 70%)
+  background: var(--lk-bg, #edf3f1)
+  color: var(--mp-board)
 
 .mt-top
   position: relative
@@ -108,10 +80,10 @@ const toggleSfx = () => sound.setSfxVolume(sound.sfxVolume.value > 0 ? 0 : DEFAU
   width: 44px
   height: 44px
   border-radius: 50%
-  border: 2px solid #f3d98a
-  background: radial-gradient(circle at 35% 30%, #c79a45, #7d5a22 70%, #4d3513)
-  box-shadow: 0 0 0 2px rgba(28, 18, 6, 0.9), 0 3px 8px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 240, 190, 0.7)
-  color: #fff3cf
+  border: 1px solid var(--lk-line, #c9dad5)
+  background: var(--lk-surface, #fff)
+  box-shadow: var(--lk-shadow, 0 2px 6px rgba(0, 0, 0, 0.12))
+  color: var(--mp-board)
   font: inherit
   font-size: 2rem
   line-height: 1
@@ -122,24 +94,21 @@ const toggleSfx = () => sound.setSfxVolume(sound.sfxVolume.value > 0 ? 0 : DEFAU
 .mt-round
   padding: 0
   font-size: 1rem
-  color: #fff3cf
+  color: var(--mp-board)
   cursor: pointer
   -webkit-tap-highlight-color: transparent
 
   &.is-off
-    background: radial-gradient(circle at 35% 30%, #6c5a3e, #3d3220 70%)
-    color: #cdbd98
+    background: var(--lk-surface-2, #e4eeeb)
+    color: var(--lk-muted, #7d948f)
 
 .mt-title
   flex: 1
   min-width: 0
   margin: 0
-  font-size: 1.25rem
-  font-weight: 700
-  letter-spacing: 0.14em
-  text-transform: uppercase
-  color: var(--mp-cream)
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85)
+  font-size: 1.3rem
+  font-weight: 800
+  color: var(--mp-board)
   white-space: nowrap
   overflow: hidden
   text-overflow: ellipsis
@@ -156,8 +125,7 @@ const toggleSfx = () => sound.setSfxVolume(sound.sfxVolume.value > 0 ? 0 : DEFAU
     padding-right: 10px
 
   .mt-title
-    font-size: 1.05rem
-    letter-spacing: 0.06em
+    font-size: 1.1rem
 
   .mt-back, .mt-round
     width: 40px

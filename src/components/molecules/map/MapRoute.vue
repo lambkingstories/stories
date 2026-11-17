@@ -34,8 +34,8 @@ const at = (v: number, max: number) => `${Math.max(0, Math.min(1, max > 0 ? v / 
   gap: 4px
   padding: 8px 10px
   border-radius: 12px
-  background: rgba(28, 19, 10, 0.62)
-  border: 1px solid rgba(226, 189, 102, 0.35)
+  background: var(--lk-surface, #fff)
+  border: 1px solid var(--lk-line, #c9dad5)
 
 .mr-row
   display: grid
@@ -50,7 +50,7 @@ const at = (v: number, max: number) => `${Math.max(0, Math.min(1, max > 0 ? v / 
     opacity: 1
 
     .mr-name
-      color: var(--mp-gold, #e2bd66)
+      color: #8a5f0a
 
 .mr-name
   overflow: hidden
@@ -69,14 +69,14 @@ const at = (v: number, max: number) => `${Math.max(0, Math.min(1, max > 0 ? v / 
   left: 0
   right: 0
   top: 50%
-  border-top: 3px dotted rgba(226, 189, 102, 0.75)
+  border-top: 3px dotted rgba(176, 130, 40, 0.8)
 
 .mr-flag
   position: absolute
   right: -16px
   top: 50%
   transform: translateY(-58%)
-  color: var(--mp-gold, #e2bd66)
+  color: #8a5f0a
   font-size: 1.1rem
 
 .mr-pos
@@ -89,5 +89,5 @@ const at = (v: number, max: number) => `${Math.max(0, Math.min(1, max > 0 ? v / 
   text-align: right
   font-size: 1.05rem
   font-weight: 800
-  color: var(--mp-gold, #e2bd66)
+  color: #8a5f0a
 </style>

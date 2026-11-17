@@ -344,7 +344,7 @@ function next() {
   letter-spacing: 0.04em
   text-align: center
   color: var(--mp-cream, #f6ead0)
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95)
+  text-shadow: none
 
 .fw-group
   width: 100%
@@ -355,7 +355,7 @@ function next() {
   font-size: 0.98rem
   font-weight: 600
   color: var(--mp-cream, #f6ead0)
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95)
+  text-shadow: none
 
 // the rounds: bronze discs on the table
 .fw-discs
@@ -451,7 +451,7 @@ function next() {
   letter-spacing: 0.08em
   text-transform: uppercase
   color: var(--mp-cream, #f6ead0)
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95)
+  text-shadow: none
 
 .fw-big
   margin: 0
@@ -459,7 +459,7 @@ function next() {
   font-size: 1.7rem
   font-weight: 800
   line-height: 1.15
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95)
+  text-shadow: none
 
 .fw-warn
   margin: 0
@@ -533,7 +533,7 @@ function next() {
   letter-spacing: 0.1em
   text-transform: uppercase
   color: #f2dca0
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95)
+  text-shadow: none
 
 // the facts are laid on the table one after the other
 .fw-fact
@@ -562,7 +562,7 @@ function next() {
 .fw-counter-n
   font-size: 2.1rem
   font-weight: 800
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95)
+  text-shadow: none
 
   small
     margin-left: 8px
@@ -574,7 +574,7 @@ function next() {
   font-size: 1.1rem
   font-weight: 800
   color: var(--mp-gold, #e2bd66)
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95)
+  text-shadow: none
 
 .fw-trail
   display: flex
@@ -624,7 +624,7 @@ function next() {
   font-size: 1rem
   font-weight: 700
   text-decoration: underline
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95)
+  text-shadow: none
   cursor: pointer
 
   &:disabled

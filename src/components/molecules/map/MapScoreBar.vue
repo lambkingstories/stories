@@ -34,22 +34,22 @@ defineProps<{ players: MapScorePlayer[] }>()
   gap: 7px
   padding: 3px 12px 3px 6px
   border-radius: 999px
-  border: 1px solid rgba(226, 189, 102, 0.55)
-  background: rgba(28, 19, 10, 0.72)
-  color: var(--mp-cream, #f6ead0)
+  border: 1px solid var(--lk-line, #c9dad5)
+  background: var(--lk-surface, #fff)
+  color: var(--mp-board, #1f3a36)
   font-family: var(--mp-serif, Georgia, serif)
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5)
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.12)
   transition: background 0.25s, border-color 0.25s
 
   &.is-turn
-    border-color: #ffe08a
+    border-color: #d4a83e
     border-width: 2px
-    background: rgba(120, 82, 24, 0.92)
+    background: #f6e3a8
     transform: translateY(-2px) scale(1.05)
-    box-shadow: 0 0 16px rgba(255, 205, 100, 0.85), 0 2px 5px rgba(0, 0, 0, 0.5)
+    box-shadow: 0 0 12px rgba(255, 205, 100, 0.8), 0 2px 5px rgba(0, 0, 0, 0.15)
 
     .msb-name
-      color: #fff3cf
+      color: #4a3608
 
 .msb-name
   max-width: 7.5em
@@ -64,5 +64,5 @@ defineProps<{ players: MapScorePlayer[] }>()
   text-align: center
   font-size: 1.15rem
   font-weight: 800
-  color: var(--mp-gold, #e2bd66)
+  color: #8a5f0a
 </style>

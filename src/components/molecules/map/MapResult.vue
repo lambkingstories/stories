@@ -74,7 +74,7 @@ function hide(e: Event) {
   font-weight: 800
   line-height: 1.15
   color: var(--mp-cream, #f6ead0)
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9)
+  text-shadow: none
 
 .mre-paper
   :deep(.mpa-in)

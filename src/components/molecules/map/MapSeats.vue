@@ -94,7 +94,7 @@ function onInput(i: number, e: Event) {
   font-weight: 800
   text-align: center
   color: var(--mp-cream, #f6ead0)
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9)
+  text-shadow: none
 
 .ms-tokens
   display: grid

@@ -373,8 +373,8 @@ function hide(e: Event) {
 
 <style scoped lang="sass">
 $ink: #3a2812
-$light: #f6ead0
-$shade: 0 1px 4px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.6)
+$light: #1f3a36
+$shade: none
 
 .fo-stack
   display: flex

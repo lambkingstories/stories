@@ -541,7 +541,7 @@ const nameSize = computed(() => (medal.value >= 200 ? '1.7rem' : medal.value >= 
   text-transform: uppercase
   text-align: center
   color: var(--mp-cream, #f6ead0)
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.6)
+  text-shadow: none
 
 .fb-count
   margin: 0
@@ -550,7 +550,7 @@ const nameSize = computed(() => (medal.value >= 200 ? '1.7rem' : medal.value >= 
   font-weight: 700
   letter-spacing: 0.05em
   color: var(--mp-cream, #f6ead0)
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95), 0 0 8px rgba(0, 0, 0, 0.6)
+  text-shadow: none
 
 .fb-error
   margin: 0
@@ -589,7 +589,7 @@ const nameSize = computed(() => (medal.value >= 200 ? '1.7rem' : medal.value >= 
   font-size: 1rem
   font-weight: 700
   text-decoration: underline
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95)
+  text-shadow: none
   cursor: pointer
   -webkit-tap-highlight-color: transparent
 

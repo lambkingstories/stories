@@ -328,8 +328,8 @@ const tilt = (id: number) => `${(((id * 37) % 5) - 2) * 0.5}deg`
 </template>
 
 <style scoped lang="sass">
-$light: #f6ead0
-$shade: 0 1px 4px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.6)
+$light: #1f3a36
+$shade: none
 
 .fm-stack
   display: flex
@@ -480,7 +480,7 @@ $shade: 0 1px 4px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.6)
   border: 1px solid rgba(226, 189, 102, 0.55)
   background: rgba(28, 19, 10, 0.72)
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5)
-  color: $light
+  color: #f6ead0
   font-family: var(--mp-serif, Georgia, serif)
   font-size: 1rem
   font-weight: 700
@@ -522,6 +522,9 @@ $shade: 0 1px 4px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.6)
   grid-template-columns: repeat(var(--fm-cols), var(--fm-w))
   justify-content: center
   max-width: none
+  // the board fills the screen exactly: what the turning cards reach over the edge must not make the page scroll (a jump of the whole board)
+  overflow: clip
+  overflow-clip-margin: 16px
 
   .fm-card3d
     width: var(--fm-w)
