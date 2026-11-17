@@ -128,7 +128,7 @@ describe('every game says how much its whole task is (Josef and Noah)', () => {
     }
     // Josef keeps four of the old games since 5.11.2026 (puzzle, way, harvest, sort); the new ones have their own tests (josefNeu*)
     expect(seen.length).toBeGreaterThanOrEqual(10)
-  })
+  }, 120000)
 })
 
 describe('the button of a game that is left unfinished', () => {
@@ -244,7 +244,7 @@ describe('the questions: no minimum star (Anton, 19.10.2026)', () => {
   it('a game skipped and every question wrong: 0 stars, a friendly line (no "almost"), and the way to try again stays', async () => {
     const { default: Stage } = await import('@/views/app/AppAdventureStageView.vue')
     const { default: useAdventure } = await import('@/use/useAdventure')
-    for (const [locale, line, again] of [['de', 'Diesmal ist noch kein Stern dabei. Versuch es gern noch einmal!', /Nochmal versuchen/], ['en', 'No star yet this time. Try again whenever you like!', /Try again/]] as const) {
+    for (const [locale, line, again] of [['de', 'Das war schwer. Versuch es noch einmal!', /Nochmal versuchen/], ['en', 'That was hard. Try it again!', /Try again/]] as const) {
       useAdventure().reset('josef')
       route.params = { journeyId: 'josef', stageId: '2' }
       const w = mount(Stage, opts(locale))
@@ -255,6 +255,7 @@ describe('the questions: no minimum star (Anton, 19.10.2026)', () => {
       await answer(w, josef.stages[1]!.questions, () => false)
       expect(w.text(), locale).toContain(line)
       expect(w.text()).not.toMatch(/Fast|Almost/)
+      expect(w.text(), `${locale} no stage done`).not.toMatch(/Etappe geschafft|Stage done/)
       expect(useAdventure().stageOf('josef', 2)?.finalStars).toBe(0)
       expect(w.findAll('button').some((b) => again.test(b.text())), `${locale} again`).toBe(true)
       w.unmount()

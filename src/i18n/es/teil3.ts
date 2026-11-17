@@ -114,7 +114,8 @@ export default {
     wishes: '¡Puedes elegir un juego! | ¡Puedes elegir {n} juegos!',
     unlock: 'Desbloquear',
     back: 'Atrás',
-    closedNote: 'Desbloquea primero este juego.',
+    closedSentence: 'Todavía no has desbloqueado este juego. Reúne estrellas y luego podrás elegirlo en «Mis juegos».',
+    toGameRoom: 'A mis juegos',
     david: {
       title: 'La honda de David',
       sub: 'Protege las ovejas',

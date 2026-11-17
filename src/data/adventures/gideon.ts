@@ -473,8 +473,8 @@ export const gideon: Journey = {
 
 // the games that lie on a stage picture (drawn soft by the app) follow the picture of their stage
 for (const st of gideon.stages) {
-  if (st.task.winnow) st.task.winnow.background = backdropOr(st.task.winnow.background, st.image)
-  if (st.task.word) st.task.word.background = backdropOr(st.task.word.background, st.image)
+  if (st.task.winnow) st.task.winnow.background = backdropOr(st.task.winnow.background, st.image ?? '')
+  if (st.task.word) st.task.word.background = backdropOr(st.task.word.background, st.image ?? '')
 }
 
 // the German recordings of the stories (voice Achernar); there are no English ones yet, so the English app reads with the voice of the device

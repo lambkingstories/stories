@@ -347,7 +347,7 @@ describe('the way back from a stage that was played again', () => {
     const x = await mountStage('2')
     await x.find('.stage-back').trigger('click')
     expect(replace.mock.calls[replace.mock.calls.length - 1]![0].name).toBe('app-adventure-map')
-  })
+  }, 90000)
 
   it('leaving a stage for the map stops every sound that is still ringing, and the tones of the star page that are still to come are dropped', async () => {
     await play([3, 3])

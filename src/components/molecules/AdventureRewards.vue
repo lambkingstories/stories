@@ -1,8 +1,8 @@
 <script setup lang="ts">
 /**
  * "What the stars give you": the account at the end of a stage (and of the exam) of an adventure, all in one place. It says how many
- * stars the adventure holds so far, how many are still missing for the collector card, whether the mini game of this stage is open,
- * how far the next bonus game is, and how near the cup is. Nothing is a button: the child only reads where it stands.
+ * stars the adventure holds so far, how many are still missing for the collector card, whether the stage game of this stage is open,
+ * how far the next adventure game is, and how near the cup is. Nothing is a button: the child only reads where it stands.
  * Everything is worked out from the progress, so the same lines are right after every try.
  */
 import { computed, ref } from 'vue'
@@ -18,7 +18,8 @@ import { albumCards, albumSetCard } from '@/utils/collection'
 import { prependBaseUrl } from '@/utils/function'
 import type { Journey, Medal } from '@/types/adventure'
 
-const props = defineProps<{ journey: Journey; stageId?: number; startOpen?: boolean }>()
+/** `slim`: the line says what it holds (the stars of this adventure) and the long list opens only on a tap. */
+const props = defineProps<{ journey: Journey; stageId?: number; startOpen?: boolean; slim?: boolean }>()
 const { t } = useI18n({ useScope: 'global' })
 const adv = useAdventure()
 
@@ -44,13 +45,13 @@ const set = computed(() =>
 // a card that is not won yet shows its back; a won one shows the hero of the adventure
 const cardPicture = computed(() => (set.value.have ? prependBaseUrl(CARD_ART[props.journey.id]?.front ?? props.journey.medal) : ui('karte-rueckseite')))
 
-// the mini game of this stage (it moves into the game room with three stars), and how many the adventure holds
+// the stage game of this stage (it moves into "My games" with three stars), and how many the adventure holds
 const miniIds = computed(() => (REWARD_GAMES[props.journey.id] ?? []).filter((id) => props.journey.stages.some((s) => s.id === id && !s.soon)))
 const miniOpenCount = computed(() => miniIds.value.filter((id) => stageStarsOf(adv.stageOf(props.journey.id, id)) >= MAX_STARS).length)
 const miniStage = computed(() => (props.stageId !== undefined && miniIds.value.includes(props.stageId) ? props.journey.stages.find((s) => s.id === props.stageId) : undefined))
 const miniOpen = computed(() => stageNow.value >= MAX_STARS)
 
-// the bonus games: every full 40 stars of all adventures together give a wish to pick one of them
+// the adventure games: every full 40 stars of all adventures together give a wish to pick one of them
 const wish = useGameWishes()
 const allStars = wish.stars
 const wishes = wish.wishes
@@ -187,7 +188,7 @@ const rows = computed<Row[]>(() => {
         @click="open = !open"
       )
         AdventureStars(:stars="3" :size="22" class="rw-head-stars")
-        span(class="rw-head-title") {{ t('app.adventure.rHead') }}
+        span(class="rw-head-title") {{ slim ? t('app.adventure.rHeadStars') : t('app.adventure.rHead') }}
         span(class="rw-head-count") {{ t('app.adventure.rOf', { n: starsNow, max: starsMax }) }}
         span(class="rw-chevron" aria-hidden="true") ▾
     ul(v-show="open" id="rw-list" class="rw-list")

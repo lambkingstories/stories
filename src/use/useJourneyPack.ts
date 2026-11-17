@@ -8,6 +8,8 @@ import { computed, reactive, ref } from 'vue'
 import type { Journey } from '@/types/adventure'
 import { journeyFiles, notPaintedYet, PACK_VERSION } from '@/utils/journeyFiles'
 import { prependBaseUrl } from '@/utils/function'
+import { isJourneyPlusLocked } from '@/utils/adventureAccess'
+import { showUpsell } from '@/use/usePremium'
 
 const KEY = 'lk-journey-packs'
 const CACHE_PREFIX = 'lk-v1-pack-'
@@ -70,6 +72,11 @@ export default function useJourneyPack() {
   /** Downloads all files of the journey. Resolves `true` when everything is there. */
   async function download(journey: Journey): Promise<boolean> {
     if (busy.value) return false
+    // an adventure behind LambKing Plus is never loaded without Plus: the Plus sheet opens instead, before a single file is fetched
+    if (isJourneyPlusLocked(journey.id)) {
+      showUpsell('adventure')
+      return false
+    }
     const urls = journeyFiles(journey)
     busy.value = journey.id
     progress.value = 0

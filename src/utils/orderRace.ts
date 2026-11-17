@@ -99,14 +99,15 @@ export function parseOrderSnap(raw: unknown): OrderSnap | null {
   if (!raw || typeof raw !== 'object') return null
   const s = raw as Record<string, unknown>
   if (s.phase !== 'handover' && s.phase !== 'play') return null
+  const phase: OrderSnap['phase'] = s.phase === 'play' ? 'play' : 'handover'
   if (!isInt(s.playerCount, 1, MAX_PLAYERS) || !isInt(s.rounds, 1, 99) || !(ORDER_ROUND_CHOICES as readonly number[]).includes(s.rounds)) return null
   if (!isInt(s.count, 1, 99) || !(ORDER_COUNTS as readonly number[]).includes(s.count)) return null
   if (typeof s.only !== 'string' || !isTexts(s.names, MAX_PLAYERS) || !isInt(s.turn, 0, s.playerCount * s.rounds - 1)) return null
   if (!Array.isArray(s.scores) || s.scores.length !== s.playerCount || !s.scores.every((x) => isInt(x, 0, 100000))) return null
-  const base = { phase: s.phase, playerCount: s.playerCount, rounds: s.rounds, count: s.count, only: s.only, names: s.names, turn: s.turn, scores: s.scores as number[] }
+  const base = { phase, playerCount: s.playerCount, rounds: s.rounds, count: s.count, only: s.only, names: s.names, turn: s.turn, scores: s.scores as number[] }
 
   const r = s.round as Record<string, unknown> | null | undefined
-  if (s.phase === 'handover') return { ...base, round: null, mixed: [], picked: [], missed: [], tried: [] }
+  if (phase === 'handover') return { ...base, round: null, mixed: [], picked: [], missed: [], tried: [] }
   if (!r || typeof r !== 'object' || typeof r.journey !== 'string' || !isTexts(r.titles, 99)) return null
   const titles = r.titles
   if (titles.length !== s.count || new Set(titles).size !== titles.length) return null

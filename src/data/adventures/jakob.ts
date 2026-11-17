@@ -496,7 +496,7 @@ const BACKDROP: Record<number, string> = {
 }
 for (const s of jakob.stages) {
   const t = s.task
-  for (const g of [t.guess, t.cycle, t.cairn, t.ring, t.catch, t.relay]) if (g) g.background = BACKDROP[s.id] ?? s.image
+  for (const g of [t.guess, t.cycle, t.cairn, t.ring, t.catch, t.relay]) if (g) g.background = BACKDROP[s.id] ?? s.image ?? ''
 }
 
 // the German recordings of the stories (voice Achernar); there are no English ones yet, so the English app reads with the voice of the device.

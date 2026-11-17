@@ -257,7 +257,7 @@ import useTaskProgress from '@/use/useTaskProgress'
 import useButtonSounds from '@/use/useButtonSounds'
 import useMusic from '@/use/useMusic'
 import useSfx from '@/use/useSfx'
-import { finalStars, maxPoints, medalFor, partialStars, pointsOf, quizStars, stageStarsOf } from '@/utils/adventureScore'
+import { finalStars, maxPoints, medalFor, partialStars, pointsOf, quizStars, stageStarsOf, starAccount } from '@/utils/adventureScore'
 import { jobNoteKey, paintJobsOf, readJobResults } from '@/utils/paintJobs'
 import { clearViaStats, isViaStats } from '@/utils/adventureStats'
 import useCelebration from '@/use/useCelebration'
@@ -299,6 +299,8 @@ const tryFinal = ref<number | null>(null)
 const tryCorrect = ref(0)
 const tryWrong = ref(0)
 const gameStars = computed(() => tryGame.value ?? bestGameStars.value)
+/** The lines of the account on the result page (never a negative number, only lines that say something). */
+const account = computed(() => starAccount(gameStars.value, tryCorrect.value, tryWrong.value, isQuizStage.value))
 const shownStars = computed(() => tryFinal.value ?? stageStars.value)
 /** Stars the questions took away from the game's stars. */
 const lostStars = computed(() => (phase.value === 'result' ? Math.max(0, gameStars.value - shownStars.value) : 0))
@@ -1294,22 +1296,23 @@ function toFinale() {
           //- the card lights up (once) when it has just been won
           AdventureCardReveal(v-if="journey" :journey="journey")
         template(v-else)
-          h2(class="stage-h2") {{ t('app.adventure.stageDone') }}
+          //- no star at all: a friendly sentence instead of "Stage done!" (nothing was lost, the stage can be tried again)
+          h2(class="stage-h2") {{ shownStars === 0 ? t('app.adventure.stageTryAgain') : t('app.adventure.stageDone') }}
           AdventureStars(:stars="shownStars" :size="60" celebrate :hush="leaving" class="burst-stars")
-          p(class="result-line") {{ shownStars === 0 ? t('app.adventure.noStars') : t('app.adventure.starsEarned', { n: shownStars }, shownStars) }}
-          //- the account of the stars: the same lines at every stage, so the child sees where each star came from
-          ul(class="account")
-            li(v-if="!isQuizStage" class="account-row")
+          p(v-if="shownStars > 0" class="result-line") {{ t('app.adventure.starsEarned', { n: shownStars }, shownStars) }}
+          //- the account of the stars, only the lines that say something; nothing is shown as a minus number
+          ul(v-if="account.game > 0 || account.right > 0 || account.taken > 0" class="account")
+            li(v-if="account.game > 0" class="account-row")
               span {{ t('app.adventure.accGame') }}
-              strong {{ gameStars }}
-            li(class="account-row")
+              strong {{ account.game }}
+            li(v-if="account.right > 0" class="account-row")
               span {{ t('app.adventure.accRight') }}
-              strong {{ isQuizStage ? tryCorrect : '+' + tryCorrect }}
-            li(v-if="!isQuizStage" class="account-row" :class="{ minus: tryWrong > 0 }")
+              strong {{ account.right }}
+            li(v-if="account.taken > 0" class="account-row minus")
               span {{ t('app.adventure.accWrong') }}
-              strong {{ tryWrong > 0 ? '−' + tryWrong : '0' }}
+              strong {{ account.taken }}
           //- everything the stars give, in one place: stars of the adventure, collector card, mini game, bonus game, cup
-          AdventureRewards(v-if="journey && stage" :journey="journey" :stage-id="stage.id")
+          AdventureRewards(v-if="journey && stage" :journey="journey" :stage-id="stage.id" slim)
           //- the last stage: the collector card of the adventure is won, it lights up
           AdventureCardReveal(v-if="journey && isLastStage" :journey="journey")
           p(v-if="wonNow.length" class="result-line result-plus") {{ t('app.awards.newAward') }}: {{ wonNow.map((w) => t(`app.awards.items.${w}.title`)).join(', ') }}

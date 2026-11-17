@@ -13,7 +13,7 @@ export interface ThanksTexts {
   date: string
   /** The words of the child; may be empty when there is only a drawing. */
   text: string
-  /** "Aus dem Dankbuch von Leonas" or the signature of the app. */
+  /** "Aus dem Dankbuch von Mia" or the signature of the app. */
   sign: string
 }
 

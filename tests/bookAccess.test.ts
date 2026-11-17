@@ -51,14 +51,14 @@ describe('what a person may use', () => {
     expect(m.hasFeature('glitter')).toBe(true)
   })
 
-  it('shows a coloring book in part, except Band 1 of the Buntstift series, once Plus is shown', async () => {
+  it('shows a coloring book in part, except Band 1 of each series, once Plus is shown', async () => {
     const m = await load({ VITE_PREMIUM_TEASER: 'true' })
     expect(m.allowedPages('lokal-abraham', 'coloring', 30)).toBe(1)
     expect(m.allowedPages('ba-02-gott-erschafft-die-welt', 'coloring', 30)).toBe(30)
-    expect(m.allowedPages('ba-1-buntstift-schoepfung', 'coloring', 30)).toBe(30)
-    // the 9-to-12 series is no longer free in full (Anton, 6.11.2026): only one picture
-    expect(m.allowedPages('ba-11-schoepfung-gott-macht-die-welt', 'coloring', 30)).toBe(1)
-    expect(m.allowedPages('lokal-912-schoepfung', 'coloring', 30)).toBe(1)
+    // Band 1 of the 9-to-12 series is free in full too (Anton); the other books of the series stay at one picture
+    expect(m.allowedPages('ba-11-schoepfung-gott-macht-die-welt', 'coloring', 30)).toBe(30)
+    expect(m.allowedPages('lokal-912-schoepfung', 'coloring', 30)).toBe(30)
+    expect(m.allowedPages('lokal-912-david', 'coloring', 30)).toBe(1)
     expect(m.allowedPages('ba-12-david-und-goliath-mutig-mit-gott', 'coloring', 30)).toBe(1)
     // a story is never shown in part
     expect(m.allowedPages('some-story', 'story', 12)).toBe(12)
@@ -66,6 +66,23 @@ describe('what a person may use', () => {
     expect(m.hasFeature('colors')).toBe(false)
     expect(m.hasFeature('glitter')).toBe(false)
     expect(m.hasFeature('adventure')).toBe(false)
+  })
+
+  it('keeps the whole of both free Band-1 coloring books open, page 2 to the last one', async () => {
+    const m = await load({ VITE_PREMIUM_TEASER: 'true' })
+    expect(m.FREE_COLORING_BOOKS).toContain('ba-11-schoepfung-gott-macht-die-welt')
+    expect(m.FREE_COLORING_BOOKS).toContain('ba-02-gott-erschafft-die-welt')
+    // the wrong id of the earlier entry is gone
+    expect(m.FREE_COLORING_BOOKS).not.toContain('ba-1-buntstift-schoepfung')
+    for (const id of ['ba-11-schoepfung-gott-macht-die-welt', 'ba-02-gott-erschafft-die-welt']) {
+      const total = 30
+      const allowed = m.allowedPages(id, 'coloring', total)
+      expect(m.isBookLocked(id, 'coloring', total), id).toBe(false)
+      // every page from the second one to the last is open (a page index is open when it is below the allowed number)
+      for (let page = 1; page < total; page++) expect(page < allowed, `${id} page ${page + 1}`).toBe(true)
+    }
+    // a book of the same series that is not Band 1 stays locked after the first picture
+    expect(m.isBookLocked('ba-12-david-und-goliath-mutig-mit-gott', 'coloring', 30)).toBe(true)
   })
 
   it('opens four adventures in full (Adam und Eva, Noah, Weihnachten, Ostern) and every stage of any other one is behind Plus', async () => {

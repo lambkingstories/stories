@@ -386,8 +386,8 @@ export const josua: Journey = {
 
 // the games that lie on a stage picture (drawn soft by the app) follow the picture of their stage
 for (const st of josua.stages) {
-  if (st.task.hush) st.task.hush.background = backdropOr(st.task.hush.background, st.image)
-  if (st.task.verse) st.task.verse.background = backdropOr(st.task.verse.background, st.image)
+  if (st.task.hush) st.task.hush.background = backdropOr(st.task.hush.background, st.image ?? '')
+  if (st.task.verse) st.task.verse.background = backdropOr(st.task.verse.background, st.image ?? '')
 }
 
 // the German recordings of the stories (voice Achernar); there are no English ones yet, so the English app reads with the voice of the device

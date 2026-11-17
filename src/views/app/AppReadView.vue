@@ -8,11 +8,17 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
+import PlusBadge from '@/components/atoms/PlusBadge.vue'
+import usePremium from '@/use/usePremium'
 import AppHeader from '@/components/molecules/AppHeader.vue'
 import { prependBaseUrl } from '@/utils/function'
 
 const { t } = useI18n({ useScope: 'global' })
 const router = useRouter()
+const { hasFeature } = usePremium()
+
+/** Good night is read aloud, which comes with Plus: its tile carries the Plus sign from the start. */
+const plusDoor = (d: { id: string }) => d.id === 'goodnight' && !hasFeature('readAloud')
 
 interface Door {
   id: 'stories' | 'books' | 'coloring' | 'goodnight'
@@ -58,6 +64,8 @@ const doors = computed<Door[]>(() => [
           span(class="door-body")
             span(class="door-text")
               span(class="door-title") {{ d.title }}
+              span(v-if="plusDoor(d)" class="door-plus")
+                PlusBadge
               span(class="door-sub") {{ d.sub }}
             span(class="door-go")
               ZIconography(name="chevron-right" :size="26")
@@ -161,6 +169,11 @@ button
   font-weight: 800
   font-size: 1.6rem
   line-height: 1.15
+
+.door-plus
+  display: block
+  align-self: flex-start
+  margin-top: 2px
 
 .door-sub
   color: var(--lk-muted)

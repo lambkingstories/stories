@@ -268,7 +268,8 @@ describe('the page of a game', () => {
     route.params = { gameId: 'david' }
     const closed = await page()
     expect(closed.find('.game-david-stub').exists()).toBe(false)
-    expect(text(closed)).toContain('Schalte dieses Spiel zuerst frei.')
+    expect(text(closed)).toContain('noch nicht freigeschaltet')
+    expect(closed.find('.bg-closed-btn').exists()).toBe(true)
     closed.unmount()
     useBigGames().addPick('david')
     const open = await page()

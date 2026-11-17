@@ -5,7 +5,7 @@
  *
  *   - `userName`           raw stored value (empty string when not set)
  *   - `displayName`        what the profile card shows — falls back to
- *                          the seed "Leonas" so the slot never reads as
+ *                          the seed "Entdecker" so the slot never reads as
  *                          empty before the user has typed anything
  *   - `hasCustomName`      truthy once the user has entered a non-empty,
  *                          non-default name; the main-view greeting uses
@@ -17,7 +17,7 @@
 import { computed, ref } from 'vue'
 
 const LS_USER_NAME = 'kanaan.userName'
-const DEFAULT_NAME = 'Leonas'
+const DEFAULT_NAME = 'Entdecker'
 
 function readStored(): string {
   try {

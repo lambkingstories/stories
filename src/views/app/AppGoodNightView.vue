@@ -10,6 +10,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
+import PlusBadge from '@/components/atoms/PlusBadge.vue'
 import useApiBooks from '@/use/useApiBooks'
 import useApiSeries from '@/use/useApiSeries'
 import useCatalogNames from '@/use/useCatalogNames'
@@ -302,6 +303,9 @@ onBeforeUnmount(() => {
       div(class="gn-moon")
         ZIconography(name="moon" :size="64")
       h1(class="gn-title") {{ t('app.goodnight.title') }}
+      //- Good night is a part of LambKing Plus: it says so from the start, not only after a story was picked
+      p(v-if="!hasFeature('readAloud')" class="gn-plus")
+        PlusBadge
       p(class="gn-sub") {{ t('app.goodnight.sub') }}
 
       div(class="gn-timer" role="radiogroup" :aria-label="t('app.goodnight.timerTitle')")
@@ -428,6 +432,11 @@ onBeforeUnmount(() => {
 
   &.is-big
     margin-top: 18vh
+
+.gn-plus
+  display: flex
+  justify-content: center
+  margin: 0 0 8px
 
 .gn-title
   margin: 8px 0 0

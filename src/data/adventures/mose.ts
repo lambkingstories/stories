@@ -588,12 +588,12 @@ export const mose: Journey = {
 // the games that lie on a stage picture (drawn soft by the app) follow the picture of their stage
 for (const st of mose.stages) {
   const t = st.task
-  if (t.weave) t.weave.background = backdropOr(t.weave.background, st.image)
-  if (t.verse) t.verse.background = backdropOr(t.verse.background, st.image)
-  if (t.pack) t.pack.background = backdropOr(t.pack.background, st.image)
-  if (t.beat) t.beat.background = backdropOr(t.beat.background, st.image)
-  if (t.manna) t.manna.background = backdropOr(t.manna.background, st.image)
-  if (t.words) t.words.background = backdropOr(t.words.background, st.image)
+  if (t.weave) t.weave.background = backdropOr(t.weave.background, st.image ?? '')
+  if (t.verse) t.verse.background = backdropOr(t.verse.background, st.image ?? '')
+  if (t.pack) t.pack.background = backdropOr(t.pack.background, st.image ?? '')
+  if (t.beat) t.beat.background = backdropOr(t.beat.background, st.image ?? '')
+  if (t.manna) t.manna.background = backdropOr(t.manna.background, st.image ?? '')
+  if (t.words) t.words.background = backdropOr(t.words.background, st.image ?? '')
 }
 
 // the German recordings of the stories (voice Achernar); there are no English ones yet, so the English app reads with the voice of the device

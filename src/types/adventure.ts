@@ -936,7 +936,11 @@ export interface CluesBlanket {
   pattern: string
 }
 /** A clue card, written by the app: a blanket lies at a place (1 = at the well) or not, one lies nearer to the well than another, or two lie right next to each other. */
-export type Clue = { kind: 'at' | 'notAt'; blanket: string; slot: number } | { kind: 'before' | 'next'; a: string; b: string }
+export type Clue =
+  | { kind: 'at'; blanket: string; slot: number }
+  | { kind: 'notAt'; blanket: string; slot: number }
+  | { kind: 'before'; a: string; b: string }
+  | { kind: 'next'; a: string; b: string }
 export interface CluesRound {
   hint: string
   blankets: string[]

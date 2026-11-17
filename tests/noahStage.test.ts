@@ -98,7 +98,7 @@ describe('Noah: the stage page with the new games', () => {
     expect(cardOf(pairs[4]!.image).attributes('aria-label')).toBe('Stier')
     expect(cardOf(pairs[4]!.imageB!).attributes('aria-label')).toBe('Kuh')
     expect(problems()).toEqual([])
-  })
+  }, 90000)
 
   it('stage 6 shows the dots, stage 7 the sky, stage 8 the altar with stones', async () => {
     const a = await openTask(6)

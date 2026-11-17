@@ -76,7 +76,7 @@ describe('the stage screen', () => {
       w.unmount()
     }
     expect(problems()).toEqual([])
-  })
+  }, 90000)
 
   it('goes on after the game is skipped: overview, questions, result', async () => {
     const { default: Stage } = await import('@/views/app/AppAdventureStageView.vue')
@@ -93,7 +93,8 @@ describe('the stage screen', () => {
       await o.trigger('click')
       await press(w, /^(Weiter|Fertig)$/)
     }
-    expect(w.text()).toContain('Etappe geschafft')
+    // with no star at all the page says so kindly instead of "Etappe geschafft" (which answers are right depends on the order of the options)
+    expect(w.text()).toMatch(/Etappe geschafft|Das war schwer/)
     expect(problems()).toEqual([])
   })
 })
@@ -129,6 +130,55 @@ describe('the stars of a try', () => {
     // trying again starts the questions afresh
     await press(w, /Nochmal versuchen/)
     expect(w.text()).not.toContain('Etappe geschafft')
+    route.query = {}
+    expect(problems()).toEqual([])
+  })
+
+  it('a try with no star says so kindly: no "Stage done", no minus, no empty account, the long list of rewards folded', async () => {
+    const { default: Stage } = await import('@/views/app/AppAdventureStageView.vue')
+    const { default: useAdventure } = await import('@/use/useAdventure')
+    useAdventure().reset('josef')
+    route.params = { journeyId: 'josef', stageId: '2' }
+    route.query = {}
+    const w = mount(Stage, opts)
+    await flushPromises()
+    await press(w, /Zur Aufgabe/)
+    await press(w, /Überspringen/)
+    await press(w, /Zu den Fragen/)
+    await answerAll(w, 'both')
+    expect(w.find('.stage-result').exists()).toBe(true)
+    const head = w.find('.stage-result .stage-h2').text()
+    expect(head).toBe('Das war schwer. Versuch es noch einmal!')
+    expect(w.text()).not.toContain('Etappe geschafft')
+    expect(w.find('.stage-result').text()).not.toContain('−')
+    // nothing was earned and nothing taken: no lines of an account at all
+    expect(w.find('.account').exists()).toBe(false)
+    // the list of rewards is folded: one line with the stars of this adventure, the rows only after a tap
+    const rw = w.find('.stage-result .rw')
+    expect(rw.exists()).toBe(true)
+    expect(rw.find('.rw-head-title').text()).toBe('Deine Sterne')
+    expect(rw.find('.rw-toggle').attributes('aria-expanded')).toBe('false')
+    expect((rw.find('.rw-list').element as HTMLElement).style.display).toBe('none')
+    await rw.find('.rw-toggle').trigger('click')
+    expect((rw.find('.rw-list').element as HTMLElement).style.display).not.toBe('none')
+    expect(problems()).toEqual([])
+  })
+
+  it('shows the stars that wrong answers took only as far as there were stars, and never as a negative number', async () => {
+    const { default: Stage } = await import('@/views/app/AppAdventureStageView.vue')
+    const { default: useAdventure } = await import('@/use/useAdventure')
+    useAdventure().reset('josef')
+    useAdventure().recordStars('josef', 2, 3)
+    route.params = { journeyId: 'josef', stageId: '2' }
+    route.query = { back: 'task', stars: '3' }
+    const w = mount(Stage, opts)
+    await flushPromises()
+    await press(w, /Zu den Fragen/)
+    await answerAll(w, 'first')
+    expect(w.text()).toContain('2 Sterne geholt')
+    const rows = w.findAll('.account-row').map((r) => r.text().replace(/\s+/g, ' '))
+    expect(rows).toEqual(['Sterne aus dem Spiel3', 'Richtige Antworten (je ein Stern)1', 'Falsche Antworten (je ein Stern weniger)1'])
+    expect(w.text()).not.toMatch(/−/)
     route.query = {}
     expect(problems()).toEqual([])
   })

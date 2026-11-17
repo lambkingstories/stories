@@ -59,6 +59,26 @@ export function finalStars(gameStars: number, correct: number, wrong: number): n
   return Math.min(MAX_STARS, Math.max(0, net))
 }
 
+/**
+ * The lines of the account of a try on the result page. Nothing is ever negative: the stars taken away for wrong answers are counted
+ * as far as there were stars to take (a try with no star cannot lose one), and a line that would say nothing is 0 (the page hides it).
+ */
+export interface StarAccount {
+  /** The stars of the game (a quiz stage has no game). */
+  game: number
+  /** The right answers, one star each. */
+  right: number
+  /** The stars the wrong answers really took away. */
+  taken: number
+}
+
+export function starAccount(gameStars: number, correct: number, wrong: number, quizStage: boolean): StarAccount {
+  const game = quizStage ? 0 : Math.max(0, gameStars)
+  const right = Math.max(0, correct)
+  const base = Math.min(MAX_STARS, game + right)
+  return { game, right, taken: quizStage ? 0 : Math.min(Math.max(0, wrong), base) }
+}
+
 /** The stars that count for a stage: the final ones once the questions are done, otherwise those of the game; never fewer than the best try gave. */
 export function stageStarsOf(s: { stars: number; gameStars?: number; finalStars?: number; bestStars?: number } | undefined): number {
   if (!s) return 0

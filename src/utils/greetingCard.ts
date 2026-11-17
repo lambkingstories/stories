@@ -53,7 +53,7 @@ export function cardLayout(picW: number, picH: number): CardLayout {
   }
 }
 
-/** The words of the lines: "Für Oma", the message and "Gemalt von Leonas mit LambKing". Nothing is invented for an empty field. */
+/** The words of the lines: "Für Oma", the message and "Gemalt von Mia mit LambKing". Nothing is invented for an empty field. */
 export function cardLines(texts: CardTexts, labels: { for: string; paintedBy: string; paintedWith: string }): { title: string; line: string; sign: string } {
   const to = texts.to.trim()
   const from = texts.from.trim()

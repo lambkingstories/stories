@@ -17,7 +17,7 @@ export interface CoverRect {
 }
 
 /** The pixels of a sprite that count as sticker: a hard mask (alpha 255 where the sprite has colour at all). */
-export function coverMaskPixels(alpha: Uint8ClampedArray): Uint8ClampedArray {
+export function coverMaskPixels(alpha: Uint8ClampedArray): Uint8ClampedArray<ArrayBuffer> {
   const out = new Uint8ClampedArray(alpha.length)
   for (let i = 3; i < alpha.length; i += 4) {
     if ((alpha[i] ?? 0) > 8) out[i] = 255
