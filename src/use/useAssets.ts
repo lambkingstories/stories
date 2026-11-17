@@ -18,16 +18,7 @@ const PLACEHOLDER_IMAGE_PATH = 'images/placeholder.webp'
 
 const STATIC_IMAGES = [
   PLACEHOLDER_IMAGE_PATH,
-  'images/logo/logo_512x512.webp',
-  'images/icons/difficulty-icon_128x128.webp',
-  'images/icons/settings-icon_128x128.webp',
-  'images/icons/sound-icon_128x128.webp'
-]
-
-const BG_IMAGE = [
-  '/images/bg/bg_1024x1024.webp',
-  'images/bg/bg_1024x1024.webp',
-  './images/bg/bg_1024x1024.webp'
+  'images/logo/logo_512x512.webp'
 ]
 
 const SOUND_ASSETS = [
@@ -44,7 +35,6 @@ export default () => {
 
     // Combine static list with the recursively found model images
     const allImages = [
-      ...BG_IMAGE,
       ...STATIC_IMAGES.map(src => prependBaseUrl(src))
     ]
 

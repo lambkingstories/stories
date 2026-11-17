@@ -2,6 +2,7 @@ import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, s
 import { fileURLToPath, URL } from 'node:url'
 import { resolve, dirname } from 'node:path'
 import { rmSync } from 'node:fs'
+import { execSync } from 'node:child_process'
 
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
@@ -9,6 +10,24 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 import tailwindcss from '@tailwindcss/vite'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
 import javascriptObfuscator from 'vite-plugin-javascript-obfuscator'
+
+/**
+ * The "Stand" shown at the bottom of the Me page (`BuildStamp.vue`): the date of the build and the short commit number, read at build time.
+ * Without Git (no repository, no `git` program) the commit stays empty and the page says "Entwicklung". A trailing "+" means: files that
+ * Git knows were changed and not yet committed when the build was made.
+ */
+function buildStamp(): { date: string; commit: string } {
+  const now = new Date()
+  const date = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.`
+  try {
+    const run = (cmd: string) => execSync(cmd, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim()
+    const commit = run('git rev-parse --short HEAD')
+    const dirty = run('git status --porcelain --untracked-files=no') !== ''
+    return { date, commit: commit ? commit + (dirty ? '+' : '') : '' }
+  } catch {
+    return { date, commit: '' }
+  }
+}
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
@@ -213,7 +232,8 @@ export default defineConfig(({ mode }) => {
       port: 5001
     },
     define: {
-      APP_VERSION: JSON.stringify(process.env.npm_package_version)
+      APP_VERSION: JSON.stringify(process.env.npm_package_version),
+      __BUILD_STAMP__: JSON.stringify(buildStamp())
     },
     plugins: [
       tailwindcss(),
