@@ -80,45 +80,8 @@ function loadAll(): Promise<void> {
         })
     )
   ).then(() => {
-    buildShine()
     loaded.value = true
   })
-}
-
-/**
- * The soft gloss that wanders over the animals: for every picture a few frames in which only a light band shows, cut to the shape of the
- * animal (made once from the painted picture, drawn over it while the band passes).
- */
-const SHINE_FRAMES = 6
-const shine: Record<string, HTMLCanvasElement[]> = {}
-function buildShine() {
-  for (const n of NAMES) {
-    if (!(n.startsWith('tier-') || n.startsWith('sp-'))) continue
-    const i = img[n]
-    if (!i || !i.width) continue
-    const k = Math.min(1, 150 / Math.max(i.width, i.height))
-    const w = Math.max(1, Math.round(i.width * k))
-    const h = Math.max(1, Math.round(i.height * k))
-    const frames: HTMLCanvasElement[] = []
-    for (let f = 0; f < SHINE_FRAMES; f++) {
-      const cv = document.createElement('canvas')
-      cv.width = w
-      cv.height = h
-      const x = cv.getContext('2d')
-      if (!x) continue
-      x.drawImage(i, 0, 0, w, h)
-      x.globalCompositeOperation = 'source-in'
-      const gx = -0.35 * w + 1.7 * w * ((f + 0.5) / SHINE_FRAMES)
-      const gr = x.createLinearGradient(gx - w * 0.22, 0, gx + w * 0.22, h * 0.45)
-      gr.addColorStop(0, 'rgba(255,255,255,0)')
-      gr.addColorStop(0.5, 'rgba(255,255,255,0.75)')
-      gr.addColorStop(1, 'rgba(255,255,255,0)')
-      x.fillStyle = gr
-      x.fillRect(0, 0, w, h)
-      frames.push(cv)
-    }
-    if (frames.length === SHINE_FRAMES) shine[n] = frames
-  }
 }
 
 // ── the screens and what the page shows ─────────────────────────────────────────────────────────────────────────────────────
@@ -236,9 +199,6 @@ let selected = -1
 let hintPair: { a: number; b: number } | null = null
 let idle = 0
 let clock = 0
-let blinkId = -1
-let blinkT = 0
-let blinkCd = 2
 
 const KIND_COLOR = ['#9db2d0', '#f2bf45', '#e48d33', '#f4ecd6', '#a87546', '#d8d8d8', '#78c850', '#d89a3a']
 
@@ -939,14 +899,6 @@ function update(dt: number) {
     if (banner.t >= banner.dur) banner = null
   }
   if (shakeT > 0) shakeT = Math.max(0, shakeT - dt)
-  // now and then an animal blinks (it squints for a moment)
-  if (blinkT > 0) blinkT = Math.max(0, blinkT - dt)
-  blinkCd -= dt
-  if (blinkCd <= 0 && list.length) {
-    blinkId = list[Math.floor(Math.random() * list.length)]!.id
-    blinkT = 0.22
-    blinkCd = 0.9 + Math.random() * 1.6
-  }
   // a hint after a while of waiting
   if (screen.value === 'play' && !paused.value && !busy() && g.phase === 'play' && !down && mode.value === '') {
     idle += dt
@@ -962,7 +914,7 @@ function frame(now: number) {
   draw()
 }
 
-function fitDraw(c: CanvasRenderingContext2D, name: string, cx: number, cy: number, box: number, sx = 1, sy = 1, rot = 0, alpha = 1, glint = 0) {
+function fitDraw(c: CanvasRenderingContext2D, name: string, cx: number, cy: number, box: number, sx = 1, sy = 1, rot = 0, alpha = 1) {
   const i = img[name]
   if (!i) return
   const k = Math.min(box / i.width, box / i.height)
@@ -974,13 +926,6 @@ function fitDraw(c: CanvasRenderingContext2D, name: string, cx: number, cy: numb
   if (rot) c.rotate(rot)
   c.scale(sx, sy)
   c.drawImage(i, -w / 2, -h / 2, w, h)
-  if (glint > 0) {
-    const fr = shine[name]?.[Math.min(SHINE_FRAMES - 1, Math.floor(glint * SHINE_FRAMES))]
-    if (fr) {
-      c.globalAlpha = alpha * 0.9
-      c.drawImage(fr, -w / 2, -h / 2, w, h)
-    }
-  }
   c.restore()
 }
 
@@ -1027,7 +972,7 @@ function glowAt(c: CanvasRenderingContext2D, x: number, y: number, r: number, co
 
 function drawTile(c: CanvasRenderingContext2D, s: Sprite) {
   let a = 1
-  let sc = (1 + 0.22 * s.pop) * (s.dying || s.moving ? 1 : 1 + 0.016 * Math.sin(clock * 2.2 + s.id * 1.7))
+  let sc = 1 + 0.22 * s.pop
   if (s.dying) {
     if (s.ddelay > 0) sc = 1
     else {
@@ -1046,14 +991,8 @@ function drawTile(c: CanvasRenderingContext2D, s: Sprite) {
     cy += w * cell * 0.05
     sc *= 1 + 0.06 * Math.abs(w)
   }
-  const blink = s.id === blinkId && blinkT > 0 ? Math.sin(Math.PI * (1 - blinkT / 0.22)) : 0
-  const sx = sc * (1 + 0.1 * s.squash + 0.03 * blink)
-  const sy = sc * (1 - 0.13 * s.squash - 0.1 * blink)
-  // the glossy band wanders over the board from corner to corner
-  const gph = (((clock * 0.34 - (s.x + s.y) * 0.2) % 1) + 1) % 1
-  const gl = gph < 0.2 && !s.dying ? gph / 0.2 : 0
-  // the animals that can be tapped with a helper glow softly
-  if (mode.value && !s.dying && s.kind !== BASKET && !(mode.value === 'swap' && (s.net || s.cage))) glowAt(c, cx, cy, cell * 0.56, 'rgba(255,244,170,0.95)', 0.28 + 0.14 * Math.sin(clock * 5 + s.id))
+  const sx = sc * (1 + 0.1 * s.squash)
+  const sy = sc * (1 - 0.13 * s.squash)
   c.globalAlpha = a
   // a soft shadow
   c.fillStyle = 'rgba(40,20,0,0.16)'
@@ -1063,19 +1002,15 @@ function drawTile(c: CanvasRenderingContext2D, s: Sprite) {
   if (s.kind === BASKET) {
     fitDraw(c, 'hi-korb', cx, cy, cell * 0.94, sx, sy, 0, a)
   } else if (s.special === RAINBOW) {
-    glowAt(c, cx, cy, cell * 0.7, 'rgba(255,255,210,0.9)', 0.55 + 0.25 * Math.sin(clock * 5))
-    fitDraw(c, 'sp-regenbogen', cx, cy, cell * 1.0, sx, sy, 0, a, gl)
+    fitDraw(c, 'sp-regenbogen', cx, cy, cell * 1.0, sx, sy, 0, a)
   } else {
-    if (s.special !== 0) glowAt(c, cx, cy, cell * 0.72, s.special === OLIVE ? 'rgba(190,255,150,0.95)' : 'rgba(255,240,150,0.95)', 0.6 + 0.3 * Math.sin(clock * 5 + s.id))
-    fitDraw(c, `tier-${KIND_NAMES[s.kind] ?? 'schaf'}`, cx, cy, cell * (s.special ? 0.8 : 0.9), sx, sy, 0, a, s.special ? 0.5 + 0.25 * Math.sin(clock * 3 + s.id) : gl)
+    fitDraw(c, `tier-${KIND_NAMES[s.kind] ?? 'schaf'}`, cx, cy, cell * (s.special ? 0.8 : 0.9), sx, sy, 0, a)
     if (s.special !== 0) {
-      // two sparkles circle around a special stone
-      c.fillStyle = s.special === OLIVE ? 'rgba(220,255,190,0.95)' : 'rgba(255,248,200,0.95)'
-      for (let k = 0; k < 2; k++) {
-        const an = clock * 2.4 + s.id + k * Math.PI
-        starPath(c, cx + Math.cos(an) * cell * 0.44, cy + Math.sin(an) * cell * 0.4, cell * 0.09, an)
-        c.fill()
-      }
+      c.strokeStyle = s.special === OLIVE ? 'rgba(120,190,70,0.95)' : 'rgba(240,190,50,0.95)'
+      c.lineWidth = Math.max(2, cell * 0.04)
+      c.beginPath()
+      c.roundRect(cx - cell * 0.44, cy - cell * 0.44, cell * 0.88, cell * 0.88, cell * 0.14)
+      c.stroke()
     }
     if (s.special === DOVE_H || s.special === DOVE_V) {
       fitDraw(c, 'sp-taube', cx + cell * 0.22, cy + cell * 0.2, cell * 0.46, sx, sy, 0, a)
