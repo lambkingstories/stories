@@ -34,7 +34,7 @@ export function routeToNav(name: string): AppNavId {
     || name === 'app-series'
     || name === 'app-all-new-books'
   ) return 'series'
-  if (name === 'app-adventure' || name === 'app-adventure-map' || name === 'app-adventure-stage' || name === 'app-adventure-stats' || name === 'app-family' || name === 'app-family-quiz' || name === 'app-family-activity' || name === 'app-family-who' || name === 'app-family-order' || name === 'app-family-bingo' || name === 'app-family-memory') return 'abenteuer'
+  if (name === 'app-adventure' || name === 'app-adventure-map' || name === 'app-adventure-stage' || name === 'app-adventure-stats' || name === 'app-family' || name === 'app-family-quiz' || name === 'app-family-activity' || name === 'app-family-who' || name === 'app-family-order' || name === 'app-family-bingo' || name === 'app-family-memory' || name === 'app-family-wortreise') return 'abenteuer'
   if (name === 'app-hoeren') return 'hoeren'
   // the good-night stories belong to "Lesen"
   if (name === 'app-goodnight') return 'series'

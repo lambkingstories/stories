@@ -37,6 +37,7 @@ const AppFamilyWhoView = () => import('@/views/app/AppFamilyWhoView.vue')
 const AppFamilyOrderView = () => import('@/views/app/AppFamilyOrderView.vue')
 const AppFamilyBingoView = () => import('@/views/app/AppFamilyBingoView.vue')
 const AppFamilyMemoryView = () => import('@/views/app/AppFamilyMemoryView.vue')
+const AppFamilyWortreiseView = () => import('@/views/app/AppFamilyWortreiseView.vue')
 const AppCollectionView = () => import('@/views/app/AppCollectionView.vue')
 const AppJesusView = () => import('@/views/app/AppJesusView.vue')
 const AppGoodNightView = () => import('@/views/app/AppGoodNightView.vue')
@@ -103,6 +104,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/app/reihenfolge', name: 'app-family-order', component: AppFamilyOrderView },
   { path: '/app/bibel-bingo', name: 'app-family-bingo', component: AppFamilyBingoView },
   { path: '/app/memory', name: 'app-family-memory', component: AppFamilyMemoryView },
+  { path: '/app/wortreise', name: 'app-family-wortreise', component: AppFamilyWortreiseView },
   // the cabinet with the cups and the card album
   { path: '/app/sammlung', name: 'app-collection', component: AppCollectionView },
   { path: '/app/wer-ist-jesus', name: 'app-jesus', component: AppJesusView },

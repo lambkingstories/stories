@@ -4,11 +4,12 @@
  */
 import nehemia from './nehemia'
 import wasser from './wasser'
+import wortreise from './wortreise'
 
 export const BIG_GAME_TEXTS = {
-  de: { wasser: wasser.de, nehemia: nehemia.de },
-  en: { wasser: wasser.en, nehemia: nehemia.en },
-  es: { wasser: wasser.es, nehemia: nehemia.es }
+  de: { wasser: wasser.de, nehemia: nehemia.de, wortreise: wortreise.de },
+  en: { wasser: wasser.en, nehemia: nehemia.en, wortreise: wortreise.en },
+  es: { wasser: wasser.es, nehemia: nehemia.es, wortreise: wortreise.es }
 } as Record<'de' | 'en' | 'es', Record<string, Record<string, unknown>>>
 
 /**

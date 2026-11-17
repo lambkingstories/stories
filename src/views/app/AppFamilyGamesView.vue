@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * The games for the whole family on the old map: six places, each a bronze emblem with a parchment strip below it, the quiz (its first
- * form is free, the others come with Plus), the activity, "Wer bin ich?", the order race, Bible bingo and memory (Plus). One purchase
+ * The games for the whole family on the old map: seven places, each a bronze emblem with a parchment strip below it, the quiz (its first
+ * form is free, the others come with Plus), the activity, "Wer bin ich?", the order race, Bible bingo, memory and the word journey (Plus). One purchase
  * covers the family, see the Plus page. All of it runs on the device: nothing is sent anywhere and nobody has an account.
  */
 import { computed } from 'vue'
@@ -26,7 +26,7 @@ function goBack() {
 }
 
 interface Game {
-  key: 'quiz' | 'activity' | 'who' | 'order' | 'bingo' | 'memory'
+  key: 'quiz' | 'activity' | 'who' | 'order' | 'bingo' | 'memory' | 'wortreise'
   to: string
   /** Comes with Plus. */
   plus: boolean
@@ -38,8 +38,15 @@ const GAMES: Game[] = [
   { key: 'who', to: 'app-family-who', plus: true },
   { key: 'order', to: 'app-family-order', plus: true },
   { key: 'bingo', to: 'app-family-bingo', plus: true },
-  { key: 'memory', to: 'app-family-memory', plus: true }
+  { key: 'memory', to: 'app-family-memory', plus: true },
+  { key: 'wortreise', to: 'app-family-wortreise', plus: true }
 ]
+
+/** The title or the line under it; the newer games keep their texts in their own file. */
+function label(g: Game, sub: boolean): string {
+  if (g.key === 'wortreise') return t(`app.bigGames.wortreise.${sub ? 'hubSub' : 'hub'}`)
+  return t(`app.family.hub_${g.key}${sub ? 'Sub' : ''}`)
+}
 
 const locked = computed(() => PREMIUM_TEASER && !hasFeature('family'))
 const emblem = (key: string) => prependBaseUrl(`images/familie/karte/emblem-${key}.webp`)
@@ -74,8 +81,8 @@ function open(g: Game) {
             PlusBadge(v-if="g.plus && PREMIUM_TEASER" size="small" class="fh-badge")
           MapPaper(kind="strip" class="fh-strip")
             span(class="fh-label")
-              span(class="fh-title") {{ t(`app.family.hub_${g.key}`) }}
-              span(class="fh-sub") {{ t(`app.family.hub_${g.key}Sub`) }}
+              span(class="fh-title") {{ label(g, false) }}
+              span(class="fh-sub") {{ label(g, true) }}
 
       MapPaper(kind="strip" class="fh-note")
         span(class="fh-note-text") {{ t('app.family.hubNote') }}
@@ -160,6 +167,11 @@ function open(g: Game) {
   --em-b: #6b4a2a
   --em-c: #3b2713
 
+.fh-place--wortreise
+  --em-a: #e8a15a
+  --em-b: #b0541f
+  --em-c: #6e2f0e
+
 .fh-img
   position: absolute
   inset: -3%
@@ -210,6 +222,12 @@ function open(g: Game) {
   font-weight: 600
   line-height: 1.3
 
+// the seventh place stands alone in the last row, in the middle
+.fh-place--wortreise
+  grid-column: 1 / -1
+  justify-self: center
+  width: calc(50% - 6px)
+
 @media (orientation: landscape)
   .fh
     --em: clamp(56px, 17vh, 96px)
@@ -222,4 +240,8 @@ function open(g: Game) {
 
   .fh-sub
     font-size: 0.85rem
+
+  .fh-place--wortreise
+    grid-column: 2
+    width: auto
 </style>
