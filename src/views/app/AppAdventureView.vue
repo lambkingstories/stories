@@ -357,6 +357,7 @@ $ink: #3b2a12
 
 .map-back
   flex: 0 0 auto
+  min-width: 44px
   pointer-events: auto
   gap: 4px
   padding: 0 16px 0 8px
@@ -683,7 +684,7 @@ $ink: #3b2a12
   background: center / contain no-repeat
   font-family: 'Fraunces', serif
   font-weight: 700
-  font-size: calc(var(--u) * 0.037)
+  font-size: max(12px, calc(var(--u) * 0.037))
   color: #4a3208
   pointer-events: none
 

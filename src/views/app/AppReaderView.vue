@@ -1394,7 +1394,7 @@ function goToBookDetail() {
   z-index: 20
   display: flex
   align-items: flex-end
-  gap: 4px
+  gap: 8px
   padding: 4px 8px
   border-radius: 999px
   background: var(--lk-surface)
@@ -1402,6 +1402,7 @@ function goToBookDetail() {
   box-shadow: var(--lk-shadow)
 
 .size-btn
+  position: relative
   display: grid
   place-items: center
   min-width: 36px
@@ -1415,6 +1416,12 @@ function goToBookDetail() {
   line-height: 1
   cursor: pointer
   -webkit-tap-highlight-color: transparent
+
+  // 36 px to look at; with 8 px between the buttons every touch area is 44 px
+  &::after
+    content: ''
+    position: absolute
+    inset: -4px
 
   &.is-m
     font-size: 0.95rem
@@ -1497,6 +1504,7 @@ function goToBookDetail() {
   padding: 0 60px
 
 .pager-dot
+  position: relative
   width: 8px
   height: 8px
   border-radius: 999px
@@ -1506,6 +1514,12 @@ function goToBookDetail() {
   cursor: pointer
   -webkit-tap-highlight-color: transparent
   transition: width 160ms ease-out, background-color 160ms ease-out
+
+  // the dot is small to look at: its touch area is 44 px high and reaches to the middle of the gap to its neighbours
+  &::after
+    content: ''
+    position: absolute
+    inset: -18px -3px
 
   &.is-cover
     background: rgba(0, 0, 0, 0.35)

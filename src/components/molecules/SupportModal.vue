@@ -152,6 +152,12 @@ button
   color: #1a2f4a
   border: 1px solid #e6d6b5
   cursor: pointer
+  // 34 px to look at, 44 px for a finger
+  &::after
+    content: ''
+    position: absolute
+    inset: -5px
+    border-radius: 999px
 
   &:disabled
     opacity: 0.4
@@ -242,7 +248,7 @@ button
 
 .support-modal-note
   margin: 14px 0 0
-  font-size: 11px
+  font-size: 13px
   line-height: 1.4
   color: #7a6b55
   text-align: center

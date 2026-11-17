@@ -546,6 +546,7 @@ $tint: rgba(31, 58, 95, 0.055)
 
 .tb-btn,
 .tb-grip
+  position: relative
   flex: 0 0 auto
   display: grid
   place-items: center
@@ -567,6 +568,12 @@ $tint: rgba(31, 58, 95, 0.055)
     opacity: 0.88
     pointer-events: none
 
+  // 40 px to look at, 44 px for a finger
+  &::after
+    content: ''
+    position: absolute
+    inset: -2px
+
   &:active:not(:disabled)
     background: rgba(20, 24, 32, 0.08)
     transform: scale(0.94)
@@ -582,6 +589,10 @@ $tint: rgba(31, 58, 95, 0.055)
   height: 36px
   min-width: 36px
   border-radius: 10px
+
+  // 26 to 36 px high to look at, 44 px for a finger
+  &::after
+    inset: -9px -2px
 
   img
     width: 18px
@@ -789,7 +800,7 @@ $tint: rgba(31, 58, 95, 0.055)
     opacity: 1
 
 .tb-cap
-  font-size: 0.6rem
+  font-size: 0.75rem
   font-weight: 700
   color: $muted
   letter-spacing: 0.01em
@@ -853,7 +864,7 @@ $tint: rgba(31, 58, 95, 0.055)
 .tb-row-left,
 .tb-row-right
   flex: 0 0 38px
-  font-size: 0.72rem
+  font-size: 0.75rem
   color: $muted
 
 .tb-row-right

@@ -106,15 +106,16 @@ const { userName } = useUserName()
   padding: 0
   border: 2px solid var(--lk-accent)
   border-radius: 50%
-  overflow: hidden
   background: var(--lk-surface)
   cursor: pointer
   -webkit-tap-highlight-color: transparent
 
+// the picture is round, not the button (the button keeps its edge free so that its touch area may reach out)
 .me-img
   display: block
   width: 100%
   height: 100%
+  border-radius: 50%
   object-fit: cover
 
 .parent-btn
@@ -154,13 +155,22 @@ const { userName } = useUserName()
     width: 36px
     height: 36px
     border-width: 2px
-    // the touch area is still the full line
+    // the touch area is still the full line (44 px)
     position: relative
 
     &::after
       content: ''
       position: absolute
-      inset: -4px
+      inset: -6px
+
+  // the logo is 34 px high on the slim line: its touch area is 44 px
+  .brand
+    position: relative
+
+    &::after
+      content: ''
+      position: absolute
+      inset: -5px -4px
 </style>
 
 <style lang="sass">

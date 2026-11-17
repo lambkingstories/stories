@@ -94,7 +94,7 @@ function onPointerUp(event: PointerEvent) {
             :class="{ 'is-dragging': dragging }"
           )
 
-      div(class="mt-2 flex items-center justify-between text-[11px] md:text-xs font-extrabold tabular-nums a-audio-time")
+      div(class="mt-2 flex items-center justify-between text-xs font-extrabold tabular-nums a-audio-time")
         span {{ formatTime(currentTime) }}
         span {{ formatTime(duration) }}
 

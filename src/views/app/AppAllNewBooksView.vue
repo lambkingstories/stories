@@ -194,7 +194,7 @@ button
   gap: 14px
 
 .page-breadcrumb
-  font-size: 11px
+  font-size: 12px
   font-weight: 700
   letter-spacing: 0.18em
   color: $brown
@@ -233,7 +233,7 @@ button
   min-width: 0
 
 .book-tile-band
-  font-size: 11px
+  font-size: 12px
   font-weight: 700
   letter-spacing: 0.12em
   text-transform: uppercase

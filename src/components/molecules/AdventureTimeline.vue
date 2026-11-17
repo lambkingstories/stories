@@ -281,7 +281,7 @@ $gap: 30px
   background: var(--lk-surface)
   border: 3px solid var(--c)
   color: var(--c)
-  font-size: 0.72rem
+  font-size: 0.75rem
   font-weight: 800
   font-variant-numeric: tabular-nums
   box-shadow: 0 2px 6px rgba(30, 40, 60, 0.25)
@@ -392,7 +392,7 @@ $gap: 30px
   border-radius: 999px
   background: #e0a820
   color: #3a2a18
-  font-size: 0.7rem
+  font-size: 0.75rem
   font-weight: 800
   white-space: nowrap
   box-shadow: 0 2px 6px rgba(60, 40, 10, 0.3)

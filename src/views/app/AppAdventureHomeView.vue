@@ -565,6 +565,9 @@ $ink: var(--lk-text)
 
 .chip
   flex: 0 0 auto
+  display: inline-flex
+  align-items: center
+  min-height: 44px
   padding: 8px 14px
   border: 1px solid var(--lk-line)
   border-radius: 999px
@@ -733,6 +736,7 @@ $ink: var(--lk-text)
 
 .vs-btn
   min-width: 112px
+  min-height: 44px
   padding: 9px 18px
   border: 0
   border-radius: 999px
@@ -834,7 +838,7 @@ $ink: var(--lk-text)
   border-radius: 999px
   background: var(--lk-track)
   color: var(--lk-muted)
-  font-size: 0.72rem
+  font-size: 0.8rem
   font-weight: 800
   line-height: 1.4
 
@@ -1022,6 +1026,11 @@ $ink: var(--lk-text)
   font-weight: 800
 
 .dlg-link
+  display: inline-flex
+  align-items: center
+  justify-content: center
+  min-width: 44px
+  min-height: 44px
   padding: 8px
   border: 0
   background: transparent

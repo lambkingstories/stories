@@ -162,6 +162,12 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   line-height: 1
   cursor: pointer
   -webkit-tap-highlight-color: transparent
+  // 34 px to look at, 44 px for a finger
+  &::after
+    content: ''
+    position: absolute
+    inset: -5px
+    border-radius: 50%
 
 .premium-title
   margin: 8px 0 0
@@ -230,7 +236,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
   border-radius: 999px
   background: var(--lk-gold)
   color: #3a2c10
-  font-size: 0.72rem
+  font-size: 0.75rem
   font-weight: 800
   white-space: nowrap
 

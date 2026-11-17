@@ -34,11 +34,11 @@ const dateOf = (ms: number | null) => (ms ? new Date(ms).toLocaleDateString(loca
       )
         img(class="award-medal mx-auto" :src="imageOf(award.image)" alt="" draggable="false" @error="onMedalError")
         h3(class="mt-2 text-sm md:text-base font-black award-title") {{ t(`app.awards.items.${award.id}.title`) }}
-        p(class="mt-1 text-[11px] md:text-xs award-desc") {{ t(`app.awards.items.${award.id}.desc`) }}
-        p(v-if="award.earned && award.earnedAt" class="mt-2 text-[11px] award-date") {{ t('app.awards.earnedOn', { date: dateOf(award.earnedAt) }) }}
+        p(class="mt-1 text-xs award-desc") {{ t(`app.awards.items.${award.id}.desc`) }}
+        p(v-if="award.earned && award.earnedAt" class="mt-2 text-xs award-date") {{ t('app.awards.earnedOn', { date: dateOf(award.earnedAt) }) }}
         div(v-else-if="award.goal > 1" class="award-bar" aria-hidden="true")
           span(:style="{ width: `${Math.round((award.done / award.goal) * 100)}%` }")
-        p(v-if="!award.earned && award.goal > 1" class="mt-1 text-[11px] award-date") {{ t('app.awards.progress', { done: award.done, goal: award.goal }) }}
+        p(v-if="!award.earned && award.goal > 1" class="mt-1 text-xs award-date") {{ t('app.awards.progress', { done: award.done, goal: award.goal }) }}
 </template>
 
 <style scoped lang="sass">

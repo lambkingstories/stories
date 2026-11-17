@@ -609,7 +609,7 @@ button
   border-radius: 6px
   background: var(--lk-new)
   color: #fff
-  font-size: 0.72rem
+  font-size: 0.75rem
   font-weight: 800
   letter-spacing: 0.04em
 

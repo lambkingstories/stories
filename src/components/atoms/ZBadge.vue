@@ -42,7 +42,7 @@ withDefaults(defineProps<Props>(), {
 
 // sizes
 .z-badge-sm
-  font-size: 10px
+  font-size: 12px
   padding: 4px 7px
   border-radius: 3px
 

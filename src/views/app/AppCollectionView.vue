@@ -304,7 +304,7 @@ function openJourney(id: string) {
   text-align: center
 
 .co-cupname
-  font-size: 0.74rem
+  font-size: 0.75rem
   color: var(--lk-muted)
   font-weight: 700
 
@@ -424,7 +424,7 @@ function openJourney(id: string) {
   border-radius: 999px
   background: #e0402c
   color: #fff
-  font-size: 0.72rem
+  font-size: 0.75rem
   font-weight: 800
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3)
 
@@ -437,6 +437,6 @@ function openJourney(id: string) {
   border-radius: 999px
   background: #e0402c
   color: #fff
-  font-size: 0.74rem
+  font-size: 0.75rem
   font-weight: 800
 </style>

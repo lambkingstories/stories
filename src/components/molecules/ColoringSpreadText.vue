@@ -39,7 +39,7 @@ const { t } = useI18n({ useScope: 'global' })
 
 .sp-no
   margin: 0
-  font-size: 0.7rem
+  font-size: 0.75rem
   font-weight: 800
   letter-spacing: 0.1em
   text-transform: uppercase

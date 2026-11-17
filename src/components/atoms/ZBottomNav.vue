@@ -150,6 +150,12 @@ button
     &.is-active
       flex: 1.2 1 0
 
+    // the button is 38 px high on the slim strip: its touch area is 44 px
+    &::after
+      content: ''
+      position: absolute
+      inset: -3px 0
+
   .z-nav-icon
     width: 36px
     height: 36px

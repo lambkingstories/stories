@@ -277,7 +277,7 @@ onBeforeUnmount(() => {
   position: absolute
   left: 0
   right: 0
-  bottom: 8px
+  bottom: 1px
   display: flex
   justify-content: center
   gap: 0
@@ -287,8 +287,8 @@ onBeforeUnmount(() => {
 .hero-dot
   pointer-events: auto
   position: relative
-  width: 28px
-  height: 30px
+  width: 44px
+  height: 44px
   border: none
   background: transparent
   padding: 0

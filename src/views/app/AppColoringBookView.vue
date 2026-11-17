@@ -683,7 +683,7 @@ $accent: var(--lk-accent)
   border-radius: 6px
   background: rgba(250, 252, 250, 0.9)
   color: var(--lk-text)
-  font-size: 0.62rem
+  font-size: 0.75rem
   line-height: 15px
 
 .bk-links

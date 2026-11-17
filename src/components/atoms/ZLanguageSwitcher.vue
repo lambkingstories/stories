@@ -115,7 +115,8 @@ $navy: #15294a
 .z-lang
   display: inline-flex
   align-items: center
-  gap: 8px
+  // 12 px between the flags: the touch area of each one is 44 px (see ::after of the button)
+  gap: 12px
 
 // The button box IS the flag box — both flags are drawn on a 3:2 canvas, so
 // the selection ring sits directly on the artwork's edge with no dead strip
@@ -137,6 +138,12 @@ $navy: #15294a
   opacity: 0.68
   transform: scale(0.95)
   transition: filter 180ms ease-out, opacity 180ms ease-out, transform 180ms ease-out, box-shadow 180ms ease-out
+
+  // the flag is small to look at: a finger needs 44 px (the flags are 32 px wide with 12 px between them)
+  &::after
+    content: ''
+    position: absolute
+    inset: -11px -6px
 
   &:hover:not(.is-active)
     filter: grayscale(0.2)

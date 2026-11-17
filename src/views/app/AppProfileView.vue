@@ -418,6 +418,7 @@ $gold: var(--lk-accent)
   padding: 20px 16px 0
 
 .profile-legal-link
+  min-height: 44px
   padding: 8px 16px
   font-size: 14px
   font-weight: 600
@@ -688,6 +689,12 @@ button
   // Pad the SVG in slightly so the camera + crayon details breathe
   // inside the navy circle.
   padding: 3px
+  // 34 px to look at, 44 px for a finger
+  &::after
+    content: ''
+    position: absolute
+    inset: -5px
+    border-radius: 999px
 
   &:hover
     transform: scale(1.08)
@@ -716,6 +723,7 @@ button
   gap: 6px
 
 .name-edit-btn
+  position: relative
   flex: 0 0 auto
   width: 26px
   height: 26px
@@ -728,6 +736,12 @@ button
   color: $navy
   cursor: pointer
   transition: background-color 150ms ease-out, transform 150ms ease-out, color 150ms ease-out
+
+  // 26 px to look at, 44 px for a finger
+  &::after
+    content: ''
+    position: absolute
+    inset: -9px
 
   &:hover
     background-color: $gold
@@ -815,7 +829,7 @@ button
 
 .level-xp
   margin-left: auto
-  font-size: 11px
+  font-size: 12px
   color: $brown
   font-variant-numeric: tabular-nums
 
@@ -877,7 +891,7 @@ button
   object-fit: contain
 
 .quick-label
-  font-size: 11px
+  font-size: 12px
   font-weight: 700
   color: $navy
   text-align: center
@@ -966,14 +980,14 @@ button
   transform: translateX(22px)
 
 .backend-host-line
-  font-size: 11px
+  font-size: 12px
   font-weight: 700
   color: $navy
   font-family: 'Nunito', ui-monospace, monospace
   word-break: break-all
 
 .backend-hint
-  font-size: 10px
+  font-size: 12px
   color: $brown
   line-height: 1.35
 
@@ -989,7 +1003,7 @@ button
 
 .count-pill
   display: inline-block
-  font-size: 11px
+  font-size: 12px
   font-weight: 700
   letter-spacing: 0.08em
   color: $navy
@@ -1058,7 +1072,7 @@ button
   overflow: hidden
 
 .favorites-author
-  font-size: 11px
+  font-size: 12px
   color: $brown
   margin-top: 2px
 

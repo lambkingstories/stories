@@ -120,6 +120,12 @@ button
   border: 1px solid #e6d6b5
   cursor: pointer
   transition: transform 150ms ease-out, background-color 150ms ease-out
+  // 34 px to look at, 44 px for a finger
+  &::after
+    content: ''
+    position: absolute
+    inset: -5px
+    border-radius: 999px
 
   &:hover
     background-color: #ffffff

@@ -63,7 +63,7 @@ button
 
 .a-breadcrumb-item
   display: inline-block
-  font-size: 11px
+  font-size: 12px
   font-weight: 700
   text-transform: uppercase
   letter-spacing: 0.22em
@@ -76,6 +76,6 @@ button
 .a-breadcrumb-sep
   display: inline-block
   color: #d1c0f0
-  font-size: 11px
+  font-size: 12px
   letter-spacing: 0.22em
 </style>

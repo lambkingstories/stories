@@ -426,7 +426,7 @@ button
   border-radius: 999px
   background: rgba(34, 38, 46, 0.78)
   color: #ffffff
-  font-size: 0.72rem
+  font-size: 0.75rem
   font-weight: 800
   letter-spacing: 0.02em
 
