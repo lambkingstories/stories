@@ -28,7 +28,6 @@ export function routeToNav(name: string): AppNavId {
     || name === 'app-books'
     || name === 'app-book-preview'
     || name === 'app-book-read'
-    || name === 'app-coloring-books'
     || name === 'app-all-books'
     || name === 'app-book'
     || name === 'app-series'
@@ -37,7 +36,8 @@ export function routeToNav(name: string): AppNavId {
   if (name === 'app-adventure' || name === 'app-adventure-map' || name === 'app-adventure-stage' || name === 'app-adventure-stats' || name === 'app-family' || name === 'app-family-quiz' || name === 'app-family-activity' || name === 'app-family-who' || name === 'app-family-order' || name === 'app-family-bingo' || name === 'app-family-memory' || name === 'app-family-wortreise') return 'abenteuer'
   // the good-night stories belong to "Lesen"
   if (name === 'app-goodnight') return 'series'
-  if (name === 'app-coloring' || name === 'app-coloring-book') return 'malen'
+  // the coloring books are one place, and it belongs to "Malen" (the door in "Lesen" leads there, too)
+  if (name === 'app-coloring' || name === 'app-coloring-book' || name === 'app-coloring-books') return 'malen'
   if (name === 'app-profile' || name === 'app-legal' || name === 'app-plus' || name === 'app-awards' || name === 'app-parents' || name === 'app-collection' || name === 'app-gameroom' || name === 'app-journal' || name === 'app-voices') return 'profile'
   return 'home'
 }
@@ -66,10 +66,7 @@ export default function useAppNav(t: ComposerTranslation): {
     { id: 'profile', label: t('app.nav.profile'), icon: 'profile', image: symbol('ich') },
   ])
 
-  // the list of coloring books belongs to "Lesen", but opened from the painting program it stays in "Malen"
-  const activeNav = computed<string | number>(() =>
-    route.name === 'app-coloring-books' && route.query.from === 'malen' ? 'malen' : routeToNav(String(route.name || ''))
-  )
+  const activeNav = computed<string | number>(() => routeToNav(String(route.name || '')))
 
   function onNav(id: string | number) {
     const name = ROUTE_BY_NAV[id as AppNavId]

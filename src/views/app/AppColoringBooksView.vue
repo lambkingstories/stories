@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * "Lesen → Malbücher": all coloring books. A tap opens the book (`AppColoringBookView`), where the pages can be turned and
+ * "Malen → Malbücher": all coloring books (the one place for them; "Lesen" has a door that leads here). A tap opens the book (`AppColoringBookView`), where the pages can be turned and
  * painted. A card shows the cover, the title, the number of pictures and, once the child has begun, how many are painted.
  */
 import { computed, onMounted, ref } from 'vue'
@@ -24,7 +24,7 @@ import { contentLocale } from '@/utils/contentLocale'
 const { t, locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
 const router = useRouter()
-/** Opened from the painting program: the way back leads there and not to "Lesen". */
+/** Opened from the painting program: the way back leads there; from the door in "Lesen" it leads back to "Lesen". */
 const fromPainting = computed(() => route.query.from === 'malen')
 const apiBooks = useApiBooks()
 
