@@ -77,6 +77,7 @@ function open(g: Game) {
           @click="open(g)"
         )
           span(class="fh-emblem")
+            span(v-if="g.key === 'wortreise'" class="fh-glyph" aria-hidden="true") Aa
             img(:src="emblem(g.key)" alt="" class="fh-img" draggable="false" @error="hide")
             PlusBadge(v-if="g.plus && PREMIUM_TEASER" size="small" class="fh-badge")
           MapPaper(kind="strip" class="fh-strip")
@@ -171,6 +172,15 @@ function open(g: Game) {
   --em-a: #e8a15a
   --em-b: #b0541f
   --em-c: #6e2f0e
+
+// the letters on the disc of the word journey (shown only while its picture is missing: the picture covers them)
+.fh-glyph
+  position: relative
+  color: #fff3cf
+  font-family: var(--mp-serif, Georgia, serif)
+  font-size: 2.2rem
+  font-weight: 800
+  text-shadow: 0 2px 4px rgba(40, 14, 2, 0.8)
 
 .fh-img
   position: absolute
