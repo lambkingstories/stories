@@ -259,6 +259,15 @@ describe('the statistics page', () => {
     expect(to.query.source).toContain(josef.gift.image)
   })
 
+  it('the present (the coloring picture) comes with the gold cup only: a silver or bronze cup has no present', async () => {
+    // silver: about 80 % of the points (the exam gets few right answers)
+    await play([3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 1, 1], 3)
+    const w = await mountStats()
+    expect(w.find('.stats-medal').text()).not.toBe('Pokal in Gold')
+    expect(w.find('[data-test="stats-gift"]').exists()).toBe(false)
+    expect(w.find('.stats-gift-btn').exists()).toBe(false)
+  })
+
   it('the overview of the end (finale): the card, the picture, the stars of all stages, what was won, no way out but "Done", which leads to the map', async () => {
     await play(Array(12).fill(3), 6)
     route.query = { finale: '1' }

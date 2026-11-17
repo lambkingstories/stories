@@ -14,6 +14,7 @@ import AdventureCount from '@/components/molecules/AdventureCount.vue'
 import AdventureOverview, { type OverviewRow } from '@/components/molecules/AdventureOverview.vue'
 import AdventureCardReveal from '@/components/molecules/AdventureCardReveal.vue'
 import AdventureRewards from '@/components/molecules/AdventureRewards.vue'
+import NewAwards from '@/components/molecules/NewAwards.vue'
 import AdventureQuiz from '@/components/molecules/AdventureQuiz.vue'
 const GameBuild = defineAsyncComponent(() => import('@/components/molecules/games/GameBuild.vue'))
 const GameDots = defineAsyncComponent(() => import('@/components/molecules/games/GameDots.vue'))
@@ -243,8 +244,6 @@ import { inBibleOrder } from '@/utils/continueJourney'
 import { albumCards, albumSetCard } from '@/utils/collection'
 import { memoryVerseOf } from '@/data/memoryVerses'
 import { JESUS_PATH } from '@/data/jesusPath'
-import { journeyBookUrl } from '@/data/bookPages'
-import { openExternal } from '@/utils/openExternal'
 import useAwards from '@/use/useAwards'
 import { adventureLanguage } from '@/use/adventureLanguage'
 import { isJourneyPlusLocked } from '@/utils/adventureAccess'
@@ -516,8 +515,11 @@ watch(
   }
 )
 
-/** The coloring book that goes with this adventure (its page on lambking.store; the way out asks the parents first). */
-const coloringBookUrl = computed(() => journeyBookUrl(journey.value?.id, adventureLanguage.value))
+/** The coloring picture of the adventure is a present of the gold cup only (Anton, 17.11.2026): it opens in the coloring program. */
+function paintGift() {
+  const g = journey.value?.gift
+  if (g) void router.push({ name: 'app-coloring', query: { source: g.image, type: 'image' } })
+}
 
 /** At the end of Easter: the way "Who is Jesus?" is offered quietly. */
 const jesusText = computed(() => JESUS_PATH[adventureLanguage.value])
@@ -1306,24 +1308,30 @@ function toFinale() {
           p(v-if="!medal" class="result-line") {{ t('app.adventure.noMedal') }}
           //- the end of the adventure: what all the stars and answers gave, and what is still to win
           AdventureRewards(v-if="journey" :journey="journey")
+          //- the awards just won, as pictures
+          NewAwards(:ids="wonNow")
+          //- the coloring picture: a present of the gold cup only
+          button(v-if="medal === 'gold' && journey?.gift" type="button" class="gift-card" data-test="result-gift" @click="paintGift")
+            img(:src="prependBaseUrl(journey.gift.image)" alt="" class="gift-img" draggable="false")
+            span(class="gift-text")
+              span(class="gift-title") {{ t('app.adventure.statsGiftTitle') }}
+              span(class="gift-sub") {{ t('app.adventure.giftColor') }}
           //- the memory verse of the adventure
           div(v-if="memoryVerse" class="verse-slip")
             span(class="verse-kicker") {{ t('app.adventure.verseKicker') }}
-            p(class="verse-line") {{ memoryVerse.line }}
             blockquote(class="verse-text") {{ memoryVerse.text }}
             span(class="verse-ref") {{ memoryVerse.ref }}
             p(class="verse-card") {{ cardWon ? t('app.adventure.verseOnCard') : t('app.adventure.verseWinCard') }}
-          p(v-if="wonNow.length" class="result-line result-plus") {{ t('app.awards.newAward') }}: {{ wonNow.map((w) => t(`app.awards.items.${w}.title`)).join(', ') }}
-          p(v-if="coloringBookUrl" class="result-line result-plus") {{ t('app.adventure.coloringBook') }}
           p(v-if="journey?.id === 'ostern'" class="result-line result-plus") {{ jesusText.homeCardText }}
-          p(v-if="nextPlusJourney" class="result-line result-plus") {{ t('app.adventure.plusNext', { title: nextPlusJourney.title }) }}
+          div(v-if="nextPlusJourney" class="plus-next")
+            p(class="plus-next-text") {{ t('app.adventure.plusNext', { title: nextPlusJourney.title }) }}
+            AdvButton(tone="blau" @click="showUpsell('adventure')") {{ t('app.adventure.plusNextButton') }}
           div(class="stage-actions")
-            AdvButton(v-if="coloringBookUrl" tone="blau" @click="openExternal(coloringBookUrl ?? '')") {{ t('app.adventure.coloringBookButton') }}
-            AdvButton(v-if="journey?.id === 'ostern'" tone="gold" @click="router.push({ name: 'app-jesus' })") {{ jesusText.homeCardTitle }}
-            AdvButton(v-if="nextPlusJourney" tone="gold" @click="showUpsell('adventure')") {{ t('app.adventure.plusNextButton') }}
             AdvButton(tone="gold" data-test="to-finale" @click="toFinale") {{ t('app.adventure.toOverview') }}
-            AdvButton(tone="blau" @click="retry") {{ t('app.adventure.retry') }}
-            AdvButton(tone="blau" @click="goMap()") {{ t('app.adventure.backToMap') }}
+            AdvButton(v-if="journey?.id === 'ostern'" tone="gold" @click="router.push({ name: 'app-jesus' })") {{ jesusText.homeCardTitle }}
+            div(class="stage-actions-row")
+              AdvButton(tone="blau" @click="retry") {{ t('app.adventure.retry') }}
+              AdvButton(tone="blau" @click="goMap()") {{ t('app.adventure.backToMap') }}
           //- the card lights up (once) when it has just been won
           AdventureCardReveal(v-if="journey" :journey="journey")
         template(v-else)
@@ -1346,7 +1354,7 @@ function toFinale() {
           AdventureRewards(v-if="journey && stage" :journey="journey" :stage-id="stage.id" slim)
           //- the last stage: the collector card of the adventure is won, it lights up
           AdventureCardReveal(v-if="journey && isLastStage" :journey="journey")
-          p(v-if="wonNow.length" class="result-line result-plus") {{ t('app.awards.newAward') }}: {{ wonNow.map((w) => t(`app.awards.items.${w}.title`)).join(', ') }}
+          NewAwards(:ids="wonNow")
           AdventureOverview(:rows="overviewRows(false)")
           div(class="stage-actions")
             AdvButton(tone="gold" @click="goMap(stage?.id, lastWasFirst)") {{ isLastStage ? t('app.adventure.toExam') : t('app.adventure.backToMap') }}
@@ -1881,10 +1889,69 @@ $ink: var(--lk-text)
   text-transform: uppercase
   color: var(--lk-muted)
 
-.verse-line
+// the coloring picture of the gold cup: one card with the picture, tap to paint
+.gift-card
+  display: flex
+  align-items: center
+  gap: 14px
+  width: 100%
+  margin: 12px 0
+  padding: 10px 14px
+  border: 1.5px solid var(--lk-gold, #e6b840)
+  border-radius: 22px
+  background: #fff8dc
+  color: var(--lk-text)
+  font: inherit
+  text-align: left
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+
+  &:active
+    transform: scale(0.98)
+
+.gift-img
+  flex: none
+  width: 76px
+  height: 76px
+  object-fit: contain
+  border-radius: 10px
+  background: #fff
+
+.gift-text
+  display: flex
+  flex-direction: column
+  gap: 2px
+
+.gift-title
+  font-weight: 800
+  font-size: 1.05rem
+
+.gift-sub
+  font-size: 0.92rem
+  font-weight: 700
+  color: var(--lk-accent)
+
+// the next adventure is only with Plus: text and button together in one quiet card
+.plus-next
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: 10px
+  margin: 12px 0
+  padding: 14px
+  border-radius: 20px
+  background: var(--lk-surface-2, #eef4f2)
+
+.plus-next-text
   margin: 0
-  color: var(--lk-muted)
-  line-height: 1.4
+  font-weight: 700
+  line-height: 1.35
+
+.stage-actions-row
+  display: flex
+  flex-wrap: wrap
+  justify-content: center
+  gap: 10px
 
 .verse-text
   margin: 0

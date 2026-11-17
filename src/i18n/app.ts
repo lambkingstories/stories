@@ -2619,6 +2619,7 @@ export default {
         errorTitle: 'That did not work.',
         errorText: 'The stories could not be loaded.',
         retry: 'Try again'
+      },
       // Stories without a net ("for the road"): the button on the book page and the list "Readable without a net".
       offline: {
         save: 'Save for the road',
@@ -2636,7 +2637,6 @@ export default {
         emptyTitle: 'You are offline.',
         emptyText: 'Open stories once with a net. Then you can read them without a net, too.',
         pinnedMark: 'Saved for the road'
-      },
       },
       parent: {
         button: 'Parents',
@@ -2700,7 +2700,7 @@ export default {
         album: 'Card album',
         awards: 'Awards',
         gifts: 'Coloring pictures',
-        giftsHint: 'Every cup gives you the coloring picture of its adventure as a present.',
+        giftsHint: 'The gold cup gives you the coloring picture of its adventure as a present.',
         cabinetHint: 'Every adventure has a place. At the end there is an exam: with enough points you win the cup.',
         albumHint: 'Every adventure has a card. You win it when you have finished all stages of the adventure, with any number of stars. Tap a card to see it big.',
         cup_bronze: 'Bronze cup',
@@ -3118,7 +3118,7 @@ export default {
         s2f5Text: 'The medals, stars and cups your child has won, in one place.',
         s2f5Where: 'Tap "Me" at the bottom, then "My rewards" and "Awards".',
         s2f6Title: 'Games and presents',
-        s2f6Text: 'Whoever finishes an adventure with a cup gets a coloring picture of that adventure as a present. Whoever wins three stars on a stage unlocks its stage game, to play freely under "My games".',
+        s2f6Text: 'Whoever finishes an adventure with the gold cup gets a coloring picture of that adventure as a present. Whoever wins three stars on a stage unlocks its stage game, to play freely under "My games".',
         s2f6Where: 'Tap "Me" at the bottom, then "My games" and "My rewards" (coloring pictures).',
         s2f7Title: 'Without internet',
         s2f7Text: 'The first time you open an adventure the app loads it onto the device. After that it also works without a net, for example in the car.',
@@ -6739,6 +6739,13 @@ export default {
         spanish: 'Spanisch'
       },
       state: {
+        offlineTitle: 'Du bist offline.',
+        offlineText: 'Heruntergeladene Inhalte kannst du weiter nutzen.',
+        reconnect: 'Erneut verbinden',
+        errorTitle: 'Das hat gerade nicht geklappt.',
+        errorText: 'Die Geschichten konnten nicht geladen werden.',
+        retry: 'Erneut versuchen'
+      },
       // Geschichten ohne Netz („Für unterwegs“): der Knopf auf der Buchseite und die Liste „Ohne Netz lesbar“.
       offline: {
         save: 'Für unterwegs speichern',
@@ -6756,13 +6763,6 @@ export default {
         emptyTitle: 'Du bist offline.',
         emptyText: 'Öffne Geschichten einmal mit Netz. Dann kannst du sie auch ohne Netz lesen.',
         pinnedMark: 'Für unterwegs gespeichert'
-      },
-        offlineTitle: 'Du bist offline.',
-        offlineText: 'Heruntergeladene Inhalte kannst du weiter nutzen.',
-        reconnect: 'Erneut verbinden',
-        errorTitle: 'Das hat gerade nicht geklappt.',
-        errorText: 'Die Geschichten konnten nicht geladen werden.',
-        retry: 'Erneut versuchen'
       },
       parent: {
         button: 'Eltern',
@@ -6826,7 +6826,7 @@ export default {
         album: 'Kartenalbum',
         awards: 'Auszeichnungen',
         gifts: 'Ausmalbilder',
-        giftsHint: 'Für jeden Pokal schenkt dir das Abenteuer sein Ausmalbild.',
+        giftsHint: 'Für den goldenen Pokal schenkt dir das Abenteuer sein Ausmalbild.',
         cabinetHint: 'Für jedes Abenteuer gibt es einen Platz. Am Ende wartet eine Prüfung: Mit genug Punkten bekommst du den Pokal.',
         albumHint: 'Für jedes Abenteuer gibt es eine Karte. Du gewinnst sie, wenn du alle Etappen des Abenteuers geschafft hast, mit beliebig vielen Sternen. Tippe eine Karte an, dann siehst du sie groß.',
         cup_bronze: 'Bronze-Pokal',
@@ -7244,7 +7244,7 @@ export default {
         s2f5Text: 'Die Medaillen, Sterne und Pokale, die dein Kind gewonnen hat, an einem Ort.',
         s2f5Where: 'Unten auf „Ich“, dann „Meine Belohnungen“ und „Auszeichnungen“.',
         s2f6Title: 'Spiele und Geschenke',
-        s2f6Text: 'Wer ein Abenteuer mit einem Pokal beendet, bekommt ein Ausmalbild dieses Abenteuers geschenkt. Wer in einer Etappe drei Sterne holt, schaltet ihr Etappen-Spiel frei, zum freien Spielen unter „Meine Spiele“.',
+        s2f6Text: 'Wer ein Abenteuer mit dem goldenen Pokal beendet, bekommt ein Ausmalbild dieses Abenteuers geschenkt. Wer in einer Etappe drei Sterne holt, schaltet ihr Etappen-Spiel frei, zum freien Spielen unter „Meine Spiele“.',
         s2f6Where: 'Unten auf „Ich“, dann „Meine Spiele“ und „Meine Belohnungen“ (Ausmalbilder).',
         s2f7Title: 'Auch ohne Internet',
         s2f7Text: 'Beim ersten Öffnen lädt die App ein Abenteuer auf das Gerät. Danach läuft es auch ohne Netz, zum Beispiel im Auto.',

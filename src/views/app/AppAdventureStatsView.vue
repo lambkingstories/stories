@@ -123,7 +123,7 @@ onMounted(() => {
         p(class="stats-line") {{ t('app.adventure.statsCardTap') }}
 
       //- the picture to color that the cup gave: shown first, colored on demand
-      section(v-if="medal" class="stats-card stats-won" data-test="stats-gift")
+      section(v-if="medal === 'gold'" class="stats-card stats-won" data-test="stats-gift")
         h2(class="stats-h2") {{ t('app.adventure.statsGiftTitle') }}
         button(type="button" class="stats-gift-btn" :aria-label="journey.gift.title" @click="giftOpen = true")
           img(:src="prependBaseUrl(journey.gift.image)" alt="" draggable="false")
@@ -166,7 +166,7 @@ onMounted(() => {
     )
 
     //- the won picture, big, with "Color it" and "Back" under it
-    div(v-if="giftOpen && medal" class="gp" role="dialog" aria-modal="true" :aria-label="journey.gift.title" data-test="gift-preview")
+    div(v-if="giftOpen && medal === 'gold'" class="gp" role="dialog" aria-modal="true" :aria-label="journey.gift.title" data-test="gift-preview")
       div(class="gp-paper")
         img(:src="prependBaseUrl(journey.gift.image)" alt="" draggable="false")
       div(class="gp-actions")

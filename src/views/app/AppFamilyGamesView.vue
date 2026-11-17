@@ -51,7 +51,9 @@ function label(g: Game, sub: boolean): string {
 }
 
 const locked = computed(() => PREMIUM_TEASER && !hasFeature('family'))
-const emblem = (key: string) => prependBaseUrl(`images/familie/symbole/${key}.webp`)
+// the bingo symbol was painted again (the first lamb had too many legs): its file has a new name, so no phone keeps the old picture
+const FILE: Record<string, string> = { bingo: 'bingo-2' }
+const emblem = (key: string) => prependBaseUrl(`images/familie/symbole/${FILE[key] ?? key}.webp`)
 function hide(e: Event) {
   ;(e.target as HTMLElement).style.display = 'none'
 }

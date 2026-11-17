@@ -6,8 +6,8 @@
  *    (the best replayable games of every adventure; one opens when its stage has all three stars, the ones not yet won stand there as
  *    locked tiles, so they can be collected). A tile opens the game of that stage in the free mode (`?free=1`: no stars, no progress).
  *    The third group of the page, the family games, is made by the page itself (see `AppGameRoomView`).
- *  - `gifts` ("My coloring pictures", a part of "My rewards"): every cup (bronze, silver, gold) gives the coloring picture of the journey as a
- *    present; a tile opens the coloring program.
+ *  - `gifts` ("My coloring pictures", a part of "My rewards"): the gold cup gives the coloring picture of the journey as a
+ *    present (Anton, 17.11.2026: only the gold cup); a tile opens the coloring program.
  * `section` (for `part="games"`) tells which group to show: `bonus` = the adventure games, `mini` = the stage games, `all` = both.
  */
 import { computed, ref } from 'vue'
@@ -77,7 +77,7 @@ function toggleGroup(grp: { id: string; open: number }) {
 }
 const gifts = computed(() =>
   journeys
-    .filter((j) => !!cupOf(j, adv.progressOf(j.id)))
+    .filter((j) => cupOf(j, adv.progressOf(j.id)) === 'gold')
     .map((j) => ({ id: `gift-${j.id}`, title: j.gift.title, image: prependBaseUrl(j.gift.image), from: j.title }))
 )
 
