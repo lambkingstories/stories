@@ -4,7 +4,7 @@
  */
 import { describe, expect, it } from 'vitest'
 import { BIG_GAMES } from '../src/data/bigGames'
-import { COLS, ROWS, checkMap, dig, newWorld, nextTipStep, playSolution, step, tipSteps, SIM_HZ } from '../src/utils/wasserGame'
+import { COLS, ROWS, checkMap, dig, newWorld, nextTipStep, playSolution, step, tipSteps, SIM_HZ, type Pt, type Stroke } from '../src/utils/wasserGame'
 import { LEVELS, WORLDS } from '../src/utils/wasserLevels'
 
 describe('the list of levels', () => {
@@ -82,4 +82,33 @@ describe.each(LEVELS.map((l, i) => [i + 1, l] as const))('tip of level %i', (_n,
     expect(nextTipStep(fresh, steps)).toBeGreaterThanOrEqual(0)
     expect(nextTipStep(w, steps)).toBe(-1)
   })
+})
+
+/** An unsteady hand: every point of the way (but the first, which is at the spring) is moved by up to 0.35 of a sign. */
+function unsteady(strokes: Stroke[], seed: number): Stroke[] {
+  let s = seed * 7919
+  const rnd = () => {
+    s = (s * 1664525 + 1013904223) >>> 0
+    return s / 4294967296
+  }
+  return strokes.map((st) => ({ ...st, pts: st.pts.map(([x, y], i) => (i === 0 ? ([x, y] as Pt) : ([x + (rnd() - 0.5) * 0.7, y + (rnd() - 0.5) * 0.7] as Pt))) }))
+}
+
+describe.each(LEVELS.map((l, i) => [i + 1, l] as const))('natural ways in level %i', (_n, def) => {
+  it('is also won with a wide finger, with an unsteady hand, and with a branch dug late (after the jar was full)', () => {
+    const base = def.solutions[0]!.strokes
+    const wide = playSolution(def, base.map((s) => ({ ...s, r: 3.6 })), 90).out
+    expect(wide.phase, 'wide').toBe('won')
+    for (const seed of [1, 2, 3]) {
+      const o = playSolution(def, unsteady(base, seed), 90).out
+      expect(o.phase, `unsteady ${seed}`).toBe('won')
+      expect(o.stars, `unsteady ${seed}`).toBeGreaterThanOrEqual(1)
+    }
+    // the ways one after the other, 7 seconds apart: the water goes on while a plant waits, so a late branch still gets its water
+    if (base.length > 1) {
+      const late = playSolution(def, base.map((s, i) => ({ ...s, t: i * 7 })), 90).out
+      expect(late.phase, 'late').toBe('won')
+      expect(late.bloomed, 'late').toBe(3)
+    }
+  }, 120000)
 })

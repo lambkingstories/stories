@@ -15,7 +15,7 @@ import useBigGames, { howSeen, markHowSeen } from '@/use/useBigGames'
 import useSfx from '@/use/useSfx'
 import useMusic from '@/use/useMusic'
 import { prependBaseUrl } from '@/utils/function'
-import { AIR, DIG_R, DIRT, H, K, MUD, ROCK, SAND, SALT, SIM_HZ, W, WALL, WOOD, digLine, dig, efficiency, finished, newWorld, nextTipStep, start, step, tipSteps, type Pt, type World } from '@/utils/wasserGame'
+import { AIR, DIG_R, DIRT, H, K, MUD, ROCK, SAND, SALT, SIM_HZ, W, WALL, WOOD, digLine, dig, efficiency, finished, newWorld, nextTipStep, plantsPending, start, step, tipSteps, type Pt, type World } from '@/utils/wasserGame'
 import { LEVELS, WORLDS } from '@/utils/wasserLevels'
 
 const emit = defineEmits<{ leave: [] }>()
@@ -519,6 +519,13 @@ function onEvents(now: number) {
     } else if (e.type === 'goal') {
       play('fanfare')
       hud.won = true
+      // a plant still waits: the water goes on for a few seconds, one may dig a branch to it
+      if (plantsPending(w)) {
+        tipText.value = t('app.bigGames.wasser.goalPending')
+        tipShown.value = true
+        window.clearTimeout(tipTimer)
+        tipTimer = window.setTimeout(() => (tipShown.value = false), 9000)
+      }
     } else if (e.type === 'end') finish(e.phase)
   }
   w.events.length = 0

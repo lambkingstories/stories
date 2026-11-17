@@ -7,7 +7,7 @@ export const WELT1: LevelDef[] = [
     world: 0,
     intro: 'dig',
     vessel: 'krug',
-    supply: 5,
+    supply: 8,
     eff: 0.6,
     map: [
       '........................',
@@ -58,7 +58,7 @@ export const WELT1: LevelDef[] = [
     world: 0,
     intro: 'rock',
     vessel: 'krug',
-    supply: 5,
+    supply: 8,
     eff: 0.3,
     map: [
       '........................',
@@ -109,7 +109,7 @@ export const WELT1: LevelDef[] = [
     world: 0,
     intro: 'plants',
     vessel: 'krug',
-    supply: 5,
+    supply: 8,
     eff: 0.25,
     map: [
       '........................',
@@ -160,8 +160,8 @@ export const WELT1: LevelDef[] = [
     world: 0,
     intro: 'sand',
     vessel: 'trog',
-    supply: 5,
-    eff: 0.3,
+    supply: 8,
+    eff: 0.35,
     map: [
       '........................',
       '........................',
@@ -175,12 +175,12 @@ export const WELT1: LevelDef[] = [
       '#dddddddddddddddddddddd#',
       '#dddddd*ddddddddddddddd#',
       '#dddddddddddddddddddddd#',
-      '#dddddddddddddddddd#dd##',
-      '#ssssssssssssssssss#dd##',
-      '#ssssssssssssssssss#dd##',
-      '#ssssssssssssssssss#dd##',
-      '#ssssssssssssssssss#dd##',
-      '#dddddddddddddddddd#dd##',
+      '#dddddddddddddddd#dddd##',
+      '#ssssssssssssssss#dddd##',
+      '#ssssssssssssssss#dddd##',
+      '#ssssssssssssssss#dddd##',
+      '#ssssssssssssssss#dddd##',
+      '#dddddddddddddddd#dddd##',
       '#dddddddddddddddddddddd#',
       '#dddddddddddddddddddddd#',
       '#dddddddddddddddddddddd#',
@@ -200,9 +200,9 @@ export const WELT1: LevelDef[] = [
       '#dddddddddddddddddddddd#',
       '########################'
     ],
-    tip: { pts: [[4.5, 7.5], [7.5, 10.5], [19.5, 10.5], [20.5, 9.5]] },
+    tip: { pts: [[4.5, 7.5], [7.5, 10.5], [18.5, 10.5], [19.5, 9.5]] },
     solutions: [
-      { name: 'Weg an allen Pflanzen vorbei', stars: 3, strokes: [{ pts: [[4.5, 7.5], [7.5, 10.5], [19.5, 10.5], [20.5, 9.5], [20.5, 21.5], [15.5, 21.5], [12.5, 24.5], [12.5, 26.5], [9.5, 29.5], [6.5, 29.5]] }] }
+      { name: 'Weg an allen Pflanzen vorbei', stars: 3, strokes: [{ pts: [[4.5, 7.5], [7.5, 10.5], [18.5, 10.5], [19.5, 9.5], [19.5, 21.5], [15.5, 21.5], [12.5, 24.5], [12.5, 26.5], [9.5, 29.5], [6.5, 29.5]] }] }
     ]
   },
   {
@@ -210,7 +210,7 @@ export const WELT1: LevelDef[] = [
     world: 0,
     intro: 'mix',
     vessel: 'krug',
-    supply: 5,
+    supply: 8,
     eff: 0.55,
     map: [
       '........................',
@@ -260,7 +260,7 @@ export const WELT1: LevelDef[] = [
     world: 0,
     intro: 'salt',
     vessel: 'krug',
-    supply: 5,
+    supply: 8,
     eff: 0.3,
     map: [
       '........................',
@@ -311,7 +311,7 @@ export const WELT1: LevelDef[] = [
     world: 0,
     intro: 'mud',
     vessel: 'krug',
-    supply: 5,
+    supply: 8,
     eff: 0.3,
     map: [
       '........................',
@@ -412,7 +412,7 @@ export const WELT1: LevelDef[] = [
     world: 0,
     intro: 'gate',
     vessel: 'krug',
-    supply: 5,
+    supply: 8,
     eff: 0.2,
     sensors: ['float'],
     map: [
@@ -463,8 +463,8 @@ export const WELT1: LevelDef[] = [
     world: 0,
     intro: 'mix',
     vessel: 'krug',
-    supply: 5,
-    eff: 0.2,
+    supply: 8,
+    eff: 0.15,
     map: [
       '........................',
       '........................',
@@ -478,17 +478,17 @@ export const WELT1: LevelDef[] = [
       '#dddddddddddddddddddddd#',
       '#dddddddddddddddddddddd#',
       '#dddddddddddddddddddddd#',
-      '##################dddd##',
+      '#################ddddd##',
       '#dddddddddddddddddddddd#',
       '#dddd*ddddddddddddddddd#',
       '#dddddddddddddddddddddd#',
       '#dddddddddddddddddddddd#',
-      '##dddd##################',
+      '##ddddd#################',
       '#dddddddddddddddddddddd#',
       '#ddddddddddddddddd*dddd#',
       '#dddddddddddddddddddddd#',
       '#dddddddddddddddddddddd#',
-      '##################dddd##',
+      '#################ddddd##',
       '#dddddddddddddddddddddd#',
       '#dddddddddddddddddddddd#',
       '#ddddd*dddddddddddddddd#',
@@ -503,9 +503,9 @@ export const WELT1: LevelDef[] = [
       '#dddddddddddddddddddddd#',
       '########################'
     ],
-    tip: { pts: [[4.5, 7.5], [6.5, 9.5], [7.5, 9.5], [8.5, 10.5], [10.5, 10.5], [11.5, 11.5], [18.5, 11.5], [18.5, 13.5]] },
+    tip: { pts: [[4.5, 7.5], [6.5, 9.5], [7.5, 9.5], [8.5, 10.5], [10.5, 10.5], [11.5, 11.5], [17.5, 11.5], [17.5, 13.5], [6.5, 13.5]] },
     solutions: [
-      { name: 'Weg an allen Pflanzen vorbei', stars: 3, strokes: [{ pts: [[4.5, 7.5], [6.5, 9.5], [7.5, 9.5], [8.5, 10.5], [10.5, 10.5], [11.5, 11.5], [18.5, 11.5], [18.5, 13.5], [6.5, 13.5], [5.5, 14.5], [5.5, 18.5], [17.5, 18.5], [18.5, 19.5], [18.5, 23.5], [8.5, 23.5], [6.5, 25.5], [6.5, 27.5], [5.5, 28.5], [5.5, 29.5]] }] }
+      { name: 'Weg an allen Pflanzen vorbei', stars: 3, strokes: [{ pts: [[4.5, 7.5], [6.5, 9.5], [7.5, 9.5], [8.5, 10.5], [10.5, 10.5], [11.5, 11.5], [17.5, 11.5], [17.5, 13.5], [6.5, 13.5], [5.5, 14.5], [5.5, 17.5], [6.5, 18.5], [17.5, 18.5], [18.5, 19.5], [18.5, 22.5], [17.5, 23.5], [8.5, 23.5], [6.5, 25.5], [6.5, 27.5], [5.5, 28.5], [5.5, 29.5]] }] }
     ]
   },
   {
@@ -513,7 +513,7 @@ export const WELT1: LevelDef[] = [
     world: 0,
     intro: 'wheel',
     vessel: 'trog',
-    supply: 5,
+    supply: 8,
     eff: 0.35,
     sensors: ['float', 'wheel'],
     map: [
@@ -564,8 +564,8 @@ export const WELT1: LevelDef[] = [
     world: 0,
     intro: 'mix',
     vessel: 'krug',
-    supply: 5,
-    eff: 0.2,
+    supply: 8,
+    eff: 0.15,
     map: [
       '........................',
       '........................',

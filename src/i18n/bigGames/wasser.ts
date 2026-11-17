@@ -4,6 +4,7 @@ export default {
     title: 'Wasser für das Volk',
     intro: 'Ohne Wasser kann niemand leben. Mit dem Finger gräbst du Wege durch die Erde, damit das Wasser dorthin läuft, wo die Menschen und Tiere es brauchen.',
     taskLabel: 'Deine Aufgabe:',
+    goalPending: 'Das Gefäß ist voll! Das Wasser fließt noch kurz weiter: Grabe jetzt zu den übrigen Blumen.',
     tipDone: 'Du bist schon auf dem richtigen Weg. Warte, bis das Wasser ankommt!',
     story: [
       { text: 'Das Volk Israel ist durstig in der Wüste. Da sagt Gott zu Mose: Schlag auf den Felsen. Mose tut es, und Wasser kommt heraus (2. Mose 17).',
@@ -66,6 +67,7 @@ export default {
     title: 'Water for the People',
     intro: 'Nobody can live without water. With your finger you dig ways through the earth, so that the water runs where people and animals need it.',
     taskLabel: 'Your task:',
+    goalPending: 'The vessel is full! The water keeps running for a moment: dig to the other flowers now.',
     tipDone: 'You are already on the right way. Wait until the water arrives!',
     story: [
       { text: 'The people of Israel are thirsty in the desert. God says to Moses: Strike the rock. Moses does it, and water comes out (Exodus 17).',
@@ -128,6 +130,7 @@ export default {
     title: 'Agua para el pueblo',
     intro: 'Nadie puede vivir sin agua. Con el dedo cavas caminos por la tierra para que el agua corra adonde las personas y los animales la necesitan.',
     taskLabel: 'Tu tarea:',
+    goalPending: '¡La vasija está llena! El agua sigue corriendo un momento: cava ahora hasta las demás flores.',
     tipDone: 'Ya estás en el buen camino. ¡Espera a que llegue el agua!',
     story: [
       { text: 'El pueblo de Israel tiene sed en el desierto. Dios le dice a Moisés: Golpea la roca. Moisés lo hace, y sale agua (Éxodo 17).',

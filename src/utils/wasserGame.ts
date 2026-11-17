@@ -171,6 +171,8 @@ export interface World {
   vesselMass: number
   /** The most water the vessel ever held in this round. */
   settle: number
+  /** What had come out of the sources when the jar was full (the third star counts against it). */
+  emittedAtGoal: number
   /** The movement of water in the last steps (low: the water rests). */
   motion: number
   calm: number
@@ -344,6 +346,7 @@ export function newWorld(def: LevelDef): World {
     total: 0,
     vesselMass: 0,
     settle: 0,
+    emittedAtGoal: 0,
     motion: 0,
     calm: 0,
     dirty: { x0: 0, y0: 0, x1: W - 1, y1: H - 1, on: true },
@@ -414,7 +417,8 @@ function touch(w: World, x: number, y: number) {
 // ── the finger ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
 /** Digs a round hole (cell coordinates). Returns the cells dug. The first dig of a round lets the water come. */
 export function dig(w: World, cx: number, cy: number, r = DIG_R): number {
-  if (w.phase === 'won' || w.phase === 'lost') return 0
+  // after the win the finger may still dig for a while (the water goes on while a plant waits)
+  if (w.phase === 'lost' || w.done) return 0
   const x0 = Math.max(0, Math.floor(cx - r))
   const x1 = Math.min(W - 1, Math.ceil(cx + r))
   const y0 = Math.max(0, Math.floor(cy - r))
@@ -639,7 +643,8 @@ function slideSand(w: World) {
 }
 
 function sources(w: World) {
-  if (!w.started || w.phase !== 'play') return
+  if (!w.started) return
+  if (w.phase === 'lost' || (w.phase === 'won' && (w.done || !plantsPending(w) || w.settle >= GRACE))) return
   const rate = w.def.rate ?? RATE
   for (const s of w.sources) {
     let k = 1
@@ -745,6 +750,8 @@ function trigger(w: World, s: Sensor) {
 /** The time the water goes on after the jar is full (the water that is on its way arrives): at least this long, and until it rests, at most so long. */
 const SETTLE_MIN = SIM_HZ * 1.5
 const SETTLE_MAX = SIM_HZ * 6
+/** How long the water goes on after the win when a plant still waits for it (the finger may dig on: a second branch to the last flower). */
+const GRACE = SIM_HZ * 10
 /** How long (steps) the water may rest before a round without enough water is given up. */
 const REST = SIM_HZ * 2.5
 
@@ -753,7 +760,13 @@ export function allPlantsWatered(w: World): boolean {
 }
 
 export function efficiency(w: World): number {
-  return w.emitted > 0 ? w.vesselMass / w.emitted : 0
+  const e = w.emittedAtGoal > 0 ? w.emittedAtGoal : w.emitted
+  return e > 0 ? Math.min(1, w.vesselMass / e) : 0
+}
+
+/** Plants that are still waiting for water (not watered, not drowned). */
+export function plantsPending(w: World): boolean {
+  return w.plants.some((p) => !p.bloomed && !p.drowned)
 }
 
 export function starsOf(w: World): number {
@@ -784,6 +797,7 @@ export function step(w: World) {
     if (w.goal > 0 && v >= w.goal) {
       w.phase = 'won'
       w.settle = 0
+      w.emittedAtGoal = w.emitted
       emit(w, { type: 'goal' })
     } else {
       // no water left that could still fill the jar, or the water rests and nothing comes any more
@@ -801,7 +815,8 @@ export function step(w: World) {
     }
   } else if (w.phase === 'won') {
     w.settle++
-    if (!w.done && ((w.settle >= SETTLE_MIN && w.motion < 0.012) || w.settle >= SETTLE_MAX)) {
+    const waiting = plantsPending(w)
+    if (!w.done && ((w.settle >= SETTLE_MIN && w.motion < 0.012 && !waiting) || w.settle >= (waiting ? GRACE : SETTLE_MAX))) {
       w.done = true
       w.eff = efficiency(w)
       w.stars = starsOf(w)

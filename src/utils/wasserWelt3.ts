@@ -7,7 +7,7 @@ export const WELT3: LevelDef[] = [
     world: 2,
     intro: 'dig',
     vessel: 'brunnen',
-    supply: 5,
+    supply: 8,
     eff: 0.7,
     map: [
       '........................',
@@ -57,8 +57,8 @@ export const WELT3: LevelDef[] = [
     id: 'vaeter-02',
     world: 2,
     vessel: 'krug',
-    supply: 5,
-    eff: 0.2,
+    supply: 8,
+    eff: 0.15,
     map: [
       '........................',
       '........................',
@@ -107,7 +107,7 @@ export const WELT3: LevelDef[] = [
     id: 'vaeter-03',
     world: 2,
     vessel: 'trog',
-    supply: 5,
+    supply: 8,
     eff: 0.25,
     map: [
       '........................',
@@ -158,7 +158,7 @@ export const WELT3: LevelDef[] = [
     world: 2,
     intro: 'mud',
     vessel: 'brunnen',
-    supply: 5,
+    supply: 8,
     eff: 0.45,
     map: [
       '........................',
@@ -258,7 +258,7 @@ export const WELT3: LevelDef[] = [
     world: 2,
     intro: 'gate',
     vessel: 'brunnen',
-    supply: 5,
+    supply: 8,
     eff: 0.5,
     sensors: ['float'],
     map: [
@@ -309,7 +309,7 @@ export const WELT3: LevelDef[] = [
     world: 2,
     intro: 'wheel',
     vessel: 'trog',
-    supply: 5,
+    supply: 8,
     eff: 0.35,
     sensors: ['float', 'wheel'],
     map: [
@@ -359,7 +359,7 @@ export const WELT3: LevelDef[] = [
     id: 'vaeter-08',
     world: 2,
     vessel: 'krug',
-    supply: 5,
+    supply: 8,
     eff: 0.4,
     map: [
       '........................',
@@ -408,7 +408,7 @@ export const WELT3: LevelDef[] = [
     id: 'vaeter-09',
     world: 2,
     vessel: 'krug',
-    supply: 5,
+    supply: 8,
     eff: 0.35,
     map: [
       '........................',
@@ -457,7 +457,7 @@ export const WELT3: LevelDef[] = [
     id: 'vaeter-10',
     world: 2,
     vessel: 'becken',
-    supply: 5,
+    supply: 8,
     eff: 0.3,
     map: [
       '........................',
@@ -506,7 +506,7 @@ export const WELT3: LevelDef[] = [
     id: 'vaeter-11',
     world: 2,
     vessel: 'brunnen',
-    supply: 5,
+    supply: 8,
     eff: 0.25,
     sensors: ['float'],
     map: [
@@ -521,12 +521,12 @@ export const WELT3: LevelDef[] = [
       '#dddddddddddddddddddddd#',
       '#ddddddd*dddddddddddddd#',
       '#dddddddddddddddddddddd#',
-      '##################dddd##',
+      '#################ddddd##',
       '#dddddddddddddddddddddd#',
       '#dddddddddddddddddddddd#',
       '#dddddd*ddddddddddddddd#',
       '#dddddddddddddddddddddd#',
-      '##dddd##################',
+      '##ddddd#################',
       '#ddddddddddddddddd...dd#',
       '#ddddddddddddddddd...dd#',
       '#ddddddddddddd*ddd.1.dd#',
@@ -556,7 +556,7 @@ export const WELT3: LevelDef[] = [
     id: 'vaeter-12',
     world: 2,
     vessel: 'brunnen',
-    supply: 6,
+    supply: 10,
     eff: 0.3,
     sensors: ['float'],
     map: [
@@ -599,7 +599,7 @@ export const WELT3: LevelDef[] = [
     ],
     tip: { pts: [[3.5, 7.5], [5.5, 9.5], [8.5, 9.5], [9.5, 10.5], [9.5, 12.5]] },
     solutions: [
-      { name: 'Weg an allen Pflanzen vorbei', stars: 3, strokes: [{ pts: [[3.5, 7.5], [5.5, 9.5], [8.5, 9.5], [9.5, 10.5], [9.5, 12.5], [10.5, 13.5], [10.5, 19.5], [6.5, 19.5], [4.5, 21.5], [4.5, 26.5], [3.5, 27.5], [2.5, 27.5]] }, { pts: [[20.5, 7.5], [16.5, 7.5], [13.5, 10.5], [13.5, 12.5], [18.5, 12.5], [19.5, 13.5], [19.5, 14.5], [20.5, 15.5], [20.5, 17.5]] }] }
+      { name: 'Weg an allen Pflanzen vorbei', stars: 3, strokes: [{ pts: [[3.5, 7.5], [5.5, 9.5], [8.5, 9.5], [9.5, 10.5], [9.5, 12.5], [10.5, 13.5], [10.5, 19.5], [6.5, 19.5], [4.5, 21.5], [4.5, 26.5], [3.5, 27.5], [2.5, 27.5]] }, { pts: [[20.5, 7.5], [16.5, 7.5], [13.5, 10.5], [13.5, 12.5], [18.5, 12.5], [19.5, 13.5], [19.5, 14.5], [20.5, 15.5], [20.5, 17.5], [21.5, 18.5], [20.5, 19.5]] }] }
     ]
   }
 ]
