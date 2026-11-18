@@ -5,6 +5,7 @@ import { HIDDEN_CATEGORY } from '../config/categories.js'
 import type { CreateBookInput, UpdateBookInput } from '../validators/book.schema.js'
 import { logger } from '../config/logger.js'
 import { absolutizeBook, absolutizeBooks, relativizeBook } from '../utils/bookUrls.js'
+import { leanBook } from '../utils/leanBook.js'
 
 function toDTO(doc: { toJSON: () => unknown }): unknown {
   return doc.toJSON()
@@ -21,7 +22,7 @@ function fillBadgeLocaleFallback<T extends { achievementBadge?: { de?: string; e
 }
 
 export const BookService = {
-  async list(opts: { includeHidden?: boolean } = {}) {
+  async list(opts: { includeHidden?: boolean; lean?: boolean } = {}) {
     const cached = await CacheService.getBooksList<unknown[]>()
     let docs: unknown[]
     let cacheHit: boolean
@@ -37,6 +38,8 @@ export const BookService = {
     if (!opts.includeHidden) {
       books = books.filter((b) => (b as { category?: string }).category !== HIDDEN_CATEGORY)
     }
+    // the slim list leaves the text of the story pages out (about three quarters of its size)
+    if (opts.lean) books = books.map((b) => leanBook(b))
     return { books, cacheHit }
   },
 

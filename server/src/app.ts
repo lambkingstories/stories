@@ -10,6 +10,7 @@ import { mongoSanitize } from './middleware/sanitize.js'
 import { helmetMiddleware } from './config/security.js'
 import { requestLogger } from './middleware/requestLogger.js'
 import { readLimiter } from './middleware/rateLimit.js'
+import { thumbnailMiddleware } from './middleware/thumbnail.js'
 import apiRouter from './routes/index.js'
 import healthRouter from './routes/health.routes.js'
 import { adminRouter } from './routes/admin.routes.js'
@@ -56,6 +57,8 @@ export function createApp(): Express {
       }
     })
   )
+  // `?w=320` on a picture: a small WebP made from it (the original stays as it is), see middleware/thumbnail.ts
+  app.use('/uploads', thumbnailMiddleware(uploadsDir, staticCors))
   app.use(
     '/uploads',
     express.static(uploadsDir, {
