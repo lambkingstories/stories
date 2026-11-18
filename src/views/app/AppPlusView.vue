@@ -58,7 +58,7 @@ const hero = img('bg/willkommen-plus-3')
       //- the whole title picture (nothing lies on the lamb), the golden Plus sign in its corner, the promise under it
       div(class="plus-hero")
         img(:src="hero" alt="" draggable="false")
-        PlusBadge(class="plus-hero-badge")
+        PlusBadge(class="plus-hero-badge" always)
       p(v-if="plusOn" class="plus-hero-line is-on" role="status") {{ t('app.plus.stateOn') }}
       p(v-else class="plus-hero-line") {{ t('app.plus.lead') }}
 

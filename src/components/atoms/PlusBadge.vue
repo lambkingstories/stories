@@ -2,18 +2,23 @@
 /**
  * The sign for everything that belongs to LambKing Plus: a small golden crown and the word "Plus" on a shining golden plate.
  * There is no lock on it: Plus is something special to look forward to, not something that is shut.
+ * Whoever has Plus does not see it any more (Anton, 18.11.2026): the sign is only there to show what Plus would open, and it comes back when
+ * Plus ends. `always` keeps it where the page is about Plus itself (the Plus page and the list of features).
  */
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { isPlus } from '@/use/usePremium'
 import { prependBaseUrl } from '@/utils/function'
 
-withDefaults(defineProps<{ size?: 'small' | 'normal' }>(), { size: 'normal' })
+const props = withDefaults(defineProps<{ size?: 'small' | 'normal'; always?: boolean }>(), { size: 'normal', always: false })
+const shown = computed(() => props.always || !isPlus())
 
 const { t } = useI18n({ useScope: 'global' })
 const crown = prependBaseUrl('images/icons/navi/plus.webp')
 </script>
 
 <template lang="pug">
-  span(:class="['plus-badge', `is-${size}`]" role="img" :aria-label="t('app.adventure.plusBadgeLabel')")
+  span(v-if="shown" :class="['plus-badge', `is-${size}`]" role="img" :aria-label="t('app.adventure.plusBadgeLabel')")
     img(:src="crown" alt="" draggable="false" class="plus-badge-crown")
     span(class="plus-badge-word") {{ t('app.adventure.plusBadge') }}
 </template>

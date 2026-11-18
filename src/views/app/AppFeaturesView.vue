@@ -120,7 +120,7 @@ const openOf = (a: Area) => a.features.find((f) => idOf(a, f) === openKey.value)
           li
             span(class="feat-tag is-free") {{ t('app.features.tagFree') }}
           li
-            PlusBadge(size="small")
+            PlusBadge(size="small" always)
 
       nav(class="feat-jump" :aria-label="t('app.features.jump')")
         button(v-for="a in AREAS" :key="a.n" type="button" class="feat-jump-btn" @click="jump(a.n)")
@@ -144,7 +144,7 @@ const openOf = (a: Area) => a.features.find((f) => idOf(a, f) === openKey.value)
             @click="toggle(idOf(a, f))"
           )
             span(class="feat-chip-title") {{ t(`app.features.s${a.n}${f.key}Title`) }}
-            PlusBadge(v-if="f.tag === 'plus'" size="small")
+            PlusBadge(v-if="f.tag === 'plus'" size="small" always)
             span(v-else :class="['feat-tag', `is-${f.tag}`]") {{ t(`app.features.${tagKey(f.tag)}`) }}
 
         //- what is open: shown under the tiles of its area
