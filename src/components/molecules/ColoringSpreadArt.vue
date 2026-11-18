@@ -37,13 +37,13 @@ defineProps<{ line: string; layer?: string; alt: string; faded?: boolean }>()
   &.faded
     filter: blur(3px)
     filter: blur(clamp(2px, 1.1cqw, 7px))
-    opacity: 0.5
+    opacity: 0.8
 
 // the veil: light, warm and a little shining, so a locked page looks special and not dull
 .sp-veil
   position: absolute
   inset: 0
   pointer-events: none
-  background: radial-gradient(ellipse at 50% 38%, rgba(255, 250, 230, 0.9), rgba(255, 236, 184, 0.78) 62%, rgba(246, 214, 140, 0.7))
+  background: radial-gradient(ellipse at 50% 38%, rgba(255, 250, 232, 0.66), rgba(255, 238, 190, 0.55) 62%, rgba(246, 214, 140, 0.5))
   box-shadow: inset 0 0 0 2px rgba(214, 170, 70, 0.35)
 </style>
