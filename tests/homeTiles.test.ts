@@ -4,7 +4,8 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { HOME_SHORTCUTS } from '@/data/homeShortcuts'
 import useHomeLayout, { HOME_LAYOUT_KEY } from '@/use/useHomeLayout'
-import { ALL_TILES, CORE_TILES, DEFAULT_LAYOUT, EXTRA_TILES, addTile, defaultLayout, missingTiles, moveTile, normalizeLayout, removeTile, setSize, toggleSize } from '@/utils/homeTiles'
+import { BIG_GAMES } from '@/data/bigGames'
+import { ALL_TILES, CORE_TILES, DEFAULT_LAYOUT, EXTRA_TILES, GAME_TILES, addTile, defaultLayout, missingTiles, moveTile, normalizeLayout, removeTile, setSize, toggleSize } from '@/utils/homeTiles'
 
 const ids = (l: readonly { id: string }[]) => l.map((t) => t.id)
 
@@ -21,6 +22,14 @@ describe('the tiles that exist', () => {
     }
     // the shortcuts are exactly the extra tiles (nothing is left over, nothing is missing)
     expect(Object.keys(HOME_SHORTCUTS).sort()).toEqual([...EXTRA_TILES].sort())
+  })
+
+  it('every adventure game can be a tile of its own', () => {
+    expect(GAME_TILES).toHaveLength(BIG_GAMES.length)
+    for (const g of BIG_GAMES) expect(ALL_TILES).toContain(`game-${g.id}`)
+    expect(addTile([], 'game-david' as never).map((t) => t.id)).toEqual(['game-david'])
+    // a saved layout with an old, unknown game tile loses it
+    expect(normalizeLayout([{ id: 'game-toepfer', size: 'small' }, { id: 'game-arche', size: 'wide' }])).toEqual([{ id: 'game-arche', size: 'wide' }])
   })
 })
 
@@ -56,7 +65,7 @@ describe('changing a layout', () => {
     const again = addTile(less, 'games')
     expect(again[again.length - 1]).toEqual({ id: 'games', size: 'small' })
     expect(ids(addTile(again, 'games'))).toEqual(ids(again))
-    expect(missingTiles(l)).toEqual([...EXTRA_TILES])
+    expect(missingTiles(l)).toEqual([...EXTRA_TILES, ...GAME_TILES])
   })
 })
 

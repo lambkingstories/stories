@@ -17,7 +17,10 @@ import AppHeader from '@/components/molecules/AppHeader.vue'
 import HomeHero, { type HeroSlide } from '@/components/molecules/HomeHero.vue'
 import HomeTileGrid from '@/components/molecules/HomeTileGrid.vue'
 import { HOME_SHORTCUTS } from '@/data/homeShortcuts'
-import type { HomeCard, HomeTileId } from '@/utils/homeTiles'
+import { GAME_TILE_PREFIX, type HomeCard, type HomeTileId } from '@/utils/homeTiles'
+import useBigGames from '@/use/useBigGames'
+import { maxStarsOf } from '@/utils/bigGames'
+import { boardsOf } from '@/utils/bilderMemory'
 import useModels from '@/use/useModels'
 import useApiBooks from '@/use/useApiBooks'
 import useReadingProgress from '@/use/useReadingProgress'
@@ -48,6 +51,9 @@ const apiBooks = useApiBooks()
 const { getPct } = useReadingProgress()
 const adventure = useAdventure()
 const { wishes, states: wishStates } = useGameWishes()
+const bigGames = useBigGames()
+// the memory has one board for every adventure that is in this build (its maximum of stars follows that)
+const memoryBoards = boardsOf(journeys).length
 const { plusOn } = usePremium()
 
 const STORE_URL = 'https://lambking.store'
@@ -265,6 +271,21 @@ const tileCards = computed<Partial<Record<HomeTileId, HomeCard>>>(() => {
       empty: false,
       icon: sc.icon,
       go: () => (sc.to ? void router.push({ name: sc.to }) : void openPlus())
+    }
+  }
+  // every adventure game on its own: open ones lead into the game (and show the stars won), closed ones lead to "My games", where they are picked
+  for (const s of wishStates.value) {
+    const id = `${GAME_TILE_PREFIX}${s.game.id}` as HomeTileId
+    out[id] = {
+      id,
+      kind: t('app.home.kindGames'),
+      title: t(`app.bigGames.${s.game.id}.title`),
+      meta: s.open ? t('app.bigGames.levelStars', { n: bigGames.stars(s.game.id), max: maxStarsOf(s.game, memoryBoards) }) : t('app.bigGames.locked'),
+      image: prependBaseUrl(s.game.image),
+      progress: -1,
+      empty: false,
+      icon: 'star',
+      go: () => void router.push(s.open ? { name: 'app-big-game', params: { gameId: s.game.id } } : { name: 'app-gameroom' })
     }
   }
   return out

@@ -4,6 +4,7 @@
  * no screen): which tiles exist, the layout a new device starts with, and how a layout is changed. The screen is `HomeTileGrid.vue`, the memory of the
  * layout is `useHomeLayout`.
  */
+import { BIG_GAMES, type BigGameId } from '@/data/bigGames'
 
 /** The five tiles of the start page since the beginning (they begin on the page). */
 export const CORE_TILES = ['adventure', 'book', 'picture', 'games', 'family'] as const
@@ -13,14 +14,21 @@ export const CORE_TILES = ['adventure', 'book', 'picture', 'games', 'family'] as
  */
 export const EXTRA_TILES = ['stageGames', 'cards', 'journal', 'goodnight', 'coloringBooks', 'plus', 'quiz', 'activity', 'who', 'order', 'bingo', 'memory', 'wortreise'] as const
 
-export type HomeTileId = (typeof CORE_TILES)[number] | (typeof EXTRA_TILES)[number]
+/**
+ * Every adventure game on its own (Anton, 18.11.2026: "the single bonus games should be choosable here too"): the tile of a game leads into the
+ * game when it is open, and to "My games" (where it is picked) when it is still closed.
+ */
+export const GAME_TILE_PREFIX = 'game-'
+export const GAME_TILES = BIG_GAMES.map((g) => `${GAME_TILE_PREFIX}${g.id}` as const)
+
+export type HomeTileId = (typeof CORE_TILES)[number] | (typeof EXTRA_TILES)[number] | `game-${BigGameId}`
 export type HomeTileSize = 'small' | 'wide'
 export interface HomeTile {
   id: HomeTileId
   size: HomeTileSize
 }
 
-export const ALL_TILES: readonly HomeTileId[] = [...CORE_TILES, ...EXTRA_TILES]
+export const ALL_TILES: readonly HomeTileId[] = [...CORE_TILES, ...EXTRA_TILES, ...GAME_TILES]
 
 /** What a device without a saved layout shows: the five tiles as before (the family games are a wide tile). */
 export const DEFAULT_LAYOUT: readonly HomeTile[] = [

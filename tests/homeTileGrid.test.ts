@@ -9,7 +9,7 @@ import HomeTileGrid from '@/components/molecules/HomeTileGrid.vue'
 import messages from '@/i18n/app'
 import { withGameTexts } from '@/i18n/bigGames'
 import useHomeLayout from '@/use/useHomeLayout'
-import { ALL_TILES, type HomeCard, type HomeTileId } from '@/utils/homeTiles'
+import { ALL_TILES, CORE_TILES, type HomeCard, type HomeTileId } from '@/utils/homeTiles'
 
 vi.mock('@/components/atoms/ZIconography.vue', () => ({ default: { template: '<i />' } }))
 
@@ -109,12 +109,14 @@ describe('the tiles of the start page', () => {
     await flushPromises()
     await w.get('[data-test="tile-add"]').trigger('click')
     const sheet = w.get('[data-test="tile-sheet"]')
-    expect(sheet.findAll('.hg-item')).toHaveLength(13)
+    // every extra tile and every adventure game on its own can be added
+    expect(sheet.findAll('.hg-item')).toHaveLength(ALL_TILES.length - CORE_TILES.length)
+    expect(sheet.find('[data-test="add-game-arche"]').exists()).toBe(true)
     await sheet.get('[data-test="add-quiz"]').trigger('click')
     expect(w.find('[data-test="tile-sheet"]').exists()).toBe(false)
     expect(tileIds(w)).toEqual(['adventure', 'book', 'picture', 'games', 'family', 'quiz'])
     await w.get('[data-test="tile-add"]').trigger('click')
-    expect(w.findAll('.hg-item')).toHaveLength(12)
+    expect(w.findAll('.hg-item')).toHaveLength(ALL_TILES.length - CORE_TILES.length - 1)
     await w.get('[data-test="tiles-reset"]').trigger('click')
     expect(tileIds(w)).toEqual(['adventure', 'book', 'picture', 'games', 'family'])
     w.unmount()
