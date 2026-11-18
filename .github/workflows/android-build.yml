@@ -91,6 +91,10 @@ jobs:
           cache: pnpm
 
       - name: Install JS dependencies
+        # onnxruntime-node (a tool package, not part of the app) tries to download a CUDA binary that GitHub answers with 404 when the
+        # pnpm cache is cold (a new lockfile): skip that download, the app does not use it.
+        env:
+          ONNXRUNTIME_NODE_INSTALL_CUDA: skip
         run: pnpm install --no-frozen-lockfile
 
       - name: Locate Android NDK
