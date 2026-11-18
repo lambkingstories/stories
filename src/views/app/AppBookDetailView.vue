@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { sizedImage } from '@/utils/sizedImage'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import ZButton from '@/components/atoms/ZButton.vue'
@@ -515,7 +516,7 @@ const seriesName = computed(() => seriesNameOfBook(book.value))
         div(class="hero-row")
           div(class="hero-cover")
             img(
-              :src="coverBlob || withPlaceholder(pickLocalizedImage(book.previewImage, lang))"
+              :src="coverBlob || withPlaceholder(sizedImage(pickLocalizedImage(book.previewImage, lang), 240))"
               :alt="localizedTitle"
               class="hero-cover-img"
               loading="eager"

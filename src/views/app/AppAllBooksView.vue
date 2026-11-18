@@ -9,6 +9,9 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import LkCompanion from '@/components/atoms/LkCompanion.vue'
+import BookListSkeleton from '@/components/molecules/BookListSkeleton.vue'
+import BookListError from '@/components/molecules/BookListError.vue'
+import { sizedImage } from '@/utils/sizedImage'
 import AppHeader from '@/components/molecules/AppHeader.vue'
 import useModels from '@/use/useModels'
 import useApiBooks from '@/use/useApiBooks'
@@ -175,6 +178,19 @@ const offlineShown = computed<OfflineItem[]>(() => {
   })
 })
 const showOffline = computed(() => offlineMode.value && offlineItems.value.length > 0)
+const nothingToShow = computed(() => !shelves.value.length && !isSearching.value && !showOffline.value)
+// The names, order and pictures of the series come with their own (tiny) list; the shelves wait for it a moment (at most 2.5 s), so that they are
+// not drawn with made-up names first and then jump into their order.
+const seriesWait = ref(true)
+const seriesWaitTimer = setTimeout(() => (seriesWait.value = false), 2500)
+onBeforeUnmount(() => clearTimeout(seriesWaitTimer))
+const seriesReady = computed(() => apiSeries.state.all !== null || !!apiSeries.state.error || !seriesWait.value)
+/** The first answer is not there yet: placeholders instead of an empty page (and instead of shelves that would still jump). */
+const showSkeleton = computed(
+  () => online.value && !isSearching.value && !showOffline.value && ((!shelves.value.length && !apiBooks.state.listReady) || (shelves.value.length > 0 && !seriesReady.value))
+)
+/** The server did not answer and the device has nothing: a friendly note and a button. */
+const showError = computed(() => nothingToShow.value && online.value && apiBooks.state.listReady && apiBooks.state.listFailed)
 const offlineText = computed(() => (online.value ? t('app.offline.listTextServer') : t('app.offline.listText')))
 
 function isNew(book: ApiBook): boolean {
@@ -280,7 +296,7 @@ function openBook(bookId: string) {
           )
             span(class="result-cover")
               img(
-                :src="withPlaceholder(pickLocalizedImage(book.previewImage, lang))"
+                :src="withPlaceholder(sizedImage(pickLocalizedImage(book.previewImage, lang), 112))"
                 :alt="bookTitle(book)"
                 loading="lazy"
                 draggable="false"
@@ -289,7 +305,7 @@ function openBook(bookId: string) {
               span(v-if="isNew(book)" class="new-badge") {{ t('app.read.newBadge') }}
             span(class="result-title") {{ bookTitle(book) }}
 
-      template(v-else)
+      template(v-else-if="seriesReady")
         section(v-for="shelf in shelves" :key="shelf.seriesId" class="shelf lk-panel")
           div(class="shelf-head")
             button(type="button" class="shelf-name" @click="openSeries(shelf.seriesId)") {{ shelf.name }}
@@ -298,7 +314,7 @@ function openBook(bookId: string) {
               ZIconography(name="chevron-right" :size="18")
           button(type="button" class="shelf-hero" :aria-label="shelf.name" @click="openSeries(shelf.seriesId)")
             img(
-              :src="withPlaceholder(shelf.cover)"
+              :src="withPlaceholder(sizedImage(shelf.cover, 330))"
               :alt="shelf.name"
               loading="lazy"
               draggable="false"
@@ -314,7 +330,7 @@ function openBook(bookId: string) {
               @click="openBook(book.bookId)"
             )
               img(
-                :src="withPlaceholder(pickLocalizedImage(book.previewImage, lang))"
+                :src="withPlaceholder(sizedImage(pickLocalizedImage(book.previewImage, lang), 100))"
                 :alt="bookTitle(book)"
                 loading="lazy"
                 draggable="false"
@@ -323,7 +339,11 @@ function openBook(bookId: string) {
               span(v-if="isNew(book)" class="new-badge") {{ t('app.read.newBadge') }}
           div(class="shelf-board" aria-hidden="true")
 
-      div(v-if="!shelves.length && !isSearching && !showOffline" class="empty lk-panel")
+      //- while the list is on its way: placeholders in the size of the shelves (never "no series yet", which would be wrong)
+      BookListSkeleton(v-if="showSkeleton" variant="shelves")
+      //- the server did not answer and nothing is kept: a friendly note with a button
+      BookListError(v-else-if="showError" @retry="reload")
+      div(v-else-if="!shelves.length && !isSearching && !showOffline" class="empty lk-panel")
         LkCompanion(class="empty-lamb" :pose="!online ? 'offline' : 'leer'" :size="110")
         template(v-if="!online")
           h2(class="empty-title") {{ t('app.offline.emptyTitle') }}
@@ -331,12 +351,6 @@ function openBook(bookId: string) {
           button(type="button" class="lk-btn lk-btn--outline" @click="reload")
             ZIconography(name="restart" :size="22")
             span {{ t('app.state.reconnect') }}
-        template(v-else-if="apiBooks.state.error")
-          h2(class="empty-title") {{ t('app.state.errorTitle') }}
-          p(class="empty-sub") {{ t('app.state.errorText') }}
-          button(type="button" class="lk-btn" @click="reload")
-            ZIconography(name="restart" :size="22")
-            span {{ t('app.state.retry') }}
         template(v-else)
           h2(class="empty-title") {{ t('app.allBooks.emptyTitle') }}
           p(class="empty-sub") {{ t('app.allBooks.emptySub') }}

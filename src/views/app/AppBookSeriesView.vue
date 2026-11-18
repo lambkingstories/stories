@@ -4,6 +4,7 @@
  * started). A tap on a book opens it.
  */
 import { computed, onMounted } from 'vue'
+import { sizedImage } from '@/utils/sizedImage'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
@@ -124,7 +125,7 @@ function openBook(bookId: string) {
       //- the picture of the series with its name below; the lamb sits on the rim
       div(class="hero lk-panel")
         img(
-          :src="withPlaceholder(heroImage)"
+          :src="withPlaceholder(sizedImage(heroImage, 330))"
           :alt="seriesTitle"
           class="hero-img"
           loading="eager"
@@ -148,7 +149,7 @@ function openBook(bookId: string) {
           )
             span(class="cell-cover")
               img(
-                :src="withPlaceholder(pickLocalizedImage(c.book.previewImage, lang))"
+                :src="withPlaceholder(sizedImage(pickLocalizedImage(c.book.previewImage, lang), 110))"
                 :alt="c.title"
                 loading="lazy"
                 draggable="false"

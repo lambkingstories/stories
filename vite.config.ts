@@ -1,7 +1,7 @@
 import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripDavidFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles, stripGleichnisseFiles, stripZachaeusFiles, stripLetztewocheFiles, stripOsternFiles, stripPfingstenFiles, stripPaulusFiles, stripPaulusromFiles, stripOffenbarungFiles, stripSohnFiles, stripIchbinFiles, stripBergpredigtFiles } from './vite.config.noah'
 import { fileURLToPath, URL } from 'node:url'
 import { resolve, dirname } from 'node:path'
-import { rmSync } from 'node:fs'
+import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 
 import { defineConfig, loadEnv, type Plugin } from 'vite'
@@ -226,6 +226,28 @@ export default defineConfig(({ mode }) => {
   }
   plugins.push(stripLocalTestBooks)
 
+  // The test site (Cloudflare Pages) answers every picture with `max-age=0, must-revalidate`: each visit asks again for every picture. The apps for the stores
+  // (`VITE_APP_NATIVE=true`) read their files from the package and are left as they are. A picture is kept for ten minutes and then shown at once while it is
+  // checked in the background (`stale-while-revalidate`), so a picture that was replaced under its old name still arrives with the next visit.
+  const testSiteHeaders: Plugin = {
+    name: 'test-site-headers',
+    apply: 'build',
+    configResolved(config) {
+      outDir = resolve(config.root, config.build.outDir)
+    },
+    closeBundle() {
+      if (env.VITE_APP_NATIVE === 'true') return
+      const file = resolve(outDir, '_headers')
+      const rules = ['', '/images/*', '  Cache-Control: public, max-age=600, stale-while-revalidate=604800', ''].join(String.fromCharCode(10))
+      try {
+        writeFileSync(file, (existsSync(file) ? readFileSync(file, 'utf8') : '') + rules)
+      } catch {
+        // without the file the host keeps its own default
+      }
+    }
+  }
+  plugins.push(testSiteHeaders)
+
   return {
     base: '/',
     server: {
@@ -261,8 +283,15 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       minify: 'esbuild',
-      // Disable source maps in production if you want maximum protection
-      sourcemap: !shouldObfuscate
+      // Disable source maps in production if you want maximum protection. The apps for the stores (Tauri: `VITE_APP_NATIVE=true`) do not carry
+      // them either: nobody reads them there and they are 16 MB of dead weight in the package (the Pages test app keeps them).
+      sourcemap: !shouldObfuscate && env.VITE_APP_NATIVE !== 'true',
+      // Test site only: the data of all adventures (35 small files, one request each) is one file, so the first screen waits for one answer instead of 35.
+      // In the apps for the stores the files lie in the package and stay as they are.
+      rollupOptions:
+        env.VITE_APP_NATIVE === 'true'
+          ? undefined
+          : { output: { manualChunks: (id: string) => (/\/src\/data\/adventures\/(?!index\.ts)/.test(id) ? 'adventures' : undefined) } }
     }
   }
 })

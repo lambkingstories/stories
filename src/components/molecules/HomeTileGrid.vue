@@ -13,10 +13,16 @@ import ZIconography from '@/components/atoms/ZIconography.vue'
 import useHomeLayout from '@/use/useHomeLayout'
 import { missingTiles, type HomeCard, type HomeTileId } from '@/utils/homeTiles'
 import { onImgFallback } from '@/utils/placeholder'
+import { medalThumb } from '@/utils/medalThumb'
 
 const props = defineProps<{ cards: Partial<Record<HomeTileId, HomeCard>> }>()
 const { t } = useI18n({ useScope: 'global' })
 const { layout, move, resize, remove, add, reset } = useHomeLayout()
+
+/** The blurred copy behind a round medal needs no sharp picture: the small copy of the medal (every adventure medal has one) is enough. */
+function blurSource(src: string): string {
+  return /\/abenteuer\/[^/]+\/medaille[^/]*\.webp$/.test(src) && !/-klein\.webp$/.test(src) ? medalThumb(src) : src
+}
 
 /** How long a finger rests on a tile before arranging starts. */
 const LONG_PRESS_MS = 450
@@ -212,7 +218,7 @@ function resetAll() {
           @click="open(tile.card)"
         )
           span(:class="['resume-thumb', { 'is-medal': tile.card.medal }]")
-            img(v-if="tile.card.medal && tile.card.image" class="resume-blur" :src="tile.card.image" alt="" draggable="false" aria-hidden="true")
+            img(v-if="tile.card.medal && tile.card.image" class="resume-blur" :src="blurSource(tile.card.image)" alt="" draggable="false" aria-hidden="true")
             img(v-if="tile.card.image" class="resume-pic" :src="tile.card.image" alt="" draggable="false" @error="onImgFallback")
             ZIconography(v-else :name="tile.card.icon" :size="40")
             span(class="resume-kind")

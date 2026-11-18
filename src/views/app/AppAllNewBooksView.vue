@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
+import { sizedImage } from '@/utils/sizedImage'
+import BookListSkeleton from '@/components/molecules/BookListSkeleton.vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import LkPageHead from '@/components/molecules/LkPageHead.vue'
@@ -84,13 +86,14 @@ function goBack() {
 
           div(class="book-tile-image")
             img(
-              :src="withPlaceholder(pickLocalizedImage(book.previewImage, lang))"
+              :src="withPlaceholder(sizedImage(pickLocalizedImage(book.previewImage, lang), 160))"
               :alt="localizedTitle(book)"
               class="book-tile-img"
               loading="lazy"
               @error="onImgFallback"
             )
 
+      BookListSkeleton(v-else-if="!apiBooks.state.listReady" variant="grid" :count="6")
       div(
         v-else
         class="empty-card"

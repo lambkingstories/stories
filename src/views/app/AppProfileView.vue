@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import useTheme, { type PaletteName, type ThemeChoice } from '@/use/useTheme'
+import { sizedImage } from '@/utils/sizedImage'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -378,7 +379,7 @@ const tileImg = (path: string) => prependBaseUrl(`images/${path}.webp`)
           )
             div(class="favorites-thumb" @click="openBook(book.bookId)")
               img(
-                :src="withPlaceholder(pickLocalizedImage(book.previewImage, lang))"
+                :src="withPlaceholder(sizedImage(pickLocalizedImage(book.previewImage, lang), 70))"
                 :alt="localizedTitle(book)"
                 class="favorites-thumb-img"
                 loading="lazy"

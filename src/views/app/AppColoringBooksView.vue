@@ -4,6 +4,8 @@
  * painted. A card shows the cover, the title, the number of pictures and, once the child has begun, how many are painted.
  */
 import { computed, onMounted, ref } from 'vue'
+import { sizedImage } from '@/utils/sizedImage'
+import BookListSkeleton from '@/components/molecules/BookListSkeleton.vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import LkPageHead from '@/components/molecules/LkPageHead.vue'
@@ -68,7 +70,7 @@ const cards = computed<Card[]>(() => {
     list.push({
       bookId: book.bookId,
       title: cleanTitle(title),
-      cover: withPlaceholder(pickLocalizedImage(book.previewImage, lang.value)),
+      cover: withPlaceholder(sizedImage(pickLocalizedImage(book.previewImage, lang.value), 170)),
       released: Date.parse(book.releaseDate) || 0,
       total: pages.length,
       done: pages.filter((p) => painted.has(pageArtworkId(p.url, 1))).length,
@@ -110,6 +112,7 @@ function openBook(bookId: string) {
             span(v-if="c.done > 0 && c.total" class="cb-bar")
               span(class="cb-bar-fill" :style="{ width: Math.round((c.done / c.total) * 100) + '%' }")
       p(v-else-if="cards.length" class="cb-empty") {{ t('app.read.ownNone') }}
+      BookListSkeleton(v-else-if="!apiBooks.state.listReady" variant="grid" :count="4")
       p(v-else class="cb-empty") {{ t('app.read.coloringEmpty') }}
 </template>
 

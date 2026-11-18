@@ -5,6 +5,7 @@
  * `storeBooks` and the books of the backend series "Einzelne Bücher".
  */
 import { computed, onMounted, ref } from 'vue'
+import { sizedImage } from '@/utils/sizedImage'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
@@ -76,7 +77,7 @@ const cards = computed<BookCardData[]>(() => {
     series: '',
     title: b.localizations?.[lang.value]?.title || b.localizations?.de?.title || '',
     text: b.localizations?.[lang.value]?.shortDescription || b.localizations?.de?.shortDescription || '',
-    cover: withPlaceholder(pickLocalizedImage(b.previewImage, lang.value)),
+    cover: withPlaceholder(sizedImage(pickLocalizedImage(b.previewImage, lang.value), 280)),
     ratio: 1,
     url: printedBookUrl(b.bookId, pickLocalizedImage(b.etsyLink, lang.value), lang.value) || STORE_URL,
     comingSoon: false,

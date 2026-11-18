@@ -21,7 +21,11 @@ export default {
     reconnect: 'Conectar de nuevo',
     errorTitle: 'Eso no funcionó.',
     errorText: 'No se pudieron cargar las historias.',
-    retry: 'Intentar de nuevo'
+    retry: 'Intentar de nuevo',
+    listLoading: 'Se están cargando los libros …',
+    listFailTitle: 'Los libros no llegan ahora',
+    listFailText: 'Comprueba si tienes conexión. Entonces lo intentamos otra vez.',
+    listFailRetry: 'Otra vez'
   },
   offline: {
     save: 'Guardar para el camino',

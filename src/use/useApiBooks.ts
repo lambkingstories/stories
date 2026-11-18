@@ -13,12 +13,18 @@ import useOfflineStories from '@/use/useOfflineStories'
 import type { ApiBook } from '@/types/apiBook'
 import { localColoringBooks, localColoringBooksMissingFrom } from '@/data/localColoringBooks'
 import { isHiddenBook, isHiddenBookOrSeries } from '@/data/hiddenBooks'
+import { readBookList, writeBookList } from '@/utils/bookListCache'
 
 const state = reactive<{
   byId: Record<string, ApiBook>
   all: ApiBook[] | null
   loading: Record<string, boolean>
   listLoading: boolean
+  /**
+   * The first attempt to get the list is over (the net answered, or failed, or the list kept on the device is there): from now on an
+   * empty shelf means "nothing here" and not "still loading". Screens show placeholders until then.
+   */
+  listReady: boolean
   /** The last try to fetch the list of all books failed (no net, or the server does not answer): the stories kept on the device are shown. */
   listFailed: boolean
   error: string | null
@@ -27,6 +33,7 @@ const state = reactive<{
   all: null,
   loading: {},
   listLoading: false,
+  listReady: false,
   listFailed: false,
   error: null
 })
@@ -135,6 +142,14 @@ async function loadBookUnfiltered(bookId: string): Promise<ApiBook | null> {
   }
 }
 
+/** The books of a list that came from the device or from the net go into the store (a slim entry never replaces a whole book). */
+function takeIntoStore(books: ApiBook[]): void {
+  for (const b of books) {
+    const known = state.byId[b.bookId]
+    if (!(b.lean && known && !known.lean)) state.byId[b.bookId] = b
+  }
+}
+
 async function loadAllBooks(): Promise<ApiBook[]> {
   if (state.listLoading) return state.all ?? []
   state.listLoading = true
@@ -143,12 +158,26 @@ async function loadAllBooks(): Promise<ApiBook[]> {
     const own = localColoringBooks()
     if (own.length) state.all = own
   }
+  // the list of the last visit is there at once, too (the net only refreshes it); it is read while the net is already asked
+  const fromDevice = state.all?.length && state.all.some((b) => !localBookById(b.bookId)) ? null : readBookList()
+  const net = booksApi.list()
+  net.catch(() => undefined)
+  if (fromDevice) {
+    const kept = await Promise.race([fromDevice, net.then(() => null, () => null)])
+    if (kept && !state.all?.some((b) => !localBookById(b.bookId))) {
+      const books = [...kept.books.filter((b) => !isHiddenBookOrSeries(b)), ...localColoringBooksMissingFrom(kept.books)]
+      state.all = books
+      takeIntoStore(books)
+      state.listReady = true
+    }
+  }
   try {
     void offline().init()
-    const remote = (await booksApi.list()).filter((b) => !isHiddenBookOrSeries(b))
+    const remote = (await net).filter((b) => !isHiddenBookOrSeries(b))
     const books = [...remote, ...localColoringBooksMissingFrom(remote)]
     state.all = books
     state.listFailed = false
+    state.listReady = true
     state.error = null
     for (const b of books) {
       // a slim entry (no story text) never replaces a whole book that is already known, and is not kept for offline use:
@@ -158,11 +187,13 @@ async function loadAllBooks(): Promise<ApiBook[]> {
       // a whole book from the list refreshes a copy that is kept already; it does not fill the device with every story of the server
       if (!b.lean && !localBookById(b.bookId) && offline().isStored(b.bookId)) void cache.saveBook(b)
     }
+    void writeBookList(remote)
     return books
   } catch (err) {
     state.error = (err as Error).message
     state.listFailed = true
-    // offline: the books that ship with the app are still there, and the stories kept on the device
+    state.listReady = true
+    // offline: the books that ship with the app are still there (and the list of the last visit, when there is one), and the stories kept on the device
     if (!state.all) state.all = localColoringBooks()
     void hydrateFromDevice()
     return state.all ?? []

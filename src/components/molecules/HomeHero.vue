@@ -85,7 +85,8 @@ onBeforeUnmount(() => {
             class="hero-img"
             draggable="false"
             decoding="async"
-            loading="eager"
+            :loading="i === 0 ? 'eager' : 'lazy'"
+            :fetchpriority="i === 0 ? 'high' : 'low'"
           )
         div(:class="['hero-copy', { 'has-lamb': i === 0 }]")
           LkCompanion(v-if="i === 0" class="hero-lamb" pose="sitzen" :size="84")

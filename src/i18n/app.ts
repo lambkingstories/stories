@@ -2618,7 +2618,11 @@ export default {
         reconnect: 'Connect again',
         errorTitle: 'That did not work.',
         errorText: 'The stories could not be loaded.',
-        retry: 'Try again'
+        retry: 'Try again',
+        listLoading: 'The books are being loaded …',
+        listFailTitle: 'The books are not arriving',
+        listFailText: 'Please check your connection. Then we will try again.',
+        listFailRetry: 'Try again'
       },
       // Stories without a net ("for the road"): the button on the book page and the list "Readable without a net".
       offline: {
@@ -6757,7 +6761,11 @@ export default {
         reconnect: 'Erneut verbinden',
         errorTitle: 'Das hat gerade nicht geklappt.',
         errorText: 'Die Geschichten konnten nicht geladen werden.',
-        retry: 'Erneut versuchen'
+        retry: 'Erneut versuchen',
+        listLoading: 'Die Bücher werden geladen …',
+        listFailTitle: 'Die Bücher kommen gerade nicht an',
+        listFailText: 'Schau bitte, ob du Netz hast. Dann versuchen wir es noch einmal.',
+        listFailRetry: 'Nochmal'
       },
       // Geschichten ohne Netz („Für unterwegs“): der Knopf auf der Buchseite und die Liste „Ohne Netz lesbar“.
       offline: {

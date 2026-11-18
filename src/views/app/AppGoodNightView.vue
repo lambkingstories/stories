@@ -7,6 +7,8 @@
  * The books are sorted by series: first the series are shown as tiles, a tap opens the stories of one series; a search looks in all of them.
  */
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { sizedImage } from '@/utils/sizedImage'
+import BookListSkeleton from '@/components/molecules/BookListSkeleton.vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
@@ -337,7 +339,7 @@ onBeforeUnmount(() => {
         span(class="gn-label") {{ t('app.goodnight.pickSeries') }}
         div(class="gn-tiles")
           button(v-for="g in groups" :key="g.id" type="button" class="gn-tile" @click="openSeries = g.id")
-            img(class="gn-tile-img" :src="withPlaceholder(g.image)" alt="" loading="lazy" draggable="false" @error="onImgFallback")
+            img(class="gn-tile-img" :src="withPlaceholder(sizedImage(g.image, 150))" alt="" loading="lazy" draggable="false" @error="onImgFallback")
             span(class="gn-tile-name") {{ g.name }}
             span(class="gn-tile-sub") {{ t('app.goodnight.storyCount', g.books.length) }}
 
@@ -348,11 +350,12 @@ onBeforeUnmount(() => {
           span {{ t('app.goodnight.allSeries') }}
           span(class="gn-series-title") {{ currentGroup.name }}
         button(v-for="b in (searching || !currentGroup ? stories : currentGroup.books)" :key="b.bookId" type="button" class="gn-story" @click="start(b)")
-          img(class="gn-thumb" :src="withPlaceholder(pickLocalizedImage(b.previewImage, lang))" alt="" loading="lazy" draggable="false" @error="onImgFallback")
+          img(class="gn-thumb" :src="withPlaceholder(sizedImage(pickLocalizedImage(b.previewImage, lang), 64))" alt="" loading="lazy" draggable="false" @error="onImgFallback")
           span(class="gn-story-text")
             span(class="gn-story-series") {{ seriesNameOfBook(b) }}{{ srcOf(b) ? '' : ' · ' + t('app.goodnight.deviceVoice') }}
             span(class="gn-story-title") {{ title(b) }}
           ZIconography(name="chevron-right" :size="22")
+      BookListSkeleton(v-else-if="!apiBooks.state.listReady" variant="grid" :count="6")
       p(v-else class="gn-empty") {{ t('app.goodnight.empty') }}
 
     //- the story is told

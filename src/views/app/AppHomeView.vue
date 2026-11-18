@@ -10,6 +10,8 @@
  * `openExternal`, which asks the parents first. The design is neutral so that other publishers can have shelves, too.
  */
 import { computed, onMounted, ref } from 'vue'
+import { sizedImage } from '@/utils/sizedImage'
+import { medalThumb, onThumbError } from '@/utils/medalThumb'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
@@ -64,8 +66,17 @@ const allBooks = computed<ApiBook[]>(() => (apiBooks.state.all ?? []) as ApiBook
 
 const artworks = ref<ArtworkMeta[]>([])
 
+/**
+ * The list of books is asked for after the first screen is drawn, not before: the start page does not wait for it (the shelves of the
+ * last visit are kept on the device, see `bookListCache`, and the net only refreshes them).
+ */
+function afterFirstScreen(job: () => void) {
+  const idle = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback
+  requestAnimationFrame(() => (idle ? idle(job, { timeout: 250 }) : setTimeout(job, 200)))
+}
+
 onMounted(() => {
-  void apiBooks.loadAllBooks()
+  afterFirstScreen(() => void apiBooks.loadAllBooks())
   listArtworks()
     .then((list) => {
       artworks.value = list
@@ -119,7 +130,7 @@ async function openPlus() {
 // ── the journey through the Bible (a row of medals to open an adventure) ─────
 
 const journeyTiles = computed(() =>
-  inBibleOrder(journeys).map((j) => ({ id: j.id, title: j.title, image: prependBaseUrl(j.medal), plus: isJourneyPlusLocked(j.id) }))
+  inBibleOrder(journeys).map((j) => ({ id: j.id, title: j.title, image: prependBaseUrl(medalThumb(j.medal)), full: prependBaseUrl(j.medal), plus: isJourneyPlusLocked(j.id) }))
 )
 
 function openJourney(id: string) {
@@ -157,7 +168,7 @@ const bookCard = computed<ResumeCard>(() => {
   if (!book) {
     // a real cover; when no story is loaded (yet), the painted picture of the children reading
     const first = newBooks.value.find((b) => !isColoringBook(b)) ?? allBooks.value.find((b) => !isColoringBook(b))
-    const image = first ? withPlaceholder(pickLocalizedImage(first.previewImage, lang.value)) : prependBaseUrl('images/bg/welcome-bg-3.webp')
+    const image = first ? withPlaceholder(sizedImage(pickLocalizedImage(first.previewImage, lang.value), 175)) : prependBaseUrl('images/bg/welcome-bg-3.webp')
     return { id: 'book', kind, title: t('app.home.discoverBook'), meta: t('app.home.pickBook'), image, progress: -1, empty: true, go: () => void router.push({ name: 'app-all-books' }) }
   }
   const total = bookPages(book)
@@ -167,7 +178,7 @@ const bookCard = computed<ResumeCard>(() => {
     kind,
     title: bookTitle(book),
     meta: t('app.read.pageShort', { n: Math.max(1, Math.round(pct * total)), total }),
-    image: withPlaceholder(pickLocalizedImage(book.previewImage, lang.value)),
+    image: withPlaceholder(sizedImage(pickLocalizedImage(book.previewImage, lang.value), 175)),
     progress: pct,
     empty: false,
     go: () => void router.push({ name: 'app-reader', params: { bookId: book.bookId } })
@@ -181,7 +192,7 @@ const pictureCard = computed<ResumeCard>(() => {
   const go = () => void router.push(work ? { name: 'app-coloring', query: { work: work.id } } : { name: 'app-coloring' })
   if (!work) {
     const first = allBooks.value.find((b) => isColoringBook(b))
-    const image = first ? withPlaceholder(pickLocalizedImage(first.previewImage, lang.value)) : ''
+    const image = first ? withPlaceholder(sizedImage(pickLocalizedImage(first.previewImage, lang.value), 175)) : ''
     return { id: 'picture', kind, title: t('app.home.discoverPicture'), meta: t('app.home.pickPicture'), image, progress: -1, empty: true, go }
   }
   return { id: 'picture', kind, title: work.title, meta: t('app.home.begun'), image: work.thumb, progress: -1, empty: false, go }
@@ -350,7 +361,7 @@ function openBook(bookId: string) {
         div(class="journey-row")
           button(v-for="j in journeyTiles" :key="j.id" type="button" class="journey-tile" @click="openJourney(j.id)")
             span(class="journey-art")
-              img(:src="j.image" alt="" draggable="false" loading="lazy")
+              img(:src="j.image" alt="" draggable="false" loading="lazy" @error="(e) => onThumbError(e, j.full)")
               span(v-if="j.plus" class="journey-plus")
                 PlusBadge(size="small")
             span(class="journey-name") {{ j.title }}
@@ -372,7 +383,7 @@ function openBook(bookId: string) {
           )
             span(class="new-cover")
               img(
-                :src="withPlaceholder(pickLocalizedImage(book.previewImage, lang))"
+                :src="withPlaceholder(sizedImage(pickLocalizedImage(book.previewImage, lang), 120))"
                 :alt="bookTitle(book)"
                 loading="lazy"
                 draggable="false"
