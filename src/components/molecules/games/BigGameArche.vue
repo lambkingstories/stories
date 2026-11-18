@@ -1393,6 +1393,7 @@ onBeforeUnmount(() => {
           AdvButton(data-test="arche-resume" @click="paused = false") {{ T('resume') }}
           AdvButton(tone="blau" @click="start(level)") {{ T('again') }}
           AdvButton(tone="blau" @click="toMenu") {{ T('menu') }}
+          AdvButton(tone="blau" data-test="arche-pause-leave" @click="leave") {{ T('leave') }}
 
     //- the end of a round
     div(v-else-if="screen === 'result'" class="ag-menu ag-menu--dim")
@@ -1422,14 +1423,12 @@ onBeforeUnmount(() => {
           img(:src="pic('tier-schaf')" alt="" class="ag-how-img" @error="hideBroken")
           img(:src="pic('tier-schaf')" alt="" class="ag-how-img" @error="hideBroken")
         p(class="ag-how-line") {{ T('howSwap') }}
-        p(class="ag-how-line") {{ T('howRow') }}
         div(class="ag-how-row")
           img(:src="pic('sp-taube')" alt="" class="ag-how-img" @error="hideBroken")
           img(:src="pic('sp-oelzweig')" alt="" class="ag-how-img" @error="hideBroken")
           img(:src="pic('sp-regenbogen')" alt="" class="ag-how-img" @error="hideBroken")
         p(class="ag-how-line") {{ T('howSpecial') }}
         p(class="ag-how-line") {{ T('howGoal') }}
-        p(class="ag-how-line") {{ T('howHelp') }}
         AdvButton(data-test="arche-go" @click="closeHow") {{ T('go') }}
 </template>
 

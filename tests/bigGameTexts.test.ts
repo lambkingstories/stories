@@ -32,8 +32,6 @@ interface Spec {
   hints: string[]
   /** The level names: at most 3 words each. */
   levels: string[]
-  /** Texts that are knowingly longer than the limits (the returned game "arche", texts kept as they were; to be shortened later, Anton decides): the length checks skip it. */
-  longTexts?: boolean
 }
 
 const SPECS: Spec[] = [
@@ -47,7 +45,7 @@ const SPECS: Spec[] = [
   { id: 'mose', component: 'BigGameMose', explain: ['howCut', 'howTap', 'howLotus'], background: ['story'], tasks: ['task', 'chapters.*.task'], chapters: ['chapters.*.story'], hints: ['hint.*', 'splash', 'stuck', 'tipShown'], levels: [] },
   { id: 'bogen', component: 'BigGameBogen', explain: ['howPull', 'howPower', 'howGoal'], background: ['story', 'ending.text'], tasks: ['task', 'chapters.*.task'], chapters: ['chapters.*.story'], hints: ['hint.*', 'tipWait', 'tipNone', 'tooWeak', 'turn'], levels: ['names.*'] },
   { id: 'bezalel', component: 'BigGameBezalel', explain: ['howMove', 'howTurn', 'howFit'], background: ['story'], tasks: ['task', 'chapters.*.task'], chapters: ['chapters.*.story'], hints: ['hint.*', 'tipShown'], levels: ['levels.*'] },
-  { id: 'arche', component: 'BigGameArche', explain: ['howSwap', 'howRow', 'howSpecial'], background: ['story', 'intro'], tasks: ['task', 'chapterTasks.*'], chapters: ['chapterStories.*'], hints: ['tip1', 'tip3', 'tip4', 'tip5', 'tip6', 'tip7', 'tip9', 'tip11', 'tip13', 'tip21', 'tip22', 'bonus', 'flood', 'shuffled', 'hammerHint', 'swapHint'], levels: [], longTexts: true },
+  { id: 'arche', component: 'BigGameArche', explain: ['howSwap', 'howSpecial', 'howGoal'], background: ['story', 'intro'], tasks: ['task', 'chapterTasks.*'], chapters: ['chapterStories.*'], hints: ['tip1', 'tip3', 'tip4', 'tip5', 'tip6', 'tip7', 'tip9', 'tip11', 'tip13', 'tip21', 'tip22', 'bonus', 'flood', 'shuffled', 'hammerHint', 'swapHint'], levels: [] },
   { id: 'wortreise', component: '', explain: [], background: ['sub', 'rule'], tasks: [], chapters: [], hints: ['startHint', 'drawHint', 'freeLetter', 'freeLetterAlone', 'again', 'no', 'noLens', 'letterShown'], levels: [] }
 ]
 
@@ -93,13 +91,11 @@ describe('the texts of the big games are short', () => {
         })
 
         it(`${lang}: the explanation card has at most 3 lines of at most 8 words`, () => {
-          if (spec.longTexts) return
           expect(spec.explain.length).toBeLessThanOrEqual(3)
           for (const k of spec.explain) for (const s of pick(game(), k)) expect(words(s), `${lang} ${spec.id}.${k}: ${s}`).toBeLessThanOrEqual(8)
         })
 
         it(`${lang}: background at most 25 words, task at most 12, chapter at most 15, hint at most 10, level name at most 3`, () => {
-          if (spec.longTexts) return
           const tooLong: string[] = []
           const limit = (paths: string[], max: number, what: string) => {
             for (const p of paths) for (const s of pick(game(), p)) if (words(s) > max) tooLong.push(`${lang} ${spec.id}.${p} (${what}, ${words(s)} words, at most ${max}): ${s}`)
@@ -123,10 +119,10 @@ describe('the texts of the big games are short', () => {
         }
       })
 
-      if (spec.component && !spec.longTexts) {
+      if (spec.component) {
         it('the component shows only the lines of the card (no more than three)', () => {
           const src = readFileSync(resolve(process.cwd(), 'src/components/molecules/games', `${spec.component}.vue`), 'utf8')
-          const used = new Set([...src.matchAll(new RegExp(`${spec.id}\\.(how[A-Z][A-Za-z]*)|TX\\('(how[A-Z][A-Za-z]*)'\\)`, 'g'))].map((m) => m[1] ?? m[2]!))
+          const used = new Set([...src.matchAll(new RegExp(`${spec.id}\\.(how[A-Z][A-Za-z]*)|\\bTX?\\('(how[A-Z][A-Za-z]*)'\\)`, 'g'))].map((m) => m[1] ?? m[2]!))
           used.delete('howTitle')
           expect([...used].sort(), spec.id).toEqual([...spec.explain].sort())
         })

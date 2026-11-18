@@ -117,6 +117,18 @@ describe('BigGameLamm', () => {
     again.unmount()
   })
 
+  it('the pause has a way out of the game (leave the game)', async () => {
+    quiet()
+    const w = await open()
+    await w.find('[data-test="lamm-level-1"]').trigger('click')
+    await w.find('[data-test="lamm-pause"]').trigger('click')
+    const out = w.find('[data-test="lamm-pause-leave"]')
+    expect(out.exists()).toBe(true)
+    await out.trigger('click')
+    expect(w.emitted('leave')).toBeTruthy()
+    w.unmount()
+  })
+
   it('has pause, restart, undo and tip in the game, and the pause leads back to the list', async () => {
     quiet()
     const w = await open()

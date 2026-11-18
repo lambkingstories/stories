@@ -70,6 +70,19 @@ describe('BigGameWasser', () => {
     again.unmount()
   })
 
+  it('the pause has a way out of the game (leave the game)', async () => {
+    localStorage.setItem('lk-biggames-how-v1', JSON.stringify({ wasser: true }))
+    localStorage.setItem('lk-wasser-story-v1', JSON.stringify({ 0: true, 1: true, 2: true }))
+    const w = await open()
+    await w.find('[data-test="wasser-level-1"]').trigger('click')
+    await w.find('[data-test="wasser-pause"]').trigger('click')
+    const out = w.find('[data-test="wasser-pause-leave"]')
+    expect(out.exists()).toBe(true)
+    await out.trigger('click')
+    expect(w.emitted('leave')).toBeTruthy()
+    w.unmount()
+  })
+
   it('has pause, restart and tip in the game, and the pause leads back to the list', async () => {
     localStorage.setItem('lk-biggames-how-v1', JSON.stringify({ wasser: true }))
     localStorage.setItem('lk-wasser-story-v1', JSON.stringify({ 0: true, 1: true, 2: true }))

@@ -925,6 +925,7 @@ onBeforeUnmount(() => {
           AdvButton(data-test="bezalel-resume" @click="paused = false") {{ TX('resume') }}
           AdvButton(tone="blau" data-test="bezalel-pause-again" @click="begin(level)") {{ TX('again') }}
           AdvButton(tone="blau" data-test="bezalel-menu" @click="toMenu") {{ TX('menu') }}
+          AdvButton(tone="blau" data-test="bezalel-pause-leave" @click="leave") {{ TX('leave') }}
 
       //- the end of a round: the painted object, the name, the stars
       div(v-if="result" class="bz-menu bz-menu--dim")

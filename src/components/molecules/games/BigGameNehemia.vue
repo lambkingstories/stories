@@ -784,6 +784,7 @@ onBeforeUnmount(() => {
           AdvButton(data-test="nehemia-resume" @click="paused = false") {{ t('app.bigGames.nehemia.resume') }}
           AdvButton(tone="blau" data-test="nehemia-pause-again" @click="begin(level)") {{ t('app.bigGames.nehemia.again') }}
           AdvButton(tone="blau" data-test="nehemia-menu" @click="toMenu") {{ t('app.bigGames.nehemia.menu') }}
+          AdvButton(tone="blau" data-test="nehemia-pause-leave" @click="leave") {{ t('app.bigGames.nehemia.leave') }}
 
     //- the end of a round
     div(v-else-if="screen === 'result'" class="nm-menu nm-menu--dim")

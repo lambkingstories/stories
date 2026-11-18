@@ -53,7 +53,7 @@ describe('BigGameArche', () => {
     // the story of the game and of the chapter, and the task
     expect(w.text()).toContain('Noah hat die Arche gebaut')
     expect(w.text()).toContain('Deine Aufgabe:')
-    expect(w.find('.ag-story').text()).toContain('Arche bauen')
+    expect(w.find('.ag-story').text()).toContain('Baue eine Arche')
     w.unmount()
   })
 
@@ -95,6 +95,18 @@ describe('BigGameArche', () => {
     expect(w.findAll('.ag-goal')).toHaveLength(LEVELS[0]!.goals.length)
     expect(w.find('.ag-moves-n').text()).toBe(String(LEVELS[0]!.moves))
     expect(w.findAll('.ag-boost-btn')).toHaveLength(3)
+    w.unmount()
+  })
+
+  it('the pause has a way out of the game (leave the game)', async () => {
+    const w = await open()
+    await w.find('[data-test="arche-level-1"]').trigger('click')
+    await w.find('[data-test="arche-go"]').trigger('click')
+    await w.find('[data-test="arche-pause"]').trigger('click')
+    const out = w.find('[data-test="arche-pause-leave"]')
+    expect(out.exists()).toBe(true)
+    await out.trigger('click')
+    expect(w.emitted('leave')).toBeTruthy()
     w.unmount()
   })
 

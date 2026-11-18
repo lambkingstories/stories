@@ -66,6 +66,18 @@ describe('BigGameDavid', () => {
     again.unmount()
   })
 
+  it('the pause has a way out of the game (leave the game)', async () => {
+    const w = await open()
+    await w.findAll('.dg-level')[0]!.trigger('click')
+    await w.find('[data-test="david-go"]').trigger('click')
+    await w.find('button[aria-label="Pause"]').trigger('click')
+    const out = w.find('[data-test="david-pause-leave"]')
+    expect(out.exists()).toBe(true)
+    await out.trigger('click')
+    expect(w.emitted('leave')).toBeTruthy()
+    w.unmount()
+  })
+
   it('tells about Goliath once before his level, never at the other levels', async () => {
     localStorage.setItem('lk-biggames-how-v1', JSON.stringify({ david: true }))
     const w = await open()

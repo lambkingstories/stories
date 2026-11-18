@@ -77,6 +77,18 @@ describe('BigGameNehemia', () => {
     w.unmount()
   })
 
+  it('the pause has a way out of the game (leave the game)', async () => {
+    const w = await open()
+    await w.find('[data-test="nehemia-level-3"]').trigger('click')
+    await w.find('[data-test="nehemia-go"]').trigger('click')
+    await w.find('[data-test="nehemia-pause"]').trigger('click')
+    const out = w.find('[data-test="nehemia-pause-leave"]')
+    expect(out.exists()).toBe(true)
+    await out.trigger('click')
+    expect(w.emitted('leave')).toBeTruthy()
+    w.unmount()
+  })
+
   it('pauses and resumes', async () => {
     const w = await open()
     await w.find('[data-test="nehemia-level-3"]').trigger('click')

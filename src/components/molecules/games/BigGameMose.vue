@@ -1162,6 +1162,7 @@ onBeforeUnmount(() => {
           AdvButton(data-test="mose-resume" @click="paused = false") {{ t('app.bigGames.mose.resume') }}
           AdvButton(tone="blau" data-test="mose-pause-again" @click="begin(level)") {{ t('app.bigGames.mose.again') }}
           AdvButton(tone="blau" data-test="mose-menu" @click="toMenu") {{ t('app.bigGames.mose.menu') }}
+          AdvButton(tone="blau" data-test="mose-pause-leave" @click="leave") {{ t('app.bigGames.mose.leave') }}
 
     //- the end of a round
     div(v-else-if="screen === 'result'" class="mk-menu mk-menu--dim")

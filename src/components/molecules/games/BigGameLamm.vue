@@ -1366,6 +1366,7 @@ onBeforeUnmount(() => {
           AdvButton(data-test="lamm-resume" @click="paused = false") {{ t('app.bigGames.lamm.resume') }}
           AdvButton(tone="blau" data-test="lamm-pause-again" @click="begin(level)") {{ t('app.bigGames.lamm.again') }}
           AdvButton(tone="blau" data-test="lamm-menu" @click="toMenu") {{ t('app.bigGames.lamm.menu') }}
+          AdvButton(tone="blau" data-test="lamm-pause-leave" @click="leave") {{ t('app.bigGames.lamm.leave') }}
 
     //- the end of a round
     div(v-else-if="screen === 'result'" class="lg-menu lg-menu--dim")

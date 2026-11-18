@@ -79,6 +79,21 @@ describe('BigGameKarawane', () => {
     w.unmount()
   })
 
+  it('the pause has a way out of the game (leave the game)', async () => {
+    localStorage.setItem('lk-biggames-how-v1', JSON.stringify({ karawane: true }))
+    const w = await open()
+    await w.find('[data-test="karawane-route-2"]').trigger('click')
+    await flushPromises()
+    await w.find('[data-test="karawane-story-go"]').trigger('click')
+    await flushPromises()
+    await w.find('.kg-pause').trigger('click')
+    const out = w.find('[data-test="karawane-pause-leave"]')
+    expect(out.exists()).toBe(true)
+    await out.trigger('click')
+    expect(w.emitted('leave')).toBeTruthy()
+    w.unmount()
+  })
+
   it('pauses, goes on, and leaves to the routes', async () => {
     localStorage.setItem('lk-biggames-how-v1', JSON.stringify({ karawane: true }))
     const w = await open()
@@ -89,7 +104,7 @@ describe('BigGameKarawane', () => {
     await w.find('.kg-pause').trigger('click')
     expect(w.text()).toContain('Pause')
     const buttons = w.findAll('.kg-card--small button')
-    await buttons[buttons.length - 1]!.trigger('click')
+    await buttons[buttons.length - 2]!.trigger('click')
     expect(w.findAll('.kg-route')).toHaveLength(6)
     w.unmount()
   })

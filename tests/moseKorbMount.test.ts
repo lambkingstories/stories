@@ -89,6 +89,18 @@ describe('BigGameMose', () => {
     w.unmount()
   })
 
+  it('the pause has a way out of the game (leave the game)', async () => {
+    const w = await open()
+    await w.find('[data-test="mose-level-3"]').trigger('click')
+    await w.find('[data-test="mose-go"]').trigger('click')
+    await w.find('[data-test="mose-pause"]').trigger('click')
+    const out = w.find('[data-test="mose-pause-leave"]')
+    expect(out.exists()).toBe(true)
+    await out.trigger('click')
+    expect(w.emitted('leave')).toBeTruthy()
+    w.unmount()
+  })
+
   it('pauses, resumes, restarts and gives a tip', async () => {
     const w = await open()
     await w.find('[data-test="mose-level-3"]').trigger('click')

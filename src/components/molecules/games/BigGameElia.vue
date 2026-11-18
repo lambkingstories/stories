@@ -1034,6 +1034,7 @@ onBeforeUnmount(() => {
             AdvButton(@click="paused = false") {{ t('app.bigGames.elia.resume') }}
             AdvButton(tone="blau" @click="start(level)") {{ t('app.bigGames.elia.again') }}
             AdvButton(tone="blau" @click="toMenu") {{ t('app.bigGames.elia.menu') }}
+            AdvButton(tone="blau" data-test="elia-pause-leave" @click="leave") {{ t('app.bigGames.elia.leave') }}
 
       //- the end of a round
       div(v-else-if="screen === 'result'" class="eg-menu eg-menu--dim")

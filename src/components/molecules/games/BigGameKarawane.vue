@@ -1335,6 +1335,7 @@ onBeforeUnmount(() => {
           AdvButton(@click="paused = false") {{ t('app.bigGames.karawane.resume') }}
           AdvButton(tone="blau" @click="start(route)") {{ t('app.bigGames.karawane.again') }}
           AdvButton(tone="blau" @click="toMenu") {{ t('app.bigGames.karawane.menu') }}
+          AdvButton(tone="blau" data-test="karawane-pause-leave" @click="leave") {{ t('app.bigGames.karawane.leave') }}
 
     //- the end of a round
     div(v-else-if="screen === 'result'" class="kg-menu kg-menu--dim")

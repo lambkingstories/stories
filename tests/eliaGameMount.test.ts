@@ -97,6 +97,20 @@ describe('BigGameElia', () => {
     m.unmount()
   })
 
+  it('the pause has a way out of the game (leave the game)', async () => {
+    const w = await open()
+    await w.find('[data-test="elia-level-0"]').trigger('click')
+    await w.find('[data-test="elia-go"]').trigger('click')
+    await w.find('[data-test="elia-world-go"]').trigger('click')
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    await flushPromises()
+    const out = w.find('[data-test="elia-pause-leave"]')
+    expect(out.exists()).toBe(true)
+    await out.trigger('click')
+    expect(w.emitted('leave')).toBeTruthy()
+    w.unmount()
+  })
+
   it('pauses with the escape key and goes on', async () => {
     const w = await open()
     await w.find('[data-test="elia-level-0"]').trigger('click')

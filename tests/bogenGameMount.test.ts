@@ -112,6 +112,19 @@ describe('BigGameBogen', () => {
     w.unmount()
   })
 
+  it('the pause has a way out of the game (leave the game)', async () => {
+    const w = await open()
+    await w.find('[data-test="bogen-level-0"]').trigger('click')
+    await w.find('[data-test="bogen-go"]').trigger('click')
+    await w.find('[data-test="bogen-chapter-go"]').trigger('click')
+    await w.find('[data-test="bogen-pause"]').trigger('click')
+    const out = w.find('[data-test="bogen-pause-leave"]')
+    expect(out.exists()).toBe(true)
+    await out.trigger('click')
+    expect(w.emitted('leave')).toBeTruthy()
+    w.unmount()
+  })
+
   it('pause stops the game and restart gives all arrows back', async () => {
     const w = await open()
     await w.find('[data-test="bogen-level-0"]').trigger('click')

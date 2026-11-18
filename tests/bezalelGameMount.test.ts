@@ -67,6 +67,19 @@ describe('BigGameBezalel', () => {
     w.unmount()
   })
 
+  it('the pause has a way out of the game (leave the game)', async () => {
+    const w = await open()
+    await w.find('[data-test="bezalel-level-0"]').trigger('click')
+    await w.find('[data-test="bezalel-go"]').trigger('click')
+    await w.find('[data-test="bezalel-chapter-go"]').trigger('click')
+    await w.find('[data-test="bezalel-pause"]').trigger('click')
+    const out = w.find('[data-test="bezalel-pause-leave"]')
+    expect(out.exists()).toBe(true)
+    await out.trigger('click')
+    expect(w.emitted('leave')).toBeTruthy()
+    w.unmount()
+  })
+
   it('shows the explanation once, then the story of the chapter, then plays; the pause and the way back work', async () => {
     const w = await open()
     await w.find('[data-test="bezalel-level-0"]').trigger('click')
