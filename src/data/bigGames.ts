@@ -3,7 +3,7 @@
  * How they open (Anton, 17.11.2026): for every full `STEP` stars on the adventures (the stars of all stages together) the child may pick
  * one game it wants to play, and it picks which one (see `utils/bigGames.ts` and `use/useGameWishes.ts`). The choice is for good.
  */
-export type BigGameId = 'david' | 'elia' | 'wasser' | 'karawane' | 'nehemia' | 'memory' | 'lamm' | 'mose' | 'bogen' | 'toepfer' | 'bezalel'
+export type BigGameId = 'david' | 'elia' | 'wasser' | 'karawane' | 'nehemia' | 'memory' | 'lamm' | 'mose' | 'bogen' | 'arche' | 'bezalel'
 
 /**
  * The stars of all adventures together that give one wish for a game. 40 stars: with about 300 stars (the nine adventures of the store
@@ -36,8 +36,8 @@ export const BIG_GAMES: BigGame[] = [
   { id: 'karawane', image: 'images/spiele-gross/karawane/kachel.webp', maxStars: 18 },
   // the archery game of Jonathan's arrows: 44 levels in 4 chapters, wind, ropes, switches, bounces (see `utils/bogenGame.ts`)
   { id: 'bogen', image: 'images/spiele-gross/bogen/kachel-2.webp', maxStars: 132 },
-  // the pottery game of Jeremiah 18: form the clay on the wheel like the template, fire and paint it, 30 vessels in 5 chapters (see `utils/toepferGame.ts`)
-  { id: 'toepfer', image: 'images/spiele-gross/toepfer/kachel.webp', maxStars: 90 },
+  // the match-3 game of the animal pairs on Noah's ark: 60 levels in 6 chapters, special stones, obstacles, helpers (see `utils/archeGame.ts`)
+  { id: 'arche', image: 'images/spiele-gross/arche/kachel.webp', maxStars: 180 },
   // the tangram game of Bezalel's workshop (Exodus 31, 25 to 40): seven pieces into a dark outline, 40 objects of the tabernacle in 4 chapters (see `utils/bezalelGame.ts`)
   { id: 'bezalel', image: 'images/spiele-gross/bezalel/kachel.webp', maxStars: 120 }
 ]
