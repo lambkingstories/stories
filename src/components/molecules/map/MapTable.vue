@@ -71,7 +71,7 @@ const toggleSfx = () => sound.setSfxVolume(sound.sfxVolume.value > 0 ? 0 : DEFAU
   display: flex
   align-items: center
   gap: 12px
-  padding: max(10px, env(safe-area-inset-top)) 14px 6px
+  padding: max(10px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 6px max(14px, env(safe-area-inset-left))
 
 .mt-back, .mt-round
   flex: none
@@ -121,8 +121,8 @@ const toggleSfx = () => sound.setSfxVolume(sound.sfxVolume.value > 0 ? 0 : DEFAU
 @media (max-width: 440px)
   .mt-top
     gap: 8px
-    padding-left: 10px
-    padding-right: 10px
+    padding-left: max(10px, env(safe-area-inset-left))
+    padding-right: max(10px, env(safe-area-inset-right))
 
   .mt-title
     font-size: 1.1rem
@@ -140,5 +140,5 @@ const toggleSfx = () => sound.setSfxVolume(sound.sfxVolume.value > 0 ? 0 : DEFAU
   // a card that is turned (3D) reaches over the board for a moment: the scroll bar must not come and go and push the whole board aside
   scrollbar-gutter: stable both-edges
   -webkit-overflow-scrolling: touch
-  padding: 4px 14px max(18px, env(safe-area-inset-bottom))
+  padding: 4px max(14px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left))
 </style>

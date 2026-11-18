@@ -107,3 +107,23 @@ describe('the touch areas of the table of the family games are at least 44 px (a
   })
 })
 
+describe('the table of the family games keeps clear of the notch when the phone is held wide', () => {
+  it('top bar and body leave room for the left and the right safe area', () => {
+    const css = src('src/components/molecules/map/MapTable.vue')
+    expect(css).toContain('env(safe-area-inset-left)')
+    expect(css).toContain('env(safe-area-inset-right)')
+    expect(css).not.toMatch(/padding-left: 10px/)
+  })
+})
+
+describe('the order race: the choice of the adventure is a 44 px field', () => {
+  it('no fixed 40 px height', () => {
+    const css = src('src/views/app/AppFamilyOrderView.vue').replace(/\r/g, '')
+    const at = css.indexOf('\n.fo-select\n')
+    expect(at).toBeGreaterThan(-1)
+    const block = css.slice(at, css.indexOf('\n\n', at + 2))
+    expect(block).toMatch(/min-height: 44px/)
+    expect(block).not.toMatch(/\n  height: 40px/)
+  })
+})
+
