@@ -33,6 +33,8 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
+        env:
+          ONNXRUNTIME_NODE_INSTALL_CUDA: skip
 
       - name: Type-check server
         run: pnpm --filter little-bible-stories-server type-check

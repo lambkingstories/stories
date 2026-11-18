@@ -6,7 +6,7 @@ services:
     plan: starter
     branch: main
     rootDir: .
-    buildCommand: npm install -g pnpm@10.6.2 && pnpm install --no-frozen-lockfile && pnpm --filter little-bible-stories-adminui build && pnpm --filter little-bible-stories-server build:prod
+    buildCommand: npm install -g pnpm@10.6.2 && ONNXRUNTIME_NODE_INSTALL_CUDA=skip pnpm install --no-frozen-lockfile && pnpm --filter little-bible-stories-adminui build && pnpm --filter little-bible-stories-server build:prod
     startCommand: cd server && node dist/index.js
     healthCheckPath: /healthz
     autoDeploy: true
