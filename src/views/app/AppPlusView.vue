@@ -18,7 +18,7 @@ import { isIOS } from '@/utils/platform'
 import { openExternal } from '@/utils/openExternal'
 import { prependBaseUrl } from '@/utils/function'
 
-const { t } = useI18n({ useScope: 'global' })
+const { t, te } = useI18n({ useScope: 'global' })
 const router = useRouter()
 const { plusOn, setTestPlus } = usePremium()
 
@@ -36,6 +36,18 @@ onMounted(() => {
 const priceOf = (plan: 'year' | 'month' | 'familyYear' | 'familyMonth') => prices.value[plan] ?? plusOffer[plan]
 const manageUrl = computed(() => (isIOS ? MANAGE_URL.ios : MANAGE_URL.android))
 const busy = computed(() => status.value === 'purchasing')
+
+/** The short points of a card (`app.plus.card<N>Point<K>`), one line each. The point about one purchase for five people is left out where the family plan is not offered (Android). */
+function pointsOf(n: number): string[] {
+  const out: string[] = []
+  for (let k = 1; k <= 5; k++) {
+    const key = `app.plus.card${n}Point${k}`
+    if (!te(key)) break
+    if (n === 3 && k === 4 && !PLUS_FAMILY) continue
+    out.push(t(key))
+  }
+  return out
+}
 
 const img = (path: string) => prependBaseUrl(`images/${path}.webp`)
 /** What Plus brings, as four big cards (the texts are `app.plus.card<N>Title` / `card<N>Text`): the painted symbol of the part of the app and its own colour. */
@@ -70,7 +82,10 @@ const hero = img('bg/willkommen-plus-3')
             img(:src="c.icon" alt="" draggable="false")
           div(class="plus-card-text")
             h3 {{ t(`app.plus.card${c.n}Title`) }}
-            p {{ t(`app.plus.card${c.n}Text`) }}
+            //- the points, one short line each (the long text stays as a fallback)
+            ul(v-if="pointsOf(c.n).length" class="plus-card-points")
+              li(v-for="(pt, i) in pointsOf(c.n)" :key="i") {{ pt }}
+            p(v-else) {{ t(`app.plus.card${c.n}Text`) }}
 
       //- the prices with the buttons (what the stores ask for stays together: price, period, the buttons)
       h2(class="plus-h") {{ t('app.plus.priceTitle') }}
@@ -227,6 +242,37 @@ const hero = img('bg/willkommen-plus-3')
     font-size: 1rem
     line-height: 1.4
     color: #3d3320
+
+// the points of a card: a short line each, with a small golden check, bigger than the old running text
+.plus-card-points
+  margin: 0
+  padding: 0
+  list-style: none
+  display: grid
+  gap: 5px
+
+  li
+    position: relative
+    padding-left: 24px
+    font-size: 1.02rem
+    font-weight: 600
+    line-height: 1.3
+    color: #2f2410
+
+    &::before
+      content: '✓'
+      position: absolute
+      left: 0
+      top: 0
+      width: 18px
+      height: 18px
+      border-radius: 50%
+      background: rgba(255, 255, 255, 0.85)
+      color: #8a5d0a
+      font-size: 0.75rem
+      font-weight: 900
+      line-height: 18px
+      text-align: center
 
 .plus-card-icon
   flex: none
