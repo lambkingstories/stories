@@ -136,7 +136,7 @@ describe('BigGameWasser', () => {
     const w = await open()
     await w.find('[data-test="wasser-level-0"]').trigger('click')
     expect(w.find('[data-test="wasser-story-go"]').exists()).toBe(true)
-    expect(w.text()).toContain('Mose')
+    expect(w.text()).toContain('Hiskia')
     expect(w.text()).toContain('Deine Aufgabe')
     await w.find('[data-test="wasser-story-go"]').trigger('click')
     expect(w.find('[data-test="wasser-story-go"]').exists()).toBe(false)

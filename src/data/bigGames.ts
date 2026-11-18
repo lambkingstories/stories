@@ -24,7 +24,7 @@ export const BIG_GAMES: BigGame[] = [
   // the memory with the pictures of the adventures: one board for each of the 37 adventures on the time line, three stars each (see `utils/bilderMemory.ts`)
   { id: 'memory', image: 'images/spiele-gross/memory/kachel-2.webp', maxStars: 111 },
   { id: 'elia', image: 'images/spiele-gross/elia/kachel.webp', maxStars: 45 },
-  { id: 'wasser', image: 'images/spiele-gross/wasser/kachel.webp', maxStars: 108 },
+  { id: 'wasser', image: 'images/spiele-gross/wasser/kachel-hiskia.webp', maxStars: 108 },
   // the catapult game in the manner of the birds-and-towers games: 36 levels in 4 chapters, jars with abilities, soldiers, beams that fall (see `utils/gideonSim.ts`)
   { id: 'gideon', image: 'images/spiele-gross/gideon/kachel-3.webp', maxStars: 108 },
   // the rope puzzle in the style of Cut the Rope: Moses' basket, 40 levels in 4 chapters (see `utils/moseKorbGame.ts`)

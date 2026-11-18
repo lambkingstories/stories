@@ -7,27 +7,27 @@ export default {
     goalPending: 'Das Gefäß ist voll! Grabe noch zu den Blumen.',
     tipDone: 'Du bist auf dem richtigen Weg. Warte kurz!',
     story: [
-      { text: 'Das Volk hat Durst in der Wüste. Gott sagt zu Mose: Schlag auf den Felsen!',
-        task: 'Grabe einen Weg zum Krug.' },
+      { text: 'Feinde kommen nach Jerusalem. Hiskia leitet das Wasser durch einen Tunnel in die Stadt.',
+        task: 'Grabe den Tunnel zum Teich.' },
       { text: 'Es hat lange nicht geregnet. Elia betet, und eine kleine Wolke steigt auf.',
         task: 'Leite den Regen in das Gefäß.' },
       { text: 'Isaak gräbt die Brunnen seines Vaters neu. Rebekka und Rahel tränken Kamele und Schafe.',
         task: 'Grabe Wege zu Brunnen und Tränke.' }
     ],
     worlds: [
-      { name: 'Wasser aus dem Felsen', ref: '2. Mose 17,1–7' },
+      { name: 'Hiskias Tunnel', ref: '2. Könige 20,20' },
       { name: 'Der Regen kommt', ref: '1. Könige 18,41–46' },
       { name: 'Am Brunnen', ref: '1. Mose 24 und 29' }
     ],
     levels: [
-      'Der erste Graben', 'Um den Felsen', 'Durstige Blumen', 'Der rutschende Sand', 'Zwei Wege', 'Der Salzsee', 'Der Sumpf', 'Zwei Quellen', 'Tor und Schwimmer', 'Der lange Umweg', 'Das Wasserrad', 'Refidim',
+      'Der erste Hieb', 'Um den Felsen', 'Durstige Blumen', 'Der rutschende Sand', 'Zwei Stollen', 'Salz im Fels', 'Nasser Lehm', 'Zwei Zuflüsse', 'Tor und Schwimmer', 'Der lange Stollen', 'Das Wasserrad', 'Der Teich',
       'Die Dürre', 'Die kleine Wolke', 'Hang am Karmel', 'Rinnsal im Sand', 'Das Wasserloch', 'Dornen am Hang', 'Die zweite Wolke', 'Der Salzsumpf', 'Das alte Tor', 'Siebenmal schauen', 'Der Sturzbach', 'Es regnet!',
       'Isaak gräbt wieder', 'Rebekka am Brunnen', 'Kamele trinken', 'Der tiefe Brunnen', 'Die Hirten warten', 'Der große Stein', 'Jakobs Stein', 'Rahels Schafe', 'Der versiegte Brunnen', 'Rehobot', 'Beerscheba', 'Brunnen der Väter'
     ],
     starRules: 'Ein Stern: Gefäß voll. Zwei: alle Blumen blühen. Drei: wenig verschüttet.',
     howTitle: 'So geht es',
     howDig: 'Wische durch die Erde.',
-    howJar: 'Fülle den Krug bis zur Marke.',
+    howJar: 'Fülle das Gefäß bis zur Marke.',
     howFlowers: 'Gib den Blumen Wasser.',
     go: 'Los!',
     pause: 'Pause',
@@ -69,27 +69,27 @@ export default {
     goalPending: 'The vessel is full! Dig on to the flowers.',
     tipDone: 'You are on the right way. Wait a moment!',
     story: [
-      { text: 'The people of Israel are thirsty in the desert. God tells Moses: Strike the rock!',
-        task: 'Dig a way to the jug.' },
+      { text: 'Enemies are coming to Jerusalem. Hezekiah leads the water through a tunnel into the city.',
+        task: 'Dig the tunnel to the pool.' },
       { text: 'It has not rained for long. Elijah prays, and a little cloud rises.',
         task: 'Lead the rain into the vessel.' },
       { text: 'Isaac digs his father\'s wells again. Rebekah and Rachel water camels and sheep.',
         task: 'Dig ways to the wells and troughs.' }
     ],
     worlds: [
-      { name: 'Water from the Rock', ref: 'Exodus 17:1–7' },
+      { name: 'Hezekiah’s Tunnel', ref: '2 Kings 20:20' },
       { name: 'The Rain Is Coming', ref: '1 Kings 18:41–46' },
       { name: 'At the Well', ref: 'Genesis 24 and 29' }
     ],
     levels: [
-      'The first ditch', 'Around the rock', 'Thirsty flowers', 'The sliding sand', 'Two ways', 'The salt lake', 'The swamp', 'Two springs', 'Gate and float', 'The long detour', 'The water wheel', 'Rephidim',
+      'The first blow', 'Around the rock', 'Thirsty flowers', 'The sliding sand', 'Two tunnels', 'Salty rock', 'Wet clay', 'Two streams', 'Gate and float', 'The long tunnel', 'The water wheel', 'The pool',
       'The drought', 'The little cloud', 'Slope of Carmel', 'Sandy trickle', 'The waterhole', 'Thorny slope', 'The second cloud', 'The salt marsh', 'The old gate', 'Looking seven times', 'The torrent', 'It is raining!',
       'Isaac digs again', 'Rebekah’s well', 'Thirsty camels', 'The deep well', 'The shepherds wait', 'The great stone', 'Jacob\'s stone', 'Rachel\'s sheep', 'The dry well', 'Rehoboth', 'Beersheba', 'Fathers\' wells'
     ],
     starRules: 'One star: vessel full. Two: all flowers bloom. Three: little water spilled.',
     howTitle: 'How to play',
     howDig: 'Swipe through the earth.',
-    howJar: 'Fill the jug up to the mark.',
+    howJar: 'Fill the vessel up to the mark.',
     howFlowers: 'Give the flowers water.',
     go: 'Go!',
     pause: 'Pause',
@@ -131,27 +131,27 @@ export default {
     goalPending: '¡La vasija está llena! Cava hasta las flores.',
     tipDone: 'Vas bien. ¡Espera un momento!',
     story: [
-      { text: 'El pueblo tiene sed en el desierto. Dios dice a Moisés: ¡Golpea la roca!',
-        task: 'Cava un camino hasta la jarra.' },
+      { text: 'Vienen enemigos a Jerusalén. Ezequías lleva el agua por un túnel hasta la ciudad.',
+        task: 'Cava el túnel hasta el estanque.' },
       { text: 'Hace mucho que no llueve. Elías ora y sube una pequeña nube.',
         task: 'Lleva la lluvia hasta la vasija.' },
       { text: 'Isaac cava de nuevo los pozos. Rebeca y Raquel dan de beber.',
         task: 'Cava caminos hasta el pozo y el abrevadero.' }
     ],
     worlds: [
-      { name: 'Agua de la roca', ref: 'Éxodo 17:1–7' },
+      { name: 'El túnel de Ezequías', ref: '2 Reyes 20:20' },
       { name: 'Viene la lluvia', ref: '1 Reyes 18:41–46' },
       { name: 'En el pozo', ref: 'Génesis 24 y 29' }
     ],
     levels: [
-      'La primera zanja', 'Rodear la roca', 'Flores sedientas', 'Arena resbaladiza', 'Dos caminos', 'El lago salado', 'El pantano', 'Dos manantiales', 'Puerta y flotador', 'El largo rodeo', 'Rueda de agua', 'Refidim',
+      'El primer golpe', 'Rodear la roca', 'Flores sedientas', 'Arena resbaladiza', 'Dos túneles', 'Roca salada', 'Arcilla mojada', 'Dos arroyos', 'Puerta y flotador', 'El túnel largo', 'Rueda de agua', 'El estanque',
       'La sequía', 'La pequeña nube', 'Ladera del Carmelo', 'Hilo de agua', 'El abrevadero', 'Ladera de espinas', 'La segunda nube', 'La marisma salada', 'La puerta vieja', 'Mirar siete veces', 'El torrente', '¡Llueve!',
       'Isaac cava', 'Pozo de Rebeca', 'Camellos sedientos', 'El pozo profundo', 'Los pastores esperan', 'La gran piedra', 'Piedra de Jacob', 'Ovejas de Raquel', 'El pozo seco', 'Rehobot', 'Beerseba', 'Pozos antiguos'
     ],
     starRules: 'Una estrella: vasija llena. Dos: todas las flores. Tres: casi sin derramar.',
     howTitle: 'Cómo se juega',
     howDig: 'Pasa el dedo por la tierra.',
-    howJar: 'Llena la jarra hasta la marca.',
+    howJar: 'Llena el recipiente hasta la marca.',
     howFlowers: 'Da agua a las flores.',
     go: '¡Vamos!',
     pause: 'Pausa',

@@ -32,7 +32,7 @@ export const WOOD = 6
 /** The wall of the vessel (jar, trough, well): cannot be dug. */
 export const WALL = 7
 
-export type VesselKind = 'krug' | 'trog' | 'brunnen' | 'becken'
+export type VesselKind = 'krug' | 'trog' | 'brunnen' | 'becken' | 'teich'
 export type SensorKind = 'float' | 'wheel'
 export type Mechanic = 'dig' | 'rock' | 'plants' | 'sand' | 'salt' | 'mud' | 'sources' | 'gate' | 'wheel' | 'cloud' | 'pressure' | 'thorn' | 'mix'
 export type Pt = [number, number]

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * "Wasser für das Volk": the big game (rules and physics in `utils/wasserGame.ts`, the levels in `utils/wasserLevels.ts`; this file draws it and takes the touch).
- * The finger digs through earth and sand, the water runs down the way that is dug into the vessel. Three worlds (Moses in the desert, Elijah and the rain, the
+ * The finger digs through earth and sand, the water runs down the way that is dug into the vessel. Three worlds (Hezekiah's tunnel to the Pool of Siloam, Elijah and the rain, the
  * wells of the fathers). The field is 2:3; it is fitted into the screen (upright or turned).
  *
  * Drawing: the earth is one picture (a canvas, cut out of the painted textures with soft edges and redrawn only where something changed), the water another
@@ -29,14 +29,16 @@ const ID = 'wasser'
 // ── the pictures ────────────────────────────────────────────────────────────────────────────────────────────────────────────
 const TILES = ['erde-1', 'erde-2', 'erde-3', 'fels-1', 'fels-2', 'fels-3', 'sand', 'schlamm', 'salz', 'holz', 'ton', 'stein']
 const SPRITES = [
-  'bg-mose', 'bg-elia', 'bg-vaeter', 'krug', 'trog', 'brunnen', 'becken', 'rad', 'hebel-aus', 'hebel-an', 'quelle', 'wolke',
-  'fels-zu', 'fels-auf', 'stab', 'detail-1', 'detail-2', 'detail-3', 'detail-4', 'detail-5', 'detail-6', 'detail-7', 'detail-8',
+  'bg-hiskia', 'bg-elia', 'bg-vaeter', 'krug', 'trog', 'brunnen', 'becken', 'teich', 'rad', 'hebel-aus', 'hebel-an', 'quelle', 'wolke',
+  'gihon', 'hacke', 'detail-1', 'detail-2', 'detail-3', 'detail-4', 'detail-5', 'detail-6', 'detail-7', 'detail-8',
   'blume-1-durstig', 'blume-1-bluehend', 'dorn-1-durstig', 'dorn-1-bluehend', 'blume-2-durstig', 'blume-2-bluehend', 'dorn-2-durstig', 'dorn-2-bluehend', 'blume-3-durstig', 'blume-3-bluehend', 'dorn-3-durstig', 'dorn-3-bluehend'
 ]
 const img: Record<string, HTMLImageElement | undefined> = {}
 const loaded = ref(false)
 const glow = new Image()
 glow.src = prependBaseUrl('images/abenteuer/ui/sternglanz.webp')
+/** Pictures that were painted anew for the tunnel world keep their key in the code but have a new file name (old copies in the caches never show). */
+const FILE: Record<string, string> = { 'erde-1': 'erde-hiskia', 'fels-1': 'fels-hiskia' }
 const pic = (n: string) => prependBaseUrl(`images/spiele-gross/wasser/${n}.webp`)
 
 function loadImage(n: string): Promise<void> {
@@ -47,7 +49,7 @@ function loadImage(n: string): Promise<void> {
       resolve()
     }
     i.onerror = () => resolve()
-    i.src = pic(n)
+    i.src = pic(FILE[n] ?? n)
   })
 }
 
@@ -157,7 +159,7 @@ function textureFor(mat: number): Uint32Array | undefined {
   if (mat === WOOD) return tiles.holz
   if (mat === WALL) {
     const v = LEVELS[level.value]!.vessel
-    return v === 'trog' ? tiles.holz : v === 'brunnen' ? tiles.stein : tiles.ton
+    return v === 'trog' ? tiles.holz : v === 'brunnen' || v === 'teich' ? tiles.stein : tiles.ton
   }
   return undefined
 }
@@ -516,7 +518,7 @@ function onEvents(now: number) {
     else if (e.type === 'gate') play('clunk')
     else if (e.type === 'sensor') play('snap')
     else if (e.type === 'first') {
-      if (hasRock() && !struck) strikeT = 0.0001
+      if (hasSpring() && !struck) strikeT = 0.0001
     } else if (e.type === 'goal') {
       play('fanfare')
       hud.won = true
@@ -548,13 +550,13 @@ function finish(phase: 'won' | 'lost') {
   }, phase === 'won' ? 500 : 900)
 }
 
-// ── the strike of Moses: the staff hits the rock, the cleft opens, then the water comes ─────────────────────────────────────
-/** Seconds since the staff began to swing (0: not struck yet); the water waits for STRIKE seconds. */
+// ── the first blow in the tunnel world: the pick swings and hits the rock beside the Gihon spring, then the water comes ─────────────────────────────────────
+/** Seconds since the pick began to swing (0: not struck yet); the water waits for STRIKE seconds. */
 let strikeT = 0
 let struck = false
 const SWING = 0.4
 const STRIKE = 0.95
-const hasRock = () => w.def.world === 0 && w.sources.some((s) => !s.cloud) && !!img['fels-zu'] && !!img['fels-auf']
+const hasSpring = () => w.def.world === 0 && w.sources.some((s) => !s.cloud) && !!img.gihon && !!img.hacke
 
 // ── little things in the earth (pebbles, roots, a fossil, a shard): painted, put in at random, gone when the earth is dug away ──
 interface Detail {
@@ -807,14 +809,14 @@ function frame(now: number) {
 /** Runs the simulation for the time that has passed (fixed steps). */
 function advance(dt: number, now: number) {
   if (screen.value !== 'play' || paused.value) return
-  // the strike of Moses: the water waits until the cleft is open
+  // the first blow: the water waits until the pick has struck
   if (strikeT > 0 && strikeT < STRIKE) {
     strikeT += dt
     if (!struck && strikeT >= SWING) {
       struck = true
       play('hit')
       const s0 = w.sources.find((s) => !s.cloud)
-      if (s0) for (let i = 0; i < 26; i++) spawn({ x: s0.x0 + K / 2 + (rand() - 0.5) * 8, y: s0.y0 + 6, vx: (rand() - 0.5) * 50, vy: -10 - rand() * 40, life: 0.5 + rand() * 0.5, r: 0.8 + rand() * 1.4, kind: i % 3 === 0 ? 'spark' : 'dust', color: i % 3 === 0 ? '#ffe9a0' : '#cdbb98' })
+      if (s0) for (let i = 0; i < 26; i++) spawn({ x: s0.x0 + K / 2 + 17 * (s0.x0 + K / 2 > W / 2 ? -1 : 1) + (rand() - 0.5) * 6, y: s0.y0 + 14, vx: (rand() - 0.5) * 50, vy: -10 - rand() * 40, life: 0.5 + rand() * 0.5, r: 0.8 + rand() * 1.4, kind: i % 3 === 0 ? 'spark' : 'dust', color: i % 3 === 0 ? '#ffe9a0' : '#cdbb98' })
     }
     for (const p of parts) {
       p.t += dt
@@ -871,7 +873,7 @@ function draw(time: number, dt: number) {
   if (!c || !cv || !loaded.value) return
   const L = LEVELS[level.value]!
   const wi = L.world
-  const bg = img[['bg-mose', 'bg-elia', 'bg-vaeter'][wi]!]
+  const bg = img[['bg-hiskia', 'bg-elia', 'bg-vaeter'][wi]!]
   c.setTransform(dpr, 0, 0, dpr, 0, 0)
   c.fillStyle = '#2a1d12'
   c.fillRect(0, 0, cvW, cvH)
@@ -945,25 +947,27 @@ function draw(time: number, dt: number) {
     c.drawImage(i, (-i.width / i.height) * h * 0.5, -h * 0.5, (i.width / i.height) * h, h)
     c.restore()
   }
-  // the sources: the cloven rock of Moses, a spring rock, a cloud, and the stream that leaves them (right under them)
+  // the sources: the Gihon spring (with the pick of the first blow), a spring rock, a cloud, and the stream that leaves them (right under them)
   const flowing = w.started && w.phase === 'play' && w.supplyLeft > 0 && !(strikeT > 0 && strikeT < STRIKE)
   for (const s of w.sources) {
     const cx = s.x0 + K / 2
     if (s.cloud) {
       const grow = 0.72 + 0.4 * Math.min(1, w.clock / 6)
       sprite(c, 'wolke', cx, s.y0 + 8 + Math.sin(time * 0.8) * 0.8, 20 * grow)
-    } else if (hasRock()) {
-      const open = strikeT >= SWING || w.started
+    } else if (hasSpring()) {
       const shake = strikeT > SWING && strikeT < STRIKE ? Math.sin(strikeT * 90) * 0.5 : 0
-      sprite(c, open ? 'fels-auf' : 'fels-zu', cx + shake, s.y0 + K + 1, 25)
-      // the staff: leans beside the rock, swings over and hits it
-      const i = img.stab
+      sprite(c, 'gihon', cx + shake, s.y0 + K + 1, 25)
+      // the pick: hangs beside the spring, swings over and hits the rock
+      const i = img.hacke
       if (i) {
-        const t = strikeT <= 0 ? 0 : Math.min(1, strikeT / SWING)
-        const ease = t * t * (3 - 2 * t)
-        const ang = 1.3 - 1.65 * ease
+        // it rests in the ground beside the spring, swings up and back, and drives into the ground again
+        const t = strikeT <= 0 ? 1 : Math.min(1, strikeT / SWING)
+        const lift = t < 0.6 ? Math.sin(((Math.PI / 2) * t) / 0.6) : Math.cos(((Math.PI / 2) * (t - 0.6)) / 0.4)
+        // on the side of the spring that has more room
+        const side = cx > W / 2 ? -1 : 1
+        const ang = side * (-0.35 - 0.85 * (strikeT <= 0 ? 0 : lift))
         c.save()
-        c.translate(cx + 10, s.y0 - 6)
+        c.translate(cx + 10 * side, s.y0 - 6)
         c.scale(1, cell / cellY)
         c.rotate(ang)
         c.globalAlpha = strikeT >= STRIKE ? Math.max(0, 1 - (strikeT - STRIKE) * 4) : 1
@@ -1044,6 +1048,19 @@ function draw(time: number, dt: number) {
     c.beginPath()
     c.arc(pointer.x, pointer.y, DIG_R, 0, Math.PI * 2)
     c.stroke()
+    // the tunnel world: a pick swings above the finger (the picture is only looked at, the finger does the digging)
+    const pick = img.hacke
+    if (pick && pressing && w.def.world === 0) {
+      const hh = 17
+      c.save()
+      c.translate(pointer.x, pointer.y)
+      c.scale(1, cell / cellY)
+      c.translate(11, -13)
+      c.rotate(0.69 + 0.22 * Math.sin(time * 15))
+      c.globalAlpha = 0.95
+      c.drawImage(pick, -((pick.width / pick.height) * hh) / 2, 0, (pick.width / pick.height) * hh, hh)
+      c.restore()
+    }
   }
   c.restore()
 }
@@ -1179,7 +1196,7 @@ const resultText = computed(() => {
 const hideBroken = (e: Event) => {
   ;(e.target as HTMLElement).style.display = 'none'
 }
-const bannerSrc = (wi: number) => pic(['bg-mose', 'bg-elia', 'bg-vaeter'][wi]!)
+const bannerSrc = (wi: number) => pic(['bg-hiskia', 'bg-elia', 'bg-vaeter'][wi]!)
 const effLine = computed(() => t('app.bigGames.wasser.lineWater', { have: outcome.eff, need: outcome.effNeed }))
 const plantsLine = computed(() => t('app.bigGames.wasser.linePlants', { have: outcome.plants, all: outcome.plantsMax }))
 
@@ -1196,6 +1213,9 @@ function setProbe() {
       step: (n = 1) => {
         for (let i = 0; i < n; i++) step(w)
         w.events.length = 0
+      },
+      get geom() {
+        return { fx, fy, cell, cellY, K }
       },
       begin,
       start: () => start(w),

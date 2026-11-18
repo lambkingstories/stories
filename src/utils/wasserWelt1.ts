@@ -1,12 +1,12 @@
-/** Welt 1 "Wasser aus dem Felsen" (Mose) (the levels as ASCII maps: # rock, d earth, s sand, m mud, z salt, c vessel wall, V inside of the vessel, Q spring, C cloud, * flower, ^ thorn bush, A-D gate, 1-4 float or wheel, ~ water; see `wasserGame.ts`). */
+/** Welt 1 "Hiskias Tunnel" (2. Koenige 20,20; 2. Chronik 32,30) (the levels as ASCII maps: # rock, d earth, s sand, m mud, z salt, c vessel wall, V inside of the vessel, Q spring, C cloud, * flower, ^ thorn bush, A-D gate, 1-4 float or wheel, ~ water; see `wasserGame.ts`). */
 import type { LevelDef } from '@/utils/wasserGame'
 
 export const WELT1: LevelDef[] = [
   {
-    id: 'mose-01',
+    id: 'hiskia-01',
     world: 0,
     intro: 'dig',
-    vessel: 'krug',
+    vessel: 'teich',
     supply: 8,
     eff: 0.6,
     map: [
@@ -54,10 +54,10 @@ export const WELT1: LevelDef[] = [
     ]
   },
   {
-    id: 'mose-02',
+    id: 'hiskia-02',
     world: 0,
     intro: 'rock',
-    vessel: 'krug',
+    vessel: 'teich',
     supply: 8,
     eff: 0.3,
     map: [
@@ -105,10 +105,10 @@ export const WELT1: LevelDef[] = [
     ]
   },
   {
-    id: 'mose-03',
+    id: 'hiskia-03',
     world: 0,
     intro: 'plants',
-    vessel: 'krug',
+    vessel: 'teich',
     supply: 8,
     eff: 0.25,
     map: [
@@ -156,10 +156,10 @@ export const WELT1: LevelDef[] = [
     ]
   },
   {
-    id: 'mose-04',
+    id: 'hiskia-04',
     world: 0,
     intro: 'sand',
-    vessel: 'trog',
+    vessel: 'teich',
     supply: 8,
     eff: 0.35,
     map: [
@@ -206,10 +206,10 @@ export const WELT1: LevelDef[] = [
     ]
   },
   {
-    id: 'mose-05',
+    id: 'hiskia-05',
     world: 0,
     intro: 'mix',
-    vessel: 'krug',
+    vessel: 'teich',
     supply: 8,
     eff: 0.55,
     map: [
@@ -256,10 +256,10 @@ export const WELT1: LevelDef[] = [
     ]
   },
   {
-    id: 'mose-06',
+    id: 'hiskia-06',
     world: 0,
     intro: 'salt',
-    vessel: 'krug',
+    vessel: 'teich',
     supply: 8,
     eff: 0.3,
     map: [
@@ -307,10 +307,10 @@ export const WELT1: LevelDef[] = [
     ]
   },
   {
-    id: 'mose-07',
+    id: 'hiskia-07',
     world: 0,
     intro: 'mud',
-    vessel: 'krug',
+    vessel: 'teich',
     supply: 8,
     eff: 0.3,
     map: [
@@ -358,10 +358,10 @@ export const WELT1: LevelDef[] = [
     ]
   },
   {
-    id: 'mose-08',
+    id: 'hiskia-08',
     world: 0,
     intro: 'sources',
-    vessel: 'trog',
+    vessel: 'teich',
     supply: 2.4,
     eff: 0.5,
     map: [
@@ -408,10 +408,10 @@ export const WELT1: LevelDef[] = [
     ]
   },
   {
-    id: 'mose-09',
+    id: 'hiskia-09',
     world: 0,
     intro: 'gate',
-    vessel: 'krug',
+    vessel: 'teich',
     supply: 8,
     eff: 0.2,
     sensors: ['float'],
@@ -459,10 +459,10 @@ export const WELT1: LevelDef[] = [
     ]
   },
   {
-    id: 'mose-10',
+    id: 'hiskia-10',
     world: 0,
     intro: 'mix',
-    vessel: 'krug',
+    vessel: 'teich',
     supply: 8,
     eff: 0.15,
     map: [
@@ -509,10 +509,10 @@ export const WELT1: LevelDef[] = [
     ]
   },
   {
-    id: 'mose-11',
+    id: 'hiskia-11',
     world: 0,
     intro: 'wheel',
-    vessel: 'trog',
+    vessel: 'teich',
     supply: 8,
     eff: 0.35,
     sensors: ['float', 'wheel'],
@@ -560,10 +560,10 @@ export const WELT1: LevelDef[] = [
     ]
   },
   {
-    id: 'mose-12',
+    id: 'hiskia-12',
     world: 0,
     intro: 'mix',
-    vessel: 'krug',
+    vessel: 'teich',
     supply: 8,
     eff: 0.15,
     map: [

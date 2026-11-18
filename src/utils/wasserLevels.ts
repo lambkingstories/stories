@@ -10,14 +10,14 @@ import { WELT3 } from '@/utils/wasserWelt3'
 export const LEVELS: LevelDef[] = [...WELT1, ...WELT2, ...WELT3]
 
 export interface WorldInfo {
-  id: 'mose' | 'elia' | 'vaeter'
+  id: 'hiskia' | 'elia' | 'vaeter'
   /** The first level of the world (index in `LEVELS`). */
   first: number
   count: number
 }
 
 export const WORLDS: WorldInfo[] = [
-  { id: 'mose', first: 0, count: WELT1.length },
+  { id: 'hiskia', first: 0, count: WELT1.length },
   { id: 'elia', first: WELT1.length, count: WELT2.length },
   { id: 'vaeter', first: WELT1.length + WELT2.length, count: WELT3.length }
 ]
