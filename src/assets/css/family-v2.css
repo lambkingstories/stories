@@ -1,0 +1,77 @@
+/*
+ * Familien-Spiele v2: the tokens of the family games in the light look of the app (quiz, Activity, Who am I?, order race, Bible bingo,
+ * memory, word journey). Only tokens of the app (`--lk-*`, see theme.css) and a few own ones: they follow day ("Petrol und Creme") and
+ * night ("Abendblau"). The pieces that use them live in `src/components/molecules/family/` (documented in
+ * D:\Claude\lk-familie-design\DESIGNSYSTEM.md). No parchment, no brass, no medals: white cards, soft shadows, capsules and chips.
+ */
+:root,
+:root[data-theme='day'] {
+  /* the colour of the game on the screen (head stripe of a card, corner accent); set by `.fam-game--<key>` */
+  --fam-accent: #2f5fb0;
+  --fam-on-accent: #ffffff;
+
+  /* shapes */
+  --fam-r-card: 24px;
+  --fam-r-field: 16px;
+  --fam-r-chip: 20px;
+
+  /* cards: white surface of the app, a thin warm line, a soft shadow */
+  --fam-card: var(--lk-surface, #fafcfa);
+  --fam-field: var(--lk-bg, #edf3f1);
+  --fam-line: rgba(150, 110, 40, 0.28);
+  --fam-line-strong: rgba(150, 110, 40, 0.5);
+  --fam-shadow: 0 10px 24px -14px rgba(22, 60, 64, 0.5), 0 1px 3px rgba(22, 60, 64, 0.08);
+  --fam-ink: var(--lk-text, #163c40);
+  --fam-muted: var(--lk-muted, #49676a);
+
+  /* the main button: filled teal capsule, white bold text */
+  --fam-primary: #1f6b6b;
+  --fam-primary-deep: #154d4d;
+  --fam-on-primary: #ffffff;
+  /* teal as ink on a light surface (second button: text and line) */
+  --fam-primary-ink: #1f6b6b;
+
+  /* chips: chosen = gold with dark text */
+  --fam-gold: #d4a83e;
+  --fam-gold-deep: #a9811f;
+  --fam-on-gold: #3a2a05;
+  --fam-focus: #e3b94a;
+
+  /* right / wrong (always together with a sign, never only a colour) */
+  --fam-ok: #2e8b57;
+  --fam-bad: #d65c52;
+
+  /* the four answer tiles A to D (fill and the text on it) */
+  --fam-a-bg: #1f6b6b;
+  --fam-a-ink: #ffffff;
+  --fam-b-bg: #ee7a60;
+  --fam-b-ink: #3a1208;
+  --fam-c-bg: #2f5fb0;
+  --fam-c-ink: #ffffff;
+  --fam-d-bg: #d4a83e;
+  --fam-d-ink: #3a2a05;
+}
+
+:root[data-theme='night'] {
+  --fam-line: rgba(215, 186, 126, 0.24);
+  --fam-line-strong: rgba(215, 186, 126, 0.5);
+  --fam-shadow: 0 10px 24px -14px rgba(0, 0, 0, 0.7), 0 1px 3px rgba(0, 0, 0, 0.3);
+  --fam-primary: #237a78;
+  --fam-primary-deep: #175654;
+  --fam-primary-ink: #7fd0cb;
+  --fam-ok: #4cc58a;
+  --fam-bad: #ee7b72;
+  --fam-a-bg: #237a78;
+  --fam-b-bg: #ee7a60;
+  --fam-c-bg: #3d6ec2;
+  --fam-d-bg: #d4a83e;
+}
+
+/* the colour of every game: the one of its box on the page of the family games */
+.fam-game--quiz { --fam-accent: #2f5fb0; }
+.fam-game--activity { --fam-accent: #23808a; }
+.fam-game--who { --fam-accent: #b0402f; }
+.fam-game--order { --fam-accent: #3d7f76; }
+.fam-game--bingo { --fam-accent: #7d52a6; }
+.fam-game--memory { --fam-accent: #7a5a30; }
+.fam-game--wortreise { --fam-accent: #b45a1f; }

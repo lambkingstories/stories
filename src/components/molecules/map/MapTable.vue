@@ -10,8 +10,10 @@ import { onBeforeUnmount, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import useMusic from '@/use/useMusic'
 import useSoundSettings, { DEFAULT_MUSIC, DEFAULT_SFX } from '@/use/useSoundSettings'
+import type { FamilyGameKey } from '@/components/molecules/family/familyGames'
 
-withDefaults(defineProps<{ title?: string; back?: boolean }>(), { title: '', back: true })
+// `game` is the colour of the game (class `fam-game--<key>`, see family-v2.css): the cards, chips and tiles of "Familien-Spiele v2" inside take their accent from it
+withDefaults(defineProps<{ title?: string; back?: boolean; game?: FamilyGameKey }>(), { title: '', back: true, game: undefined })
 const emit = defineEmits<{ back: [] }>()
 const { t } = useI18n({ useScope: 'global' })
 
@@ -25,7 +27,7 @@ const toggleSfx = () => sound.setSfxVolume(sound.sfxVolume.value > 0 ? 0 : DEFAU
 </script>
 
 <template lang="pug">
-  div(class="mt")
+  div(:class="['mt', game ? 'fam-game--' + game : '']")
     header(class="mt-top")
       button(v-if="back" type="button" class="mt-back" :aria-label="t('app.read.back')" @click="emit('back')")
         span(aria-hidden="true") ‹
@@ -51,9 +53,9 @@ const toggleSfx = () => sound.setSfxVolume(sound.sfxVolume.value > 0 ? 0 : DEFAU
   --mp-ink-soft: #6b5230
   --mp-gold: #e2bd66
   --mp-gold-deep: #a9802d
-  // the ink of the board (text lying directly on the light background); the parchment pieces keep their own brown ink
-  --mp-cream: #1f3a36
-  --mp-board: #1f3a36
+  // the ink of the board (text lying directly on the background): the text colour of the app, so that it reads by day and by night; the parchment pieces keep their own brown ink
+  --mp-cream: var(--lk-text, #1f3a36)
+  --mp-board: var(--lk-text, #1f3a36)
   --mp-night: #1c130a
   --mp-serif: 'Cormorant Garamond', 'Palatino Linotype', Palatino, Georgia, 'Times New Roman', serif
   position: fixed
@@ -77,8 +79,8 @@ const toggleSfx = () => sound.setSfxVolume(sound.sfxVolume.value > 0 ? 0 : DEFAU
   flex: none
   display: grid
   place-items: center
-  width: 44px
-  height: 44px
+  width: 48px
+  height: 48px
   border-radius: 50%
   border: 1px solid var(--lk-line, #c9dad5)
   background: var(--lk-surface, #fff)

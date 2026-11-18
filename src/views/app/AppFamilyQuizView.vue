@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * The family quiz (free, all of it), played on the old map. All of it stays on the device, nothing is sent anywhere.
+ * The family quiz (free, all of it), in the light look of "Familien-Spiele v2" (white cards, capsules, chips, answer tiles; see components/molecules/family/). All of it stays on the device, nothing is sent anywhere.
  *  - Which questions: the Bible quiz (real questions with a Bible passage, three levels: easy, medium, hard, or all mixed) or the
  *    questions of the adventures the child has been through (they grow with the adventures).
  *  - How: `table` (two to eight people pass the device around, also in two teams) or `code` (every person plays on their own phone;
@@ -14,15 +14,19 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import MapTable from '@/components/molecules/map/MapTable.vue'
 import { goBackTo } from '@/utils/navBack'
-import MapPaper from '@/components/molecules/map/MapPaper.vue'
-import MapCoin from '@/components/molecules/map/MapCoin.vue'
 import MapToken from '@/components/molecules/map/MapToken.vue'
-import MapButton from '@/components/molecules/map/MapButton.vue'
-import MapSeats from '@/components/molecules/map/MapSeats.vue'
 import MapScoreBar from '@/components/molecules/map/MapScoreBar.vue'
 import MapRoute from '@/components/molecules/map/MapRoute.vue'
-import MapResult from '@/components/molecules/map/MapResult.vue'
-import MapResume from '@/components/molecules/map/MapResume.vue'
+import FamilyCard from '@/components/molecules/family/FamilyCard.vue'
+import FamilyButton from '@/components/molecules/family/FamilyButton.vue'
+import FamilyChip from '@/components/molecules/family/FamilyChip.vue'
+import FamilySwitch from '@/components/molecules/family/FamilySwitch.vue'
+import FamilyChoice from '@/components/molecules/family/FamilyChoice.vue'
+import FamilyQuestionCard from '@/components/molecules/family/FamilyQuestionCard.vue'
+import FamilyNameField from '@/components/molecules/family/FamilyNameField.vue'
+import FamilySeats from '@/components/molecules/family/FamilySeats.vue'
+import FamilyResult from '@/components/molecules/family/FamilyResult.vue'
+import FamilyResume from '@/components/molecules/family/FamilyResume.vue'
 import { journeys } from '@/data/adventures'
 import { loadBibleQuiz } from '@/data/bibleQuiz'
 import { isJourneyPlusLocked } from '@/utils/adventureAccess'
@@ -384,16 +388,8 @@ function next() {
 
 const right = computed(() => !!current.value && picked.value === current.value.answer)
 
-/** The words on a coin lie on a small band: longer answers get smaller letters. */
-function coinFont(text: string): string {
-  const n = text.length
-  if (n <= 10) return '1.4rem'
-  if (n <= 18) return '1.2rem'
-  if (n <= 28) return '1.02rem'
-  if (n <= 40) return '0.9rem'
-  return '0.8rem'
-}
-function coinState(i: number): 'idle' | 'right' | 'wrong' | 'dim' {
+/** What an answer tile shows after the answer: the right one, the wrong one that was picked, or the others at rest. */
+function choiceState(i: number): 'idle' | 'right' | 'wrong' | 'dim' {
   if (phase.value !== 'reveal') return 'idle'
   if (i === current.value?.answer) return 'right'
   return i === picked.value ? 'wrong' : 'dim'
@@ -405,353 +401,189 @@ const questionSize = computed(() => {
 </script>
 
 <template lang="pug">
-  MapTable(:title="t('app.family.title')" @back="goBack")
+  MapTable(:title="t('app.family.title')" game="quiz" @back="goBack")
     div(class="fq")
       //- ===== the start page: how (table / own phones) and which questions =====
       template(v-if="phase === 'setup'")
-        MapResume(v-if="resumeInfo" :info="resumeInfo" @resume="resume")
+        FamilyResume(v-if="resumeInfo" :info="resumeInfo" @resume="resume")
         div(class="fq-modes" role="radiogroup" :aria-label="t('app.family.modeLabel')")
-          button(v-for="m in MODES" :key="m" type="button" role="radio" :aria-checked="mode === m" :class="['fq-brass', 'fq-mode', { 'is-on': mode === m }]" @click="pickMode(m)")
-            span {{ t(`app.family.mode_${m}`) }}
-        h3(class="fq-h") {{ t('app.family.questionsHead') }}
-        div(class="fq-levels" role="radiogroup" :aria-label="t('app.family.questionsHead')")
-          button(v-for="s in SOURCES" :key="s" type="button" role="radio" :aria-checked="source === s" :class="['fq-brass', 'fq-level', { 'is-on': source === s }]" @click="pickSource(s)")
-            span {{ t(`app.family.src_${s}`) }}
-        MapPaper(kind="strip")
+          FamilyChip(v-for="m in MODES" :key="m" class="fq-wide-chip" :selected="mode === m" @click="pickMode(m)") {{ t(`app.family.mode_${m}`) }}
+        FamilyCard(:title="t('app.family.questionsHead')" symbol="quiz")
+          div(class="fq-levels" role="radiogroup" :aria-label="t('app.family.questionsHead')")
+            FamilyChip(v-for="s in SOURCES" :key="s" :selected="source === s" @click="pickSource(s)") {{ t(`app.family.src_${s}`) }}
           span(class="fq-fine") {{ t(`app.family.srcText_${source}`) }}
 
       //- ===== the round code: one person, their own phone =====
       div(v-if="phase === 'setup' && mode === 'code'" class="fq-code")
         div(class="fq-codename")
-          MapSeats(:count="1" :names="names" :min="1" :max="1" fixed @update:names="setNames")
+          FamilySeats(:count="1" :names="names" :min="1" :max="1" fixed @update:names="setNames")
 
         div(class="fq-things")
-          div(class="fq-thing")
-            MapPaper(kind="strip")
-              span(class="fq-thing-in")
-                strong(class="fq-thing-h") {{ t('app.family.codeDaily') }}
-                span(class="fq-fine") {{ dailyDoneToday ? t('app.family.codeDailyDone', { score: dailyResult?.score ?? 0, total: dailyResult?.total ?? 0 }) : t('app.family.codeDailyText', { n: DAILY_QUESTIONS }) }}
-            MapButton(:disabled="!dailyReady" @click="playDaily") {{ t('app.family.codeDailyGo') }}
+          FamilyCard(class="fq-thing" :title="t('app.family.codeDaily')")
+            span(class="fq-fine") {{ dailyDoneToday ? t('app.family.codeDailyDone', { score: dailyResult?.score ?? 0, total: dailyResult?.total ?? 0 }) : t('app.family.codeDailyText', { n: DAILY_QUESTIONS }) }}
+            FamilyButton(:disabled="!dailyReady" @click="playDaily") {{ t('app.family.codeDailyGo') }}
 
-          div(class="fq-thing")
-            MapPaper(kind="strip")
-              span(class="fq-thing-in")
-                strong(class="fq-thing-h") {{ t('app.family.codeNew') }}
-                span(class="fq-fine") {{ t('app.family.codeNewText', { n: ROUND_QUESTIONS }) }}
-            MapButton(:disabled="!codeReady" @click="newRound") {{ t('app.family.codeNewGo') }}
+          FamilyCard(class="fq-thing" :title="t('app.family.codeNew')")
+            span(class="fq-fine") {{ t('app.family.codeNewText', { n: ROUND_QUESTIONS }) }}
+            FamilyButton(:disabled="!codeReady" @click="newRound") {{ t('app.family.codeNewGo') }}
 
-          div(class="fq-thing")
-            MapPaper(kind="strip")
-              span(class="fq-thing-in")
-                strong(class="fq-thing-h") {{ t('app.family.codeJoin') }}
-                input(
-                  v-model="codeInput"
-                  class="fq-input fq-code-input"
-                  type="text"
-                  maxlength="8"
-                  autocapitalize="characters"
-                  autocomplete="off"
-                  spellcheck="false"
-                  placeholder="K7M-4QX"
-                  :aria-label="t('app.family.codeJoin')"
-                  @keyup.enter="joinRound"
-                )
-                span(v-if="codeError" class="fq-fine fq-error" role="alert") {{ t(`app.family.codeError_${codeError}`) }}
-            MapButton(:disabled="!codeInput.trim()" @click="joinRound") {{ t('app.family.codeJoinGo') }}
+          FamilyCard(class="fq-thing" :title="t('app.family.codeJoin')")
+            FamilyNameField(v-model="codeInput" code :maxlength="8" placeholder="K7M-4QX" :aria-label="t('app.family.codeJoin')" @enter="joinRound")
+            span(v-if="codeError" class="fq-fine fq-error" role="alert") {{ t(`app.family.codeError_${codeError}`) }}
+            FamilyButton(:disabled="!codeInput.trim()" @click="joinRound") {{ t('app.family.codeJoinGo') }}
 
       //- ===== who plays =====
       div(v-else-if="phase === 'setup'" class="fq-setup")
-        MapPaper(v-if="!pool.length" kind="strip" class="fq-wide")
+        FamilyCard(v-if="!pool.length" class="fq-wide" compact)
           span(class="fq-fine") {{ source === 'adventure' ? t('app.family.empty') : t('app.family.loading') }}
         template(v-else)
           div(class="fq-col")
             //- the questions of the adventures grow with every stage and exam the child has been through
-            MapPaper(v-if="source === 'adventure'" kind="strip")
+            FamilyCard(v-if="source === 'adventure'" compact)
               span(class="fq-unlock" role="group")
                 span(class="fq-unlock-n") {{ pool.length }}
                   small {{ t('app.family.unlockOf', { total: poolTotal }) }}
                 span(class="fq-unlock-bar" aria-hidden="true")
                   span(class="fq-unlock-fill" :style="{ width: Math.round(poolShare * 100) + '%' }")
 
-            MapSeats(v-model:count="playerCount" :names="names" :min="MIN_PLAYERS" :max="MAX_PLAYERS" :question="t('app.family.howMany')" @update:names="setNames")
+            FamilySeats(v-model:count="playerCount" :names="names" :min="MIN_PLAYERS" :max="MAX_PLAYERS" :question="t('app.family.howMany')" @update:names="setNames")
 
-            button(type="button" role="switch" :aria-checked="teams" :class="['fq-brass', 'fq-switch', { 'is-on': teams }]" @click="teams = !teams")
-              span(class="fq-lamp" aria-hidden="true")
-              span {{ t('app.family.teamsOn') }}
+            FamilySwitch(v-model="teams") {{ t('app.family.teamsOn') }}
             template(v-if="teams")
-              MapPaper(kind="strip")
+              FamilyCard(compact)
                 span(class="fq-fine") {{ t('app.family.teamsNote') }}
               div(class="fq-teams")
-                MapPaper(v-for="(line, k) in teamLines" :key="k" kind="strip")
+                FamilyCard(v-for="(line, k) in teamLines" :key="k" compact)
                   span(class="fq-team")
                     strong {{ line.name }}
                     span(class="fq-fine") {{ line.members }}
 
           div(class="fq-col")
-            h3(class="fq-h") {{ t('app.family.rounds') }}
-            div(class="fq-marks" role="radiogroup")
-              button(
-                v-for="r in ROUND_CHOICES"
-                :key="r"
-                type="button"
-                role="radio"
-                :aria-checked="rounds === r"
-                :disabled="r > maxRounds"
-                :class="['fq-brass', 'fq-mark', { 'is-on': rounds === r }]"
-                @click="rounds = r"
-              ) {{ r }}
-            MapPaper(kind="strip")
+            FamilyCard(:title="t('app.family.rounds')")
+              div(class="fq-marks" role="radiogroup")
+                FamilyChip(v-for="r in ROUND_CHOICES" :key="r" round :selected="rounds === r" :disabled="r > maxRounds" @click="rounds = r") {{ r }}
               span(class="fq-fine") {{ roundsText }}
             div(class="fq-go")
-              MapButton(:disabled="maxRounds < 1" @click="start") {{ t('app.family.start') }}
+              FamilyButton(:disabled="maxRounds < 1" @click="start") {{ t('app.family.start') }}
 
       //- ===== a question =====
       div(v-else-if="phase === 'ask' || phase === 'reveal'" class="fq-play")
         div(class="fq-left")
-          //- the road with the travellers (upright, up to three people); sideways and for more people the row of brass tags
+          //- the road with the travellers (upright, up to three people); sideways and for more people the row of small tags
           MapRoute(v-if="showRoad" class="fq-road" :players="travellers" :max="perPlayer" aria-hidden="true")
           MapScoreBar(:class="['fq-tags', { 'is-alt': showRoad }]" :players="travellers" aria-hidden="true")
           div(class="fq-meta")
             p(v-if="mode === 'code'" class="fq-chip") {{ isDaily ? t('app.family.codeChipDaily') : t('app.family.codeChip', { code: showCode(roundCode) }) }}
             p(v-else class="fq-turn")
-              MapToken(:index="who" :size="34" lit)
+              MapToken(:index="who" :size="38" lit)
               span {{ t('app.family.turn', { name: whoName }) }}
             p(class="fq-count") {{ t('app.family.question', { n: index + 1, total: questions.length }) }}
-          MapPaper(kind="card" :lit="phase === 'reveal' && right" :key="index" class="fq-qcard")
-            span(class="fq-source")
-              span(class="fq-source-adv") {{ current?.level ? t(`app.family.level_${current.level}`) : t('app.family.fromAdventure', { name: current?.journey ?? '' }) }}
-              span(v-if="current?.stage" class="fq-source-stage") {{ current.stage }}
-            h2(class="fq-q" :style="{ fontSize: questionSize }") {{ current?.q }}
-        div(class="fq-coins")
+          FamilyQuestionCard(
+            :key="index"
+            class="fq-qcard"
+            :chip="current?.level ? t(`app.family.level_${current.level}`) : t('app.family.fromAdventure', { name: current?.journey ?? '' })"
+            :sub="current?.stage ?? ''"
+            :text="current?.q ?? ''"
+            :size="questionSize"
+            :tone="phase === 'reveal' ? (right ? 'right' : 'wrong') : 'default'"
+          )
+        div(class="fq-answers")
           div(v-for="(o, i) in current?.options ?? []" :key="index + '-' + i" class="fq-rise" :style="{ animationDelay: i * 70 + 'ms' }")
-            MapCoin(:index="i" :state="coinState(i)" :disabled="phase === 'reveal'" @click="choose(i)")
-              span(:style="{ fontSize: coinFont(o) }") {{ o }}
+            FamilyChoice(:index="i" :text="o" :state="choiceState(i)" :disabled="phase === 'reveal'" @click="choose(i)")
         div(v-if="phase === 'reveal'" class="fq-reveal")
-          MapPaper(kind="strip" :lit="right" class="fq-verdict")
-            span(role="status") {{ right ? t('app.family.right') : t('app.family.wrong') }}
+          FamilyCard(:tone="right ? 'right' : 'wrong'" class="fq-verdict" compact)
+            span(role="status" :class="['fq-verdict-t', { 'is-right': right }]") {{ right ? t('app.family.right') : t('app.family.wrong') }}
             span(v-if="current?.ref" class="fq-ref") {{ current.ref }}
-          MapButton(@click="next") {{ nextLabel }}
+          FamilyButton(class="fq-next" @click="next") {{ nextLabel }}
 
       //- ===== the end =====
-      MapResult(v-else :headline="endHeadline" :rows="mode === 'code' ? [] : rankRows" :winner-index="winnerIndex")
+      FamilyResult(v-else :headline="endHeadline" :rows="mode === 'code' ? [] : rankRows" :winner-index="winnerIndex")
         template(v-if="mode === 'code'")
           p(v-if="!isDaily" class="fq-codebig") {{ showCode(roundCode) }}
-          MapPaper(kind="strip")
+          FamilyCard(compact)
             span(class="fq-fine") {{ isDaily ? t('app.family.codeShareDaily') : t('app.family.codeShare') }}
-          MapButton(@click="phase = 'setup'") {{ t('app.family.codeBack') }}
+          FamilyButton(@click="phase = 'setup'") {{ t('app.family.codeBack') }}
         template(v-else)
           template(v-if="useTeams")
-            MapPaper(v-for="(line, k) in teamLines" :key="k" kind="strip" class="fq-endteam")
+            FamilyCard(v-for="(line, k) in teamLines" :key="k" class="fq-endteam" compact)
               span(class="fq-endteam-in")
                 span(class="fq-endteam-text")
                   strong {{ line.name }}
                   span(class="fq-fine") {{ line.members }}
                 strong(class="fq-endteam-n") {{ t('app.family.points', line.points) }}
-          MapButton(@click="start") {{ t('app.family.again') }}
-          MapButton(quiet @click="phase = 'setup'") {{ t('app.family.change') }}
+          FamilyButton(@click="start") {{ t('app.family.again') }}
+          FamilyButton(quiet @click="phase = 'setup'") {{ t('app.family.change') }}
 </template>
 
 <style scoped lang="sass">
 .fq
   display: flex
   flex-direction: column
-  gap: 12px
-  max-width: 34rem
+  gap: 16px
+  max-width: 36rem
   margin: 0 auto
-  padding-top: 4px
+  padding: 6px 0 24px
 
-  // the parchment strip has an olive sprig at its left end and a framed edge: the words keep clear of both
-  :deep(.mpa--strip .mpa-in)
-    padding: 15px 6% 15px 15%
-
-// ── brass things on the table: card-index tabs, round marks, the switch ──
-.fq-brass
-  position: relative
-  border: 2px solid #9a6b1c
-  background: linear-gradient(180deg, #fff8e0 0%, #efd89c 100%)
-  box-shadow: 0 0 0 2px rgba(255, 246, 214, 0.92), 0 4px 8px rgba(60, 35, 5, 0.45), inset 0 1px 0 #ffffff
-  color: #3a2812
-  font: inherit
-  font-weight: 800
-  text-shadow: none
-  cursor: pointer
-  -webkit-tap-highlight-color: transparent
-  transition: transform 0.18s, box-shadow 0.25s, background 0.25s
-
-  &.is-on
-    background: linear-gradient(180deg, #ffe88f 0%, #f2b73b 100%)
-    color: #2e1f0a
-    text-shadow: none
-    box-shadow: 0 0 0 3px rgba(255, 246, 214, 0.95), 0 0 16px rgba(255, 200, 70, 0.85), 0 4px 8px rgba(60, 35, 5, 0.45), inset 0 1px 0 #fffbe0
-
-  &:disabled
-    opacity: 0.4
-    cursor: default
-
+// ── setup ──
 .fq-modes
   display: grid
   grid-template-columns: repeat(2, minmax(0, 1fr))
-  gap: 8px
-  align-items: end
+  gap: 10px
 
-.fq-mode
-  display: flex
-  flex-direction: column
-  align-items: center
-  justify-content: center
-  gap: 4px
-  min-height: 64px
-  padding: 8px 6px
-  border-radius: 12px 12px 4px 4px
-  font-size: 1rem
-  line-height: 1.12
-  text-align: center
-
-  &.is-on
-    transform: translateY(-3px)
+.fq-wide-chip
+  width: 100%
+  min-height: 56px
+  padding: 8px 10px
 
 .fq-levels
   display: flex
   flex-wrap: wrap
   justify-content: center
-  gap: 8px
-
-.fq-level
-  flex: 0 1 auto
-  min-width: 5.4rem
-  padding: 9px 14px
-  border-radius: 999px
-  font-size: 1rem
-  text-align: center
-
-.fq-ref
-  display: block
-  font-size: 0.8rem
-  font-weight: 700
-  color: var(--mp-ink-soft, #6b5230)
+  gap: 10px
 
 .fq-marks
   display: flex
+  flex-wrap: wrap
   justify-content: center
   gap: 14px
-
-.fq-mark
-  width: 56px
-  height: 56px
-  border-radius: 50%
-  font-size: 1.3rem
-
-.fq-switch
-  display: flex
-  align-items: center
-  justify-content: center
-  gap: 10px
-  min-height: 48px
-  padding: 6px 16px
-  border-radius: 12px
-  font-size: 1rem
-  text-align: left
-
-.fq-lamp
-  flex: none
-  width: 14px
-  height: 14px
-  border-radius: 50%
-  background: radial-gradient(circle at 35% 30%, #6b5230, #2c1d0a)
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 222, 150, 0.5)
-
-.fq-switch.is-on .fq-lamp
-  background: radial-gradient(circle at 35% 30%, #fffbe0, #ffc84a 60%, #c27d12)
-  box-shadow: 0 0 10px rgba(255, 215, 110, 1), 0 0 0 1px #fff3cf
-
-// ── texts and fields on parchment and on the map ──
-.fq-h
-  margin: 0 0 4px
-  text-align: center
-  font-size: 1.2rem
-  font-weight: 800
-  color: var(--mp-cream, #f6ead0)
-  text-shadow: none
+  padding-top: 4px
 
 .fq-fine
   display: block
   width: 100%
+  color: var(--fam-muted)
   text-align: center
-  font-size: 1.05rem
+  font-size: 1.02rem
   font-weight: 600
-  line-height: 1.3
-
-.fq-lead
-  font-size: 1.1rem
-  line-height: 1.4
-
-.fq-input
-  width: 100%
-  min-width: 0
-  min-height: 40px
-  border: 0
-  border-bottom: 1px solid rgba(58, 40, 18, 0.45)
-  background: transparent
-  color: var(--mp-ink, #3a2812)
-  font: inherit
-  font-size: 1.1rem
-  font-weight: 700
-  padding: 2px 2px
-  outline: none
-
-  &::placeholder
-    color: rgba(58, 40, 18, 0.5)
-    font-weight: 600
-
-  &:focus
-    border-bottom-color: #8a5a10
-
-.fq-select
-  appearance: auto
-  cursor: pointer
-
-.fq-code-input
-  text-align: center
-  font-size: 1.3rem
-  letter-spacing: 0.12em
-  text-transform: uppercase
+  line-height: 1.35
 
 .fq-error
-  color: #8a2a14
-
-.fq-seat
-  display: flex
-  align-items: center
-  gap: 8px
-  width: 100%
-
-.fq-pick
-  display: flex
-  flex-direction: column
-  width: 100%
-  gap: 0
-
-.fq-pick-h
-  font-size: 0.85rem
+  color: var(--fam-bad)
   font-weight: 700
-  color: var(--mp-ink-soft, #6b5230)
 
-// ── setup ──
+.fq-ref
+  display: block
+  color: var(--fam-muted)
+  font-size: 0.9rem
+  font-weight: 700
+
 .fq-setup, .fq-col
   display: flex
   flex-direction: column
-  gap: 12px
+  gap: 16px
 
 .fq-teams
   display: grid
   grid-template-columns: repeat(2, minmax(0, 1fr))
-  gap: 8px
+  gap: 10px
 
 .fq-team
   display: flex
   flex-direction: column
+  align-items: center
   min-width: 0
-  line-height: 1.2
+  line-height: 1.25
+  text-align: center
 
 .fq-go
   display: flex
@@ -761,7 +593,8 @@ const questionSize = computed(() => {
 .fq-unlock
   display: flex
   flex-direction: column
-  gap: 6px
+  align-items: center
+  gap: 8px
   width: 100%
 
 .fq-unlock-n
@@ -771,28 +604,29 @@ const questionSize = computed(() => {
 
   small
     margin-left: 8px
+    color: var(--fam-muted)
     font-size: 0.85rem
     font-weight: 700
-    color: var(--mp-ink-soft, #6b5230)
 
 .fq-unlock-bar
   display: block
-  height: 8px
+  width: 100%
+  height: 10px
   border-radius: 999px
-  background: rgba(58, 40, 18, 0.2)
+  background: var(--lk-track, rgba(0, 0, 0, 0.12))
   overflow: hidden
 
 .fq-unlock-fill
   display: block
   height: 100%
   border-radius: 999px
-  background: linear-gradient(90deg, #a9802d, #e2bd66)
+  background: var(--fam-gold)
 
 // ── the round code ──
 .fq-code
   display: flex
   flex-direction: column
-  gap: 14px
+  gap: 16px
 
 .fq-things
   display: flex
@@ -800,38 +634,26 @@ const questionSize = computed(() => {
   gap: 16px
 
 .fq-thing
-  display: flex
-  flex-direction: column
-  align-items: center
-  gap: 8px
-  min-width: 0
-
-
-.fq-thing-in
-  display: flex
-  flex-direction: column
-  gap: 4px
-  width: 100%
-  text-align: center
-
-.fq-thing-h
-  font-size: 1.08rem
+  :deep(.fam-card-body)
+    height: 100%
+    justify-content: space-between
 
 // ── during the game ──
 .fq-play
   display: flex
   flex-direction: column
-  gap: 12px
+  gap: 16px
 
 .fq-left
   display: flex
   flex-direction: column
-  gap: 8px
+  gap: 12px
   min-width: 0
 
 .fq-meta
   display: flex
   flex-direction: column
+  align-items: center
   gap: 2px
 
 // upright: the road for up to three people; sideways: the tags (they take less room)
@@ -844,76 +666,38 @@ const questionSize = computed(() => {
   justify-content: center
   gap: 10px
   margin: 2px 0 0
+  color: var(--fam-ink)
   font-size: 1.3rem
   font-weight: 800
-  color: var(--mp-cream, #f6ead0)
-  text-shadow: none
 
 .fq-count
   margin: 0
+  color: var(--fam-muted)
   text-align: center
   font-size: 0.95rem
   font-weight: 700
-  color: var(--mp-cream, #f6ead0)
-  text-shadow: none
 
 .fq-chip
-  align-self: center
   margin: 2px 0 0
-  padding: 4px 18px
+  padding: 6px 18px
+  border: 1.5px solid var(--fam-gold)
   border-radius: 999px
-  border: 1px solid rgba(226, 189, 102, 0.7)
-  background: rgba(28, 19, 10, 0.72)
-  color: var(--mp-gold, #e2bd66)
+  background: color-mix(in srgb, var(--fam-gold) 22%, var(--fam-card))
+  color: var(--fam-ink)
   font-weight: 800
   letter-spacing: 0.06em
 
-.fq-qcard
-  :deep(.mpa-in)
-    padding: 12% 10% 9%
-    min-height: 120px
-    display: flex
-    flex-direction: column
-    justify-content: center
-    gap: 4px
-
-.fq-source
-  display: flex
-  flex-direction: column
-  align-items: center
-  gap: 0
-  line-height: 1.2
-
-.fq-source-adv
-  font-size: 0.8rem
-  font-weight: 800
-  letter-spacing: 0.08em
-  text-transform: uppercase
-  color: var(--mp-ink-soft, #6b5230)
-
-.fq-source-stage
-  font-size: 0.8rem
-  font-weight: 600
-  color: var(--mp-ink-soft, #6b5230)
-
-.fq-q
-  margin: 4px 0 0
-  line-height: 1.28
-  font-weight: 800
-  text-align: center
-
-.fq-coins
+.fq-answers
   display: grid
-  grid-template-columns: repeat(2, minmax(0, 1fr))
-  gap: 10px
-  width: min(100%, 19.5rem)
-  align-self: center
+  grid-template-columns: minmax(0, 1fr)
+  gap: 14px
+  width: 100%
+  // room for the rings of a right or wrong answer
+  padding: 0 7px
 
-// a question with three answers: the last coin lies in the middle of the second row
-.fq-rise:last-child:nth-child(odd)
-  grid-column: 1 / -1
-  justify-self: center
-  width: calc(50% - 5px)
+@media (min-width: 560px) and (orientation: portrait)
+  .fq-answers
+    grid-template-columns: repeat(2, minmax(0, 1fr))
 
 .fq-rise
   animation: fq-rise 0.45s cubic-bezier(0.25, 0.8, 0.3, 1) both
@@ -921,7 +705,7 @@ const questionSize = computed(() => {
 @keyframes fq-rise
   from
     opacity: 0
-    transform: translateY(16px) scale(0.92)
+    transform: translateY(16px) scale(0.96)
   to
     opacity: 1
     transform: none
@@ -934,27 +718,29 @@ const questionSize = computed(() => {
   display: flex
   flex-direction: column
   align-items: center
-  gap: 10px
+  gap: 14px
   width: 100%
 
 .fq-verdict
-  max-width: 15rem
+  max-width: 20rem
 
-  :deep(.mpa-in)
-    flex-direction: column
-    justify-content: center
-    gap: 0
-    font-size: 1.3rem
-    font-weight: 800
+.fq-verdict-t
+  display: block
+  font-size: 1.35rem
+  font-weight: 800
+  line-height: 1.2
+
+  &.is-right
+    color: var(--fam-ok)
 
 // ── the end ──
 .fq-codebig
   margin: 0
   padding: 8px 26px
+  border: 1.5px solid var(--fam-gold)
   border-radius: 999px
-  border: 1px solid rgba(226, 189, 102, 0.8)
-  background: rgba(28, 19, 10, 0.78)
-  color: var(--mp-gold, #e2bd66)
+  background: color-mix(in srgb, var(--fam-gold) 22%, var(--fam-card))
+  color: var(--fam-ink)
   font-size: 2rem
   font-weight: 800
   letter-spacing: 0.14em
@@ -968,13 +754,15 @@ const questionSize = computed(() => {
   justify-content: space-between
   gap: 10px
   width: 100%
-  text-align: left
 
 .fq-endteam-text
   display: flex
   flex-direction: column
+  align-items: center
+  flex: 1
   min-width: 0
-  line-height: 1.2
+  line-height: 1.25
+  text-align: center
 
 .fq-endteam-n
   flex: none
@@ -983,7 +771,7 @@ const questionSize = computed(() => {
 @media (orientation: landscape)
   .fq
     max-width: 62rem
-    gap: 10px
+    gap: 12px
 
   .fq-modes
     max-width: 40rem
@@ -1002,42 +790,65 @@ const questionSize = computed(() => {
   .fq-things
     display: grid
     grid-template-columns: repeat(3, minmax(0, 1fr))
-    align-items: start
+    align-items: stretch
     gap: 14px
 
   .fq-codename
-    max-width: 22rem
+    max-width: 24rem
     width: 100%
     margin: 0 auto
 
   .fq-play
     display: grid
-    grid-template-columns: minmax(0, 1fr) minmax(0, 20rem)
-    grid-template-areas: 'left coins' 'reveal coins'
+    grid-template-columns: minmax(0, 1fr) minmax(0, 24rem)
+    grid-template-areas: 'left answers' 'reveal answers'
     grid-template-rows: auto 1fr
-    gap: 10px 18px
+    gap: 12px 20px
     align-items: start
 
   .fq-left
     grid-area: left
+    gap: 8px
 
-  .fq-coins
-    grid-area: coins
-    width: min(100%, 72vh)
-    justify-self: center
+  // the card of the question needs less height when the phone is held wide
+  .fq-qcard
+    :deep(.fam-card-head)
+      min-height: 44px
+      padding-top: 4px
+      padding-bottom: 4px
 
+    :deep(.fam-card-body)
+      padding: 10px 14px
+
+    :deep(.fam-q-text)
+      min-height: 40px
+
+  .fq-answers
+    grid-area: answers
+    gap: 12px
+
+  // the verdict and the button side by side, so that both stay on a phone held wide
   .fq-reveal
     grid-area: reveal
     flex-direction: row
-    flex-wrap: wrap
+    flex-wrap: nowrap
     justify-content: center
     align-items: center
+    gap: 12px
 
   .fq-verdict
-    flex: 0 1 8.5rem
+    flex: 1 1 0
+    min-width: 0
+    max-width: none
 
-    :deep(.mpa-in)
-      font-size: 1.05rem
+    :deep(.fam-card-body)
+      padding: 8px 10px
+
+  .fq-next
+    flex: 1 1 0
+    min-width: 0
+    width: auto
+    padding: 8px 14px
 
   .fq-road
     display: none
@@ -1051,9 +862,4 @@ const questionSize = computed(() => {
     align-items: center
     justify-content: center
     gap: 2px 16px
-
-  .fq-qcard
-    :deep(.mpa-in)
-      padding: 8% 8% 7%
-      min-height: 90px
 </style>
