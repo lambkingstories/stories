@@ -17,6 +17,7 @@ const AppBookDetailView = () => import('@/views/app/AppBookDetailView.vue')
 const AppReaderView = () => import('@/views/app/AppReaderView.vue')
 const AppColoringView = () => import('@/views/app/AppColoringView.vue')
 const AppColoringBookView = () => import('@/views/app/AppColoringBookView.vue')
+const AppColoringPickView = () => import('@/views/app/AppColoringPickView.vue')
 const AppAdventureHomeView = () => import('@/views/app/AppAdventureHomeView.vue')
 const AppAdventureView = () => import('@/views/app/AppAdventureView.vue')
 const AppAdventureStageView = () => import('@/views/app/AppAdventureStageView.vue')
@@ -54,6 +55,7 @@ export function prefetchRoutes() {
   void AppAdventureStageView()
   void AppAdventureStatsView()
   void AppColoringView()
+  void AppColoringPickView()
 }
 
 /** The welcome screen was shown once (see AppWelcomeView). */
@@ -116,6 +118,8 @@ const routes: RouteRecordRaw[] = [
   { path: '/app/gute-nacht', name: 'app-goodnight', component: AppGoodNightView },
   // the awards are a part of "My rewards" now (the name stays, so every old link still arrives)
   { path: '/app/awards', name: 'app-awards', redirect: { name: 'app-collection', query: { tab: 'awards' } } },
+  // "Malen" opens here first: pick one of the coloring books you have; the book goes on the shelf of the painting program (`app-coloring`)
+  { path: '/app/coloring/pick', name: 'app-coloring-pick', component: AppColoringPickView },
   { path: '/app/coloring', name: 'app-coloring', component: AppColoringView },
   { path: '/app/coloring/book/:bookId', name: 'app-coloring-book', component: AppColoringBookView },
   { path: '/app/adventure', name: 'app-adventure', component: AppAdventureHomeView },

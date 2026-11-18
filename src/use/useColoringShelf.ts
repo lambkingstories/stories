@@ -21,6 +21,8 @@ function read(): string[] | null {
 const initial = read()
 const ids = ref<string[]>(initial ?? [])
 const seeded = ref(initial !== null)
+/** The book that has just been put on the shelf (from the choice page): the menu of the painting program shows it once, softly. Only in memory. */
+const fresh = ref('')
 
 function save() {
   try {
@@ -33,6 +35,14 @@ function save() {
 export default function useColoringShelf() {
   return {
     ids: computed(() => ids.value),
+    fresh: computed(() => fresh.value),
+    /** Marks a book as "just arrived" (the menu lifts it once); `clearFresh` takes the mark away again. */
+    markFresh(id: string) {
+      fresh.value = id
+    },
+    clearFresh(id?: string) {
+      if (!id || fresh.value === id) fresh.value = ''
+    },
     has: (id: string) => ids.value.includes(id),
     add(id: string) {
       if (!ids.value.includes(id)) {

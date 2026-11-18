@@ -4369,6 +4369,7 @@ watch(queryBook, (id) => {
         @open-book="openBookCard"
         @remove-book="(card) => paintShelf.remove(card.bookId)"
         @to-books="router.push({ name: 'app-coloring-books', query: { from: 'malen' } })"
+        @back="goBackTo(router, { name: 'app-coloring-pick' })"
         @blank="startBlankSheet"
         @own-image="pickFile"
         @open-work="openWork"
