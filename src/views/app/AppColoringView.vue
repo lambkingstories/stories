@@ -4368,7 +4368,7 @@ watch(queryBook, (id) => {
         :backup-message="backupMessage"
         @open-book="openBookCard"
         @remove-book="(card) => paintShelf.remove(card.bookId)"
-        @to-books="router.push({ name: 'app-coloring-books', query: { from: 'malen' } })"
+        @to-books="router.push({ name: 'app-coloring-books', query: { from: 'shelf' } })"
         @blank="startBlankSheet"
         @own-image="pickFile"
         @open-work="openWork"

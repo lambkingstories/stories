@@ -2,7 +2,7 @@
  * How much of a book may be seen without paying.
  *
  *   - Stories (and every book that is not a coloring book) are free in full, with reading aloud.
- *   - A coloring book: the first picture. The two books in `FREE_COLORING_BOOKS` (Band 1 of each series) are free in full.
+ *   - A coloring book: the first picture. Only the book in `FREE_COLORING_BOOKS` (Band 1 of the Buntstift series, "Gott erschafft die Welt") is free in full.
  *
  * The rest opens with the subscription (LambKing Plus) or when the single book was bought. All of this only
  * applies when `VITE_PREMIUM_TEASER=true` (see `usePremium`): while nothing can be bought yet, a book is
@@ -13,16 +13,11 @@ import { PREMIUM_TEASER, hasBook } from '@/use/usePremium'
 export const FREE_COLORING_PAGES = 1
 
 /**
- * The coloring books that are free in full (Anton, 29.10.2026, repeated 17.11.2026): Band 1 of the Buntstift series (ages 5-8,
- * "Gott erschafft die Welt") and Band 1 of the series for 9-12 ("Die Schöpfung - Gott macht die Welt"). The ids are the ones of the
- * backend (see `BOOK_PAGES`), plus the local copy of the second book that the test build uses while the backend does not have it.
- * Every other book is for sale (or comes with Plus). A book can also be made free in the AdminUI with its own number of free pictures.
+ * The coloring book that is free in full (Anton, 18.11.2026): only Band 1 of the Buntstift series (ages 5-8), "Gott erschafft die Welt". The id is the one of the
+ * backend (see `BOOK_PAGES`). "Die Schöpfung - Gott macht die Welt" (ages 9-12, `ba-11-...`) is NOT free any more: it is bought on its own or comes with Plus, and its first
+ * picture is free like in every book. Every other book is for sale (or comes with Plus) too. A book can also be made free in the AdminUI with its own number of free pictures.
  */
-export const FREE_COLORING_BOOKS: readonly string[] = [
-  'ba-02-gott-erschafft-die-welt',
-  'ba-11-schoepfung-gott-macht-die-welt',
-  'lokal-912-schoepfung'
-]
+export const FREE_COLORING_BOOKS: readonly string[] = ['ba-02-gott-erschafft-die-welt']
 
 export type BookKind = 'story' | 'coloring'
 

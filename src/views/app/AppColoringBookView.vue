@@ -16,6 +16,7 @@ import { deleteArtwork, getDrawing, listArtworks, pageArtworkId, type ArtworkMet
 import { LINE_ICONS } from '@/data/coloringKits'
 import { prependBaseUrl } from '@/utils/function'
 import { goBackTo, previousPath } from '@/utils/navBack'
+import { shortColoringTitle } from '@/utils/coloringTitles'
 import useColoringShelf from '@/use/useColoringShelf'
 import { cacheUrlToBlobUrl } from '@/use/useBookCache'
 import { allowedPages, freePageCount } from '@/use/useBookAccess'
@@ -39,6 +40,8 @@ const paintShelf = useColoringShelf()
 
 const bookId = computed(() => String(route.params.bookId))
 const title = ref('')
+/** What the head shows: the name of the book without the series and the volume (the long start "Bibelgeschichten zum Ausmalen: Band 1 - " is left out), so it fits over two lines. */
+const headTitle = computed(() => shortColoringTitle(title.value))
 const shopLink = ref('')
 /** Where the printed book is sold (Amazon) in the language of the app; empty when there is none for this language. */
 const printedLink = ref('')
@@ -70,6 +73,7 @@ const bookLocked = computed(() => pages.value.length > 0 && allowed.value < page
 const purchases = usePurchases()
 const bookPrice = computed(() => purchases.prices.value[bookProductId(bookId.value)] ?? plusOffer.book)
 watch(bookId, (id) => {
+  purchases.resetPurchaseStatus()
   if (id) void purchases.loadBookPrice(id)
 }, { immediate: true })
 
@@ -291,7 +295,7 @@ watch(bookId, () => {
       button(type="button" class="bk-btn" :aria-label="t('app.coloring.back')" @click="back")
         img(:src="LINE_ICONS.back" alt="" draggable="false")
       div(class="bk-head")
-        h1(class="bk-title") {{ title || t('app.coloring.books') }}
+        h1(class="bk-title") {{ headTitle || t('app.coloring.books') }}
         p(v-if="pages.length" class="bk-progress") {{ t('app.coloring.pagesPainted', { done: paintedCount, total: pages.length }) }}
         span(v-if="pages.length" class="bk-meter" aria-hidden="true")
           span(class="bk-meter-fill" :style="{ width: share + '%' }")
@@ -361,6 +365,8 @@ watch(bookId, () => {
             button(type="button" class="bk-offer-opt is-book" @click="buyBook")
               span(class="bk-offer-name") {{ t('app.premium.optBook') }}
               span(class="bk-offer-price") {{ bookPrice }}
+          //- the store does not answer, or does not know the single book yet: a friendly note, never an error
+          p(v-if="purchases.status.value !== 'idle' && purchases.status.value !== 'done'" class="bk-offer-status" role="status" data-test="book-status") {{ t(`app.plus.status_${purchases.status.value}`) }}
 
         div(v-if="current || printedLink" class="bk-links")
           button(v-if="current" type="button" class="bk-link" @click="confirming = true") {{ t('app.coloring.resetPage') }}
@@ -406,6 +412,11 @@ $accent: var(--lk-accent)
   align-items: center
   gap: 12px
 
+  // as wide as the back button on the other side, so the name stands exactly in the middle
+  &::after
+    content: ''
+    flex: 0 0 48px
+
 .bk-btn
   flex: 0 0 auto
   width: 48px
@@ -426,15 +437,19 @@ $accent: var(--lk-accent)
 .bk-head
   flex: 1 1 auto
   min-width: 0
+  text-align: center
 
+// the whole name of the book, over two lines (it was cut off after one)
 .bk-title
   margin: 0
-  font-size: 1.1rem
+  font-size: 1.05rem
   font-weight: 800
   line-height: 1.2
+  display: -webkit-box
+  -webkit-line-clamp: 2
+  -webkit-box-orient: vertical
   overflow: hidden
-  text-overflow: ellipsis
-  white-space: nowrap
+  overflow-wrap: anywhere
 
 .bk-progress
   margin: 2px 0 6px
@@ -492,6 +507,13 @@ $accent: var(--lk-accent)
   padding: 12px
   border-radius: 18px
   background: var(--lk-accent-soft)
+
+.bk-offer-status
+  margin: 8px 0 0
+  text-align: center
+  font-size: 0.9rem
+  font-weight: 600
+  color: $muted
 
 .bk-offer-title
   margin: 0 0 8px

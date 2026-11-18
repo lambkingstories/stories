@@ -1264,7 +1264,10 @@ export default {
     books: 'Libros para colorear',
     pagesPainted: '{done} de {total} páginas pintadas',
     pagesCount: '{total} dibujos',
-    newPage: 'Otro dibujo'
+    newPage: 'Otro dibujo',
+    transferMoving: 'Tu libro para colorear está en tu estante de pintura',
+    transferThere: 'Tu libro para colorear ya está en tu estante de pintura',
+    transferSkip: 'Seguir'
   },
   premium: {
     title: 'LambKing Plus',

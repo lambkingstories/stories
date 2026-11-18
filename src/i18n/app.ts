@@ -3871,7 +3871,10 @@ export default {
         books: 'Coloring books',
         pagesPainted: '{done} of {total} pages painted',
         pagesCount: '{total} pictures',
-        newPage: 'Other picture'
+        newPage: 'Other picture',
+        transferMoving: 'Your coloring book goes onto your paint shelf',
+        transferThere: 'Your coloring book is already on your paint shelf',
+        transferSkip: 'Go on'
       },
       premium: {
         title: 'LambKing Plus',
@@ -8033,7 +8036,10 @@ export default {
         books: 'Ausmalbücher',
         pagesPainted: '{done} von {total} Seiten gemalt',
         pagesCount: '{total} Bilder',
-        newPage: 'Anderes Bild'
+        newPage: 'Anderes Bild',
+        transferMoving: 'Dein Malbuch liegt im Malregal',
+        transferThere: 'Dein Malbuch liegt schon im Malregal',
+        transferSkip: 'Weiter'
       },
       premium: {
         title: 'LambKing Plus',

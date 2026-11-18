@@ -17,6 +17,8 @@ import { booksOfArea } from '@/utils/readingAreas'
 import { coloringPagesOfBook } from '@/utils/coloringBook'
 import { pickLocalizedImage, type ApiBook, type Locale } from '@/types/apiBook'
 import { goBackTo } from '@/utils/navBack'
+import useColoringShelf from '@/use/useColoringShelf'
+import ColoringTransfer from '@/components/molecules/ColoringTransfer.vue'
 import { PREMIUM_TEASER, hasFeature, ownsBook } from '@/use/usePremium'
 import { FREE_COLORING_BOOKS } from '@/use/useBookAccess'
 import OwnBadge from '@/components/atoms/OwnBadge.vue'
@@ -31,7 +33,9 @@ const { t, locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
 const router = useRouter()
 /** Opened from the painting program: the way back leads there; from the door in "Lesen" it leads back to "Lesen". */
-const fromPainting = computed(() => route.query.from === 'malen')
+/** `from=shelf`: opened from the big door / the button of the paint shelf in the painting program: the chip "Habe ich" is on, and a book that is mine goes onto the shelf. */
+const fromShelf = computed(() => route.query.from === 'shelf')
+const fromPainting = computed(() => route.query.from === 'malen' || fromShelf.value)
 const apiBooks = useApiBooks()
 
 const lang = computed<Locale>(() => (contentLocale(locale.value)))
@@ -56,6 +60,8 @@ interface Card {
   parts: ColoringTitleParts
   group: ColoringAgeGroup
   cover: string
+  /** The cover a little larger, for the transfer. */
+  coverBig: string
   /** For the order: the import gives the volumes rising dates, so Band 1 comes before Band 2. */
   released: number
   total: number
@@ -77,6 +83,7 @@ const cards = computed<Card[]>(() => {
       parts,
       group: coloringAgeGroup(book, title),
       cover: withPlaceholder(sizedImage(pickLocalizedImage(book.previewImage, lang.value), 170)),
+      coverBig: withPlaceholder(sizedImage(pickLocalizedImage(book.previewImage, lang.value), 260)),
       released: Date.parse(book.releaseDate) || 0,
       total: pages.length,
       done: pages.filter((p) => painted.has(pageArtworkId(p.url, 1))).length,
@@ -86,7 +93,8 @@ const cards = computed<Card[]>(() => {
   return list.sort((a, b) => a.released - b.released || a.bookId.localeCompare(b.bookId))
 })
 
-const filter = ref<OwnFilterValue>('all')
+// from the paint shelf the books that are mine come first (the chips can still be changed to "Alle" or "Zu kaufen")
+const filter = ref<OwnFilterValue>(fromShelf.value ? 'mine' : 'all')
 const counts = computed(() => ownCounts(cards.value.map((c) => c.own)))
 /** The books of the chosen chip (the whole shelf is on show with "Alle"). */
 const shown = computed(() => cards.value.filter((c) => matchesOwnFilter(c.own, filter.value)))
@@ -107,8 +115,30 @@ function goBack() {
   goBackTo(router, { name: fromPainting.value ? 'app-coloring' : 'app-read' })
 }
 
-function openBook(bookId: string) {
-  void router.push({ name: 'app-coloring-book', params: { bookId } })
+const paintShelf = useColoringShelf()
+/** The book that is going onto the paint shelf (the short transfer is on show). */
+const moving = ref<{ card: Card; already: boolean } | null>(null)
+
+function openBook(card: Card) {
+  if (moving.value) return
+  if (fromShelf.value && card.own !== 'locked') {
+    // a book that is mine is not opened here: it goes straight onto the paint shelf (a device that painted before keeps the books it painted in)
+    paintShelf.seedShelf(cards.value.filter((c) => c.done > 0).map((c) => c.bookId))
+    const already = paintShelf.has(card.bookId)
+    paintShelf.add(card.bookId)
+    moving.value = { card, already }
+    return
+  }
+  void router.push({ name: 'app-coloring-book', params: { bookId: card.bookId } })
+}
+
+/** The transfer is over (time or tap): back to the painting program, where the book stands on the shelf and is lifted once. */
+function arrived() {
+  const m = moving.value
+  if (!m) return
+  moving.value = null
+  paintShelf.markFresh(m.card.bookId)
+  goBackTo(router, { name: 'app-coloring' })
 }
 </script>
 
@@ -125,7 +155,7 @@ function openBook(bookId: string) {
             p(v-if="sec.series" class="cb-sec-series") {{ sec.series }}
           ul(class="cb-grid")
             li(v-for="c in sec.cards" :key="c.bookId")
-              button(type="button" :class="['cb-card', { 'is-locked': c.own === 'locked' }]" :aria-label="c.title" @click="openBook(c.bookId)")
+              button(type="button" :class="['cb-card', { 'is-locked': c.own === 'locked' }]" :aria-label="c.title" @click="openBook(c)")
                 span(class="cb-cover")
                   img(:src="c.cover" :alt="c.title" loading="lazy" draggable="false" @error="onImgFallback")
                 //- the sign (free, to buy…) stands under the cover, never over its title
@@ -141,6 +171,14 @@ function openBook(bookId: string) {
       BookListError(v-else-if="showError" @retry="retry")
       BookListSkeleton(v-else-if="!apiBooks.state.listReady || retrying" variant="grid" :count="4")
       p(v-else class="cb-empty") {{ t('app.read.coloringEmpty') }}
+
+    ColoringTransfer(
+      v-if="moving"
+      :cover="moving.card.coverBig"
+      :title="moving.card.title"
+      :already="moving.already"
+      @done="arrived"
+    )
 </template>
 
 <style scoped lang="sass">
