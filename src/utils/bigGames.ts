@@ -18,15 +18,39 @@ export function pickedIds(games: BigGame[], picked: readonly string[]): string[]
   return [...new Set(picked)].filter((id) => known.has(id))
 }
 
-/** The wishes still free: earned minus the games already picked (never below 0, and never more than there are games left). */
-export function wishesFree(games: BigGame[], total: number, picked: readonly string[], step: number = STEP): number {
-  const used = pickedIds(games, picked).length
-  return Math.max(0, Math.min(wishesEarned(total, step) - used, games.length - used))
+/** The games that open by themselves at a number of stars (they need no wish). */
+function giftIds(games: BigGame[]): Set<string> {
+  return new Set(games.filter((g) => g.freeAt !== undefined).map((g) => g.id as string))
 }
 
-/** A game can be picked when it is still closed and a wish is free. */
+/** The games picked with a wish (the gifts do not count: they use no wish). */
+function wishPicks(games: BigGame[], picked: readonly string[]): string[] {
+  const gifts = giftIds(games)
+  return pickedIds(games, picked).filter((id) => !gifts.has(id))
+}
+
+/** The wishes still free: earned minus the games already picked (never below 0, and never more than there are games left to pick). */
+export function wishesFree(games: BigGame[], total: number, picked: readonly string[], step: number = STEP): number {
+  const used = wishPicks(games, picked).length
+  const pickable = games.length - giftIds(games).size
+  return Math.max(0, Math.min(wishesEarned(total, step) - used, pickable - used))
+}
+
+/** A game can be picked when it is still closed, is not a gift and a wish is free. */
 export function canPick(games: BigGame[], total: number, picked: readonly string[], id: string, step: number = STEP): boolean {
-  return games.some((g) => g.id === id) && !pickedIds(games, picked).includes(id) && wishesFree(games, total, picked, step) > 0
+  return (
+    games.some((g) => g.id === id) &&
+    !giftIds(games).has(id) &&
+    !pickedIds(games, picked).includes(id) &&
+    wishesFree(games, total, picked, step) > 0
+  )
+}
+
+/** A game is open when it was picked, or when it is a gift and the stars have reached its number. */
+export function isGameOpen(games: BigGame[], total: number, picked: readonly string[], id: string): boolean {
+  const g = games.find((x) => x.id === id)
+  if (!g) return false
+  return pickedIds(games, picked).includes(id) || (g.freeAt !== undefined && total >= g.freeAt)
 }
 
 export interface BigGameState {
@@ -35,9 +59,8 @@ export interface BigGameState {
   open: boolean
 }
 
-export function bigGameStates(games: BigGame[], picked: readonly string[]): BigGameState[] {
-  const ids = pickedIds(games, picked)
-  return games.map((game) => ({ game, open: ids.includes(game.id) }))
+export function bigGameStates(games: BigGame[], picked: readonly string[], total: number = 0): BigGameState[] {
+  return games.map((game) => ({ game, open: isGameOpen(games, total, picked, game.id) }))
 }
 
 export interface WishState {
@@ -56,13 +79,13 @@ export interface WishState {
 
 export function wishState(games: BigGame[], total: number, picked: readonly string[], step: number = STEP): WishState {
   const t = Math.max(0, total)
-  const used = pickedIds(games, picked).length
+  const used = wishPicks(games, picked).length
   const into = t % step
   return {
     earned: wishesEarned(t, step),
     used,
     free: wishesFree(games, t, picked, step),
-    allOpen: used >= games.length,
+    allOpen: games.every((g) => isGameOpen(games, t, picked, g.id)),
     missing: step - into,
     share: into / step
   }

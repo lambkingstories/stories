@@ -16,7 +16,7 @@ import { useRouter } from 'vue-router'
 import { journeys } from '@/data/adventures'
 import useAdventure from '@/use/useAdventure'
 import { cupOf, rewardGames, type RewardGame } from '@/utils/rewards'
-import { STEP } from '@/data/bigGames'
+import { BIG_GAMES, STEP } from '@/data/bigGames'
 import useBigGames from '@/use/useBigGames'
 import useGameWishes from '@/use/useGameWishes'
 import useCelebration from '@/use/useCelebration'
@@ -34,6 +34,8 @@ const router = useRouter()
 const adv = useAdventure()
 
 const bigGames = useBigGames()
+/** The stars at which the gift game (David's sling) opens by itself; the hint under the title names it. */
+const davidAt = BIG_GAMES.find((g) => g.freeAt !== undefined)?.freeAt ?? STEP
 const wish = useGameWishes()
 const { celebrate } = useCelebration()
 const stars = wish.stars
@@ -112,13 +114,13 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
         img(:src="prependBaseUrl('images/icons/kacheln/kachel-bonus-c.webp')" alt="" class="rw-title-img" draggable="false")
         span(class="rw-title-text") {{ t('app.bigGames.title') }}
         span(class="rw-count") {{ bigStates.filter((s) => s.open).length }} / {{ bigStates.length }}
-      p(v-if="section !== 'mini'" class="rw-hint") {{ t('app.bigGames.hint', { n: STEP }) }}
+      p(v-if="section !== 'mini'" class="rw-hint") {{ t('app.bigGames.hint', { n: STEP, first: davidAt }) }}
       div(v-if="section !== 'mini'" class="rw-grid")
         button(
           v-for="s in bigStates"
           :key="s.game.id"
           type="button"
-          :class="['rw-tile', 'rw-big', { 'is-locked': !s.open, 'is-pick': !s.open && w.free > 0, 'is-new': justOpened === s.game.id }]"
+          :class="['rw-tile', 'rw-big', { 'is-locked': !s.open, 'is-pick': !s.open && w.free > 0 && s.game.freeAt === undefined, 'is-new': justOpened === s.game.id }]"
           :data-game="s.game.id"
           :aria-label="s.open ? undefined : `${t(`app.bigGames.${s.game.id}.title`)}: ${t('app.bigGames.locked')}`"
           @click="tapBig(s)"
@@ -128,7 +130,7 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
             span(v-if="s.open" class="rw-play" aria-hidden="true")
               svg(viewBox="0 0 24 24" width="26" height="26" fill="currentColor")
                 path(d="M8 5.2v13.6a1 1 0 0 0 1.5.86l11-6.8a1 1 0 0 0 0-1.72l-11-6.8A1 1 0 0 0 8 5.2z")
-            span(v-else-if="w.free > 0" class="rw-lock rw-lock--pick" aria-hidden="true")
+            span(v-else-if="w.free > 0 && s.game.freeAt === undefined" class="rw-lock rw-lock--pick" aria-hidden="true")
               img(:src="prependBaseUrl('images/abenteuer/ui/stern-gold-1.webp')" alt="" draggable="false")
             span(v-else class="rw-lock" aria-hidden="true")
               svg(viewBox="0 0 24 24" width="30" height="30" fill="currentColor")
@@ -174,7 +176,7 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
           span(class="rw-name") {{ g.title }}
           span(class="rw-from") {{ g.from }}
       p(v-else class="rw-empty") {{ t('app.profile.myColoringPicturesEmpty') }}
-    BigGamePickDialog(v-if="asking" :game="asking.game" :free="w.free" :missing="w.missing" @close="asking = null" @pick="doPick")
+    BigGamePickDialog(v-if="asking" :game="asking.game" :free="w.free" :missing="w.missing" :stars="stars" @close="asking = null" @pick="doPick")
 </template>
 
 <style scoped lang="sass">

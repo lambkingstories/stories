@@ -9,7 +9,7 @@ import { computed, defineAsyncComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { BIG_GAMES } from '@/data/bigGames'
-import useBigGames from '@/use/useBigGames'
+import useGameWishes from '@/use/useGameWishes'
 import { PLUS_TEST } from '@/use/usePremium'
 import { prependBaseUrl } from '@/utils/function'
 const BigGameBezalel = defineAsyncComponent(() => import('@/components/molecules/games/BigGameBezalel.vue'))
@@ -27,12 +27,12 @@ const BigGameNehemia = defineAsyncComponent(() => import('@/components/molecules
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n({ useScope: 'global' })
-const bg = useBigGames()
+const wish = useGameWishes()
 
 const game = computed(() => BIG_GAMES.find((g) => g.id === route.params.gameId))
 /** The test door `?probe=1`: only where the test switch is on (the test app) or in development, never in a store build. */
 const PROBE_ALLOWED: boolean = PLUS_TEST || import.meta.env.DEV
-const open = computed(() => !!game.value && ((PROBE_ALLOWED && route.query.probe === '1') || bg.isPicked(game.value.id)))
+const open = computed(() => !!game.value && ((PROBE_ALLOWED && route.query.probe === '1') || wish.isOpen(game.value.id)))
 const gameTitle = computed(() => (game.value ? t(`app.bigGames.${game.value.id}.title`) : ''))
 
 function toGameRoom() {

@@ -72,28 +72,28 @@ describe('the sums', () => {
 
   it('free wishes = earned minus picked, never below zero and never more than games left', () => {
     expect(wishesFree(BIG_GAMES, 85, [])).toBe(2)
-    expect(wishesFree(BIG_GAMES, 85, ['david'])).toBe(1)
-    expect(wishesFree(BIG_GAMES, 85, ['david', 'memory'])).toBe(0)
+    expect(wishesFree(BIG_GAMES, 85, ['bezalel'])).toBe(1)
+    expect(wishesFree(BIG_GAMES, 85, ['bezalel', 'memory'])).toBe(0)
     // more picks than earned (stars were taken away, or a test button): not negative
-    expect(wishesFree(BIG_GAMES, 30, ['david', 'memory', 'elia'])).toBe(0)
+    expect(wishesFree(BIG_GAMES, 30, ['bezalel', 'memory', 'elia'])).toBe(0)
     expect(wishesFree(BIG_GAMES, 0, [])).toBe(0)
     // plenty of stars, but only the games that are left can be picked
-    expect(wishesFree(BIG_GAMES, 4000, [])).toBe(BIG_GAMES.length)
+    expect(wishesFree(BIG_GAMES, 4000, [])).toBe(BIG_GAMES.length - 1)
     expect(wishesFree(BIG_GAMES, 4000, ids.slice(0, BIG_GAMES.length - 1))).toBe(1)
     expect(wishesFree(BIG_GAMES, 4000, ids)).toBe(0)
   })
 
   it('only the games of the list count, each once', () => {
-    expect(pickedIds(BIG_GAMES, ['david', 'david', 'nonsense', 'memory'])).toEqual(['david', 'memory'])
-    expect(wishesFree(BIG_GAMES, 120, ['david', 'david', 'nonsense'])).toBe(2)
+    expect(pickedIds(BIG_GAMES, ['bezalel', 'bezalel', 'nonsense', 'memory'])).toEqual(['bezalel', 'memory'])
+    expect(wishesFree(BIG_GAMES, 120, ['bezalel', 'bezalel', 'nonsense'])).toBe(2)
   })
 
   it('a game can be picked only with a free wish, only once, and only if it exists', () => {
-    expect(canPick(BIG_GAMES, 39, [], 'david')).toBe(false)
-    expect(canPick(BIG_GAMES, 40, [], 'david')).toBe(true)
-    expect(canPick(BIG_GAMES, 40, ['david'], 'memory')).toBe(false)
-    expect(canPick(BIG_GAMES, 80, ['david'], 'david')).toBe(false)
-    expect(canPick(BIG_GAMES, 80, ['david'], 'memory')).toBe(true)
+    expect(canPick(BIG_GAMES, 39, [], 'bezalel')).toBe(false)
+    expect(canPick(BIG_GAMES, 40, [], 'bezalel')).toBe(true)
+    expect(canPick(BIG_GAMES, 40, ['bezalel'], 'memory')).toBe(false)
+    expect(canPick(BIG_GAMES, 80, ['bezalel'], 'bezalel')).toBe(false)
+    expect(canPick(BIG_GAMES, 80, ['bezalel'], 'memory')).toBe(true)
     expect(canPick(BIG_GAMES, 400, [], 'nonsense')).toBe(false)
   })
 
@@ -102,7 +102,7 @@ describe('the sums', () => {
     expect(wishState(BIG_GAMES, 0, [])).toMatchObject({ earned: 0, used: 0, free: 0, missing: 40, share: 0, allOpen: false })
     expect(wishState(BIG_GAMES, 15, [])).toMatchObject({ free: 0, missing: 25, share: 0.375 })
     expect(wishState(BIG_GAMES, 40, [])).toMatchObject({ earned: 1, free: 1, missing: 40, share: 0 })
-    expect(wishState(BIG_GAMES, 95, ['david'])).toMatchObject({ earned: 2, used: 1, free: 1, missing: 25 })
+    expect(wishState(BIG_GAMES, 95, ['bezalel'])).toMatchObject({ earned: 2, used: 1, free: 1, missing: 25 })
     expect(wishState(BIG_GAMES, 95, ids).allOpen).toBe(true)
   })
 
@@ -130,25 +130,68 @@ describe('the sums', () => {
   })
 })
 
+describe("David's sling opens as a gift at 20 stars (Anton, 18 Nov 2026)", () => {
+  it('is closed below 20 stars, open from 20 on, and needs no wish', () => {
+    const david = BIG_GAMES.find((g) => g.id === 'david')!
+    expect(david.freeAt).toBe(20)
+    expect(bigGameStates(BIG_GAMES, [], 19).find((s) => s.game.id === 'david')!.open).toBe(false)
+    expect(bigGameStates(BIG_GAMES, [], 20).find((s) => s.game.id === 'david')!.open).toBe(true)
+    // the first wish still comes at 40 stars and is free for another game
+    expect(wishesFree(BIG_GAMES, 20, [])).toBe(0)
+    expect(wishesFree(BIG_GAMES, 40, [])).toBe(1)
+    // David cannot be picked with a wish, and being open does not use one
+    expect(canPick(BIG_GAMES, 400, [], 'david')).toBe(false)
+    expect(wishState(BIG_GAMES, 45, [], 40)).toMatchObject({ earned: 1, used: 0, free: 1 })
+  })
+
+  it('every game open means David (by stars) and all others (by wish)', () => {
+    const others = ids.filter((id) => id !== 'david')
+    expect(wishState(BIG_GAMES, 4000, others).allOpen).toBe(true)
+    expect(wishState(BIG_GAMES, 10, others).allOpen).toBe(false)
+  })
+
+  it('the hook and the page of the game follow the stars', () => {
+    const w = useGameWishes()
+    expect(w.isOpen('david')).toBe(false)
+    giveStars(21)
+    expect(w.isOpen('david')).toBe(true)
+    expect(w.wishes.value.free).toBe(0)
+    expect(w.pick('david')).toBe(false)
+    expect(useBigGames().picked()).toEqual([])
+  })
+
+  it('the window of the closed game says how many stars are missing for it, not for a wish', async () => {
+    giveStars(15)
+    const { default: MyRewards } = await import('@/components/molecules/MyRewards.vue')
+    const w = mount(MyRewards, { props: { part: 'games', section: 'bonus' }, ...opts })
+    await flushPromises()
+    await w.get('button[data-game="david"]').trigger('click')
+    await flushPromises()
+    expect(w.find('[data-test="bp-unlock"]').exists()).toBe(false)
+    expect(text(w.get('[data-test="bp-gift"]'))).toBe('Noch 5 Sterne, dann gehört dir dieses Spiel.')
+    w.unmount()
+  })
+})
+
 describe('the picks are kept on the device', () => {
   it('without a wish nothing can be picked; with one, one game, once; the choice is saved', () => {
     const w = useGameWishes()
-    expect(w.pick('david')).toBe(false)
-    expect(w.isOpen('david')).toBe(false)
+    expect(w.pick('bezalel')).toBe(false)
+    expect(w.isOpen('bezalel')).toBe(false)
     giveStars(40)
     expect(w.wishes.value.free).toBe(1)
-    expect(w.pick('david')).toBe(true)
-    expect(w.isOpen('david')).toBe(true)
+    expect(w.pick('bezalel')).toBe(true)
+    expect(w.isOpen('bezalel')).toBe(true)
     // the only wish is used
     expect(w.wishes.value.free).toBe(0)
     expect(w.pick('memory')).toBe(false)
-    expect(w.pick('david')).toBe(false)
-    expect(JSON.parse(localStorage.getItem('lk-biggames-picks-v1') ?? 'null')).toEqual(['david'])
+    expect(w.pick('bezalel')).toBe(false)
+    expect(JSON.parse(localStorage.getItem('lk-biggames-picks-v1') ?? 'null')).toEqual(['bezalel'])
     giveStars(95)
     expect(w.wishes.value.free).toBe(1)
     expect(w.pick('elia')).toBe(true)
-    expect(JSON.parse(localStorage.getItem('lk-biggames-picks-v1') ?? 'null')).toEqual(['david', 'elia'])
-    expect(w.states.value.filter((s) => s.open).map((s) => s.game.id)).toEqual(['david', 'elia'])
+    expect(JSON.parse(localStorage.getItem('lk-biggames-picks-v1') ?? 'null')).toEqual(['bezalel', 'elia'])
+    expect(w.states.value.filter((s) => s.open).map((s) => s.game.id)).toEqual(['david', 'elia', 'bezalel'])
   })
 
   it('a child who had its stars before gets its wishes (no migration)', () => {
@@ -171,11 +214,11 @@ describe('the game room', () => {
     const w = await room()
     expect(w.find('.gw').exists()).toBe(false)
     expect(text(w)).toContain('Noch 25 Sterne bis zum nächsten Spiel-Wunsch.')
-    await tile(w, 'david').trigger('click')
+    await tile(w, 'bezalel').trigger('click')
     await flushPromises()
     expect(w.find('[data-test="bp-unlock"]').exists()).toBe(false)
     expect(text(w.get('[data-test="bp-missing"]'))).toBe('Noch 25 Sterne bis zum nächsten Spiel-Wunsch.')
-    expect(text(w.get('[role="dialog"]'))).toContain('Davids Schleuder')
+    expect(text(w.get('[role="dialog"]'))).toContain('Bezalels Werkstatt')
     await w.get('[data-test="bp-back"]').trigger('click')
     expect(w.find('[role="dialog"]').exists()).toBe(false)
     expect(useBigGames().picked()).toEqual([])
@@ -209,23 +252,24 @@ describe('the game room', () => {
   it('"Unlock" opens the game for good, celebrates quietly, uses the wish, and the game can be played', async () => {
     giveStars(45)
     const w = await room()
-    await tile(w, 'david').trigger('click')
+    await tile(w, 'bezalel').trigger('click')
     await flushPromises()
     await w.get('[data-test="bp-unlock"]').trigger('click')
     await flushPromises()
     expect(w.find('[role="dialog"]').exists()).toBe(false)
-    expect(useBigGames().picked()).toEqual(['david'])
+    expect(useBigGames().picked()).toEqual(['bezalel'])
     expect(celebrate).toHaveBeenCalledTimes(1)
-    expect(tile(w, 'david').classes()).not.toContain('is-locked')
+    expect(tile(w, 'bezalel').classes()).not.toContain('is-locked')
     expect(tile(w, 'memory').classes()).toContain('is-locked')
     // the wish is used up: no bar, the next one is named, the other tiles do not glow any more
     expect(w.find('.gw').exists()).toBe(false)
     expect(text(w)).toContain('Noch 35 Sterne bis zum nächsten Spiel-Wunsch.')
     expect(tile(w, 'memory').classes()).not.toContain('is-pick')
-    expect(text(w.get('#rw-bonus'))).toContain(`1 / ${BIG_GAMES.length}`)
+    // David is open as a gift (45 stars), Bezalel by the wish
+    expect(text(w.get('#rw-bonus'))).toContain(`2 / ${BIG_GAMES.length}`)
     // an open game starts; a second closed game now only tells the missing stars
-    await tile(w, 'david').trigger('click')
-    expect(push).toHaveBeenCalledWith({ name: 'app-big-game', params: { gameId: 'david' } })
+    await tile(w, 'bezalel').trigger('click')
+    expect(push).toHaveBeenCalledWith({ name: 'app-big-game', params: { gameId: 'bezalel' } })
     await tile(w, 'memory').trigger('click')
     await flushPromises()
     expect(w.find('[data-test="bp-unlock"]').exists()).toBe(false)
@@ -259,33 +303,33 @@ describe('the game room', () => {
 describe('the page of a game', () => {
   const page = async () => {
     const { default: View } = await import('@/views/app/AppBigGameView.vue')
-    const w = mount(View, { global: { plugins: [i18n], stubs: { BigGameDavid: { template: '<div class="game-david-stub"></div>' } } }, attachTo: document.body })
+    const w = mount(View, { global: { plugins: [i18n], stubs: { BigGameBezalel: { template: '<div class="game-bezalel-stub"></div>' } } }, attachTo: document.body })
     await flushPromises()
     return w
   }
 
   it('opens only a picked game; otherwise it says so kindly and leads to the game page', async () => {
-    route.params = { gameId: 'david' }
+    route.params = { gameId: 'bezalel' }
     const closed = await page()
-    expect(closed.find('.game-david-stub').exists()).toBe(false)
+    expect(closed.find('.game-bezalel-stub').exists()).toBe(false)
     expect(text(closed)).toContain('noch nicht freigeschaltet')
     expect(closed.find('.bg-closed-btn').exists()).toBe(true)
     closed.unmount()
-    useBigGames().addPick('david')
+    useBigGames().addPick('bezalel')
     const open = await page()
-    expect(open.find('.game-david-stub').exists()).toBe(true)
+    expect(open.find('.game-bezalel-stub').exists()).toBe(true)
     open.unmount()
   })
 
   it('the stars alone do not open it any more, the test link does', async () => {
     giveStars(500)
-    route.params = { gameId: 'david' }
+    route.params = { gameId: 'bezalel' }
     const closed = await page()
-    expect(closed.find('.game-david-stub').exists()).toBe(false)
+    expect(closed.find('.game-bezalel-stub').exists()).toBe(false)
     closed.unmount()
     route.query = { probe: '1' }
     const probe = await page()
-    expect(probe.find('.game-david-stub').exists()).toBe(true)
+    expect(probe.find('.game-bezalel-stub').exists()).toBe(true)
     probe.unmount()
   })
 })

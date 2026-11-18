@@ -17,10 +17,13 @@ export interface BigGame {
   image: string
   /** The stars that can be won in all levels together. */
   maxStars: number
+  /** Opens by itself at this many stars on the adventures (a gift: it needs no wish and uses none). */
+  freeAt?: number
 }
 
 export const BIG_GAMES: BigGame[] = [
-  { id: 'david', image: 'images/spiele-gross/david/kachel.webp', maxStars: 30 },
+  // David's sling is the first game: it opens at 20 stars (Anton, 18.11.2026), before the first wish at 40 stars
+  { id: 'david', image: 'images/spiele-gross/david/kachel.webp', maxStars: 30, freeAt: 20 },
   // the memory with the pictures of the adventures: one board for each of the 37 adventures on the time line, three stars each (see `utils/bilderMemory.ts`)
   { id: 'memory', image: 'images/spiele-gross/memory/kachel-2.webp', maxStars: 111 },
   { id: 'elia', image: 'images/spiele-gross/elia/kachel.webp', maxStars: 45 },

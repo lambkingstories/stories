@@ -12,10 +12,21 @@ import type { BigGame } from '@/data/bigGames'
 import { firstSentence } from '@/utils/bigGames'
 import { prependBaseUrl } from '@/utils/function'
 
-const props = defineProps<{ game: BigGame; /** Wishes free now. */ free: number; /** Stars still missing for the next wish. */ missing: number }>()
+const props = defineProps<{
+  game: BigGame
+  /** Wishes free now. */
+  free: number
+  /** Stars still missing for the next wish. */
+  missing: number
+  /** The stars of the child on all adventures (for a gift game, which opens by itself at a number of stars). */
+  stars?: number
+}>()
 const emit = defineEmits<{ close: []; pick: [id: string] }>()
 const { t, te } = useI18n({ useScope: 'global' })
 
+/** A gift game opens by itself at its number of stars: no wish, so the window only says how many stars are missing for it. */
+const isGift = computed(() => props.game.freeAt !== undefined)
+const giftMissing = computed(() => Math.max(1, (props.game.freeAt ?? 0) - (props.stars ?? 0)))
 const title = computed(() => t(`app.bigGames.${props.game.id}.title`))
 const sentence = computed(() => {
   for (const key of ['intro', 'story', 'sub']) {
@@ -33,9 +44,10 @@ const sentence = computed(() => {
     div(class="bp")
       img(:src="prependBaseUrl(game.image)" alt="" class="bp-img" draggable="false")
       p(v-if="sentence" class="bp-text") {{ sentence }}
-      p(v-if="free <= 0" class="bp-missing" data-test="bp-missing") {{ t('app.bigGames.nextGame', { n: missing }, missing) }}
+      p(v-if="isGift" class="bp-missing" data-test="bp-gift") {{ t('app.bigGames.giftAt', { n: giftMissing }, giftMissing) }}
+      p(v-else-if="free <= 0" class="bp-missing" data-test="bp-missing") {{ t('app.bigGames.nextGame', { n: missing }, missing) }}
     template(#actions)
-      AdvButton(v-if="free > 0" tone="gold" class="bp-unlock" data-test="bp-unlock" @click="emit('pick', game.id)") {{ t('app.bigGames.unlock') }}
+      AdvButton(v-if="free > 0 && !isGift" tone="gold" class="bp-unlock" data-test="bp-unlock" @click="emit('pick', game.id)") {{ t('app.bigGames.unlock') }}
       AdvButton(tone="blau" data-test="bp-back" @click="emit('close')") {{ t('app.bigGames.back') }}
 </template>
 

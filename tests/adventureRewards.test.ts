@@ -98,7 +98,7 @@ describe('AdventureRewards', () => {
     expect(text(w)).toContain('Du darfst ein Spiel aussuchen!')
     expect(w.find('.rw-bonus').classes()).toContain('is-done')
     // the wish is used: the row speaks of the next one
-    useBigGames().addPick('david')
+    useBigGames().addPick('bezalel')
     const again = make(1)
     expect(text(again)).not.toContain('aussuchen')
     expect(text(again)).toContain('Noch 38 Sterne bis zum nächsten Spiel-Wunsch.')

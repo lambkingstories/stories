@@ -117,7 +117,7 @@ describe('"Meine Spiele": three rooms', () => {
     expect(text(w.get('.gw'))).toBe('Du darfst ein Spiel aussuchen!')
     expect(w.findAll('button[data-game]').length).toBe(BIG_GAMES.length)
     expect(w.findAll('.rw-tile:not(.rw-big)')).toHaveLength(0)
-    await w.get('button[data-game="david"]').trigger('click')
+    await w.get('button[data-game="bezalel"]').trigger('click')
     await flushPromises()
     expect(w.find('[role="dialog"]').exists()).toBe(true)
     expect(w.find('[data-test="bp-unlock"]').exists()).toBe(true)
