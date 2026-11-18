@@ -5,7 +5,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
-import app from '../src/i18n/app'
+import rawApp from '../src/i18n/app'
+import { withGameTexts } from '../src/i18n/bigGames'
 
 vi.mock('@/use/useSfx', () => ({ default: () => ({ play: vi.fn() }) }))
 vi.mock('@/use/useMusic', () => ({ default: () => ({ playGame: vi.fn(), playElia: vi.fn(), stop: vi.fn() }) }))
@@ -13,6 +14,7 @@ vi.mock('@/use/useMusic', () => ({ default: () => ({ playGame: vi.fn(), playElia
 import BigGameElia from '@/components/molecules/games/BigGameElia.vue'
 import useBigGames from '@/use/useBigGames'
 
+const app = withGameTexts(rawApp)
 const i18n = createI18n({ legacy: false, locale: 'de', fallbackLocale: 'en', messages: { de: (app as { de?: object }).de ?? {}, en: (app as { en?: object }).en ?? {} } })
 
 /** jsdom does not load pictures: every one "fails" at once, so the game goes on without them. */
@@ -106,6 +108,7 @@ describe('BigGameElia', () => {
     await flushPromises()
     const out = w.find('[data-test="elia-pause-leave"]')
     expect(out.exists()).toBe(true)
+    expect(out.text()).toBe('Spiel verlassen')
     await out.trigger('click')
     expect(w.emitted('leave')).toBeTruthy()
     w.unmount()

@@ -1354,7 +1354,7 @@ onBeforeUnmount(() => {
         div(class="ag-menu-buttons")
           AdvButton(data-test="arche-play" @click="startFirstOpen") {{ levelTitle(firstOpen()) }}
           AdvButton(tone="blau" small data-test="arche-how" @click="how = true") {{ T('howTitle') }}
-          AdvButton(tone="blau" small @click="leave") {{ T('leave') }}
+          AdvButton(tone="blau" small @click="leave") {{ t('app.bigGames.common.leave') }}
 
     //- the game
     template(v-else-if="screen === 'play'")
@@ -1393,7 +1393,7 @@ onBeforeUnmount(() => {
           AdvButton(data-test="arche-resume" @click="paused = false") {{ T('resume') }}
           AdvButton(tone="blau" @click="start(level)") {{ T('again') }}
           AdvButton(tone="blau" @click="toMenu") {{ T('menu') }}
-          AdvButton(tone="blau" data-test="arche-pause-leave" @click="leave") {{ T('leave') }}
+          AdvButton(tone="blau" data-test="arche-pause-leave" @click="leave") {{ t('app.bigGames.common.leave') }}
 
     //- the end of a round
     div(v-else-if="screen === 'result'" class="ag-menu ag-menu--dim")

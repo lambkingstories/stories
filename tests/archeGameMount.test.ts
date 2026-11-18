@@ -105,6 +105,7 @@ describe('BigGameArche', () => {
     await w.find('[data-test="arche-pause"]').trigger('click')
     const out = w.find('[data-test="arche-pause-leave"]')
     expect(out.exists()).toBe(true)
+    expect(out.text()).toBe('Spiel verlassen')
     await out.trigger('click')
     expect(w.emitted('leave')).toBeTruthy()
     w.unmount()

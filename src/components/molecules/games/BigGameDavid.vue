@@ -654,7 +654,7 @@ onBeforeUnmount(() => {
         p(class="dg-rules") {{ t('app.bigGames.david.starRules') }}
         div(class="dg-menu-buttons")
           AdvButton(tone="blau" small data-test="david-how" @click="how = true") {{ t('app.bigGames.david.howTitle') }}
-          AdvButton(tone="blau" small @click="leave") {{ t('app.bigGames.david.leave') }}
+          AdvButton(tone="blau" small @click="leave") {{ t('app.bigGames.common.leave') }}
 
     //- the game
     template(v-else-if="screen === 'play'")
@@ -684,7 +684,7 @@ onBeforeUnmount(() => {
             AdvButton(@click="paused = false") {{ t('app.bigGames.david.resume') }}
             AdvButton(tone="blau" @click="start(level)") {{ t('app.bigGames.david.again') }}
             AdvButton(tone="blau" @click="toMenu") {{ t('app.bigGames.david.menu') }}
-            AdvButton(tone="blau" data-test="david-pause-leave" @click="leave") {{ t('app.bigGames.david.leave') }}
+            AdvButton(tone="blau" data-test="david-pause-leave" @click="leave") {{ t('app.bigGames.common.leave') }}
 
     //- the end of a round
     div(v-else-if="screen === 'result'" class="dg-menu dg-menu--dim")

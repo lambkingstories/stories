@@ -737,7 +737,7 @@ onBeforeUnmount(() => {
         p(class="nm-rules") {{ t('app.bigGames.nehemia.starRules') }}
         div(class="nm-menu-buttons")
           AdvButton(tone="blau" small data-test="nehemia-how" @click="how = true") {{ t('app.bigGames.nehemia.howTitle') }}
-          AdvButton(tone="blau" small @click="leave") {{ t('app.bigGames.nehemia.leave') }}
+          AdvButton(tone="blau" small @click="leave") {{ t('app.bigGames.common.leave') }}
 
     //- the game
     template(v-else-if="screen === 'play'")
@@ -784,7 +784,7 @@ onBeforeUnmount(() => {
           AdvButton(data-test="nehemia-resume" @click="paused = false") {{ t('app.bigGames.nehemia.resume') }}
           AdvButton(tone="blau" data-test="nehemia-pause-again" @click="begin(level)") {{ t('app.bigGames.nehemia.again') }}
           AdvButton(tone="blau" data-test="nehemia-menu" @click="toMenu") {{ t('app.bigGames.nehemia.menu') }}
-          AdvButton(tone="blau" data-test="nehemia-pause-leave" @click="leave") {{ t('app.bigGames.nehemia.leave') }}
+          AdvButton(tone="blau" data-test="nehemia-pause-leave" @click="leave") {{ t('app.bigGames.common.leave') }}
 
     //- the end of a round
     div(v-else-if="screen === 'result'" class="nm-menu nm-menu--dim")

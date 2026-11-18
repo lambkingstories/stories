@@ -430,7 +430,7 @@ const STAND = ['#c98a52', '#6f9fc2', '#7fb069', '#e0c25a', '#b58ac4', '#7fc4b8',
         p(class="mm-rules") {{ t('app.bigGames.memory.starRules') }}
         div(class="mm-menu-buttons")
           AdvButton(tone="blau" small data-test="memory-how" @click="how = true") {{ t('app.bigGames.memory.howTitle') }}
-          AdvButton(tone="blau" small data-test="memory-leave" @click="leave") {{ t('app.bigGames.memory.leave') }}
+          AdvButton(tone="blau" data-test="memory-leave" @click="leave") {{ t('app.bigGames.common.leave') }}
 
     //- the board
     template(v-else-if="screen === 'play' && board && game")

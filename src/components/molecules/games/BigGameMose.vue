@@ -1138,7 +1138,7 @@ onBeforeUnmount(() => {
         p(class="mk-rules") {{ t('app.bigGames.mose.starRules') }}
         div(class="mk-menu-buttons")
           AdvButton(tone="blau" small data-test="mose-how" @click="how = true") ? {{ t('app.bigGames.mose.howTitle') }}
-          AdvButton(tone="blau" small data-test="mose-leave" @click="leave") {{ t('app.bigGames.mose.leave') }}
+          AdvButton(tone="blau" small data-test="mose-leave" @click="leave") {{ t('app.bigGames.common.leave') }}
 
     //- the game
     template(v-else-if="screen === 'play'")
@@ -1162,7 +1162,7 @@ onBeforeUnmount(() => {
           AdvButton(data-test="mose-resume" @click="paused = false") {{ t('app.bigGames.mose.resume') }}
           AdvButton(tone="blau" data-test="mose-pause-again" @click="begin(level)") {{ t('app.bigGames.mose.again') }}
           AdvButton(tone="blau" data-test="mose-menu" @click="toMenu") {{ t('app.bigGames.mose.menu') }}
-          AdvButton(tone="blau" data-test="mose-pause-leave" @click="leave") {{ t('app.bigGames.mose.leave') }}
+          AdvButton(tone="blau" data-test="mose-pause-leave" @click="leave") {{ t('app.bigGames.common.leave') }}
 
     //- the end of a round
     div(v-else-if="screen === 'result'" class="mk-menu mk-menu--dim")

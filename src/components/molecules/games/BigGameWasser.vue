@@ -1301,7 +1301,7 @@ onBeforeUnmount(() => {
         p(class="wg-rules") {{ t('app.bigGames.wasser.starRules') }}
         div(class="wg-menu-buttons")
           AdvButton(tone="blau" small data-test="wasser-how" @click="how = true") {{ t('app.bigGames.wasser.howTitle') }}
-          AdvButton(tone="blau" small @click="leave") {{ t('app.bigGames.wasser.leave') }}
+          AdvButton(tone="blau" small @click="leave") {{ t('app.bigGames.common.leave') }}
 
     //- the game
     template(v-else-if="screen === 'play'")
@@ -1328,7 +1328,7 @@ onBeforeUnmount(() => {
           AdvButton(data-test="wasser-resume" @click="paused = false") {{ t('app.bigGames.wasser.resume') }}
           AdvButton(tone="blau" data-test="wasser-pause-again" @click="begin(level)") {{ t('app.bigGames.wasser.again') }}
           AdvButton(tone="blau" data-test="wasser-menu" @click="toMenu") {{ t('app.bigGames.wasser.menu') }}
-          AdvButton(tone="blau" data-test="wasser-pause-leave" @click="leave") {{ t('app.bigGames.wasser.leave') }}
+          AdvButton(tone="blau" data-test="wasser-pause-leave" @click="leave") {{ t('app.bigGames.common.leave') }}
 
     //- the end of a round
     div(v-else-if="screen === 'result'" class="wg-menu wg-menu--dim")

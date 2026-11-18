@@ -996,7 +996,7 @@ onBeforeUnmount(() => {
             span(v-else class="eg-free-best") {{ t('app.bigGames.elia.freeLocked') }}
           p(class="eg-rules") {{ t('app.bigGames.elia.starRules') }}
           AdvButton(tone="gold" small data-test="elia-how" @click="how = true") {{ t('app.bigGames.elia.howTitle') }}
-          AdvButton(tone="blau" small @click="leave") {{ t('app.bigGames.elia.leave') }}
+          AdvButton(tone="blau" small @click="leave") {{ t('app.bigGames.common.leave') }}
 
       //- the game
       template(v-else-if="screen === 'play'")
@@ -1034,7 +1034,7 @@ onBeforeUnmount(() => {
             AdvButton(@click="paused = false") {{ t('app.bigGames.elia.resume') }}
             AdvButton(tone="blau" @click="start(level)") {{ t('app.bigGames.elia.again') }}
             AdvButton(tone="blau" @click="toMenu") {{ t('app.bigGames.elia.menu') }}
-            AdvButton(tone="blau" data-test="elia-pause-leave" @click="leave") {{ t('app.bigGames.elia.leave') }}
+            AdvButton(tone="blau" data-test="elia-pause-leave" @click="leave") {{ t('app.bigGames.common.leave') }}
 
       //- the end of a round
       div(v-else-if="screen === 'result'" class="eg-menu eg-menu--dim")

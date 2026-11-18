@@ -1474,7 +1474,7 @@ onBeforeUnmount(() => {
         p(class="bo-rules") {{ t('app.bigGames.bogen.starRules') }}
         div(class="bo-menu-buttons")
           AdvButton(tone="blau" small data-test="bogen-how" @click="how = true") {{ t('app.bigGames.bogen.howTitle') }}
-          AdvButton(tone="blau" small @click="leave") {{ t('app.bigGames.bogen.leave') }}
+          AdvButton(tone="blau" small @click="leave") {{ t('app.bigGames.common.leave') }}
 
     //- the game
     template(v-else-if="screen === 'play'")
@@ -1505,7 +1505,7 @@ onBeforeUnmount(() => {
             AdvButton(small data-test="bogen-resume" @click="paused = false") {{ t('app.bigGames.bogen.resume') }}
             AdvButton(small tone="blau" data-test="bogen-pause-again" @click="begin(level)") {{ t('app.bigGames.bogen.again') }}
             AdvButton(small tone="blau" data-test="bogen-menu" @click="toMenu") {{ t('app.bigGames.bogen.menu') }}
-            AdvButton(small tone="blau" data-test="bogen-pause-leave" @click="leave") {{ t('app.bigGames.bogen.leave') }}
+          AdvButton(tone="blau" data-test="bogen-pause-leave" @click="leave") {{ t('app.bigGames.common.leave') }}
 
     //- the end of a round
     div(v-else-if="screen === 'result'" class="bo-menu bo-menu--dim")

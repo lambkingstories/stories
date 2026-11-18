@@ -84,6 +84,7 @@ describe('BigGameNehemia', () => {
     await w.find('[data-test="nehemia-pause"]').trigger('click')
     const out = w.find('[data-test="nehemia-pause-leave"]')
     expect(out.exists()).toBe(true)
+    expect(out.text()).toBe('Spiel verlassen')
     await out.trigger('click')
     expect(w.emitted('leave')).toBeTruthy()
     w.unmount()

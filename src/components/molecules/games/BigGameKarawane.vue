@@ -1288,7 +1288,7 @@ onBeforeUnmount(() => {
         div(class="kg-menu-buttons")
           AdvButton(data-test="karawane-shop" @click="shop = true") {{ t('app.bigGames.karawane.workshop') }}
           AdvButton(tone="blau" small data-test="karawane-how" @click="how = true") {{ t('app.bigGames.karawane.howTitle') }}
-          AdvButton(tone="blau" small @click="leave") {{ t('app.bigGames.karawane.leave') }}
+          AdvButton(tone="blau" small @click="leave") {{ t('app.bigGames.common.leave') }}
 
     //- the game
     template(v-else-if="screen === 'play'")
@@ -1335,7 +1335,7 @@ onBeforeUnmount(() => {
           AdvButton(@click="paused = false") {{ t('app.bigGames.karawane.resume') }}
           AdvButton(tone="blau" @click="start(route)") {{ t('app.bigGames.karawane.again') }}
           AdvButton(tone="blau" @click="toMenu") {{ t('app.bigGames.karawane.menu') }}
-          AdvButton(tone="blau" data-test="karawane-pause-leave" @click="leave") {{ t('app.bigGames.karawane.leave') }}
+          AdvButton(tone="blau" data-test="karawane-pause-leave" @click="leave") {{ t('app.bigGames.common.leave') }}
 
     //- the end of a round
     div(v-else-if="screen === 'result'" class="kg-menu kg-menu--dim")

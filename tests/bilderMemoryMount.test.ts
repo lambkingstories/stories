@@ -294,6 +294,7 @@ describe('BigGameMemory', () => {
   it('leaves with the buttons and the escape key', async () => {
     const w = await open()
     await closeHow(w)
+    expect(w.find('[data-test="memory-leave"]').text()).toBe('Spiel verlassen')
     await w.find('[data-test="memory-leave"]').trigger('click')
     expect(w.emitted('leave')).toHaveLength(1)
     w.unmount()

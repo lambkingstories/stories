@@ -895,7 +895,7 @@ onBeforeUnmount(() => {
         p(class="bz-rules") {{ TX('starRules') }}
         div(class="bz-menu-buttons")
           AdvButton(tone="blau" small data-test="bezalel-how" @click="how = true") {{ TX('howTitle') }}
-          AdvButton(tone="blau" small @click="leave") {{ TX('leave') }}
+          AdvButton(tone="blau" small @click="leave") {{ t('app.bigGames.common.leave') }}
 
     //- the game
     template(v-else-if="screen === 'play'")
@@ -925,7 +925,7 @@ onBeforeUnmount(() => {
           AdvButton(data-test="bezalel-resume" @click="paused = false") {{ TX('resume') }}
           AdvButton(tone="blau" data-test="bezalel-pause-again" @click="begin(level)") {{ TX('again') }}
           AdvButton(tone="blau" data-test="bezalel-menu" @click="toMenu") {{ TX('menu') }}
-          AdvButton(tone="blau" data-test="bezalel-pause-leave" @click="leave") {{ TX('leave') }}
+          AdvButton(tone="blau" data-test="bezalel-pause-leave" @click="leave") {{ t('app.bigGames.common.leave') }}
 
       //- the end of a round: the painted object, the name, the stars
       div(v-if="result" class="bz-menu bz-menu--dim")
