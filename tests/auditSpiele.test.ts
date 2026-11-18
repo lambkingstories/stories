@@ -181,3 +181,22 @@ describe('David does not repaint the whole picture 60 times a second behind a me
   })
 })
 
+describe('Elia: the run waits behind the note to hold the phone upright, and the road is not repainted 60 times a second behind a menu', () => {
+  const text = () => src('src/components/molecules/games/BigGameElia.vue').replace(/\r/g, '')
+  const frame = () => {
+    const t = text()
+    const at = t.indexOf('function frame(now: number)')
+    return t.slice(at, t.indexOf('\nfunction handleEvents', at))
+  }
+  it('the step of the run is skipped while the note is shown', () => {
+    expect(frame()).toContain("const running = screen.value === 'play' && !paused.value && !(landscape.value && !showAnyway.value)")
+    expect(frame()).toMatch(/if \(running\) \{\n\s+\/\/ a fixed small step/)
+  })
+  it('the picture is repainted at most every 250 ms while nothing runs, and at once after a resize', () => {
+    expect(text()).toContain('const IDLE_DRAW_MS = 250')
+    expect(frame()).toMatch(/running \|\| now - lastDraw >= IDLE_DRAW_MS/)
+    const resize = text().slice(text().indexOf('function resize()'), text().indexOf('const resultText'))
+    expect(resize).toContain('lastDraw = 0')
+  })
+})
+

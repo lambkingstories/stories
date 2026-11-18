@@ -349,12 +349,19 @@ function onKey(e: KeyboardEvent) {
 const canvas = ref<HTMLCanvasElement | null>(null)
 let ctx: CanvasRenderingContext2D | null = null
 
+/** When the picture was painted last (ms). */
+let lastDraw = 0
+/** Behind a menu, the pause card or the note to hold the phone upright the road does not move: the picture is painted only a few times a second (battery, heat: the road is made of thousands of slices). */
+const IDLE_DRAW_MS = 250
+
 function frame(now: number) {
   raf = requestAnimationFrame(frame)
   const dt = Math.min(0.05, Math.max(0, (now - last) / 1000))
   last = now
   if (!ctx) return
-  if (screen.value === 'play' && !paused.value) {
+  // the phone is held wide and the note asks to turn it: the run waits (it must not go on behind the note)
+  const running = screen.value === 'play' && !paused.value && !(landscape.value && !showAnyway.value)
+  if (running) {
     // a fixed small step keeps the fast game exact
     let left = dt
     while (left > 0) {
@@ -370,7 +377,10 @@ function frame(now: number) {
     updateParticles(dt)
     syncHud(false, now)
   }
-  draw(now / 1000)
+  if (running || now - lastDraw >= IDLE_DRAW_MS) {
+    lastDraw = now
+    draw(now / 1000)
+  }
 }
 
 function handleEvents() {
@@ -878,6 +888,8 @@ function resize() {
     cv.width = Math.round(VW * CS)
     cv.height = Math.round(VH * CS)
     ctx = cv.getContext('2d')
+    // a canvas that was resized is empty: paint it again at once
+    lastDraw = 0
   }
 }
 
