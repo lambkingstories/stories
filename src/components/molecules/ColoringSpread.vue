@@ -111,6 +111,7 @@ const pageAt = (i: number) => props.pages[i]!
           :title="pageAt(leftIndex).title"
           :reference="pageAt(leftIndex).reference"
           :text="pageAt(leftIndex).text"
+          :locked="isLocked(leftIndex)"
         )
       div(class="sp-page sp-right" role="button" tabindex="0" :aria-label="t('app.coloring.startPaint')" @click="emit('paint')" @keydown.enter="emit('paint')")
         ColoringSpreadArt(
@@ -130,10 +131,10 @@ const pageAt = (i: number) => props.pages[i]!
           template(v-if="turn.dir === 1")
             ColoringSpreadArt(:line="lineOf(pageAt(turn.from))" :layer="layerOf(turn.from)" alt="" :faded="isLocked(turn.from)")
           template(v-else)
-            ColoringSpreadText(:no="turn.from + 1" :total="pages.length" :title="pageAt(turn.from).title" :reference="pageAt(turn.from).reference" :text="pageAt(turn.from).text")
+            ColoringSpreadText(:no="turn.from + 1" :total="pages.length" :title="pageAt(turn.from).title" :reference="pageAt(turn.from).reference" :text="pageAt(turn.from).text" :locked="isLocked(turn.from)")
         div(class="sp-face sp-reverse")
           template(v-if="turn.dir === 1")
-            ColoringSpreadText(:no="turn.to + 1" :total="pages.length" :title="pageAt(turn.to).title" :reference="pageAt(turn.to).reference" :text="pageAt(turn.to).text")
+            ColoringSpreadText(:no="turn.to + 1" :total="pages.length" :title="pageAt(turn.to).title" :reference="pageAt(turn.to).reference" :text="pageAt(turn.to).text" :locked="isLocked(turn.to)")
           template(v-else)
             ColoringSpreadArt(:line="lineOf(pageAt(turn.to))" :layer="layerOf(turn.to)" alt="" :faded="isLocked(turn.to)")
 

@@ -93,6 +93,28 @@ describe('ColoringSpread', () => {
     expect(w.emitted('paint')).toHaveLength(1)
   })
 
+  it('shows none of the words of a locked page (no title, no Bible passage, no text), only veiled bars', () => {
+    const w = open(1, [1])
+    const left = w.find('.sp-left')
+    expect(left.text()).not.toContain('Bild 2')
+    expect(left.text()).not.toContain('1. Mose 2')
+    expect(left.text()).not.toContain('Text 2')
+    expect(left.html()).not.toContain('Text 2')
+    expect(left.findAll('.sp-bar').length).toBeGreaterThan(3)
+    // the number of the page stays, and an open page still shows its words
+    expect(left.text()).toContain('2')
+    const open1 = open(0, [1])
+    expect(open1.find('.sp-left').text()).toContain('Text 1')
+    expect(open1.find('.sp-left .sp-bar').exists()).toBe(false)
+  })
+
+  it('lays a bright veil over a locked picture (no grey blur copies)', () => {
+    const w = open(1, [1])
+    expect(w.find('.sp-right .sp-veil').exists()).toBe(true)
+    expect(w.findAll('.sp-right img.sp-line')).toHaveLength(1)
+    expect(open(0, [1]).find('.sp-right .sp-veil').exists()).toBe(false)
+  })
+
   it('marks a locked picture with the Plus sign, not with a lock', () => {
     const w = open(1, [1])
     expect(w.find('.sp-lock').exists()).toBe(true)
