@@ -2,7 +2,7 @@ name: Android Build & Sign
 
 # Builds the signed Play Store bundle (.aab) and an installable .apk.
 # Upload the .aab by hand in the Play Console (Test and release -> Closed testing).
-# Last build request: 2026-11-18 b (Joseph's granary instead of Gideon, Hezekiah's tunnel in the water game, caravan brakes on hills, lamb levers, audit fixes; release 1.2.0).
+# Last build request: 2026-11-18 c (the potter and Bezalel's workshop instead of Gideon, Hezekiah's tunnel in the water game, caravan brakes on hills, lamb levers, audit fixes; release 1.2.0).
 #
 # Needs the repository secrets ANDROID_KEYSTORE_BASE64 (the release keystore,
 # base64) and ANDROID_KEYSTORE_PASSWORD (store = key password; alias `lambking`).
