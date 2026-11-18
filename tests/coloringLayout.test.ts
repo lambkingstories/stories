@@ -6,11 +6,14 @@ import {
   FOLDED_TAB,
   PAGE_INSET,
   TOP_BAR_ROOM,
+  TOP_BTN,
   colorBoxPlacement,
   fitPaper,
   isFlatLandscape,
   paperInsets,
+  toolbarStartsOpen,
   topBarReach,
+  topBarRows,
   type InsetInput
 } from '@/utils/coloringLayout'
 
@@ -134,9 +137,10 @@ describe('the paper of the painting screen', () => {
   })
 
   it('narrows the paper between the buttons instead of dropping it below the bar when that is bigger', () => {
-    const { w, insets } = fitPaper(base(667, 375))
+    // (with 48 px buttons a 667 px wide phone has no more room beside the paper; 700 px is the narrowest case where rising is still bigger)
+    const { w, insets } = fitPaper(base(700, 375))
     expect(insets.top).toBe(FLAT_TOP_INSET)
-    expect(w).toBeLessThanOrEqual(667 - 2 * topBarReach(plain))
+    expect(w).toBeLessThanOrEqual(700 - 2 * topBarReach(plain))
     expect(w).toBeGreaterThan(212)
   })
 
@@ -162,9 +166,53 @@ describe('the paper of the painting screen', () => {
   })
 
   it('counts the width of the top bar buttons', () => {
-    expect(topBarReach(plain)).toBe(208)
+    expect(topBarReach(plain)).toBe(228)
     expect(topBarReach({ ...plain, pages: true })).toBeGreaterThan(topBarReach(plain))
     expect(topBarReach({ ...plain, zoom: true })).toBeGreaterThan(topBarReach(plain))
     expect(topBarReach({ ...plain, doneButton: true })).toBeGreaterThanOrEqual(topBarReach(plain))
+  })
+})
+
+describe('the top bar with 48 px buttons', () => {
+  it('has buttons of 48 px (Anton: everything a finger hits)', () => {
+    expect(TOP_BTN).toBe(48)
+  })
+
+  it('is one row on a phone for a free sheet (back, eraser, undo, redo, finished, menu), also at 360 px', () => {
+    const free = { doneButton: false, finishButton: true, pages: false, zoom: false, text: false }
+    for (const w of [360, 375, 390, 412]) expect(topBarRows(w, free)).toBe(1)
+  })
+
+  it('wraps into a second row with the arrows of a book on a phone upright, and not on wide screens', () => {
+    const book = { doneButton: false, finishButton: true, pages: true, zoom: false, text: true }
+    expect(topBarRows(390, book)).toBe(2)
+    expect(topBarRows(768, book)).toBe(1)
+    expect(topBarRows(844, book)).toBe(1)
+  })
+
+  it('makes room for the second row over the paper: the paper starts lower, and keeps its size where the width limits it', () => {
+    const one = paperInsets(base(390, 844))
+    const two = paperInsets(base(390, 844, { rows: 2 }))
+    expect(two.top - one.top).toBe(TOP_BTN + 8)
+    // a sheet 3:4 on a phone upright is limited by the width
+    expect(fitPaper(base(390, 844, { rows: 2 })).w).toBe(fitPaper(base(390, 844)).w)
+  })
+
+  it('counts the finished button in how far the buttons reach', () => {
+    expect(topBarReach({ ...plain, finishButton: true })).toBeGreaterThan(topBarReach(plain))
+  })
+})
+
+describe('the tool bar at the start of a picture', () => {
+  it('starts folded on a phone (up to 520 px wide), so that the paper fills the screen', () => {
+    expect(toolbarStartsOpen(360)).toBe(false)
+    expect(toolbarStartsOpen(390)).toBe(false)
+    expect(toolbarStartsOpen(520)).toBe(false)
+  })
+
+  it('starts out on tablets and computers, as before', () => {
+    expect(toolbarStartsOpen(521)).toBe(true)
+    expect(toolbarStartsOpen(768)).toBe(true)
+    expect(toolbarStartsOpen(1280)).toBe(true)
   })
 })

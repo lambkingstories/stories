@@ -3,8 +3,10 @@
  * The main menu of the painting program. It is built like the other tabs (Lesen, Abenteuer, Ich): a left-aligned heading with the
  * companion lamb, then framed groups in the surface colour, one after the other: "My coloring books" (the books standing on a
  * shelf, or a big door to the books while the shelf is empty), "Paint freely" (blank sheets and an own picture), the pictures won
- * as presents, the child's own paintings, the exhibition (the three best paintings on place 1, 2 and 3, kept on the device only),
- * and the part for parents. The other pictures (built in and from stories) are not shown any more; they are still handed in (`groups`).
+ * as presents, the child's own paintings, the finished pictures of the coloring books, and the part for parents. At the top stands the card "Keep painting"
+ * with the painting that was painted on last (or "Your first picture" while there is none), and under it a small row of the exhibition (the three best
+ * paintings, kept on the device only). A tap on a painting of the exhibition or of the finished pictures opens the quiet view (`ArtworkViewer`), not the
+ * painting screen. The other pictures (built in and from stories) are not shown any more; they are still handed in (`groups`).
  * It only shows what it is given and says what was tapped; the screen with the picture does the rest.
  */
 import { computed, ref } from 'vue'
@@ -12,9 +14,12 @@ import { useI18n } from 'vue-i18n'
 import LkCompanion from '@/components/atoms/LkCompanion.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import AppHeader from '@/components/molecules/AppHeader.vue'
+import ArtworkViewer from '@/components/molecules/ArtworkViewer.vue'
 import { prependBaseUrl } from '@/utils/function'
 import useExhibition from '@/use/useExhibition'
 import type { ArtworkMeta } from '@/use/useArtworks'
+import type { TimelapseData } from '@/utils/timelapse'
+import { frameRatio } from '@/utils/coloringThumb'
 import type { BookCard, GalleryGroup, GalleryItem, RewardItem } from '@/types/coloringMenu'
 
 interface Props {
@@ -42,6 +47,8 @@ const emit = defineEmits<{
   'open-work': [meta: ArtworkMeta]
   'ask-delete': [meta: ArtworkMeta]
   'pick-item': [item: GalleryItem]
+  'save-work': [meta: ArtworkMeta]
+  'play-lapse': [meta: ArtworkMeta, data: TimelapseData]
   'open-reward': [item: RewardItem]
   'export-backup': []
   'pick-backup': []
@@ -49,30 +56,43 @@ const emit = defineEmits<{
 
 const { t } = useI18n({ useScope: 'global' })
 
-// ── My exhibition: place 1, 2 and 3 ──────────────────────────────────────────────────────────
+// ── The painting to keep painting on, my exhibition and my finished pictures ──────────────────
 const exhibition = useExhibition()
+/** The places of the exhibition (a ref on the top level, so the template sees its value). */
+const exPlaces = exhibition.places
 const worksById = computed(() => new Map(props.exhibitionWorks.map((w) => [w.id, w])))
-/** The three places: place 1 hangs big, places 2 and 3 smaller beside each other under it. */
-const podium = computed(() =>
-  [0, 1, 2].map((place) => {
-    const id = exhibition.places.value[place]
-    return { place, work: (id ? worksById.value.get(id) : undefined) ?? null }
+const recent = computed(() => [...props.exhibitionWorks].sort((a, b) => b.updatedAt - a.updatedAt))
+
+/** The painting for the card on top: the one painted on last that is not finished; when all are, the newest. */
+const continueWork = computed<ArtworkMeta | null>(() => recent.value.find((w) => !w.done) ?? recent.value[0] ?? null)
+/** The line under its name: the page of the book, or "finished". */
+const continueSub = computed(() => {
+  const w = continueWork.value
+  if (!w) return ''
+  if (w.bookId && w.bookPage) {
+    const book = props.books.find((b) => b.bookId === w.bookId)
+    return book ? t('app.coloring.pageOfBook', { title: book.title, n: w.bookPage, total: book.total }) : t('app.coloring.pageNumber', { n: w.bookPage })
+  }
+  return w.done ? t('app.coloring.finishedTag') : ''
+})
+
+/** The paintings that hang, in the order of the places (a place whose painting is gone is left out). */
+const hungWorks = computed(() =>
+  exPlaces.value.flatMap((id, place) => {
+    const work = id ? worksById.value.get(id) : undefined
+    return work ? [{ place, work }] : []
   })
 )
-const hung = computed(() => podium.value.filter((s) => s.work).length)
-/** The place that gets a painting right now (0 = place 1); null while the choice window is closed. */
-const pickerFor = ref<number | null>(null)
-const canFill = computed(() => hung.value === 0 && props.exhibitionWorks.length > 0)
+/** The paintings that do not hang yet: they can be chosen. */
+const hangable = computed(() => recent.value.filter((w) => !exPlaces.value.includes(w.id)))
+const canHangMore = computed(() => hungWorks.value.length < exPlaces.value.length && hangable.value.length > 0)
+const canFill = computed(() => hungWorks.value.length === 0 && props.exhibitionWorks.length > 0)
+/** The window to choose a painting for the exhibition. */
+const picking = ref(false)
 
-function openPicker(place: number) {
-  pickerFor.value = place
-}
-function closePicker() {
-  pickerFor.value = null
-}
 function choose(w: ArtworkMeta) {
-  if (pickerFor.value !== null) exhibition.assign(pickerFor.value, w.id)
-  closePicker()
+  exhibition.hang(w.id)
+  picking.value = false
 }
 /** The newest finished paintings first, then the newest of the rest. */
 function fillNewest() {
@@ -80,8 +100,29 @@ function fillNewest() {
   exhibition.fill(sorted.slice(0, 3).map((w) => w.id))
 }
 
-/** The same picture as the door "Malbücher" in Lesen. */
-const booksDoorImage = prependBaseUrl('images/lesen/malbuecher-kachel.webp')
+/** The finished pictures of the coloring books, the newest first; six are shown, "show all" opens the rest. */
+const finishedBook = computed(() => recent.value.filter((w) => w.done && w.bookId))
+const FINISHED_SHOWN = 6
+const showAllFinished = ref(false)
+const finishedShown = computed(() => (showAllFinished.value ? finishedBook.value : finishedBook.value.slice(0, FINISHED_SHOWN)))
+
+/** The quiet view of one painting. */
+const viewing = ref<ArtworkMeta | null>(null)
+const viewingHung = computed(() => !!viewing.value && exPlaces.value.includes(viewing.value.id))
+function toggleHang(w: ArtworkMeta) {
+  if (exPlaces.value.includes(w.id)) exhibition.unhang(w.id)
+  else exhibition.hang(w.id)
+}
+function viewContinue(w: ArtworkMeta) {
+  viewing.value = null
+  emit('open-work', w)
+}
+
+/** The frame of a painting has the ratio of its sheet (no white bars). */
+const frameStyle = (w: ArtworkMeta) => ({ aspectRatio: String(frameRatio(w)) })
+
+/** The picture of the door to the books (the children's hands painting in a coloring book, the lamb watching). */
+const booksDoorImage = prependBaseUrl('images/bg/malen-kinderhaende.webp')
 
 const bookPercent = (b: BookCard) => `${Math.round((b.done / Math.max(1, b.total)) * 100)}%`
 </script>
@@ -99,13 +140,57 @@ const bookPercent = (b: BookCard) => `${Math.round((b.done / Math.max(1, b.total
           p(class="ac-head-sub") {{ t('app.coloring.menuSub') }}
         LkCompanion(class="ac-head-lamb" pose="stift" :size="92")
 
+      //- the painting that was painted on last: one tap goes on painting; while there is none, "Your first picture" with a button into painting
+      section(v-if="continueWork" class="ac-continue lk-panel" aria-labelledby="ac-h-continue" data-test="continue-card")
+        button(type="button" class="ac-cont-pic" :aria-label="t('app.coloring.keepPainting') + ': ' + continueWork.title" @click="emit('open-work', continueWork)")
+          img(:src="continueWork.thumb" alt="" draggable="false" :style="frameStyle(continueWork)")
+        div(class="ac-cont-body")
+          h2(id="ac-h-continue" class="ac-cont-kicker") {{ continueWork.done ? t('app.coloring.continueKickerDone') : t('app.coloring.continueKicker') }}
+          p(class="ac-cont-title") {{ continueWork.title }}
+          p(v-if="continueSub" class="ac-cont-sub") {{ continueSub }}
+          button(type="button" class="lk-btn ac-cont-go" data-test="continue-go" @click="emit('open-work', continueWork)")
+            ZIconography(name="brush" :size="22")
+            span {{ t('app.coloring.keepPainting') }}
+      section(v-else class="ac-continue ac-first lk-panel" aria-labelledby="ac-h-first" data-test="first-card")
+        span(class="ac-first-ico" aria-hidden="true")
+          ZIconography(name="brush" :size="30")
+        div(class="ac-cont-body")
+          h2(id="ac-h-first" class="ac-cont-kicker") {{ t('app.coloring.firstTitle') }}
+          p(class="ac-cont-sub") {{ t('app.coloring.firstText') }}
+          button(type="button" class="lk-btn ac-cont-go" data-test="first-go" @click="emit('blank', 'portrait')")
+            ZIconography(name="plus" :size="22")
+            span {{ t('app.coloring.firstGo') }}
+
+      //- my exhibition: a small row of the best paintings (only on this device); nothing is shown while there is no painting at all
+      section(v-if="exhibitionWorks.length" class="ac-sec" aria-labelledby="ac-h-exhibition" data-test="exhibition")
+        h2(id="ac-h-exhibition" class="ac-sec-title")
+          span {{ t('app.coloring.exhibition') }}
+          span(class="ac-count") {{ hungWorks.length }}/3
+        div(class="ac-exrow")
+          div(v-for="h in hungWorks" :key="h.work.id" class="ac-place")
+            button(
+              type="button"
+              class="ac-frame"
+              data-test="exhibition-frame"
+              :style="frameStyle(h.work)"
+              :aria-label="t('app.coloring.exhibitionOpen', { n: h.place + 1, title: h.work.title })"
+              @click="viewing = h.work"
+            )
+              img(:src="h.work.thumb" alt="" draggable="false")
+            span(class="ac-place-no" aria-hidden="true") {{ h.place + 1 }}
+          button(v-if="canHangMore" type="button" class="ac-frame is-empty ac-hangmore" data-test="exhibition-add" :aria-label="t('app.coloring.exhibitionHang')" @click="picking = true")
+            ZIconography(name="plus" :size="26")
+            span {{ t('app.coloring.exhibitionHang') }}
+        button(v-if="canFill" type="button" class="lk-btn lk-btn--outline lk-btn--small ac-ex-fill" data-test="exhibition-fill" @click="fillNewest")
+          | {{ t('app.coloring.exhibitionFill') }}
+
       //- 1. My coloring books: the books on their shelf, or the way to the books
       section(class="ac-sec" aria-labelledby="ac-h-books")
         h2(id="ac-h-books" class="ac-sec-title")
           span {{ t('app.coloring.myBooks') }}
           span(v-if="books.length" class="ac-count") {{ books.length }}
         div(v-if="books.length" class="ac-shelf lk-panel")
-          div(class="ac-bigbooks")
+          div(:class="['ac-bigbooks', { 'is-one': books.length === 1 }]")
             div(v-for="b in books" :key="b.bookId" class="ac-bigbook-wrap")
               button(type="button" class="ac-bigbook" @click="emit('open-book', b)")
                 span(class="ac-bigbook-cover")
@@ -118,9 +203,16 @@ const bookPercent = (b: BookCard) => `${Math.round((b.done / Math.max(1, b.total
                   span(class="ac-bigbook-fill" :style="{ width: bookPercent(b) }")
                 span(class="ac-bigbook-sub") {{ b.done > 0 ? t('app.coloring.pagesPainted', { done: b.done, total: b.total }) : t('app.coloring.pagesCount', { total: b.total }) }}
               //- takes the book out of the shelf again (the painted pictures stay)
-              button(type="button" class="ac-bigbook-remove" :aria-label="t('app.coloring.shelfRemove', { title: b.title })" @click="emit('remove-book', b)") ✕
+              button(type="button" class="ac-bigbook-remove" :aria-label="t('app.coloring.shelfRemove', { title: b.title })" @click="emit('remove-book', b)")
+                span(aria-hidden="true") ✕
+            //- one book only: the shelf would look empty beside it, so a friendly note stands there (the way to the other books)
+            div(v-if="books.length === 1" class="ac-onebook" data-test="one-book-note")
+              p(class="ac-onebook-text") {{ t('app.coloring.shelfMore') }}
+              button(type="button" class="lk-btn ac-onebook-go" @click="emit('to-books')")
+                span {{ t('app.coloring.shelfGo') }}
+                ZIconography(name="chevron-right" :size="20")
           //- the way to all coloring books, also when the shelf is full
-          button(type="button" class="lk-btn lk-btn--outline ac-allbooks" @click="emit('to-books')")
+          button(v-if="books.length !== 1" type="button" class="lk-btn lk-btn--outline ac-allbooks" @click="emit('to-books')")
             span {{ t('app.coloring.shelfGo') }}
             ZIconography(name="chevron-right" :size="20")
         //- nothing on the shelf yet: a big door like the ones in Lesen
@@ -174,41 +266,26 @@ const bookPercent = (b: BookCard) => `${Math.round((b.done / Math.max(1, b.total
           span(class="ac-count") {{ works.length }}
         div(class="ac-gallery")
           div(v-for="w in works" :key="w.id" class="ac-work")
-            button(type="button" class="ac-gal-tile" :aria-label="w.title" @click="emit('open-work', w)")
+            button(type="button" class="ac-gal-tile" :style="frameStyle(w)" :aria-label="w.title" @click="emit('open-work', w)")
               img(:src="w.thumb" alt="" draggable="false")
             button(
               type="button"
               class="ac-work-del"
               :aria-label="t('app.coloring.deleteTitle')"
               @click="emit('ask-delete', w)"
-            ) ✕
-
-      //- 5. My exhibition: the three best paintings on place 1, 2 and 3 (only on this device)
-      section(class="ac-sec" aria-labelledby="ac-h-exhibition")
-        h2(id="ac-h-exhibition" class="ac-sec-title")
-          span {{ t('app.coloring.exhibition') }}
-          span(class="ac-count") {{ hung }}/3
-        p(class="ac-ex-sub") {{ t('app.coloring.exhibitionSub') }}
-        div(class="ac-wall")
-          div(v-for="slot in podium" :key="slot.place" :class="['ac-place', 'is-p' + (slot.place + 1)]")
-            button(
-              v-if="slot.work"
-              type="button"
-              class="ac-frame"
-              :aria-label="t('app.coloring.exhibitionOpen', { n: slot.place + 1, title: slot.work.title })"
-              @click="emit('open-work', slot.work)"
             )
-              img(:src="slot.work.thumb" alt="" draggable="false")
-            button(v-else type="button" class="ac-frame is-empty" :aria-label="t('app.coloring.exhibitionPick', { n: slot.place + 1 })" @click="openPicker(slot.place)")
-              ZIconography(name="plus" :size="26")
-              span {{ t('app.coloring.exhibitionFree') }}
-            span(class="ac-place-no" aria-hidden="true") {{ slot.place + 1 }}
-            div(v-if="slot.work" class="ac-place-actions")
-              button(type="button" class="ac-mini" :aria-label="t('app.coloring.exhibitionChange')" @click="openPicker(slot.place)") ✎
-              button(type="button" class="ac-mini ac-mini--x" :aria-label="t('app.coloring.exhibitionRemove', { n: slot.place + 1 })" @click="exhibition.clear(slot.place)") ✕
-        button(v-if="canFill" type="button" class="lk-btn lk-btn--outline lk-btn--small ac-ex-fill" @click="fillNewest")
-          | {{ t('app.coloring.exhibitionFill') }}
-        p(v-if="!exhibitionWorks.length" class="ac-ex-hint") {{ t('app.coloring.exhibitionNone') }}
+              span(aria-hidden="true") ✕
+
+      //- 5. My finished pictures: the pictures that were finished in the coloring books (a tap shows one quietly)
+      section(v-if="finishedBook.length" class="ac-sec" aria-labelledby="ac-h-finished" data-test="finished-gallery")
+        h2(id="ac-h-finished" class="ac-sec-title")
+          span {{ t('app.coloring.myFinished') }}
+          span(class="ac-count") {{ finishedBook.length }}
+        div(class="ac-gallery")
+          button(v-for="w in finishedShown" :key="w.id" type="button" class="ac-gal-tile" data-test="finished-tile" :style="frameStyle(w)" :aria-label="w.title" @click="viewing = w")
+            img(:src="w.thumb" alt="" draggable="false")
+        button(v-if="finishedBook.length > FINISHED_SHOWN" type="button" class="lk-btn lk-btn--outline lk-btn--small ac-ex-fill" data-test="finished-more" @click="showAllFinished = !showAllFinished")
+          | {{ showAllFinished ? t('app.coloring.showLess') : t('app.coloring.showAll', { n: finishedBook.length }) }}
 
       //- 6. For parents: all paintings in one file, and back again.
       section(class="ac-sec ac-parents lk-panel" aria-labelledby="ac-h-parents")
@@ -224,15 +301,26 @@ const bookPercent = (b: BookCard) => `${Math.round((b.done / Math.max(1, b.total
             | {{ t('app.coloring.backupRestore') }}
         p(v-if="backupMessage" class="ac-parents-msg" role="status") {{ backupMessage }}
 
-    //- the window to choose a painting for a place of the exhibition
-    div(v-if="pickerFor !== null" class="ac-ex-overlay" role="dialog" aria-modal="true" :aria-label="t('app.coloring.exhibitionChoose', { n: pickerFor + 1 })" @click.self="closePicker" @keydown.esc="closePicker")
+    //- the window to choose a painting for the exhibition
+    div(v-if="picking" class="ac-ex-overlay" role="dialog" aria-modal="true" :aria-label="t('app.coloring.exhibitionChoose')" @click.self="picking = false" @keydown.esc="picking = false")
       div(class="ac-ex-window lk-panel")
-        h3(class="ac-ex-window-title") {{ t('app.coloring.exhibitionChoose', { n: pickerFor + 1 }) }}
-        p(v-if="!exhibitionWorks.length" class="ac-ex-hint") {{ t('app.coloring.exhibitionNone') }}
-        div(v-else class="ac-gallery")
-          button(v-for="w in exhibitionWorks" :key="w.id" type="button" class="ac-gal-tile" :aria-label="w.title" @click="choose(w)")
+        h3(class="ac-ex-window-title") {{ t('app.coloring.exhibitionChoose') }}
+        div(class="ac-gallery")
+          button(v-for="w in hangable" :key="w.id" type="button" class="ac-gal-tile" data-test="picker-tile" :style="frameStyle(w)" :aria-label="w.title" @click="choose(w)")
             img(:src="w.thumb" alt="" draggable="false")
-        button(type="button" class="lk-btn lk-btn--outline lk-btn--small ac-ex-close" @click="closePicker") {{ t('app.coloring.exhibitionClose') }}
+        button(type="button" class="lk-btn lk-btn--outline lk-btn--small ac-ex-close" @click="picking = false") {{ t('app.coloring.exhibitionClose') }}
+
+    //- the quiet view of one painting
+    ArtworkViewer(
+      v-if="viewing"
+      :work="viewing"
+      :hung="viewingHung"
+      @close="viewing = null"
+      @continue="viewContinue"
+      @save="(w) => emit('save-work', w)"
+      @lapse="(w, d) => emit('play-lapse', w, d)"
+      @toggle-hang="toggleHang"
+    )
 </template>
 
 <style scoped lang="sass">
@@ -316,6 +404,82 @@ button
   font-weight: 700
   color: var(--lk-muted)
 
+// ── The card on top: keep painting (or the first picture) ──────────────────────────────────
+.ac-continue
+  display: flex
+  align-items: center
+  gap: 14px
+  padding: 12px
+
+.ac-cont-pic
+  flex: 0 0 auto
+  width: clamp(110px, 32%, 190px)
+  display: grid
+  place-items: center
+  padding: 0
+  border: 0
+  background: transparent
+  cursor: pointer
+
+  img
+    display: block
+    width: 100%
+    max-height: 210px
+    object-fit: cover
+    border: 3px solid #d9a93a
+    border-radius: 4px
+    background: #ffffff
+    box-shadow: 0 6px 14px rgba(70, 45, 10, 0.28)
+
+  &:active img
+    transform: scale(0.98)
+
+  &:focus-visible
+    outline: 3px solid var(--lk-accent)
+    outline-offset: 3px
+
+.ac-cont-body
+  flex: 1 1 auto
+  min-width: 0
+  display: flex
+  flex-direction: column
+  align-items: flex-start
+  gap: 4px
+
+.ac-cont-kicker
+  margin: 0
+  font-size: 0.8rem
+  font-weight: 800
+  letter-spacing: 0.04em
+  color: var(--lk-muted)
+
+.ac-cont-title
+  margin: 0
+  font-size: 1.25rem
+  font-weight: 800
+  line-height: 1.2
+  overflow-wrap: anywhere
+
+.ac-cont-sub
+  margin: 0
+  color: var(--lk-muted)
+  font-size: 0.95rem
+  line-height: 1.35
+
+.ac-cont-go
+  margin-top: 8px
+  min-height: 56px
+
+.ac-first-ico
+  flex: 0 0 auto
+  display: grid
+  place-items: center
+  width: 64px
+  height: 64px
+  border-radius: 50%
+  background: var(--lk-accent-soft)
+  color: var(--lk-accent)
+
 // ── 1. The shelf of coloring books ────────────────────────────────────────────────────
 .ac-shelf
   padding: 14px 14px 16px
@@ -345,21 +509,55 @@ button
   flex: 0 0 clamp(142px, 42%, 220px)
   scroll-snap-align: start
 
+// takes a book off the shelf: 48 px to hit (Anton's rule), a round 32 px disc to look at, at the top left corner of the cover
 .ac-bigbook-remove
   position: absolute
-  top: 6px
-  left: 6px
+  top: 0
+  left: 0
   z-index: 2
-  width: 30px
-  height: 30px
+  display: grid
+  place-items: center
+  width: 48px
+  height: 48px
+  padding: 0
   border: 0
-  border-radius: 50%
-  background: var(--lk-surface)
-  color: var(--lk-muted)
-  font-size: 0.8rem
-  font-weight: 800
+  background: transparent
   cursor: pointer
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)
+
+  span
+    display: grid
+    place-items: center
+    width: 32px
+    height: 32px
+    border-radius: 50%
+    background: var(--lk-surface)
+    color: var(--lk-muted)
+    font-size: 0.85rem
+    font-weight: 800
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)
+
+// one book on the shelf: it stands at the left, a friendly note on the right
+.ac-bigbooks.is-one
+  align-items: stretch
+
+.ac-onebook
+  flex: 1 1 0
+  min-width: 150px
+  display: flex
+  flex-direction: column
+  align-items: flex-start
+  justify-content: center
+  gap: 10px
+  padding: 4px 6px
+
+.ac-onebook-text
+  margin: 0
+  color: var(--lk-muted)
+  font-size: 0.98rem
+  line-height: 1.4
+
+.ac-onebook-go
+  min-height: 56px
 
 .ac-bigbook
   width: 100%
@@ -612,18 +810,20 @@ button
     display: none
 
   .ac-gallery
-    grid-template-columns: repeat(auto-fill, minmax(132px, 1fr))
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr))
 
 // ── 3. and 4. Pictures: presents and own paintings ──────────────────────────────────
 .ac-gallery
   display: grid
-  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr))
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr))
   gap: 12px
+  align-items: start
 
 .ac-gal-tile
   position: relative
   display: block
   width: 100%
+  // a painting has the ratio of its sheet (set on the tile); the presents and everything else without a ratio are 3:4
   aspect-ratio: 3 / 4
   padding: 0
   overflow: hidden
@@ -637,7 +837,7 @@ button
   img
     width: 100%
     height: 100%
-    object-fit: contain
+    object-fit: cover
     display: block
 
   &:active
@@ -661,6 +861,9 @@ button
 .ac-reward
   border: 2px solid var(--lk-gold)
 
+  img
+    object-fit: contain
+
 .ac-reward-name
   position: absolute
   left: 0
@@ -677,44 +880,57 @@ button
 .ac-work
   position: relative
 
+// deletes a painting: 48 px to hit (Anton's rule), a round 32 px disc to look at, in the top right corner
 .ac-work-del
   position: absolute
-  top: 6px
-  right: 6px
-  width: 30px
-  height: 30px
-  border-radius: 50%
-  border: 1px solid var(--lk-line)
-  background: var(--lk-surface)
-  color: var(--lk-muted)
-  font-size: 0.8rem
-  font-weight: 800
-  cursor: pointer
-  box-shadow: 0 2px 6px rgba(22, 60, 64, 0.3)
-
-// ── 5. My exhibition: the three places ──────────────────────────────────────────────────
-.ac-ex-sub
-  margin: -4px 0 0
-  color: var(--lk-muted)
-  font-size: 0.98rem
-
-.ac-wall
+  top: 0
+  right: 0
   display: grid
-  grid-template-columns: 1fr 1fr
+  place-items: center
+  width: 48px
+  height: 48px
+  padding: 0
+  border: 0
+  background: transparent
+  cursor: pointer
+
+  span
+    display: grid
+    place-items: center
+    width: 32px
+    height: 32px
+    border-radius: 50%
+    border: 1px solid var(--lk-line)
+    background: var(--lk-surface)
+    color: var(--lk-muted)
+    font-size: 0.85rem
+    font-weight: 800
+    box-shadow: 0 2px 6px rgba(22, 60, 64, 0.3)
+
+// ── My exhibition: a small row of the best paintings ────────────────────────────────────────
+// the row is swiped sideways; every frame has the ratio of its painting, so there are no white bars; the paintings are sharp (the thumb is 800 px)
+.ac-exrow
+  display: flex
+  align-items: flex-start
+  // the wall is as wide as its pictures (one picture: a small wall), and is swiped when there are more than fit
+  align-self: flex-start
+  max-width: 100%
   gap: 14px
-  padding: 16px
-  border-radius: 24px
+  padding: 14px 14px 12px
+  overflow-x: auto
+  border-radius: 20px
   // a warm wall the pictures hang on
   background: linear-gradient(180deg, #f6ecd8 0%, #ecdcbb 100%)
   box-shadow: inset 0 0 0 1px rgba(160, 120, 50, 0.18), var(--lk-shadow)
+  scrollbar-width: none
+  -webkit-overflow-scrolling: touch
+
+  &::-webkit-scrollbar
+    display: none
 
 .ac-place
   position: relative
-  min-width: 0
-
-// the best picture hangs big, over the whole width
-.is-p1
-  grid-column: 1 / -1
+  flex: 0 0 auto
 
 .ac-frame
   position: relative
@@ -723,13 +939,12 @@ button
   align-items: center
   justify-content: center
   gap: 6px
-  width: 100%
-  aspect-ratio: 1 / 1
+  height: 150px
   padding: 0
   overflow: hidden
-  border-radius: 6px
+  border-radius: 4px
   // a thin golden frame
-  border: 5px solid #d9a93a
+  border: 4px solid #d9a93a
   background: #ffffff
   box-shadow: 0 0 0 1.5px #f6d77a inset, 0 6px 14px rgba(70, 45, 10, 0.28)
   color: var(--lk-muted)
@@ -741,7 +956,7 @@ button
   img
     width: 100%
     height: 100%
-    object-fit: contain
+    object-fit: cover
     display: block
 
   &:active
@@ -751,11 +966,11 @@ button
     outline: 3px solid var(--lk-accent)
     outline-offset: 2px
 
-.is-p1 .ac-frame
-  aspect-ratio: 4 / 3
-  border-width: 6px
-
+// the place that is still free: one small dashed frame ("Hang a picture") with a plus, 150 px high like the others
 .ac-frame.is-empty
+  width: 112px
+  padding: 8px
+  text-align: center
   background: rgba(255, 255, 255, 0.55)
   border-style: dashed
   border-color: #c9b07a
@@ -766,52 +981,21 @@ button
   position: absolute
   top: -8px
   left: -8px
-  width: 30px
-  height: 30px
+  width: 28px
+  height: 28px
   display: grid
   place-items: center
   border-radius: 50%
   background: linear-gradient(160deg, #ffe08a, #e0a82e)
   color: #5a3a00
   font-weight: 800
-  font-size: 0.95rem
+  font-size: 0.9rem
   box-shadow: 0 2px 5px rgba(70, 45, 10, 0.35)
   pointer-events: none
 
-// change and take away: two round buttons on the picture
-.ac-place-actions
-  position: absolute
-  right: 10px
-  bottom: 10px
-  display: flex
-  gap: 6px
-
-.ac-mini
-  width: 36px
-  height: 36px
-  display: grid
-  place-items: center
-  padding: 0
-  border-radius: 50%
-  border: 1px solid rgba(0, 0, 0, 0.12)
-  background: rgba(255, 255, 255, 0.92)
-  color: var(--lk-text)
-  font-size: 1rem
-  font-weight: 700
-  line-height: 1
-  cursor: pointer
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25)
-
-.ac-mini--x
-  color: var(--lk-muted)
-
 .ac-ex-fill
   align-self: flex-start
-
-.ac-ex-hint
-  margin: 0
-  color: var(--lk-muted)
-  font-size: 0.95rem
+  min-height: 48px
 
 .ac-ex-overlay
   position: fixed
@@ -840,6 +1024,10 @@ button
 
 .ac-ex-close
   align-self: center
+  min-height: 48px
+
+.lk-btn--small
+  min-height: 48px
 
 // ── 6. For parents ──────────────────────────────────────────────────────────────────────
 .ac-parents
@@ -870,6 +1058,13 @@ button
   margin: 0
   font-size: 0.9rem
   color: var(--lk-muted)
+
+@media (min-width: 640px)
+  .ac-frame
+    height: 190px
+
+  .ac-frame.is-empty
+    width: 140px
 
 @media (prefers-reduced-motion: reduce)
   .ac-bigbook-cover,

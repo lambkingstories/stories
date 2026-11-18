@@ -110,6 +110,8 @@ export interface HomeCard {
   /** The line under the title (when no bar and no "start here" is shown). */
   meta: string
   image: string
+  /** Where a wide picture is held when it is cut to the box (CSS `object-position`, e.g. `50% 22%`), so that faces stay in view. */
+  focus?: string
   /** The picture is a symbol: it stands whole on a soft blur of itself. */
   medal?: boolean
   /** 0-1, or -1 when there is nothing to measure. */

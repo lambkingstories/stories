@@ -219,7 +219,7 @@ function resetAll() {
         )
           span(:class="['resume-thumb', { 'is-medal': tile.card.medal }]")
             img(v-if="tile.card.medal && tile.card.image" class="resume-blur" :src="blurSource(tile.card.image)" alt="" draggable="false" aria-hidden="true")
-            img(v-if="tile.card.image" class="resume-pic" :src="tile.card.image" alt="" draggable="false" @error="onImgFallback")
+            img(v-if="tile.card.image" class="resume-pic" :src="tile.card.image" :style="tile.card.focus ? { objectPosition: tile.card.focus } : undefined" alt="" draggable="false" @error="onImgFallback")
             ZIconography(v-else :name="tile.card.icon" :size="40")
             span(class="resume-kind")
               ZIconography(:name="tile.card.icon" :size="16")

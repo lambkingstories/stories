@@ -31,7 +31,10 @@ import { isIOS } from '@/utils/platform'
 import { goBackTo } from '@/utils/navBack'
 import { screenToSheet } from '@/utils/sheetMath'
 import { PatchHistory } from '@/utils/patchHistory'
-import { PAGE_INSET, colorBoxPlacement, fitPaper, paperInsets, topBarReach, type InsetInput, type Insets } from '@/utils/coloringLayout'
+import { thumbSize } from '@/utils/coloringThumb'
+import { shortColoringTitle } from '@/utils/coloringTitles'
+import useExhibition from '@/use/useExhibition'
+import { PAGE_INSET, colorBoxPlacement, fitPaper, paperInsets, topBarReach, topBarRows, toolbarStartsOpen, type InsetInput, type Insets, type TopBarContent } from '@/utils/coloringLayout'
 import useViewportSize from '@/use/useViewportSize'
 import { StickerCover } from '@/utils/stickerCover'
 import useSfx from '@/use/useSfx'
@@ -544,7 +547,14 @@ const awardImage = (id: AwardId) => prependBaseUrl(`images/awards/${AWARDS.find(
 const STAR_IMAGE = prependBaseUrl('images/awards/star.webp')
 
 /** The dialog after "picture finished". */
-const finishInfo = ref<{ won: AwardId[]; bookDone: boolean; hasNext: boolean; hasLapse: boolean } | null>(null)
+const finishInfo = ref<{ id: string; won: AwardId[]; bookDone: boolean; hasNext: boolean; hasLapse: boolean } | null>(null)
+/** The exhibition of the child (three places, kept on the device): the message after "picture finished" can hang the picture there. */
+const exhibition = useExhibition()
+const exPlaces = exhibition.places
+const finishHung = computed(() => !!finishInfo.value && exPlaces.value.includes(finishInfo.value.id))
+function hangFinished() {
+  if (finishInfo.value) exhibition.hang(finishInfo.value.id)
+}
 const finishNote = ref('')
 
 async function finishPicture() {
@@ -561,8 +571,8 @@ async function finishPicture() {
     finishNote.value = t('app.coloring.finishPaintFirst')
     return
   }
-  const { drawing: layer, ...meta } = rec
-  await saveArtwork({ ...meta, done: true }, layer)
+  const { drawing: layer, stickers: layerStickers, ...meta } = rec
+  await saveArtwork({ ...meta, done: true }, layer, layerStickers)
   if (!meta.done) useActivity().count('pictures')
   identity.done = true
   await flushTimelapse()
@@ -585,7 +595,7 @@ async function finishPicture() {
     return
   }
   const hasNext = !!ctx && ctx.index + 1 < allowedPages(ctx.bookId, 'coloring', ctx.pages.length, ctx.freePages)
-  finishInfo.value = { won, bookDone: complete, hasNext, hasLapse: timelapse.count >= MIN_STEPS }
+  finishInfo.value = { id, won, bookDone: complete, hasNext, hasLapse: timelapse.count >= MIN_STEPS }
   void refreshMyWorks()
   confetti({ particleCount: 90, spread: 70, origin: { y: 0.65 }, disableForReducedMotion: true })
 }
@@ -689,7 +699,8 @@ const coloringBooks = computed<BookCard[]>(() => {
     }
     cards.push({
       bookId: book.bookId,
-      title: (loc[locale.value]?.title || loc.de?.title || book.bookId).replace(/^Buch\s*\d+\s*[–-]\s*/i, ''),
+      // the name of the book without the series and the number of the volume ("Bibelgeschichten zum Ausmalen: Band 1 - " is cut off)
+      title: shortColoringTitle(loc[locale.value]?.title || loc.de?.title || book.bookId),
       cover: pickLocalizedImage(book.previewImage, contentLocale(locale.value)),
       total: pages.length,
       done,
@@ -1096,7 +1107,12 @@ const barTool = computed<ToolId>(() => (tool.value === 'whitepencil' ? 'graphite
 const currentSprite = computed(() => (tool.value === 'eraser' ? TOOL_SPRITES.eraser : tool.value === 'stamp' ? LINE_ICONS.stamp : (toolbarTools.value.find((x) => x.id === barTool.value)?.sprite ?? '')))
 
 // The tool bar and the small menu.
-const toolbarOpen = ref(true)
+// on a phone the tool bar starts folded (to its tab): the paper fills the screen; tablets and computers start with the bar out
+const toolbarOpen = ref(toolbarStartsOpen(typeof window === 'undefined' ? 1024 : window.innerWidth))
+/** A picture is opened: the bar is as it is at the start (folded on a phone), also when the last picture was left with the bar out. */
+function resetToolbarForNewPicture() {
+  toolbarOpen.value = toolbarStartsOpen(window.innerWidth)
+}
 const menuOpen = ref(false)
 /** The menu has its main list and two small pages: the eraser (size, what a tap does) and the scene behind the paper. */
 const menuPage = ref<'main' | 'eraser' | 'scene'>('main')
@@ -1134,6 +1150,8 @@ let previewCtx: CanvasRenderingContext2D | null = null
 const previewStyle = ref<Record<string, string>>({ opacity: '0' })
 
 const hasImage = ref(false)
+/** The round "picture finished" button of the top bar (check mark): every picture except the task of a stage, a page of the thank-you book and the family activity. */
+const showFinishButton = computed(() => hasImage.value && !advCtx.value && !journalCtx.value && !activityCtx.value)
 // the main menu (no picture open) keeps the tab bar of the app
 const { coloringMenuShown } = useChrome()
 watch(hasImage, (v) => (coloringMenuShown.value = !v), { immediate: true })
@@ -1177,8 +1195,66 @@ const lapseOpen = ref(false)
 const lapseData = ref<TimelapseData | null>(null)
 
 async function openTimelapse() {
+  lapseLine.value = null
   lapseData.value = await timelapse.snapshot()
   lapseOpen.value = true
+}
+
+/** The line art for the time-lapse of a painting that is not open on the sheet (watched from the quiet view of the menu); null = the line art of the sheet. */
+const lapseLine = shallowRef<HTMLCanvasElement | null>(null)
+function closeLapse() {
+  lapseOpen.value = false
+  lapseLine.value = null
+}
+
+/**
+ * The time-lapse of a painting of the menu (the exhibition, the finished pictures): its line art is drawn again on a canvas of its own (white for a blank sheet,
+ * the picture from where it came from), so nothing is opened on the painting screen.
+ */
+async function playWorkLapse(meta: ArtworkMeta, data: TimelapseData) {
+  const c = document.createElement('canvas')
+  const long = 1000
+  const r = long / Math.max(meta.width, meta.height, 1)
+  c.width = Math.max(1, Math.round(meta.width * r))
+  c.height = Math.max(1, Math.round(meta.height * r))
+  const ctx = c.getContext('2d')!
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, c.width, c.height)
+  if (meta.kind === 'page' && meta.sourceUrl) {
+    try {
+      const local = await cacheUrlToBlobUrl(meta.sourceUrl, meta.bookId)
+      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const i = new Image()
+        i.crossOrigin = 'anonymous'
+        i.onload = () => resolve(i)
+        i.onerror = () => reject(new Error('line art'))
+        i.src = local
+      })
+      ctx.drawImage(img, 0, 0, c.width, c.height)
+      if (local !== meta.sourceUrl) URL.revokeObjectURL(local)
+    } catch {
+      // without the line art the film is shown on white paper: the paint is still there
+    }
+  }
+  lapseLine.value = c
+  lapseData.value = data
+  lapseOpen.value = true
+}
+
+/** "Save" in the quiet view: the thumb of the painting goes to Photos (iOS app) or is downloaded. */
+async function saveWorkPicture(meta: ArtworkMeta) {
+  const img = await new Promise<HTMLImageElement | null>((resolve) => {
+    const i = new Image()
+    i.onload = () => resolve(i)
+    i.onerror = () => resolve(null)
+    i.src = meta.thumb
+  })
+  if (!img) return
+  const out = document.createElement('canvas')
+  out.width = img.naturalWidth
+  out.height = img.naturalHeight
+  out.getContext('2d')!.drawImage(img, 0, 0)
+  deliverCanvas(out, `Ausmalbild_${new Date(meta.updatedAt).toISOString().slice(0, 10)}.png`)
 }
 
 /** Undo and redo keep only the area each change touched (see `patchHistory.ts`), so a long session stays light on a tablet. */
@@ -1293,8 +1369,8 @@ function paintComposite(ctx: CanvasRenderingContext2D, w: number, h: number, lig
 function makeThumb(): string {
   const dc = drawCanvas.value, bg = bgCanvas.value
   if (!dc || !bg) return ''
-  const w = 280
-  const h = Math.max(1, Math.round((bg.height / bg.width) * w))
+  // a sharp thumb: its long side is `THUMB_LONG` pixels (it was 280 pixels wide once, which looked blurred where it is shown big)
+  const { w, h } = thumbSize(bg.width, bg.height)
   // A big picture is shrunk in halves: one jump to thumbnail size would leave the fine lines as scattered dots.
   let cw = Math.max(w, Math.min(bg.width, w * 4))
   let ch = Math.max(h, Math.round((bg.height / bg.width) * cw))
@@ -1319,7 +1395,7 @@ function makeThumb(): string {
       cw = nw
       ch = nh
     }
-    return c.toDataURL('image/jpeg', 0.78)
+    return c.toDataURL('image/jpeg', 0.82)
   } catch {
     // A line-art image from another origin can taint the canvas; fall back to
     // the child's own paint on white.
@@ -1330,7 +1406,7 @@ function makeThumb(): string {
     fctx.fillStyle = '#ffffff'
     fctx.fillRect(0, 0, w, h)
     fctx.drawImage(dc, 0, 0, w, h)
-    return f.toDataURL('image/jpeg', 0.72)
+    return f.toDataURL('image/jpeg', 0.78)
   }
 }
 
@@ -1724,6 +1800,7 @@ function openImageUrl(url: string): Promise<void> {
       pdfDoc = null
       totalPages.value = 1
       currentPage.value = 1
+      if (!hasImage.value) resetToolbarForNewPicture()
       hasImage.value = true
       fitCanvas()
       // the fields of the line art are found in a quiet moment, not at the first stroke
@@ -1807,6 +1884,7 @@ async function renderPdfPage(num: number) {
     bgCtx.fillRect(0, 0, bg.width, bg.height)
     await page.render({ canvasContext: bgCtx, viewport: vp }).promise
     drawCtx.clearRect(0, 0, dc.width, dc.height)
+    if (!hasImage.value) resetToolbarForNewPicture()
     hasImage.value = true
     currentPage.value = num
     fitCanvas()
@@ -1895,14 +1973,19 @@ function fitCanvas() {
 // paper rises up to the top edge, see `utils/coloringLayout.ts`). The colour box at the bottom edge lies over the paper; only
 // its little tab keeps room (and not in fullscreen).
 /** What the top bar shows now: how far its buttons reach into the screen decides whether the paper may rise to the top edge. */
-function barReach(): number {
-  return topBarReach({
+function barContent(): TopBarContent {
+  return {
     doneButton: !!(advCtx.value || journalCtx.value),
+    // the round "picture finished" button: every picture that is not the task of a stage, a page of the thank-you book or the family activity
+    finishButton: showFinishButton.value,
     pages: navTotal.value > 1,
     // (the zoom buttons that a touch screen shows once the sheet is zoomed do not count: the paper must not jump when they come)
     zoom: finePointer.value,
     text: !!pageInfo.value
-  })
+  }
+}
+function barReach(): number {
+  return topBarReach(barContent())
 }
 /** The inputs of the layout rule for a picture area of W × H (the layout box of `.ac-main`). */
 function layoutInput(W: number, H: number, ratio = 0.75): InsetInput {
@@ -1913,7 +1996,9 @@ function layoutInput(W: number, H: number, ratio = 0.75): InsetInput {
     fullscreen: isFullscreen.value,
     hasImage: hasImage.value,
     band: activityCtx.value ? bandEl.value?.offsetHeight || BAND_HEIGHT : 0,
-    reach: barReach()
+    reach: barReach(),
+    // a phone upright: the buttons wrap into a second row, the paper starts below it
+    rows: topBarRows(W, barContent())
   }
 }
 /** Room over and under the paper. */
@@ -3840,6 +3925,11 @@ function flattenCanvas(): HTMLCanvasElement | null {
 function downloadPng() {
   const out = flattenCanvas()
   if (!out) return
+  deliverCanvas(out, buildExportFilename())
+}
+
+/** A picture leaves the app as a file: on iOS straight into Photos, elsewhere as a download. */
+function deliverCanvas(out: HTMLCanvasElement, filename: string) {
   // The iOS app's WKWebView ignores `<a download>` — the tap would do
   // nothing — so the picture goes straight into Photos instead.
   if (isIOS) {
@@ -3847,7 +3937,7 @@ function downloadPng() {
     return
   }
   const a = document.createElement('a')
-  a.download = buildExportFilename()
+  a.download = filename
   a.href = out.toDataURL('image/png')
   a.click()
 }
@@ -3903,8 +3993,8 @@ async function shareCanvas() {
     try {
       await navigator.share({
         files: [file],
-        title: 'Mein Ausmalbild',
-        text: 'Mein Ausmalbild aus der LambKing-App'
+        title: t('app.coloring.shareTitle'),
+        text: t('app.coloring.shareText')
       })
     } catch (err) {
       // AbortError = user dismissed the share sheet — silent.
@@ -4284,6 +4374,8 @@ watch(queryBook, (id) => {
         @open-work="openWork"
         @ask-delete="askDelete"
         @pick-item="pickGalleryItem"
+        @save-work="saveWorkPicture"
+        @play-lapse="playWorkLapse"
         @open-reward="openReward"
         @export-backup="exportBackup"
         @pick-backup="pickBackup"
@@ -4361,7 +4453,7 @@ watch(queryBook, (id) => {
       button(
         v-if="pageInfo"
         type="button"
-        class="ac-btn"
+        class="ac-btn ac-textbtn"
         :class="{ on: textOpen }"
         :aria-pressed="textOpen"
         :aria-label="t('app.coloring.pageText')"
@@ -4402,6 +4494,11 @@ watch(queryBook, (id) => {
         button(class="ac-pg-btn" :disabled="navCurrent <= 1" :aria-label="t('app.coloring.prevPage')" @click="gotoPage(-1)") ‹
         span(class="ac-pg-info") {{ navCurrent }} / {{ navTotal }}
         button(class="ac-pg-btn" :disabled="navCurrent >= navTotal" :aria-label="t('app.coloring.nextPage')" @click="gotoPage(1)") ›
+
+      //- "Picture finished" (stars, award, time-lapse) in plain sight, not only in the three-dot menu
+      button(v-if="showFinishButton" type="button" class="ac-btn ac-finish-btn" data-test="finish-top" :aria-label="t('app.coloring.finish')" :title="t('app.coloring.finish')" @click="finishPicture")
+        span(class="ac-finish-dot")
+          img(:src="LINE_ICONS.check" alt="" draggable="false")
 
       template(v-if="hasImage && !activityCtx")
         button(type="button" class="ac-btn" :class="{ on: menuOpen }" :aria-label="t('app.coloring.menu')" :aria-expanded="menuOpen" @click="toggleMenu")
@@ -4653,6 +4750,9 @@ watch(queryBook, (id) => {
           strong(class="ac-finish-name") {{ finishInfo.won.map((w) => t(`app.awards.items.${w}.title`)).join(', ') }}
         p(v-else class="ac-confirm-body") {{ t('app.coloring.pictureFinishedText') }}
         button(v-if="finishInfo.hasLapse" type="button" class="ac-lapse-btn" @click="watchTimelapse") {{ t('app.coloring.timelapseWatch') }}
+        //- the finished picture can hang in the exhibition at once (nobody has to look for "hang my newest pictures" later)
+        button(v-if="!finishHung" type="button" class="ac-lapse-btn" data-test="finish-hang" @click="hangFinished") {{ t('app.coloring.exhibitionHang') }}
+        p(v-else class="ac-finish-hung" role="status" data-test="finish-hung") {{ t('app.coloring.exhibitionHung') }}
         div(class="ac-confirm-actions")
           button(type="button" class="ac-confirm-leave" @click="finishOverview") {{ retStats ? t('app.coloring.backToStats') : bookCtx ? t('app.coloring.bookOverview') : t('app.coloring.newPage') }}
           button(v-if="finishInfo.hasNext" type="button" class="ac-confirm-stay" @click="finishNext") {{ t('app.coloring.nextPage') }}
@@ -4663,9 +4763,9 @@ watch(queryBook, (id) => {
     ColoringTimelapse(
       :open="lapseOpen"
       :data="lapseData"
-      :line-art="bgCanvas"
+      :line-art="lapseLine || bgCanvas"
       :gate="requireParent"
-      @close="lapseOpen = false"
+      @close="closeLapse"
     )
 
     p(v-if="finishNote" class="ac-save-notice is-denied" role="status" @click="finishNote = ''") {{ finishNote }}
@@ -4897,7 +4997,7 @@ $accent-dark: $accent
   justify-content: center
   gap: 8px
   width: 100%
-  min-height: 32px
+  min-height: 48px
   padding: 2px 12px
   border: 0
   background: transparent
@@ -5076,12 +5176,12 @@ $accent-dark: $accent
 .ac-btn
   position: relative
   flex: 0 0 auto
-  width: 42px
-  height: 42px
+  width: 48px
+  height: 48px
   display: grid
   place-items: center
   border: 1px solid $line
-  border-radius: 12px
+  border-radius: 14px
   background: $glass
   box-shadow: 0 2px 10px rgba(20, 24, 32, 0.15)
   cursor: pointer
@@ -5089,12 +5189,12 @@ $accent-dark: $accent
   transition: background 120ms ease-out, transform 100ms ease-out
 
   img
-    width: 22px
-    height: 22px
+    width: 24px
+    height: 24px
     object-fit: contain
     pointer-events: none
 
-  // the touch area is at least 44 px, also where the button looks smaller
+  // the touch area is 48 px at the least: so is the button (Anton's rule), the edge only makes it easier to hit
   &::after
     content: ''
     position: absolute
@@ -5152,7 +5252,7 @@ $accent-dark: $accent
   display: flex
   align-items: center
   gap: 10px
-  min-height: 44px
+  min-height: 48px
   margin: 4px 6px 2px
   font-size: 0.85rem
   font-weight: 700
@@ -5223,29 +5323,23 @@ $accent-dark: $accent
 .ac-pages
   display: flex
   align-items: center
-  gap: 6px
-  padding: 4px 8px
-  border-radius: 12px
+  gap: 2px
+  padding: 0 4px
+  border-radius: 14px
   background: $glass
   box-shadow: 0 2px 10px rgba(20, 24, 32, 0.15)
 
 .ac-pg-btn
   position: relative
-  width: 30px
-  height: 30px
+  width: 48px
+  height: 48px
   border: 0
-  border-radius: 8px
+  border-radius: 12px
   background: transparent
   color: $ink
-  font-size: 1.1rem
+  font-size: 1.5rem
   font-weight: 800
   cursor: pointer
-
-  // the arrow is small to look at: its touch area is 44 px
-  &::after
-    content: ''
-    position: absolute
-    inset: -7px -8px
 
   &:disabled
     opacity: 0.35
@@ -5256,52 +5350,51 @@ $accent-dark: $accent
   color: $muted
   white-space: nowrap
 
-// Phones: smaller buttons so the whole top bar fits; where it still does not (a very narrow screen, or the zoom buttons
-// showing), the bar can be swiped sideways and the last button (the menu) is reached.
+// the round "picture finished" button: a white check on the blue of the big "finished" button of the menu
+.ac-finish-btn
+  border: 0
+  background: linear-gradient(135deg, #2a4f7e 0%, #1f3a5f 100%)
+  box-shadow: 0 4px 12px -4px rgba(31, 58, 95, 0.8)
+
+.ac-finish-dot
+  display: grid
+  place-items: center
+  width: 34px
+  height: 34px
+  border-radius: 50%
+  background: rgba(255, 255, 255, 0.94)
+
+  img
+    width: 22px
+    height: 22px
+
+// Phones: the buttons stay 48 px (Anton's rule). The top bar is one row where everything fits (a picture of the free sheet: back, eraser, undo, redo,
+// "finished", menu = 336 px); where it does not (the arrows of a book, the text of the page) the buttons wrap into a second row, which the paper makes room
+// for (see `topBarRows`). The arrows of a book and the button with the text of the page go to the end so that the second row holds only them.
 @media (max-width: 520px)
   .ac-top
     gap: 8px
     padding-left: 8px
     padding-right: 8px
-    padding-bottom: 14px
-    overflow-x: auto
-    overflow-y: hidden
-    overscroll-behavior-x: contain
-    scrollbar-width: none
-    touch-action: pan-x
-
-    &::-webkit-scrollbar
-      display: none
+    padding-bottom: 6px
+    flex-wrap: wrap
+    row-gap: 8px
 
     > *
       flex-shrink: 0
 
-  .ac-btn
-    width: 36px
-    height: 36px
-    border-radius: 10px
-
-    // 36 px to look at; with 8 px between the buttons every touch area is 44 px
-    &::after
-      inset: -4.5px
-
-    img
-      width: 20px
-      height: 20px
-
   .ac-quick
     gap: 8px
 
-  .ac-pages
-    gap: 2px
-    padding: 2px 4px
+  .ac-textbtn
+    order: 8
 
-  .ac-pg-btn
-    width: 28px
-    height: 30px
+  .ac-pages
+    order: 9
+    margin-right: auto
 
   .ac-pg-info
-    font-size: 0.78rem
+    font-size: 0.85rem
 
 // ── Finished picture, awards ────────────────────────────────────────────────────────
 .ac-mi-main
@@ -5310,10 +5403,20 @@ $accent-dark: $accent
 .ac-finish
   text-align: center
 
+.ac-finish-hung
+  margin: 0 auto 14px
+  min-height: 48px
+  display: flex
+  align-items: center
+  justify-content: center
+  font-weight: 800
+  font-size: 0.92rem
+  color: $accent
+
 .ac-lapse-btn
   display: block
-  margin: 0 auto 14px
-  min-height: 44px
+  margin: 0 auto 10px
+  min-height: 48px
   padding: 0 20px
   border: 2px solid $accent
   border-radius: 999px
@@ -5554,7 +5657,7 @@ $accent-dark: $accent
   display: flex
   align-items: center
   gap: 10px
-  min-height: 44px
+  min-height: 48px
   padding: 10px 8px
   border: 0
   border-radius: 12px
@@ -5709,8 +5812,8 @@ $accent-dark: $accent
   border-top: 1px solid $line
 
 .ac-swatch
-  width: 30px
-  height: 30px
+  width: 48px
+  height: 48px
   padding: 0
   border: 2px solid #ffffff
   border-radius: 50%
@@ -5766,8 +5869,8 @@ $accent-dark: $accent
 .ac-corner-btn
   display: grid
   place-items: center
-  min-width: 38px
-  height: 38px
+  min-width: 48px
+  height: 48px
   padding: 0
   border: 1px solid rgba(20, 24, 32, 0.08)
   border-radius: 13px
@@ -5896,7 +5999,7 @@ $accent-dark: $accent
   cursor: pointer
   padding: 12px 20px
   border-radius: 999px
-  min-height: 46px
+  min-height: 48px
 
   &:active
     transform: scale(0.96)
@@ -5925,19 +6028,11 @@ $accent-dark: $accent
     opacity: 1
     transform: scale(1)
 
-// A phone held wide (hardly 375 px high): the buttons of the top bar are 44 px big and sit in the two corners, the paper in the
+// A phone held wide (hardly 375 px high): the buttons of the top bar (48 px) sit in the two corners, the paper in the
 // middle rises up to the top edge (see `utils/coloringLayout.ts`).
 @media (max-height: 450px) and (orientation: landscape)
   .ac-top
     padding-bottom: 0
-
-  .ac-btn
-    width: 44px
-    height: 44px
-
-  .ac-pg-btn
-    width: 36px
-    height: 36px
 
   .ac-jobs
     top: 8px
@@ -5947,7 +6042,4 @@ $accent-dark: $accent
   .ac-menu
     max-height: calc(100vh - 64px)
 
-  .ac-corner-btn
-    min-width: 44px
-    height: 44px
 </style>

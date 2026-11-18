@@ -408,8 +408,8 @@ $accent: var(--lk-accent)
 
 .bk-btn
   flex: 0 0 auto
-  width: 44px
-  height: 44px
+  width: 48px
+  height: 48px
   display: grid
   place-items: center
   border: 1px solid var(--lk-line)
@@ -550,8 +550,8 @@ $accent: var(--lk-accent)
 
 .bk-nav
   flex: 0 0 auto
-  width: 46px
-  height: 46px
+  width: 48px
+  height: 48px
   border: 1px solid var(--lk-line)
   border-radius: 50%
   background: transparent
@@ -629,8 +629,8 @@ $accent: var(--lk-accent)
 .bk-thumb
   position: relative
   flex: 0 0 auto
-  width: 40px
-  height: 40px
+  width: 48px
+  height: 48px
   padding: 0
   border: 2px solid transparent
   border-radius: 12px
@@ -693,8 +693,8 @@ $accent: var(--lk-accent)
   gap: 4px 18px
 
 .bk-link
-  min-height: 36px
-  padding: 0 4px
+  min-height: 48px
+  padding: 0 8px
   border: 0
   background: transparent
   color: $accent

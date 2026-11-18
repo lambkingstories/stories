@@ -12,7 +12,7 @@
 
 /** Breathing room around the paper at the sides (and at the top/bottom where nothing floats). */
 export const PAGE_INSET = 10
-/** The top bar of the painting screen floats over the top edge; below it the paper starts. */
+/** The top bar of the painting screen floats over the top edge (10 px from the edge, 48 px buttons); below it the paper starts. */
 export const TOP_BAR_ROOM = 62
 /** Room for the little arrow tab that stays at the bottom edge while the colour box is hidden. */
 export const FOLDED_TAB = 30
@@ -41,9 +41,15 @@ export function colorBoxPlacement(width: number, height: number, dockEdge: 'left
   return dockEdge === 'left' ? 'side-right' : 'side-left'
 }
 
+/** The buttons of the top bar are 48 px (Anton's rule for everything a finger has to hit); 8 px lie between them. */
+export const TOP_BTN = 48
+export const TOP_GAP = 8
+
 export interface TopBarContent {
-  /** A button that hands the picture in ("Fertig") sits next to the back button. */
+  /** A button that hands the picture in ("Fertig") sits next to the back button (the picture of an adventure stage or of the thank-you book). */
   doneButton: boolean
+  /** The round "Picture finished" button (check mark) next to the menu: every picture that is not a task of a stage has it. */
+  finishButton?: boolean
   /** The arrows of a coloring book (previous, next page). */
   pages: boolean
   /** The percentage and zoom buttons. */
@@ -54,19 +60,48 @@ export interface TopBarContent {
 
 /**
  * How far the buttons of the top bar reach from the screen edge into the screen (the wider one of the left and right group),
- * in pixels. The widths are those of the buttons at 44 px.
+ * in pixels. The widths are those of the buttons at 48 px.
  */
 export function topBarReach(c: TopBarContent): number {
-  const BTN = 44
-  const GAP = 6
+  const BTN = TOP_BTN
+  const GAP = TOP_GAP
   const EDGE = 12
   const left = EDGE + BTN + (c.doneButton ? GAP + 170 : 0)
-  // eraser, undo, redo (6 px apart), then the menu (8 px further)
+  // eraser, undo, redo (8 px apart), then the menu (8 px further)
   let right = EDGE + BTN * 4 + GAP * 2 + 8
-  if (c.pages) right += GAP + 104
+  if (c.finishButton) right += GAP + BTN
+  if (c.pages) right += GAP + 160
   if (c.zoom) right += GAP + 150
   if (c.text) right += GAP + BTN
   return Math.max(left, right)
+}
+
+/**
+ * How many rows the top bar needs on a screen of this width: all its buttons in one row when they fit, else they wrap into more rows (a phone upright
+ * with the arrows of a book). The paper starts below the last row, which costs nothing where the paper is as wide as the screen and has height to spare.
+ */
+export function topBarRows(width: number, c: TopBarContent): number {
+  const PADDING = 16
+  // back, (the done button of a stage), eraser/undo/redo, (finish), (pages), (text), (zoom), menu
+  const widths: number[] = [TOP_BTN]
+  if (c.doneButton) widths.push(170)
+  widths.push(TOP_BTN * 3 + TOP_GAP * 2)
+  if (c.finishButton) widths.push(TOP_BTN)
+  if (c.pages) widths.push(160)
+  if (c.text) widths.push(TOP_BTN)
+  if (c.zoom) widths.push(150)
+  widths.push(TOP_BTN)
+  const room = Math.max(1, width - PADDING)
+  let rows = 1
+  let used = 0
+  for (const w of widths) {
+    const need = (used ? TOP_GAP : 0) + w
+    if (used && used + need > room) {
+      rows++
+      used = w
+    } else used += need
+  }
+  return rows
 }
 
 export interface InsetInput {
@@ -81,6 +116,8 @@ export interface InsetInput {
   band: number
   /** See `topBarReach`. */
   reach: number
+  /** Rows of the top bar (see `topBarRows`); each one after the first takes `TOP_BTN + TOP_GAP` more room over the paper. Missing = 1. */
+  rows?: number
 }
 
 export interface Insets {
@@ -100,7 +137,8 @@ export function paperInsets(i: InsetInput): Insets {
   const flat = isFlatLandscape(i.width, i.height)
   // the colour box of a phone held wide stands at the side: no tab at the bottom edge to keep room for
   const bottom = i.hasImage && !flat ? FOLDED_TAB : PAGE_INSET
-  const lower = { top: TOP_BAR_ROOM + i.band, bottom, maxWidth: sideRoom }
+  const extra = (Math.max(1, i.rows ?? 1) - 1) * (TOP_BTN + TOP_GAP)
+  const lower = { top: TOP_BAR_ROOM + extra + i.band, bottom, maxWidth: sideRoom }
   if (!flat) return lower
   // Paper right up to the top edge, but only between the two groups of buttons: is it then bigger than below the bar?
   const between = i.width - 2 * (i.reach + BAR_GAP)
@@ -121,4 +159,15 @@ export function fitPaper(i: InsetInput): { w: number; h: number; insets: Insets 
     w = ah * i.ratio
   }
   return { w: Math.max(1, Math.round(w)), h: Math.max(1, Math.round(h)), insets }
+}
+
+/** A screen up to this wide is a phone held upright (the buttons are the same size, but the screen is small). */
+export const PHONE_MAX_WIDTH = 520
+
+/**
+ * Whether the tool bar is out when a picture is opened. On a phone it starts folded (to its little tab) so that the paper fills the screen; a tap on the tab
+ * brings it out, and it folds away again by itself when the child paints. On tablets and computers it starts out as it always did.
+ */
+export function toolbarStartsOpen(screenWidth: number): boolean {
+  return screenWidth > PHONE_MAX_WIDTH
 }

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 /**
  * "Malen → Malbücher": all coloring books (the one place for them; "Lesen" has a door that leads here). A tap opens the book (`AppColoringBookView`), where the pages can be turned and
- * painted. A card shows the cover, the title, the number of pictures and, once the child has begun, how many are painted.
+ * painted. A card shows the cover, the name of the book, the number of pictures and, once the child has begun, how many are painted. The books stand in two groups, "Ab 5 Jahren"
+ * and "Ab 9 Jahren" (the series 5 to 8 and 9 to 12), and the series ("Mit Buntstift durch die Bibel") is a small heading over a group instead of a long start of every title.
+ * Without a net and with nothing kept on the device the page says so and offers "Try again".
  */
 import { computed, onMounted, ref } from 'vue'
 import { sizedImage } from '@/utils/sizedImage'
@@ -22,6 +24,8 @@ import OwnFilter from '@/components/molecules/OwnFilter.vue'
 import { matchesOwnFilter, ownCounts, ownershipOf, type OwnFilterValue, type Ownership } from '@/utils/bookOwnership'
 import { onImgFallback, withPlaceholder } from '@/utils/placeholder'
 import { contentLocale } from '@/utils/contentLocale'
+import BookListError from '@/components/molecules/BookListError.vue'
+import { coloringAgeGroup, groupColoringBooks, splitColoringTitle, type ColoringAgeGroup, type ColoringTitleParts } from '@/utils/coloringTitles'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
@@ -46,7 +50,11 @@ onMounted(() => {
 
 interface Card {
   bookId: string
+  /** The name of the book (no series, no volume): what the card shows. */
   title: string
+  /** The parts of the whole title: series and volume. */
+  parts: ColoringTitleParts
+  group: ColoringAgeGroup
   cover: string
   /** For the order: the import gives the volumes rising dates, so Band 1 comes before Band 2. */
   released: number
@@ -56,20 +64,18 @@ interface Card {
   own: Ownership
 }
 
-/** The title without a leading "Buch 01 –" of the old books. */
-function cleanTitle(s: string): string {
-  return s.replace(/^Buch\s*\d+\s*[–-]\s*/i, '')
-}
-
 const cards = computed<Card[]>(() => {
   const painted = new Set(works.value.map((w) => w.id))
   const list: Card[] = []
   for (const book of booksOfArea((apiBooks.state.all ?? []) as ApiBook[], 'coloring')) {
     const pages = coloringPagesOfBook(book, locale.value)
     const title = book.localizations?.[lang.value]?.title || book.localizations?.de?.title || book.bookId
+    const parts = splitColoringTitle(title)
     list.push({
       bookId: book.bookId,
-      title: cleanTitle(title),
+      title: parts.name,
+      parts,
+      group: coloringAgeGroup(book, title),
       cover: withPlaceholder(sizedImage(pickLocalizedImage(book.previewImage, lang.value), 170)),
       released: Date.parse(book.releaseDate) || 0,
       total: pages.length,
@@ -84,6 +90,18 @@ const filter = ref<OwnFilterValue>('all')
 const counts = computed(() => ownCounts(cards.value.map((c) => c.own)))
 /** The books of the chosen chip (the whole shelf is on show with "Alle"). */
 const shown = computed(() => cards.value.filter((c) => matchesOwnFilter(c.own, filter.value)))
+/** The books in their age groups, the volumes rising. */
+const sections = computed(() => groupColoringBooks(shown.value))
+
+/** The list could not be fetched and there is nothing on the device: a friendly note with "Try again" (the first loading shows placeholders). */
+const retrying = ref(false)
+const showError = computed(() => !cards.value.length && apiBooks.state.listReady && apiBooks.state.listFailed && !retrying.value)
+function retry() {
+  retrying.value = true
+  void apiBooks.loadAllBooks().finally(() => {
+    retrying.value = false
+  })
+}
 
 function goBack() {
   goBackTo(router, { name: fromPainting.value ? 'app-coloring' : 'app-read' })
@@ -100,19 +118,28 @@ function openBook(bookId: string) {
 
     main(class="cb-body")
       OwnFilter(v-if="PREMIUM_TEASER && cards.length" v-model="filter" :counts="counts")
-      ul(v-if="shown.length" class="cb-grid")
-        li(v-for="c in shown" :key="c.bookId")
-          button(type="button" :class="['cb-card', { 'is-locked': c.own === 'locked' }]" :aria-label="c.title" @click="openBook(c.bookId)")
-            span(class="cb-cover")
-              img(:src="c.cover" :alt="c.title" loading="lazy" draggable="false" @error="onImgFallback")
-              span(v-if="PREMIUM_TEASER" class="cb-plus")
-                OwnBadge(:state="c.own")
-            span(class="cb-title") {{ c.title }}
-            span(v-if="c.total" class="cb-meta") {{ c.done > 0 ? t('app.read.paintedOf', { done: c.done, total: c.total }) : t('app.read.pictures', { n: c.total }) }}
-            span(v-if="c.done > 0 && c.total" class="cb-bar")
-              span(class="cb-bar-fill" :style="{ width: Math.round((c.done / c.total) * 100) + '%' }")
+      template(v-if="sections.length")
+        section(v-for="sec in sections" :key="sec.group" class="cb-section" :data-group="sec.group")
+          header(class="cb-sec-head")
+            h2(class="cb-sec-title") {{ t('app.read.coloringAge_' + sec.group) }}
+            p(v-if="sec.series" class="cb-sec-series") {{ sec.series }}
+          ul(class="cb-grid")
+            li(v-for="c in sec.cards" :key="c.bookId")
+              button(type="button" :class="['cb-card', { 'is-locked': c.own === 'locked' }]" :aria-label="c.title" @click="openBook(c.bookId)")
+                span(class="cb-cover")
+                  img(:src="c.cover" :alt="c.title" loading="lazy" draggable="false" @error="onImgFallback")
+                //- the sign (free, to buy…) stands under the cover, never over its title
+                span(v-if="PREMIUM_TEASER" class="cb-own")
+                  OwnBadge(:state="c.own")
+                span(class="cb-title") {{ c.title }}
+                span(v-if="c.parts.volume || (c.parts.series && c.parts.series !== sec.series)" class="cb-vol")
+                  | {{ [c.parts.series && c.parts.series !== sec.series ? c.parts.series : '', c.parts.volume ? t('app.read.volumeNo', { n: c.parts.volume }) : ''].filter(Boolean).join(' · ') }}
+                span(v-if="c.total" class="cb-meta") {{ c.done > 0 ? t('app.read.paintedOf', { done: c.done, total: c.total }) : t('app.read.pictures', { n: c.total }) }}
+                span(v-if="c.done > 0 && c.total" class="cb-bar")
+                  span(class="cb-bar-fill" :style="{ width: Math.round((c.done / c.total) * 100) + '%' }")
       p(v-else-if="cards.length" class="cb-empty") {{ t('app.read.ownNone') }}
-      BookListSkeleton(v-else-if="!apiBooks.state.listReady" variant="grid" :count="4")
+      BookListError(v-else-if="showError" @retry="retry")
+      BookListSkeleton(v-else-if="!apiBooks.state.listReady || retrying" variant="grid" :count="4")
       p(v-else class="cb-empty") {{ t('app.read.coloringEmpty') }}
 </template>
 
@@ -161,10 +188,32 @@ button
     outline-offset: 3px
     border-radius: 12px
 
-.cb-plus
-  position: absolute
-  top: 8px
-  right: 8px
+.cb-section + .cb-section
+  margin-top: 26px
+
+.cb-sec-head
+  margin: 0 0 12px
+
+.cb-sec-title
+  margin: 0
+  font-size: 1.3rem
+  font-weight: 800
+
+// the series, a small heading over the group
+.cb-sec-series
+  margin: 2px 0 0
+  color: var(--lk-muted)
+  font-size: 0.92rem
+  font-weight: 700
+
+.cb-own
+  display: flex
+  margin-top: 8px
+
+.cb-vol
+  color: var(--lk-muted)
+  font-size: 0.85rem
+  font-weight: 700
 
 .cb-card.is-locked .cb-cover img
   filter: saturate(0.8)
@@ -185,7 +234,7 @@ button
     display: block
 
 .cb-title
-  margin-top: 4px
+  margin-top: 2px
   font-weight: 800
   font-size: 1.05rem
   line-height: 1.2

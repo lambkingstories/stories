@@ -154,6 +154,10 @@ interface ResumeCard {
   go: () => void
 }
 
+/** The two pictures of the areas (small versions for the tiles; Anton chose them on 18.11.2026). */
+const READ_AREA_IMAGE = prependBaseUrl('images/bg/lesen-jesus-erzaehlt-klein.webp')
+const PAINT_AREA_IMAGE = prependBaseUrl('images/bg/malen-kinderhaende-klein.webp')
+
 function bookTitle(book: ApiBook): string {
   return book.localizations?.[lang.value]?.title || book.localizations?.de?.title || ''
 }
@@ -166,10 +170,8 @@ const bookCard = computed<ResumeCard>(() => {
   const kind = t('app.home.kindBook')
   const book = lastReadId.value ? apiBooks.getById(lastReadId.value) : null
   if (!book) {
-    // a real cover; when no story is loaded (yet), the painted picture of the children reading
-    const first = newBooks.value.find((b) => !isColoringBook(b)) ?? allBooks.value.find((b) => !isColoringBook(b))
-    const image = first ? withPlaceholder(sizedImage(pickLocalizedImage(first.previewImage, lang.value), 175)) : prependBaseUrl('images/bg/welcome-bg-3.webp')
-    return { id: 'book', kind, title: t('app.home.discoverBook'), meta: t('app.home.pickBook'), image, progress: -1, empty: true, go: () => void router.push({ name: 'app-all-books' }) }
+    // nothing read yet: the painted picture of the area (Jesus tells the children at the lake; Jesus sits left of the middle, the children right)
+    return { id: 'book', kind, title: t('app.home.discoverBook'), meta: t('app.home.pickBook'), image: READ_AREA_IMAGE, focus: '50% 22%', progress: -1, empty: true, go: () => void router.push({ name: 'app-all-books' }) }
   }
   const total = bookPages(book)
   const pct = getPct(book.bookId, total)
@@ -191,9 +193,8 @@ const pictureCard = computed<ResumeCard>(() => {
   const work = list.find((w) => !w.done) ?? list[0]
   const go = () => void router.push(work ? { name: 'app-coloring', query: { work: work.id } } : { name: 'app-coloring' })
   if (!work) {
-    const first = allBooks.value.find((b) => isColoringBook(b))
-    const image = first ? withPlaceholder(sizedImage(pickLocalizedImage(first.previewImage, lang.value), 175)) : ''
-    return { id: 'picture', kind, title: t('app.home.discoverPicture'), meta: t('app.home.pickPicture'), image, progress: -1, empty: true, go }
+    // nothing painted yet: the painted picture of the area (children's hands with crayons, the lamb, the window)
+    return { id: 'picture', kind, title: t('app.home.discoverPicture'), meta: t('app.home.pickPicture'), image: PAINT_AREA_IMAGE, focus: '50% 40%', progress: -1, empty: true, go }
   }
   return { id: 'picture', kind, title: work.title, meta: t('app.home.begun'), image: work.thumb, progress: -1, empty: false, go }
 })

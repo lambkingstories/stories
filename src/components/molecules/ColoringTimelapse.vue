@@ -359,7 +359,7 @@ $accent: #1f3a5f
   gap: 8px
 
 .tl-btn
-  min-height: 46px
+  min-height: 48px
   padding: 0 18px
   border: 2px solid #e6d3a8
   border-radius: 999px

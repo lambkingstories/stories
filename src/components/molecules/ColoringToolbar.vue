@@ -1215,4 +1215,10 @@ $tint: rgba(31, 58, 95, 0.055)
 
   .tb-stamps
     max-height: 132px
+
+// "fold away": 48 px for a finger on every screen (Anton's rule), also where the other buttons of the bar are tighter
+.tb .tb-btn.tb-collapse
+  width: 48px
+  height: 48px
+  min-width: 48px
 </style>

@@ -67,5 +67,33 @@ export default function useExhibition() {
     save()
   }
 
-  return { places, assign, clear, fill }
+  /** True when the painting hangs on one of the places. */
+  function isHung(id: string): boolean {
+    return places.value.includes(id)
+  }
+
+  /**
+   * Hangs a painting up: on the first free place; when all places are taken the painting goes to place 1 and the others move one place
+   * further (the one that was on place 3 is taken down: the newest is always in front). A painting that hangs already stays where it is.
+   */
+  function hang(id: string) {
+    if (!id || places.value.includes(id)) return
+    const free = places.value.indexOf(null)
+    const next = [...places.value]
+    if (free >= 0) next[free] = id
+    else {
+      next.pop()
+      next.unshift(id)
+    }
+    places.value = next
+    save()
+  }
+
+  /** Takes a painting down, wherever it hangs; the places after it do not move. */
+  function unhang(id: string) {
+    const at = places.value.indexOf(id)
+    if (at >= 0) clear(at)
+  }
+
+  return { places, assign, clear, fill, hang, unhang, isHung }
 }
