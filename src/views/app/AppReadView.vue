@@ -63,9 +63,10 @@ const doors = computed<Door[]>(() => [
             ZIconography(v-else name="moon" :size="72" class="door-moon")
           span(class="door-body")
             span(class="door-text")
-              span(class="door-title") {{ d.title }}
+              //- the Plus sign stands in the middle above the name
               span(v-if="plusDoor(d)" class="door-plus")
                 PlusBadge
+              span(class="door-title") {{ d.title }}
               span(class="door-sub") {{ d.sub }}
             span(class="door-go")
               ZIconography(name="chevron-right" :size="26")
@@ -172,9 +173,9 @@ button
 
 .door-plus
   display: block
-  // under the name, in the middle like the name and the line (not stuck to the left edge)
+  // above the name, in the middle like the name and the line (not stuck to the left edge)
   align-self: center
-  margin-top: 2px
+  margin-bottom: 2px
 
 .door-sub
   color: var(--lk-muted)
