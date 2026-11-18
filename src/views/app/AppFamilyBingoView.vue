@@ -756,7 +756,7 @@ const nameSize = computed(() => (medal.value >= 200 ? '1.7rem' : medal.value >= 
 // the brass plate glows when a whole line is sealed
 .fb-bingo
   &.is-lit
-    animation: fb-shine 1.8s ease-in-out infinite
+    animation: fb-shine 1.8s ease-in-out 3
 
 .fb-msg
   :deep(.mpa-in)

@@ -1401,7 +1401,7 @@ onBeforeUnmount(() => {
   transition: width 0.2s linear
 
 .eg-hunger.is-low
-  animation: eg-pulse 0.7s ease-in-out infinite
+  animation: eg-pulse 0.7s ease-in-out 5
 
   .eg-hunger-bar
     background: #d6482a

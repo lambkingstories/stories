@@ -830,7 +830,7 @@ const STAND = ['#c98a52', '#6f9fc2', '#7fb069', '#e0c25a', '#b58ac4', '#7fc4b8',
   animation: mm-pop 700ms ease-out both
 
 .mm-card.is-hint .mm-face
-  animation: mm-hint 900ms ease-in-out infinite
+  animation: mm-hint 900ms ease-in-out 4
 
 .mm-caption
   position: absolute

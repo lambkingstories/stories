@@ -668,7 +668,7 @@ returnFromPaint()
 
 .fa-clock.is-up .fa-left
   color: #ffb27a
-  animation: fa-glow 1.4s ease-in-out infinite
+  animation: fa-glow 1.4s ease-in-out 4
 
 .fa-clock.is-up .fa-fill
   width: 0 !important
