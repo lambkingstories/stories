@@ -15,7 +15,6 @@ import { prependBaseUrl } from '@/utils/function'
 const BigGameBogen = defineAsyncComponent(() => import('@/components/molecules/games/BigGameBogen.vue'))
 const BigGameDavid = defineAsyncComponent(() => import('@/components/molecules/games/BigGameDavid.vue'))
 const BigGameElia = defineAsyncComponent(() => import('@/components/molecules/games/BigGameElia.vue'))
-const BigGameKornspeicher = defineAsyncComponent(() => import('@/components/molecules/games/BigGameKornspeicher.vue'))
 const BigGameKarawane = defineAsyncComponent(() => import('@/components/molecules/games/BigGameKarawane.vue'))
 const BigGameLamm = defineAsyncComponent(() => import('@/components/molecules/games/BigGameLamm.vue'))
 const BigGameMemory = defineAsyncComponent(() => import('@/components/molecules/games/BigGameMemory.vue'))
@@ -47,7 +46,6 @@ function leave() {
 <template lang="pug">
   BigGameDavid(v-if="game?.id === 'david' && open" @leave="leave")
   BigGameElia(v-else-if="game?.id === 'elia' && open" @leave="leave")
-  BigGameKornspeicher(v-else-if="game?.id === 'kornspeicher' && open" @leave="leave")
   BigGameWasser(v-else-if="game?.id === 'wasser' && open" @leave="leave")
   BigGameMose(v-else-if="game?.id === 'mose' && open" @leave="leave")
   BigGameKarawane(v-else-if="game?.id === 'karawane' && open" @leave="leave")

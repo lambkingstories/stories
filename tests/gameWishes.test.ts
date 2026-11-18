@@ -79,7 +79,7 @@ describe('the sums', () => {
     expect(wishesFree(BIG_GAMES, 0, [])).toBe(0)
     // plenty of stars, but only the games that are left can be picked
     expect(wishesFree(BIG_GAMES, 4000, [])).toBe(BIG_GAMES.length)
-    expect(wishesFree(BIG_GAMES, 4000, ids.slice(0, 9))).toBe(1)
+    expect(wishesFree(BIG_GAMES, 4000, ids.slice(0, BIG_GAMES.length - 1))).toBe(1)
     expect(wishesFree(BIG_GAMES, 4000, ids)).toBe(0)
   })
 
@@ -222,7 +222,7 @@ describe('the game room', () => {
     expect(w.find('.gw').exists()).toBe(false)
     expect(text(w)).toContain('Noch 35 Sterne bis zum nächsten Spiel-Wunsch.')
     expect(tile(w, 'memory').classes()).not.toContain('is-pick')
-    expect(text(w.get('#rw-bonus'))).toContain('1 / 10')
+    expect(text(w.get('#rw-bonus'))).toContain(`1 / ${BIG_GAMES.length}`)
     // an open game starts; a second closed game now only tells the missing stars
     await tile(w, 'david').trigger('click')
     expect(push).toHaveBeenCalledWith({ name: 'app-big-game', params: { gameId: 'david' } })

@@ -13,6 +13,7 @@ import esTeil1 from '@/i18n/es/teil1'
 import esTeil2 from '@/i18n/es/teil2'
 import esTeil3 from '@/i18n/es/teil3'
 import { withGameTexts } from '@/i18n/bigGames'
+import { BIG_GAMES } from '@/data/bigGames'
 import useAdventure from '@/use/useAdventure'
 import useBigGames from '@/use/useBigGames'
 import { routeToNav } from '@/use/useAppNav'
@@ -114,7 +115,7 @@ describe('"Meine Spiele": three rooms', () => {
     const w = mount(Page, opts)
     await flushPromises()
     expect(text(w.get('.gw'))).toBe('Du darfst ein Spiel aussuchen!')
-    expect(w.findAll('button[data-game]').length).toBeGreaterThanOrEqual(10)
+    expect(w.findAll('button[data-game]').length).toBe(BIG_GAMES.length)
     expect(w.findAll('.rw-tile:not(.rw-big)')).toHaveLength(0)
     await w.get('button[data-game="david"]').trigger('click')
     await flushPromises()
