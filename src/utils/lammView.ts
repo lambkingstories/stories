@@ -33,8 +33,8 @@ export interface Bounds {
   v1: number
 }
 
-/** The room a level needs on the screen, in units of S: every place a cell can be in (all states of every group, turns included) and the things that stand on it. */
-export function levelBounds(m: Model): Bounds {
+/** The room a level needs on the screen, in units of S: every place a cell can be in (all states of every group, turns included) and the things that stand on it (and, unless `withControls` is false, the cranks where the level puts them). */
+export function levelBounds(m: Model, withControls = true): Bounds {
   let u0 = Infinity
   let u1 = -Infinity
   let v0 = Infinity
@@ -63,7 +63,7 @@ export function levelBounds(m: Model): Bounds {
       take(x, y, z, 1.2)
     }
   }
-  for (const c of m.controls) take(c.def.h[0], c.def.h[1], c.def.h[2], 1.3)
+  if (withControls) for (const c of m.controls) take(c.def.h[0], c.def.h[1], c.def.h[2], 1.3)
   for (const d of m.def.deco ?? []) take(d.x, d.y, d.z, (DECO_HEIGHT[d.s] ?? 1) * (d.k ?? 1) + 0.1, 0.3)
   return { u0, u1, v0, v1 }
 }

@@ -21,7 +21,8 @@ import {
   type Cell, type ControlRT, type Graph, type Model, type Pose, type Space
 } from '@/utils/lammGame'
 import { CHAPTERS, LEVELS } from '@/utils/lammLevels'
-import { DECO_HEIGHT, depthKey, fitView, levelBounds, project, unproject, type Bounds, type View } from '@/utils/lammView'
+import { DECO_HEIGHT, depthKey, project, unproject, type View } from '@/utils/lammView'
+import { cellExt, cellReach, goalReach, handleKind, pictureSize, planLevel, spotAt, type Plan, type Spot } from '@/utils/lammHit'
 import { decoShape, flockShape, flowerShape, gateShape, handleShape, lambShape, shepherdShape } from '@/utils/lammFallback'
 
 const emit = defineEmits<{ leave: [] }>()
@@ -127,7 +128,6 @@ interface Run {
   won: boolean
   wonT: number
   flowersAll: number
-  bounds: Bounds
   chapter: number
 }
 let run: Run | null = null
@@ -155,16 +155,26 @@ function newRun(i: number): Run {
   const graph = graphOf({ m, graphs }, st)
   return {
     m, st, lamb: m.start, graphs, graph, space: null, path: [], from: m.start, to: m.start, stepT: 1, target: -1, anim: null, pending: -1, queuedTap: null, moves: 0, history: [], got: 0,
-    connected: false, won: false, wonT: 0, flowersAll: m.flowers, bounds: levelBounds(m), chapter: def.chapter
+    connected: false, won: false, wonT: 0, flowersAll: m.flowers, chapter: def.chapter
   }
 }
 
+/** The place of the building and of the touch areas of the cranks: made once for each level and screen size (the touch areas never lie on a street, see `lammHit.ts`). */
+const plans = new Map<string, Plan>()
+let plan: Plan | null = null
 function layout() {
   if (!run) return
-  const top = cvW > cvH ? 44 : 66
-  const bottom = cvW > cvH ? 10 : 22
-  view = fitView(run.bounds, 6, top, cvW - 12, cvH - top - bottom)
+  const key = `${run.m.def.id}|${Math.round(cvW)}|${Math.round(cvH)}`
+  let p = plans.get(key)
+  if (!p) {
+    p = planLevel(run.m, cvW, cvH)
+    if (plans.size > 80) plans.clear()
+    plans.set(key, p)
+  }
+  plan = p
+  view = p.view
 }
+const spots = (): readonly Spot[] => plan?.spots ?? []
 
 function resize() {
   const c = canvas.value
@@ -397,26 +407,15 @@ function pointerPos(e: PointerEvent): { x: number; y: number } {
   const c = canvas.value!
   const r = c.getBoundingClientRect()
   // the size is measured again at every touch (a page that changed without a resize event would shift the finger)
-  if (Math.abs(r.width - cvW) > 0.5 || Math.abs(r.height - cvH) > 0.5) resize()
+  if (Math.abs(r.width - cvW) > 0.5 || Math.abs(r.height - cvH) > 0.5 || Math.min(window.devicePixelRatio || 1, 2) !== dpr) resize()
   const kx = r.width > 0 ? cvW / r.width : 1
   const ky = r.height > 0 ? cvH / r.height : 1
   return { x: (e.clientX - r.left) * kx, y: (e.clientY - r.top) * ky }
 }
 
-/** The crank (its number) under a point, or -1. */
-function handleAt(r: Run, px: number, py: number): number {
-  let best = -1
-  let bestD = Math.max(34, view.s * 0.8)
-  for (const c of r.m.controls) {
-    const [hx, hy, hz] = c.def.h
-    const [sx, sy] = project(view, hx, hy, hz)
-    const d = Math.hypot(px - sx, py - (sy - view.s * 0.55))
-    if (d < bestD) {
-      bestD = d
-      best = c.index
-    }
-  }
-  return best
+/** The crank (its number) under a point, or -1: every crank has a round touch area of its own that lies on no street (see `planLevel`). */
+function handleAt(px: number, py: number): number {
+  return spotAt(spots(), px, py)
 }
 
 /** The cell the lamb can walk to under a point (the nearest one in front when several lie behind each other), or -1. */
@@ -429,7 +428,7 @@ function cellAt(r: Run, px: number, py: number): number {
     const [x, y, z] = placeOf(r.m, c, pose)
     const zz = z + surfaceOffset(c)
     const [wx, wy] = unproject(view, px, py, zz)
-    const ext = c.stair >= 0 ? 0.62 : 0.55
+    const ext = cellExt(c)
     if (Math.abs(wx - x) <= ext && Math.abs(wy - y) <= ext) {
       const k = depthKey(x, y, z)
       if (k > bestK) {
@@ -440,7 +439,7 @@ function cellAt(r: Run, px: number, py: number): number {
   }
   if (best >= 0) return best
   // a finger is bigger than a tile: the nearest cell within a little way
-  let bestD = view.s * 0.75
+  let bestD = cellReach(view.s)
   for (const c of r.m.cells) {
     if (!r.graph.walk[c.id]) continue
     const [sx, sy] = cellScreen(r, c.id)
@@ -458,7 +457,7 @@ function onDown(e: PointerEvent) {
   if (screen.value !== 'play' || paused.value || !r || r.won) return
   const p = pointerPos(e)
   idleT = 0
-  const h = handleAt(r, p.x, p.y)
+  const h = handleAt(p.x, p.y)
   if (h >= 0) {
     touchHandle(r, h)
     return
@@ -470,7 +469,7 @@ function onDown(e: PointerEvent) {
   // the shepherd stands above his floor tile: a touch on him is a touch on the goal
   if (r.connected) {
     const [gx, gy] = cellScreen(r, r.m.goal)
-    if (Math.hypot(p.x - gx, p.y - (gy - view.s * 0.9)) < view.s * 1.0) {
+    if (Math.hypot(p.x - gx, p.y - (gy - view.s * 0.9)) < goalReach(view.s)) {
       walkTo(r, r.m.goal)
       return
     }
@@ -755,7 +754,6 @@ interface Item {
   z: number
 }
 const T_CELL = 0
-const T_HANDLE = 1
 const T_DECO = 2
 const T_LAMB = 3
 const T_FLOWER = 4
@@ -770,6 +768,7 @@ function draw(time: number, dt: number) {
   c.setTransform(dpr, 0, 0, dpr, 0, 0)
   drawBackground(c, r?.chapter ?? 0, time)
   if (!r || !loaded.value || screen.value === 'menu') return
+  drawTethers(c, r)
   items.length = 0
   const g = r.graph
   for (const cell of r.m.cells) {
@@ -779,10 +778,6 @@ function draw(time: number, dt: number) {
     items.push({ k: depthKey(x, y, z), type: T_CELL, a: cell.id, b: 0, x, y, z })
     if (cell.flower >= 0 && !(r.got & (1 << cell.flower)) && pose.alpha > 0.5) items.push({ k: depthKey(x, y, z) + 0.3, type: T_FLOWER, a: cell.id, b: 0, x, y, z })
     if (cell.goal) items.push({ k: depthKey(x, y, z) + 0.2, type: T_GOAL, a: cell.id, b: 0, x, y, z })
-  }
-  for (const cr of r.m.controls) {
-    const [hx, hy, hz] = cr.def.h
-    items.push({ k: depthKey(hx, hy, hz) + 0.3, type: T_HANDLE, a: cr.index, b: 0, x: hx, y: hy, z: hz })
   }
   for (let i = 0; i < (r.m.def.deco?.length ?? 0); i++) {
     const d = r.m.def.deco![i]!
@@ -803,9 +798,6 @@ function draw(time: number, dt: number) {
       case T_GOAL:
         drawGoal(c, r, r.m.cells[it.a]!, time)
         break
-      case T_HANDLE:
-        drawHandle(c, r, r.m.controls[it.a]!, time)
-        break
       case T_DECO:
         drawDeco(c, r.m.def.deco![it.a]!)
         break
@@ -816,6 +808,8 @@ function draw(time: number, dt: number) {
   }
   // the lamb is also seen faintly through whatever stands in front of it
   drawLamb(c, r, lx, ly, time, true)
+  // the cranks stand on top of everything, each in its own free place
+  for (const cr of r.m.controls) drawHandle(c, r, cr, time)
   void g
   // sparks
   for (const p of parts) {
@@ -1075,38 +1069,72 @@ function drawGoal(c: CanvasRenderingContext2D, r: Run, cell: Cell, time: number)
   }
 }
 
+/** A dotted line from each crank to the part it moves (drawn first, so the floors hide it: it is only seen in the free room between). */
+function drawTethers(c: CanvasRenderingContext2D, r: Run) {
+  c.save()
+  c.lineCap = 'round'
+  c.setLineDash([1, 7])
+  for (const ctl of r.m.controls) {
+    const sp = spots()[ctl.index]
+    if (!sp) continue
+    const glow = glowGroup === ctl.index
+    for (const gi of ctl.groups) {
+      let best = -1
+      let bd = Infinity
+      let bx = 0
+      let by = 0
+      for (const id of r.m.groups[gi]!.cells) {
+        const [x, y] = cellScreen(r, id)
+        const d = Math.hypot(x - sp.x, y - sp.y)
+        if (d < bd) {
+          bd = d
+          best = id
+          bx = x
+          by = y
+        }
+      }
+      if (best < 0) continue
+      c.strokeStyle = 'rgba(60,40,10,0.35)'
+      c.lineWidth = 4.5
+      c.beginPath()
+      c.moveTo(sp.x, sp.y)
+      c.lineTo(bx, by)
+      c.stroke()
+      c.strokeStyle = glow ? 'rgba(255,240,170,1)' : 'rgba(255,244,200,0.9)'
+      c.lineWidth = 3
+      c.stroke()
+    }
+  }
+  c.restore()
+}
+
 function drawHandle(c: CanvasRenderingContext2D, r: Run, ctl: ControlRT, time: number) {
-  const hd = ctl.def.h
-  const [sx, sy] = project(view, hd[0], hd[1], hd[2])
-  const gs = ctl.groups.map((i) => r.m.groups[i]!.def)
-  const first = gs[0]!
-  const name = first.kind === 'turn' || first.kind === 'swing' || gs.length > 1 ? 'kurbel' : first.kind === 'slide' && first.step && first.step[2] === 0 ? 'schieber' : 'hebel'
+  const sp = spots()[ctl.index]
+  if (!sp) return
+  const name = handleKind(r.m, ctl)
   const im = img[name]
-  const s = view.s
-  const h = s * 1.15
+  // the picture lies inside the round touch area, so it never covers a street
+  const [pw, ph] = pictureSize(sp.r, im ? im.width / im.height : 1)
   const used = r.anim && r.anim.groups.some((i) => ctl.groups.includes(i))
   const glow = glowGroup === ctl.index
-  // the ring under it: gentle, stronger when it is the tip, and when the child does nothing for a while
-  const calm = 0.16 + 0.1 * Math.sin(time * 2.4)
-  const a = glow ? 0.55 + 0.25 * Math.sin(time * 6) : idleT > 12 ? 0.3 + 0.15 * Math.sin(time * 4) : calm
-  c.fillStyle = `rgba(255,226,120,${a.toFixed(3)})`
+  // the round touch area: gentle, stronger when it is the tip, and when the child does nothing for a while
+  const calm = 0.18 + 0.1 * Math.sin(time * 2.4)
+  const a = glow ? 0.6 + 0.25 * Math.sin(time * 6) : idleT > 12 ? 0.32 + 0.15 * Math.sin(time * 4) : calm
+  const g = c.createRadialGradient(sp.x, sp.y, sp.r * 0.2, sp.x, sp.y, sp.r)
+  g.addColorStop(0, `rgba(255,236,150,${(a + 0.12).toFixed(3)})`)
+  g.addColorStop(1, `rgba(255,214,90,${a.toFixed(3)})`)
+  c.fillStyle = g
   c.beginPath()
-  c.ellipse(sx, sy, s * 0.8, s * 0.4, 0, 0, Math.PI * 2)
+  c.arc(sp.x, sp.y, sp.r, 0, Math.PI * 2)
   c.fill()
-  if (glow) {
-    c.strokeStyle = 'rgba(255,240,170,0.9)'
-    c.lineWidth = 2.5
-    c.stroke()
-  }
+  c.strokeStyle = glow ? 'rgba(255,240,170,0.95)' : 'rgba(255,248,215,0.6)'
+  c.lineWidth = glow ? 3 : 1.5
+  c.stroke()
   c.save()
-  c.translate(sx, sy + 3)
+  c.translate(sp.x, sp.y + ph / 2)
   if (used) c.rotate(Math.sin(time * 18) * 0.07)
-  if (im) {
-    const w = (h * im.width) / im.height
-    c.drawImage(im, -w / 2, -h, w, h)
-  } else {
-    handleShape(c, h, name as 'kurbel' | 'schieber' | 'hebel')
-  }
+  if (im) c.drawImage(im, -pw / 2, -ph, pw, ph)
+  else handleShape(c, ph, name)
   c.restore()
 }
 
@@ -1193,7 +1221,12 @@ const hideBroken = (e: Event) => {
   ;(e.target as HTMLElement).style.display = 'none'
 }
 const bannerSrc = (ci: number) => pic(`bg-${CHAPTERS[ci]?.bg ?? 1}`)
-const starsLive = computed(() => (hud.won || hud.connected ? 1 : 0) + (hud.flowers >= hud.flowersAll ? 1 : 0) + (hud.flowers >= hud.flowersAll && hud.moves <= hud.par ? 1 : 0))
+// the stars of the round as they stand now (the same rule as the result: nothing counts before the way to the shepherd is open)
+const starsLive = computed(() => {
+  if (!hud.won && !hud.connected) return 0
+  const all = hud.flowers >= hud.flowersAll
+  return 1 + (all ? 1 : 0) + (all && hud.moves <= hud.par ? 1 : 0)
+})
 const resultText = computed(() => t(`app.bigGames.lamm.won${Math.max(1, outcome.stars)}`))
 const flowerLine = computed(() => t('app.bigGames.lamm.lineFlowers', { have: outcome.flowers, all: outcome.flowersAll }))
 const movesLine = computed(() => t('app.bigGames.lamm.lineMoves', { have: outcome.moves, par: outcome.par }))
@@ -1211,6 +1244,10 @@ function setProbe() {
       get view() {
         return view
       },
+      get spots() {
+        return spots()
+      },
+      handleAt,
       begin,
       advance: (sec = 0.1) => {
         let left = sec
