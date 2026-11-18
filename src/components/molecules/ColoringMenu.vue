@@ -699,8 +699,11 @@ button
   padding: 14px 14px 16px 18px
 
 .ac-door-text
+  flex: 1 1 auto
   display: flex
   flex-direction: column
+  align-items: center
+  text-align: center
   gap: 2px
   min-width: 0
 

@@ -160,9 +160,13 @@ button
   gap: 12px
   padding: 14px 16px 16px
 
+// name and line stand in the middle of the free space between the picture and the arrow (Anton, 18.11.2026: all texts central)
 .door-text
+  flex: 1 1 auto
   display: flex
   flex-direction: column
+  align-items: center
+  text-align: center
   gap: 4px
   min-width: 0
 
