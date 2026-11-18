@@ -2,6 +2,7 @@
  * The texts of the newer big games, one file per game, so that several games can be built side by side without touching the big text files.
  * They are merged into `app.bigGames.<id>` in `app.ts` (german, english) and `app.es.ts` (spanish).
  */
+import bezalel from './bezalel'
 import bogen from './bogen'
 import common from './common'
 import home from './home'
@@ -17,9 +18,9 @@ import wasser from './wasser'
 import wortreise from './wortreise'
 
 export const BIG_GAME_TEXTS = {
-  de: { common: common.de, bogen: bogen.de, wasser: wasser.de, toepfer: toepfer.de, mose: mose.de, karawane: karawane.de, nehemia: nehemia.de, wortreise: wortreise.de, memory: memory.de, lamm: lamm.de, rooms: rooms.de, result: result.de, home: home.de },
-  en: { common: common.en, bogen: bogen.en, wasser: wasser.en, toepfer: toepfer.en, mose: mose.en, karawane: karawane.en, nehemia: nehemia.en, wortreise: wortreise.en, memory: memory.en, lamm: lamm.en, rooms: rooms.en, result: result.en, home: home.en },
-  es: { common: common.es, bogen: bogen.es, wasser: wasser.es, toepfer: toepfer.es, mose: mose.es, karawane: karawane.es, nehemia: nehemia.es, wortreise: wortreise.es, memory: memory.es, lamm: lamm.es, rooms: rooms.es, result: result.es, home: home.es }
+  de: { common: common.de, bogen: bogen.de, wasser: wasser.de, toepfer: toepfer.de, bezalel: bezalel.de, mose: mose.de, karawane: karawane.de, nehemia: nehemia.de, wortreise: wortreise.de, memory: memory.de, lamm: lamm.de, rooms: rooms.de, result: result.de, home: home.de },
+  en: { common: common.en, bogen: bogen.en, wasser: wasser.en, toepfer: toepfer.en, bezalel: bezalel.en, mose: mose.en, karawane: karawane.en, nehemia: nehemia.en, wortreise: wortreise.en, memory: memory.en, lamm: lamm.en, rooms: rooms.en, result: result.en, home: home.en },
+  es: { common: common.es, bogen: bogen.es, wasser: wasser.es, toepfer: toepfer.es, bezalel: bezalel.es, mose: mose.es, karawane: karawane.es, nehemia: nehemia.es, wortreise: wortreise.es, memory: memory.es, lamm: lamm.es, rooms: rooms.es, result: result.es, home: home.es }
 } as Record<'de' | 'en' | 'es', Record<string, Record<string, unknown>>>
 
 /**

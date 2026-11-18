@@ -1,0 +1,177 @@
+/** The texts of the big game "bezalel" (Bezalel's workshop, a tangram game; german, english, spanish), merged into `app.bigGames.bezalel` (see `index.ts`). */
+export default {
+  de: {
+    title: 'Bezalels Werkstatt',
+    story: 'Gott erfüllt Bezalel mit seinem Geist. So kann er kunstvoll mit Holz, Gold, Silber und Bronze arbeiten. (2. Mose 31,3–5)',
+    task: 'Deine Aufgabe: Lege die Teile in den dunklen Umriss.',
+    chapters: [
+      { name: 'Das Holz', ref: '2. Mose 25,10', story: 'Aus Akazienholz entstehen Bretter, Stangen, ein Tisch und die Altäre.', task: 'Lege die Holzteile in den dunklen Umriss.' },
+      { name: 'Gold, Silber, Bronze', ref: '2. Mose 31,4', story: 'Bezalel arbeitet kunstvoll mit Gold, Silber und Bronze.', task: 'Lege die Metallteile in den dunklen Umriss.' },
+      { name: 'Die Stoffe', ref: '2. Mose 26,1', story: 'Die Teppiche sind aus feinem Leinen, blauem und rotem Purpur und Karmesin.', task: 'Lege die Stoffteile in den dunklen Umriss.' },
+      { name: 'Die ganze Stiftshütte', ref: '2. Mose 39,43', story: 'Mose sieht das ganze Werk. Alles ist gemacht, wie der Herr gebot.', task: 'Lege alle sieben Teile in den dunklen Umriss.' }
+    ],
+    levels: [
+      'Das Brett', 'Der Riegel', 'Die Tragstange', 'Die Säule', 'Die Leiste', 'Die Lade', 'Der Tisch', 'Der Räucheraltar', 'Die Bretterwand', 'Der Brandopferaltar',
+      'Der Haken', 'Der Pflock', 'Die Schale', 'Die Kanne', 'Die Lampe', 'Der Sockel', 'Der Ring', 'Der Deckel', 'Das Becken', 'Der Leuchter',
+      'Der Teppich', 'Die Zeltdecke', 'Die Felldecke', 'Das Garn', 'Das Gesponnene', 'Der Vorhang', 'Das Schulterkleid', 'Das Brustschild', 'Der Saum', 'Der Gürtel',
+      'Die Säulenreihe', 'Der Eingang', 'Der Vorhof', 'Das Heilige', 'Das Allerheiligste', 'Die Wohnung', 'Die Schaubrote', 'Das Salböl', 'Der Aufbau', 'Das fertige Werk'
+    ],
+    refs: [
+      '2. Mose 26,15', '2. Mose 26,26', '2. Mose 25,13', '2. Mose 26,32', '2. Mose 25,25', '2. Mose 25,10', '2. Mose 25,23', '2. Mose 30,1', '2. Mose 26,15–17', '2. Mose 27,1',
+      '2. Mose 26,6', '2. Mose 27,19', '2. Mose 25,29', '2. Mose 25,29', '2. Mose 25,37', '2. Mose 26,19', '2. Mose 25,12', '2. Mose 25,17', '2. Mose 30,18', '2. Mose 25,31',
+      '2. Mose 26,1', '2. Mose 26,7', '2. Mose 26,14', '2. Mose 35,25', '2. Mose 35,25', '2. Mose 26,31', '2. Mose 28,6', '2. Mose 28,15', '2. Mose 28,33', '2. Mose 28,39',
+      '2. Mose 27,10', '2. Mose 26,36', '2. Mose 27,9', '2. Mose 26,33', '2. Mose 26,33', '2. Mose 26,1', '2. Mose 25,30', '2. Mose 30,25', '2. Mose 40,17', '2. Mose 39,43'
+    ],
+    allDone: 'Das ganze Werk ist fertig, wie der Herr es gebot! (2. Mose 39,43)',
+    chapterDone: 'Kapitel fertig!',
+    starRules: 'Drei Sterne ohne Tipp. Mit Tipp gibt es weniger.',
+    shelf: 'Meine Werkstatt',
+    howTitle: 'So geht es',
+    howMove: 'Ziehe die Teile in den Umriss.',
+    howTurn: 'Tippe ein Teil: Es dreht sich.',
+    howFit: 'Passt es, rastet es ein.',
+    go: 'Los!',
+    pause: 'Pause',
+    resume: 'Weiter spielen',
+    menu: 'Zur Übersicht',
+    next: 'Nächstes Bild',
+    leave: 'Zurück',
+    restart: 'Neu legen',
+    undo: 'Zurück nehmen',
+    tipBtn: 'Tipp',
+    rotate: 'Teil drehen',
+    flip: 'Teil spiegeln',
+    handle: 'Frei drehen',
+    again: 'Nochmal',
+    won1: 'Fertig!',
+    won2: 'Schön gelegt!',
+    won3: 'Meisterhaft!',
+    lineAll: 'Alle Teile liegen richtig',
+    lineTips: 'Tipps benutzt: {n}',
+    hint: {
+      first: 'Ziehe ein Teil in den dunklen Umriss.',
+      turn: 'Tippe ein Teil, dann dreht es sich.',
+      flip: 'Das Parallelogramm lässt sich spiegeln.',
+      snap: 'Liegt ein Teil fast richtig, rastet es ein.',
+      tip: 'Ein Tipp zeigt dir ein Teil. Das kostet einen Stern.',
+      handle: 'Am Griff drehst du frei und mit Rasten.'
+    },
+    tipShown: 'Hier gehört das Teil hin.'
+  },
+  en: {
+    title: "Bezalel's Workshop",
+    story: 'God fills Bezalel with his Spirit. So he can work skilfully in wood, gold, silver and bronze. (Exodus 31:3–5)',
+    task: 'Your task: lay the pieces into the dark outline.',
+    chapters: [
+      { name: 'The Wood', ref: 'Exodus 25:10', story: 'Boards, poles, a table and the altars are made of acacia wood.', task: 'Lay the wooden pieces into the dark outline.' },
+      { name: 'Gold, Silver, Bronze', ref: 'Exodus 31:4', story: 'Bezalel works skilfully with gold, silver and bronze.', task: 'Lay the metal pieces into the dark outline.' },
+      { name: 'The Fabrics', ref: 'Exodus 26:1', story: 'The curtains are of fine linen, blue and purple and scarlet yarn.', task: 'Lay the cloth pieces into the dark outline.' },
+      { name: 'The Whole Tabernacle', ref: 'Exodus 39:43', story: 'Moses sees all the work. It is done just as the Lord commanded.', task: 'Lay all seven pieces into the dark outline.' }
+    ],
+    levels: [
+      'The Board', 'The Bar', 'The Carrying Pole', 'The Pillar', 'The Rim', 'The Ark', 'The Table', 'The Incense Altar', 'The Board Wall', 'Burnt Offering Altar',
+      'The Clasp', 'The Tent Peg', 'The Bowl', 'The Pitcher', 'The Lamp', 'The Silver Base', 'The Ring', 'The Lid', 'The Basin', 'The Lampstand',
+      'The Carpet', 'The Goat-Hair Cover', 'The Ram Skins', 'The Yarn', 'The Spun Thread', 'The Curtain', 'The Ephod', 'The Breastpiece', 'The Hem', 'The Belt',
+      'The Pillar Row', 'The Entrance', 'The Courtyard', 'The Holy Place', 'Most Holy Place', 'The Tabernacle', 'The Showbread', 'The Anointing Oil', 'The Setting Up', 'The Finished Work'
+    ],
+    refs: [
+      'Exodus 26:15', 'Exodus 26:26', 'Exodus 25:13', 'Exodus 26:32', 'Exodus 25:25', 'Exodus 25:10', 'Exodus 25:23', 'Exodus 30:1', 'Exodus 26:15–17', 'Exodus 27:1',
+      'Exodus 26:6', 'Exodus 27:19', 'Exodus 25:29', 'Exodus 25:29', 'Exodus 25:37', 'Exodus 26:19', 'Exodus 25:12', 'Exodus 25:17', 'Exodus 30:18', 'Exodus 25:31',
+      'Exodus 26:1', 'Exodus 26:7', 'Exodus 26:14', 'Exodus 35:25', 'Exodus 35:25', 'Exodus 26:31', 'Exodus 28:6', 'Exodus 28:15', 'Exodus 28:33', 'Exodus 28:39',
+      'Exodus 27:10', 'Exodus 26:36', 'Exodus 27:9', 'Exodus 26:33', 'Exodus 26:33', 'Exodus 26:1', 'Exodus 25:30', 'Exodus 30:25', 'Exodus 40:17', 'Exodus 39:43'
+    ],
+    allDone: 'The whole work is finished, just as the Lord commanded! (Exodus 39:43)',
+    chapterDone: 'Chapter finished!',
+    starRules: 'Three stars without a tip. With a tip you get fewer.',
+    shelf: 'My Workshop',
+    howTitle: 'How to play',
+    howMove: 'Drag the pieces into the outline.',
+    howTurn: 'Tap a piece: it turns.',
+    howFit: 'If it fits, it clicks in.',
+    go: 'Go!',
+    pause: 'Pause',
+    resume: 'Keep playing',
+    menu: 'To the overview',
+    next: 'Next picture',
+    leave: 'Back',
+    restart: 'Start over',
+    undo: 'Take back',
+    tipBtn: 'Tip',
+    rotate: 'Turn piece',
+    flip: 'Flip piece',
+    handle: 'Turn freely',
+    again: 'Again',
+    won1: 'Finished!',
+    won2: 'Nicely laid!',
+    won3: 'Masterful!',
+    lineAll: 'All pieces lie right',
+    lineTips: 'Tips used: {n}',
+    hint: {
+      first: 'Drag a piece into the dark outline.',
+      turn: 'Tap a piece and it turns.',
+      flip: 'The parallelogram can be flipped.',
+      snap: 'A piece that lies nearly right clicks in.',
+      tip: 'A tip shows you a piece. It costs one star.',
+      handle: 'Turn freely at the handle, with stops.'
+    },
+    tipShown: 'This is where the piece belongs.'
+  },
+  es: {
+    title: 'El taller de Bezalel',
+    story: 'Dios llena a Bezalel con su Espíritu. Así puede trabajar con arte la madera, el oro, la plata y el bronce. (Éxodo 31:3–5)',
+    task: 'Tu tarea: coloca las piezas en el contorno oscuro.',
+    chapters: [
+      { name: 'La madera', ref: 'Éxodo 25:10', story: 'Las tablas, las varas, la mesa y los altares son de madera de acacia.', task: 'Coloca las piezas de madera en el contorno oscuro.' },
+      { name: 'Oro, plata, bronce', ref: 'Éxodo 31:4', story: 'Bezalel trabaja con arte el oro, la plata y el bronce.', task: 'Coloca las piezas de metal en el contorno oscuro.' },
+      { name: 'Las telas', ref: 'Éxodo 26:1', story: 'Las cortinas son de lino fino, azul, púrpura y carmesí.', task: 'Coloca las piezas de tela en el contorno oscuro.' },
+      { name: 'Todo el tabernáculo', ref: 'Éxodo 39:43', story: 'Moisés ve toda la obra. Todo está hecho como el Señor mandó.', task: 'Coloca las siete piezas en el contorno oscuro.' }
+    ],
+    levels: [
+      'La tabla', 'La barra', 'La vara', 'La columna', 'La moldura', 'El arca', 'La mesa', 'Altar del incienso', 'Pared de tablas', 'Altar del holocausto',
+      'El broche', 'La estaca', 'El tazón', 'La jarra', 'La lámpara', 'Base de plata', 'El anillo', 'La tapa', 'La fuente', 'El candelabro',
+      'El tapiz', 'Tela de pelo', 'Pieles de carnero', 'El hilo', 'Lo hilado', 'El velo', 'El efod', 'El pectoral', 'El dobladillo', 'El cinto',
+      'Fila de columnas', 'La entrada', 'El atrio', 'El lugar santo', 'El lugar santísimo', 'El tabernáculo', 'Panes de proposición', 'El aceite santo', 'El montaje', 'La obra terminada'
+    ],
+    refs: [
+      'Éxodo 26:15', 'Éxodo 26:26', 'Éxodo 25:13', 'Éxodo 26:32', 'Éxodo 25:25', 'Éxodo 25:10', 'Éxodo 25:23', 'Éxodo 30:1', 'Éxodo 26:15–17', 'Éxodo 27:1',
+      'Éxodo 26:6', 'Éxodo 27:19', 'Éxodo 25:29', 'Éxodo 25:29', 'Éxodo 25:37', 'Éxodo 26:19', 'Éxodo 25:12', 'Éxodo 25:17', 'Éxodo 30:18', 'Éxodo 25:31',
+      'Éxodo 26:1', 'Éxodo 26:7', 'Éxodo 26:14', 'Éxodo 35:25', 'Éxodo 35:25', 'Éxodo 26:31', 'Éxodo 28:6', 'Éxodo 28:15', 'Éxodo 28:33', 'Éxodo 28:39',
+      'Éxodo 27:10', 'Éxodo 26:36', 'Éxodo 27:9', 'Éxodo 26:33', 'Éxodo 26:33', 'Éxodo 26:1', 'Éxodo 25:30', 'Éxodo 30:25', 'Éxodo 40:17', 'Éxodo 39:43'
+    ],
+    allDone: '¡Toda la obra está terminada, como el Señor mandó! (Éxodo 39:43)',
+    chapterDone: '¡Capítulo terminado!',
+    starRules: 'Tres estrellas sin pista. Con pista, menos.',
+    shelf: 'Mi taller',
+    howTitle: 'Cómo se juega',
+    howMove: 'Arrastra las piezas al contorno.',
+    howTurn: 'Toca una pieza: gira.',
+    howFit: 'Si encaja, se fija.',
+    go: '¡Vamos!',
+    pause: 'Pausa',
+    resume: 'Seguir jugando',
+    menu: 'A la vista general',
+    next: 'Siguiente imagen',
+    leave: 'Atrás',
+    restart: 'Empezar de nuevo',
+    undo: 'Deshacer',
+    tipBtn: 'Pista',
+    rotate: 'Girar pieza',
+    flip: 'Voltear pieza',
+    handle: 'Girar libremente',
+    again: 'Otra vez',
+    won1: '¡Listo!',
+    won2: '¡Bien puesto!',
+    won3: '¡Magistral!',
+    lineAll: 'Todas las piezas bien puestas',
+    lineTips: 'Pistas usadas: {n}',
+    hint: {
+      first: 'Arrastra una pieza al contorno oscuro.',
+      turn: 'Toca una pieza y gira.',
+      flip: 'El paralelogramo se puede voltear.',
+      snap: 'Si una pieza casi encaja, se fija.',
+      tip: 'Una pista te muestra una pieza. Cuesta una estrella.',
+      handle: 'En el asa giras libre, con paradas.'
+    },
+    tipShown: 'Aquí va la pieza.'
+  }
+}

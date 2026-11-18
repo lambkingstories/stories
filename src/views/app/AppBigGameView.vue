@@ -12,6 +12,7 @@ import { BIG_GAMES } from '@/data/bigGames'
 import useBigGames from '@/use/useBigGames'
 import { PLUS_TEST } from '@/use/usePremium'
 import { prependBaseUrl } from '@/utils/function'
+const BigGameBezalel = defineAsyncComponent(() => import('@/components/molecules/games/BigGameBezalel.vue'))
 const BigGameBogen = defineAsyncComponent(() => import('@/components/molecules/games/BigGameBogen.vue'))
 const BigGameDavid = defineAsyncComponent(() => import('@/components/molecules/games/BigGameDavid.vue'))
 const BigGameElia = defineAsyncComponent(() => import('@/components/molecules/games/BigGameElia.vue'))
@@ -54,6 +55,7 @@ function leave() {
   BigGameNehemia(v-else-if="game?.id === 'nehemia' && open" @leave="leave")
   BigGameMemory(v-else-if="game?.id === 'memory' && open" @leave="leave")
   BigGameLamm(v-else-if="game?.id === 'lamm' && open" @leave="leave")
+  BigGameBezalel(v-else-if="game?.id === 'bezalel' && open" @leave="leave")
   BigGameBogen(v-else-if="game?.id === 'bogen' && open" @leave="leave")
   div(v-else class="bg-closed")
     img(v-if="game" class="bg-closed-pic" :src="prependBaseUrl(game.image)" alt="" draggable="false")
