@@ -3871,19 +3871,7 @@ export default {
         books: 'Coloring books',
         pagesPainted: '{done} of {total} pages painted',
         pagesCount: '{total} pictures',
-        newPage: 'Other picture',
-        bookPickTitle: 'Pick a coloring book',
-        bookPickSub: 'Tap a book. It moves into your paint app.',
-        pickToApp: 'Go to the paint app',
-        pickToAppSub: 'Paint freely, your pictures and your exhibition',
-        pickMore: 'Discover more coloring books',
-        pickEmptyTitle: 'You have no coloring book yet',
-        pickEmptyText: 'Take a look at the coloring books. Or paint freely in the paint app.',
-        pickBack: 'Pick a book',
-        pickBookLabel: '{title}: put in the paint app',
-        transferMoving: 'Your coloring book moves into the paint app',
-        transferThere: 'Your coloring book is already waiting in the paint app',
-        transferSkip: 'Go on'
+        newPage: 'Other picture'
       },
       premium: {
         title: 'LambKing Plus',
@@ -8045,19 +8033,7 @@ export default {
         books: 'Ausmalbücher',
         pagesPainted: '{done} von {total} Seiten gemalt',
         pagesCount: '{total} Bilder',
-        newPage: 'Anderes Bild',
-        bookPickTitle: 'Such dir ein Malbuch aus',
-        bookPickSub: 'Tippe auf ein Buch. Es kommt in deine Mal-App.',
-        pickToApp: 'Zur Mal-App',
-        pickToAppSub: 'Frei malen, deine Bilder und deine Ausstellung',
-        pickMore: 'Weitere Malbücher entdecken',
-        pickEmptyTitle: 'Du hast noch kein Malbuch',
-        pickEmptyText: 'Schau dir die Malbücher an. Oder male frei in der Mal-App.',
-        pickBack: 'Buch aussuchen',
-        pickBookLabel: '{title}: in die Mal-App legen',
-        transferMoving: 'Dein Malbuch kommt in die Mal-App',
-        transferThere: 'Dein Malbuch wartet schon in der Mal-App',
-        transferSkip: 'Weiter'
+        newPage: 'Anderes Bild'
       },
       premium: {
         title: 'LambKing Plus',

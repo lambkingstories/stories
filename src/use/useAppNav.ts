@@ -37,7 +37,7 @@ export function routeToNav(name: string): AppNavId {
   // the good-night stories belong to "Lesen"
   if (name === 'app-goodnight') return 'series'
   // the coloring books are one place, and it belongs to "Malen" (the door in "Lesen" leads there, too)
-  if (name === 'app-coloring-pick' || name === 'app-coloring' || name === 'app-coloring-book' || name === 'app-coloring-books') return 'malen'
+  if (name === 'app-coloring' || name === 'app-coloring-book' || name === 'app-coloring-books') return 'malen'
   if (name === 'app-profile' || name === 'app-legal' || name === 'app-plus' || name === 'app-awards' || name === 'app-parents' || name === 'app-collection' || name === 'app-gameroom' || name === 'app-games-adventure' || name === 'app-games-stage' || name === 'app-family' || name === 'app-journal' || name === 'app-voices') return 'profile'
   return 'home'
 }
@@ -46,8 +46,7 @@ const ROUTE_BY_NAV: Record<AppNavId, string> = {
   home: 'app-main',
   series: 'app-read',
   abenteuer: 'app-adventure',
-  // "Malen" first asks for a coloring book (the painting program itself is one step further)
-  malen: 'app-coloring-pick',
+  malen: 'app-coloring',
   profile: 'app-profile'
 }
 

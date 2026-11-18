@@ -9,7 +9,7 @@
  * painting screen. The other pictures (built in and from stories) are not shown any more; they are still handed in (`groups`).
  * It only shows what it is given and says what was tapped; the screen with the picture does the rest.
  */
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import LkCompanion from '@/components/atoms/LkCompanion.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
@@ -17,7 +17,6 @@ import AppHeader from '@/components/molecules/AppHeader.vue'
 import ArtworkViewer from '@/components/molecules/ArtworkViewer.vue'
 import { prependBaseUrl } from '@/utils/function'
 import useExhibition from '@/use/useExhibition'
-import useColoringShelf from '@/use/useColoringShelf'
 import type { ArtworkMeta } from '@/use/useArtworks'
 import type { TimelapseData } from '@/utils/timelapse'
 import { frameRatio } from '@/utils/coloringThumb'
@@ -43,8 +42,6 @@ const emit = defineEmits<{
   'open-book': [card: BookCard]
   'remove-book': [card: BookCard]
   'to-books': []
-  /** Back to "Such dir ein Malbuch aus". */
-  back: []
   blank: [shape: 'portrait' | 'landscape']
   'own-image': []
   'open-work': [meta: ArtworkMeta]
@@ -127,27 +124,6 @@ const frameStyle = (w: ArtworkMeta) => ({ aspectRatio: String(frameRatio(w)) })
 /** The picture of the door to the books (the children's hands painting in a coloring book, the lamb watching). */
 const booksDoorImage = prependBaseUrl('images/bg/malen-kinderhaende.webp')
 
-// ── The book that has just come from the choice page: it is lifted once, softly, and brought into view ──────────────────────────
-const paintShelf = useColoringShelf()
-/** The book that is lifted right now (it stays marked for a short while only, never as a lasting glow). */
-const lifted = ref('')
-let liftTimer: ReturnType<typeof setTimeout> | undefined
-watch(
-  () => [paintShelf.fresh.value, props.books.map((b) => b.bookId).join('|')] as const,
-  ([id]) => {
-    if (!id || !props.books.some((b) => b.bookId === id)) return
-    lifted.value = id
-    paintShelf.clearFresh(id)
-    void nextTick(() => {
-      Array.from(document.querySelectorAll<HTMLElement>('[data-shelf-book]')).find((el) => el.dataset.shelfBook === id)?.scrollIntoView?.({ block: 'nearest', inline: 'nearest', behavior: 'smooth' })
-    })
-    clearTimeout(liftTimer)
-    liftTimer = setTimeout(() => (lifted.value = ''), 2800)
-  },
-  { immediate: true }
-)
-onBeforeUnmount(() => clearTimeout(liftTimer))
-
 const bookPercent = (b: BookCard) => `${Math.round((b.done / Math.max(1, b.total)) * 100)}%`
 </script>
 
@@ -157,11 +133,6 @@ const bookPercent = (b: BookCard) => `${Math.round((b.done / Math.max(1, b.total
     AppHeader(class="ac-apphead")
 
     div(class="ac-body")
-      //- the way back to "Such dir ein Malbuch aus"
-      button(type="button" class="lk-btn lk-btn--outline lk-btn--small ac-back" data-test="menu-back" @click="emit('back')")
-        ZIconography(name="chevron-left" :size="20")
-        span {{ t('app.coloring.pickBack') }}
-
       //- heading with the companion lamb
       header(class="ac-head")
         div(class="ac-head-text")
@@ -220,7 +191,7 @@ const bookPercent = (b: BookCard) => `${Math.round((b.done / Math.max(1, b.total
           span(v-if="books.length" class="ac-count") {{ books.length }}
         div(v-if="books.length" class="ac-shelf lk-panel")
           div(:class="['ac-bigbooks', { 'is-one': books.length === 1 }]")
-            div(v-for="b in books" :key="b.bookId" :class="['ac-bigbook-wrap', { 'is-lifted': lifted === b.bookId }]" :data-shelf-book="b.bookId")
+            div(v-for="b in books" :key="b.bookId" class="ac-bigbook-wrap")
               button(type="button" class="ac-bigbook" @click="emit('open-book', b)")
                 span(class="ac-bigbook-cover")
                   img(v-if="b.cover" :src="b.cover" alt="" draggable="false" loading="lazy")
@@ -407,17 +378,6 @@ button
 .ac-head-lamb
   flex: 0 0 auto
   margin-bottom: -4px
-
-// back to the choice of a coloring book (a capsule like the one on the inner pages; at least 48 px high)
-.ac-back
-  align-self: flex-start
-  min-height: 48px
-  gap: 4px
-  padding: 0 18px 0 10px
-  margin-bottom: -10px
-
-  :deep(.z-icon-outline)
-    color: currentColor
 
 // ── A group: its heading (with a small count) and what belongs to it ─────────────────────
 .ac-sec
@@ -654,32 +614,6 @@ button
     inset: 0
     background: linear-gradient(90deg, rgba(20, 12, 4, 0.28) 0, rgba(255, 255, 255, 0.14) 2.5%, rgba(255, 255, 255, 0) 7%)
     pointer-events: none
-
-// the book that has just come from the choice page: lifted once, with a soft ring that fades away (never a lasting glow)
-.ac-bigbook-wrap.is-lifted .ac-bigbook-cover
-  animation: ac-lift 2400ms cubic-bezier(0.22, 1, 0.36, 1) 1 both
-
-@keyframes ac-lift
-  0%
-    transform: translateY(0) scale(1)
-    box-shadow: 0 0 0 0 rgba(217, 169, 58, 0), 0 20px 30px -14px rgba(60, 40, 10, 0.6), 0 2px 5px rgba(60, 40, 10, 0.28)
-  25%
-    transform: translateY(-10px) scale(1.04)
-    box-shadow: 0 0 0 6px rgba(217, 169, 58, 0.55), 0 26px 34px -14px rgba(60, 40, 10, 0.6), 0 2px 5px rgba(60, 40, 10, 0.28)
-  100%
-    transform: translateY(0) scale(1)
-    box-shadow: 0 0 0 0 rgba(217, 169, 58, 0), 0 20px 30px -14px rgba(60, 40, 10, 0.6), 0 2px 5px rgba(60, 40, 10, 0.28)
-
-@media (prefers-reduced-motion: reduce)
-  // only a soft ring that fades, nothing moves
-  .ac-bigbook-wrap.is-lifted .ac-bigbook-cover
-    animation-name: ac-lift-calm
-
-@keyframes ac-lift-calm
-  0%
-    box-shadow: 0 0 0 6px rgba(217, 169, 58, 0.55), 0 20px 30px -14px rgba(60, 40, 10, 0.6)
-  100%
-    box-shadow: 0 0 0 0 rgba(217, 169, 58, 0), 0 20px 30px -14px rgba(60, 40, 10, 0.6)
 
 .ac-bigbook-badge
   position: absolute

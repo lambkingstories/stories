@@ -32,8 +32,6 @@ const route = useRoute()
 const router = useRouter()
 /** Opened from the painting program: the way back leads there; from the door in "Lesen" it leads back to "Lesen". */
 const fromPainting = computed(() => route.query.from === 'malen')
-/** Opened from "Such dir ein Malbuch aus": the way back leads there. */
-const fromPick = computed(() => route.query.from === 'pick')
 const apiBooks = useApiBooks()
 
 const lang = computed<Locale>(() => (contentLocale(locale.value)))
@@ -106,7 +104,7 @@ function retry() {
 }
 
 function goBack() {
-  goBackTo(router, { name: fromPick.value ? 'app-coloring-pick' : fromPainting.value ? 'app-coloring' : 'app-read' })
+  goBackTo(router, { name: fromPainting.value ? 'app-coloring' : 'app-read' })
 }
 
 function openBook(bookId: string) {

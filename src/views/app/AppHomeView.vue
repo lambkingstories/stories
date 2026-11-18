@@ -191,7 +191,7 @@ const pictureCard = computed<ResumeCard>(() => {
   const kind = t('app.home.kindPicture')
   const list = [...artworks.value].sort((a, b) => b.updatedAt - a.updatedAt)
   const work = list.find((w) => !w.done) ?? list[0]
-  const go = () => void router.push(work ? { name: 'app-coloring', query: { work: work.id } } : { name: 'app-coloring-pick' })
+  const go = () => void router.push(work ? { name: 'app-coloring', query: { work: work.id } } : { name: 'app-coloring' })
   if (!work) {
     // nothing painted yet: the painted picture of the area (children's hands with crayons, the lamb, the window)
     return { id: 'picture', kind, title: t('app.home.discoverPicture'), meta: t('app.home.pickPicture'), image: PAINT_AREA_IMAGE, focus: '50% 40%', progress: -1, empty: true, go }

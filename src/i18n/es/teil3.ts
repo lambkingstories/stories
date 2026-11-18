@@ -1264,19 +1264,7 @@ export default {
     books: 'Libros para colorear',
     pagesPainted: '{done} de {total} páginas pintadas',
     pagesCount: '{total} dibujos',
-    newPage: 'Otro dibujo',
-    bookPickTitle: 'Elige un libro para colorear',
-    bookPickSub: 'Toca un libro. Se va a tu app de pintura.',
-    pickToApp: 'A la app de pintura',
-    pickToAppSub: 'Pintar libremente, tus dibujos y tu exposición',
-    pickMore: 'Descubrir más libros para colorear',
-    pickEmptyTitle: 'Todavía no tienes ningún libro para colorear',
-    pickEmptyText: 'Mira los libros para colorear. O pinta libremente en la app de pintura.',
-    pickBack: 'Elegir libro',
-    pickBookLabel: '{title}: poner en la app de pintura',
-    transferMoving: 'Tu libro para colorear se va a la app de pintura',
-    transferThere: 'Tu libro para colorear ya te espera en la app de pintura',
-    transferSkip: 'Seguir'
+    newPage: 'Otro dibujo'
   },
   premium: {
     title: 'LambKing Plus',

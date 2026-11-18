@@ -133,8 +133,7 @@ export function warmSprites(): void {
       const img = new Image()
       img.decoding = 'async'
       img.src = it.src
-      // (an environment without `decode`, e.g. a test that has already ended, is left alone)
-      void img.decode?.()?.catch(() => undefined)
+      void img.decode().catch(() => undefined)
     }
     later(next)
   }
