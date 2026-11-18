@@ -3,7 +3,7 @@
  * How they open (Anton, 17.11.2026): for every full `STEP` stars on the adventures (the stars of all stages together) the child may pick
  * one game it wants to play, and it picks which one (see `utils/bigGames.ts` and `use/useGameWishes.ts`). The choice is for good.
  */
-export type BigGameId = 'david' | 'elia' | 'wasser' | 'karawane' | 'nehemia' | 'memory' | 'lamm' | 'mose' | 'bogen'
+export type BigGameId = 'david' | 'elia' | 'wasser' | 'karawane' | 'nehemia' | 'memory' | 'lamm' | 'mose' | 'bogen' | 'toepfer'
 
 /**
  * The stars of all adventures together that give one wish for a game. 40 stars: with about 300 stars (the nine adventures of the store
@@ -32,5 +32,7 @@ export const BIG_GAMES: BigGame[] = [
   { id: 'lamm', image: 'images/spiele-gross/lamm/kachel-2.webp', maxStars: 102 },
   { id: 'karawane', image: 'images/spiele-gross/karawane/kachel.webp', maxStars: 18 },
   // the archery game of Jonathan's arrows: 44 levels in 4 chapters, wind, ropes, switches, bounces (see `utils/bogenGame.ts`)
-  { id: 'bogen', image: 'images/spiele-gross/bogen/kachel-2.webp', maxStars: 132 }
+  { id: 'bogen', image: 'images/spiele-gross/bogen/kachel-2.webp', maxStars: 132 },
+  // the pottery game of Jeremiah 18: form the clay on the wheel like the template, fire and paint it, 30 vessels in 5 chapters (see `utils/toepferGame.ts`)
+  { id: 'toepfer', image: 'images/spiele-gross/toepfer/kachel.webp', maxStars: 90 }
 ]

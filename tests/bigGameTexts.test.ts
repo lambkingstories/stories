@@ -44,6 +44,7 @@ const SPECS: Spec[] = [
   { id: 'lamm', component: 'BigGameLamm', explain: ['howTap', 'howCrank', 'howFlowers'], background: ['intro'], tasks: ['task', 'story.*.task'], chapters: ['story.*.text'], hints: ['hint.*', 'tipWalk', 'tipNone', 'tipRide', 'tipCrank', 'noWay', 'standing', 'inTheWay', 'called'], levels: ['levels.*'] },
   { id: 'mose', component: 'BigGameMose', explain: ['howCut', 'howTap', 'howLotus'], background: ['story'], tasks: ['task', 'chapters.*.task'], chapters: ['chapters.*.story'], hints: ['hint.*', 'splash', 'stuck', 'tipShown'], levels: [] },
   { id: 'bogen', component: 'BigGameBogen', explain: ['howPull', 'howPower', 'howGoal'], background: ['story', 'ending.text'], tasks: ['task', 'chapters.*.task'], chapters: ['chapters.*.story'], hints: ['hint.*', 'tipWait', 'tipNone', 'tooWeak', 'turn'], levels: ['names.*'] },
+  { id: 'toepfer', component: 'BigGameToepfer', explain: ['howShape', 'howTop', 'howFire'], background: ['story'], tasks: ['task', 'chapters.*.task'], chapters: ['chapters.*.story'], hints: ['hint.*'], levels: ['levels.*'] },
   { id: 'wortreise', component: '', explain: [], background: ['sub', 'rule'], tasks: [], chapters: [], hints: ['startHint', 'drawHint', 'freeLetter', 'freeLetterAlone', 'again', 'no', 'noLens', 'letterShown'], levels: [] }
 ]
 
