@@ -46,7 +46,7 @@ describe('BigGameKarawane', () => {
     const w = await open()
     expect(w.findAll('.kg-route')).toHaveLength(6)
     for (const r of w.findAll('.kg-route')) expect(r.attributes('disabled')).toBeUndefined()
-    expect(w.text()).toContain('Die Karawane nach Ägypten')
+    expect(w.text()).toContain('Karawane nach Ägypten')
     expect(w.text()).toContain('Auf nach Jerusalem')
     w.unmount()
   })

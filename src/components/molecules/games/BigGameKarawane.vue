@@ -23,17 +23,14 @@ import {
   heightAt,
   hop,
   newRun,
-  speedLimit,
   starsForTime,
   stepRun,
   winBonus,
-  zoneAt,
   START_X,
   type GameEvent,
   type Input,
   type Run,
-  type Track,
-  type Zone
+  type Track
 } from '@/utils/karawaneGame'
 import {
   ANIMAL_IDS,
@@ -78,11 +75,6 @@ import {
   routeImages
 } from '@/utils/karawaneArt'
 
-/** How far down in the bridge picture the deck lies (a share of its height). */
-const DECK_TOP = 0.41
-void zoneAt
-void speedLimit
-type _Z = Zone
 const emit = defineEmits<{ leave: [] }>()
 const { t } = useI18n({ useScope: 'global' })
 const { play } = useSfx()
@@ -272,6 +264,7 @@ async function start(i: number, fromCheckpoint = 0, practice = false) {
   how.value = !howSeen(ID)
   paused.value = how.value
   await load(routeImages((practice ? 0 : i) + 1))
+  await load(STONES[(practice ? 0 : i) + 1] ?? [])
   makeBand(i)
   practiceMode = practice
   track = generateTrack(practice ? 0 : i)
@@ -458,10 +451,6 @@ function handle(e: GameEvent): void {
   } else if (e.type === 'won') {
     play('fanfare', 0.7)
     for (let k = 0; k < 30; k++) emitParticle('spark', x + (Math.random() - 0.5) * 6, y + 1 + Math.random() * 3, (Math.random() - 0.5) * 6, 2 + Math.random() * 5, 1.2, 0.22)
-  } else if (e.type === 'station') {
-    play('caravan', 0.6)
-    floatText(t('app.bigGames.karawane.stationOpen'), x, y + 2.6, '#c8f4ff')
-    for (let k = 0; k < 12; k++) emitParticle('spark', x + 2 + (Math.random() - 0.5) * 3, y + 1, (Math.random() - 0.5) * 5, 2 + Math.random() * 3, 0.7, 0.2)
   } else if (e.type === 'warn') {
     play('tap', 0.5, 0.8)
     floatText(t(`app.bigGames.karawane.warn.${e.kind}`), x + 3, y + 2.8, '#ffd0a0')
@@ -470,9 +459,9 @@ function handle(e: GameEvent): void {
     floatText(t('app.bigGames.karawane.jarBroken'), x, y + 2.4, '#ffb090')
     for (let k = 0; k < 4; k++) emitParticle('shard', x - 1, y + 0.8, (Math.random() - 0.5) * 5, 2 + Math.random() * 3, 1, 0.2)
   } else if (e.type === 'bump') {
-    play('hit', 0.6)
-    shake = 0.35
-    floatText(t('app.bigGames.karawane.gateBump'), x, y + 2.6, '#ffb090')
+    play('hit', Math.min(0.7, 0.3 + e.speed / 14))
+    shake = Math.min(0.6, 0.2 + e.speed / 18)
+    for (let k = 0; k < 6; k++) emitParticle('dust', run.rear.cx, heightAt(track, run.rear.cx) + 0.1, (Math.random() - 0.3) * 4, Math.random() * 2.4, 0.7, 0.35)
   } else if (e.type === 'hop') {
     play('flip', 0.7, 1.5)
     for (let k = 0; k < 5; k++) emitParticle('dust', run.rear.cx, heightAt(track, run.rear.cx) + 0.1, (Math.random() - 0.5) * 3, Math.random() * 1.4, 0.6, 0.3)
@@ -621,12 +610,14 @@ function updateCamera(dt: number) {
   const tx = run.x + wM * 0.12 + Math.min(wM * 0.14, Math.max(-1, run.vx) * 0.42)
   const ground = heightAt(track, run.x)
   const air = Math.max(0, run.y - ground - 1.2)
-  const ty = run.y + 1.35 - Math.min(2.2, air * 0.18)
+  // a steep way down: the camera looks ahead and down so that the cart does not sink to the bottom edge of the screen
+  const lookDown = Math.max(-2.6, Math.min(1, run.vy * 0.38))
+  const ty = run.y + 1.35 - Math.min(2.2, air * 0.18) + lookDown
   const k = 1 - Math.exp(-5 * dt)
-  const ky = 1 - Math.exp(-3.2 * dt)
+  const ky = 1 - Math.exp(-(3.2 + Math.min(2.6, Math.max(0, -run.vy) * 0.4)) * dt)
   camX += (tx - camX) * k
   camY += (ty - camY) * ky
-  const wantView = 7.4 + Math.min(4.5, air * 0.55) + Math.min(1.6, Math.max(0, run.vx - 9) * 0.25)
+  const wantView = 7.4 + Math.min(4.5, air * 0.55) + Math.min(1.6, Math.max(0, run.vx - 9) * 0.25) + Math.min(1.2, Math.max(0, -run.vy - 3) * 0.2)
   viewM += (wantView - viewM) * (1 - Math.exp(-2 * dt))
   ppm = hPx / viewM
 }
@@ -673,17 +664,6 @@ function layerMid(c: CanvasRenderingContext2D, look: (typeof LOOKS)[number], r: 
   }
 }
 
-/** The ground as it is drawn: under a bridge it falls away into a ravine (the cart drives on the deck, which is the real ground). */
-function visH(x: number): number {
-  let dip = 0
-  for (const z of track.zones) {
-    if (z.kind !== 'bridge' || x < z.x0 - 3 || x > z.x1 + 3) continue
-    const u = Math.min(1, Math.min(x - (z.x0 - 3), z.x1 + 3 - x) / 3)
-    dip = Math.max(dip, 3.4 * u * u * (3 - 2 * u))
-  }
-  return heightAt(track, x) - dip
-}
-
 function drawTerrain(c: CanvasRenderingContext2D, r: number) {
   const x0 = camX - wPx / ppm / 2 - 1
   const x1 = camX + wPx / ppm / 2 + 1
@@ -699,7 +679,7 @@ function drawTerrain(c: CanvasRenderingContext2D, r: number) {
   let minY = hPx
   let last = first
   for (let x = first; x <= x1 + stepM; x += stepM) {
-    const sy = toY(visH(x))
+    const sy = toY(heightAt(track, x))
     if (sy < minY) minY = sy
     path.lineTo(toX(x), sy)
     last = x
@@ -728,9 +708,9 @@ function drawTerrain(c: CanvasRenderingContext2D, r: number) {
   const dh = (b.height / pxPerM) * ppm
   for (let x = first; x <= x1; x += dw) {
     const cx = x + dw / 2
-    const sy = toY(visH(cx))
+    const sy = toY(heightAt(track, cx))
     if (sy > hPx + dh) continue
-    const slope = (visH(cx + 0.3) - visH(cx - 0.3)) / 0.6
+    const slope = (heightAt(track, cx + 0.3) - heightAt(track, cx - 0.3)) / 0.6
     const ang = -Math.atan(slope)
     const sx = (((x * pxPerM) % b.width) + b.width) % b.width
     c.save()
@@ -751,8 +731,8 @@ function drawTerrain(c: CanvasRenderingContext2D, r: number) {
   c.lineWidth = Math.max(2, ppm * 0.06)
   c.beginPath()
   for (let x = first; x <= x1 + stepM; x += stepM) {
-    if (x === first) c.moveTo(toX(x), toY(visH(x)))
-    else c.lineTo(toX(x), toY(visH(x)))
+    if (x === first) c.moveTo(toX(x), toY(heightAt(track, x)))
+    else c.lineTo(toX(x), toY(heightAt(track, x)))
   }
   c.stroke()
 }
@@ -889,25 +869,13 @@ function drawStanding(c: CanvasRenderingContext2D, r: number, xMin: number, xMax
   }
 }
 
-/** The marks of the special stretches that stand behind the cart: signs before bridges, steps and boulders, the halt zone with its markers, the toll gate (shut or open) and a trough. */
-function drawZonesBack(c: CanvasRenderingContext2D, xMin: number, xMax: number) {
-  for (let k = 0; k < track.zones.length; k++) {
-    const z = track.zones[k]!
-    if (z.x1 < xMin - 10 || z.x0 > xMax + 20) continue
-    if (z.kind === 'bridge' || z.kind === 'ledges' || z.kind === 'rocks') sprite(c, 'zonen-4', z.x0 - 12, heightAt(track, z.x0 - 12) - 0.1, 1.7, 0.5, 1)
-    if (z.kind === 'stop') {
-      sprite(c, 'zonen-4', z.x0 - 22, heightAt(track, z.x0 - 22) - 0.1, 1.7, 0.5, 1)
-      sprite(c, 'zonen-3', z.x0, heightAt(track, z.x0) - 0.1, 1.9, 0.5, 1)
-      sprite(c, 'zonen-3', z.x1, heightAt(track, z.x1) - 0.1, 1.9, 0.5, 1)
-      sprite(c, 'zonen-5', z.x0 + 5, heightAt(track, z.x0 + 5) - 0.1, 1.2, 0.5, 1)
-      if (z.gate !== undefined) sprite(c, run.zoneDone[k] ? (img['zonen-2'] ? 'zonen-2' : 'ziel') : img['zonen-1'] ? 'zonen-1' : 'ziel', z.gate + 0.9, heightAt(track, z.gate) - 0.15, 2.6, 0.5, 1)
-    }
-  }
-}
+/** The painted stones of the near layer that lie on a stony stretch (the last route has none of its own and takes those of the one before). */
+const STONES: Record<number, string[]> = { 1: ['vorn-1-2'], 2: ['vorn-2-2', 'vorn-2-5'], 3: ['vorn-3-2'], 4: ['vorn-4-4'], 5: ['vorn-5-2', 'vorn-5-5'], 6: ['vorn-5-2', 'vorn-5-5'] }
 
-/** What lies on the ground in front of the terrain: the plank deck of a bridge, the dark patch of a sand or mud hole. */
+/** What lies on the ground in front of the terrain: the dark patch of a sand or mud hole, the boulders of a stony stretch (the painted stones of the near layer). */
 function drawZonesFront(c: CanvasRenderingContext2D, xMin: number, xMax: number, r: number) {
   const mud = ROUTES[r]!.mood === 'morning'
+  const stones = (STONES[r + 1] ?? []).map((n) => img[n]).filter((im): im is HTMLImageElement => !!im)
   for (const z of track.zones) {
     if (z.x1 < xMin || z.x0 > xMax) continue
     if (z.kind === 'pit') {
@@ -918,23 +886,13 @@ function drawZonesFront(c: CanvasRenderingContext2D, xMin: number, xMax: number,
       for (let x = z.x1; x >= z.x0; x -= 1) c.lineTo(x, -heightAt(track, x) + 0.9)
       c.closePath()
       c.fill()
-    } else if (z.kind === 'bridge') {
-      const im = img.steg
-      if (!im) {
-        // until the painted bridge is there: a plain plank deck
-        c.fillStyle = '#8a5a2b'
-        c.fillRect(z.x0 - 1, -heightAt(track, z.x0) - 0.05, z.x1 - z.x0 + 2, 0.32)
-        c.fillStyle = '#5e3a18'
-        c.fillRect(z.x0 - 1, -heightAt(track, z.x0) + 0.2, z.x1 - z.x0 + 2, 0.08)
-        continue
-      }
-      const h = 1.3
-      const w = (im.width / im.height) * h
-      // the deck line lies this share down in the picture
-      const top = DECK_TOP * h
-      for (let x = z.x0 - 1; x < z.x1 + 1; x += w) {
-        const piece = Math.min(w, z.x1 + 1 - x)
-        c.drawImage(im, 0, 0, im.width * (piece / w), im.height, x, -heightAt(track, x) - top, piece, h)
+    } else if (z.kind === 'rocks' && z.marks && stones.length > 0) {
+      for (let q = 0; q < z.marks.length; q++) {
+        const im = stones[q % stones.length]!
+        const h = 0.95
+        const w = Math.min(1.9, (im.width / im.height) * h)
+        const mx = z.marks[q]!
+        c.drawImage(im, mx - w / 2, -(heightAt(track, mx) + h - 0.15), w, h)
       }
     }
   }
@@ -991,7 +949,6 @@ function draw(time: number) {
   const xMax = camX + wPx / ppm / 2 + 6
   worldT()
   drawStanding(c, r, xMin, xMax)
-  drawZonesBack(c, xMin, xMax)
   // the ground covers the feet of everything that stands behind the cart
   c.setTransform(dpr, 0, 0, dpr, 0, 0)
   drawTerrain(c, r)
@@ -1074,11 +1031,13 @@ function draw(time: number) {
   c.lineJoin = 'round'
   for (const f of floaters) {
     const q = f.t / 1.6
-    const sx = (f.x - camX) * ppm + wPx / 2
     const sy = hPx / 2 + (camY - f.y) * ppm - q * ppm * 1.6
     c.globalAlpha = Math.min(1, (1 - q) * 2)
     const size = Math.round(Math.max(18, Math.min(34, hPx * 0.06)) * (1 + Math.max(0, 0.25 - f.t) * 1.2))
     c.font = `800 ${size}px Fraunces, Georgia, serif`
+    // the word stays on the screen (the cart drives on while it floats)
+    const half = c.measureText(f.text).width / 2 + 10
+    const sx = Math.max(half, Math.min(wPx - half, (f.x - camX) * ppm + wPx / 2))
     c.strokeStyle = 'rgba(70,40,10,0.85)'
     c.lineWidth = 5
     c.strokeText(f.text, sx, sy)
@@ -1155,7 +1114,7 @@ function statFor(id: UpgradeId): { label: string; from: string; to: string } | n
     case 'wheels':
       return { label: t('app.bigGames.karawane.stats.grip'), from: String(Math.round(before.mu * 100)), to: String(Math.round(after.mu * 100)) }
     case 'suspension':
-      return { label: t('app.bigGames.karawane.stats.bridge'), from: kmh(before.bridgeV), to: kmh(after.bridgeV) }
+      return { label: t('app.bigGames.karawane.stats.shock'), from: String(Math.round(before.hardV * 10)), to: String(Math.round(after.hardV * 10)) }
     case 'water':
       return { label: t('app.bigGames.karawane.stats.stamina'), from: `${Math.round(before.staminaSec)} ${t('app.bigGames.karawane.statUnit.s')}`, to: `${Math.round(after.staminaSec)} ${t('app.bigGames.karawane.statUnit.s')}` }
     case 'cover':
@@ -1254,6 +1213,7 @@ onMounted(async () => {
   }
   await load(COMMON_IMAGES)
   await load(routeImages(1))
+  await load(STONES[1] ?? [])
   makeBand(0)
   loaded.value = true
   last = performance.now()
@@ -2036,7 +1996,7 @@ onBeforeUnmount(() => {
     gap: 4px
 
   .kg-card--small :deep(.adv-btn)
-    min-height: 40px
+    min-height: 44px
 
   .kg-routes
     grid-template-columns: repeat(6, minmax(0, 1fr))
@@ -2198,8 +2158,8 @@ onBeforeUnmount(() => {
   padding-bottom: 2px
 
 .kg-pause
-  width: 38px
-  height: 38px
+  width: 44px
+  height: 44px
   font-size: 0.8rem
 
 .kg-meters

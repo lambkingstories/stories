@@ -3,7 +3,8 @@
  * `BigGameKarawane.vue`). A cart on two wheels pulled by an animal drives from left to right over hills and dunes. Two keys: gas and brake
  * (backwards). The vehicle is one rigid body with two springs against the ground (the cart wheel and the feet of the animal): it bounces,
  * pitches, flies and must land well. Gas in the air lifts the nose, brake lowers it. The jars on the cart or the head of the animal on the
- * ground end the round. Stamina (the water of the animal) runs down; skins of water and the oases fill it. Everything here is plain
+ * ground end the round. The ground itself asks for the brake: a steep way down makes the cart fast, and a cart that is too fast takes off at a crest
+ * or runs hard into a bowl (a hard knock breaks a jar, a harder one the cart). Nothing makes the cart stop. Stamina (the water of the animal) runs down; skins of water and the oases fill it. Everything here is plain
  * calculation in metres and seconds with a fixed time step and a seed, so that it can be tested (a bot drives a way in the tests).
  */
 import type { Stats } from '@/utils/karawaneUpgrades'
@@ -52,11 +53,15 @@ export interface RouteDef {
   firstOasis?: number
   /** A lively start: a first small jump and bigger hills within the first hundred metres. */
   lively?: boolean
-  /** Where (as shares of the length) the toll gates with a halt, the wooden bridges with a speed limit and the sand or mud holes lie. */
-  stops: number[]
-  bridges: number[]
+  /** Where (as shares of the length) the steep ridges with a fast way down, the sharp humps and the rolling hills come, and where the sand or mud holes lie. */
+  ridges: number[]
+  humps: number[]
+  rollers: number[]
+  ledges: number[]
+  rocks: number[]
   pits: { at: number; depth: number }[]
-  /** How often steps and boulders come (1 = often). */
+  /** How steep the ridges get (1 = as steep as it gets) and how often the steps and boulders come (1 = often). */
+  steep: number
   hazard: number
   /** The seconds of the day: the arrival time for three stars, and for two stars (the sun goes down then). */
   times: [number, number]
@@ -65,12 +70,12 @@ export interface RouteDef {
 }
 
 export const ROUTES: RouteDef[] = [
-  { id: 'egypt', length: 900, goals: [250, 550, 900], seed: 1337, angles: [10, 20], relief: 14, oasisGap: 270, mood: 'day', grip: 1, sand: 1.4, wind: 0, hillAmp: 1.35, firstOasis: 120, lively: true, stops: [0.5], bridges: [], pits: [{ at: 0.32, depth: 2.2 }], hazard: 0.4, times: [95, 140], chars: ['sand', 'hills'] },
-  { id: 'bethlehem', length: 1000, goals: [280, 620, 1000], seed: 2024, angles: [11, 22], relief: 24, oasisGap: 280, mood: 'dusk', grip: 1.05, sand: 1, wind: 0, hillAmp: 1.45, firstOasis: 130, lively: true, stops: [0.45], bridges: [0.7], pits: [], hazard: 0.6, times: [98, 145], chars: ['hills'] },
-  { id: 'magi', length: 1100, goals: [300, 700, 1100], seed: 7771, angles: [11, 22], relief: 16, oasisGap: 380, mood: 'night', grip: 0.95, sand: 1.25, wind: 1.1, hillAmp: 1, stops: [0.3, 0.66], bridges: [], pits: [{ at: 0.5, depth: 3.5 }], hazard: 0.9, times: [112, 165], chars: ['sand', 'wind'] },
-  { id: 'jordan', length: 1200, goals: [320, 760, 1200], seed: 4242, angles: [12, 24], relief: 20, oasisGap: 420, mood: 'morning', grip: 0.85, sand: 1, wind: 0.4, hillAmp: 0.85, stops: [0.28, 0.75], bridges: [0.45, 0.6], pits: [{ at: 0.2, depth: 5 }], hazard: 0.9, times: [125, 175], chars: ['slippery'] },
-  { id: 'judea', length: 1300, goals: [340, 820, 1300], seed: 9001, angles: [13, 26], relief: 46, oasisGap: 460, mood: 'bright', grip: 1.1, sand: 1, wind: 0.6, hillAmp: 1.2, stops: [0.25, 0.8], bridges: [0.4, 0.62], pits: [{ at: 0.52, depth: 7 }], hazard: 1.2, times: [140, 215], chars: ['steep', 'wind'] },
-  { id: 'jerusalem', length: 1500, goals: [360, 900, 1500], seed: 5150, angles: [13, 26], relief: 36, oasisGap: 500, mood: 'gold', grip: 1, sand: 1, wind: 0.3, hillAmp: 1.1, stops: [0.2, 0.5, 0.88], bridges: [0.35, 0.68], pits: [{ at: 0.28, depth: 8 }, { at: 0.58, depth: 9 }], hazard: 1.3, times: [165, 260], chars: ['festive'] }
+  { id: 'egypt', length: 900, goals: [250, 550, 900], seed: 1337, angles: [10, 20], relief: 16, oasisGap: 250, mood: 'day', grip: 1, sand: 1.4, wind: 0, hillAmp: 1.35, firstOasis: 120, lively: true, ridges: [0.2, 0.44, 0.7], humps: [0.33, 0.6], rollers: [0.14], ledges: [], rocks: [], pits: [{ at: 0.54, depth: 2.2 }], steep: 0.6, hazard: 0.4, times: [92, 144], chars: ['sand', 'hills'] },
+  { id: 'bethlehem', length: 1000, goals: [280, 620, 1000], seed: 2024, angles: [11, 22], relief: 24, oasisGap: 260, mood: 'dusk', grip: 1.05, sand: 1, wind: 0, hillAmp: 1.45, firstOasis: 130, lively: true, ridges: [0.2, 0.42, 0.66], humps: [0.3, 0.55], rollers: [0.14, 0.8], ledges: [], rocks: [0.34], pits: [], steep: 0.68, hazard: 0.6, times: [97, 143], chars: ['hills'] },
+  { id: 'magi', length: 1100, goals: [300, 700, 1100], seed: 7771, angles: [11, 22], relief: 18, oasisGap: 300, mood: 'night', grip: 0.95, sand: 1.25, wind: 1.1, hillAmp: 1, ridges: [0.18, 0.4, 0.62], humps: [0.3, 0.52, 0.8], rollers: [0.12], ledges: [0.5], rocks: [], pits: [{ at: 0.72, depth: 3.5 }], steep: 0.74, hazard: 0.9, times: [113, 178], chars: ['sand', 'wind'] },
+  { id: 'jordan', length: 1200, goals: [320, 760, 1200], seed: 4242, angles: [12, 24], relief: 22, oasisGap: 320, mood: 'morning', grip: 0.85, sand: 1, wind: 0.4, hillAmp: 0.85, ridges: [0.26, 0.55, 0.8], humps: [0.4, 0.68], rollers: [0.16], ledges: [], rocks: [0.5], pits: [{ at: 0.2, depth: 5 }], steep: 0.82, hazard: 0.9, times: [117, 185], chars: ['slippery'] },
+  { id: 'judea', length: 1300, goals: [340, 820, 1300], seed: 9001, angles: [13, 26], relief: 46, oasisGap: 340, mood: 'bright', grip: 1.1, sand: 1, wind: 0.6, hillAmp: 1.2, ridges: [0.22, 0.46, 0.7, 0.88], humps: [0.34], rollers: [0.58], ledges: [0.3], rocks: [0.62], pits: [{ at: 0.52, depth: 7 }], steep: 0.92, hazard: 1.2, times: [129, 199], chars: ['steep', 'wind'] },
+  { id: 'jerusalem', length: 1500, goals: [360, 900, 1500], seed: 5150, angles: [13, 26], relief: 36, oasisGap: 360, mood: 'gold', grip: 1, sand: 1, wind: 0.3, hillAmp: 1.1, ridges: [0.18, 0.4, 0.62, 0.85], humps: [0.3, 0.74], rollers: [0.5], ledges: [0.55], rocks: [0.4], pits: [{ at: 0.28, depth: 8 }, { at: 0.58, depth: 9 }], steep: 1, hazard: 1.3, times: [156, 261], chars: ['festive'] }
 ]
 
 export const ROUTE_COUNT = ROUTES.length
@@ -120,19 +125,19 @@ export interface Track {
   decor: Decor[]
   /** The steepest slope that was built (tangent), for the tests. */
   maxSlope: number
-  /** The special stretches: halts at a toll gate, bridges, sand or mud holes, steps, boulders. */
+  /** The special stretches of the ground: steep ways down, sharp humps, rolling hills, sand or mud holes, steps, boulders. */
   zones: Zone[]
 }
 
-export type ZoneKind = 'stop' | 'bridge' | 'pit' | 'ledges' | 'rocks'
+export type ZoneKind = 'drop' | 'hump' | 'rollers' | 'pit' | 'ledges' | 'rocks'
 export interface Zone {
   kind: ZoneKind
   x0: number
   x1: number
   /** Sand or mud: how much it slows down (added to the sand of the way). */
   depth?: number
-  /** The toll gate that closes the way behind a halt zone. */
-  gate?: number
+  /** The tops of the boulders of a stony stretch (for drawing the stones). */
+  marks?: number[]
 }
 
 export const START_X = 8
@@ -183,22 +188,120 @@ export function generateTrack(route: number, seed?: number): Track {
   }
   const flat = (len: number) => put(len, () => 0)
 
-  /** A ramp, a short top and a steep drop behind it: the cart takes off and lands on a long gentle slope (a "jump"). */
-  const jump = (a1: number, l1: number, extraDrop: number) => {
-    const up = a1 * l1
-    const dy = Math.max(0.9, up - 0.8 + range(0.3, 1.3) + extraDrop)
-    const ld = dy / 0.7
-    const landing = 0.18
-    const ll = 9
-    const total = l1 + 1.2 + ld + ll
-    put(total, (u) => {
-      const m = u * total
-      if (m < l1) return a1 * m
-      if (m < l1 + 1.2) return up
-      if (m < l1 + 1.2 + ld) return up - 0.7 * (m - l1 - 1.2)
-      return up - dy - landing * (m - l1 - 1.2 - ld)
+  /** A stretch given as pieces (metres, slope angle at the start and at the end in degrees, up is positive; the angle changes evenly): put as one block. */
+  const pieces = (segs: [number, number, number][]) => {
+    const tot = segs.reduce((a, q) => a + q[0], 0)
+    const N = Math.max(8, Math.round(tot / 0.1))
+    const ys = new Float32Array(N + 1)
+    const dx = tot / N
+    let m = 0
+    let qi = 0
+    let qs = 0
+    let yy = 0
+    for (let k = 1; k <= N; k++) {
+      m = (k - 0.5) * dx
+      while (qi < segs.length - 1 && m > qs + segs[qi]![0]) {
+        qs += segs[qi]![0]
+        qi++
+      }
+      const q = segs[qi]!
+      const a = q[1] + (q[2] - q[1]) * Math.min(1, Math.max(0, (m - qs) / q[0]))
+      yy += Math.tan(rad(a)) * dx
+      ys[k] = yy
+    }
+    put(tot, (u) => {
+      const f = Math.min(N, Math.max(0, u * N))
+      const i0 = Math.min(N - 1, Math.floor(f))
+      return ys[i0]! * (1 - (f - i0)) + ys[i0 + 1]! * (f - i0)
     })
-    crests.push(i * STEP - ld - ll - 1.2)
+  }
+  /** A ramp, a round crest and a steep fall behind it: the cart takes off (a "jump") and, at a fitting speed, lands softly on the slope of the fall. */
+  const jump = (a1: number, l1: number, extraDrop: number) => {
+    const ad = Math.min(33, 25 + extraDrop * 3 + range(0, 3))
+    const rampH = Math.tan(a1) * l1
+    const a1d = (Math.atan(a1) * 180) / Math.PI
+    pieces([[3, 0, a1d], [l1, a1d, a1d]])
+    const x0 = i * STEP
+    pieces([[9 * (rad(a1d) + rad(ad)), a1d, -ad]])
+    crests.push(i * STEP - 2)
+    pieces([[Math.max(6, (rampH * 0.8 + 1.4 + extraDrop) / Math.sin(rad(ad))), -ad, -ad], [6, -ad, 0]])
+    zones.push({ kind: 'hump', x0: x0 - 4, x1: i * STEP })
+  }
+  /** A ridge: a long climb, a round crest and a steep way down (k = 0..1 how big and how steep); behind it a bowl, or a counter slope that the speed carries up. */
+  const ridge = (k: number) => {
+    const ac = lerp(9, 14, k) * range(0.92, 1.08)
+    const ad = lerp(19, 31, k) * Math.min(1, 0.7 + 0.5 * R.steep) * range(0.96, 1.04)
+    const upH = lerp(7, 19, k) * range(0.9, 1.1)
+    const crestLen = 12 * (rad(ac) + rad(ad))
+    const lc = Math.max(14, upH / Math.tan(rad(ac)) - crestLen * 0.3 - 4)
+    pieces([[6, 0, ac], [lc, ac, ac], [crestLen, ac, -ad]])
+    const x0 = i * STEP
+    const ld = Math.max(12, (upH * range(0.97, 1.1)) / Math.sin(rad(ad)))
+    pieces([[ld, -ad, -ad]])
+    const pick = rnd()
+    if (pick < 0.5) {
+      // a narrow bottom and a counter slope: the speed of the way down carries the cart up the other side (too fast and the bottom is a hard knock)
+      const bb = range(14, 19)
+      pieces([[range(4.5, 5.5), -ad, bb], [range(16, 26), bb, bb], [9, bb, 0]])
+    } else if (pick < 0.85) {
+      // a narrow bottom, a short steep rise and a crest with a fall behind it: fast enough and the cart takes off
+      const ad2 = range(22, 28)
+      pieces([[range(4.5, 5.5), -ad, 21], [range(8, 10), 21, 21], [9 * (rad(21) + rad(ad2)), 21, -ad2], [range(9, 13), -ad2, -ad2], [range(5, 7), -ad2, 0]])
+    } else {
+      pieces([[range(4, 6), -ad, 0]])
+    }
+    zones.push({ kind: 'drop', x0, x1: i * STEP - 6 })
+    flat(range(8, 14))
+  }
+  /** A sharp hump: a quick round crest with a steep fall behind it; fast enough and the cart takes off and lands hard. */
+  const hump = (k: number) => {
+    const ad = lerp(21, 31, k) * range(0.94, 1.04)
+    const crestLen = 9 * (rad(8) + rad(ad))
+    const ld = lerp(8, 16, k) * range(0.9, 1.1)
+    const fallH = ld * Math.sin(rad(ad)) + 1
+    flat(range(8, 14))
+    pieces([[5, 0, 8], [Math.max(10, (fallH * 0.9) / Math.tan(rad(8))), 8, 8]])
+    const x0 = i * STEP
+    pieces([[crestLen, 8, -ad], [ld, -ad, -ad], [range(5, 8), -ad, 0]])
+    zones.push({ kind: 'hump', x0, x1: i * STEP })
+    flat(range(10, 16))
+  }
+  /** Rolling hills one after the other (the next crest comes before the cart has settled). */
+  const rollers = (k: number) => {
+    flat(range(8, 12))
+    const x0 = i * STEP
+    const nb = k > 0.5 ? 4 : 3
+    const wl = range(17, 22)
+    const amp = lerp(1.5, 2.6, k) * range(0.9, 1.1)
+    put(nb * wl, (u) => amp * (1 - Math.cos(2 * Math.PI * nb * u)) * 0.5)
+    zones.push({ kind: 'rollers', x0, x1: i * STEP })
+    flat(range(8, 12))
+  }
+  /** A steep way down in steps: a gentle run, then a drop; too fast and the cart flies off every step. */
+  const ledges = (d: number) => {
+    flat(10)
+    const x0 = i * STEP
+    const steps = 4 + (d > 0.6 ? 1 : 0)
+    for (let k = 0; k < steps; k++) {
+      put(6, (u) => -0.14 * 6 * u)
+      put(1.7, (u) => -1.0 * smooth(u))
+      flat(2.5)
+    }
+    zones.push({ kind: 'ledges', x0, x1: i * STEP })
+    flat(14)
+  }
+  /** Boulders in a narrow place: too fast and the cart is thrown up. */
+  const rocks = () => {
+    flat(10)
+    const x0 = i * STEP
+    const marks: number[] = []
+    for (let k = 0; k < 4; k++) {
+      flat(range(5, 7))
+      marks.push(i * STEP + 1.3)
+      put(2.6, (u) => 0.6 * (1 - Math.cos(2 * Math.PI * u)) * 0.5)
+    }
+    zones.push({ kind: 'rocks', x0, x1: i * STEP, marks })
+    flat(12)
   }
   const hill = (len: number, amp: number, sign = 1) => put(len, (u) => sign * amp * (1 - Math.cos(2 * Math.PI * u)) * 0.5)
 
@@ -221,11 +324,15 @@ export function generateTrack(route: number, seed?: number): Track {
     flat(10)
   }
 
-  // the scheduled stretches: toll gates, bridges, holes (in the order of the way)
-  const events: { kind: ZoneKind; at: number; depth?: number }[] = [
-    ...R.stops.map((f) => ({ kind: 'stop' as ZoneKind, at: f * R.length })),
-    ...R.bridges.map((f) => ({ kind: 'bridge' as ZoneKind, at: f * R.length })),
-    ...R.pits.map((p) => ({ kind: 'pit' as ZoneKind, at: p.at * R.length, depth: p.depth }))
+  // the scheduled stretches: the big ridges, humps, rolling hills and the holes (in the order of the way)
+  type EvKind = 'ridge' | 'hump' | 'rollers' | 'pit' | 'ledges' | 'rocks'
+  const events: { kind: EvKind; at: number; depth?: number }[] = [
+    ...R.ridges.map((f) => ({ kind: 'ridge' as EvKind, at: f * R.length })),
+    ...R.humps.map((f) => ({ kind: 'hump' as EvKind, at: f * R.length })),
+    ...R.rollers.map((f) => ({ kind: 'rollers' as EvKind, at: f * R.length })),
+    ...R.ledges.map((f) => ({ kind: 'ledges' as EvKind, at: f * R.length })),
+    ...R.rocks.map((f) => ({ kind: 'rocks' as EvKind, at: f * R.length })),
+    ...R.pits.map((p) => ({ kind: 'pit' as EvKind, at: p.at * R.length, depth: p.depth }))
   ].sort((a, b) => a.at - b.at)
   let nextOasis = R.firstOasis ?? R.oasisGap * range(0.8, 0.95)
   let placedFinish = false
@@ -252,22 +359,17 @@ export function generateTrack(route: number, seed?: number): Track {
       continue
     }
     const ev = events[0]
-    if (ev && x >= ev.at && x < R.length - 90) {
+    if (ev && x >= ev.at) {
       events.shift()
-      if (ev.kind === 'stop') {
-        flat(16)
-        const x0 = i * STEP
-        flat(13)
-        const x1 = i * STEP
-        zones.push({ kind: 'stop', x0, x1, gate: x1 + 2 })
-        flat(14)
-      } else if (ev.kind === 'bridge') {
-        flat(12)
-        const x0 = i * STEP
-        flat(34)
-        zones.push({ kind: 'bridge', x0, x1: i * STEP })
-        flat(12)
-      } else {
+      // too close to the goal for a big stretch: left out
+      if (x >= R.length - (ev.kind === 'ridge' ? 190 : 110)) continue
+      const kk = Math.min(1, Math.max(0, d * 0.5 + R.steep * 0.5))
+      if (ev.kind === 'ridge') ridge(kk)
+      else if (ev.kind === 'hump') hump(kk)
+      else if (ev.kind === 'rollers') rollers(kk)
+      else if (ev.kind === 'ledges') ledges(d)
+      else if (ev.kind === 'rocks') rocks()
+      else {
         flat(10)
         const x0 = i * STEP
         flat(28)
@@ -279,7 +381,8 @@ export function generateTrack(route: number, seed?: number): Track {
     }
     // what may come: stay inside the height of the route
     const high = y > R.relief * 0.85
-    const low = y < -9
+    const room = x < R.length - 110
+    const low = y < -4
     type Block = { w: number; run: () => void; name: string }
     const blocks: Block[] = []
     const add = (name: string, w: number, run: () => void) => {
@@ -288,7 +391,7 @@ export function generateTrack(route: number, seed?: number): Track {
     add('flat', 1.2, () => flat(range(10, 24)))
     add('hill', low ? 1 : 3, () => {
       const len = range(24, 46)
-      const amp = Math.min(range(1.2, 2.7) * (0.6 + 0.9 * d) * R.hillAmp, (len * A * 0.9) / Math.PI)
+      const amp = Math.min(range(1.2, 3.4) * (0.6 + 0.9 * d) * R.hillAmp, (len * A * 1.25) / Math.PI)
       put(len, (u) => amp * (1 - Math.cos(2 * Math.PI * u)) * 0.5)
     })
     add('valley', high ? 3 : y > -6 ? 1.6 : 0, () => {
@@ -299,10 +402,10 @@ export function generateTrack(route: number, seed?: number): Track {
     add('bumps', 1.2 + 1.6 * d, () => {
       const nb = Math.round(range(3, 6))
       const wl = range(7.5, 11)
-      const amp = Math.min(range(0.28, 0.6) * (0.6 + d), (wl * A * 0.9) / Math.PI)
+      const amp = Math.min(range(0.2, 0.4) * (0.6 + d), (wl * A * 0.9) / Math.PI)
       put(nb * wl, (u) => amp * (1 - Math.cos(2 * Math.PI * nb * u)) * 0.5)
     })
-    add('up', high ? 0 : 2.2, () => {
+    add('up', high ? 0 : low ? 6 : 2.2, () => {
       const len = range(22, 48)
       const dy = (A * 0.78 * len) / 1.5
       put(len, (u) => dy * smooth(u))
@@ -312,36 +415,17 @@ export function generateTrack(route: number, seed?: number): Track {
       const dy = (A * 0.78 * len) / 1.5
       put(len, (u) => -dy * smooth(u))
     })
-    add('crest', x > (R.lively ? 45 : 90) ? 1 + 2.4 * d + (R.lively ? 0.6 : 0) : 0, () => {
+    add('crest', room && x > (R.lively ? 45 : 90) ? 1 + 2.4 * d + (R.lively ? 0.6 : 0) : 0, () => {
       flat(range(12, 18))
       jump(Math.tan(rad(lerp(R.lively ? 10 : 12, 29, d))), range(8, 13), d * range(0.5, 2.2))
       flat(range(8, 14))
     })
-    add('ledges', d > 0.22 && y > -7 ? R.hazard * (0.7 + 1.4 * d) : 0, () => {
-      // a steep way down in steps: a gentle run, then a drop; too fast and the cart flies off every step
-      flat(10)
-      const x0 = i * STEP
-      const steps = 4 + (d > 0.6 ? 1 : 0)
-      for (let k = 0; k < steps; k++) {
-        put(6, (u) => -0.14 * 6 * u)
-        put(1.7, (u) => -1.0 * smooth(u))
-        flat(2.5)
-      }
-      zones.push({ kind: 'ledges', x0, x1: i * STEP })
-      flat(14)
-    })
-    add('rocks', d > 0.12 ? R.hazard * (0.7 + 1.1 * d) : 0, () => {
-      // boulders in a narrow place: too fast and the cart is thrown up
-      flat(10)
-      const x0 = i * STEP
-      for (let k = 0; k < 4; k++) {
-        flat(range(5, 7))
-        put(2.4, (u) => 0.85 * (1 - Math.cos(2 * Math.PI * u)) * 0.5)
-      }
-      zones.push({ kind: 'rocks', x0, x1: i * STEP })
-      flat(12)
-    })
-    add('climb', d > 0.1 && !high ? 0.6 + 1.8 * d : 0, () => {
+    add('ridge', x < R.length - 190 && d > 0.12 && y < R.relief * 0.5 ? (0.5 + 1.6 * d) * R.steep : 0, () => ridge(Math.min(1, d * 0.5 + R.steep * 0.45)))
+    add('hump', room && d > 0.1 ? 0.5 + 1.2 * d : 0, () => hump(Math.min(1, d * 0.5 + R.steep * 0.45)))
+    add('rollers', room && d > 0.14 ? 0.4 + 0.8 * d : 0, () => rollers(Math.min(1, d * 0.5 + R.steep * 0.4)))
+    add('ledges', room && d > 0.22 && y > -3 ? R.hazard * (0.7 + 1.4 * d) : 0, () => ledges(d))
+    add('rocks', room && d > 0.12 ? R.hazard * (0.7 + 1.1 * d) : 0, rocks)
+    add('climb', d > 0.06 && !high ? (low ? 3 : 1) * (0.6 + 1.8 * d) : 0, () => {
       const len = range(30, 60)
       const dy = (A * 0.93 * len) / 1.5
       put(len, (u) => dy * smooth(u))
@@ -523,10 +607,9 @@ export type GameEvent =
   | { type: 'tired' }
   | { type: 'low' }
   | { type: 'hop' }
-  | { type: 'station'; coins: number; x: number }
   | { type: 'warn'; kind: ZoneKind }
   | { type: 'jar' }
-  | { type: 'bump'; speed: number }
+  | { type: 'bump'; speed: number; x: number }
 
 export type Phase = 'play' | 'crash' | 'won' | 'tired'
 
@@ -542,15 +625,15 @@ export interface Run {
   cpClock: number
   /** The goal of this round (a test drive ends earlier). */
   goalX: number
-  /** Halt zones that are done (the gate is open), warnings that were given, the seconds of standing still in a halt zone, the seconds too fast on a bridge. */
-  zoneDone: Uint8Array
+  /** The hints that were given (one for each stretch of the ground). */
   warned: Uint8Array
-  hold: number
-  bridgeT: number
   /** A corner of the cart is deep in the ground (a hard impact): the round ends at once. */
   deep: boolean
   /** Whether a support touches the ground in this step. */
   touching: number
+  /** How hard the supports ran into the ground in this step (m/s along the ground normal), and the seconds until the next hard knock may count. */
+  impact: number
+  hardCd: number
   track: Track
   stats: Stats
   route: number
@@ -640,12 +723,11 @@ export function newRun(track: Track, stats: Stats, from = 0, clock0 = 0): Run {
     jars: 3,
     cpClock: clock0,
     goalX: track.finishX,
-    zoneDone: new Uint8Array(track.zones.length),
     warned: new Uint8Array(track.zones.length),
-    hold: 0,
-    bridgeT: 0,
     deep: false,
     touching: 0,
+    impact: 0,
+    hardCd: 0,
     taken: new Uint8Array(track.pickups.length),
     checkpoint: from,
     idle: 0,
@@ -658,10 +740,7 @@ export function newRun(track: Track, stats: Stats, from = 0, clock0 = 0): Run {
     brake: 0,
     lastCx: 0
   }
-  for (let k = 0; k < track.zones.length; k++) if (track.zones[k]!.x1 + 3 < x0) {
-    r.zoneDone[k] = 1
-    r.warned[k] = 1
-  }
+  for (let k = 0; k < track.zones.length; k++) if (track.zones[k]!.x1 + 3 < x0) r.warned[k] = 1
   // the pickups behind the start are gone
   for (let k = 0; k < track.pickups.length; k++) if (track.pickups[k]!.x < x0 + 4) r.taken[k] = 1
   // settle the springs
@@ -713,9 +792,10 @@ export function zoneAt(t: Track, x: number, kind: ZoneKind): Zone | null {
   return null
 }
 
-/** The speed (m/s) up to which a stretch can be driven without a fall; zero for the stretches without a limit. */
-export function speedLimit(st: Stats, kind: ZoneKind): number {
-  return kind === 'bridge' ? st.bridgeV : kind === 'stop' ? 5 : kind === 'ledges' ? 6.4 + 0.5 * st.suspLevel : kind === 'rocks' ? 7 + 0.4 * st.suspLevel : 0
+/** The speed (m/s) up to which a stretch of the ground can be driven without a hard knock (a better suspension takes more); it is only a hint for the warning and for the bot, no rule. */
+export function safeSpeed(st: Stats, kind: ZoneKind): number {
+  const k = st.suspLevel
+  return kind === 'drop' ? 9.6 + 0.5 * k : kind === 'hump' ? 9.4 + 0.5 * k : kind === 'rollers' ? 9.6 + 0.5 * k : kind === 'ledges' ? 6.4 + 0.5 * k : kind === 'rocks' ? 7 + 0.4 * k : 0
 }
 
 /** The ground for a wreck: every corner of the cart is stopped by the ground (no bounce upwards), it slides on and comes to rest. */
@@ -738,6 +818,9 @@ function wreckGround(r: Run, dt: number): void {
     r.y += Math.min(worst * 0.3, 0.012)
     if (r.vy < 0) r.vy = 0
     r.vx *= 1 - 4 * dt
+    // dry friction as well: a wreck on a steep slope lies still instead of creeping down it
+    const f = 6 * dt
+    r.vx = Math.abs(r.vx) <= f ? 0 : r.vx - Math.sign(r.vx) * f
     r.w *= 1 - 5 * dt
   }
   // never flung upwards
@@ -767,6 +850,7 @@ function physics(r: Run, dt: number, input: Input, quiet = false): void {
   const pz = zoneAt(tr, r.x, 'pit')
   if (pz) pitDrag = (pz.depth ?? 2) / Math.pow(Math.max(0.6, st.mu / 1.15), 1.4)
   let touching = 0
+  let impact = 0
   // after a crash the cart is a wreck: no springs, no drive, only the ground and gravity (it falls, tips, slides and lies still)
   const wreck = r.phase === 'crash'
   for (let si = 0; si < 2 && !wreck; si++) {
@@ -822,6 +906,9 @@ function physics(r: Run, dt: number, input: Input, quiet = false): void {
     const vpx = r.vx - r.w * pry
     const vpy = r.vy + r.w * prx
     const vt = vpx * tx + vpy * ty
+    // how fast this support runs into the ground (along the ground normal): the measure of a hard landing, of a bowl taken too fast
+    const closing = -(vpx * nx + vpy * ny)
+    if (closing > impact) impact = closing
     const grip = st.mu * R_OF(r).grip * Math.min(F, 14)
     let ft = 0
     if (si === 1) {
@@ -898,6 +985,7 @@ function physics(r: Run, dt: number, input: Input, quiet = false): void {
   r.deep = deep
 
   r.touching = touching
+  r.impact = impact
   if (r.hopCd > 0) r.hopCd -= dt
   // gusts of wind (a slow push to and fro, stronger on some ways)
   const wind = R_OF(r).wind
@@ -919,31 +1007,6 @@ function physics(r: Run, dt: number, input: Input, quiet = false): void {
   r.y += r.vy * dt
   r.a += r.w * dt
   if (wreck) wreckGround(r, dt)
-  // the toll gate: shut until the halt is done; a cart that comes too fast hits it and the round ends, a slow one only bumps
-  if (!quiet && running) {
-    for (let k = 0; k < tr.zones.length; k++) {
-      const z = tr.zones[k]!
-      if (z.kind !== 'stop' || r.zoneDone[k] || z.gate === undefined) continue
-      if (r.x > z.gate - 3.2 && r.x < z.gate + 4) {
-        const v = r.vx
-        r.x = z.gate - 3.2
-        if (v > 0) {
-          r.vx = -v * 0.05
-          if (v > 6.5) {
-            r.phase = 'crash'
-            r.crashKind = 'load'
-            r.events.push({ type: 'crash', kind: 'load' })
-          } else if (v > 3) {
-            r.events.push({ type: 'bump', speed: v })
-            if (r.jars > 0) {
-              r.jars--
-              r.events.push({ type: 'jar' })
-            }
-          }
-        }
-      }
-    }
-  }
   // not back past the start
   if (r.x < 2) {
     r.x = 2
@@ -964,36 +1027,37 @@ function physics(r: Run, dt: number, input: Input, quiet = false): void {
   }
   if (r.phase === 'play') {
     r.clock += dt
-    // the stretches: warnings, the halt at the gate, the speed limit on a bridge
+    // a hint when the cart comes fast to a stretch that asks for the brake (once for each stretch)
     for (let k = 0; k < tr.zones.length; k++) {
       const z = tr.zones[k]!
-      const lim = speedLimit(st, z.kind)
-      if (!r.warned[k] && lim > 0 && z.x0 - r.x < 46 && z.x0 - r.x > 4 && r.vx > lim + 0.8) {
+      const lim = safeSpeed(st, z.kind)
+      if (!r.warned[k] && lim > 0 && z.x0 - r.x < 40 && r.x < z.x1 - 12 && r.vx > lim + 1) {
         r.warned[k] = 1
         r.events.push({ type: 'warn', kind: z.kind })
       }
-      if (z.kind === 'stop' && !r.zoneDone[k] && r.x >= z.x0 && r.x <= z.x1) {
-        if (Math.abs(r.vx) < 0.45 && r.touching > 0) r.hold += dt
-        else r.hold = 0
-        if (r.hold > 1.0) {
-          r.zoneDone[k] = 1
-          r.hold = 0
-          r.stamina = 1
-          r.lowSaid = false
-          r.checkpoint = Math.max(r.checkpoint, z.x0)
-          r.cpClock = r.clock
-          r.coins += Math.round(25 * st.coinMult)
-          r.events.push({ type: 'station', coins: Math.round(25 * st.coinMult), x: z.x0 })
-        }
-      }
-      if (z.kind === 'bridge' && r.x >= z.x0 && r.x <= z.x1) {
-        if (r.vx > st.bridgeV && r.touching > 0) r.bridgeT += dt
-        else r.bridgeT = Math.max(0, r.bridgeT - dt)
-        if (r.bridgeT > 0.4) {
+    }
+    // a hard knock: the supports run into the ground (a landing after a flight, a bowl taken too fast); one jar breaks, a harder knock breaks the cart
+    if (r.hardCd > 0) r.hardCd -= dt
+    else if (r.impact > st.hardV) {
+      r.hardCd = 0.7
+      if (r.impact > st.crashV) {
+        r.phase = 'crash'
+        r.crashKind = 'load'
+        r.vy = Math.min(r.vy, 0.5)
+        r.events.push({ type: 'crash', kind: 'load' })
+        r.events.push({ type: 'bump', speed: r.impact, x: r.x })
+      } else {
+        if (r.jars > 0) {
+          r.jars--
+          r.events.push({ type: 'bump', speed: r.impact, x: r.x })
+          r.events.push({ type: 'jar' })
+        } else {
+          // no jar is left to take the knock: the cart breaks
           r.phase = 'crash'
           r.crashKind = 'load'
           r.vy = Math.min(r.vy, 0.5)
           r.events.push({ type: 'crash', kind: 'load' })
+          r.events.push({ type: 'bump', speed: r.impact, x: r.x })
         }
       }
     }
@@ -1059,10 +1123,6 @@ function physics(r: Run, dt: number, input: Input, quiet = false): void {
         const flips = Math.floor((Math.abs(r.airRot) + 0.5) / (2 * Math.PI))
         if (flips > 0) r.pendFlips = flips
         if (r.airT > 0.3) r.events.push({ type: 'land', speed: Math.abs(r.vy), air: r.airT, dist })
-        if (Math.abs(r.vy) > 5.2 && r.jars > 0) {
-          r.jars--
-          r.events.push({ type: 'jar' })
-        }
         r.pendT = r.pendJump > 0 || r.pendFlips > 0 ? 0.55 : 0
         r.pendDist = dist
       }
@@ -1148,29 +1208,40 @@ export function speedOf(r: Run): number {
 }
 
 // ── the bot (a simple driver for the tests, and to try a way) ──────────────────────────────────────────────────────────────
-const botMemory = new WeakMap<Run, { slow: number; back: number }>()
+interface BotMemory {
+  slow: number
+  back: number
+  /** How much too fast (+) or too slow (-) it takes each stretch (an inexact child), in m/s. */
+  offs: number[]
+  lag: number
+}
+const botMemory = new WeakMap<Run, BotMemory>()
+/** How inexact a bot brakes: the spread of the speed it aims at for each stretch (m/s), the metres it brakes too late, and a seed. */
+export interface BotNoise {
+  seed: number
+  spread: number
+  lag: number
+}
+const botNoise = new WeakMap<Run, BotNoise>()
+/** Makes the bot of this round an inexact one (it brakes a little too early or too late, and aims at a speed that is off by a bit). */
+export function blurBot(r: Run, noise: BotNoise): void {
+  botNoise.set(r, noise)
+  botMemory.delete(r)
+}
 
-/** The speed the bot wants to have now: the limits of the stretches ahead (it brakes in time), and a standstill in a halt zone. */
-function botTarget(r: Run): number {
+/** The speed the bot wants to have now: a safe speed on the stretches ahead that ask for the brake (it brakes in time, as a child brakes on the slope). */
+function botTarget(r: Run, mem: BotMemory): number {
   const st = r.stats
   const decel = 3.4
   let target = Math.min(14, st.vmax * 1.05)
   const tr = r.track
   for (let k = 0; k < tr.zones.length; k++) {
     const z = tr.zones[k]!
-    if (r.zoneDone[k] && z.kind === 'stop') continue
     if (z.x1 < r.x) continue
-    if (z.kind === 'stop') {
-      // stop in the zone, a little after its beginning
-      const aim = z.x0 + 3.5
-      const d = aim - r.x
-      if (d > -0.5) target = Math.min(target, d <= 0.4 ? 0 : Math.sqrt(2 * decel * (d - 0.2)))
-      continue
-    }
-    const lim = speedLimit(st, z.kind)
+    const lim = safeSpeed(st, z.kind)
     if (lim <= 0) continue
-    const eff = lim - 0.7
-    const d = z.x0 - r.x
+    const eff = lim - 0.7 + (mem.offs[k] ?? 0)
+    const d = z.x0 - r.x - mem.lag
     if (d <= 0) target = Math.min(target, eff)
     else target = Math.min(target, Math.sqrt(eff * eff + 2 * decel * Math.max(0, d - 1)))
   }
@@ -1179,8 +1250,13 @@ function botTarget(r: Run): number {
 
 export function botInput(r: Run): Input {
   const tr = r.track
-  const mem = botMemory.get(r) ?? { slow: 0, back: 0 }
-  botMemory.set(r, mem)
+  let mem = botMemory.get(r)
+  if (!mem) {
+    const nz = botNoise.get(r)
+    const rn = rng(nz?.seed ?? 1)
+    mem = { slow: 0, back: 0, offs: tr.zones.map(() => (nz ? (rn() * 2 - 1) * nz.spread : 0)), lag: nz?.lag ?? 0 }
+    botMemory.set(r, mem)
+  }
   const grounded = r.rear.contact || r.front.contact
   const slopeHere = Math.atan(slopeAt(tr, r.x))
   if (!grounded) {
@@ -1191,8 +1267,8 @@ export function botInput(r: Run): Input {
     if (err < -0.06 || r.w < -1.6) return { gas: true, brake: false }
     return { gas: false, brake: false }
   }
-  const target = botTarget(r)
-  // stuck on a climb: back off and take a run-up (not while it is meant to stand)
+  const target = botTarget(r, mem)
+  // stuck on a climb: back off and take a run-up
   if (mem.back > 0) {
     mem.back -= DT * 2
     return { gas: false, brake: true }
@@ -1205,7 +1281,6 @@ export function botInput(r: Run): Input {
   }
   const pitch = r.a - slopeHere
   if (pitch > 0.42) return { gas: false, brake: false }
-  if (target < 0.4) return { gas: false, brake: r.vx > 0.35 }
   if (r.vx > target + 0.35) return { gas: false, brake: r.vx > 0.8 }
   if (r.vx > target) return { gas: false, brake: false }
   return { gas: true, brake: false }

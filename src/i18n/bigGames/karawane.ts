@@ -1,10 +1,8 @@
 /** The texts of the big game "karawane" (german, english, spanish), merged into `app.bigGames.karawane` (see `index.ts`). */
 const de = {
   starRules: 'Ein Stern: Ziel erreicht. Mehr Sterne: früher ankommen.',
-  warn: { bridge: 'Steg! Langsam!', stop: 'Tor! Halte an!', ledges: 'Steile Stufen! Bremsen!', rocks: 'Felsen! Langsam!', pit: 'Tiefer Sand!' },
-  stationOpen: 'Das Tor geht auf!',
+  warn: { drop: 'Steil bergab! Bremse!', hump: 'Kuppe! Bremse vorher!', rollers: 'Hügelfolge! Bremse leicht!', ledges: 'Steile Stufen! Bremse!', rocks: 'Geröll! Bremse!', pit: 'Tiefer Sand!' },
   jarBroken: 'Ein Krug ist kaputt!',
-  gateBump: 'Hoppla, das Tor!',
   arrived: 'Angekommen um',
   clockUnit: 'Uhr',
   jarsWhole: 'Krüge heil',
@@ -13,11 +11,11 @@ const de = {
   trial: 'Probefahrt',
   trialInfo: 'Teste deinen Wagen auf einer kurzen Strecke.',
   trialResult: 'Probefahrt: {m} m in {s} Sekunden, Höchsttempo {v} km/h.',
-  stats: { speed: 'Höchsttempo', pull: 'Beschleunigung', grip: 'Grip', stamina: 'Ausdauer', coins: 'Münzen', bridge: 'Stegtempo', hop: 'Hüpfer' },
+  stats: { speed: 'Höchsttempo', pull: 'Beschleunigung', grip: 'Grip', stamina: 'Ausdauer', coins: 'Münzen', shock: 'Stoßdämpfung', hop: 'Hüpfer' },
   statUnit: { kmh: 'km/h', s: 's' },
   nowLabel: 'Jetzt',
   story: 'Händler und Pilger zogen mit Karren über Sand und Berge. Sechs Wege aus der Bibel fährst du nach.',
-  task: 'Bring die Krüge heil ins Ziel.',
+  task: 'Bring die Krüge heil ins Ziel. Bremse bergab!',
   taskLabel: 'Deine Aufgabe',
   routeStory: {
     egypt: 'Händler ziehen mit Kamelen nach Ägypten und nehmen Josef mit (1. Mose 37,25–28).',
@@ -28,12 +26,12 @@ const de = {
     jerusalem: 'Zu den großen Festen ziehen die Familien nach Jerusalem (Psalm 122,1).'
   },
   routeTask: {
-    egypt: 'Fahre den Karren heil ans Ziel. Der Sand bremst.',
-    bethlehem: 'Bring den Karren über sanfte Hügel nach Bethlehem.',
-    magi: 'Folge dem Stern. Der Wind schiebt, der Sand bremst.',
-    jordan: 'Fahre ruhig durch das Tal. Der Boden ist rutschig.',
-    judea: 'Hole Schwung für die steilen Hänge.',
-    jerusalem: 'Fahre bis zum Tor von Jerusalem. Die längste Strecke!'
+    egypt: 'Bremse bergab, dann bleiben die Krüge heil.',
+    bethlehem: 'Bremse an den Hügeln. Bring den Karren nach Bethlehem.',
+    magi: 'Folge dem Stern. Bremse bergab, der Wind schiebt.',
+    jordan: 'Bremse sanft bergab. Der Boden ist rutschig.',
+    judea: 'Hole Schwung bergauf und bremse steil bergab.',
+    jerusalem: 'Meistere Hügel und Abfahrten bis zum Tor von Jerusalem.'
   },
   routeGo: 'Los!',
   chars: { sand: 'Tiefer Sand', hills: 'Hügelig', steep: 'Steil', wind: 'Windig', slippery: 'Rutschig', festive: 'Festzug' },
@@ -43,13 +41,13 @@ const de = {
   hopButton: 'Hüpfer',
   title: 'Karawane über die Dünen',
   ref: '1. Mose 37 und Lukas 2',
-  intro: 'Fahre über Hügel und Dünen. Sammle Münzen für die Werkstatt!',
+  intro: 'Fahre über Hügel und Dünen. Bremse bergab!',
   route: {
-    egypt: 'Die Karawane nach Ägypten',
-    bethlehem: 'Der Weg nach Bethlehem',
-    magi: 'Die Weisen aus dem Morgenland',
+    egypt: 'Karawane nach Ägypten',
+    bethlehem: 'Weg nach Bethlehem',
+    magi: 'Die Weisen reisen',
     jordan: 'Durch das Jordantal',
-    judea: 'Die Berge von Judäa',
+    judea: 'Berge von Judäa',
     jerusalem: 'Auf nach Jerusalem'
   },
   routeRef: {
@@ -88,8 +86,8 @@ const de = {
     hop: 'Federkraft'
   },
   partInfo: {
-    wheels: 'Mehr Halt am Berg.',
-    suspension: 'Weicher und ruhiger fahren.',
+    wheels: 'Mehr Halt, kürzerer Bremsweg.',
+    suspension: 'Weicher fahren, harte Stöße tun weniger weh.',
     water: 'Das Tier hält länger durch.',
     cover: 'Mehr Münzen bei jedem Fund.',
     harness: 'Das Tier zieht kräftiger an.',
@@ -120,10 +118,10 @@ const de = {
   floatFlip: 'Salto!',
   floatOasis: 'Oase! Wasser für alle!',
   floatLow: 'Das Tier wird müde. Suche Wasser!',
-  tip: 'Rechts Gas, links Bremse.',
+  tip: 'Bremse bergab, sonst gehen Krüge kaputt.',
   howTitle: 'So fährst du',
   howGas: 'Rechts tippen: Gas.',
-  howBrake: 'Links tippen: Bremse.',
+  howBrake: 'Links tippen: Bremse, vor allem bergab.',
   howWater: 'Sammle Münzen und Wasser.',
   go: 'Los geht’s!',
   howOpen: '?',
@@ -133,10 +131,8 @@ const de = {
 
 const en = {
   starRules: 'One star: goal reached. More stars: arrive earlier.',
-  warn: { bridge: 'Bridge! Slowly!', stop: 'Gate! Stop!', ledges: 'Steep steps! Brake!', rocks: 'Boulders! Slowly!', pit: 'Deep sand!' },
-  stationOpen: 'The gate opens!',
+  warn: { drop: 'Steep downhill! Brake!', hump: 'Hump! Brake before it!', rollers: 'Rolling hills! Brake lightly!', ledges: 'Steep steps! Brake!', rocks: 'Rocks! Brake!', pit: 'Deep sand!' },
   jarBroken: 'A jar broke!',
-  gateBump: 'Oops, the gate!',
   arrived: 'Arrived at',
   clockUnit: 'o’clock',
   jarsWhole: 'Jars whole',
@@ -145,11 +141,11 @@ const en = {
   trial: 'Test drive',
   trialInfo: 'Try your wagon on a short course.',
   trialResult: 'Test drive: {m} m in {s} seconds, top speed {v} km/h.',
-  stats: { speed: 'Top speed', pull: 'Acceleration', grip: 'Grip', stamina: 'Stamina', coins: 'Coins', bridge: 'Bridge speed', hop: 'Hop' },
+  stats: { speed: 'Top speed', pull: 'Acceleration', grip: 'Grip', stamina: 'Stamina', coins: 'Coins', shock: 'Shock absorber', hop: 'Hop' },
   statUnit: { kmh: 'km/h', s: 's' },
   nowLabel: 'Now',
   story: 'Merchants and pilgrims travelled with carts over sand and mountains. You drive six ways from the Bible.',
-  task: 'Bring the jars safely to the goal.',
+  task: 'Bring the jars safely to the goal. Brake downhill!',
   taskLabel: 'Your task',
   routeStory: {
     egypt: 'Merchants travel with camels to Egypt and take Joseph along (Genesis 37:25–28).',
@@ -160,12 +156,12 @@ const en = {
     jerusalem: 'For the great feasts families travel to Jerusalem (Psalm 122:1).'
   },
   routeTask: {
-    egypt: 'Drive the cart safely to the goal. The sand slows you.',
-    bethlehem: 'Bring the cart over soft hills to Bethlehem.',
-    magi: 'Follow the star. Wind pushes, sand slows.',
-    jordan: 'Drive calmly through the valley. The ground is slippery.',
-    judea: 'Get up speed for the steep slopes.',
-    jerusalem: 'Drive to the gate of Jerusalem. The longest route!'
+    egypt: 'Brake downhill, then the jars stay whole.',
+    bethlehem: 'Brake on the hills. Bring the cart to Bethlehem.',
+    magi: 'Follow the star. Brake downhill, the wind pushes.',
+    jordan: 'Brake gently downhill. The ground is slippery.',
+    judea: 'Get up speed uphill and brake on steep slopes.',
+    jerusalem: 'Master hills and descents up to the gate of Jerusalem.'
   },
   routeGo: 'Go!',
   chars: { sand: 'Deep sand', hills: 'Hilly', steep: 'Steep', wind: 'Windy', slippery: 'Slippery', festive: 'Festival' },
@@ -175,13 +171,13 @@ const en = {
   hopButton: 'Hop',
   title: 'Caravan over the Dunes',
   ref: 'Genesis 37 and Luke 2',
-  intro: 'Drive over hills and dunes. Collect coins for the workshop!',
+  intro: 'Drive over hills and dunes. Brake downhill!',
   route: {
-    egypt: 'The caravan to Egypt',
-    bethlehem: 'The road to Bethlehem',
-    magi: 'The wise men from the east',
-    jordan: 'Through the Jordan valley',
-    judea: 'The mountains of Judea',
+    egypt: 'Caravan to Egypt',
+    bethlehem: 'Road to Bethlehem',
+    magi: 'Wise men travel',
+    jordan: 'Through Jordan Valley',
+    judea: 'Mountains of Judea',
     jerusalem: 'Up to Jerusalem'
   },
   routeRef: {
@@ -220,8 +216,8 @@ const en = {
     hop: 'Spring power'
   },
   partInfo: {
-    wheels: 'More grip on hills.',
-    suspension: 'A softer, calmer ride.',
+    wheels: 'More grip, shorter braking distance.',
+    suspension: 'A softer ride, hard knocks hurt less.',
     water: 'The animal keeps going longer.',
     cover: 'More coins with every find.',
     harness: 'The animal pulls harder.',
@@ -252,10 +248,10 @@ const en = {
   floatFlip: 'Flip!',
   floatOasis: 'Oasis! Water for all!',
   floatLow: 'The animal gets tired. Find water!',
-  tip: 'Right is gas, left is brake.',
+  tip: 'Brake downhill, or jars will break.',
   howTitle: 'How to drive',
   howGas: 'Tap right: gas.',
-  howBrake: 'Tap left: brake.',
+  howBrake: 'Tap left: brake, especially downhill.',
   howWater: 'Collect coins and water.',
   go: 'Let’s go!',
   howOpen: '?',
@@ -265,10 +261,8 @@ const en = {
 
 const es = {
   starRules: 'Una estrella: meta alcanzada. Más estrellas: llegar antes.',
-  warn: { bridge: '¡Puente! ¡Despacio!', stop: '¡Puerta! ¡Para!', ledges: '¡Escalones! ¡Frena!', rocks: '¡Rocas! ¡Despacio!', pit: '¡Arena profunda!' },
-  stationOpen: '¡Se abre la puerta!',
+  warn: { drop: '¡Bajada empinada! ¡Frena!', hump: '¡Loma! ¡Frena antes!', rollers: '¡Lomas seguidas! ¡Frena suave!', ledges: '¡Escalones! ¡Frena!', rocks: '¡Piedras! ¡Frena!', pit: '¡Arena profunda!' },
   jarBroken: '¡Se rompió una jarra!',
-  gateBump: '¡Ups, la puerta!',
   arrived: 'Llegada a las',
   clockUnit: 'h',
   jarsWhole: 'Jarras enteras',
@@ -277,11 +271,11 @@ const es = {
   trial: 'Prueba',
   trialInfo: 'Prueba tu carreta en un tramo corto.',
   trialResult: 'Prueba: {m} m en {s} segundos, velocidad máxima {v} km/h.',
-  stats: { speed: 'Velocidad máx.', pull: 'Aceleración', grip: 'Agarre', stamina: 'Aguante', coins: 'Monedas', bridge: 'Vel. en puente', hop: 'Salto' },
+  stats: { speed: 'Velocidad máx.', pull: 'Aceleración', grip: 'Agarre', stamina: 'Aguante', coins: 'Monedas', shock: 'Amortiguación', hop: 'Salto' },
   statUnit: { kmh: 'km/h', s: 's' },
   nowLabel: 'Ahora',
   story: 'Comerciantes y peregrinos viajaban con carretas por arena y montañas. Tú recorres seis caminos de la Biblia.',
-  task: 'Lleva las jarras enteras a la meta.',
+  task: 'Lleva las jarras enteras a la meta. ¡Frena en las bajadas!',
   taskLabel: 'Tu tarea',
   routeStory: {
     egypt: 'Unos comerciantes viajan con camellos a Egipto y se llevan a José (Génesis 37:25–28).',
@@ -292,12 +286,12 @@ const es = {
     jerusalem: 'Para las grandes fiestas las familias viajan a Jerusalén (Salmo 122:1).'
   },
   routeTask: {
-    egypt: 'Lleva la carreta entera a la meta. La arena frena.',
-    bethlehem: 'Lleva la carreta por suaves colinas hasta Belén.',
-    magi: 'Sigue la estrella. El viento empuja, la arena frena.',
-    jordan: 'Conduce con calma por el valle. El suelo resbala.',
-    judea: 'Toma impulso para las cuestas empinadas.',
-    jerusalem: 'Llega a la puerta de Jerusalén. ¡El camino más largo!'
+    egypt: 'Frena en las bajadas y las jarras se salvan.',
+    bethlehem: 'Frena en las colinas. Lleva la carreta a Belén.',
+    magi: 'Sigue la estrella. Frena en las bajadas, el viento empuja.',
+    jordan: 'Frena suave en las bajadas. El suelo resbala.',
+    judea: 'Toma impulso en las subidas y frena en las bajadas.',
+    jerusalem: 'Domina colinas y bajadas hasta la puerta de Jerusalén.'
   },
   routeGo: '¡Vamos!',
   chars: { sand: 'Arena profunda', hills: 'Con colinas', steep: 'Empinado', wind: 'Con viento', slippery: 'Resbaladizo', festive: 'De fiesta' },
@@ -307,14 +301,14 @@ const es = {
   hopButton: 'Salto',
   title: 'Caravana sobre las dunas',
   ref: 'Génesis 37 y Lucas 2',
-  intro: 'Conduce por colinas y dunas. ¡Reúne monedas para el taller!',
+  intro: 'Conduce por colinas y dunas. ¡Frena en las bajadas!',
   route: {
-    egypt: 'La caravana a Egipto',
-    bethlehem: 'El camino a Belén',
-    magi: 'Los sabios de oriente',
-    jordan: 'Por el valle del Jordán',
-    judea: 'Las montañas de Judea',
-    jerusalem: 'Subimos a Jerusalén'
+    egypt: 'Caravana a Egipto',
+    bethlehem: 'Camino a Belén',
+    magi: 'Los sabios viajan',
+    jordan: 'Valle del Jordán',
+    judea: 'Montes de Judea',
+    jerusalem: 'Subida a Jerusalén'
   },
   routeRef: {
     egypt: 'Génesis 37:25–28',
@@ -352,8 +346,8 @@ const es = {
     hop: 'Fuerza del muelle'
   },
   partInfo: {
-    wheels: 'Más agarre en las cuestas.',
-    suspension: 'Un viaje más suave y tranquilo.',
+    wheels: 'Más agarre, frenada más corta.',
+    suspension: 'Viaje suave, los golpes duelen menos.',
     water: 'El animal aguanta más.',
     cover: 'Más monedas en cada hallazgo.',
     harness: 'El animal tira con más fuerza.',
@@ -384,10 +378,10 @@ const es = {
   floatFlip: '¡Voltereta!',
   floatOasis: '¡Oasis! ¡Agua para todos!',
   floatLow: 'El animal se cansa. ¡Busca agua!',
-  tip: 'A la derecha el gas, a la izquierda el freno.',
+  tip: 'Frena en las bajadas o se rompen jarras.',
   howTitle: 'Cómo se conduce',
   howGas: 'Toca a la derecha: acelerar.',
-  howBrake: 'Toca a la izquierda: frenar.',
+  howBrake: 'Toca a la izquierda: frenar en bajadas.',
   howWater: 'Reúne monedas y agua.',
   go: '¡Vamos!',
   howOpen: '?',

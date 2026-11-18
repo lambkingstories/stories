@@ -63,8 +63,9 @@ export interface Stats {
   /** The strength of the hop (m/s upwards, 0 = no hop yet) and the seconds before the next one. */
   hopV: number
   hopCool: number
-  /** The speed up to which a wooden bridge can be crossed (the suspension carries the load) and the level of the suspension. */
-  bridgeV: number
+  /** How hard a knock the cart takes before a jar breaks and before the cart breaks (m/s into the ground; the suspension carries it), and the level of the suspension. */
+  hardV: number
+  crashV: number
   suspLevel: number
   /** How strongly the cart rights itself on the ground (the strength of the help for the youngest). */
   assist: number
@@ -201,7 +202,8 @@ export function statsFor(s: Save): Stats {
     grip: a.grip,
     hopV: s.up.hop > 0 ? 2.6 + 0.8 * s.up.hop : 0,
     hopCool: 2.3 - 0.3 * s.up.hop,
-    bridgeV: 5.2 + 0.7 * s.up.suspension,
+    hardV: 4 + 0.3 * s.up.suspension,
+    crashV: 7 + 0.45 * s.up.suspension,
     suspLevel: s.up.suspension,
     assist: 2.6,
     animal: s.animal

@@ -14,8 +14,7 @@ export const COMMON_IMAGES = [
   'esel-a', 'esel-b', 'kamel-a', 'kamel-b', 'ochse-a', 'ochse-b',
   ...['esel', 'ochse', 'kamel', 'pferd'].flatMap((a) => [1, 2, 3, 4, 5, 6].map((k) => `${a}-teil-${k}`)),
   'krug-gross', 'krug-klein', 'sack', 'korb', 'plane', 'scherben',
-  'dattel', 'schlauch', 'muenze', 'beutel', 'feder', 'oase', 'ziel', 'steg',
-  ...[1, 2, 3, 4, 5].map((k) => `zonen-${k}`),
+  'dattel', 'schlauch', 'muenze', 'beutel', 'feder', 'oase', 'ziel',
   ...[1, 2, 3, 4, 5, 6].map((k) => `sym-${k}`)
 ]
 

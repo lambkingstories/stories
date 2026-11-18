@@ -8,14 +8,15 @@ import {
   ROUTES,
   ROUTE_COUNT,
   START_X,
+  blurBot,
   botInput,
   generateTrack,
   heightAt,
   hop,
   newRun,
   rng,
+  safeSpeed,
   slopeAt,
-  speedLimit,
   starsFor,
   starsForTime,
   stepRun,
@@ -544,8 +545,9 @@ describe('a crash', () => {
             r.vy = 0
             r.a = angle
             let crashedAt = -1
-            let maxAbove = 0
+            let yCrash = 0
             let h0 = 0
+            let maxRise = 0
             let maxVy = 0
             for (let i = 0; i < 60 * 8; i++) {
               stepRun(r, 1 / 60, { gas: true, brake: false })
@@ -553,9 +555,11 @@ describe('a crash', () => {
               if (r.phase === 'crash') {
                 if (crashedAt < 0) {
                   crashedAt = i
+                  yCrash = r.y
                   h0 = r.y - heightAt(track, r.x)
                 } else {
-                  maxAbove = Math.max(maxAbove, r.y - heightAt(track, r.x))
+                  // thrown up means: higher than at the crash AND higher above the ground (sliding up a slope, or off the edge of a drop, is no throw)
+                  maxRise = Math.max(maxRise, Math.min(r.y - yCrash, r.y - heightAt(track, r.x) - h0))
                   maxVy = Math.max(maxVy, r.vy)
                 }
               }
@@ -564,7 +568,7 @@ describe('a crash', () => {
               crashes++
               // after the first impact the cart stays low and is never thrown up
               expect(maxVy).toBeLessThanOrEqual(1.0001)
-              expect(maxAbove).toBeLessThan(h0 + 0.8)
+              expect(maxRise).toBeLessThan(0.8)
               // it comes to rest
               expect(Math.abs(r.vx)).toBeLessThan(0.6)
               expect(Math.abs(r.vy)).toBeLessThan(0.6)
@@ -597,98 +601,144 @@ describe('a crash', () => {
 /** A driver that does what the bot does, but without ever braking. */
 const gasOnly = () => ({ gas: true, brake: false })
 
-describe('braking is needed', () => {
-  it('builds halt zones with a toll gate, bridges, holes, steps and boulders on the ways', () => {
+describe('the ground asks for the brake', () => {
+  it('has no halt zones, toll gates or bridges with a speed limit any more: only the shape of the ground asks for the brake', () => {
     const kinds = new Set<string>()
     for (let i = 0; i < ROUTE_COUNT; i++) for (const z of generateTrack(i).zones) kinds.add(z.kind)
-    for (const k of ['stop', 'bridge', 'pit', 'ledges', 'rocks']) expect(kinds.has(k), k).toBe(true)
-    // every way has a halt zone, and the zones are on flat ground where they must be
+    for (const k of ['drop', 'hump', 'rollers', 'pit', 'ledges', 'rocks']) expect(kinds.has(k), k).toBe(true)
+    expect(kinds.has('stop')).toBe(false)
+    expect(kinds.has('bridge')).toBe(false)
+    const r = ROUTES[0] as unknown as Record<string, unknown>
+    expect(r.stops).toBeUndefined()
+    expect(r.bridges).toBeUndefined()
+  })
+
+  it('every way has several steep ways down (a ridge with a long climb, a round crest and a fall of 20 degrees or more) and hills in a row', () => {
     for (let i = 0; i < ROUTE_COUNT; i++) {
       const t = generateTrack(i)
-      expect(t.zones.some((z) => z.kind === 'stop')).toBe(true)
-      for (const z of t.zones.filter((q) => q.kind === 'stop' || q.kind === 'bridge')) {
-        expect(Math.abs(heightAt(t, z.x0) - heightAt(t, z.x1))).toBeLessThan(0.3)
-        expect(z.x1).toBeLessThan(t.finishX - 30)
+      const drops = t.zones.filter((z) => z.kind === 'drop')
+      expect(drops.length, `route ${i}`).toBeGreaterThanOrEqual(2)
+      for (const z of drops) {
+        let steepest = 0
+        for (let x = z.x0; x <= z.x1; x += 0.5) steepest = Math.max(steepest, -slopeAt(t, x))
+        expect((Math.atan(steepest) * 180) / Math.PI, `route ${i} at ${z.x0.toFixed(0)}`).toBeGreaterThan(17)
+        // the way down starts high: the climb before it is longer than the fall
+        expect(heightAt(t, z.x0 - 30)).toBeLessThan(heightAt(t, z.x0))
       }
+      expect(t.zones.some((z) => z.kind === 'hump')).toBe(true)
     }
   })
 
-  it('holding the gas does not get through: every way ends in a fall before the goal', () => {
+  it('a way down makes the cart fast, and the brake keeps it slow enough: the same drop with and without the brake', () => {
+    const t = generateTrack(3)
+    const z = t.zones.find((q) => q.kind === 'drop')!
+    const top = (driver: (r: Run) => Input) => {
+      const r = newRun(t, statsFor(newSave()), 0)
+      r.x = z.x0 - 70
+      r.y = heightAt(t, r.x) + 1.05
+      r.vx = 9
+      let fastest = 0
+      for (let k = 0; k < 60 * 14 && r.phase === 'play' && r.x < z.x1 + 4; k++) {
+        stepRun(r, 1 / 60, driver(r))
+        r.events.length = 0
+        if (r.x > z.x0) fastest = Math.max(fastest, r.vx)
+      }
+      return fastest
+    }
+    expect(top(gasOnly)).toBeGreaterThan(14.5)
+    expect(top(botInput)).toBeLessThan(11.5)
+  })
+
+  it('holding the gas does not get through unharmed: every way ends in a fall or in broken jars, and most in a fall', () => {
+    let falls = 0
     for (let i = 0; i < ROUTE_COUNT; i++) {
       const r = newRun(generateTrack(i), statsFor(newSave()))
       drive(r, 400, gasOnly)
-      expect(r.phase, `route ${i}`).toBe('crash')
-      expect(r.meters).toBeLessThan(ROUTES[i]!.length * 0.7)
+      expect(r.phase === 'crash' || r.jars < 3, `route ${i}`).toBe(true)
+      if (r.phase === 'crash') falls++
+    }
+    expect(falls).toBeGreaterThanOrEqual(5)
+  })
+
+  it('a driver who brakes on the slopes gets every jar to the goal on every way, with the plain cart and with the best parts', () => {
+    for (let i = 0; i < ROUTE_COUNT; i++) {
+      for (const save of [newSave(), fullSave()]) {
+        const r = newRun(generateTrack(i), statsFor(save))
+        drive(r, 400, botInput)
+        expect(r.phase, `route ${i}`).toBe('won')
+        expect(r.jars, `route ${i}`).toBe(3)
+      }
     }
   })
 
-  it('a cart that hits the shut gate at speed crashes, one that comes slowly only bumps', () => {
-    const t = generateTrack(0)
-    const z = t.zones.find((q) => q.kind === 'stop')!
-    const fast = newRun(t, statsFor(newSave()))
-    fast.x = z.gate! - 14
-    fast.y = heightAt(t, fast.x) + 1.05
-    fast.vx = 10
-    drive(fast, 5, gasOnly)
-    expect(fast.phase).toBe('crash')
-    const slow = newRun(t, statsFor(newSave()))
-    slow.x = z.gate! - 8
-    slow.y = heightAt(t, slow.x) + 1.05
-    slow.vx = 4
-    drive(slow, 4, () => ({ gas: false, brake: false }))
-    expect(slow.phase).toBe('play')
-    expect(slow.x).toBeLessThanOrEqual(z.gate! - 1.7)
-  })
-
-  it('standing still in the halt zone opens the gate, gives water and coins and a checkpoint', () => {
-    const t = generateTrack(0)
-    const k = t.zones.findIndex((q) => q.kind === 'stop')
-    const z = t.zones[k]!
-    const r = newRun(t, statsFor(newSave()))
-    r.x = z.x0 + 3
-    r.y = heightAt(t, r.x) + 1.05
-    r.stamina = 0.4
-    r.taken.fill(1)
-    let opened = false
-    for (let i = 0; i < 60 * 4; i++) {
-      stepRun(r, 1 / 60, { gas: false, brake: false })
-      if (r.events.some((e) => e.type === 'station')) opened = true
-      r.events.length = 0
+  it('a driver who brakes a little too early, too late or too hard still wins most of the time (twelve different children on every way)', () => {
+    let won = 0
+    let tries = 0
+    for (let i = 0; i < ROUTE_COUNT; i++) {
+      for (let seed = 1; seed <= 12; seed++) {
+        const r = newRun(generateTrack(i), statsFor(newSave()))
+        blurBot(r, { seed: seed * 17 + i, spread: 2.2, lag: 5 })
+        drive(r, 400, botInput)
+        tries++
+        if (r.phase === 'won') won++
+      }
     }
-    expect(opened).toBe(true)
-    expect(r.zoneDone[k]).toBe(1)
-    expect(r.stamina).toBeGreaterThan(0.95)
-    expect(r.checkpoint).toBeGreaterThan(0)
-    // and the way is free now
-    drive(r, 4, gasOnly)
-    expect(r.x).toBeGreaterThan(z.gate! + 2)
+    expect(won / tries).toBeGreaterThan(0.9)
   })
 
-  it('too fast on a bridge makes the jars fall, slowly it is fine, and a better suspension allows more speed', () => {
-    const t = generateTrack(1)
-    const z = t.zones.find((q) => q.kind === 'bridge')!
-    const cross = (speed: number, susp = 0) => {
+  it('a hard knock breaks a jar, an even harder one the cart, and a better suspension takes more', () => {
+    const t = generateTrack(0)
+    const fall = (height: number, susp = 0) => {
       const s = newSave()
       s.up.suspension = susp
       const r = newRun(t, statsFor(s))
-      r.x = z.x0 - 3
-      r.y = heightAt(t, r.x) + 1.05
-      r.vx = speed
-      for (let i = 0; i < 60 * 6 && r.x < z.x1 + 2 && r.phase === 'play'; i++) {
-        // hold the speed
-        r.vx = Math.max(r.vx, speed - 0.5)
-        stepRun(r, 1 / 60, { gas: r.vx < speed, brake: false })
+      r.y += height
+      let bumps = 0
+      for (let k = 0; k < 60 * 3; k++) {
+        stepRun(r, 1 / 60, { gas: false, brake: false })
+        bumps += r.events.filter((e) => e.type === 'bump').length
         r.events.length = 0
       }
-      return r.phase
+      return { phase: r.phase, jars: r.jars, bumps }
     }
-    expect(cross(4.6)).toBe('play')
-    expect(cross(9)).toBe('crash')
-    expect(speedLimit(statsFor(newSave()), 'bridge')).toBeLessThan(speedLimit({ ...statsFor(newSave()), bridgeV: 8.7 }, 'bridge'))
-    expect(statsFor({ ...newSave(), up: { ...newSave().up, suspension: 5 } }).bridgeV).toBeGreaterThan(statsFor(newSave()).bridgeV + 2)
+    // a soft landing: nothing breaks
+    expect(fall(0.4)).toEqual({ phase: 'play', jars: 3, bumps: 0 })
+    // a hard one: one jar, and the round goes on
+    const hard = fall(1.3)
+    expect(hard.phase).toBe('play')
+    expect(hard.jars).toBe(2)
+    // a very hard one: the cart breaks
+    expect(fall(4).phase).toBe('crash')
+    // a better suspension takes the hard one without a break
+    expect(fall(1.3, 5).jars).toBe(3)
   })
 
-  it('a hole slows the cart down, much less with strong wheels', () => {
+  it('with no jar left a hard knock breaks the cart', () => {
+    const r = newRun(generateTrack(0), statsFor(newSave()))
+    r.jars = 0
+    r.y += 1.6
+    drive(r, 3, () => ({ gas: false, brake: false }))
+    expect(r.phase).toBe('crash')
+  })
+
+  it('a hill needs gas and swing: the cart that coasts is slower on the climb of a ridge than the one with the gas on', () => {
+    const t = generateTrack(3)
+    const z = t.zones.find((q) => q.kind === 'drop')!
+    const climbSpeed = (gas: boolean) => {
+      const r = newRun(t, statsFor(newSave()), 0)
+      r.x = z.x0 - 60
+      r.y = heightAt(t, r.x) + 1.05
+      r.vx = 9
+      for (let k = 0; k < 60 * 6 && r.x < z.x0 - 10 && r.phase === 'play'; k++) {
+        stepRun(r, 1 / 60, { gas, brake: false })
+        r.events.length = 0
+      }
+      return r.vx
+    }
+    expect(climbSpeed(true)).toBeGreaterThan(climbSpeed(false) + 1)
+  })
+
+  it('a hole of sand or mud slows the cart down, much less with strong wheels', () => {
     const t = generateTrack(3)
     const z = t.zones.find((q) => q.kind === 'pit')!
     const through = (wheels: number) => {
@@ -708,6 +758,28 @@ describe('braking is needed', () => {
     }
     expect(through(0)).toBeGreaterThan(through(5) * 1.2)
     expect(zoneAt(t, (z.x0 + z.x1) / 2, 'pit')).toBe(z)
+  })
+
+  it('warns once when the cart comes fast to a stretch that asks for the brake, and says nothing to a slow one', () => {
+    const t = generateTrack(2)
+    const z = t.zones.find((q) => q.kind === 'drop')!
+    const warned = (speed: number) => {
+      const r = newRun(t, statsFor(newSave()))
+      r.x = z.x0 - 30
+      r.y = heightAt(t, r.x) + 1.05
+      r.vx = speed
+      let n = 0
+      for (let k = 0; k < 60 * 1.5; k++) {
+        r.vx = Math.max(r.vx, speed - 0.3)
+        stepRun(r, 1 / 60, { gas: r.vx < speed, brake: false })
+        n += r.events.filter((e) => e.type === 'warn').length
+        r.events.length = 0
+      }
+      return n
+    }
+    expect(warned(14)).toBe(1)
+    expect(warned(6)).toBe(0)
+    expect(safeSpeed(statsFor(newSave()), 'drop')).toBeLessThan(safeSpeed(statsFor(fullSave()), 'drop'))
   })
 })
 
