@@ -68,3 +68,16 @@ describe('english texts of the order race read right', () => {
   })
 })
 
+describe('the result line about the stones of Nehemias Mauer makes sense in every language', () => {
+  it('says how many stones were used and how many are enough, not "6 of 4"', () => {
+    const texts = src('src/i18n/bigGames/nehemia.ts')
+    const lines = [...texts.matchAll(/lineSteady: '([^']*)'/g)].map((m) => m[1]!)
+    expect(lines).toHaveLength(3)
+    for (const l of lines) {
+      expect(l).toContain('{have}')
+      expect(l).toContain('{need}')
+      expect(l).not.toMatch(/\{have\} (von|of|de) \{need\}/)
+    }
+  })
+})
+
