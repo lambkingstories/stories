@@ -169,3 +169,15 @@ describe('David: the card of the pause and of the end of a round fits a phone he
   })
 })
 
+describe('David does not repaint the whole picture 60 times a second behind a menu', () => {
+  it('while nothing plays the picture is repainted at most every 250 ms (measured in the browser: 360 sprites a second before, a few now)', () => {
+    const text = src('src/components/molecules/games/BigGameDavid.vue').replace(/\r/g, '')
+    expect(text).toContain('const IDLE_DRAW_MS = 250')
+    const at = text.indexOf('function frame(now: number)')
+    const frame = text.slice(at, text.indexOf('\n}\n', at))
+    expect(frame).toMatch(/running \|\| now - lastDraw >= IDLE_DRAW_MS/)
+    // a canvas that was resized is empty: it is painted again at once
+    expect(text.slice(text.indexOf('function resize()'), text.indexOf('/** One step of the whole game'))).toContain('lastDraw = 0')
+  })
+})
+

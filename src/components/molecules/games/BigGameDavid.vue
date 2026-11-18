@@ -284,6 +284,8 @@ function resize() {
   scale = Math.min(vw / W, vh / H)
   ox = (vw - W * scale) / 2
   oy = (vh - H * scale) / 2
+  // a canvas that was resized is empty: paint it again at once, also behind a menu
+  lastDraw = 0
 }
 
 /** One step of the whole game (rules, legs, puffs), `dt` seconds. */
@@ -304,12 +306,21 @@ function update(dt: number) {
   if (hud.stones !== g.stonesLeft) hud.stones = g.stonesLeft
 }
 
+/** When the picture was painted last (ms). */
+let lastDraw = 0
+/** Behind a menu, the pause card, the explanation or the note to turn the phone nothing that matters moves: the picture is painted only a few times a second (battery, heat). */
+const IDLE_DRAW_MS = 250
+
 function frame(now: number) {
   raf = requestAnimationFrame(frame)
   const dt = Math.min(0.033, (now - last) / 1000 || 0)
   last = now
-  if (screen.value === 'play' && !paused.value && !(portrait.value && !showRotateAnyway.value)) update(dt)
-  draw(now / 1000)
+  const running = screen.value === 'play' && !paused.value && !(portrait.value && !showRotateAnyway.value)
+  if (running) update(dt)
+  if (running || now - lastDraw >= IDLE_DRAW_MS) {
+    lastDraw = now
+    draw(now / 1000)
+  }
 }
 
 function sprite(ctx2: CanvasRenderingContext2D, name: string, cx: number, bottom: number, height: number, flip = false, rot = 0) {
