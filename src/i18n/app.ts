@@ -2985,7 +2985,7 @@ export default {
         howMany: 'How many are playing?',
         count: 'How many steps?',
         from: 'From which adventure?',
-        rounds: 'How often is everybody on turn?',
+        rounds: 'How many turns does everybody get?',
         rule: 'Each station in the right place gives 1 point. A fully correct row gives 2 extra points.',
         turnOf: 'Turn {n} of {total}',
         handover: 'Pass the device to {name}.',
@@ -2993,7 +2993,7 @@ export default {
         task: 'Tap the stations in the order they happen in the story: the first one first.',
         yours: 'Your order',
         allRight: 'All right!',
-        someRight: '{n} of {total} on the right place',
+        someRight: '{n} of {total} in the right place',
         gotPoints: '{name} gets {points}.',
         nextTurn: 'Next',
         soloEnd: 'Done: {points}!'

@@ -60,3 +60,11 @@ describe('one spelling of the name Goliat in the german texts of David', () => {
   })
 })
 
+describe('english texts of the order race read right', () => {
+  it('"in the right place" and a plain question about the turns', () => {
+    const order = (rawApp as unknown as { en: { app: { order: Record<string, string> } } }).en.app.order
+    expect(order.someRight).toBe('{n} of {total} in the right place')
+    expect(order.rounds).not.toMatch(/on turn/)
+  })
+})
+
