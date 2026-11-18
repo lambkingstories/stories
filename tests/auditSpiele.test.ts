@@ -127,3 +127,10 @@ describe('the order race: the choice of the adventure is a 44 px field', () => {
   })
 })
 
+describe('english text of the way to the next game wish', () => {
+  it('reads "1 more star until the next game wish", not "Still 1 star to"', () => {
+    const big = (rawApp as unknown as { en: { app: { bigGames: { nextGame: string } } } }).en.app.bigGames
+    expect(big.nextGame).toBe('1 more star until the next game wish. | {n} more stars until the next game wish.')
+  })
+})
+

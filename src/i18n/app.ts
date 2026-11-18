@@ -2726,7 +2726,7 @@ export default {
         starsNow: '{n} stars so far',
         play: 'Play',
         levelStars: '{n} of {max} stars',
-        nextGame: 'Still 1 star to the next game wish. | Still {n} stars to the next game wish.',
+        nextGame: '1 more star until the next game wish. | {n} more stars until the next game wish.',
         wishes: 'You may pick a game! | You may pick {n} games!',
         unlock: 'Unlock',
         back: 'Back',
