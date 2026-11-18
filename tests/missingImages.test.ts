@@ -20,7 +20,7 @@ import { JESUS_PATH } from '@/data/jesusPath'
 import { medalThumb } from '@/utils/medalThumb'
 
 /** Teile von Pfaden, die vorerst fehlen dürfen (laufender Bilder-Nachzug: Gideon, Lamm, Bogen, Karawane, Wortreise). */
-const AUSNAHMEN = ['spiele-gross/gideon/', 'spiele-gross/lamm/', 'spiele-gross/bogen/', 'spiele-gross/karawane/', 'wortreise']
+const AUSNAHMEN = ['spiele-gross/lamm/', 'spiele-gross/bogen/', 'spiele-gross/karawane/', 'wortreise']
 const erlaubt = (p: string) => AUSNAHMEN.some((a) => p.includes(a))
 const da = (p: string) => existsSync(`public/${p}`)
 

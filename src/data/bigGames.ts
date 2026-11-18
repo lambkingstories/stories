@@ -3,7 +3,7 @@
  * How they open (Anton, 17.11.2026): for every full `STEP` stars on the adventures (the stars of all stages together) the child may pick
  * one game it wants to play, and it picks which one (see `utils/bigGames.ts` and `use/useGameWishes.ts`). The choice is for good.
  */
-export type BigGameId = 'david' | 'elia' | 'wasser' | 'karawane' | 'nehemia' | 'memory' | 'lamm' | 'gideon' | 'mose' | 'bogen'
+export type BigGameId = 'david' | 'elia' | 'wasser' | 'karawane' | 'nehemia' | 'memory' | 'lamm' | 'kornspeicher' | 'mose' | 'bogen'
 
 /**
  * The stars of all adventures together that give one wish for a game. 40 stars: with about 300 stars (the nine adventures of the store
@@ -25,8 +25,8 @@ export const BIG_GAMES: BigGame[] = [
   { id: 'memory', image: 'images/spiele-gross/memory/kachel-2.webp', maxStars: 111 },
   { id: 'elia', image: 'images/spiele-gross/elia/kachel.webp', maxStars: 45 },
   { id: 'wasser', image: 'images/spiele-gross/wasser/kachel-hiskia.webp', maxStars: 108 },
-  // the catapult game in the manner of the birds-and-towers games: 36 levels in 4 chapters, jars with abilities, soldiers, beams that fall (see `utils/gideonSim.ts`)
-  { id: 'gideon', image: 'images/spiele-gross/gideon/kachel-3.webp', maxStars: 108 },
+  // Joseph's granary (Genesis 41): a peaceful catapult game in the manner of the birds-and-towers games: sacks of grain into empty granaries, 36 levels in 4 chapters (see `utils/kornspeicherSim.ts`)
+  { id: 'kornspeicher', image: 'images/spiele-gross/kornspeicher/kachel.webp', maxStars: 108 },
   // the rope puzzle in the style of Cut the Rope: Moses' basket, 40 levels in 4 chapters (see `utils/moseKorbGame.ts`)
   { id: 'mose', image: 'images/spiele-gross/mose/kachel.webp', maxStars: 120 },
   { id: 'nehemia', image: 'images/spiele-gross/nehemia/kachel.webp', maxStars: 180 },
