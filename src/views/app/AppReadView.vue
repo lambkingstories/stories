@@ -172,7 +172,8 @@ button
 
 .door-plus
   display: block
-  align-self: flex-start
+  // under the name, in the middle like the name and the line (not stuck to the left edge)
+  align-self: center
   margin-top: 2px
 
 .door-sub
