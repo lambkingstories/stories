@@ -2721,7 +2721,7 @@ export default {
       },
       bigGames: {
         title: 'Adventure games',
-        hint: 'Collect stars. At {first} stars David gives you his sling, then for every {n} stars you pick a game.',
+        hint: "David's sling is free. Collect stars: for every {n} stars you pick one more game.",
         locked: 'Locked',
         starsNow: '{n} stars so far',
         play: 'Play',
@@ -6848,7 +6848,7 @@ export default {
       },
       bigGames: {
         title: 'Abenteuer-Spiele',
-        hint: 'Sammle Sterne. Bei {first} Sternen schenkt dir David seine Schleuder, danach wählst du für je {n} Sterne ein Spiel.',
+        hint: 'Davids Schleuder ist gratis. Sammle Sterne: Für je {n} Sterne wählst du ein weiteres Spiel.',
         locked: 'Gesperrt',
         starsNow: '{n} Sterne bisher',
         play: 'Spielen',

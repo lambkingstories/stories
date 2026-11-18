@@ -16,7 +16,7 @@ import { useRouter } from 'vue-router'
 import { journeys } from '@/data/adventures'
 import useAdventure from '@/use/useAdventure'
 import { cupOf, rewardGames, type RewardGame } from '@/utils/rewards'
-import { BIG_GAMES, STEP } from '@/data/bigGames'
+import { STEP } from '@/data/bigGames'
 import useBigGames from '@/use/useBigGames'
 import useGameWishes from '@/use/useGameWishes'
 import useCelebration from '@/use/useCelebration'
@@ -34,8 +34,6 @@ const router = useRouter()
 const adv = useAdventure()
 
 const bigGames = useBigGames()
-/** The stars at which the gift game (David's sling) opens by itself; the hint under the title names it. */
-const davidAt = BIG_GAMES.find((g) => g.freeAt !== undefined)?.freeAt ?? STEP
 const wish = useGameWishes()
 const { celebrate } = useCelebration()
 const stars = wish.stars
@@ -114,7 +112,7 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
         img(:src="prependBaseUrl('images/icons/kacheln/kachel-bonus-c.webp')" alt="" class="rw-title-img" draggable="false")
         span(class="rw-title-text") {{ t('app.bigGames.title') }}
         span(class="rw-count") {{ bigStates.filter((s) => s.open).length }} / {{ bigStates.length }}
-      p(v-if="section !== 'mini'" class="rw-hint") {{ t('app.bigGames.hint', { n: STEP, first: davidAt }) }}
+      p(v-if="section !== 'mini'" class="rw-hint") {{ t('app.bigGames.hint', { n: STEP }) }}
       div(v-if="section !== 'mini'" class="rw-grid")
         button(
           v-for="s in bigStates"
@@ -130,10 +128,11 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
             span(v-if="s.open" class="rw-play" aria-hidden="true")
               svg(viewBox="0 0 24 24" width="26" height="26" fill="currentColor")
                 path(d="M8 5.2v13.6a1 1 0 0 0 1.5.86l11-6.8a1 1 0 0 0 0-1.72l-11-6.8A1 1 0 0 0 8 5.2z")
-            span(v-else-if="w.free > 0 && s.game.freeAt === undefined" class="rw-lock rw-lock--pick" aria-hidden="true")
+            //- a closed game stays in its colours: only a small badge in the corner says that it can be unlocked (a golden star when a wish is free, else a padlock)
+            span(v-else-if="w.free > 0 && s.game.freeAt === undefined" class="rw-badge rw-badge--pick" aria-hidden="true")
               img(:src="prependBaseUrl('images/abenteuer/ui/stern-gold-1.webp')" alt="" draggable="false")
-            span(v-else class="rw-lock" aria-hidden="true")
-              svg(viewBox="0 0 24 24" width="30" height="30" fill="currentColor")
+            span(v-else class="rw-badge" aria-hidden="true")
+              svg(viewBox="0 0 24 24" width="24" height="24" fill="currentColor")
                 path(d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 0 1 6 0v3H9z")
           span(class="rw-name") {{ t(`app.bigGames.${s.game.id}.title`) }}
           span(v-if="s.open" class="rw-from") {{ t('app.bigGames.levelStars', { n: bigGames.stars(s.game.id), max: maxStarsOf(s.game, memoryBoards) }) }}
@@ -274,17 +273,35 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
   font-size: 0.88rem
   line-height: 1.35
 
-.rw-big.is-locked
-  .rw-img > img
-    filter: grayscale(1) brightness(0.8)
-
-// a free wish: the closed tiles glow a little, so the child sees that it may pick
+// a closed game keeps its colours (Anton, 18.11.2026): the badge in the corner is the sign that it can be unlocked
+// a free wish: the closed tiles get a gold rim (no glow that never ends), so the child sees that it may pick
 .rw-big.is-pick
   border-color: #d4a83e
   box-shadow: 0 0 0 3px rgba(255, 214, 90, 0.4)
 
-  .rw-img > img
-    filter: grayscale(0.6) brightness(0.9)
+.rw-badge
+  position: absolute
+  top: 8px
+  right: 8px
+  width: 40px
+  height: 40px
+  display: grid
+  place-items: center
+  border-radius: 50%
+  background: rgba(255, 255, 255, 0.94)
+  border: 2px solid #d4a83e
+  color: #7a5200
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35)
+
+.rw-badge--pick
+  background: #ffd35a
+  border-color: #c9981f
+
+// the little gold star of a free wish (the picture rule of the tile would stretch it over the whole badge)
+.rw-img .rw-badge--pick img
+  width: 28px
+  height: 28px
+  object-fit: contain
 
 .rw-big.is-new
   animation: rw-pop 1.2s ease-out
@@ -315,16 +332,6 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
   font-weight: 800
   font-size: 0.95rem
   text-align: center
-
-.rw-lock--pick
-  background: rgba(20, 30, 50, 0.3)
-
-// the little gold star of a free wish (the picture rule of the tile would stretch it over the whole tile)
-.rw-img .rw-lock--pick img
-  width: 44px
-  height: 44px
-  object-fit: contain
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45))
 
 .rw-bar
   display: block

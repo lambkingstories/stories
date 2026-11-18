@@ -123,7 +123,7 @@ export default {
   },
   bigGames: {
     title: 'Juegos de aventura',
-    hint: 'Reúne estrellas. Con {first} estrellas David te regala su honda; después eliges un juego por cada {n} estrellas.',
+    hint: 'La honda de David es gratis. Reúne estrellas: por cada {n} estrellas eliges un juego más.',
     locked: 'Bloqueado',
     starsNow: '{n} estrellas hasta ahora',
     play: 'Jugar',

@@ -44,10 +44,10 @@ afterEach(() => {
 
 describe('the page of a game that is not unlocked', () => {
   it('shows the tile, the name, one friendly sentence and a big button to the game room', async () => {
-    const { wrapper, router } = await open('/app/spiel/david')
+    const { wrapper, router } = await open('/app/spiel/elia')
     expect(wrapper.find('.stub-game').exists()).toBe(false)
     expect(wrapper.find('img.bg-closed-pic').exists()).toBe(true)
-    expect(wrapper.find('.bg-closed-title').text()).toBe('Davids Schleuder')
+    expect(wrapper.find('.bg-closed-title').text()).toBe('Elia läuft')
     expect(wrapper.find('.bg-closed-note').text()).toContain('noch nicht freigeschaltet')
     const go = wrapper.find('.bg-closed-btn')
     expect(go.text()).toBe(i18n.global.t('app.bigGames.toGameRoom'))
@@ -66,17 +66,17 @@ describe('the page of a game that is not unlocked', () => {
 
 describe('the test door ?probe=1', () => {
   it('opens a game in development (and in tests)', async () => {
-    const { wrapper } = await open('/app/spiel/david?probe=1')
+    const { wrapper } = await open('/app/spiel/elia?probe=1')
     expect(wrapper.find('.stub-game').exists()).toBe(true)
   })
 
   it('opens a game in the test app (test switch on) even when it is not development', async () => {
-    const { wrapper } = await open('/app/spiel/david?probe=1', { DEV: false, VITE_PLUS_TEST: 'true' })
+    const { wrapper } = await open('/app/spiel/elia?probe=1', { DEV: false, VITE_PLUS_TEST: 'true' })
     expect(wrapper.find('.stub-game').exists()).toBe(true)
   })
 
   it('does nothing in a store build (no development, no test switch)', async () => {
-    const { wrapper } = await open('/app/spiel/david?probe=1', { DEV: false, VITE_PLUS_TEST: 'false' })
+    const { wrapper } = await open('/app/spiel/elia?probe=1', { DEV: false, VITE_PLUS_TEST: 'false' })
     expect(wrapper.find('.stub-game').exists()).toBe(false)
     expect(wrapper.find('.bg-closed-btn').exists()).toBe(true)
   })

@@ -98,7 +98,7 @@ describe('the sums', () => {
   })
 
   it('a game is open when it was picked, and the state tells how far the next wish is', () => {
-    expect(bigGameStates(BIG_GAMES, ['elia']).filter((s) => s.open).map((s) => s.game.id)).toEqual(['elia'])
+    expect(bigGameStates(BIG_GAMES, ['elia']).filter((s) => s.open).map((s) => s.game.id)).toEqual(['david', 'elia'])
     expect(wishState(BIG_GAMES, 0, [])).toMatchObject({ earned: 0, used: 0, free: 0, missing: 40, share: 0, allOpen: false })
     expect(wishState(BIG_GAMES, 15, [])).toMatchObject({ free: 0, missing: 25, share: 0.375 })
     expect(wishState(BIG_GAMES, 40, [])).toMatchObject({ earned: 1, free: 1, missing: 40, share: 0 })
@@ -130,45 +130,46 @@ describe('the sums', () => {
   })
 })
 
-describe("David's sling opens as a gift at 20 stars (Anton, 18 Nov 2026)", () => {
-  it('is closed below 20 stars, open from 20 on, and needs no wish', () => {
+describe("David's sling is free from the start (Anton, 18 Nov 2026)", () => {
+  it('is open with no stars at all and needs no wish', () => {
     const david = BIG_GAMES.find((g) => g.id === 'david')!
-    expect(david.freeAt).toBe(20)
-    expect(bigGameStates(BIG_GAMES, [], 19).find((s) => s.game.id === 'david')!.open).toBe(false)
-    expect(bigGameStates(BIG_GAMES, [], 20).find((s) => s.game.id === 'david')!.open).toBe(true)
-    // the first wish still comes at 40 stars and is free for another game
-    expect(wishesFree(BIG_GAMES, 20, [])).toBe(0)
+    expect(david.freeAt).toBe(0)
+    expect(bigGameStates(BIG_GAMES, [], 0).find((s) => s.game.id === 'david')!.open).toBe(true)
+    // all the other games stay closed until they are picked
+    expect(bigGameStates(BIG_GAMES, [], 0).filter((s) => s.open).map((s) => s.game.id)).toEqual(['david'])
+    // the first wish still comes at 40 stars, for another game
+    expect(wishesFree(BIG_GAMES, 39, [])).toBe(0)
     expect(wishesFree(BIG_GAMES, 40, [])).toBe(1)
     // David cannot be picked with a wish, and being open does not use one
     expect(canPick(BIG_GAMES, 400, [], 'david')).toBe(false)
     expect(wishState(BIG_GAMES, 45, [], 40)).toMatchObject({ earned: 1, used: 0, free: 1 })
   })
 
-  it('every game open means David (by stars) and all others (by wish)', () => {
+  it('every game open means David (free) and all others (by wish)', () => {
     const others = ids.filter((id) => id !== 'david')
     expect(wishState(BIG_GAMES, 4000, others).allOpen).toBe(true)
-    expect(wishState(BIG_GAMES, 10, others).allOpen).toBe(false)
+    expect(wishState(BIG_GAMES, 10, others).allOpen).toBe(true)
+    expect(wishState(BIG_GAMES, 10, []).allOpen).toBe(false)
   })
 
-  it('the hook and the page of the game follow the stars', () => {
+  it('the hook follows: open at 0 stars, no wish is used', () => {
     const w = useGameWishes()
-    expect(w.isOpen('david')).toBe(false)
-    giveStars(21)
     expect(w.isOpen('david')).toBe(true)
+    expect(w.isOpen('elia')).toBe(false)
     expect(w.wishes.value.free).toBe(0)
     expect(w.pick('david')).toBe(false)
     expect(useBigGames().picked()).toEqual([])
   })
 
-  it('the window of the closed game says how many stars are missing for it, not for a wish', async () => {
+  it('a closed game keeps its colours and shows a badge (a padlock, or a gold star with a free wish)', async () => {
     giveStars(15)
     const { default: MyRewards } = await import('@/components/molecules/MyRewards.vue')
     const w = mount(MyRewards, { props: { part: 'games', section: 'bonus' }, ...opts })
     await flushPromises()
-    await w.get('button[data-game="david"]').trigger('click')
-    await flushPromises()
-    expect(w.find('[data-test="bp-unlock"]').exists()).toBe(false)
-    expect(text(w.get('[data-test="bp-gift"]'))).toBe('Noch 5 Sterne, dann gehört dir dieses Spiel.')
+    const closed = w.get('button[data-game="elia"]')
+    expect(closed.classes()).toContain('is-locked')
+    expect(closed.find('.rw-badge').exists()).toBe(true)
+    expect(w.get('button[data-game="david"]').find('.rw-badge').exists()).toBe(false)
     w.unmount()
   })
 })
