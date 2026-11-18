@@ -1043,7 +1043,7 @@ $shade: none
 
   .wr-act
     min-width: 0
-    height: 42px
+    height: 44px
     padding: 0 12px
 
   .wr-actions :deep(.mb)
@@ -1062,9 +1062,12 @@ $shade: none
   .wr-msg-t
     max-width: 100%
     overflow: hidden
-    text-overflow: ellipsis
-    white-space: nowrap
-    font-size: 1rem
+    // two lines instead of one line cut off with dots (a phone held wide has room for it)
+    display: -webkit-box
+    -webkit-line-clamp: 2
+    -webkit-box-orient: vertical
+    font-size: 0.95rem
+    line-height: 1.15
 
   .wr-msg-s
     display: none

@@ -134,3 +134,18 @@ describe('english text of the way to the next game wish', () => {
   })
 })
 
+describe('the Wortreise held wide: buttons of 44 px and a hint that is not cut off', () => {
+  const css = () => src('src/views/app/AppFamilyWortreiseView.vue').replace(/\r/g, '')
+  it('the buttons under the wheel are 44 px high', () => {
+    expect(css()).not.toMatch(/\.wr-act\n\s+min-width: 0\n\s+height: 42px/)
+    expect(css()).toMatch(/\.wr-act\n\s+min-width: 0\n\s+height: 44px/)
+  })
+  it('the line of the message wraps to two lines instead of ending in dots', () => {
+    const text = css()
+    const at = text.indexOf('  .wr-msg-t\n')
+    const block = text.slice(at, text.indexOf('\n\n', at))
+    expect(block).not.toMatch(/text-overflow: ellipsis/)
+    expect(block).toMatch(/-webkit-line-clamp: 2/)
+  })
+})
+
