@@ -127,10 +127,6 @@ const toggleSfx = () => sound.setSfxVolume(sound.sfxVolume.value > 0 ? 0 : DEFAU
   .mt-title
     font-size: 1.1rem
 
-  .mt-back, .mt-round
-    width: 40px
-    height: 40px
-
   .mt-actions
     gap: 6px
 

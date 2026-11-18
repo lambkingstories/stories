@@ -143,8 +143,11 @@ function onInput(i: number, e: Event) {
 .ms-own
   display: flex
   align-items: center
+  justify-content: center
   gap: 1px
   flex: none
+  min-width: 44px
+  min-height: 44px
   padding: 0
   border: 0
   background: transparent
@@ -196,6 +199,7 @@ function onInput(i: number, e: Event) {
   font: inherit
   font-size: 1.1rem
   font-weight: 700
+  min-height: 44px
   padding: 2px 2px
   outline: none
 

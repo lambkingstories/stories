@@ -81,3 +81,29 @@ describe('the result line about the stones of Nehemias Mauer makes sense in ever
   })
 })
 
+describe('the touch areas of the table of the family games are at least 44 px (also on a narrow phone)', () => {
+  /** Every `width`/`height` in pixels that is written for a selector (in any media block) of a sass file. */
+  const sizes = (file: string, selectorStart: string): number[] => {
+    const lines = src(file).replace(/\r/g, '').split('\n')
+    const out: number[] = []
+    for (let i = 0; i < lines.length; i++) {
+      if (!lines[i]!.trim().startsWith(selectorStart)) continue
+      const indent = lines[i]!.length - lines[i]!.trimStart().length
+      for (let j = i + 1; j < lines.length && (lines[j]!.trim() === '' || lines[j]!.length - lines[j]!.trimStart().length > indent); j++) {
+        const m = lines[j]!.match(/^\s*(width|height|min-width|min-height):\s*(\d+)px/)
+        if (m) out.push(Number(m[2]))
+      }
+    }
+    return out
+  }
+  it('the back, music and sound buttons keep 44 px', () => {
+    const all = sizes('src/components/molecules/map/MapTable.vue', '.mt-back, .mt-round')
+    expect(all.length).toBeGreaterThanOrEqual(2)
+    for (const n of all) expect(n).toBeGreaterThanOrEqual(44)
+  })
+  it('the figure button and the name field of a player are 44 px high', () => {
+    expect(sizes('src/components/molecules/map/MapSeats.vue', '.ms-own')).toEqual(expect.arrayContaining([44, 44]))
+    expect(sizes('src/components/molecules/map/MapSeats.vue', '.ms-input')).toContain(44)
+  })
+})
+
