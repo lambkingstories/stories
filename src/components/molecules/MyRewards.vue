@@ -22,7 +22,8 @@ import useGameWishes from '@/use/useGameWishes'
 import useCelebration from '@/use/useCelebration'
 import BigGamePickDialog from '@/components/molecules/BigGamePickDialog.vue'
 import GameWishBar from '@/components/molecules/GameWishBar.vue'
-import type { BigGameState } from '@/utils/bigGames'
+import { maxStarsOf, type BigGameState } from '@/utils/bigGames'
+import { boardsOf } from '@/utils/bilderMemory'
 import { prependBaseUrl } from '@/utils/function'
 
 /** `section` (for `part="games"`): both groups in one page (`all`), only the stage games (`mini`) or only the adventure games (`bonus`). */
@@ -53,6 +54,8 @@ function doPick(id: string) {
   window.setTimeout(() => (justOpened.value = ''), 1600)
 }
 
+// the memory has one board for every adventure that is in this build: its maximum of stars follows that
+const memoryBoards = boardsOf(journeys).length
 const games = computed(() => rewardGames(journeys, adv.progressOf))
 const openCount = computed(() => games.value.filter((g) => g.open).length)
 /** The stage games in the order of the adventures: one group per adventure with its own heading, so the tiles are not one endless grid. */
@@ -131,7 +134,7 @@ const pic = (p: string | undefined) => (p ? prependBaseUrl(p) : '')
               svg(viewBox="0 0 24 24" width="30" height="30" fill="currentColor")
                 path(d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 0 1 6 0v3H9z")
           span(class="rw-name") {{ t(`app.bigGames.${s.game.id}.title`) }}
-          span(v-if="s.open" class="rw-from") {{ t('app.bigGames.levelStars', { n: bigGames.stars(s.game.id), max: s.game.maxStars }) }}
+          span(v-if="s.open" class="rw-from") {{ t('app.bigGames.levelStars', { n: bigGames.stars(s.game.id), max: maxStarsOf(s.game, memoryBoards) }) }}
 
       //- the stage games: they come with the stars of their stage, the others wait as locked tiles
       h3(v-if="section !== 'bonus'" id="rw-mini" :class="['rw-title', { 'rw-title--next': section === 'all' }]")

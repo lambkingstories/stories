@@ -89,3 +89,8 @@ export function firstSentence(text: string): string {
     .replace(/\s*\([^()]*\d[^()]*\)(?=[.!?…]?$)/u, '')
     .trim()
 }
+
+/** The stars that can be won in a game in this build. The memory has one board of three stars for every adventure that is in the build (a store build has fewer than the whole time line), so its maximum follows `boardCount`. */
+export function maxStarsOf(game: BigGame, boardCount: number): number {
+  return game.id === 'memory' ? Math.max(0, boardCount) * 3 : game.maxStars
+}
