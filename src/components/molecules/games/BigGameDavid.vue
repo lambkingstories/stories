@@ -669,9 +669,10 @@ onBeforeUnmount(() => {
       div(v-else-if="paused && !how" class="dg-menu dg-menu--dim")
         div(class="dg-card dg-card--small")
           h2(class="dg-title") {{ t('app.bigGames.david.pause') }}
-          AdvButton(@click="paused = false") {{ t('app.bigGames.david.resume') }}
-          AdvButton(tone="blau" @click="start(level)") {{ t('app.bigGames.david.again') }}
-          AdvButton(tone="blau" @click="toMenu") {{ t('app.bigGames.david.menu') }}
+          div(class="dg-menu-buttons")
+            AdvButton(@click="paused = false") {{ t('app.bigGames.david.resume') }}
+            AdvButton(tone="blau" @click="start(level)") {{ t('app.bigGames.david.again') }}
+            AdvButton(tone="blau" @click="toMenu") {{ t('app.bigGames.david.menu') }}
 
     //- the end of a round
     div(v-else-if="screen === 'result'" class="dg-menu dg-menu--dim")
@@ -679,9 +680,10 @@ onBeforeUnmount(() => {
         h2(class="dg-title") {{ levelTitle(level) }}
         AdventureStars(:stars="outcome.stars" :size="56" celebrate)
         p(class="dg-text") {{ resultText }}
-        AdvButton(v-if="outcome.phase === 'won' && level < GOLIATH_LEVEL" @click="start(level + 1)") {{ t('app.bigGames.david.next') }}
-        AdvButton(:tone="outcome.phase === 'won' && level < GOLIATH_LEVEL ? 'blau' : 'gold'" @click="start(level)") {{ t('app.bigGames.david.again') }}
-        AdvButton(tone="blau" @click="toMenu") {{ t('app.bigGames.david.menu') }}
+        div(class="dg-menu-buttons")
+          AdvButton(v-if="outcome.phase === 'won' && level < GOLIATH_LEVEL" @click="start(level + 1)") {{ t('app.bigGames.david.next') }}
+          AdvButton(:tone="outcome.phase === 'won' && level < GOLIATH_LEVEL ? 'blau' : 'gold'" @click="start(level)") {{ t('app.bigGames.david.again') }}
+          AdvButton(tone="blau" @click="toMenu") {{ t('app.bigGames.david.menu') }}
 
     //- the explanation: pull back, let go
     div(v-if="how && loaded" class="dg-menu dg-menu--dim")
@@ -923,6 +925,18 @@ onBeforeUnmount(() => {
   flex-wrap: wrap
   justify-content: center
   gap: 10px
+
+// a phone held wide with hardly 360 px of height: the card of the pause and of the end of a round must fit (the page cannot be scrolled
+// while it plays), so the buttons sit side by side and the card is a little tighter
+@media (max-height: 460px)
+  .dg-card
+    padding: 12px 18px 12px
+    gap: 6px
+
+  .dg-card .dg-menu-buttons :deep(.lk-btn)
+    min-width: 0
+    padding-left: 18px
+    padding-right: 18px
 
 .dg-how
   gap: 20px

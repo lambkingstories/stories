@@ -149,3 +149,23 @@ describe('the Wortreise held wide: buttons of 44 px and a hint that is not cut o
   })
 })
 
+describe('David: the card of the pause and of the end of a round fits a phone held wide (360 px high)', () => {
+  const vue = () => src('src/components/molecules/games/BigGameDavid.vue').replace(/\r/g, '')
+  it('the buttons of both cards stand in the wrapping row', () => {
+    const text = vue()
+    for (const marker of ["AdvButton(@click=\"paused = false\")", "AdvButton(v-if=\"outcome.phase === 'won' && level < GOLIATH_LEVEL\""]) {
+      const at = text.indexOf(marker)
+      expect(at, marker).toBeGreaterThan(-1)
+      expect(text.slice(Math.max(0, at - 80), at)).toContain('div(class="dg-menu-buttons")')
+    }
+  })
+  it('a rule for low screens makes the card tighter and the buttons narrower', () => {
+    const text = vue()
+    const at = text.indexOf('@media (max-height: 460px)')
+    expect(at).toBeGreaterThan(-1)
+    const block = text.slice(at, at + 400)
+    expect(block).toContain('.dg-card')
+    expect(block).toMatch(/min-width: 0/)
+  })
+})
+
