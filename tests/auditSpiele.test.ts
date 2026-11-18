@@ -50,3 +50,13 @@ describe('the pause buttons are at least 44 px and do not shrink in the row of t
   })
 })
 
+describe('one spelling of the name Goliat in the german texts of David', () => {
+  it('level name, story, task, hints and the end all say Goliat', () => {
+    const david = (rawApp as unknown as { de: { app: { bigGames: { david: Record<string, unknown> } } } }).de.app.bigGames.david
+    // the keys (tipGoliath, wonGoliath) keep their names, only the words count
+    const all = Object.values(david).flat(2).filter((v) => typeof v === 'string').join(' ')
+    expect(all).toContain('Goliat')
+    expect(all).not.toMatch(/Goliath/)
+  })
+})
+
