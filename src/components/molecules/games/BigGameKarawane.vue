@@ -486,7 +486,12 @@ function refreshInput() {
 }
 function onDown(e: PointerEvent) {
   if (screen.value !== 'play' || paused.value) return
-  ;(e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId)
+  try {
+    ;(e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId)
+  } catch {
+    // the finger is already gone: the press still counts
+  }
+  // the canvas is measured anew at every touch (the page may have moved or turned)
   const r = (e.currentTarget as HTMLElement).getBoundingClientRect()
   touches.set(e.pointerId, e.clientX - r.left < r.width * 0.42 ? 'brake' : 'gas')
   refreshInput()
