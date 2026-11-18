@@ -7,7 +7,7 @@ export default {
     intro: 'Noah brachte von jeder Tierart ein Paar in die Arche (1. Mose 6,19–20).',
     story: 'Noah hat die Arche gebaut. Die Tiere kommen paarweise zu ihm (1. Mose 6,19–20).',
     taskWord: 'Deine Aufgabe:',
-    task: 'Tausche Tiere: drei gleiche in einer Reihe gehen an Bord.',
+    task: 'Bringe die Tiere paarweise an Bord.',
     chapterStories: [
       'Gott sagt Noah: Baue eine Arche. Noah tut alles, was Gott ihm sagt (1. Mose 6,22).',
       'Noah, seine Familie und die Tiere gehen hinein. Gott schließt hinter ihnen zu (1. Mose 7,16).',
@@ -90,7 +90,7 @@ export default {
     intro: 'Noah brought a pair of every kind of animal into the ark (Genesis 6:19–20).',
     story: 'Noah has built the ark. The animals come to him in pairs (Genesis 6:19–20).',
     taskWord: 'Your task:',
-    task: 'Swap animals: three of a kind in a row go on board.',
+    task: 'Bring the animals on board in pairs.',
     chapterStories: [
       'God tells Noah: Build an ark. Noah does everything God tells him (Genesis 6:22).',
       'Noah, his family and the animals enter the ark. God shuts them in (Genesis 7:16).',
@@ -173,7 +173,7 @@ export default {
     intro: 'Noé llevó al arca una pareja de cada clase de animal (Génesis 6:19–20).',
     story: 'Noé construyó el arca. Los animales vienen hacia él de dos en dos (Génesis 6:19–20).',
     taskWord: 'Tu tarea:',
-    task: 'Cambia animales: tres iguales en fila suben a bordo.',
+    task: 'Lleva los animales a bordo de dos en dos.',
     chapterStories: [
       'Dios dice a Noé: Construye un arca. Noé hace todo lo que Dios dice (Génesis 6:22).',
       'Noé, su familia y los animales entran al arca. Dios cierra tras ellos (Génesis 7:16).',
