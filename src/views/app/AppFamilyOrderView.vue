@@ -496,7 +496,7 @@ $shade: none
 .fo-select
   flex: 1
   min-width: 0
-  height: 40px
+  min-height: 44px
   border: 0
   background: transparent
   color: $ink
