@@ -203,7 +203,7 @@ describe('my finished pictures', () => {
       work('p2', 4, false, { bookId: 'noah', bookPage: 2 }),
       work('blank', 6, true)
     ])
-    expect(w.find('#ac-h-finished').text()).toContain('Meine fertigen Bilder')
+    expect(w.find('#ac-h-finished').text()).toContain('Fertig aus den Malbüchern')
     expect(w.findAll('[data-test="finished-tile"]')).toHaveLength(1)
   })
 
