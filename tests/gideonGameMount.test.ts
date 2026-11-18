@@ -72,8 +72,8 @@ describe('BigGameGideon', () => {
     await w.find('[data-test="gideon-chapter-go"]').trigger('click')
     expect(w.find('[data-test="gideon-pause"]').exists()).toBe(true)
     expect(w.find('[data-test="gideon-restart"]').exists()).toBe(true)
-    expect(w.text()).toContain('Ziehe den Krug zurück')
-    expect(w.text()).toContain('0 von 1 erschreckt')
+    expect(w.text()).toContain('Ziehe zurück, lass los')
+    expect(w.text()).toContain('Soldaten: 0 von 1')
     // back to the overview and into the level again: neither card comes a second time, the hint neither
     await w.find('[data-test="gideon-pause"]').trigger('click')
     await w.find('[data-test="gideon-menu"]').trigger('click')
@@ -150,6 +150,22 @@ describe('the texts of the game', () => {
       expect(t.story).toMatch(/Gideon|Gedeón/)
       expect(t.task.length).toBeGreaterThan(20)
       expect(t.help.length).toBeGreaterThan(2)
+    }
+  })
+
+  it('stay short (the rules for the texts of the big games): explanation lines up to 8 words, background up to 25, task up to 12, chapter tasks up to 15, hints up to 10, level names up to 3', () => {
+    const words = (x: string) => x.trim().split(/\s+/).length
+    for (const l of ['de', 'en', 'es'] as const) {
+      const t = BIG_GAME_TEXTS[l].gideon as Record<string, any>
+      for (const k of ['howPull', 'howTap', 'howGuards']) expect(words(t[k]), `${l} ${k}`).toBeLessThanOrEqual(8)
+      expect(words(t.story), `${l} story`).toBeLessThanOrEqual(25)
+      expect(words(t.task), `${l} task`).toBeLessThanOrEqual(12)
+      for (const c of t.chapters as { story: string; task: string }[]) {
+        expect(words(c.story), `${l} chapter story`).toBeLessThanOrEqual(25)
+        expect(words(c.task), `${l} chapter task`).toBeLessThanOrEqual(15)
+      }
+      for (const [k, h] of Object.entries(t.hint as Record<string, string>)) expect(words(h), `${l} hint ${k}`).toBeLessThanOrEqual(10)
+      for (const n of t.levels as string[]) expect(words(n), `${l} level ${n}`).toBeLessThanOrEqual(3)
     }
   })
 

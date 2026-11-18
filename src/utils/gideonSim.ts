@@ -1,10 +1,15 @@
 /**
  * "Gideons Nacht": the rules and the physics of the big game, without any drawing (so they can be tested and played back by the level tests).
  *
- * Gideon and his 300 men surround the camp of the Midianites at night (Judges 7,19–22). Gideon's catapult throws clay jars, trumpets and torch jars at the
- * towers, tents and straw heaps of the camp. Nobody is hurt: a guard who is hit, who falls, or who is startled by a crash, a trumpet or a bright light
- * is scared and runs away shouting for help. The level is won when every guard has run away. The structures are real physics (Box2D through `planck`):
- * stacks, beams, bridges, barrels that roll, seesaws and swinging logs, with a hit-point model for each material.
+ * Gideon and his 300 men surround the camp of the Midianites at night (Judges 7,19–22). Gideon's catapult throws clay jars, stone jars, a trumpet, a torch
+ * jar and a bundle of three jars at the towers of the camp (a game in the manner of the birds-and-pigs games). The structures are real physics (Box2D through
+ * `planck`): beams, blocks, tiles, bricks, straw and cloth, each material with its own weight, strength and way of breaking. A beam that is hit tips over, a
+ * tower that loses a post falls down, and what falls down (or what is thrown, or what burns) hurts the soldiers: every soldier has hit points and is
+ * knocked silly when they are gone (he sees stars, loses his helmet and runs away shouting for help; nobody is bleeding or really hurt).
+ * Every jar has an ability that the child starts with a tap while it flies: the clay jar bursts into shards, the stone jar plunges down, the trumpet
+ * blows a shock wave, the torch jar sets wood, straw and cloth on fire (and the fire spreads), the bundle of three jars splits into three.
+ * The level is won when every soldier is down. Points are given for broken parts and soldiers (and a bonus for every jar not used); the stars come
+ * from the throws (three up to the par, two with one more, one otherwise).
  *
  * The simulation is deterministic: a fixed time step (1/60 s), the same level and the same shots always give the same game.
  */
@@ -19,9 +24,12 @@ export const SPEED_MAX = 20
 /** A pull shorter than this (as a share of the full pull) does not throw. */
 export const MIN_POWER = 0.14
 export const SETTLE_STEPS = 100
+/** Nothing that is not thrown flies faster than this (or upward faster than `UP_MAX`): a blast or a break never catapults a block away. */
+const SPEED_CAP = 26
+const UP_MAX = 12
 
 export type Ammo = 'krug' | 'stein' | 'posaune' | 'fackel' | 'ruf'
-export type Mat = 'wood' | 'straw' | 'stone' | 'cloth' | 'barrel' | 'rock'
+export type Mat = 'wood' | 'straw' | 'stone' | 'cloth' | 'barrel' | 'rock' | 'clay' | 'glass'
 export type Shape = 'box' | 'circle' | 'tent'
 
 export interface PartDef {
@@ -43,7 +51,7 @@ export interface GuardDef {
   x: number
   /** The height of the feet. */
   y: number
-  /** Which of the three figures (0, 1, 2). */
+  /** Which of the three soldiers (0 = soldier, 1 = captain with a crest, 2 = the small one with the big helmet). */
   kind: number
 }
 export interface JointDef {
@@ -73,7 +81,7 @@ export interface Shot {
   a: number
   /** The strength 0..1 of the full pull. */
   p: number
-  /** For trumpet, torch jar and call: the seconds after the throw at which the child taps (the effect then happens in the air). */
+  /** The seconds after the throw at which the child taps (the ability of the jar then works in the air). */
   tap?: number
 }
 
@@ -85,49 +93,73 @@ interface MatInfo {
   hp: number
   /** A hit weaker than this does nothing. */
   armor: number
+  /** Wood, straw, cloth and barrels burn. */
+  burns: boolean
+  /** How much the shock wave of the trumpet hurts it (relative). */
+  blast: number
+  /** The points for breaking a part of it. */
+  pts: number
 }
 export const MATS: Record<Mat, MatInfo> = {
-  wood: { density: 0.9, friction: 0.6, restitution: 0.04, hp: 13, armor: 1.7 },
-  straw: { density: 0.38, friction: 0.85, restitution: 0.0, hp: 4.5, armor: 0.7 },
-  stone: { density: 2.2, friction: 0.7, restitution: 0.02, hp: 36, armor: 5 },
-  cloth: { density: 0.3, friction: 0.55, restitution: 0.0, hp: 2.2, armor: 0.35 },
-  barrel: { density: 0.6, friction: 0.5, restitution: 0.12, hp: 7, armor: 1.1 },
-  rock: { density: 1, friction: 0.8, restitution: 0, hp: 1e9, armor: 1e9 }
+  wood: { density: 0.9, friction: 0.6, restitution: 0.04, hp: 13, armor: 1.7, burns: true, blast: 1, pts: 500 },
+  straw: { density: 0.38, friction: 0.85, restitution: 0.0, hp: 4.5, armor: 0.7, burns: true, blast: 1.5, pts: 300 },
+  stone: { density: 2.2, friction: 0.7, restitution: 0.02, hp: 36, armor: 5, burns: false, blast: 0.45, pts: 1000 },
+  cloth: { density: 0.3, friction: 0.55, restitution: 0.0, hp: 2.2, armor: 0.35, burns: true, blast: 1.5, pts: 300 },
+  barrel: { density: 0.6, friction: 0.5, restitution: 0.12, hp: 7, armor: 1.1, burns: true, blast: 1, pts: 400 },
+  rock: { density: 1, friction: 0.8, restitution: 0, hp: 1e9, armor: 1e9, burns: false, blast: 0, pts: 0 },
+  /** Sun-dried clay brick: heavy, brittle. */
+  clay: { density: 1.5, friction: 0.7, restitution: 0.0, hp: 9, armor: 1.4, burns: false, blast: 1.7, pts: 600 },
+  /** Glazed tile ("glass"): light and very fragile, shatters at a touch. */
+  glass: { density: 0.7, friction: 0.35, restitution: 0.05, hp: 3.2, armor: 0.45, burns: false, blast: 3.5, pts: 400 }
 }
+/** The materials that give way to the stone jar like paper. */
+const SOFT: Mat[] = ['wood', 'straw', 'cloth', 'barrel', 'glass', 'clay']
 
 export interface AmmoInfo {
   r: number
   density: number
   /** The jar breaks on its first real hit. */
   breaks: boolean
-  /** How far the clatter of the breaking jar scares a guard. */
-  klirr: number
 }
 export const AMMO: Record<Ammo, AmmoInfo> = {
-  krug: { r: 0.42, density: 1.25, breaks: true, klirr: 1.7 },
-  stein: { r: 0.5, density: 3.1, breaks: false, klirr: 0 },
-  posaune: { r: 0.34, density: 1.0, breaks: true, klirr: 0 },
-  fackel: { r: 0.42, density: 1.2, breaks: true, klirr: 1.4 },
-  ruf: { r: 0.42, density: 1.25, breaks: true, klirr: 1.7 }
+  krug: { r: 0.42, density: 1.25, breaks: true },
+  stein: { r: 0.5, density: 3.1, breaks: false },
+  posaune: { r: 0.34, density: 1.0, breaks: true },
+  fackel: { r: 0.42, density: 1.2, breaks: true },
+  ruf: { r: 0.42, density: 1.25, breaks: true }
 }
-/** The reach of the trumpet blast and of the torch light. */
+/** The reach of the shock wave of the trumpet and of the burst of fire of the torch jar. */
 export const BLAST_R = 5.2
-export const LIGHT_R = 4.6
-const GUARD_ARMOR = 2.2
+export const FIRE_R = 2.5
+const GUARD_ARMOR = 0.6
 const GUARD_W = 0.76
 const GUARD_H = 1.56
-const SCARE_SECONDS = 0.55
+/** The hit points of the three kinds of soldier. */
+export const GUARD_HP = [4.5, 9, 3.2]
+/** The points for a soldier who is knocked out. */
+export const GUARD_PTS = [5000, 8000, 5000]
+const BONUS_PER_JAR = 10000
+const SCARE_SECONDS = 0.6
+const SHARD_DMG = 1.4
+const SHARD_POWER = 1.7
+const MAX_SHARDS = 24
+const BURN_SECONDS = 6
+const BURN_DPS = 6
+const SHARD_LIFE = 1.5
 
 export type SimEvent =
   | { t: 'launch'; ammo: Ammo; x: number; y: number }
   | { t: 'hit'; x: number; y: number; power: number; m: Mat }
   | { t: 'break'; m: Mat; x: number; y: number; w: number; h: number; vx: number; vy: number }
-  | { t: 'klirr'; x: number; y: number; r: number }
+  | { t: 'shatter'; x: number; y: number }
   | { t: 'blast'; x: number; y: number; r: number }
-  | { t: 'light'; x: number; y: number; r: number }
+  | { t: 'fire'; x: number; y: number; r: number }
   | { t: 'split'; x: number; y: number }
-  | { t: 'scare'; x: number; y: number; kind: number }
+  | { t: 'slam'; x: number; y: number }
+  | { t: 'hurt'; x: number; y: number; kind: number }
+  | { t: 'down'; x: number; y: number; kind: number }
   | { t: 'run'; x: number; y: number; kind: number }
+  | { t: 'points'; x: number; y: number; n: number }
   | { t: 'won' }
   | { t: 'lost' }
 
@@ -138,14 +170,26 @@ export interface Part {
   maxHp: number
   dead: boolean
   mat: MatInfo
+  /** Seconds the part will still burn (0 = not burning) and how long it has burned. */
+  burn: number
+  burnT: number
+  /** A piece of a broken beam (it does not break into pieces again). */
+  half: boolean
   kind: 'part'
 }
 export interface Guard {
   def: GuardDef
   body: Body | null
-  scared: boolean
-  /** Seconds since the scare. */
+  hp: number
+  maxHp: number
+  /** Knocked out: he sees stars and then runs away. */
+  down: boolean
+  /** Seconds since he was knocked out. */
   since: number
+  /** Seconds he still shows the hit face (after a hit that did not knock him out). */
+  hurtT: number
+  /** Seconds he still burns (his feet are hot). */
+  burn: number
   gone: boolean
   kind: 'guard'
 }
@@ -153,7 +197,7 @@ export interface Proj {
   ammo: Ammo
   body: Body | null
   age: number
-  /** The effect (blast, light, split) has been used. */
+  /** The ability (burst, plunge, blast, fire, split) has been used. */
   used: boolean
   tapAt: number | null
   dead: boolean
@@ -161,6 +205,10 @@ export interface Proj {
   prevVx: number
   prevVy: number
   punched: boolean
+  /** A shard of a clay jar. */
+  shard: boolean
+  /** How many tents or tiles the jar has gone through (a clay jar goes through two of them before it breaks). */
+  pierce: number
   kind: 'proj'
 }
 interface Ground {
@@ -195,13 +243,17 @@ export class Sim {
   used = 0
   /** Steps since the last throw. */
   sinceShot = 0
-  /** Steps since the last guard was scared (for the cheer after the win). */
+  /** Steps since the last soldier went down (for the cheer after the win). */
   sinceWin = 0
+  /** The points for broken parts and soldiers, and the bonus for the jars not used (given when the round is won). */
+  score = 0
+  bonus = 0
   private armed = false
   private notes: ContactNote[] = []
   private ground: Body
   private wind: number
   private quietSteps = 0
+  private rng = 20231117
 
   constructor(def: LevelDef) {
     this.def = def
@@ -209,7 +261,6 @@ export class Sim {
     this.world = new World({ gravity: new Vec2(0, -GRAVITY) })
     this.ground = this.world.createBody({ type: 'static', position: new Vec2(0, 0), userData: { kind: 'ground' } satisfies Ground })
     this.ground.createFixture({ shape: new Box(def.width + 60, 1, new Vec2(def.width / 2, -1), 0), friction: 0.9, restitution: 0 })
-    // a low wall far left and far right so that nothing rolls out of the world and bounces back
     for (const r of def.rocks ?? []) {
       const b = this.world.createBody({ type: 'static', position: new Vec2(r.x, r.y) })
       b.createFixture({ shape: new Box(r.w / 2, r.h / 2), friction: 0.8, restitution: 0 })
@@ -254,6 +305,11 @@ export class Sim {
     })
   }
 
+  private rand(): number {
+    this.rng = (Math.imul(this.rng, 1664525) + 1013904223) >>> 0
+    return this.rng / 4294967296
+  }
+
   private addPart(d: PartDef): Part {
     const mat = MATS[d.m]
     const shape: Shape = d.s ?? (d.m === 'barrel' ? 'circle' : 'box')
@@ -267,7 +323,7 @@ export class Sim {
     } else body.createFixture({ shape: new Box(d.w / 2, d.h / 2), ...opt })
     const thin = Math.min(d.w, d.h)
     const hp = d.fixed ? 1e9 : mat.hp * Math.max(0.6, Math.min(2.4, thin / 0.5))
-    const part: Part = { def: d, body, hp, maxHp: hp, dead: false, mat, kind: 'part' }
+    const part: Part = { def: d, body, hp, maxHp: hp, dead: false, mat, burn: 0, burnT: 0, half: false, kind: 'part' }
     body.setUserData(part)
     this.parts.push(part)
     return part
@@ -276,7 +332,8 @@ export class Sim {
   private addGuard(d: GuardDef): Guard {
     const body = this.world.createBody({ type: 'dynamic', position: new Vec2(d.x, d.y + GUARD_H / 2), angularDamping: 0.7, linearDamping: 0.02 })
     body.createFixture({ shape: new Box(GUARD_W / 2, GUARD_H / 2), density: 0.45, friction: 0.7, restitution: 0 })
-    const g: Guard = { def: d, body, scared: false, since: 0, gone: false, kind: 'guard' }
+    const hp = GUARD_HP[d.kind % 3]!
+    const g: Guard = { def: d, body, hp, maxHp: hp, down: false, since: 0, hurtT: 0, burn: 0, gone: false, kind: 'guard' }
     body.setUserData(g)
     this.guards.push(g)
     return g
@@ -303,15 +360,27 @@ export class Sim {
   get nextAmmo(): Ammo | null {
     return this.def.ammo[this.used] ?? null
   }
-  get scaredCount(): number {
+  /** How many soldiers are down. */
+  get downCount(): number {
     let n = 0
-    for (const g of this.guards) if (g.scared) n++
+    for (const g of this.guards) if (g.down) n++
     return n
+  }
+  /** The points of the round so far (with the bonus once it is won). */
+  get total(): number {
+    return this.score + this.bonus
   }
   /** The stars of the round: 3 up to `par` throws, 2 with one more, 1 otherwise. */
   get stars(): number {
     if (this.status !== 'won') return 0
     return this.used <= this.def.par ? 3 : this.used <= this.def.par + 1 ? 2 : 1
+  }
+
+  private makeProj(ammo: Ammo, body: Body, tapAt: number | null, shard = false, used = false): Proj {
+    const p: Proj = { ammo, body, age: 0, used, tapAt, dead: false, hits: 0, prevVx: 0, prevVy: 0, punched: false, shard, pierce: 0, kind: 'proj' }
+    body.setUserData(p)
+    this.projs.push(p)
+    return p
   }
 
   /** Throws the next jar. Returns false if there is none or the round is over. */
@@ -326,21 +395,19 @@ export class Sim {
     const body = this.world.createBody({ type: 'dynamic', position: new Vec2(CATAPULT.x, CATAPULT.y), bullet: true, linearDamping: 0, angularDamping: 0.1 })
     body.createFixture({ shape: new Circle(info.r), density: info.density, friction: 0.5, restitution: ammo === 'stein' ? 0.05 : 0.1, filterGroupIndex: -1 })
     body.setLinearVelocity(new Vec2(Math.cos(a) * v, Math.sin(a) * v))
-    body.setAngularVelocity(-4)
-    const p: Proj = { ammo, body, age: 0, used: false, tapAt: tap ?? null, dead: false, hits: 0, prevVx: 0, prevVy: 0, punched: false, kind: 'proj' }
-    body.setUserData(p)
-    this.projs.push(p)
+    body.setAngularVelocity(ammo === 'posaune' ? -1.5 : -4)
+    this.makeProj(ammo, body, tap ?? null)
     this.used++
     this.sinceShot = 0
     this.events.push({ t: 'launch', ammo, x: CATAPULT.x, y: CATAPULT.y })
     return true
   }
 
-  /** The child taps while a jar is in the air: the newest one that has an effect left. */
+  /** The child taps while a jar is in the air: the newest one that has its ability left. */
   tap(): boolean {
     for (let i = this.projs.length - 1; i >= 0; i--) {
       const p = this.projs[i]!
-      if (!p.dead && !p.used && (p.ammo === 'posaune' || p.ammo === 'fackel' || p.ammo === 'ruf')) {
+      if (!p.dead && !p.used && !p.shard) {
         this.trigger(p)
         return true
       }
@@ -350,24 +417,33 @@ export class Sim {
 
   /** Is there a thrown thing in the air that a tap would do something to? */
   get tappable(): boolean {
-    return this.projs.some((p) => !p.dead && !p.used && (p.ammo === 'posaune' || p.ammo === 'fackel' || p.ammo === 'ruf'))
+    return this.projs.some((p) => !p.dead && !p.used && !p.shard)
   }
 
   private trigger(p: Proj) {
     if (!p.body || p.used) return
     const pos = p.body.getPosition()
-    if (p.ammo === 'posaune') {
-      p.used = true
+    const v = p.body.getLinearVelocity()
+    const speed = Math.hypot(v.x, v.y)
+    const ang = Math.atan2(v.y, v.x)
+    p.used = true
+    if (p.ammo === 'krug') {
+      // the jar bursts: a fan of shards flies on in the direction of the throw
+      this.events.push({ t: 'shatter', x: pos.x, y: pos.y })
+      this.shards(pos.x, pos.y, 7, ang, 1.2, speed * 0.55 + 2, speed * 0.9 + 3)
+      this.killProj(p)
+    } else if (p.ammo === 'stein') {
+      // the stone jar plunges: almost straight down, fast
+      this.events.push({ t: 'slam', x: pos.x, y: pos.y })
+      p.body.setLinearVelocity(new Vec2(v.x * 0.2, -Math.min(22, Math.max(15, speed * 1.15))))
+      p.body.setAngularVelocity(0)
+    } else if (p.ammo === 'posaune') {
       this.blast(pos.x, pos.y)
       this.killProj(p)
     } else if (p.ammo === 'fackel') {
-      p.used = true
-      this.light(pos.x, pos.y)
+      this.burst(pos.x, pos.y)
+      this.killProj(p)
     } else if (p.ammo === 'ruf') {
-      p.used = true
-      const v = p.body.getLinearVelocity()
-      const speed = Math.hypot(v.x, v.y)
-      const ang = Math.atan2(v.y, v.x)
       this.events.push({ t: 'split', x: pos.x, y: pos.y })
       p.body.setLinearVelocity(new Vec2(Math.cos(ang) * speed, Math.sin(ang) * speed))
       for (const d of [-0.2, 0.2]) {
@@ -375,9 +451,8 @@ export class Sim {
         body.createFixture({ shape: new Circle(0.36), density: 1.25, friction: 0.5, restitution: 0.1, filterGroupIndex: -1 })
         body.setLinearVelocity(new Vec2(Math.cos(ang + d) * speed, Math.sin(ang + d) * speed))
         body.setAngularVelocity(-4)
-        const q: Proj = { ammo: 'ruf', body, age: p.age, used: true, tapAt: null, dead: false, hits: 0, prevVx: 0, prevVy: 0, punched: false, kind: 'proj' }
-        body.setUserData(q)
-        this.projs.push(q)
+        const q = this.makeProj('ruf', body, null, false, true)
+        q.age = p.age
       }
     }
   }
@@ -389,11 +464,27 @@ export class Sim {
     p.body = null
   }
 
-  /** The trumpet: pushes everything near away and scares the guards in reach. */
+  /** Clay shards: `n` small bodies in a fan around `a0` (radians) with the given spread and speeds. */
+  private shards(x: number, y: number, n: number, a0: number, spread: number, v0: number, v1: number) {
+    let live = 0
+    for (const p of this.projs) if (p.shard && !p.dead) live++
+    n = Math.min(n, MAX_SHARDS - live)
+    for (let i = 0; i < n; i++) {
+      const ang = a0 + (n > 1 ? i / (n - 1) - 0.5 : 0) * spread + (this.rand() - 0.5) * 0.12
+      const v = v0 + (v1 - v0) * this.rand()
+      const body = this.world.createBody({ type: 'dynamic', position: new Vec2(x + Math.cos(ang) * 0.25, y + Math.sin(ang) * 0.25), linearDamping: 0.08, angularDamping: 0.1 })
+      body.createFixture({ shape: new Circle(0.13), density: 1.6, friction: 0.5, restitution: 0.15, filterGroupIndex: -1 })
+      body.setLinearVelocity(new Vec2(Math.cos(ang) * v, Math.sin(ang) * v))
+      body.setAngularVelocity((this.rand() - 0.5) * 20)
+      this.makeProj('krug', body, null, true, true)
+    }
+  }
+
+  /** The trumpet: a shock wave that pushes everything near away, breaks fragile things and hurts the soldiers in reach. */
   private blast(x: number, y: number) {
     this.events.push({ t: 'blast', x, y, r: BLAST_R })
-    for (const part of this.parts) {
-      if (part.dead) continue
+    for (const part of [...this.parts]) {
+      if (part.dead || part.def.fixed) continue
       const c = part.body.getWorldCenter()
       const d = Math.hypot(c.x - x, c.y - y)
       if (d > BLAST_R) continue
@@ -402,57 +493,42 @@ export class Sim {
       // always a little upward, so that the push does not drive a block into the ground (where its friction would eat it)
       const ny = Math.max(0.3, (c.y - y) / (d || 1) + 0.25)
       const v = part.body.getLinearVelocity()
-      part.body.setLinearVelocity(new Vec2(v.x + nx * 9 * k, v.y + ny * 9 * k))
+      part.body.setLinearVelocity(new Vec2(v.x + nx * 9 * k, Math.min(UP_MAX, v.y + ny * 9 * k)))
       part.body.setAwake(true)
-      this.hurt(part, 4.5 * k)
+      this.hurt(part, 4.5 * k * part.mat.blast)
     }
     for (const g of this.guards) {
-      if (g.scared || !g.body) continue
+      if (g.down || !g.body) continue
       const c = g.body.getWorldCenter()
-      if (Math.hypot(c.x - x, c.y - y) <= BLAST_R * 0.85) this.scare(g)
-      else {
-        const d = Math.hypot(c.x - x, c.y - y)
-        const k = 1 - d / BLAST_R
-        if (k > 0) {
-          const v = g.body.getLinearVelocity()
-          g.body.setLinearVelocity(new Vec2(v.x + ((c.x - x) / (d || 1)) * 6 * k, v.y + 2 * k))
-          g.body.setAwake(true)
-        }
-      }
+      const d = Math.hypot(c.x - x, c.y - y)
+      if (d > BLAST_R) continue
+      const k = 1 - d / BLAST_R
+      const v = g.body.getLinearVelocity()
+      g.body.setLinearVelocity(new Vec2(v.x + ((c.x - x) / (d || 1)) * 7 * k, Math.min(UP_MAX, v.y + 2.5 * k)))
+      g.body.setAwake(true)
+      this.hurtGuard(g, 7.5 * k)
     }
   }
 
-  /** The torch jar: a bright light that scares the guards in reach (no fire, nothing burns). */
-  private light(x: number, y: number) {
-    this.events.push({ t: 'light', x, y, r: LIGHT_R })
+  /** The torch jar bursts: everything that burns near it catches fire, soldiers in the burst get hot feet. */
+  private burst(x: number, y: number) {
+    this.events.push({ t: 'fire', x, y, r: FIRE_R })
+    for (const part of this.parts) {
+      if (part.dead || !part.mat.burns || part.burn > 0) continue
+      const c = part.body.getWorldCenter()
+      const reach = FIRE_R + Math.min(part.def.w, part.def.h) * 0.4
+      if (Math.hypot(c.x - x, c.y - y) <= reach) this.ignite(part)
+    }
     for (const g of this.guards) {
-      if (g.scared || !g.body) continue
+      if (g.down || !g.body) continue
       const c = g.body.getWorldCenter()
-      if (Math.hypot(c.x - x, c.y - y) <= LIGHT_R) this.scare(g)
+      if (Math.hypot(c.x - x, c.y - y) <= FIRE_R) g.burn = 2.6
     }
   }
 
-  private klirr(x: number, y: number, r: number) {
-    if (r <= 0) return
-    this.events.push({ t: 'klirr', x, y, r })
-    for (const g of this.guards) {
-      if (g.scared || !g.body) continue
-      const c = g.body.getWorldCenter()
-      if (Math.hypot(c.x - x, c.y - y) <= r) this.scare(g)
-    }
-  }
-
-  private scare(g: Guard) {
-    if (g.scared || !this.armed) return
-    g.scared = true
-    g.since = 0
-    const p = g.body!.getPosition()
-    this.events.push({ t: 'scare', x: p.x, y: p.y, kind: g.def.kind })
-    if (this.status === 'play' && this.guards.every((q) => q.scared)) {
-      this.status = 'won'
-      this.sinceWin = 0
-      this.events.push({ t: 'won' })
-    }
+  private ignite(part: Part) {
+    part.burn = BURN_SECONDS
+    part.burnT = 0
   }
 
   private hurt(p: Part, dmg: number) {
@@ -461,12 +537,68 @@ export class Sim {
     if (p.hp <= 0) this.destroyPart(p)
   }
 
+  private hurtGuard(g: Guard, dmg: number) {
+    if (g.down || !this.armed || dmg <= 0 || !g.body) return
+    g.hp -= dmg
+    const p = g.body.getPosition()
+    if (g.hp <= 0) {
+      g.down = true
+      g.since = 0
+      this.events.push({ t: 'down', x: p.x, y: p.y, kind: g.def.kind })
+      const pts = GUARD_PTS[g.def.kind % 3]!
+      this.score += pts
+      this.events.push({ t: 'points', x: p.x, y: p.y + 2.3, n: pts })
+      if (this.status === 'play' && this.guards.every((q) => q.down)) {
+        this.status = 'won'
+        this.sinceWin = 0
+        this.bonus = this.shotsLeft * BONUS_PER_JAR
+        this.events.push({ t: 'won' })
+      }
+    } else if (dmg > 0.4 && g.hurtT < 0.2) {
+      g.hurtT = 0.5
+      this.events.push({ t: 'hurt', x: p.x, y: p.y, kind: g.def.kind })
+    }
+  }
+
   private destroyPart(p: Part) {
     p.dead = true
     const c = p.body.getWorldCenter()
     const v = p.body.getLinearVelocity()
-    this.events.push({ t: 'break', m: p.def.m, x: c.x, y: c.y, w: p.def.w, h: p.def.h, vx: v.x, vy: v.y })
+    const d = p.def
+    this.events.push({ t: 'break', m: d.m, x: c.x, y: c.y, w: d.w, h: d.h, vx: v.x, vy: v.y })
+    const pts = p.mat.pts
+    if (pts > 0) {
+      this.score += pts
+      this.events.push({ t: 'points', x: c.x, y: c.y + 0.4, n: pts })
+    }
+    const ang = p.body.getAngle()
+    const w = d.w
+    const h = d.h
+    const av = p.body.getAngularVelocity()
     this.world.destroyBody(p.body)
+    // a long wooden beam snaps in two (the pieces do not break again into pieces)
+    const shape = d.s ?? 'box'
+    const long = Math.max(w, h)
+    if (d.m === 'wood' && shape === 'box' && !d.id && !d.fixed && !p.half && long >= 1.9 && Math.min(w, h) <= 0.6) {
+      const horizontal = w >= h
+      const half = long / 2 - 0.04
+      for (const sgn of [-1, 1]) {
+        const off = (long / 4) * sgn
+        const lx = horizontal ? off : 0
+        const ly = horizontal ? 0 : off
+        const px = c.x + lx * Math.cos(ang) - ly * Math.sin(ang)
+        const py = c.y + lx * Math.sin(ang) + ly * Math.cos(ang)
+        const piece = this.addPart({ m: 'wood', x: px, y: py, w: horizontal ? half : w, h: horizontal ? h : half, a: ang })
+        piece.half = true
+        piece.hp = piece.maxHp = piece.maxHp * 0.35
+        piece.body.setLinearVelocity(new Vec2(v.x * 0.7 + sgn * 0.8 * (horizontal ? 1 : 0), v.y * 0.7 + (horizontal ? 0 : sgn * 0.3)))
+        piece.body.setAngularVelocity(av * 0.5 + sgn * 0.6)
+        if (p.burn > 0) {
+          piece.burn = p.burn
+          piece.burnT = p.burnT
+        }
+      }
+    }
   }
 
   /** One step of 1/60 s. */
@@ -478,7 +610,7 @@ export class Sim {
       p.prevVx = v.x
       p.prevVy = v.y
       p.punched = false
-      if (this.wind) p.body.applyForceToCenter(new Vec2(this.wind * p.body.getMass(), 0))
+      if (this.wind && !p.shard) p.body.applyForceToCenter(new Vec2(this.wind * p.body.getMass(), 0))
       p.age += DT
       if (p.tapAt !== null && !p.used && p.age >= p.tapAt) this.trigger(p)
     }
@@ -492,7 +624,9 @@ export class Sim {
     }
     this.processContacts()
     this.updateProjs()
+    this.updateFire()
     this.updateGuards()
+    this.capSpeeds()
     if (this.status === 'won') this.sinceWin++
     if (this.status === 'play' && this.shotsLeft === 0 && this.projs.every((p) => p.dead) && this.quiet()) {
       this.quietSteps++
@@ -503,6 +637,30 @@ export class Sim {
     } else this.quietSteps = 0
   }
 
+  /** Nothing that was not thrown is faster than `SPEED_CAP` or flies upward faster than `UP_MAX`. */
+  private capSpeeds() {
+    for (let b = this.world.getBodyList(); b; b = b.getNext()) {
+      if (!b.isDynamic() || !b.isAwake()) continue
+      const v = b.getLinearVelocity()
+      const ud = b.getUserData() as Ent | null
+      const thrown = ud?.kind === 'proj'
+      let vx = v.x
+      let vy = v.y
+      let changed = false
+      if (!thrown && vy > UP_MAX) {
+        vy = UP_MAX
+        changed = true
+      }
+      const sp = Math.hypot(vx, vy)
+      if (sp > SPEED_CAP) {
+        vx *= SPEED_CAP / sp
+        vy *= SPEED_CAP / sp
+        changed = true
+      }
+      if (changed) b.setLinearVelocity(new Vec2(vx, vy))
+    }
+  }
+
   private processContacts() {
     let hitEvents = 0
     for (const n of this.notes) {
@@ -511,39 +669,60 @@ export class Sim {
         [n.b, n.a]
       ]
       for (const [me, other] of ents) {
+        const shardHit = other.kind === 'proj' && other.shard
+        if (shardHit && (other as Proj).age < 0.05) continue
         if (me.kind === 'part') {
           if (me.dead) continue
           const fromProj = other.kind === 'proj'
-          let k = fromProj ? 1.5 : 0.7
-          if (fromProj && (other as Proj).ammo === 'stein' && (me.def.m === 'wood' || me.def.m === 'straw' || me.def.m === 'cloth' || me.def.m === 'barrel')) k = 3.2
-          const dmg = (n.i - me.mat.armor) * k
+          let dmg: number
+          if (shardHit) dmg = SHARD_POWER - me.mat.armor
+          else {
+            let k = fromProj ? 1.5 : 0.7
+            if (fromProj && (other as Proj).ammo === 'stein' && SOFT.includes(me.def.m)) k = 3.2
+            dmg = (n.i - me.mat.armor) * k
+          }
           if (dmg > 0) {
             this.hurt(me, dmg)
             if (fromProj && me.dead && (other as Proj).ammo === 'stein') (other as Proj).punched = true
           }
-          if (n.i > 2.2 && hitEvents < 3 && other.kind !== 'guard') {
+          if (n.i > 2.2 && hitEvents < 3 && other.kind !== 'guard' && !shardHit) {
             hitEvents++
             this.events.push({ t: 'hit', x: n.x, y: n.y, power: Math.min(1, n.i / 12), m: me.def.m })
           }
         } else if (me.kind === 'guard') {
-          if (!me.scared && me.body && n.i > GUARD_ARMOR) this.scare(me)
+          if (me.down || !me.body) continue
+          if (shardHit) this.hurtGuard(me, SHARD_DMG)
+          else {
+            const k = other.kind === 'proj' ? ((other as Proj).ammo === 'stein' ? 2.4 : 1.8) : 1.7
+            this.hurtGuard(me, (n.i - GUARD_ARMOR) * k)
+          }
         } else if (me.kind === 'proj') {
           if (me.dead || !me.body) continue
+          if (me.shard) {
+            if (me.age > 0.05 && n.i > 0.05) this.killProj(me)
+            continue
+          }
           me.hits++
           const info = AMMO[me.ammo]
           if (info.breaks && n.i > 0.6) {
-            const p = me.body.getPosition()
-            if (me.ammo === 'fackel' && !me.used) {
-              me.used = true
-              this.light(p.x, p.y)
+            // a clay jar goes through cloth and tiles (they break, the jar is only slowed down), but breaks on the second one it meets
+            if ((me.ammo === 'krug' || me.ammo === 'ruf') && other.kind === 'part' && (other.def.m === 'cloth' || other.def.m === 'glass') && me.pierce < 2) {
+              me.pierce++
+              me.punched = true
+              continue
             }
-            if (me.ammo === 'posaune' && !me.used) {
-              me.used = true
-              this.blast(p.x, p.y)
-            } else if (me.ammo !== 'posaune') this.klirr(p.x, p.y, me.ammo === 'ruf' && me.used ? 1.3 : info.klirr)
+            const p = me.body.getPosition()
+            if (me.ammo === 'fackel') {
+              if (!me.used) this.burst(p.x, p.y)
+            } else if (me.ammo === 'posaune') {
+              if (!me.used) this.blast(p.x, p.y)
+            } else {
+              // a clay jar that breaks on a hit throws a few shards up and sideways
+              this.events.push({ t: 'shatter', x: p.x, y: p.y })
+              this.shards(p.x, p.y + 0.1, me.ammo === 'ruf' ? 3 : 5, Math.PI / 2, 2.6, 3, 6.5)
+            }
+            me.used = true
             this.killProj(me)
-          } else if (me.ammo === 'stein' && n.i > 4 && other.kind === 'guard' && !other.scared) {
-            // a stone jar hits a guard: he is scared (handled above through the guard's own contact)
           }
         }
       }
@@ -558,8 +737,10 @@ export class Sim {
         if (p.punched) {
           p.body.setLinearVelocity(new Vec2(p.prevVx * 0.82, p.prevVy * 0.82))
         }
-        if (pos.x > this.def.width + 30 || pos.x < -10 || pos.y < -4 || p.age > 9) {
-          // flown away: a jar that leaves the camp breaks in the distance (nobody hears it)
+        if (p.shard) {
+          if (p.age > SHARD_LIFE || pos.x > this.def.width + 30 || pos.y < -4) this.killProj(p)
+        } else if (pos.x > this.def.width + 30 || pos.x < -10 || pos.y < -4 || p.age > 9) {
+          // flown away: a jar that leaves the camp breaks in the distance
           this.killProj(p)
         } else if (p.ammo === 'stein' && p.age > 1 && p.body.getLinearVelocity().length() < 0.4 && p.body.isAwake() === false) {
           this.killProj(p)
@@ -568,13 +749,55 @@ export class Sim {
           if (p.hits > 2) this.killProj(p)
         }
       }
-      if (p.dead && this.projs.length > 40) this.projs.splice(i, 1)
+      if (p.dead && this.projs.length > 60) this.projs.splice(i, 1)
+    }
+  }
+
+  /** Burning parts lose hit points, the fire jumps to burnable parts nearby, soldiers who stand in the fire get hot feet. */
+  private updateFire() {
+    const burning: Part[] = []
+    for (const p of this.parts) if (!p.dead && p.burn > 0) burning.push(p)
+    if (burning.length) {
+      const spread = this.steps % 20 === 0
+      for (const p of burning) {
+        p.burn -= DT
+        p.burnT += DT
+        this.hurt(p, BURN_DPS * DT)
+        if (p.dead) continue
+        if (spread && p.burnT > 0.6) {
+          const c = p.body.getWorldCenter()
+          const ra = Math.hypot(p.def.w, p.def.h) / 2
+          for (const q of this.parts) {
+            if (q.dead || q === p || !q.mat.burns || q.burn > 0) continue
+            const qc = q.body.getWorldCenter()
+            if (Math.hypot(qc.x - c.x, qc.y - c.y) < ra + Math.hypot(q.def.w, q.def.h) / 2 + 0.35) this.ignite(q)
+          }
+        }
+      }
+    }
+    for (const g of this.guards) {
+      if (g.down || !g.body) continue
+      let hot = g.burn > 0
+      if (g.burn > 0) g.burn -= DT
+      if (!hot && burning.length) {
+        const c = g.body.getWorldCenter()
+        for (const p of burning) {
+          const pc = p.body.getWorldCenter()
+          if (Math.hypot(pc.x - c.x, pc.y - c.y) < Math.hypot(p.def.w, p.def.h) / 2 + 0.7) {
+            hot = true
+            g.burn = Math.max(g.burn, 0.4)
+            break
+          }
+        }
+      }
+      if (hot) this.hurtGuard(g, 1.9 * DT)
     }
   }
 
   private updateGuards() {
     for (const g of this.guards) {
-      if (!g.scared || g.gone) continue
+      if (g.hurtT > 0) g.hurtT -= DT
+      if (!g.down || g.gone) continue
       g.since += DT
       if (g.since >= SCARE_SECONDS && g.body) {
         const p = g.body.getPosition()
@@ -586,13 +809,15 @@ export class Sim {
     }
   }
 
-  /** Nothing moves any more (all bodies sleep) and no guard waits to run. */
+  /** Nothing moves any more (all bodies sleep), nothing burns and no soldier waits to run. */
   quiet(): boolean {
     for (let b = this.world.getBodyList(); b; b = b.getNext()) if (b.isDynamic() && b.isAwake()) return false
-    return this.guards.every((g) => !g.scared || g.gone)
+    for (const p of this.parts) if (!p.dead && p.burn > 0) return false
+    for (const g of this.guards) if (!g.gone && !g.down && g.burn > 0) return false
+    return this.guards.every((g) => !g.down || g.gone)
   }
 
-  /** The speed of the fastest thrown thing, or 0. */
+  /** Is a thrown thing (or a shard) still in the air? */
   get flying(): boolean {
     return this.projs.some((p) => !p.dead)
   }

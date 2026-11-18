@@ -1,9 +1,10 @@
 <script setup lang="ts">
 /**
  * "Gideons Nacht": the big game (rules and physics in `utils/gideonSim.ts`, levels in `utils/gideonLevels.ts`; this file draws it and takes the touch).
- * Gideon's catapult throws jars, a trumpet and torch jars into the camp of the Midianites. The structures are real physics; a guard who is hit or
- * startled runs away shouting for help. The level is won when every guard has run away. Nobody is hurt. The canvas is measured at every touch
- * (a tablet's browser bar slides in and out) and by a ResizeObserver.
+ * Gideon's catapult throws jars into the camp of the Midianites, in the manner of the birds-and-pigs games: the structures (beams, blocks, tiles,
+ * bricks, straw, tents) are real physics, they break and fall over, and what falls knocks the soldiers silly (they see stars, lose the helmet and run
+ * away). Every jar has its own look and its own ability that a tap starts in the air. The canvas is measured at every touch (a tablet's browser bar
+ * slides in and out) and by a ResizeObserver.
  */
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -14,7 +15,7 @@ import useBigGames, { howSeen, markHowSeen } from '@/use/useBigGames'
 import useSfx from '@/use/useSfx'
 import useMusic from '@/use/useMusic'
 import { prependBaseUrl } from '@/utils/function'
-import { AMMO, BLAST_R, CATAPULT, DT, LIGHT_R, MAX_PULL, MIN_POWER, SETTLE_STEPS, Sim, previewPath, pullToShot, type Ammo, type Guard, type Part, type SimEvent } from '@/utils/gideonSim'
+import { AMMO, BLAST_R, CATAPULT, DT, FIRE_R, MAX_PULL, MIN_POWER, SETTLE_STEPS, Sim, previewPath, pullToShot, type Ammo, type Guard, type Part, type SimEvent } from '@/utils/gideonSim'
 import { CHAPTER_COUNT, LEVELS, LEVELS_PER_CHAPTER } from '@/utils/gideonLevels'
 
 const emit = defineEmits<{ leave: [] }>()
@@ -29,10 +30,11 @@ const TX = (k: string, p?: Record<string, unknown>) => t(`app.bigGames.${ID}.${k
 const NAMES = [
   'bg-1', 'bg-2', 'bg-3', 'bg-4',
   'katapult-gestell', 'katapult-arm', 'katapult-schale',
-  'krug', 'stein', 'posaune', 'fackel', 'ruf', 'scherben',
-  'm-holz', 'm-stroh', 'm-stein', 'm-zelt',
-  'fass', 'sack', 'fackelstaender', 'amphore',
-  ...[0, 1, 2].flatMap((k) => [`w${k}-stand`, `w${k}-scared`, `w${k}-run`]),
+  'krug-2', 'stein-2', 'posaune-2', 'fackel-2', 'ruf-2', 'scherben',
+  'splitter-holz', 'splitter-lehm', 'splitter-stein', 'helm', 'schild', 'flamme', 'flamme-klein', 'riss-1', 'riss-2', 'riss-3',
+  'm-holz', 'm-stroh', 'm-stein', 'm-zelt', 'm-lehm', 'm-glas',
+  'fass',
+  ...[0, 1, 2].flatMap((k) => [`s${k}-stand`, `s${k}-hit`, `s${k}-run`]),
   'g-stand', 'g-cheer', 'g-horn', 'g-torch'
 ]
 const img: Record<string, HTMLImageElement | undefined> = {}
@@ -58,10 +60,13 @@ async function loadAll() {
 }
 
 /** The colours of the things when their picture is missing. */
-const FLAT: Record<string, string> = { wood: '#b9854f', straw: '#d9b85c', stone: '#9a9488', cloth: '#d6bf96', barrel: '#a8683a', rock: '#6f675c' }
+const FLAT: Record<string, string> = { wood: '#b9854f', straw: '#d9b85c', stone: '#9a9488', cloth: '#d6bf96', barrel: '#a8683a', rock: '#6f675c', clay: '#b9793f', glass: '#4fb6c4' }
 const SKY: [string, string][] = [['#20254a', '#e0905a'], ['#0b1233', '#2a3b78'], ['#1b1736', '#7a4a52'], ['#e7a58c', '#f6dca0']]
-const JAR_ICON: Record<Ammo, string> = { krug: '🏺', stein: '🪨', posaune: '🎺', fackel: '💡', ruf: '✨' }
-const SPRITE_OF: Record<Ammo, string> = { krug: 'krug', stein: 'stein', posaune: 'posaune', fackel: 'fackel', ruf: 'ruf' }
+const JAR_ICON: Record<Ammo, string> = { krug: '🏺', stein: '🪨', posaune: '🎺', fackel: '🔥', ruf: '🏺' }
+/** The size of the picture of each jar in the air (metres, the longer side) and what it turns with. */
+const JAR_FIT: Record<Ammo, { w?: number; h?: number }> = { krug: { h: 1.2 }, stein: { w: 1.25 }, posaune: { w: 1.9 }, fackel: { h: 1.55 }, ruf: { w: 1.35 } }
+const TRAIL: Record<Ammo, string> = { krug: '#ffd9a0', stein: '#e2e2e2', posaune: '#ffe9a0', fackel: '#ffb040', ruf: '#7fe0e0' }
+const SPRITE_OF: Record<Ammo, string> = { krug: 'krug-2', stein: 'stein-2', posaune: 'posaune-2', fackel: 'fackel-2', ruf: 'ruf-2' }
 
 // ── the screens ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
 type Screen = 'menu' | 'play' | 'result'
@@ -78,6 +83,7 @@ type ChapterText = { name: Parameters<typeof rt>[0]; ref: Parameters<typeof rt>[
 const chapterTexts = computed(() => ((tm(`app.bigGames.${ID}.chapters`) as unknown as ChapterText[]) ?? []).map((m) => ({ name: rt(m.name), ref: rt(m.ref), story: rt(m.story), task: rt(m.task) })))
 const levelNames = computed(() => ((tm(`app.bigGames.${ID}.levels`) as unknown as Parameters<typeof rt>[0][]) ?? []).map((m) => rt(m)))
 const helpText = computed(() => TX('help'))
+const ouchText = computed(() => TX('ouch'))
 const levelStars = computed(() => progress.levels(ID))
 const chapterLevels = (c: number) => Array.from({ length: LEVELS_PER_CHAPTER }, (_, k) => c * LEVELS_PER_CHAPTER + k)
 const chapterStars = (c: number) => chapterLevels(c).reduce((n, i) => n + (levelStars.value[i] ?? 0), 0)
@@ -86,23 +92,25 @@ const allDone = computed(() => Array.from({ length: CHAPTER_COUNT }, (_, c) => c
 const hasNext = computed(() => level.value < LEVELS.length - 1)
 const chapterOf = (i: number) => LEVELS[i]?.chapter ?? 0
 
-const hud = reactive({ scared: 0, all: 0, used: 0, left: 0, par: 0, tappable: false, wind: 0, next: 'krug' as Ammo | '', queue: [] as Ammo[], tapAmmo: 'krug' as Ammo })
-const outcome = reactive({ stars: 0, used: 0, par: 0, scared: 0, all: 0, lost: false })
+const hud = reactive({ down: 0, score: 0, all: 0, used: 0, left: 0, par: 0, tappable: false, wind: 0, next: 'krug' as Ammo | '', queue: [] as Ammo[], tapAmmo: 'krug' as Ammo })
+const outcome = reactive({ stars: 0, used: 0, par: 0, down: 0, all: 0, score: 0, best: 0, newBest: false, lost: false })
 
 // ── local memory (chapters seen, hints seen) ────────────────────────────────────────────────────────────────────────────────
 const MEM_KEY = 'lk-gideon-v1'
 interface Mem {
   chapters: boolean[]
   hints: Record<string, boolean>
+  /** The best score of each level. */
+  best: Record<string, number>
 }
 function loadMem(): Mem {
   try {
     const m = JSON.parse(localStorage.getItem(MEM_KEY) ?? 'null') as Mem | null
-    if (m && typeof m === 'object') return { chapters: m.chapters ?? [], hints: m.hints ?? {} }
+    if (m && typeof m === 'object') return { chapters: m.chapters ?? [], hints: m.hints ?? {}, best: m.best ?? {} }
   } catch {
     // start fresh
   }
-  return { chapters: [], hints: {} }
+  return { chapters: [], hints: {}, best: {} }
 }
 const mem = reactive<Mem>(loadMem())
 function saveMem() {
@@ -135,6 +143,8 @@ let overviewUntil = 0
 let aimScale = 20
 /** The right edge of the camp (the last guard, block or rock). */
 let farX = 30
+/** Where the middle of the soldiers stands: the picture is zoomed so that the catapult and this place fit on the screen. */
+let focusX = 28
 let overScale = 12
 
 interface Particle {
@@ -145,9 +155,12 @@ interface Particle {
   t: number
   life: number
   r: number
-  kind: 'dust' | 'chip' | 'straw' | 'shard' | 'spark' | 'puff' | 'cloth'
+  kind: 'dust' | 'chip' | 'straw' | 'shard' | 'spark' | 'puff' | 'cloth' | 'sprite' | 'flame' | 'text' | 'stars'
   color: string
   rot: number
+  /** The picture of a flying piece (a name of `img`), or the words of a floating text. */
+  img?: string
+  text?: string
 }
 interface Ring {
   x: number
@@ -182,6 +195,8 @@ let aim: { dx: number; dy: number } | null = null
 /** The cup and arm spring: how far the arm is pulled back (degrees) and how fast it moves. */
 const arm = { off: 0, vel: 0 }
 let flash = 0
+/** The jolt of a hard hit (the picture shakes a little, fading out). */
+let impact = 0
 let winT = -1
 let slowT = 0
 let loseTimer = 0
@@ -195,6 +210,8 @@ function begin(i: number) {
   const L = LEVELS[i]!
   sim = new Sim(L)
   farX = Math.max(30, ...L.guards.map((g) => g.x + 0.5), ...L.parts.map((p) => p.x + p.w / 2), ...(L.rocks ?? []).map((r) => r.x + r.w / 2))
+  const gx = L.guards.map((g) => g.x).sort((a, b) => a - b)
+  focusX = Math.max(24, (gx[Math.floor(gx.length / 2)] ?? 28) + 3.5)
   for (let k = 0; k < SETTLE_STEPS + 2; k++) sim.step()
   sim.events.length = 0
   acc = 0
@@ -211,6 +228,7 @@ function begin(i: number) {
   gideonPose = 'stand'
   window.clearTimeout(loseTimer)
   window.clearTimeout(endTimer)
+  lastScore = 0
   screen.value = 'play'
   pendingCard = L.index === 0 && !mem.chapters[L.chapter] ? L.chapter : -1
   how.value = !howSeen(ID)
@@ -288,8 +306,10 @@ function hintOnce(intro: string | undefined) {
 
 function syncHud() {
   const d = sim.def
-  const scared = sim.scaredCount
-  if (hud.scared !== scared) hud.scared = scared
+  const down = sim.downCount
+  if (hud.down !== down) hud.down = down
+  const sc = Math.round(sim.score + sim.bonus)
+  if (hud.score !== sc) hud.score = sc
   if (hud.all !== sim.guards.length) hud.all = sim.guards.length
   if (hud.used !== sim.used) hud.used = sim.used
   if (hud.left !== sim.shotsLeft) hud.left = sim.shotsLeft
@@ -297,7 +317,7 @@ function syncHud() {
   const tp = sim.tappable
   if (hud.tappable !== tp) hud.tappable = tp
   if (tp) {
-    const p = [...sim.projs].reverse().find((q) => !q.dead && !q.used && (q.ammo === 'posaune' || q.ammo === 'fackel' || q.ammo === 'ruf'))
+    const p = [...sim.projs].reverse().find((q) => !q.dead && !q.used && !q.shard)
     if (p && hud.tapAmmo !== p.ammo) hud.tapAmmo = p.ammo
   }
   const w = Math.round((d.wind / 2) * 10) / 10
@@ -309,7 +329,9 @@ function syncHud() {
 }
 
 // ── the events of the rules: sounds and effects ─────────────────────────────────────────────────────────────────────────────
-const MAT_COLOR: Record<string, string> = { wood: '#b9854f', straw: '#e6c56a', stone: '#a7a195', cloth: '#d9c39a', barrel: '#a8683a', rock: '#8a8478' }
+const MAT_COLOR: Record<string, string> = { wood: '#b9854f', straw: '#e6c56a', stone: '#a7a195', cloth: '#d9c39a', barrel: '#a8683a', rock: '#8a8478', clay: '#b9793f', glass: '#7fd4dc' }
+/** The flying pieces of a broken part: a picture (or a colour) for each material. */
+const PIECE: Record<string, string> = { wood: 'splitter-holz', barrel: 'splitter-holz', clay: 'splitter-lehm', stone: 'splitter-stein' }
 function onEvents() {
   for (const e of sim.events) handleEvent(e)
   sim.events.length = 0
@@ -327,8 +349,10 @@ function handleEvent(e: SimEvent) {
       break
     case 'hit': {
       const strong = e.power > 0.45
-      if (e.m === 'stone' || e.m === 'rock') play('clunk', 0.4 + e.power * 0.5)
+      if (e.power > 0.5) impact = Math.max(impact, 0.2 + e.power * 0.25)
+      if (e.m === 'stone' || e.m === 'rock' || e.m === 'clay') play('clunk', 0.4 + e.power * 0.5)
       else if (e.m === 'straw' || e.m === 'cloth') play('sack', 0.4 + e.power * 0.4)
+      else if (e.m === 'glass') play('snap', 0.3 + e.power * 0.4)
       else play('hit', 0.35 + e.power * 0.5)
       spawn({ x: e.x, y: e.y, vx: 0, vy: 0.4, life: 0.45, r: 0.45 + e.power * 0.7, kind: 'puff', color: '#fff3d6', rot: 0 })
       const n = strong ? 8 : 4
@@ -336,49 +360,65 @@ function handleEvent(e: SimEvent) {
       break
     }
     case 'break': {
-      play(e.m === 'stone' ? 'clunk' : e.m === 'straw' || e.m === 'cloth' ? 'sack' : 'hit', 0.8)
-      const n = e.m === 'straw' ? 16 : e.m === 'cloth' ? 10 : 12
+      play(e.m === 'stone' || e.m === 'clay' ? 'clunk' : e.m === 'straw' || e.m === 'cloth' ? 'sack' : e.m === 'glass' ? 'snap' : 'hit', 0.8)
+      const piece = PIECE[e.m]
+      const n = e.m === 'straw' ? 16 : e.m === 'cloth' ? 10 : e.m === 'glass' ? 14 : piece ? 3 : 12
       for (let k = 0; k < n; k++) {
-        const kind = e.m === 'straw' ? 'straw' : e.m === 'cloth' ? 'cloth' : 'chip'
+        const kind: Particle['kind'] = e.m === 'straw' ? 'straw' : e.m === 'cloth' ? 'cloth' : e.m === 'glass' ? 'shard' : piece ? 'sprite' : 'chip'
         spawn({
           x: e.x + (rand() - 0.5) * e.w * 0.8,
           y: e.y + (rand() - 0.5) * e.h * 0.8,
           vx: e.vx * 0.4 + (rand() - 0.5) * 6,
           vy: e.vy * 0.3 + rand() * 5,
           life: 0.9 + rand() * 0.5,
-          r: 0.08 + rand() * 0.12,
+          r: kind === 'sprite' ? 0.32 + rand() * 0.22 : 0.08 + rand() * 0.12,
           kind,
           color: MAT_COLOR[e.m] ?? '#b9854f',
-          rot: rand() * 6
+          rot: rand() * 6,
+          img: kind === 'sprite' ? piece : undefined
         })
       }
-      spawn({ x: e.x, y: e.y, vx: 0, vy: 0.3, life: 0.6, r: 0.9, kind: 'puff', color: '#f4e6c4', rot: 0 })
+      spawn({ x: e.x, y: e.y, vx: 0, vy: 0.3, life: 0.6, r: 0.9, kind: 'puff', color: e.m === 'clay' ? '#e2c49a' : '#f4e6c4', rot: 0 })
       break
     }
-    case 'klirr':
+    case 'shatter':
       play('snap', 0.9)
-      rings.push({ x: e.x, y: e.y, t: 0, life: 0.45, r: e.r, kind: 'klirr' })
-      for (let k = 0; k < 12; k++) spawn({ x: e.x, y: e.y, vx: (rand() - 0.5) * 9, vy: rand() * 6, life: 0.9, r: 0.08 + rand() * 0.1, kind: 'shard', color: '#c8754a', rot: rand() * 6 })
+      for (let k = 0; k < 10; k++) spawn({ x: e.x, y: e.y, vx: (rand() - 0.5) * 9, vy: rand() * 6, life: 0.9, r: 0.12 + rand() * 0.1, kind: 'shard', color: '#c8754a', rot: rand() * 6 })
       spawn({ x: e.x, y: e.y, vx: 0, vy: 0.4, life: 0.5, r: 1.0, kind: 'puff', color: '#fff0d0', rot: 0 })
+      break
+    case 'slam':
+      play('clunk', 0.7)
+      rings.push({ x: e.x, y: e.y, t: 0, life: 0.4, r: 1.6, kind: 'klirr' })
+      for (let k = 0; k < 6; k++) spawn({ x: e.x, y: e.y, vx: (rand() - 0.5) * 3, vy: -rand() * 2, life: 0.4, r: 0.1, kind: 'dust', color: '#e8d6b0', rot: 0 })
       break
     case 'blast':
       play('caravan', 0.9)
       rings.push({ x: e.x, y: e.y, t: 0, life: 0.7, r: e.r, kind: 'blast' }, { x: e.x, y: e.y, t: -0.12, life: 0.7, r: e.r * 0.8, kind: 'blast' }, { x: e.x, y: e.y, t: -0.24, life: 0.7, r: e.r * 0.6, kind: 'blast' })
       flash = 0.3
       break
-    case 'light':
+    case 'fire':
       play('star', 0.9)
-      rings.push({ x: e.x, y: e.y, t: 0, life: 0.9, r: e.r, kind: 'light' })
-      flash = 0.9
-      for (let k = 0; k < 10; k++) spawn({ x: e.x, y: e.y, vx: (rand() - 0.5) * 5, vy: rand() * 4, life: 0.8, r: 0.5, kind: 'spark', color: '#ffe08a', rot: 0 })
+      rings.push({ x: e.x, y: e.y, t: 0, life: 0.6, r: e.r, kind: 'light' })
+      flash = 0.35
+      spawn({ x: e.x, y: e.y, vx: 0, vy: 0.5, life: 0.9, r: 3.2, kind: 'flame', color: '', rot: 0, img: 'flamme' })
+      for (let k = 0; k < 9; k++) spawn({ x: e.x + (rand() - 0.5) * 2, y: e.y + (rand() - 0.5) * 1.2, vx: (rand() - 0.5) * 3, vy: 1 + rand() * 2, life: 0.7 + rand() * 0.5, r: 0.9 + rand() * 0.8, kind: 'flame', color: '', rot: 0 })
       break
     case 'split':
       play('bead', 0.8)
-      for (let k = 0; k < 8; k++) spawn({ x: e.x, y: e.y, vx: (rand() - 0.5) * 4, vy: (rand() - 0.5) * 4, life: 0.6, r: 0.4, kind: 'spark', color: '#ffd45a', rot: 0 })
+      for (let k = 0; k < 8; k++) spawn({ x: e.x, y: e.y, vx: (rand() - 0.5) * 4, vy: (rand() - 0.5) * 4, life: 0.6, r: 0.4, kind: 'spark', color: '#7fe0e0', rot: 0 })
       break
-    case 'scare':
-      play('tap', 0.8)
-      spawn({ x: e.x, y: e.y + 0.9, vx: 0, vy: 1.2, life: 0.5, r: 0.5, kind: 'spark', color: '#fff6c0', rot: 0 })
+    case 'hurt':
+      play('tap', 0.5)
+      spawn({ x: e.x, y: e.y + 0.9, vx: 0, vy: 0.8, life: 0.4, r: 0.5, kind: 'spark', color: '#fff6c0', rot: 0 })
+      break
+    case 'down':
+      play('tap', 0.9)
+      spawn({ x: e.x, y: e.y + 0.85, vx: 0, vy: 0, life: 0.9, r: 0.5, kind: 'stars', color: '', rot: 0 })
+      spawn({ x: e.x, y: e.y + 0.9, vx: (rand() - 0.5) * 4, vy: 6 + rand() * 2, life: 1.6, r: 0.42, kind: 'sprite', color: '', rot: rand() * 6, img: 'helm' })
+      spawn({ x: e.x, y: e.y + 0.4, vx: (rand() - 0.2) * 5, vy: 4 + rand() * 2, life: 1.6, r: 0.5, kind: 'sprite', color: '', rot: rand() * 6, img: 'schild' })
+      break
+    case 'points':
+      spawn({ x: e.x, y: e.y, vx: 0, vy: 1.7, life: 1.1, r: 0.5, kind: 'text', color: '#fff6c0', rot: 0, text: `+${e.n}` })
       break
     case 'run':
       runners.push({ x: e.x, y: e.y, vy: 0, kind: e.kind, t: 0 })
@@ -390,6 +430,8 @@ function handleEvent(e: SimEvent) {
       pose('cheer', 6)
       camMode = 'hold'
       camHold = 2.4
+      // every jar that was not needed gives a bonus (one after the other)
+      for (let k = 0; k < sim.shotsLeft; k++) parts.push({ x: view.x + (k - (sim.shotsLeft - 1) / 2) * 0.2, y: wyOf(cvH * 0.3), vx: 0, vy: 1.3, t: -(0.7 + k * 0.45), life: 1.3, r: 0.5, kind: 'text', color: '#fff6c0', rot: 0, text: '+10000' })
       finish(false)
       break
     case 'lost':
@@ -408,8 +450,17 @@ function finish(lost: boolean) {
   outcome.stars = lost ? 0 : sim.stars
   outcome.used = sim.used
   outcome.par = sim.def.par
-  outcome.scared = sim.scaredCount
+  outcome.down = sim.downCount
   outcome.all = sim.guards.length
+  outcome.score = Math.round(sim.total)
+  const key = String(level.value)
+  const before = mem.best[key] ?? 0
+  outcome.newBest = !lost && outcome.score > before
+  if (outcome.newBest) {
+    mem.best[key] = outcome.score
+    saveMem()
+  }
+  outcome.best = Math.max(before, lost ? 0 : outcome.score)
   if (!lost) progress.record(ID, level.value, outcome.stars)
   window.clearTimeout(endTimer)
   endTimer = window.setTimeout(
@@ -455,7 +506,8 @@ function onDown(e: PointerEvent) {
   const p = pos(e)
   const cx = sxOf(CATAPULT.x)
   const cy = syOf(CATAPULT.y)
-  const near = Math.hypot(p.x - cx, p.y - cy) < Math.max(96, 3.6 * view.s)
+  // while a jar is in the air a tap anywhere but right at the cup starts its ability
+  const near = Math.hypot(p.x - cx, p.y - cy) < (hud.tappable ? Math.max(56, 1.7 * view.s) : Math.max(96, 3.6 * view.s))
   if (near && sim.nextAmmo) {
     drag = { kind: 'aim' }
     camMode = 'aim'
@@ -525,6 +577,7 @@ function toggleOverview() {
   }
 }
 let launchFrom: { x: number; y: number; t: number } | null = null
+let lastScore = 0
 
 // ── the layout and the loop ─────────────────────────────────────────────────────────────────────────────────────────────────
 const ARM_BACK = 62
@@ -533,8 +586,8 @@ function layout() {
   if (!c) return
   dpr = Math.min(window.devicePixelRatio || 1, 2)
   const box = c.getBoundingClientRect()
-  cvW = box.width || window.innerWidth
-  cvH = box.height || window.innerHeight
+  cvW = box.width || window.innerWidth || 800
+  cvH = box.height || window.innerHeight || 450
   c.width = Math.round(cvW * dpr)
   c.height = Math.round(cvH * dpr)
   portrait = cvH > cvW * 1.05
@@ -542,9 +595,14 @@ function layout() {
   const width = sim.def.width
   // the picture shows the whole camp from the catapult to the last tower, as long as the things do not get too small
   const base = portrait ? cvW / 24 : Math.min(cvW / 27, cvH / 11.5)
-  const fit = cvW / (farX + 4.4)
-  aimScale = portrait ? base : Math.min(base, Math.max(fit, cvW / 46))
+  const fit = cvW / (focusX + 1.4)
+  aimScale = portrait ? base : Math.min(base, Math.max(fit, cvW / 38))
   overScale = Math.min(aimScale, cvW / (width + 4))
+  // a layout made while the page was hidden (no size yet) must not leave the camera with nonsense numbers
+  if (!Number.isFinite(view.s) || view.s < 1 || !Number.isFinite(view.x)) {
+    view.s = view.ts = overScale
+    view.x = view.tx = (width + 2) / 2
+  }
 }
 const aimCenter = () => -1.4 + cvW / aimScale / 2
 
@@ -587,13 +645,15 @@ function update(dt: number) {
       if (launchFrom.t > 0.07) launchFrom = null
     }
     if (flash > 0) flash -= dt
+    if (impact > 0) impact = Math.max(0, impact - dt * 1.4)
     updateCamera(dt)
     for (const p of parts) {
       p.t += dt
+      if (p.t < 0) continue
       p.x += p.vx * dt
       p.y += p.vy * dt
-      p.vy -= (p.kind === 'dust' || p.kind === 'puff' ? 1 : p.kind === 'spark' ? -0.5 : 9) * dt
-      if (p.kind !== 'spark' && p.kind !== 'puff' && p.y < 0.05 && p.vy < 0) {
+      p.vy -= (p.kind === 'dust' || p.kind === 'puff' ? 1 : p.kind === 'spark' ? -0.5 : p.kind === 'flame' ? -2.5 : p.kind === 'text' || p.kind === 'stars' ? 0 : 9) * dt
+      if (p.kind !== 'spark' && p.kind !== 'puff' && p.kind !== 'flame' && p.kind !== 'text' && p.kind !== 'stars' && p.y < 0.05 && p.vy < 0) {
         p.y = 0.05
         p.vy *= -0.2
         p.vx *= 0.6
@@ -611,12 +671,13 @@ function update(dt: number) {
     }
     for (let i = runners.length - 1; i >= 0; i--) if (runners[i]!.x > sim.def.width + 14) runners.splice(i, 1)
     for (const p of sim.projs) {
-      if (p.dead || !p.body) continue
+      if (p.dead || !p.body || p.shard) continue
       let tr = trails.get(p)
       if (!tr) trails.set(p, (tr = []))
       const q = p.body.getPosition()
       tr.push({ x: q.x, y: q.y })
       if (tr.length > 16) tr.shift()
+      if (p.ammo === 'fackel' && !p.shard && rand() < 0.6) spawn({ x: q.x, y: q.y + 0.2, vx: (rand() - 0.5) * 1.2, vy: 0.4 + rand(), life: 0.35, r: 0.5, kind: 'flame', color: '', rot: 0 })
     }
   }
 }
@@ -636,7 +697,7 @@ function updateCamera(dt: number) {
     view.tx = lo
   } else if (camMode === 'follow') {
     view.ts = aimScale
-    const pr = [...sim.projs].reverse().find((p) => !p.dead && p.body)
+    const pr = [...sim.projs].reverse().find((p) => !p.dead && p.body && !p.shard)
     if (pr?.body) view.tx = Math.min(hi, Math.max(lo, pr.body.getPosition().x + viewW * 0.18))
     else {
       camMode = 'hold'
@@ -655,7 +716,7 @@ function updateCamera(dt: number) {
 
 // ── drawing ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 const patterns: Record<string, CanvasPattern | null> = {}
-const MAT_IMG: Record<string, string> = { wood: 'm-holz', straw: 'm-stroh', stone: 'm-stein', cloth: 'm-zelt', rock: 'm-stein', barrel: 'm-holz' }
+const MAT_IMG: Record<string, string> = { wood: 'm-holz', straw: 'm-stroh', stone: 'm-stein', cloth: 'm-zelt', rock: 'm-stein', barrel: 'm-holz', clay: 'm-lehm', glass: 'm-glas' }
 const patMatrix = typeof DOMMatrix !== 'undefined' ? new DOMMatrix() : null
 function patternFor(c: CanvasRenderingContext2D, mat: string): CanvasPattern | null {
   if (mat in patterns) return patterns[mat]!
@@ -744,24 +805,44 @@ function drawPart(c: CanvasRenderingContext2D, p: Part) {
     c.roundRect(-hw, -hh, hw * 2, hh * 2, Math.min(4, hw, hh))
     c.save()
     c.clip()
-    fillMat(c, mat, -hw, -hh, hw * 2, hh * 2, vertical, mat === 'straw' ? 1.6 : mat === 'stone' ? 1.8 : 2)
+    fillMat(c, mat, -hw, -hh, hw * 2, hh * 2, vertical, mat === 'straw' ? 1.6 : mat === 'stone' ? 1.8 : mat === 'clay' ? 1.5 : mat === 'glass' ? 1.3 : 2)
     c.fillStyle = 'rgba(255,240,200,0.22)'
     c.fillRect(-hw, -hh, hw * 2, Math.min(3, hh * 0.3))
     c.fillStyle = 'rgba(30,16,6,0.28)'
     c.fillRect(-hw, hh - Math.min(3, hh * 0.3), hw * 2, Math.min(3, hh * 0.3))
-    if (ratio < 0.7) {
-      c.strokeStyle = 'rgba(30,16,6,0.6)'
-      c.lineWidth = 1.5
-      c.beginPath()
-      const n = ratio < 0.35 ? 3 : 2
-      for (let k = 0; k < n; k++) {
-        const u = -0.6 + k * (1.2 / n)
-        c.moveTo(u * hw, -hh)
-        c.lineTo(u * hw + hw * 0.15, -hh * 0.2)
-        c.lineTo(u * hw - hw * 0.1, hh * 0.3)
-        c.lineTo(u * hw + hw * 0.12, hh)
+    if (ratio < 0.75) {
+      const rk = img[ratio < 0.25 ? 'riss-3' : ratio < 0.5 ? 'riss-2' : 'riss-1']
+      if (rk) {
+        const longSide = Math.max(hw, hh) * 2
+        const thin = Math.min(hw, hh) * 2
+        const sz = thin * 1.7
+        const rw = (rk.width / rk.height) * sz
+        const nCr = Math.max(1, Math.min(4, Math.round(longSide / Math.max(1, thin * 1.1))))
+        const horiz = hw >= hh
+        for (let k = 0; k < nCr; k++) {
+          const off = nCr === 1 ? 0 : (k / (nCr - 1) - 0.5) * (longSide - thin)
+          c.drawImage(rk, (horiz ? off : 0) - rw / 2, (horiz ? 0 : off) - sz / 2, rw, sz)
+        }
+      } else {
+      if (ratio < 0.7) {
+        c.strokeStyle = 'rgba(30,16,6,0.6)'
+        c.lineWidth = 1.5
+        c.beginPath()
+        const n = ratio < 0.35 ? 3 : 2
+        for (let k = 0; k < n; k++) {
+          const u = -0.6 + k * (1.2 / n)
+          c.moveTo(u * hw, -hh)
+          c.lineTo(u * hw + hw * 0.15, -hh * 0.2)
+          c.lineTo(u * hw - hw * 0.1, hh * 0.3)
+          c.lineTo(u * hw + hw * 0.12, hh)
+        }
+        c.stroke()
       }
-      c.stroke()
+      }
+    }
+    if (p.burn > 0) {
+      c.fillStyle = `rgba(50,16,0,${Math.min(0.5, p.burnT * 0.2)})`
+      c.fillRect(-hw, -hh, hw * 2, hh * 2)
     }
     c.restore()
     c.strokeStyle = 'rgba(40,22,8,0.8)'
@@ -813,16 +894,17 @@ function drawRock(c: CanvasRenderingContext2D, r: { x: number; y: number; w: num
 function bodyAngleOf(g: Guard): number {
   return g.body ? g.body.getAngle() : 0
 }
-function drawGuardAt(c: CanvasRenderingContext2D, x: number, y: number, ang: number, kind: number, pose: 'stand' | 'scared' | 'run', t: number) {
+function drawGuardAt(c: CanvasRenderingContext2D, x: number, y: number, ang: number, kind: number, pose: 'stand' | 'hit' | 'run', t: number) {
   const s = view.s
   const px = sxOf(x)
   const py = syOf(y)
   c.save()
   c.translate(px, py)
   c.rotate(-ang)
-  const im = img[`w${kind}-${pose}`]
-  const h = 1.95 * s
+  const im = img[`s${kind}-${pose}`]
   if (im) {
+    // all soldier pictures have the same scale (150 pixels of the picture are one metre)
+    const h = (im.height / 150) * s
     const w = (im.width / im.height) * h
     c.drawImage(im, -w / 2, 0.78 * s - h, w, h)
   } else {
@@ -837,7 +919,7 @@ function drawGuardAt(c: CanvasRenderingContext2D, x: number, y: number, ang: num
     c.beginPath()
     c.arc(0, -bh / 2 + bh * 0.2, bw * 0.42, 0, Math.PI * 2)
     c.fill()
-    c.fillStyle = ['#f3efe6', '#9b2d28', '#35703f'][kind % 3]!
+    c.fillStyle = ['#c9a24a', '#9b2d28', '#c9a24a'][kind % 3]!
     c.beginPath()
     c.arc(0, -bh / 2 + bh * 0.1, bw * 0.46, Math.PI, 0)
     c.fill()
@@ -865,6 +947,15 @@ function drawGuardAt(c: CanvasRenderingContext2D, x: number, y: number, ang: num
     }
   }
   c.restore()
+}
+
+/** A small painted flame standing on (x, y), `size` metres high, flickering. */
+function drawFlame(c: CanvasRenderingContext2D, x: number, y: number, size: number, ph: number) {
+  const im = img['flamme-klein']
+  if (!im) return
+  const h = size * (0.85 + 0.2 * Math.sin(ph * 13)) * view.s
+  const w = (im.width / im.height) * h * (1.05 - 0.1 * Math.sin(ph * 9))
+  c.drawImage(im, sxOf(x) - w / 2, syOf(y) - h, w, h)
 }
 
 function drawBubble(c: CanvasRenderingContext2D, x: number, y: number, text: string) {
@@ -904,13 +995,13 @@ function drawJar(c: CanvasRenderingContext2D, ammo: Ammo, x: number, y: number, 
   c.rotate(-ang)
   const im = img[SPRITE_OF[ammo]]
   if (im) {
-    const long = ammo === 'posaune' ? 2.5 : 2.4
-    const h = info.r * long * s * scale
+    const fit = JAR_FIT[ammo]
+    const h = (fit.h ?? ((fit.w ?? 1) * im.height) / im.width) * s * scale
     const w = (im.width / im.height) * h
     c.drawImage(im, -w / 2, -h / 2, w, h)
   } else {
     const r = info.r * s * scale
-    c.fillStyle = ammo === 'stein' ? '#8a847a' : ammo === 'posaune' ? '#c9a24a' : '#c8754a'
+    c.fillStyle = ammo === 'stein' ? '#8a847a' : ammo === 'posaune' ? '#c9a24a' : ammo === 'ruf' ? '#3fa7b0' : '#c8754a'
     c.beginPath()
     c.arc(0, 0, r, 0, Math.PI * 2)
     c.fill()
@@ -922,16 +1013,6 @@ function drawJar(c: CanvasRenderingContext2D, ammo: Ammo, x: number, y: number, 
       c.beginPath()
       c.arc(0, -r, r * 0.4, 0, Math.PI * 2)
       c.fill()
-    } else if (ammo === 'ruf') {
-      c.strokeStyle = '#ffd24a'
-      c.lineWidth = 3
-      c.beginPath()
-      c.moveTo(-r, -r * 0.2)
-      c.lineTo(r, -r * 0.2)
-      c.stroke()
-    } else if (ammo === 'posaune') {
-      c.fillStyle = '#5a3a14'
-      c.fillRect(-r * 0.9, -r * 0.2, r * 1.8, r * 0.4)
     }
   }
   c.restore()
@@ -1018,7 +1099,7 @@ function drawCatapult(c: CanvasRenderingContext2D) {
     c.arc(sxOf(cup.x), syOf(cup.y), 0.45 * s, 0, Math.PI)
     c.fill()
   }
-  if (sim.nextAmmo && !launchFrom) drawJar(c, sim.nextAmmo, cup.x, cup.y + 0.22, 0, 1)
+  if (sim.nextAmmo && !launchFrom) drawJar(c, sim.nextAmmo, cup.x, cup.y + 0.22, sim.nextAmmo === 'posaune' ? 0.5 : 0, 1)
 }
 
 function drawGideon(c: CanvasRenderingContext2D) {
@@ -1071,6 +1152,7 @@ function drawRing(c: CanvasRenderingContext2D, r: Ring) {
 }
 
 function drawParticle(c: CanvasRenderingContext2D, p: Particle) {
+  if (p.t < 0) return
   const k = p.t / p.life
   const px = sxOf(p.x)
   const py = syOf(p.y)
@@ -1101,8 +1183,49 @@ function drawParticle(c: CanvasRenderingContext2D, p: Particle) {
     c.moveTo(px - Math.cos(a) * p.r * s, py - Math.sin(a) * p.r * s)
     c.lineTo(px + Math.cos(a) * p.r * s, py + Math.sin(a) * p.r * s)
     c.stroke()
+  } else if (p.kind === 'sprite') {
+    const im = p.img ? img[p.img] : undefined
+    if (im) {
+      c.save()
+      c.translate(px, py)
+      c.rotate(p.rot + p.t * 7)
+      const h = p.r * s * 2
+      c.drawImage(im, (-(im.width / im.height) * h) / 2, -h / 2, (im.width / im.height) * h, h)
+      c.restore()
+    }
+  } else if (p.kind === 'flame') {
+    const im = img[p.img ?? 'flamme-klein']
+    if (im) {
+      const h = p.r * s * (1 - k * 0.5)
+      const w = (im.width / im.height) * h
+      c.drawImage(im, px - w / 2, py - h, w, h)
+    }
+  } else if (p.kind === 'text') {
+    c.font = `800 ${Math.max(14, Math.min(26, s * 0.9))}px system-ui, sans-serif`
+    c.textAlign = 'center'
+    c.textBaseline = 'middle'
+    c.lineWidth = 4
+    c.strokeStyle = 'rgba(60,30,0,0.85)'
+    c.strokeText(p.text ?? '', px, py)
+    c.fillStyle = p.color
+    c.fillText(p.text ?? '', px, py)
+  } else if (p.kind === 'stars') {
+    const g = glow.complete && glow.naturalWidth ? glow : null
+    for (let i = 0; i < 3; i++) {
+      const a = p.t * 8 + i * 2.094
+      const sx = px + Math.cos(a) * 0.55 * s
+      const sy = py + Math.sin(a) * 0.17 * s
+      const sz = 0.5 * s
+      if (g) c.drawImage(g, sx - sz / 2, sy - sz / 2, sz, sz)
+      else {
+        c.fillStyle = '#ffe27a'
+        c.beginPath()
+        c.arc(sx, sy, sz / 4, 0, Math.PI * 2)
+        c.fill()
+      }
+    }
   } else if (p.kind === 'shard') {
-    const sh = img['scherben']
+    const sh = p.color === MAT_COLOR.glass ? undefined : img['scherben']
     c.save()
     c.translate(px, py)
     c.rotate(p.rot + p.t * 9)
@@ -1196,7 +1319,7 @@ function draw(time: number) {
   c.fillRect(0, groundY + 3, cvW, 2)
   const shake = sim.status === 'won' && winT >= 0 && winT < 0.5 ? Math.sin(time * 90) * 3 * (1 - winT / 0.5) : 0
   c.save()
-  c.translate(shake, 0)
+  c.translate(shake + (impact > 0 ? Math.sin(time * 70) * impact * 9 : 0), impact > 0 ? Math.cos(time * 83) * impact * 7 : 0)
   drawPennant(c, time)
   drawCatapult(c)
   drawGideon(c)
@@ -1216,8 +1339,23 @@ function draw(time: number) {
   for (const g of sim.guards) {
     if (!g.body) continue
     const pos = g.body.getPosition()
-    drawGuardAt(c, pos.x, pos.y, bodyAngleOf(g), g.def.kind, g.scared ? 'scared' : 'stand', g.since + time)
-    if (g.scared) drawBubble(c, pos.x, pos.y + 1.2, helpText.value)
+    const hop = g.burn > 0 ? Math.abs(Math.sin(time * 15)) * 0.22 : 0
+    drawGuardAt(c, pos.x, pos.y + hop, bodyAngleOf(g), g.def.kind, g.down || g.hurtT > 0 ? 'hit' : 'stand', g.since + time)
+    if (g.burn > 0) drawFlame(c, pos.x + 0.08, pos.y - 0.5, 0.85, time + g.def.x)
+    if (g.down) drawBubble(c, pos.x, pos.y + 1.2, ouchText.value)
+  }
+  for (const p of sim.parts) {
+    if (p.dead || p.burn <= 0) continue
+    const d = p.def
+    const longSide = Math.max(d.w, d.h)
+    const n = Math.max(1, Math.min(4, Math.round(longSide / 1.1)))
+    const fade = Math.min(1, p.burn / 0.8)
+    for (let k = 0; k < n; k++) {
+      const u = n === 1 ? 0 : (k / (n - 1) - 0.5) * (longSide - 0.5)
+      const horiz = d.w >= d.h
+      const wp = p.body.getWorldPoint({ x: horiz ? u : 0, y: horiz ? d.h / 2 : u } as never)
+      drawFlame(c, wp.x, wp.y - 0.05, (0.8 + Math.min(0.6, Math.min(d.w, d.h) * 0.5)) * fade, time + k * 1.7 + d.x)
+    }
   }
   for (const r of runners) {
     const bob = Math.abs(Math.sin(r.t * 14)) * 0.14
@@ -1226,7 +1364,7 @@ function draw(time: number) {
   }
   // the thrown things with their trails
   for (const [pr, tr] of trails) {
-    const p = pr as { dead: boolean }
+    const p = pr as { dead: boolean; ammo: Ammo }
     if (p.dead && tr.length) tr.shift()
     if (!tr.length) {
       trails.delete(pr)
@@ -1234,7 +1372,7 @@ function draw(time: number) {
     }
     for (let i = 0; i < tr.length; i++) {
       c.globalAlpha = (i / tr.length) * 0.5
-      c.fillStyle = '#fff4cf'
+      c.fillStyle = TRAIL[p.ammo] ?? '#fff4cf'
       c.beginPath()
       c.arc(sxOf(tr[i]!.x), syOf(tr[i]!.y), Math.max(1.5, view.s * 0.1 * (i / tr.length)), 0, Math.PI * 2)
       c.fill()
@@ -1251,13 +1389,30 @@ function draw(time: number) {
       x = launchFrom.x + (q.x - launchFrom.x) * k
       y = launchFrom.y + (q.y - launchFrom.y) * k
     }
+    const vel = p.body.getLinearVelocity()
+    if (p.shard) {
+      const sh = img['scherben']
+      c.save()
+      c.translate(sxOf(x), syOf(y))
+      c.rotate(-p.body.getAngle())
+      const sz = 0.34 * view.s
+      if (sh) c.drawImage(sh, -sz / 2, -sz / 2, sz, sz)
+      else {
+        c.fillStyle = '#c8754a'
+        c.fillRect(-sz / 3, -sz / 3, sz / 1.5, sz / 1.5)
+      }
+      c.restore()
+      continue
+    }
     const small = p.ammo === 'ruf' && p.body.getFixtureList()?.getShape().getRadius() === 0.36
-    drawJar(c, p.ammo, x, y, p.body.getAngle(), small ? 0.86 : 1)
-    if (hud.tappable && !p.used && (p.ammo === 'posaune' || p.ammo === 'fackel' || p.ammo === 'ruf')) {
+    // the trumpet points where it flies, the torch jar stays upright, the others turn
+    const ang = p.ammo === 'posaune' ? Math.atan2(vel.y, vel.x) : p.ammo === 'fackel' ? 0.15 * Math.sin(time * 9) : p.body.getAngle()
+    drawJar(c, p.ammo, x, y, ang, small ? 0.86 : 1)
+    if (hud.tappable && !p.used) {
       c.strokeStyle = `rgba(255,236,150,${0.5 + 0.4 * Math.sin(time * 10)})`
       c.lineWidth = 3
       c.beginPath()
-      c.arc(sxOf(x), syOf(y), view.s * (AMMO[p.ammo].r + 0.35), 0, Math.PI * 2)
+      c.arc(sxOf(x), syOf(y), view.s * (AMMO[p.ammo].r + 0.45), 0, Math.PI * 2)
       c.stroke()
     }
   }
@@ -1379,7 +1534,7 @@ onBeforeUnmount(() => {
   document.body.style.overflow = bodyOverflow
 })
 void BLAST_R
-void LIGHT_R
+void FIRE_R
 </script>
 
 <template lang="pug">
@@ -1441,22 +1596,26 @@ void LIGHT_R
           button(type="button" class="gd-btn" :aria-label="TX('overview')" data-test="gideon-overview" @click="toggleOverview") ⤢
         div(class="gd-info")
           span(class="gd-level-label") {{ chapterTexts[chapterOf(level)]?.name }} · {{ TX('level') }} {{ levelNo(level) }}
-          div(class="gd-stars-live")
-            span(class="gd-star is-on") ★
-            span(:class="['gd-star', { 'is-on': stars2 }]") ★
-            span(:class="['gd-star', { 'is-on': stars3 }]") ★
-          span(class="gd-left" data-test="gideon-guards") {{ TX('scaredOf', { n: hud.scared, all: hud.all }) }}
+          div(class="gd-info-row")
+            div(class="gd-stars-live")
+              span(class="gd-star is-on") ★
+              span(:class="['gd-star', { 'is-on': stars2 }]") ★
+              span(:class="['gd-star', { 'is-on': stars3 }]") ★
+            span(class="gd-left" data-test="gideon-guards") {{ TX('downOf', { n: hud.down, all: hud.all }) }}
+            span(class="gd-score" data-test="gideon-score") {{ TX('points') }}: {{ hud.score }}
         div(v-if="windText" class="gd-wind" aria-hidden="true") 💨 {{ windText }}
 
       div(class="gd-queue")
-        div(
-          v-for="(a, i) in hud.queue"
-          :key="i"
-          :class="['gd-q', { 'is-next': i === 0 }]"
-          :title="TX('ammo.' + a)"
-        )
-          span(class="gd-q-icon") {{ icon(a) }}
-          img(:src="jarSrc(a)" alt="" class="gd-q-pic" @error="hideBroken")
+        div(v-if="hud.next" class="gd-abil") {{ TX('abil.' + hud.next) }}
+        div(class="gd-queue-row")
+          div(
+            v-for="(a, i) in hud.queue"
+            :key="i"
+            :class="['gd-q', { 'is-next': i === 0 }]"
+            :title="TX('ammo.' + a)"
+          )
+            span(class="gd-q-icon") {{ icon(a) }}
+            img(:src="jarSrc(a)" alt="" class="gd-q-pic" @error="hideBroken")
 
       button(
         v-if="hud.tappable"
@@ -1465,8 +1624,8 @@ void LIGHT_R
         data-test="gideon-tap"
         @click="doTap"
       )
-        span(class="gd-tap-icon") {{ icon(hud.tapAmmo) }}
-        span {{ TX('tapNow') }}
+        img(:src="jarSrc(hud.tapAmmo)" alt="" class="gd-tap-pic" @error="hideBroken")
+        span(class="gd-tap-text") {{ TX('abil.' + hud.tapAmmo) }}
       div(v-if="hintShown" class="gd-tip") {{ hintText }}
 
       div(v-if="paused && !how && chapterCard < 0" class="gd-menu gd-menu--dim")
@@ -1483,8 +1642,12 @@ void LIGHT_R
         AdventureStars(v-if="!outcome.lost" :stars="outcome.stars" :size="56" celebrate)
         p(class="gd-text") {{ resultText }}
         div(class="gd-lines")
-          p(:class="['gd-line', { 'is-on': !outcome.lost }]") {{ outcome.lost ? '○' : '✓' }} {{ TX('lineScared', { have: outcome.scared, all: outcome.all }) }}
+          p(:class="['gd-line', { 'is-on': !outcome.lost }]") {{ outcome.lost ? '○' : '✓' }} {{ TX('lineDown', { have: outcome.down, all: outcome.all }) }}
           p(v-if="!outcome.lost" :class="['gd-line', { 'is-on': outcome.stars >= 3 }]") {{ outcome.stars >= 3 ? '✓' : '○' }} {{ TX('lineThrows', { have: outcome.used, par: outcome.par }) }}
+        div(v-if="!outcome.lost" class="gd-lines")
+          p(class="gd-line is-on" data-test="gideon-result-score") ★ {{ TX('lineScore', { n: outcome.score }) }}
+          p(v-if="outcome.newBest" class="gd-line is-on") {{ TX('newBest') }}
+          p(v-else-if="outcome.best" class="gd-line") {{ TX('lineBest', { n: outcome.best }) }}
         p(v-if="lastChapterLevel" class="gd-line is-on") {{ TX('chapterDone') }}
         p(v-if="lastChapterLevel && level === LEVELS.length - 1" class="gd-text") {{ TX('allDone') }}
         AdvButton(v-if="hasNext && !outcome.lost" data-test="gideon-next" @click="begin(level + 1)") {{ TX('next') }}
@@ -1509,11 +1672,11 @@ void LIGHT_R
           span(class="gd-how-sign") 👆
           p(class="gd-how-line") {{ TX('howPull') }}
         div(class="gd-how-row")
-          span(class="gd-how-sign") 💬
-          p(class="gd-how-line") {{ TX('howGuards') }}
+          span(class="gd-how-sign") 💥
+          p(class="gd-how-line") {{ TX('howTap') }}
         div(class="gd-how-row")
-          span(class="gd-how-sign") ★
-          p(class="gd-how-line") {{ TX('howStars') }}
+          span(class="gd-how-sign") 🪖
+          p(class="gd-how-line") {{ TX('howGuards') }}
         AdvButton(data-test="gideon-go" @click="closeHow") {{ TX('go') }}
 </template>
 
@@ -1714,7 +1877,7 @@ void LIGHT_R
   top: 0
   left: 0
   right: 0
-  height: 80px
+  height: 64px
   display: flex
   align-items: flex-start
   gap: 8px
@@ -1770,6 +1933,27 @@ void LIGHT_R
   font-weight: 700
   color: #6b5a3a
 
+.gd-info-row
+  display: flex
+  align-items: center
+  justify-content: center
+  flex-wrap: wrap
+  gap: 2px 12px
+
+.gd-score
+  font-size: 0.8rem
+  font-weight: 800
+  color: #8a4b00
+
+.gd-abil
+  padding: 3px 9px
+  border-radius: 10px
+  background: rgba(255, 250, 235, 0.92)
+  color: #3b2a08
+  font-size: 0.78rem
+  font-weight: 800
+  white-space: nowrap
+
 .gd-stars-live
   display: flex
   gap: 1px
@@ -1796,9 +1980,15 @@ void LIGHT_R
   left: max(8px, env(safe-area-inset-left))
   bottom: max(8px, env(safe-area-inset-bottom))
   display: flex
+  flex-direction: column
+  align-items: flex-start
+  gap: 4px
+  pointer-events: none
+
+.gd-queue-row
+  display: flex
   gap: 6px
   align-items: flex-end
-  pointer-events: none
 
 .gd-q
   position: relative
@@ -1856,10 +2046,21 @@ void LIGHT_R
 .gd-tap-icon
   font-size: 1.6rem
 
+.gd-tap-pic
+  width: 40px
+  height: 40px
+  object-fit: contain
+
+.gd-tap-text
+  font-size: 0.68rem
+  line-height: 1.05
+  text-align: center
+  padding: 0 4px
+
 .gd-tip
   position: absolute
   left: 50%
-  top: 92px
+  top: 76px
   transform: translateX(-50%)
   max-width: min(520px, 92vw)
   padding: 10px 18px

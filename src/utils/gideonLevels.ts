@@ -16,7 +16,7 @@ export interface Level extends LevelDef {
   /** 0-based number in the chapter. */
   index: number
   /** The little hint that is shown once when this level starts (a key in the texts), if there is a new thing. */
-  intro?: 'krug' | 'stein' | 'wind' | 'wippe' | 'pendel' | 'ruf' | 'posaune' | 'fackel' | 'fels'
+  intro?: 'krug' | 'stein' | 'lehm' | 'glas' | 'wind' | 'wippe' | 'pendel' | 'ruf' | 'posaune' | 'fackel' | 'fels'
 }
 
 // ── the builders (the bottom edge `yb` and the middle `x`) ──────────────────────────────────────────────────────────────────
@@ -41,6 +41,10 @@ export function tower(x: number, yb: number, floors: number, span = 3, m: Mat = 
     y += 2.2
   }
   return { parts, top: y }
+}
+/** A little house for one soldier: two thin posts and a roof slab (the soldier stands inside, at the bottom edge `yb`). The roof is 1.75 m above the bottom. */
+export function cabin(x: number, yb: number, span = 2.6, m: Mat = 'glass'): { parts: PartDef[]; top: number } {
+  return { parts: [box(m, x - (span / 2 - 0.2), yb, 0.4, 1.75), box(m, x + (span / 2 - 0.2), yb, 0.4, 1.75), box(m, x, yb + 1.75, span + 0.3, 0.3)], top: yb + 2.05 }
 }
 /** A camel frame: two posts, a beam across the top. The top is 2.55 m above the bottom. */
 export function frame(x: number, yb: number, w = 3): PartDef[] {
@@ -83,7 +87,7 @@ export const mod = {
   /** A tent with a guard behind it (to the right). */
   tent: (x: number, kind = 1): Mod => ({ parts: [tent(x, 0)], guards: [guard(x + 2.3, 0, kind)] }),
   /** A stone wall `h` blocks high with a guard behind it. */
-  wall: (x: number, h = 2, kind = 2): Mod => ({ parts: wall(x - 0.5, 0, 1, h), guards: [guard(x + 1.3, 0, kind)] }),
+  wall: (x: number, h = 2, kind = 2, m: Mat = 'stone'): Mod => ({ parts: wall(x - 0.5, 0, 1, h, m), guards: [guard(x + 1.3, 0, kind)] }),
   /** Two straw bales on each other with a guard on top. */
   bale: (x: number, kind = 0): Mod => ({ parts: [bale(x, 0), bale(x, 1)], guards: [guard(x, 2, kind)] }),
   /** A one-floor wooden tower with a guard on top. */
@@ -183,9 +187,10 @@ function chapter1(): Level[] {
   out.push(make(c, 6, {
     width: 40,
     ammo: [K, K, S, K],
-    parts: [post(22, 0, 2.6), post(32, 0, 2.6), plank(27, 2.6, 11.2), block(27, 0), block(27, 1)],
+    parts: [post(22, 0, 2.6), post(32, 0, 2.6), plank(27, 2.6, 11.2), block(27, 0, 1, 'clay'), block(27, 1, 1, 'clay')],
     guards: [guard(25, 3), guard(29.5, 3, 1), guard(33.5, 0, 2)],
-    mods: [mod.wall(36.5, 2)]
+    mods: [mod.wall(36.5, 2, 2, 'clay')],
+    intro: 'lehm'
   }))
   // 8 a pile of hay
   {
@@ -200,11 +205,13 @@ function chapter1(): Level[] {
   // 9 the big watchtower, a stone wall and a guard far behind
   {
     const t = tower(26, 0, 3)
+    const cb = cabin(26, t.top, 2.6, 'glass')
     out.push(make(c, 8, {
       width: 44,
       ammo: [K, S, K, K, S, K],
-      parts: [...t.parts, ...wall(31, 0, 1, 3), bale(37.5, 0), bale(37.5, 1)],
-      guards: [guard(26, t.top), guard(34, 0, 1), guard(37.5, 2, 2)]
+      parts: [...t.parts, ...cb.parts, ...wall(31, 0, 1, 3), bale(37.5, 0), bale(37.5, 1)],
+      guards: [guard(26, t.top), guard(34, 0, 1), guard(37.5, 2, 2)],
+      intro: 'glas'
     }))
   }
   return out
@@ -217,12 +224,12 @@ function chapter2(): Level[] {
   // 10 the night wind
   {
     const t = tower(26, 0, 2)
-    out.push(make(c, 0, { width: 40, wind: 1.6, ammo: [K, K, K, K, K], parts: [...t.parts, bale(21.5, 0)], guards: [guard(26, t.top), guard(31, 0, 1)], mods: [mod.wall(35, 2)], intro: 'wind' }))
+    out.push(make(c, 0, { width: 40, wind: 1.6, ammo: [K, K, K, K, K], parts: [...t.parts, bale(21.5, 0)], guards: [guard(26, t.top), guard(31, 0, 1)], mods: [mod.wall(35, 2, 2, 'clay')], intro: 'wind' }))
   }
   // 11 wind against the throw, two towers
   {
     const a = tower(23, 0, 1)
-    const b = tower(31, 0, 1, 2.6)
+    const b = tower(31, 0, 1, 2.6, 'clay')
     out.push(make(c, 1, { width: 42, wind: -1.6, ammo: [K, K, K, K, K], parts: [...a.parts, ...b.parts, bale(27, 0)], guards: [guard(23, a.top), guard(31, b.top, 1), guard(35, 0, 2)] }))
   }
   // 12 the seesaw
@@ -245,7 +252,7 @@ function chapter2(): Level[] {
       parts: [...g.parts, ...t.parts, bale(36.5, 0)],
       joints: [g.joint],
       guards: [guard(31, t.top), guard(36.5, 1, 1)],
-      mods: [mod.wall(38.5, 3)],
+      mods: [mod.wall(38.5, 3, 2, 'clay')],
       intro: 'pendel'
     }))
   }
@@ -253,7 +260,8 @@ function chapter2(): Level[] {
   {
     const a = tower(24, 0, 1)
     const b = tower(35, 0, 1)
-    out.push(make(c, 4, { width: 42, ammo: [R, R, K, K, K], parts: [...a.parts, ...b.parts, bale(29.5, 0)], guards: [guard(24, a.top), guard(35, b.top, 1), guard(29.5, 1, 2)], mods: [mod.tent(38.5)], intro: 'ruf' }))
+    const cb = cabin(29.5, 0, 2.6, 'glass')
+    out.push(make(c, 4, { width: 42, ammo: [R, R, K, K, K], parts: [...a.parts, ...b.parts, ...cb.parts], guards: [guard(24, a.top), guard(35, b.top, 1), guard(29.5, 0, 2)], mods: [mod.tent(38.5)], intro: 'ruf' }))
   }
   // 15 camel frames with sacks
   out.push(make(c, 5, {
@@ -267,7 +275,7 @@ function chapter2(): Level[] {
     width: 44,
     wind: 1,
     ammo: [S, S, R, K, K, K],
-    parts: [...wall(25, 0, 2, 4), slab(26, 4, 3, 0.5), bale(31, 0), block(34, 0), block(34, 1), bale(38, 0)],
+    parts: [...wall(25, 0, 2, 2), ...wall(25, 2, 2, 2, 'clay'), slab(26, 4, 3, 0.5, 'clay'), bale(31, 0), block(34, 0), block(34, 1), bale(38, 0)],
     guards: [guard(26, 4.5), guard(29.5, 0, 1), guard(34, 2, 2), guard(38, 1, 0)],
     mods: [mod.tower(41.5)]
   }))
@@ -284,10 +292,11 @@ function chapter2(): Level[] {
   {
     const g = gallows(22, 5)
     const t = tower(29, 0, 2)
+    const cb = cabin(29, t.top, 2.6, 'glass')
     out.push(make(c, 8, {
       width: 46,
       ammo: [K, R, S, K, K, K],
-      parts: [...g.parts, ...t.parts, ...wall(32.5, 0, 1, 2), ...frame(39, 0), bale(36, 0)],
+      parts: [...g.parts, ...t.parts, ...cb.parts, ...wall(32.5, 0, 1, 2), ...frame(39, 0), bale(36, 0)],
       joints: [g.joint],
       guards: [guard(29, t.top), guard(34.5, 0, 1), guard(39, 2.55, 2)],
       mods: [mod.tent(42.2)]
@@ -313,7 +322,7 @@ function chapter3(): Level[] {
   out.push(make(c, 1, {
     width: 44,
     ammo: [F, F, K, K, K],
-    parts: [...wall(27.4, 0, 1, 2), ...wall(31.6, 0, 1, 2), slab(30, 2, 5.4, 0.5), ...wall(37.4, 0, 1, 2), ...wall(41.6, 0, 1, 2), slab(40, 2, 5.4, 0.5)],
+    parts: [...wall(27.4, 0, 1, 2, 'wood'), ...wall(31.6, 0, 1, 2, 'wood'), slab(30, 2, 5.4, 0.5, 'wood'), ...wall(37.4, 0, 1, 2, 'wood'), ...wall(41.6, 0, 1, 2, 'wood'), slab(40, 2, 5.4, 0.5, 'wood')],
     guards: [guard(30, 0), guard(40, 0, 1)],
     intro: 'fackel'
   }))
@@ -321,7 +330,7 @@ function chapter3(): Level[] {
   out.push(make(c, 2, {
     width: 46,
     ammo: [P, F, K, K, K, K],
-    parts: [...wall(31, 5, 1, 2), bale(35, 5), ...tower(25, 0, 1).parts],
+    parts: [...wall(31, 5, 1, 2, 'clay'), bale(35, 5), ...tower(25, 0, 1).parts],
     rocks: [{ x: 34, y: 2.5, w: 8, h: 5 }],
     guards: [guard(33.2, 5), guard(37.2, 5, 1), guard(25, 2.2, 2)],
     intro: 'fels'
@@ -371,7 +380,7 @@ function chapter3(): Level[] {
       width: 49,
       wind: 2,
       ammo: [P, F, S, K, K, K],
-      parts: [...wall(24, 0, 2, 3), ...t.parts, block(38.5, 0), block(38.5, 1)],
+      parts: [...wall(24, 0, 2, 2), ...wall(24, 2, 2, 1, 'clay'), ...t.parts, block(38.5, 0, 1, 'clay'), block(38.5, 1, 1, 'glass')],
       guards: [guard(25, 3), guard(33, t.top, 1), guard(41, 0, 2)],
       mods: [mod.tent(44.5)]
     }))
@@ -380,7 +389,7 @@ function chapter3(): Level[] {
   out.push(make(c, 7, {
     width: 50,
     ammo: [R, F, P, S, K, K],
-    parts: [...wall(22, 0, 1, 3), ...frame(28, 0), bale(28, 2.55), ...hay(35, 0, 3).parts, tent(41.5, 0)],
+    parts: [...wall(22, 0, 1, 2), ...wall(22, 2, 1, 1, 'clay'), ...frame(28, 0), bale(28, 2.55), ...hay(35, 0, 3).parts, tent(41.5, 0)],
     guards: [guard(25, 0), guard(28, 3.55, 1), guard(35, 3, 2), guard(44, 0)],
     mods: [mod.tower(47.5)]
   }))
@@ -405,7 +414,7 @@ function chapter4(): Level[] {
   out.push(make(c, 0, {
     width: 48,
     ammo: [K, R, S, P, K, K],
-    parts: [...frame(22, 0), ...frame(28, 0), ...frame(34, 0), plank(31, 2.55, 4.2), tent(40, 0), ...hay(45, 0, 2).parts],
+    parts: [...frame(22, 0), ...frame(28, 0), ...frame(34, 0), slab(31, 2.55, 4.2, 0.4, 'glass'), tent(40, 0), ...hay(45, 0, 2).parts],
     guards: [guard(22, 2.55), guard(28, 2.55, 1), guard(34, 2.55, 2), guard(45, 2)]
   }))
   // 29 the ram
@@ -425,7 +434,7 @@ function chapter4(): Level[] {
   out.push(make(c, 2, {
     width: 48,
     ammo: [F, P, S, K, K, K],
-    parts: [...wall(28, 0, 3, 3), slab(29.5, 3, 3.4, 0.5), ...wall(34.5, 0, 1, 2), ...wall(38, 0, 2, 3), slab(39, 3, 2.4, 0.5)],
+    parts: [...wall(28, 0, 3, 3), slab(29.5, 3, 3.4, 0.5, 'clay'), ...wall(34.5, 0, 1, 2, 'clay'), ...wall(38, 0, 2, 3), slab(39, 3, 2.4, 0.5, 'clay')],
     guards: [guard(29.5, 3.5), guard(32.5, 0, 1), guard(39, 3.5, 2), guard(36, 0)],
     mods: [mod.tent(43.5)]
   }))
@@ -452,7 +461,7 @@ function chapter4(): Level[] {
   }
   // 33 the high tower of stone and wood
   {
-    const a = tower(28, 0, 2, 3, 'stone')
+    const a = tower(28, 0, 2, 3, 'clay')
     const b = tower(28, a.top, 2, 3, 'wood')
     out.push(make(c, 5, {
       width: 48,
@@ -478,19 +487,20 @@ function chapter4(): Level[] {
     out.push(make(c, 7, {
       width: 48,
       ammo: [R, F, P, S, K, K],
-      parts: [...t.parts, ...hay(29.5, 0, 3).parts, ...wall(35, 0, 1, 3), ...frame(40.5, 0), tent(45, 0)],
+      parts: [...t.parts, ...hay(29.5, 0, 3).parts, ...wall(35, 0, 1, 2), ...wall(35, 2, 1, 1, 'glass'), ...frame(40.5, 0), tent(45, 0)],
       guards: [guard(23, t.top), guard(29.5, 3, 1), guard(37, 0, 2), guard(40.5, 2.55), guard(47.5, 0, 1)]
     }))
   }
   // 36 Gideon has won: the whole camp
   {
     const t = tower(24, 0, 3, 3, 'wood')
+    const cb = cabin(43, 0, 2.6, 'glass')
     out.push(make(c, 8, {
-      width: 50,
-      wind: 1,
+      width: 48,
+      wind: 0,
       ammo: [R, P, F, S, K, K],
-      parts: [...t.parts, ...wall(37, 0, 2, 3), slab(38, 3, 3.4, 0.5), ...frame(43.5, 0), tent(47, 0, 3, 2.2), bale(20, 0)],
-      guards: [guard(24, t.top), guard(34.5, 0, 1), guard(38, 3.5, 2), guard(43.5, 2.55), guard(48.8, 0, 1)],
+      parts: [...t.parts, ...wall(37, 0, 2, 3), slab(38, 3, 3.4, 0.5), ...cb.parts, bale(20, 0)],
+      guards: [guard(24, t.top), guard(34.5, 0, 1), guard(38, 3.5, 2), guard(43, 0)],
       mods: [mod.bale(27.4), mod.tent(29.6)]
     }))
   }

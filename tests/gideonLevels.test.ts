@@ -33,7 +33,17 @@ describe('the levels', () => {
   it('teach one new thing at a time: the first level has one guard, the new things come in order', () => {
     expect(LEVELS[0]!.guards).toHaveLength(1)
     const intros = LEVELS.filter((l) => l.intro).map((l) => l.intro)
-    expect(intros).toEqual(['krug', 'stein', 'wind', 'wippe', 'pendel', 'ruf', 'posaune', 'fackel', 'fels'])
+    expect(intros).toEqual(['krug', 'stein', 'lehm', 'glas', 'wind', 'wippe', 'pendel', 'ruf', 'posaune', 'fackel', 'fels'])
+  })
+
+  it('use the new materials (bricks from the 7th level, tiles from the 9th), and the soldiers come in all three kinds', () => {
+    const mats = (from: number, to: number) => new Set(LEVELS.slice(from, to).flatMap((l) => l.parts.map((p) => p.m)))
+    expect(mats(0, 6).has('clay')).toBe(false)
+    expect(mats(6, 36).has('clay')).toBe(true)
+    expect(mats(0, 8).has('glass')).toBe(false)
+    expect(mats(8, 36).has('glass')).toBe(true)
+    const kinds = new Set(LEVELS.flatMap((l) => l.guards.map((g) => g.kind)))
+    expect([...kinds].sort()).toEqual([0, 1, 2])
   })
 
   it('get harder: later chapters have more guards and parts', () => {
@@ -42,12 +52,13 @@ describe('the levels', () => {
     expect(avg(3, (l) => l.parts.length)).toBeGreaterThan(avg(0, (l) => l.parts.length))
   })
 
-  it('stand still at the start: nothing broken, nobody startled, nothing moves away', () => {
+  it('stand still at the start: nothing broken, nobody hurt, nothing moves away', () => {
     for (const l of LEVELS) {
       const s = new Sim(l)
       for (let i = 0; i < SETTLE_STEPS + 240; i++) s.step()
       expect(s.status, `level ${l.id + 1}`).toBe('play')
-      expect(s.scaredCount, `level ${l.id + 1} scared`).toBe(0)
+      expect(s.downCount, `level ${l.id + 1} down`).toBe(0)
+      for (const g of s.guards) expect(g.hp, `level ${l.id + 1} soldier hurt while settling`).toBe(g.maxHp)
       for (const p of s.parts) {
         expect(p.dead, `level ${l.id + 1} broken`).toBe(false)
         if (!p.def.id) {
@@ -103,6 +114,6 @@ describe('the solutions', () => {
   it('are listed as a big game of the corner (picked with a wish)', () => {
     const g = BIG_GAMES.find((x) => x.id === 'gideon')!
     expect(g.maxStars).toBe(108)
-    expect(g.image).toBe('images/spiele-gross/gideon/kachel-2.webp')
+    expect(g.image).toBe('images/spiele-gross/gideon/kachel-3.webp')
   })
 })
