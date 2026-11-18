@@ -878,6 +878,7 @@ onBeforeUnmount(() => {
   pointer-events: auto
 
 .dg-btn
+  flex: 0 0 44px
   width: 44px
   height: 44px
   border: none

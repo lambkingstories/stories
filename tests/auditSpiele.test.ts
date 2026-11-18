@@ -29,3 +29,24 @@ describe('the tile of the memory shows what can be won in this build', () => {
   })
 })
 
+describe('the pause buttons are at least 44 px and do not shrink in the row of the screen', () => {
+  const rule = (file: string, selector: string) => {
+    const text = src(file).replace(/\r/g, '')
+    const at = text.indexOf(`\n${selector}\n`)
+    expect(at, `${selector} in ${file}`).toBeGreaterThan(-1)
+    return text.slice(at, text.indexOf('\n\n', at + 2))
+  }
+  it('David', () => {
+    const css = rule('src/components/molecules/games/BigGameDavid.vue', '.dg-btn')
+    expect(css).toMatch(/flex: 0 0 44px/)
+    expect(css).toMatch(/width: 44px/)
+    expect(css).toMatch(/height: 44px/)
+  })
+  it('Elia', () => {
+    const css = rule('src/components/molecules/games/BigGameElia.vue', '.eg-btn')
+    expect(css).toMatch(/flex: 0 0 44px/)
+    expect(css).toMatch(/width: 44px/)
+    expect(css).toMatch(/height: 44px/)
+  })
+})
+

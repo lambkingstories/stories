@@ -1295,8 +1295,9 @@ onBeforeUnmount(() => {
   pointer-events: auto
 
 .eg-btn
-  width: 42px
-  height: 42px
+  flex: 0 0 44px
+  width: 44px
+  height: 44px
   border: none
   border-radius: 50%
   background: rgba(255, 255, 255, 0.85)
