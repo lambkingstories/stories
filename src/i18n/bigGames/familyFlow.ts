@@ -1,0 +1,77 @@
+/**
+ * The texts of the course of a family game in "Familien-Spiele v2" (title screen, who plays along, leaving, the end), german, english, spanish.
+ * Merged into `app.bigGames.familyFlow` (see `index.ts`). The pieces in `components/molecules/family/` (FamilyStart, FamilyLobby, FamilyGameBar,
+ * FamilyPodium) read them; the NAME of a game never stands in here (it always comes from the texts of the game itself, as a prop).
+ * `quizRule1` to `quizRule4` are the four lines of "How to play" of the quiz (what the quiz does anyway).
+ */
+export default {
+  de: {
+    play: 'Spielen',
+    newGame: 'Neues Spiel',
+    howTo: 'So geht’s',
+    whoPlays: 'Wer spielt mit?',
+    playerCount: 'Anzahl der Spieler',
+    figureHint: 'Tippe auf eine Figur, um eine andere zu bekommen.',
+    figureNext: 'Andere Figur wählen',
+    teamSolo: 'Einzeln',
+    leaveTitle: 'Spiel beenden?',
+    leaveKept: 'Die Runde bleibt gespeichert. Ihr könnt später weiterspielen.',
+    leaveLost: 'Dann ist das Spiel zu Ende.',
+    leaveStay: 'Weiterspielen',
+    leaveEnd: 'Beenden',
+    again: 'Nochmal',
+    newPlayers: 'Neue Runde mit anderen Spielern',
+    toGames: 'Zur Auswahl',
+    place: 'Platz {n}',
+    quizRule1: 'Reihum bekommt jeder Spieler eine Frage.',
+    quizRule2: 'Tippe die Antwort an, die du für richtig hältst.',
+    quizRule3: 'Jede richtige Antwort gibt einen Punkt.',
+    quizRule4: 'Wer am Ende die meisten Punkte hat, gewinnt.'
+  },
+  en: {
+    play: 'Play',
+    newGame: 'New game',
+    howTo: 'How to play',
+    whoPlays: 'Who is playing?',
+    playerCount: 'Number of players',
+    figureHint: 'Tap a figure to get another one.',
+    figureNext: 'Choose another figure',
+    teamSolo: 'On your own',
+    leaveTitle: 'End the game?',
+    leaveKept: 'The round is saved. You can play on later.',
+    leaveLost: 'Then the game is over.',
+    leaveStay: 'Keep playing',
+    leaveEnd: 'End game',
+    again: 'Again',
+    newPlayers: 'New round with other players',
+    toGames: 'Back to the games',
+    place: 'Place {n}',
+    quizRule1: 'Every player gets a question, one after the other.',
+    quizRule2: 'Tap the answer you think is right.',
+    quizRule3: 'Every right answer gives one point.',
+    quizRule4: 'Whoever has the most points at the end wins.'
+  },
+  es: {
+    play: 'Jugar',
+    newGame: 'Juego nuevo',
+    howTo: 'Cómo se juega',
+    whoPlays: '¿Quién juega?',
+    playerCount: 'Número de jugadores',
+    figureHint: 'Toca una figura para conseguir otra.',
+    figureNext: 'Elegir otra figura',
+    teamSolo: 'Cada uno solo',
+    leaveTitle: '¿Terminar el juego?',
+    leaveKept: 'La ronda queda guardada. Podéis seguir jugando más tarde.',
+    leaveLost: 'Entonces el juego se acaba.',
+    leaveStay: 'Seguir jugando',
+    leaveEnd: 'Terminar',
+    again: 'Otra vez',
+    newPlayers: 'Ronda nueva con otros jugadores',
+    toGames: 'A la selección',
+    place: 'Puesto {n}',
+    quizRule1: 'Cada jugador recibe una pregunta, uno tras otro.',
+    quizRule2: 'Toca la respuesta que crees correcta.',
+    quizRule3: 'Cada respuesta correcta da un punto.',
+    quizRule4: 'Gana quien tenga más puntos al final.'
+  }
+}

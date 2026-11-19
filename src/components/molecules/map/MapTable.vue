@@ -28,7 +28,10 @@ const toggleSfx = () => sound.setSfxVolume(sound.sfxVolume.value > 0 ? 0 : DEFAU
 
 <template lang="pug">
   div(:class="['mt', game ? 'fam-game--' + game : '']")
-    header(class="mt-top")
+    //- a game that runs brings its own bar in the slot `top` (FamilyGameBar), it takes the place of this header
+    div(v-if="$slots.top" class="mt-bar")
+      slot(name="top")
+    header(v-else class="mt-top")
       button(v-if="back" type="button" class="mt-back" :aria-label="t('app.read.back')" @click="emit('back')")
         span(aria-hidden="true") ‹
       h1(v-if="title" class="mt-title") {{ title }}
@@ -74,6 +77,11 @@ const toggleSfx = () => sound.setSfxVolume(sound.sfxVolume.value > 0 ? 0 : DEFAU
   align-items: center
   gap: 12px
   padding: max(10px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 6px max(14px, env(safe-area-inset-left))
+
+.mt-bar
+  position: relative
+  z-index: 2
+  flex: none
 
 .mt-back, .mt-round
   flex: none

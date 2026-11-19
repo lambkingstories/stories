@@ -1,13 +1,15 @@
 <script setup lang="ts">
 /**
  * The family quiz (free, all of it), in the light look of "Familien-Spiele v2" (white cards, capsules, chips, answer tiles; see components/molecules/family/). All of it stays on the device, nothing is sent anywhere.
+ * The course of a real game: the title screen (`start`: picture, name, "Play", "How to play", "Continue"), the players page (`lobby`: figures, names,
+ * the settings of the quiz, "Let's go"), the game (`ask`/`reveal`, with the bar of the game in its colour) and the end (`result`: podium).
  *  - Which questions: the Bible quiz (real questions with a Bible passage, three levels: easy, medium, hard, or all mixed) or the
  *    questions of the adventures the child has been through (they grow with the adventures).
  *  - How: `table` (two to eight people pass the device around, also in two teams) or `code` (every person plays on their own phone;
  *    a short round code decides which questions come in which order, there is also a "quiz of the day").
  * Every question says where it comes from (the level, or the adventure); after the answer the Bible passage is shown. At the end the
- * people are ranked. A round that was left can be taken up again (`useFamilySave`); the back button of a running round goes to this
- * start page, from here to the games.
+ * people are ranked. A round that was left can be taken up again (`useFamilySave`); leaving a running round (after "End the game?") goes to the
+ * title screen, from there to the games.
  */
 import { computed, nextTick, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -15,18 +17,16 @@ import { useRouter } from 'vue-router'
 import MapTable from '@/components/molecules/map/MapTable.vue'
 import { goBackTo } from '@/utils/navBack'
 import MapToken from '@/components/molecules/map/MapToken.vue'
-import MapScoreBar from '@/components/molecules/map/MapScoreBar.vue'
-import MapRoute from '@/components/molecules/map/MapRoute.vue'
 import FamilyCard from '@/components/molecules/family/FamilyCard.vue'
 import FamilyButton from '@/components/molecules/family/FamilyButton.vue'
 import FamilyChip from '@/components/molecules/family/FamilyChip.vue'
-import FamilySwitch from '@/components/molecules/family/FamilySwitch.vue'
 import FamilyChoice from '@/components/molecules/family/FamilyChoice.vue'
 import FamilyQuestionCard from '@/components/molecules/family/FamilyQuestionCard.vue'
 import FamilyNameField from '@/components/molecules/family/FamilyNameField.vue'
-import FamilySeats from '@/components/molecules/family/FamilySeats.vue'
-import FamilyResult from '@/components/molecules/family/FamilyResult.vue'
-import FamilyResume from '@/components/molecules/family/FamilyResume.vue'
+import FamilyStart from '@/components/molecules/family/FamilyStart.vue'
+import FamilyLobby from '@/components/molecules/family/FamilyLobby.vue'
+import FamilyGameBar from '@/components/molecules/family/FamilyGameBar.vue'
+import FamilyPodium, { type FamilyPodiumRow } from '@/components/molecules/family/FamilyPodium.vue'
 import { journeys } from '@/data/adventures'
 import { loadBibleQuiz } from '@/data/bibleQuiz'
 import { isJourneyPlusLocked } from '@/utils/adventureAccess'
@@ -148,8 +148,10 @@ function pickSource(s: Source) {
 }
 
 // ── the game ────────────────────────────────────────────────────────────────────────────────────────────────────
-type Phase = 'setup' | 'ask' | 'reveal' | 'result'
-const phase = ref<Phase>('setup')
+/** The course: title screen, players page, a question (asked, then the verdict), the end. */
+type Phase = 'start' | 'lobby' | 'ask' | 'reveal' | 'result'
+const phase = ref<Phase>('start')
+const playing = computed(() => phase.value === 'ask' || phase.value === 'reveal')
 const questions = ref<FamilyQuestion[]>([])
 const index = ref(0)
 const scores = ref<number[]>([])
@@ -183,10 +185,18 @@ const teamHeadline = computed(() => {
 })
 
 // the end on the map: the ranking with the token of every person (the same order as `ranking`, which sorts by score and keeps the seats' order)
-const rankRows = computed(() => {
+const rankRows = computed<FamilyPodiumRow[]>(() => {
   const order = players.value.map((_, i) => i).sort((a, b) => (scores.value[b] ?? 0) - (scores.value[a] ?? 0))
   return placing.value.map((p, k) => ({ rank: p.rank, name: p.name, score: t('app.family.points', p.score), index: order[k] ?? 0 }))
 })
+/** With two teams the podium has the two teams (a figure of their people stands for them), the single players are listed below it. */
+const teamRows = computed<FamilyPodiumRow[]>(() => {
+  const [a, b] = teamLines.value
+  const first = a!.points >= b!.points ? 0 : 1
+  const tie = a!.points === b!.points
+  return [first, 1 - first].map((k, n) => ({ rank: tie || n === 0 ? 1 : 2, name: teamLines.value[k]!.name, sub: teamLines.value[k]!.members, score: t('app.family.points', teamLines.value[k]!.points), index: k }))
+})
+const podiumRows = computed(() => (mode.value === 'code' ? [] : useTeams.value ? teamRows.value : rankRows.value))
 const winnerIndex = computed(() => {
   if (useTeams.value) {
     const [a, b] = teamLines.value
@@ -200,11 +210,10 @@ const endHeadline = computed(() => {
   return winners.value.length > 1 ? t('app.family.winners', { names: winners.value.map((w) => w.name).join(' & ') }) : t('app.family.winner', { name: winners.value[0]?.name ?? '' })
 })
 
-// the travellers on their road: how far everybody has come (every person answers about the same number of questions)
-const perPlayer = computed(() => Math.max(1, Math.ceil(questions.value.length / Math.max(1, count.value))))
-const travellers = computed(() => players.value.map((name, i) => ({ name, value: scores.value[i] ?? 0, score: scores.value[i] ?? 0, index: i, turn: i === who.value })))
-/** One to three travellers get a road each, more of them a row of brass tags. */
-const showRoad = computed(() => count.value <= 3)
+/** The chips in the bar of the game: the figure, the name and the points of everybody; the one whose turn it is shines (with the round code there is only one person, no turns). */
+const barPlayers = computed(() => players.value.map((name, i) => ({ name, score: scores.value[i] ?? 0, index: i, turn: mode.value === 'table' && i === who.value })))
+/** The four lines of "How to play". */
+const rules = computed(() => [1, 2, 3, 4].map((n) => t(`app.bigGames.familyFlow.quizRule${n}`)))
 
 function saveNames() {
   try {
@@ -279,12 +288,17 @@ function resume() {
   play('tap')
 }
 
-/** The back button: a round that runs goes back to this start page, from here to the games. */
+/** The back button of the table: one step back (players page to the title screen, the end to the title screen), from the title screen to the games. A running round has its own button (the bar of the game asks first). */
 function goBack() {
-  if (phase.value !== 'setup') {
-    phase.value = 'setup'
+  if (phase.value === 'lobby' || phase.value === 'result') {
+    phase.value = 'start'
     return
   }
+  goBackTo(router, { name: 'app-family' })
+}
+
+/** "To the games": from the end back to the page of the family games. */
+function toGames() {
   goBackTo(router, { name: 'app-family' })
 }
 
@@ -401,83 +415,101 @@ const questionSize = computed(() => {
 </script>
 
 <template lang="pug">
-  MapTable(:title="t('app.family.title')" game="quiz" @back="goBack")
+  MapTable(title="" game="quiz" @back="goBack")
+    //- ===== the bar of the game (while a round runs): the colour of the game, the people with their points, leaving asks first =====
+    template(v-if="playing" v-slot:top)
+      FamilyGameBar(
+        game="quiz"
+        :title="t('app.family.hub_quiz')"
+        :subtitle="t('app.family.question', { n: index + 1, total: questions.length })"
+        :players="barPlayers"
+        :leave-text="t('app.bigGames.familyFlow.leaveKept')"
+        @leave="phase = 'start'"
+      )
+
     div(class="fq")
-      //- ===== the start page: how (table / own phones) and which questions =====
-      template(v-if="phase === 'setup'")
-        FamilyResume(v-if="resumeInfo" :info="resumeInfo" @resume="resume")
-        div(class="fq-modes" role="radiogroup" :aria-label="t('app.family.modeLabel')")
-          FamilyChip(v-for="m in MODES" :key="m" class="fq-wide-chip" :selected="mode === m" @click="pickMode(m)") {{ t(`app.family.mode_${m}`) }}
-        FamilyCard(:title="t('app.family.questionsHead')" symbol="quiz")
-          div(class="fq-levels" role="radiogroup" :aria-label="t('app.family.questionsHead')")
-            FamilyChip(v-for="s in SOURCES" :key="s" :selected="source === s" @click="pickSource(s)") {{ t(`app.family.src_${s}`) }}
-          span(class="fq-fine") {{ t(`app.family.srcText_${source}`) }}
+      //- ===== 1. the title screen =====
+      FamilyStart(
+        v-if="phase === 'start'"
+        game="quiz"
+        :name="t('app.family.hub_quiz')"
+        :tagline="t('app.family.hub_quizSub')"
+        :rules="rules"
+        :resume-info="resumeInfo"
+        @play="phase = 'lobby'"
+        @resume="resume"
+      )
 
-      //- ===== the round code: one person, their own phone =====
-      div(v-if="phase === 'setup' && mode === 'code'" class="fq-code")
-        div(class="fq-codename")
-          FamilySeats(:count="1" :names="names" :min="1" :max="1" fixed @update:names="setNames")
+      //- ===== 2. who plays, and the settings of the quiz =====
+      FamilyLobby(
+        v-else-if="phase === 'lobby'"
+        game="quiz"
+        :count="count"
+        :names="names"
+        :min="MIN_PLAYERS"
+        :max="MAX_PLAYERS"
+        :fixed="mode === 'code'"
+        :team-option="mode === 'table'"
+        :teams="teams"
+        :can-go="maxRounds >= 1"
+        :hide-go="mode === 'code'"
+        @update:count="playerCount = $event"
+        @update:names="setNames"
+        @update:teams="teams = $event"
+        @go="start"
+      )
+        //- how: one device, or several phones with the round code
+        template(v-slot:top)
+          div(class="fq-modes" role="radiogroup" :aria-label="t('app.family.modeLabel')")
+            FamilyChip(v-for="m in MODES" :key="m" class="fq-wide-chip" :selected="mode === m" @click="pickMode(m)") {{ t(`app.family.mode_${m}`) }}
 
-        div(class="fq-things")
-          FamilyCard(class="fq-thing" :title="t('app.family.codeDaily')")
-            span(class="fq-fine") {{ dailyDoneToday ? t('app.family.codeDailyDone', { score: dailyResult?.score ?? 0, total: dailyResult?.total ?? 0 }) : t('app.family.codeDailyText', { n: DAILY_QUESTIONS }) }}
-            FamilyButton(:disabled="!dailyReady" @click="playDaily") {{ t('app.family.codeDailyGo') }}
+        template(v-slot:settings)
+          //- which questions (the level, or the adventures)
+          FamilyCard(:title="t('app.family.questionsHead')" symbol="quiz")
+            div(class="fq-levels" role="radiogroup" :aria-label="t('app.family.questionsHead')")
+              FamilyChip(v-for="s in SOURCES" :key="s" :selected="source === s" @click="pickSource(s)") {{ t(`app.family.src_${s}`) }}
+            span(class="fq-fine") {{ t(`app.family.srcText_${source}`) }}
 
-          FamilyCard(class="fq-thing" :title="t('app.family.codeNew')")
-            span(class="fq-fine") {{ t('app.family.codeNewText', { n: ROUND_QUESTIONS }) }}
-            FamilyButton(:disabled="!codeReady" @click="newRound") {{ t('app.family.codeNewGo') }}
+          //- the questions of the adventures grow with every stage and exam the child has been through
+          FamilyCard(v-if="source === 'adventure' && pool.length" compact)
+            span(class="fq-unlock" role="group")
+              span(class="fq-unlock-n") {{ pool.length }}
+                small {{ t('app.family.unlockOf', { total: poolTotal }) }}
+              span(class="fq-unlock-bar" aria-hidden="true")
+                span(class="fq-unlock-fill" :style="{ width: Math.round(poolShare * 100) + '%' }")
 
-          FamilyCard(class="fq-thing" :title="t('app.family.codeJoin')")
-            FamilyNameField(v-model="codeInput" code :maxlength="8" placeholder="K7M-4QX" :aria-label="t('app.family.codeJoin')" @enter="joinRound")
-            span(v-if="codeError" class="fq-fine fq-error" role="alert") {{ t(`app.family.codeError_${codeError}`) }}
-            FamilyButton(:disabled="!codeInput.trim()" @click="joinRound") {{ t('app.family.codeJoinGo') }}
-
-      //- ===== who plays =====
-      div(v-else-if="phase === 'setup'" class="fq-setup")
-        FamilyCard(v-if="!pool.length" class="fq-wide" compact)
-          span(class="fq-fine") {{ source === 'adventure' ? t('app.family.empty') : t('app.family.loading') }}
-        template(v-else)
-          div(class="fq-col")
-            //- the questions of the adventures grow with every stage and exam the child has been through
-            FamilyCard(v-if="source === 'adventure'" compact)
-              span(class="fq-unlock" role="group")
-                span(class="fq-unlock-n") {{ pool.length }}
-                  small {{ t('app.family.unlockOf', { total: poolTotal }) }}
-                span(class="fq-unlock-bar" aria-hidden="true")
-                  span(class="fq-unlock-fill" :style="{ width: Math.round(poolShare * 100) + '%' }")
-
-            FamilySeats(v-model:count="playerCount" :names="names" :min="MIN_PLAYERS" :max="MAX_PLAYERS" :question="t('app.family.howMany')" @update:names="setNames")
-
-            FamilySwitch(v-model="teams") {{ t('app.family.teamsOn') }}
-            template(v-if="teams")
-              FamilyCard(compact)
-                span(class="fq-fine") {{ t('app.family.teamsNote') }}
-              div(class="fq-teams")
-                FamilyCard(v-for="(line, k) in teamLines" :key="k" compact)
-                  span(class="fq-team")
-                    strong {{ line.name }}
-                    span(class="fq-fine") {{ line.members }}
-
-          div(class="fq-col")
-            FamilyCard(:title="t('app.family.rounds')")
+          //- one device: how many questions for everybody
+          template(v-if="mode === 'table'")
+            FamilyCard(v-if="!pool.length" compact)
+              span(class="fq-fine") {{ source === 'adventure' ? t('app.family.empty') : t('app.family.loading') }}
+            FamilyCard(v-else :title="t('app.family.rounds')")
               div(class="fq-marks" role="radiogroup")
                 FamilyChip(v-for="r in ROUND_CHOICES" :key="r" round :selected="rounds === r" :disabled="r > maxRounds" @click="rounds = r") {{ r }}
               span(class="fq-fine") {{ roundsText }}
-            div(class="fq-go")
-              FamilyButton(:disabled="maxRounds < 1" @click="start") {{ t('app.family.start') }}
 
-      //- ===== a question =====
-      div(v-else-if="phase === 'ask' || phase === 'reveal'" class="fq-play")
+          //- several phones: the quiz of the day, a new round, join with a code
+          div(v-else class="fq-things")
+            FamilyCard(class="fq-thing" :title="t('app.family.codeDaily')")
+              span(class="fq-fine") {{ dailyDoneToday ? t('app.family.codeDailyDone', { score: dailyResult?.score ?? 0, total: dailyResult?.total ?? 0 }) : t('app.family.codeDailyText', { n: DAILY_QUESTIONS }) }}
+              FamilyButton(:disabled="!dailyReady" @click="playDaily") {{ t('app.family.codeDailyGo') }}
+
+            FamilyCard(class="fq-thing" :title="t('app.family.codeNew')")
+              span(class="fq-fine") {{ t('app.family.codeNewText', { n: ROUND_QUESTIONS }) }}
+              FamilyButton(:disabled="!codeReady" @click="newRound") {{ t('app.family.codeNewGo') }}
+
+            FamilyCard(class="fq-thing" :title="t('app.family.codeJoin')")
+              FamilyNameField(v-model="codeInput" code :maxlength="8" placeholder="K7M-4QX" :aria-label="t('app.family.codeJoin')" @enter="joinRound")
+              span(v-if="codeError" class="fq-fine fq-error" role="alert") {{ t(`app.family.codeError_${codeError}`) }}
+              FamilyButton(:disabled="!codeInput.trim()" @click="joinRound") {{ t('app.family.codeJoinGo') }}
+
+      //- ===== 3. a question =====
+      div(v-else-if="playing" class="fq-play")
         div(class="fq-left")
-          //- the road with the travellers (upright, up to three people); sideways and for more people the row of small tags
-          MapRoute(v-if="showRoad" class="fq-road" :players="travellers" :max="perPlayer" aria-hidden="true")
-          MapScoreBar(:class="['fq-tags', { 'is-alt': showRoad }]" :players="travellers" aria-hidden="true")
           div(class="fq-meta")
             p(v-if="mode === 'code'" class="fq-chip") {{ isDaily ? t('app.family.codeChipDaily') : t('app.family.codeChip', { code: showCode(roundCode) }) }}
             p(v-else class="fq-turn")
               MapToken(:index="who" :size="38" lit)
               span {{ t('app.family.turn', { name: whoName }) }}
-            p(class="fq-count") {{ t('app.family.question', { n: index + 1, total: questions.length }) }}
           FamilyQuestionCard(
             :key="index"
             class="fq-qcard"
@@ -496,23 +528,31 @@ const questionSize = computed(() => {
             span(v-if="current?.ref" class="fq-ref") {{ current.ref }}
           FamilyButton(class="fq-next" @click="next") {{ nextLabel }}
 
-      //- ===== the end =====
-      FamilyResult(v-else :headline="endHeadline" :rows="mode === 'code' ? [] : rankRows" :winner-index="winnerIndex")
-        template(v-if="mode === 'code'")
-          p(v-if="!isDaily" class="fq-codebig") {{ showCode(roundCode) }}
-          FamilyCard(compact)
-            span(class="fq-fine") {{ isDaily ? t('app.family.codeShareDaily') : t('app.family.codeShare') }}
-          FamilyButton(@click="phase = 'setup'") {{ t('app.family.codeBack') }}
-        template(v-else)
-          template(v-if="useTeams")
-            FamilyCard(v-for="(line, k) in teamLines" :key="k" class="fq-endteam" compact)
-              span(class="fq-endteam-in")
-                span(class="fq-endteam-text")
-                  strong {{ line.name }}
-                  span(class="fq-fine") {{ line.members }}
-                strong(class="fq-endteam-n") {{ t('app.family.points', line.points) }}
-          FamilyButton(@click="start") {{ t('app.family.again') }}
-          FamilyButton(quiet @click="phase = 'setup'") {{ t('app.family.change') }}
+      //- ===== 4. the end: the podium =====
+      FamilyPodium(
+        v-else
+        game="quiz"
+        :headline="endHeadline"
+        :rows="podiumRows"
+        :winner-index="winnerIndex"
+        @again="start"
+        @change="phase = 'lobby'"
+        @exit="toGames"
+      )
+        template(v-slot:extra)
+          //- with teams: the people below the two teams
+          ol(v-if="useTeams" class="fq-endlist")
+            li(v-for="r in rankRows" :key="r.name + r.index")
+              MapToken(:index="r.index" :size="34")
+              span(class="fq-endlist-name") {{ r.name }}
+              strong {{ r.score }}
+          template(v-if="mode === 'code'")
+            p(v-if="!isDaily" class="fq-codebig") {{ showCode(roundCode) }}
+            FamilyCard(compact)
+              span(class="fq-fine") {{ isDaily ? t('app.family.codeShareDaily') : t('app.family.codeShare') }}
+        template(v-if="mode === 'code'" v-slot:actions)
+          FamilyButton(@click="phase = 'lobby'") {{ t('app.family.codeBack') }}
+          FamilyButton(quiet @click="toGames") {{ t('app.bigGames.familyFlow.toGames') }}
 </template>
 
 <style scoped lang="sass">
@@ -520,15 +560,17 @@ const questionSize = computed(() => {
   display: flex
   flex-direction: column
   gap: 16px
+  min-height: 100%
   max-width: 36rem
   margin: 0 auto
   padding: 6px 0 24px
 
-// ── setup ──
+// ── the players page: how, which questions, how many ──
 .fq-modes
   display: grid
   grid-template-columns: repeat(2, minmax(0, 1fr))
   gap: 10px
+  width: 100%
 
 .fq-wide-chip
   width: 100%
@@ -567,29 +609,6 @@ const questionSize = computed(() => {
   font-size: 0.9rem
   font-weight: 700
 
-.fq-setup, .fq-col
-  display: flex
-  flex-direction: column
-  gap: 16px
-
-.fq-teams
-  display: grid
-  grid-template-columns: repeat(2, minmax(0, 1fr))
-  gap: 10px
-
-.fq-team
-  display: flex
-  flex-direction: column
-  align-items: center
-  min-width: 0
-  line-height: 1.25
-  text-align: center
-
-.fq-go
-  display: flex
-  justify-content: center
-  padding: 4px 0 8px
-
 .fq-unlock
   display: flex
   flex-direction: column
@@ -623,15 +642,11 @@ const questionSize = computed(() => {
   background: var(--fam-gold)
 
 // ── the round code ──
-.fq-code
-  display: flex
-  flex-direction: column
-  gap: 16px
-
 .fq-things
   display: flex
   flex-direction: column
   gap: 16px
+  width: 100%
 
 .fq-thing
   :deep(.fam-card-body)
@@ -656,10 +671,6 @@ const questionSize = computed(() => {
   align-items: center
   gap: 2px
 
-// upright: the road for up to three people; sideways: the tags (they take less room)
-.fq-tags.is-alt
-  display: none
-
 .fq-turn
   display: flex
   align-items: center
@@ -669,13 +680,6 @@ const questionSize = computed(() => {
   color: var(--fam-ink)
   font-size: 1.3rem
   font-weight: 800
-
-.fq-count
-  margin: 0
-  color: var(--fam-muted)
-  text-align: center
-  font-size: 0.95rem
-  font-weight: 700
 
 .fq-chip
   margin: 2px 0 0
@@ -745,29 +749,35 @@ const questionSize = computed(() => {
   font-weight: 800
   letter-spacing: 0.14em
 
-.fq-endteam
-  width: min(100%, 24rem)
-
-.fq-endteam-in
-  display: flex
-  align-items: center
-  justify-content: space-between
-  gap: 10px
+.fq-endlist
+  display: grid
+  gap: 8px
   width: 100%
+  margin: 0
+  padding: 0
+  list-style: none
 
-.fq-endteam-text
-  display: flex
-  flex-direction: column
-  align-items: center
-  flex: 1
-  min-width: 0
-  line-height: 1.25
-  text-align: center
+  li
+    display: grid
+    grid-template-columns: 38px minmax(0, 1fr) auto
+    align-items: center
+    gap: 10px
+    min-height: 48px
+    padding: 4px 14px 4px 8px
+    border: 1.5px solid var(--fam-line)
+    border-radius: 16px
+    background: var(--fam-card)
+    box-shadow: var(--fam-shadow)
+    font-size: 1.05rem
+    font-weight: 700
 
-.fq-endteam-n
-  flex: none
+.fq-endlist-name
+  overflow: hidden
+  text-align: left
+  text-overflow: ellipsis
+  white-space: nowrap
 
-// ── sideways: the setup and the game in two columns ──
+// ── sideways: the game in two columns (the players page and the end arrange themselves) ──
 @media (orientation: landscape)
   .fq
     max-width: 62rem
@@ -775,28 +785,10 @@ const questionSize = computed(() => {
 
   .fq-modes
     max-width: 40rem
-    width: 100%
     margin: 0 auto
 
-  .fq-setup
-    display: grid
-    grid-template-columns: repeat(2, minmax(0, 1fr))
-    gap: 12px 18px
-    align-items: start
-
-  .fq-setup > .fq-wide
-    grid-column: 1 / -1
-
-  .fq-things
-    display: grid
-    grid-template-columns: repeat(3, minmax(0, 1fr))
-    align-items: stretch
-    gap: 14px
-
-  .fq-codename
-    max-width: 24rem
-    width: 100%
-    margin: 0 auto
+  .fq-wide-chip
+    min-height: 48px
 
   .fq-play
     display: grid
@@ -849,17 +841,4 @@ const questionSize = computed(() => {
     min-width: 0
     width: auto
     padding: 8px 14px
-
-  .fq-road
-    display: none
-
-  .fq-tags.is-alt
-    display: flex
-
-  .fq-meta
-    flex-direction: row
-    flex-wrap: wrap
-    align-items: center
-    justify-content: center
-    gap: 2px 16px
 </style>

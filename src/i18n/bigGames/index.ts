@@ -6,6 +6,7 @@ import arche from './arche'
 import bezalel from './bezalel'
 import bogen from './bogen'
 import common from './common'
+import familyFlow from './familyFlow'
 import home from './home'
 import karawane from './karawane'
 import lamm from './lamm'
@@ -18,9 +19,9 @@ import wasser from './wasser'
 import wortreise from './wortreise'
 
 export const BIG_GAME_TEXTS = {
-  de: { common: common.de, bogen: bogen.de, wasser: wasser.de, arche: arche.de, bezalel: bezalel.de, mose: mose.de, karawane: karawane.de, nehemia: nehemia.de, wortreise: wortreise.de, memory: memory.de, lamm: lamm.de, rooms: rooms.de, result: result.de, home: home.de },
-  en: { common: common.en, bogen: bogen.en, wasser: wasser.en, arche: arche.en, bezalel: bezalel.en, mose: mose.en, karawane: karawane.en, nehemia: nehemia.en, wortreise: wortreise.en, memory: memory.en, lamm: lamm.en, rooms: rooms.en, result: result.en, home: home.en },
-  es: { common: common.es, bogen: bogen.es, wasser: wasser.es, arche: arche.es, bezalel: bezalel.es, mose: mose.es, karawane: karawane.es, nehemia: nehemia.es, wortreise: wortreise.es, memory: memory.es, lamm: lamm.es, rooms: rooms.es, result: result.es, home: home.es }
+  de: { common: common.de, bogen: bogen.de, wasser: wasser.de, arche: arche.de, bezalel: bezalel.de, mose: mose.de, karawane: karawane.de, nehemia: nehemia.de, wortreise: wortreise.de, memory: memory.de, lamm: lamm.de, rooms: rooms.de, result: result.de, home: home.de, familyFlow: familyFlow.de },
+  en: { common: common.en, bogen: bogen.en, wasser: wasser.en, arche: arche.en, bezalel: bezalel.en, mose: mose.en, karawane: karawane.en, nehemia: nehemia.en, wortreise: wortreise.en, memory: memory.en, lamm: lamm.en, rooms: rooms.en, result: result.en, home: home.en, familyFlow: familyFlow.en },
+  es: { common: common.es, bogen: bogen.es, wasser: wasser.es, arche: arche.es, bezalel: bezalel.es, mose: mose.es, karawane: karawane.es, nehemia: nehemia.es, wortreise: wortreise.es, memory: memory.es, lamm: lamm.es, rooms: rooms.es, result: result.es, home: home.es, familyFlow: familyFlow.es }
 } as Record<'de' | 'en' | 'es', Record<string, Record<string, unknown>>>
 
 /**

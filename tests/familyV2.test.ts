@@ -5,7 +5,7 @@
 import { readFileSync } from 'node:fs'
 import { flushPromises, mount } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import messages from '@/i18n/app'
 import { withGameTexts } from '@/i18n/bigGames'
 import FamilyButton from '@/components/molecules/family/FamilyButton.vue'
@@ -38,9 +38,9 @@ const i18n = createI18n({ legacy: false, locale: 'de', fallbackLocale: 'de', mes
 const opts = { global: { plugins: [i18n], stubs: { RouterLink: true } }, attachTo: document.body }
 const src = (p: string) => readFileSync(p, 'utf8').replace(/\r/g, '')
 
-/** The questions of the Bible quiz load asynchronously: wait until the start button is there. */
-async function loaded(w: { find: (s: string) => { exists: () => boolean } }) {
-  for (let i = 0; i < 40 && !w.find('.fq-go .fam-btn').exists(); i++) {
+/** The questions of the Bible quiz load asynchronously: wait until the question bank is there (the "Los geht's" capsule of the players page is not disabled). */
+async function loaded(w: { find: (s: string) => { exists: () => boolean; attributes: (n: string) => string | undefined } }) {
+  for (let i = 0; i < 40 && w.find('.fam-lobby-go .fam-btn').attributes('disabled') !== undefined; i++) {
     await new Promise((r) => setTimeout(r, 25))
     await flushPromises()
   }
@@ -204,15 +204,21 @@ describe('FamilyResult', () => {
 })
 
 describe('the quiz in the new look', () => {
-  it('opens on the table of the game and shows the setup with the new pieces', async () => {
+  beforeEach(() => localStorage.clear())
+
+  it('opens on the table of the game, first with the title screen, then with the players page and the new pieces', async () => {
     const { default: View } = await import('@/views/app/AppFamilyQuizView.vue')
     const w = mount(View, opts)
     await flushPromises()
-    await loaded(w)
     expect(w.find('.mt').classes()).toContain('fam-game--quiz')
+    expect(w.find('.fam-start').exists()).toBe(true)
+    await w.find('.fam-start-play').trigger('click')
+    await flushPromises()
+    await loaded(w)
+    expect(w.find('.fam-lobby').exists()).toBe(true)
     expect(w.findAll('.fam-chip').length).toBeGreaterThan(5)
     expect(w.find('.fam-card-head').exists()).toBe(true)
-    expect(w.find('.fam-btn--primary').exists()).toBe(true)
+    expect(w.find('.fam-lobby-go .fam-btn--primary').exists()).toBe(true)
     // the old pieces are gone
     expect(w.find('.mpa').exists()).toBe(false)
     expect(w.find('.mb').exists()).toBe(false)
@@ -220,16 +226,19 @@ describe('the quiz in the new look', () => {
     w.unmount()
   })
 
-  it('plays a round: four tiles A to D, the verdict, the end with the ranking', async () => {
+  it('plays a round: four tiles A to D, the verdict, the end with the podium', async () => {
     const { default: View } = await import('@/views/app/AppFamilyQuizView.vue')
     const w = mount(View, opts)
     await flushPromises()
-    await loaded(w)
-    await w.find('.fq-go .fam-btn').trigger('click')
+    await w.find('.fam-start-play').trigger('click')
     await flushPromises()
+    await loaded(w)
+    await w.find('.fam-lobby-go .fam-btn').trigger('click')
+    await flushPromises()
+    expect(w.find('.fam-bar').exists()).toBe(true)
     expect(w.find('.fam-q-chip').exists()).toBe(true)
     let guard = 0
-    while (!w.find('.fam-res').exists() && guard++ < 30) {
+    while (!w.find('.fam-pod').exists() && guard++ < 30) {
       const tiles = w.findAll('.fam-choice')
       expect(tiles.length).toBeGreaterThanOrEqual(3)
       expect(tiles[0]!.find('.fam-choice-letter').text()).toBe('A')
@@ -239,8 +248,8 @@ describe('the quiz in the new look', () => {
       await w.find('.fq-reveal .fam-btn').trigger('click')
       await flushPromises()
     }
-    expect(w.find('.fam-res').exists()).toBe(true)
-    expect(w.find('.fam-res-head').text().length).toBeGreaterThan(3)
+    expect(w.find('.fam-pod').exists()).toBe(true)
+    expect(w.find('.fam-pod-head').text().length).toBeGreaterThan(3)
     w.unmount()
   })
 
