@@ -295,15 +295,25 @@ function resetAll() {
   &:active
     transform: translateY(1px)
 
+// The height comes from padding (a share of the width), not from `aspect-ratio`: Safari on the iPad let the picture box shrink to nothing inside
+// the button (only the title and the bar were left, Anton 20.11.2026). 62.5 % = 16 : 10.
 .resume-thumb
   position: relative
-  aspect-ratio: 16 / 10
+  flex: none
+  width: 100%
+  height: 0
+  padding-top: 62.5%
   overflow: hidden
   background: var(--lk-surface-2)
   color: var(--lk-muted)
-  display: flex
-  align-items: center
-  justify-content: center
+  display: block
+
+  // the symbol of a tile without a picture sits in the middle of the box
+  > :deep(.z-icon)
+    position: absolute
+    left: 50%
+    top: 50%
+    transform: translate(-50%, -50%)
 
   // the picture fills the box without ever making it taller (a tall book cover would otherwise stretch the card)
   img
@@ -449,7 +459,7 @@ function resetAll() {
   grid-column: span 2
 
   .resume-thumb
-    aspect-ratio: 16 / 6
+    padding-top: 37.5%
 
 .hg-tile.is-dragging
   opacity: 0.25
@@ -647,7 +657,7 @@ function resetAll() {
     grid-template-columns: repeat(4, minmax(0, 1fr))
 
   .hg-tile--wide .resume-thumb
-    aspect-ratio: 16 / 7
+    padding-top: 43.75%
 </style>
 
 <style lang="sass">
