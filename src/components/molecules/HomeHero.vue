@@ -6,6 +6,7 @@
  * once the child has touched them.
  */
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import LkCompanion from '@/components/atoms/LkCompanion.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 
@@ -27,6 +28,29 @@ const props = withDefaults(defineProps<{ slides: HeroSlide[]; intervalMs?: numbe
   intervalMs: 8000,
   label: ''
 })
+
+const { t } = useI18n()
+
+// The text under the title folds in and out (Anton 19.11.2026): at first only the title and a small arrow show. One choice for all slides,
+// so the card keeps its height when it is swiped; it is kept on the device.
+const OPEN_KEY = 'lk-hero-open-v1'
+function readOpen(): boolean {
+  try {
+    return localStorage.getItem(OPEN_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+const open = ref(readOpen())
+function toggle() {
+  open.value = !open.value
+  pause()
+  try {
+    localStorage.setItem(OPEN_KEY, open.value ? '1' : '0')
+  } catch {
+    /* private window: the choice just is not kept */
+  }
+}
 
 const track = ref<HTMLElement | null>(null)
 const index = ref(0)
@@ -91,17 +115,28 @@ onBeforeUnmount(() => {
         div(:class="['hero-copy', { 'has-lamb': i === 0 }]")
           LkCompanion(v-if="i === 0" class="hero-lamb" pose="sitzen" :size="84")
           p(v-if="s.eyebrow" class="hero-eyebrow") {{ s.eyebrow }}
-          h2(:class="['hero-title', { 'has-eyebrow': !!s.eyebrow }]") {{ s.title }}
-          p(v-if="s.slogan" class="hero-slogan") {{ s.slogan }}
-          p(class="hero-text") {{ s.text }}
-          ul(v-if="s.points?.length" class="hero-points")
-            li(v-for="(p, k) in s.points" :key="k" class="hero-point")
-              span(class="hero-point-ico" :class="{ 'has-image': !!p.image }" aria-hidden="true")
-                img(v-if="p.image" :src="p.image" alt="" draggable="false")
-                ZIconography(v-else :name="p.icon" :size="22")
-              span(class="hero-point-copy")
-                b {{ p.label }}
-                span {{ p.text }}
+          div(class="hero-head" @click="toggle")
+            h2(:class="['hero-title', { 'has-eyebrow': !!s.eyebrow }]") {{ s.title }}
+            button(
+              type="button"
+              :class="['hero-fold', { 'is-open': open }]"
+              :aria-expanded="open"
+              :aria-label="open ? t('app.home.heroClose') : t('app.home.heroOpen')"
+              @click.stop="toggle"
+            )
+              ZIconography(name="chevron-down" :size="22")
+          div(:class="['hero-more', { 'is-open': open }]" :inert="!open")
+            div(class="hero-more-in")
+              p(v-if="s.slogan" class="hero-slogan") {{ s.slogan }}
+              p(class="hero-text") {{ s.text }}
+              ul(v-if="s.points?.length" class="hero-points")
+                li(v-for="(p, k) in s.points" :key="k" class="hero-point")
+                  span(class="hero-point-ico" :class="{ 'has-image': !!p.image }" aria-hidden="true")
+                    img(v-if="p.image" :src="p.image" alt="" draggable="false")
+                    ZIconography(v-else :name="p.icon" :size="22")
+                  span(class="hero-point-copy")
+                    b {{ p.label }}
+                    span {{ p.text }}
           div(class="hero-actions")
             slot(name="actions" :index="i" :id="s.id")
     div(v-if="slides.length > 1" class="hero-dots")
@@ -178,6 +213,51 @@ onBeforeUnmount(() => {
   right: 16px
   // the lamb sits on the upper edge of the text panel and never covers the title
   top: -80px
+
+.hero-head
+  display: flex
+  align-items: center
+  justify-content: space-between
+  gap: 8px
+  cursor: pointer
+
+// the small arrow: 44 px to tap, the symbol turns over when the text is open
+.hero-fold
+  flex: 0 0 44px
+  width: 44px
+  height: 44px
+  margin: -6px -8px -6px 0
+  border: none
+  border-radius: 999px
+  background: transparent
+  color: var(--lk-accent)
+  display: flex
+  align-items: center
+  justify-content: center
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+
+  :deep(svg)
+    transition: transform 220ms ease-out
+
+  &.is-open :deep(svg)
+    transform: rotate(180deg)
+
+// the folding part: it grows from nothing to its height
+.hero-more
+  display: grid
+  grid-template-rows: 0fr
+  transition: grid-template-rows 240ms ease-out
+
+  &.is-open
+    grid-template-rows: 1fr
+
+.hero-more-in
+  min-height: 0
+  overflow: hidden
+  display: flex
+  flex-direction: column
+  gap: 4px
 
 .hero-title
   margin: 0
