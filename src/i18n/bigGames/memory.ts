@@ -1,7 +1,7 @@
-/** The texts of the big game "memory" (Bilder-Memory; german, english, spanish), merged into `app.bigGames.memory` (see `index.ts`). */
+/** The texts of the big game "memory" (Bilder-Paare; german, english, spanish), merged into `app.bigGames.memory` (see `index.ts`). */
 export default {
   de: {
-    title: 'Bilder-Memory',
+    title: 'Bilder-Paare',
     story: 'Finde zu jedem Abenteuer die Bilderpaare. Dann siehst du das ganze Bild.',
     task: 'Deine Aufgabe: Finde alle Paare.',
     stageLine: 'Etappe {n}: {title}',
@@ -42,7 +42,7 @@ export default {
     cardOpen: 'Offene Karte'
   },
   en: {
-    title: 'Picture Memory',
+    title: 'Picture Pairs',
     story: 'Find the picture pairs of every adventure. Then you see the whole picture.',
     task: 'Your task: find all the pairs.',
     stageLine: 'Stage {n}: {title}',
@@ -83,7 +83,7 @@ export default {
     cardOpen: 'Card face up'
   },
   es: {
-    title: 'Memoria de imágenes',
+    title: 'Parejas de imágenes',
     story: 'Encuentra las parejas de imágenes de cada aventura. Entonces verás la imagen entera.',
     task: 'Tu tarea: encuentra todas las parejas.',
     stageLine: 'Etapa {n}: {title}',

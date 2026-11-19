@@ -3,7 +3,7 @@ export default {
   de: {
     adventureSub: 'Mit Sternen freispielen',
     stageSub: 'Aus jeder Etappe ein Spiel',
-    familySub: 'Quiz, Memory, Bingo und mehr',
+    familySub: 'Quiz, Paare finden, Bingo und mehr',
     openOf: '{n} von {total} frei',
     homeMeta: 'Zusammen spielen',
     kindFamily: 'Familie',
@@ -12,7 +12,7 @@ export default {
   en: {
     adventureSub: 'Unlock them with stars',
     stageSub: 'One game from every stage',
-    familySub: 'Quiz, memory, bingo and more',
+    familySub: 'Quiz, Find the Pairs, bingo and more',
     openOf: '{n} of {total} unlocked',
     homeMeta: 'Play together',
     kindFamily: 'Family',
@@ -21,7 +21,7 @@ export default {
   es: {
     adventureSub: 'Se abren con estrellas',
     stageSub: 'Un juego de cada etapa',
-    familySub: 'Quiz, memoria, bingo y más',
+    familySub: 'Quiz, encuentra las parejas, bingo y más',
     openOf: '{n} de {total} abiertos',
     homeMeta: 'Jugar juntos',
     kindFamily: 'Familia',

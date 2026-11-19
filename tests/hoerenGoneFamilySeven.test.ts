@@ -56,8 +56,8 @@ describe('the "Hören" page is gone', () => {
 })
 
 const GAME_WORDS = {
-  de: ['Quiz', 'Bibel-Begriffe', 'Wer bin ich?', 'Reihenfolge-Rennen', 'Bibel-Bingo', 'Memory', 'Wortreise'],
-  en: ['quiz', 'Bible Words', 'Who am I?', 'order race', 'Bible bingo', 'memory', 'Word Journey']
+  de: ['Quiz', 'Bibel-Begriffe', 'Wer bin ich?', 'Reihenfolge-Rennen', 'Bibel-Bingo', 'Paare finden', 'Wortreise'],
+  en: ['quiz', 'Bible Words', 'Who am I?', 'order race', 'Bible bingo', 'Find the Pairs', 'Word Journey']
 }
 
 describe('seven family games', () => {

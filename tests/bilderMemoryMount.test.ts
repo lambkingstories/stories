@@ -1,5 +1,5 @@
 /**
- * "Bilder-Memory" on the screen: the overview with one card for every adventure, the explanation only once, a board, a pair and a miss, the card that comes
+ * "Bilder-Paare" (id memory) on the screen: the overview with one card for every adventure, the explanation only once, a board, a pair and a miss, the card that comes
  * together at the end, the stars that are kept, the end of the whole game, and the texts in all three languages.
  */
 import { afterAll, beforeAll, beforeEach, afterEach, describe, expect, it, vi } from 'vitest'
@@ -95,7 +95,7 @@ describe('BigGameMemory', () => {
 
   it('opens with the story and the explanation, which comes only once', async () => {
     const w = await open()
-    expect(w.text()).toContain('Bilder-Memory')
+    expect(w.text()).toContain('Bilder-Paare')
     expect(w.text()).toContain('Finde zu jedem Abenteuer die Bilderpaare. Dann siehst du das ganze Bild.')
     expect(w.find('[data-test="memory-howcard"]').exists()).toBe(true)
     await closeHow(w)
@@ -301,7 +301,7 @@ describe('BigGameMemory', () => {
   })
 })
 
-describe('the texts of the Bilder-Memory', () => {
+describe('the texts of the Bilder-Paare (id memory)', () => {
   const keys = (o: Record<string, unknown>) => Object.keys(o).sort()
 
   it('german, english and spanish have the same keys, all filled', () => {
@@ -332,7 +332,7 @@ describe('the texts of the Bilder-Memory', () => {
     localStorage.clear()
     const w = mount(BigGameMemory, { global: { plugins: [en] }, attachTo: document.body })
     await flushPromises()
-    expect(w.text()).toContain('Picture Memory')
+    expect(w.text()).toContain('Picture Pairs')
     expect(w.text()).toContain('Find the picture pairs')
     w.unmount()
   })
