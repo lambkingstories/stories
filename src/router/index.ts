@@ -49,7 +49,7 @@ export function prefetchRoutes() {
   if (saveData) return
   void AppAdventureHomeView()
   // the picture at the top of the adventure page is ready when the page opens
-  new Image().src = prependBaseUrl('images/bg/abenteuer-reise.webp')
+  new Image().src = prependBaseUrl('images/bg/abenteuer-reise-2.webp')
   void AppAdventureView()
   void AppAdventureStageView()
   void AppAdventureStatsView()

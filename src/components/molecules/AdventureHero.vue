@@ -17,17 +17,18 @@ interface Slot {
   s: number
 }
 
-// the places were chosen on the painting (the big valley): the medals lie on the bends of the path, near ones are bigger than far ones
-const IMAGE = 'images/bg/abenteuer-reise.webp'
-const MEDALS: Slot[] = [{ x: 58, y: 79, s: 15 }, { x: 35, y: 63, s: 12 }, { x: 55, y: 55, s: 10.5 }, { x: 77, y: 44, s: 9 }, { x: 84, y: 31, s: 7.5 }, { x: 93, y: 29, s: 6 }]
-const LAMB: Slot = { x: 80, y: 86, s: 11 }
-const COMPASS: Slot = { x: 91, y: 12, s: 9 }
+// the places were chosen on the painting (the sunny valley seen from the rock, Anton 20.11.2026): the medals lie on the bends of the path, near ones are bigger than far ones.
+// The LambKing and the two children are painted on the rock in the picture; the golden beads start at the foot of the path.
+const IMAGE = 'images/bg/abenteuer-reise-2.webp'
+const MEDALS: Slot[] = [{ x: 23, y: 75, s: 12.5 }, { x: 31, y: 65, s: 10.5 }, { x: 22, y: 57, s: 9.5 }, { x: 33, y: 49, s: 8.5 }, { x: 49, y: 39, s: 7 }, { x: 58, y: 30, s: 6 }]
+const START: Slot = { x: 27, y: 97, s: 1 }
+const COMPASS: Slot = { x: 47, y: 9, s: 8 }
 
 const props = defineProps<{ medals: string[] }>()
 
-// the golden beads that tie the places together: a soft curve from the lamb through the medals (the picture is 160 x 90 units, so beads stay round)
+// the golden beads that tie the places together: a soft curve from the foot of the path through the medals (the picture is 160 x 90 units, so beads stay round)
 const way = computed(() => {
-  const pts = [LAMB, ...MEDALS.slice(0, props.medals.length)].map((p) => [p.x * 1.6, p.y * 0.9] as const)
+  const pts = [START, ...MEDALS.slice(0, props.medals.length)].map((p) => [p.x * 1.6, p.y * 0.9] as const)
   if (pts.length < 2) return ''
   let d = `M ${pts[0]![0]} ${pts[0]![1]}`
   for (let i = 0; i < pts.length - 1; i++) {
@@ -45,7 +46,7 @@ const way = computed(() => {
 const loaded = ref(0)
 const ready = ref(false)
 let timer = 0
-const need = computed(() => 1 + props.medals.length + 2)
+const need = computed(() => 1 + props.medals.length + 1)
 function one() {
   loaded.value++
   if (loaded.value >= need.value) ready.value = true
@@ -69,7 +70,6 @@ const placed = computed(() => MEDALS.slice(0, props.medals.length).map((p, i) =>
       path(:d="way" class="ah-bead ah-bead-gold")
     img(v-for="(m, i) in placed" :key="i" :src="prependBaseUrl(m.thumb)" alt="" class="ah-el ah-medal" :style="m.style" draggable="false" decoding="async" @load="one" @error="(e) => { onThumbError(e, prependBaseUrl(m.src)); one() }")
     img(:src="prependBaseUrl('images/icons/navi/abenteuer.webp')" alt="" class="ah-el ah-compass" :style="spot(COMPASS)" draggable="false" @load="one" @error="one")
-    img(:src="prependBaseUrl('images/logo/lk-lamm.webp')" alt="" class="ah-el ah-lamb" :style="spot(LAMB)" draggable="false" @load="one" @error="one")
     slot
 </template>
 
@@ -139,6 +139,4 @@ const placed = computed(() => MEDALS.slice(0, props.medals.length).map((p, i) =>
 .ah-compass
   filter: drop-shadow(0 2px 4px rgba(40, 24, 4, 0.4))
 
-.ah-lamb
-  filter: drop-shadow(0 3px 4px rgba(40, 24, 4, 0.4))
 </style>
