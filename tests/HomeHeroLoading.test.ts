@@ -49,4 +49,14 @@ describe('HomeHero · folding text', () => {
     wrapper.unmount()
     localStorage.removeItem('lk-hero-open-v1')
   })
+
+  it('the slogan (the four words) stays outside the folding part, so it can be read when the text is folded', () => {
+    localStorage.removeItem('lk-hero-open-v1')
+    const wrapper = mount(HomeHero, { props: { slides: [{ id: 'w', image: '/w.webp', title: 'Willkommen', slogan: 'A · B · C · D', text: 'Text' }], intervalMs: 100000 } })
+    const slogan = wrapper.find('.hero-slogan')
+    expect(slogan.exists()).toBe(true)
+    expect(slogan.element.closest('.hero-more')).toBeNull()
+    expect(wrapper.find('.hero-more').classes()).not.toContain('is-open')
+    wrapper.unmount()
+  })
 })

@@ -125,9 +125,10 @@ onBeforeUnmount(() => {
               @click.stop="toggle"
             )
               ZIconography(name="chevron-down" :size="22")
+          //- the slogan (the four words) always stays readable, folded or not
+          p(v-if="s.slogan" class="hero-slogan") {{ s.slogan }}
           div(:class="['hero-more', { 'is-open': open }]" :inert="!open")
             div(class="hero-more-in")
-              p(v-if="s.slogan" class="hero-slogan") {{ s.slogan }}
               p(class="hero-text") {{ s.text }}
               ul(v-if="s.points?.length" class="hero-points")
                 li(v-for="(p, k) in s.points" :key="k" class="hero-point")

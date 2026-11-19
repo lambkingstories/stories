@@ -59,7 +59,7 @@ const cards = [
 ]
 /** What stays free for ever, as a list of ticks (texts that exist in all languages). */
 const FREE = ['app.plus.plusFree1', 'app.plus.plusFree2', 'app.plus.plusFree3', 'app.plus.plusFree4', 'app.plus.area2Free2', 'app.plus.area4Free1']
-const hero = img('bg/willkommen-plus-3')
+const hero = img('bg/willkommen-plus-4')
 </script>
 
 <template lang="pug">

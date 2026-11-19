@@ -871,7 +871,7 @@ export default {
     welcomeTitle1: 'Apoya nuestra misión',
     welcomeText1: 'Ayúdanos a hacer posibles nuevas historias, audiolibros y dibujos para colorear para los niños.',
     plusTitle: 'LambKing Plus',
-    plusText: 'Libros leídos en voz alta, todas las aventuras, todos los libros para colorear, más colores y lápices con brillantina. Leer las historias sigue siendo gratis para todos los niños.',
+    plusText: '¡Descubre aún más! Con LambKing Plus se abre todo el viaje por la Biblia, para ti y tu familia.',
     plusMore: 'Saber más',
     welcomeTitle2: 'Descubre nuestro mundo de libros',
     welcomeText2: 'Hermosos libros infantiles impresos con historias bíblicas para leer en voz alta y regalar.',
