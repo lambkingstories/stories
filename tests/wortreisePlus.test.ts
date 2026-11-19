@@ -32,7 +32,11 @@ describe('Wortreise and Plus', () => {
     await flushPromises()
     expect(w.text()).toContain('gehört zu LambKing Plus')
     expect(w.find('.wr-setup').exists()).toBe(false)
-    await w.find('button.mb').trigger('click')
+    // the lock card has its own button, and the pill "Play" of the title screen opens the Plus sheet too
+    await w.find('.wr-lock').trigger('click')
+    expect(showUpsell).toHaveBeenCalledWith('family')
+    showUpsell.mockClear()
+    await w.find('.fam-start-play').trigger('click')
     expect(showUpsell).toHaveBeenCalledWith('family')
     w.unmount()
   })

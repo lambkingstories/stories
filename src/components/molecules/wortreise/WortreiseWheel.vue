@@ -1,21 +1,17 @@
 <script setup lang="ts">
 /**
- * The letter circle of the Wortreise: the letters lie on a round board of dark wood, each on an ivory tile. A word is drawn with one finger from
- * letter to letter (a brass line follows it), the finger lifts and the word is handed over (`submit`). Going back to the letter before takes the
+ * The letter circle of the Wortreise in the light look of "Familien-Spiele v2": a round white board with a soft edge, the letters lie on it as white discs with
+ * a line. A word is drawn with one finger from letter to letter (a golden trace follows it, the chosen letters turn gold), the finger lifts and the word is handed over (`submit`). Going back to the letter before takes the
  * last one away. A single tap on a letter starts a word that is built tap by tap (`taps` tells the page, which then shows the buttons to take
  * the last letter away and to hand the word over: `undo`, `send`); the keys of a keyboard work too (letters, Enter, Backspace, Escape, Space for
  * mixing). The button in the middle mixes the letters. The letters that are drawn are told to the page (`word`), which shows them above the circle.
  */
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { prependBaseUrl } from '@/utils/function'
 
 const props = withDefaults(defineProps<{ letters: string[]; disabled?: boolean; bad?: boolean }>(), { disabled: false, bad: false })
 const emit = defineEmits<{ submit: [word: string]; mix: []; tick: [n: number]; word: [word: string]; taps: [on: boolean] }>()
 const { t } = useI18n({ useScope: 'global' })
-
-const plate = `url(${prependBaseUrl('images/familie/wortreise/scheibe.webp')})`
-const tile = `url(${prependBaseUrl('images/familie/wortreise/stein.webp')})`
 
 /** Where the letters lie, in parts of the side of the board (0 to 1). */
 const RADIUS = 0.35
@@ -208,7 +204,6 @@ defineExpose({ clear, undo, send })
     div(
       ref="board"
       :class="['ww-board', { 'is-off': disabled, 'is-bad': bad }]"
-      :style="{ backgroundImage: plate }"
       @pointerdown.prevent="down"
       @pointermove="move"
       @pointerup="up"
@@ -221,7 +216,7 @@ defineExpose({ clear, undo, send })
         v-for="(n, i) in nodes"
         :key="i"
         :class="['ww-node', { 'is-on': sel.includes(i) }]"
-        :style="{ left: n.x * 100 + '%', top: n.y * 100 + '%', backgroundImage: tile }"
+        :style="{ left: n.x * 100 + '%', top: n.y * 100 + '%' }"
       )
         span {{ n.ch }}
       button(type="button" class="ww-mix" :disabled="disabled" :aria-label="t('app.bigGames.wortreise.mix')" @pointerdown.stop @click="clear(); emit('mix')")
@@ -238,26 +233,27 @@ defineExpose({ clear, undo, send })
   user-select: none
   -webkit-user-select: none
 
-// the round board: dark walnut with a brass ring; the letters lie on it
+// the round board: a white disc with a soft edge; the letters lie on it
 .ww-board
   position: relative
+  box-sizing: border-box
   width: var(--wheel)
   height: var(--wheel)
+  border: 3px solid var(--fam-line-strong)
   border-radius: 50%
-  background-color: #4a3018
-  background-size: 100% 100%
-  background-repeat: no-repeat
-  box-shadow: 0 10px 18px rgba(10, 5, 0, 0.55)
+  background: radial-gradient(circle at 50% 36%, var(--fam-card), color-mix(in srgb, var(--fam-accent) 9%, var(--fam-card)) 88%)
+  box-shadow: var(--fam-shadow)
   touch-action: none
   cursor: pointer
   -webkit-tap-highlight-color: transparent
+  transition: opacity 0.25s
 
   &.is-off
-    filter: saturate(0.6) brightness(0.85)
+    opacity: 0.6
     cursor: default
 
   &.is-bad
-    animation: ww-shake 0.4s
+    border-color: var(--fam-bad)
 
 .ww-line
   position: absolute
@@ -273,40 +269,44 @@ defineExpose({ clear, undo, send })
   stroke-linejoin: round
 
 .ww-path-shade
-  stroke: rgba(30, 14, 2, 0.55)
-  stroke-width: 4.6
+  stroke: color-mix(in srgb, var(--fam-gold-deep) 38%, transparent)
+  stroke-width: 5
 
 .ww-path
-  stroke: #f2cf72
-  stroke-width: 2.6
+  stroke: var(--fam-gold)
+  stroke-width: 3
 
+// a letter: a white disc with a line; chosen: gold
 .ww-node
   position: absolute
+  box-sizing: border-box
   display: grid
   place-items: center
   width: 20.5%
   height: 20.5%
   transform: translate(-50%, -50%)
-  border-radius: 22%
-  background-color: #f0e2bd
-  background-size: 100% 100%
-  background-repeat: no-repeat
-  color: #3a2812
-  font-family: var(--mp-serif, Georgia, serif)
+  border: 2px solid var(--fam-line-strong)
+  border-radius: 50%
+  background: var(--fam-card)
+  box-shadow: 0 3px 0 var(--fam-line), 0 6px 10px -6px color-mix(in srgb, var(--fam-ink) 45%, transparent)
+  color: var(--fam-ink)
   font-size: calc(var(--wheel) * 0.115)
   font-weight: 800
   line-height: 1
   pointer-events: none
-  filter: drop-shadow(0 3px 3px rgba(10, 5, 0, 0.6))
-  transition: transform 0.14s, filter 0.14s
+  transition: transform 0.14s, background-color 0.14s, border-color 0.14s
 
   span
     transform: translateY(-2%)
 
   &.is-on
-    transform: translate(-50%, -50%) scale(1.12)
-    filter: drop-shadow(0 0 10px rgba(255, 205, 100, 0.95)) drop-shadow(0 3px 3px rgba(10, 5, 0, 0.6)) brightness(1.06)
+    transform: translate(-50%, -50%) scale(1.1)
+    border-color: var(--fam-gold-deep)
+    background: var(--fam-gold)
+    color: var(--fam-on-gold)
+    box-shadow: 0 3px 0 var(--fam-gold-deep)
 
+// the button in the middle: mix the letters
 .ww-mix
   position: absolute
   left: 50%
@@ -315,34 +315,31 @@ defineExpose({ clear, undo, send })
   place-items: center
   width: 17%
   height: 17%
-  min-width: 44px
-  min-height: 44px
+  min-width: 48px
+  min-height: 48px
   transform: translate(-50%, -50%)
   padding: 0
+  border: 2px solid var(--fam-card)
   border-radius: 50%
-  border: 2px solid #f3d98a
-  background: radial-gradient(circle at 35% 30%, #c79a45, #7d5a22 70%, #4d3513)
-  box-shadow: 0 0 0 2px rgba(28, 18, 6, 0.9), 0 3px 8px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 240, 190, 0.7)
-  color: #fff3cf
+  background: var(--fam-primary)
+  box-shadow: 0 3px 0 var(--fam-primary-deep), 0 8px 12px -8px rgba(10, 40, 40, 0.55)
+  color: var(--fam-on-primary)
   cursor: pointer
+  touch-action: manipulation
   -webkit-tap-highlight-color: transparent
+
+  &:focus-visible
+    outline: 3px solid var(--fam-focus)
+    outline-offset: 3px
 
   &:active:not(:disabled)
     transform: translate(-50%, -50%) scale(0.94)
 
-@keyframes ww-shake
-  0%, 100%
-    transform: translateX(0)
-  20%
-    transform: translateX(-7px)
-  40%
-    transform: translateX(6px)
-  60%
-    transform: translateX(-4px)
-  80%
-    transform: translateX(3px)
+  &:disabled
+    opacity: 0.5
+    cursor: default
 
 @media (prefers-reduced-motion: reduce)
-  .ww-board.is-bad
-    animation: none
+  .ww-node, .ww-board
+    transition: none
 </style>

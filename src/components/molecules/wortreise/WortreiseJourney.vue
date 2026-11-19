@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
- * The journey of the Wortreise as a dotted road over the map: one brass stop for every stage with the name of the place under it. A stop that
- * was reached carries the travel token of the person who filled the last square of that stage; the stage that is played now shines.
+ * The journey of the Wortreise as a dotted road in the light look of "Familien-Spiele v2": one round stop for every stage with the name of the place under it.
+ * A stop that was reached carries the travel token of the person who filled the last square of that stage; the stage that is played now is teal.
  */
 import MapToken from '@/components/molecules/map/MapToken.vue'
 
@@ -30,7 +30,6 @@ defineProps<{ places: JourneyPlace[]; current: number; winners: number[] }>()
   margin: 0
   padding: 0
   list-style: none
-  font-family: var(--mp-serif, Georgia, serif)
 
   // the dotted road behind the stops
   &::before
@@ -38,8 +37,8 @@ defineProps<{ places: JourneyPlace[]; current: number; winners: number[] }>()
     position: absolute
     left: 6%
     right: 6%
-    top: 17px
-    border-top: 3px dotted rgba(226, 189, 102, 0.75)
+    top: 20px
+    border-top: 3px dotted var(--fam-line-strong)
 
 .wj-stop
   position: relative
@@ -48,50 +47,53 @@ defineProps<{ places: JourneyPlace[]; current: number; winners: number[] }>()
   display: flex
   flex-direction: column
   align-items: center
-  gap: 3px
-  color: rgba(246, 234, 208, 0.85)
+  gap: 4px
+  color: var(--fam-muted)
   text-align: center
 
 .wj-dot
+  box-sizing: border-box
   display: grid
   place-items: center
-  width: 34px
-  height: 34px
+  width: 40px
+  height: 40px
+  border: 2px solid var(--fam-line-strong)
   border-radius: 50%
-  border: 2px solid rgba(226, 189, 102, 0.55)
-  background: rgba(28, 19, 10, 0.82)
-  color: rgba(246, 234, 208, 0.75)
-  font-size: 1rem
+  background: var(--fam-card)
+  color: var(--fam-muted)
+  font-size: 1.05rem
   font-weight: 800
-  transition: transform 0.3s, box-shadow 0.3s
+  transition: transform 0.3s, background-color 0.3s
 
 .wj-n
   line-height: 1
 
 .wj-name
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 8px rgba(0, 0, 0, 0.6)
   max-width: 100%
-  overflow: hidden
-  text-overflow: ellipsis
-  white-space: nowrap
-  font-size: 0.82rem
+  font-size: clamp(0.72rem, 2.9vw, 0.9rem)
   font-weight: 700
   line-height: 1.1
+  overflow-wrap: anywhere
 
+// a stop that was reached: the token of the person, on a gold ring
 .is-done
-  color: #f6ead0
+  color: var(--fam-ink)
 
   .wj-dot
-    border-color: #f3d98a
-    background: radial-gradient(circle at 35% 30%, #c79a45, #7d5a22 70%)
+    border-color: var(--fam-gold-deep)
+    background: color-mix(in srgb, var(--fam-gold) 34%, var(--fam-card))
 
+// the stage that is played now
 .is-now
-  color: #ffe08a
+  color: var(--fam-ink)
 
   .wj-dot
-    border-color: #ffe08a
-    background: rgba(120, 82, 24, 0.92)
-    box-shadow: 0 0 14px rgba(255, 205, 100, 0.85)
-    transform: scale(1.12)
-    color: #fff3cf
+    border-color: var(--fam-primary)
+    background: var(--fam-primary)
+    color: var(--fam-on-primary)
+    transform: scale(1.1)
+
+@media (prefers-reduced-motion: reduce)
+  .wj-dot
+    transition: none
 </style>

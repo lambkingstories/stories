@@ -8,6 +8,10 @@ import bezalel from './bezalel'
 import bogen from './bogen'
 import common from './common'
 import familyFlow from './familyFlow'
+import memoryFlow from './memoryFlow'
+import wortreiseFlow from './wortreiseFlow'
+import orderFlow from './orderFlow'
+import bingoFlow from './bingoFlow'
 import home from './home'
 import karawane from './karawane'
 import lamm from './lamm'
@@ -21,9 +25,9 @@ import whoFlow from './whoFlow'
 import wortreise from './wortreise'
 
 export const BIG_GAME_TEXTS = {
-  de: { common: common.de, bogen: bogen.de, wasser: wasser.de, arche: arche.de, bezalel: bezalel.de, mose: mose.de, karawane: karawane.de, nehemia: nehemia.de, wortreise: wortreise.de, memory: memory.de, lamm: lamm.de, rooms: rooms.de, result: result.de, home: home.de, familyFlow: familyFlow.de, activityFlow: activityFlow.de, whoFlow: whoFlow.de },
-  en: { common: common.en, bogen: bogen.en, wasser: wasser.en, arche: arche.en, bezalel: bezalel.en, mose: mose.en, karawane: karawane.en, nehemia: nehemia.en, wortreise: wortreise.en, memory: memory.en, lamm: lamm.en, rooms: rooms.en, result: result.en, home: home.en, familyFlow: familyFlow.en, activityFlow: activityFlow.en, whoFlow: whoFlow.en },
-  es: { common: common.es, bogen: bogen.es, wasser: wasser.es, arche: arche.es, bezalel: bezalel.es, mose: mose.es, karawane: karawane.es, nehemia: nehemia.es, wortreise: wortreise.es, memory: memory.es, lamm: lamm.es, rooms: rooms.es, result: result.es, home: home.es, familyFlow: familyFlow.es, activityFlow: activityFlow.es, whoFlow: whoFlow.es }
+  de: { common: common.de, bogen: bogen.de, wasser: wasser.de, arche: arche.de, bezalel: bezalel.de, mose: mose.de, karawane: karawane.de, nehemia: nehemia.de, wortreise: wortreise.de, memory: memory.de, lamm: lamm.de, rooms: rooms.de, result: result.de, home: home.de, familyFlow: familyFlow.de, memoryFlow: memoryFlow.de, wortreiseFlow: wortreiseFlow.de, activityFlow: activityFlow.de, whoFlow: whoFlow.de, orderFlow: orderFlow.de, bingoFlow: bingoFlow.de },
+  en: { common: common.en, bogen: bogen.en, wasser: wasser.en, arche: arche.en, bezalel: bezalel.en, mose: mose.en, karawane: karawane.en, nehemia: nehemia.en, wortreise: wortreise.en, memory: memory.en, lamm: lamm.en, rooms: rooms.en, result: result.en, home: home.en, familyFlow: familyFlow.en, memoryFlow: memoryFlow.en, wortreiseFlow: wortreiseFlow.en, activityFlow: activityFlow.en, whoFlow: whoFlow.en, orderFlow: orderFlow.en, bingoFlow: bingoFlow.en },
+  es: { common: common.es, bogen: bogen.es, wasser: wasser.es, arche: arche.es, bezalel: bezalel.es, mose: mose.es, karawane: karawane.es, nehemia: nehemia.es, wortreise: wortreise.es, memory: memory.es, lamm: lamm.es, rooms: rooms.es, result: result.es, home: home.es, familyFlow: familyFlow.es, memoryFlow: memoryFlow.es, wortreiseFlow: wortreiseFlow.es, activityFlow: activityFlow.es, whoFlow: whoFlow.es, orderFlow: orderFlow.es, bingoFlow: bingoFlow.es }
 } as Record<'de' | 'en' | 'es', Record<string, Record<string, unknown>>>
 
 /**

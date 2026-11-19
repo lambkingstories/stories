@@ -4,7 +4,8 @@
  * "End the game?" first, with a line you can set; `confirm` = false leaves at once), in the middle the NAME of the game (a prop, never fixed here) with an
  * optional line under it (e.g. "Question 3 of 10"), at the right the buttons for music and sounds, below (or sideways when the phone is held wide) one chip
  * for every player with the figure, the name and the score; the player whose turn it is has the gold chip. Event: `leave` (the player really wants to end).
- * Put it in the slot `top` of `MapTable` (that takes the place of the standard header).
+ * Put it in the slot `top` of `MapTable` (that takes the place of the standard header). Slot `actions`: own round buttons (48 px) left of the sound buttons
+ * (e.g. "play sideways" of the pairs game).
  */
 import { nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -56,9 +57,10 @@ function onKey(e: KeyboardEvent) {
       button(type="button" class="fam-bar-btn" :aria-label="t('app.bigGames.familyFlow.leaveTitle')" @click="ask")
         span(aria-hidden="true") ‹
     div(class="fam-bar-titles")
-      h1(class="fam-bar-title") {{ title }}
+      h1(:class="['fam-bar-title', { 'is-long': title.length > 14 }]") {{ title }}
       p(v-if="subtitle" class="fam-bar-sub") {{ subtitle }}
     div(class="fam-bar-sound")
+      slot(name="actions")
       FamilySoundButtons
     ul(v-if="players.length" :class="['fam-bar-players', { 'is-many': players.length > 4 }]" :aria-label="title")
       li(v-for="(p, i) in players" :key="i" :class="['fam-bar-chip', { 'is-turn': p.turn }]")
@@ -95,6 +97,9 @@ function onKey(e: KeyboardEvent) {
 
 .fam-bar-sound
   grid-area: sound
+  display: flex
+  align-items: center
+  gap: 8px
 
 .fam-bar-btn
   display: grid
@@ -134,6 +139,15 @@ function onKey(e: KeyboardEvent) {
   line-height: 1.15
   text-overflow: ellipsis
   white-space: nowrap
+
+// a long name (more than 14 letters): a little smaller, and it may take two lines instead of being cut off
+.fam-bar-title.is-long
+  font-size: clamp(1.02rem, 4.7vw, 1.3rem)
+  white-space: normal
+  overflow-wrap: anywhere
+  display: -webkit-box
+  -webkit-box-orient: vertical
+  -webkit-line-clamp: 2
 
 .fam-bar-sub
   margin: 1px 0 0

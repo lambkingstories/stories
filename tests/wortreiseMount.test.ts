@@ -43,6 +43,9 @@ const press = async (w: ReturnType<typeof mount>, text: string) => {
   await flushPromises()
 }
 
+/** From the title screen to the players page ("Play"). */
+const toLobby = async (w: ReturnType<typeof mount>, text = 'Spielen') => press(w, text)
+
 /** Draws a word on the circle (the wheel hands it over like a finger that is lifted). */
 async function draw(w: ReturnType<typeof mount>, word: string) {
   w.findComponent(WortreiseWheel).vm.$emit('submit', word)
@@ -55,17 +58,25 @@ describe('Wortreise view', () => {
     push.mockClear()
   })
 
-  it('opens with the setup: seats, three levels, three lengths of the journey and the start', async () => {
+  it('opens with the title screen (name, line, Play, How to play) and goes on to the players page: seats, three levels, three lengths of the journey and the start', async () => {
     const w = await open()
-    expect(w.text()).toContain('Wortreise')
+    expect(w.find('.fam-start-name').text()).toBe('Wortreise')
+    expect(w.find('.fam-start-line').text()).toBe('Wörter aus der Bibel finden')
+    expect(w.find('.fam-start-play').text()).toBe('Spielen')
+    expect(w.findAll('.fam-start-list li')).toHaveLength(5)
+    expect(w.find('.wr-level').exists()).toBe(false)
+    await toLobby(w)
+    expect(w.text()).toContain('Wer spielt mit?')
+    expect(w.findAll('.fam-lobby-seat')).toHaveLength(2)
     expect(w.findAll('.wr-level')).toHaveLength(3)
     expect(w.findAll('.wr-mark').map((b) => b.text())).toEqual(['3', '5', '7'])
-    expect(w.text()).toContain('Wie viele spielen mit?')
+    expect(w.find('.fam-lobby-go .fam-btn').exists()).toBe(true)
     w.unmount()
   })
 
   it('starts: whose turn it is, then the circle with its letters and the grid', async () => {
     const w = await open()
+    await toLobby(w)
     await press(w, "Los geht's")
     expect(w.text()).toContain('Spieler 1 ist dran')
     expect(w.text()).toContain('Etappe 1 von 5')
@@ -81,6 +92,7 @@ describe('Wortreise view', () => {
 
   it('a wrong word shakes and tells so; a word of the grid fills it, gives points and hands over to the next person', async () => {
     const w = await open()
+    await toLobby(w)
     await press(w, "Los geht's")
     await press(w, "Los geht's")
     const game = parseGame(kept().game)!
@@ -102,6 +114,7 @@ describe('Wortreise view', () => {
 
   it('a bonus word gives points and the turn goes on', async () => {
     const w = await open()
+    await toLobby(w)
     await press(w, "Los geht's")
     await press(w, "Los geht's")
     const p = puzzleOf(parseGame(kept().game)!)
@@ -118,6 +131,7 @@ describe('Wortreise view', () => {
 
   it('a help shows a letter and counts down; passing hands over to the next person', async () => {
     const w = await open()
+    await toLobby(w)
     await press(w, "Los geht's")
     await press(w, "Los geht's")
     await press(w, 'Lupe')
@@ -132,10 +146,11 @@ describe('Wortreise view', () => {
   it('plays a whole journey of three stages to the result and forgets the kept game', async () => {
     localStorage.setItem('lk-family-names', JSON.stringify(['Anna', 'Ben']))
     const w = await open()
+    await toLobby(w)
     await w.findAll('.wr-mark')[0]!.trigger('click')
     await press(w, "Los geht's")
     for (let guard = 0; guard < 80; guard++) {
-      if (w.text().includes('Noch einmal')) break
+      if (w.find('.fam-pod-again').exists()) break
       const next = w.findAll('button').find((b) => /^(Zur nächsten Etappe|Zum Ergebnis)/.test(b.text()))
       if (next) {
         await next.trigger('click')
@@ -159,9 +174,13 @@ describe('Wortreise view', () => {
       const left = p.words.find((x) => !st.game.progress.found.includes(x.key))!
       await draw(w, left.key)
     }
-    expect(w.text()).toContain('gewonnen')
+    expect(w.find('.fam-pod-head').text()).toContain('gewonnen')
+    expect(w.findAll('.fam-pod-col')).toHaveLength(2)
     expect(w.text()).toContain('Punkte')
     expect(w.text()).toContain('Jericho')
+    expect(w.find('.fam-pod-again').text()).toBe('Nochmal')
+    expect(w.find('.fam-pod-change').text()).toBe('Neue Runde mit anderen Spielern')
+    expect(w.find('.fam-pod-exit').text()).toBe('Zur Auswahl')
     expect(kept()).toBeFalsy()
     w.unmount()
   })
@@ -169,6 +188,7 @@ describe('Wortreise view', () => {
   it('a person who plays alone goes on without a hand-over', async () => {
     localStorage.setItem('lk-family-names', JSON.stringify(['Anna']))
     const w = await open()
+    await toLobby(w)
     await press(w, "Los geht's")
     await press(w, "Los geht's")
     const p = puzzleOf(parseGame(kept().game)!)
@@ -184,6 +204,7 @@ describe('Wortreise view', () => {
 
   it('keeps the game and offers to keep playing after the page was left', async () => {
     let w = await open()
+    await toLobby(w)
     await press(w, "Los geht's")
     await press(w, "Los geht's")
     const p = puzzleOf(parseGame(kept().game)!)
@@ -210,7 +231,8 @@ describe('Wortreise view', () => {
   it('speaks english', async () => {
     const w = await open('en')
     expect(w.text()).toContain('Word Journey')
-    expect(w.text()).toContain('How many are playing?')
+    await toLobby(w, 'Play')
+    expect(w.text()).toContain('Who is playing?')
     w.unmount()
   })
 })
