@@ -3,7 +3,7 @@
  * The adventure tab: the journeys as painted medals. Josef is the first; the next ones (Adam and Eve, Noah, and on through the
  * whole Bible) stand there closed until they are written. A tap on a medal opens the map of that journey.
  */
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import AdvButton from '@/components/atoms/AdvButton.vue'
@@ -84,23 +84,6 @@ const goOn = computed(() => {
   return items.value.find((i) => i.journey.id === j?.id) ?? null
 })
 
-// the chip of the epoch that is on the screen is marked (the page is long, the bar shows where the child is)
-const activeEpoch = ref('')
-let seen: IntersectionObserver | null = null
-function observeEpochs() {
-  seen?.disconnect()
-  if (typeof IntersectionObserver === 'undefined') return
-  seen = new IntersectionObserver(
-    (entries) => {
-      for (const e of entries) if (e.isIntersecting) activeEpoch.value = e.target.id.replace('epoch-', '')
-    },
-    { rootMargin: '-25% 0px -65% 0px' }
-  )
-  document.querySelectorAll('.epoch').forEach((el) => seen?.observe(el))
-}
-onMounted(observeEpochs)
-onBeforeUnmount(() => seen?.disconnect())
-
 // two views of the same adventures: the list (the epochs one below the other) and the time line (from left to right, to wipe through); remembered
 const VIEW_KEY = 'lk-adventure-view'
 type HomeView = 'list' | 'timeline'
@@ -122,19 +105,10 @@ function setView(v: HomeView) {
   } catch {
     // not remembered in a private window
   }
-  if (v === 'list') void nextTick(observeEpochs)
 }
 
 /** How many adventures of an epoch have a cup, for the little count at the head of the epoch. */
 const cupsOf = (g: { entries: { item?: { medal: string | null } | null }[] }) => g.entries.filter((e) => e.item?.medal).length
-
-function jumpTo(id: string) {
-  if (view.value === 'timeline') {
-    tl.value?.scrollToEpoch(id)
-    return
-  }
-  document.getElementById(`epoch-${id}`)?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' })
-}
 
 // the window of the journey that was tapped
 const detailId = ref('')
@@ -270,10 +244,6 @@ async function doDelete() {
         button(type="button" :class="['vs-btn', { 'is-on': view === 'list' }]" :aria-pressed="view === 'list'" @click="setView('list')") {{ t('app.adventure.viewList') }}
         button(type="button" :class="['vs-btn', { 'is-on': view === 'timeline' }]" :aria-pressed="view === 'timeline'" @click="setView('timeline')") {{ t('app.adventure.viewTimeline') }}
 
-      //- the time line of the Bible: a band of epochs to jump to; the one on the screen is marked
-      div(class="chips" role="navigation" :aria-label="t('app.adventure.timelineLabel')")
-        button(v-for="g in groups" :key="g.epoch.id" type="button" :class="['chip', { 'is-on': activeEpoch === g.epoch.id }]" :aria-current="activeEpoch === g.epoch.id ? 'true' : undefined" @click="jumpTo(g.epoch.id)") {{ g.title }}
-
       template(v-if="view === 'list'")
         section(v-for="g in groups" :key="g.epoch.id" :id="`epoch-${g.epoch.id}`" class="epoch")
           h2(class="epoch-title")
@@ -312,7 +282,7 @@ async function doDelete() {
 
     //- the time line: the whole width of the screen
     div(v-if="view === 'timeline'" class="tl-wrap")
-      AdventureTimeline(ref="tl" :groups="groups" :current-id="goOn?.journey.id ?? null" @pick="detailId = $event" @epoch="activeEpoch = $event")
+      AdventureTimeline(ref="tl" :groups="groups" :current-id="goOn?.journey.id ?? null" @pick="detailId = $event")
 
     //- the window of one journey
     AdvDialog(v-if="detail" :title="detail.journey.title" @close="detailId = ''")
@@ -548,42 +518,6 @@ $ink: var(--lk-text)
   place-items: center
   color: var(--lk-muted)
 
-.chips
-  display: flex
-  gap: 8px
-  overflow-x: auto
-  margin: 0 -16px
-  padding: 4px 16px 8px
-  position: sticky
-  top: 0
-  z-index: 3
-  background: var(--lk-bg)
-  scrollbar-width: none
-
-  &::-webkit-scrollbar
-    display: none
-
-.chip
-  flex: 0 0 auto
-  display: inline-flex
-  align-items: center
-  min-height: 44px
-  padding: 8px 14px
-  border: 1px solid var(--lk-line)
-  border-radius: 999px
-  background: var(--lk-surface)
-  color: $ink
-  font: inherit
-  font-size: 0.9rem
-  font-weight: 700
-  white-space: nowrap
-  cursor: pointer
-  -webkit-tap-highlight-color: transparent
-  touch-action: manipulation
-
-  &:active
-    transform: scale(0.96)
-
 .go-on
   display: flex
   align-items: center
@@ -647,6 +581,132 @@ $ink: var(--lk-text)
 
 .epoch
   scroll-margin-top: 56px
+
+.epoch-title
+  margin: 6px 4px 10px
+  font-size: 1.2rem
+  font-weight: 800
+
+.jesus-row
+  display: flex
+  align-items: center
+  justify-content: space-between
+  gap: 10px
+  margin: 0 0 12px
+  padding: 10px 14px
+  border: 1px solid var(--lk-line)
+  border-left: 4px solid var(--lk-accent)
+  border-radius: 12px
+  background: transparent
+  color: var(--lk-text)
+  text-decoration: none
+
+  :deep(.z-icon-outline)
+    color: var(--lk-muted)
+
+.jesus-row-text
+  display: flex
+  flex-direction: column
+  min-width: 0
+
+.jesus-row-title
+  font-weight: 800
+  font-size: 1rem
+
+.jesus-row-sub
+  font-size: 0.85rem
+  color: var(--lk-muted)
+
+.epoch-sub
+  margin-left: 8px
+  font-size: 0.8rem
+  font-weight: 600
+  color: var(--lk-muted)
+
+// two big medals next to each other on a phone, three on a wider screen
+.tile-grid
+  display: grid
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr))
+  gap: 12px
+
+.tile-bar
+  display: block
+  width: 70%
+  height: 6px
+  border-radius: 999px
+  background: var(--lk-track)
+  overflow: hidden
+
+.tile-fill
+  display: block
+  height: 100%
+  border-radius: 999px
+  background: #c9962a
+
+.tile-name
+  padding: 0 8px
+  font-weight: 800
+  font-size: 0.98rem
+  line-height: 1.2
+
+.go-on-go
+  flex: none
+  display: grid
+  place-items: center
+  width: 40px
+  height: 40px
+  border-radius: 50%
+  background: #c9962a
+  color: #fff
+
+.view-switch
+  // one big oval with a straight line in the middle: left or right is chosen, it does not look like two buttons (Anton 20.11.2026)
+  position: relative
+  align-self: center
+  display: flex
+  width: min(100%, 340px)
+  min-height: 54px
+  border: 1.5px solid var(--lk-line)
+  border-radius: 999px
+  background: var(--lk-surface)
+  box-shadow: var(--lk-shadow)
+  overflow: hidden
+
+  &::after
+    content: ''
+    position: absolute
+    left: 50%
+    top: 22%
+    bottom: 22%
+    width: 2px
+    margin-left: -1px
+    border-radius: 2px
+    background: var(--lk-line)
+    pointer-events: none
+
+.vs-btn
+  flex: 1 1 0
+  min-height: 54px
+  padding: 9px 12px
+  border: 0
+  border-radius: 0
+  background: transparent
+  color: var(--lk-muted)
+  font: inherit
+  font-size: 1.02rem
+  font-weight: 800
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+  touch-action: manipulation
+  transition: background 160ms ease-out, color 160ms ease-out
+
+  // the chosen side: a soft tint and the colour of the app, no filled button
+  &.is-on
+    background: var(--lk-accent-soft)
+    color: var(--lk-accent)
+
+.tl-wrap
+  margin-top: 6px
 
 .epoch-title
   margin: 6px 4px 10px

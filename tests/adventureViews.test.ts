@@ -239,6 +239,22 @@ describe('the home page and the map', () => {
     expect(problems()).toEqual([])
   })
 
+  it('has no row of epoch buttons any more (the page just scrolls), and the list/time line switch is one oval with two sides', async () => {
+    const { default: Home } = await import('@/views/app/AppAdventureHomeView.vue')
+    const w = mount(Home, opts)
+    await flushPromises()
+    expect(w.find('.chips').exists()).toBe(false)
+    expect(w.find('.chip').exists()).toBe(false)
+    const sw = w.find('.view-switch')
+    expect(sw.exists()).toBe(true)
+    expect(sw.findAll('.vs-btn')).toHaveLength(2)
+    // the chosen side is marked, and a tap on the other side changes it
+    expect(sw.findAll('.vs-btn')[0]!.classes()).toContain('is-on')
+    await sw.findAll('.vs-btn')[1]!.trigger('click')
+    expect(sw.findAll('.vs-btn')[1]!.classes()).toContain('is-on')
+    expect(problems()).toEqual([])
+  })
+
   it('the map shows every stage and the sound switch is a real button', async () => {
     const { default: MapView } = await import('@/views/app/AppAdventureView.vue')
     route.params = { journeyId: 'josef' }
