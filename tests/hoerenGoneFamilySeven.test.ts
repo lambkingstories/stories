@@ -2,7 +2,7 @@
  * Two cleanups of 17 Nov 2026 (Anton):
  *  1. The unreachable "Hören" page (a 9,000 px list of red play buttons that led to the book page anyway) is gone. Listening starts on the page of a book
  *     ("Anhören", a Plus feature with its Plus badge); old addresses lead to "Lesen".
- *  2. There are seven family games (quiz, memory, bingo, activity, who am I, order race, word journey) and every text that counts them says seven.
+ *  2. There are seven family games (quiz, memory, bingo, Bible Words (id activity), who am I, order race, word journey) and every text that counts them says seven.
  */
 import { existsSync, readFileSync } from 'node:fs'
 import { flushPromises, mount } from '@vue/test-utils'
@@ -56,8 +56,8 @@ describe('the "Hören" page is gone', () => {
 })
 
 const GAME_WORDS = {
-  de: ['Quiz', 'Activity', 'Wer bin ich?', 'Reihenfolge-Rennen', 'Bibel-Bingo', 'Memory', 'Wortreise'],
-  en: ['quiz', 'Activity', 'Who am I?', 'order race', 'Bible bingo', 'memory', 'Word Journey']
+  de: ['Quiz', 'Bibel-Begriffe', 'Wer bin ich?', 'Reihenfolge-Rennen', 'Bibel-Bingo', 'Memory', 'Wortreise'],
+  en: ['quiz', 'Bible Words', 'Who am I?', 'order race', 'Bible bingo', 'memory', 'Word Journey']
 }
 
 describe('seven family games', () => {
