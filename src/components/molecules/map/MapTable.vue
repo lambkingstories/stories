@@ -4,7 +4,7 @@
  * (quiz, activity, who am I, order race, Bible bingo, memory, word journey) is played on it, with the pieces of `Map*.vue` (parchment, bronze
  * medallion, answer coins, travel tokens, brass button: the painted game material stays). The board is the soft background of the app, the text
  * on it is dark (`--mp-cream`, the old name, now holds the ink of the board). It fills the whole screen (also above the tab bar), has a quiet
- * round back button and an optional small title.
+ * round back button and an optional small title. A game that runs puts its own bar in the slot `top` (`FamilyGameBar`), which then takes the place of this header.
  */
 import { onBeforeUnmount, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
