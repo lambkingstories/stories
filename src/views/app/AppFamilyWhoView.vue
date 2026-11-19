@@ -1,26 +1,30 @@
 <script setup lang="ts">
 /**
- * "Wer bin ich?" (Plus), on the old map: one person guesses who a card shows by asking questions that can be answered with yes or no, but
- * does not look at the screen. Another person holds the device, sees the name and a few facts from the Bible and answers on three coins
- * (yes, no, don't know). The fewer questions it takes, the more points. Everything runs on the device; the people are in `data/whoAmI.ts`.
- * The picture of the person is never shown: it stays behind the velvet curtain of the frame, only the name lies on parchment.
+ * "Who am I?" (id `who`, Plus), in the light look of "Familien-Spiele v2" (white cards, capsules, chips, answer tiles; see components/molecules/family/). One person
+ * guesses who a card shows by asking questions that can be answered with yes or no, but does not look at the screen. Another person holds the
+ * device, sees the name and a few facts from the Bible and answers on three tiles (yes, no, don't know). The fewer questions it takes, the more points.
+ * Everything runs on the device; the people are in `data/whoAmI.ts`. The picture of the person is never shown.
+ * The course of a real game: the title screen (`start`: picture, name, "Play", "How to play", "Continue"), the players page (`lobby`: figures, names, how
+ * often everybody guesses, "Let's go"), the game (`handover`, `card`, `verdict`, with the bar of the game in its colour) and the end (`result`: podium).
  */
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import MapTable from '@/components/molecules/map/MapTable.vue'
 import { goBackTo } from '@/utils/navBack'
-import MapPaper from '@/components/molecules/map/MapPaper.vue'
-import MapCoin from '@/components/molecules/map/MapCoin.vue'
-import MapButton from '@/components/molecules/map/MapButton.vue'
-import MapSeats from '@/components/molecules/map/MapSeats.vue'
-import MapScoreBar from '@/components/molecules/map/MapScoreBar.vue'
-import MapResult from '@/components/molecules/map/MapResult.vue'
-import MapResume from '@/components/molecules/map/MapResume.vue'
+import MapToken from '@/components/molecules/map/MapToken.vue'
+import FamilyCard from '@/components/molecules/family/FamilyCard.vue'
+import FamilyButton from '@/components/molecules/family/FamilyButton.vue'
+import FamilyChip from '@/components/molecules/family/FamilyChip.vue'
+import FamilyChoice from '@/components/molecules/family/FamilyChoice.vue'
+import FamilyQuestionCard from '@/components/molecules/family/FamilyQuestionCard.vue'
+import FamilyStart from '@/components/molecules/family/FamilyStart.vue'
+import FamilyLobby from '@/components/molecules/family/FamilyLobby.vue'
+import FamilyGameBar from '@/components/molecules/family/FamilyGameBar.vue'
+import FamilyPodium from '@/components/molecules/family/FamilyPodium.vue'
 import { PREMIUM_TEASER, hasFeature, showUpsell } from '@/use/usePremium'
 import useSfx from '@/use/useSfx'
 import useFamilySave from '@/use/useFamilySave'
-import { prependBaseUrl } from '@/utils/function'
 import { MAX_PLAYERS, MIN_PLAYERS, ranking } from '@/utils/familyQuiz'
 import { MAX_QUESTIONS, WHO_ROUND_CHOICES, buildWhoDeck, cardsFor, guesserOf, pointsFor, readWhoSnap, whoSnapDeck, type WhoSnap } from '@/utils/whoAmI'
 import { WHO_PEOPLE, type WhoPerson } from '@/data/whoAmI'
@@ -31,22 +35,21 @@ const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
 const { displayName, hasCustomName } = useUserName()
 const { play } = useSfx()
-const frameSrc = prependBaseUrl('images/familie/karte/rahmen-wer.webp')
-const frameMissing = ref(false)
-const hideImg = (e: Event) => {
-  ;(e.target as HTMLElement).style.display = 'none'
-  frameMissing.value = true
-}
 
 const save = useFamilySave<WhoSnap>('who', 1)
 
-/** In the game the back button leads to the start page of this game (where a new round can begin); from there to the main menu. */
+/** The back button of the table: one step back (players page to the title screen, the end to the title screen), from the title screen to the games. A running round has its own button (the bar of the game asks first). */
 function goBack() {
-  if (phase.value === 'setup') {
-    goBackTo(router, { name: 'app-family' })
+  if (phase.value === 'lobby' || phase.value === 'result') {
+    phase.value = 'start'
     return
   }
-  phase.value = 'setup'
+  goBackTo(router, { name: 'app-family' })
+}
+
+/** "To the games": from the end back to the page of the family games. */
+function toGames() {
+  goBackTo(router, { name: 'app-family' })
 }
 
 const locked = computed(() => PREMIUM_TEASER && !hasFeature('family'))
@@ -54,11 +57,10 @@ const lang = computed<ActivityLocale>(() => (locale.value.startsWith('en') ? 'en
 
 const NAMES_KEY = 'lk-family-names'
 
-// ── setup ───────────────────────────────────────────────────────────────────────────────────────────────────────
+// ── setup (on the players page) ─────────────────────────────────────────────────────────────────────────────────
 const names = ref<string[]>(Array.from({ length: MAX_PLAYERS }, () => ''))
 const playerCount = ref(3)
 const rounds = ref<number>(1)
-const showRules = ref(false)
 
 onMounted(() => {
   let saved: string[] = []
@@ -76,15 +78,22 @@ const nameOf = (i: number) => names.value[i]?.trim() || t('app.family.player', {
 const players = computed(() => Array.from({ length: playerCount.value }, (_, i) => nameOf(i)))
 const totalCards = computed(() => cardsFor(playerCount.value, rounds.value, WHO_PEOPLE.length))
 
+function pickRounds(r: number) {
+  rounds.value = r
+  void play('tap')
+}
+
 // ── the game ────────────────────────────────────────────────────────────────────────────────────────────────────
-type Phase = 'setup' | 'handover' | 'card' | 'verdict' | 'result'
+/** The course: title screen, players page, the device goes to the other person, the card, the verdict, the end. */
+type Phase = 'start' | 'lobby' | 'handover' | 'card' | 'verdict' | 'result'
 type Answer = 'yes' | 'no' | 'maybe'
-const phase = ref<Phase>('setup')
+const phase = ref<Phase>('start')
+const playing = computed(() => phase.value === 'handover' || phase.value === 'card' || phase.value === 'verdict')
 const deck = ref<WhoPerson[]>([])
 const index = ref(0)
 const scores = ref<number[]>([])
 const asked = ref(0)
-/** What was answered to the questions of this card, one coin after the other (shown as a little trail). */
+/** What was answered to the questions of this card, one tile after the other (shown as a little trail). */
 const trail = ref<Answer[]>([])
 const lastPoints = ref(0)
 
@@ -101,12 +110,15 @@ const placeIndex = computed(() =>
     .sort((a, b) => (scores.value[b] ?? 0) - (scores.value[a] ?? 0))
 )
 const resultRows = computed(() => placing.value.map((p, i) => ({ rank: p.rank, name: p.name, score: t('app.family.points', p.score), index: placeIndex.value[i] ?? i })))
-const winnerIndex = computed(() => placeIndex.value[0] ?? 0)
-const bar = computed(() => players.value.map((name, i) => ({ name, score: scores.value[i] ?? 0, index: i, turn: i === guesser.value })))
+const endHeadline = computed(() => (winners.value.length > 1 ? t('app.family.winners', { names: winners.value.map((w) => w.name).join(' & ') }) : t('app.family.winner', { name: winners.value[0]?.name ?? '' })))
+/** The chips in the bar of the game: the figure, the name and the points of everybody; the one who guesses shines. */
+const bar = computed(() => players.value.map((name, i) => ({ name, score: scores.value[i] ?? 0, index: i, turn: playing.value && i === guesser.value })))
 const nowPoints = computed(() => pointsFor(asked.value))
 const cardName = computed(() => (card.value ? card.value.name[lang.value] : ''))
 const cardFacts = computed(() => (card.value ? card.value.facts[lang.value] : []))
-const nameSize = computed(() => (cardName.value.length <= 10 ? 2.1 : cardName.value.length <= 16 ? 1.7 : 1.4))
+const nameSize = computed(() => (cardName.value.length <= 10 ? '2.1rem' : cardName.value.length <= 16 ? '1.7rem' : '1.4rem'))
+/** The four lines of "How to play" (the rules of the game) and the one about the winner. */
+const rules = computed(() => [...[1, 2, 3, 4].map((n) => t(`app.who.rule${n}`, { max: MAX_QUESTIONS })), t('app.bigGames.whoFlow.ruleWin')])
 const COINS: { key: Answer; label: string }[] = [
   { key: 'yes', label: 'app.who.answerYes' },
   { key: 'no', label: 'app.who.answerNo' },
@@ -134,7 +146,7 @@ function keep() {
 /** What is kept, if it has the right shape; a broken or old entry is thrown away. */
 const resumable = computed(() => readWhoSnap(save.saved.value))
 if (save.saved.value && !readWhoSnap(save.saved.value)) save.clear()
-const resumeInfo = computed(() => (resumable.value ? t('app.who.cardOf', { n: resumable.value.snap.index + 1, total: resumable.value.deck.length }) : ''))
+const resumeInfo = computed(() => (!locked.value && resumable.value ? t('app.who.cardOf', { n: resumable.value.snap.index + 1, total: resumable.value.deck.length }) : ''))
 /** After "keep playing" in the middle of a card the questions that were asked stay when the card is opened again. */
 let keepAsked = false
 
@@ -157,6 +169,25 @@ function resume() {
   else phase.value = s.phase
 }
 
+/** "Continue" on the title screen. */
+function takeUp() {
+  if (locked.value) {
+    showUpsell('family')
+    return
+  }
+  resume()
+  void play('tap')
+}
+
+/** "Play" on the title screen: to the players page (without Plus the Plus sheet opens instead). */
+function openLobby() {
+  if (locked.value) {
+    showUpsell('family')
+    return
+  }
+  phase.value = 'lobby'
+}
+
 function start() {
   try {
     localStorage.setItem(NAMES_KEY, JSON.stringify(names.value.map((n) => n.trim())))
@@ -175,6 +206,11 @@ function start() {
   keep()
 }
 
+/** The bar of the game says "End game": the round stays kept, the title screen offers to continue. */
+function leave() {
+  phase.value = 'start'
+}
+
 function show() {
   if (!keepAsked) {
     asked.value = 0
@@ -186,7 +222,7 @@ function show() {
   keep()
 }
 
-/** A question (or a wrong guess) was asked and answered on a coin. */
+/** A question (or a wrong guess) was asked and answered on a tile. */
 function ask(a: Answer) {
   if (asked.value >= MAX_QUESTIONS) return
   asked.value = Math.min(MAX_QUESTIONS, asked.value + 1)
@@ -223,212 +259,180 @@ function next() {
   phase.value = 'handover'
   keep()
 }
+
 </script>
 
 <template lang="pug">
-  MapTable(:title="t('app.who.title')" @back="goBack")
+  MapTable(title="" game="who" @back="goBack")
+    //- ===== the bar of the game (while a round runs): the colour of the game, the people with their points, leaving asks first =====
+    template(v-if="playing" v-slot:top)
+      FamilyGameBar(
+        game="who"
+        :title="t('app.family.hub_who')"
+        :subtitle="t('app.who.cardOf', { n: index + 1, total: deck.length })"
+        :players="bar"
+        :leave-text="t('app.bigGames.familyFlow.leaveKept')"
+        @leave="leave"
+      )
+
     div(class="fw")
-      //- ===== locked =====
-      template(v-if="locked")
-        MapPaper(kind="card" class="fw-narrow")
-          p(class="fw-text") {{ t('app.who.locked') }}
-        MapButton(@click="showUpsell('family')") {{ t('app.family.lockedButton') }}
+      //- ===== 1. the title screen (without Plus it says so, and "Play" opens the Plus sheet) =====
+      FamilyStart(
+        v-if="phase === 'start'"
+        game="who"
+        :name="t('app.family.hub_who')"
+        :tagline="t('app.family.hub_whoSub')"
+        :rules="rules"
+        :resume-info="resumeInfo"
+        @play="openLobby"
+        @resume="takeUp"
+      )
+        template(v-if="locked" v-slot:extra)
+          FamilyCard(compact class="fw-locked")
+            p(class="fw-fine") {{ t('app.who.locked') }}
+            FamilyButton(class="fw-locked-btn" quiet @click="showUpsell('family')") {{ t('app.family.lockedButton') }}
 
-      //- ===== setup =====
-      template(v-else-if="phase === 'setup'")
-        MapResume(v-if="resumable" :info="resumeInfo" class="fw-narrow" @resume="resume")
-        MapPaper(kind="strip" class="fw-narrow")
-          span(class="fw-strip") {{ t('app.who.explain') }}
-        MapSeats(v-model:count="playerCount" v-model:names="names" :min="2" :max="8" :question="t('app.family.howMany')" class="fw-narrow")
+      //- ===== 2. who plays, and how often everybody guesses =====
+      FamilyLobby(
+        v-else-if="phase === 'lobby'"
+        game="who"
+        :count="playerCount"
+        :names="names"
+        :min="2"
+        :max="8"
+        :can-go="totalCards >= 1"
+        @update:count="playerCount = $event"
+        @update:names="names = $event"
+        @go="start"
+      )
+        template(v-slot:settings)
+          FamilyCard(:title="t('app.who.rounds')" symbol="who")
+            div(class="fw-chips" role="radiogroup" :aria-label="t('app.who.rounds')")
+              FamilyChip(v-for="r in WHO_ROUND_CHOICES" :key="r" round :selected="rounds === r" @click="pickRounds(r)") {{ r }}
+            span(class="fw-fine") {{ t('app.who.total', { n: totalCards }) }}
 
-        section(class="fw-group fw-narrow")
-          h3(class="fw-h") {{ t('app.who.rounds') }}
-          div(class="fw-discs" role="radiogroup")
-            button(v-for="r in WHO_ROUND_CHOICES" :key="r" type="button" role="radio" :aria-checked="rounds === r" :class="['fw-disc', { 'is-on': rounds === r }]" @click="rounds = r") {{ r }}
+      //- ===== 3a. the device goes to the other person =====
+      div(v-else-if="phase === 'handover'" class="fw-hand")
+        FamilyCard(class="fw-hand-card")
+          MapToken(:index="guesser" :size="104" lit class="fw-bighand")
+          h2(class="fw-big") {{ t('app.who.turn', { name: guesserName }) }}
+          span(class="fw-fine") {{ t('app.who.handover', { name: guesserName }) }}
+        FamilyButton(class="fw-show" @click="show") {{ t('app.who.show') }}
 
-        button(type="button" class="fw-plate" :aria-expanded="showRules" @click="showRules = !showRules") {{ t('app.who.rulesTitle') }}
-        MapPaper(v-if="showRules" kind="card" class="fw-narrow fw-rules-paper")
-          ol(class="fw-rules")
-            li(v-for="n in 4" :key="n") {{ t(`app.who.rule${n}`, { max: MAX_QUESTIONS }) }}
+      //- ===== 3b. the card with its facts and the answers, then who it was =====
+      div(v-else-if="phase === 'card' || phase === 'verdict'" :class="['fw-table', 'is-' + phase]")
+        div(class="fw-left")
+          FamilyCard(v-if="phase === 'card'" compact tone="wrong" class="fw-warn")
+            span(class="fw-warn-t") {{ t('app.who.notFor', { name: guesserName }) }}
+          FamilyQuestionCard(
+            :key="'n' + index + phase"
+            class="fw-name"
+            symbol="who"
+            :chip="phase === 'verdict' ? t('app.who.itWas') : t('app.who.turn', { name: guesserName })"
+            :text="cardName"
+            :size="nameSize"
+            :tone="phase === 'verdict' ? 'lit' : 'default'"
+          )
+          FamilyCard(v-if="phase === 'card'" class="fw-facts" :title="t('app.who.facts')")
+            ul(class="fw-facts-list")
+              li(v-for="(f, i) in cardFacts" :key="index + '-' + i" class="fw-fact" :style="{ animationDelay: 0.25 + i * 0.5 + 's' }") {{ f }}
 
-        p(class="fw-note") {{ t('app.who.total', { n: totalCards }) }}
-        MapButton(:disabled="totalCards < 1" @click="start") {{ t('app.family.start') }}
+        div(class="fw-right")
+          //- the questions and the answers
+          template(v-if="phase === 'card'")
+            FamilyCard(compact class="fw-log")
+              div(class="fw-counter")
+                span(class="fw-counter-n") {{ asked }}
+                  small {{ t('app.who.ofMax', { max: MAX_QUESTIONS }) }}
+                span(class="fw-counter-pts") {{ t('app.who.pointsNow', { n: nowPoints }) }}
+              div(class="fw-trail" role="img" :aria-label="t('app.who.questionsAsked') + ': ' + asked")
+                span(v-for="n in MAX_QUESTIONS" :key="n" :class="['fw-dot', trail[n - 1] ? 'is-' + trail[n - 1] : '']")
+            FamilyCard(v-if="asked >= MAX_QUESTIONS" compact tone="wrong")
+              span(class="fw-warn-t") {{ t('app.who.lastGuess', { name: guesserName }) }}
+            div(class="fw-tiles" role="group" :aria-label="t('app.who.answerLabel')")
+              FamilyChoice(v-for="(c, i) in COINS" :key="c.key" plain :index="i" :text="t(c.label)" :disabled="asked >= MAX_QUESTIONS" @click="ask(c.key)")
+            button(type="button" class="fw-undo" :disabled="asked <= 0" @click="undo") {{ t('app.who.undo') }}
+            FamilyButton(class="fw-go" @click="finish(true)") {{ t('app.who.guessed', { name: guesserName }) }}
+            FamilyButton(class="fw-go" quiet @click="finish(false)") {{ t('app.who.giveUp') }}
 
-      //- ===== result =====
-      template(v-else-if="phase === 'result'")
-        MapResult(:headline="winners.length > 1 ? t('app.family.winners', { names: winners.map((w) => w.name).join(' & ') }) : t('app.family.winner', { name: winners[0]?.name ?? '' })" :rows="resultRows" :winner-index="winnerIndex")
-          MapButton(@click="start") {{ t('app.family.again') }}
-          MapButton(quiet @click="phase = 'setup'") {{ t('app.activity.change') }}
+          //- who it was
+          template(v-else)
+            FamilyCard(compact :tone="lastPoints > 0 ? 'right' : 'default'" class="fw-verdict")
+              span(role="status" class="fw-verdict-t") {{ lastPoints > 0 ? t('app.who.gotPoints', { name: guesserName, points: t('app.family.points', lastPoints) }) : t('app.who.gotNothing', { name: guesserName }) }}
+            FamilyButton(class="fw-go" @click="next") {{ isLast ? t('app.family.result') : t('app.who.nextCard') }}
 
-      //- ===== handover, the card and the verdict share one table =====
-      template(v-else)
-        MapScoreBar(:players="bar")
-        div(:class="['fw-table', 'is-' + phase]")
-          div(class="fw-left")
-            p(v-if="phase === 'card'" class="fw-warn") {{ t('app.who.notFor', { name: guesserName }) }}
-            p(v-if="phase === 'verdict'" class="fw-count") {{ t('app.who.itWas') }}
-            div(:class="['fw-frame', { 'is-lit': phase === 'verdict', 'is-plain': frameMissing }]" role="img" :aria-label="t('app.who.behindCurtain')")
-              img(:src="frameSrc" alt="" draggable="false" @error="hideImg")
-            MapPaper(v-if="phase === 'card' || phase === 'verdict'" kind="strip" :lit="phase === 'verdict'" :key="'n' + index + phase" class="fw-name")
-              span(class="fw-person" :style="{ fontSize: nameSize + 'rem' }") {{ cardName }}
-            div(v-if="phase === 'card'" class="fw-facts")
-              span(class="fw-facts-title") {{ t('app.who.facts') }}
-              MapPaper(v-for="(f, i) in cardFacts" :key="index + '-' + i" kind="strip" class="fw-fact" :style="{ animationDelay: 0.25 + i * 0.5 + 's' }")
-                span(class="fw-strip") {{ f }}
-
-          div(class="fw-right")
-            //- the device goes to the other person
-            template(v-if="phase === 'handover'")
-              p(class="fw-count") {{ t('app.who.cardOf', { n: index + 1, total: deck.length }) }}
-              h2(class="fw-big") {{ t('app.who.turn', { name: guesserName }) }}
-              MapPaper(kind="strip" class="fw-narrow")
-                span(class="fw-strip") {{ t('app.who.handover', { name: guesserName }) }}
-              MapButton(@click="show") {{ t('app.who.show') }}
-
-            //- the questions and the coins
-            template(v-else-if="phase === 'card'")
-              div(class="fw-log")
-                div(class="fw-counter")
-                  span(class="fw-counter-n") {{ asked }}
-                    small {{ t('app.who.ofMax', { max: MAX_QUESTIONS }) }}
-                  span(class="fw-counter-pts") {{ t('app.who.pointsNow', { n: nowPoints }) }}
-                div(class="fw-trail" role="img" :aria-label="t('app.who.questionsAsked') + ': ' + asked")
-                  span(v-for="n in MAX_QUESTIONS" :key="n" :class="['fw-dot', trail[n - 1] ? 'is-' + trail[n - 1] : '']")
-              p(v-if="asked >= MAX_QUESTIONS" class="fw-warn") {{ t('app.who.lastGuess', { name: guesserName }) }}
-              div(class="fw-coins" role="group" :aria-label="t('app.who.answerLabel')")
-                MapCoin(v-for="(c, i) in COINS" :key="c.key" :index="i" :disabled="asked >= MAX_QUESTIONS" @click="ask(c.key)") {{ t(c.label) }}
-              button(type="button" class="fw-undo" :disabled="asked <= 0" @click="undo") {{ t('app.who.undo') }}
-              MapButton(@click="finish(true)") {{ t('app.who.guessed', { name: guesserName }) }}
-              MapButton(quiet @click="finish(false)") {{ t('app.who.giveUp') }}
-
-            //- who it was
-            template(v-else)
-              MapPaper(kind="strip" class="fw-narrow")
-                span(class="fw-strip") {{ lastPoints > 0 ? t('app.who.gotPoints', { name: guesserName, points: t('app.family.points', lastPoints) }) : t('app.who.gotNothing', { name: guesserName }) }}
-              MapButton(@click="next") {{ isLast ? t('app.family.result') : t('app.who.nextCard') }}
+      //- ===== 4. the end: the podium =====
+      FamilyPodium(
+        v-else
+        game="who"
+        :headline="endHeadline"
+        :rows="resultRows"
+        @again="start"
+        @change="phase = 'lobby'"
+        @exit="toGames"
+      )
 </template>
 
 <style scoped lang="sass">
 .fw
   display: flex
   flex-direction: column
-  align-items: center
-  gap: 14px
-  width: 100%
-  max-width: 34rem
+  gap: 16px
+  min-height: 100%
+  max-width: 36rem
   margin: 0 auto
-  padding: 6px 0 12px
-  color: var(--mp-cream, #f6ead0)
-  font-family: var(--mp-serif, Georgia, serif)
+  padding: 6px 0 24px
 
-.fw-narrow
-  width: 100%
-  max-width: 30rem
-
-.fw-text
-  margin: 0
-  line-height: 1.4
-
-.fw-strip
+.fw-fine
   display: block
   width: 100%
+  margin: 0
+  color: var(--fam-muted)
+  text-align: center
   font-size: 1.02rem
   font-weight: 600
-  line-height: 1.3
-  text-align: center
-
-.fw-h
-  margin: 0 0 8px
-  font-size: 1.1rem
-  font-weight: 800
-  letter-spacing: 0.04em
-  text-align: center
-  color: var(--mp-cream, #f6ead0)
-  text-shadow: none
-
-.fw-group
-  width: 100%
-
-.fw-note
-  margin: 0
-  text-align: center
-  font-size: 0.98rem
-  font-weight: 600
-  color: var(--mp-cream, #f6ead0)
-  text-shadow: none
-
-// the rounds: bronze discs on the table
-.fw-discs
-  display: flex
-  gap: 12px
-  justify-content: center
-
-.fw-disc
-  display: grid
-  place-items: center
-  width: 58px
-  height: 58px
-  padding: 0
-  border-radius: 50%
-  border: 2px solid #9a6b1c
-  background: radial-gradient(circle at 38% 30%, #fffbeb, #ecd596 80%)
-  box-shadow: 0 0 0 2px rgba(255, 246, 214, 0.92), 0 4px 8px rgba(60, 35, 5, 0.45), inset 0 1px 0 #ffffff
-  color: #3a2812
-  font: inherit
-  font-size: 1.3rem
-  font-weight: 800
-  cursor: pointer
-  transition: transform 0.15s
-  -webkit-tap-highlight-color: transparent
-
-  &:active
-    transform: translateY(2px)
-
-  &.is-on
-    border-color: #fff0b8
-    background: radial-gradient(circle at 38% 30%, #fff3b0, #f2b73b 80%)
-    box-shadow: 0 0 0 3px rgba(255, 246, 214, 0.95), 0 0 16px rgba(255, 200, 70, 0.85), 0 4px 8px rgba(60, 35, 5, 0.45), inset 0 1px 0 #fffbe0
-    color: #2e1f0a
-
-// a small bronze plate (the rules)
-.fw-plate
-  min-height: 46px
-  padding: 8px 26px
-  border-radius: 9px
-  border: 2px solid #9a6b1c
-  background: linear-gradient(180deg, #fff8e0 0%, #efd89c 100%)
-  box-shadow: 0 0 0 2px rgba(255, 246, 214, 0.92), 0 4px 8px rgba(60, 35, 5, 0.45), inset 0 1px 0 #ffffff
-  color: #3a2812
-  font: inherit
-  font-size: 1.05rem
-  font-weight: 800
-  letter-spacing: 0.04em
-  cursor: pointer
-  -webkit-tap-highlight-color: transparent
-
-  &:active
-    transform: translateY(2px)
-
-.fw-rules-paper
-  :deep(.mpa-in)
-    padding: 15% 10% 11%
-
-.fw-rules
-  margin: 0
-  padding-left: 1.2em
-  display: grid
-  gap: 10px
-  text-align: left
-  font-size: 1.3rem
-  font-weight: 700
   line-height: 1.35
 
-// ── handover, the card and the verdict ─────────────────────────────────────────────────────────────────────
-.fw-table
+.fw-chips
+  display: flex
+  flex-wrap: wrap
+  justify-content: center
+  gap: 14px
+  padding-top: 4px
+
+.fw-locked
+  max-width: 24rem
+
+// ── the device goes to the other person ──
+.fw-hand
   display: flex
   flex-direction: column
   align-items: center
-  gap: 14px
+  gap: 16px
+  margin: auto 0
+
+.fw-hand-card
+  max-width: 28rem
+
+.fw-bighand
+  margin: 4px 0 0
+
+.fw-big
+  margin: 0
+  color: var(--fam-ink)
+  text-align: center
+  font-size: 1.7rem
+  font-weight: 800
+  line-height: 1.15
+
+.fw-show
+  width: min(100%, 22rem)
+
+// ── the card and the verdict share one table ──
+.fw-table
+  display: flex
+  flex-direction: column
+  gap: 16px
   width: 100%
 
 .fw-left, .fw-right
@@ -437,266 +441,170 @@ function next() {
   align-items: center
   gap: 12px
   width: 100%
+  min-width: 0
 
-.fw-right
-  max-width: 28rem
-
-.fw-left
-  max-width: 28rem
-
-.fw-count
-  margin: 0
-  font-size: 0.98rem
-  font-weight: 700
-  letter-spacing: 0.08em
-  text-transform: uppercase
-  color: var(--mp-cream, #f6ead0)
-  text-shadow: none
-
-.fw-big
-  margin: 0
-  text-align: center
-  font-size: 1.7rem
-  font-weight: 800
-  line-height: 1.15
-  text-shadow: none
-
-.fw-warn
-  margin: 0
-  padding: 5px 16px
-  border-radius: 6px
-  border: 1px solid rgba(255, 200, 140, 0.6)
-  background: rgba(110, 42, 20, 0.88)
-  color: #ffe6c8
-  font-size: 0.95rem
-  font-weight: 800
-  letter-spacing: 0.03em
-  text-align: center
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.5)
-
-// the gilded oval with the closed velvet curtain: the person stays hidden behind it
-.fw-frame
-  position: relative
-  height: 190px
-  aspect-ratio: 4 / 5
-  display: grid
-  place-items: center
-  transition: filter 0.4s
-
-  // only while the picture of the frame is missing: a plain gilded oval
-  &.is-plain
-    border-radius: 50%
-    background: radial-gradient(ellipse at 50% 40%, #6b1d22, #3a0e12 70%)
-    box-shadow: 0 0 0 6px #a9802d, 0 10px 14px rgba(10, 5, 0, 0.6)
-
-  img
-    position: absolute
-    inset: -8%
-    width: 116%
-    height: 116%
-    max-width: none
-    object-fit: contain
-    filter: drop-shadow(0 8px 8px rgba(10, 5, 0, 0.6))
-
-  &.is-lit
-    img
-      filter: drop-shadow(0 0 16px rgba(255, 205, 100, 0.9)) drop-shadow(0 8px 8px rgba(10, 5, 0, 0.6))
-
-.is-card .fw-frame
-  height: 116px
-
-.is-verdict .fw-frame
-  height: 150px
-
-// the name lies on parchment, like a plate before the frame
-.fw-name
-  max-width: 24rem
-  margin-top: -12px
-  animation: fw-drop 0.6s ease both
-
-.fw-person
+.fw-warn-t
   display: block
-  width: 100%
+  color: var(--fam-ink)
+  text-align: center
+  font-size: 1.05rem
   font-weight: 800
-  line-height: 1.1
-  overflow-wrap: anywhere
+  line-height: 1.3
 
-.fw-facts
+.fw-name
+  :deep(.fam-card-body)
+    min-height: 6rem
+    justify-content: center
+
+.fw-facts-list
   display: grid
-  gap: 8px
+  gap: 0
   width: 100%
-  justify-items: center
+  margin: 0
+  padding: 0
+  list-style: none
 
-.fw-facts-title
-  font-size: 0.82rem
-  font-weight: 800
-  letter-spacing: 0.1em
-  text-transform: uppercase
-  color: #f2dca0
-  text-shadow: none
-
-// the facts are laid on the table one after the other
 .fw-fact
-  animation: fw-lay 0.7s ease both
-  min-height: 46px
-  :deep(.mpa-in)
-    min-height: 46px
+  min-height: 44px
+  display: flex
+  align-items: center
+  justify-content: center
+  padding: 8px 4px
+  border-top: 1.5px solid var(--fam-line)
+  color: var(--fam-ink)
+  text-align: center
+  font-size: 1.08rem
+  font-weight: 600
+  line-height: 1.35
 
-.fw-log
-  display: grid
-  justify-items: center
-  gap: 6px
-  padding: 6px 18px 9px
-  border-radius: 14px
-  border: 1px solid rgba(226, 189, 102, 0.45)
-  background: rgba(28, 19, 10, 0.72)
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5)
+  &:first-child
+    border-top: 0
 
+// the questions: the number, the points now, and a trail of little dots in the colours of the answers
 .fw-counter
   display: flex
   align-items: baseline
   justify-content: center
   flex-wrap: wrap
-  gap: 4px 16px
+  gap: 6px 16px
 
 .fw-counter-n
+  color: var(--fam-ink)
   font-size: 2.1rem
   font-weight: 800
-  text-shadow: none
+  line-height: 1.1
 
   small
     margin-left: 8px
+    color: var(--fam-muted)
     font-size: 1rem
     font-weight: 700
-    color: #f2dca0
 
 .fw-counter-pts
-  font-size: 1.1rem
+  padding: 4px 14px
+  border: 1.5px solid var(--fam-gold)
+  border-radius: 999px
+  background: color-mix(in srgb, var(--fam-gold) 22%, var(--fam-card))
+  color: var(--fam-ink)
+  font-size: 1.02rem
   font-weight: 800
-  color: var(--mp-gold, #e2bd66)
-  text-shadow: none
 
 .fw-trail
   display: flex
   flex-wrap: wrap
   justify-content: center
-  gap: 4px
+  gap: 5px
   max-width: 17rem
+  margin: 0 auto
 
 .fw-dot
-  width: 11px
-  height: 11px
+  width: 12px
+  height: 12px
+  border: 1.5px solid var(--fam-line-strong)
   border-radius: 50%
-  border: 1px solid rgba(226, 189, 102, 0.55)
-  background: rgba(20, 12, 4, 0.6)
+  background: var(--fam-field)
   transition: background 0.3s, transform 0.3s
 
   &.is-yes
-    background: radial-gradient(circle at 35% 30%, #e3c070, #9a7226)
-    transform: scale(1.1)
-  &.is-no
-    background: radial-gradient(circle at 35% 30%, #e0996a, #8d4a22)
-    transform: scale(1.1)
-  &.is-maybe
-    background: radial-gradient(circle at 35% 30%, #f1f0e8, #8e9088)
+    border-color: transparent
+    background: var(--fam-a-bg)
     transform: scale(1.1)
 
-.fw-coins
+  &.is-no
+    border-color: transparent
+    background: var(--fam-b-bg)
+    transform: scale(1.1)
+
+  &.is-maybe
+    border-color: transparent
+    background: var(--fam-c-bg)
+    transform: scale(1.1)
+
+// the three answers, side by side
+.fw-tiles
   display: grid
   grid-template-columns: repeat(3, minmax(0, 1fr))
   gap: 10px
   width: 100%
-  max-width: 22rem
+  max-width: 26rem
   padding: 4px 0
 
-  :deep(.mc)
-    transition: transform 0.18s, filter 0.25s, opacity 0.25s
-  :deep(.mc:disabled)
+  :deep(.fam-choice:disabled)
     opacity: 0.5
 
 .fw-undo
-  min-height: 44px
-  padding: 0 14px
-  border: none
+  min-height: 48px
+  padding: 0 16px
+  border: 0
   background: transparent
-  color: var(--mp-cream, #f6ead0)
+  color: var(--fam-primary-ink)
   font: inherit
-  font-size: 1rem
+  font-size: 1.02rem
   font-weight: 700
   text-decoration: underline
-  text-shadow: none
   cursor: pointer
+  touch-action: manipulation
+  -webkit-tap-highlight-color: transparent
+
+  &:focus-visible
+    outline: 3px solid var(--fam-focus)
+    outline-offset: 2px
 
   &:disabled
     opacity: 0.4
+    cursor: default
 
-@media (orientation: landscape)
-  .fw
-    max-width: 60rem
+.fw-go
+  width: min(100%, 22rem)
 
-  .fw-table
-    flex-direction: row
-    align-items: flex-start
-    justify-content: center
-    gap: 28px
+.fw-verdict
+  max-width: 24rem
 
-  .fw-left, .fw-right
-    flex: 1 1 0
-    min-width: 0
+.fw-verdict-t
+  display: block
+  color: var(--fam-ink)
+  font-size: 1.3rem
+  font-weight: 800
+  line-height: 1.25
 
-  .is-handover .fw-left, .is-verdict .fw-left
-    justify-content: center
+// ── motion only when the device does not ask for less ──
+@media (prefers-reduced-motion: no-preference)
+  .fw-name
+    animation: fw-drop 0.5s ease both
 
-  // the card: the little frame and the name side by side, so that the facts and the coins fit on the screen
-  .is-card .fw-left
-    display: grid
-    grid-template-columns: auto minmax(0, 1fr)
-    align-items: center
-    gap: 8px 12px
-    .fw-warn, .fw-facts
-      grid-column: 1 / -1
-      justify-self: center
-    .fw-name
-      margin-top: 0
-    .fw-frame
-      height: 96px
-
-  .fw-undo
-    min-height: 36px
-
-  .fw-right :deep(.mb)
-    height: 52px
-    min-width: 200px
-  .fw-right :deep(.mb.is-quiet)
-    height: 44px
-
-  .fw-fact :deep(.mpa-in)
-    min-height: 38px
-    padding-top: 2px
-    padding-bottom: 2px
   .fw-fact
-    min-height: 38px
+    animation: fw-lay 0.6s ease both
 
-  .fw-coins
-    max-width: 17rem
-
-  .fw
-    gap: 8px
-    padding: 0 0 4px
-
-  .fw-table, .fw-right
-    gap: 8px
-
-  .fw-coins
-    max-width: 18rem
+  .fw-bighand
+    animation: fw-hop 1.8s ease-in-out infinite
 
 @keyframes fw-lay
   from
     opacity: 0
-    transform: translateY(-18px) rotate(-1.5deg)
+    transform: translateY(-10px)
   to
     opacity: 1
-    transform: translateY(0) rotate(0)
+    transform: none
 
 @keyframes fw-drop
   from
@@ -704,9 +612,51 @@ function next() {
     transform: translateY(-14px)
   to
     opacity: 1
-    transform: translateY(0)
+    transform: none
 
-@media (prefers-reduced-motion: reduce)
-  .fw-fact, .fw-name
-    animation: none
+@keyframes fw-hop
+  0%, 100%
+    transform: translateY(0)
+  50%
+    transform: translateY(-6px)
+
+// ── sideways: the card on the left, the answers on the right ──
+@media (orientation: landscape)
+  .fw
+    max-width: 62rem
+    gap: 12px
+
+  .fw-table
+    display: grid
+    grid-template-columns: minmax(0, 1fr) minmax(0, 24rem)
+    gap: 12px 20px
+    align-items: start
+
+  .fw-left, .fw-right
+    gap: 8px
+
+  .fw-name
+    :deep(.fam-card-head)
+      min-height: 44px
+      padding-top: 4px
+      padding-bottom: 4px
+
+    :deep(.fam-card-body)
+      min-height: 4.5rem
+      padding: 8px 14px
+
+  .fw-fact
+    min-height: 40px
+    padding-top: 4px
+    padding-bottom: 4px
+
+  .fw-undo
+    min-height: 48px
+
+  .fw-hand
+    display: grid
+    grid-template-columns: minmax(0, 28rem) minmax(0, 18rem)
+    justify-content: center
+    align-items: center
+    gap: 16px 24px
 </style>

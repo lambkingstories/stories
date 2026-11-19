@@ -4,10 +4,11 @@
  * colours (`index` 0 to 3: teal, coral, blue, gold; the colours repeat after four), a small letter badge A to D at the left, the text centred.
  * `state` shows what happened after the answer: `right` = green ring and a tick, `wrong` = soft red ring, a cross and a gentle shake (only when
  * the device does not ask for less motion), `dim` = the others rest. The answer text comes as `text` (the size follows its length) or in the slot.
+ * `plain` = no letter badge and less room at the sides, for short answers that are no choice among A to D.
  */
 import { computed } from 'vue'
 
-const props = withDefaults(defineProps<{ index: number; state?: 'idle' | 'right' | 'wrong' | 'dim'; disabled?: boolean; text?: string }>(), { state: 'idle', disabled: false, text: '' })
+const props = withDefaults(defineProps<{ index: number; state?: 'idle' | 'right' | 'wrong' | 'dim'; disabled?: boolean; text?: string; plain?: boolean }>(), { state: 'idle', disabled: false, text: '', plain: false })
 const emit = defineEmits<{ click: [] }>()
 const slot4 = computed(() => ((props.index % 4) + 4) % 4)
 const letter = computed(() => String.fromCharCode(65 + slot4.value))
@@ -19,8 +20,8 @@ const size = computed(() => {
 </script>
 
 <template lang="pug">
-  button(type="button" :class="['fam-choice', 'fam-choice--' + slot4, 'is-' + state]" :disabled="disabled" @click="emit('click')")
-    span(class="fam-choice-letter" aria-hidden="true") {{ letter }}
+  button(type="button" :class="['fam-choice', 'fam-choice--' + slot4, 'is-' + state, { 'is-plain': plain }]" :disabled="disabled" @click="emit('click')")
+    span(v-if="!plain" class="fam-choice-letter" aria-hidden="true") {{ letter }}
     span(class="fam-choice-text" :style="{ fontSize: size }")
       slot {{ text }}
     span(v-if="state === 'right'" class="fam-choice-mark is-tick" aria-hidden="true")
@@ -77,6 +78,10 @@ const size = computed(() => {
   &.is-dim
     opacity: 0.55
     box-shadow: none
+
+// `plain`: no letter badge, less room at the sides (short answers such as Yes / No / Don't know, three fit in a row)
+.fam-choice.is-plain
+  padding: 10px 8px
 
 .fam-choice--0
   --bg: var(--fam-a-bg)

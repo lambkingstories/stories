@@ -1,26 +1,29 @@
 <script setup lang="ts">
 /**
- * The family activity (Plus), on the old map: one device in the middle, two to four teams take turns. One person of the team sees a word
- * from the adventures on a bronze medallion and shows it (explain, draw on paper, act out); the team guesses until the sand has run out.
- * A point for every word that was guessed. Everything runs on the device; the words are in `data/activityWords.ts`.
+ * Bible Words (id `activity`, Plus), in the light look of "Familien-Spiele v2" (white cards, capsules, chips; see components/molecules/family/). One device in the
+ * middle, two to four teams take turns. One person of the team sees a word from the adventures and shows it (explain, draw on paper, act out);
+ * the team guesses until the time has run out. A point for every word that was guessed. Everything runs on the device; the words are in `data/activityWords.ts`.
+ * The course of a real game: the title screen (`start`: picture, name, "Play", "How to play", "Continue"), the page of the teams (`lobby`: figures, names,
+ * the words, the ways, the number of words and the time, "Let's go"), the game (`handover`, `card`, with the bar of the game in its colour) and the end
+ * (`result`: podium). A word that is painted goes to the painting app and comes back to the same card (`returnFromPaint`).
  */
-import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import MapTable from '@/components/molecules/map/MapTable.vue'
 import { goBackTo } from '@/utils/navBack'
-import MapPaper from '@/components/molecules/map/MapPaper.vue'
-import MapMedallion from '@/components/molecules/map/MapMedallion.vue'
 import MapToken from '@/components/molecules/map/MapToken.vue'
-import MapButton from '@/components/molecules/map/MapButton.vue'
-import MapSeats from '@/components/molecules/map/MapSeats.vue'
-import MapScoreBar from '@/components/molecules/map/MapScoreBar.vue'
-import MapResult from '@/components/molecules/map/MapResult.vue'
-import MapResume from '@/components/molecules/map/MapResume.vue'
+import FamilyCard from '@/components/molecules/family/FamilyCard.vue'
+import FamilyButton from '@/components/molecules/family/FamilyButton.vue'
+import FamilyChip from '@/components/molecules/family/FamilyChip.vue'
+import FamilyQuestionCard from '@/components/molecules/family/FamilyQuestionCard.vue'
+import FamilyStart from '@/components/molecules/family/FamilyStart.vue'
+import FamilyLobby from '@/components/molecules/family/FamilyLobby.vue'
+import FamilyGameBar from '@/components/molecules/family/FamilyGameBar.vue'
+import FamilyPodium from '@/components/molecules/family/FamilyPodium.vue'
 import { PREMIUM_TEASER, hasFeature, showUpsell } from '@/use/usePremium'
 import useSfx from '@/use/useSfx'
 import useFamilySave from '@/use/useFamilySave'
-import { prependBaseUrl } from '@/utils/function'
 import { ranking } from '@/utils/familyQuiz'
 import {
   ACTIVITY_KINDS,
@@ -46,40 +49,27 @@ const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
 const route = useRoute()
 const { play } = useSfx()
-const hourglass = prependBaseUrl('images/familie/karte/sanduhr.webp')
-const hideImg = (e: Event) => ((e.target as HTMLElement).style.display = 'none')
 
 const save = useFamilySave<ActivitySnap>('activity', 1)
 
-/** In the game the back button leads to the start page of this game (where a new round can begin); from there to the main menu. */
+/** The back button of the table: one step back (the teams page to the title screen, the end to the title screen), from the title screen to the games. A running round has its own button (the bar of the game asks first). */
 function goBack() {
-  if (phase.value === 'setup') {
-    goBackTo(router, { name: 'app-family' })
+  if (phase.value === 'lobby' || phase.value === 'result') {
+    phase.value = 'start'
     return
   }
-  stopTimer()
-  painted.value = false
-  phase.value = 'setup'
+  goBackTo(router, { name: 'app-family' })
+}
+
+/** "To the games": from the end back to the page of the family games. */
+function toGames() {
+  goBackTo(router, { name: 'app-family' })
 }
 
 const locked = computed(() => PREMIUM_TEASER && !hasFeature('family'))
 const lang = computed<ActivityLocale>(() => (locale.value.startsWith('en') ? 'en' : locale.value.startsWith('es') ? 'es' : 'de'))
 
-// ── how big the medallion can be (it follows the screen, upright or sideways) ───────────────────────────────────
-const box = reactive({ w: 390, h: 800 })
-function measure() {
-  box.w = window.innerWidth
-  box.h = window.innerHeight
-}
-onMounted(() => {
-  measure()
-  window.addEventListener('resize', measure)
-})
-onBeforeUnmount(() => window.removeEventListener('resize', measure))
-const wide = computed(() => box.w > box.h)
-const medal = computed(() => Math.round(wide.value ? Math.min(box.h - 150, box.w * 0.4, 330) : Math.min(box.w - 60, box.h * 0.36, 310)))
-
-// ── setup ───────────────────────────────────────────────────────────────────────────────────────────────────────
+// ── setup (on the teams page) ───────────────────────────────────────────────────────────────────────────────────
 const teamCount = ref<number>(2)
 const cardsEach = ref<number>(5)
 const seconds = ref<number>(60)
@@ -94,10 +84,30 @@ const allowed = computed(() => ACTIVITY_MODES.filter((m) => modes[m]))
 const words = computed(() => wordsFor(kind.value, lang.value))
 /** The cards are as many as asked for, but never more than there are words. */
 const totalCards = computed(() => Math.min(cardsEach.value * teamCount.value, words.value.length))
+const canGo = computed(() => totalCards.value >= 1 && allowed.value.length > 0)
+
+function pickKind(k: ActivityKind) {
+  kind.value = k
+  void play('tap')
+}
+function toggleMode(m: ActivityMode) {
+  modes[m] = !modes[m]
+  void play('tap')
+}
+function pickCards(n: number) {
+  cardsEach.value = n
+  void play('tap')
+}
+function pickSeconds(n: number) {
+  seconds.value = n
+  void play('tap')
+}
 
 // ── the game ────────────────────────────────────────────────────────────────────────────────────────────────────
-type Phase = 'setup' | 'handover' | 'card' | 'result'
-const phase = ref<Phase>('setup')
+/** The course: title screen, teams page, the device goes to the team, the word (with the time), the end. */
+type Phase = 'start' | 'lobby' | 'handover' | 'card' | 'result'
+const phase = ref<Phase>('start')
+const playing = computed(() => phase.value === 'handover' || phase.value === 'card')
 const deck = ref<ActivityCard[]>([])
 const index = ref(0)
 const scores = ref<number[]>([])
@@ -112,11 +122,13 @@ const isLast = computed(() => index.value >= deck.value.length - 1)
 /** The word was painted in the painting program: the card is back with the time over (or "Done" pressed) and asks who guessed it. */
 const painted = ref(false)
 const paintedOver = ref(false)
-/** The painting program could not be opened (the hand-over could not be written): the card then works like the others, with the sand. */
+/** The painting program could not be opened (the hand-over could not be written): the card then works like the others, with the time. */
 const noPaintApp = ref(false)
 /** A card whose way is "paint": the word is shown first, the painting program opens when the person taps the button (the time starts there). */
 const readyToPaint = computed(() => phase.value === 'card' && card.value?.mode === 'draw' && !painted.value && !noPaintApp.value)
 const timeUp = computed(() => phase.value === 'card' && !readyToPaint.value && (painted.value ? paintedOver.value : left.value <= 0))
+/** The clock is shown unless the word is being painted somewhere else. */
+const showClock = computed(() => !readyToPaint.value && (!painted.value || paintedOver.value))
 const placing = computed(() => ranking(names.value, scores.value))
 const winners = computed(() => placing.value.filter((p) => p.rank === 1))
 /** The same order as `ranking` (it sorts stably), so every place knows which team (which token) it is. */
@@ -126,8 +138,11 @@ const placeIndex = computed(() =>
     .sort((a, b) => (scores.value[b] ?? 0) - (scores.value[a] ?? 0))
 )
 const resultRows = computed(() => placing.value.map((p, i) => ({ rank: p.rank, name: p.name, score: t('app.family.points', p.score), index: placeIndex.value[i] ?? i })))
-const winnerIndex = computed(() => placeIndex.value[0] ?? 0)
-const bar = computed(() => names.value.map((name, i) => ({ name, score: scores.value[i] ?? 0, index: i, turn: phase.value !== 'setup' && phase.value !== 'result' && i === team.value })))
+const endHeadline = computed(() => (winners.value.length > 1 ? t('app.activity.winners', { names: winners.value.map((w) => w.name).join(' & ') }) : t('app.activity.winner', { name: winners.value[0]?.name ?? '' })))
+/** The chips in the bar of the game: the figure, the name and the points of every team; the team whose turn it is shines. */
+const bar = computed(() => names.value.map((name, i) => ({ name, score: scores.value[i] ?? 0, index: i, turn: playing.value && i === team.value })))
+/** The four to five lines of "How to play": what the game does anyway (the existing texts, and two short new ones). */
+const rules = computed(() => [t('app.activity.handover'), t('app.activity.sub'), t('app.bigGames.activityFlow.ruleTime'), t('app.activity.pointRule'), t('app.bigGames.activityFlow.ruleWin')])
 
 const wordSize = computed(() => {
   const n = card.value?.word.length ?? 0
@@ -177,10 +192,28 @@ function resume(): boolean {
   phase.value = 'handover'
   return true
 }
-const resumeInfo = computed(() => (resumable.value ? t('app.activity.cardOf', { n: resumable.value.index + 1, total: resumable.value.deck.length }) : ''))
+const resumeInfo = computed(() => (!locked.value && resumable.value ? t('app.activity.cardOf', { n: resumable.value.index + 1, total: resumable.value.deck.length }) : ''))
+
+/** "Play" on the title screen: to the teams page (without Plus the Plus sheet opens instead). */
+function openLobby() {
+  if (locked.value) {
+    showUpsell('family')
+    return
+  }
+  phase.value = 'lobby'
+}
+
+/** "Continue" on the title screen. */
+function takeUp() {
+  if (locked.value) {
+    showUpsell('family')
+    return
+  }
+  if (resume()) void play('tap')
+}
 
 function start() {
-  if (totalCards.value < 1 || !allowed.value.length) return
+  if (!canGo.value) return
   painted.value = false
   deck.value = buildDeck(words.value, totalCards.value, allowed.value)
   scores.value = Array.from({ length: teamCount.value }, () => 0)
@@ -189,9 +222,16 @@ function start() {
   phase.value = 'handover'
 }
 
+/** The bar of the game says "End game": the round stays kept, the title screen offers to continue. */
+function leave() {
+  stopTimer()
+  painted.value = false
+  phase.value = 'start'
+}
+
 /**
  * A card whose way is "paint" first shows the word (like the others); the button there goes to the painting program (blank sheet, the
- * word and the sand in a band on top). What is kept is the hand-over of this card, so the round comes back to the same card.
+ * word and the time in a band on top). What is kept is the hand-over of this card, so the round comes back to the same card.
  */
 function paintCard(c: ActivityCard): boolean {
   keep()
@@ -236,7 +276,7 @@ function showCard() {
   noPaintApp.value = false
   stopTimer()
   if (card.value?.mode === 'draw') {
-    // no sand yet: the word is shown, and the time starts when the painting program opens
+    // no time yet: the word is shown, and the time starts when the painting program opens
     left.value = seconds.value
     keep()
   } else {
@@ -246,7 +286,7 @@ function showCard() {
   phase.value = 'card'
 }
 
-/** The button of a paint card: to the painting program; when that is not possible the card goes on like the others, with the sand. */
+/** The button of a paint card: to the painting program; when that is not possible the card goes on like the others, with the time. */
 function goPaint() {
   const c = card.value
   if (!c || c.mode !== 'draw') return
@@ -278,13 +318,11 @@ function answer(guessedBy: number | null) {
   phase.value = 'handover'
 }
 
-function again() {
-  start()
-}
+/** "New round with other players": back to the teams page. */
 function change() {
   stopTimer()
   painted.value = false
-  phase.value = 'setup'
+  phase.value = 'lobby'
 }
 const share = computed(() => (seconds.value ? Math.max(0, Math.min(1, left.value / seconds.value)) : 0))
 
@@ -292,320 +330,213 @@ returnFromPaint()
 </script>
 
 <template lang="pug">
-  MapTable(:title="t('app.activity.title')" @back="goBack")
-    div(class="fa" :class="{ 'is-wide': wide }")
-      //- ===== locked =====
-      template(v-if="locked")
-        MapPaper(kind="card" class="fa-narrow")
-          p(class="fa-text") {{ t('app.activity.locked') }}
-        MapButton(@click="showUpsell('family')") {{ t('app.family.lockedButton') }}
+  MapTable(title="" game="activity" @back="goBack")
+    //- ===== the bar of the game (while a round runs): the colour of the game, the teams with their points, leaving asks first =====
+    template(v-if="playing" v-slot:top)
+      FamilyGameBar(
+        game="activity"
+        :title="t('app.family.hub_activity')"
+        :subtitle="t('app.activity.cardOf', { n: index + 1, total: deck.length })"
+        :players="bar"
+        :leave-text="t('app.bigGames.familyFlow.leaveKept')"
+        @leave="leave"
+      )
 
-      //- ===== setup: the teams and the plates on the table =====
-      template(v-else-if="phase === 'setup'")
-        MapResume(v-if="resumable" :info="resumeInfo" class="fa-narrow" @resume="resume")
-        MapPaper(kind="strip" class="fa-narrow")
-          span(class="fa-strip") {{ t('app.activity.sub') }}
-        MapSeats(v-model:count="teamCount" v-model:names="teamNames" :min="2" :max="4" :question="t('app.activity.teams')" placeholder-key="app.family.team" class="fa-narrow")
+    div(class="fa")
+      //- ===== 1. the title screen (without Plus it says so, and "Play" opens the Plus sheet) =====
+      FamilyStart(
+        v-if="phase === 'start'"
+        game="activity"
+        :name="t('app.family.hub_activity')"
+        :tagline="t('app.family.hub_activitySub')"
+        :rules="rules"
+        :resume-info="resumeInfo"
+        @play="openLobby"
+        @resume="takeUp"
+      )
+        template(v-if="locked" v-slot:extra)
+          FamilyCard(compact class="fa-locked")
+            p(class="fa-fine") {{ t('app.activity.locked') }}
+            FamilyButton(class="fa-locked-btn" quiet @click="showUpsell('family')") {{ t('app.family.lockedButton') }}
 
-        section(class="fa-group fa-narrow")
-          h3(class="fa-h") {{ t('app.activity.words') }}
-          div(class="fa-row" role="radiogroup")
-            button(v-for="k in KINDS" :key="k" type="button" role="radio" :aria-checked="kind === k" :class="['fa-plate', { 'is-on': kind === k }]" @click="kind = k")
-              span(class="fa-plate-name") {{ t(`app.activity.kind_${k}`) }}
+      //- ===== 2. the teams, and the settings of the game =====
+      FamilyLobby(
+        v-else-if="phase === 'lobby'"
+        game="activity"
+        :title="t('app.activity.teams')"
+        :count="teamCount"
+        :names="teamNames"
+        :min="2"
+        :max="4"
+        placeholder-key="app.family.team"
+        :can-go="canGo"
+        @update:count="teamCount = $event"
+        @update:names="teamNames = $event"
+        @go="start"
+      )
+        template(v-slot:settings)
+          //- which words
+          FamilyCard(:title="t('app.activity.words')" symbol="activity")
+            div(class="fa-chips" role="radiogroup" :aria-label="t('app.activity.words')")
+              FamilyChip(v-for="k in KINDS" :key="k" :selected="kind === k" @click="pickKind(k)") {{ t(`app.activity.kind_${k}`) }}
 
-        section(class="fa-group fa-narrow")
-          h3(class="fa-h") {{ t('app.activity.ways') }}
-          div(class="fa-row" role="group")
-            button(v-for="m in ACTIVITY_MODES" :key="m" type="button" role="checkbox" :aria-checked="modes[m]" :class="['fa-plate', { 'is-on': modes[m] }]" @click="modes[m] = !modes[m]")
-              span(class="fa-plate-name") {{ t(`app.activity.mode_${m}`) }}
-          p(v-if="modes.draw" class="fa-hint") {{ t('app.activity.modeHint_draw') }}
-          p(v-if="!allowed.length" class="fa-error" role="alert") {{ t('app.activity.noWay') }}
+          //- how a word is shown (one way at least)
+          FamilyCard(:title="t('app.activity.ways')")
+            div(class="fa-chips" role="group" :aria-label="t('app.activity.ways')")
+              FamilyChip(v-for="m in ACTIVITY_MODES" :key="m" role="checkbox" :selected="modes[m]" @click="toggleMode(m)") {{ t(`app.activity.mode_${m}`) }}
+            span(v-if="modes.draw" class="fa-fine") {{ t('app.activity.modeHint_draw') }}
+            span(v-if="!allowed.length" class="fa-fine fa-error" role="alert") {{ t('app.activity.noWay') }}
 
-        section(class="fa-pair fa-narrow")
-          div(class="fa-group")
-            h3(class="fa-h") {{ t('app.activity.cards') }}
-            div(class="fa-row fa-row--discs" role="radiogroup")
-              button(v-for="n in CARD_CHOICES" :key="n" type="button" role="radio" :aria-checked="cardsEach === n" :class="['fa-disc', { 'is-on': cardsEach === n }]" @click="cardsEach = n") {{ n }}
-          div(class="fa-group")
-            h3(class="fa-h") {{ t('app.activity.time') }}
-            div(class="fa-row fa-row--discs" role="radiogroup")
-              button(v-for="n in SECOND_CHOICES" :key="n" type="button" role="radio" :aria-checked="seconds === n" :aria-label="t('app.activity.seconds', { n })" :class="['fa-disc', { 'is-on': seconds === n }]" @click="seconds = n")
-                | {{ n }}
-                small s
+          //- how many words for every team, and how long for one word
+          FamilyCard(:title="t('app.activity.cards')")
+            div(class="fa-chips" role="radiogroup" :aria-label="t('app.activity.cards')")
+              FamilyChip(v-for="n in CARD_CHOICES" :key="n" round :selected="cardsEach === n" @click="pickCards(n)") {{ n }}
+          FamilyCard(:title="t('app.activity.time')")
+            div(class="fa-chips" role="radiogroup" :aria-label="t('app.activity.time')")
+              FamilyChip(v-for="n in SECOND_CHOICES" :key="n" :selected="seconds === n" :aria-label="t('app.activity.seconds', { n })" @click="pickSeconds(n)") {{ n }} s
 
-        p(class="fa-note") {{ t('app.activity.total', { n: totalCards }) }} {{ t('app.activity.pointRule') }}
-        MapButton(:disabled="totalCards < 1 || !allowed.length" @click="start") {{ t('app.family.start') }}
+          FamilyCard(compact)
+            span(class="fa-fine") {{ t('app.activity.total', { n: totalCards }) }} {{ t('app.activity.pointRule') }}
 
-      //- ===== the device goes to the team =====
-      template(v-else-if="phase === 'handover'")
-        MapScoreBar(:players="bar")
-        div(class="fa-hand fa-narrow")
-          p(class="fa-count") {{ t('app.activity.cardOf', { n: index + 1, total: deck.length }) }}
-          MapToken(:index="team" :size="wide ? 70 : 104" lit class="fa-bighand")
+      //- ===== 3a. the device goes to the team =====
+      div(v-else-if="phase === 'handover'" class="fa-hand")
+        FamilyCard(class="fa-hand-card")
+          MapToken(:index="team" :size="104" lit class="fa-bighand")
           h2(class="fa-team") {{ t('app.activity.turn', { team: teamName }) }}
-          MapPaper(kind="strip")
-            span(class="fa-strip") {{ t('app.activity.handover') }}
-        MapButton(@click="showCard") {{ t('app.activity.show') }}
+          span(class="fa-fine") {{ t('app.activity.handover') }}
+        FamilyButton(class="fa-show" @click="showCard") {{ t('app.activity.show') }}
 
-      //- ===== the word on the medallion, the sand running =====
-      template(v-else-if="phase === 'card'")
-        div(class="fa-top")
-          MapScoreBar(:players="bar")
-        div(class="fa-play")
-          div(class="fa-stage")
-            div(:key="index" class="fa-flip" :style="{ width: medal + 'px', height: medal + 'px' }")
-              MapMedallion(:size="medal")
-                span(class="fa-count fa-count--in") {{ t('app.activity.cardOf', { n: index + 1, total: deck.length }) }}
-                span(class="fa-mode") {{ t(`app.activity.mode_${card?.mode ?? 'explain'}`) }}
-                span(class="fa-word" :style="{ fontSize: wordSize + 'rem' }") {{ card?.word }}
-          div(class="fa-side")
-            div(v-if="!readyToPaint && (!painted || paintedOver)" class="fa-clock" :class="{ 'is-up': timeUp, 'is-low': !timeUp && !painted && left <= 10 }")
-              img(:src="hourglass" alt="" class="fa-glass" draggable="false" @error="hideImg")
-              div(class="fa-time")
-                div(class="fa-track" aria-hidden="true")
-                  span(class="fa-fill" :style="{ width: Math.round(share * 100) + '%' }")
-                p(class="fa-left" role="timer") {{ timeUp ? t('app.activity.timeUp') : t('app.activity.secondsLeft', { n: left }) }}
-            MapPaper(v-if="!painted" kind="strip")
-              span(class="fa-strip") {{ t(`app.activity.rule_${card?.mode ?? 'explain'}`) }}
-            //- a paint card: first the word, then the button to the painting program
-            MapButton(v-if="readyToPaint" @click="goPaint") {{ t('app.activity.paintGo') }}
-            h3(v-if="!readyToPaint" class="fa-h fa-h--center") {{ t('app.activity.whoGuessed') }}
-            div(v-if="!readyToPaint" class="fa-figures")
+      //- ===== 3b. the word, the time running =====
+      div(v-else-if="phase === 'card'" class="fa-play")
+        div(class="fa-stage")
+          FamilyQuestionCard(
+            :key="index"
+            class="fa-wordcard"
+            symbol="activity"
+            :chip="t(`app.activity.mode_${card?.mode ?? 'explain'}`)"
+          )
+            span(class="fa-word" :style="{ fontSize: wordSize + 'rem' }") {{ card?.word }}
+          //- how to show this word (under the word, so that the right side keeps room for the time and the guess)
+          FamilyCard(v-if="!painted" compact class="fa-rule")
+            span(class="fa-fine") {{ t(`app.activity.rule_${card?.mode ?? 'explain'}`) }}
+        div(class="fa-side")
+          FamilyCard(v-if="showClock" compact :tone="timeUp ? 'wrong' : 'default'" :class="['fa-clock', { 'is-up': timeUp, 'is-low': !timeUp && !painted && left <= 10 }]")
+            p(class="fa-left" role="timer") {{ timeUp ? t('app.activity.timeUp') : t('app.activity.secondsLeft', { n: left }) }}
+            div(class="fa-track" aria-hidden="true")
+              span(class="fa-fill" :style="{ width: Math.round(share * 100) + '%' }")
+          //- a paint card: first the word, then the button to the painting program
+          FamilyButton(v-if="readyToPaint" class="fa-paint" @click="goPaint") {{ t('app.activity.paintGo') }}
+          template(v-else)
+            h3(class="fa-h") {{ t('app.activity.whoGuessed') }}
+            div(class="fa-figures")
               button(v-for="(n, i) in names" :key="i" type="button" :class="['fa-fig', { 'is-turn': i === team }]" :aria-label="t('app.activity.guessedBy', { team: n })" @click="answer(i)")
-                MapToken(:index="i" :size="wide ? 36 : 44" :lit="i === team")
+                MapToken(:index="i" :size="44" :lit="i === team")
                 span(class="fa-fig-name") {{ n }}
-            MapButton(v-if="!readyToPaint" quiet @click="answer(null)") {{ t('app.activity.wrong') }}
+            FamilyButton(quiet class="fa-nobody" @click="answer(null)") {{ t('app.activity.wrong') }}
 
-      //- ===== the end =====
-      template(v-else)
-        MapResult(:headline="winners.length > 1 ? t('app.activity.winners', { names: winners.map((w) => w.name).join(' & ') }) : t('app.activity.winner', { name: winners[0]?.name ?? '' })" :rows="resultRows" :winner-index="winnerIndex")
-          MapButton(@click="again") {{ t('app.family.again') }}
-          MapButton(quiet @click="change") {{ t('app.activity.change') }}
+      //- ===== 4. the end: the podium =====
+      FamilyPodium(
+        v-else
+        game="activity"
+        :headline="endHeadline"
+        :rows="resultRows"
+        @again="start"
+        @change="change"
+        @exit="toGames"
+      )
 </template>
 
 <style scoped lang="sass">
 .fa
   display: flex
   flex-direction: column
-  align-items: center
-  gap: 14px
-  width: 100%
-  max-width: 34rem
+  gap: 16px
+  min-height: 100%
+  max-width: 36rem
   margin: 0 auto
-  padding: 6px 0 12px
-  color: var(--mp-cream, #f6ead0)
-  font-family: var(--mp-serif, Georgia, serif)
+  padding: 6px 0 24px
 
-  &.is-wide
-    max-width: 62rem
+// ── the teams page: the words, the ways, how many, how long ──
+.fa-chips
+  display: flex
+  flex-wrap: wrap
+  justify-content: center
+  gap: 12px
+  padding-top: 2px
 
-.fa-narrow
-  width: 100%
-  max-width: 30rem
-
-.fa-text
-  margin: 0
-  line-height: 1.4
-
-.fa-strip
+.fa-fine
   display: block
   width: 100%
-  font-size: 1.25rem
-  font-weight: 600
-  line-height: 1.3
-  text-align: center
-
-.fa-h
-  margin: 0 0 6px
-  font-size: 1.1rem
-  font-weight: 800
-  letter-spacing: 0.04em
-  text-align: center
-  color: var(--mp-cream, #f6ead0)
-  text-shadow: none
-
-.fa-h--center
-  margin: 2px 0 0
-
-.fa-group
-  width: 100%
-
-.fa-note
   margin: 0
-  max-width: 28rem
+  color: var(--fam-muted)
   text-align: center
-  font-size: 1.1rem
-  font-weight: 700
+  font-size: 1.02rem
+  font-weight: 600
   line-height: 1.35
-  color: var(--mp-cream, #f6ead0)
-  text-shadow: none
 
 .fa-error
-  margin: 6px 0 0
+  color: var(--fam-bad)
+  font-weight: 700
+
+.fa-locked
+  max-width: 24rem
+
+.fa-h
+  margin: 4px 0 0
+  color: var(--fam-ink)
   text-align: center
+  font-size: 1.15rem
   font-weight: 800
-  color: #ffd2a0
-  text-shadow: none
 
-// ── the brass and bronze plates of the setup ───────────────────────────────────────────────────────────────
-.fa-row
-  display: flex
-  gap: 8px
-  justify-content: center
-
-.fa-row--discs
-  gap: 8px
-  flex-wrap: wrap
-
-.fa-plate
-  position: relative
-  flex: 1 1 0
-  min-width: 0
-  min-height: 52px
-  padding: 8px 12px
-  border-radius: 9px
-  border: 2px solid #9a6b1c
-  background: linear-gradient(180deg, #fff8e0 0%, #efd89c 100%)
-  box-shadow: 0 0 0 2px rgba(255, 246, 214, 0.92), 0 4px 8px rgba(60, 35, 5, 0.45), inset 0 1px 0 #ffffff
-  color: #3a2812
-  font: inherit
-  cursor: pointer
-  transition: transform 0.15s, background 0.2s, box-shadow 0.2s
-  -webkit-tap-highlight-color: transparent
-
-  &:active
-    transform: translateY(2px)
-
-  &.is-on
-    border-color: #fff0b8
-    background: linear-gradient(180deg, #ffe88f 0%, #f2b73b 100%)
-    box-shadow: 0 0 0 3px rgba(255, 246, 214, 0.95), 0 0 16px rgba(255, 200, 70, 0.85), 0 4px 8px rgba(60, 35, 5, 0.45), inset 0 1px 0 #fffbe0
-    color: #2e1f0a
-
-.fa-plate-name
-  display: block
-  font-size: 1.08rem
-  font-weight: 800
-  line-height: 1.15
-
-.fa-hint
-  margin: 8px 0 0
-  text-align: center
-  font-size: 1.08rem
-  font-weight: 600
-  color: var(--mp-cream, #f6ead0)
-  text-shadow: none
-
-.fa-pair
-  display: grid
-  grid-template-columns: 1fr 1fr
-  gap: 10px
-
-  @media (max-width: 560px)
-    grid-template-columns: 1fr
-
-.fa-disc
-  display: grid
-  place-items: center
-  align-content: center
-  flex: none
-  width: 56px
-  height: 56px
-  padding: 0
-  border-radius: 50%
-  border: 2px solid #9a6b1c
-  background: radial-gradient(circle at 38% 30%, #fffbeb, #ecd596 80%)
-  box-shadow: 0 0 0 2px rgba(255, 246, 214, 0.92), 0 4px 8px rgba(60, 35, 5, 0.45), inset 0 1px 0 #ffffff
-  color: #3a2812
-  font: inherit
-  font-size: 1.25rem
-  font-weight: 800
-  line-height: 1
-  cursor: pointer
-  transition: transform 0.15s, background 0.2s
-  -webkit-tap-highlight-color: transparent
-
-  small
-    display: block
-    font-size: 0.7rem
-    font-weight: 700
-    margin-top: 1px
-
-  &:active
-    transform: translateY(2px)
-
-  &.is-on
-    border-color: #fff0b8
-    background: radial-gradient(circle at 38% 30%, #fff3b0, #f2b73b 80%)
-    box-shadow: 0 0 0 3px rgba(255, 246, 214, 0.95), 0 0 16px rgba(255, 200, 70, 0.85), 0 4px 8px rgba(60, 35, 5, 0.45), inset 0 1px 0 #fffbe0
-    color: #2e1f0a
-
-// ── the device goes to the team ────────────────────────────────────────────────────────────────────────────
+// ── the device goes to the team ──
 .fa-hand
   display: flex
   flex-direction: column
   align-items: center
-  gap: 10px
-  padding-top: 6px
+  gap: 16px
+  margin: auto 0
 
-.fa-count
-  margin: 0
-  font-size: 0.95rem
-  font-weight: 700
-  letter-spacing: 0.06em
-  color: var(--mp-cream, #f6ead0)
-  text-shadow: none
-
-.fa-count--in
-  font-size: 0.78rem
-  color: #f2dca0
-  opacity: 0.9
+.fa-hand-card
+  max-width: 28rem
 
 .fa-bighand
-  margin: 6px 0 2px
-  animation: fa-hop 1.8s ease-in-out infinite
+  margin: 4px 0 0
 
 .fa-team
   margin: 0
+  color: var(--fam-ink)
   text-align: center
   font-size: 1.7rem
   font-weight: 800
   line-height: 1.15
-  text-shadow: none
 
-// ── the word ───────────────────────────────────────────────────────────────────────────────────────────────
-.fa-top
-  width: 100%
+.fa-show
+  width: min(100%, 22rem)
 
+// ── the word ──
 .fa-play
   display: flex
   flex-direction: column
-  align-items: center
-  gap: 10px
-  width: 100%
+  gap: 16px
 
 .fa-stage
-  display: grid
-  place-items: center
-  max-width: 100%
+  display: flex
+  flex-direction: column
+  gap: 12px
+  min-width: 0
 
-.fa-flip
-  animation: fa-turn 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both
-  transform-origin: 50% 50%
-
-.fa-mode
-  margin-top: 2px
-  font-size: 0.82rem
-  font-weight: 800
-  letter-spacing: 0.16em
-  text-transform: uppercase
-  color: #f5d88a
+.fa-wordcard
+  :deep(.fam-card-body)
+    min-height: 9.5rem
+    justify-content: center
 
 .fa-word
-  margin-top: 6px
+  display: block
   max-width: 100%
+  color: var(--fam-ink)
   font-weight: 800
   line-height: 1.1
+  text-align: center
   overflow-wrap: anywhere
   hyphens: auto
 
@@ -613,138 +544,116 @@ returnFromPaint()
   display: flex
   flex-direction: column
   align-items: center
-  gap: 10px
-  width: 100%
-  max-width: 28rem
-
-.fa-clock
-  display: flex
-  align-items: center
   gap: 12px
-  width: 100%
-
-.fa-glass
-  flex: none
-  height: 64px
-  width: auto
-  filter: drop-shadow(0 6px 6px rgba(10, 5, 0, 0.6))
-  transform-origin: 50% 55%
-  transition: transform 0.9s ease
-
-.fa-clock.is-up .fa-glass
-  transform: rotate(180deg)
-
-.fa-time
-  flex: 1
   min-width: 0
 
+.fa-clock
+  :deep(.fam-card-body)
+    gap: 8px
+
+.fa-left
+  margin: 0
+  color: var(--fam-ink)
+  font-size: 1.35rem
+  font-weight: 800
+  line-height: 1.2
+
 .fa-track
-  height: 8px
+  width: 100%
+  height: 10px
   border-radius: 999px
-  background: rgba(20, 12, 4, 0.75)
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(226, 189, 102, 0.4)
+  background: var(--fam-field)
+  box-shadow: inset 0 0 0 1px var(--fam-line)
   overflow: hidden
 
 .fa-fill
   display: block
   height: 100%
   border-radius: 999px
-  background: linear-gradient(90deg, #b98a35, #f0d584)
+  background: var(--fam-primary)
   transition: width 260ms linear
 
-.fa-left
-  margin: 6px 0 0
-  font-size: 1.3rem
-  font-weight: 800
-  letter-spacing: 0.03em
-  color: var(--mp-cream, #f6ead0)
-  text-shadow: none
+.fa-clock.is-low
+  .fa-left
+    color: var(--fam-bad)
 
-.fa-clock.is-low .fa-left
-  color: #ffcf8a
+  .fa-fill
+    background: var(--fam-bad)
 
-.fa-clock.is-low .fa-fill
-  background: linear-gradient(90deg, #a5521f, #e08a4a)
+.fa-clock.is-up
+  .fa-left
+    color: var(--fam-bad)
 
-.fa-clock.is-up .fa-left
-  color: #ffb27a
-  animation: fa-glow 1.4s ease-in-out 4
+  .fa-fill
+    width: 0 !important
 
-.fa-clock.is-up .fa-fill
-  width: 0 !important
+.fa-paint
+  width: min(100%, 22rem)
 
 .fa-figures
   display: flex
   flex-wrap: wrap
   justify-content: center
-  gap: 8px 14px
+  gap: 12px
+  width: 100%
 
 .fa-fig
+  box-sizing: border-box
   display: grid
   justify-items: center
   gap: 4px
-  min-width: 76px
-  min-height: 44px
-  padding: 6px 8px 5px
-  border: 1px solid rgba(226, 189, 102, 0.4)
-  border-radius: 12px
-  background: rgba(28, 19, 10, 0.72)
-  color: #f6ead0
+  min-width: 96px
+  min-height: 64px
+  padding: 8px 12px 7px
+  border: 2px solid var(--fam-line-strong)
+  border-radius: 20px
+  background: var(--fam-card)
+  box-shadow: var(--fam-shadow)
+  color: var(--fam-ink)
   font: inherit
   cursor: pointer
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.5)
-  transition: transform 0.15s, border-color 0.2s
+  touch-action: manipulation
   -webkit-tap-highlight-color: transparent
+  transition: transform 0.12s, border-color 0.2s
+
+  &:focus-visible
+    outline: 3px solid var(--fam-focus)
+    outline-offset: 2px
 
   &:active
-    transform: scale(0.95)
+    transform: scale(0.96)
 
   &.is-turn
-    border-color: var(--mp-gold, #e2bd66)
-    background: rgba(94, 64, 20, 0.85)
+    border-color: var(--fam-gold)
+    background: color-mix(in srgb, var(--fam-gold) 18%, var(--fam-card))
 
 .fa-fig-name
   max-width: 7.5em
   overflow: hidden
   text-overflow: ellipsis
   white-space: nowrap
-  font-size: 0.98rem
+  font-size: 1rem
   font-weight: 700
 
-// sideways: the medallion on the left, the rest of the table on the right
-@media (orientation: landscape)
-  .fa
-    gap: 8px
-    padding: 0 0 4px
+.fa-nobody
+  width: min(100%, 22rem)
 
-  .fa-play
-    flex-direction: row
-    align-items: center
-    justify-content: center
-    gap: 28px
+// ── motion only when the device does not ask for less ──
+@media (prefers-reduced-motion: no-preference)
+  .fa-wordcard
+    animation: fa-turn 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both
+    transform-origin: 50% 50%
 
-  .fa-side
-    flex: 1
-    max-width: 26rem
-    gap: 8px
+  .fa-bighand
+    animation: fa-hop 1.8s ease-in-out infinite
 
-  .fa-glass
-    height: 48px
-
-  .fa-hand
-    gap: 6px
-
-  .fa-fig
-    min-width: 70px
-    padding: 4px 8px 3px
-
-  .fa-side :deep(.mpa--strip), .fa-side :deep(.mpa-in)
-    min-height: 42px
+  .fa-clock.is-up .fa-left
+    animation: fa-pulse 1.4s ease-in-out 4
 
 @keyframes fa-turn
   from
     opacity: 0
-    transform: perspective(700px) rotateY(80deg) scale(0.9)
+    transform: perspective(700px) rotateY(70deg) scale(0.92)
   to
     opacity: 1
     transform: perspective(700px) rotateY(0) scale(1)
@@ -755,13 +664,46 @@ returnFromPaint()
   50%
     transform: translateY(-6px)
 
-@keyframes fa-glow
+@keyframes fa-pulse
   0%, 100%
-    text-shadow: none
+    transform: scale(1)
   50%
-    text-shadow: 0 0 14px rgba(255, 180, 90, 0.9), 0 1px 4px rgba(0, 0, 0, 0.95)
+    transform: scale(1.08)
 
-@media (prefers-reduced-motion: reduce)
-  .fa-flip, .fa-bighand, .fa-clock.is-up .fa-left
-    animation: none
+// ── sideways: the word on the left, the rest on the right (the teams page and the end arrange themselves) ──
+@media (orientation: landscape)
+  .fa
+    max-width: 62rem
+    gap: 12px
+
+  .fa-play
+    display: grid
+    grid-template-columns: minmax(0, 1fr) minmax(0, 24rem)
+    gap: 12px 20px
+    align-items: start
+
+  .fa-wordcard
+    :deep(.fam-card-head)
+      min-height: 44px
+      padding-top: 4px
+      padding-bottom: 4px
+
+    :deep(.fam-card-body)
+      min-height: 7rem
+      padding: 10px 14px
+
+  .fa-side
+    gap: 8px
+
+  .fa-fig
+    min-width: 84px
+    min-height: 56px
+    padding: 4px 10px 3px
+
+  .fa-hand
+    display: grid
+    grid-template-columns: minmax(0, 28rem) minmax(0, 18rem)
+    justify-content: center
+    align-items: center
+    gap: 16px 24px
 </style>
