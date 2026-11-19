@@ -4,7 +4,7 @@
  * the language, and one button that goes to the start page. The companion lamb sits on the rim of the greeting card.
  * The language is written through `setSettingValue('language', …)` only; App.vue syncs it to i18n and localStorage.
  */
-import { computed, ref } from 'vue'
+import { computed, ref, useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
@@ -25,20 +25,15 @@ const { setSettingValue } = useUser()
 // the language of the screens (German, English or Spanish; anything else counts as German)
 const current = computed<'de' | 'en' | 'es'>(() => (locale.value === 'en' || locale.value === 'es' ? locale.value : 'de'))
 
+// every language is written in its own language, whatever the app speaks right now (Anton 20.11.2026: "English", not "Englisch")
 const languages = computed(() => [
-  { code: 'de' as const, label: t('app.language.german') },
-  { code: 'en' as const, label: t('app.language.english') },
-  ...(SPANISH_ENABLED ? [{ code: 'es' as const, label: t('app.language.spanish') }] : [])
+  { code: 'de' as const, label: 'Deutsch' },
+  { code: 'en' as const, label: 'English' },
+  ...(SPANISH_ENABLED ? [{ code: 'es' as const, label: 'Español' }] : [])
 ])
 
-// the little stars of the American flag: rows of six and five dots
-const stars = Array.from({ length: 9 }, (_, row) =>
-  Array.from({ length: row % 2 === 0 ? 6 : 5 }, (_, i) => ({
-    k: row * 10 + i,
-    x: (row % 2 === 0 ? 2.6 : 4.7) + i * 4.2,
-    y: 2.6 + row * 2.1
-  }))
-).flat()
+// the clip path of the Union Jack needs an id of its own
+const ukClipId = `w-uk-clip-${useId()}`
 
 function pick(code: 'de' | 'en' | 'es') {
   if (current.value !== code) setSettingValue('language', code)
@@ -93,7 +88,7 @@ function onStart() {
           )
             span(class="lang-radio" aria-hidden="true")
             span(class="lang-flag" aria-hidden="true")
-              //- German flag (3:2) and the flag of the USA for English, on one 60 x 40 canvas
+              //- German flag (3:2) and the Union Jack for English, on one 60 x 40 canvas
               svg(v-if="l.code === 'de'" viewBox="0 0 60 40" focusable="false")
                 rect(width="60" height="13.5" y="0" fill="#000000")
                 rect(width="60" height="13.5" y="13.3" fill="#dd0000")
@@ -103,11 +98,15 @@ function onStart() {
                 rect(width="60" height="10.1" y="0" fill="#c60b1e")
                 rect(width="60" height="20.2" y="9.9" fill="#ffc400")
                 rect(width="60" height="10.1" y="29.9" fill="#c60b1e")
+              //- the Union Jack for English (not the flag of one country of speakers: Anton 20.11.2026)
               svg(v-else viewBox="0 0 60 40" focusable="false")
-                rect(width="60" height="40" fill="#ffffff")
-                rect(v-for="n in 7" :key="n" width="60" height="3.08" :y="(n - 1) * 6.154" fill="#b22234")
-                rect(width="26" height="21.5" fill="#3c3b6e")
-                circle(v-for="d in stars" :key="d.k" :cx="d.x" :cy="d.y" r="1.1" fill="#ffffff")
+                clipPath(:id="ukClipId")
+                  path(d="M30,20 h30 v20 z v20 h-30 z h-30 v-20 z v-20 h30 z")
+                path(d="M0,0 v40 h60 v-40 z" fill="#012169")
+                path(d="M0,0 L60,40 M60,0 L0,40" stroke="#ffffff" stroke-width="8")
+                path(d="M0,0 L60,40 M60,0 L0,40" :clip-path="`url(#${ukClipId})`" stroke="#c8102e" stroke-width="5")
+                path(d="M30,0 v40 M0,20 h60" stroke="#ffffff" stroke-width="13")
+                path(d="M30,0 v40 M0,20 h60" stroke="#c8102e" stroke-width="7.5")
             span(class="lang-name") {{ l.label }}
 
       section(class="who")

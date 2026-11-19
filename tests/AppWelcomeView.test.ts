@@ -58,6 +58,16 @@ describe('AppWelcomeView', () => {
     expect(rows[1]!.attributes('aria-checked')).toBe('false')
   })
 
+  it('writes every language in its own language and shows the Union Jack for English (no flag of one country of speakers)', () => {
+    const w = mount(AppWelcomeView)
+    const rows = w.findAll('.lang-row')
+    expect(rows.map((r) => r.find('.lang-name').text())).toEqual(['Deutsch', 'English'])
+    // the Union Jack has a clip path and the blue field #012169; the old flag of the USA had a field #3c3b6e
+    const html = rows[1]!.find('.lang-flag').html()
+    expect(html).toContain('#012169')
+    expect(html).not.toContain('#3c3b6e')
+  })
+
   it('writes the language when the other one is picked, and nothing when it is already active', async () => {
     const w = mount(AppWelcomeView)
     const rows = w.findAll('.lang-row')
