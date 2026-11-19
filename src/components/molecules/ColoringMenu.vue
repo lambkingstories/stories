@@ -123,7 +123,7 @@ function viewContinue(w: ArtworkMeta) {
 const frameStyle = (w: ArtworkMeta) => ({ aspectRatio: String(frameRatio(w)) })
 
 /** The picture of the door to the books (the children's hands painting in a coloring book, the lamb watching). */
-const booksDoorImage = prependBaseUrl('images/bg/malen-kinderhaende.webp')
+const booksDoorImage = prependBaseUrl('images/bg/malen-einfach.webp')
 
 // ── The book that has just come from the choice page: it is lifted once, softly, and brought into view ──────────────────────────
 const paintShelf = useColoringShelf()
