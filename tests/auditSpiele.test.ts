@@ -116,13 +116,13 @@ describe('the table of the family games keeps clear of the notch when the phone 
   })
 })
 
-describe('the order race: the choice of the adventure is a 44 px field', () => {
+describe('the order race: the choice of the adventure is a 48 px field', () => {
   it('no fixed 40 px height', () => {
     const css = src('src/views/app/AppFamilyOrderView.vue').replace(/\r/g, '')
     const at = css.indexOf('\n.fo-select\n')
     expect(at).toBeGreaterThan(-1)
     const block = css.slice(at, css.indexOf('\n\n', at + 2))
-    expect(block).toMatch(/min-height: 44px/)
+    expect(block).toMatch(/min-height: 48px/)
     expect(block).not.toMatch(/\n  height: 40px/)
   })
 })
@@ -134,11 +134,11 @@ describe('english text of the way to the next game wish', () => {
   })
 })
 
-describe('the Wortreise held wide: buttons of 44 px and a hint that is not cut off', () => {
+describe('the Wortreise held wide: buttons of 48 px and a hint that is not cut off', () => {
   const css = () => src('src/views/app/AppFamilyWortreiseView.vue').replace(/\r/g, '')
-  it('the buttons under the wheel are 44 px high', () => {
-    expect(css()).not.toMatch(/\.wr-act\n\s+min-width: 0\n\s+height: 42px/)
-    expect(css()).toMatch(/\.wr-act\n\s+min-width: 0\n\s+height: 44px/)
+  it('the buttons under the wheel are at least 48 px high (the capsules of the new look)', () => {
+    expect(css()).not.toMatch(/\.wr-act\n\s+min-width: 0\n\s+min-height: 4[0-7]px/)
+    expect(css()).toMatch(/\.wr-act\n\s+min-width: 0\n\s+min-height: 48px/)
   })
   it('the line of the message wraps to two lines instead of ending in dots', () => {
     const text = css()

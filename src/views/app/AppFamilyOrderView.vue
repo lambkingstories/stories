@@ -1,24 +1,27 @@
 <script setup lang="ts">
 /**
- * The order race (Plus), on the old map: a few stages of one adventure lie mixed up on the table as parchment strips (their titles), and
- * the person on turn taps them in the order in which they happen in the story. A strip that is right travels onto a dotted route, where
- * it gets a wax seal with its number; a wrong one shakes for a moment. One point for every place that was right at the first try, and a
- * bonus for the whole row (`scoreOrder`, unchanged). One device is passed around (or one person plays alone). The right order is the
- * order of the stages in the adventure, so nothing is made up.
+ * The order race (Plus), in the light look of "Familien-Spiele v2": a few stages of one adventure lie mixed up as white cards (their titles), and
+ * the person on turn taps them in the order in which they happen in the story. A card that is right travels onto a dotted route and gets a round
+ * badge with its number; a wrong one wobbles for a moment. One point for every place that was right at the first try, and a bonus for the whole
+ * row (`scoreOrder`, unchanged). One device is passed around (or one person plays alone). The right order is the order of the stages in the
+ * adventure, so nothing is made up.
+ * The course of a real game: the title screen (`start`), the players page (`lobby`: who plays, how many stations, how many turns, which
+ * adventure), the game (`handover` "whose turn", `play`; the bar of the game in its colour) and the end (`result`: podium).
  */
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import MapTable from '@/components/molecules/map/MapTable.vue'
 import { goBackTo } from '@/utils/navBack'
-import MapPaper from '@/components/molecules/map/MapPaper.vue'
-import MapButton from '@/components/molecules/map/MapButton.vue'
-import MapSeats from '@/components/molecules/map/MapSeats.vue'
 import MapToken from '@/components/molecules/map/MapToken.vue'
-import MapScoreBar from '@/components/molecules/map/MapScoreBar.vue'
 import MapRoute from '@/components/molecules/map/MapRoute.vue'
-import MapResult from '@/components/molecules/map/MapResult.vue'
-import MapResume from '@/components/molecules/map/MapResume.vue'
+import FamilyCard from '@/components/molecules/family/FamilyCard.vue'
+import FamilyButton from '@/components/molecules/family/FamilyButton.vue'
+import FamilyChip from '@/components/molecules/family/FamilyChip.vue'
+import FamilyStart from '@/components/molecules/family/FamilyStart.vue'
+import FamilyLobby from '@/components/molecules/family/FamilyLobby.vue'
+import FamilyGameBar from '@/components/molecules/family/FamilyGameBar.vue'
+import FamilyPodium, { type FamilyPodiumRow } from '@/components/molecules/family/FamilyPodium.vue'
 import { journeys } from '@/data/adventures'
 import { PREMIUM_TEASER, hasFeature, showUpsell } from '@/use/usePremium'
 import useFamilySave from '@/use/useFamilySave'
@@ -48,21 +51,31 @@ const save = useFamilySave<OrderSnap>('order', 1)
 // a kept round of another shape (older app) is thrown away at once
 if (save.saved.value && !parseOrderSnap(save.saved.value)) save.clear()
 
-/** Inside a round the arrow leads to the start page of this game (the round stays kept); there it leads to the main menu. */
+/** The arrow of the table: the players page and the end lead to the title screen, the title screen leads to the games. A running round has its own button (the bar of the game asks first). */
 function goBack() {
-  if (phase.value !== 'setup') {
-    clearTimeout(wobbleTimer)
-    wobble.value = null
-    phase.value = 'setup'
+  if (phase.value === 'lobby' || phase.value === 'result') {
+    phase.value = 'start'
     return
   }
+  goBackTo(router, { name: 'app-family' })
+}
+
+/** Leaving a running round (the bar of the game asked first): to the title screen, the round stays kept ("Continue"). */
+function toStart() {
+  clearTimeout(wobbleTimer)
+  wobble.value = null
+  phase.value = 'start'
+}
+
+/** "To the games": from the end back to the page of the family games. */
+function toGames() {
   goBackTo(router, { name: 'app-family' })
 }
 
 const locked = computed(() => PREMIUM_TEASER && !hasFeature('family'))
 const NAMES_KEY = 'lk-family-names'
 
-// ── setup ───────────────────────────────────────────────────────────────────────────────────────────────────────
+// ── players page ────────────────────────────────────────────────────────────────────────────────────────────────
 const names = ref<string[]>(Array.from({ length: MAX_PLAYERS }, () => ''))
 const playerCount = ref(2)
 const rounds = ref<number>(1)
@@ -81,15 +94,31 @@ onMounted(() => {
   if (saved.filter(Boolean).length >= 1) playerCount.value = Math.min(MAX_PLAYERS, Math.max(1, saved.filter(Boolean).length))
 })
 
+/** The lobby hands over the changed names (always all eight places). */
+function setNames(next: string[]) {
+  names.value = Array.from({ length: MAX_PLAYERS }, (_, i) => next[i] ?? '')
+}
+
 const nameOf = (i: number) => names.value[i]?.trim() || t('app.family.player', { n: i + 1 })
 const players = computed(() => Array.from({ length: playerCount.value }, (_, i) => nameOf(i)))
 const journeyOptions = computed(() => orderJourneys(journeys, count.value))
 const canStart = computed(() => journeyOptions.value.length > 0 && (!only.value || journeyOptions.value.includes(only.value)))
 const totalTurns = computed(() => playerCount.value * rounds.value)
 
+function pickCount(n: number) {
+  count.value = n
+  play('tap')
+}
+function pickRounds(r: number) {
+  rounds.value = r
+  play('tap')
+}
+
 // ── the game ────────────────────────────────────────────────────────────────────────────────────────────────────
-type Phase = 'setup' | 'handover' | 'play' | 'result'
-const phase = ref<Phase>('setup')
+/** The course: title screen, players page, whose turn, a row, the end. */
+type Phase = 'start' | 'lobby' | 'handover' | 'play' | 'result'
+const phase = ref<Phase>('start')
+const playing = computed(() => phase.value === 'handover' || phase.value === 'play')
 const turn = ref(0)
 const scores = ref<number[]>([])
 const round = ref<OrderRound | null>(null)
@@ -111,7 +140,8 @@ const left = computed(() => mixed.value.filter((x) => !picked.value.includes(x))
 const done = computed(() => !!round.value && picked.value.length === round.value.titles.length)
 const routeMax = computed(() => rounds.value * (count.value + ORDER_BONUS))
 
-const scorePlayers = computed(() => players.value.map((name, i) => ({ name, score: scores.value[i] ?? 0, index: i, turn: i === who.value })))
+/** The chips in the bar of the game: figure, name and points of everybody; the one on turn shines. */
+const barPlayers = computed(() => players.value.map((name, i) => ({ name, score: scores.value[i] ?? 0, index: i, turn: i === who.value })))
 const routePlayers = computed(() => players.value.map((name, i) => ({ name, value: scores.value[i] ?? 0, index: i, turn: i === who.value })))
 
 /** The ranking with the number of the token of each person. */
@@ -131,7 +161,9 @@ const headline = computed(() =>
       ? t('app.family.winners', { names: winners.value.map((w) => w.name).join(' & ') })
       : t('app.family.winner', { name: winners.value[0]?.name ?? '' })
 )
-const rows = computed(() => placing.value.map((p) => ({ rank: p.rank, name: p.name, score: t('app.family.points', p.score), index: p.index })))
+const rows = computed<FamilyPodiumRow[]>(() => placing.value.map((p) => ({ rank: p.rank, name: p.name, score: t('app.family.points', p.score), index: p.index })))
+/** The lines of "How to play": what the race does anyway. */
+const rules = computed(() => [t('app.bigGames.orderFlow.ruleMix'), t('app.order.task'), t('app.bigGames.orderFlow.ruleWrong'), t('app.order.rule'), t('app.bigGames.orderFlow.ruleTurns')])
 
 function newRound() {
   round.value = buildOrderRound(journeys, count.value, Math.random, only.value)
@@ -166,7 +198,7 @@ function persist() {
 
 /** The kept round, if it is still good. */
 const kept = computed(() => parseOrderSnap(save.saved.value))
-const keptInfo = computed(() => (kept.value ? t('app.order.turnOf', { n: kept.value.turn + 1, total: kept.value.playerCount * kept.value.rounds }) : ''))
+const keptInfo = computed(() => (!locked.value && kept.value ? t('app.order.turnOf', { n: kept.value.turn + 1, total: kept.value.playerCount * kept.value.rounds }) : ''))
 
 function resume() {
   const s = kept.value
@@ -265,331 +297,314 @@ function again() {
   start()
 }
 
+/** "New round with other players": back to the players page. */
 function change() {
   play('tap')
-  phase.value = 'setup'
+  phase.value = 'lobby'
+}
+
+/** "Play": to the players page (without Plus it opens the sheet of Plus). */
+function onPlay() {
+  if (locked.value) {
+    showUpsell('family')
+    return
+  }
+  phase.value = 'lobby'
 }
 
 // ── pictures ────────────────────────────────────────────────────────────────────────────────────────────────────
+/** A picture that cannot be loaded is left out (the title stays, in the middle). */
+const gone = reactive<Record<string, boolean>>({})
 /** The picture of a stage (small, beside its title) when the adventure has one. */
 function thumb(title: string): string {
   const stage = journeys.find((j) => j.title === round.value?.journey)?.stages.find((s) => s.title?.trim() === title)
-  return stage?.image ? prependBaseUrl(stage.image) : ''
+  const src = stage?.image ? prependBaseUrl(stage.image) : ''
+  return src && !gone[src] ? src : ''
 }
-const seal = (n: number) => prependBaseUrl(`images/familie/karte/siegel-${n}.webp`)
-const sealGone = reactive<Record<number, boolean>>({})
 function hide(e: Event) {
-  ;(e.target as HTMLElement).style.display = 'none'
+  const el = e.target
+  if (el instanceof HTMLImageElement) gone[el.getAttribute('src') ?? ''] = true
 }
 </script>
 
 <template lang="pug">
-  MapTable(:title="t('app.order.title')" @back="goBack")
-    //- ===== Plus ====================================================================================================
-    div(v-if="locked" class="fo-stack")
-      MapPaper(kind="card")
-        p(class="fo-text") {{ t('app.order.locked') }}
-      MapButton(@click="showUpsell('family')") {{ t('app.family.lockedButton') }}
+  MapTable(title="" game="order" @back="goBack")
+    //- ===== the bar of the game (while a round runs): the colour of the game, the people with their points, leaving asks first =====
+    template(v-if="playing" v-slot:top)
+      FamilyGameBar(
+        game="order"
+        :title="t('app.family.hub_order')"
+        :subtitle="t('app.order.turnOf', { n: turn + 1, total: totalTurns })"
+        :players="barPlayers"
+        :leave-text="t('app.bigGames.familyFlow.leaveKept')"
+        @leave="toStart"
+      )
 
-    //- ===== setup: the seats, the coins, the adventure =============================================================
-    div(v-else-if="phase === 'setup'" class="fo-setup")
-      div(v-if="kept" class="fo-resume")
-        MapResume(:info="keptInfo" @resume="resume")
-      p(class="fo-sub") {{ t('app.order.sub') }}
-      div(class="fo-part")
-        MapSeats(v-model:count="playerCount" v-model:names="names" :max="MAX_PLAYERS" :question="t('app.order.howMany')")
-      div(class="fo-part")
-        div(class="fo-duo")
-          section(class="fo-sec")
-            h2(class="fo-h") {{ t('app.order.count') }}
-            div(class="fo-marks" role="radiogroup")
-              button(v-for="n in ORDER_COUNTS" :key="n" type="button" role="radio" :aria-checked="count === n" :class="['fo-mark', { 'is-on': count === n }]" @click="count = n; play('tap')") {{ n }}
-          section(class="fo-sec")
-            h2(class="fo-h") {{ t('app.order.rounds') }}
-            div(class="fo-marks" role="radiogroup")
-              button(v-for="r in ORDER_ROUND_CHOICES" :key="r" type="button" role="radio" :aria-checked="rounds === r" :class="['fo-mark', { 'is-on': rounds === r }]" @click="rounds = r; play('tap')") {{ r }}
-        section(class="fo-sec")
-          h2(class="fo-h") {{ t('app.order.from') }}
-          MapPaper(kind="strip")
-            select(v-model="only" class="fo-select" :aria-label="t('app.order.from')")
-              option(value="") {{ t('app.family.eveningAll') }}
-              option(v-for="j in journeyOptions" :key="j" :value="j") {{ j }}
-            span(class="fo-caret" aria-hidden="true") ▾
-        p(class="fo-note") {{ t('app.order.rule') }}
-        div(class="fo-go")
-          MapButton(:disabled="!canStart" @click="play('button'); start()") {{ t('app.family.start') }}
+    div(class="fo")
+      //- ===== 1. the title screen (without Plus: "Play" opens the sheet of Plus, the note says why) =====
+      FamilyStart(
+        v-if="phase === 'start'"
+        game="order"
+        :name="t('app.family.hub_order')"
+        :tagline="t('app.family.hub_orderSub')"
+        :rules="rules"
+        :resume-info="keptInfo"
+        @play="onPlay"
+        @resume="resume"
+      )
+        template(v-if="locked" v-slot:extra)
+          FamilyCard(compact class="fo-lock")
+            span(class="fo-fine") {{ t('app.order.locked') }}
+            FamilyButton(quiet @click="showUpsell('family')") {{ t('app.family.lockedButton') }}
 
-    //- ===== whose turn =============================================================================================
-    div(v-else-if="phase === 'handover'" class="fo-stack")
-      p(class="fo-count") {{ t('app.order.turnOf', { n: turn + 1, total: totalTurns }) }}
-      MapToken(:index="who" :size="92" lit class="fo-hero")
-      h2(class="fo-big") {{ t('app.family.turn', { name: whoName }) }}
-      p(v-if="playerCount > 1" class="fo-note") {{ t('app.order.handover', { name: whoName }) }}
-      MapRoute(v-if="playerCount > 1" :players="routePlayers" :max="routeMax" class="fo-wide")
-      MapButton(@click="go") {{ t('app.order.show') }}
+      //- ===== 2. who plays, and the settings of the race =====
+      FamilyLobby(
+        v-else-if="phase === 'lobby'"
+        game="order"
+        :count="playerCount"
+        :names="names"
+        :min="1"
+        :max="MAX_PLAYERS"
+        :can-go="canStart"
+        @update:count="playerCount = $event"
+        @update:names="setNames"
+        @go="start"
+      )
+        template(v-slot:settings)
+          //- how many stations
+          FamilyCard(:title="t('app.order.count')" symbol="order")
+            div(class="fo-marks" role="radiogroup" :aria-label="t('app.order.count')")
+              FamilyChip(v-for="n in ORDER_COUNTS" :key="n" round :selected="count === n" @click="pickCount(n)") {{ n }}
 
-    //- ===== bring the strips in order ==============================================================================
-    div(v-else-if="phase === 'play'" class="fo-play")
-      div(class="fo-head")
-        MapScoreBar(:players="scorePlayers")
-        p(class="fo-who") {{ whoName }} · {{ t('app.family.fromAdventure', { name: round?.journey ?? '' }) }}
-        p(v-if="!done" class="fo-task") {{ t('app.order.task') }}
-      div(class="fo-board")
-        ol(class="fo-route" :aria-label="t('app.order.yours')")
-          li(v-for="(title, i) in round?.titles ?? []" :key="i" :class="['fo-slot', { 'is-full': i < picked.length, 'is-missed': i < picked.length && missed[i] }]")
-            span(class="fo-seal")
-              template(v-if="i < picked.length")
-                img(v-if="!sealGone[missed[i] ? 4 : 1]" :src="seal(missed[i] ? 4 : 1)" alt="" draggable="false" @error="sealGone[missed[i] ? 4 : 1] = true")
-                span(v-else class="fo-seal-fallback")
-              span(class="fo-seal-n") {{ i + 1 }}
-            Transition(name="fo-land")
-              MapPaper(v-if="i < picked.length" kind="strip" :lit="!done && i === picked.length - 1" class="fo-placed")
-                img(v-if="thumb(picked[i] ?? '')" :src="thumb(picked[i] ?? '')" alt="" class="fo-thumb" loading="lazy" draggable="false" @error="hide")
-                span(class="fo-card-t") {{ picked[i] }}
-              span(v-else class="fo-empty" aria-hidden="true")
-        div(class="fo-side")
-          TransitionGroup(v-if="!done" name="fo-pile" tag="div" class="fo-pile")
-            button(
-              v-for="x in left"
-              :key="x"
-              type="button"
-              :class="['fo-card', { 'is-wobble': wobble === x, 'is-tried': tried.includes(x) }]"
-              @click="pick(x)"
-            )
-              MapPaper(kind="strip" :dim="tried.includes(x)")
+          //- how many turns for everybody
+          FamilyCard(:title="t('app.order.rounds')")
+            div(class="fo-marks" role="radiogroup" :aria-label="t('app.order.rounds')")
+              FamilyChip(v-for="r in ORDER_ROUND_CHOICES" :key="r" round :selected="rounds === r" @click="pickRounds(r)") {{ r }}
+
+          //- from which adventure
+          FamilyCard(:title="t('app.order.from')")
+            span(class="fo-field")
+              select(v-model="only" class="fo-select" :aria-label="t('app.order.from')")
+                option(value="") {{ t('app.family.eveningAll') }}
+                option(v-for="j in journeyOptions" :key="j" :value="j") {{ j }}
+              span(class="fo-caret" aria-hidden="true")
+
+          FamilyCard(compact)
+            span(class="fo-fine") {{ t('app.order.rule') }}
+
+      //- ===== 3a. whose turn =====
+      div(v-else-if="phase === 'handover'" class="fo-hand")
+        FamilyCard(class="fo-handcard")
+          MapToken(:index="who" :size="104" lit)
+          h2(class="fo-big") {{ t('app.family.turn', { name: whoName }) }}
+          p(v-if="playerCount > 1" class="fo-fine") {{ t('app.order.handover', { name: whoName }) }}
+        MapRoute(v-if="playerCount > 1" :players="routePlayers" :max="routeMax" class="fo-wide")
+        FamilyButton(class="fo-show" @click="go") {{ t('app.order.show') }}
+
+      //- ===== 3b. bring the cards in order =====
+      div(v-else-if="phase === 'play'" class="fo-play")
+        div(class="fo-meta")
+          p(class="fo-turn")
+            MapToken(:index="who" :size="38" lit)
+            span {{ t('app.family.turn', { name: whoName }) }}
+          p(class="fo-chip") {{ t('app.family.fromAdventure', { name: round?.journey ?? '' }) }}
+          p(v-if="!done" class="fo-task") {{ t('app.order.task') }}
+        div(class="fo-board")
+          FamilyCard(compact class="fo-routecard")
+            ol(class="fo-route" :aria-label="t('app.order.yours')")
+              li(v-for="(title, i) in round?.titles ?? []" :key="i" :class="['fo-slot', { 'is-full': i < picked.length, 'is-missed': i < picked.length && missed[i], 'is-last': !done && i === picked.length - 1 }]")
+                span(class="fo-badge" :aria-label="t('app.bigGames.familyFlow.place', { n: i + 1 })") {{ i + 1 }}
+                Transition(name="fo-land")
+                  div(v-if="i < picked.length" :class="['fo-placed', { 'has-pic': !!thumb(picked[i] ?? '') }]")
+                    img(v-if="thumb(picked[i] ?? '')" :src="thumb(picked[i] ?? '')" alt="" class="fo-thumb" loading="lazy" draggable="false" @error="hide")
+                    span(class="fo-card-t") {{ picked[i] }}
+                  span(v-else class="fo-empty" aria-hidden="true")
+          div(class="fo-side")
+            TransitionGroup(v-if="!done" name="fo-pile" tag="div" class="fo-pile")
+              button(
+                v-for="x in left"
+                :key="x"
+                type="button"
+                :class="['fo-card', { 'is-wobble': wobble === x, 'is-tried': tried.includes(x), 'has-pic': !!thumb(x) }]"
+                @click="pick(x)"
+              )
                 img(v-if="thumb(x)" :src="thumb(x)" alt="" class="fo-thumb" loading="lazy" draggable="false" @error="hide")
                 span(class="fo-card-t") {{ x }}
-          div(v-else class="fo-done")
-            h2(class="fo-big") {{ result?.all ? t('app.order.allRight') : t('app.order.someRight', { n: result?.right ?? 0, total: round?.titles.length ?? 0 }) }}
-            p(class="fo-note") {{ t('app.order.gotPoints', { name: whoName, points: t('app.family.points', result?.points ?? 0) }) }}
-            MapButton(@click="next") {{ isLast ? t('app.family.result') : t('app.order.nextTurn') }}
+            FamilyCard(v-else class="fo-done" :tone="result?.all ? 'right' : 'lit'")
+              h2(class="fo-big" role="status") {{ result?.all ? t('app.order.allRight') : t('app.order.someRight', { n: result?.right ?? 0, total: round?.titles.length ?? 0 }) }}
+              p(class="fo-fine") {{ t('app.order.gotPoints', { name: whoName, points: t('app.family.points', result?.points ?? 0) }) }}
+              FamilyButton(@click="next") {{ isLast ? t('app.family.result') : t('app.order.nextTurn') }}
 
-    //- ===== the end ================================================================================================
-    div(v-else class="fo-stack")
-      MapResult(:headline="headline" :rows="rows" :winner-index="winners[0]?.index")
-        MapButton(@click="again") {{ t('app.family.again') }}
-        MapButton(quiet @click="change") {{ t('app.activity.change') }}
+      //- ===== 4. the end: the podium =====
+      FamilyPodium(
+        v-else
+        game="order"
+        :headline="headline"
+        :rows="rows"
+        :winner-index="winners[0]?.index"
+        @again="again"
+        @change="change"
+        @exit="toGames"
+      )
 </template>
 
 <style scoped lang="sass">
-$ink: #3a2812
-$light: #1f3a36
-$shade: none
-
-.fo-stack
+.fo
   display: flex
   flex-direction: column
-  align-items: center
-  gap: 14px
-  width: 100%
-  max-width: 28rem
+  gap: 16px
+  min-height: 100%
+  max-width: 36rem
   margin: 0 auto
-  padding-top: 8px
-  text-align: center
+  padding: 6px 0 24px
 
-.fo-text
-  margin: 0
-  line-height: 1.4
-
-.fo-sub, .fo-note, .fo-count
-  margin: 0
+.fo-fine
+  display: block
+  width: 100%
+  color: var(--fam-muted)
   text-align: center
-  color: $light
-  text-shadow: $shade
+  font-size: 1.02rem
+  font-weight: 600
   line-height: 1.35
-
-.fo-sub
-  font-size: 1.1rem
-  font-style: italic
-
-.fo-note
-  font-size: 1rem
-
-.fo-count
-  font-size: 0.95rem
-  letter-spacing: 0.12em
-  text-transform: uppercase
 
 .fo-big
   margin: 0
-  font-size: 1.7rem
+  color: var(--fam-ink)
+  font-size: 1.6rem
   font-weight: 800
   line-height: 1.15
   text-align: center
-  color: $light
-  text-shadow: $shade
 
-.fo-wide
-  width: 100%
+.fo-lock
+  max-width: 24rem
 
-.fo-hero
-  margin: 8px 0 2px
-
-// ── setup ──
-.fo-setup
-  display: flex
-  flex-direction: column
-  gap: 14px
-  width: 100%
-  max-width: 30rem
-  margin: 0 auto
-  padding-top: 4px
-
-.fo-part
-  display: flex
-  flex-direction: column
-  gap: 12px
-
-.fo-sec
-  display: flex
-  flex-direction: column
-  gap: 8px
-
-.fo-h
-  margin: 0
-  font-size: 1.15rem
-  font-weight: 800
-  text-align: center
-  color: $light
-  text-shadow: $shade
-
-.fo-duo
-  display: grid
-  grid-template-columns: repeat(2, minmax(0, 1fr))
-  gap: 10px
-  align-items: start
-
-  .fo-h
-    font-size: 1rem
-    line-height: 1.15
-
+// ── the players page ──
 .fo-marks
   display: flex
+  flex-wrap: wrap
   justify-content: center
-  gap: 9px
+  gap: 14px
+  padding-top: 4px
 
-// a brass mark: a round plate of bronze with the number
-.fo-mark
-  display: grid
-  place-items: center
-  width: 50px
-  height: 50px
-  padding: 0 0 2px
-  border-radius: 50%
-  border: 2px solid #9a6b1c
-  background: radial-gradient(circle at 38% 30%, #fffbeb, #ecd596 80%)
-  box-shadow: 0 0 0 2px rgba(255, 246, 214, 0.92), 0 4px 8px rgba(60, 35, 5, 0.45), inset 0 1px 0 #ffffff
-  color: #3a2812
-  font-family: var(--mp-serif, Georgia, serif)
-  font-size: 1.4rem
-  font-weight: 800
-  text-shadow: none
-  cursor: pointer
-  transition: transform 0.2s, filter 0.2s, box-shadow 0.2s
-  -webkit-tap-highlight-color: transparent
-
-  &.is-on
-    transform: translateY(-3px) scale(1.08)
-    border-color: #ffe9a8
-    box-shadow: 0 0 0 3px rgba(255, 246, 214, 0.95), 0 0 16px rgba(255, 200, 70, 0.85), 0 4px 8px rgba(60, 35, 5, 0.45), inset 0 1px 0 #fffbe0
+.fo-field
+  position: relative
+  display: block
+  width: 100%
 
 .fo-select
-  flex: 1
-  min-width: 0
-  min-height: 44px
-  border: 0
-  background: transparent
-  color: $ink
+  box-sizing: border-box
+  width: 100%
+  min-height: 48px
+  padding: 6px 44px 6px 16px
+  border: 2px solid var(--fam-line-strong)
+  border-radius: var(--fam-r-field)
+  background: var(--fam-field)
+  color: var(--fam-ink)
   font: inherit
   font-size: 1.1rem
   font-weight: 700
+  text-align: center
+  text-align-last: center
+  text-overflow: ellipsis
   appearance: none
   -webkit-appearance: none
-  outline: none
   cursor: pointer
-  text-overflow: ellipsis
+
+  &:focus-visible
+    outline: 3px solid var(--fam-focus)
+    outline-offset: 2px
 
   option
-    color: $ink
-    background: #f3e6c6
+    background: var(--fam-card)
+    color: var(--fam-ink)
 
+// the little arrow of the field (drawn by its borders)
 .fo-caret
-  flex: none
-  margin-left: 6px
-  color: $ink
-  font-size: 1.1rem
+  position: absolute
+  right: 18px
+  top: 50%
+  width: 9px
+  height: 9px
+  margin-top: -7px
+  border: solid var(--fam-primary-ink)
+  border-width: 0 3px 3px 0
+  transform: rotate(45deg)
   pointer-events: none
 
-.fo-go
+// ── whose turn ──
+.fo-hand
   display: flex
-  justify-content: center
-  padding-top: 6px
+  flex-direction: column
+  align-items: center
+  gap: 16px
+  margin: auto 0
+  width: 100%
 
-@media (orientation: landscape)
-  .fo-resume
-    grid-column: 1 / -1
+.fo-handcard
+  max-width: 24rem
 
-  .fo-setup
-    display: grid
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)
-    max-width: 52rem
-    gap: 6px 22px
-    align-items: start
-
-  .fo-sub
-    display: none
-
-  .fo-part
-    gap: 8px
-
-  .fo-go
-    padding-top: 0
+.fo-wide
+  width: 100%
 
 // ── the game ──
 .fo-play
   display: flex
   flex-direction: column
-  gap: 8px
+  gap: 12px
   width: 100%
-  max-width: 34rem
-  margin: 0 auto
 
-.fo-head
+.fo-meta
   display: flex
   flex-direction: column
   align-items: center
   gap: 6px
 
-.fo-who
+.fo-turn
+  display: flex
+  align-items: center
+  justify-content: center
+  gap: 10px
+  margin: 2px 0 0
+  color: var(--fam-ink)
+  font-size: 1.3rem
+  font-weight: 800
+
+.fo-chip
   margin: 0
-  font-size: 1.05rem
-  font-weight: 700
+  padding: 6px 18px
+  border: 1.5px solid var(--fam-gold)
+  border-radius: 999px
+  background: color-mix(in srgb, var(--fam-gold) 22%, var(--fam-card))
+  color: var(--fam-ink)
+  font-size: 0.98rem
+  font-weight: 800
+  line-height: 1.2
   text-align: center
-  color: $light
-  text-shadow: $shade
 
 .fo-task
+  max-width: 28rem
   margin: 0
-  font-size: 0.95rem
-  font-style: italic
+  color: var(--fam-muted)
+  font-size: 0.98rem
+  font-weight: 600
+  line-height: 1.35
   text-align: center
-  color: $light
-  text-shadow: $shade
 
 .fo-board
   display: flex
   flex-direction: column
-  gap: 12px
+  gap: 14px
 
-// the route: a dotted line over the map, a wax seal for every stop, a strip beside it
+// the route: a dotted line, a round badge with the number for every stop, a card beside it
 .fo-route
   position: relative
+  display: flex
+  flex-direction: column
+  gap: 8px
+  width: 100%
   margin: 0
   padding: 0
   list-style: none
-  display: flex
-  flex-direction: column
-  gap: 6px
 
   &::before
     content: ''
@@ -597,97 +612,79 @@ $shade: none
     left: 21px
     top: 20px
     bottom: 20px
-    border-left: 4px dotted rgba(58, 40, 18, 0.9)
-    filter: drop-shadow(0 1px 0 rgba(255, 240, 200, 0.5))
+    border-left: 3px dotted var(--fam-line-strong)
 
 .fo-slot
   position: relative
   display: grid
-  grid-template-columns: 46px minmax(0, 1fr)
+  grid-template-columns: 44px minmax(0, 1fr)
   align-items: center
-  gap: 8px
-  min-height: 36px
-  transition: min-height 0.3s ease
+  gap: 10px
+  min-height: 44px
 
-  &.is-full
-    min-height: 54px
-
-.fo-seal
-  position: relative
-  display: grid
-  place-items: center
-  width: 44px
-  height: 44px
-  justify-self: center
-  border-radius: 50%
-  border: 2px dashed rgba(246, 234, 208, 0.55)
-  background: rgba(28, 19, 10, 0.55)
-  color: rgba(246, 234, 208, 0.6)
-  font-family: var(--mp-serif, Georgia, serif)
-  font-size: 1.05rem
-  font-weight: 700
-  transform: scale(0.8)
-  transition: transform 0.3s ease
-
-  img
-    position: absolute
-    inset: -8%
-    width: 116%
-    height: 116%
-    object-fit: contain
-    filter: drop-shadow(0 3px 3px rgba(10, 5, 0, 0.6))
-
-.fo-seal-fallback
-  position: absolute
-  inset: -2px
-  border-radius: 50%
-  background: radial-gradient(circle at 35% 30%, #c0493c, #8c2a22 70%, #5e1a14)
-  box-shadow: 0 3px 4px rgba(10, 5, 0, 0.6)
-
-.fo-seal-n
+.fo-badge
   position: relative
   z-index: 1
-
-.is-full .fo-seal
-  transform: scale(1)
-  border: 0
-  background: transparent
-  color: #fbe9c4
-  font-size: 1.3rem
+  display: grid
+  place-items: center
+  width: 40px
+  height: 40px
+  justify-self: center
+  border: 2px dashed var(--fam-line-strong)
+  border-radius: 50%
+  background: var(--fam-card)
+  color: var(--fam-muted)
+  font-size: 1.1rem
   font-weight: 800
-  text-shadow: 0 1px 2px rgba(40, 8, 4, 0.9)
 
-.is-missed .fo-seal
-  opacity: 0.72
+.is-full .fo-badge
+  border: 2px solid var(--fam-primary)
+  background: var(--fam-primary)
+  color: var(--fam-on-primary)
 
-  .fo-seal-fallback
-    background: radial-gradient(circle at 35% 30%, #c9a24a, #8a6a24 70%, #5a4214)
+// a place that was not right at the first try: a gold badge (and one point less)
+.is-missed .fo-badge
+  border-color: var(--fam-gold-deep)
+  background: var(--fam-gold)
+  color: var(--fam-on-gold)
+
+.is-last .fo-badge
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--fam-gold) 45%, transparent)
 
 .fo-empty
   display: block
-  height: 34px
-  border-radius: 8px
-  border: 2px dashed rgba(58, 40, 18, 0.45)
-  background: rgba(246, 234, 208, 0.18)
+  height: 40px
+  border: 2px dashed var(--fam-line)
+  border-radius: 14px
+  background: color-mix(in srgb, var(--fam-field) 60%, transparent)
 
-.fo-placed
+.fo-placed,
+.fo-card
+  box-sizing: border-box
+  display: flex
+  align-items: center
+  justify-content: center
+  gap: 10px
   min-width: 0
+  min-height: 52px
+  padding: 6px 12px
+  border: 1.5px solid var(--fam-line-strong)
+  border-radius: 16px
+  background: var(--fam-card)
+  box-shadow: var(--fam-shadow)
+  color: var(--fam-ink)
+  text-align: center
 
-.fo-play
-  :deep(.mpa--strip)
-    min-height: 48px
+// a placed card: calm, with a teal edge at the left (it is on its place)
+.fo-placed
+  border-left: 5px solid var(--fam-primary)
 
-  :deep(.mpa--strip .mpa-in)
-    justify-content: flex-start
-    gap: 8px
-    min-height: 48px
-    padding-top: 4px
-    padding-bottom: 4px
-    text-align: left
+.is-missed .fo-placed
+  border-left-color: var(--fam-gold)
 
 .fo-card-t
   min-width: 0
-  font-size: 1.1rem
+  font-size: 1.08rem
   font-weight: 700
   line-height: 1.2
   overflow-wrap: anywhere
@@ -696,11 +693,17 @@ $shade: none
   flex: none
   width: 54px
   height: 36px
-  border-radius: 4px
+  border-radius: 8px
   object-fit: cover
-  box-shadow: 0 1px 3px rgba(40, 24, 6, 0.6), 0 0 0 1px rgba(58, 40, 18, 0.45)
+  box-shadow: 0 0 0 1px var(--fam-line)
 
-// the strips that are still on the table
+// with a picture the title stays in the true middle (the same room left and right of it)
+.fo-placed.has-pic,
+.fo-card.has-pic
+  display: grid
+  grid-template-columns: 54px minmax(0, 1fr) 54px
+
+// the cards that are still on the table
 .fo-side
   position: relative
   min-width: 0
@@ -709,35 +712,146 @@ $shade: none
   position: relative
   display: flex
   flex-direction: column
-  gap: 8px
+  gap: 10px
 
 .fo-card
-  display: block
+  position: relative
   width: 100%
-  padding: 0
-  border: 0
-  background: transparent
+  min-height: 56px
+  padding: 8px 14px
+  // the colour of the game as a small stripe on top
+  border-top: 4px solid var(--fam-accent)
   font: inherit
-  text-align: left
   cursor: pointer
+  touch-action: manipulation
   -webkit-tap-highlight-color: transparent
-  transition: transform 0.15s
+  transition: transform 0.15s, opacity 0.2s
+
+  &:focus-visible
+    outline: 3px solid var(--fam-focus)
+    outline-offset: 2px
 
   &:active
     transform: scale(0.985)
 
+  // a wrong card rests (and says so with a cross, not only with its colour)
   &.is-tried
+    opacity: 0.6
     transform: scale(0.97)
 
-  &.is-wobble
-    animation: fo-wobble 0.5s ease
+    &::after
+      content: '×'
+      position: absolute
+      top: 4px
+      right: 8px
+      display: grid
+      place-items: center
+      width: 20px
+      height: 20px
+      border-radius: 50%
+      background: var(--fam-bad)
+      color: var(--fam-on-accent)
+      font-size: 1rem
+      font-weight: 800
+      line-height: 1
 
 .fo-done
-  display: flex
-  flex-direction: column
-  align-items: center
-  gap: 12px
-  padding-top: 6px
+  max-width: 28rem
+  margin: 0 auto
+
+// ── sideways: the route on the left, the cards on the right ──
+@media (orientation: landscape)
+  .fo
+    max-width: 62rem
+    gap: 12px
+
+  .fo-play
+    gap: 8px
+
+  .fo-meta
+    flex-direction: row
+    flex-wrap: wrap
+    justify-content: center
+    gap: 4px 16px
+
+  .fo-task
+    display: none
+
+  .fo-board
+    display: grid
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)
+    gap: 16px
+    align-items: start
+
+  // the route has to fit next to the cards on a phone held wide
+  .fo-route
+    gap: 5px
+
+    &::before
+      left: 19px
+      top: 17px
+      bottom: 17px
+
+  .fo-slot
+    grid-template-columns: 40px minmax(0, 1fr)
+    min-height: 40px
+
+  .fo-badge
+    width: 34px
+    height: 34px
+    font-size: 1rem
+
+  .fo-empty
+    height: 34px
+
+  .fo-placed
+    min-height: 44px
+    padding-top: 3px
+    padding-bottom: 3px
+
+  .fo-hand
+    display: grid
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)
+    grid-template-areas: 'card route' 'show route'
+    gap: 12px 20px
+    align-items: center
+
+  .fo-handcard
+    grid-area: card
+    max-width: none
+
+  .fo-wide
+    grid-area: route
+
+  .fo-show
+    grid-area: show
+    justify-self: center
+
+// ── movement only for those who do not ask for less ──
+@media (prefers-reduced-motion: no-preference)
+  .fo-card.is-wobble
+    animation: fo-wobble 0.5s ease
+
+  // a right card leaves the pile and settles on the route
+  .fo-pile-leave-active
+    position: absolute
+    left: 0
+    right: 0
+    transition: opacity 0.3s, transform 0.3s
+
+  .fo-pile-leave-to
+    opacity: 0
+    transform: translateY(-24px) scale(0.96)
+
+  .fo-pile-move
+    transition: transform 0.35s ease
+
+  .fo-land-enter-active
+    transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.3, 1.4, 0.5, 1)
+
+  .fo-land-enter-from
+    opacity: 0
+    transform: translateY(26px) scale(0.94)
 
 @keyframes fo-wobble
   0%, 100%
@@ -750,50 +864,4 @@ $shade: none
     transform: translateX(-4px) rotate(-0.8deg)
   78%
     transform: translateX(2px) rotate(0.4deg)
-
-// a right strip leaves the pile and settles on the route
-.fo-pile-leave-active
-  position: absolute
-  left: 0
-  right: 0
-  transition: opacity 0.3s, transform 0.3s
-
-.fo-pile-leave-to
-  opacity: 0
-  transform: translateY(-24px) scale(0.96)
-
-.fo-pile-move
-  transition: transform 0.35s ease
-
-.fo-land-enter-active
-  transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.3, 1.4, 0.5, 1)
-
-.fo-land-enter-from
-  opacity: 0
-  transform: translateY(26px) scale(0.94)
-
-// turned phone: the route on the left, the strips on the right
-@media (orientation: landscape)
-  .fo-play
-    max-width: 56rem
-    gap: 4px
-
-  .fo-head
-    flex-direction: row
-    flex-wrap: wrap
-    justify-content: center
-    gap: 4px 16px
-
-  .fo-task
-    display: none
-
-  .fo-board
-    display: grid
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr)
-    gap: 20px
-    align-items: start
-
-@media (prefers-reduced-motion: reduce)
-  .fo-card.is-wobble
-    animation: none
 </style>
