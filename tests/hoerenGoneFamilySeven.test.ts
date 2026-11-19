@@ -105,7 +105,11 @@ describe('seven family games', () => {
       const feat = all[lang].app.features
       const count = lang === 'de' ? 'Sieben' : 'Seven'
       expect(feat.s2f8Text.startsWith(count)).toBe(true)
-      expect(plus.card3Text.startsWith(count)).toBe(true)
+      // the Plus card lists only the six paid games; the quiz is named once as the free one
+      expect(plus.card3Text.startsWith(lang === 'de' ? 'Sechs' : 'Six')).toBe(true)
+      expect(plus.card3Text.toLowerCase()).toContain(lang === 'de' ? 'quiz bleibt gratis' : 'quiz stays free')
+      expect(plus.card3Point1.toLowerCase()).not.toContain('quiz')
+      expect(plus.familyText.toLowerCase()).toContain(lang === 'de' ? 'quiz ist für alle gratis' : 'quiz is free')
       for (const word of GAME_WORDS[lang]) {
         expect(feat.s2f8Text.toLowerCase(), `features: ${word}`).toContain(word.toLowerCase())
         expect(plus.card3Text.toLowerCase(), `plus card: ${word}`).toContain(word.toLowerCase())
@@ -120,7 +124,7 @@ describe('seven family games', () => {
   it('Spanish names the seventh game too', () => {
     const es = readFileSync('src/i18n/es/teil3.ts', 'utf8')
     expect(es).toContain('Siete juegos para toda la familia')
-    expect(es).toContain('Siete juegos para la familia')
+    expect(es).toContain('Seis juegos para la familia')
     expect(es).not.toContain('Seis juegos para toda la familia')
   })
 })
