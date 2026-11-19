@@ -155,8 +155,8 @@ interface ResumeCard {
 }
 
 /** The two pictures of the areas (small versions for the tiles; Anton chose them on 18.11.2026). */
-const READ_AREA_IMAGE = prependBaseUrl('images/bg/lesen-geschichten-titel-klein.webp')
-const PAINT_AREA_IMAGE = prependBaseUrl('images/bg/malen-kind-malbuch-klein.webp')
+const READ_AREA_IMAGE = prependBaseUrl('images/bg/lesen-geschichten-leben-klein.webp')
+const PAINT_AREA_IMAGE = prependBaseUrl('images/bg/malen-malbuch-klein.webp')
 
 function bookTitle(book: ApiBook): string {
   return book.localizations?.[lang.value]?.title || book.localizations?.de?.title || ''
