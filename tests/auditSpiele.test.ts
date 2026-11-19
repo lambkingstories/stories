@@ -101,9 +101,11 @@ describe('the touch areas of the table of the family games are at least 44 px (a
     expect(all.length).toBeGreaterThanOrEqual(2)
     for (const n of all) expect(n).toBeGreaterThanOrEqual(44)
   })
-  it('the figure button and the name field of a player are 44 px high', () => {
-    expect(sizes('src/components/molecules/map/MapSeats.vue', '.ms-own')).toEqual(expect.arrayContaining([44, 44]))
-    expect(sizes('src/components/molecules/map/MapSeats.vue', '.ms-input')).toContain(44)
+  it('the name field of a player in the new lobby is at least 48 px high', () => {
+    const lines = src('src/components/molecules/family/FamilyNameField.vue').replace(/\r/g, '')
+    const heights = [...lines.matchAll(/min-height:\s*(\d+)px/g)].map((m) => Number(m[1]))
+    expect(heights.length).toBeGreaterThan(0)
+    for (const n of heights) expect(n).toBeGreaterThanOrEqual(48)
   })
 })
 
