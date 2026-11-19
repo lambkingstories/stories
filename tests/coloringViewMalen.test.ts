@@ -85,6 +85,33 @@ describe('the painting screen', () => {
     w.unmount()
   })
 
+  it('has no blank-sheet tiles (portrait / landscape) in the menu: only "Jetzt malen" (and "own picture")', async () => {
+    const w = await mountView(390)
+    expect(w.text()).not.toContain('Hochformat')
+    expect(w.text()).not.toContain('Querformat')
+    expect(w.findAll('.ac-tile')).toHaveLength(1)
+    w.unmount()
+  })
+
+  it('the back button of the phone from a sheet leads back to the menu of the painting program (the sheet has a step of its own in the history)', async () => {
+    const w = await mountView(390)
+    const router = (w.vm as unknown as { $router: import('vue-router').Router }).$router
+    await w.find('[data-test="first-go"]').trigger('click')
+    await new Promise((r) => setTimeout(r, 30))
+    await flushPromises()
+    expect(w.find('.ac-top').exists()).toBe(true)
+    expect(router.currentRoute.value.query.e).toBe('1')
+
+    router.back() // the phone's back button
+    await new Promise((r) => setTimeout(r, 30))
+    await flushPromises()
+    expect(router.currentRoute.value.query.e).toBeUndefined()
+    expect(router.currentRoute.value.name).toBe('app-coloring')
+    expect(w.find('.ac-top').exists()).toBe(false)
+    expect(w.find('[data-test="first-card"], [data-test="continue-go"]').exists()).toBe(true)
+    w.unmount()
+  })
+
   it('starts the tool bar folded on a phone and out on a tablet, when a picture is opened', async () => {
     for (const [width, folded] of [[390, true], [768, false]] as const) {
       const w = await mountView(width)

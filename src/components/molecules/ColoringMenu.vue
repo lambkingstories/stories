@@ -173,6 +173,8 @@ const bookPercent = (b: BookCard) => `${Math.round((b.done / Math.max(1, b.total
           button(type="button" class="lk-btn ac-cont-go" data-test="continue-go" @click="emit('open-work', continueWork)")
             ZIconography(name="brush" :size="22")
             span {{ t('app.coloring.keepPainting') }}
+          //- the two blank-sheet tiles are gone (Anton 20.11.2026); a new sheet is one quiet button here, and "Start painting" below while nothing is begun
+          button(type="button" class="ac-cont-new" data-test="new-sheet" @click="emit('blank', 'portrait')") {{ t('app.coloring.newSheet') }}
       section(v-else class="ac-continue ac-first lk-panel" aria-labelledby="ac-h-first" data-test="first-card")
         span(class="ac-first-ico" aria-hidden="true")
           ZIconography(name="brush" :size="30")
@@ -253,16 +255,6 @@ const bookPercent = (b: BookCard) => `${Math.round((b.done / Math.max(1, b.total
         h2(id="ac-h-free" class="ac-sec-title")
           span {{ t('app.coloring.freePainting') }}
         div(class="ac-free")
-          button(type="button" class="ac-tile" @click="emit('blank', 'portrait')")
-            span(class="ac-tile-ico")
-              ZIconography(name="plus" :size="26")
-            span(class="ac-tile-name") {{ t('app.coloring.blankSheet') }}
-            span(class="ac-tile-sub") {{ t('app.coloring.portraitShort') }}
-          button(type="button" class="ac-tile" @click="emit('blank', 'landscape')")
-            span(class="ac-tile-ico")
-              ZIconography(name="plus" :size="26")
-            span(class="ac-tile-name") {{ t('app.coloring.blankSheet') }}
-            span(class="ac-tile-sub") {{ t('app.coloring.landscapeShort') }}
           button(type="button" class="ac-tile ac-tile--wide" @click="emit('own-image')")
             span(class="ac-tile-ico")
               ZIconography(name="image" :size="26")
@@ -496,6 +488,20 @@ button
 .ac-cont-go
   margin-top: 8px
   min-height: 56px
+
+// a quiet text button under the main one: a new blank sheet
+.ac-cont-new
+  align-self: flex-start
+  min-height: 48px
+  padding: 0 4px
+  margin-top: 2px
+  border: none
+  background: transparent
+  color: var(--lk-accent)
+  font-weight: 800
+  font-size: 1rem
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
 
 .ac-first-ico
   flex: 0 0 auto

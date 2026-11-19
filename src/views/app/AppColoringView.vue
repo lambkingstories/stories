@@ -767,6 +767,7 @@ const BLANK_LANDSCAPE = { w: 1600, h: 1200 }
 
 function startBlankSheet(shape: 'portrait' | 'landscape') {
   const size = shape === 'portrait' ? BLANK_PORTRAIT : BLANK_LANDSCAPE
+  markEditing()
   void startBlank(size.w, size.h)
 }
 
@@ -798,6 +799,7 @@ async function startBlank(w: number, h: number, existing?: ArtworkMeta, unsaved 
 
 function openWork(meta: ArtworkMeta) {
   if (meta.kind === 'blank') {
+    markEditing()
     void startBlank(meta.width, meta.height, meta)
     return
   }
@@ -1548,20 +1550,47 @@ async function onBack() {
   }
   if (await backToStats()) return
   if (hasImage.value) {
-    await persistWithNote()
-    bookCtx.value = null
-    hasImage.value = false
-    identity = null
-    pdfDoc = null
-    totalPages.value = 1
-    currentPage.value = 1
+    // a sheet opened in place from the menu has its own step in the history (see `markEditing`): one real step back, the watcher below closes it
+    if (route.query.e === '1') {
+      router.back()
+      return
+    }
+    await closeEditorHere()
     // the menu is the page before when the picture was opened from a book or the menu: a real step back
     goBackTo(router, { name: 'app-coloring', query: {} })
-    void refreshMyWorks()
     return
   }
   goBackTo(router, { name: 'app-main' })
 }
+
+/** The picture is saved and put away; the menu of the painting program shows again (no navigation here). */
+async function closeEditorHere() {
+  await persistWithNote()
+  bookCtx.value = null
+  hasImage.value = false
+  identity = null
+  pdfDoc = null
+  totalPages.value = 1
+  currentPage.value = 1
+  void refreshMyWorks()
+}
+
+/**
+ * A sheet that is opened right in the menu (a blank sheet, an own picture) gets one step in the browser's history, so the back
+ * button of the phone (and of the page) leads back to the menu of the painting program and not out of it to some other page.
+ */
+function markEditing() {
+  if (route.query.e === '1' || activityCtx.value || journalCtx.value || advCtx.value) return
+  void router.push({ name: 'app-coloring', query: { ...route.query, e: '1' } })
+}
+
+// the step of that sheet was taken back (the phone's back button, or the arrow): the sheet is closed and the menu shows
+watch(
+  () => route.query.e,
+  (now, before) => {
+    if (before === '1' && now !== '1' && hasImage.value) void closeEditorHere()
+  }
+)
 
 /** Back to the choose-a-picture screen; the picture is saved first. */
 async function closePicture() {
@@ -1581,6 +1610,10 @@ async function closePicture() {
   if (await backToStats()) return
   if (bookCtx.value) {
     await leaveToBook()
+    return
+  }
+  if (route.query.e === '1') {
+    router.back()
     return
   }
   await persistWithNote()
@@ -1836,6 +1869,7 @@ function readFileAsUint8Array(file: File): Promise<Uint8Array> {
 }
 
 async function openFile(file: File) {
+  if (!hasImage.value) markEditing()
   identity = null
   isLoading.value = true
   try {
