@@ -926,27 +926,39 @@ onBeforeUnmount(() => {
   background: rgba(255, 255, 255, 0.78)
   min-height: 44px
   align-items: center
-  flex-wrap: wrap
-  max-width: 34vw
+  // one row on every screen (Konstantin 21.11.2026: the stones broke into four rows on an iPhone held upright): the pictures get narrower when there is no room
+  flex-wrap: nowrap
+  flex: 0 1 auto
+  min-width: 0
+  max-width: 46vw
 
 .dg-ico
-  height: 28px
+  flex: 0 1 auto
+  min-width: 6px
+  height: clamp(16px, 5.5vmin, 28px)
   width: auto
+  object-fit: contain
 
 .dg-ico--stone
-  height: 18px
+  height: clamp(11px, 3.8vmin, 18px)
 
 .dg-hud-mid
   display: flex
   flex-direction: column
   align-items: center
+  flex: 0 1 auto
+  min-width: 0
   padding: 4px 14px
   border-radius: 16px
   background: rgba(255, 255, 255, 0.78)
   font-weight: 800
 
 .dg-level-label
-  font-size: 0.95rem
+  max-width: 100%
+  overflow: hidden
+  text-overflow: ellipsis
+  white-space: nowrap
+  font-size: clamp(0.7rem, 2.6vmin, 0.95rem)
 
 .dg-menu-buttons
   display: flex

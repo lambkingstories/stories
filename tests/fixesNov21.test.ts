@@ -44,4 +44,12 @@ describe("David's sling", () => {
     expect(s).toContain("window.addEventListener('orientationchange', resize)")
     expect(s).toContain("window.visualViewport?.addEventListener('resize', resize)")
   })
+
+  it('keeps the sheep and the stones in one row on every screen (the pictures get narrower, they do not break into rows)', () => {
+    const s = read('components/molecules/games/BigGameDavid.vue')
+    const group = s.slice(s.indexOf('.dg-hud-group'), s.indexOf('.dg-menu-buttons'))
+    expect(group).toContain('flex-wrap: nowrap')
+    expect(group).toContain('object-fit: contain')
+    expect(group).not.toContain('flex-wrap: wrap')
+  })
 })
