@@ -28,7 +28,7 @@
  * owns and hands it in here (`setSubscribed`, `setOwnedBooks`). The buttons are on `AppPlusView.vue`, behind the parental gate.
  */
 import { computed, ref } from 'vue'
-import { bookProductId } from '@/data/plusProducts'
+import { bookProductId, type PlusPlan } from '@/data/plusProducts'
 
 export type PremiumFeature = 'readAloud' | 'colors' | 'glitter' | 'adventure' | 'allBooks' | 'book' | 'family'
 
@@ -63,6 +63,17 @@ const owned = ref<PremiumFeature[]>([])
 const ownedBooks = ref<string[]>([])
 /** True while the store says the person has an active subscription. */
 const subscribed = ref(false)
+/**
+ * What the store says about the running subscription (shown in "Ich"): the plan (iOS knows it, Android has one product for all plans), whether it renews
+ * by itself, and until when it runs (iOS tells it in the signed receipt; Android does not). `null` while there is no subscription.
+ */
+export interface PlusInfo {
+  plan?: PlusPlan
+  renews: boolean
+  /** Unix time in milliseconds of the end of the period that is paid. */
+  until?: number
+}
+const plusInfo = ref<PlusInfo | null>(null)
 /** The test switch of the test build: behave as a subscriber. */
 const testPlus = ref(readTest())
 const upsellContext = ref<UpsellContext | null>(null)
@@ -93,6 +104,11 @@ export function setOwnedBooks(productIds: string[]) {
 /** The store says whether the subscription is active. */
 export function setSubscribed(on: boolean) {
   subscribed.value = on
+}
+
+/** The store says what it knows about the running subscription (`null` when there is none). */
+export function setPlusInfo(info: PlusInfo | null) {
+  plusInfo.value = info
 }
 
 /** Switches Plus on or off in the test build (it does nothing in any other build). */
@@ -159,6 +175,8 @@ export default function usePremium() {
     upsellContext,
     /** Reactive: true while the person has Plus (the page shows it). */
     plusOn: computed(() => isPlus()),
+    /** Reactive: what the store says about the subscription (plan, renewal, end), or `null`. */
+    plusInfo: computed(() => plusInfo.value),
     closeUpsell: () => {
       upsellFeature.value = null
       upsellContext.value = null

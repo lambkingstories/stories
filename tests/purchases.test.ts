@@ -63,7 +63,8 @@ describe('what the store says is owned', () => {
       [{ productId: 'com.stories.lambking.plus.year', purchaseState: 0 }],
       [{ productId: 'lambking_book_lokal_abraham', purchaseState: 0 }, { productId: 'com.stories.lambking.support.3', purchaseState: 0 }, { productId: 'lambking_book_lokal_mose', purchaseState: 2 }]
     )
-    expect(owned).toEqual({ plus: true, books: ['lambking_book_lokal_abraham'] })
+    expect(owned).toMatchObject({ plus: true, books: ['lambking_book_lokal_abraham'] })
+    expect(owned.info).toMatchObject({ plan: 'year', renews: true })
     expect(ownedFrom([{ productId: 'com.stories.lambking.plus.month', purchaseState: 1 }], []).plus).toBe(false)
     expect(ownedFrom([{ productId: 'lambking_plus', purchaseState: 0 }], []).plus).toBe(true)
   })

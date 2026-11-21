@@ -162,6 +162,48 @@ const bookPercent = (b: BookCard) => `${Math.round((b.done / Math.max(1, b.total
           p(class="ac-head-sub") {{ t('app.coloring.menuSub') }}
         LkCompanion(class="ac-head-lamb" pose="stift" :size="92")
 
+      //- 1. My coloring books: the books on their shelf, or the way to the books. They stand at the very top, everything else below (Anton 21.11.2026)
+      section(class="ac-sec" aria-labelledby="ac-h-books")
+        h2(id="ac-h-books" class="ac-sec-title")
+          span {{ t('app.coloring.myBooks') }}
+          span(v-if="books.length" class="ac-count") {{ books.length }}
+        div(v-if="books.length" class="ac-shelf lk-panel")
+          div(:class="['ac-bigbooks', { 'is-one': books.length === 1 }]")
+            div(v-for="b in books" :key="b.bookId" :class="['ac-bigbook-wrap', { 'is-lifted': lifted === b.bookId }]" :data-shelf-book="b.bookId")
+              button(type="button" class="ac-bigbook" @click="emit('open-book', b)")
+                span(class="ac-bigbook-cover")
+                  img(v-if="b.cover" :src="b.cover" alt="" draggable="false" loading="lazy")
+                  span(v-if="b.done > 0" class="ac-bigbook-badge") {{ b.done }}/{{ b.total }}
+                //- the board the book stands on: the boards of all books join to one shelf
+                span(class="ac-bigbook-board" aria-hidden="true")
+                span(class="ac-bigbook-title") {{ b.title }}
+                span(v-if="b.done > 0" class="ac-bigbook-bar" aria-hidden="true")
+                  span(class="ac-bigbook-fill" :style="{ width: bookPercent(b) }")
+                span(class="ac-bigbook-sub") {{ b.done > 0 ? t('app.coloring.pagesPainted', { done: b.done, total: b.total }) : t('app.coloring.pagesCount', { total: b.total }) }}
+              //- takes the book out of the shelf again (the painted pictures stay)
+              button(type="button" class="ac-bigbook-remove" :aria-label="t('app.coloring.shelfRemove', { title: b.title })" @click="emit('remove-book', b)")
+                span(aria-hidden="true") ✕
+            //- one book only: the shelf would look empty beside it, so a friendly note stands there (the way to the other books)
+            div(v-if="books.length === 1" class="ac-onebook" data-test="one-book-note")
+              p(class="ac-onebook-text") {{ t('app.coloring.shelfMore') }}
+              button(type="button" class="lk-btn ac-onebook-go" @click="emit('to-books')")
+                span {{ t('app.coloring.shelfGo') }}
+                ZIconography(name="chevron-right" :size="20")
+          //- the way to all coloring books, also when the shelf is full
+          button(v-if="books.length !== 1" type="button" class="lk-btn lk-btn--outline ac-allbooks" @click="emit('to-books')")
+            span {{ t('app.coloring.shelfGo') }}
+            ZIconography(name="chevron-right" :size="20")
+        //- nothing on the shelf yet: a big door like the ones in Lesen
+        button(v-else type="button" class="ac-door" @click="emit('to-books')")
+          span(class="ac-door-pic")
+            img(:src="booksDoorImage" alt="" draggable="false" decoding="async")
+          span(class="ac-door-body")
+            span(class="ac-door-text")
+              span(class="ac-door-title") {{ t('app.coloring.shelfDoorTitle') }}
+              span(class="ac-door-sub") {{ t('app.coloring.shelfDoorSub') }}
+            span(class="ac-door-go")
+              ZIconography(name="chevron-right" :size="26")
+
       //- the painting that was painted on last: one tap goes on painting; while there is none, "Your first picture" with a button into painting
       section(v-if="continueWork" class="ac-continue lk-panel" aria-labelledby="ac-h-continue" data-test="continue-card")
         button(type="button" class="ac-cont-pic" :aria-label="t('app.coloring.keepPainting') + ': ' + continueWork.title" @click="emit('open-work', continueWork)")
@@ -207,48 +249,6 @@ const bookPercent = (b: BookCard) => `${Math.round((b.done / Math.max(1, b.total
             span {{ t('app.coloring.exhibitionHang') }}
         button(v-if="canFill" type="button" class="lk-btn lk-btn--outline lk-btn--small ac-ex-fill" data-test="exhibition-fill" @click="fillNewest")
           | {{ t('app.coloring.exhibitionFill') }}
-
-      //- 1. My coloring books: the books on their shelf, or the way to the books
-      section(class="ac-sec" aria-labelledby="ac-h-books")
-        h2(id="ac-h-books" class="ac-sec-title")
-          span {{ t('app.coloring.myBooks') }}
-          span(v-if="books.length" class="ac-count") {{ books.length }}
-        div(v-if="books.length" class="ac-shelf lk-panel")
-          div(:class="['ac-bigbooks', { 'is-one': books.length === 1 }]")
-            div(v-for="b in books" :key="b.bookId" :class="['ac-bigbook-wrap', { 'is-lifted': lifted === b.bookId }]" :data-shelf-book="b.bookId")
-              button(type="button" class="ac-bigbook" @click="emit('open-book', b)")
-                span(class="ac-bigbook-cover")
-                  img(v-if="b.cover" :src="b.cover" alt="" draggable="false" loading="lazy")
-                  span(v-if="b.done > 0" class="ac-bigbook-badge") {{ b.done }}/{{ b.total }}
-                //- the board the book stands on: the boards of all books join to one shelf
-                span(class="ac-bigbook-board" aria-hidden="true")
-                span(class="ac-bigbook-title") {{ b.title }}
-                span(v-if="b.done > 0" class="ac-bigbook-bar" aria-hidden="true")
-                  span(class="ac-bigbook-fill" :style="{ width: bookPercent(b) }")
-                span(class="ac-bigbook-sub") {{ b.done > 0 ? t('app.coloring.pagesPainted', { done: b.done, total: b.total }) : t('app.coloring.pagesCount', { total: b.total }) }}
-              //- takes the book out of the shelf again (the painted pictures stay)
-              button(type="button" class="ac-bigbook-remove" :aria-label="t('app.coloring.shelfRemove', { title: b.title })" @click="emit('remove-book', b)")
-                span(aria-hidden="true") ✕
-            //- one book only: the shelf would look empty beside it, so a friendly note stands there (the way to the other books)
-            div(v-if="books.length === 1" class="ac-onebook" data-test="one-book-note")
-              p(class="ac-onebook-text") {{ t('app.coloring.shelfMore') }}
-              button(type="button" class="lk-btn ac-onebook-go" @click="emit('to-books')")
-                span {{ t('app.coloring.shelfGo') }}
-                ZIconography(name="chevron-right" :size="20")
-          //- the way to all coloring books, also when the shelf is full
-          button(v-if="books.length !== 1" type="button" class="lk-btn lk-btn--outline ac-allbooks" @click="emit('to-books')")
-            span {{ t('app.coloring.shelfGo') }}
-            ZIconography(name="chevron-right" :size="20")
-        //- nothing on the shelf yet: a big door like the ones in Lesen
-        button(v-else type="button" class="ac-door" @click="emit('to-books')")
-          span(class="ac-door-pic")
-            img(:src="booksDoorImage" alt="" draggable="false" decoding="async")
-          span(class="ac-door-body")
-            span(class="ac-door-text")
-              span(class="ac-door-title") {{ t('app.coloring.shelfDoorTitle') }}
-              span(class="ac-door-sub") {{ t('app.coloring.shelfDoorSub') }}
-            span(class="ac-door-go")
-              ZIconography(name="chevron-right" :size="26")
 
       //- 2. Paint freely: a blank sheet or an own picture
       section(class="ac-sec" aria-labelledby="ac-h-free")

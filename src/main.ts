@@ -126,7 +126,15 @@ app.use(i18n)
 void Promise.all([Promise.race([loadPreviewJourneys(), new Promise((resolve) => setTimeout(resolve, 1000))]), userLanguage.value === 'es' ? loadSpanish() : undefined]).finally(() => app.mount('#app'))
 
 // In the app from the store: ask the store what the person owns (LambKing Plus, single coloring books). Loaded only there, so the web bundle never carries it.
-if (import.meta.env.VITE_APP_NATIVE === 'true') void import('@/use/usePurchases').then((m) => m.refreshOwned())
+if (import.meta.env.VITE_APP_NATIVE === 'true') {
+  void import('@/use/usePurchases').then((m) => {
+    void m.refreshOwned()
+    // back in front after a while: ask the store again (the end of a subscription, or a new one)
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') void m.refreshOnResume()
+    })
+  })
+}
 
 // While the first screen is read, the screens of the bottom bar are loaded quietly in the background.
 const whenQuiet = (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number }).requestIdleCallback

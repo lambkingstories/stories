@@ -725,6 +725,38 @@ const questionSize = computed(() => {
   gap: 14px
   width: 100%
 
+// held upright: the verdict and the button stay at the lower edge of the screen as soon as the answer is given, so that nobody has to scroll
+// down to go on (Anton 21.11.2026); the verdict and the button sit side by side to take little room
+@media (orientation: portrait)
+  .fq-reveal
+    position: sticky
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 8px)
+    z-index: 5
+    flex-direction: row
+    flex-wrap: nowrap
+    justify-content: center
+    align-items: center
+    gap: 10px
+    padding: 8px
+    border: 1.5px solid var(--fam-line)
+    border-radius: 22px
+    background: color-mix(in srgb, var(--fam-card) 96%, transparent)
+    box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.16), var(--fam-shadow)
+
+  .fq-reveal .fq-verdict
+    flex: 1 1 0
+    min-width: 0
+    max-width: none
+
+    :deep(.fam-card-body)
+      padding: 8px 10px
+
+  .fq-reveal .fq-next
+    flex: 1 1 0
+    min-width: 0
+    width: auto
+    padding: 10px 14px
+
 .fq-verdict
   max-width: 20rem
 

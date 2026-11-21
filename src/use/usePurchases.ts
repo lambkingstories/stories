@@ -13,7 +13,7 @@
 import { ref } from 'vue'
 import { isIOS } from '@/utils/platform'
 import { requireParent } from '@/use/useParentalGate'
-import { PLUS_TEST, setOwnedBooks, setSubscribed, setTestBook } from '@/use/usePremium'
+import { PLUS_TEST, setOwnedBooks, setPlusInfo, setSubscribed, setTestBook, type PlusInfo } from '@/use/usePremium'
 import { PLUS_PRODUCTS, bookProductId, isBookProduct, type PlusPlan } from '@/data/plusProducts'
 import type { Product, Purchase, SubscriptionOffer } from '@choochmeque/tauri-plugin-iap-api'
 
@@ -56,13 +56,34 @@ export function regularPrice(offer: SubscriptionOffer | undefined): string | und
   return phases[phases.length - 1]?.formattedPrice
 }
 
-/** What a list of active purchases of the store says: is Plus on, and which single books are owned (ids of their products). */
-export function ownedFrom(subs: Pick<Purchase, 'productId' | 'purchaseState'>[], books: Pick<Purchase, 'productId' | 'purchaseState'>[]) {
+/** The end of the paid period from the signed receipt of Apple (`expiresDate` in its payload); `undefined` when there is none or it cannot be read. */
+export function expiryFromJws(jws: string | undefined): number | undefined {
+  try {
+    const part = jws?.split('.')[1]
+    if (!part) return undefined
+    const json = atob(part.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(part.length / 4) * 4, '='))
+    const value = (JSON.parse(json) as { expiresDate?: unknown }).expiresDate
+    return typeof value === 'number' && value > 0 ? value : undefined
+  } catch {
+    return undefined
+  }
+}
+
+type PurchaseLike = Pick<Purchase, 'productId' | 'purchaseState'> & Partial<Pick<Purchase, 'isAutoRenewing' | 'jwsRepresentation'>>
+
+/** What a list of active purchases of the store says: is Plus on (and how: plan, renewal, end), and which single books are owned (ids of their products). */
+export function ownedFrom(subs: PurchaseLike[], books: Pick<Purchase, 'productId' | 'purchaseState'>[]) {
   const plusIds: string[] = [PLUS_PRODUCTS.ios.year, PLUS_PRODUCTS.ios.month, PLUS_PRODUCTS.ios.familyYear, PLUS_PRODUCTS.ios.familyMonth, PLUS_PRODUCTS.android.subscription]
   // PurchaseState.PURCHASED is 0 (not pending, not cancelled)
   const live = (p: Pick<Purchase, 'purchaseState'>) => p.purchaseState === 0
+  const plusSubs = subs.filter((p) => live(p) && plusIds.includes(p.productId))
+  // when there are several (a change of plan), the one that runs longest counts
+  const best = [...plusSubs].sort((a, b) => (expiryFromJws(b.jwsRepresentation) ?? 0) - (expiryFromJws(a.jwsRepresentation) ?? 0))[0]
+  const plan = best ? (Object.keys(PLUS_PRODUCTS.ios) as PlusPlan[]).find((k) => PLUS_PRODUCTS.ios[k] === best.productId) : undefined
+  const info: PlusInfo | null = best ? { plan, renews: best.isAutoRenewing !== false, until: expiryFromJws(best.jwsRepresentation) } : null
   return {
-    plus: subs.some((p) => live(p) && plusIds.includes(p.productId)),
+    plus: plusSubs.length > 0,
+    info,
     books: [...new Set(books.filter((p) => live(p) && isBookProduct(p.productId)).map((p) => p.productId))]
   }
 }
@@ -73,28 +94,30 @@ interface Cache {
   plus: boolean
   books: string[]
   at: number
+  info?: PlusInfo | null
 }
 
 function readCache(now = Date.now()): Cache | null {
   try {
     const c = JSON.parse(localStorage.getItem(CACHE_KEY) ?? 'null') as Cache | null
     if (!c || typeof c.at !== 'number' || now - c.at > OFFLINE_DAYS * 86_400_000) return null
-    return { plus: !!c.plus, books: Array.isArray(c.books) ? c.books.filter((b) => typeof b === 'string') : [], at: c.at }
+    return { plus: !!c.plus, books: Array.isArray(c.books) ? c.books.filter((b) => typeof b === 'string') : [], at: c.at, info: c.info ?? null }
   } catch {
     return null
   }
 }
 
-function writeCache(plus: boolean, books: string[]) {
+function writeCache(plus: boolean, books: string[], info: PlusInfo | null) {
   try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ plus, books, at: Date.now() } satisfies Cache))
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ plus, books, at: Date.now(), info } satisfies Cache))
   } catch {
     // no storage: only until the app is closed
   }
 }
 
-function apply(plus: boolean, books: string[]) {
+function apply(plus: boolean, books: string[], info: PlusInfo | null) {
   setSubscribed(plus)
+  setPlusInfo(plus ? info : null)
   setOwnedBooks(books)
 }
 
@@ -110,15 +133,29 @@ export async function refreshOwned(): Promise<boolean> {
     const { restorePurchases } = await iapApi()
     const [subs, books] = await Promise.all([restorePurchases('subs'), restorePurchases('inapp')])
     const owned = ownedFrom(subs.purchases ?? [], books.purchases ?? [])
-    apply(owned.plus, owned.books)
-    writeCache(owned.plus, owned.books)
+    apply(owned.plus, owned.books, owned.info)
+    writeCache(owned.plus, owned.books, owned.info)
+    lastAsked = Date.now()
     return true
   } catch (error) {
     console.warn('[purchases] the store could not be asked', error)
     const cached = readCache()
-    if (cached) apply(cached.plus, cached.books)
+    if (cached) apply(cached.plus, cached.books, cached.info ?? null)
     return false
   }
+}
+
+let lastAsked = 0
+/** How long the answer of the store is trusted when the app comes back to the front (so that the end of a subscription shows soon, without asking at every glance). */
+export const RESUME_ASK_MS = 5 * 60_000
+
+/**
+ * The app was in the background and is in front again: the store is asked once more (at most every few minutes), so that a subscription
+ * that has run out turns the app back into the free version, and a new one shows at once.
+ */
+export function refreshOnResume(now = Date.now()): Promise<boolean> {
+  if (!PURCHASES_AVAILABLE || now - lastAsked < RESUME_ASK_MS) return Promise.resolve(false)
+  return refreshOwned()
 }
 
 let lookup: Promise<void> | null = null

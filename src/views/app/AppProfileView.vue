@@ -12,7 +12,11 @@ import ZLanguageSwitcher from '@/components/atoms/ZLanguageSwitcher.vue'
 import AvatarPickerModal from '@/components/molecules/AvatarPickerModal.vue'
 import TestUnlock from '@/components/molecules/TestUnlock.vue'
 import BuildStamp from '@/components/atoms/BuildStamp.vue'
-import { PLUS_TEST } from '@/use/usePremium'
+import usePremium, { PLUS_TEST, PREMIUM_TEASER } from '@/use/usePremium'
+import { MANAGE_URL } from '@/data/plusProducts'
+import { isIOS } from '@/utils/platform'
+import { openExternal } from '@/utils/openExternal'
+import { requireParent } from '@/use/useParentalGate'
 import useModels from '@/use/useModels'
 import useApiBooks from '@/use/useApiBooks'
 import useUser from '@/use/useUser'
@@ -49,6 +53,27 @@ onMounted(() => {
 })
 
 const lang = computed<Locale>(() => (contentLocale(locale.value)))
+
+// LambKing Plus: the card says whether the subscription runs (and until when), or that this is the free version. The end of a subscription needs nothing
+// from the child: the store says "not any more" and the app is the free one again (`usePurchases` asks again when the app comes back to the front).
+const { plusOn, plusInfo } = usePremium()
+const showPlusCard = PREMIUM_TEASER
+const plusDate = computed(() => {
+  const until = plusInfo.value?.until
+  return until ? new Date(until).toLocaleDateString(locale.value, { day: 'numeric', month: 'long', year: 'numeric' }) : ''
+})
+const plusLine = computed(() => {
+  const info = plusInfo.value
+  if (!info) return t('app.profile.plusTestOn')
+  if (info.renews) return plusDate.value ? t('app.profile.plusRenewsOn', { date: plusDate.value }) : t('app.profile.plusRenewsAuto')
+  return plusDate.value ? t('app.profile.plusEndsOn', { date: plusDate.value }) : t('app.profile.plusEndsAuto')
+})
+const plusPlanName = computed(() => (plusInfo.value?.plan ? t(`app.profile.plusPlan_${plusInfo.value.plan}`) : ''))
+const manageUrl = computed(() => (isIOS ? MANAGE_URL.ios : MANAGE_URL.android))
+/** The page of the store where the subscription is managed: behind the parental gate, like every way out of the app. */
+async function manageSubscription() {
+  if (await requireParent()) void openExternal(manageUrl.value)
+}
 
 // Backdrop — a tall artwork for portrait, a wide one for landscape. The swap
 // itself happens in CSS (`@media (orientation: …)`); we only feed the
@@ -290,6 +315,17 @@ const tileImg = (path: string) => prependBaseUrl(`images/${path}.webp`)
           span(class="my-tile-text")
             span(class="my-tile-title") {{ t('app.journal.title') }}
             span(class="my-tile-sub") {{ t('app.profile.tileJournalSub') }}
+
+      //- LambKing Plus: runs (plan, until when) or "free version" with the way to the Plus page
+      section(v-if="showPlusCard" :class="['plus-card', { 'is-on': plusOn }]" data-test="plus-card" aria-labelledby="plus-card-title")
+        div(class="plus-card-head")
+          h3(id="plus-card-title" class="plus-card-title") {{ plusOn ? t('app.profile.plusCardTitle') : t('app.profile.plusFreeTitle') }}
+          span(v-if="plusOn" class="plus-card-badge" data-test="plus-badge") {{ t('app.profile.plusActive') }}
+        p(v-if="plusOn && plusPlanName" class="plus-card-plan" data-test="plus-plan") {{ plusPlanName }}
+        p(class="plus-card-line" data-test="plus-line") {{ plusOn ? plusLine : t('app.profile.plusFreeSub') }}
+        div(class="plus-card-actions")
+          router-link(:to="{ name: 'app-plus' }" class="lk-btn lk-btn--small plus-card-go" data-test="plus-go") {{ plusOn ? t('app.plus.title') : t('app.profile.plusSee') }}
+          button(v-if="plusOn && plusInfo" type="button" class="plus-card-manage" data-test="plus-manage" @click="manageSubscription") {{ t('app.plus.manage') }}
 
       //- only in the test build: unlock all the adventures to try the cards and the big games
       TestUnlock(v-if="PLUS_TEST")
@@ -548,6 +584,67 @@ button
   display: flex
   align-items: center
   gap: 14px
+
+.plus-card
+  display: flex
+  flex-direction: column
+  gap: 6px
+  margin-top: 14px
+  padding: 14px 16px
+  border: 1px solid var(--lk-line)
+  border-radius: var(--lk-r-group)
+  background: $cream-card
+  box-shadow: var(--lk-shadow)
+
+  &.is-on
+    border-color: var(--lk-accent, #1f6f68)
+
+.plus-card-head
+  display: flex
+  align-items: center
+  justify-content: space-between
+  gap: 10px
+
+.plus-card-title
+  margin: 0
+  font-size: 1.05rem
+  font-weight: 800
+  color: $navy
+
+.plus-card-badge
+  padding: 3px 12px
+  border-radius: 999px
+  background: var(--lk-accent-soft, #d9efe9)
+  color: var(--lk-accent, #1f6f68)
+  font-size: 0.8rem
+  font-weight: 800
+
+.plus-card-plan
+  margin: 0
+  font-weight: 700
+  color: $navy
+
+.plus-card-line
+  margin: 0
+  font-size: 0.92rem
+  line-height: 1.35
+  color: $navy
+
+.plus-card-actions
+  display: flex
+  align-items: center
+  flex-wrap: wrap
+  gap: 12px
+  margin-top: 4px
+
+.plus-card-manage
+  padding: 6px 2px
+  border: 0
+  background: none
+  color: var(--lk-accent, #1f6f68)
+  font-weight: 700
+  text-decoration: underline
+  cursor: pointer
 
 .my-tiles
   display: grid

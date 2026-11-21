@@ -2,7 +2,7 @@ name: Android Build & Sign
 
 # Builds the signed Play Store bundle (.aab) and an installable .apk.
 # Upload the .aab by hand in the Play Console (Test and release -> Closed testing).
-# Last build request: 2026-11-20 f (final 1.2.0: new area pictures, Plus invitation, welcome slides that fold, adventure picture, painting menu and back step, oval switch; all family games in the new design).
+# Last build request: 2026-11-21 (1.2.1: quiz button stays visible, book page turn without flicker, David game keeps its size on iPhone, painting menu with My books on top, Plus status in Ich).
 #
 # Needs the repository secrets ANDROID_KEYSTORE_BASE64 (the release keystore,
 # base64) and ANDROID_KEYSTORE_PASSWORD (store = key password; alias `lambking`).

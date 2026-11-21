@@ -328,7 +328,6 @@ defineExpose({ go, page, double })
   position: absolute
   z-index: 4
   opacity: 0
-  transition: opacity 160ms ease-out
   top: 0
   left: calc(50% - 22px)
   width: 44px
@@ -336,12 +335,9 @@ defineExpose({ go, page, double })
   pointer-events: none
   background: linear-gradient(90deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.28) 46%, rgba(0, 0, 0, 0.34) 50%, rgba(0, 0, 0, 0.18) 56%, rgba(0, 0, 0, 0))
 
-  // it comes in while the leaf is nearly down, and goes at once when the book turns to a single page
+  // no fading at all: a shadow that fades in and out next to the turning leaf flickered on some phones (Anton 21.11.2026)
   &.is-on
     opacity: 1
-
-  &.is-on.is-flipping
-    transition: opacity 360ms ease-out 320ms
 
 .bf-single
   position: absolute
@@ -395,26 +391,6 @@ defineExpose({ go, page, double })
     width: 100%
     height: 100%
     object-fit: cover
-
-  // the light on the paper: the leaf is in shade while it stands upright and gets its light back when it lies flat
-  &::after
-    content: ''
-    position: absolute
-    inset: 0
-    pointer-events: none
-    background: linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.05) 70%)
-    opacity: 0
-    transition: opacity 720ms ease-in
-
-.bf-rear::after
-  opacity: 0.8
-
-.bf-leaf.is-turning
-  .bf-front::after
-    opacity: 0.8
-
-  .bf-rear::after
-    opacity: 0
 
 .bf-rear
   transform: rotateY(180deg)
