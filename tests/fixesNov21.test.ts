@@ -37,12 +37,9 @@ describe('quiz', () => {
 })
 
 describe("David's sling", () => {
-  it('checks the size of the canvas in every frame and listens to the turning of the phone', () => {
+  it('has its picture made new whenever the size of the screen changes (the guard of the canvas)', () => {
     const s = read('components/molecules/games/BigGameDavid.vue')
-    expect(s).toContain('function keepSize()')
-    expect(s).toMatch(/function frame\(now: number\) \{\s*raf = requestAnimationFrame\(frame\)\s*keepSize\(\)/)
-    expect(s).toContain("window.addEventListener('orientationchange', resize)")
-    expect(s).toContain("window.visualViewport?.addEventListener('resize', resize)")
+    expect(s).toContain('useCanvasGuard(canvas, () => resize())')
   })
 
   it('keeps the sheep and the stones in one row on every screen (the pictures get narrower, they do not break into rows)', () => {

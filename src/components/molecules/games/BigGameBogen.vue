@@ -7,6 +7,7 @@
  */
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import useCanvasGuard from '@/use/useCanvasGuard'
 import AdvButton from '@/components/atoms/AdvButton.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
 import GameIntroBox from '@/components/molecules/games/GameIntroBox.vue'
@@ -113,6 +114,8 @@ function saveMem() {
 // ── the game ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 let g: Game = levelGame(0)
 const canvas = ref<HTMLCanvasElement | null>(null)
+// the picture of the canvas always has the shape of its box, also after a turn of the phone (see `useCanvasGuard`)
+useCanvasGuard(canvas, () => layout())
 let ctx: CanvasRenderingContext2D | null = null
 let raf = 0
 let last = 0

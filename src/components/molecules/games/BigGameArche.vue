@@ -7,6 +7,7 @@
  */
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import useCanvasGuard from '@/use/useCanvasGuard'
 import AdvButton from '@/components/atoms/AdvButton.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
 import useBigGames, { howSeen, markHowSeen } from '@/use/useBigGames'
@@ -119,6 +120,8 @@ const levelTitle = (i: number) => T('levelN', { n: i + 1 })
 // ── the game and its display state ──────────────────────────────────────────────────────────────────────────────────────────
 let g: Game = newGame(LEVELS[0]!)
 const canvas = ref<HTMLCanvasElement | null>(null)
+// the picture of the canvas always has the shape of its box, also after a turn of the phone (see `useCanvasGuard`)
+useCanvasGuard(canvas, () => resize())
 const hudEl = ref<HTMLElement | null>(null)
 const boostEl = ref<HTMLElement | null>(null)
 let ctx: CanvasRenderingContext2D | null = null

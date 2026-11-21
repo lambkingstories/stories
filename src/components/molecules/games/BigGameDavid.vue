@@ -5,6 +5,7 @@
  */
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import useCanvasGuard from '@/use/useCanvasGuard'
 import AdvButton from '@/components/atoms/AdvButton.vue'
 import AdventureStars from '@/components/molecules/AdventureStars.vue'
 import GameIntroBox from '@/components/molecules/games/GameIntroBox.vue'
@@ -96,6 +97,8 @@ const outcome = reactive({ phase: 'play' as 'play' | 'won' | 'lost', stars: 0, n
 // ── the game ────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 let g: Game = newGame(LEVELS[0]!)
 const canvas = ref<HTMLCanvasElement | null>(null)
+// the picture of the canvas always has the shape of its box, also after a turn of the phone (see `useCanvasGuard`)
+useCanvasGuard(canvas, () => resize())
 let ctx: CanvasRenderingContext2D | null = null
 let raf = 0
 let last = 0
@@ -311,20 +314,8 @@ let lastDraw = 0
 /** Behind a menu, the pause card, the explanation or the note to turn the phone nothing that matters moves: the picture is painted only a few times a second (battery, heat). */
 const IDLE_DRAW_MS = 250
 
-/**
- * On an iPhone the window sends its "resize" before the page has the new size when the phone is turned, and the picture stayed squeezed
- * (Anton 21.11.2026, iPhone 13): so the size of the box is checked in every frame, and the picture is made new as soon as it is not right.
- */
-function keepSize() {
-  const cv = canvas.value
-  if (!cv) return
-  const r = cv.getBoundingClientRect()
-  if (r.width > 0 && r.height > 0 && (Math.round(r.width * dpr) !== cv.width || Math.round(r.height * dpr) !== cv.height)) resize()
-}
-
 function frame(now: number) {
   raf = requestAnimationFrame(frame)
-  keepSize()
   const dt = Math.min(0.033, (now - last) / 1000 || 0)
   last = now
   const running = screen.value === 'play' && !paused.value && !(portrait.value && !showRotateAnyway.value)
@@ -609,8 +600,6 @@ onMounted(async () => {
   if (window.location.href.includes('probe=1')) (window as unknown as { __david?: unknown }).__david = { start, advance(seconds: number) { for (let t = 0; t < seconds; t += 1 / 60) update(1 / 60); draw(performance.now() / 1000) }, get game() { return g }, get goliath() { return goliath }, get paused() { return paused.value }, set paused(v: boolean) { paused.value = v } }
   resize()
   window.addEventListener('resize', resize)
-  window.visualViewport?.addEventListener('resize', resize)
-  window.addEventListener('orientationchange', resize)
   // the fighting music of the game (it stops with the game)
   music.playDavid()
   await loadAll()
@@ -621,8 +610,6 @@ onBeforeUnmount(() => {
   cancelAnimationFrame(raf)
   music.stop('game')
   window.removeEventListener('resize', resize)
-  window.visualViewport?.removeEventListener('resize', resize)
-  window.removeEventListener('orientationchange', resize)
   document.body.style.overflow = bodyOverflow
   leaveFullscreen()
 })
