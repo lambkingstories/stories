@@ -7,11 +7,11 @@ const clipId = `fi-uk-${useId()}`
 </script>
 
 <template lang="pug">
-  svg(v-if="lang === 'de'" viewBox="0 0 60 40" focusable="false" aria-hidden="true")
+  svg(v-if="lang === 'de'" viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice" focusable="false" aria-hidden="true")
     rect(width="60" height="13.5" y="0" fill="#000000")
     rect(width="60" height="13.5" y="13.3" fill="#dd0000")
     rect(width="60" height="13.4" y="26.6" fill="#ffce00")
-  svg(v-else viewBox="0 0 60 40" focusable="false" aria-hidden="true")
+  svg(v-else viewBox="0 0 60 40" preserveAspectRatio="xMidYMid slice" focusable="false" aria-hidden="true")
     clipPath(:id="clipId")
       path(d="M30,20 h30 v20 z v20 h-30 z h-30 v-20 z v-20 h30 z")
     path(d="M0,0 v40 h60 v-40 z" fill="#012169")

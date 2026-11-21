@@ -1439,6 +1439,8 @@ export default {
     ask5: '¿Cómo se sintió el personaje principal, y cómo lo notaste?',
     ask6: '¿Hay algo que quieras decirle a Dios sobre esto?',
     nextStoryWaiting: '¡La siguiente historia te está esperando!',
+    pagerLabel: 'Páginas',
+    pageN: 'Página {n}',
     openColoring: 'Abrir hoja para colorear',
     paintThis: 'Colorear esta hoja',
     unlockBook: 'Desbloquear todo el libro'

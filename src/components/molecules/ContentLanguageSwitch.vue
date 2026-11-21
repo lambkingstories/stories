@@ -40,33 +40,40 @@ const name = (l: 'de' | 'en') => (l === 'de' ? t('app.language.german') : t('app
   align-items: center
   gap: 10px
 
-// a round flag, 44 px to hit (the rule of the app), a ring around the chosen one
+// a round flag: the flag fills the whole circle (no gap above or below, the sides are cut as in a round badge), the chosen one has a ring outside of it
 .cls-btn
   position: relative
-  width: 44px
-  height: 44px
+  flex: none
+  width: 38px
+  height: 38px
   padding: 0
-  border: 3px solid transparent
+  border: 0
   border-radius: 50%
   background: transparent
   cursor: pointer
-  overflow: hidden
+  overflow: visible
   opacity: 0.55
-  transition: opacity 120ms, border-color 120ms, transform 120ms
+  transition: opacity 120ms, transform 120ms, box-shadow 120ms
 
+  // the flag itself: a disc without a border, filled to the edge
   svg
     display: block
     width: 100%
     height: 100%
     border-radius: 50%
-    object-fit: cover
 
   &.is-on
     opacity: 1
-    border-color: var(--lk-accent, #1f6f68)
-    transform: scale(1.04)
+    transform: scale(1.06)
+    box-shadow: 0 0 0 3px var(--lk-accent, #1f6f68)
+
+  // a touch area of 44 px around the 38 px disc (the rule of the app)
+  &::after
+    content: ''
+    position: absolute
+    inset: -3px
 
   &:focus-visible
     outline: 3px solid var(--lk-accent, #1f6f68)
-    outline-offset: 2px
+    outline-offset: 4px
 </style>

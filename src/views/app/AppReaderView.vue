@@ -963,7 +963,7 @@ function goToBookDetail() {
       div(
         v-if="book && displayEntries.length > 1"
         class="pager"
-        aria-label="Seiten"
+        :aria-label="t('app.reader.pagerLabel')"
       )
         button(
           v-for="(entry, i) in displayEntries"
@@ -971,7 +971,7 @@ function goToBookDetail() {
           type="button"
           class="pager-dot"
           :class="{ active: i === currentIndex, 'is-cover': entry.kind === 'cover', 'is-end': entry.kind === 'celebration' }"
-          :aria-label="`Seite ${i + 1}`"
+          :aria-label="t('app.reader.pageN', { n: i + 1 })"
           @click="gotoIndex(i)"
         )
 
