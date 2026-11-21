@@ -18,9 +18,13 @@ const { t } = useI18n({ useScope: 'global' })
   div(class="page-head")
     AppHeader
     div(class="head-body")
-      button(v-if="back" type="button" class="head-back lk-btn lk-btn--outline lk-btn--small" @click="emit('back')")
-        ZIconography(name="chevron-left" :size="20")
-        span {{ t('app.read.back') }}
+      div(v-if="back || $slots.tools" class="head-top")
+        button(v-if="back" type="button" class="head-back lk-btn lk-btn--outline lk-btn--small" @click="emit('back')")
+          ZIconography(name="chevron-left" :size="20")
+          span {{ t('app.read.back') }}
+        //- tools at the right of the back button (for example the round flags of the language of a shelf)
+        div(v-if="$slots.tools" class="head-tools")
+          slot(name="tools")
       div(class="head-row")
         div(class="head-text")
           h1(class="head-title") {{ title }}
@@ -33,6 +37,15 @@ const { t } = useI18n({ useScope: 'global' })
   max-width: 980px
   margin: 0 auto
   padding: 0 16px
+
+.head-top
+  display: flex
+  align-items: center
+  justify-content: space-between
+  gap: 12px
+
+.head-tools
+  margin-left: auto
 
 .head-back
   gap: 4px

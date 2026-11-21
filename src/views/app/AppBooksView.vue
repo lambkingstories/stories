@@ -9,6 +9,8 @@ import { sizedImage } from '@/utils/sizedImage'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
+import ContentLanguageSwitch from '@/components/molecules/ContentLanguageSwitch.vue'
+import useContentLanguage, { bookIn } from '@/use/useContentLanguage'
 import LkPageHead from '@/components/molecules/LkPageHead.vue'
 import useApiBooks from '@/use/useApiBooks'
 import { STORE_URL, digitalBooks, storeBooks } from '@/data/storeBooks'
@@ -34,7 +36,10 @@ const apiBooks = useApiBooks()
 const purchases = usePurchases()
 const { ownsBook } = usePremium()
 
-const lang = computed<Locale>(() => (contentLocale(locale.value)))
+const { shelfLanguage } = useContentLanguage()
+const backendBooks = computed<ApiBook[]>(() => booksOfArea((apiBooks.state.all ?? []) as ApiBook[], 'books'))
+// our own books exist in both languages; the books of the server only in the languages they have
+const lang = computed<Locale>(() => shelfLanguage(backendBooks.value.length ? backendBooks.value : [{ localizations: { de: 1, en: 1 } }]))
 
 onMounted(() => {
   void apiBooks.loadAllBooks()
@@ -72,7 +77,7 @@ const cards = computed<BookCardData[]>(() => {
     preview: !!b.preview?.pages.length,
     digital: !!b.digital
   }))
-  const fromBackend = booksOfArea((apiBooks.state.all ?? []) as ApiBook[], 'books').map((b) => ({
+  const fromBackend = backendBooks.value.filter((b) => bookIn(b, lang.value)).map((b) => ({
     id: b.bookId,
     series: '',
     title: b.localizations?.[lang.value]?.title || b.localizations?.de?.title || '',
@@ -126,6 +131,8 @@ function toRead(id: string) {
 <template lang="pug">
   div(class="books-page")
     LkPageHead(:title="t('app.read.booksTitle')" :subtitle="t('app.read.storeNote')" @back="goBack")
+      template(#tools)
+        ContentLanguageSwitch(:books="[...backendBooks, { localizations: { de: 1, en: 1 } }]")
 
     main(class="books-body")
       p(v-if="buyMessage" class="books-msg lk-panel" role="status") {{ buyMessage }}

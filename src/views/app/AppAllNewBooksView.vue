@@ -4,8 +4,9 @@ import { sizedImage } from '@/utils/sizedImage'
 import BookListSkeleton from '@/components/molecules/BookListSkeleton.vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import ContentLanguageSwitch from '@/components/molecules/ContentLanguageSwitch.vue'
+import useContentLanguage, { bookIn } from '@/use/useContentLanguage'
 import LkPageHead from '@/components/molecules/LkPageHead.vue'
-import BookLangFlag from '@/components/atoms/BookLangFlag.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import ZBadge from '@/components/atoms/ZBadge.vue'
 import useApiBooks from '@/use/useApiBooks'
@@ -24,7 +25,7 @@ onMounted(() => {
   void apiBooks.loadAllBooks()
 })
 
-const lang = computed<Locale>(() => (contentLocale(locale.value)))
+const { shelfLanguage } = useContentLanguage()
 const THREE_MONTHS_MS = 1000 * 60 * 60 * 24 * 90
 
 // Backdrop — a tall artwork for portrait, a wide one for landscape. The swap
@@ -42,11 +43,12 @@ function localizedTitle(book: ApiBook): string {
 }
 
 const allBooks = computed<ApiBook[]>(() => (apiBooks.state.all ?? []) as ApiBook[])
+const lang = computed<Locale>(() => shelfLanguage(allBooks.value))
 
 const newBooks = computed<ApiBook[]>(() => {
   const now = Date.now()
   return allBooks.value
-    .filter((b) => now - new Date(b.releaseDate).getTime() < THREE_MONTHS_MS)
+    .filter((b) => now - new Date(b.releaseDate).getTime() < THREE_MONTHS_MS && bookIn(b, lang.value))
     .sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime())
 })
 
@@ -66,6 +68,8 @@ function goBack() {
     :style="backdropVars"
   )
     LkPageHead(:title="t('app.home.newTitle')" :subtitle="t('app.newBooks.sub')" @back="goBack")
+      template(#tools)
+        ContentLanguageSwitch(:books="allBooks")
 
     div(class="page-content")
       div(v-if="newBooks.length" class="tile-grid")
@@ -93,7 +97,6 @@ function goBack() {
               loading="lazy"
               @error="onImgFallback"
             )
-            BookLangFlag(:book="book")
 
       BookListSkeleton(v-else-if="!apiBooks.state.listReady" variant="grid" :count="6")
       div(

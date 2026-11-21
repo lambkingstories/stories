@@ -5,13 +5,13 @@
  * and "Ab 9 Jahren" (the series 5 to 8 and 9 to 12), and the series ("Mit Buntstift durch die Bibel") is a small heading over a group instead of a long start of every title.
  * Without a net and with nothing kept on the device the page says so and offers "Try again".
  */
-import BookLangFlag from '@/components/atoms/BookLangFlag.vue'
-import { bookFlagLanguage } from '@/utils/bookLanguage'
 import { computed, onMounted, ref } from 'vue'
 import { sizedImage } from '@/utils/sizedImage'
 import BookListSkeleton from '@/components/molecules/BookListSkeleton.vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
+import ContentLanguageSwitch from '@/components/molecules/ContentLanguageSwitch.vue'
+import useContentLanguage, { bookIn } from '@/use/useContentLanguage'
 import LkPageHead from '@/components/molecules/LkPageHead.vue'
 import useApiBooks from '@/use/useApiBooks'
 import { listArtworks, pageArtworkId, type ArtworkMeta } from '@/use/useArtworks'
@@ -40,7 +40,7 @@ const fromShelf = computed(() => route.query.from === 'shelf')
 const fromPainting = computed(() => route.query.from === 'malen' || fromShelf.value)
 const apiBooks = useApiBooks()
 
-const lang = computed<Locale>(() => (contentLocale(locale.value)))
+const { shelfLanguage } = useContentLanguage()
 const works = ref<ArtworkMeta[]>([])
 
 onMounted(() => {
@@ -64,8 +64,6 @@ interface Card {
   cover: string
   /** The cover a little larger, for the transfer. */
   coverBig: string
-  /** The language of the book when it is not the one of the screen (a flag on the cover). */
-  flag: 'de' | 'en' | null
   /** For the order: the import gives the volumes rising dates, so Band 1 comes before Band 2. */
   released: number
   total: number
@@ -74,10 +72,14 @@ interface Card {
   own: Ownership
 }
 
+/** All coloring books; the shelf shows those that exist in the language of the round flags on top. */
+const coloringBooks = computed<ApiBook[]>(() => booksOfArea((apiBooks.state.all ?? []) as ApiBook[], 'coloring'))
+const lang = computed<Locale>(() => shelfLanguage(coloringBooks.value))
+
 const cards = computed<Card[]>(() => {
   const painted = new Set(works.value.map((w) => w.id))
   const list: Card[] = []
-  for (const book of booksOfArea((apiBooks.state.all ?? []) as ApiBook[], 'coloring')) {
+  for (const book of coloringBooks.value.filter((b) => bookIn(b, lang.value))) {
     const pages = coloringPagesOfBook(book, locale.value)
     const title = book.localizations?.[lang.value]?.title || book.localizations?.de?.title || book.bookId
     const parts = splitColoringTitle(title)
@@ -88,7 +90,6 @@ const cards = computed<Card[]>(() => {
       group: coloringAgeGroup(book, title),
       cover: withPlaceholder(sizedImage(pickLocalizedImage(book.previewImage, lang.value), 170)),
       coverBig: withPlaceholder(sizedImage(pickLocalizedImage(book.previewImage, lang.value), 260)),
-      flag: bookFlagLanguage(book, locale.value),
       released: Date.parse(book.releaseDate) || 0,
       total: pages.length,
       done: pages.filter((p) => painted.has(pageArtworkId(p.url, 1))).length,
@@ -150,6 +151,8 @@ function arrived() {
 <template lang="pug">
   div(class="cb-page")
     LkPageHead(:title="t('app.read.coloringTitle')" :subtitle="t('app.read.coloringSub')" @back="goBack")
+      template(#tools)
+        ContentLanguageSwitch(:books="coloringBooks")
 
     main(class="cb-body")
       OwnFilter(v-if="PREMIUM_TEASER && cards.length" v-model="filter" :counts="counts")
@@ -163,7 +166,6 @@ function arrived() {
               button(type="button" :class="['cb-card', { 'is-locked': c.own === 'locked' }]" :aria-label="c.title" @click="openBook(c)")
                 span(class="cb-cover")
                   img(:src="c.cover" :alt="c.title" loading="lazy" draggable="false" @error="onImgFallback")
-                  BookLangFlag(:language="c.flag")
                 //- the sign (free, to buy…) stands under the cover, never over its title
                 span(v-if="PREMIUM_TEASER" class="cb-own")
                   OwnBadge(:state="c.own")

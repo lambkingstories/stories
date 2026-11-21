@@ -8,6 +8,7 @@
  */
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import useContentLanguage from '@/use/useContentLanguage'
 import { useRoute, useRouter } from 'vue-router'
 import useApiBooks from '@/use/useApiBooks'
 import type { ApiBook } from '@/types/apiBook'
@@ -32,6 +33,7 @@ import { contentLocale } from '@/utils/contentLocale'
 import { printedBookUrl } from '@/data/bookPages'
 
 const { t, locale } = useI18n({ useScope: 'global' })
+const { lang: contentLang } = useContentLanguage()
 const route = useRoute()
 const router = useRouter()
 const { loadBook } = useApiBooks()
@@ -241,7 +243,7 @@ async function start() {
       return
     }
     const loc = book.localizations as Record<string, { title?: string } | null | undefined>
-    title.value = (loc[locale.value]?.title || loc.de?.title || bookId.value).replace(/^Buch\s*\d+\s*[–-]\s*/i, '')
+    title.value = (loc[contentLang.value]?.title || loc.de?.title || bookId.value).replace(/^Buch\s*\d+\s*[–-]\s*/i, '')
     pages.value = list
     ownFree.value = (book as ApiBook).freePages ?? null
     // the page of the book on lambking.store (the old link of the backend only when the book has no page there)

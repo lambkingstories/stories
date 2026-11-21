@@ -8,6 +8,7 @@
  * content page we render a celebration page with confetti and surface the
  * next volume in the same series via ABookCard.
  */
+import useContentLanguage from '@/use/useContentLanguage'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
@@ -75,7 +76,7 @@ watch(bookId, () => {
 
 // ----- Locale-aware content -----
 
-const lang = computed<Locale>(() => (contentLocale(locale.value)))
+const { lang } = useContentLanguage()
 
 const localization = computed(() => {
   const b = book.value

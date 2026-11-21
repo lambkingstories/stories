@@ -7,13 +7,14 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import BookLangFlag from '@/components/atoms/BookLangFlag.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import LkCompanion from '@/components/atoms/LkCompanion.vue'
 import BookListSkeleton from '@/components/molecules/BookListSkeleton.vue'
 import BookListError from '@/components/molecules/BookListError.vue'
 import { sizedImage } from '@/utils/sizedImage'
 import AppHeader from '@/components/molecules/AppHeader.vue'
+import ContentLanguageSwitch from '@/components/molecules/ContentLanguageSwitch.vue'
+import useContentLanguage, { bookIn } from '@/use/useContentLanguage'
 import useModels from '@/use/useModels'
 import useApiBooks from '@/use/useApiBooks'
 import useApiSeries from '@/use/useApiSeries'
@@ -95,12 +96,15 @@ onBeforeUnmount(() => {
   releaseCovers()
 })
 
-const lang = computed<Locale>(() => (contentLocale(locale.value)))
+const { shelfLanguage } = useContentLanguage()
 watch(offlineMode, (off) => {
   if (off) void loadOfflineList()
 })
 // only the stories: coloring books are in "Malbücher", printed store books in "Books"
-const allBooks = computed<ApiBook[]>(() => booksOfArea((apiBooks.state.all ?? []) as ApiBook[], 'stories'))
+const storyBooks = computed<ApiBook[]>(() => booksOfArea((apiBooks.state.all ?? []) as ApiBook[], 'stories'))
+// the language of the shelf (the round flags on top): only the stories that exist in it are shown
+const lang = computed<Locale>(() => shelfLanguage(storyBooks.value))
+const allBooks = computed<ApiBook[]>(() => storyBooks.value.filter((b) => bookIn(b, lang.value)))
 
 interface Shelf {
   seriesId: string
@@ -137,7 +141,7 @@ const shelves = computed<Shelf[]>(() => {
   for (const [sid, books] of groups) {
     const apiMeta = apiSeries.getById(sid)
     const legacyMeta = getSeries(sid)
-    const inSeries = booksOfArea(apiBooks.booksOfSeries(sid), 'stories')
+    const inSeries = booksOfArea(apiBooks.booksOfSeries(sid), 'stories').filter((b) => bookIn(b, lang.value))
     const ofSeries = inSeries.length ? inSeries : books
     const first = ofSeries[0]
     list.push({
@@ -235,9 +239,11 @@ function openBook(bookId: string) {
     AppHeader
 
     main(class="read-body")
-      button(type="button" class="read-back lk-btn lk-btn--outline lk-btn--small" @click="goBack")
-        ZIconography(name="chevron-left" :size="20")
-        span {{ t('app.read.back') }}
+      div(class="read-top")
+        button(type="button" class="read-back lk-btn lk-btn--outline lk-btn--small" @click="goBack")
+          ZIconography(name="chevron-left" :size="20")
+          span {{ t('app.read.back') }}
+        ContentLanguageSwitch(:books="storyBooks")
       h1(class="read-title") {{ t('app.read.storiesTitle') }}
       //- the question of the lamb is the search field: "Which book shall we read?" is typed over
       label(class="ask")
@@ -277,7 +283,6 @@ function openBook(bookId: string) {
                 draggable="false"
                 @error="onImgFallback"
               )
-              BookLangFlag(:book="item.book")
               span(v-if="item.meta.pinned" class="pin-mark" role="img" :aria-label="t('app.offline.pinnedMark')")
                 ZIconography(name="check" :size="16")
             span(class="result-title") {{ bookTitle(item.book) }}
@@ -304,7 +309,6 @@ function openBook(bookId: string) {
                 draggable="false"
                 @error="onImgFallback"
               )
-              BookLangFlag(:book="book")
               span(v-if="isNew(book)" class="new-badge") {{ t('app.read.newBadge') }}
             span(class="result-title") {{ bookTitle(book) }}
 
@@ -339,7 +343,6 @@ function openBook(bookId: string) {
                 draggable="false"
                 @error="onImgFallback"
               )
-              BookLangFlag(:book="book")
               span(v-if="isNew(book)" class="new-badge") {{ t('app.read.newBadge') }}
           div(class="shelf-board" aria-hidden="true")
 
@@ -379,9 +382,16 @@ button
   flex-direction: column
   gap: 28px
 
-.read-back
-  align-self: flex-start
+.read-top
+  display: flex
+  align-items: center
+  justify-content: space-between
+  gap: 12px
   margin-bottom: -14px
+
+.read-back
+  align-self: center
+  margin-bottom: 0
   gap: 4px
   padding: 0 18px 0 10px
 

@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import useContentLanguage from '@/use/useContentLanguage'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { sizedImage } from '@/utils/sizedImage'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import ZButton from '@/components/atoms/ZButton.vue'
 import LkCompanion from '@/components/atoms/LkCompanion.vue'
-import BookLangFlag from '@/components/atoms/BookLangFlag.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import AAudioPlayer from '@/components/atoms/AAudioPlayer.vue'
 import AttachmentTile from '@/components/molecules/AttachmentTile.vue'
@@ -45,7 +45,7 @@ const book = computed<ApiBook | null>(
   () => (apiBooks.state.byId[bookId.value] as ApiBook | undefined) ?? null
 )
 
-const lang = computed<Locale>(() => (contentLocale(locale.value)))
+const { lang } = useContentLanguage()
 const localization = computed(() => {
   const b = book.value
   if (!b) return null
@@ -523,7 +523,6 @@ const seriesName = computed(() => seriesNameOfBook(book.value))
               loading="eager"
               @error="onImgFallback"
             )
-            BookLangFlag(:book="book")
           div(class="hero-info")
             span(class="series-eyebrow") {{ seriesName }}
             h1(class="book-band-title") {{ localizedTitle }}

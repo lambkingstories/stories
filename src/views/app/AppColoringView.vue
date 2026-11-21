@@ -23,9 +23,9 @@
  * BookDetail "Use in coloring app" CTA can drop straight into the
  * artwork, without going through the upload card.
  */
-import { bookFlagLanguage } from '@/utils/bookLanguage'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import useContentLanguage from '@/use/useContentLanguage'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 import { prependBaseUrl } from '@/utils/function'
 import { isIOS } from '@/utils/platform'
@@ -138,6 +138,7 @@ function loadPdfjs(): Promise<typeof import('pdfjs-dist')> {
 }
 
 const { t, locale } = useI18n({ useScope: 'global' })
+const { lang: contentLang } = useContentLanguage()
 const route = useRoute()
 const router = useRouter()
 
@@ -701,9 +702,8 @@ const coloringBooks = computed<BookCard[]>(() => {
     cards.push({
       bookId: book.bookId,
       // the name of the book without the series and the number of the volume ("Bibelgeschichten zum Ausmalen: Band 1 - " is cut off)
-      title: shortColoringTitle(loc[locale.value]?.title || loc.de?.title || book.bookId),
-      cover: pickLocalizedImage(book.previewImage, contentLocale(locale.value)),
-      flag: bookFlagLanguage(book, locale.value),
+      title: shortColoringTitle(loc[contentLang.value]?.title || loc.de?.title || book.bookId),
+      cover: pickLocalizedImage(book.previewImage, contentLang.value),
       total: pages.length,
       done,
       updatedAt

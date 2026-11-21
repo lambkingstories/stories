@@ -14,9 +14,9 @@ import { sizedImage } from '@/utils/sizedImage'
 import { medalThumb, onThumbError } from '@/utils/medalThumb'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import BookLangFlag from '@/components/atoms/BookLangFlag.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import AppHeader from '@/components/molecules/AppHeader.vue'
+import useContentLanguage, { bookIn } from '@/use/useContentLanguage'
 import HomeHero, { type HeroSlide } from '@/components/molecules/HomeHero.vue'
 import HomeTileGrid from '@/components/molecules/HomeTileGrid.vue'
 import { HOME_SHORTCUTS } from '@/data/homeShortcuts'
@@ -62,7 +62,7 @@ const { plusOn } = usePremium()
 const STORE_URL = 'https://lambking.store'
 
 
-const lang = computed<Locale>(() => (contentLocale(locale.value)))
+const { lang } = useContentLanguage()
 const allBooks = computed<ApiBook[]>(() => (apiBooks.state.all ?? []) as ApiBook[])
 
 const artworks = ref<ArtworkMeta[]>([])
@@ -309,7 +309,7 @@ const tileCards = computed<Partial<Record<HomeTileId, HomeCard>>>(() => {
 const newBooks = computed<ApiBook[]>(() => {
   const now = Date.now()
   return allBooks.value
-    .filter((b) => new Date(b.releaseDate).getTime() <= now)
+    .filter((b) => new Date(b.releaseDate).getTime() <= now && bookIn(b, lang.value))
     .sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime())
     .slice(0, 10)
 })
@@ -391,7 +391,6 @@ function openBook(bookId: string) {
                 draggable="false"
                 @error="onImgFallback"
               )
-              BookLangFlag(:book="book")
               span(v-if="i === 0" class="new-badge") {{ t('app.read.newBadge') }}
 </template>
 

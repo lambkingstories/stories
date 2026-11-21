@@ -14,8 +14,7 @@ export default {
     english: 'Inglés',
     german: 'Alemán',
     spanish: 'Español',
-    bookGerman: 'Este libro está en alemán',
-    bookEnglish: 'Este libro está en inglés'
+    shelf: 'Idioma de los libros'
   },
   state: {
     offlineTitle: 'No tienes conexión.',

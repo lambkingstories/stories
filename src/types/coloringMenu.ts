@@ -1,8 +1,6 @@
 /** What the main menu of the painting program shows (see `ColoringMenu.vue`). */
 
 export interface BookCard {
-  /** The language of the book when it is not the one of the screen (shows a flag on the cover). */
-  flag?: 'de' | 'en' | null
   bookId: string
   title: string
   cover: string

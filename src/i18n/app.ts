@@ -2611,8 +2611,7 @@ export default {
         english: 'English',
         german: 'German',
         spanish: 'Spanish',
-        bookGerman: 'This book is in German',
-        bookEnglish: 'This book is in English'
+        shelf: 'Language of the books'
       },
       state: {
         offlineTitle: 'You are offline.',
@@ -6797,8 +6796,7 @@ export default {
         english: 'Englisch',
         german: 'Deutsch',
         spanish: 'Spanisch',
-        bookGerman: 'Dieses Buch ist auf Deutsch',
-        bookEnglish: 'Dieses Buch ist auf Englisch'
+        shelf: 'Sprache der Bücher'
       },
       state: {
         offlineTitle: 'Du bist offline.',
