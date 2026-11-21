@@ -5,6 +5,7 @@ import BookListSkeleton from '@/components/molecules/BookListSkeleton.vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import LkPageHead from '@/components/molecules/LkPageHead.vue'
+import BookLangFlag from '@/components/atoms/BookLangFlag.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import ZBadge from '@/components/atoms/ZBadge.vue'
 import useApiBooks from '@/use/useApiBooks'
@@ -92,6 +93,7 @@ function goBack() {
               loading="lazy"
               @error="onImgFallback"
             )
+            BookLangFlag(:book="book")
 
       BookListSkeleton(v-else-if="!apiBooks.state.listReady" variant="grid" :count="6")
       div(

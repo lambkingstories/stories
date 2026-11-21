@@ -12,6 +12,7 @@
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import LkCompanion from '@/components/atoms/LkCompanion.vue'
+import BookLangFlag from '@/components/atoms/BookLangFlag.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import AppHeader from '@/components/molecules/AppHeader.vue'
 import ArtworkViewer from '@/components/molecules/ArtworkViewer.vue'
@@ -173,6 +174,7 @@ const bookPercent = (b: BookCard) => `${Math.round((b.done / Math.max(1, b.total
               button(type="button" class="ac-bigbook" @click="emit('open-book', b)")
                 span(class="ac-bigbook-cover")
                   img(v-if="b.cover" :src="b.cover" alt="" draggable="false" loading="lazy")
+                  BookLangFlag(:language="b.flag ?? null")
                   span(v-if="b.done > 0" class="ac-bigbook-badge") {{ b.done }}/{{ b.total }}
                 //- the board the book stands on: the boards of all books join to one shelf
                 span(class="ac-bigbook-board" aria-hidden="true")

@@ -2610,7 +2610,9 @@ export default {
         aria: 'Language',
         english: 'English',
         german: 'German',
-        spanish: 'Spanish'
+        spanish: 'Spanish',
+        bookGerman: 'This book is in German',
+        bookEnglish: 'This book is in English'
       },
       state: {
         offlineTitle: 'You are offline.',
@@ -6794,7 +6796,9 @@ export default {
         aria: 'Sprache',
         english: 'Englisch',
         german: 'Deutsch',
-        spanish: 'Spanisch'
+        spanish: 'Spanisch',
+        bookGerman: 'Dieses Buch ist auf Deutsch',
+        bookEnglish: 'Dieses Buch ist auf Englisch'
       },
       state: {
         offlineTitle: 'Du bist offline.',

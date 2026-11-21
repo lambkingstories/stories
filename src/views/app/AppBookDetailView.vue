@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import ZButton from '@/components/atoms/ZButton.vue'
 import LkCompanion from '@/components/atoms/LkCompanion.vue'
+import BookLangFlag from '@/components/atoms/BookLangFlag.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import AAudioPlayer from '@/components/atoms/AAudioPlayer.vue'
 import AttachmentTile from '@/components/molecules/AttachmentTile.vue'
@@ -522,6 +523,7 @@ const seriesName = computed(() => seriesNameOfBook(book.value))
               loading="eager"
               @error="onImgFallback"
             )
+            BookLangFlag(:book="book")
           div(class="hero-info")
             span(class="series-eyebrow") {{ seriesName }}
             h1(class="book-band-title") {{ localizedTitle }}
@@ -558,8 +560,9 @@ const seriesName = computed(() => seriesNameOfBook(book.value))
                 PlusBadge(v-if="PREMIUM_TEASER && !hasFeature('readAloud')" size="small" class="listen-plus")
               button(
                 type="button"
-                class="lk-btn lk-btn--outline"
+                :class="['lk-btn', 'lk-btn--outline', 'save-btn', { 'is-saved': isColoring ? inPaintShelf : inWatchList }]"
                 :aria-pressed="isColoring ? inPaintShelf : inWatchList"
+                data-test="save-btn"
                 @click="onToggleWatchList"
               )
                 ZIconography(name="bookmark" :size="22")
@@ -706,6 +709,7 @@ button
 
 // the cover is shown whole (3:4)
 .hero-cover
+  position: relative
   flex: 0 0 44%
   aspect-ratio: 3 / 4
   border-radius: var(--lk-r-cover)
@@ -947,4 +951,14 @@ button
 
   .awaits-block, .cta-row, .reading-progress, .attachments-section
     grid-column: 1 / -1
+
+// the saved state must be seen (Anton 21.11.2026: the bookmark looked the same before and after): a tinted button and a filled bookmark
+.save-btn.is-saved
+  border-color: var(--lk-accent)
+  background: var(--lk-accent-soft, #d9efe9)
+  color: var(--lk-accent)
+  font-weight: 800
+
+  :deep(svg path)
+    fill: currentColor
 </style>

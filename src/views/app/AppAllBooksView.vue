@@ -7,6 +7,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import BookLangFlag from '@/components/atoms/BookLangFlag.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import LkCompanion from '@/components/atoms/LkCompanion.vue'
 import BookListSkeleton from '@/components/molecules/BookListSkeleton.vue'
@@ -276,6 +277,7 @@ function openBook(bookId: string) {
                 draggable="false"
                 @error="onImgFallback"
               )
+              BookLangFlag(:book="item.book")
               span(v-if="item.meta.pinned" class="pin-mark" role="img" :aria-label="t('app.offline.pinnedMark')")
                 ZIconography(name="check" :size="16")
             span(class="result-title") {{ bookTitle(item.book) }}
@@ -302,6 +304,7 @@ function openBook(bookId: string) {
                 draggable="false"
                 @error="onImgFallback"
               )
+              BookLangFlag(:book="book")
               span(v-if="isNew(book)" class="new-badge") {{ t('app.read.newBadge') }}
             span(class="result-title") {{ bookTitle(book) }}
 
@@ -336,6 +339,7 @@ function openBook(bookId: string) {
                 draggable="false"
                 @error="onImgFallback"
               )
+              BookLangFlag(:book="book")
               span(v-if="isNew(book)" class="new-badge") {{ t('app.read.newBadge') }}
           div(class="shelf-board" aria-hidden="true")
 

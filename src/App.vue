@@ -369,6 +369,20 @@ img
   // the pages slide sideways: what sticks out must not widen the page (that made the screen shiver)
   overflow-x: clip
 
+// The clock and the battery of the phone lie over the screen (translucent status bar): what scrolls up must not run under them (Anton 21.11.2026: the clock stood on
+// top of a heading). A strip as high as the status bar in the colour of the page, fading out at its lower edge. Full-screen games, the reader and the book are higher
+// (z-index) and cover it; it takes no touches. On a phone without a notch the height is 0 and nothing is drawn.
+#app-root::before
+  content: ''
+  position: fixed
+  z-index: 40
+  top: 0
+  left: 0
+  right: 0
+  height: env(safe-area-inset-top, 0px)
+  background: linear-gradient(180deg, var(--lk-bg, var(--color-bg-main)) 75%, transparent)
+  pointer-events: none
+
 // A phone held wide (hardly 375 px high): the tab bar is a slim strip (48 px, see ZBottomNav) instead of 92 px, so the screens
 // that keep room for it at their foot need less. The classes are the page roots of the screens with the tab bar.
 @media (max-height: 450px) and (orientation: landscape)

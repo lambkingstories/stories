@@ -5,6 +5,8 @@
  * and "Ab 9 Jahren" (the series 5 to 8 and 9 to 12), and the series ("Mit Buntstift durch die Bibel") is a small heading over a group instead of a long start of every title.
  * Without a net and with nothing kept on the device the page says so and offers "Try again".
  */
+import BookLangFlag from '@/components/atoms/BookLangFlag.vue'
+import { bookFlagLanguage } from '@/utils/bookLanguage'
 import { computed, onMounted, ref } from 'vue'
 import { sizedImage } from '@/utils/sizedImage'
 import BookListSkeleton from '@/components/molecules/BookListSkeleton.vue'
@@ -62,6 +64,8 @@ interface Card {
   cover: string
   /** The cover a little larger, for the transfer. */
   coverBig: string
+  /** The language of the book when it is not the one of the screen (a flag on the cover). */
+  flag: 'de' | 'en' | null
   /** For the order: the import gives the volumes rising dates, so Band 1 comes before Band 2. */
   released: number
   total: number
@@ -84,6 +88,7 @@ const cards = computed<Card[]>(() => {
       group: coloringAgeGroup(book, title),
       cover: withPlaceholder(sizedImage(pickLocalizedImage(book.previewImage, lang.value), 170)),
       coverBig: withPlaceholder(sizedImage(pickLocalizedImage(book.previewImage, lang.value), 260)),
+      flag: bookFlagLanguage(book, locale.value),
       released: Date.parse(book.releaseDate) || 0,
       total: pages.length,
       done: pages.filter((p) => painted.has(pageArtworkId(p.url, 1))).length,
@@ -158,6 +163,7 @@ function arrived() {
               button(type="button" :class="['cb-card', { 'is-locked': c.own === 'locked' }]" :aria-label="c.title" @click="openBook(c)")
                 span(class="cb-cover")
                   img(:src="c.cover" :alt="c.title" loading="lazy" draggable="false" @error="onImgFallback")
+                  BookLangFlag(:language="c.flag")
                 //- the sign (free, to buy…) stands under the cover, never over its title
                 span(v-if="PREMIUM_TEASER" class="cb-own")
                   OwnBadge(:state="c.own")

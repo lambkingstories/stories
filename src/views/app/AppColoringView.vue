@@ -23,6 +23,7 @@
  * BookDetail "Use in coloring app" CTA can drop straight into the
  * artwork, without going through the upload card.
  */
+import { bookFlagLanguage } from '@/utils/bookLanguage'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
@@ -702,6 +703,7 @@ const coloringBooks = computed<BookCard[]>(() => {
       // the name of the book without the series and the number of the volume ("Bibelgeschichten zum Ausmalen: Band 1 - " is cut off)
       title: shortColoringTitle(loc[locale.value]?.title || loc.de?.title || book.bookId),
       cover: pickLocalizedImage(book.previewImage, contentLocale(locale.value)),
+      flag: bookFlagLanguage(book, locale.value),
       total: pages.length,
       done,
       updatedAt

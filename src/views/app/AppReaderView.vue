@@ -921,11 +921,10 @@ function goToBookDetail() {
                   v-if="achievementBadge"
                   :src="resolved(achievementBadge)"
                 )
-                div(v-else class="celebration-burst" aria-hidden="true") 🎉
+                //- no operating-system emoji any more (Anton 21.11.2026): the party picture in the style of the app comes as an own image (see the order for Codex)
                 h3(class="celebration-title") {{ t('app.reader.congratsTitle') }}
                 p(v-if="readAwards.booksReadCount.value > 0" class="celebration-star") ★ {{ t('app.reader.readStar', { n: readAwards.booksReadCount.value }) }}
                 p(class="celebration-ask")
-                  span(class="celebration-ask-kicker") {{ t('app.reader.askKicker') }}
                   | {{ t(`app.reader.ask${askIndex}`) }}
                 p(v-if="readWon.length" class="celebration-star") {{ t('app.awards.newAward') }}: {{ readWon.map((w) => t(`app.awards.items.${w}.title`)).join(', ') }}
 
@@ -942,13 +941,12 @@ function goToBookDetail() {
                   v-if="nextBook"
                   class="next-volume"
                 )
-                  div(class="next-label") {{ t('app.reader.nextStoryWaiting') }}
                   ABookCard(
                     :title="nextBook.localizations?.[lang]?.title || nextBook.localizations?.de?.title || ''"
                     subtitle=""
                     :image="resolved(nextBookCoverUrl)"
                     :cover-gradient="nextBook.cover"
-                    badge="NEU"
+                    :badge="t('app.read.newBadge')"
                     @click="openNextBook"
                   )
 
@@ -1384,8 +1382,12 @@ function goToBookDetail() {
 // Achievement badge presentation lives in `AchievementBadge.vue` — keeping
 // only the celebration-page emoji-fallback styles here.
 
+// the lamb is shown whole, hooves too (Anton 21.11.2026: the feet looked cut off): no pull into the next element, it keeps its height in the column and lies on top
 .celebration-lamb
-  margin: 0 auto -10px
+  position: relative
+  z-index: 1
+  flex: none
+  margin: 0 auto
 
 .size-bar
   position: absolute

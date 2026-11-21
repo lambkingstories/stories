@@ -7,6 +7,7 @@ import { computed, onMounted } from 'vue'
 import { sizedImage } from '@/utils/sizedImage'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
+import BookLangFlag from '@/components/atoms/BookLangFlag.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import LkCompanion from '@/components/atoms/LkCompanion.vue'
 import AppHeader from '@/components/molecules/AppHeader.vue'
@@ -155,6 +156,7 @@ function openBook(bookId: string) {
                 draggable="false"
                 @error="onImgFallback"
               )
+              BookLangFlag(:book="c.book")
               span(v-if="c.isNew" class="new-badge") {{ t('app.read.newBadge') }}
             span(class="cell-title") {{ c.title }}
             span(v-if="c.state !== 'done'" class="cell-bar")

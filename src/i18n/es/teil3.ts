@@ -13,7 +13,9 @@ export default {
     aria: 'Idioma',
     english: 'Inglés',
     german: 'Alemán',
-    spanish: 'Español'
+    spanish: 'Español',
+    bookGerman: 'Este libro está en alemán',
+    bookEnglish: 'Este libro está en inglés'
   },
   state: {
     offlineTitle: 'No tienes conexión.',
