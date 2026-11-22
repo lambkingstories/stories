@@ -184,15 +184,14 @@ describe('the tiles of the start page', () => {
 describe('the hint beside the lone tile (Anton 22.11.2026)', () => {
   const holdHint = (w: ReturnType<typeof mountGrid>) => press(w.get('[data-test="tile-hint"]').element)
 
-  it('stands in the empty place beside the small family tile, as words only (no button, nothing that moves)', async () => {
+  it('stands in the empty place beside the small family tile as a quiet circle with a plus, and shows no words', async () => {
     const w = mountGrid()
     const hint = w.get('[data-test="tile-hint"]')
-    // two lines: a long press on a tile sorts, a long press here adds
-    expect(hint.text()).toContain('Lange auf eine Kachel drücken: sortieren')
-    expect(hint.text()).toContain('Hier lange drücken: neue Kachel hinzufügen')
+    expect(hint.find('.hg-hint-dot').text()).toBe('+')
+    expect(hint.text()).not.toContain('Kachel')
     expect(hint.classes()).not.toContain('hg-hint-tile--wide')
-    expect(hint.element.tagName).toBe('DIV')
-    expect(hint.find('button').exists()).toBe(false)
+    // for the screen reader the words are the name of it
+    expect(hint.attributes('aria-label')).toContain('Hier lange drücken: neue Kachel hinzufügen')
     w.unmount()
   })
 
@@ -214,17 +213,34 @@ describe('the hint beside the lone tile (Anton 22.11.2026)', () => {
     w.unmount()
   })
 
-  it('a tap on it does nothing', async () => {
+  it('a short tap shows the words for a few seconds (how things are sorted and added), then the circle is back; nothing opens', async () => {
     const w = mountGrid()
-    await w.get('[data-test="tile-hint"]').trigger('click')
+    const hint = w.get('[data-test="tile-hint"]')
+    await hint.trigger('click')
+    expect(hint.text()).toContain('Lange auf eine Kachel drücken: sortieren')
+    expect(hint.text()).toContain('Hier lange drücken: neue Kachel hinzufügen')
+    expect(hint.find('.hg-hint-dot').exists()).toBe(false)
+    vi.advanceTimersByTime(4000)
+    await flushPromises()
+    expect(w.get('[data-test="tile-hint"]').text()).toContain('Lange auf eine Kachel')
+    vi.advanceTimersByTime(1500)
+    await flushPromises()
+    expect(w.get('[data-test="tile-hint"]').find('.hg-hint-dot').exists()).toBe(true)
+    expect(w.get('[data-test="tile-hint"]').text()).not.toContain('Kachel')
+    expect(w.classes()).not.toContain('is-editing')
+    expect(w.find('[data-test="tile-sheet"]').exists()).toBe(false)
+    expect(nav.push).not.toHaveBeenCalled()
+    w.unmount()
+  })
+
+  it('a press that is let go too early (a tap) does not start arranging', async () => {
+    const w = mountGrid()
     holdHint(w)
     vi.advanceTimersByTime(200)
-    document.dispatchEvent(new MouseEvent('pointerup', { bubbles: true }))
     w.get('[data-test="tile-hint"]').element.dispatchEvent(new MouseEvent('pointerup', { bubbles: true }))
     vi.advanceTimersByTime(600)
     await flushPromises()
     expect(w.classes()).not.toContain('is-editing')
-    expect(w.find('[data-test="tile-sheet"]').exists()).toBe(false)
     expect(nav.push).not.toHaveBeenCalled()
     w.unmount()
   })

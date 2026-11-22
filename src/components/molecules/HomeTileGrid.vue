@@ -168,6 +168,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.clearTimeout(pressTimer)
   window.clearTimeout(hintTimer)
+  window.clearTimeout(hintOff)
   ghost?.remove()
   document.removeEventListener('pointermove', onMove)
   document.removeEventListener('pointerup', onUp)
@@ -187,7 +188,7 @@ const full = computed(() => !canAddTile(layout.value))
 const emptyPlace = computed(() => shown.value.reduce((n, t) => n + (t.size === 'wide' ? 2 : 1), 0) % 2 === 1)
 /**
  * A hint tile stands at the end while there is room for more: beside a lone small tile as a small tile, else under the last row over the whole width. It only says in words what a long
- * press does (on a tile: sort; on the hint: add new ones); a tap does nothing.
+ * press does (on a tile: sort; on the hint: add new ones). It shows a quiet grey circle with a plus; a short tap shows the words for a few seconds.
  */
 const showHint = computed(() => !editing.value && !full.value)
 const hintWide = computed(() => !emptyPlace.value)
@@ -243,7 +244,18 @@ onMounted(() => {
   }
 })
 
-// ── the hint tile: only a long press (not a tap) starts arranging with the list of new tiles ──
+// ── the hint tile: a quiet grey circle with a plus. A short tap shows the words for a few seconds; a long press starts arranging with the list of new tiles ──
+/** How long the words stay after a tap (ms). */
+const HINT_SHOWN_MS = 5000
+const hintOpen = ref(false)
+let hintOff = 0
+function showHintInfo() {
+  // right after a long press the tap that ends it does not count
+  if (swallowClick) return
+  hintOpen.value = true
+  window.clearTimeout(hintOff)
+  hintOff = window.setTimeout(() => (hintOpen.value = false), HINT_SHOWN_MS)
+}
 let hintTimer = 0
 let hintX = 0
 let hintY = 0
@@ -253,6 +265,7 @@ function hintDown(e: PointerEvent) {
   hintY = e.clientY
   window.clearTimeout(hintTimer)
   hintTimer = window.setTimeout(() => {
+    hintOpen.value = false
     swallowClick = true
     window.setTimeout(() => (swallowClick = false), 400)
     buzz()
@@ -334,13 +347,14 @@ function resetAll() {
               path(d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round")
             svg(v-else viewBox="0 0 24 24" width="18" height="18" aria-hidden="true")
               path(d="M20 10h-6V4M14 10l7-7M4 14h6v6M10 14l-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round")
-      //- beside the lone tile: only words that say how more things come onto the page (press and hold). A tap does nothing; a long press opens the choice
+      //- beside the lone tile: a quiet grey circle with a plus. A short tap shows the words (how things are sorted and added) for a few seconds; a long press opens the choice
       div(
         v-if="showHint"
         key="hint"
         :class="['hg-hint-tile', { 'hg-hint-tile--wide': hintWide }]"
-        role="note"
+        role="button"
         tabindex="0"
+        :aria-label="t('app.bigGames.home.holdHint')"
         data-test="tile-hint"
         @pointerdown="hintDown"
         @pointermove="hintMove"
@@ -348,10 +362,13 @@ function resetAll() {
         @pointercancel="hintUp"
         @pointerleave="hintUp"
         @contextmenu.prevent
-        @keydown.enter="startArranging(true)"
+        @click="showHintInfo"
+        @keydown.enter="showHintInfo"
       )
-        span(class="hg-hint-text") {{ t('app.bigGames.home.holdTile') }}
-        span(class="hg-hint-text") {{ t('app.bigGames.home.holdHint') }}
+        span(v-if="!hintOpen" class="hg-hint-dot" aria-hidden="true") +
+        template(v-else)
+          span(class="hg-hint-text" data-test="hint-words") {{ t('app.bigGames.home.holdTile') }}
+          span(class="hg-hint-text") {{ t('app.bigGames.home.holdHint') }}
       button(v-if="editing" key="add" type="button" class="hg-add" data-test="tile-add" @click="adding = true")
         span(class="hg-add-plus" aria-hidden="true") +
         span {{ t('app.bigGames.home.addTile') }}
@@ -630,7 +647,7 @@ function resetAll() {
   background: var(--lk-surface)
   color: var(--lk-text)
 
-// the hint tile: a dashed place with a few words, nothing that moves and nothing to tap
+// the hint tile: a quiet grey circle with a plus, nothing else; a short tap shows the words for a few seconds
 .hg-hint-tile
   display: flex
   flex-direction: column
@@ -639,15 +656,28 @@ function resetAll() {
   gap: 8px
   min-height: 120px
   padding: 14px
-  border: 2px dashed var(--lk-line)
-  border-radius: var(--lk-r-card)
   color: var(--lk-muted)
+  cursor: pointer
   touch-action: pan-y
   -webkit-touch-callout: none
   user-select: none
   -webkit-user-select: none
+  -webkit-tap-highlight-color: transparent
 
-// under the last row, when the row is full: over the whole width
+.hg-hint-dot
+  display: flex
+  align-items: center
+  justify-content: center
+  width: 44px
+  height: 44px
+  border: 2px solid var(--lk-line)
+  border-radius: 50%
+  color: var(--lk-muted)
+  opacity: 0.7
+  font-size: 1.6rem
+  font-weight: 400
+  line-height: 1
+
 .hg-hint-tile--wide
   grid-column: 1 / -1
   min-height: 84px
