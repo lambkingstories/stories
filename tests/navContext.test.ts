@@ -45,6 +45,14 @@ describe('the rule for one step', () => {
     expect(decideNav('app-coloring-book', {}, 'series', null)).toBe('series')
     expect(decideNav('app-big-game', {}, 'profile', null)).toBe('profile')
   })
+  it('the list of an area that a new book asked for (?book=) is "Lesen", from wherever the child comes', () => {
+    for (const name of ['app-coloring-books', 'app-books', 'app-all-books']) {
+      expect(decideNav(name, { book: 'x' }, 'home', null)).toBe('series')
+      expect(decideNav(name, { book: 'x' }, 'malen', null)).toBe('series')
+      // without the book it keeps the tab of the page it was opened from
+      expect(decideNav(name, {}, 'home', null)).toBe('home')
+    }
+  })
   it('going back lights what was lit on that page before', () => {
     expect(decideNav('app-book', {}, 'malen', 'home')).toBe('home')
   })
@@ -72,6 +80,18 @@ describe('the ways through the app', () => {
     r.back()
     await new Promise((x) => setTimeout(x, 10))
     expect(lit()).toBe('home')
+    r.back()
+    await new Promise((x) => setTimeout(x, 10))
+    expect(lit()).toBe('home')
+  })
+
+  it('Start → a new book (the list of its area) → a book of it: Lesen is lit from the list on; back lights Start', async () => {
+    const r = await start('/app')
+    await go(r, 'app-coloring-books', { book: 'ba-14' })
+    expect(lit()).toBe('series')
+    await go(r, 'app-coloring-book')
+    expect(lit()).toBe('series')
+    r.back()
     r.back()
     await new Promise((x) => setTimeout(x, 10))
     expect(lit()).toBe('home')

@@ -314,8 +314,10 @@ button
       width: 210px
 
 // the book that was asked for (from "New for you") shows a ring for a moment
+.book-card
+  transition: box-shadow 500ms ease
+
+// a soft, rounded ring for a few seconds (it fades out when it goes); the card is rounded already
 .book-card.is-asked
-  outline: 3px solid var(--lk-accent)
-  outline-offset: 2px
-  transition: outline-color 300ms
+  box-shadow: 0 0 0 3px var(--lk-accent), 0 6px 18px rgba(0, 0, 0, 0.12)
 </style>

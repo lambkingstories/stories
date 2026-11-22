@@ -14,8 +14,8 @@ export const LOOK_FIRST_MS = 700
 /** How often and how long the card is looked for. */
 export const LOOK_EVERY_MS = 300
 export const LOOK_TRIES = 14
-/** How long the ring stays (counted from the first look, so that it is seen when the book is there). */
-export const RING_MS = 5000
+/** How long the ring stays (counted from the first look, so that it is seen when the book is there): a few seconds, then it fades. */
+export const RING_MS = 3000
 
 export default function useAskedBook() {
   const route = useRoute() as ReturnType<typeof useRoute> | undefined
@@ -30,11 +30,15 @@ export default function useAskedBook() {
     let settled = false
     const look = () => {
       const card = document.querySelector(`[data-book-id="${esc(id)}"]`)
-      // at once, not gliding: the page has just opened, and the child wants to see the book, not the way to it
       if (card) {
+        // at once, not gliding: the page has just opened, and the child wants to see the book, not the way to it
         card.scrollIntoView({ block: 'center', inline: 'center', behavior: 'auto' })
-        // once more a moment later: the pictures that come in (lazy) move the card
-        if (!settled) {
+        // the screen change may still hold the height of the page (the scroll is cut short then): when the card is not in view yet, it is tried again
+        const r = card.getBoundingClientRect()
+        const seen = r.bottom > window.innerHeight * 0.1 && r.top < window.innerHeight * 0.9
+        if (!seen && ++tries < LOOK_TRIES) timers.push(window.setTimeout(look, LOOK_EVERY_MS))
+        else if (!settled) {
+          // once more a moment later: the pictures that come in (lazy) move the card
           settled = true
           timers.push(window.setTimeout(look, LOOK_FIRST_MS))
         }

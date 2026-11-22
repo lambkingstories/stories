@@ -325,7 +325,11 @@ button
     gap: 22px 18px
 
 // the book that was asked for (from "New for you") shows a ring for a moment
+.cb-card
+  border-radius: 26px
+  transition: box-shadow 500ms ease
+
+// a soft, rounded ring with a little air inside, for a few seconds (it fades out when it goes)
 .cb-card.is-asked
-  outline: 3px solid var(--lk-accent)
-  outline-offset: 4px
+  box-shadow: 0 0 0 5px var(--lk-bg, #ffffff), 0 0 0 8px var(--lk-accent)
 </style>

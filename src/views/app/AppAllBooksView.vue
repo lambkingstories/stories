@@ -682,9 +682,13 @@ button
     aspect-ratio: 21 / 8
 
 // the book that was asked for (from "New for you") shows a ring for a moment
+.shelf-book,
+.result
+  border-radius: 20px
+  transition: box-shadow 500ms ease
+
+// a soft, rounded ring with a little air inside, for a few seconds (it fades out when it goes)
 .shelf-book.is-asked,
 .result.is-asked
-  outline: 3px solid var(--lk-accent)
-  outline-offset: 3px
-  border-radius: 14px
+  box-shadow: 0 0 0 4px var(--lk-bg, #ffffff), 0 0 0 7px var(--lk-accent)
 </style>

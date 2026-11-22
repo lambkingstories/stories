@@ -60,6 +60,9 @@ export const OWN_TAB: Readonly<Record<string, AppNavId>> = {
   'app-profile': 'profile'
 }
 
+/** The lists of the area "Lesen" that a book of "New for you" opens. */
+export const ASKED_LISTS: readonly string[] = ['app-all-books', 'app-books', 'app-coloring-books']
+
 /**
  * The tab of a page that is entered. `previous` is the tab that was lit on the page the child comes from (none when the app has just been opened), `remembered` the tab this
  * very page had when it was shown before (going back or forward in the history).
@@ -67,6 +70,8 @@ export const OWN_TAB: Readonly<Record<string, AppNavId>> = {
 export function decideNav(name: string, query: Record<string, unknown> | undefined, previous: AppNavId | null, remembered: AppNavId | null): AppNavId {
   const own = OWN_TAB[name]
   if (own) return own
+  // a book of "New for you" opens the list of its area with `?book=<id>`: that is "Lesen" (the child has gone over to the books), and it stays there (Anton 22.11.2026)
+  if (ASKED_LISTS.includes(name) && query?.book) return 'series'
   return remembered ?? previous ?? routeToNav(name, query)
 }
 

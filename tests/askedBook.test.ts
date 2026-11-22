@@ -34,6 +34,8 @@ function open(cardAt: number | null) {
     window.setTimeout(() => {
       const el = document.createElement('div')
       el.setAttribute('data-book-id', 'ba-05')
+      // the card is in view (jsdom has no layout)
+      el.getBoundingClientRect = () => ({ top: 100, bottom: 400, left: 0, right: 100, width: 100, height: 300, x: 0, y: 100, toJSON: () => ({}) }) as DOMRect
       document.body.appendChild(el)
     }, cardAt)
   }
@@ -41,6 +43,23 @@ function open(cardAt: number | null) {
 }
 
 describe('useAskedBook', () => {
+  it('tries again when the card is not in view after the scroll (the screen change holds the height of the page)', async () => {
+    q.query = { book: 'ba-05' }
+    const el = document.createElement('div')
+    el.setAttribute('data-book-id', 'ba-05')
+    let top = 2200
+    el.getBoundingClientRect = () => ({ top, bottom: top + 300, left: 0, right: 100, width: 100, height: 300, x: 0, y: top, toJSON: () => ({}) }) as DOMRect
+    document.body.appendChild(el)
+    const { w } = open(null)
+    await vi.advanceTimersByTimeAsync(LOOK_FIRST_MS + 50)
+    expect(scroll).toHaveBeenCalledTimes(1)
+    // the height is let go: the card is in view with the next scroll
+    top = 100
+    await vi.advanceTimersByTimeAsync(LOOK_EVERY_MS + 50)
+    expect(scroll).toHaveBeenCalledTimes(2)
+    w.unmount()
+  })
+
   it('does nothing when no book is asked for', async () => {
     const { w, asked } = open(0)
     await vi.advanceTimersByTimeAsync(3000)
