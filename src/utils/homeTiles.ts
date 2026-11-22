@@ -30,6 +30,19 @@ export interface HomeTile {
 
 export const ALL_TILES: readonly HomeTileId[] = [...CORE_TILES, ...EXTRA_TILES, ...GAME_TILES]
 
+/**
+ * The start page has room for 8 places (Anton 22.11.2026): a small tile takes one place, a wide tile two. Nothing can be added, and no tile made wide, when that would
+ * need more places than that.
+ */
+export const MAX_SLOTS = 8
+const costOf = (size: HomeTileSize) => (size === 'wide' ? 2 : 1)
+/** The places the tiles of a layout take. */
+export const slotsUsed = (layout: readonly HomeTile[]): number => layout.reduce((n, t) => n + costOf(t.size), 0)
+/** True when one more small tile has a place. */
+export const canAddTile = (layout: readonly HomeTile[]): boolean => slotsUsed(layout) + 1 <= MAX_SLOTS
+/** True when this tile may become wide: it is small, and one more place is free. */
+export const canWiden = (layout: readonly HomeTile[], id: HomeTileId): boolean => layout.some((t) => t.id === id && t.size === 'small') && slotsUsed(layout) + 1 <= MAX_SLOTS
+
 /** What a device without a saved layout shows: the five tiles, all small (Anton 22.11.2026: the family games are a small square tile like the others; a hint tile stands beside it). */
 export const DEFAULT_LAYOUT: readonly HomeTile[] = [
   { id: 'adventure', size: 'small' },
@@ -57,8 +70,11 @@ export function normalizeLayout(raw: unknown): HomeTile[] | null {
     if (!item || typeof item !== 'object') continue
     const { id, size } = item as { id?: unknown; size?: unknown }
     if (!isId(id) || seen.has(id)) continue
+    const sz: HomeTileSize = isSize(size) ? size : 'small'
+    // more than the 8 places: the tile that does not fit stays off the page (it can be added again when there is room)
+    if (slotsUsed(out) + costOf(sz) > MAX_SLOTS) continue
     seen.add(id)
-    out.push({ id, size: isSize(size) ? size : 'small' })
+    out.push({ id, size: sz })
   }
   return out
 }
@@ -76,6 +92,8 @@ export function moveTile(layout: readonly HomeTile[], id: HomeTileId, targetId: 
 
 /** Another size for one tile. */
 export function setSize(layout: readonly HomeTile[], id: HomeTileId, size: HomeTileSize): HomeTile[] {
+  // a wide tile needs a second place: without one the size stays
+  if (size === 'wide' && !canWiden(layout, id)) return layout.map((t) => ({ ...t }))
   return layout.map((t) => (t.id === id ? { ...t, size } : { ...t }))
 }
 
@@ -93,6 +111,8 @@ export function removeTile(layout: readonly HomeTile[], id: HomeTileId): HomeTil
 /** A tile comes to the end of the page, small. Nothing changes when it is there already. */
 export function addTile(layout: readonly HomeTile[], id: HomeTileId, size: HomeTileSize = 'small'): HomeTile[] {
   if (!isId(id) || layout.some((t) => t.id === id)) return layout.map((t) => ({ ...t }))
+  // the page is full: nothing is added
+  if (slotsUsed(layout) + costOf(size) > MAX_SLOTS) return layout.map((t) => ({ ...t }))
   return [...layout.map((t) => ({ ...t })), { id, size }]
 }
 

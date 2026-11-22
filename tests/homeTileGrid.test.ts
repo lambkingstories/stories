@@ -9,7 +9,7 @@ import HomeTileGrid from '@/components/molecules/HomeTileGrid.vue'
 import messages from '@/i18n/app'
 import { withGameTexts } from '@/i18n/bigGames'
 import useHomeLayout from '@/use/useHomeLayout'
-import { ALL_TILES, CORE_TILES, type HomeCard, type HomeTileId } from '@/utils/homeTiles'
+import { ALL_TILES, CORE_TILES, slotsUsed, type HomeCard, type HomeTileId } from '@/utils/homeTiles'
 
 vi.mock('@/components/atoms/ZIconography.vue', () => ({ default: { template: '<i />' } }))
 
@@ -187,14 +187,28 @@ describe('the hint beside the lone tile (Anton 22.11.2026)', () => {
   it('stands in the empty place beside the small family tile, as words only (no button, nothing that moves)', async () => {
     const w = mountGrid()
     const hint = w.get('[data-test="tile-hint"]')
-    expect(hint.text()).toContain('Lange drücken')
+    // two lines: a long press on a tile sorts, a long press here adds
+    expect(hint.text()).toContain('Lange auf eine Kachel drücken: sortieren')
+    expect(hint.text()).toContain('Hier lange drücken: neue Kachel hinzufügen')
+    expect(hint.classes()).not.toContain('hg-hint-tile--wide')
     expect(hint.element.tagName).toBe('DIV')
     expect(hint.find('button').exists()).toBe(false)
     w.unmount()
   })
 
-  it('is not there when the tiles fill the rows (an even number of small places, or a wide tile)', async () => {
+  it('stands under the last row over the whole width when the row is full and there is room left', async () => {
     useHomeLayout().remove('family')
+    const w = mountGrid()
+    expect(w.find('[data-test="tile-hint"]').classes()).toContain('hg-hint-tile--wide')
+    w.unmount()
+  })
+
+  it('is gone when the 8 places are taken', async () => {
+    const h = useHomeLayout()
+    h.add('quiz')
+    h.add('who')
+    h.add('order')
+    expect(slotsUsed(h.layout.value)).toBe(8)
     const w = mountGrid()
     expect(w.find('[data-test="tile-hint"]').exists()).toBe(false)
     w.unmount()
@@ -263,6 +277,54 @@ describe('the back button while arranging (Anton 22.11.2026)', () => {
     await flushPromises()
     expect(w.classes()).not.toContain('is-editing')
     expect(nav.replace).toHaveBeenCalledWith({ query: {} })
+    w.unmount()
+  })
+})
+
+describe('only 8 places on the start page (Anton 22.11.2026)', () => {
+  const fill = () => {
+    const h = useHomeLayout()
+    h.add('quiz')
+    h.add('who')
+    h.add('order')
+  }
+
+  it('shows how many places are taken while arranging', async () => {
+    const w = mountGrid()
+    press(w.get('[data-tile-id="picture"]').element)
+    vi.advanceTimersByTime(500)
+    release()
+    await flushPromises()
+    expect(w.get('[data-test="tile-places"]').text()).toBe('5 von 8 Plätzen belegt')
+    w.unmount()
+  })
+
+  it('with the 8 places taken the list says that the page is full and offers nothing to add', async () => {
+    fill()
+    const w = mountGrid()
+    press(w.get('[data-tile-id="picture"]').element)
+    vi.advanceTimersByTime(500)
+    release()
+    await flushPromises()
+    await w.get('[data-test="tile-add"]').trigger('click')
+    expect(w.get('[data-test="tiles-full"]').text()).toContain('voll')
+    expect(w.find('[data-test="add-cards"]').exists()).toBe(false)
+    w.unmount()
+  })
+
+  it('a small tile cannot be made wide when no second place is free, and can again after one is taken away', async () => {
+    fill()
+    const w = mountGrid()
+    press(w.get('[data-tile-id="book"]').element)
+    vi.advanceTimersByTime(500)
+    release()
+    await flushPromises()
+    expect(w.get('[data-tile-id="book"] [data-test="tile-size"]').attributes('disabled')).toBeDefined()
+    await w.get('[data-tile-id="games"] [data-test="tile-remove"]').trigger('click')
+    expect(w.get('[data-tile-id="book"] [data-test="tile-size"]').attributes('disabled')).toBeUndefined()
+    await w.get('[data-tile-id="book"] [data-test="tile-size"]').trigger('click')
+    expect(w.get('[data-tile-id="book"]').classes()).toContain('hg-tile--wide')
+    expect(slotsUsed(useHomeLayout().layout.value)).toBe(8)
     w.unmount()
   })
 })

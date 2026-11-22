@@ -12,7 +12,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import useHomeLayout from '@/use/useHomeLayout'
-import { missingTiles, type HomeCard, type HomeTileId } from '@/utils/homeTiles'
+import { MAX_SLOTS, canAddTile, canWiden, missingTiles, slotsUsed, type HomeCard, type HomeTileId } from '@/utils/homeTiles'
 import { onImgFallback } from '@/utils/placeholder'
 import { medalThumb } from '@/utils/medalThumb'
 
@@ -181,9 +181,18 @@ function open(card: HomeCard) {
   if (editing.value || swallowClick) return
   card.go()
 }
-/** The place beside a lone small tile is empty: a hint tile stands there. It only says in words that a long press sorts the tiles and lets new ones be chosen; a tap does nothing. */
+/** The places that are taken (a small tile one, a wide tile two; 8 in all) and the place that is free at the end of the last row. */
+const used = computed(() => slotsUsed(layout.value))
+const full = computed(() => !canAddTile(layout.value))
 const emptyPlace = computed(() => shown.value.reduce((n, t) => n + (t.size === 'wide' ? 2 : 1), 0) % 2 === 1)
-const showHint = computed(() => !editing.value && emptyPlace.value)
+/**
+ * A hint tile stands at the end while there is room for more: beside a lone small tile as a small tile, else under the last row over the whole width. It only says in words what a long
+ * press does (on a tile: sort; on the hint: add new ones); a tap does nothing.
+ */
+const showHint = computed(() => !editing.value && !full.value)
+const hintWide = computed(() => !emptyPlace.value)
+/** May this tile become wide? (A second place has to be free.) */
+const mayWiden = (id: HomeTileId) => canWiden(layout.value, id)
 
 function buzz() {
   try {
@@ -318,6 +327,7 @@ function resetAll() {
             data-tile-action
             data-test="tile-size"
             :aria-label="(tile.size === 'small' ? t('app.bigGames.home.bigger') : t('app.bigGames.home.smaller')) + ': ' + tile.card.title"
+            :disabled="tile.size === 'small' && !mayWiden(tile.id)"
             @click.stop="resize(tile.id)"
           )
             svg(v-if="tile.size === 'small'" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true")
@@ -328,7 +338,7 @@ function resetAll() {
       div(
         v-if="showHint"
         key="hint"
-        class="hg-hint-tile"
+        :class="['hg-hint-tile', { 'hg-hint-tile--wide': hintWide }]"
         role="note"
         tabindex="0"
         data-test="tile-hint"
@@ -340,17 +350,21 @@ function resetAll() {
         @contextmenu.prevent
         @keydown.enter="startArranging(true)"
       )
+        span(class="hg-hint-text") {{ t('app.bigGames.home.holdTile') }}
         span(class="hg-hint-text") {{ t('app.bigGames.home.holdHint') }}
       button(v-if="editing" key="add" type="button" class="hg-add" data-test="tile-add" @click="adding = true")
         span(class="hg-add-plus" aria-hidden="true") +
         span {{ t('app.bigGames.home.addTile') }}
+        span(class="hg-add-count" data-test="tile-places") {{ t('app.bigGames.home.places', { n: used, max: MAX_SLOTS }) }}
     //- the list of tiles that can be added
     div(v-if="adding" class="hg-sheet" role="dialog" aria-modal="true" :aria-label="t('app.bigGames.home.addTile')" data-test="tile-sheet")
       div(class="hg-backdrop" @click="adding = false")
       div(class="hg-panel")
         h3(class="hg-panel-title") {{ t('app.bigGames.home.addTile') }}
-        p(v-if="!addable.length" class="hg-none") {{ t('app.bigGames.home.addNone') }}
-        ul(class="hg-list")
+        p(v-if="full" class="hg-none" data-test="tiles-full") {{ t('app.bigGames.home.full', { max: MAX_SLOTS }) }}
+        p(v-else-if="!addable.length" class="hg-none") {{ t('app.bigGames.home.addNone') }}
+        p(v-if="!full" class="hg-places" data-test="tile-places-sheet") {{ t('app.bigGames.home.places', { n: used, max: MAX_SLOTS }) }}
+        ul(v-if="!full" class="hg-list")
           li(v-for="c in addable" :key="c.id")
             button(type="button" class="hg-item" :data-test="'add-' + c.id" @click="addTileAndClose(c.id)")
               img(:src="c.image" alt="" class="hg-item-img" draggable="false")
@@ -619,8 +633,10 @@ function resetAll() {
 // the hint tile: a dashed place with a few words, nothing that moves and nothing to tap
 .hg-hint-tile
   display: flex
+  flex-direction: column
   align-items: center
   justify-content: center
+  gap: 8px
   min-height: 120px
   padding: 14px
   border: 2px dashed var(--lk-line)
@@ -631,11 +647,27 @@ function resetAll() {
   user-select: none
   -webkit-user-select: none
 
+// under the last row, when the row is full: over the whole width
+.hg-hint-tile--wide
+  grid-column: 1 / -1
+  min-height: 84px
+
 .hg-hint-text
-  font-size: 0.95rem
+  font-size: 0.9rem
   font-weight: 800
   line-height: 1.3
   text-align: center
+
+.hg-add-count
+  font-size: 0.8rem
+  font-weight: 700
+  color: var(--lk-muted)
+
+.hg-places
+  margin: 0 0 8px
+  font-size: 0.85rem
+  font-weight: 700
+  color: var(--lk-muted)
 
 .hg-add
   display: flex

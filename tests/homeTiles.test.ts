@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { HOME_SHORTCUTS } from '@/data/homeShortcuts'
 import useHomeLayout, { HOME_LAYOUT_KEY } from '@/use/useHomeLayout'
 import { BIG_GAMES } from '@/data/bigGames'
-import { ALL_TILES, CORE_TILES, DEFAULT_LAYOUT, EXTRA_TILES, GAME_TILES, addTile, defaultLayout, missingTiles, moveTile, normalizeLayout, removeTile, setSize, toggleSize } from '@/utils/homeTiles'
+import { ALL_TILES, CORE_TILES, DEFAULT_LAYOUT, EXTRA_TILES, GAME_TILES, MAX_SLOTS, addTile, canAddTile, canWiden, defaultLayout, missingTiles, moveTile, normalizeLayout, removeTile, setSize, slotsUsed, toggleSize } from '@/utils/homeTiles'
 
 const ids = (l: readonly { id: string }[]) => l.map((t) => t.id)
 
@@ -116,5 +116,43 @@ describe('the memory on the device', () => {
     localStorage.setItem(HOME_LAYOUT_KEY, '{not json')
     h.reload()
     expect(ids(h.layout.value)).toEqual([...CORE_TILES])
+  })
+})
+
+describe('the 8 places (Anton 22.11.2026)', () => {
+  it('a small tile takes one place, a wide tile two, and the page has 8', () => {
+    expect(MAX_SLOTS).toBe(8)
+    expect(slotsUsed(defaultLayout())).toBe(5)
+    expect(slotsUsed([{ id: 'family', size: 'wide' }, { id: 'book', size: 'small' }])).toBe(3)
+  })
+
+  it('adds tiles only while a place is free', () => {
+    let l = defaultLayout()
+    expect(canAddTile(l)).toBe(true)
+    l = addTile(addTile(addTile(l, 'quiz'), 'who'), 'order')
+    expect(slotsUsed(l)).toBe(8)
+    expect(canAddTile(l)).toBe(false)
+    expect(ids(addTile(l, 'bingo'))).toEqual(ids(l))
+  })
+
+  it('makes a tile wide only when a second place is free', () => {
+    const l = defaultLayout()
+    expect(canWiden(l, 'book')).toBe(true)
+    const wide = setSize(setSize(setSize(l, 'book', 'wide'), 'picture', 'wide'), 'games', 'wide')
+    expect(slotsUsed(wide)).toBe(8)
+    expect(canWiden(wide, 'adventure')).toBe(false)
+    expect(setSize(wide, 'adventure', 'wide').find((t) => t.id === 'adventure')?.size).toBe('small')
+    // back to small is always possible
+    expect(setSize(wide, 'book', 'small').find((t) => t.id === 'book')?.size).toBe('small')
+  })
+
+  it('a saved layout with more than 8 places loses the tiles that do not fit (they can be added again later)', () => {
+    const raw = ['adventure', 'book', 'picture', 'games', 'family', 'quiz', 'who', 'order', 'bingo', 'memory'].map((id) => ({ id, size: 'small' }))
+    const l = normalizeLayout(raw)!
+    expect(slotsUsed(l)).toBe(8)
+    expect(ids(l)).toEqual(['adventure', 'book', 'picture', 'games', 'family', 'quiz', 'who', 'order'])
+    // a wide tile that would not fit stays off, a small one after it can still come
+    const l2 = normalizeLayout([...raw.slice(0, 7), { id: 'order', size: 'wide' }, { id: 'bingo', size: 'small' }])!
+    expect(ids(l2)).toEqual(['adventure', 'book', 'picture', 'games', 'family', 'quiz', 'who', 'bingo'])
   })
 })
