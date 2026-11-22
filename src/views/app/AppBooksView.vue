@@ -7,8 +7,9 @@
 import { computed, onMounted, ref } from 'vue'
 import { sizedImage } from '@/utils/sizedImage'
 import { useI18n } from 'vue-i18n'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
+import useAskedBook from '@/use/useAskedBook'
 import ContentLanguageSwitch from '@/components/molecules/ContentLanguageSwitch.vue'
 import useContentLanguage, { bookIn } from '@/use/useContentLanguage'
 import LkPageHead from '@/components/molecules/LkPageHead.vue'
@@ -32,7 +33,6 @@ import { printedBookUrl } from '@/data/bookPages'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
-const route = useRoute() as ReturnType<typeof useRoute> | undefined
 const apiBooks = useApiBooks()
 const purchases = usePurchases()
 const { ownsBook } = usePremium()
@@ -95,21 +95,8 @@ const cards = computed<BookCardData[]>(() => {
   return [...own, ...fromBackend]
 })
 
-// a book of "New for you" leads here with `?book=<id>`: its card is brought into view and lit for a moment (the books of the server may still be on their way: it looks again for a few seconds)
-const askedId = ref('')
-onMounted(() => {
-  const id = String(route?.query?.book ?? '')
-  if (!id) return
-  askedId.value = id
-  let tries = 0
-  const look = () => {
-    const card = document.querySelector(`[data-book-id="${CSS.escape(id)}"]`)
-    if (card) card.scrollIntoView({ block: 'center', behavior: 'smooth' })
-    else if (++tries < 12) window.setTimeout(look, 300)
-  }
-  window.setTimeout(look, 300)
-  window.setTimeout(() => (askedId.value = ''), 5000)
-})
+// a book of "New for you" leads here with `?book=<id>` (see `useAskedBook`)
+const { asked: askedId } = useAskedBook()
 
 function goBack() {
   goBackTo(router, { name: 'app-read' })

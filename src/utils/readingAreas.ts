@@ -21,17 +21,17 @@ export function booksOfArea<T extends AreaBook>(list: readonly T[], area: Readin
 }
 
 /**
- * Where a book of the list "New for you" leads (Anton 22.11.2026): into the area where the book was put, to the place where it can be used. A coloring book opens in the area
- * of the coloring books, on its own page (paint, read, buy); a printed book opens in "Books", at its card (read, buy); a story opens on its page of the stories.
+ * Where a book of the list "New for you" leads (Anton 22.11.2026): the whole list of the area where the book was put, and the list scrolls to the book (`?book=<id>`, see
+ * `useAskedBook`). A coloring book leads to the coloring books, a printed book to the books, a story to the stories.
  */
 export function bookDestination(book: (AreaBook & { bookId: string }) | null | undefined, bookId?: string) {
   const id = book?.bookId ?? bookId ?? ''
   switch (readingAreaOf(book)) {
     case 'coloring':
-      return { name: 'app-coloring-book', params: { bookId: id } }
+      return { name: 'app-coloring-books', query: { book: id } }
     case 'books':
       return { name: 'app-books', query: { book: id } }
     default:
-      return { name: 'app-book', params: { bookId: id } }
+      return { name: 'app-all-books', query: { book: id } }
   }
 }

@@ -13,6 +13,7 @@ import BookListSkeleton from '@/components/molecules/BookListSkeleton.vue'
 import BookListError from '@/components/molecules/BookListError.vue'
 import { sizedImage } from '@/utils/sizedImage'
 import AppHeader from '@/components/molecules/AppHeader.vue'
+import useAskedBook from '@/use/useAskedBook'
 import ContentLanguageSwitch from '@/components/molecules/ContentLanguageSwitch.vue'
 import useContentLanguage, { bookIn } from '@/use/useContentLanguage'
 import useModels from '@/use/useModels'
@@ -97,6 +98,8 @@ onBeforeUnmount(() => {
 })
 
 const { shelfLanguage } = useContentLanguage()
+// a book of "New for you" leads here with `?book=<id>` (see `useAskedBook`)
+const { asked } = useAskedBook()
 watch(offlineMode, (off) => {
   if (off) void loadOfflineList()
 })
@@ -298,7 +301,8 @@ function openBook(bookId: string) {
             v-for="book in results"
             :key="book.bookId"
             type="button"
-            class="result"
+            :class="['result', { 'is-asked': asked === book.bookId }]"
+            :data-book-id="book.bookId"
             @click="openBook(book.bookId)"
           )
             span(class="result-cover")
@@ -332,7 +336,8 @@ function openBook(bookId: string) {
               v-for="book in shelf.books"
               :key="book.bookId"
               type="button"
-              class="shelf-book"
+              :class="['shelf-book', { 'is-asked': asked === book.bookId }]"
+              :data-book-id="book.bookId"
               :aria-label="bookTitle(book)"
               @click="openBook(book.bookId)"
             )
@@ -675,4 +680,11 @@ button
 
   .shelf-hero
     aspect-ratio: 21 / 8
+
+// the book that was asked for (from "New for you") shows a ring for a moment
+.shelf-book.is-asked,
+.result.is-asked
+  outline: 3px solid var(--lk-accent)
+  outline-offset: 3px
+  border-radius: 14px
 </style>

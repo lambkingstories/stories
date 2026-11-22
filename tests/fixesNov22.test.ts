@@ -112,21 +112,24 @@ describe('the page of a coloring book that is new (Anton 22.11.2026)', () => {
   })
 })
 
-describe('a book of "New for you" opens in its own area (Anton 22.11.2026)', () => {
-  it('a coloring book opens on its page in the coloring books, a printed book at its card in the books, a story on its page', () => {
-    expect(bookDestination({ bookId: 'ba-02', kind: 'coloring' })).toEqual({ name: 'app-coloring-book', params: { bookId: 'ba-02' } })
+describe('a book of "New for you" opens the whole list of its area (Anton 22.11.2026)', () => {
+  it('a coloring book leads to the coloring books, a printed book to the books, a story to the stories, each with the book that is asked for', () => {
+    expect(bookDestination({ bookId: 'ba-02', kind: 'coloring' })).toEqual({ name: 'app-coloring-books', query: { book: 'ba-02' } })
     expect(bookDestination({ bookId: 'x', bookSeriesId: 'einzelne-bucher' })).toEqual({ name: 'app-books', query: { book: 'x' } })
-    expect(bookDestination({ bookId: 'story-1', bookSeriesId: 'talheim' })).toEqual({ name: 'app-book', params: { bookId: 'story-1' } })
+    expect(bookDestination({ bookId: 'story-1', bookSeriesId: 'talheim' })).toEqual({ name: 'app-all-books', query: { book: 'story-1' } })
     // an old coloring book without a kind is known by its category
-    expect(bookDestination({ bookId: 'old', category: 'Ausmalbücher' })).toEqual({ name: 'app-coloring-book', params: { bookId: 'old' } })
+    expect(bookDestination({ bookId: 'old', category: 'Ausmalbücher' })).toEqual({ name: 'app-coloring-books', query: { book: 'old' } })
   })
   it('the start page and the list of new books use it', () => {
     expect(read('views/app/AppHomeView.vue')).toContain('bookDestination(allBooks.value.find')
     expect(read('views/app/AppAllNewBooksView.vue')).toContain('bookDestination(allBooks.value.find')
   })
-  it('the shelf of books brings the asked card into view', () => {
-    const s = read('views/app/AppBooksView.vue')
-    expect(s).toContain(':data-book-id="c.id"')
-    expect(s).toContain("route?.query?.book")
+  it('the three lists mark their cards and bring the asked one into view', () => {
+    for (const f of ['views/app/AppBooksView.vue', 'views/app/AppColoringBooksView.vue', 'views/app/AppAllBooksView.vue']) {
+      const s = read(f)
+      expect(s, f).toContain('useAskedBook()')
+      expect(s, f).toContain('data-book-id')
+      expect(s, f).toContain('is-asked')
+    }
   })
 })

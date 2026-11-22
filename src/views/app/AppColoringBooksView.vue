@@ -10,6 +10,7 @@ import { sizedImage } from '@/utils/sizedImage'
 import BookListSkeleton from '@/components/molecules/BookListSkeleton.vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
+import useAskedBook from '@/use/useAskedBook'
 import ContentLanguageSwitch from '@/components/molecules/ContentLanguageSwitch.vue'
 import useContentLanguage, { bookIn } from '@/use/useContentLanguage'
 import LkPageHead from '@/components/molecules/LkPageHead.vue'
@@ -33,6 +34,8 @@ import { coloringAgeGroup, groupColoringBooks, splitColoringTitle, type Coloring
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
+// a book of "New for you" leads here with `?book=<id>` (see `useAskedBook`)
+const { asked } = useAskedBook()
 const router = useRouter()
 /** Opened from the painting program: the way back leads there; from the door in "Lesen" it leads back to "Lesen". */
 /** `from=shelf`: opened from the big door / the button of the paint shelf in the painting program: the chip "Habe ich" is on, and a book that is mine goes onto the shelf. */
@@ -164,8 +167,8 @@ function arrived() {
             h2(class="cb-sec-title") {{ t('app.read.coloringAge_' + sec.group) }}
             p(v-if="sec.series" class="cb-sec-series") {{ sec.series }}
           ul(class="cb-grid")
-            li(v-for="c in sec.cards" :key="c.bookId")
-              button(type="button" :class="['cb-card', { 'is-locked': c.own === 'locked' }]" :aria-label="c.title" @click="openBook(c)")
+            li(v-for="c in sec.cards" :key="c.bookId" :data-book-id="c.bookId")
+              button(type="button" :class="['cb-card', { 'is-locked': c.own === 'locked', 'is-asked': asked === c.bookId }]" :aria-label="c.title" @click="openBook(c)")
                 span(class="cb-cover")
                   img(:src="c.cover" :alt="c.title" loading="lazy" draggable="false" @error="onImgFallback")
                 //- the sign (free, to buy…) stands under the cover, never over its title
@@ -320,4 +323,9 @@ button
   .cb-grid
     grid-template-columns: repeat(4, minmax(0, 1fr))
     gap: 22px 18px
+
+// the book that was asked for (from "New for you") shows a ring for a moment
+.cb-card.is-asked
+  outline: 3px solid var(--lk-accent)
+  outline-offset: 4px
 </style>
