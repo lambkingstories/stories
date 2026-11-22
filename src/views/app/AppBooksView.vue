@@ -13,7 +13,7 @@ import ContentLanguageSwitch from '@/components/molecules/ContentLanguageSwitch.
 import useContentLanguage, { bookIn } from '@/use/useContentLanguage'
 import LkPageHead from '@/components/molecules/LkPageHead.vue'
 import useApiBooks from '@/use/useApiBooks'
-import { STORE_URL, digitalBooks, storeBooks } from '@/data/storeBooks'
+import { STORE_URL, digitalBooks, storeBooks, storeBookIn } from '@/data/storeBooks'
 import { bookProductId } from '@/data/plusProducts'
 import usePremium from '@/use/usePremium'
 import usePurchases from '@/use/usePurchases'
@@ -65,13 +65,14 @@ interface BookCardData {
 }
 
 const cards = computed<BookCardData[]>(() => {
-  const own: BookCardData[] = storeBooks.map((b) => ({
+  // in English only the books that exist in English, with their English series name and cover (Anton 22.11.2026)
+  const own: BookCardData[] = storeBooks.filter((b) => storeBookIn(b, lang.value)).map((b) => ({
     id: b.id,
-    series: b.series,
+    series: lang.value === 'en' ? (b.seriesEn ?? b.series) : b.series,
     title: b.title[lang.value],
     text: b.text[lang.value],
-    cover: prependBaseUrl(b.cover),
-    ratio: b.coverRatio ?? 1,
+    cover: prependBaseUrl(lang.value === 'en' ? (b.coverEn ?? b.cover) : b.cover),
+    ratio: (lang.value === 'en' ? b.coverRatioEn : b.coverRatio) ?? 1,
     url: b.url,
     comingSoon: !!b.comingSoon,
     preview: !!b.preview?.pages.length,
@@ -163,7 +164,7 @@ function toRead(id: string) {
             p(v-else-if="!c.comingSoon" class="book-note") {{ t('app.read.storeParents') }}
             p(v-else class="book-note") {{ t('app.read.soonNote') }}
       p(v-else-if="cards.length" class="books-empty") {{ t('app.read.ownNone') }}
-      p(v-else class="books-empty") {{ t('app.read.booksEmpty') }}
+      p(v-else class="books-empty") {{ lang === 'en' ? t('app.read.booksNoneInLanguage') : t('app.read.booksEmpty') }}
 </template>
 
 <style scoped lang="sass">

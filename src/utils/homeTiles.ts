@@ -30,13 +30,13 @@ export interface HomeTile {
 
 export const ALL_TILES: readonly HomeTileId[] = [...CORE_TILES, ...EXTRA_TILES, ...GAME_TILES]
 
-/** What a device without a saved layout shows: the five tiles as before (the family games are a wide tile). */
+/** What a device without a saved layout shows: the five tiles, all small (Anton 22.11.2026: the family games are a small square tile like the others; a hint tile stands beside it). */
 export const DEFAULT_LAYOUT: readonly HomeTile[] = [
   { id: 'adventure', size: 'small' },
   { id: 'book', size: 'small' },
   { id: 'picture', size: 'small' },
   { id: 'games', size: 'small' },
-  { id: 'family', size: 'wide' }
+  { id: 'family', size: 'small' }
 ]
 
 const isId = (x: unknown): x is HomeTileId => typeof x === 'string' && (ALL_TILES as readonly string[]).includes(x)

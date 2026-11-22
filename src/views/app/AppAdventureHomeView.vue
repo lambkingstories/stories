@@ -227,8 +227,8 @@ async function doDelete() {
         span(class="go-on-go" aria-hidden="true")
           ZIconography(name="chevron-right" :size="22")
 
-      //- the slim line: the rewards (cards, cups, the next game); a tap leads to "Me", where "My rewards" and "My games" are
-      router-link(:to="{ name: 'app-profile' }" :class="['rewards-line', { 'is-wish': wishes.free > 0 }]")
+      //- the slim line: the rewards (cards, cups, the next game); a tap leads straight to "My rewards" (Anton 22.11.2026)
+      router-link(:to="{ name: 'app-collection' }" :class="['rewards-line', { 'is-wish': wishes.free > 0 }]")
         img(:src="ui('stern-gold-3')" alt="" class="rewards-img" draggable="false")
         span(class="rewards-body")
           span(class="rewards-title") {{ t('app.adventure.rewardsTitle') }}

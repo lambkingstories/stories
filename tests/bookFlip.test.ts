@@ -139,3 +139,35 @@ describe('BookFlip, standing upright', () => {
     w.unmount()
   })
 })
+
+describe('BookFlip with upright pages (a coloring book, Anton 22.11.2026)', () => {
+  const openUpright = (ratio: number) => mount(BookFlip, { global: { plugins: [i18n] }, props: { pages, ratio }, attachTo: document.body })
+
+  it('lying on its side the two upright pages are as high as the screen allows and as wide as their shape says', () => {
+    size(900, 400)
+    const w = openUpright(0.75)
+    const book = document.body.querySelector<HTMLElement>('.bf-book')!
+    // the height is 400, one page is 300 wide, a spread 600
+    expect(book.style.height).toBe('400px')
+    expect(book.style.width).toBe('600px')
+    w.unmount()
+  })
+
+  it('standing upright one upright page fills the width (or the height, where that is smaller)', () => {
+    size(300, 800)
+    const w = openUpright(0.75)
+    const book = document.body.querySelector<HTMLElement>('.bf-book')!
+    expect(book.style.width).toBe('300px')
+    expect(book.style.height).toBe('400px')
+    w.unmount()
+  })
+
+  it('stays square without a shape', () => {
+    size(900, 400)
+    const w = mount(BookFlip, { global: { plugins: [i18n] }, props: { pages }, attachTo: document.body })
+    const book = document.body.querySelector<HTMLElement>('.bf-book')!
+    expect(book.style.width).toBe('800px')
+    expect(book.style.height).toBe('400px')
+    w.unmount()
+  })
+})

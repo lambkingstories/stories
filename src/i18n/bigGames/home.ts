@@ -3,6 +3,7 @@ export default {
   de: {
     editDone: 'Fertig',
     editHint: 'Zum Verschieben ziehen. Mit dem Pfeil änderst du die Größe.',
+    holdHint: 'Lange drücken: weitere Kacheln',
     addTile: 'Kachel hinzufügen',
     addNone: 'Alle Kacheln sind schon auf der Startseite.',
     reset: 'Alles zurücksetzen',
@@ -32,6 +33,7 @@ export default {
   en: {
     editDone: 'Done',
     editHint: 'Drag to move. Use the arrow to change the size.',
+    holdHint: 'Press and hold: more tiles',
     addTile: 'Add a tile',
     addNone: 'All tiles are on the start page already.',
     reset: 'Reset everything',
@@ -61,6 +63,7 @@ export default {
   es: {
     editDone: 'Listo',
     editHint: 'Arrastra para mover. Con la flecha cambias el tamaño.',
+    holdHint: 'Mantén pulsado: más mosaicos',
     addTile: 'Añadir un mosaico',
     addNone: 'Todos los mosaicos ya están en la página de inicio.',
     reset: 'Restablecer todo',

@@ -29,6 +29,9 @@ import { requireParent } from '@/use/useParentalGate'
 import { pickLocalizedImage } from '@/types/apiBook'
 import { openExternal } from '@/utils/openExternal'
 import ColoringSpread from '@/components/molecules/ColoringSpread.vue'
+import BookFlip from '@/components/molecules/BookFlip.vue'
+import ZIconography from '@/components/atoms/ZIconography.vue'
+import { composeColoringPage, loadPicture } from '@/utils/composeColoringPage'
 import { contentLocale } from '@/utils/contentLocale'
 import { printedBookUrl } from '@/data/bookPages'
 
@@ -45,6 +48,8 @@ const title = ref('')
 /** What the head shows: the name of the book without the series and the volume (the long start "Bibelgeschichten zum Ausmalen: Band 1 - " is left out), so it fits over two lines. */
 const headTitle = computed(() => shortColoringTitle(title.value))
 const shopLink = ref('')
+/** The cover of the book (shown first when the book is read). */
+const coverUrl = ref('')
 /** Where the printed book is sold (Amazon) in the language of the app; empty when there is none for this language. */
 const printedLink = ref('')
 /** The number of free pictures of this book, when it has its own (see the AdminUI). */
@@ -221,6 +226,62 @@ async function resetPage() {
   await refreshWorks()
 }
 
+// ── Reading -------------------------------------------------------------------------------
+
+/** The book is read like a real book: big, and turned sideways with two pages and a turning leaf (`BookFlip`). The pages are shown as they were painted. */
+const reading = ref(false)
+const readPages = ref<string[]>([])
+const readRatio = ref(0.75)
+const readBusy = ref(false)
+let readUrls: string[] = []
+
+function closeReader() {
+  reading.value = false
+  readPages.value = []
+  for (const u of readUrls) URL.revokeObjectURL(u)
+  readUrls = []
+}
+
+async function openReader() {
+  if (readBusy.value || !pages.value.length) return
+  readBusy.value = true
+  try {
+    const list: string[] = []
+    if (coverUrl.value) list.push(coverUrl.value)
+    // the pages that are open (a locked book shows the free pictures); a painted page is put together with its painting, the others are the line art
+    const open = Math.min(pages.value.length, allowed.value)
+    for (let i = 0; i < open; i++) {
+      const p = pages.value[i]!
+      await loadLine(i)
+      const line = lineOf(p)
+      let shown = line
+      if (isPainted(p)) {
+        try {
+          const blob = await getDrawing(idOf(p))
+          if (blob) {
+            shown = await composeColoringPage(line, blob)
+            readUrls.push(shown)
+          }
+        } catch (err) {
+          console.warn('painted page could not be put together', err)
+        }
+      }
+      list.push(shown)
+    }
+    // the shape of a page: the first picture of the book decides
+    try {
+      const first = await loadPicture(lineOf(pages.value[0]!))
+      if (first.naturalWidth && first.naturalHeight) readRatio.value = first.naturalWidth / first.naturalHeight
+    } catch {
+      readRatio.value = 0.75
+    }
+    readPages.value = list
+    reading.value = true
+  } finally {
+    readBusy.value = false
+  }
+}
+
 function back() {
   // opened from the list of coloring books: one step back leads to the list again
   if (previousPath()?.startsWith('/app/coloring-books')) {
@@ -245,6 +306,7 @@ async function start() {
     const loc = book.localizations as Record<string, { title?: string } | null | undefined>
     title.value = (loc[contentLang.value]?.title || loc.de?.title || bookId.value).replace(/^Buch\s*\d+\s*[–-]\s*/i, '')
     pages.value = list
+    coverUrl.value = pickLocalizedImage((book as ApiBook).previewImage, contentLang.value)
     ownFree.value = (book as ApiBook).freePages ?? null
     // the page of the book on lambking.store (the old link of the backend only when the book has no page there)
     const printed = printedBookUrl(bookId.value, (book as ApiBook).etsyLink?.[contentLocale(locale.value)] ?? '', contentLocale(locale.value))
@@ -283,6 +345,7 @@ onMounted(() => {
 })
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', onKeydown)
+  closeReader()
   dropLayers()
 })
 watch(bookId, () => {
@@ -330,6 +393,11 @@ watch(bookId, () => {
               img(:src="pageLocked ? crown : brush" alt="" draggable="false")
             span {{ pageLocked ? t('app.coloring.unlockBook') : current ? t('app.coloring.continuePaint') : t('app.coloring.startPaint') }}
           button(type="button" class="bk-nav" :disabled="index >= pages.length - 1" :aria-label="t('app.coloring.nextPage')" @click="go(index + 1)") ›
+
+        //- read the book: the pages as they are painted, big, turned like a real book (Anton 22.11.2026)
+        button(type="button" class="bk-read" data-test="read-book" :disabled="readBusy" @click="openReader")
+          ZIconography(name="series" :size="24")
+          span {{ readBusy ? t('app.coloring.loading') : t('app.coloring.read') }}
 
         nav(ref="strip" class="bk-strip" :aria-label="t('app.coloring.books')")
           button(
@@ -387,6 +455,9 @@ watch(bookId, () => {
         div(class="bk-dialog-actions")
           button(type="button" class="bk-secondary" @click="confirming = false") {{ t('app.coloring.deleteNo') }}
           button(type="button" class="bk-danger" @click="resetPage") {{ t('app.coloring.resetYes') }}
+
+    //- the whole screen: the book to read
+    BookFlip(v-if="reading" :pages="readPages" :ratio="readRatio" @close="closeReader")
 </template>
 
 <style scoped lang="sass">
@@ -762,4 +833,27 @@ $accent: var(--lk-accent)
   justify-content: flex-end
   flex-wrap: wrap
 
+// the button to read the book: quiet, under the buttons for painting
+.bk-read
+  display: flex
+  align-items: center
+  justify-content: center
+  gap: 10px
+  min-height: 48px
+  padding: 0 22px
+  border: 2px solid var(--lk-accent)
+  border-radius: 999px
+  background: transparent
+  color: var(--lk-accent)
+  font: inherit
+  font-weight: 800
+  font-size: 1rem
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+
+  :deep(.z-icon-outline)
+    color: currentColor
+
+  &:disabled
+    opacity: 0.6
 </style>

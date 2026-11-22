@@ -162,9 +162,9 @@ describe('the adventure page: adventures first, one slim line for the rewards', 
     expect(text(line)).toContain('Deine Belohnungen')
     expect(text(line)).toMatch(/\d+ Karten? · \d+ Pokale?/)
     expect(text(line)).toContain('Noch 25 Sterne bis zum nächsten Spiel')
-    // it leads to "Me"
+    // it leads straight to "My rewards" (Anton 22.11.2026)
     const to = w.findAllComponents('.rl').find((c) => c.classes().includes('rewards-line'))?.props('to') as { name: string }
-    expect(to).toEqual({ name: 'app-profile' })
+    expect(to).toEqual({ name: 'app-collection' })
     // the adventures stand before the line is needed: the list of epochs is on the page, and only one star counter
     expect(w.findAll('.epoch').length).toBeGreaterThan(3)
     expect(w.text()).not.toMatch(/Minispiel|Spielzimmer|Bonusspiel/)

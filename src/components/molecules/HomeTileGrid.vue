@@ -181,6 +181,15 @@ function open(card: HomeCard) {
   if (editing.value || swallowClick) return
   card.go()
 }
+/** The place beside a lone small tile is empty: a hint tile stands there (it says that a long press arranges the tiles and lets more be added). A tap on it does that too. */
+const emptyPlace = computed(() => shown.value.reduce((n, t) => n + (t.size === 'wide' ? 2 : 1), 0) % 2 === 1)
+const showHint = computed(() => !editing.value && emptyPlace.value)
+function startAdding() {
+  if (swallowClick) return
+  editing.value = true
+  adding.value = true
+}
+
 function finish() {
   editing.value = false
   adding.value = false
@@ -253,6 +262,11 @@ function resetAll() {
               path(d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round")
             svg(v-else viewBox="0 0 24 24" width="18" height="18" aria-hidden="true")
               path(d="M20 10h-6V4M14 10l7-7M4 14h6v6M10 14l-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round")
+      //- beside the lone tile: a place that shows how more tiles come onto the page (press and hold, or tap here)
+      button(v-if="showHint" key="hint" type="button" class="hg-hint-tile" data-test="tile-hint" :aria-label="t('app.bigGames.home.holdHint')" @click="startAdding")
+        span(class="hg-hint-ring" aria-hidden="true")
+          ZIconography(name="plus" :size="26")
+        span(class="hg-hint-text") {{ t('app.bigGames.home.holdHint') }}
       button(v-if="editing" key="add" type="button" class="hg-add" data-test="tile-add" @click="adding = true")
         span(class="hg-add-plus" aria-hidden="true") +
         span {{ t('app.bigGames.home.addTile') }}
@@ -527,6 +541,66 @@ function resetAll() {
   right: -8px
   background: var(--lk-surface)
   color: var(--lk-text)
+
+// the hint tile: a dashed place with a plus that breathes like a finger that rests on the screen (it stands still for people who do not want movement)
+.hg-hint-tile
+  display: flex
+  flex-direction: column
+  align-items: center
+  justify-content: center
+  gap: 10px
+  min-height: 120px
+  padding: 12px
+  border: 2px dashed var(--lk-line)
+  border-radius: var(--lk-r-card)
+  background: transparent
+  color: var(--lk-muted)
+  font: inherit
+  cursor: pointer
+  -webkit-tap-highlight-color: transparent
+
+.hg-hint-ring
+  position: relative
+  display: flex
+  align-items: center
+  justify-content: center
+  width: 52px
+  height: 52px
+  border-radius: 50%
+  background: var(--lk-accent-soft)
+  color: var(--lk-accent)
+
+  &::after
+    content: ''
+    position: absolute
+    inset: -6px
+    border: 2px solid var(--lk-accent)
+    border-radius: 50%
+    opacity: 0
+    animation: hg-hold 2.4s ease-out infinite
+
+  :deep(.z-icon-outline)
+    color: currentColor
+
+.hg-hint-text
+  font-size: 0.85rem
+  font-weight: 800
+  line-height: 1.25
+  text-align: center
+
+@keyframes hg-hold
+  0%
+    transform: scale(0.8)
+    opacity: 0.7
+  70%, 100%
+    transform: scale(1.25)
+    opacity: 0
+
+@media (prefers-reduced-motion: reduce)
+  .hg-hint-ring::after
+    animation: none
+    opacity: 0.45
+    transform: none
 
 .hg-add
   display: flex

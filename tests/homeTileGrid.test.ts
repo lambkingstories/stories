@@ -37,10 +37,10 @@ afterEach(() => {
 })
 
 describe('the tiles of the start page', () => {
-  it('show the five main tiles, the family games wide, and a tap opens a tile', async () => {
+  it('show the five main tiles, all small (the family games too), and a tap opens a tile', async () => {
     const w = mountGrid()
     expect(tileIds(w)).toEqual(['adventure', 'book', 'picture', 'games', 'family'])
-    expect(w.get('[data-tile-id="family"]').classes()).toContain('hg-tile--wide')
+    expect(w.get('[data-tile-id="family"]').classes()).toContain('hg-tile--small')
     expect(w.get('[data-tile-id="book"]').classes()).toContain('hg-tile--small')
     expect(w.find('.hg-remove').exists()).toBe(false)
     await w.get('[data-tile-id="book"] .resume-card').trigger('click')
@@ -90,7 +90,9 @@ describe('the tiles of the start page', () => {
     vi.advanceTimersByTime(500)
     release()
     await flushPromises()
-    // the family games: wide -> small (what Anton asked for)
+    // the family games: small -> wide and back
+    await w.get('[data-tile-id="family"] [data-test="tile-size"]').trigger('click')
+    expect(w.get('[data-tile-id="family"]').classes()).toContain('hg-tile--wide')
     await w.get('[data-tile-id="family"] [data-test="tile-size"]').trigger('click')
     expect(w.get('[data-tile-id="family"]').classes()).toContain('hg-tile--small')
     await w.get('[data-tile-id="book"] [data-test="tile-size"]').trigger('click')
@@ -154,6 +156,30 @@ describe('the tiles of the start page', () => {
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
     await flushPromises()
     expect(w.classes()).not.toContain('is-editing')
+    w.unmount()
+  })
+})
+
+describe('the hint beside the lone tile (Anton 22.11.2026)', () => {
+  it('stands in the empty place beside the small family tile and shows that a long press adds tiles', async () => {
+    const w = mountGrid()
+    expect(w.find('[data-test="tile-hint"]').exists()).toBe(true)
+    expect(w.get('[data-test="tile-hint"]').text()).toContain('Lange drücken')
+    w.unmount()
+  })
+  it('is not there when the tiles fill the rows (an even number of small places, or a wide tile)', async () => {
+    useHomeLayout().remove('family')
+    const w = mountGrid()
+    expect(w.find('[data-test="tile-hint"]').exists()).toBe(false)
+    w.unmount()
+  })
+  it('a tap on it starts arranging and opens the list of tiles to add; while arranging it is gone', async () => {
+    const w = mountGrid()
+    await w.get('[data-test="tile-hint"]').trigger('click')
+    await flushPromises()
+    expect(w.classes()).toContain('is-editing')
+    expect(w.find('[data-test="tile-sheet"]').exists()).toBe(true)
+    expect(w.find('[data-test="tile-hint"]').exists()).toBe(false)
     w.unmount()
   })
 })

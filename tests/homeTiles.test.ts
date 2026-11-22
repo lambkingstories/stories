@@ -10,10 +10,9 @@ import { ALL_TILES, CORE_TILES, DEFAULT_LAYOUT, EXTRA_TILES, GAME_TILES, addTile
 const ids = (l: readonly { id: string }[]) => l.map((t) => t.id)
 
 describe('the tiles that exist', () => {
-  it('begin with the five main tiles as before (the family games wide), and every extra tile has a shortcut with a painted symbol', () => {
+  it('begin with the five main tiles, all small (Anton 22.11.2026), and every extra tile has a shortcut with a painted symbol', () => {
     expect(ids(DEFAULT_LAYOUT)).toEqual([...CORE_TILES])
-    expect(DEFAULT_LAYOUT.find((t) => t.id === 'family')?.size).toBe('wide')
-    expect(DEFAULT_LAYOUT.filter((t) => t.id !== 'family').every((t) => t.size === 'small')).toBe(true)
+    expect(DEFAULT_LAYOUT.every((t) => t.size === 'small')).toBe(true)
     expect(new Set(ALL_TILES).size).toBe(ALL_TILES.length)
     for (const id of EXTRA_TILES) {
       const sc = HOME_SHORTCUTS[id]!
@@ -40,7 +39,7 @@ describe('changing a layout', () => {
     expect(ids(moveTile(l, 'adventure', 'family'))).toEqual(['book', 'picture', 'games', 'family', 'adventure'])
     expect(ids(moveTile(l, 'book', 'picture'))).toEqual(['adventure', 'picture', 'book', 'games', 'family'])
     // the sizes go with the tiles; unknown tiles and the same tile change nothing; the old layout is not touched
-    expect(moveTile(l, 'family', 'adventure')[0]).toEqual({ id: 'family', size: 'wide' })
+    expect(moveTile(l, 'family', 'adventure')[0]).toEqual({ id: 'family', size: 'small' })
     expect(ids(moveTile(l, 'book', 'book'))).toEqual(ids(l))
     expect(ids(moveTile(l, 'book', 'quiz'))).toEqual(ids(l))
     expect(ids(l)).toEqual([...CORE_TILES])
@@ -48,8 +47,8 @@ describe('changing a layout', () => {
 
   it('makes a tile small or wide, and back', () => {
     const l = defaultLayout()
-    expect(setSize(l, 'family', 'small').find((t) => t.id === 'family')?.size).toBe('small')
-    expect(toggleSize(l, 'family').find((t) => t.id === 'family')?.size).toBe('small')
+    expect(setSize(l, 'family', 'wide').find((t) => t.id === 'family')?.size).toBe('wide')
+    expect(toggleSize(l, 'family').find((t) => t.id === 'family')?.size).toBe('wide')
     expect(toggleSize(toggleSize(l, 'book'), 'book').find((t) => t.id === 'book')?.size).toBe('small')
     expect(toggleSize(l, 'book').find((t) => t.id === 'book')?.size).toBe('wide')
     // the others stay as they were
@@ -93,6 +92,7 @@ describe('the memory on the device', () => {
     const h = useHomeLayout()
     expect(ids(h.layout.value)).toEqual([...CORE_TILES])
     h.move('family', 'adventure')
+    h.resize('family')
     h.resize('family')
     h.remove('picture')
     h.add('quiz')

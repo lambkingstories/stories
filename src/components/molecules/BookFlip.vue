@@ -5,13 +5,14 @@
  *
  * Lying on its side the phone shows two pages at a time (a spread: the cover alone on the right, then 2/3, 4/5 …); standing upright it shows
  * one page as large as the screen allows. A tap on the left or right edge, a swipe or the arrow keys turn the page. Turning the phone keeps
- * the page. Where the person wants less movement the page changes at once. The pages are square pictures (`pages`, in reading order).
+ * the page. Where the person wants less movement the page changes at once. The pages are pictures of one shape (`pages`, in reading order): square as
+ * default, or the shape given with `ratio` (width divided by height; a coloring book has upright pages, for example 0.75).
  */
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 
-const props = defineProps<{ pages: string[] }>()
+const props = withDefaults(defineProps<{ pages: string[]; ratio?: number }>(), { ratio: 1 })
 const emit = defineEmits<{ close: [] }>()
 const { t } = useI18n({ useScope: 'global' })
 
@@ -22,8 +23,12 @@ const w = ref(typeof window === 'undefined' ? 800 : window.innerWidth)
 const h = ref(typeof window === 'undefined' ? 600 : window.innerHeight)
 /** Lying on its side: two pages at a time. */
 const double = computed(() => w.value > h.value * 1.15)
-/** The side of one (square) page in pixels: as large as the screen allows. */
-const ph = computed(() => Math.max(1, Math.floor(double.value ? Math.min(h.value, w.value / 2) : Math.min(w.value, h.value))))
+/** The shape of a page: width divided by height. */
+const shape = computed(() => (props.ratio > 0.2 && props.ratio < 5 ? props.ratio : 1))
+/** The height of one page in pixels: as large as the screen allows (two pages side by side lying on the side, else one page). */
+const ph = computed(() => Math.max(1, Math.floor(double.value ? Math.min(h.value, w.value / (2 * shape.value)) : Math.min(h.value, w.value / shape.value))))
+/** The width of one page. */
+const pw = computed(() => Math.max(1, Math.floor(ph.value * shape.value)))
 
 const count = computed(() => props.pages.length)
 /** The page (0 = the cover) that is at the left of what is shown, kept while the phone is turned. */
@@ -81,9 +86,9 @@ const backdrop = computed(() => {
 /** The cover stands alone on the right: the book moves to the left so that it is in the middle. */
 const shifted = computed(() => double.value && (flip.value ? flip.value.to : view.value) === 0)
 const bookStyle = computed(() => ({
-  width: `${double.value ? ph.value * 2 : ph.value}px`,
+  width: `${double.value ? pw.value * 2 : pw.value}px`,
   height: `${ph.value}px`,
-  transform: `translateX(${shifted.value ? -ph.value / 2 : 0}px)`
+  transform: `translateX(${shifted.value ? -pw.value / 2 : 0}px)`
 }))
 
 const reducedMotion = () => typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches

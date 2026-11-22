@@ -124,21 +124,17 @@ describe('Books: the preview of "Zachäus begegnet Jesus"', () => {
   })
 })
 
-describe('Books: coming soon', () => {
-  it('shows "Völker der Bibel – Band 1" as coming soon with a preview and without a store button', async () => {
+describe('Books: the preview of the history book is gone (Anton 22.11.2026)', () => {
+  it('shows only the picture book "Zachäus begegnet Jesus", with its store button and no "coming soon" book', async () => {
     vi.doMock('@/use/useApiBooks', () => ({ default: () => ({ state: { all: [] }, loadAllBooks: vi.fn() }) }))
     vi.resetModules()
     const { default: View } = await import('@/views/app/AppBooksView.vue')
     const wrapper = mount(View, { global: { plugins: [i18n] }, attachTo: document.body })
     await flushPromises()
     const cards = wrapper.findAll('.book-card')
-    expect(cards).toHaveLength(2)
-    expect(cards[1]!.text()).toContain('Völker der Bibel – Band 1')
-    expect(cards[1]!.find('.book-soon').text()).toBe('Bald erhältlich')
-    expect(cards[1]!.find('.book-preview').exists()).toBe(true)
-    expect(cards[1]!.find('.book-store').exists()).toBe(false)
-    // the book that is for sale keeps its store button
+    expect(cards).toHaveLength(1)
+    expect(wrapper.text()).not.toContain('Völker der Bibel')
+    expect(wrapper.find('.book-soon').exists()).toBe(false)
     expect(cards[0]!.find('.book-store').exists()).toBe(true)
-    expect(cards[0]!.find('.book-soon').exists()).toBe(false)
   })
 })

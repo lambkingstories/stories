@@ -28,8 +28,7 @@ export const BOOK_PAGES: Record<string, string> = {
   'lokal-912-weihnachten': 'die-weihnachtsgeschichte-jesus-ist-geboren',
   'lokal-912-ostern': 'ostern-jesus-lebt',
   // the printed books of the store shown under "Lesen → Bücher"
-  'der-mann-im-baum-zachaeus': 'der-mann-im-baum-zachaeus-begegnet-jesus',
-  'voelker-der-bibel-band-1': 'voelker-der-bibel-eine-zeitreise-zu-den-ersten-zivilisationen'
+  'der-mann-im-baum-zachaeus': 'der-mann-im-baum-zachaeus-begegnet-jesus'
 }
 
 /**

@@ -110,29 +110,3 @@ describe('the preview of "Zachäus begegnet Jesus"', () => {
     expect(warnings.filter((w) => /not defined on instance|is not a function|ERROR/.test(w))).toEqual([])
   })
 })
-
-describe('the preview of "Völker der Bibel – Band 1" (coming soon)', () => {
-  it('is marked coming soon, has six pages with their own shapes and a last page without a store button', async () => {
-    const b = storeBooks.find((x) => x.id === 'voelker-der-bibel-band-1')!
-    expect(b.comingSoon).toBe(true)
-    expect(b.preview?.pages).toHaveLength(6)
-    expect(b.preview!.pages.every((p) => p.ratio > 0.7 && p.ratio < 1.6)).toBe(true)
-    current.bookId = 'voelker-der-bibel-band-1'
-    const { default: View } = await import('@/views/app/AppBookPreviewView.vue')
-    const wrapper = mount(View, { global: { plugins: [i18n] }, attachTo: document.body })
-    await flushPromises()
-    expect(wrapper.find('.bp-count').text()).toBe('1 / 8')
-    // a single page: its own shape; a double page is as high as a single page (it is measured with the ratio 0.75), so it is twice as wide
-    expect(wrapper.find('.bp-sheet').attributes('style')).toContain('--r: 0.75')
-    expect(wrapper.find('.bp-sheet').attributes('style')).toContain('--wr: 0.75')
-    await wrapper.findAll('.bp-arrow')[1]!.trigger('click')
-    expect(wrapper.find('.bp-sheet').attributes('style')).toContain('--r: 1.5009')
-    expect(wrapper.find('.bp-sheet').attributes('style')).toContain('--wr: 0.75')
-    for (let i = 0; i < 6; i++) await wrapper.findAll('.bp-arrow')[1]!.trigger('click')
-    expect(wrapper.find('.bp-count').text()).toBe('8 / 8')
-    expect(wrapper.find('.bp-buy').text()).toContain('Bald erhältlich')
-    expect(wrapper.find('.bp-buy-btn').exists()).toBe(false)
-    current.bookId = 'der-mann-im-baum-zachaeus'
-    expect(warnings.filter((w) => /not defined on instance|is not a function|ERROR/.test(w))).toEqual([])
-  })
-})
