@@ -6,7 +6,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { storeBookIn, storeBooks, type StoreBook } from '@/data/storeBooks'
-import { bookDestination } from '@/utils/readingAreas'
+import { bookListDestination } from '@/utils/readingAreas'
 
 const read = (p: string) => readFileSync(resolve(process.cwd(), 'src', p), 'utf8')
 
@@ -98,31 +98,35 @@ describe('"The Man in the Tree – Zacchaeus meets Jesus!" in English (Anton 22.
 describe('the page of a coloring book that is new (Anton 22.11.2026)', () => {
   const s = read('views/app/AppBookDetailView.vue')
   it('has the cover in the middle, the title under it, and one button "to the book"', () => {
-    expect(s).toContain("['hero-row', { 'is-coloring': isColoring }]")
+    expect(s).toContain("['hero-row', { 'is-coloring': toList }]")
     expect(s).toContain('.hero-row.is-coloring')
     expect(s).toContain('data-test="to-book"')
     expect(s).not.toContain('onPaintBook')
     expect(s).not.toContain("t('app.bookDetail.paint')")
   })
-  it('the button opens the book in the reading mode, and the book page does so at once and clears the sign', () => {
-    expect(s).toContain("router.push({ name: 'app-coloring-book', params: { bookId: book.value.bookId }, query: { read: '1' } })")
-    const v = read('views/app/AppColoringBookView.vue')
-    expect(v).toContain("route.query.read === '1'")
-    expect(v).toContain('void openReader()')
-  })
 })
 
-describe('a book of "New for you" opens the whole list of its area (Anton 22.11.2026)', () => {
+describe('"To the book" on the page of a new book leads into its area (Anton 22.11.2026)', () => {
   it('a coloring book leads to the coloring books, a printed book to the books, a story to the stories, each with the book that is asked for', () => {
-    expect(bookDestination({ bookId: 'ba-02', kind: 'coloring' })).toEqual({ name: 'app-coloring-books', query: { book: 'ba-02' } })
-    expect(bookDestination({ bookId: 'x', bookSeriesId: 'einzelne-bucher' })).toEqual({ name: 'app-books', query: { book: 'x' } })
-    expect(bookDestination({ bookId: 'story-1', bookSeriesId: 'talheim' })).toEqual({ name: 'app-all-books', query: { book: 'story-1' } })
+    expect(bookListDestination({ bookId: 'ba-02', kind: 'coloring' })).toEqual({ name: 'app-coloring-books', query: { book: 'ba-02' } })
+    expect(bookListDestination({ bookId: 'x', bookSeriesId: 'einzelne-bucher' })).toEqual({ name: 'app-books', query: { book: 'x' } })
+    expect(bookListDestination({ bookId: 'story-1', bookSeriesId: 'talheim' })).toEqual({ name: 'app-all-books', query: { book: 'story-1' } })
     // an old coloring book without a kind is known by its category
-    expect(bookDestination({ bookId: 'old', category: 'Ausmalbücher' })).toEqual({ name: 'app-coloring-books', query: { book: 'old' } })
+    expect(bookListDestination({ bookId: 'old', category: 'Ausmalbücher' })).toEqual({ name: 'app-coloring-books', query: { book: 'old' } })
   })
-  it('the start page and the list of new books use it', () => {
-    expect(read('views/app/AppHomeView.vue')).toContain('bookDestination(allBooks.value.find')
-    expect(read('views/app/AppAllNewBooksView.vue')).toContain('bookDestination(allBooks.value.find')
+  it('a tap on a book in "New for you" opens its page first (the start page and the list of new books)', () => {
+    for (const f of ['views/app/AppHomeView.vue', 'views/app/AppAllNewBooksView.vue']) {
+      const s = read(f)
+      expect(s, f).toContain("router.push({ name: 'app-book', params: { bookId } })")
+      expect(s, f).not.toContain('bookDestination')
+    }
+  })
+  it('the page of a coloring book or a printed book has one button, "To the book", that goes into the area', () => {
+    const s = read('views/app/AppBookDetailView.vue')
+    expect(s).toContain("const toList = computed(() => isColoring.value || readingAreaOf(book.value) === 'books')")
+    expect(s).toContain('data-test="to-book" @click="onToBook"')
+    expect(s).toContain('router.push(bookListDestination(book.value))')
+    expect(s).not.toContain("query: { read: '1' }")
   })
   it('the three lists mark their cards and bring the asked one into view', () => {
     for (const f of ['views/app/AppBooksView.vue', 'views/app/AppColoringBooksView.vue', 'views/app/AppAllBooksView.vue']) {
@@ -131,5 +135,10 @@ describe('a book of "New for you" opens the whole list of its area (Anton 22.11.
       expect(s, f).toContain('data-book-id')
       expect(s, f).toContain('is-asked')
     }
+  })
+  it('the ring comes once: the sign is taken from the address, and for these lists it is no part of the key of the screen', () => {
+    expect(read('use/useAskedBook.ts')).toContain('void router.replace({ query: rest })')
+    const app = read('App.vue')
+    expect(app).toContain("k === 'book' && ASKED_LISTS.includes(String(name))")
   })
 })

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { bookListDestination, readingAreaOf } from '@/utils/readingAreas'
 import useContentLanguage from '@/use/useContentLanguage'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { sizedImage } from '@/utils/sizedImage'
@@ -56,6 +57,8 @@ const localizedDescription = computed(() => localization.value?.description || '
 // Coloring books have no audio — the "Anhören" CTA is hidden and listen mode
 // is never entered for them.
 const isColoring = computed(() => isColoringBook(book.value))
+// a coloring book and a printed book have one button on their page: "To the book" (it leads into their area, to the book); a story has its reading and listening
+const toList = computed(() => isColoring.value || readingAreaOf(book.value) === 'books')
 // a coloring book is not "saved" but put into the paint shelf of the painting program
 const paintShelf = useColoringShelf()
 const inPaintShelf = computed(() => (book.value ? paintShelf.ids.value.includes(book.value.bookId) : false))
@@ -474,10 +477,10 @@ function saveAttachmentToPhone() {
 }
 
 /** A coloring book opens its own overview: the pages as painted so far, to go on painting from. */
-/** A coloring book is opened in its reading mode (`read=1`): big, turned like a real book; from there the book page with "Paint" is one step back. */
-function onOpenColoringBook() {
+/** "To the book": the whole list of the area where the book was put, scrolled to the book, which shows a ring for a moment (see `useAskedBook`). The tab bar goes over to "Lesen" there. */
+function onToBook() {
   if (!book.value) return
-  router.push({ name: 'app-coloring-book', params: { bookId: book.value.bookId }, query: { read: '1' } })
+  void router.push(bookListDestination(book.value))
 }
 
 function useInColoringApp() {
@@ -515,7 +518,7 @@ const seriesName = computed(() => seriesNameOfBook(book.value))
           ZIconography(name="chevron-left" :size="20")
           span {{ t('app.read.back') }}
 
-        div(:class="['hero-row', { 'is-coloring': isColoring }]")
+        div(:class="['hero-row', { 'is-coloring': toList }]")
           div(class="hero-cover")
             img(
               :src="coverBlob || withPlaceholder(sizedImage(pickLocalizedImage(book.previewImage, lang), 240))"
@@ -527,7 +530,7 @@ const seriesName = computed(() => seriesNameOfBook(book.value))
           div(class="hero-info")
             span(class="series-eyebrow") {{ seriesName }}
             h1(class="book-band-title") {{ localizedTitle }}
-            LkCompanion(v-if="!isColoring" class="hero-lamb" pose="buch" :size="96")
+            LkCompanion(v-if="!toList" class="hero-lamb" pose="buch" :size="96")
 
       template(v-if="mode === 'detail'")
         //- ===== Detail section =====
@@ -541,13 +544,13 @@ const seriesName = computed(() => seriesNameOfBook(book.value))
           //- AdminUI whether the upload is missing.
           div(class="cta-row")
             //- Coloring book (Anton 22.11.2026): one button, "to the book", and it opens the book in the reading mode (painting is in "Malen")
-            button(v-if="isColoring" type="button" class="lk-btn lk-btn--full" data-test="to-book" @click="onOpenColoringBook")
+            button(v-if="toList" type="button" class="lk-btn lk-btn--full" data-test="to-book" @click="onToBook")
               ZIconography(name="series" :size="22")
               span {{ t('app.bookDetail.toBook') }}
             button(v-else type="button" class="lk-btn lk-btn--full" @click="onRead")
               ZIconography(name="series" :size="22")
               span {{ t('app.bookDetail.readMyself') }}
-            div(v-if="!isColoring" class="cta-second")
+            div(v-if="!toList" class="cta-second")
               button(
                 v-if="!isColoring"
                 type="button"

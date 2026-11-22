@@ -19,7 +19,7 @@ import PremiumSheet from '@/components/molecules/PremiumSheet.vue'
 import { GAME_USER_LANGUAGE } from '@/utils/constants.ts'
 import { setAdventureLanguage } from '@/use/adventureLanguage'
 import { startActivityTracking, type Section } from '@/use/useActivity'
-import { contextNav, routeToNav, trackNav } from '@/use/useAppNav'
+import { ASKED_LISTS, contextNav, routeToNav, trackNav } from '@/use/useAppNav'
 
 const { initMusic, pauseMusic, continueMusic } = useMusic()
 const { userLanguage } = useUser()
@@ -74,10 +74,12 @@ try {
  */
 // (`read=1` is such a sign too: a coloring book opened in its reading mode takes it from the address again without the screen being made new)
 const SIGNS = ['arrange', 'read']
-const withoutArrange = (query: Record<string, unknown>) => Object.fromEntries(Object.entries(query).filter(([k]) => !SIGNS.includes(k)))
-/** The key of a screen: its address without the arranging sign. */
-function pageKey(r: { path: string; query: Record<string, unknown> }): string {
-  const rest = Object.entries(withoutArrange(r.query)).map(([k, v]) => `${k}=${String(v)}`).join('&')
+// (`book=<id>` on the lists of the area "Lesen" is one as well: the list shows the book once and takes the sign from the address; on the painting screen `book` is a real part of the address)
+const withoutArrange = (query: Record<string, unknown>, name: unknown) =>
+  Object.fromEntries(Object.entries(query).filter(([k]) => !SIGNS.includes(k) && !(k === 'book' && ASKED_LISTS.includes(String(name)))))
+/** The key of a screen: its address without the signs. */
+function pageKey(r: { path: string; name?: unknown; query: Record<string, unknown> }): string {
+  const rest = Object.entries(withoutArrange(r.query, r.name)).map(([k, v]) => `${k}=${String(v)}`).join('&')
   return rest ? `${r.path}?${rest}` : r.path
 }
 

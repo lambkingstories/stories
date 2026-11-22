@@ -16,7 +16,6 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import AppHeader from '@/components/molecules/AppHeader.vue'
-import { bookDestination } from '@/utils/readingAreas'
 import useContentLanguage, { bookIn } from '@/use/useContentLanguage'
 import HomeHero, { type HeroSlide } from '@/components/molecules/HomeHero.vue'
 import HomeTileGrid from '@/components/molecules/HomeTileGrid.vue'
@@ -315,9 +314,9 @@ const newBooks = computed<ApiBook[]>(() => {
     .slice(0, 10)
 })
 
-// a new book opens in the area where it was put (see `bookDestination`)
+// a new book opens its page first (the picture, the five points, the short text); "To the book" there leads on into its area
 function openBook(bookId: string) {
-  void router.push(bookDestination(allBooks.value.find((b) => b.bookId === bookId), bookId))
+  void router.push({ name: 'app-book', params: { bookId } })
 }
 </script>
 

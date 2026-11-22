@@ -5,7 +5,6 @@ import BookListSkeleton from '@/components/molecules/BookListSkeleton.vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ContentLanguageSwitch from '@/components/molecules/ContentLanguageSwitch.vue'
-import { bookDestination } from '@/utils/readingAreas'
 import useContentLanguage, { bookIn } from '@/use/useContentLanguage'
 import LkPageHead from '@/components/molecules/LkPageHead.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
@@ -53,9 +52,9 @@ const newBooks = computed<ApiBook[]>(() => {
     .sort((a, b) => new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime())
 })
 
-// a new book opens in the area where it was put (see `bookDestination`)
+// a new book opens its page first (see the start page)
 function openBook(bookId: string) {
-  void router.push(bookDestination(allBooks.value.find((b) => b.bookId === bookId), bookId))
+  void router.push({ name: 'app-book', params: { bookId } })
 }
 
 function goBack() {

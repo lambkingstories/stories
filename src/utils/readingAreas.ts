@@ -21,10 +21,10 @@ export function booksOfArea<T extends AreaBook>(list: readonly T[], area: Readin
 }
 
 /**
- * Where a book of the list "New for you" leads (Anton 22.11.2026): the whole list of the area where the book was put, and the list scrolls to the book (`?book=<id>`, see
- * `useAskedBook`). A coloring book leads to the coloring books, a printed book to the books, a story to the stories.
+ * "To the book" on the page of a new book (Anton 22.11.2026): the whole list of the area where the book was put, scrolled to the book (`?book=<id>`, see `useAskedBook`). A coloring
+ * book leads to the coloring books, a printed book to the books, a story to the stories. (A tap on the book in "New for you" itself opens its page first.)
  */
-export function bookDestination(book: (AreaBook & { bookId: string }) | null | undefined, bookId?: string) {
+export function bookListDestination(book: (AreaBook & { bookId: string }) | null | undefined, bookId?: string) {
   const id = book?.bookId ?? bookId ?? ''
   switch (readingAreaOf(book)) {
     case 'coloring':

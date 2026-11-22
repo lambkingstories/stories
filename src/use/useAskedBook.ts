@@ -4,7 +4,7 @@
  * The list may still be on its way (the books of the server): it looks again for a few seconds.
  */
 import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 /** A value for an attribute selector (old browsers have no `CSS.escape`). */
 const esc = (v: string) => (typeof CSS !== 'undefined' && typeof CSS.escape === 'function' ? CSS.escape(v) : v.replace(/["\\]/g, '\\$&'))
@@ -19,6 +19,7 @@ export const RING_MS = 3000
 
 export default function useAskedBook() {
   const route = useRoute() as ReturnType<typeof useRoute> | undefined
+  const router = useRouter() as ReturnType<typeof useRouter> | undefined
   const asked = ref('')
   const timers: number[] = []
 
@@ -26,6 +27,12 @@ export default function useAskedBook() {
     const id = String(route?.query?.book ?? '')
     if (!id) return
     asked.value = id
+    // the ring and the scroll are for this one time: the sign is taken from the address (the screen is not made new, see App.vue), so that coming back to the list later
+    // (after another book was opened) does not show the ring again
+    if (router && route) {
+      const { book: _once, ...rest } = route.query
+      void router.replace({ query: rest })
+    }
     let tries = 0
     let settled = false
     const look = () => {

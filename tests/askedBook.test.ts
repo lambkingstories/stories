@@ -6,13 +6,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick } from 'vue'
 import useAskedBook, { LOOK_EVERY_MS, LOOK_FIRST_MS, LOOK_TRIES, RING_MS } from '@/use/useAskedBook'
 
-const q = vi.hoisted(() => ({ query: {} as Record<string, string> }))
-vi.mock('vue-router', () => ({ useRoute: () => q }))
+const q = vi.hoisted(() => ({ query: {} as Record<string, string>, replace: vi.fn() }))
+vi.mock('vue-router', () => ({ useRoute: () => q, useRouter: () => ({ replace: q.replace }) }))
 
 const scroll = vi.fn()
 beforeEach(() => {
   vi.useFakeTimers()
   q.query = {}
+  q.replace.mockClear()
   scroll.mockClear()
   Element.prototype.scrollIntoView = scroll as never
 })
@@ -65,6 +66,15 @@ describe('useAskedBook', () => {
     await vi.advanceTimersByTimeAsync(3000)
     expect(asked()).toBe('')
     expect(scroll).not.toHaveBeenCalled()
+    w.unmount()
+  })
+
+  it('takes the sign from the address at once, so that coming back to the list later shows no ring again', async () => {
+    q.query = { book: 'ba-05', other: '1' }
+    const { w } = open(0)
+    await vi.advanceTimersByTimeAsync(LOOK_FIRST_MS + 50)
+    expect(q.replace).toHaveBeenCalledTimes(1)
+    expect(q.replace).toHaveBeenCalledWith({ query: { other: '1' } })
     w.unmount()
   })
 
