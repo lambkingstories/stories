@@ -40,4 +40,23 @@ describe('the Plus sign', () => {
     expect(w.find('.plus-badge').exists()).toBe(false)
     w.unmount()
   })
+
+  it('a book that is still to get wears the Plus sign (Plus off), and the bought and free ones their own sign', async () => {
+    const locked = mountIt(OwnBadge, { state: 'locked' })
+    expect(locked.find('.plus-badge').exists()).toBe(true)
+    expect(locked.find('.own-badge').exists()).toBe(false)
+    locked.unmount()
+    for (const state of ['free', 'owned']) {
+      const w = mountIt(OwnBadge, { state })
+      expect(w.find('.plus-badge').exists()).toBe(false)
+      expect(w.find('.own-badge').exists()).toBe(true)
+      w.unmount()
+    }
+  })
+
+  it('has one look: no small plates', async () => {
+    const w = mountIt(PlusBadge)
+    expect(w.find('.plus-badge').classes()).toEqual(['plus-badge'])
+    w.unmount()
+  })
 })

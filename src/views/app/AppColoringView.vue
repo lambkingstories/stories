@@ -4545,6 +4545,10 @@ watch(queryBook, (id) => {
     //- The text that belongs to the picture of a coloring book; the button above shows and hides it
     transition(name="ac-text")
       div(v-if="textOpen && pageInfo && !isFullscreen" class="ac-text" role="dialog" :aria-label="t('app.coloring.pageText')")
+        //- a small cross in the corner: standing upright the card covers the button that opened it, so the text must be closable on the card itself (Anton 22.11.2026)
+        button(type="button" class="ac-text-close" data-test="text-close" :aria-label="t('app.coloring.pageTextClose')" @click="textOpen = false")
+          svg(viewBox="0 0 24 24" width="16" height="16" aria-hidden="true")
+            path(d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round")
         h3(class="ac-text-title") {{ pageInfo.title }}
         p(v-if="pageInfo.reference" class="ac-text-ref") {{ pageInfo.reference }}
         p(v-if="pageInfo.text" class="ac-text-body") {{ pageInfo.text }}
@@ -5328,6 +5332,26 @@ $accent-dark: $accent
 .ac-text-leave-to
   opacity: 0
   transform: translateY(-8px)
+
+// the small cross in the upper right corner of the text (the card sits over the button that opens it when the device stands upright)
+.ac-text-close
+  position: sticky
+  top: 0
+  float: right
+  display: grid
+  place-items: center
+  width: 30px
+  height: 30px
+  margin: -6px -8px 0 8px
+  padding: 0
+  border: 0
+  border-radius: 50%
+  background: rgba(20, 24, 32, 0.08)
+  color: $muted
+  cursor: pointer
+
+  &:active
+    background: rgba(20, 24, 32, 0.16)
 
 .ac-text-title
   margin: 0 0 4px

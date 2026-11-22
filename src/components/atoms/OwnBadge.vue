@@ -1,8 +1,8 @@
 <script setup lang="ts">
 /**
- * The sign on a book that says what the person has of it: Gratis (free), Gekauft (bought), Mit Plus (opened by the subscription),
- * or a plain "Zu kaufen" plate (still to buy). One look at a shelf shows which books are theirs.
- * "With Plus" is shown as the golden Plus sign (crown and "Plus", the same everywhere in the app; Anton, 18.11.2026).
+ * The sign on a book that says what the person has of it: Gratis (free), Gekauft (bought), or the golden Plus sign. One look at a shelf shows which books are theirs.
+ * The Plus sign (crown and "Plus", the same everywhere in the app; Anton, 18.11.2026) is on a book that comes with Plus: for a person with Plus it is hidden (they have it),
+ * and a book that is still to get carries it again when Plus is off (Anton 22.11.2026), so a locked book is never without a sign.
  */
 import { useI18n } from 'vue-i18n'
 import PlusBadge from '@/components/atoms/PlusBadge.vue'
@@ -13,9 +13,11 @@ const { t } = useI18n({ useScope: 'global' })
 </script>
 
 <template lang="pug">
-  PlusBadge(v-if="state === 'plus'" size="small" :title="t('app.read.own_plus')")
+  //- "With Plus" (the person has Plus: the sign hides itself) and a book that is still to get (Plus opens it): the golden Plus sign, the same everywhere
+  PlusBadge(v-if="state === 'plus'" :title="t('app.read.own_plus')")
+  PlusBadge(v-else-if="state === 'locked'" always :title="t('app.read.own_plus')")
   span(v-else :class="['own-badge', 'is-' + state]")
-    span(v-if="state !== 'locked'" class="own-check" aria-hidden="true") ✓
+    span(class="own-check" aria-hidden="true") ✓
     span {{ t('app.read.own_' + state) }}
 </template>
 

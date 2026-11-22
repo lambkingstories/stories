@@ -1,7 +1,8 @@
 <script setup lang="ts">
 /**
- * The sign for everything that belongs to LambKing Plus: a small golden crown and the word "Plus" on a shining golden plate.
+ * The sign for everything that belongs to LambKing Plus: a golden crown and the word "Plus" on a shining golden plate.
  * There is no lock on it: Plus is something special to look forward to, not something that is shut.
+ * It looks the same everywhere in the app, one size and one glint (Anton 22.11.2026): no small and big plates.
  * Whoever has Plus does not see it any more (Anton, 18.11.2026): the sign is only there to show what Plus would open, and it comes back when
  * Plus ends. `always` keeps it where the page is about Plus itself (the Plus page and the list of features).
  */
@@ -10,8 +11,7 @@ import { useI18n } from 'vue-i18n'
 import { isPlus } from '@/use/usePremium'
 import { prependBaseUrl } from '@/utils/function'
 
-// `shine`: the plate is a little bigger and glints, also in its small size (the adventure area, Anton 22.11.2026; the plates in the long lists of the other areas stay quiet)
-const props = withDefaults(defineProps<{ size?: 'small' | 'normal'; always?: boolean; shine?: boolean }>(), { size: 'normal', always: false, shine: false })
+const props = withDefaults(defineProps<{ always?: boolean }>(), { always: false })
 const shown = computed(() => props.always || !isPlus())
 
 const { t } = useI18n({ useScope: 'global' })
@@ -19,7 +19,7 @@ const crown = prependBaseUrl('images/icons/navi/plus.webp')
 </script>
 
 <template lang="pug">
-  span(v-if="shown" :class="['plus-badge', `is-${size}`, { 'is-shine': shine }]" role="img" :aria-label="t('app.adventure.plusBadgeLabel')")
+  span(v-if="shown" class="plus-badge" role="img" :aria-label="t('app.adventure.plusBadgeLabel')")
     img(:src="crown" alt="" draggable="false" class="plus-badge-crown")
     span(class="plus-badge-word") {{ t('app.adventure.plusBadge') }}
 </template>
@@ -55,38 +55,12 @@ const crown = prependBaseUrl('images/icons/navi/plus.webp')
     transform: skewX(-18deg)
     animation: plus-glint 3.6s ease-in-out infinite
 
-  &.is-small
-    padding: 1px 8px 1px 4px
-    font-size: 0.68rem
-
-    // the small plates stand in long lists: they do not glint (many moving layers slow a phone down)
-    &::after
-      animation: none
-      display: none
-
-// the shining small plate: bigger, and the glint runs (a few plates only, in the adventure area)
-.plus-badge.is-small.is-shine
-  padding: 2px 10px 2px 5px
-  font-size: 0.82rem
-
-  &::after
-    display: block
-    animation: plus-glint 3.2s ease-in-out infinite
-
-.is-small.is-shine .plus-badge-crown
-  width: 22px
-  height: 22px
-
 .plus-badge-crown
   display: block
   width: 20px
   height: 20px
   object-fit: contain
   filter: drop-shadow(0 1px 1px rgba(90, 58, 6, 0.4))
-
-.is-small .plus-badge-crown
-  width: 15px
-  height: 15px
 
 .plus-badge-word
   position: relative
@@ -100,8 +74,7 @@ const crown = prependBaseUrl('images/icons/navi/plus.webp')
     transform: translateX(575%) skewX(-18deg)
 
 @media (prefers-reduced-motion: reduce)
-  .plus-badge::after,
-  .plus-badge.is-small.is-shine::after
+  .plus-badge::after
     animation: none
     display: none
 </style>

@@ -1031,6 +1031,7 @@ export default {
     clearBody: 'Se quitarán todos los colores de esta hoja. El dibujo se queda.',
     clearYes: 'Borrar',
     pageText: 'Texto de este dibujo',
+    pageTextClose: 'Cerrar el texto',
     zoom: 'Zoom',
     zoomIn: 'Acercar',
     zoomOut: 'Alejar',

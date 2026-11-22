@@ -560,7 +560,7 @@ const seriesName = computed(() => seriesNameOfBook(book.value))
               )
                 ZIconography(name="headphones" :size="22")
                 span {{ t('app.bookDetail.listen') }}
-                PlusBadge(v-if="PREMIUM_TEASER && !hasFeature('readAloud')" size="small" class="listen-plus")
+                PlusBadge(v-if="PREMIUM_TEASER && !hasFeature('readAloud')" class="listen-plus")
               button(
                 type="button"
                 :class="['lk-btn', 'lk-btn--outline', 'save-btn', { 'is-saved': isColoring ? inPaintShelf : inWatchList }]"

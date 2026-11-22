@@ -264,7 +264,7 @@ async function doDelete() {
                 span(class="tile-no") {{ e.nr }}
                 span(v-if="e.item.finished" class="tile-check" aria-hidden="true") ✓
                 span(v-if="e.item.plus" class="tile-plus")
-                  PlusBadge(size="small" shine)
+                  PlusBadge
                 span(class="tile-art")
                   img(:src="prependBaseUrl(medalThumb(e.item.journey.medal))" alt="" draggable="false" @error="(ev) => onThumbError(ev, prependBaseUrl(e.item?.journey.medal ?? ''))")
                   img(v-if="e.item.medal" :src="ui(`pokal-${e.item.medal === 'silver' ? 'silber' : e.item.medal}`)" alt="" class="tile-cup" draggable="false")
@@ -291,7 +291,7 @@ async function doDelete() {
           img(:src="prependBaseUrl(detail.journey.medal)" alt="" draggable="false")
           img(v-if="detail.medal" :src="ui(`pokal-${detail.medal === 'silver' ? 'silber' : detail.medal}`)" alt="" class="medal-cup" draggable="false")
         p(v-if="detail.plus" class="journey-plus")
-          PlusBadge(shine)
+          PlusBadge
           span {{ t('app.adventure.plusBadgeLabel') }}
         p(class="journey-sub") {{ detail.journey.subtitle }}
         div(class="journey-bar" role="progressbar" :aria-valuenow="detail.doneCount" aria-valuemin="0" :aria-valuemax="detail.total")

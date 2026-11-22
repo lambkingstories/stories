@@ -368,7 +368,7 @@ function openBook(bookId: string) {
             span(class="journey-art")
               img(:src="j.image" alt="" draggable="false" loading="lazy" @error="(e) => onThumbError(e, j.full)")
               span(v-if="j.plus" class="journey-plus")
-                PlusBadge(size="small")
+                PlusBadge
             span(class="journey-name") {{ j.title }}
 
       //- 4. new

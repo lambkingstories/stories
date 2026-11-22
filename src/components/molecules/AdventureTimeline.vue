@@ -128,7 +128,7 @@ defineExpose({ scrollToEpoch, scrollToCurrent })
                   span(v-if="e.item.finished" class="tl-check" aria-hidden="true") ✓
                   span(v-if="e.id === currentId" class="tl-flag") {{ t('app.adventure.timelineHere') }}
                   span(v-if="e.item.plus" class="tl-plus")
-                    PlusBadge(size="small" shine)
+                    PlusBadge
                   span(class="tl-art")
                     img(:src="prependBaseUrl(medalThumb(e.item.journey.medal))" alt="" draggable="false" @error="(ev) => onThumbError(ev, prependBaseUrl(e.item?.journey.medal ?? ''))")
                     img(v-if="e.item.medal" :src="cupOf(e.item.medal)" alt="" class="tl-cup" draggable="false")

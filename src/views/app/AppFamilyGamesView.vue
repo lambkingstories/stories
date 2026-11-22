@@ -95,7 +95,7 @@ function open(g: Game) {
           span(class="fh-text")
             span(class="fh-title") {{ label(g, false) }}
             span(class="fh-sub") {{ label(g, true) }}
-          PlusBadge(v-if="g.plus && PREMIUM_TEASER" size="small" class="fh-badge")
+          PlusBadge(v-if="g.plus && PREMIUM_TEASER" class="fh-badge")
 </template>
 
 <style scoped lang="sass">
@@ -216,8 +216,6 @@ function open(g: Game) {
   position: absolute
   top: 8px
   right: 8px
-  transform: scale(0.85)
-  transform-origin: right top
 
 @media (orientation: landscape)
   .fh
