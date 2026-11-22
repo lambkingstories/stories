@@ -7,8 +7,9 @@
  *  - Outside of arranging a tile is a button that opens its place, and a swipe over a tile still scrolls the page.
  * The tiles themselves are made by the start page (`cards`): it knows where the child stands (adventure, book, picture) and the shortcuts.
  */
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import useHomeLayout from '@/use/useHomeLayout'
 import { missingTiles, type HomeCard, type HomeTileId } from '@/utils/homeTiles'
@@ -18,6 +19,8 @@ import { medalThumb } from '@/utils/medalThumb'
 const props = defineProps<{ cards: Partial<Record<HomeTileId, HomeCard>> }>()
 const { t } = useI18n({ useScope: 'global' })
 const { layout, move, resize, remove, add, reset } = useHomeLayout()
+const route = useRoute() as ReturnType<typeof useRoute> | undefined
+const router = useRouter() as ReturnType<typeof useRouter> | undefined
 
 /** The blurred copy behind a round medal needs no sharp picture: the small copy of the medal (every adventure medal has one) is enough. */
 function blurSource(src: string): string {
@@ -69,14 +72,10 @@ function down(e: PointerEvent, id: HomeTileId) {
   window.clearTimeout(pressTimer)
   if (!editing.value) {
     pressTimer = window.setTimeout(() => {
-      editing.value = true
+      startArranging(false)
       dragReady = true
       swallowClick = true
-      try {
-        navigator.vibrate?.(15)
-      } catch {
-        // no vibration on this device
-      }
+      buzz()
     }, LONG_PRESS_MS)
   }
 }
@@ -168,6 +167,7 @@ onMounted(() => {
 })
 onBeforeUnmount(() => {
   window.clearTimeout(pressTimer)
+  window.clearTimeout(hintTimer)
   ghost?.remove()
   document.removeEventListener('pointermove', onMove)
   document.removeEventListener('pointerup', onUp)
@@ -181,18 +181,80 @@ function open(card: HomeCard) {
   if (editing.value || swallowClick) return
   card.go()
 }
-/** The place beside a lone small tile is empty: a hint tile stands there (it says that a long press arranges the tiles and lets more be added). A tap on it does that too. */
+/** The place beside a lone small tile is empty: a hint tile stands there. It only says in words that a long press sorts the tiles and lets new ones be chosen; a tap does nothing. */
 const emptyPlace = computed(() => shown.value.reduce((n, t) => n + (t.size === 'wide' ? 2 : 1), 0) % 2 === 1)
 const showHint = computed(() => !editing.value && emptyPlace.value)
-function startAdding() {
-  if (swallowClick) return
-  editing.value = true
-  adding.value = true
+
+function buzz() {
+  try {
+    navigator.vibrate?.(15)
+  } catch {
+    // no vibration on this device
+  }
 }
 
+// ── arranging and the back button ─────────────────────────────────────────────
+// Arranging (with the list of new tiles on top) is one step of the history: `?arrange=1` stands in the address while it lasts. The back button of the phone takes
+// that step away and so ends arranging (Anton 22.11.2026: back used to leave the start page for the welcome page). "Done" does the same by hand.
+const ARRANGE = 'arrange'
+const inAddress = () => route?.query?.[ARRANGE] === '1'
+
+/** Starts arranging (and opens the list of tiles to add when `withList`). */
+function startArranging(withList: boolean) {
+  editing.value = true
+  if (withList) adding.value = true
+  if (router && route && !inAddress()) void router.push({ query: { ...route.query, [ARRANGE]: '1' } })
+}
+
+/** Ends arranging: the step in the history is taken away, so that "back" does not stay on it. */
 function finish() {
   editing.value = false
   adding.value = false
+  if (router && inAddress()) router.back()
+}
+
+// the address lost the step (the back button, or another page): arranging ends
+if (route) {
+  watch(
+    () => route.query?.[ARRANGE],
+    (now) => {
+      if (now !== '1' && (editing.value || adding.value)) {
+        editing.value = false
+        adding.value = false
+      }
+    }
+  )
+}
+
+// a page that is reloaded or opened with the sign in the address does not start in arranging
+onMounted(() => {
+  if (router && route && inAddress()) {
+    const { [ARRANGE]: _gone, ...rest } = route.query
+    void router.replace({ query: rest })
+  }
+})
+
+// ── the hint tile: only a long press (not a tap) starts arranging with the list of new tiles ──
+let hintTimer = 0
+let hintX = 0
+let hintY = 0
+function hintDown(e: PointerEvent) {
+  if (e.pointerType === 'mouse' && e.button !== 0) return
+  hintX = e.clientX
+  hintY = e.clientY
+  window.clearTimeout(hintTimer)
+  hintTimer = window.setTimeout(() => {
+    swallowClick = true
+    window.setTimeout(() => (swallowClick = false), 400)
+    buzz()
+    startArranging(true)
+  }, LONG_PRESS_MS)
+}
+function hintMove(e: PointerEvent) {
+  if (Math.hypot(e.clientX - hintX, e.clientY - hintY) > SCROLL_PX) window.clearTimeout(hintTimer)
+}
+function hintUp() {
+  window.clearTimeout(hintTimer)
 }
 function addTileAndClose(id: HomeTileId) {
   add(id)
@@ -262,10 +324,22 @@ function resetAll() {
               path(d="M14 4h6v6M20 4l-7 7M10 20H4v-6M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round")
             svg(v-else viewBox="0 0 24 24" width="18" height="18" aria-hidden="true")
               path(d="M20 10h-6V4M14 10l7-7M4 14h6v6M10 14l-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round")
-      //- beside the lone tile: a place that shows how more tiles come onto the page (press and hold, or tap here)
-      button(v-if="showHint" key="hint" type="button" class="hg-hint-tile" data-test="tile-hint" :aria-label="t('app.bigGames.home.holdHint')" @click="startAdding")
-        span(class="hg-hint-ring" aria-hidden="true")
-          ZIconography(name="plus" :size="26")
+      //- beside the lone tile: only words that say how more things come onto the page (press and hold). A tap does nothing; a long press opens the choice
+      div(
+        v-if="showHint"
+        key="hint"
+        class="hg-hint-tile"
+        role="note"
+        tabindex="0"
+        data-test="tile-hint"
+        @pointerdown="hintDown"
+        @pointermove="hintMove"
+        @pointerup="hintUp"
+        @pointercancel="hintUp"
+        @pointerleave="hintUp"
+        @contextmenu.prevent
+        @keydown.enter="startArranging(true)"
+      )
         span(class="hg-hint-text") {{ t('app.bigGames.home.holdHint') }}
       button(v-if="editing" key="add" type="button" class="hg-add" data-test="tile-add" @click="adding = true")
         span(class="hg-add-plus" aria-hidden="true") +
@@ -542,65 +616,26 @@ function resetAll() {
   background: var(--lk-surface)
   color: var(--lk-text)
 
-// the hint tile: a dashed place with a plus that breathes like a finger that rests on the screen (it stands still for people who do not want movement)
+// the hint tile: a dashed place with a few words, nothing that moves and nothing to tap
 .hg-hint-tile
   display: flex
-  flex-direction: column
   align-items: center
   justify-content: center
-  gap: 10px
   min-height: 120px
-  padding: 12px
+  padding: 14px
   border: 2px dashed var(--lk-line)
   border-radius: var(--lk-r-card)
-  background: transparent
   color: var(--lk-muted)
-  font: inherit
-  cursor: pointer
-  -webkit-tap-highlight-color: transparent
-
-.hg-hint-ring
-  position: relative
-  display: flex
-  align-items: center
-  justify-content: center
-  width: 52px
-  height: 52px
-  border-radius: 50%
-  background: var(--lk-accent-soft)
-  color: var(--lk-accent)
-
-  &::after
-    content: ''
-    position: absolute
-    inset: -6px
-    border: 2px solid var(--lk-accent)
-    border-radius: 50%
-    opacity: 0
-    animation: hg-hold 2.4s ease-out infinite
-
-  :deep(.z-icon-outline)
-    color: currentColor
+  touch-action: pan-y
+  -webkit-touch-callout: none
+  user-select: none
+  -webkit-user-select: none
 
 .hg-hint-text
-  font-size: 0.85rem
+  font-size: 0.95rem
   font-weight: 800
-  line-height: 1.25
+  line-height: 1.3
   text-align: center
-
-@keyframes hg-hold
-  0%
-    transform: scale(0.8)
-    opacity: 0.7
-  70%, 100%
-    transform: scale(1.25)
-    opacity: 0
-
-@media (prefers-reduced-motion: reduce)
-  .hg-hint-ring::after
-    animation: none
-    opacity: 0.45
-    transform: none
 
 .hg-add
   display: flex

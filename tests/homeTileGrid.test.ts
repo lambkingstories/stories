@@ -13,6 +13,23 @@ import { ALL_TILES, CORE_TILES, type HomeCard, type HomeTileId } from '@/utils/h
 
 vi.mock('@/components/atoms/ZIconography.vue', () => ({ default: { template: '<i />' } }))
 
+// a small router: the address (`query`) is reactive, `push` puts a sign into it, `back` takes it away again (like the back button of the phone)
+const nav = vi.hoisted(() => ({ route: null as unknown as { query: Record<string, string> }, push: vi.fn(), back: vi.fn(), replace: vi.fn() }))
+vi.mock('vue-router', async () => {
+  const { reactive } = await import('vue')
+  nav.route = reactive({ query: {} as Record<string, string> })
+  nav.push.mockImplementation(async (to: { query: Record<string, string> }) => {
+    nav.route.query = { ...to.query }
+  })
+  nav.back.mockImplementation(() => {
+    nav.route.query = {}
+  })
+  nav.replace.mockImplementation(async (to: { query: Record<string, string> }) => {
+    nav.route.query = { ...to.query }
+  })
+  return { useRoute: () => nav.route, useRouter: () => ({ push: nav.push, back: nav.back, replace: nav.replace }) }
+})
+
 const i18n = createI18n({ legacy: false, locale: 'de', fallbackLocale: 'de', messages: withGameTexts(messages) as never, missingWarn: false, fallbackWarn: false })
 const go = vi.fn()
 const cards = (): Partial<Record<HomeTileId, HomeCard>> =>
@@ -27,6 +44,10 @@ const release = () => document.dispatchEvent(new MouseEvent('pointerup', { bubbl
 
 beforeEach(() => {
   localStorage.clear()
+  nav.route.query = {}
+  nav.push.mockClear()
+  nav.back.mockClear()
+  nav.replace.mockClear()
   useHomeLayout().reload()
   go.mockClear()
   vi.useFakeTimers()
@@ -161,25 +182,87 @@ describe('the tiles of the start page', () => {
 })
 
 describe('the hint beside the lone tile (Anton 22.11.2026)', () => {
-  it('stands in the empty place beside the small family tile and shows that a long press adds tiles', async () => {
+  const holdHint = (w: ReturnType<typeof mountGrid>) => press(w.get('[data-test="tile-hint"]').element)
+
+  it('stands in the empty place beside the small family tile, as words only (no button, nothing that moves)', async () => {
     const w = mountGrid()
-    expect(w.find('[data-test="tile-hint"]').exists()).toBe(true)
-    expect(w.get('[data-test="tile-hint"]').text()).toContain('Lange drücken')
+    const hint = w.get('[data-test="tile-hint"]')
+    expect(hint.text()).toContain('Lange drücken')
+    expect(hint.element.tagName).toBe('DIV')
+    expect(hint.find('button').exists()).toBe(false)
     w.unmount()
   })
+
   it('is not there when the tiles fill the rows (an even number of small places, or a wide tile)', async () => {
     useHomeLayout().remove('family')
     const w = mountGrid()
     expect(w.find('[data-test="tile-hint"]').exists()).toBe(false)
     w.unmount()
   })
-  it('a tap on it starts arranging and opens the list of tiles to add; while arranging it is gone', async () => {
+
+  it('a tap on it does nothing', async () => {
     const w = mountGrid()
     await w.get('[data-test="tile-hint"]').trigger('click')
+    holdHint(w)
+    vi.advanceTimersByTime(200)
+    document.dispatchEvent(new MouseEvent('pointerup', { bubbles: true }))
+    w.get('[data-test="tile-hint"]').element.dispatchEvent(new MouseEvent('pointerup', { bubbles: true }))
+    vi.advanceTimersByTime(600)
+    await flushPromises()
+    expect(w.classes()).not.toContain('is-editing')
+    expect(w.find('[data-test="tile-sheet"]').exists()).toBe(false)
+    expect(nav.push).not.toHaveBeenCalled()
+    w.unmount()
+  })
+
+  it('a long press on it starts arranging and opens the list of things to choose; the hint is gone then', async () => {
+    const w = mountGrid()
+    holdHint(w)
+    vi.advanceTimersByTime(500)
     await flushPromises()
     expect(w.classes()).toContain('is-editing')
     expect(w.find('[data-test="tile-sheet"]').exists()).toBe(true)
     expect(w.find('[data-test="tile-hint"]').exists()).toBe(false)
+    w.unmount()
+  })
+})
+
+describe('the back button while arranging (Anton 22.11.2026)', () => {
+  it('arranging is a step in the address, and "back" ends it (the list too) instead of leaving the start page', async () => {
+    const w = mountGrid()
+    press(w.get('[data-test="tile-hint"]').element)
+    vi.advanceTimersByTime(500)
+    await flushPromises()
+    expect(nav.push).toHaveBeenCalledWith({ query: { arrange: '1' } })
+    expect(w.find('[data-test="tile-sheet"]').exists()).toBe(true)
+    // the back button of the phone takes the step from the address
+    nav.route.query = {}
+    await flushPromises()
+    expect(w.classes()).not.toContain('is-editing')
+    expect(w.find('[data-test="tile-sheet"]').exists()).toBe(false)
+    w.unmount()
+  })
+
+  it('a long press on a tile is a step too, and "Done" takes it back with one step of the history', async () => {
+    const w = mountGrid()
+    press(w.get('[data-tile-id="picture"]').element)
+    vi.advanceTimersByTime(500)
+    release()
+    await flushPromises()
+    expect(nav.push).toHaveBeenCalledTimes(1)
+    expect(w.classes()).toContain('is-editing')
+    await w.get('[data-test="tiles-done"]').trigger('click')
+    expect(nav.back).toHaveBeenCalledTimes(1)
+    expect(w.classes()).not.toContain('is-editing')
+    w.unmount()
+  })
+
+  it('does not start in arranging when the page is opened with the sign in the address', async () => {
+    nav.route.query = { arrange: '1' }
+    const w = mountGrid()
+    await flushPromises()
+    expect(w.classes()).not.toContain('is-editing')
+    expect(nav.replace).toHaveBeenCalledWith({ query: {} })
     w.unmount()
   })
 })

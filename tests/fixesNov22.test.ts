@@ -54,3 +54,17 @@ describe('the slides of the start page', () => {
     expect(s).toMatch(/\.hero-actions[\s\S]*?margin-top: auto/)
   })
 })
+
+describe('arranging the start page and the history (Anton 22.11.2026)', () => {
+  it('the sign ?arrange=1 does not make the screen new and plays no screen change', () => {
+    const s = read('App.vue')
+    expect(s).toContain('component(:is="Component" :key="pageKey(route)")')
+    expect(s).toMatch(/router\.beforeEach\(\(to, from\) => \{\s*if \(from\.name && from\.path === to\.path && pageKey\(from\) === pageKey\(to\)\) return true/)
+  })
+  it('the hint beside the lone tile is a div with words (no pulsing plus, no button)', () => {
+    const s = read('components/molecules/HomeTileGrid.vue')
+    expect(s).not.toContain('hg-hint-ring')
+    expect(s).not.toContain('@keyframes hg-hold')
+    expect(s).toContain('@pointerdown="hintDown"')
+  })
+})

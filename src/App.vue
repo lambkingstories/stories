@@ -68,7 +68,23 @@ try {
   window.history.scrollRestoration = 'manual'
 } catch { /* not available */ }
 
+/**
+ * The sign `?arrange=1` (the start page is being arranged, see `HomeTileGrid`) is a step of the history, not another page: the screen stays as it is, it is not made new, and
+ * no screen change is played (Anton 22.11.2026: the back button then ends arranging).
+ */
+const ARRANGE_QUERY = 'arrange'
+const withoutArrange = (query: Record<string, unknown>) => {
+  const { [ARRANGE_QUERY]: _sign, ...rest } = query
+  return rest
+}
+/** The key of a screen: its address without the arranging sign. */
+function pageKey(r: { path: string; query: Record<string, unknown> }): string {
+  const rest = Object.entries(withoutArrange(r.query)).map(([k, v]) => `${k}=${String(v)}`).join('&')
+  return rest ? `${r.path}?${rest}` : r.path
+}
+
 router.beforeEach((to, from) => {
+  if (from.name && from.path === to.path && pageKey(from) === pageKey(to)) return true
   clearTimeout(navTimer)
   navTimer = setTimeout(() => (navigating.value = true), 90)
   scrollOf.set(from.fullPath, window.scrollY)
@@ -299,7 +315,7 @@ function isCrazyGamesUrl() {
         @after-enter="onEnterDone"
         @enter-cancelled="onEnterDone"
       )
-        component(:is="Component" :key="route.fullPath")
+        component(:is="Component" :key="pageKey(route)")
 
     //- Shared bottom nav lives outside the page-swipe <transition> so it
     //- stays mounted while the underlying pages slide past each other.
