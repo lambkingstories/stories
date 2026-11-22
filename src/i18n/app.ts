@@ -4026,7 +4026,9 @@ export default {
         unlock: 'Unlock everything (test)',
         restore: 'Bring my progress back',
         done: 'All adventures are unlocked.',
-        restored: 'Your progress is back.'
+        restored: 'Your progress is back.',
+        plusIsOn: 'LambKing Plus is switched ON in this test app: every book counts as yours.',
+        plusIsOff: 'LambKing Plus is switched OFF in this test app: only free and bought books count.'
       },
       reader: {
         back: 'Back',
@@ -8214,7 +8216,9 @@ export default {
         unlock: 'Alles freischalten (Test)',
         restore: 'Fortschritt zurückholen',
         done: 'Alle Abenteuer sind freigeschaltet.',
-        restored: 'Dein Fortschritt ist wieder da.'
+        restored: 'Dein Fortschritt ist wieder da.',
+        plusIsOn: 'LambKing Plus ist in dieser Test-App EINGESCHALTET: Alle Bücher zählen als deine.',
+        plusIsOff: 'LambKing Plus ist in dieser Test-App AUSGESCHALTET: Nur kostenlose und gekaufte Bücher zählen.'
       },
       reader: {
         back: 'Zurück',

@@ -1419,7 +1419,9 @@ export default {
     unlock: 'Desbloquear todo (prueba)',
     restore: 'Recuperar mi progreso',
     done: 'Todas las aventuras están desbloqueadas.',
-    restored: 'Tu progreso ha vuelto.'
+    restored: 'Tu progreso ha vuelto.',
+    plusIsOn: 'LambKing Plus está ACTIVADO en esta app de prueba: todos los libros cuentan como tuyos.',
+    plusIsOff: 'LambKing Plus está DESACTIVADO en esta app de prueba: solo cuentan los libros gratis y comprados.'
   },
   reader: {
     back: 'Atrás',

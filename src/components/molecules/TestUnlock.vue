@@ -9,6 +9,7 @@ import { journeys } from '@/data/adventures'
 import useAdventure from '@/use/useAdventure'
 import useBigGames from '@/use/useBigGames'
 import { BIG_GAMES } from '@/data/bigGames'
+import usePremium from '@/use/usePremium'
 
 const BACKUP = 'lk-adventure-backup-v1'
 
@@ -16,6 +17,8 @@ const { t } = useI18n({ useScope: 'global' })
 const adv = useAdventure()
 const games = useBigGames()
 const note = ref('')
+// the second test switch (the same as on the Plus page): it sits here too, so it is found where the other one is
+const { plusOn, setTestPlus } = usePremium()
 
 function hasBackup(): boolean {
   try {
@@ -72,6 +75,8 @@ function restore() {
     p(class="tu-text") {{ t('app.testUnlock.text') }}
     button(type="button" class="lk-btn lk-btn--full" @click="unlockAll") {{ t('app.testUnlock.unlock') }}
     button(v-if="canRestore" type="button" class="lk-btn lk-btn--full lk-btn--outline tu-restore" @click="restore") {{ t('app.testUnlock.restore') }}
+    p(class="tu-text tu-plus-state" data-test="tu-plus-state") {{ plusOn ? t('app.testUnlock.plusIsOn') : t('app.testUnlock.plusIsOff') }}
+    button(type="button" :class="['lk-btn', 'lk-btn--full', { 'lk-btn--outline': plusOn }]" data-test="tu-plus" @click="setTestPlus(!plusOn)") {{ plusOn ? t('app.plus.testOff') : t('app.plus.testOn') }}
     p(v-if="note" class="tu-note" role="status") {{ note }}
 </template>
 
