@@ -171,3 +171,47 @@ describe('BookFlip with upright pages (a coloring book, Anton 22.11.2026)', () =
     w.unmount()
   })
 })
+
+describe('BookFlip with pages of words (reading a coloring book, Anton 22.11.2026)', () => {
+  const text = (n: number) => ({ text: { no: n, total: 2, title: `Titel ${n}`, reference: '1. Mose 1', text: `Worte ${n}` } })
+  // the cover, then for every picture its words first
+  const mixed = ['cover.webp', text(1), 'bild-1.webp', text(2), 'bild-2.webp']
+  const openMixed = () => mount(BookFlip, { global: { plugins: [i18n] }, props: { pages: mixed, ratio: 0.75 }, attachTo: document.body })
+
+  it('lying on its side the words are on the left and the picture on the right, after the cover', async () => {
+    size(900, 400)
+    const w = openMixed()
+    expect(src('.bf-right')).toBe('cover.webp')
+    go(w, 1)
+    await turn()
+    expect(document.body.querySelector('.bf-left [data-test="book-text-page"]')?.textContent).toContain('Titel 1')
+    expect(src('.bf-right')).toBe('bild-1.webp')
+    go(w, 1)
+    await turn()
+    expect(document.body.querySelector('.bf-left [data-test="book-text-page"]')?.textContent).toContain('Worte 2')
+    expect(src('.bf-right')).toBe('bild-2.webp')
+    w.unmount()
+  })
+
+  it('standing upright the words come first and then the picture', async () => {
+    size(400, 800)
+    const w = openMixed()
+    expect(src('.bf-single')).toBe('cover.webp')
+    go(w, 1)
+    await turn()
+    expect(document.body.querySelector('.bf-single [data-test="book-text-page"]')?.textContent).toContain('Titel 1')
+    go(w, 1)
+    await turn()
+    expect(src('.bf-single')).toBe('bild-1.webp')
+    w.unmount()
+  })
+
+  it('the blurred ground is the nearest picture while only words are on show', async () => {
+    size(400, 800)
+    const w = openMixed()
+    go(w, 1)
+    await turn()
+    expect(document.body.querySelector<HTMLElement>('.bf-bg')?.style.backgroundImage).toContain('bild-1.webp')
+    w.unmount()
+  })
+})

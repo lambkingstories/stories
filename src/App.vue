@@ -256,7 +256,7 @@ onMounted(() => {
     const name = String(route.name ?? '')
     // the family games and the game room count as playing, wherever the way leads through
     if (name.startsWith('app-family') || name === 'app-gameroom' || name === 'app-games-adventure' || name === 'app-games-stage' || name === 'app-big-game') return 'play'
-    return SECTION_OF_NAV[routeToNav(name)] ?? 'other'
+    return SECTION_OF_NAV[routeToNav(name, route.query)] ?? 'other'
   })
 })
 onUnmounted(() => stopTracking?.())

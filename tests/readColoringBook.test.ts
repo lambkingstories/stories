@@ -33,6 +33,16 @@ describe('the coloring book view', () => {
     expect(s).toContain('BookFlip(v-if="reading" :pages="readPages" :ratio="readRatio"')
     expect(s).toContain('if (coverUrl.value) list.push(coverUrl.value)')
   })
+  it('puts the words of a page before its picture (upright: words, then picture; sideways: words left, picture right)', () => {
+    const textAt = s.indexOf('list.push({ text: { no: i + 1')
+    const pictureAt = s.indexOf('list.push(shown)')
+    expect(textAt).toBeGreaterThan(0)
+    expect(pictureAt).toBeGreaterThan(textAt)
+  })
+  it('has paint and read side by side in one row, the page arrows at the ends of the strip', () => {
+    expect(s).toMatch(/div\(class="bk-row bk-actions"\)\s+button\(type="button" class="bk-primary"[\s\S]*?button\(type="button" class="bk-read"/)
+    expect(s).toContain('div(class="bk-stripbar")')
+  })
   it('puts a painted page together with its painting, and only the open pages are read', () => {
     expect(s).toContain('composeColoringPage(line, blob)')
     expect(s).toContain('Math.min(pages.value.length, allowed.value)')

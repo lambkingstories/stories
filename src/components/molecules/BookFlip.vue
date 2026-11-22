@@ -11,8 +11,9 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ZIconography from '@/components/atoms/ZIconography.vue'
+import BookFlipPage, { type BookFlipPage as Page } from '@/components/atoms/BookFlipPage.vue'
 
-const props = withDefaults(defineProps<{ pages: string[]; ratio?: number }>(), { ratio: 1 })
+const props = withDefaults(defineProps<{ pages: Page[]; ratio?: number }>(), { ratio: 1 })
 const emit = defineEmits<{ close: [] }>()
 const { t } = useI18n({ useScope: 'global' })
 
@@ -39,9 +40,9 @@ const pageOf = (v: number) => (double.value ? (v === 0 ? 0 : 2 * v - 1) : v)
 const view = computed(() => Math.min(views.value - 1, viewOf(page.value)))
 
 interface Slots {
-  l: string | null
-  r: string | null
-  s: string | null
+  l: Page | null
+  r: Page | null
+  s: Page | null
 }
 /** The pictures of a view: left and right page of a spread (the cover is alone on the right), or the one page. */
 function slots(v: number): Slots {
@@ -56,8 +57,8 @@ interface Flip {
   to: number
   /** what lies under the leaf */
   base: Slots
-  front: string | null
-  back: string | null
+  front: Page | null
+  back: Page | null
   /** the angle of the leaf; it is set a moment after the leaf is shown, so that it moves */
   angle: number
   from: number
@@ -78,9 +79,18 @@ const spineOn = computed(() => {
 })
 
 // the current page, blurred and dark, behind the book
+const picture = (p: Page | null | undefined): string => (typeof p === 'string' ? p : '')
 const backdrop = computed(() => {
   const s = slots(flip.value ? flip.value.to : view.value)
-  return s.s ?? s.r ?? s.l ?? ''
+  const own = picture(s.s) || picture(s.r) || picture(s.l)
+  if (own) return own
+  // only words are on show: the nearest picture of the book lies behind them, blurred
+  const here = pageOf(flip.value ? flip.value.to : view.value)
+  for (let d = 0; d < props.pages.length; d++) {
+    const near = picture(props.pages[here + d]) || picture(props.pages[here - d])
+    if (near) return near
+  }
+  return ''
 })
 
 /** The cover stands alone on the right: the book moves to the left so that it is in the middle. */
@@ -156,7 +166,7 @@ function preload() {
     if (v < 0 || v >= views.value) continue
     const s = slots(v)
     for (const src of [s.l, s.r, s.s]) {
-      if (src) new Image().src = src
+      if (typeof src === 'string' && src) new Image().src = src
     }
   }
 }
@@ -236,20 +246,20 @@ defineExpose({ go, page, double })
     div(class="bf-book" :class="{ 'is-double': double }" :style="bookStyle")
       template(v-if="double")
         div(v-if="baseSlots.l" class="bf-half bf-left")
-          img(:src="baseSlots.l" alt="" draggable="false")
+          BookFlipPage(:page="baseSlots.l")
         div(v-if="baseSlots.r" class="bf-half bf-right")
-          img(:src="baseSlots.r" alt="" draggable="false")
+          BookFlipPage(:page="baseSlots.r")
       div(v-else class="bf-single")
-        img(v-if="baseSlots.s" :src="baseSlots.s" alt="" draggable="false")
+        BookFlipPage(v-if="baseSlots.s" :page="baseSlots.s")
 
       div(v-if="double" class="bf-spine" :class="{ 'is-on': spineOn, 'is-flipping': !!flip }")
 
       //- the page that is turning: its front, and its back (the other side of the leaf)
       div(v-if="flip" class="bf-leaf" :class="leafClass" :style="leafStyle")
         div(class="bf-face bf-front")
-          img(v-if="flip.front" :src="flip.front" alt="" draggable="false")
+          BookFlipPage(v-if="flip.front" :page="flip.front")
         div(class="bf-face bf-rear")
-          img(v-if="flip.back" :src="flip.back" alt="" draggable="false")
+          BookFlipPage(v-if="flip.back" :page="flip.back")
 </template>
 
 <style scoped lang="sass">

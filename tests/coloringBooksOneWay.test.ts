@@ -1,6 +1,6 @@
 /**
- * The coloring books have one place: the list `app-coloring-books` belongs to "Malen". The door in "Lesen" leads there, and so do the
- * buttons of the painting menu and of the feature list; wherever it is opened from, the tab bar shows "Malen".
+ * The coloring books have one place: the list `app-coloring-books`. It belongs to "Malen", except when the door in "Lesen" opened it (`?from=read`, Anton 22.11.2026):
+ * then the tab bar keeps "Lesen", also for a single book that is opened from that list.
  */
 import { describe, expect, it } from 'vitest'
 import { routeToNav } from '@/use/useAppNav'
@@ -10,6 +10,16 @@ describe('coloring books: one way', () => {
     expect(routeToNav('app-coloring-books')).toBe('malen')
     expect(routeToNav('app-coloring-book')).toBe('malen')
     expect(routeToNav('app-coloring')).toBe('malen')
+  })
+
+  it('keeps "Lesen" lit when the door in "Lesen" opened the list or a book of it', () => {
+    expect(routeToNav('app-coloring-books', { from: 'read' })).toBe('series')
+    expect(routeToNav('app-coloring-book', { from: 'read' })).toBe('series')
+    // the painting screen itself is "Malen", also from there
+    expect(routeToNav('app-coloring', { from: 'read' })).toBe('malen')
+    // other ways in (the painting menu, the shelf) keep "Malen"
+    expect(routeToNav('app-coloring-books', { from: 'shelf' })).toBe('malen')
+    expect(routeToNav('app-coloring-books', {})).toBe('malen')
   })
 
   it('leaves the other reading places in Lesen', () => {

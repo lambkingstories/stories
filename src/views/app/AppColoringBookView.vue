@@ -30,6 +30,7 @@ import { pickLocalizedImage } from '@/types/apiBook'
 import { openExternal } from '@/utils/openExternal'
 import ColoringSpread from '@/components/molecules/ColoringSpread.vue'
 import BookFlip from '@/components/molecules/BookFlip.vue'
+import type { BookFlipPage } from '@/components/atoms/BookFlipPage.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import { composeColoringPage, loadPicture } from '@/utils/composeColoringPage'
 import { contentLocale } from '@/utils/contentLocale'
@@ -230,7 +231,7 @@ async function resetPage() {
 
 /** The book is read like a real book: big, and turned sideways with two pages and a turning leaf (`BookFlip`). The pages are shown as they were painted. */
 const reading = ref(false)
-const readPages = ref<string[]>([])
+const readPages = ref<BookFlipPage[]>([])
 const readRatio = ref(0.75)
 const readBusy = ref(false)
 let readUrls: string[] = []
@@ -246,12 +247,14 @@ async function openReader() {
   if (readBusy.value || !pages.value.length) return
   readBusy.value = true
   try {
-    const list: string[] = []
+    const list: BookFlipPage[] = []
     if (coverUrl.value) list.push(coverUrl.value)
-    // the pages that are open (a locked book shows the free pictures); a painted page is put together with its painting, the others are the line art
+    // the pages that are open (a locked book shows the free pictures). Every picture comes after its words: standing upright the words and then the picture, lying on the
+    // side the words on the left and the picture on the right (Anton 22.11.2026). A painted page is put together with its painting, the others are the line art
     const open = Math.min(pages.value.length, allowed.value)
     for (let i = 0; i < open; i++) {
       const p = pages.value[i]!
+      list.push({ text: { no: i + 1, total: pages.value.length, title: p.title, reference: p.reference, text: p.text } })
       await loadLine(i)
       const line = lineOf(p)
       let shown = line
@@ -386,35 +389,37 @@ watch(bookId, () => {
 
       //- everything the child can do with the page, in one place
       section(class="bk-dock")
-        div(class="bk-row")
-          button(type="button" class="bk-nav" :disabled="index <= 0" :aria-label="t('app.coloring.prevPage')" @click="go(index - 1)") ‹
+        //- paint and read side by side (Anton 22.11.2026)
+        div(class="bk-row bk-actions")
           button(type="button" class="bk-primary" @click="paint")
             span(class="bk-primary-ico")
               img(:src="pageLocked ? crown : brush" alt="" draggable="false")
             span {{ pageLocked ? t('app.coloring.unlockBook') : current ? t('app.coloring.continuePaint') : t('app.coloring.startPaint') }}
+          //- read the book: the pages as they are painted, big, turned like a real book
+          button(type="button" class="bk-read" data-test="read-book" :disabled="readBusy" @click="openReader")
+            ZIconography(name="series" :size="24")
+            span {{ readBusy ? t('app.coloring.loading') : t('app.coloring.read') }}
+
+        //- the pages: an arrow at each end of the strip of small pages
+        div(class="bk-stripbar")
+          button(type="button" class="bk-nav" :disabled="index <= 0" :aria-label="t('app.coloring.prevPage')" @click="go(index - 1)") ‹
+          nav(ref="strip" class="bk-strip" :aria-label="t('app.coloring.books')")
+            button(
+              v-for="(p, i) in pages"
+              :key="p.url"
+              type="button"
+              class="bk-thumb"
+              :class="{ current: i === index, painted: isPainted(p), locked: isLockedPage(i) }"
+              :aria-label="t('app.coloring.pageOf', { n: i + 1, total: pages.length })"
+              @click="go(i)"
+            )
+              //- Only painted pages have a small picture (saved with the painting); the others are plain chips,
+              //- so the strip does not have to download every page of the book.
+              img(v-if="thumbOf(p)" :src="thumbOf(p)" alt="" draggable="false")
+              img(v-if="isLockedPage(i)" class="bk-thumb-crown" :src="crown" alt="" draggable="false")
+              span(v-else class="bk-thumb-n") {{ i + 1 }}
+              img(v-if="works[idOf(p)]?.done" class="bk-thumb-star" :src="starImage" alt="" draggable="false")
           button(type="button" class="bk-nav" :disabled="index >= pages.length - 1" :aria-label="t('app.coloring.nextPage')" @click="go(index + 1)") ›
-
-        //- read the book: the pages as they are painted, big, turned like a real book (Anton 22.11.2026)
-        button(type="button" class="bk-read" data-test="read-book" :disabled="readBusy" @click="openReader")
-          ZIconography(name="series" :size="24")
-          span {{ readBusy ? t('app.coloring.loading') : t('app.coloring.read') }}
-
-        nav(ref="strip" class="bk-strip" :aria-label="t('app.coloring.books')")
-          button(
-            v-for="(p, i) in pages"
-            :key="p.url"
-            type="button"
-            class="bk-thumb"
-            :class="{ current: i === index, painted: isPainted(p), locked: isLockedPage(i) }"
-            :aria-label="t('app.coloring.pageOf', { n: i + 1, total: pages.length })"
-            @click="go(i)"
-          )
-            //- Only painted pages have a small picture (saved with the painting); the others are plain chips,
-            //- so the strip does not have to download every page of the book.
-            img(v-if="thumbOf(p)" :src="thumbOf(p)" alt="" draggable="false")
-            img(v-if="isLockedPage(i)" class="bk-thumb-crown" :src="crown" alt="" draggable="false")
-            span(v-else class="bk-thumb-n") {{ i + 1 }}
-            img(v-if="works[idOf(p)]?.done" class="bk-thumb-star" :src="starImage" alt="" draggable="false")
 
         //- the two ways to open the whole book: Plus (all books) or this one book
         div(v-if="bookLocked" class="bk-offer")
@@ -856,4 +861,29 @@ $accent: var(--lk-accent)
 
   &:disabled
     opacity: 0.6
+
+// the strip of pages with an arrow at each end
+.bk-stripbar
+  display: flex
+  align-items: center
+  gap: 8px
+
+  .bk-strip
+    flex: 1 1 auto
+    min-width: 0
+
+  .bk-nav
+    width: 40px
+    height: 40px
+
+// paint and read: two buttons of the same size side by side
+.bk-actions
+  gap: 10px
+
+  .bk-primary,
+  .bk-read
+    flex: 1 1 0
+    min-width: 0
+    padding: 0 12px
+    white-space: nowrap
 </style>

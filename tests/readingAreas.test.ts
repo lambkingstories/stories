@@ -82,7 +82,8 @@ describe('Lesen: the front door', () => {
     for (let i = 0; i < doors.length; i++) {
       push.mockClear()
       await doors[i]!.trigger('click')
-      expect(push).toHaveBeenCalledWith({ name: routes[i] })
+      // the door of the coloring books carries `from=read`, so that the tab bar keeps "Lesen" (Anton 22.11.2026)
+      expect(push).toHaveBeenCalledWith(routes[i] === 'app-coloring-books' ? { name: routes[i], query: { from: 'read' } } : { name: routes[i] })
     }
     expect(warnings.filter((w) => /not defined on instance|is not a function|ERROR/.test(w))).toEqual([])
   })

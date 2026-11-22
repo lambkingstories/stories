@@ -135,7 +135,9 @@ function openBook(card: Card) {
     moving.value = { card, already }
     return
   }
-  void router.push({ name: 'app-coloring-book', params: { bookId: card.bookId } })
+  // opened from "Lesen" the tab bar keeps "Lesen" (the sign `from=read` travels on to the book)
+  const to = { name: 'app-coloring-book', params: { bookId: card.bookId } }
+  void router.push(route.query.from === 'read' ? { ...to, query: { from: 'read' } } : to)
 }
 
 /** The transfer is over (time or tap): back to the painting program, where the book stands on the shelf and is lifted once. */

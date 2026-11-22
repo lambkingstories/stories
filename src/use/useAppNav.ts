@@ -21,7 +21,7 @@ export interface AppNavItem {
 /** The painted symbols of the app (the same ones are on the start page): start, lesen, abenteuer, malen, ich, pokal, plus. */
 const symbol = (name: string) => prependBaseUrl(`images/icons/navi/${name}.webp`)
 
-export function routeToNav(name: string): AppNavId {
+export function routeToNav(name: string, query?: Record<string, unknown>): AppNavId {
   if (name === 'app-main') return 'home'
   if (
     name === 'app-read'
@@ -36,8 +36,9 @@ export function routeToNav(name: string): AppNavId {
   if (name === 'app-adventure' || name === 'app-adventure-map' || name === 'app-adventure-stage' || name === 'app-adventure-stats' || name === 'app-family-quiz' || name === 'app-family-activity' || name === 'app-family-who' || name === 'app-family-order' || name === 'app-family-bingo' || name === 'app-family-memory' || name === 'app-family-wortreise') return 'abenteuer'
   // the good-night stories belong to "Lesen"
   if (name === 'app-goodnight') return 'series'
-  // the coloring books are one place, and it belongs to "Malen" (the door in "Lesen" leads there, too)
-  if (name === 'app-coloring' || name === 'app-coloring-book' || name === 'app-coloring-books') return 'malen'
+  // the coloring books: the door in "Lesen" leads there with `?from=read`, and then the tab bar keeps "Lesen" (Anton 22.11.2026); from "Malen" it shows "Malen"
+  if (name === 'app-coloring-books' || name === 'app-coloring-book') return query?.from === 'read' ? 'series' : 'malen'
+  if (name === 'app-coloring') return 'malen'
   if (name === 'app-profile' || name === 'app-legal' || name === 'app-plus' || name === 'app-awards' || name === 'app-parents' || name === 'app-collection' || name === 'app-gameroom' || name === 'app-games-adventure' || name === 'app-games-stage' || name === 'app-family' || name === 'app-journal' || name === 'app-voices') return 'profile'
   return 'home'
 }
@@ -66,7 +67,7 @@ export default function useAppNav(t: ComposerTranslation): {
     { id: 'profile', label: t('app.nav.profile'), icon: 'profile', image: symbol('ich') },
   ])
 
-  const activeNav = computed<string | number>(() => routeToNav(String(route.name || '')))
+  const activeNav = computed<string | number>(() => routeToNav(String(route.name || ''), route.query))
 
   function onNav(id: string | number) {
     const name = ROUTE_BY_NAV[id as AppNavId]

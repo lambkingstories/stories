@@ -1240,7 +1240,7 @@ export default {
     sizeLarge: 'Grueso',
     bookFailed: 'No se pudo cargar este libro.',
     startPaint: 'Colorear esta hoja',
-    read: 'Leer el libro',
+    read: 'Leer',
     unlockBook: 'Desbloquear todo el libro',
     offerTitle: 'Colorea todo el libro',
     offerPlusTitle: 'Con LambKing Plus',

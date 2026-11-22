@@ -56,7 +56,7 @@ const doors = computed<Door[]>(() => [
           type="button"
           :class="['door', 'is-' + d.id]"
           :aria-label="d.title + ': ' + d.sub"
-          @click="router.push({ name: d.route })"
+          @click="router.push(d.route === 'app-coloring-books' ? { name: d.route, query: { from: 'read' } } : { name: d.route })"
         )
           span(class="door-pic")
             img(v-if="d.image" :src="d.image" alt="" draggable="false" decoding="async" @error="d.id === 'goodnight' ? (nightPicOk = false) : undefined")
