@@ -21,6 +21,7 @@ import { shortColoringTitle } from '@/utils/coloringTitles'
 import useColoringShelf from '@/use/useColoringShelf'
 import { cacheUrlToBlobUrl } from '@/use/useBookCache'
 import { allowedPages, freePageCount } from '@/use/useBookAccess'
+import { rememberFreePages } from '@/use/artworkAccess'
 import usePremium from '@/use/usePremium'
 import usePurchases from '@/use/usePurchases'
 import { plusOffer } from '@/data/plus'
@@ -67,9 +68,10 @@ const layers = ref<Record<number, string>>({})
 const index = ref(0)
 const page = computed(() => pages.value[index.value] ?? null)
 const idOf = (p: ColoringBookPage) => pageArtworkId(p.url, 1)
-const isPainted = (p: ColoringBookPage) => !!works.value[idOf(p)]
+/** What was painted on a page that is locked now (Plus ended, book not bought) is kept on the device but not shown: the page counts as not painted (Anton 22.11.2026). */
+const isPainted = (p: ColoringBookPage) => !!works.value[idOf(p)] && !isLockedPage(pages.value.indexOf(p))
 const starImage = prependBaseUrl('images/awards/star.webp')
-const thumbOf = (p: ColoringBookPage) => works.value[idOf(p)]?.thumb ?? ''
+const thumbOf = (p: ColoringBookPage) => (isPainted(p) ? works.value[idOf(p)]?.thumb ?? '' : '')
 const paintedCount = computed(() => pages.value.filter(isPainted).length)
 /** Pictures that may be painted: all of them, or the free ones while the book is locked. */
 const allowed = computed(() => allowedPages(bookId.value, 'coloring', pages.value.length, ownFree.value))
@@ -108,7 +110,7 @@ function unlock() {
   })
 }
 
-const current = computed(() => (page.value ? works.value[idOf(page.value)] ?? null : null))
+const current = computed(() => (page.value && isPainted(page.value) ? works.value[idOf(page.value)] ?? null : null))
 
 async function refreshWorks() {
   const map: Record<string, ArtworkMeta> = {}
@@ -311,6 +313,8 @@ async function start() {
     pages.value = list
     coverUrl.value = pickLocalizedImage((book as ApiBook).previewImage, contentLang.value)
     ownFree.value = (book as ApiBook).freePages ?? null
+    // the other screens (the shelf of pictures, the start page) leave out what was painted on a locked page: they need the number of free pictures of this book too
+    rememberFreePages(bookId.value, ownFree.value)
     // the page of the book on lambking.store (the old link of the backend only when the book has no page there)
     const printed = printedBookUrl(bookId.value, (book as ApiBook).etsyLink?.[contentLocale(locale.value)] ?? '', contentLocale(locale.value))
     shopLink.value = printed || pickLocalizedImage((book as ApiBook).etsyLink, contentLocale(locale.value))

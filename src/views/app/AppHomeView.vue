@@ -37,6 +37,7 @@ import { inBibleOrder, journeyToBegin, journeyToContinue } from '@/utils/continu
 import { isColoringBook } from '@/utils/coloringBook'
 import usePremium, { PREMIUM_TEASER } from '@/use/usePremium'
 import { isJourneyPlusLocked } from '@/utils/adventureAccess'
+import { visibleArtworks } from '@/use/artworkAccess'
 import PlusBadge from '@/components/atoms/PlusBadge.vue'
 import { requireParent } from '@/use/useParentalGate'
 import type { ApiBook, Locale } from '@/types/apiBook'
@@ -80,7 +81,8 @@ onMounted(() => {
   afterFirstScreen(() => void apiBooks.loadAllBooks())
   listArtworks()
     .then((list) => {
-      artworks.value = list
+      // what was painted on a locked page is kept but not shown (see `artworkAccess`)
+      artworks.value = visibleArtworks(list)
     })
     .catch(() => {
       artworks.value = []

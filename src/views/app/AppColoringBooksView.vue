@@ -24,6 +24,7 @@ import useColoringShelf from '@/use/useColoringShelf'
 import ColoringTransfer from '@/components/molecules/ColoringTransfer.vue'
 import { PREMIUM_TEASER, hasFeature, ownsBook } from '@/use/usePremium'
 import { FREE_COLORING_BOOKS } from '@/use/useBookAccess'
+import { visibleArtworks } from '@/use/artworkAccess'
 import OwnBadge from '@/components/atoms/OwnBadge.vue'
 import OwnFilter from '@/components/molecules/OwnFilter.vue'
 import { matchesOwnFilter, ownCounts, ownershipOf, type OwnFilterValue, type Ownership } from '@/utils/bookOwnership'
@@ -50,7 +51,8 @@ onMounted(() => {
   void apiBooks.loadAllBooks()
   listArtworks()
     .then((list) => {
-      works.value = list
+      // what was painted on a locked page is kept but not counted or shown (see `artworkAccess`)
+      works.value = visibleArtworks(list)
     })
     .catch(() => {
       works.value = []

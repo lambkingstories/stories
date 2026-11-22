@@ -1334,7 +1334,7 @@ function toFinale() {
             span(class="next-adv-text")
               span(class="next-adv-kicker") {{ t('app.bigGames.result.nextHead') }}
               span(class="next-adv-title") {{ nextJourney.title }}
-              PlusBadge(v-if="nextLocked" size="small" class="next-adv-plus")
+              PlusBadge(v-if="nextLocked" size="small" shine class="next-adv-plus")
               span(v-else class="next-adv-go") {{ t('app.bigGames.result.nextButton') }}
           div(class="stage-actions")
             AdvButton(tone="gold" data-test="to-finale" @click="toFinale") {{ t('app.adventure.toOverview') }}

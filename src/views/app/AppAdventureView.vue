@@ -298,7 +298,9 @@ onMounted(async () => {
             @click="openStage(i)"
           )
             span(class="spot-fog")
-            img(v-if="plusLocked(i)" :src="crownIcon" alt="" class="spot-lock is-crown" draggable="false")
+            //- the Plus crown of a stage that comes with Plus: bigger, and it twinkles (it is only there while the person has no Plus)
+            span(v-if="plusLocked(i)" class="spot-crown" data-test="spot-crown")
+              img(:src="crownIcon" alt="" draggable="false")
             img(v-else-if="!isStageOpen(journey, progress, i)" :src="ui('lock')" alt="" class="spot-lock" draggable="false")
           span(class="spot-coin" :style="{ backgroundImage: `url(${ui('coin')})` }") {{ s.id }}
           img(v-if="stageDone(s.id)" :src="ui('check')" alt="" class="spot-check" draggable="false")
@@ -661,9 +663,68 @@ $ink: #3b2a12
 .map-spot:not(.open) .spot-fog
   opacity: 1
 
-.spot-lock.is-crown
-  width: calc(var(--u) * 0.06)
-  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.35))
+// the Plus crown: bigger than the padlock, with a slow glow and two little stars that twinkle (only transform and opacity move: it runs on the graphics chip)
+.spot-crown
+  position: absolute
+  left: 50%
+  top: 50%
+  width: calc(var(--u) * 0.1)
+  aspect-ratio: 1
+  transform: translate(-50%, -50%)
+  pointer-events: none
+  animation: crown-glow 2.6s ease-in-out infinite
+
+  img
+    display: block
+    width: 100%
+    height: 100%
+    object-fit: contain
+    filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.35))
+
+  &::before,
+  &::after
+    content: ''
+    position: absolute
+    width: 34%
+    aspect-ratio: 1
+    background: #fffbe0
+    clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%)
+    filter: drop-shadow(0 0 3px rgba(255, 220, 90, 0.9))
+    opacity: 0
+    animation: crown-twinkle 2.6s ease-in-out infinite
+
+  &::before
+    top: -12%
+    right: -8%
+
+  &::after
+    bottom: 6%
+    left: -12%
+    width: 26%
+    animation-delay: 1.3s
+
+@keyframes crown-glow
+  0%, 100%
+    transform: translate(-50%, -50%) scale(1)
+  50%
+    transform: translate(-50%, -50%) scale(1.08)
+
+@keyframes crown-twinkle
+  0%, 100%
+    opacity: 0
+    transform: scale(0.3) rotate(0deg)
+  45%
+    opacity: 1
+    transform: scale(1) rotate(25deg)
+  70%
+    opacity: 0
+    transform: scale(0.4) rotate(45deg)
+
+@media (prefers-reduced-motion: reduce)
+  .spot-crown,
+  .spot-crown::before,
+  .spot-crown::after
+    animation: none
 
 .spot-lock
   position: absolute

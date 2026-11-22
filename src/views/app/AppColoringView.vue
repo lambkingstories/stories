@@ -95,6 +95,7 @@ import { BUILTIN_COLORING_PAGES } from '@/data/builtinColoringPages'
 import { coloringPagesOfBook, isColoringBook, type ColoringBookPage } from '@/utils/coloringBook'
 import { cacheUrlToBlobUrl } from '@/use/useBookCache'
 import { allowedPages, freePageCount } from '@/use/useBookAccess'
+import { visibleArtworks } from '@/use/artworkAccess'
 import useAwards from '@/use/useAwards'
 import { AWARDS, type AwardId } from '@/utils/awards'
 import confetti from 'canvas-confetti'
@@ -583,7 +584,7 @@ async function finishPicture() {
   let complete = false
   const ctx = bookCtx.value
   if (ctx) {
-    const saved = new Map((await listArtworks()).map((a) => [a.id, a]))
+    const saved = new Map(visibleArtworks(await listArtworks()).map((a) => [a.id, a]))
     complete = ctx.pages.every((p) => saved.get(pageArtworkId(p.url, 1))?.done)
   }
   const won = awards.pictureFinished(id, ctx ? { bookId: ctx.bookId, complete } : undefined)
@@ -1330,7 +1331,8 @@ const deleteCandidate = ref<ArtworkMeta | null>(null)
 let autosaveTimer: ReturnType<typeof setTimeout> | undefined
 
 async function refreshMyWorks() {
-  myWorks.value = await listArtworks()
+  // what was painted on a locked page of a coloring book is kept on the device but not shown (see `artworkAccess`)
+  myWorks.value = visibleArtworks(await listArtworks())
 }
 
 /** Runs `fn` when the browser has nothing better to do (Safari has no idle callback: then straight away). */
@@ -4320,8 +4322,8 @@ onMounted(() => {
   // `?work=<id>`: a picture of "my works" opened straight from the start page ("Dein Bild")
   const workId = typeof route.query.work === 'string' ? route.query.work : ''
   if (workId && !queryBook.value && !querySource.value) {
-    void listArtworks().then((list) => {
-      const meta = list.find((w) => w.id === workId)
+    void listArtworks().then((all) => {
+      const meta = visibleArtworks(all).find((w) => w.id === workId)
       if (meta) openWork(meta)
     })
   }

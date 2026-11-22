@@ -10,7 +10,8 @@ import { useI18n } from 'vue-i18n'
 import { isPlus } from '@/use/usePremium'
 import { prependBaseUrl } from '@/utils/function'
 
-const props = withDefaults(defineProps<{ size?: 'small' | 'normal'; always?: boolean }>(), { size: 'normal', always: false })
+// `shine`: the plate is a little bigger and glints, also in its small size (the adventure area, Anton 22.11.2026; the plates in the long lists of the other areas stay quiet)
+const props = withDefaults(defineProps<{ size?: 'small' | 'normal'; always?: boolean; shine?: boolean }>(), { size: 'normal', always: false, shine: false })
 const shown = computed(() => props.always || !isPlus())
 
 const { t } = useI18n({ useScope: 'global' })
@@ -18,7 +19,7 @@ const crown = prependBaseUrl('images/icons/navi/plus.webp')
 </script>
 
 <template lang="pug">
-  span(v-if="shown" :class="['plus-badge', `is-${size}`]" role="img" :aria-label="t('app.adventure.plusBadgeLabel')")
+  span(v-if="shown" :class="['plus-badge', `is-${size}`, { 'is-shine': shine }]" role="img" :aria-label="t('app.adventure.plusBadgeLabel')")
     img(:src="crown" alt="" draggable="false" class="plus-badge-crown")
     span(class="plus-badge-word") {{ t('app.adventure.plusBadge') }}
 </template>
@@ -63,6 +64,19 @@ const crown = prependBaseUrl('images/icons/navi/plus.webp')
       animation: none
       display: none
 
+// the shining small plate: bigger, and the glint runs (a few plates only, in the adventure area)
+.plus-badge.is-small.is-shine
+  padding: 2px 10px 2px 5px
+  font-size: 0.82rem
+
+  &::after
+    display: block
+    animation: plus-glint 3.2s ease-in-out infinite
+
+.is-small.is-shine .plus-badge-crown
+  width: 22px
+  height: 22px
+
 .plus-badge-crown
   display: block
   width: 20px
@@ -86,7 +100,8 @@ const crown = prependBaseUrl('images/icons/navi/plus.webp')
     transform: translateX(575%) skewX(-18deg)
 
 @media (prefers-reduced-motion: reduce)
-  .plus-badge::after
+  .plus-badge::after,
+  .plus-badge.is-small.is-shine::after
     animation: none
     display: none
 </style>
