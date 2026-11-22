@@ -28,6 +28,10 @@ const crown = prependBaseUrl('images/icons/navi/plus.webp')
 .plus-badge
   position: relative
   display: inline-flex
+  // never narrower than its own content, whatever box it sits in (in a narrow box the word "Plus" was cut off)
+  flex: none
+  width: max-content
+  max-width: none
   align-items: center
   gap: 4px
   padding: 2px 10px 2px 6px

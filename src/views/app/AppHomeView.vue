@@ -597,10 +597,12 @@ button
     object-fit: contain
     border-radius: 50%
 
+// the plate is as wide as it is (a box that sits at left 50% would only get half of the picture: the word was cut off)
 .journey-plus
   position: absolute
   left: 50%
   bottom: -6px
+  width: max-content
   transform: translateX(-50%)
 
 .journey-name
