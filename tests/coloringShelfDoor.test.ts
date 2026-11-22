@@ -126,14 +126,16 @@ describe('the list from the paint shelf (from=shelf)', () => {
     expect(names(w)).toHaveLength(4)
   })
 
-  it('the chips can be changed to "Alle" and "Zu kaufen" as before', async () => {
+  it('there are two chips, "Alle" and "Habe ich" (the chip "still to buy" is gone), and they can be changed', async () => {
     h.query = { from: 'shelf' }
     const w = await list()
     const chips = w.findAll('.own-chip')
+    expect(chips).toHaveLength(2)
+    expect(chips.some((c) => c.text().includes('Noch zu kaufen'))).toBe(false)
     await chips.find((c) => c.text().includes('Alle'))!.trigger('click')
     expect(names(w)).toHaveLength(4)
-    await chips.find((c) => c.text().includes('Noch zu kaufen'))!.trigger('click')
-    expect(names(w)).toHaveLength(3)
+    await chips.find((c) => c.text().includes('Habe ich'))!.trigger('click')
+    expect(names(w).length).toBeLessThan(4)
   })
 
   it('a tap on a book that is mine does not open it: it goes on the shelf and the transfer shows', async () => {

@@ -68,3 +68,11 @@ describe('arranging the start page and the history (Anton 22.11.2026)', () => {
     expect(s).toContain('@pointerdown="hintDown"')
   })
 })
+
+describe('the chips above the lists of books (Anton 22.11.2026)', () => {
+  it('are two: "All" and the ones I have; the chip "still to buy" is gone', () => {
+    const s = read('components/molecules/OwnFilter.vue')
+    expect(s).toContain("const VALUES: OwnFilterValue[] = ['all', 'mine']")
+    expect(s).not.toContain("'buy'")
+  })
+})

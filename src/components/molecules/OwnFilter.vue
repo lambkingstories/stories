@@ -1,12 +1,15 @@
 <script setup lang="ts">
-/** Three chips above a list of books: all of them, the ones I have (bought, free or with Plus) and the ones still to buy, each with its number. */
+/**
+ * Two chips above a list of books: all of them, and the ones I have (bought, free or with Plus), each with its number. The chip "still to buy" is gone (Anton 22.11.2026:
+ * it only took room; what is still to buy is what "All" shows beyond "I have").
+ */
 import { useI18n } from 'vue-i18n'
 import type { OwnFilterValue } from '@/utils/bookOwnership'
 
 defineProps<{ modelValue: OwnFilterValue; counts: Record<OwnFilterValue, number> }>()
 const emit = defineEmits<{ 'update:modelValue': [v: OwnFilterValue] }>()
 const { t } = useI18n({ useScope: 'global' })
-const VALUES: OwnFilterValue[] = ['all', 'mine', 'buy']
+const VALUES: OwnFilterValue[] = ['all', 'mine']
 </script>
 
 <template lang="pug">
