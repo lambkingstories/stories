@@ -7,7 +7,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { sizedImage } from '@/utils/sizedImage'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import ContentLanguageSwitch from '@/components/molecules/ContentLanguageSwitch.vue'
 import useContentLanguage, { bookIn } from '@/use/useContentLanguage'
@@ -32,6 +32,7 @@ import { printedBookUrl } from '@/data/bookPages'
 
 const { t, locale } = useI18n({ useScope: 'global' })
 const router = useRouter()
+const route = useRoute() as ReturnType<typeof useRoute> | undefined
 const apiBooks = useApiBooks()
 const purchases = usePurchases()
 const { ownsBook } = usePremium()
@@ -94,6 +95,22 @@ const cards = computed<BookCardData[]>(() => {
   return [...own, ...fromBackend]
 })
 
+// a book of "New for you" leads here with `?book=<id>`: its card is brought into view and lit for a moment (the books of the server may still be on their way: it looks again for a few seconds)
+const askedId = ref('')
+onMounted(() => {
+  const id = String(route?.query?.book ?? '')
+  if (!id) return
+  askedId.value = id
+  let tries = 0
+  const look = () => {
+    const card = document.querySelector(`[data-book-id="${CSS.escape(id)}"]`)
+    if (card) card.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    else if (++tries < 12) window.setTimeout(look, 300)
+  }
+  window.setTimeout(look, 300)
+  window.setTimeout(() => (askedId.value = ''), 5000)
+})
+
 function goBack() {
   goBackTo(router, { name: 'app-read' })
 }
@@ -140,7 +157,7 @@ function toRead(id: string) {
       p(v-if="buyMessage" class="books-msg lk-panel" role="status") {{ buyMessage }}
       OwnFilter(v-if="PREMIUM_TEASER && cards.length" v-model="filter" :counts="counts")
       ul(v-if="shown.length" class="book-list")
-        li(v-for="c in shown" :key="c.id" class="book-card lk-panel")
+        li(v-for="c in shown" :key="c.id" :class="['book-card', 'lk-panel', { 'is-asked': askedId === c.id }]" :data-book-id="c.id")
           span(:class="['book-cover', { tall: c.ratio < 0.9 }]" :style="{ aspectRatio: String(c.ratio) }")
             img(:src="c.cover" :alt="c.title" loading="lazy" draggable="false" @error="onImgFallback")
           span(class="book-info")
@@ -308,4 +325,10 @@ button
 
     &.tall
       width: 210px
+
+// the book that was asked for (from "New for you") shows a ring for a moment
+.book-card.is-asked
+  outline: 3px solid var(--lk-accent)
+  outline-offset: 2px
+  transition: outline-color 300ms
 </style>

@@ -16,6 +16,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import AppHeader from '@/components/molecules/AppHeader.vue'
+import { bookDestination } from '@/utils/readingAreas'
 import useContentLanguage, { bookIn } from '@/use/useContentLanguage'
 import HomeHero, { type HeroSlide } from '@/components/molecules/HomeHero.vue'
 import HomeTileGrid from '@/components/molecules/HomeTileGrid.vue'
@@ -314,8 +315,9 @@ const newBooks = computed<ApiBook[]>(() => {
     .slice(0, 10)
 })
 
+// a new book opens in the area where it was put (see `bookDestination`)
 function openBook(bookId: string) {
-  void router.push({ name: 'app-book', params: { bookId } })
+  void router.push(bookDestination(allBooks.value.find((b) => b.bookId === bookId), bookId))
 }
 </script>
 

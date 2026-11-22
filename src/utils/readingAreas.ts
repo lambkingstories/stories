@@ -19,3 +19,19 @@ export function readingAreaOf(book: AreaBook | null | undefined): ReadingArea {
 export function booksOfArea<T extends AreaBook>(list: readonly T[], area: ReadingArea): T[] {
   return list.filter((b) => readingAreaOf(b) === area)
 }
+
+/**
+ * Where a book of the list "New for you" leads (Anton 22.11.2026): into the area where the book was put, to the place where it can be used. A coloring book opens in the area
+ * of the coloring books, on its own page (paint, read, buy); a printed book opens in "Books", at its card (read, buy); a story opens on its page of the stories.
+ */
+export function bookDestination(book: (AreaBook & { bookId: string }) | null | undefined, bookId?: string) {
+  const id = book?.bookId ?? bookId ?? ''
+  switch (readingAreaOf(book)) {
+    case 'coloring':
+      return { name: 'app-coloring-book', params: { bookId: id } }
+    case 'books':
+      return { name: 'app-books', query: { book: id } }
+    default:
+      return { name: 'app-book', params: { bookId: id } }
+  }
+}
