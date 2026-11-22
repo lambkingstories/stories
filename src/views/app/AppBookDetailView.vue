@@ -474,9 +474,10 @@ function saveAttachmentToPhone() {
 }
 
 /** A coloring book opens its own overview: the pages as painted so far, to go on painting from. */
-function onPaintBook() {
+/** A coloring book is opened in its reading mode (`read=1`): big, turned like a real book; from there the book page with "Paint" is one step back. */
+function onOpenColoringBook() {
   if (!book.value) return
-  router.push({ name: 'app-coloring-book', params: { bookId: book.value.bookId } })
+  router.push({ name: 'app-coloring-book', params: { bookId: book.value.bookId }, query: { read: '1' } })
 }
 
 function useInColoringApp() {
@@ -514,7 +515,7 @@ const seriesName = computed(() => seriesNameOfBook(book.value))
           ZIconography(name="chevron-left" :size="20")
           span {{ t('app.read.back') }}
 
-        div(class="hero-row")
+        div(:class="['hero-row', { 'is-coloring': isColoring }]")
           div(class="hero-cover")
             img(
               :src="coverBlob || withPlaceholder(sizedImage(pickLocalizedImage(book.previewImage, lang), 240))"
@@ -526,7 +527,7 @@ const seriesName = computed(() => seriesNameOfBook(book.value))
           div(class="hero-info")
             span(class="series-eyebrow") {{ seriesName }}
             h1(class="book-band-title") {{ localizedTitle }}
-            LkCompanion(class="hero-lamb" pose="buch" :size="96")
+            LkCompanion(v-if="!isColoring" class="hero-lamb" pose="buch" :size="96")
 
       template(v-if="mode === 'detail'")
         //- ===== Detail section =====
@@ -539,14 +540,14 @@ const seriesName = computed(() => seriesNameOfBook(book.value))
           //- and shows the empty player — the editor can confirm in
           //- AdminUI whether the upload is missing.
           div(class="cta-row")
-            //- Coloring book: paint it (turn the pages, keep on painting) or just leaf through it.
-            button(v-if="isColoring" type="button" class="lk-btn lk-btn--full" @click="onPaintBook")
-              ZIconography(name="brush" :size="22")
-              span {{ t('app.bookDetail.paint') }}
-            button(type="button" :class="['lk-btn', 'lk-btn--full', { 'lk-btn--outline': isColoring }]" @click="onRead")
+            //- Coloring book (Anton 22.11.2026): one button, "to the book", and it opens the book in the reading mode (painting is in "Malen")
+            button(v-if="isColoring" type="button" class="lk-btn lk-btn--full" data-test="to-book" @click="onOpenColoringBook")
               ZIconography(name="series" :size="22")
-              span {{ isColoring ? t('app.bookDetail.browse') : t('app.bookDetail.readMyself') }}
-            div(class="cta-second")
+              span {{ t('app.bookDetail.toBook') }}
+            button(v-else type="button" class="lk-btn lk-btn--full" @click="onRead")
+              ZIconography(name="series" :size="22")
+              span {{ t('app.bookDetail.readMyself') }}
+            div(v-if="!isColoring" class="cta-second")
               button(
                 v-if="!isColoring"
                 type="button"
@@ -722,6 +723,21 @@ button
   height: 100%
   object-fit: cover
   display: block
+
+// a coloring book: the cover in the middle, the title and the line under it, centred (Anton 22.11.2026)
+.hero-row.is-coloring
+  flex-direction: column
+  align-items: center
+  text-align: center
+  gap: 14px
+
+  .hero-cover
+    flex: none
+    width: min(64%, 15rem)
+
+  .hero-info
+    align-items: center
+    padding-bottom: 0
 
 .hero-info
   position: relative

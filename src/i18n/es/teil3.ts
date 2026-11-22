@@ -962,6 +962,7 @@ export default {
     readMyself: 'Leer',
     paint: 'Colorear',
     browse: 'Hojear',
+    toBook: 'Al libro',
     download: 'Descargar',
     nowListening: 'ESCUCHANDO AHORA',
     followAlong: 'SIGUE EL TEXTO',

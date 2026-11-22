@@ -32,6 +32,9 @@ export interface StoreBook {
    */
   coverEn?: string
   coverRatioEn?: number
+  /** A look inside and the whole book for the English edition (the pictures of the book itself are in the language of the book). Until they are there, the English card has only the store button. */
+  previewEn?: { pages: PreviewPage[] }
+  digitalEn?: { price: string; pages: PreviewPage[]; pdf: string }
   url: string
   /** The book is announced but not for sale yet: "coming soon" instead of the store button. */
   comingSoon?: boolean
@@ -58,13 +61,15 @@ export const storeBooks: StoreBook[] = [
   {
     id: 'der-mann-im-baum-zachaeus',
     series: 'Der Mann im Baum',
-    seriesEn: 'Little Bible Stories',
+    seriesEn: 'The Man in the Tree',
     title: { de: 'Zachäus begegnet Jesus', en: 'Zacchaeus meets Jesus' },
     text: {
       de: 'Ein Bilderbuch über Zachäus in Jericho. Jesus sieht jeden einzelnen Menschen, und seine Liebe kann jedes Herz verändern. Mit einem QR-Code zum Geschichts-Song.',
       en: 'A picture book about Zacchaeus in Jericho. Jesus sees every single person, and his love can change every heart. With a QR code for the story song.'
     },
     cover: 'images/buecher/zachaeus-cover.webp',
+    // the English edition: "The Man in the Tree – Zacchaeus meets Jesus!" (the front cover; the pages of the English book are not in the app yet)
+    coverEn: 'images/buecher/zachaeus-cover-en.webp',
     url: printedBookUrl('der-mann-im-baum-zachaeus', STORE_URL),
     // five sample pages (the sixth of the landing page is left out, so that the end of the story stays a surprise); with the cover and
     // the page about buying the preview has seven pages

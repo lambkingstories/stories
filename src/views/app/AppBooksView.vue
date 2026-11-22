@@ -75,8 +75,9 @@ const cards = computed<BookCardData[]>(() => {
     ratio: (lang.value === 'en' ? b.coverRatioEn : b.coverRatio) ?? 1,
     url: b.url,
     comingSoon: !!b.comingSoon,
-    preview: !!b.preview?.pages.length,
-    digital: !!b.digital
+    // the preview and the digital book are the pictures of the book itself: in English only when the English edition has them
+    preview: !!(lang.value === 'en' ? b.previewEn : b.preview)?.pages.length,
+    digital: !!(lang.value === 'en' ? b.digitalEn : b.digital)
   }))
   const fromBackend = backendBooks.value.filter((b) => bookIn(b, lang.value)).map((b) => ({
     id: b.bookId,

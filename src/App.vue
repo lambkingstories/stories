@@ -72,11 +72,9 @@ try {
  * The sign `?arrange=1` (the start page is being arranged, see `HomeTileGrid`) is a step of the history, not another page: the screen stays as it is, it is not made new, and
  * no screen change is played (Anton 22.11.2026: the back button then ends arranging).
  */
-const ARRANGE_QUERY = 'arrange'
-const withoutArrange = (query: Record<string, unknown>) => {
-  const { [ARRANGE_QUERY]: _sign, ...rest } = query
-  return rest
-}
+// (`read=1` is such a sign too: a coloring book opened in its reading mode takes it from the address again without the screen being made new)
+const SIGNS = ['arrange', 'read']
+const withoutArrange = (query: Record<string, unknown>) => Object.fromEntries(Object.entries(query).filter(([k]) => !SIGNS.includes(k)))
 /** The key of a screen: its address without the arranging sign. */
 function pageKey(r: { path: string; query: Record<string, unknown> }): string {
   const rest = Object.entries(withoutArrange(r.query)).map(([k, v]) => `${k}=${String(v)}`).join('&')

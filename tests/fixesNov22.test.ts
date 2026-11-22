@@ -21,7 +21,7 @@ describe('books in English', () => {
 
   it('the picture book has its English series name (not the German one)', () => {
     expect(storeBooks[0]!.series).toBe('Der Mann im Baum')
-    expect(storeBooks[0]!.seriesEn).toBe('Little Bible Stories')
+    expect(storeBooks[0]!.seriesEn).toBe('The Man in the Tree')
   })
 
   it('the shelf takes series, cover and shape from the English edition in English and says so when there is none', () => {
@@ -74,5 +74,39 @@ describe('the chips above the lists of books (Anton 22.11.2026)', () => {
     const s = read('components/molecules/OwnFilter.vue')
     expect(s).toContain("const VALUES: OwnFilterValue[] = ['all', 'mine']")
     expect(s).not.toContain("'buy'")
+  })
+})
+
+describe('"The Man in the Tree – Zacchaeus meets Jesus!" in English (Anton 22.11.2026)', () => {
+  it('has its English cover, and so it is an English book', () => {
+    const b = storeBooks[0]!
+    expect(b.coverEn).toBe('images/buecher/zachaeus-cover-en.webp')
+    expect(existsSync(resolve(process.cwd(), 'public', b.coverEn!))).toBe(true)
+    expect(storeBookIn(b, 'en')).toBe(true)
+  })
+  it('has no preview and no digital book in English until the English pages are there (only the store button)', () => {
+    const b = storeBooks[0]!
+    expect(b.previewEn).toBeUndefined()
+    expect(b.digitalEn).toBeUndefined()
+    const s = read('views/app/AppBooksView.vue')
+    expect(s).toContain("preview: !!(lang.value === 'en' ? b.previewEn : b.preview)?.pages.length")
+    expect(s).toContain("digital: !!(lang.value === 'en' ? b.digitalEn : b.digital)")
+  })
+})
+
+describe('the page of a coloring book that is new (Anton 22.11.2026)', () => {
+  const s = read('views/app/AppBookDetailView.vue')
+  it('has the cover in the middle, the title under it, and one button "to the book"', () => {
+    expect(s).toContain("['hero-row', { 'is-coloring': isColoring }]")
+    expect(s).toContain('.hero-row.is-coloring')
+    expect(s).toContain('data-test="to-book"')
+    expect(s).not.toContain('onPaintBook')
+    expect(s).not.toContain("t('app.bookDetail.paint')")
+  })
+  it('the button opens the book in the reading mode, and the book page does so at once and clears the sign', () => {
+    expect(s).toContain("router.push({ name: 'app-coloring-book', params: { bookId: book.value.bookId }, query: { read: '1' } })")
+    const v = read('views/app/AppColoringBookView.vue')
+    expect(v).toContain("route.query.read === '1'")
+    expect(v).toContain('void openReader()')
   })
 })

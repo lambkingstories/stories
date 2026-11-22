@@ -344,7 +344,14 @@ async function start() {
 
 onMounted(() => {
   window.addEventListener('keydown', onKeydown)
-  void start()
+  void start().then(() => {
+    // opened with `read=1` (from the page of a new book): the reading mode opens at once; the sign is taken from the address, so that a reload does not open it again
+    if (route.query.read === '1' && pages.value.length) {
+      const { read: _gone, ...rest } = route.query
+      void router.replace({ query: rest })
+      void openReader()
+    }
+  })
 })
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', onKeydown)
