@@ -751,7 +751,7 @@ export default {
     storeNote: 'También puedes encontrar estos libros en nuestra tienda.',
     ownLabel: 'Mostrar libros',
     own_f_all: 'Todos',
-    own_f_mine: 'Los tengo',
+    own_f_mine: 'Míos',
     own_f_buy: 'Por comprar',
     own_free: 'Gratis',
     own_owned: 'Comprado',

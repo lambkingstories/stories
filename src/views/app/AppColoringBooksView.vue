@@ -38,7 +38,7 @@ const route = useRoute()
 const { asked } = useAskedBook()
 const router = useRouter()
 /** Opened from the painting program: the way back leads there; from the door in "Lesen" it leads back to "Lesen". */
-/** `from=shelf`: opened from the big door / the button of the paint shelf in the painting program: the chip "Habe ich" is on, and a book that is mine goes onto the shelf. */
+/** `from=shelf`: opened from the big door / the button of the paint shelf in the painting program: the chip "Meine" is on, and a book that is mine goes onto the shelf. */
 const fromShelf = computed(() => route.query.from === 'shelf')
 const fromPainting = computed(() => route.query.from === 'malen' || fromShelf.value)
 const apiBooks = useApiBooks()

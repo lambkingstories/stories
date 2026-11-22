@@ -1,6 +1,6 @@
 /**
  * The way from the painting program to the paint shelf (Anton, 18.11.2026): "Malen" opens the painting program as before. The big door "Dein Malregal ist noch leer" (and the
- * button to all coloring books) leads to the list of coloring books with the chip "Habe ich" switched on (`?from=shelf`). A tap on a book that is mine does not open it, it
+ * button to all coloring books) leads to the list of coloring books with the chip "Meine" switched on (`?from=shelf`). A tap on a book that is mine does not open it, it
  * puts it on the paint shelf (a short transfer, which a tap skips) and leads back to the painting program, where the book is lifted once. Books that are not mine, and the list
  * reached any other way, behave as before.
  */
@@ -100,18 +100,18 @@ describe('the way into the painting area is as before', () => {
     expect(readFileSync('src/router/index.ts', 'utf8')).not.toContain('app-coloring-pick')
   })
 
-  it('the big door and the button of the shelf lead to the list with "Habe ich" (from=shelf)', () => {
+  it('the big door and the button of the shelf lead to the list with "Meine" (from=shelf)', () => {
     const view = readFileSync('src/views/app/AppColoringView.vue', 'utf8')
     expect(view).toContain("@to-books=\"router.push({ name: 'app-coloring-books', query: { from: 'shelf' } })\"")
   })
 })
 
 describe('the list from the paint shelf (from=shelf)', () => {
-  it('starts with the chip "Habe ich": only the free book (no book still to buy, also not "Die Schöpfung")', async () => {
+  it('starts with the chip "Meine": only the free book (no book still to buy, also not "Die Schöpfung")', async () => {
     h.query = { from: 'shelf' }
     const w = await list()
     expect(names(w)).toEqual(['Gott erschafft die Welt'])
-    expect(w.find('.own-chip.is-on').text()).toContain('Habe ich')
+    expect(w.find('.own-chip.is-on').text()).toContain('Meine')
   })
 
   it('adds a book that was bought, and every book with Plus', async () => {
@@ -126,7 +126,7 @@ describe('the list from the paint shelf (from=shelf)', () => {
     expect(names(w)).toHaveLength(4)
   })
 
-  it('there are two chips, "Alle" and "Habe ich" (the chip "still to buy" is gone), and they can be changed', async () => {
+  it('there are two chips, "Alle" and "Meine" (the chip "still to buy" is gone), and they can be changed', async () => {
     h.query = { from: 'shelf' }
     const w = await list()
     const chips = w.findAll('.own-chip')
@@ -134,7 +134,7 @@ describe('the list from the paint shelf (from=shelf)', () => {
     expect(chips.some((c) => c.text().includes('Noch zu kaufen'))).toBe(false)
     await chips.find((c) => c.text().includes('Alle'))!.trigger('click')
     expect(names(w)).toHaveLength(4)
-    await chips.find((c) => c.text().includes('Habe ich'))!.trigger('click')
+    await chips.find((c) => c.text().includes('Meine'))!.trigger('click')
     expect(names(w).length).toBeLessThan(4)
   })
 
