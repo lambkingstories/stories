@@ -17,3 +17,13 @@ export function goBackTo(router: Router, to: RouteLocationRaw): void {
   if (prev !== null && prev.split('?')[0] === path) router.back()
   else void router.replace(to)
 }
+
+/**
+ * The way back to where the child really came from (Anton 22.11.2026): when there is a page before this one in the app, one real step back leads there, whatever it is (the start
+ * page, a list, a book). Only when this is the first page (opened by a link, a reload) the page `fallback` takes its place. Used where a page can be reached from several
+ * places, so that "back" does not throw the child into another part of the app (and the tab bar does not jump).
+ */
+export function goBackToOrigin(router: Router, fallback: RouteLocationRaw): void {
+  if (previousPath() !== null) router.back()
+  else void router.replace(fallback)
+}

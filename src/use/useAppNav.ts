@@ -3,8 +3,8 @@
  * Centralises the 5-item LambKing nav (Start, Lesen, Abenteuer, Malen, Ich) so each view only needs to call `useAppNav(t)` and pass the
  * returned `navItems` / `activeNav` / `onNav` into `<ZBottomNav>`.
  */
-import { computed, type ComputedRef } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed, ref, type ComputedRef } from 'vue'
+import { useRoute, useRouter, type RouteLocationNormalized, type Router } from 'vue-router'
 import type { ComposerTranslation } from 'vue-i18n'
 import { prependBaseUrl } from '@/utils/function'
 
@@ -43,6 +43,77 @@ export function routeToNav(name: string, query?: Record<string, unknown>): AppNa
   return 'home'
 }
 
+// ── Which tab is lit (Anton 22.11.2026) ─────────────────────────────────────────────────────────────────────────────────────────
+// The tab bar follows the way the child went, not the page it is on: a page that is opened from "Start" keeps "Start" lit, one that is opened from "Lesen" keeps "Lesen", and so on.
+// The tab changes only (1) when a tab is tapped, and (2) when a place is entered that belongs to a tab by itself: the painting screen (Malen), the adventure map and its stages
+// (Abenteuer). Going back lights the tab that was lit on that page before. A page that is opened directly (the address, a reload) has the tab that its kind belongs to.
+
+/** The places that belong to a tab by themselves. */
+export const OWN_TAB: Readonly<Record<string, AppNavId>> = {
+  'app-main': 'home',
+  'app-read': 'series',
+  'app-adventure': 'abenteuer',
+  'app-adventure-map': 'abenteuer',
+  'app-adventure-stage': 'abenteuer',
+  'app-adventure-stats': 'abenteuer',
+  'app-coloring': 'malen',
+  'app-profile': 'profile'
+}
+
+/**
+ * The tab of a page that is entered. `previous` is the tab that was lit on the page the child comes from (none when the app has just been opened), `remembered` the tab this
+ * very page had when it was shown before (going back or forward in the history).
+ */
+export function decideNav(name: string, query: Record<string, unknown> | undefined, previous: AppNavId | null, remembered: AppNavId | null): AppNavId {
+  const own = OWN_TAB[name]
+  if (own) return own
+  return remembered ?? previous ?? routeToNav(name, query)
+}
+
+/** The tab that is lit now; `null` until the first page is entered (then the kind of the page decides, see `routeToNav`). */
+export const contextNav = ref<AppNavId | null>(null)
+const visited = new Map<number, { path: string; nav: AppNavId }>()
+let tracked = false
+
+/** Starts to follow the way through the app (once). */
+export function trackNav(router: Router): void {
+  if (tracked) return
+  tracked = true
+  // where in the history the page stands: the browser says it (`state.position`); a history without that (the one of the tests) is counted by hand
+  let counted = 0
+  let popDelta: number | null = null
+  // the first page may be entered already (the app starts before this runs): its tab is the one of its kind
+  const here = router.currentRoute.value
+  if (here.name) {
+    counted = 1
+    const nav = decideNav(String(here.name), here.query, null, null)
+    contextNav.value = nav
+    const given = (router.options.history.state as { position?: number } | undefined)?.position
+    visited.set(typeof given === 'number' ? given : counted, { path: here.fullPath, nav })
+  }
+  router.options.history.listen((_to, _from, info) => {
+    popDelta = info.delta
+  })
+  router.afterEach((to: RouteLocationNormalized, from: RouteLocationNormalized) => {
+    counted = popDelta !== null ? counted + popDelta : counted + 1
+    popDelta = null
+    const given = (router.options.history.state as { position?: number } | undefined)?.position
+    const position = typeof given === 'number' ? given : counted
+    const seen = visited.get(position)
+    const remembered = seen && seen.path === to.fullPath ? seen.nav : null
+    const nav = decideNav(String(to.name ?? ''), to.query, from.name ? contextNav.value : null, remembered)
+    contextNav.value = nav
+    visited.set(position, { path: to.fullPath, nav })
+  })
+}
+
+/** For the tests: forget the way. */
+export function resetNavTracking(): void {
+  contextNav.value = null
+  visited.clear()
+  tracked = false
+}
+
 const ROUTE_BY_NAV: Record<AppNavId, string> = {
   home: 'app-main',
   series: 'app-read',
@@ -67,7 +138,7 @@ export default function useAppNav(t: ComposerTranslation): {
     { id: 'profile', label: t('app.nav.profile'), icon: 'profile', image: symbol('ich') },
   ])
 
-  const activeNav = computed<string | number>(() => routeToNav(String(route.name || ''), route.query))
+  const activeNav = computed<string | number>(() => contextNav.value ?? routeToNav(String(route.name || ''), route.query))
 
   function onNav(id: string | number) {
     const name = ROUTE_BY_NAV[id as AppNavId]

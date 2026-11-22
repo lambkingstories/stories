@@ -16,7 +16,7 @@ import { coloringPagesOfBook, type ColoringBookPage } from '@/utils/coloringBook
 import { deleteArtwork, getDrawing, listArtworks, pageArtworkId, type ArtworkMeta } from '@/use/useArtworks'
 import { LINE_ICONS } from '@/data/coloringKits'
 import { prependBaseUrl } from '@/utils/function'
-import { goBackTo, previousPath } from '@/utils/navBack'
+import { goBackToOrigin, previousPath } from '@/utils/navBack'
 import { shortColoringTitle } from '@/utils/coloringTitles'
 import useColoringShelf from '@/use/useColoringShelf'
 import { cacheUrlToBlobUrl } from '@/use/useBookCache'
@@ -291,7 +291,7 @@ function back() {
     router.back()
     return
   }
-  goBackTo(router, { name: 'app-coloring' })
+  goBackToOrigin(router, { name: 'app-coloring' })
 }
 
 // ── Start ---------------------------------------------------------------------------------

@@ -18,7 +18,7 @@ import { listArtworks, pageArtworkId, type ArtworkMeta } from '@/use/useArtworks
 import { booksOfArea } from '@/utils/readingAreas'
 import { coloringPagesOfBook } from '@/utils/coloringBook'
 import { pickLocalizedImage, type ApiBook, type Locale } from '@/types/apiBook'
-import { goBackTo } from '@/utils/navBack'
+import { goBackToOrigin } from '@/utils/navBack'
 import useColoringShelf from '@/use/useColoringShelf'
 import ColoringTransfer from '@/components/molecules/ColoringTransfer.vue'
 import { PREMIUM_TEASER, hasFeature, ownsBook } from '@/use/usePremium'
@@ -118,7 +118,7 @@ function retry() {
 }
 
 function goBack() {
-  goBackTo(router, { name: fromPainting.value ? 'app-coloring' : 'app-read' })
+  goBackToOrigin(router, { name: fromPainting.value ? 'app-coloring' : 'app-read' })
 }
 
 const paintShelf = useColoringShelf()
@@ -146,7 +146,7 @@ function arrived() {
   if (!m) return
   moving.value = null
   paintShelf.markFresh(m.card.bookId)
-  goBackTo(router, { name: 'app-coloring' })
+  goBackToOrigin(router, { name: 'app-coloring' })
 }
 </script>
 

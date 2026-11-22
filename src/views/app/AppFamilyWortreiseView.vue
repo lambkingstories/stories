@@ -29,7 +29,7 @@ import { PREMIUM_TEASER, hasFeature, showUpsell } from '@/use/usePremium'
 import useFamilySave from '@/use/useFamilySave'
 import useSfx from '@/use/useSfx'
 import useUserName from '@/use/useUserName'
-import { goBackTo } from '@/utils/navBack'
+import { goBackToOrigin } from '@/utils/navBack'
 import { ranking } from '@/utils/familyQuiz'
 import {
   WR_LEVELS,
@@ -191,12 +191,12 @@ function goBack() {
     phase.value = 'start'
     return
   }
-  goBackTo(router, { name: 'app-family' })
+  goBackToOrigin(router, { name: 'app-family' })
 }
 
 /** "To the games": from the end back to the page of the family games. */
 function toGames() {
-  goBackTo(router, { name: 'app-family' })
+  goBackToOrigin(router, { name: 'app-family' })
 }
 
 // ── keep playing ────────────────────────────────────────────────────────────────────────────────────────────────

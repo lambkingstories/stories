@@ -13,7 +13,7 @@ import PlusBadge from '@/components/atoms/PlusBadge.vue'
 import useSfx from '@/use/useSfx'
 import { PREMIUM_TEASER, hasFeature, showUpsell } from '@/use/usePremium'
 import { prependBaseUrl } from '@/utils/function'
-import { goBackTo } from '@/utils/navBack'
+import { goBackToOrigin } from '@/utils/navBack'
 
 const { t } = useI18n({ useScope: 'global' })
 const router = useRouter()
@@ -22,7 +22,7 @@ const { play } = useSfx()
 function goBack() {
   // always to "My games" (one real step back when that is the page before, else it replaces this page): a game that
   // pushed this page must not become the way back
-  goBackTo(router, { name: 'app-gameroom' })
+  goBackToOrigin(router, { name: 'app-gameroom' })
 }
 
 interface Game {

@@ -15,7 +15,7 @@ import { computed, nextTick, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import MapTable from '@/components/molecules/map/MapTable.vue'
-import { goBackTo } from '@/utils/navBack'
+import { goBackToOrigin } from '@/utils/navBack'
 import MapToken from '@/components/molecules/map/MapToken.vue'
 import FamilyCard from '@/components/molecules/family/FamilyCard.vue'
 import FamilyButton from '@/components/molecules/family/FamilyButton.vue'
@@ -294,12 +294,12 @@ function goBack() {
     phase.value = 'start'
     return
   }
-  goBackTo(router, { name: 'app-family' })
+  goBackToOrigin(router, { name: 'app-family' })
 }
 
 /** "To the games": from the end back to the page of the family games. */
 function toGames() {
-  goBackTo(router, { name: 'app-family' })
+  goBackToOrigin(router, { name: 'app-family' })
 }
 
 function begin(list: FamilyQuestion[], playersCount: number) {

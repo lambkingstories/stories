@@ -18,7 +18,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import MapTable from '@/components/molecules/map/MapTable.vue'
-import { goBackTo } from '@/utils/navBack'
+import { goBackToOrigin } from '@/utils/navBack'
 import FamilyCard from '@/components/molecules/family/FamilyCard.vue'
 import FamilyButton from '@/components/molecules/family/FamilyButton.vue'
 import FamilyChip from '@/components/molecules/family/FamilyChip.vue'
@@ -53,7 +53,7 @@ function goBack() {
     phase.value = 'start'
     return
   }
-  goBackTo(router, { name: 'app-family' })
+  goBackToOrigin(router, { name: 'app-family' })
 }
 
 /** Leaving a running round (the bar of the game asked first): the clock stops here, the round stays kept ("Continue"). */
@@ -64,7 +64,7 @@ function toStart() {
 
 /** "To the games": from the end back to the page of the family games. */
 function toGames() {
-  goBackTo(router, { name: 'app-family' })
+  goBackToOrigin(router, { name: 'app-family' })
 }
 
 const locked = computed(() => PREMIUM_TEASER && !hasFeature('family'))

@@ -249,9 +249,9 @@ describe('the old ways lead to the new places', () => {
     w.unmount()
   })
 
-  it('the family games page goes back to "Meine Spiele"', () => {
+  it('the family games page goes back to where it was opened from, and to "Meine Spiele" when it was opened directly', () => {
     const src = readFileSync(resolve(__dirname, '../src/views/app/AppFamilyGamesView.vue'), 'utf8')
-    expect(src).toContain("goBackTo(router, { name: 'app-gameroom' })")
+    expect(src).toContain("goBackToOrigin(router, { name: 'app-gameroom' })")
   })
 })
 

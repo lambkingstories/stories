@@ -19,7 +19,7 @@ import PremiumSheet from '@/components/molecules/PremiumSheet.vue'
 import { GAME_USER_LANGUAGE } from '@/utils/constants.ts'
 import { setAdventureLanguage } from '@/use/adventureLanguage'
 import { startActivityTracking, type Section } from '@/use/useActivity'
-import { routeToNav } from '@/use/useAppNav'
+import { contextNav, routeToNav, trackNav } from '@/use/useAppNav'
 
 const { initMusic, pauseMusic, continueMusic } = useMusic()
 const { userLanguage } = useUser()
@@ -80,6 +80,9 @@ function pageKey(r: { path: string; query: Record<string, unknown> }): string {
   const rest = Object.entries(withoutArrange(r.query)).map(([k, v]) => `${k}=${String(v)}`).join('&')
   return rest ? `${r.path}?${rest}` : r.path
 }
+
+// the tab bar follows the way the child went (see `useAppNav`)
+trackNav(router)
 
 router.beforeEach((to, from) => {
   if (from.name && from.path === to.path && pageKey(from) === pageKey(to)) return true
@@ -270,7 +273,7 @@ onMounted(() => {
     const name = String(route.name ?? '')
     // the family games and the game room count as playing, wherever the way leads through
     if (name.startsWith('app-family') || name === 'app-gameroom' || name === 'app-games-adventure' || name === 'app-games-stage' || name === 'app-big-game') return 'play'
-    return SECTION_OF_NAV[routeToNav(name, route.query)] ?? 'other'
+    return SECTION_OF_NAV[contextNav.value ?? routeToNav(name, route.query)] ?? 'other'
   })
 })
 onUnmounted(() => stopTracking?.())
