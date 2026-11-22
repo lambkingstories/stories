@@ -350,7 +350,9 @@ onBeforeUnmount(() => {
   display: flex
   flex-wrap: wrap
   gap: 10px
-  margin-top: 8px
+  // the buttons of all slides lie on the same line, at the foot of the card, however long the title or the text of a slide is (Anton 22.11.2026)
+  margin-top: auto
+  padding-top: 8px
 
   &:empty
     display: none

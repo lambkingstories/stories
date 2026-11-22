@@ -47,3 +47,10 @@ describe('the rewards line of the adventures', () => {
     expect(read('views/app/AppAdventureHomeView.vue')).toContain("router-link(:to=\"{ name: 'app-collection' }\" :class=\"['rewards-line'")
   })
 })
+
+describe('the slides of the start page', () => {
+  it('have their buttons on the same line (the actions are pushed to the foot of the card)', () => {
+    const s = read('components/molecules/HomeHero.vue')
+    expect(s).toMatch(/\.hero-actions[\s\S]*?margin-top: auto/)
+  })
+})
