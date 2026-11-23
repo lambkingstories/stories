@@ -256,6 +256,9 @@ jobs:
           if [ -n "${{ inputs.media_split }}" ]; then
             EXTRA="--config src-tauri/tauri.ios-media.conf.json"
             echo "Media split: ${{ inputs.media_split }}"
+            # Tauri reads the list of resources before Vite has run (first try, 23.11.2026: "glob pattern ../dist-media/**/* path not found"): the folder must exist.
+            # Vite empties and fills it again (see vite.config.media.ts).
+            mkdir -p dist-media && echo "placeholder" > dist-media/placeholder.txt
           fi
           pnpm exec tauri ios build --export-method "${{ inputs.export_method }}" --build-number "${{ github.run_number }}" $EXTRA
           if [ -n "${{ inputs.media_split }}" ]; then
