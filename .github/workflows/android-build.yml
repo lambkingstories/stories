@@ -2,7 +2,7 @@ name: Android Build & Sign
 
 # Builds the signed Play Store bundle (.aab) and an installable .apk.
 # Upload the .aab by hand in the Play Console (Test and release -> Closed testing).
-# Last build request: 2026-11-22 (1.2.1 final: language flags, one look for the Plus sign, paintings on locked pages hidden, reading mode for coloring books, New for you flow, tab bar follows the way, start page with 8 places).
+# Last build request: 2026-11-23 (1.2.1 final: 21 adventures and Josef (the kings series, 431 MB), one lock on closed adventures, language flags, one look for the Plus sign, paintings on locked pages hidden, reading mode for coloring books, New for you flow, start page with 8 places).
 #
 # Needs the repository secrets ANDROID_KEYSTORE_BASE64 (the release keystore,
 # base64) and ANDROID_KEYSTORE_PASSWORD (store = key password; alias `lambking`).
@@ -51,13 +51,11 @@ jobs:
       VITE_SHOW_MOSE: "true"
       VITE_SHOW_WEIHNACHTEN: "true"
       VITE_SHOW_OSTERN: "true"
+      VITE_SHOW_SALOMO: "true"
+      VITE_SHOW_DAVID: "true"
+      VITE_SHOW_SAMUEL: "true"
+      VITE_SHOW_GIDEON: "true"
       VITE_SHOW_RUT: "true"
-      VITE_SHOW_OFFENBARUNG: "true"
-      VITE_SHOW_ELISA: "true"
-      VITE_SHOW_ELIA: "true"
-      VITE_SHOW_TAUFE: "true"
-      VITE_SHOW_SOHN: "true"
-      VITE_SHOW_PROPHETEN: "true"
       VITE_SHOW_NEHEMIA: "true"
       VITE_SHOW_JOSUA: "true"
       VITE_SHOW_HEILUNG: "true"
