@@ -17,7 +17,7 @@ describe('store builds', () => {
     expect(shown(android).length).toBeGreaterThan(0)
   })
 
-  it('keep the adventures that were measured to fit (21 flags and Josef = 22: 431 MB of web files, the limit of Apple is 500 MB for the program file)', () => {
+  it('keep the adventures that were measured to fit (22 flags and Josef = 23 since 1.2.2 with Elia: about 446 MB; 1.2.1 had 21 flags and Josef = 22: 431 MB of web files, the limit of Apple is 500 MB for the program file)', () => {
     // one more adventure costs 10-30 MB: raise this number only after measuring `du -sm dist` and keeping 30 MB of air under 500 MB
     expect(shown(android).length).toBeLessThanOrEqual(22)
   })

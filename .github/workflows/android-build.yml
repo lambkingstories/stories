@@ -51,6 +51,7 @@ jobs:
       VITE_SHOW_MOSE: "true"
       VITE_SHOW_WEIHNACHTEN: "true"
       VITE_SHOW_OSTERN: "true"
+      VITE_SHOW_ELIA: "true"
       VITE_SHOW_SALOMO: "true"
       VITE_SHOW_DAVID: "true"
       VITE_SHOW_SAMUEL: "true"
