@@ -138,8 +138,8 @@ defineExpose({ scrollToEpoch, scrollToCurrent })
                   AdventureStars(:stars="e.item.stars" :size="14")
                 div(v-else class="tl-card is-closed")
                   span(class="tl-art")
+                    //- the medal of a closed adventure already carries its padlock: no second lock on top
                     img(:src="ui('coin-locked')" alt="" draggable="false")
-                    img(:src="ui('lock')" alt="" class="tl-lock" draggable="false")
                   span(class="tl-name") {{ e.title }}
                   span(class="tl-soon") {{ t('app.adventure.soonLabel') }}
       //- the end of the line: an arrow that points on
@@ -425,14 +425,6 @@ $gap: 30px
   bottom: -4px
   width: 38px !important
   height: 38px !important
-
-.tl-lock
-  position: absolute
-  left: 50%
-  top: 50%
-  width: 34px !important
-  height: 34px !important
-  transform: translate(-50%, -50%)
 
 .tl-name
   padding: 0 6px

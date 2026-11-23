@@ -275,8 +275,8 @@ async function doDelete() {
               div(v-else class="tile is-closed")
                 span(class="tile-no") {{ e.nr }}
                 span(class="tile-art")
+                  //- the medal of a closed adventure already carries its padlock: no second lock on top (Anton 23.11.2026)
                   img(:src="ui('coin-locked')" alt="" draggable="false")
-                  img(:src="ui('lock')" alt="" class="tile-lock" draggable="false")
                 span(class="tile-name") {{ e.title }}
                 span(class="tile-soon") {{ t('app.adventure.soonLabel') }}
 
@@ -825,14 +825,6 @@ $ink: var(--lk-text)
   bottom: -6%
   width: 40%
   pointer-events: none
-
-.tile-art .tile-lock
-  position: absolute
-  left: 50%
-  top: 50%
-  width: 30%
-  transform: translate(-50%, -50%)
-  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.35))
 
 .tile-name
   font-weight: 800
