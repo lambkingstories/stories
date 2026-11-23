@@ -40,5 +40,6 @@ export const REWARD_GAMES: Record<string, number[]> = {
   offenbarung: [7, 9],
   sohn: [5, 6],
   ichbin: [2, 12],
-  bergpredigt: [4, 7]
+  bergpredigt: [4, 7],
+  simson: [5, 7]
 }

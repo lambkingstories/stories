@@ -100,6 +100,8 @@ export const ICHBIN_PREVIEW_KEY = 'lk-preview-ichbin'
 export const ICHBIN_UNLOCK_CODE = 'ichbin-vorschau-t6n4'
 export const BERGPREDIGT_PREVIEW_KEY = 'lk-preview-bergpredigt'
 export const BERGPREDIGT_UNLOCK_CODE = 'bergpredigt-vorschau-v7r3'
+export const SIMSON_PREVIEW_KEY = 'lk-preview-simson'
+export const SIMSON_UNLOCK_CODE = 'simson-vorschau-mikv'
 
 /** A journey that is shown only on unlocked devices: the name of its link (`?<param>=<code>`), where the unlock is kept, and how it is loaded. */
 interface PreviewJourney {
@@ -466,6 +468,16 @@ function previewJourneys(): PreviewJourney[] {
       key: BERGPREDIGT_PREVIEW_KEY,
       always: import.meta.env.VITE_SHOW_BERGPREDIGT === 'true',
       load: async () => (await import('@/data/adventures/bergpredigt')).bergpredigt
+    })
+  }
+  if (import.meta.env.VITE_INCLUDE_SIMSON === 'true' || import.meta.env.VITE_SHOW_SIMSON === 'true') {
+    list.push({
+      id: 'simson',
+      param: 'simson',
+      code: SIMSON_UNLOCK_CODE,
+      key: SIMSON_PREVIEW_KEY,
+      always: import.meta.env.VITE_SHOW_SIMSON === 'true',
+      load: async () => (await import('@/data/adventures/simson')).simson
     })
   }
   if (import.meta.env.VITE_INCLUDE_NOAH === 'true' || import.meta.env.VITE_SHOW_NOAH === 'true') {

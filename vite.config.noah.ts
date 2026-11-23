@@ -315,3 +315,11 @@ export const BERGPREDIGT_ONLY_DIRS = ['images/abenteuer/bergpredigt', 'images/ab
 export function stripBergpredigtFiles(outDir: string) {
   strip(outDir, BERGPREDIGT_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Simson" (id `simson`) alone, in the same three places as Adam and Eve. */
+export const SIMSON_ONLY_DIRS = ['images/abenteuer/simson', 'images/abenteuer/spiele/simson', 'audio/abenteuer/simson']
+
+/** Takes the folders of "Simson" out of a finished build. */
+export function stripSimsonFiles(outDir: string) {
+  strip(outDir, SIMSON_ONLY_DIRS)
+}

@@ -36,6 +36,7 @@ export const CARD_ART: Record<string, CardArt> = {
   'freunde': { front: 'images/abenteuer/freunde/karte-vorn.webp', back: 'images/abenteuer/freunde/karte-hinten.webp' },
   'wunder': { front: 'images/abenteuer/wunder/karte-vorn.webp', back: 'images/abenteuer/wunder/karte-hinten.webp' },
   'bergpredigt': { front: 'images/abenteuer/bergpredigt/karte-vorn.webp', back: 'images/abenteuer/bergpredigt/karte-hinten.webp' },
+  'simson': { front: 'images/abenteuer/simson/medaille-v1.webp', back: 'images/abenteuer/simson/medaille-v1.webp' }, // PLATZHALTER bis karte-vorn/-hinten gemalt sind
   'gleichnisse': { front: 'images/abenteuer/gleichnisse/karte-vorn.webp', back: 'images/abenteuer/gleichnisse/karte-hinten.webp' },
   'heilung': { front: 'images/abenteuer/heilung/karte-vorn.webp', back: 'images/abenteuer/heilung/karte-hinten.webp' },
   'ichbin': { front: 'images/abenteuer/ichbin/karte-vorn.webp', back: 'images/abenteuer/ichbin/karte-hinten.webp' },

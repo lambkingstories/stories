@@ -62,6 +62,11 @@ export const MEMORY_VERSES: Record<string, MemoryVerse> = {
     en: { ref: 'Judges 6:12', text: `The LORD is with thee, thou mighty man of valour.` },
     line: { de: `Gideon hielt sich für den Kleinsten. Gott nannte ihn trotzdem einen Helden.`, en: `Gideon thought he was the smallest. God called him a hero all the same.` }
   },
+  simson: {
+    de: { ref: 'Richter 13,24', text: `Und der Knabe wuchs, und der HERR segnete ihn.` },
+    en: { ref: 'Judges 13:24', text: `And the child grew, and the LORD blessed him.` },
+    line: { de: `Der Engel des HERRN sagte Manoachs Frau einen Sohn an. Sie nannte ihn Simson.`, en: `The angel of the LORD told Manoah's wife that she would have a son. She called him Samson.` }
+  },
   rut: {
     de: { ref: 'Rut 1,16', text: `Wo du hin gehst, da will ich auch hin gehen; wo du bleibst, da bleibe ich auch. Dein Volk ist mein Volk, und dein Gott ist mein Gott.` },
     en: { ref: 'Ruth 1:16', text: `Whither thou goest, I will go; and where thou lodgest, I will lodge: thy people shall be my people, and thy God my God.` },

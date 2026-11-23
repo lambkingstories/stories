@@ -115,7 +115,7 @@ describe('BigGameMemory', () => {
     expect(tiles).toHaveLength(TIMELINE.length)
     expect(tiles.map((t) => t.attributes('data-test'))).toEqual(TIMELINE.map((e) => 'memory-board-' + e.id))
     expect(w.findAll('.mm-epoch').length).toBe(7)
-    expect(w.find('[data-test="memory-progress"]').text()).toBe('0 von 37 Brettern geschafft')
+    expect(w.find('[data-test="memory-progress"]').text()).toBe('0 von 38 Brettern geschafft')
     w.unmount()
   })
 
@@ -240,7 +240,7 @@ describe('BigGameMemory', () => {
     expect(w.find('[data-test="memory-next"]').exists()).toBe(true)
     // back to the overview: the card of Adam and Eve is shown, with its stars
     await w.find('[data-test="memory-menu-btn"]').trigger('click')
-    expect(w.find('[data-test="memory-progress"]').text()).toBe('1 von 37 Brettern geschafft')
+    expect(w.find('[data-test="memory-progress"]').text()).toBe('1 von 38 Brettern geschafft')
     expect(w.find('[data-test="memory-board-adam-eva"]').classes()).toContain('is-done')
     w.unmount()
   })

@@ -34,6 +34,7 @@ import { offenbarung } from '@/data/adventures/offenbarung'
 import { sohn } from '@/data/adventures/sohn'
 import { ichbin } from '@/data/adventures/ichbin'
 import { bergpredigt } from '@/data/adventures/bergpredigt'
+import { simson } from '@/data/adventures/simson'
 import { pfingsten } from '@/data/adventures/pfingsten'
 import { paulusrom } from '@/data/adventures/paulusrom'
 import { paulus } from '@/data/adventures/paulus'
@@ -42,7 +43,7 @@ import { journeyFiles } from '@/utils/journeyFiles'
 import { MUSIC_FILES } from '@/utils/sfxFiles'
 
 // every adventure has its own music: at least three pieces (Anton, 21.10.2026), so that one hears more than one piece
-const ALL = [josef, noah, adamEva, abraham, jakob, babel, josua, gideon, mose, jona, daniel, elia, rut, samuel, david, salomo, elisa, ester, nehemia, propheten, weihnachten, taufe, freunde, wueste, wunder, heilung, gleichnisse, zachaeus, letztewoche, ostern, pfingsten, offenbarung, paulus, paulusrom, sohn, ichbin, bergpredigt]
+const ALL = [josef, noah, adamEva, abraham, jakob, babel, josua, gideon, mose, jona, daniel, elia, rut, samuel, david, salomo, elisa, ester, nehemia, propheten, weihnachten, taufe, freunde, wueste, wunder, heilung, gleichnisse, zachaeus, letztewoche, ostern, pfingsten, offenbarung, paulus, paulusrom, sohn, ichbin, bergpredigt, simson]
 
 describe('the music of the journeys', () => {
   for (const j of ALL) {
