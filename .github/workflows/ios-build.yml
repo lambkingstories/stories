@@ -23,6 +23,11 @@ on:
         required: false
         default: ""
         type: string
+      media_split:
+        description: "TEST for 1.3: ids of adventures whose pictures and sounds are NOT put into the program file but next to it, e.g. elia (empty = normal build)"
+        required: false
+        default: ""
+        type: string
 
 concurrency:
   group: ios-build
@@ -62,6 +67,8 @@ jobs:
       # Release 1.1 (2026-11-04): only these adventures are public (see android-build.yml).
       # Release 1.2 (2026-11-04): purchases on (LambKing Plus). Free: Josef, Adam und Eva, Noah, Babel, Abraham, Jakob (FREE_JOURNEYS); Mose is Plus.
       VITE_PREMIUM_TEASER: "true"
+      # empty in a normal build; `media_split` makes Vite move the media of those adventures to dist-media/ (see src/utils/mediaSplit.ts)
+      VITE_MEDIA_SPLIT: ${{ inputs.media_split }}
       VITE_SHOW_NOAH: "true"
       VITE_SHOW_ADAM: "true"
       VITE_SHOW_BABEL: "true"
@@ -244,7 +251,17 @@ jobs:
           # plain "2" (its 1.0.0.10 was taken by a hung upload), so the old
           # <app version>.<run> scheme (1.0.0.x) would now be "lower than 2".
           # If Xcode ever renumbers again, raise bundleVersion above it.
-          pnpm exec tauri ios build --export-method "${{ inputs.export_method }}" --build-number "${{ github.run_number }}"
+          # the media test (1.3): the folder dist-media/ that Vite made is bundled as resources next to the program, and the asset protocol may read it
+          EXTRA=""
+          if [ -n "${{ inputs.media_split }}" ]; then
+            EXTRA="--config src-tauri/tauri.ios-media.conf.json"
+            echo "Media split: ${{ inputs.media_split }}"
+          fi
+          pnpm exec tauri ios build --export-method "${{ inputs.export_method }}" --build-number "${{ github.run_number }}" $EXTRA
+          if [ -n "${{ inputs.media_split }}" ]; then
+            echo "dist-media size:"; du -sh dist-media || true
+            find src-tauri/gen/apple/build -name '*.app' -maxdepth 6 | head -3 || true
+          fi
 
       # iOS terminates the app (no prompt, no error) when it touches the camera
       # or Photos without a usage description; 1.0.0.7 was rejected for that.

@@ -23,6 +23,8 @@ const AppAdventureStageView = () => import('@/views/app/AppAdventureStageView.vu
 const AppAdventureStatsView = () => import('@/views/app/AppAdventureStatsView.vue')
 const AppProfileView = () => import('@/views/app/AppProfileView.vue')
 const AppLegalView = () => import('@/views/app/AppLegalView.vue')
+// the test page of "media outside the program file" (only a build with `VITE_MEDIA_SPLIT` has a button that leads there)
+const AppMediaTestView = () => import('@/views/app/AppMediaTestView.vue')
 const AppPlusView = () => import('@/views/app/AppPlusView.vue')
 const AppFeaturesView = () => import('@/views/app/AppFeaturesView.vue')
 const AppVoicesView = () => import('@/views/app/AppVoicesView.vue')
@@ -125,6 +127,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/app/adventure/:journeyId/:stageId', name: 'app-adventure-stage', component: AppAdventureStageView },
   { path: '/app/profile', name: 'app-profile', component: AppProfileView },
   { path: '/app/legal', name: 'app-legal', component: AppLegalView },
+  { path: '/app/medientest', name: 'app-media-test', component: AppMediaTestView },
   { path: '/app/plus', name: 'app-plus', component: AppPlusView },
   { path: '/app/was-kann-lambking', name: 'app-features', component: AppFeaturesView },
   // the numbers for grown-ups (reached through the parents' window, behind the parental gate)

@@ -1,4 +1,5 @@
 import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripDavidFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles, stripGleichnisseFiles, stripZachaeusFiles, stripLetztewocheFiles, stripOsternFiles, stripPfingstenFiles, stripPaulusFiles, stripPaulusromFiles, stripOffenbarungFiles, stripSohnFiles, stripIchbinFiles, stripBergpredigtFiles } from './vite.config.noah'
+import { splitMediaFiles } from './vite.config.media'
 import { fileURLToPath, URL } from 'node:url'
 import { resolve, dirname } from 'node:path'
 import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
@@ -69,11 +70,13 @@ export default defineConfig(({ mode }) => {
   // build. Unless the build is a test build (VITE_LOCAL_TEST_BOOKS=true) their pictures are taken out again, so a
   // store build never ships them.
   let outDir = 'dist'
+  let projectRoot = ''
   const stripLocalTestBooks: Plugin = {
     name: 'strip-local-test-books',
     apply: 'build',
     configResolved(config) {
       outDir = resolve(config.root, config.build.outDir)
+      projectRoot = config.root
     },
     closeBundle() {
       if (env.VITE_LOCAL_TEST_BOOKS !== 'true') rmSync(resolve(outDir, 'images/ausmalbuecher'), { recursive: true, force: true })
@@ -221,6 +224,12 @@ export default defineConfig(({ mode }) => {
       // The same for "Die Bergpredigt" (`VITE_INCLUDE_BERGPREDIGT=true` / `vite --mode bergpredigt`).
       if (env.VITE_SHOW_BERGPREDIGT !== 'true' && env.VITE_INCLUDE_BERGPREDIGT !== 'true') {
         stripBergpredigtFiles(outDir)
+      }
+      // Media outside the program file (the test for 1.3, see src/utils/mediaSplit.ts): after the strips above, so only media that belong to the build are moved.
+      if (env.VITE_MEDIA_SPLIT) {
+        const ids = env.VITE_MEDIA_SPLIT.split(',').map((x) => x.trim()).filter(Boolean)
+        const r = splitMediaFiles(outDir, projectRoot, ids, env.VITE_MEDIA_SPLIT_WEB === 'true')
+        console.log(`[media-split] ${ids.join(',')}: ${r.moved} folders moved to ${r.target}`)
       }
     }
   }

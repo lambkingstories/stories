@@ -13,6 +13,7 @@ import AvatarPickerModal from '@/components/molecules/AvatarPickerModal.vue'
 import TestUnlock from '@/components/molecules/TestUnlock.vue'
 import BuildStamp from '@/components/atoms/BuildStamp.vue'
 import usePremium, { PLUS_TEST, PREMIUM_TEASER } from '@/use/usePremium'
+import { MEDIA_SPLIT_ON } from '@/utils/mediaSplit'
 import { MANAGE_URL } from '@/data/plusProducts'
 import { isIOS } from '@/utils/platform'
 import { openExternal } from '@/utils/openExternal'
@@ -329,6 +330,9 @@ const tileImg = (path: string) => prependBaseUrl(`images/${path}.webp`)
 
       //- only in the test build: unlock all the adventures to try the cards and the big games
       TestUnlock(v-if="PLUS_TEST")
+
+      //- only in the test build of "media outside the program file" (1.3 test): leads to the page that shows whether the media load
+      router-link(v-if="MEDIA_SPLIT_ON" :to="{ name: 'app-media-test' }" class="lk-btn lk-btn--full" data-test="media-test-link") Medien-Test (nur Test-Fassung)
 
       //- ===== Settings (collapsible) =====
       div(

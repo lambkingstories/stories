@@ -1,3 +1,5 @@
+import { isSplitPath, MEDIA_SPLIT_ON, splitUrl } from '@/utils/mediaSplit'
+
 export const isProduction = import.meta.env.VITE_NODE_ENV === 'production'
 export const isWeb = import.meta.env.VITE_PLATTFORM === 'web'
 
@@ -15,7 +17,15 @@ export const isWeb = import.meta.env.VITE_PLATTFORM === 'web'
 // where `/little-bible-stories/assets/images/bg/…` 404s came from.
 const baseURL = import.meta.env.BASE_URL || '/'
 
-export const prependBaseUrl = (url: string): string => `${baseURL}${url.replace(/^\/+/, '')}`
+export const prependBaseUrl = (url: string): string => {
+  const path = url.replace(/^\/+/, '')
+  // the media of an adventure that lies outside the program file (only in a build with `VITE_MEDIA_SPLIT`, see `mediaSplit.ts`)
+  if (MEDIA_SPLIT_ON && isSplitPath(path)) {
+    const away = splitUrl(path)
+    if (away) return away
+  }
+  return `${baseURL}${path}`
+}
 export const repeat = (n: number, callback: (_: any, i: number) => string): string[] => [...new Array(n)].map(callback)
 export const repeatPages = (n: number, callback: (_: any, i: number) => any): any[] => [...new Array(n)].map(callback)
 

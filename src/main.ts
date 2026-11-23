@@ -21,6 +21,7 @@ import { offeredLanguage } from '@/utils/languages'
 import { mergeObjectsRecursive } from '@/utils/function'
 import { GAME_USER_LANGUAGE } from '@/utils/constants.ts'
 import { loadPreviewJourneys } from '@/data/adventures'
+import { initMediaSplit } from '@/utils/mediaSplit'
 
 // On-device debug console (vConsole). Gated by `VITE_DEBUG_CONSOLE=true`
 // at build time so production APKs / Pages bundles don't ship the
@@ -123,7 +124,8 @@ app.use(i18n)
 
 // journeys that are not public yet (Noah) are added on devices that were unlocked, before the first screen is drawn
 // (the first screen waits at most a second for them: later ones are there when a screen is opened again)
-void Promise.all([Promise.race([loadPreviewJourneys(), new Promise((resolve) => setTimeout(resolve, 1000))]), userLanguage.value === 'es' ? loadSpanish() : undefined]).finally(() => app.mount('#app'))
+// (a build that keeps the media of some adventures outside the program file first finds the folder of them: `initMediaSplit`, a few seconds at most, never fails)
+void Promise.all([Promise.race([loadPreviewJourneys(), new Promise((resolve) => setTimeout(resolve, 1000))]), userLanguage.value === 'es' ? loadSpanish() : undefined, initMediaSplit()]).finally(() => app.mount('#app'))
 
 // In the app from the store: ask the store what the person owns (LambKing Plus, single coloring books). Loaded only there, so the web bundle never carries it.
 if (import.meta.env.VITE_APP_NATIVE === 'true') {

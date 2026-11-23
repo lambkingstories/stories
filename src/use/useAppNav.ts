@@ -39,7 +39,7 @@ export function routeToNav(name: string, query?: Record<string, unknown>): AppNa
   // the coloring books: the door in "Lesen" leads there with `?from=read`, and then the tab bar keeps "Lesen" (Anton 22.11.2026); from "Malen" it shows "Malen"
   if (name === 'app-coloring-books' || name === 'app-coloring-book') return query?.from === 'read' ? 'series' : 'malen'
   if (name === 'app-coloring') return 'malen'
-  if (name === 'app-profile' || name === 'app-legal' || name === 'app-plus' || name === 'app-awards' || name === 'app-parents' || name === 'app-collection' || name === 'app-gameroom' || name === 'app-games-adventure' || name === 'app-games-stage' || name === 'app-family' || name === 'app-journal' || name === 'app-voices') return 'profile'
+  if (name === 'app-profile' || name === 'app-legal' || name === 'app-plus' || name === 'app-awards' || name === 'app-parents' || name === 'app-collection' || name === 'app-gameroom' || name === 'app-games-adventure' || name === 'app-games-stage' || name === 'app-family' || name === 'app-journal' || name === 'app-voices' || name === 'app-media-test') return 'profile'
   return 'home'
 }
 
