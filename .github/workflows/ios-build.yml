@@ -256,9 +256,11 @@ jobs:
           if [ -n "${{ inputs.media_split }}" ]; then
             EXTRA="--config src-tauri/tauri.ios-media.conf.json"
             echo "Media split: ${{ inputs.media_split }}"
-            # Tauri reads the list of resources before Vite has run (first try, 23.11.2026: "glob pattern ../dist-media/**/* path not found"): the folder must exist.
-            # Vite empties and fills it again (see vite.config.media.ts).
-            mkdir -p dist-media && echo "placeholder" > dist-media/placeholder.txt
+            # Tauri reads AND COPIES the resources before its own `beforeBuildCommand` (Vite) has run: first try (23.11.2026) "glob pattern ../dist-media/**/* path not found",
+            # second try (placeholder file) the app only had the placeholder. So Vite runs once here first and makes dist-media/ with the real media; the build that Tauri
+            # starts afterwards makes the same folder again.
+            pnpm build-only
+            ls dist-media/images/abenteuer || true
           fi
           pnpm exec tauri ios build --export-method "${{ inputs.export_method }}" --build-number "${{ github.run_number }}" $EXTRA
           if [ -n "${{ inputs.media_split }}" ]; then
