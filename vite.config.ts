@@ -1,4 +1,4 @@
-import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripDavidFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles, stripGleichnisseFiles, stripZachaeusFiles, stripLetztewocheFiles, stripOsternFiles, stripPfingstenFiles, stripPaulusFiles, stripPaulusromFiles, stripOffenbarungFiles, stripSohnFiles, stripIchbinFiles, stripBergpredigtFiles, stripSimsonFiles } from './vite.config.noah'
+import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripDavidFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles, stripGleichnisseFiles, stripZachaeusFiles, stripLetztewocheFiles, stripOsternFiles, stripPfingstenFiles, stripPaulusFiles, stripPaulusromFiles, stripOffenbarungFiles, stripSohnFiles, stripIchbinFiles, stripBergpredigtFiles, stripSimsonFiles, stripJohannesFiles } from './vite.config.noah'
 import { splitMediaFiles } from './vite.config.media'
 import { fileURLToPath, URL } from 'node:url'
 import { resolve, dirname } from 'node:path'
@@ -228,6 +228,10 @@ export default defineConfig(({ mode }) => {
       // The same for "Simson" (`VITE_INCLUDE_SIMSON=true` / `vite --mode simson`).
       if (env.VITE_SHOW_SIMSON !== 'true' && env.VITE_INCLUDE_SIMSON !== 'true') {
         stripSimsonFiles(outDir)
+      }
+      // The same for "Johannes der Täufer" (`VITE_INCLUDE_JOHANNES=true` / `vite --mode johannes`).
+      if (env.VITE_SHOW_JOHANNES !== 'true' && env.VITE_INCLUDE_JOHANNES !== 'true') {
+        stripJohannesFiles(outDir)
       }
       // Media outside the program file (the test for 1.3, see src/utils/mediaSplit.ts): after the strips above, so only media that belong to the build are moved.
       if (env.VITE_MEDIA_SPLIT) {

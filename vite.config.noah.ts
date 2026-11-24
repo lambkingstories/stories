@@ -323,3 +323,11 @@ export const SIMSON_ONLY_DIRS = ['images/abenteuer/simson', 'images/abenteuer/sp
 export function stripSimsonFiles(outDir: string) {
   strip(outDir, SIMSON_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Johannes der Täufer" (id `johannes`) alone, in the same three places as Adam and Eve. */
+export const JOHANNES_ONLY_DIRS = ['images/abenteuer/johannes', 'images/abenteuer/spiele/johannes', 'audio/abenteuer/johannes']
+
+/** Takes the folders of "Johannes der Täufer" out of a finished build. */
+export function stripJohannesFiles(outDir: string) {
+  strip(outDir, JOHANNES_ONLY_DIRS)
+}

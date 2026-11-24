@@ -132,6 +132,11 @@ export const MEMORY_VERSES: Record<string, MemoryVerse> = {
     en: { ref: 'Matthew 3:17', text: `This is my beloved Son, in whom I am well pleased.` },
     line: { de: `Als Jesus getauft wurde, sprach eine Stimme vom Himmel.`, en: `When Jesus was baptized, a voice spoke from heaven.` }
   },
+  johannes: {
+    de: { ref: 'Lukas 1,80', text: `Und das Kindlein wuchs und ward stark im Geist.` },
+    en: { ref: 'Luke 1:80', text: `And the child grew, and waxed strong in spirit.` },
+    line: { de: `Der Engel sagte Zacharias einen Sohn an. Er sollte Johannes heißen.`, en: `The angel told Zacharias that he would have a son. He was to be called John.` }
+  },
   freunde: {
     de: { ref: 'Lukas 5,10', text: `Fürchte dich nicht; denn von nun an wirst du Menschen fangen.` },
     en: { ref: 'Luke 5:10', text: `Fear not; from henceforth thou shalt catch men.` },

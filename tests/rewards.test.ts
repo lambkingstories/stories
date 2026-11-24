@@ -40,12 +40,13 @@ import { sohn } from '@/data/adventures/sohn'
 import { ichbin } from '@/data/adventures/ichbin'
 import { bergpredigt } from '@/data/adventures/bergpredigt'
 import { simson } from '@/data/adventures/simson'
+import { johannes } from '@/data/adventures/johannes'
 import { samuel } from '@/data/adventures/samuel'
 import { REWARD_GAMES } from '@/data/adventures/rewardGames'
 import { cupOf, rewardGameTotal, rewardGames, unlockedGames } from '@/utils/rewards'
 import type { Journey, JourneyProgress } from '@/types/adventure'
 
-const ALL: Journey[] = [adamEva, noah, babel, abraham, jakob, josef, mose, josua, gideon, rut, samuel, david, elia, jona, daniel, salomo, elisa, ester, nehemia, propheten, weihnachten, taufe, freunde, wueste, wunder, heilung, gleichnisse, zachaeus, letztewoche, ostern, pfingsten, paulus, paulusrom, offenbarung, sohn, ichbin, bergpredigt, simson]
+const ALL: Journey[] = [adamEva, noah, babel, abraham, jakob, josef, mose, josua, gideon, rut, samuel, david, elia, jona, daniel, salomo, elisa, ester, nehemia, propheten, weihnachten, taufe, freunde, wueste, wunder, heilung, gleichnisse, zachaeus, letztewoche, ostern, pfingsten, paulus, paulusrom, offenbarung, sohn, ichbin, bergpredigt, simson, johannes]
 
 /** A progress with the exam done and so many stars and right answers that the share of the possible points is about `share`. */
 function progressFor(j: Journey, share: number): JourneyProgress {
