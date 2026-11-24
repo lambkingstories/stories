@@ -212,7 +212,7 @@ export const johannes: Journey = {
     },
     {
       id: 2,
-      image: `${PICS}etappe-bild-02.webp`,
+      image: `${PICS}etappe-bild-02-v2.webp`,
       music: 'audio/abenteuer/johannes/musik-tempel-v1.mp3',
       title: 'Zacharias muss schweigen',
       ref: 'Lukas 1,18–25',
@@ -345,7 +345,7 @@ export const johannes: Journey = {
     },
     {
       id: 9,
-      image: `${PICS}etappe-bild-09.webp`,
+      image: `${PICS}etappe-bild-09-v2.webp`,
       music: 'audio/abenteuer/johannes/musik-aenon-v1.mp3',
       title: 'Er muss wachsen',
       ref: 'Johannes 3,22–30',
