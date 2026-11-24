@@ -1,12 +1,12 @@
 /**
  * Abenteuer "Johannes der Täufer" (Lukas 1 und 3, Johannes 1 und 3, Matthäus 11 und 14; id `johannes`) für 7 bis 10 Jahre: 10 Etappen. Entstanden nach dem Skill "LambKing Abenteuer Skill".
- * Luther 1912 kindgerecht erzählt; weggelassen (ETAPPENPLAN.md): Maria und Elisabeth, der Auftritt mit dem Kamelhaar und die Rede an die Pharisäer, die Taufe Jesu (alles in "Weihnachten" und "Taufe"),
- * Herodias und die Art von Johannes' Tod (Etappe 10 endet mit dem Satz "Später starb Johannes ..."). Der Engel Gabriel erscheint in den Etappen 1 und 2; Gott der Vater und die Taube sind nie im Bild.
- * Kein Blut, keine Waffen, keine Soldaten, keine Fesseln; Herodes ist nie im Bild. Merkvers: Lukas 1,80a (Lückenvers in Etappe 4).
+ * Luther 1912 kindgerecht erzählt; weggelassen (ETAPPENPLAN.md): Maria und Elisabeth, der Auftritt mit dem Kamelhaar und die Rede an die Pharisäer, (Maria und Elisabeth und der Kamelhaar-Auftritt stehen in "Weihnachten" und "Taufe"; die Taufe Jesu erzählt hier Etappe 7 "Jesus kommt zu Johannes", Mt 3,13–17),
+ * Herodias und die Art von Johannes' Tod (Etappe 10 endet mit dem Satz "Später starb Johannes ..."). Der Engel Gabriel erscheint in den Etappen 1 und 2; Gott der Vater ist nie im Bild; die Taube nur im Bild der Etappe 7.
+ * Kein Blut, keine Waffen, keine Soldaten, keine Fesseln; Herodes ist nie im Bild. Merkvers: Lukas 1,80a (Lückenvers in Etappe 3).
  * Quelle der Texte: D:/Claude/Abenteuer-Johannes/ENTWURF_Johannes.md, Plan: ETAPPENPLAN.md, Figuren: FIGUREN.md, Spiele: SPIELE.md.
  * Die richtige Antwort steht in den Daten IMMER zuerst (answer: 0); die App mischt die Antworten beim Anzeigen.
- * Spiele (Antons Regel 5.11.2026: höchstens zwei bekannte Spiele, nie hintereinander): 2 Zeige es ihnen (gebaerde, neu), 4 Lückenvers (lueckenvers, bekannt, Merkvers Lk 1,80a),
- * 6 Wer zwei hat, gibt ab (abgeben, neu), 8 Wohin zeigt Johannes? (zeigen, neu), 9 Ausmalen (ausmalen, bekannt); die Etappen 1, 3, 5, 7 und die ernste 10 nur Fragen.
+ * Spiele (Antons Regel 5.11.2026: höchstens zwei bekannte Spiele, nie hintereinander): 2 Zeige es ihnen (gebaerde, neu), 3 Lückenvers (lueckenvers, bekannt, Merkvers Lk 1,80a),
+ * 5 Wer zwei hat, gibt ab (abgeben, neu), 6 Ausmalen (ausmalen, bekannt: die Taufe Jesu), 8 Wohin zeigt Johannes? (zeigen, neu); die Etappen 1, 4, 7, 9 und die ernste 10 nur Fragen.
  * Dateien dieses Abenteuers liegen NUR in diesen Ordnern (der normale Build lässt sie weg, siehe vite.config.noah.ts):
  * images/abenteuer/johannes/, images/abenteuer/spiele/johannes/<spiel>/, audio/abenteuer/johannes/.
  * Das Abenteuer ist nicht öffentlich: es ist hinter dem Vorschau-Link versteckt (`src/data/adventures/index.ts`).
@@ -49,7 +49,7 @@ const GEBAERDE: GestureGame = {
 }
 
 /**
- * Etappe 4, "Lückenvers" (bekannt 1, Lk 1,80a, der Merkvers): der Vers steht im Wortlaut von Luther 1912. Tafel und Blatt wie in allen Abenteuern (aus `spiele/simson/lueckenvers/` kopiert),
+ * Etappe 3, "Lückenvers" (bekannt 1, Lk 1,80a, der Merkvers): der Vers steht im Wortlaut von Luther 1912. Tafel und Blatt wie in allen Abenteuern (aus `spiele/simson/lueckenvers/` kopiert),
  * Hintergrund `hintergrund/vers-hintergrund` (Dorfrand im Bergland von Judäa, Morgenlicht, ohne Menschen, ohne Tiere).
  */
 const VERS: VerseGame = {
@@ -63,7 +63,7 @@ const VERS: VerseGame = {
 }
 
 /**
- * Etappe 6, "Wer zwei hat, gibt ab" (neu, `abgeben`, Lk 3,11): am Jordanufer stehen Menschen in einer Reihe, jeder hat Röcke (Runde 1) oder Brote (Runde 2) auf seiner Matte, manche nichts. Wer mehr
+ * Etappe 5, "Wer zwei hat, gibt ab" (neu, `abgeben`, Lk 3,11): am Jordanufer stehen Menschen in einer Reihe, jeder hat Röcke (Runde 1) oder Brote (Runde 2) auf seiner Matte, manche nichts. Wer mehr
  * als eins hat, reicht eins dem NACHBARN, bis jeder genau eins hat. „Nur zum Nachbarn“ und „es reicht genau“ sind Spielregeln, keine Bibelworte; Zöllner und Soldaten kommen im Spiel nicht vor.
  * Lagen: VORLÄUFIG, am gemalten Bild nachzumessen (tools/_massen_johannes.json).
  * Bilder (`spiele/johannes/abgeben/`): `ufer` (1500 × 1000), `person-1…5` (je 260 × 420), `matte` (260 × 70), `rock` (200 × 160), `brot` (160 × 120).
@@ -132,30 +132,30 @@ const ZEIGEN: PointGame = {
 }
 
 /**
- * Etappe 9, "Ausmalen" (bekannt 2, Joh 3,23): Strichbild „Die Quellen von Änon“ (Quellen und Wasserläufe zu einem flachen Becken, Palmen, Schilf, Felsen, Hügel, Sonne, Wolken, ein Vogel; keine
- * Menschen, keine Schrift). Zonen am Strichbild gemessen (Saatpunkte in Prozent, tools/zonen_aus9_johannes.py, tools/_zonen_johannes.json); bei jedem Start werden drei Aufgaben aus dem Pool gezogen.
+ * Etappe 6, "Ausmalen" (bekannt 2, Mt 3,13–17): Strichbild „Die Taufe Jesu“ (Jesus hüfttief im Jordan, Johannes neben ihm, eine Taube, Schilf, Felsen, Hügel; keine Strahlen, kein Heiligenschein,
+ * kein Gott). Zonen am Strichbild gemessen (Saatpunkte in Prozent, tools/zonen_aus9_johannes.py, tools/_zonen_johannes.json); bei jedem Start werden drei Aufgaben aus dem Pool gezogen.
  */
 const AUSMALEN_ZONEN: Record<string, PaintZone> = {
-  himmel: { seeds: [[49.1, 5.1]] },
-  sonne: { seeds: [[67.7, 9.1]] },
-  wolken: { seeds: [[29.2, 19.3], [58.3, 20.3]] },
-  wasser: { seeds: [[57, 81.4], [31.9, 80.9], [71.1, 57.1]] },
-  gewand: { seeds: [[44.7, 66.8], [42.7, 39.7], [47.9, 47.8]] },
-  baum: { seeds: [[2.6, 15.3]] },
-  felsen: { seeds: [[86.9, 81], [92, 64.3], [89.4, 73.8]] },
-  huegel: { seeds: [[60.7, 35.7], [21.9, 35.2], [29.2, 32.5]] },
-  palmen: { seeds: [[86.1, 5.2], [86, 10.3], [82.5, 16.4], [86.3, 16], [88.1, 21.6]] }
+  himmel: { seeds: [[52.5, 23.6]] },
+  wolken: { seeds: [[44.8, 7.7], [96.1, 9.5]] },
+  taube: { seeds: [[68.7, 12.1], [64.6, 7.8]] },
+  wasser: { seeds: [[78.2, 78.3], [41.7, 78.3]] },
+  jesus: { seeds: [[63.6, 58.5], [73.6, 61.9], [51.9, 60.5], [51.9, 65.5]] },
+  johannes: { seeds: [[30.2, 80.5], [37.3, 44.9], [30, 42.6], [23.3, 78.3]] },
+  huegel: { seeds: [[49.4, 34.7], [81.6, 31.2], [91.5, 33.6]] },
+  felsen: { seeds: [[7, 86.2], [9.5, 97.1], [8.6, 90.7], [7.7, 74.7]] },
+  baum: { seeds: [[8.5, 15.4]] }
 }
 const AUSMALEN_AUFGABEN: PaintJob[] = [
   { zone: 'himmel', color: 'blue', hint: 'Male den Himmel blau.' },
-  { zone: 'wasser', tool: 'watercolor', hint: 'Male das Wasser mit Wasserfarbe.' },
-  { zone: 'sonne', color: 'yellow', hint: 'Male die Sonne gelb.' },
   { zone: 'wolken', tool: 'chalk', hint: 'Male die Wolken mit Kreide.' },
-  { zone: 'gewand', color: 'brown', hint: 'Male das Gewand von Johannes braun.' },
+  { zone: 'taube', tool: 'graphite', hint: 'Male die Taube sanft mit Graphit.' },
+  { zone: 'wasser', tool: 'watercolor', hint: 'Male das Wasser mit Wasserfarbe.' },
+  { zone: 'jesus', color: 'red', hint: 'Male das Gewand von Jesus rot.' },
+  { zone: 'johannes', color: 'brown', hint: 'Male das Gewand von Johannes braun.' },
   { zone: 'baum', color: 'brown', hint: 'Male den Baumstamm braun.' },
-  { zone: 'felsen', color: 'orange', hint: 'Male den Felsen rechts orange.' },
-  { zone: 'huegel', color: 'orange', hint: 'Male die fernen Hügel orange.' },
-  { zone: 'palmen', color: 'green', hint: 'Male die Palmenblätter grün.' }
+  { zone: 'felsen', color: 'orange', hint: 'Male die Felsen am Ufer orange.' },
+  { zone: 'huegel', color: 'brown', hint: 'Male die fernen Hügel braun.' }
 ]
 
 export const johannes: Journey = {
@@ -163,30 +163,30 @@ export const johannes: Journey = {
   title: 'Johannes der Täufer',
   subtitle: 'Vom Engel im Tempel bis ins Gefängnis',
   age: '8-10',
-  downloadMb: 14, // gemessen 24.11.2026: alle 103 Dateien von journeyFiles(johannes) = 13,22 MB, aufgerundet
+  downloadMb: 14, // gemessen 24.11.2026: alle 103 Dateien von journeyFiles(johannes) = 13,07 MB (10 Etappen, Panorama v3), aufgerundet
   medal: `${PICS}medaille-v1.webp`, // Medaille 1 bis zu Antons Wahl
   // Geschenk-Ausmalbild (Variante b, Leitung 24.11.2026): Johannes ruft am Jordan mit der Hand am Mund, drei winzige Menschen fern; Konturzeichnung
   gift: { title: 'Johannes ruft am Jordan', image: `${PICS}geschenk-b.webp` },
   // die gemalte Karte (Panorama in drei Stücken, 9920 × 1648 px, OpenAI-Bildmodell): von Tempel und Bergland von Judäa durch die Wüste an den Jordan, nach Bethabara und Änon bis zum Gefängnis;
   // Stationen aus ergebnis/panorama-<Fassung>/map-johannes*.json, Perlenweg aus johannesPath.ts
   map: {
-    images: [1, 2, 3].map((n) => `images/abenteuer/johannes/karte-pano-v1-${n}.webp`),
+    images: [1, 2, 3].map((n) => `images/abenteuer/johannes/karte-pano-v3-${n}.webp`),
     ring: josef.map.ring,
     aspect: 9920 / 1648,
     widthPx: 9920,
     stages: [
-      { x: 0.0403, y: 0.7828, d: 0.0339 },
-      { x: 0.1895, y: 0.2852, d: 0.0339 },
-      { x: 0.2671, y: 0.5947, d: 0.0339 },
-      { x: 0.3256, y: 0.3155, d: 0.0339 },
-      { x: 0.4990, y: 0.4733, d: 0.0339 },
-      { x: 0.5827, y: 0.2002, d: 0.0339 },
-      { x: 0.6149, y: 0.7585, d: 0.0339 },
-      { x: 0.6754, y: 0.2913, d: 0.0339 },
-      { x: 0.8165, y: 0.6857, d: 0.0339 },
-      { x: 0.9093, y: 0.3883, d: 0.0339 }
+      { x: 0.0907, y: 0.6675, d: 0.0339 },
+      { x: 0.1764, y: 0.3034, d: 0.0339 },
+      { x: 0.2742, y: 0.7585, d: 0.0339 },
+      { x: 0.3276, y: 0.3155, d: 0.0339 },
+      { x: 0.4536, y: 0.7828, d: 0.0339 },
+      { x: 0.5645, y: 0.2609, d: 0.0339 },
+      { x: 0.6905, y: 0.7828, d: 0.0339 },
+      { x: 0.7661, y: 0.2852, d: 0.0339 },
+      { x: 0.8821, y: 0.7524, d: 0.0339 },
+      { x: 0.9405, y: 0.2731, d: 0.0339 }
     ],
-    exam: { x: 0.9577, y: 0.7524, d: 0.0339 },
+    exam: { x: 0.9778, y: 0.7585, d: 0.0339 },
     path: JOHANNES_PATH
   },
   stages: [
@@ -233,43 +233,24 @@ export const johannes: Journey = {
       id: 3,
       image: `${PICS}etappe-bild-03.webp`,
       music: 'audio/abenteuer/johannes/musik-tempel-v1.mp3',
-      title: 'Wie soll das Kind heißen?',
-      ref: 'Lukas 1,57–66',
+      title: 'Der Name und das Lied',
+      ref: 'Lukas 1,57–80',
       text: [
-        'Elisabeth bekommt einen Sohn. Die Nachbarn und Verwandten hören, wie gütig der HERR zu ihr gewesen ist, und freuen sich mit ihr.',
-        'Am achten Tag kommen sie zum Kind. Sie wollen es nach seinem Vater nennen: Zacharias. Aber seine Mutter sagt: „Nein, er soll Johannes heißen.“ „Niemand in deiner Verwandtschaft heißt so“, sagen sie, und sie winken dem Vater zu: Wie will er das Kind nennen?',
-        'Zacharias verlangt ein Täfelchen und schreibt darauf: „Er heißt Johannes.“ Alle staunen. Im selben Augenblick wird sein Mund aufgetan, und er redet und lobt Gott.',
-        'Furcht und Staunen kommen über die Nachbarn, und im ganzen Bergland von Judäa erzählt man davon. Alle, die es hören, fragen sich: „Was wird wohl aus diesem Kind werden?“ Denn die Hand des HERRN ist mit ihm.'
+        'Elisabeth bekommt einen Sohn. Die Nachbarn freuen sich mit ihr.',
+        'Am achten Tag will man das Kind nach seinem Vater nennen: Zacharias. Aber seine Mutter sagt: „Nein, er soll Johannes heißen.“ Zacharias verlangt ein Täfelchen und schreibt darauf: „Er heißt Johannes.“ Alle staunen. Im selben Augenblick wird sein Mund aufgetan, und er lobt Gott.',
+        'Dann wird Zacharias vom Heiligen Geist erfüllt. Er spricht zu dem Kind: „Und du, Kindlein, wirst ein Prophet des Höchsten heißen. Du wirst vor dem HERRN hergehen und seinen Weg bereiten.“',
+        'Das Kindlein wächst und wird stark im Geist. Johannes lebt in der Wüste, bis die Zeit kommt, in der er vor das Volk Israel treten soll.'
       ],
-      // nur Fragen
-      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
+      // Spiel: Lückenvers (lueckenvers, bekannt, Merkvers Lk 1,80a)
+      task: { kind: 'lueckenvers', hint: 'Setze das fehlende Wort in den Vers.', verse: VERS },
       questions: [
-        { q: 'Wie wollen die Nachbarn das Kind zuerst nennen?', options: ['Zacharias', 'Gabriel', 'Elia'], answer: 0 },
         { q: 'Worauf schreibt Zacharias den Namen?', options: ['auf ein Täfelchen', 'auf ein Tuch', 'in den Sand'], answer: 0 },
         { q: 'Was tut Zacharias, als sein Mund aufgetan wird?', options: ['Er lobt Gott.', 'Er geht in den Tempel.', 'Er läuft fort.'], answer: 0 }
       ]
     },
     {
       id: 4,
-      image: `${PICS}etappe-bild-04.webp`,
-      music: 'audio/abenteuer/johannes/musik-tempel-v1.mp3',
-      title: 'Das Lied des Zacharias',
-      ref: 'Lukas 1,67–80',
-      text: [
-        'Zacharias wird vom Heiligen Geist erfüllt. Er spricht: „Gelobt sei der HERR, der Gott Israels! Er hat sein Volk besucht und erlöst.“',
-        'Dann spricht er zu dem Kind: „Und du, Kindlein, wirst ein Prophet des Höchsten heißen. Du wirst vor dem HERRN hergehen und seinen Weg bereiten.“',
-        'Das Kind wächst und wird stark im Geist. Johannes lebt in der Wüste, bis die Zeit kommt, in der er vor das Volk Israel treten soll.'
-      ],
-      // Spiel: Lückenvers (lueckenvers, bekannt, Merkvers Lk 1,80a)
-      task: { kind: 'lueckenvers', hint: 'Setze das fehlende Wort in den Vers.', verse: VERS },
-      questions: [
-        { q: 'Was wird das Kind nach den Worten seines Vaters heißen?', options: ['Prophet des Höchsten', 'König von Israel', 'Priester im Tempel'], answer: 0 },
-        { q: 'Wo lebt Johannes, bis er vor das Volk treten soll?', options: ['in der Wüste', 'in Jerusalem', 'am Meer'], answer: 0 }
-      ]
-    },
-    {
-      id: 5,
-      image: `${PICS}etappe-bild-05.webp`,
+      image: `${PICS}etappe-bild-04-m.webp`,
       music: 'audio/abenteuer/johannes/musik-stimme-v1.mp3',
       title: 'Eine Stimme ruft',
       ref: 'Lukas 3,1–6',
@@ -287,8 +268,8 @@ export const johannes: Journey = {
       ]
     },
     {
-      id: 6,
-      image: `${PICS}etappe-bild-06.webp`,
+      id: 5,
+      image: `${PICS}etappe-bild-05-m.webp`,
       music: 'audio/abenteuer/johannes/musik-stimme-v1.mp3',
       title: 'Was sollen wir tun?',
       ref: 'Lukas 3,10–14',
@@ -305,8 +286,27 @@ export const johannes: Journey = {
       ]
     },
     {
+      id: 6,
+      image: `${PICS}etappe-bild-06-m.webp`,
+      music: 'audio/abenteuer/johannes/musik-stimme-v1.mp3',
+      title: 'Jesus kommt zu Johannes',
+      ref: 'Matthäus 3,13–17',
+      text: [
+        'Eines Tages kommt Jesus aus Galiläa an den Jordan zu Johannes. Er will sich von ihm taufen lassen.',
+        'Johannes wehrt ab: „Ich müsste von dir getauft werden, und du kommst zu mir?“ Jesus antwortet: „Lass es jetzt geschehen. So erfüllen wir, was vor Gott recht ist.“ Da lässt Johannes es zu.',
+        'Als Jesus getauft ist, steigt er sofort aus dem Wasser. Der Himmel tut sich auf. Jesus sieht den Geist Gottes wie eine Taube herabkommen und auf sich kommen.',
+        'Und eine Stimme aus dem Himmel spricht: „Dies ist mein lieber Sohn, an dem ich Wohlgefallen habe.“'
+      ],
+      // Spiel: Ausmalen (ausmalen, bekannt): die Taufe Jesu
+      task: { kind: 'ausmalen', hint: 'Male die Taufe Jesu im Jordan aus.', image: `${G}ausmalen/etappe-06.webp`, zones: AUSMALEN_ZONEN, jobs: AUSMALEN_AUFGABEN, jobCount: 3 },
+      questions: [
+        { q: 'Wer will sich von Johannes taufen lassen?', options: ['Jesus', 'Petrus', 'Zacharias'], answer: 0 },
+        { q: 'Wie kommt der Geist Gottes herab?', options: ['wie eine Taube', 'wie ein Adler', 'wie ein Sturm'], answer: 0 }
+      ]
+    },
+    {
       id: 7,
-      image: `${PICS}etappe-bild-07.webp`,
+      image: `${PICS}etappe-bild-07-m.webp`,
       music: 'audio/abenteuer/johannes/musik-stimme-v1.mp3',
       title: 'Wer bist du?',
       ref: 'Johannes 1,19–28',
@@ -326,7 +326,7 @@ export const johannes: Journey = {
     },
     {
       id: 8,
-      image: `${PICS}etappe-bild-08.webp`,
+      image: `${PICS}etappe-bild-08-m.webp`,
       music: 'audio/abenteuer/johannes/musik-stimme-v1.mp3',
       title: 'Siehe, das ist Gottes Lamm',
       ref: 'Johannes 1,29–37',
@@ -345,7 +345,7 @@ export const johannes: Journey = {
     },
     {
       id: 9,
-      image: `${PICS}etappe-bild-09-v2.webp`,
+      image: `${PICS}etappe-bild-09-m.webp`,
       music: 'audio/abenteuer/johannes/musik-aenon-v1.mp3',
       title: 'Er muss wachsen',
       ref: 'Johannes 3,22–30',
@@ -355,16 +355,17 @@ export const johannes: Journey = {
         'Johannes antwortet: „Ein Mensch kann nichts nehmen, es werde ihm denn gegeben vom Himmel. Ihr seid meine Zeugen, dass ich gesagt habe: Ich bin nicht der Christus, sondern vor ihm her gesandt.“',
         '„Wer die Braut hat, der ist der Bräutigam. Der Freund des Bräutigams aber steht da, hört ihm zu und freut sich sehr über die Stimme des Bräutigams. Diese meine Freude ist nun erfüllt. Er muss wachsen, ich aber muss abnehmen.“'
       ],
-      // Spiel: Ausmalen (ausmalen, bekannt)
-      task: { kind: 'ausmalen', hint: 'Male die Quellen von Änon aus.', image: `${G}ausmalen/etappe-09.webp`, zones: AUSMALEN_ZONEN, jobs: AUSMALEN_AUFGABEN, jobCount: 3 },
+      // nur Fragen
+      task: { kind: 'quiz', hint: 'Höre gut zu und beantworte die Fragen.' },
       questions: [
         { q: 'Warum tauft Johannes in Änon?', options: ['Dort ist viel Wasser.', 'Dort steht der Tempel.', 'Dort wohnt seine Mutter.'], answer: 0 },
-        { q: 'Was sagt Johannes über den, zu dem alle laufen?', options: ['Er muss wachsen.', 'Er muss schweigen.', 'Er muss weggehen.'], answer: 0 }
+        { q: 'Was sagt Johannes über den, zu dem alle laufen?', options: ['Er muss wachsen.', 'Er muss schweigen.', 'Er muss weggehen.'], answer: 0 },
+        { q: 'Woher muss einem Menschen etwas gegeben werden, damit er es nehmen kann?', options: ['vom Himmel', 'vom König', 'von den Priestern'], answer: 0 }
       ]
     },
     {
       id: 10,
-      image: `${PICS}etappe-bild-10.webp`,
+      image: `${PICS}etappe-bild-10-m.webp`,
       music: 'audio/abenteuer/johannes/musik-aenon-v1.mp3',
       title: 'Im Gefängnis',
       ref: 'Matthäus 11,2–11; 14,3.12',
@@ -400,7 +401,7 @@ for (const st of johannes.stages) {
 
 // the German recordings of the stories (voice Achernar, files "geschichte-NN-vK.mp3"; K is the version, a re-recorded story gets a new number); until a recording is made the app reads with the voice of the device.
 // stage -> version of the file in public/audio/abenteuer/johannes/ (written by bauen_johannes.py from the files that exist and ergebnis/geltend.json)
-const RECORDING_VERSION: Record<number, number> = { 1: 2, 2: 3, 3: 3, 4: 4, 5: 3, 6: 2, 7: 2, 8: 2, 9: 2, 10: 3 }
+const RECORDING_VERSION: Record<number, number> = { 1: 2, 2: 3, 3: 5, 4: 30, 5: 30, 6: 30, 7: 30, 8: 30, 9: 30, 10: 30 }
 for (const s of johannes.stages) {
   const version = RECORDING_VERSION[s.id]
   const file = version ? `audio/abenteuer/johannes/geschichte-${String(s.id).padStart(2, '0')}-v${version}.mp3` : undefined

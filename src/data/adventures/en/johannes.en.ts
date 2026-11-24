@@ -49,27 +49,12 @@ export const johannesEn: TextOverlay<Journey> = {
       ]
     },
     {
-      title: 'What Shall the Child Be Called?',
-      ref: 'Luke 1:57–66',
+      title: 'The Name and the Song',
+      ref: 'Luke 1:57–80',
       text: [
-        'Elisabeth has a son. The neighbors and relatives hear how kind the LORD has been to her, and they rejoice with her.',
-        'On the eighth day they come to the child. They want to call him after his father: Zacharias. But his mother says: “No, he shall be called John.” “None of your relatives is called by that name,” they say, and they make signs to the father: What does he want the child to be called?',
-        'Zacharias asks for a writing tablet and writes on it: “His name is John.” Everyone is amazed. At that moment his mouth is opened, and he speaks and praises God.',
-        'Fear and wonder come over the neighbors, and in all the hill country of Judaea people talk about it. All who hear it ask themselves: “What will this child become?” For the hand of the LORD is with him.'
-      ],
-      task: { hint: 'Listen well and answer the questions.' },
-      questions: [
-        { q: 'What do the neighbors first want to call the child?', options: ['Zacharias', 'Gabriel', 'Elijah'] },
-        { q: 'What does Zacharias write the name on?', options: ['on a tablet', 'on a cloth', 'in the sand'] },
-        { q: 'What does Zacharias do when his mouth is opened?', options: ['He praises God.', 'He goes to the temple.', 'He runs away.'] }
-      ]
-    },
-    {
-      title: 'The Song of Zacharias',
-      ref: 'Luke 1:67–80',
-      text: [
-        'Zacharias is filled with the Holy Spirit. He says: “Blessed be the LORD God of Israel! He has visited his people and redeemed them.”',
-        'Then he speaks to the child: “And you, child, will be called the prophet of the Highest. You will go before the LORD and prepare his way.”',
+        'Elisabeth has a son. The neighbors rejoice with her.',
+        'On the eighth day they want to call the child after his father: Zacharias. But his mother says: “No, he shall be called John.” Zacharias asks for a writing tablet and writes on it: “His name is John.” Everyone is amazed. At that moment his mouth is opened, and he speaks and praises God.',
+        'Then Zacharias is filled with the Holy Spirit. He says to the child: “And you, child, will be called the prophet of the Highest. You will go before the LORD and prepare his way.”',
         'The child grows and becomes strong in spirit. John lives in the wilderness until the time comes when he is to appear before the people of Israel.'
       ],
       task: {
@@ -82,8 +67,8 @@ export const johannesEn: TextOverlay<Journey> = {
         }
       },
       questions: [
-        { q: 'What will the child be called, says his father?', options: ['the prophet of the Highest', 'the king of Israel', 'a priest in the temple'] },
-        { q: 'Where does John live until he is to appear before the people?', options: ['in the wilderness', 'in Jerusalem', 'by the sea'] }
+        { q: 'What does Zacharias write the name on?', options: ['on a tablet', 'on a cloth', 'in the sand'] },
+        { q: 'What does Zacharias do when his mouth is opened?', options: ['He praises God.', 'He goes to the temple.', 'He runs away.'] }
       ]
     },
     {
@@ -119,6 +104,24 @@ export const johannesEn: TextOverlay<Journey> = {
       questions: [
         { q: 'Who else comes to John and asks, besides the people?', options: ['the tax collectors', 'the fishermen', 'the priests'] },
         { q: 'What does John say to the tax collectors?', options: ['Take no more than what is appointed for you.', 'Pay more taxes.', 'Go home.'] }
+      ]
+    },
+    {
+      title: 'Jesus Comes to John',
+      ref: 'Matthew 3:13–17',
+      text: [
+        'One day Jesus comes from Galilee to the Jordan, to John, to be baptized by him.',
+        'John tries to stop him: “I need to be baptized by you, and do you come to me?” Jesus answers: “Let it be so now. In this way we fulfil what is right before God.” Then John lets him.',
+        'When Jesus is baptized, he goes up at once out of the water. The heavens open. Jesus sees the Spirit of God coming down like a dove and resting on him.',
+        'And a voice from heaven says: “This is my beloved Son, in whom I am well pleased.”'
+      ],
+      task: {
+        hint: 'Colour in the baptism of Jesus in the Jordan.',
+        jobs: [{ hint: 'Colour the sky blue.' }, { hint: 'Colour the clouds with chalk.' }, { hint: 'Shade the dove softly with graphite.' }, { hint: 'Paint the water with watercolour.' }, { hint: 'Colour the garment of Jesus red.' }, { hint: 'Colour the garment of John brown.' }, { hint: 'Colour the tree trunk brown.' }, { hint: 'Colour the rocks on the bank orange.' }, { hint: 'Colour the far hills brown.' }]
+      },
+      questions: [
+        { q: 'Who wants to be baptized by John?', options: ['Jesus', 'Peter', 'Zacharias'] },
+        { q: 'How does the Spirit of God come down?', options: ['like a dove', 'like an eagle', 'like a storm'] }
       ]
     },
     {
@@ -166,13 +169,11 @@ export const johannesEn: TextOverlay<Journey> = {
         'John answers: “A man can receive nothing unless it is given him from heaven. You are my witnesses that I said: I am not the Christ, but I am sent before him.”',
         '“He who has the bride is the bridegroom. The friend of the bridegroom stands and hears him and rejoices greatly at the bridegroom’s voice. This joy of mine is now fulfilled. He must increase, but I must decrease.”'
       ],
-      task: {
-        hint: 'Colour in the springs of Aenon.',
-        jobs: [{ hint: 'Colour the sky blue.' }, { hint: 'Paint the water with watercolour.' }, { hint: 'Colour the sun yellow.' }, { hint: 'Colour the clouds with chalk.' }, { hint: 'Colour the garment of John brown.' }, { hint: 'Colour the tree trunk brown.' }, { hint: 'Colour the rock on the right orange.' }, { hint: 'Colour the far hills orange.' }, { hint: 'Colour the palm leaves green.' }]
-      },
+      task: { hint: 'Listen well and answer the questions.' },
       questions: [
         { q: 'Why does John baptize at Aenon?', options: ['There is much water there.', 'The temple stands there.', 'His mother lives there.'] },
-        { q: 'What does John say about the one to whom all are going?', options: ['He must increase.', 'He must be silent.', 'He must go away.'] }
+        { q: 'What does John say about the one to whom all are going?', options: ['He must increase.', 'He must be silent.', 'He must go away.'] },
+        { q: 'From where must something be given to a person, so that he can receive it?', options: ['from heaven', 'from the king', 'from the priests'] }
       ]
     },
     {
@@ -203,7 +204,7 @@ export const johannesEn: TextOverlay<Journey> = {
 }
 
 // the English recordings of the stories (voice Achernar, Gemini): geschichte-NN-en-vK.mp3 (K = version); a stage without a number in this list is read with the voice of the device
-const ENGLISH_RECORDING_VERSION: Record<number, number> = { 1: 4, 2: 2, 3: 2, 4: 3, 5: 6, 6: 2, 7: 2, 8: 2, 9: 2, 10: 2 }
+const ENGLISH_RECORDING_VERSION: Record<number, number> = { 1: 4, 2: 2, 3: 6, 4: 30, 5: 30, 6: 30, 7: 30, 8: 30, 9: 30, 10: 30 }
 johannesEn.stages!.forEach((s, i) => {
   const version = ENGLISH_RECORDING_VERSION[i + 1]
   if (version) s.audio = `audio/abenteuer/johannes/geschichte-${String(i + 1).padStart(2, '0')}-en-v${version}.mp3`
