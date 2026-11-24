@@ -43,6 +43,8 @@ object LkMedia {
         @Volatile var percent = 0
         @Volatile var root: File? = null
         @Volatile var asked = false
+        // set once the app has asked for this pack: from then on "not installed" means "is coming", never "there is nothing to load"
+        @Volatile var requested = false
     }
 
     private val packs = ConcurrentHashMap<String, Pack>()
@@ -125,7 +127,8 @@ object LkMedia {
                 p.percent = 100
                 return
             }
-            val wanted = fetch || p.name == CORE
+            if (fetch) p.requested = true
+            val wanted = p.requested || p.name == CORE
             p.detail = "v2 loc=null"
             if (wanted && p.status != "downloading") {
                 try { m.fetch(listOf(p.name)) } catch (e: Throwable) { p.detail = "fetch: " + e.message }
@@ -204,6 +207,8 @@ object LkMedia {
             val name = query(parts[1], "pack") ?: CORE
             val p = pack(name)
             if (!isKnownPack(name)) p.status = "none" else refresh(p, path == "/__fetch")
+            // Google answers asynchronously: right after the request the state is not known yet, but the pack is on its way
+            if (p.requested && p.status == "none") p.status = "pending"
             val body = ("{\"status\":\"" + p.status + "\",\"percent\":" + p.percent + ",\"detail\":\"" + p.detail.replace("\"", "'") + "\"}").toByteArray()
             write(out, 200, "OK", mapOf("Content-Type" to "application/json"), body.inputStream(), body.size.toLong(), method == "HEAD")
             return
