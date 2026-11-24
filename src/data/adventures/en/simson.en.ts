@@ -9,7 +9,7 @@ import type { TextOverlay } from '../localize'
 export const simsonEn: TextOverlay<Journey> = {
   title: 'Samson',
   subtitle: 'From the angel in Zorah to the house in Gaza',
-  gift: { title: 'Honey in the Vineyard' },
+  gift: { title: 'Samson Carries the Gate' },
   stages: [
     {
       title: 'The Angel Comes',
@@ -120,8 +120,8 @@ export const simsonEn: TextOverlay<Journey> = {
         'That is why the spring is still called “the Well of the Caller” today.'
       ],
       task: {
-        hint: 'Color the spring in the cave.',
-        jobs: [{ hint: 'Colour the sky blue.' }, { hint: 'Colour the pond blue.' }, { hint: 'Colour the rocks brown.' }, { hint: 'Colour the grass green.' }, { hint: 'Colour the tree green.' }, { hint: 'Colour the flowers with the felt pen.' }, { hint: 'Colour the clouds with chalk.' }, { hint: 'Paint the water of the spring with watercolour.' }]
+        hint: 'Color Samson at the spring.',
+        jobs: [{ hint: 'Colour the sky blue.' }, { hint: 'Colour the water of the spring blue.' }, { hint: 'Colour the rocks brown.' }, { hint: 'Colour the grass green.' }, { hint: 'Colour the leaves of the olive tree green.' }, { hint: 'Colour the trunk of the olive tree brown.' }, { hint: 'Colour the bird with the felt pen.' }, { hint: 'Colour the clouds with chalk.' }, { hint: 'Paint the water of the spring with watercolour.' }]
       },
       questions: [
         { q: 'Where does God split open the hollow place?', options: ['in Lehi', 'in Gaza', 'in Zorah'] },

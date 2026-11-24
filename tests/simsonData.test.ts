@@ -164,13 +164,13 @@ describe('Simson: the games', () => {
     expect(stage(5).text.join(' ')).toContain('Was ist süßer als Honig? Was ist stärker als ein Löwe?')
   })
 
-  it('6 colouring (known): the spring in the cave; the line picture lies in the folder of the game', () => {
+  it('6 colouring (known): Samson at the spring (line picture for ten-year-olds, v2); the line picture lies in the folder of the game', () => {
     expect(stage(6).task.kind).toBe('ausmalen')
-    expect(stage(6).task.hint).toBe('Male die Quelle in der Höhle aus.')
-    expect(task(6).image).toBe('images/abenteuer/spiele/simson/ausmalen/etappe-06.webp')
+    expect(stage(6).task.hint).toBe('Male Simson an der Quelle aus.')
+    expect(task(6).image).toBe('images/abenteuer/spiele/simson/ausmalen/etappe-06-v2.webp')
     // zones measured on the line picture (tools/ausmalen_zonen_simson.py), a pool of tasks, three drawn
     const t6 = stage(6).task
-    expect(Object.keys(t6.zones ?? {}).sort()).toEqual(['baum', 'blumen', 'felsen', 'gras', 'himmel', 'quelle', 'teich', 'vogel', 'wolken'])
+    expect(Object.keys(t6.zones ?? {}).sort()).toEqual(['felsen', 'gras', 'himmel', 'laub', 'stamm', 'vogel', 'wasser', 'wolken'])
     for (const z of Object.values(t6.zones ?? {})) for (const [x, y] of z.seeds) expect(x >= 0 && x <= 100 && y >= 0 && y <= 100).toBe(true)
     expect(t6.jobCount).toBe(3)
     for (const j of t6.jobs ?? []) {
@@ -182,8 +182,8 @@ describe('Simson: the games', () => {
 
   it('the stage pictures: variant a, the newer versions (3 v3; 4, 5, 6, 7, 9, 10, 11 v5; new names for the cache of the phones); stage 11 has the burial as its second picture', () => {
     expect(simson.stages.map((s) => s.image!.replace('images/abenteuer/simson/', ''))).toEqual([
-      'etappe-bild-01.webp', 'etappe-bild-02.webp', 'etappe-bild-03-v3.webp', 'etappe-bild-04-v5.webp', 'etappe-bild-05-v5.webp', 'etappe-bild-06-v5.webp',
-      'etappe-bild-07-v5.webp', 'etappe-bild-08.webp', 'etappe-bild-09-v5.webp', 'etappe-bild-10-v5.webp', 'etappe-bild-11-v5.webp'
+      'etappe-bild-01.webp', 'etappe-bild-02.webp', 'etappe-bild-03-v6.webp', 'etappe-bild-04-v5.webp', 'etappe-bild-05-v5.webp', 'etappe-bild-06-v5.webp',
+      'etappe-bild-07-v6.webp', 'etappe-bild-08.webp', 'etappe-bild-09-v5.webp', 'etappe-bild-10-v6.webp', 'etappe-bild-11-v6.webp'
     ])
     expect(simson.stages.filter((s) => s.imageEnd).map((s) => [s.id, s.imageEnd])).toEqual([[11, 'images/abenteuer/simson/etappe-bild-11-b-v2.webp']])
     expect(existsSync('public/images/abenteuer/simson/etappe-bild-11-b-v2.webp')).toBe(true)
@@ -191,10 +191,10 @@ describe('Simson: the games', () => {
     const view = readFileSync('src/views/app/AppAdventureStageView.vue', 'utf8')
     expect(view).toMatch(/img\(v-if="stage\.imageEnd" :src="img\(stage\.imageEnd\)"/)
     // the collector's card (v5), no longer the medal
-    expect(CARD_ART.simson).toEqual({ front: 'images/abenteuer/simson/karte-vorn-v6.webp', back: 'images/abenteuer/simson/karte-hinten-v6.webp' })
+    expect(CARD_ART.simson).toEqual({ front: 'images/abenteuer/simson/karte-vorn-v7.webp', back: 'images/abenteuer/simson/karte-hinten-v6.webp' })
     for (const f of Object.values(CARD_ART.simson!)) expect(existsSync(`public/${f}`), f).toBe(true)
     expect(simson.map.images).toEqual([1, 2, 3].map((n) => `images/abenteuer/simson/karte-pano-v4-${n}.webp`))
-    expect(simson.medal).toBe('images/abenteuer/simson/medaille-v1.webp')
+    expect(simson.medal).toBe('images/abenteuer/simson/medaille-v4.webp')
     expect(task(7).gateLift!.background).toBe('images/abenteuer/spiele/simson/torheben/nacht-v2.webp')
     expect(task(7).gateLift!.strong.image).toBe('images/abenteuer/spiele/simson/torheben/simson-links-v5.webp')
   })
@@ -232,14 +232,14 @@ describe('Simson: map, files, English', () => {
     const path = readFileSync('src/data/adventures/simsonPath.ts', 'utf8')
     if (PANORAMA_IN) expect(path, 'the real way of the panorama must replace the placeholder').not.toMatch(/PLATZHALTER/)
     const data = readFileSync('src/data/adventures/simson.ts', 'utf8')
-    if (existsSync('public/images/abenteuer/simson/medaille-v1.webp')) expect(simson.medal).toBe('images/abenteuer/simson/medaille-v1.webp')
+    if (existsSync('public/images/abenteuer/simson/medaille-v4.webp')) expect(simson.medal).toBe('images/abenteuer/simson/medaille-v4.webp')
     else expect(data).toMatch(/medal: 'images\/abenteuer\/ui\/medaille-josef\.webp', \/\/ PLATZHALTER/)
     if (PICTURES_IN) expect(data).toMatch(/const G = 'images\/abenteuer\/spiele\/simson\/'/)
   })
 
   it('the gift lies in the folder of the adventure; music of its own only when its files are in', () => {
-    expect(simson.gift.image).toBe('images/abenteuer/simson/geschenk.webp')
-    expect(simson.gift.title).toBe('Honig im Weinberg')
+    expect(simson.gift.image).toBe('images/abenteuer/simson/geschenk-v2.webp')
+    expect(simson.gift.title).toBe('Simson trägt das Tor')
     expect(simson.downloadMb).toBe(14) // measured 24.11.2026: all files of the journey are 13.04 MB
     expect(simson.music).toEqual(['zora', 'timna', 'gaza'].map((n) => `audio/abenteuer/simson/musik-${n}-v1.mp3`))
     expect(simson.stages.map((s) => s.music?.match(/musik-(\w+)-/)?.[1])).toEqual(['zora', 'zora', 'zora', 'timna', 'timna', 'timna', 'timna', 'gaza', 'gaza', 'gaza', 'gaza'])
@@ -287,7 +287,7 @@ describe('Simson: map, files, English', () => {
     setAdventureLanguage('en')
     expect(stage(1).title).toBe('The Angel Comes')
     expect(stage(11).text[1]).toContain('Samson dies, too.')
-    expect(simson.gift.title).toBe('Honey in the Vineyard')
+    expect(simson.gift.title).toBe('Samson Carries the Gate')
     expect(task(2).avoid!.items[2]!.label).toBe('a cup of wine')
     expect(task(2).avoid!.rounds[1]!.hint).toBe('What may the woman eat? She must avoid everything that comes from the vine.')
     expect(task(5).riddle!.rounds[1]!.ladderLabel).toBe('the strongest')

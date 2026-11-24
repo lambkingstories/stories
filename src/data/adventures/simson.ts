@@ -101,29 +101,29 @@ const RAETSEL: RiddleGame = {
 }
 
 /**
- * Etappe 6, "Ausmalen" (bekannt 2, Ri 15,19): Strichbild mit Felsen, Quelle, Teich, Ölbaum, Wolken, Vogel und Blumen (keine Menschen, keine Schrift). Zonen am Strichbild gemessen
- * (Saatpunkte in Prozent, geprüft mit tools/ausmalen_zonen_simson.py); bei jedem Start werden drei Aufgaben aus dem Pool gezogen.
+ * Etappe 6, "Ausmalen" (bekannt 2, Ri 15,19): Strichbild für Zehnjährige (v2, 24.11.2026): Simson kniet an der Quelle von Lehi und trinkt aus den Händen; Felsen, Wasser, Ölbaum, Wolken, Vogel, Gras.
+ * Zonen am Strichbild gemessen (Saatpunkte in Prozent, tools/zonen_aus6_v2.py); bei jedem Start werden drei Aufgaben aus dem Pool gezogen.
  */
 const AUSMALEN_ZONEN: Record<string, PaintZone> = {
-  himmel: { seeds: [[3, 5], [55, 30], [97, 8], [60, 3]] },
-  wolken: { seeds: [[17, 13], [73, 12]] },
-  vogel: { seeds: [[46, 13], [43, 6]] },
-  felsen: { seeds: [[30, 40], [47, 40], [12, 58], [62, 63], [8, 45]] },
-  quelle: { seeds: [[37.5, 62], [40.5, 64], [43, 66]] },
-  teich: { seeds: [[36, 86], [52, 82]] },
-  gras: { seeds: [[60, 94], [96, 96], [3, 95]] },
-  blumen: { seeds: [[10.7, 79.5], [10.7, 82.5], [18.3, 85], [18.3, 87.8], [89, 80], [89, 83.5]] },
-  baum: { seeds: [[76, 23], [82, 72]] }
+  himmel: { seeds: [[21.6, 5.3]] },
+  wolken: { seeds: [[35.3, 5.7], [5.7, 12.2], [2.8, 21], [52.1, 2.4]] },
+  vogel: { seeds: [[12.7, 6.4]] },
+  felsen: { seeds: [[94.1, 39.8], [49, 52.8], [84.8, 60.8], [75.5, 74], [85, 29.3], [79.9, 48.4], [67.2, 29.3], [58.3, 23.5], [62.9, 44.6], [74.9, 63.7]] },
+  wasser: { seeds: [[60.7, 93.3]] },
+  stamm: { seeds: [[95.3, 13.4], [92.9, 62.6], [83.1, 35.9]] },
+  laub: { seeds: [[83, 25.1], [91.8, 18.5], [77.1, 13], [82.5, 3.4], [93.9, 9.1], [94.8, 22.8], [63.6, 24.5], [75.9, 7.4], [87.4, 9.3], [97.7, 21.6]] },
+  gras: { seeds: [[9.3, 65.6], [81.5, 66.9], [94.1, 75.6], [87.6, 81.9], [98, 97], [35.3, 95.7], [8.9, 98.5], [17, 98]] }
 }
 const AUSMALEN_AUFGABEN: PaintJob[] = [
   { zone: 'himmel', color: 'blue', hint: 'Male den Himmel blau.' },
-  { zone: 'teich', color: 'blue', hint: 'Male den Teich blau.' },
+  { zone: 'wasser', color: 'blue', hint: 'Male das Wasser der Quelle blau.' },
   { zone: 'felsen', color: 'brown', hint: 'Male die Felsen braun.' },
   { zone: 'gras', color: 'green', hint: 'Male das Gras grün.' },
-  { zone: 'baum', color: 'green', hint: 'Male den Baum grün.' },
-  { zone: 'blumen', tool: 'felt', hint: 'Male die Blumen mit dem Filzstift.' },
+  { zone: 'laub', color: 'green', hint: 'Male das Laub des Ölbaums grün.' },
+  { zone: 'stamm', color: 'brown', hint: 'Male den Stamm des Ölbaums braun.' },
+  { zone: 'vogel', tool: 'felt', hint: 'Male den Vogel mit dem Filzstift.' },
   { zone: 'wolken', tool: 'chalk', hint: 'Male die Wolken mit Kreide.' },
-  { zone: 'quelle', tool: 'watercolor', hint: 'Male das Wasser der Quelle mit Wasserfarbe.' }
+  { zone: 'wasser', tool: 'watercolor', hint: 'Male das Wasser der Quelle mit Wasserfarbe.' }
 ]
 
 /**
@@ -166,9 +166,9 @@ export const simson: Journey = {
   subtitle: 'Vom Engel in Zora bis zum Haus in Gaza',
   age: '8-10',
   downloadMb: 14, // gemessen 24.11.2026: alle Dateien von journeyFiles(simson) = 13,04 MB, aufgerundet
-  medal: `${PICS}medaille-v1.webp`, // Medaille 1 bis zu Antons Wahl
-  // Geschenk-Ausmalbild: Honig im Weinberg (Weinberge von Timna mit Trauben, Blüten und einer Honigwabe in einem Ast, Bienen im Flug; ohne Menschen, ohne Löwen; Konturzeichnung)
-  gift: { title: 'Honig im Weinberg', image: `${PICS}geschenk.webp` },
+  medal: `${PICS}medaille-v4.webp`, // Medaille 4 (24.11.2026: junger Bart, Simson am Tor, für Zehnjährige; Antons frühere Wahl war Medaille 1)
+  // Geschenk-Ausmalbild (v2, 24.11.2026, für Zehnjährige): Simson trägt das Tor von Gaza auf die Höhe vor Hebron (Konturzeichnung; Stadt Gaza mit leerem Torbogen, Morgensonne, Ölbäume, Weinberge)
+  gift: { title: 'Simson trägt das Tor', image: `${PICS}geschenk-v2.webp` },
   // die gemalte Karte (Panorama in drei Stücken, 9920 × 1648 px, OpenAI-Bildmodell): eine Landschaft Israels und der Philisterküste, von Zora über Timna, Lehi, Gaza und den Bach Sorek
   // bis zum Hügel zwischen Zora und Eschtaol; Stationen aus ergebnis/panorama/map-simson.json, Perlenweg aus simsonPath.ts
   map: {
@@ -236,7 +236,7 @@ export const simson: Journey = {
     },
     {
       id: 3,
-      image: `${PICS}etappe-bild-03-v3.webp`,
+      image: `${PICS}etappe-bild-03-v6.webp`,
       music: 'audio/abenteuer/simson/musik-zora-v1.mp3',
       title: 'Auf dem Felsen',
       ref: 'Richter 13,15–23',
@@ -306,7 +306,7 @@ export const simson: Journey = {
         'Darum heißt die Quelle bis heute „Brunnen des Anrufers“.'
       ],
       // Spiel: Ausmalen (ausmalen, bekannt)
-      task: { kind: 'ausmalen', hint: 'Male die Quelle in der Höhle aus.', image: `${G}ausmalen/etappe-06.webp`, zones: AUSMALEN_ZONEN, jobs: AUSMALEN_AUFGABEN, jobCount: 3 },
+      task: { kind: 'ausmalen', hint: 'Male Simson an der Quelle aus.', image: `${G}ausmalen/etappe-06-v2.webp`, zones: AUSMALEN_ZONEN, jobs: AUSMALEN_AUFGABEN, jobCount: 3 },
       questions: [
         { q: 'Wo spaltet Gott die Höhlung?', options: ['in Lehi', 'in Gaza', 'in Zora'], answer: 0 },
         { q: 'Was tut Simson, als er so großen Durst hat?', options: ['Er ruft den HERRN an.', 'Er sucht Honig.', 'Er geht nach Hause.'], answer: 0 }
@@ -314,7 +314,7 @@ export const simson: Journey = {
     },
     {
       id: 7,
-      image: `${PICS}etappe-bild-07-v5.webp`,
+      image: `${PICS}etappe-bild-07-v6.webp`,
       music: 'audio/abenteuer/simson/musik-timna-v1.mp3',
       title: 'Das Tor von Gaza',
       ref: 'Richter 16,1–3',
@@ -371,7 +371,7 @@ export const simson: Journey = {
     },
     {
       id: 10,
-      image: `${PICS}etappe-bild-10-v5.webp`,
+      image: `${PICS}etappe-bild-10-v6.webp`,
       music: 'audio/abenteuer/simson/musik-gaza-v1.mp3',
       title: 'In Gaza',
       ref: 'Richter 16,21–27',
@@ -389,7 +389,7 @@ export const simson: Journey = {
     },
     {
       id: 11,
-      image: `${PICS}etappe-bild-11-v5.webp`,
+      image: `${PICS}etappe-bild-11-v6.webp`,
       // das zweite Bild unter dem Text (Begräbnis, Variante 11b v2)
       imageEnd: `${PICS}etappe-bild-11-b-v2.webp`,
       music: 'audio/abenteuer/simson/musik-gaza-v1.mp3',
