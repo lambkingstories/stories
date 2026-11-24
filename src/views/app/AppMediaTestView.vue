@@ -4,10 +4,10 @@
  * It shows what the start found (where the folder of the media is), then asks for every file of the split adventure through `prependBaseUrl`, exactly as the app does,
  * and counts how many load. One look at this page on a real iPhone says whether the way works.
  */
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { prependBaseUrl } from '@/utils/function'
-import { ensureAdventurePack, isSplitPath, mediaSplitReport, pictureLoads } from '@/utils/mediaSplit'
+import { androidPackStatus, ensureAdventurePack, isSplitPath, mediaSplitReport, pictureLoads } from '@/utils/mediaSplit'
 
 const router = useRouter()
 const report = mediaSplitReport
@@ -92,7 +92,21 @@ function playSound() {
   void a.play().catch((e) => (state.soundNote = 'Abspielen verweigert: ' + String(e)))
 }
 
+// Android: the state of the core pack right now (the report above is the one of the start of the app)
+const live = ref('')
+let liveTimer: ReturnType<typeof setInterval> | undefined
+async function pollLive() {
+  const s = await androidPackStatus()
+  live.value = s ? `${s.status} ${s.percent} % ${s.detail}` : 'keine Antwort'
+  if (s?.status === 'ready' && !mediaSplitReport.chosen) window.location.reload()
+}
+onUnmounted(() => clearInterval(liveTimer))
+
 onMounted(async () => {
+  if (report.mode === 'android') {
+    void pollLive()
+    liveTimer = setInterval(() => void pollLive(), 2000)
+  }
   await loadList()
   if (files.value.length) void checkAll()
 })
@@ -108,6 +122,7 @@ onMounted(async () => {
       h2 1. Wo liegen die Dateien?
       p Art: <b>{{ report.mode === 'asset' ? 'App (Asset-Protokoll von Tauri)' : report.mode === 'android' ? 'Android (Play-Paket, Mini-Server auf dem Handy)' : report.mode === 'web' ? 'Browser-Prüfung' : 'nicht aktiv' }}</b>
       p(v-if="report.mode === 'android'") Play-Paket: <b :class="report.pack.status === 'ready' ? 'ok' : 'bad'">{{ report.pack.status || 'KEINE ANTWORT' }}</b> {{ report.pack.percent }} % {{ report.pack.detail }}
+      p(v-if="report.mode === 'android'" class="mt-small") Jetzt (alle 2 Sekunden): <b>{{ live }}</b> · Fassung: Kernpaket + je Abenteuer
       p(v-if="report.mode === 'android' && report.pack.status !== 'ready'" class="mt-small") Das Paket lädt Google nach der Installation selbst. Warte etwas, dann die App ganz schließen und neu öffnen.
       p(v-if="report.resourceDir") Ressourcen-Ordner der App: <code>{{ report.resourceDir }}</code>
       p Gefunden: <b :class="report.chosen ? 'ok' : 'bad'">{{ report.chosen || 'NICHTS GEFUNDEN' }}</b> (nach {{ report.ms }} ms)

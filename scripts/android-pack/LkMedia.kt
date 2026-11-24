@@ -3,6 +3,8 @@ package __PACKAGE__
 import android.app.Activity
 import com.google.android.play.core.assetpacks.AssetPackManager
 import com.google.android.play.core.assetpacks.AssetPackManagerFactory
+import com.google.android.play.core.assetpacks.AssetPackState
+import com.google.android.play.core.assetpacks.AssetPackStateUpdateListener
 import com.google.android.play.core.assetpacks.model.AssetPackStatus
 import java.io.File
 import java.io.InputStream
@@ -69,13 +71,43 @@ object LkMedia {
         started = true
         activityRef = java.lang.ref.WeakReference(activity)
         try {
-            manager = AssetPackManagerFactory.getInstance(activity.applicationContext)
+            val m = AssetPackManagerFactory.getInstance(activity.applicationContext)
+            manager = m
+            m.registerListener(AssetPackStateUpdateListener { st ->
+                if (isKnownPack(st.name())) {
+                    val p = pack(st.name())
+                    apply(p, st, true)
+                    try {
+                        val path = m.getPackLocation(st.name())?.assetsPath()
+                        if (path != null) { p.root = File(path); p.status = "ready"; p.percent = 100 }
+                    } catch (ignored: Throwable) {}
+                }
+            })
         } catch (e: Throwable) {
             pack(CORE).status = "error"
             pack(CORE).detail = "Play Asset Delivery nicht verfuegbar: " + e.message
         }
         refresh(pack(CORE), false)
         pool.execute { serve() }
+    }
+
+    /** Takes over what Google says about a pack (from a question or from the listener). */
+    private fun apply(p: Pack, s: AssetPackState, wanted: Boolean) {
+        val total = s.totalBytesToDownload()
+        p.percent = if (total > 0) ((s.bytesDownloaded() * 100) / total).toInt() else 0
+        p.detail = "v2 raw=" + s.status() + " bytes=" + s.bytesDownloaded() + "/" + total + " err=" + s.errorCode()
+        when (s.status()) {
+            AssetPackStatus.COMPLETED -> p.status = if (p.root != null) "ready" else "pending"
+            AssetPackStatus.DOWNLOADING, AssetPackStatus.TRANSFERRING -> p.status = "downloading"
+            AssetPackStatus.PENDING -> p.status = "pending"
+            AssetPackStatus.WAITING_FOR_WIFI, AssetPackStatus.REQUIRES_USER_CONFIRMATION -> {
+                p.status = "waiting_wifi"
+                askForCellular(p)
+            }
+            AssetPackStatus.FAILED, AssetPackStatus.CANCELED -> p.status = "failed"
+            AssetPackStatus.NOT_INSTALLED -> p.status = if (wanted) "pending" else "none"
+            else -> p.status = "pending"
+        }
     }
 
     /** Looks where a pack is (cheap; called with every status request); `fetch` also asks Google to download it when it is not there. */
@@ -90,28 +122,13 @@ object LkMedia {
                 return
             }
             val wanted = fetch || p.name == CORE
+            p.detail = "v2 loc=null"
             if (wanted && p.status != "downloading") {
                 try { m.fetch(listOf(p.name)) } catch (e: Throwable) { p.detail = "fetch: " + e.message }
             }
             m.getPackStates(listOf(p.name)).addOnSuccessListener { states ->
                 val s = states.packStates()[p.name] ?: return@addOnSuccessListener
-                val total = s.totalBytesToDownload()
-                p.percent = if (total > 0) ((s.bytesDownloaded() * 100) / total).toInt() else 0
-                when (s.status()) {
-                    AssetPackStatus.COMPLETED -> p.status = if (p.root != null) "ready" else "pending"
-                    AssetPackStatus.DOWNLOADING, AssetPackStatus.TRANSFERRING -> p.status = "downloading"
-                    AssetPackStatus.PENDING -> p.status = "pending"
-                    AssetPackStatus.WAITING_FOR_WIFI, AssetPackStatus.REQUIRES_USER_CONFIRMATION -> {
-                        p.status = "waiting_wifi"
-                        askForCellular(p)
-                    }
-                    AssetPackStatus.FAILED, AssetPackStatus.CANCELED -> {
-                        p.status = "failed"
-                        p.detail = "Fehlercode " + s.errorCode()
-                    }
-                    AssetPackStatus.NOT_INSTALLED -> p.status = if (wanted) "pending" else "none"
-                    else -> p.status = "pending"
-                }
+                apply(p, s, wanted)
             }.addOnFailureListener { e ->
                 p.status = "error"
                 p.detail = "getPackStates: " + e.message
