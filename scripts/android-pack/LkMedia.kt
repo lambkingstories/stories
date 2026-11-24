@@ -52,6 +52,8 @@ object LkMedia {
     private val pool = Executors.newCachedThreadPool()
     private val pathPattern = Regex("^/(?:images|audio)/abenteuer/(?:spiele/)?([^/]+)/")
 
+    private val keepInCore = Regex("^/images/abenteuer/[^/]+/(?:medaille|karte-vorn|karte-hinten|geschenk)[^/]*$")
+
     private fun pack(name: String): Pack = packs.getOrPut(name) { Pack(name) }
 
     private fun packNameOfId(id: String) = "adv_" + id.replace('-', '_')
@@ -63,6 +65,8 @@ object LkMedia {
     private fun packOf(path: String): String {
         val m = pathPattern.find(path) ?: return CORE
         val id = m.groupValues[1]
+        // medals, cards and gifts of an adventure stay in lkcore (same rule as KEEP_IN_CORE in scripts/patch-android-assetpack.mjs)
+        if (keepInCore.containsMatchIn(path)) return CORE
         return if (id in IDS) packNameOfId(id) else CORE
     }
 
