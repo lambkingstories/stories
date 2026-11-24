@@ -5,7 +5,7 @@
       "csp": null,
       "assetProtocol": {
         "enable": true,
-        "scope": ["$RESOURCE/**"]
+        "scope": ["$RESOURCE/**/*", "$RESOURCE/**", "$RESOURCE/*"]
       }
     }
   },

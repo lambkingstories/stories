@@ -87,12 +87,13 @@ onMounted(async () => {
 
     section(class="mt-box")
       h2 1. Wo liegen die Dateien?
-      p Art: <b>{{ report.mode === 'asset' ? 'App (Asset-Protokoll)' : report.mode === 'web' ? 'Browser-Prüfung' : 'nicht aktiv' }}</b>
+      p Art: <b>{{ report.mode === 'asset' ? 'App (Asset-Protokoll von Tauri)' : report.mode === 'lkmedia' ? 'App (eigenes Protokoll lkmedia)' : report.mode === 'web' ? 'Browser-Prüfung' : 'nicht aktiv' }}</b>
       p(v-if="report.resourceDir") Ressourcen-Ordner der App: <code>{{ report.resourceDir }}</code>
       p Gefunden: <b :class="report.chosen ? 'ok' : 'bad'">{{ report.chosen || 'NICHTS GEFUNDEN' }}</b> (nach {{ report.ms }} ms)
       p(v-if="report.error" class="bad") Fehler: {{ report.error }}
       ul(v-if="report.tried.length")
-        li(v-for="t in report.tried" :key="t.where" :class="t.ok ? 'ok' : 'bad'") {{ t.ok ? '✓' : '✗' }} {{ t.where }}
+        li(v-for="t in report.tried" :key="t.where" :class="t.ok ? 'ok' : 'bad'") {{ t.ok ? '✓' : '✗' }} {{ t.where }} {{ t.note ? '(' + t.note + ')' : '' }}
+      p(v-if="report.tried.length" class="mt-small") Beispiel-Adresse: <code>{{ (report.tried.find((t) => t.where === '_up_/dist-media') ?? report.tried[0]).url }}</code>
 
     section(class="mt-box")
       h2 2. Laden alle Dateien von Elia?
@@ -149,6 +150,10 @@ onMounted(async () => {
 
   ul
     padding-left: 18px
+
+.mt-small
+  font-size: 0.75rem
+  word-break: break-all
 
 .mt-pic
   width: 100%

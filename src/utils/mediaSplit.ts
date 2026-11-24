@@ -32,12 +32,15 @@ export const CANDIDATES = ['media', '_up_/dist-media', 'dist-media', 'assets/med
 
 export const isSplitPath = (path: string): boolean => !!PATTERN && PATTERN.test(path)
 
+/** The own protocol of the app (`src-tauri/src/lib.rs`, iOS): it reads `_up_/dist-media` of the resource folder itself. */
+export const LKMEDIA = 'lkmedia://localhost/'
+
 export interface MediaSplitReport {
   on: boolean
   ids: string[]
-  mode: 'none' | 'web' | 'asset'
+  mode: 'none' | 'web' | 'asset' | 'lkmedia'
   resourceDir: string
-  tried: { where: string; ok: boolean; url: string }[]
+  tried: { where: string; ok: boolean; url: string; note: string }[]
   chosen: string
   error: string
   ms: number
@@ -84,18 +87,37 @@ export async function initMediaSplit(): Promise<void> {
     mediaSplitReport.mode = 'asset'
     const rd = (await resourceDir()).replace(/[\\/]+$/, '')
     mediaSplitReport.resourceDir = rd
+    // the places of the asset protocol of Tauri, and the own protocol of the app (first try on a real iPad: the asset protocol loaded nothing, so a second way is tried at once)
+    const attempts = [
+      ...CANDIDATES.map((where) => ({ where, url: convertFileSrc(`${rd}/${where}/${SENTINEL}`), make: (path: string) => convertFileSrc(`${rd}/${where}/${path}`), mode: 'asset' as const })),
+      { where: 'lkmedia', url: `${LKMEDIA}${SENTINEL}`, make: (path: string) => `${LKMEDIA}${path}`, mode: 'lkmedia' as const }
+    ]
     const results = await Promise.all(
-      CANDIDATES.map(async (where) => {
-        const url = convertFileSrc(`${rd}/${where}/${SENTINEL}`)
-        const ok = await pictureLoads(url)
-        mediaSplitReport.tried.push({ where, ok, url })
-        return { where, ok }
+      attempts.map(async (a) => {
+        const ok = await pictureLoads(a.url)
+        // a failed one says why, as far as the browser tells (the status, or the kind of error)
+        let note = ''
+        if (!ok) {
+          note =
+            typeof fetch !== 'function'
+              ? ''
+              : await Promise.race([
+                  fetch(a.url).then(
+                    (r) => 'HTTP ' + r.status,
+                    (e) => String(e).slice(0, 80)
+                  ),
+                  new Promise<string>((resolve) => window.setTimeout(() => resolve('keine Antwort'), 2500))
+                ])
+        }
+        mediaSplitReport.tried.push({ where: a.where, ok, url: a.url, note })
+        return { a, ok }
       })
     )
-    const hit = CANDIDATES.map((c) => results.find((r) => r.where === c)).find((r) => r?.ok)
+    const hit = attempts.map((a) => results.find((r) => r.a === a)).find((r) => r?.ok)
     if (hit) {
-      mediaSplitReport.chosen = hit.where
-      toUrl = (path) => convertFileSrc(`${rd}/${hit.where}/${path}`)
+      mediaSplitReport.chosen = hit.a.where
+      mediaSplitReport.mode = hit.a.mode
+      toUrl = hit.a.make
     }
   } catch (err) {
     mediaSplitReport.error = String(err)

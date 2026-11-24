@@ -67,16 +67,41 @@ describe('media outside the program file', () => {
       }
     }
     vi.stubGlobal('Image', FakeImage)
+    vi.stubGlobal('fetch', () => Promise.reject(new TypeError('Load failed')))
     const m = await load({ VITE_MEDIA_SPLIT: 'elia' })
     await m.initMediaSplit()
     vi.unstubAllGlobals()
     expect(m.mediaSplitReport.mode).toBe('asset')
     expect(m.mediaSplitReport.resourceDir).toBe('/private/var/App.app')
     expect(m.mediaSplitReport.chosen).toBe('_up_/dist-media')
-    expect(m.mediaSplitReport.tried.length).toBe(m.CANDIDATES.length)
+    // every place of the asset protocol and the own protocol were tried; a failed one says why
+    expect(m.mediaSplitReport.tried.length).toBe(m.CANDIDATES.length + 1)
+    expect(m.mediaSplitReport.tried.find((t) => t.where === 'media')?.note).toContain('Load failed')
     expect(m.mediaSplitReport.tried.filter((t) => t.ok).map((t) => t.where)).toEqual(['_up_/dist-media'])
     expect(decodeURIComponent(m.prependBaseUrl('images/abenteuer/elia/x.webp'))).toBe('asset://localhost//private/var/App.app/_up_/dist-media/images/abenteuer/elia/x.webp')
     // what is not part of the split keeps the old address
+    expect(m.prependBaseUrl('images/abenteuer/ui/coin.webp')).toBe('/images/abenteuer/ui/coin.webp')
+  })
+
+  it('takes the own protocol of the app when the asset protocol loads nothing (first try on a real iPad, 24.11.2026)', async () => {
+    ;(window as unknown as Record<string, unknown>).__TAURI_INTERNALS__ = {}
+    vi.doMock('@tauri-apps/api/path', () => ({ resourceDir: async () => '/private/var/App.app/assets' }))
+    vi.doMock('@tauri-apps/api/core', () => ({ convertFileSrc: (p: string) => `asset://localhost/${encodeURIComponent(p)}` }))
+    class OwnImage {
+      onload: (() => void) | null = null
+      onerror: (() => void) | null = null
+      set src(url: string) {
+        setTimeout(() => (url.startsWith('lkmedia://localhost/') ? this.onload?.() : this.onerror?.()), 0)
+      }
+    }
+    vi.stubGlobal('Image', OwnImage)
+    vi.stubGlobal('fetch', () => Promise.reject(new TypeError('Load failed')))
+    const m = await load({ VITE_MEDIA_SPLIT: 'elia' })
+    await m.initMediaSplit()
+    vi.unstubAllGlobals()
+    expect(m.mediaSplitReport.mode).toBe('lkmedia')
+    expect(m.mediaSplitReport.chosen).toBe('lkmedia')
+    expect(m.prependBaseUrl('audio/abenteuer/elia/geschichte-01-v1.mp3')).toBe('lkmedia://localhost/audio/abenteuer/elia/geschichte-01-v1.mp3')
     expect(m.prependBaseUrl('images/abenteuer/ui/coin.webp')).toBe('/images/abenteuer/ui/coin.webp')
   })
 
@@ -91,7 +116,8 @@ describe('media outside the program file', () => {
         setTimeout(() => this.onerror?.(), 0)
       }
     }
-    vi.stubGlobal('Image', NoImage)
+    vi.stubGlobal("Image", NoImage)
+    vi.stubGlobal("fetch", () => Promise.reject(new TypeError("Load failed")))
     const m = await load({ VITE_MEDIA_SPLIT: 'elia' })
     await m.initMediaSplit()
     vi.unstubAllGlobals()
