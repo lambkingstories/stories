@@ -195,9 +195,8 @@ jobs:
       - name: Give Gradle more memory (the 800 MB bundle is signed in the Gradle process) and show full errors
         run: |
           mkdir -p ~/.gradle
-          printf 'org.gradle.jvmargs=-Xmx6g -XX:MaxMetaspaceSize=1g
-org.gradle.logging.stacktrace=all
-' >> ~/.gradle/gradle.properties
+          echo 'org.gradle.jvmargs=-Xmx6g -XX:MaxMetaspaceSize=1g' >> ~/.gradle/gradle.properties
+          echo 'org.gradle.logging.stacktrace=all' >> ~/.gradle/gradle.properties
           cat ~/.gradle/gradle.properties
 
       - name: Build signed AAB
