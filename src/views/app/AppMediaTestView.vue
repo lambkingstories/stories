@@ -13,7 +13,7 @@ const router = useRouter()
 const report = mediaSplitReport
 
 const files = ref<string[]>([])
-const state = reactive({ running: false, done: 0, ok: 0, failed: [] as string[], sampleUrl: '', soundUrl: '', soundNote: '' })
+const state = reactive({ running: false, done: 0, ok: 0, failed: [] as string[], failedBy: {} as Record<string, number>, adventures: 0, sampleUrl: '', soundUrl: '', soundNote: '' })
 const total = computed(() => files.value.length)
 
 /** True when the sound at `url` can be read (its length is known). */
@@ -33,13 +33,25 @@ function soundLoads(url: string, timeoutMs = 8000): Promise<boolean> {
   })
 }
 
+/** The adventure of every file (to say which adventure has missing files). */
+const ownerOf = new Map<string, string>()
+
 async function loadList() {
-  // the data of the adventure is only fetched in a build with the split (the condition is a constant: elsewhere the chunk is not even made)
+  // the data of the adventures is only fetched in a build with the split (the condition is a constant: elsewhere the chunk is not even made)
   if (!import.meta.env.VITE_MEDIA_SPLIT) return
-  const [{ elia }, { journeyFiles }] = await Promise.all([import('@/data/adventures/elia'), import('@/utils/journeyFiles')])
-  files.value = journeyFiles(elia).filter((p) => isSplitPath(p))
-  const pic = files.value.find((p) => /\.(webp|png|jpe?g)$/i.test(p))
-  const snd = files.value.find((p) => /\.mp3$/i.test(p))
+  const [{ journeys, loadPreviewJourneys }, { journeyFiles }] = await Promise.all([import('@/data/adventures'), import('@/utils/journeyFiles')])
+  await loadPreviewJourneys()
+  const all = new Set<string>()
+  for (const j of journeys) {
+    for (const p of journeyFiles(j).filter((x) => isSplitPath(x))) {
+      all.add(p)
+      if (!ownerOf.has(p)) ownerOf.set(p, j.id)
+    }
+  }
+  files.value = [...all]
+  state.adventures = journeys.length
+  const pic = files.value.find((p) => /\.(webp|png|jpe?g)$/i.test(p) && p.includes('/elia/')) ?? files.value.find((p) => /\.(webp|png|jpe?g)$/i.test(p))
+  const snd = files.value.find((p) => /\.mp3$/i.test(p) && p.includes('/elia/')) ?? files.value.find((p) => /\.mp3$/i.test(p))
   state.sampleUrl = pic ? prependBaseUrl(pic) : ''
   state.soundUrl = snd ? prependBaseUrl(snd) : ''
 }
@@ -50,6 +62,7 @@ async function checkAll() {
   state.done = 0
   state.ok = 0
   state.failed = []
+  state.failedBy = {}
   let next = 0
   const run = async () => {
     while (next < files.value.length) {
@@ -58,10 +71,14 @@ async function checkAll() {
       const ok = /\.mp3$/i.test(path) ? await soundLoads(url) : await pictureLoads(url, 8000)
       state.done++
       if (ok) state.ok++
-      else state.failed.push(path)
+      else {
+        state.failed.push(path)
+        const id = ownerOf.get(path) ?? '?'
+        state.failedBy[id] = (state.failedBy[id] ?? 0) + 1
+      }
     }
   }
-  await Promise.all(Array.from({ length: 6 }, run))
+  await Promise.all(Array.from({ length: 10 }, run))
   state.running = false
 }
 
@@ -83,11 +100,11 @@ onMounted(async () => {
   div(class="mt" data-test="media-test")
     button(type="button" class="lk-btn lk-btn--small lk-btn--outline mt-back" @click="router.back()") Zurück
     h1 Medien-Test
-    p(class="mt-sub") Nur in dieser Test-Fassung. Elia liegt hier nicht in der Programmdatei, sondern als eigene Dateien neben dem Programm.
+    p(class="mt-sub") Nur in dieser Test-Fassung. Bilder und Töne der Abenteuer liegen hier nicht in der Programmdatei, sondern als eigene Dateien neben dem Programm.
 
     section(class="mt-box")
       h2 1. Wo liegen die Dateien?
-      p Art: <b>{{ report.mode === 'asset' ? 'App (Asset-Protokoll von Tauri)' : report.mode === 'lkmedia' ? 'App (eigenes Protokoll lkmedia)' : report.mode === 'web' ? 'Browser-Prüfung' : 'nicht aktiv' }}</b>
+      p Art: <b>{{ report.mode === 'asset' ? 'App (Asset-Protokoll von Tauri)' : report.mode === 'web' ? 'Browser-Prüfung' : 'nicht aktiv' }}</b>
       p(v-if="report.resourceDir") Ressourcen-Ordner der App: <code>{{ report.resourceDir }}</code>
       p Gefunden: <b :class="report.chosen ? 'ok' : 'bad'">{{ report.chosen || 'NICHTS GEFUNDEN' }}</b> (nach {{ report.ms }} ms)
       p(v-if="report.error" class="bad") Fehler: {{ report.error }}
@@ -96,15 +113,19 @@ onMounted(async () => {
       p(v-if="report.tried.length" class="mt-small") Beispiel-Adresse: <code>{{ (report.tried.find((t) => t.where === '_up_/dist-media') ?? report.tried[0]).url }}</code>
 
     section(class="mt-box")
-      h2 2. Laden alle Dateien von Elia?
+      h2 2. Laden alle Dateien der Abenteuer?
       p(v-if="!total") Keine Dateien in der Liste (diese Fassung hat keine getrennten Medien).
       template(v-else)
+        p {{ state.adventures }} Abenteuer, {{ total }} Dateien
         p <b :class="state.ok === total ? 'ok' : state.running ? '' : 'bad'">{{ state.ok }} von {{ total }} geladen</b> ({{ state.done }} geprüft)
         p(v-if="state.running") Prüfung läuft …
         template(v-if="state.failed.length")
-          p(class="bad") Nicht geladen ({{ state.failed.length }}), die ersten:
+          p(class="bad") Nicht geladen ({{ state.failed.length }}), je Abenteuer:
           ul
-            li(v-for="f in state.failed.slice(0, 8)" :key="f") {{ f }}
+            li(v-for="(n, id) in state.failedBy" :key="id") {{ id }}: {{ n }}
+          p(class="bad") Die ersten:
+          ul
+            li(v-for="f in state.failed.slice(0, 6)" :key="f") {{ f }}
         button(type="button" class="lk-btn lk-btn--small" :disabled="state.running" @click="checkAll") Noch einmal prüfen
 
     section(class="mt-box")

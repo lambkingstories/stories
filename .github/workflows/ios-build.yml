@@ -24,10 +24,15 @@ on:
         default: ""
         type: string
       media_split:
-        description: "TEST for 1.3: ids of adventures whose pictures and sounds are NOT put into the program file but next to it, e.g. elia (empty = normal build)"
+        description: "Pictures and sounds of the adventures lie next to the program, not in it (Apple: program file 500 MB at most). * = all adventures (the default), elia,david = only these, empty = all inside the program (only for a few adventures)"
         required: false
-        default: ""
+        default: "*"
         type: string
+      media_test:
+        description: "TEST build: puts a button 'Medien-Test' at the bottom of 'Ich' (never for the build that goes to the App Store)"
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: ios-build
@@ -69,6 +74,8 @@ jobs:
       VITE_PREMIUM_TEASER: "true"
       # empty in a normal build; `media_split` makes Vite move the media of those adventures to dist-media/ (see src/utils/mediaSplit.ts)
       VITE_MEDIA_SPLIT: ${{ inputs.media_split }}
+      VITE_MEDIA_TEST: ${{ inputs.media_test && 'true' || '' }}
+      # iOS: ALL finished adventures (Simson is not finished yet). The media of the adventures lie next to the program (media_split), so the 500 MB of Apple are no limit. Android keeps its own list (android-build.yml).
       VITE_SHOW_NOAH: "true"
       VITE_SHOW_ADAM: "true"
       VITE_SHOW_BABEL: "true"
@@ -77,6 +84,20 @@ jobs:
       VITE_SHOW_MOSE: "true"
       VITE_SHOW_WEIHNACHTEN: "true"
       VITE_SHOW_OSTERN: "true"
+      VITE_SHOW_BERGPREDIGT: "true"
+      VITE_SHOW_ICHBIN: "true"
+      VITE_SHOW_SOHN: "true"
+      VITE_SHOW_OFFENBARUNG: "true"
+      VITE_SHOW_PAULUSROM: "true"
+      VITE_SHOW_PAULUS: "true"
+      VITE_SHOW_PFINGSTEN: "true"
+      VITE_SHOW_LETZTEWOCHE: "true"
+      VITE_SHOW_GLEICHNISSE: "true"
+      VITE_SHOW_WUNDER: "true"
+      VITE_SHOW_WUESTE: "true"
+      VITE_SHOW_TAUFE: "true"
+      VITE_SHOW_PROPHETEN: "true"
+      VITE_SHOW_ELISA: "true"
       VITE_SHOW_ELIA: "true"
       VITE_SHOW_SALOMO: "true"
       VITE_SHOW_DAVID: "true"
