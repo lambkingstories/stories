@@ -1,6 +1,6 @@
 name: Android Pack Test (Play Asset Delivery)
 
-# TEST build 8 (24.11.2026, core pack + one pack per adventure; medals, cards and gifts are served from the core pack; frees disk space, gives Gradle 6 GB; a requested pack is never reported as "none" while it is on its way): the media of ALL adventures are not inside the app but in a Play Asset Delivery pack (fast-follow), so the main file stays small.
+# TEST build 9 (24.11.2026, core pack + one pack per adventure; medals, cards and gifts are served from the core pack; Simson on, frees disk space, gives Gradle 6 GB; a requested pack is never reported as "none" while it is on its way): the media of ALL adventures are not inside the app but in a Play Asset Delivery pack (fast-follow), so the main file stays small.
 # Only the .aab is useful: the pack works only when the bundle is installed through Google Play (internal testing / Internal App Sharing), not as a loose .apk.
 # Not for the store release before Anton has seen the test page ("Ich" -> "Medien-Test") on a real phone.
 # Needs the same repository secrets as android-build.yml.
@@ -67,6 +67,7 @@ jobs:
       VITE_SHOW_DAVID: "true"
       VITE_SHOW_SAMUEL: "true"
       VITE_SHOW_GIDEON: "true"
+      VITE_SHOW_SIMSON: "true"
       VITE_SHOW_RUT: "true"
       VITE_SHOW_NEHEMIA: "true"
       VITE_SHOW_JOSUA: "true"

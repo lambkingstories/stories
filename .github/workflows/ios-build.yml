@@ -103,6 +103,7 @@ jobs:
       VITE_SHOW_DAVID: "true"
       VITE_SHOW_SAMUEL: "true"
       VITE_SHOW_GIDEON: "true"
+      VITE_SHOW_SIMSON: "true"
       VITE_SHOW_RUT: "true"
       VITE_SHOW_NEHEMIA: "true"
       VITE_SHOW_JOSUA: "true"
