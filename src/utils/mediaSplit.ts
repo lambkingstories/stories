@@ -15,6 +15,8 @@
  * are assets of the APK, which the asset protocol cannot read): there the media are a Play Asset Delivery pack that a little server on the phone hands out
  * (`initAndroidPack`, scripts/android-pack/LkMedia.kt).
  */
+import { reactive } from 'vue'
+
 const IDS = ((import.meta.env.VITE_MEDIA_SPLIT as string | undefined) ?? '')
   .split(',')
   .map((s) => s.trim())
@@ -113,6 +115,30 @@ async function initAndroidPack(): Promise<void> {
   }
 }
 
+/** Android: the state of the Play pack right now (asked again and again by the waiting screen); `null` when the media server does not answer. */
+export async function androidPackStatus(): Promise<{ status: string; percent: number; detail: string } | null> {
+  const ports = mediaSplitReport.pack.port ? [mediaSplitReport.pack.port] : ANDROID_PORTS
+  for (const port of ports) {
+    const ctl = new AbortController()
+    const timer = window.setTimeout(() => ctl.abort(), 2000)
+    try {
+      const j = (await (await fetch(`http://127.0.0.1:${port}/__status`, { signal: ctl.signal })).json()) as { status?: string; percent?: number; detail?: string }
+      return { status: String(j.status ?? ''), percent: Number(j.percent ?? 0), detail: String(j.detail ?? '') }
+    } catch {
+      /* try the next port */
+    } finally {
+      window.clearTimeout(timer)
+    }
+  }
+  return null
+}
+
+/** True on Android when the media server answered and the core pack is usable. */
+export const androidPackReady = (): boolean => MEDIA_SPLIT_ON && mediaSplitReport.mode === 'android' && !!mediaSplitReport.chosen
+
+/** True on Android while the media pack is not usable yet (the app then shows the waiting screen instead of empty pictures). */
+export const androidPackMissing = (): boolean => MEDIA_SPLIT_ON && mediaSplitReport.mode === 'android' && !mediaSplitReport.chosen
+
 /** Finds the media folder. Called once before the first screen is drawn; never throws (a failure only means the old addresses stay). */
 export async function initMediaSplit(): Promise<void> {
   if (!MEDIA_SPLIT_ON) return
@@ -162,5 +188,72 @@ export async function initMediaSplit(): Promise<void> {
     mediaSplitReport.error = String(err)
   } finally {
     mediaSplitReport.ms = Math.round(performance.now() - t0)
+  }
+}
+
+// ── Android: one pack per adventure (on-demand) ──────────────────────────────────────────────────────────────────────────────────
+
+/** The name of the Play pack of an adventure (the same rule as in scripts/patch-android-assetpack.mjs and LkMedia.kt). */
+export const packNameOf = (journeyId: string): string => 'adv_' + journeyId.replace(/-/g, '_')
+
+/** What the waiting screen shows while a pack of an adventure is downloaded (`id` is empty when nothing is waited for). */
+export const adventureWait = reactive({ id: '', percent: 0, status: '', cancelled: false })
+
+/** The packs that are known to be there (asked once, then remembered for this start). */
+const packReady = new Set<string>()
+
+/** One answer of the media server about a pack (`fetch` also asks Google to download it). */
+async function packAsk(port: number, pack: string, fetchIt: boolean): Promise<{ status: string; percent: number; detail: string } | null> {
+  const ctl = new AbortController()
+  const timer = window.setTimeout(() => ctl.abort(), 3000)
+  try {
+    const r = await fetch(`http://127.0.0.1:${port}/${fetchIt ? '__fetch' : '__status'}?pack=${encodeURIComponent(pack)}`, { signal: ctl.signal })
+    const j = (await r.json()) as { status?: string; percent?: number; detail?: string }
+    return { status: String(j.status ?? ''), percent: Number(j.percent ?? 0), detail: String(j.detail ?? '') }
+  } catch {
+    return null
+  } finally {
+    window.clearTimeout(timer)
+  }
+}
+
+/**
+ * Android: makes sure the pack of an adventure is on the phone before the adventure opens (the router waits for it). Returns `false` when the child cancelled,
+ * `true` otherwise (also when nothing has to be done: not Android, no split, an adventure without a pack, or the pack is there).
+ */
+export async function ensureAdventurePack(journeyId: string): Promise<boolean> {
+  if (!androidPackReady() || !journeyId) return true
+  const pack = packNameOf(journeyId)
+  if (packReady.has(pack)) return true
+  const port = mediaSplitReport.pack.port
+  let a = await packAsk(port, pack, false)
+  if (!a || a.status === 'none') {
+    // not downloaded yet (or no such pack: then the server says `none` again after the first request)
+    a = await packAsk(port, pack, true)
+  }
+  if (!a || a.status === 'ready') {
+    packReady.add(pack)
+    return true
+  }
+  if (a.status === 'none') return true
+  adventureWait.id = journeyId
+  adventureWait.cancelled = false
+  adventureWait.percent = a.percent
+  adventureWait.status = a.status
+  try {
+    for (let i = 0; i < 1500 && !adventureWait.cancelled; i++) {
+      await new Promise((resolve) => window.setTimeout(resolve, 700))
+      const s = await packAsk(port, pack, i % 8 === 7)
+      if (!s) continue
+      adventureWait.percent = s.percent
+      adventureWait.status = s.status
+      if (s.status === 'ready') {
+        packReady.add(pack)
+        return true
+      }
+    }
+    return false
+  } finally {
+    adventureWait.id = ''
   }
 }

@@ -1,14 +1,16 @@
 #!/usr/bin/env node
-// Android: the media of the adventures go into a Play Asset Delivery pack ("lkmedia", fast-follow) instead of into the app itself, so the main file stays small
+// Android: the media of the adventures go into Play Asset Delivery packs instead of into the app itself, so the main file stays small
 // (decision of Anton, 24.11.2026; research in H:\Claude\research_notes\Wie andere Apps große Medien laden). Run after `tauri android init` and after
 // `VITE_MEDIA_SPLIT=* pnpm build-only` (which makes `dist-media`). Idempotent.
 //
-//  1. creates the pack module `src-tauri/gen/android/lkmedia` (Gradle plugin com.android.asset-pack) and copies `dist-media` into its assets
-//  2. includes the module in settings.gradle(.kts) and lists it as asset pack in app/build.gradle.kts, adds the Play library
+//  1. packs (modules in src-tauri/gen/android):
+//       lkcore       fast-follow  the shared pictures (games of several adventures), the medals, cards and gifts of every adventure, the sentinel picture
+//       adv_<id>     on-demand    one per adventure: images/abenteuer/<id>/, images/abenteuer/spiele/<id>/ and audio/abenteuer/<id>/ (loaded when the child opens it)
+//  2. includes the modules in settings.gradle(.kts) and lists them as asset packs in app/build.gradle.kts, adds the Play library
 //  3. puts LkMedia.kt (the little web server on the phone) next to MainActivity and starts it from MainActivity.onCreate
 //  4. allows plain http to 127.0.0.1 (only that) through a network security config
 
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -17,56 +19,98 @@ const ROOT = process.env.LK_ROOT ?? SCRIPT_ROOT
 const ANDROID = join(ROOT, 'src-tauri/gen/android')
 const APP = join(ANDROID, 'app')
 const MEDIA = join(ROOT, 'dist-media')
-const PACK = 'lkmedia'
+const CORE = 'lkcore'
 const LIB = 'com.google.android.play:asset-delivery:2.3.0'
 const MARK = 'managed by scripts/patch-android-assetpack.mjs'
+// files of an adventure folder that every screen of the app needs even when the adventure is not downloaded (the overview, the collection, the gifts)
+const KEEP_IN_CORE = /^(medaille|karte-vorn|karte-hinten|geschenk)/
 
 const fail = (msg) => {
   console.error(`[patch-android-assetpack] ${msg}`)
   process.exit(1)
 }
+const dirsOf = (p) => (existsSync(p) ? readdirSync(p, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name) : [])
+const packNameOf = (id) => 'adv_' + id.replace(/-/g, '_')
+const sizeOf = (p) => {
+  let n = 0
+  if (!existsSync(p)) return 0
+  for (const e of readdirSync(p, { withFileTypes: true })) n += e.isDirectory() ? sizeOf(join(p, e.name)) : statSync(join(p, e.name)).size
+  return n
+}
 
 if (!existsSync(join(APP, 'build.gradle.kts'))) fail('no generated Android project (run `tauri android init` first)')
 if (!existsSync(MEDIA)) fail('no dist-media (run `VITE_MEDIA_SPLIT=* pnpm build-only` first)')
 
-// ── 1. the pack module ───────────────────────────────────────────────
-const packDir = join(ANDROID, PACK)
-rmSync(join(packDir, 'src'), { recursive: true, force: true })
-mkdirSync(join(packDir, 'src/main/assets'), { recursive: true })
-writeFileSync(
-  join(packDir, 'build.gradle.kts'),
-  `// ${MARK}
+// ── 1. the packs ─────────────────────────────────────────────────────
+// the adventures: every folder below images/abenteuer and audio/abenteuer of the split media (the shared games live in `spiele`, which is no adventure)
+const ids = [...new Set([...dirsOf(join(MEDIA, 'images/abenteuer')), ...dirsOf(join(MEDIA, 'audio/abenteuer'))])].filter((d) => d !== 'spiele' && d !== 'ui').sort()
+
+for (const old of dirsOf(ANDROID).filter((d) => d === CORE || d.startsWith('adv_'))) rmSync(join(ANDROID, old), { recursive: true, force: true })
+
+function makePack(name, delivery) {
+  const dir = join(ANDROID, name)
+  mkdirSync(join(dir, 'src/main/assets'), { recursive: true })
+  writeFileSync(
+    join(dir, 'build.gradle.kts'),
+    `// ${MARK}
 plugins {
     id("com.android.asset-pack")
 }
 
 assetPack {
-    packName.set("${PACK}")
+    packName.set("${name}")
     dynamicDelivery {
-        deliveryType.set("fast-follow")
+        deliveryType.set("${delivery}")
     }
 }
 `
-)
-cpSync(MEDIA, join(packDir, 'src/main/assets'), { recursive: true })
-console.log(`[patch-android-assetpack] pack module ${packDir}: media copied`)
+  )
+  return join(dir, 'src/main/assets')
+}
+
+// the core gets everything first, then each adventure takes its own folders out
+const coreAssets = makePack(CORE, 'fast-follow')
+cpSync(MEDIA, coreAssets, { recursive: true })
+const names = [CORE]
+for (const id of ids) {
+  const assets = makePack(packNameOf(id), 'on-demand')
+  names.push(packNameOf(id))
+  const moves = [`images/abenteuer/${id}`, `audio/abenteuer/${id}`, `images/abenteuer/spiele/${id}`]
+  for (const rel of moves) {
+    const from = join(coreAssets, rel)
+    if (!existsSync(from)) continue
+    const to = join(assets, rel)
+    mkdirSync(dirname(to), { recursive: true })
+    if (rel === `images/abenteuer/${id}`) {
+      // medals, cards and gifts stay in the core
+      mkdirSync(to, { recursive: true })
+      for (const e of readdirSync(from, { withFileTypes: true })) {
+        if (e.isFile() && KEEP_IN_CORE.test(e.name)) continue
+        renameSync(join(from, e.name), join(to, e.name))
+      }
+    } else {
+      renameSync(from, to)
+    }
+  }
+}
+const mb = (n) => (n / 1048576).toFixed(1)
+console.log(`[patch-android-assetpack] ${names.length} packs; ${CORE}: ${mb(sizeOf(coreAssets))} MB`)
+for (const n of names.slice(1)) console.log(`  ${n}: ${mb(sizeOf(join(ANDROID, n, 'src/main/assets')))} MB`)
 
 // ── 2. settings + app gradle ─────────────────────────────────────────
 const settingsFile = ['settings.gradle.kts', 'settings.gradle'].map((f) => join(ANDROID, f)).find(existsSync)
 if (!settingsFile) fail('no settings.gradle(.kts)')
 let settings = readFileSync(settingsFile, 'utf8')
 if (!settings.includes(MARK)) {
-  settings += `\n// ${MARK}\ninclude(":${PACK}")\n`
+  settings += `\n// ${MARK}\n${names.map((n) => `include(":${n}")`).join('\n')}\n`
   writeFileSync(settingsFile, settings)
 }
 
 const gradleFile = join(APP, 'build.gradle.kts')
 let gradle = readFileSync(gradleFile, 'utf8')
 if (!gradle.includes(MARK)) {
-  // inside `android { ... }`: the list of the asset packs
   if (!/^android\s*\{/m.test(gradle)) fail('no `android {` block in app/build.gradle.kts')
-  gradle = gradle.replace(/^android\s*\{/m, `android {\n    // ${MARK}\n    assetPacks += listOf(":${PACK}")`)
-  // the Play library: into the first dependencies block
+  gradle = gradle.replace(/^android\s*\{/m, `android {\n    // ${MARK}\n    assetPacks += listOf(${names.map((n) => `":${n}"`).join(', ')})`)
   if (!/^dependencies\s*\{/m.test(gradle)) fail('no `dependencies {` block in app/build.gradle.kts')
   gradle = gradle.replace(/^dependencies\s*\{/m, `dependencies {\n    // ${MARK}\n    implementation("${LIB}")`)
   writeFileSync(gradleFile, gradle)
@@ -88,7 +132,12 @@ if (!mainActivity) fail('MainActivity.kt not found')
 let ma = readFileSync(mainActivity, 'utf8')
 const pkg = /^package\s+([\w.]+)/m.exec(ma)?.[1]
 if (!pkg) fail('no package line in MainActivity.kt')
-writeFileSync(join(dirname(mainActivity), 'LkMedia.kt'), readFileSync(join(SCRIPT_ROOT, 'scripts/android-pack/LkMedia.kt'), 'utf8').replace('__PACKAGE__', pkg))
+writeFileSync(
+  join(dirname(mainActivity), 'LkMedia.kt'),
+  readFileSync(join(SCRIPT_ROOT, 'scripts/android-pack/LkMedia.kt'), 'utf8')
+    .replace('__PACKAGE__', pkg)
+    .replace('__IDS__', ids.map((i) => `"${i}"`).join(', '))
+)
 if (!ma.includes('LkMedia.start')) {
   if (/override\s+fun\s+onCreate\s*\([^)]*\)\s*\{/.test(ma)) {
     ma = ma.replace(/(override\s+fun\s+onCreate\s*\([^)]*\)\s*\{)/, `$1\n    LkMedia.start(this) // ${MARK}`)

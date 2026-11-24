@@ -7,7 +7,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { prependBaseUrl } from '@/utils/function'
-import { isSplitPath, mediaSplitReport, pictureLoads } from '@/utils/mediaSplit'
+import { ensureAdventurePack, isSplitPath, mediaSplitReport, pictureLoads } from '@/utils/mediaSplit'
 
 const router = useRouter()
 const report = mediaSplitReport
@@ -59,6 +59,8 @@ async function loadList() {
 async function checkAll() {
   if (state.running) return
   state.running = true
+  // Android: every adventure is its own pack that has to be downloaded first (the waiting screen shows each one)
+  if (report.mode === 'android') for (const id of new Set(ownerOf.values())) await ensureAdventurePack(id)
   state.done = 0
   state.ok = 0
   state.failed = []

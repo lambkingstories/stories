@@ -136,6 +136,71 @@ describe('media outside the program file', () => {
   })
 })
 
+describe('Android: one Play pack per adventure', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    vi.unstubAllGlobals()
+    vi.resetModules()
+    delete (window as unknown as Record<string, unknown>).__TAURI_INTERNALS__
+  })
+
+  /** A fake media server: lkcore is ready, the adventure pack is 'none' at first, then 'downloading' for two answers, then 'ready'. */
+  function fakeServer() {
+    const calls: string[] = []
+    let adv = 0
+    vi.stubGlobal('fetch', async (url: string) => {
+      calls.push(url)
+      const pack = new URL(url).searchParams.get('pack')
+      let body = { status: 'ready', percent: 100, detail: '' }
+      if (pack && pack !== 'lkcore') {
+        adv++
+        body = adv < 2 ? { status: 'none', percent: 0, detail: '' } : adv < 4 ? { status: 'downloading', percent: adv * 30, detail: '' } : { status: 'ready', percent: 100, detail: '' }
+      }
+      return { json: async () => body }
+    })
+    vi.stubGlobal('Image', class { onload: (() => void) | null = null; set src(_u: string) { setTimeout(() => this.onload?.(), 0) } })
+    return calls
+  }
+
+  it('names the pack like the patch script and the server on the phone', async () => {
+    vi.resetModules()
+    vi.stubEnv('VITE_MEDIA_SPLIT', '*')
+    const m = await import('@/utils/mediaSplit')
+    expect(m.packNameOf('david')).toBe('adv_david')
+    expect(m.packNameOf('adam-eva')).toBe('adv_adam_eva')
+  })
+
+  it('does nothing outside Android (the router never waits)', async () => {
+    vi.resetModules()
+    vi.stubEnv('VITE_MEDIA_SPLIT', '*')
+    const m = await import('@/utils/mediaSplit')
+    expect(await m.ensureAdventurePack('david')).toBe(true)
+  })
+
+  it('waits until the pack of the adventure is ready, shows the progress and asks Google to download it', async () => {
+    ;(window as unknown as Record<string, unknown>).__TAURI_INTERNALS__ = {}
+    vi.stubGlobal('navigator', { ...navigator, userAgent: 'Mozilla/5.0 (Linux; Android 14) Chrome/120' })
+    const calls = fakeServer()
+    vi.resetModules()
+    vi.stubEnv('VITE_MEDIA_SPLIT', '*')
+    const m = await import('@/utils/mediaSplit')
+    await m.initMediaSplit()
+    expect(m.mediaSplitReport.mode).toBe('android')
+    expect(m.androidPackReady()).toBe(true)
+    vi.useFakeTimers()
+    const done = m.ensureAdventurePack('david')
+    await vi.advanceTimersByTimeAsync(5000)
+    expect(await done).toBe(true)
+    vi.useRealTimers()
+    expect(calls.some((c) => c.includes('__fetch?pack=adv_david'))).toBe(true)
+    expect(m.adventureWait.id).toBe('')
+    // a second time it is known: no more questions
+    const before = calls.length
+    expect(await m.ensureAdventurePack('david')).toBe(true)
+    expect(calls.length).toBe(before)
+  })
+})
+
 describe('taking the media out of a build (vite.config.media.ts)', () => {
   function fakeBuild() {
     const root = mkdtempSync(join(tmpdir(), 'lk-media-'))

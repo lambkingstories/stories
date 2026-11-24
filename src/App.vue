@@ -16,6 +16,7 @@ import ZBottomNav from '@/components/atoms/ZBottomNav.vue'
 import useChrome from '@/use/useChrome'
 import ParentalGateModal from '@/components/molecules/ParentalGateModal.vue'
 import PremiumSheet from '@/components/molecules/PremiumSheet.vue'
+import MediaPackGate from '@/components/molecules/MediaPackGate.vue'
 import { GAME_USER_LANGUAGE } from '@/utils/constants.ts'
 import { setAdventureLanguage } from '@/use/adventureLanguage'
 import { startActivityTracking, type Section } from '@/use/useActivity'
@@ -334,6 +335,8 @@ function isCrazyGamesUrl() {
     ParentalGateModal
     //- "LambKing Plus" hint for locked features; only reachable with VITE_PREMIUM_TEASER=true.
     PremiumSheet
+    //- Android: waiting screen while the Google Play pack with the pictures and sounds is still downloading (renders nothing elsewhere).
+    MediaPackGate
 </template>
 
 <style lang="sass">

@@ -1,4 +1,5 @@
 import { createRouter, createWebHashHistory, type RouteRecordRaw } from 'vue-router'
+import { ensureAdventurePack } from '@/utils/mediaSplit'
 import AppHomeView from '@/views/app/AppHomeView.vue'
 import AppWelcomeView from '@/views/app/AppWelcomeView.vue'
 import useUser, { isWeb } from '@/use/useUser'
@@ -141,6 +142,14 @@ const router = createRouter({
 
 const remoteURL = import.meta.env.VITE_APP_REMOTE_URL
 // --- THE ROUTER HOOK ---
+// Android: the pictures and sounds of an adventure are a Play pack that is downloaded when the adventure is opened (a waiting screen shows the progress; nothing
+// happens elsewhere: the function answers at once)
+router.beforeEach(async (to) => {
+  const id = typeof to.params.journeyId === 'string' ? to.params.journeyId : ''
+  if (id && !(await ensureAdventurePack(id))) return false
+  return true
+})
+
 router.beforeEach((to, from) => {
   const { userUnlocked, setSettingValue } = useUser()
 
