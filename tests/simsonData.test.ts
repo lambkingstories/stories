@@ -28,7 +28,7 @@ const task = (n: number) => stage(n).task as unknown as NewTask
 /** Words that no German text, question or answer may use: nothing gruesome, no weapons; what Anton left out of the story. */
 const FORBIDDEN = /\b(Teufel|Hölle|Leiche|Leichen|Blut|blutig|Kreuz|Schwert|Messer|Mörder|Wunden|Waffen|Heiligenschein|Augen aus|stachen|blendeten|räche|rächen|Rache|Hochzeit|Philisterin|Füchse|Fackeln|Kinnbacken|Eselskinnbacken|Askalon|dreitausend|erschlug|erschlagen|Hure|Aas)\b/i
 const PICTURES_IN = existsSync('public/images/abenteuer/spiele/simson/torheben/simson-links-v5.webp')
-const PANORAMA_IN = existsSync('public/images/abenteuer/simson/karte-pano-v3-1.webp')
+const PANORAMA_IN = existsSync('public/images/abenteuer/simson/karte-pano-v4-1.webp')
 const LUTHER_13_24B = 'Und der Knabe wuchs, und der HERR segnete ihn.'
 
 describe('Simson: stories and questions', () => {
@@ -191,9 +191,9 @@ describe('Simson: the games', () => {
     const view = readFileSync('src/views/app/AppAdventureStageView.vue', 'utf8')
     expect(view).toMatch(/img\(v-if="stage\.imageEnd" :src="img\(stage\.imageEnd\)"/)
     // the collector's card (v5), no longer the medal
-    expect(CARD_ART.simson).toEqual({ front: 'images/abenteuer/simson/karte-vorn-v5.webp', back: 'images/abenteuer/simson/karte-hinten-v5.webp' })
+    expect(CARD_ART.simson).toEqual({ front: 'images/abenteuer/simson/karte-vorn-v6.webp', back: 'images/abenteuer/simson/karte-hinten-v6.webp' })
     for (const f of Object.values(CARD_ART.simson!)) expect(existsSync(`public/${f}`), f).toBe(true)
-    expect(simson.map.images).toEqual([1, 2, 3].map((n) => `images/abenteuer/simson/karte-pano-v3-${n}.webp`))
+    expect(simson.map.images).toEqual([1, 2, 3].map((n) => `images/abenteuer/simson/karte-pano-v4-${n}.webp`))
     expect(simson.medal).toBe('images/abenteuer/simson/medaille-v1.webp')
     expect(task(7).gateLift!.background).toBe('images/abenteuer/spiele/simson/torheben/nacht-v2.webp')
     expect(task(7).gateLift!.strong.image).toBe('images/abenteuer/spiele/simson/torheben/simson-links-v5.webp')
@@ -240,7 +240,7 @@ describe('Simson: map, files, English', () => {
   it('the gift lies in the folder of the adventure; music of its own only when its files are in', () => {
     expect(simson.gift.image).toBe('images/abenteuer/simson/geschenk.webp')
     expect(simson.gift.title).toBe('Honig im Weinberg')
-    expect(simson.downloadMb).toBe(14) // measured 24.11.2026: all files of the journey are 13.05 MB
+    expect(simson.downloadMb).toBe(14) // measured 24.11.2026: all files of the journey are 13.04 MB
     expect(simson.music).toEqual(['zora', 'timna', 'gaza'].map((n) => `audio/abenteuer/simson/musik-${n}-v1.mp3`))
     expect(simson.stages.map((s) => s.music?.match(/musik-(\w+)-/)?.[1])).toEqual(['zora', 'zora', 'zora', 'timna', 'timna', 'timna', 'timna', 'gaza', 'gaza', 'gaza', 'gaza'])
     for (const f of simson.music ?? []) expect(existsSync(`public/${f}`), f).toBe(true)

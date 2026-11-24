@@ -165,14 +165,14 @@ export const simson: Journey = {
   title: 'Simson',
   subtitle: 'Vom Engel in Zora bis zum Haus in Gaza',
   age: '8-10',
-  downloadMb: 14, // gemessen 24.11.2026: alle Dateien von journeyFiles(simson) = 13,05 MB, aufgerundet
+  downloadMb: 14, // gemessen 24.11.2026: alle Dateien von journeyFiles(simson) = 13,04 MB, aufgerundet
   medal: `${PICS}medaille-v1.webp`, // Medaille 1 bis zu Antons Wahl
   // Geschenk-Ausmalbild: Honig im Weinberg (Weinberge von Timna mit Trauben, Blüten und einer Honigwabe in einem Ast, Bienen im Flug; ohne Menschen, ohne Löwen; Konturzeichnung)
   gift: { title: 'Honig im Weinberg', image: `${PICS}geschenk.webp` },
   // die gemalte Karte (Panorama in drei Stücken, 9920 × 1648 px, OpenAI-Bildmodell): eine Landschaft Israels und der Philisterküste, von Zora über Timna, Lehi, Gaza und den Bach Sorek
   // bis zum Hügel zwischen Zora und Eschtaol; Stationen aus ergebnis/panorama/map-simson.json, Perlenweg aus simsonPath.ts
   map: {
-    images: [1, 2, 3].map((n) => `images/abenteuer/simson/karte-pano-v3-${n}.webp`),
+    images: [1, 2, 3].map((n) => `images/abenteuer/simson/karte-pano-v4-${n}.webp`),
     ring: josef.map.ring,
     aspect: 9920 / 1648,
     widthPx: 9920,
@@ -184,12 +184,12 @@ export const simson: Journey = {
       { x: 0.4153, y: 0.7888, d: 0.0339 },
       { x: 0.4637, y: 0.3034, d: 0.0339 },
       { x: 0.5847, y: 0.5097, d: 0.0339 },
-      { x: 0.6956, y: 0.4248, d: 0.0339 },
-      { x: 0.7762, y: 0.7646, d: 0.0339 },
-      { x: 0.8216, y: 0.1820, d: 0.0339 },
-      { x: 0.8669, y: 0.6978, d: 0.0339 }
+      { x: 0.7016, y: 0.3519, d: 0.0339 },
+      { x: 0.7762, y: 0.7403, d: 0.0339 },
+      { x: 0.8468, y: 0.1942, d: 0.0339 },
+      { x: 0.9073, y: 0.7646, d: 0.0339 }
     ],
-    exam: { x: 0.9637, y: 0.2791, d: 0.0339 },
+    exam: { x: 0.9556, y: 0.2791, d: 0.0339 },
     path: SIMSON_PATH
   },
   stages: [
