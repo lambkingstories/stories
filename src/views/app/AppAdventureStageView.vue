@@ -1018,6 +1018,8 @@ function toFinale() {
       section(v-if="phase === 'text' && stage" class="stage-card")
         ReadAloud(:key="stage.id" :text="stage.text" :audio="stage.audio")
         p(v-for="(p, i) in stage.text" :key="i" class="stage-text" :class="{ first: i === 0 }") {{ p }}
+        //- an optional second picture after the story (AdventureStage.imageEnd)
+        img(v-if="stage.imageEnd" :src="img(stage.imageEnd)" alt="" class="stage-pic stage-pic--end" data-test="stage-image-end" draggable="false")
         div(class="stage-actions")
           AdvButton(tone="gold" @click="fromText") {{ backFrom ? t('app.adventure.next') : isQuizStage ? t('app.adventure.toQuestions') : t('app.adventure.toTask') }}
 
@@ -1514,6 +1516,10 @@ $ink: var(--lk-text)
   border-radius: var(--lk-r-group)
   background: var(--lk-surface-2)
   box-shadow: var(--lk-shadow)
+
+  // the second picture after the story (AdventureStage.imageEnd)
+  &--end
+    margin: 14px 0 4px
 
 .stage-body
   max-width: 640px

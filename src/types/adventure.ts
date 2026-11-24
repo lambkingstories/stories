@@ -3135,6 +3135,8 @@ export interface AdventureStage {
   audio?: string
   /** The big picture of the stage (3:2). */
   image?: string
+  /** A second picture (3:2), shown under the text of the stage, after the story (Simson, stage 11: the burial). Optional; no other stage uses it. */
+  imageEnd?: string
   task: StageTask
   questions: AdventureQuestion[]
   /**

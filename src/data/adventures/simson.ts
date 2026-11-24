@@ -131,13 +131,13 @@ const AUSMALEN_AUFGABEN: PaintJob[] = [
  * Jedes freie Teil wandert auf Simsons Schultern. Die Reihenfolge ist Spielregel, keine Bibelaussage (Simson trägt alles zusammen fort, samt Riegel). Keine Wächter, keine Waffen.
  * Runde 1: das kleine Tor (Riegel, zwei Türen), Runde 2: das große Tor (dazu zwei Pfosten). Lagen am gemalten Bild gemessen (Faktor 0,63 der Teile auf dem 1500 px breiten Hintergrund:
  * die zwei Türen füllen die Bogenöffnung; tools/_massen_simson.json). Simson steht rechts vom Tor und schaut nach links zum Tor.
- * Bilder (`spiele/simson/torheben/`): `nacht-v2` (1500 × 1000), `riegel-v2` (658 × 106), `fluegel-links|rechts-v2` (je 296 × 620), `pfosten-links|rechts-v2` (je 120 × 695), `simson-links-v3` (420 × 520).
+ * Bilder (`spiele/simson/torheben/`): `nacht-v2` (1500 × 1000), `riegel-v2` (658 × 106), `fluegel-links|rechts-v2` (je 296 × 620), `pfosten-links|rechts-v2` (je 120 × 695), `simson-links-v5` (420 × 520).
  */
 const TORHEBEN: GateLiftGame = {
   background: `${G}torheben/nacht-v2.webp`,
   ratio: 1.5,
-  strong: { image: `${G}torheben/simson-links-v3.webp`, x: 83, y: 92, w: 24, ratio: 0.808 },
-  shoulder: { x: 83, y: 58, step: 5, w: 20 },
+  strong: { image: `${G}torheben/simson-links-v5.webp`, x: 83, y: 81, w: 14.3, ratio: 0.808 },
+  shoulder: { x: 83, y: 60, step: 5, w: 18 },
   rounds: [
     {
       hint: 'Hebe die Teile des Tores aus. Was noch hält, lässt sich nicht anheben.',
@@ -165,7 +165,7 @@ export const simson: Journey = {
   title: 'Simson',
   subtitle: 'Vom Engel in Zora bis zum Haus in Gaza',
   age: '8-10',
-  downloadMb: 13, // gemessen 23.11.2026: alle Dateien von journeyFiles(simson) = 12,81 MB, aufgerundet
+  downloadMb: 14, // gemessen 24.11.2026: alle Dateien von journeyFiles(simson) = 13,05 MB, aufgerundet
   medal: `${PICS}medaille-v1.webp`, // Medaille 1 bis zu Antons Wahl
   // Geschenk-Ausmalbild: Honig im Weinberg (Weinberge von Timna mit Trauben, Blüten und einer Honigwabe in einem Ast, Bienen im Flug; ohne Menschen, ohne Löwen; Konturzeichnung)
   gift: { title: 'Honig im Weinberg', image: `${PICS}geschenk.webp` },
@@ -256,7 +256,7 @@ export const simson: Journey = {
     },
     {
       id: 4,
-      image: `${PICS}etappe-bild-04.webp`,
+      image: `${PICS}etappe-bild-04-v5.webp`,
       music: 'audio/abenteuer/simson/musik-timna-v1.mp3',
       title: 'Simson und der Löwe',
       ref: 'Richter 13,24–25; 14,5–9',
@@ -274,7 +274,7 @@ export const simson: Journey = {
     },
     {
       id: 5,
-      image: `${PICS}etappe-bild-05.webp`,
+      image: `${PICS}etappe-bild-05-v5.webp`,
       music: 'audio/abenteuer/simson/musik-timna-v1.mp3',
       title: 'Das Rätsel',
       ref: 'Richter 14,10–14.18a',
@@ -295,7 +295,7 @@ export const simson: Journey = {
     },
     {
       id: 6,
-      image: `${PICS}etappe-bild-06.webp`,
+      image: `${PICS}etappe-bild-06-v5.webp`,
       music: 'audio/abenteuer/simson/musik-timna-v1.mp3',
       title: 'Wasser aus der Höhle',
       ref: 'Richter 15,18–19',
@@ -314,7 +314,7 @@ export const simson: Journey = {
     },
     {
       id: 7,
-      image: `${PICS}etappe-bild-07-v3.webp`,
+      image: `${PICS}etappe-bild-07-v5.webp`,
       music: 'audio/abenteuer/simson/musik-timna-v1.mp3',
       title: 'Das Tor von Gaza',
       ref: 'Richter 16,1–3',
@@ -353,7 +353,7 @@ export const simson: Journey = {
     },
     {
       id: 9,
-      image: `${PICS}etappe-bild-09.webp`,
+      image: `${PICS}etappe-bild-09-v5.webp`,
       music: 'audio/abenteuer/simson/musik-gaza-v1.mp3',
       title: 'Das Geheimnis',
       ref: 'Richter 16,15–20',
@@ -371,7 +371,7 @@ export const simson: Journey = {
     },
     {
       id: 10,
-      image: `${PICS}etappe-bild-10-v3.webp`,
+      image: `${PICS}etappe-bild-10-v5.webp`,
       music: 'audio/abenteuer/simson/musik-gaza-v1.mp3',
       title: 'In Gaza',
       ref: 'Richter 16,21–27',
@@ -389,7 +389,9 @@ export const simson: Journey = {
     },
     {
       id: 11,
-      image: `${PICS}etappe-bild-11.webp`,
+      image: `${PICS}etappe-bild-11-v5.webp`,
+      // das zweite Bild unter dem Text (Begräbnis, Variante 11b v2)
+      imageEnd: `${PICS}etappe-bild-11-b-v2.webp`,
       music: 'audio/abenteuer/simson/musik-gaza-v1.mp3',
       title: 'Das Haus',
       ref: 'Richter 16,25b–31',

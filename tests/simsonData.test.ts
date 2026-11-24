@@ -5,7 +5,7 @@
  * the same shape. What is left out on purpose (Anton, 23.11.2026) is checked too: no putting out of the eyes, no words of revenge, no number of the dead, no wedding, no foxes, no jawbone.
  *
  * The pictures: while they are still being painted the test does not ask for the picture files (and the data write the folders in the PLACEHOLDER way, see `bauen_simson.py`); it asks for them as soon
- * as the pictures are built in (the last picture of the list, `spiele/simson/torheben/simson-links-v3.webp`, lies in `public/`). The map pieces are asked for as soon as the panorama is in. Recordings and
+ * as the pictures are built in (the last picture of the list, `spiele/simson/torheben/simson-links-v5.webp`, lies in `public/`). The map pieces are asked for as soon as the panorama is in. Recordings and
  * music only when they exist.
  */
 import { existsSync, readFileSync, statSync } from 'node:fs'
@@ -19,6 +19,7 @@ import { AVOID_BANNED_IDS, avoidProblems, gateLiftProblems, gateSolve, riddlePro
 import type { AvoidGame, GateLiftGame, RiddleGame } from '@/utils/simsonNeu'
 import type { VerseGame } from '@/types/adventure'
 import { SIMSON_WORDS } from './simsonNeuI18n'
+import { CARD_ART } from '@/data/cardArt'
 
 afterEach(() => setAdventureLanguage('de'))
 const stage = (n: number) => simson.stages[n - 1]!
@@ -26,7 +27,7 @@ type NewTask = { avoid?: AvoidGame; riddle?: RiddleGame; gateLift?: GateLiftGame
 const task = (n: number) => stage(n).task as unknown as NewTask
 /** Words that no German text, question or answer may use: nothing gruesome, no weapons; what Anton left out of the story. */
 const FORBIDDEN = /\b(Teufel|Hölle|Leiche|Leichen|Blut|blutig|Kreuz|Schwert|Messer|Mörder|Wunden|Waffen|Heiligenschein|Augen aus|stachen|blendeten|räche|rächen|Rache|Hochzeit|Philisterin|Füchse|Fackeln|Kinnbacken|Eselskinnbacken|Askalon|dreitausend|erschlug|erschlagen|Hure|Aas)\b/i
-const PICTURES_IN = existsSync('public/images/abenteuer/spiele/simson/torheben/simson-links-v3.webp')
+const PICTURES_IN = existsSync('public/images/abenteuer/spiele/simson/torheben/simson-links-v5.webp')
 const PANORAMA_IN = existsSync('public/images/abenteuer/simson/karte-pano-v3-1.webp')
 const LUTHER_13_24B = 'Und der Knabe wuchs, und der HERR segnete ihn.'
 
@@ -179,15 +180,23 @@ describe('Simson: the games', () => {
     expect(new Set((t6.jobs ?? []).map((j) => j.zone)).size).toBeGreaterThanOrEqual(3)
   })
 
-  it('the stage pictures: variant a, the newer versions v3 of stages 3, 7 and 10 (new names for the cache of the phones)', () => {
+  it('the stage pictures: variant a, the newer versions (3 v3; 4, 5, 6, 7, 9, 10, 11 v5; new names for the cache of the phones); stage 11 has the burial as its second picture', () => {
     expect(simson.stages.map((s) => s.image!.replace('images/abenteuer/simson/', ''))).toEqual([
-      'etappe-bild-01.webp', 'etappe-bild-02.webp', 'etappe-bild-03-v3.webp', 'etappe-bild-04.webp', 'etappe-bild-05.webp', 'etappe-bild-06.webp',
-      'etappe-bild-07-v3.webp', 'etappe-bild-08.webp', 'etappe-bild-09.webp', 'etappe-bild-10-v3.webp', 'etappe-bild-11.webp'
+      'etappe-bild-01.webp', 'etappe-bild-02.webp', 'etappe-bild-03-v3.webp', 'etappe-bild-04-v5.webp', 'etappe-bild-05-v5.webp', 'etappe-bild-06-v5.webp',
+      'etappe-bild-07-v5.webp', 'etappe-bild-08.webp', 'etappe-bild-09-v5.webp', 'etappe-bild-10-v5.webp', 'etappe-bild-11-v5.webp'
     ])
+    expect(simson.stages.filter((s) => s.imageEnd).map((s) => [s.id, s.imageEnd])).toEqual([[11, 'images/abenteuer/simson/etappe-bild-11-b-v2.webp']])
+    expect(existsSync('public/images/abenteuer/simson/etappe-bild-11-b-v2.webp')).toBe(true)
+    // the stage page shows the second picture under the text (and only when a stage has one)
+    const view = readFileSync('src/views/app/AppAdventureStageView.vue', 'utf8')
+    expect(view).toMatch(/img\(v-if="stage\.imageEnd" :src="img\(stage\.imageEnd\)"/)
+    // the collector's card (v5), no longer the medal
+    expect(CARD_ART.simson).toEqual({ front: 'images/abenteuer/simson/karte-vorn-v5.webp', back: 'images/abenteuer/simson/karte-hinten-v5.webp' })
+    for (const f of Object.values(CARD_ART.simson!)) expect(existsSync(`public/${f}`), f).toBe(true)
     expect(simson.map.images).toEqual([1, 2, 3].map((n) => `images/abenteuer/simson/karte-pano-v3-${n}.webp`))
     expect(simson.medal).toBe('images/abenteuer/simson/medaille-v1.webp')
     expect(task(7).gateLift!.background).toBe('images/abenteuer/spiele/simson/torheben/nacht-v2.webp')
-    expect(task(7).gateLift!.strong.image).toBe('images/abenteuer/spiele/simson/torheben/simson-links-v3.webp')
+    expect(task(7).gateLift!.strong.image).toBe('images/abenteuer/spiele/simson/torheben/simson-links-v5.webp')
   })
 
   it('7 lift out the gate: the bar first, then the doors, then the posts; no guards, no weapons in the data', () => {
@@ -231,7 +240,7 @@ describe('Simson: map, files, English', () => {
   it('the gift lies in the folder of the adventure; music of its own only when its files are in', () => {
     expect(simson.gift.image).toBe('images/abenteuer/simson/geschenk.webp')
     expect(simson.gift.title).toBe('Honig im Weinberg')
-    expect(simson.downloadMb).toBe(13) // measured 23.11.2026: all files of the journey are 12.81 MB
+    expect(simson.downloadMb).toBe(14) // measured 24.11.2026: all files of the journey are 13.05 MB
     expect(simson.music).toEqual(['zora', 'timna', 'gaza'].map((n) => `audio/abenteuer/simson/musik-${n}-v1.mp3`))
     expect(simson.stages.map((s) => s.music?.match(/musik-(\w+)-/)?.[1])).toEqual(['zora', 'zora', 'zora', 'timna', 'timna', 'timna', 'timna', 'gaza', 'gaza', 'gaza', 'gaza'])
     for (const f of simson.music ?? []) expect(existsSync(`public/${f}`), f).toBe(true)
