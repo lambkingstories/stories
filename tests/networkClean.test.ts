@@ -19,7 +19,7 @@ const LINK_TARGETS = [
   'play.google.com'
 ]
 // only for local tests and the app's own webview address, never reached from outside
-const LOCAL = ['localhost', 'tauri.localhost', 'asset.localhost'] // asset.localhost: the address kind of the asset protocol of Tauri on Android and Windows (the media next to the program), the app's own webview
+const LOCAL = ['localhost', 'tauri.localhost', 'asset.localhost', '127.0.0.1'] // 127.0.0.1: the media server on the Android phone itself (scripts/android-pack/LkMedia.kt, only reachable from that phone); asset.localhost: the address kind of the asset protocol of Tauri on Android and Windows (the media next to the program), the app's own webview
 const NAMESPACES = ['www.w3.org'] // xml namespaces are names, not requests
 
 function sourceFiles(dir: string): string[] {

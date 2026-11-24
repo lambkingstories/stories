@@ -104,13 +104,15 @@ onMounted(async () => {
 
     section(class="mt-box")
       h2 1. Wo liegen die Dateien?
-      p Art: <b>{{ report.mode === 'asset' ? 'App (Asset-Protokoll von Tauri)' : report.mode === 'web' ? 'Browser-Prüfung' : 'nicht aktiv' }}</b>
+      p Art: <b>{{ report.mode === 'asset' ? 'App (Asset-Protokoll von Tauri)' : report.mode === 'android' ? 'Android (Play-Paket, Mini-Server auf dem Handy)' : report.mode === 'web' ? 'Browser-Prüfung' : 'nicht aktiv' }}</b>
+      p(v-if="report.mode === 'android'") Play-Paket: <b :class="report.pack.status === 'ready' ? 'ok' : 'bad'">{{ report.pack.status || 'KEINE ANTWORT' }}</b> {{ report.pack.percent }} % {{ report.pack.detail }}
+      p(v-if="report.mode === 'android' && report.pack.status !== 'ready'" class="mt-small") Das Paket lädt Google nach der Installation selbst. Warte etwas, dann die App ganz schließen und neu öffnen.
       p(v-if="report.resourceDir") Ressourcen-Ordner der App: <code>{{ report.resourceDir }}</code>
       p Gefunden: <b :class="report.chosen ? 'ok' : 'bad'">{{ report.chosen || 'NICHTS GEFUNDEN' }}</b> (nach {{ report.ms }} ms)
       p(v-if="report.error" class="bad") Fehler: {{ report.error }}
       ul(v-if="report.tried.length")
         li(v-for="t in report.tried" :key="t.where" :class="t.ok ? 'ok' : 'bad'") {{ t.ok ? '✓' : '✗' }} {{ t.where }} {{ t.note ? '(' + t.note + ')' : '' }}
-      p(v-if="report.tried.length" class="mt-small") Beispiel-Adresse: <code>{{ (report.tried.find((t) => t.where === '_up_/dist-media') ?? report.tried[0]).url }}</code>
+      p(v-if="report.tried.length" class="mt-small") Beispiel-Adresse: <code>{{ (report.tried.find((t) => t.where === '_up_/dist-media') ?? report.tried[0])?.url }}</code>
 
     section(class="mt-box")
       h2 2. Laden alle Dateien der Abenteuer?

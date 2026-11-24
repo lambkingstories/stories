@@ -47,3 +47,19 @@ describe('store builds', () => {
     expect(ios).toMatch(/media_test:[\s\S]*?default:\s*false/)
   })
 })
+
+describe('the Android test build with the media pack (Play Asset Delivery)', () => {
+  const pack = read('android-pack-build.yml')
+  const ios = read('ios-build.yml')
+
+  it('is a test: no store workflow, own version codes above the store builds, test button on', () => {
+    expect(pack).toMatch(/VITE_MEDIA_SPLIT:\s*"\*"/)
+    expect(pack).toMatch(/VITE_MEDIA_TEST:\s*"true"/)
+    expect(pack).toMatch(/1000900 \+/)
+    expect(pack).toContain('patch-android-assetpack.mjs')
+  })
+
+  it('shows every adventure that iOS shows (the media are outside the main file)', () => {
+    expect(shown(pack)).toEqual(shown(ios))
+  })
+})

@@ -1,0 +1,203 @@
+name: Android Pack Test (Play Asset Delivery)
+
+# TEST build (24.11.2026): the media of ALL adventures are not inside the app but in a Play Asset Delivery pack (fast-follow), so the main file stays small.
+# Only the .aab is useful: the pack works only when the bundle is installed through Google Play (internal testing / Internal App Sharing), not as a loose .apk.
+# Not for the store release before Anton has seen the test page ("Ich" -> "Medien-Test") on a real phone.
+# Needs the same repository secrets as android-build.yml.
+
+on:
+  workflow_dispatch:
+  # a workflow can only be started by hand once the file is on `main`: this branch runs it when the file changes (like android-build.yml)
+  push:
+    branches: [ueberarbeitung-2026-10]
+    paths: ['.github/workflows/android-pack-build.yml']
+
+concurrency:
+  group: android-pack-build
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build signed AAB with media pack
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    env:
+      # Same build variables as the local `.env.tauri` (a clean checkout has none
+      # of the gitignored .env files; without the client key every API call
+      # answers 401 MISSING_CLIENT_KEY). Client keys are not secrets.
+      VITE_APP_NATIVE: "true"
+      VITE_APP_DEMO: "false"
+      VITE_NODE_ENV: production
+      VITE_ENABLE_OBFUSCATION: "false"
+      VITE_APP_FPS_CAP: "60"
+      VITE_APP_DEBUG: "false"
+      VITE_DEBUG_CONSOLE: "false"
+      VITE_APP_TITLE: LambKing Stories
+      # Release 1.1 (2026-11-04): exactly these adventures are public and in the app: Josef (always) + Adam und Eva, Noah, Babel, Abraham, Jakob, Mose.
+      # Every adventure adds about 17 MB; Apple allows 500 MB for the executable, Google about 200 MB per download. Do not add more without measuring (vite build, du -sm dist).
+      # Release 1.2 (2026-11-04): purchases on (LambKing Plus). Free: Josef, Adam und Eva, Noah, Babel, Abraham, Jakob (FREE_JOURNEYS); Mose is Plus.
+      VITE_PREMIUM_TEASER: "true"
+      # the family plan is not offered on Android for now (single plans only: monthly and yearly)
+      VITE_PLUS_FAMILY: "false"
+      VITE_SHOW_NOAH: "true"
+      VITE_SHOW_ADAM: "true"
+      VITE_SHOW_BABEL: "true"
+      VITE_SHOW_ABRAHAM: "true"
+      VITE_SHOW_JAKOB: "true"
+      VITE_SHOW_MOSE: "true"
+      VITE_SHOW_WEIHNACHTEN: "true"
+      VITE_SHOW_OSTERN: "true"
+      VITE_SHOW_BERGPREDIGT: "true"
+      VITE_SHOW_ICHBIN: "true"
+      VITE_SHOW_SOHN: "true"
+      VITE_SHOW_OFFENBARUNG: "true"
+      VITE_SHOW_PAULUSROM: "true"
+      VITE_SHOW_PAULUS: "true"
+      VITE_SHOW_PFINGSTEN: "true"
+      VITE_SHOW_LETZTEWOCHE: "true"
+      VITE_SHOW_GLEICHNISSE: "true"
+      VITE_SHOW_WUNDER: "true"
+      VITE_SHOW_WUESTE: "true"
+      VITE_SHOW_TAUFE: "true"
+      VITE_SHOW_PROPHETEN: "true"
+      VITE_SHOW_ELISA: "true"
+      VITE_SHOW_ELIA: "true"
+      VITE_SHOW_SALOMO: "true"
+      VITE_SHOW_DAVID: "true"
+      VITE_SHOW_SAMUEL: "true"
+      VITE_SHOW_GIDEON: "true"
+      VITE_SHOW_RUT: "true"
+      VITE_SHOW_NEHEMIA: "true"
+      VITE_SHOW_JOSUA: "true"
+      VITE_SHOW_HEILUNG: "true"
+      VITE_SHOW_FREUNDE: "true"
+      VITE_SHOW_ESTER: "true"
+      VITE_SHOW_ZACHAEUS: "true"
+      VITE_SHOW_DANIEL: "true"
+      VITE_SHOW_JONA: "true"
+      # all media of the adventures go to dist-media/ and from there into the pack (scripts/patch-android-assetpack.mjs)
+      VITE_MEDIA_SPLIT: "*"
+      VITE_MEDIA_TEST: "true"
+      VITE_CLIENT_KEY: tauri-key-public-1111
+      VITE_API_BASE_URL: ${{ vars.API_BASE_URL || 'https://lbs-be.onrender.com' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Play needs a strictly rising versionCode; the last one used by hand was
+      # 1000020. Builds from here count up with the run number.
+      - name: Compute versionCode
+        run: echo "ANDROID_VERSION_CODE=$((1000900 + ${{ github.run_number }}))" >> "$GITHUB_ENV"
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,i686-linux-android,x86_64-linux-android
+
+      - name: Cache Cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.6.2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install JS dependencies
+        # onnxruntime-node (a tool package, not part of the app) tries to download a CUDA binary that GitHub answers with 404 when the
+        # pnpm cache is cold (a new lockfile): skip that download, the app does not use it.
+        env:
+          ONNXRUNTIME_NODE_INSTALL_CUDA: skip
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Locate Android NDK
+        run: |
+          NDK="${ANDROID_NDK_LATEST_HOME:-${ANDROID_NDK_HOME:-}}"
+          if [ -z "$NDK" ] || [ ! -d "$NDK" ]; then
+            echo "::error::No Android NDK on this runner"
+            exit 1
+          fi
+          echo "NDK_HOME=$NDK" >> "$GITHUB_ENV"
+          echo "Using NDK $NDK"
+
+      # src-tauri/gen/ is not fully in Git (only the launcher icons and
+      # assets are). `tauri android init` creates the Gradle project; the icons
+      # that are in Git are restored afterwards, so the store icon stays ours.
+      - name: Initialize Tauri Android project
+        run: |
+          # `init` refuses a half-filled gen/android, so set the icons aside first.
+          cp -R src-tauri/gen/android/app/src/main/res "$RUNNER_TEMP/android-res"
+          rm -rf src-tauri/gen/android
+          pnpm exec tauri android init --ci
+          cp -R "$RUNNER_TEMP/android-res/." src-tauri/gen/android/app/src/main/res/
+
+      # Family voices (Ich -> Eltern -> Stimmen) record through the WebView's
+      # getUserMedia; the Tauri WebView asks for RECORD_AUDIO only if the
+      # manifest declares it, and `tauri android init` does not.
+      - name: Declare microphone permission
+        run: |
+          M=src-tauri/gen/android/app/src/main/AndroidManifest.xml
+          grep -q 'android.permission.RECORD_AUDIO' "$M" || sed -i '0,/<application/s##<uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <application#' "$M"
+          grep -q 'android.permission.RECORD_AUDIO' "$M" || { echo "::error::RECORD_AUDIO could not be added to $M"; exit 1; }
+          grep -n 'uses-permission' "$M"
+
+      - name: Patch Gradle (release signing + versionCode)
+        run: |
+          node scripts/patch-android-signing.mjs
+          node scripts/patch-android-versioncode.mjs
+
+      - name: Write signing material
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_B64" ] || [ -z "$KEYSTORE_PASSWORD" ]; then
+            echo "::error::Secrets ANDROID_KEYSTORE_BASE64 / ANDROID_KEYSTORE_PASSWORD are missing"
+            exit 1
+          fi
+          echo "$KEYSTORE_B64" | base64 --decode > "$RUNNER_TEMP/release.keystore"
+          {
+            echo "password=$KEYSTORE_PASSWORD"
+            echo "keyAlias=lambking"
+            echo "storeFile=$RUNNER_TEMP/release.keystore"
+          } > src-tauri/gen/android/key.properties
+
+      - name: Make the web build and take the media out of it
+        run: |
+          pnpm build-only
+          ls dist-media/images/abenteuer | head -50
+          du -sm dist dist-media
+
+      - name: Put the media into the Play Asset Delivery pack
+        run: node scripts/patch-android-assetpack.mjs
+
+      - name: Build signed AAB
+        run: pnpm exec tauri android build --aab --target aarch64 armv7
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-pack-aab
+          path: src-tauri/gen/android/app/build/outputs/bundle/**/*.aab
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Remove signing material
+        if: always()
+        run: |
+          rm -f "$RUNNER_TEMP/release.keystore" src-tauri/gen/android/key.properties

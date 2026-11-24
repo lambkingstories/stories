@@ -12,7 +12,8 @@
  *    with "Load failed" (the first tries of 24.11.2026).
  *
  * `prependBaseUrl` asks `splitUrl` first; a path that is not part of the split goes the old way. Android keeps its media inside the app (the resources of an Android app
- * are assets of the APK, which the asset protocol cannot read).
+ * are assets of the APK, which the asset protocol cannot read): there the media are a Play Asset Delivery pack that a little server on the phone hands out
+ * (`initAndroidPack`, scripts/android-pack/LkMedia.kt).
  */
 const IDS = ((import.meta.env.VITE_MEDIA_SPLIT as string | undefined) ?? '')
   .split(',')
@@ -46,16 +47,18 @@ export const isSplitPath = (path: string): boolean => !!PATTERN && PATTERN.test(
 export interface MediaSplitReport {
   on: boolean
   ids: string[]
-  mode: 'none' | 'web' | 'asset'
+  mode: 'none' | 'web' | 'asset' | 'android'
   resourceDir: string
   tried: { where: string; ok: boolean; url: string; note: string }[]
+  /** Android: what the media server on the phone said (the Play pack: ready, downloading ...). */
+  pack: { status: string; percent: number; detail: string; port: number }
   chosen: string
   error: string
   ms: number
 }
 
 /** What the start found out (shown by the test page). */
-export const mediaSplitReport: MediaSplitReport = { on: MEDIA_SPLIT_ON, ids: IDS, mode: 'none', resourceDir: '', tried: [], chosen: '', error: '', ms: 0 }
+export const mediaSplitReport: MediaSplitReport = { on: MEDIA_SPLIT_ON, ids: IDS, mode: 'none', resourceDir: '', tried: [], pack: { status: '', percent: 0, detail: '', port: 0 }, chosen: '', error: '', ms: 0 }
 
 let toUrl: ((path: string) => string) | null = null
 
@@ -78,6 +81,38 @@ export function pictureLoads(url: string, timeoutMs = 3000): Promise<boolean> {
   })
 }
 
+/** The ports of the little media server of the Android app (LkMedia.kt; scripts/android-pack). */
+export const ANDROID_PORTS = [47321, 47322, 47323]
+
+/** Android: asks the media server on the phone itself; ready when the Play Asset Delivery pack is downloaded. */
+async function initAndroidPack(): Promise<void> {
+  mediaSplitReport.mode = 'android'
+  const asks = ANDROID_PORTS.map(async (port) => {
+    const ctl = new AbortController()
+    const timer = window.setTimeout(() => ctl.abort(), 2000)
+    try {
+      const r = await fetch(`http://127.0.0.1:${port}/__status`, { signal: ctl.signal })
+      const j = (await r.json()) as { status?: string; percent?: number; detail?: string }
+      return { port, status: String(j.status ?? ''), percent: Number(j.percent ?? 0), detail: String(j.detail ?? '') }
+    } catch (e) {
+      mediaSplitReport.tried.push({ where: `Anschluss ${port}`, ok: false, url: `http://127.0.0.1:${port}/`, note: String(e).slice(0, 80) })
+      return null
+    } finally {
+      window.clearTimeout(timer)
+    }
+  })
+  const answer = (await Promise.all(asks)).find(Boolean)
+  if (!answer) return
+  mediaSplitReport.pack = answer
+  const base = `http://127.0.0.1:${answer.port}/`
+  const ok = answer.status === 'ready' && (await pictureLoads(base + SENTINEL))
+  mediaSplitReport.tried.push({ where: `Anschluss ${answer.port}`, ok, url: base + SENTINEL, note: answer.status + (answer.detail ? ' ' + answer.detail : '') })
+  if (ok) {
+    mediaSplitReport.chosen = base
+    toUrl = (path) => base + path
+  }
+}
+
 /** Finds the media folder. Called once before the first screen is drawn; never throws (a failure only means the old addresses stay). */
 export async function initMediaSplit(): Promise<void> {
   if (!MEDIA_SPLIT_ON) return
@@ -91,6 +126,7 @@ export async function initMediaSplit(): Promise<void> {
       return
     }
     if (!('__TAURI_INTERNALS__' in window)) return
+    if (/Android/i.test(navigator.userAgent)) return await initAndroidPack()
     const [{ resourceDir }, { convertFileSrc }] = await Promise.all([import('@tauri-apps/api/path'), import('@tauri-apps/api/core')])
     mediaSplitReport.mode = 'asset'
     const rd = (await resourceDir()).replace(/[\\/]+$/, '')
