@@ -191,7 +191,7 @@ describe('Simson: the games', () => {
     const view = readFileSync('src/views/app/AppAdventureStageView.vue', 'utf8')
     expect(view).toMatch(/img\(v-if="stage\.imageEnd" :src="img\(stage\.imageEnd\)"/)
     // the collector's card (v5), no longer the medal
-    expect(CARD_ART.simson).toEqual({ front: 'images/abenteuer/simson/karte-vorn-v7.webp', back: 'images/abenteuer/simson/karte-hinten-v6.webp' })
+    expect(CARD_ART.simson).toEqual({ front: 'images/abenteuer/simson/karte-vorn-v7b.webp', back: 'images/abenteuer/simson/karte-hinten-v6.webp' })
     for (const f of Object.values(CARD_ART.simson!)) expect(existsSync(`public/${f}`), f).toBe(true)
     expect(simson.map.images).toEqual([1, 2, 3].map((n) => `images/abenteuer/simson/karte-pano-v4-${n}.webp`))
     expect(simson.medal).toBe('images/abenteuer/simson/medaille-v4.webp')

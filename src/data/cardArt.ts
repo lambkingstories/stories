@@ -36,7 +36,7 @@ export const CARD_ART: Record<string, CardArt> = {
   'freunde': { front: 'images/abenteuer/freunde/karte-vorn.webp', back: 'images/abenteuer/freunde/karte-hinten.webp' },
   'wunder': { front: 'images/abenteuer/wunder/karte-vorn.webp', back: 'images/abenteuer/wunder/karte-hinten.webp' },
   'bergpredigt': { front: 'images/abenteuer/bergpredigt/karte-vorn.webp', back: 'images/abenteuer/bergpredigt/karte-hinten.webp' },
-  'simson': { front: 'images/abenteuer/simson/karte-vorn-v7.webp', back: 'images/abenteuer/simson/karte-hinten-v6.webp' },
+  'simson': { front: 'images/abenteuer/simson/karte-vorn-v7b.webp', back: 'images/abenteuer/simson/karte-hinten-v6.webp' },
   'gleichnisse': { front: 'images/abenteuer/gleichnisse/karte-vorn.webp', back: 'images/abenteuer/gleichnisse/karte-hinten.webp' },
   'heilung': { front: 'images/abenteuer/heilung/karte-vorn.webp', back: 'images/abenteuer/heilung/karte-hinten.webp' },
   'ichbin': { front: 'images/abenteuer/ichbin/karte-vorn.webp', back: 'images/abenteuer/ichbin/karte-hinten.webp' },
