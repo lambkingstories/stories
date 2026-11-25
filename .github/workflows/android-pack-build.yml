@@ -1,6 +1,6 @@
 name: Android Pack Test (Play Asset Delivery)
 
-# TEST build 14 (Hiskia on, collection cards show again, paintings keep their name, finished adventures in mint green) (24.11.2026, core pack + one pack per adventure; medals, cards and gifts are served from the core pack; Simson and Johannes on, frees disk space, gives Gradle 6 GB; a requested pack is never reported as "none" while it is on its way): the media of ALL adventures are not inside the app but in a Play Asset Delivery pack (fast-follow), so the main file stays small.
+# TEST build 15 (native debug symbols, Hiskia on, collection cards show again, paintings keep their name, finished adventures in mint green) (24.11.2026, core pack + one pack per adventure; medals, cards and gifts are served from the core pack; Simson and Johannes on, frees disk space, gives Gradle 6 GB; a requested pack is never reported as "none" while it is on its way): the media of ALL adventures are not inside the app but in a Play Asset Delivery pack (fast-follow), so the main file stays small.
 # Only the .aab is useful: the pack works only when the bundle is installed through Google Play (internal testing / Internal App Sharing), not as a loose .apk.
 # Not for the store release before Anton has seen the test page ("Ich" -> "Medien-Test") on a real phone.
 # Needs the same repository secrets as android-build.yml.
@@ -81,6 +81,8 @@ jobs:
       VITE_SHOW_JONA: "true"
       # all media of the adventures go to dist-media/ and from there into the pack (scripts/patch-android-assetpack.mjs)
       VITE_MEDIA_SPLIT: "*"
+      # keep the symbols in the Rust library: Gradle strips it for the app and puts the symbol table into the bundle (patch-android-symbols.mjs)
+      CARGO_PROFILE_RELEASE_STRIP: "false"
       VITE_MEDIA_TEST: "true"
       VITE_CLIENT_KEY: tauri-key-public-1111
       VITE_API_BASE_URL: ${{ vars.API_BASE_URL || 'https://lbs-be.onrender.com' }}
@@ -169,6 +171,7 @@ jobs:
         run: |
           node scripts/patch-android-signing.mjs
           node scripts/patch-android-versioncode.mjs
+          node scripts/patch-android-symbols.mjs
 
       - name: Write signing material
         env:
@@ -204,6 +207,12 @@ jobs:
 
       - name: Build signed AAB
         run: pnpm exec tauri android build --aab --target aarch64 armv7
+
+      - name: Debug symbols in the bundle
+        run: |
+          AAB=$(find src-tauri/gen/android -name '*.aab' | head -n 1)
+          unzip -l "$AAB" | grep -E "debugsymbols/|/lib/[^/]+/libapp_lib.so" || true
+          unzip -l "$AAB" | grep -q "debugsymbols/" || echo "::warning::no native debug symbols in the bundle"
 
       - name: Disk after build
         if: always()
