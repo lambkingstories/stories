@@ -18,6 +18,7 @@ import useBigGames, { howSeen, markHowSeen } from '@/use/useBigGames'
 import useMusic from '@/use/useMusic'
 import useSfx from '@/use/useSfx'
 import { prependBaseUrl } from '@/utils/function'
+import { androidPackReady, ensureAdventurePack } from '@/utils/mediaSplit'
 import {
   allBoardsDone,
   boardDone,
@@ -111,6 +112,15 @@ function begin(b: Board) {
   clearAssemble()
   board.value = b
   preload(b)
+  // Android: the pictures of an adventure that was never opened lie in its Play pack: fetch it, then show the cards again with the pictures
+  if (androidPackReady()) {
+    void ensureAdventurePack(b.id).then((ok) => {
+      if (ok && board.value === b) {
+        preload(b)
+        dealKey.value++
+      }
+    })
+  }
   started++
   dealKey.value = started
   game.value = newGame(b.pairs, (Date.now() + started * 7919) >>> 0)

@@ -10,6 +10,7 @@ import { journeyFiles, notPaintedYet, PACK_VERSION } from '@/utils/journeyFiles'
 import { prependBaseUrl } from '@/utils/function'
 import { isJourneyPlusLocked } from '@/utils/adventureAccess'
 import { showUpsell } from '@/use/usePremium'
+import { MEDIA_SPLIT_ON } from '@/utils/mediaSplit'
 
 const KEY = 'lk-journey-packs'
 const CACHE_PREFIX = 'lk-v1-pack-'
@@ -46,6 +47,13 @@ function save() {
 }
 
 const supported = typeof caches !== 'undefined'
+
+/**
+ * Whether the app offers this one-time download at all. Not in a store build with separate media (iOS: the files lie next to the program; Android: they lie in
+ * the Play packs, which the router fetches with a loading screen when the adventure opens): there the download would ask the net for files that are not on a
+ * server, fail ("Das Laden hat nicht geklappt") and block the adventure (found on Anton's phone, 25.11.2026). The web test with `VITE_MEDIA_SPLIT_WEB` keeps it.
+ */
+const offered = supported && !(MEDIA_SPLIT_ON && import.meta.env.VITE_MEDIA_SPLIT_WEB !== 'true')
 
 /** Runs `worker` over the items, a few at a time. */
 async function pool<T>(items: T[], size: number, worker: (item: T) => Promise<void>, stopped: () => boolean) {
@@ -134,5 +142,5 @@ export default function useJourneyPack() {
     if (supported) for (const k of await caches.keys()) if (k.startsWith(CACHE_PREFIX + id)) await caches.delete(k)
   }
 
-  return { busy, progress, failed, isReady, infoOf, download, cancel, remove, supported, anyReady: computed(() => Object.keys(packs).length > 0) }
+  return { busy, progress, failed, isReady, infoOf, download, cancel, remove, supported: offered, anyReady: computed(() => Object.keys(packs).length > 0) }
 }

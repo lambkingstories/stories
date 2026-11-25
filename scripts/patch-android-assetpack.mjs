@@ -23,7 +23,10 @@ const CORE = 'lkcore'
 const LIB = 'com.google.android.play:asset-delivery:2.3.0'
 const MARK = 'managed by scripts/patch-android-assetpack.mjs'
 // files of an adventure folder that every screen of the app needs even when the adventure is not downloaded (the overview, the collection, the gifts)
-const KEEP_IN_CORE = /^(medaille|karte-vorn|karte-hinten|geschenk)/
+// (the same list is in LkMedia.kt, `keepInCore`; the test tests/androidCoreFiles.test.ts keeps both in step and checks every adventure against it)
+// medaillon-ring = the gold ring of every map station (it lies in the folder of Josef and every adventure uses it), reise = the cover of Josef on the start page
+const CORE_FILES = ['medaille', 'karte-vorn', 'karte-hinten', 'geschenk', 'medaillon-ring', 'reise']
+const KEEP_IN_CORE = new RegExp('^(' + CORE_FILES.join('|') + ')')
 
 const fail = (msg) => {
   console.error(`[patch-android-assetpack] ${msg}`)

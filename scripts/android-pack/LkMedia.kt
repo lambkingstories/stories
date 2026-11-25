@@ -54,7 +54,7 @@ object LkMedia {
     private val pool = Executors.newCachedThreadPool()
     private val pathPattern = Regex("^/(?:images|audio)/abenteuer/(?:spiele/)?([^/]+)/")
 
-    private val keepInCore = Regex("^/images/abenteuer/[^/]+/(?:medaille|karte-vorn|karte-hinten|geschenk)[^/]*$")
+    private val keepInCore = Regex("^/images/abenteuer/[^/]+/(?:medaille|karte-vorn|karte-hinten|geschenk|medaillon-ring|reise)[^/]*$")
 
     private fun pack(name: String): Pack = packs.getOrPut(name) { Pack(name) }
 
