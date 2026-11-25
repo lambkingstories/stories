@@ -35,5 +35,11 @@ content = content.replace(
     '    // END: managed by scripts/patch-android-symbols.mjs'
   ].join('\n')
 )
+// Tauri's template writes `jniLibs.keepDebugSymbols.add(...)` into the debug build type, but `packaging` is not per build type: it keeps the release
+// libraries unstripped too, and then no symbol table is made. Debug builds are not used for the store.
+const lines = content.split('\n')
+const rest = lines.filter((l) => !l.includes('jniLibs.keepDebugSymbols.add'))
+content = rest.join('\n')
+console.log(`[patch-android-symbols] removed ${lines.length - rest.length} keepDebugSymbols line(s)`)
 writeFileSync(GRADLE, content, 'utf8')
 console.log('[patch-android-symbols] patched')

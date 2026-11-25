@@ -1,6 +1,6 @@
 name: Android Pack Test (Play Asset Delivery)
 
-# TEST build 15 (native debug symbols, Hiskia on, collection cards show again, paintings keep their name, finished adventures in mint green) (24.11.2026, core pack + one pack per adventure; medals, cards and gifts are served from the core pack; Simson and Johannes on, frees disk space, gives Gradle 6 GB; a requested pack is never reported as "none" while it is on its way): the media of ALL adventures are not inside the app but in a Play Asset Delivery pack (fast-follow), so the main file stays small.
+# TEST build 16 (keepDebugSymbols removed, native debug symbols, Hiskia on, collection cards show again, paintings keep their name, finished adventures in mint green) (24.11.2026, core pack + one pack per adventure; medals, cards and gifts are served from the core pack; Simson and Johannes on, frees disk space, gives Gradle 6 GB; a requested pack is never reported as "none" while it is on its way): the media of ALL adventures are not inside the app but in a Play Asset Delivery pack (fast-follow), so the main file stays small.
 # Only the .aab is useful: the pack works only when the bundle is installed through Google Play (internal testing / Internal App Sharing), not as a loose .apk.
 # Not for the store release before Anton has seen the test page ("Ich" -> "Medien-Test") on a real phone.
 # Needs the same repository secrets as android-build.yml.
