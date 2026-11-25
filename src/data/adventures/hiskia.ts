@@ -44,7 +44,7 @@ const LAUFWEGE: RunRoutesGame = {
   ],
   runnerRatio: 0.684,
   runnerW: 12.5,
-  waiting: [{ x: 7, y: 96 }, { x: 19, y: 96 }, { x: 31, y: 96 }],
+  waiting: [{ x: 7, y: 100 }, { x: 19, y: 100 }, { x: 31, y: 100 }],
   road: `${G}laufwege/strasse.webp`,
   roadH: 3.4,
   step: `${G}laufwege/fuss.webp`,

@@ -347,6 +347,7 @@ const comesTowns = computed(() => current.value.towns.filter((x) => x.reacts ===
         div(
           ref="fieldEl"
           class="gm-field"
+          :class="{ picking: selected !== null }"
           :style="{ backgroundImage: `url(${src(game.background)})`, aspectRatio: String(ratio) }"
           role="group"
           :aria-label="t('app.adventure.lettersRunField')"
@@ -497,6 +498,11 @@ const comesTowns = computed(() => current.value.towns.filter((x) => x.reacts ===
     border-color: #ffd86a
     box-shadow: 0 0 12px rgba(255, 220, 110, 0.95)
     animation: gm-pulse 1300ms ease-in-out infinite
+
+// a runner who waits or stands beside a town can lie over another town: once a runner is taken up, the towns are on top,
+// so that every town can be tapped; the rest of the other runners stays free to take them up
+.gm-field.picking .gm-tbtn
+  z-index: 3
 
 .gm-runner
   position: absolute

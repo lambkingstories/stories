@@ -132,6 +132,16 @@ describe('Schicke die Läufer los (laufwege)', () => {
     expect(problems()).toEqual([])
   })
 
+  it('with a runner taken up the towns lie on top, so that a runner who waits over a town does not take the tap (Anton 25.11.2026: the lowest town could not be tapped)', async () => {
+    const w = mountIt()
+    const field = () => w.find('.gm-field').classes()
+    expect(field()).not.toContain('picking')
+    await runner(w, 1).trigger('click')
+    expect(field()).toContain('picking')
+    await town(w, '5').trigger('click')
+    expect(field()).not.toContain('picking')
+  })
+
   it('a runner (he shines), then the town: the runner stands there, one letter less, a letter in the town, a soft tone, "Brief abgegeben.", a tick over the town; the people react', async () => {
     const w = mountIt()
     await runner(w, 0).trigger('click')
