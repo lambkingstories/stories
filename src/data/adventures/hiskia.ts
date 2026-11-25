@@ -261,7 +261,7 @@ export const hiskia: Journey = {
   subtitle: 'Vom Brief an alle bis zum Wasser für die Stadt',
   age: '8-10',
   downloadMb: 12, // gemessen 25.11.2026: alle 119 Dateien von journeyFiles(hiskia) = 11,97 MB (Panorama v3), aufgerundet
-  medal: `${PICS}medaille-v1.webp`, // Medaille 1 bis zu Antons Wahl
+  medal: `${PICS}medaille-v3.webp`, // Medaille 3 (Antons Wahl 25.11.2026)
   // Geschenk-Ausmalbild (Standard bis zu Antons Wahl: Variante b): Jerusalem in Hiskias Tagen, Konturzeichnung für Zehnjährige
   gift: { title: 'Jerusalem in Hiskias Tagen', image: `${PICS}geschenk-b.webp` },
   // die gemalte Karte (Panorama in drei Stücken, 9920 × 1648 px, OpenAI-Bildmodell): vom Tempel mit der offenen Tür über die Mauer und den Vorhof bis zum Hang mit Teich und Wasserleitung;
@@ -403,7 +403,7 @@ export const hiskia: Journey = {
     },
     {
       id: 7,
-      image: `${PICS}etappe-bild-07.webp`,
+      image: `${PICS}etappe-bild-07-v2.webp`,
       music: 'audio/abenteuer/hiskia/musik-briefgebet-v1.mp3',
       title: 'Ein Brief vor Gott',
       ref: '2. Könige 19,8–19',
