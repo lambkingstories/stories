@@ -414,7 +414,8 @@ async function leaveToStage() {
 
 const querySource = computed<string>(() => {
   const v = route.query.source
-  return typeof v === 'string' ? v : ''
+  // a stored or handed-on address of a media file is built anew (see prependBaseUrl)
+  return typeof v === 'string' && v ? prependBaseUrl(v) : ''
 })
 const querySourceType = computed<'image' | 'pdf' | ''>(() => {
   const v = route.query.type
@@ -1227,7 +1228,8 @@ async function playWorkLapse(meta: ArtworkMeta, data: TimelapseData) {
   ctx.fillRect(0, 0, c.width, c.height)
   if (meta.kind === 'page' && meta.sourceUrl) {
     try {
-      const local = await cacheUrlToBlobUrl(meta.sourceUrl, meta.bookId)
+      const source = prependBaseUrl(meta.sourceUrl)
+      const local = await cacheUrlToBlobUrl(source, meta.bookId)
       const img = await new Promise<HTMLImageElement>((resolve, reject) => {
         const i = new Image()
         i.crossOrigin = 'anonymous'
@@ -1236,7 +1238,7 @@ async function playWorkLapse(meta: ArtworkMeta, data: TimelapseData) {
         i.src = local
       })
       ctx.drawImage(img, 0, 0, c.width, c.height)
-      if (local !== meta.sourceUrl) URL.revokeObjectURL(local)
+      if (local !== source) URL.revokeObjectURL(local)
     } catch {
       // without the line art the film is shown on white paper: the paint is still there
     }

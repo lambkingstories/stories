@@ -753,11 +753,17 @@ $ink: var(--lk-text)
     cursor: default
     opacity: 0.8
 
-  // an adventure that is finished: a warm honey gold, so that the child sees at once what is done
+  // an adventure that is finished: a fresh mint green (not gold), so that the child sees at once what is done (Anton, 25.11.2026)
   &.is-finished
-    background: color-mix(in srgb, #f0c850 28%, var(--lk-surface))
-    border-color: #d4a83e
+    background: color-mix(in srgb, #63d2a2 34%, var(--lk-surface))
+    border-color: #2fa876
     border-width: 2px
+
+    .tile-fill
+      background: #2fa876
+
+    .tile-check
+      background: #23895f
 
 .tile-check
   position: absolute

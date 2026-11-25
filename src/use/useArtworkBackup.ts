@@ -6,6 +6,7 @@
  * app: `sicherung/` with the painted layers and an index. Nothing leaves the device unless the parent shares the file.
  */
 import { getArtwork, listArtworks, saveArtwork, type ArtworkMeta } from '@/use/useArtworks'
+import { prependBaseUrl } from '@/utils/function'
 import { unzip, zip, type ZipEntry } from '@/utils/zipStore'
 
 const INDEX = 'sicherung/index.json'
@@ -46,7 +47,7 @@ async function composite(meta: ArtworkMeta, drawing: Blob): Promise<Uint8Array> 
   ctx.drawImage(bmp, 0, 0)
   bmp.close?.()
   if (meta.kind === 'page' && meta.sourceType === 'image' && meta.sourceUrl) {
-    const line = await loadImage(meta.sourceUrl)
+    const line = await loadImage(prependBaseUrl(meta.sourceUrl))
     if (line) {
       ctx.globalCompositeOperation = 'multiply'
       ctx.drawImage(line, 0, 0, c.width, c.height)

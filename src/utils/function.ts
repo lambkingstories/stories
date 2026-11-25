@@ -17,8 +17,32 @@ export const isWeb = import.meta.env.VITE_PLATTFORM === 'web'
 // where `/little-bible-stories/assets/images/bg/…` 404s came from.
 const baseURL = import.meta.env.BASE_URL || '/'
 
+/**
+ * The path in the app of a media file that is addressed on this device: the Android media server (`http://127.0.0.1:<port>/images/...`) or the iOS asset protocol
+ * (`asset://...%2Fimages%2F...`), e.g. `/images/abenteuer/x/y.webp`. `null` for every other address. Such addresses change (the port; on iOS the folder of the
+ * app with every update), so nothing that is kept may hold one (see `pageArtworkId`).
+ */
+export const localMediaPath = (url: string): string | null => {
+  if (!/^(asset:|https?:\/\/(asset\.localhost|127\.0\.0\.1)[:/])/i.test(url)) return null
+  let full = url
+  try {
+    full = decodeURIComponent(url)
+  } catch {
+    // not encoded: used as it is
+  }
+  const at = full.search(/\/(images|audio)\//)
+  return at >= 0 ? full.slice(at).split(/[?#]/)[0]! : null
+}
+
+/**
+ * The address of a file of the app. It may be called twice on the same value (a page hands a finished address to a component that calls it again): an address
+ * with a scheme stays as it is, and an address of a media file on this device is built anew from its path. (Found on Anton's phone, 25.11.2026: the collection
+ * card of "Das Volk in der Wüste" showed no picture, because the finished address of the media server was prefixed a second time.)
+ */
 export const prependBaseUrl = (url: string): string => {
-  const path = url.replace(/^\/+/, '')
+  const local = localMediaPath(url)
+  if (!local && /^([a-z][a-z0-9+.-]*:|\/\/)/i.test(url)) return url
+  const path = (local ?? url).replace(/^\/+/, '')
   // the media of an adventure that lies outside the program file (only in a build with `VITE_MEDIA_SPLIT`, see `mediaSplit.ts`)
   if (MEDIA_SPLIT_ON && isSplitPath(path)) {
     const away = splitUrl(path)

@@ -8,6 +8,8 @@
  * page, a book attachment) or, for a blank sheet, is simply white.
  */
 
+import { localMediaPath } from '@/utils/function'
+
 export interface ArtworkMeta {
   /** `src:<url>#<page>` for a coloring page, `blank:<timestamp>` for a blank sheet. */
   id: string
@@ -79,7 +81,8 @@ function request<T>(mode: IDBTransactionMode, run: (store: IDBObjectStore) => ID
 }
 
 export function pageArtworkId(sourceUrl: string, page: number): string {
-  return `src:${sourceUrl}#${page}`
+  // a media file on this device is kept by its path: its address changes (port; on iOS with every update), the painting must stay found
+  return `src:${localMediaPath(sourceUrl) ?? sourceUrl}#${page}`
 }
 
 export async function saveArtwork(meta: ArtworkMeta, drawing: Blob, stickers?: Blob | null): Promise<void> {
