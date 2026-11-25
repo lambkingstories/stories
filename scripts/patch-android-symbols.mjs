@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 // Put the native debug symbols into the .aab, so that Google Play can show readable crash reports (the Play Console warns when they are missing).
 // The symbols travel in the bundle's metadata only: the app that is installed on the phone does not get bigger, because the Android build tools strip the
-// library themselves. For that, two things are needed: the Rust library must not be stripped before (CARGO_PROFILE_RELEASE_STRIP=false in the workflow) and
-// Gradle must know the NDK that does the stripping (`ndkVersion`, taken from NDK_HOME). Run after `tauri android init`. Idempotent.
+// library themselves. For that, three things are needed: the Rust library must not be stripped before (CARGO_PROFILE_RELEASE_STRIP=false in the workflow),
+// Gradle must know the NDK that does the stripping (`ndkVersion`, taken from NDK_HOME), and the "keep the symbols" list of Tauri's template must be empty:
+// the template fills `packaging.jniLibs.keepDebugSymbols` in its debug build type, but `packaging` is not per build type, so it also keeps the release
+// libraries unstripped (then no symbol table is made). The template itself is not touched: a second `android` block at the end of the file empties the list.
+// Run after `tauri android init`. Idempotent. Debug builds are not used for the store.
 
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { appendFileSync, existsSync, readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -18,28 +21,25 @@ const fail = (msg) => {
 }
 
 if (!existsSync(GRADLE)) fail(`no gradle file at ${GRADLE}`)
-let content = readFileSync(GRADLE, 'utf8')
+const content = readFileSync(GRADLE, 'utf8')
 if (content.includes(SENTINEL)) {
   console.log('[patch-android-symbols] already patched — skipping')
   process.exit(0)
 }
 if (!/^android\s*\{/m.test(content)) fail('no `android {` block in app/build.gradle.kts')
 
-content = content.replace(
-  /^android\s*\{/m,
+appendFileSync(
+  GRADLE,
   [
+    '',
+    SENTINEL,
     'android {',
-    `    ${SENTINEL}`,
     '    System.getenv("NDK_HOME")?.let { ndkVersion = it.trimEnd(\'/\').substringAfterLast(\'/\') }',
+    '    packaging.jniLibs.keepDebugSymbols.clear()',
     '    buildTypes.getByName("release") { ndk.debugSymbolLevel = "SYMBOL_TABLE" }',
-    '    // END: managed by scripts/patch-android-symbols.mjs'
+    '}',
+    '// END: managed by scripts/patch-android-symbols.mjs',
+    ''
   ].join('\n')
 )
-// Tauri's template writes `jniLibs.keepDebugSymbols.add(...)` into the debug build type, but `packaging` is not per build type: it keeps the release
-// libraries unstripped too, and then no symbol table is made. Debug builds are not used for the store.
-const lines = content.split('\n')
-const rest = lines.filter((l) => !l.includes('jniLibs.keepDebugSymbols.add'))
-content = rest.join('\n')
-console.log(`[patch-android-symbols] removed ${lines.length - rest.length} keepDebugSymbols line(s)`)
-writeFileSync(GRADLE, content, 'utf8')
 console.log('[patch-android-symbols] patched')
