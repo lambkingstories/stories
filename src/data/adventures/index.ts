@@ -1,9 +1,16 @@
 import type { Journey } from '@/types/adventure'
 import { josef } from '@/data/adventures/josef'
 import { localize } from '@/data/adventures/localize'
+import { fitMapToScreen } from '@/utils/mapFit'
+
+/** Every journey that enters the app passes here: its map is brought into the rule of `mapFit` (no name plate or button under the tab bar). */
+const fitted = (j: Journey): Journey => {
+  const map = fitMapToScreen(j.map)
+  return map === j.map ? j : { ...j, map }
+}
 
 /** All journeys of this build. More follow, one after the other, through the whole Bible. */
-export const journeys: Journey[] = [josef]
+export const journeys: Journey[] = [fitted(josef)]
 
 export const journeyById = (id: string): Journey | undefined => journeys.find((j) => j.id === id)
 
@@ -538,7 +545,7 @@ export async function loadPreviewJourneys(): Promise<void> {
   )
   for (const journey of loaded) {
     if (!journey) continue
-    if (!journeys.some((j) => j.id === journey.id)) journeys.push(journey)
+    if (!journeys.some((j) => j.id === journey.id)) journeys.push(fitted(journey))
     const at = comingSoon.findIndex((c) => c.id === journey.id)
     if (at >= 0) comingSoon.splice(at, 1)
   }
