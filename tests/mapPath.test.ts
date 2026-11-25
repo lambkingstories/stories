@@ -38,6 +38,7 @@ import { ichbin } from '../src/data/adventures/ichbin'
 import { bergpredigt } from '../src/data/adventures/bergpredigt'
 import { simson } from '../src/data/adventures/simson'
 import { johannes } from '../src/data/adventures/johannes'
+import { hiskia } from '../src/data/adventures/hiskia'
 import type { Journey } from '../src/types/adventure'
 
 /** Rules for the dotted way on the maps (Anton, 19.10.2026): into every medal from the left, out of it on the right, always curved, 10 beads between two medals. */
@@ -82,7 +83,8 @@ describe.each([
   ['Jesus erzählt von sich', ichbin],
   ['Die Bergpredigt', bergpredigt],
   ['Simson', simson],
-  ['Johannes der Täufer', johannes]
+  ['Johannes der Täufer', johannes],
+  ['Hiskia: Ein Brief vor Gott', hiskia]
 ] as [string, Journey][])('the dotted way of %s', (_name, j) => {
   const m = j.map
   const spots = [...m.stages, m.exam]

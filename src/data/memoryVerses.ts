@@ -102,6 +102,11 @@ export const MEMORY_VERSES: Record<string, MemoryVerse> = {
     en: { ref: 'Jonah 2:2', text: `I cried by reason of mine affliction unto the LORD, and he heard me.` },
     line: { de: `Jona rief aus dem Bauch des Fisches zu Gott.`, en: `Jonah called to God from inside the fish.` }
   },
+  hiskia: {
+    de: { ref: '2. Könige 19,6', text: `Fürchte dich nicht vor den Worten, die du gehört hast.` },
+    en: { ref: '2 Kings 19:6', text: `Be not afraid of the words which thou hast heard.` },
+    line: { de: `Hiskia hört böse Worte über seinen Gott. Der HERR lässt ihm sagen: Fürchte dich nicht.`, en: `Hezekiah hears evil words about his God. The LORD sends him word: Be not afraid.` }
+  },
   daniel: {
     de: { ref: 'Daniel 6,23', text: `Und sie zogen Daniel aus dem Graben, und man spürte keinen Schaden an ihm; denn er hatte seinem Gott vertraut.` },
     en: { ref: 'Daniel 6:23', text: `So Daniel was taken up out of the den, and no manner of hurt was found upon him, because he believed in his God.` },

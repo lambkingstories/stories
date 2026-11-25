@@ -111,6 +111,8 @@ export const SIMSON_PREVIEW_KEY = 'lk-preview-simson'
 export const SIMSON_UNLOCK_CODE = 'simson-vorschau-mikv'
 export const JOHANNES_PREVIEW_KEY = 'lk-preview-johannes'
 export const JOHANNES_UNLOCK_CODE = 'johannes-vorschau-w4k7'
+export const HISKIA_PREVIEW_KEY = 'lk-preview-hiskia'
+export const HISKIA_UNLOCK_CODE = 'hiskia-vorschau-n5q8'
 
 /** A journey that is shown only on unlocked devices: the name of its link (`?<param>=<code>`), where the unlock is kept, and how it is loaded. */
 interface PreviewJourney {
@@ -497,6 +499,16 @@ function previewJourneys(): PreviewJourney[] {
       key: JOHANNES_PREVIEW_KEY,
       always: import.meta.env.VITE_SHOW_JOHANNES === 'true',
       load: async () => (await import('@/data/adventures/johannes')).johannes
+    })
+  }
+  if (import.meta.env.VITE_INCLUDE_HISKIA === 'true' || import.meta.env.VITE_SHOW_HISKIA === 'true') {
+    list.push({
+      id: 'hiskia',
+      param: 'hiskia',
+      code: HISKIA_UNLOCK_CODE,
+      key: HISKIA_PREVIEW_KEY,
+      always: import.meta.env.VITE_SHOW_HISKIA === 'true',
+      load: async () => (await import('@/data/adventures/hiskia')).hiskia
     })
   }
   if (import.meta.env.VITE_INCLUDE_NOAH === 'true' || import.meta.env.VITE_SHOW_NOAH === 'true') {

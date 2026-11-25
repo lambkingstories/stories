@@ -2039,3 +2039,53 @@ describe('the hidden journey Johannes der Täufer (id johannes)', () => {
     expect(m.journeys.filter((j) => j.id === 'johannes')).toHaveLength(1)
   })
 })
+
+describe('the hidden journey Hiskia: Ein Brief vor Gott (id hiskia)', () => {
+  it('a normal build (without Hiskia: Ein Brief vor Gott) never adds it, even with the unlock link', async () => {
+    vi.stubEnv('VITE_INCLUDE_HISKIA', 'false')
+    open('?hiskia=hiskia-vorschau-n5q8')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(m.journeyById('hiskia')).toBeUndefined()
+  })
+
+  it('the test build without the link does not show it; a wrong code does not unlock it', async () => {
+    vi.stubEnv('VITE_INCLUDE_HISKIA', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.map((j) => j.id)).toEqual(['josef'])
+    open('?hiskia=raten')
+    const wrong = await load()
+    await wrong.loadPreviewJourneys()
+    expect(wrong.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem(wrong.HISKIA_PREVIEW_KEY)).toBeNull()
+  })
+
+  it('the unlock link shows it (the code leaves the address bar), the device remembers it, ?hiskia=off locks it again', async () => {
+    vi.stubEnv('VITE_INCLUDE_HISKIA', 'true')
+    const first = await load()
+    open(`?hiskia=${first.HISKIA_UNLOCK_CODE}#/app/adventure`)
+    await first.loadPreviewJourneys()
+    expect(first.HISKIA_UNLOCK_CODE).toBe('hiskia-vorschau-n5q8')
+    expect(first.journeys.map((j) => j.id)).toEqual(['josef', 'hiskia'])
+    expect(localStorage.getItem('lk-preview-hiskia')).toBe('1')
+    expect(window.location.search).toBe('')
+    const again = await load()
+    await again.loadPreviewJourneys()
+    expect(again.journeyById('hiskia')?.stages.length).toBe(10)
+    open('?hiskia=off')
+    const off = await load()
+    await off.loadPreviewJourneys()
+    expect(off.journeys.map((j) => j.id)).toEqual(['josef'])
+    expect(localStorage.getItem('lk-preview-hiskia')).toBeNull()
+  })
+
+  it('local mode (VITE_SHOW_HISKIA) shows it on every device and loading twice adds it once', async () => {
+    vi.stubEnv('VITE_SHOW_HISKIA', 'true')
+    const m = await load()
+    await m.loadPreviewJourneys()
+    await m.loadPreviewJourneys()
+    expect(m.journeys.filter((j) => j.id === 'hiskia')).toHaveLength(1)
+  })
+})

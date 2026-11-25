@@ -331,3 +331,11 @@ export const JOHANNES_ONLY_DIRS = ['images/abenteuer/johannes', 'images/abenteue
 export function stripJohannesFiles(outDir: string) {
   strip(outDir, JOHANNES_ONLY_DIRS)
 }
+
+/** The folders that belong to the journey "Hiskia: Ein Brief vor Gott" (id `hiskia`) alone, in the same three places as Adam and Eve. */
+export const HISKIA_ONLY_DIRS = ['images/abenteuer/hiskia', 'images/abenteuer/spiele/hiskia', 'audio/abenteuer/hiskia']
+
+/** Takes the folders of "Hiskia: Ein Brief vor Gott" out of a finished build. */
+export function stripHiskiaFiles(outDir: string) {
+  strip(outDir, HISKIA_ONLY_DIRS)
+}

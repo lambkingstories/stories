@@ -24,8 +24,8 @@ export interface BigGame {
 export const BIG_GAMES: BigGame[] = [
   // David's sling is free from the start (Anton, 18.11.2026): it needs no stars and no wish; all the other games open with a wish, one for every 40 stars
   { id: 'david', image: 'images/spiele-gross/david/kachel.webp', maxStars: 30, freeAt: 0 },
-  // the memory with the pictures of the adventures: one board for each of the 39 adventures on the time line, three stars each (see `utils/bilderMemory.ts`)
-  { id: 'memory', image: 'images/spiele-gross/memory/kachel-2.webp', maxStars: 117 },
+  // the memory with the pictures of the adventures: one board for each of the 40 adventures on the time line, three stars each (see `utils/bilderMemory.ts`)
+  { id: 'memory', image: 'images/spiele-gross/memory/kachel-2.webp', maxStars: 120 },
   { id: 'elia', image: 'images/spiele-gross/elia/kachel.webp', maxStars: 45 },
   { id: 'wasser', image: 'images/spiele-gross/wasser/kachel-hiskia.webp', maxStars: 108 },
   // the rope puzzle in the style of Cut the Rope: Moses' basket, 40 levels in 4 chapters (see `utils/moseKorbGame.ts`)

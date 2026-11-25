@@ -42,7 +42,8 @@ import { ichbin } from '@/data/adventures/ichbin'
 import { bergpredigt } from '@/data/adventures/bergpredigt'
 import { simson } from '@/data/adventures/simson'
 import { johannes } from '@/data/adventures/johannes'
-import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, GIDEON_ONLY_DIRS, JAKOB_ONLY_DIRS, JONA_ONLY_DIRS, JOSUA_ONLY_DIRS, MOSE_ONLY_DIRS, NOAH_ONLY_DIRS, RUT_ONLY_DIRS, SAMUEL_ONLY_DIRS, DAVID_ONLY_DIRS, SALOMO_ONLY_DIRS, ELISA_ONLY_DIRS, ESTER_ONLY_DIRS, NEHEMIA_ONLY_DIRS, PROPHETEN_ONLY_DIRS, WEIHNACHTEN_ONLY_DIRS, TAUFE_ONLY_DIRS, FREUNDE_ONLY_DIRS, WUESTE_ONLY_DIRS, WUNDER_ONLY_DIRS, HEILUNG_ONLY_DIRS, GLEICHNISSE_ONLY_DIRS, ZACHAEUS_ONLY_DIRS, LETZTEWOCHE_ONLY_DIRS, OSTERN_ONLY_DIRS, stripOsternFiles, PFINGSTEN_ONLY_DIRS, stripPfingstenFiles, PAULUS_ONLY_DIRS, PAULUSROM_ONLY_DIRS, OFFENBARUNG_ONLY_DIRS, SOHN_ONLY_DIRS, stripSohnFiles, BERGPREDIGT_ONLY_DIRS, SIMSON_ONLY_DIRS, JOHANNES_ONLY_DIRS, ICHBIN_ONLY_DIRS, stripIchbinFiles, stripBergpredigtFiles, stripSimsonFiles, stripJohannesFiles, stripPaulusFiles, stripPaulusromFiles, stripOffenbarungFiles, stripLetztewocheFiles, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles, stripGleichnisseFiles, stripZachaeusFiles, stripDavidFiles } from '../vite.config.noah'
+import { hiskia } from '@/data/adventures/hiskia'
+import { ABRAHAM_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, GIDEON_ONLY_DIRS, JAKOB_ONLY_DIRS, JONA_ONLY_DIRS, JOSUA_ONLY_DIRS, MOSE_ONLY_DIRS, NOAH_ONLY_DIRS, RUT_ONLY_DIRS, SAMUEL_ONLY_DIRS, DAVID_ONLY_DIRS, SALOMO_ONLY_DIRS, ELISA_ONLY_DIRS, ESTER_ONLY_DIRS, NEHEMIA_ONLY_DIRS, PROPHETEN_ONLY_DIRS, WEIHNACHTEN_ONLY_DIRS, TAUFE_ONLY_DIRS, FREUNDE_ONLY_DIRS, WUESTE_ONLY_DIRS, WUNDER_ONLY_DIRS, HEILUNG_ONLY_DIRS, GLEICHNISSE_ONLY_DIRS, ZACHAEUS_ONLY_DIRS, LETZTEWOCHE_ONLY_DIRS, OSTERN_ONLY_DIRS, stripOsternFiles, PFINGSTEN_ONLY_DIRS, stripPfingstenFiles, PAULUS_ONLY_DIRS, PAULUSROM_ONLY_DIRS, OFFENBARUNG_ONLY_DIRS, SOHN_ONLY_DIRS, stripSohnFiles, BERGPREDIGT_ONLY_DIRS, SIMSON_ONLY_DIRS, JOHANNES_ONLY_DIRS, HISKIA_ONLY_DIRS, ICHBIN_ONLY_DIRS, stripIchbinFiles, stripBergpredigtFiles, stripSimsonFiles, stripJohannesFiles, stripHiskiaFiles, stripPaulusFiles, stripPaulusromFiles, stripOffenbarungFiles, stripLetztewocheFiles, stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles, stripGleichnisseFiles, stripZachaeusFiles, stripDavidFiles } from '../vite.config.noah'
 
 const inNoahDir = (f: string) => NOAH_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
 
@@ -1694,6 +1695,49 @@ describe('a build without Johannes ships nothing of it', () => {
       for (const f of johannesFiles) expect(existsSync(join(out, f)), f).toBe(false)
       for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
       expect(() => stripJohannesFiles(out)).not.toThrow()
+    } finally {
+      rmSync(out, { recursive: true, force: true })
+    }
+  })
+})
+
+const inHiskiaDir = (f: string) => HISKIA_ONLY_DIRS.some((d) => f.startsWith(`${d}/`))
+
+describe('a build without Hiskia ships nothing of it', () => {
+  it('every file that only Hiskia uses lies in a folder that the normal build removes', () => {
+    const others = new Set([...journeys, noah, adamEva, babel, abraham, jakob, josua, gideon, mose, jona, daniel, elia, rut, samuel, david, salomo, elisa, ester, nehemia, propheten, weihnachten, taufe, freunde, wueste, wunder, heilung, gleichnisse, zachaeus, letztewoche, ostern, pfingsten, paulus, paulusrom, offenbarung, sohn, ichbin, bergpredigt, simson, johannes].flatMap((j) => journeyFiles(j)))
+    const app = /^audio\/abenteuer\/(klang|musik)-/
+    const only = journeyFiles(hiskia).filter((f) => !others.has(f) && !app.test(f))
+    const leaks = only.filter((f) => !inHiskiaDir(f))
+    expect(leaks, `files of Hiskia outside the folders that are removed: ${leaks.join(', ')}`).toEqual([])
+  })
+
+  it('the folders of Hiskia are only the three places that belong to it, none is on the lists of the others, and no folder with "hiskia" in its name is missing', () => {
+    expect([...HISKIA_ONLY_DIRS].sort()).toEqual(['audio/abenteuer/hiskia', 'images/abenteuer/hiskia', 'images/abenteuer/spiele/hiskia'])
+    for (const d of HISKIA_ONLY_DIRS) {
+      for (const list of [JOHANNES_ONLY_DIRS, SIMSON_ONLY_DIRS, BERGPREDIGT_ONLY_DIRS, ICHBIN_ONLY_DIRS, SOHN_ONLY_DIRS, OFFENBARUNG_ONLY_DIRS, PAULUSROM_ONLY_DIRS, PAULUS_ONLY_DIRS, PFINGSTEN_ONLY_DIRS, OSTERN_ONLY_DIRS, LETZTEWOCHE_ONLY_DIRS, ZACHAEUS_ONLY_DIRS, GLEICHNISSE_ONLY_DIRS, HEILUNG_ONLY_DIRS, WUNDER_ONLY_DIRS, NOAH_ONLY_DIRS, ADAM_ONLY_DIRS, BABEL_ONLY_DIRS, ABRAHAM_ONLY_DIRS, JAKOB_ONLY_DIRS, JOSUA_ONLY_DIRS, GIDEON_ONLY_DIRS, MOSE_ONLY_DIRS, JONA_ONLY_DIRS, DANIEL_ONLY_DIRS, ELIA_ONLY_DIRS, RUT_ONLY_DIRS, SAMUEL_ONLY_DIRS, DAVID_ONLY_DIRS, SALOMO_ONLY_DIRS, ELISA_ONLY_DIRS, ESTER_ONLY_DIRS, NEHEMIA_ONLY_DIRS, PROPHETEN_ONLY_DIRS, WEIHNACHTEN_ONLY_DIRS, TAUFE_ONLY_DIRS, FREUNDE_ONLY_DIRS, WUESTE_ONLY_DIRS]) expect(list, d).not.toContain(d)
+    }
+    const found: string[] = []
+    for (const base of ['public/images/abenteuer', 'public/audio/abenteuer', 'public/images/abenteuer/spiele']) {
+      for (const n of readdirSync(base)) if (/^hiskia$/i.test(n) && !n.includes('.')) found.push(`${base.replace('public/', '')}/${n}`)
+    }
+    for (const d of found) expect(HISKIA_ONLY_DIRS, d).toContain(d)
+    for (const j of [...journeys, noah, adamEva, babel, abraham, jakob, josua, gideon, mose, jona, daniel, elia, rut, samuel, david, salomo, elisa, ester, nehemia, propheten, weihnachten, taufe, freunde, wueste, wunder, heilung, gleichnisse, zachaeus, letztewoche, ostern, pfingsten, paulus, paulusrom, offenbarung, sohn, ichbin, bergpredigt, simson, johannes]) for (const f of journeyFiles(j)) expect(inHiskiaDir(f), `${j.id}: ${f}`).toBe(false)
+  })
+
+  it('removing takes the folders of Hiskia out of a build and leaves everything else (the other journeys, the sounds)', () => {
+    const out = mkdtempSync(join(tmpdir(), 'lk-build-hiskia-'))
+    try {
+      const hiskiaFiles = ['audio/abenteuer/hiskia/geschichte-01-v1.mp3', 'images/abenteuer/hiskia/etappe-bild-01.webp', 'images/abenteuer/spiele/hiskia/laufwege/karte.webp']
+      const keep = ['images/abenteuer/josef/etappe-01.webp', 'images/abenteuer/ostern/etappe-bild-02.webp', 'images/abenteuer/spiele/ostern/fischzug/see.webp', 'images/abenteuer/spiele/pfingsten/wagen/fern.webp', 'audio/abenteuer/klang-stern.mp3']
+      for (const f of [...hiskiaFiles, ...keep]) {
+        mkdirSync(join(out, f, '..'), { recursive: true })
+        writeFileSync(join(out, f), 'x')
+      }
+      stripHiskiaFiles(out)
+      for (const f of hiskiaFiles) expect(existsSync(join(out, f)), f).toBe(false)
+      for (const f of keep) expect(existsSync(join(out, f)), f).toBe(true)
+      expect(() => stripHiskiaFiles(out)).not.toThrow()
     } finally {
       rmSync(out, { recursive: true, force: true })
     }

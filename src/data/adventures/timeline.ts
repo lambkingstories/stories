@@ -49,6 +49,7 @@ export const TIMELINE: TimelineEntry[] = [
   { id: 'elia', de: 'Elia', en: 'Elijah', epoch: 'propheten' },
   { id: 'elisa', de: 'Elisa und Naaman', en: 'Elisha and Naaman', epoch: 'propheten' },
   { id: 'jona', de: 'Jona', en: 'Jonah', epoch: 'propheten' },
+  { id: 'hiskia', de: 'Hiskia: Ein Brief vor Gott', en: 'Hezekiah: A Letter Before God', epoch: 'propheten' },
   { id: 'daniel', de: 'Daniel', en: 'Daniel', epoch: 'propheten' },
   { id: 'ester', de: 'Ester', en: 'Esther', epoch: 'propheten' },
   { id: 'nehemia', de: 'Nehemia baut die Mauer', en: 'Nehemiah builds the wall', epoch: 'propheten' },
