@@ -180,17 +180,21 @@ const bookPercent = (b: BookCard) => `${Math.round((b.done / Math.max(1, b.total
                 span(v-if="b.done > 0" class="ac-bigbook-bar" aria-hidden="true")
                   span(class="ac-bigbook-fill" :style="{ width: bookPercent(b) }")
                 span(class="ac-bigbook-sub") {{ b.done > 0 ? t('app.coloring.pagesPainted', { done: b.done, total: b.total }) : t('app.coloring.pagesCount', { total: b.total }) }}
+              //- a button under every book says what a tap does: the cover alone did not tell that the book can be painted (Anton 26.11.2026)
+              button(type="button" class="lk-btn ac-bigbook-go" data-test="shelf-paint" :aria-label="(b.done > 0 ? t('app.coloring.continuePaint') : t('app.coloring.shelfPaint')) + ': ' + b.title" @click="emit('open-book', b)")
+                ZIconography(name="brush" :size="20")
+                span {{ b.done > 0 ? t('app.coloring.continuePaint') : t('app.coloring.shelfPaint') }}
               //- takes the book out of the shelf again (the painted pictures stay)
               button(type="button" class="ac-bigbook-remove" :aria-label="t('app.coloring.shelfRemove', { title: b.title })" @click="emit('remove-book', b)")
                 span(aria-hidden="true") ✕
             //- one book only: the shelf would look empty beside it, so a friendly note stands there (the way to the other books)
             div(v-if="books.length === 1" class="ac-onebook" data-test="one-book-note")
               p(class="ac-onebook-text") {{ t('app.coloring.shelfMore') }}
-              button(type="button" class="lk-btn ac-onebook-go" @click="emit('to-books')")
+              button(type="button" class="lk-btn lk-btn--outline lk-btn--small ac-onebook-go" @click="emit('to-books')")
                 span {{ t('app.coloring.shelfGo') }}
                 ZIconography(name="chevron-right" :size="20")
           //- the way to all coloring books, also when the shelf is full
-          button(v-if="books.length !== 1" type="button" class="lk-btn lk-btn--outline ac-allbooks" @click="emit('to-books')")
+          button(v-if="books.length !== 1" type="button" class="lk-btn lk-btn--outline lk-btn--small ac-allbooks" @click="emit('to-books')")
             span {{ t('app.coloring.shelfGo') }}
             ZIconography(name="chevron-right" :size="20")
         //- nothing on the shelf yet: a big door like the ones in Lesen
@@ -519,9 +523,10 @@ button
   overflow: hidden
 
 // the books stand in one row on a shelf, swiped sideways: the one painted on last is in front
+// the way to more books stays quiet: the books on the shelf are what a child is here for
 .ac-allbooks
-  width: 100%
-  margin-top: 12px
+  display: flex
+  margin: 12px auto 0
   justify-content: center
 
 .ac-bigbooks
@@ -590,7 +595,18 @@ button
   line-height: 1.4
 
 .ac-onebook-go
-  min-height: 56px
+  min-height: 48px
+
+.ac-bigbook-go
+  width: 100%
+  margin-top: 10px
+  min-height: 52px
+  gap: 8px
+  padding: 0 8px
+  justify-content: center
+
+  :deep(.z-icon-outline)
+    color: currentColor
 
 .ac-bigbook
   width: 100%
