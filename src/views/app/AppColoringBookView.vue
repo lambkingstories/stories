@@ -68,8 +68,8 @@ const layers = ref<Record<number, string>>({})
 const index = ref(0)
 const page = computed(() => pages.value[index.value] ?? null)
 const idOf = (p: ColoringBookPage) => pageArtworkId(p.url, 1)
-/** What was painted on a page that is locked now (Plus ended, book not bought) is kept on the device but not shown: the page counts as not painted (Anton 22.11.2026). */
-const isPainted = (p: ColoringBookPage) => !!works.value[idOf(p)] && !isLockedPage(pages.value.indexOf(p))
+/** A painted page stays to be seen also when it is locked now (Plus ended, book not bought); it only cannot be painted on (Anton 26.11.2026). */
+const isPainted = (p: ColoringBookPage) => !!works.value[idOf(p)]
 const starImage = prependBaseUrl('images/awards/star.webp')
 const thumbOf = (p: ColoringBookPage) => (isPainted(p) ? works.value[idOf(p)]?.thumb ?? '' : '')
 const paintedCount = computed(() => pages.value.filter(isPainted).length)
@@ -253,9 +253,10 @@ async function openReader() {
     if (coverUrl.value) list.push(coverUrl.value)
     // the pages that are open (a locked book shows the free pictures). Every picture comes after its words: standing upright the words and then the picture, lying on the
     // side the words on the left and the picture on the right (Anton 22.11.2026). A painted page is put together with its painting, the others are the line art
-    const open = Math.min(pages.value.length, allowed.value)
-    for (let i = 0; i < open; i++) {
+    // and the painted ones that are locked now: what the child has made can always be looked at
+    for (let i = 0; i < pages.value.length; i++) {
       const p = pages.value[i]!
+      if (i >= allowed.value && !isPainted(p)) continue
       list.push({ text: { no: i + 1, total: pages.value.length, title: p.title, reference: p.reference, text: p.text } })
       await loadLine(i)
       const line = lineOf(p)
@@ -455,7 +456,7 @@ watch(bookId, () => {
           p(v-if="purchases.status.value !== 'idle' && purchases.status.value !== 'done'" class="bk-offer-status" role="status" data-test="book-status") {{ t(`app.plus.status_${purchases.status.value}`) }}
 
         div(v-if="current || printedLink" class="bk-links")
-          button(v-if="current" type="button" class="bk-link" @click="confirming = true") {{ t('app.coloring.resetPage') }}
+          button(v-if="current && !pageLocked" type="button" class="bk-link" @click="confirming = true") {{ t('app.coloring.resetPage') }}
           button(v-if="printedLink" type="button" class="bk-link" @click="openExternal(printedLink)") {{ t('app.coloring.printedAt') }} ›
 
     div(

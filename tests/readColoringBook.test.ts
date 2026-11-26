@@ -43,9 +43,9 @@ describe('the coloring book view', () => {
     expect(s).toMatch(/div\(class="bk-row bk-actions"\)\s+button\(type="button" class="bk-primary"[\s\S]*?button\(type="button" class="bk-read"/)
     expect(s).toContain('div(class="bk-stripbar")')
   })
-  it('puts a painted page together with its painting, and only the open pages are read', () => {
+  it('puts a painted page together with its painting; the open pages are read, and painted ones that are locked now', () => {
     expect(s).toContain('composeColoringPage(line, blob)')
-    expect(s).toContain('Math.min(pages.value.length, allowed.value)')
+    expect(s).toContain('if (i >= allowed.value && !isPainted(p)) continue')
   })
   it('lets the pictures go when the reading is closed or the view is left', () => {
     expect(s).toContain('URL.revokeObjectURL(u)')

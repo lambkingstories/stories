@@ -15,6 +15,7 @@ import LkCompanion from '@/components/atoms/LkCompanion.vue'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import AppHeader from '@/components/molecules/AppHeader.vue'
 import ArtworkViewer from '@/components/molecules/ArtworkViewer.vue'
+import { paintableArtworks } from '@/use/artworkAccess'
 import { prependBaseUrl } from '@/utils/function'
 import useExhibition from '@/use/useExhibition'
 import useColoringShelf from '@/use/useColoringShelf'
@@ -65,7 +66,11 @@ const worksById = computed(() => new Map(props.exhibitionWorks.map((w) => [w.id,
 const recent = computed(() => [...props.exhibitionWorks].sort((a, b) => b.updatedAt - a.updatedAt))
 
 /** The painting for the card on top: the one painted on last that is not finished; when all are, the newest. */
-const continueWork = computed<ArtworkMeta | null>(() => recent.value.find((w) => !w.done) ?? recent.value[0] ?? null)
+// a picture that is locked now is only looked at (in the galleries): the card that goes on painting never offers it
+const continueWork = computed<ArtworkMeta | null>(() => {
+  const open = paintableArtworks(recent.value)
+  return open.find((w) => !w.done) ?? open[0] ?? null
+})
 /** The line under its name: the page of the book, or "finished". */
 const continueSub = computed(() => {
   const w = continueWork.value

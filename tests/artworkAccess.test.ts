@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-/** What was painted on a locked page of a coloring book is kept but not shown (Anton 22.11.2026). */
+/** What was painted on a locked page of a coloring book is only looked at, not painted on (Anton 26.11.2026). */
 describe('paintings on locked pages', () => {
   afterEach(() => {
     vi.unstubAllEnvs()
@@ -30,7 +30,7 @@ describe('paintings on locked pages', () => {
     expect(m.isArtworkLocked(ostern(35))).toBe(true)
     // a blank sheet and a page that was not opened from a book have no book
     expect(m.isArtworkLocked({})).toBe(false)
-    expect(m.visibleArtworks([{}, ostern(1), ostern(3)])).toEqual([{}, ostern(1)])
+    expect(m.paintableArtworks([{}, ostern(1), ostern(3)])).toEqual([{}, ostern(1)])
   })
 
   it('shows every page of the book that is free in full', async () => {
@@ -41,11 +41,11 @@ describe('paintings on locked pages', () => {
   it('shows the paintings again with Plus, and hides them again when Plus is off (nothing is deleted)', async () => {
     const m = await load({ VITE_PREMIUM_TEASER: 'true', VITE_PLUS_TEST: 'true' })
     const list = [ostern(1), ostern(4)]
-    expect(m.visibleArtworks(list)).toHaveLength(1)
+    expect(m.paintableArtworks(list)).toHaveLength(1)
     m.setTestPlus(true)
-    expect(m.visibleArtworks(list)).toHaveLength(2)
+    expect(m.paintableArtworks(list)).toHaveLength(2)
     m.setTestPlus(false)
-    expect(m.visibleArtworks(list)).toHaveLength(1)
+    expect(m.paintableArtworks(list)).toHaveLength(1)
     expect(list).toHaveLength(2)
   })
 

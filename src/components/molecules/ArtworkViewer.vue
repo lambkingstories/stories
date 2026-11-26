@@ -7,6 +7,7 @@
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ZIconography from '@/components/atoms/ZIconography.vue'
+import { isArtworkLocked } from '@/use/artworkAccess'
 import { getTimelapse, type ArtworkMeta } from '@/use/useArtworks'
 import { MIN_STEPS, unpackTimelapse, type TimelapseData } from '@/utils/timelapse'
 
@@ -67,7 +68,7 @@ watch(() => props.work.id, () => void loadLapse())
       div(class="av-actions")
         button(type="button" class="lk-btn av-main" data-test="viewer-continue" @click="emit('continue', work)")
           ZIconography(name="brush" :size="22")
-          span {{ t('app.coloring.keepPainting') }}
+          span {{ isArtworkLocked(work) ? t('app.coloring.lockedContinue') : t('app.coloring.keepPainting') }}
         button(v-if="lapse" type="button" class="lk-btn lk-btn--outline av-btn" data-test="viewer-lapse" @click="emit('lapse', work, lapse)")
           ZIconography(name="eye" :size="22")
           span {{ t('app.coloring.timelapseWatch') }}

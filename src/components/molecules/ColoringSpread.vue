@@ -119,7 +119,7 @@ const pageAt = (i: number) => props.pages[i]!
           :line="lineOf(pageAt(rightIndex))"
           :layer="layerOf(rightIndex)"
           :alt="pageAt(rightIndex).title"
-          :faded="isLocked(rightIndex)"
+          :faded="isLocked(rightIndex) && !layerOf(rightIndex)"
         )
         span(v-if="isLocked(rightIndex)" class="sp-lock")
           PlusBadge
@@ -129,14 +129,14 @@ const pageAt = (i: number) => props.pages[i]!
       div(v-if="turn" class="sp-leaf" :class="[turn.dir === 1 ? 'is-fwd' : 'is-back', { run: turn.run }]" aria-hidden="true")
         div(class="sp-face sp-front")
           template(v-if="turn.dir === 1")
-            ColoringSpreadArt(:line="lineOf(pageAt(turn.from))" :layer="layerOf(turn.from)" alt="" :faded="isLocked(turn.from)")
+            ColoringSpreadArt(:line="lineOf(pageAt(turn.from))" :layer="layerOf(turn.from)" alt="" :faded="isLocked(turn.from) && !layerOf(turn.from)")
           template(v-else)
             ColoringSpreadText(:no="turn.from + 1" :total="pages.length" :title="pageAt(turn.from).title" :reference="pageAt(turn.from).reference" :text="pageAt(turn.from).text" :locked="isLocked(turn.from)")
         div(class="sp-face sp-reverse")
           template(v-if="turn.dir === 1")
             ColoringSpreadText(:no="turn.to + 1" :total="pages.length" :title="pageAt(turn.to).title" :reference="pageAt(turn.to).reference" :text="pageAt(turn.to).text" :locked="isLocked(turn.to)")
           template(v-else)
-            ColoringSpreadArt(:line="lineOf(pageAt(turn.to))" :layer="layerOf(turn.to)" alt="" :faded="isLocked(turn.to)")
+            ColoringSpreadArt(:line="lineOf(pageAt(turn.to))" :layer="layerOf(turn.to)" alt="" :faded="isLocked(turn.to) && !layerOf(turn.to)")
 
     button(v-if="arrows !== false" type="button" class="sp-arrow sp-next" :disabled="index >= pages.length - 1" :aria-label="t('app.coloring.nextPage')" @click="flip(index + 1)") ›
 </template>

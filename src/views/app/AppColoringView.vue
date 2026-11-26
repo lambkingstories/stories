@@ -95,7 +95,7 @@ import { BUILTIN_COLORING_PAGES } from '@/data/builtinColoringPages'
 import { coloringPagesOfBook, isColoringBook, type ColoringBookPage } from '@/utils/coloringBook'
 import { cacheUrlToBlobUrl } from '@/use/useBookCache'
 import { allowedPages, freePageCount } from '@/use/useBookAccess'
-import { visibleArtworks } from '@/use/artworkAccess'
+import { isArtworkLocked, paintableArtworks } from '@/use/artworkAccess'
 import useAwards from '@/use/useAwards'
 import { AWARDS, type AwardId } from '@/utils/awards'
 import confetti from 'canvas-confetti'
@@ -585,7 +585,7 @@ async function finishPicture() {
   let complete = false
   const ctx = bookCtx.value
   if (ctx) {
-    const saved = new Map(visibleArtworks(await listArtworks()).map((a) => [a.id, a]))
+    const saved = new Map(paintableArtworks(await listArtworks()).map((a) => [a.id, a]))
     complete = ctx.pages.every((p) => saved.get(pageArtworkId(p.url, 1))?.done)
   }
   const won = awards.pictureFinished(id, ctx ? { bookId: ctx.bookId, complete } : undefined)
@@ -802,6 +802,13 @@ async function startBlank(w: number, h: number, existing?: ArtworkMeta, unsaved 
 }
 
 function openWork(meta: ArtworkMeta) {
+  // a picture on a page that is locked now is only looked at: going on painting asks for Plus or the book
+  if (isArtworkLocked(meta)) {
+    const card = coloringBooks.value.find((b) => b.bookId === meta.bookId)
+    const total = card?.total ?? meta.bookPage ?? 1
+    showUpsell('book', { bookId: meta.bookId ?? '', kind: 'coloring', title: card?.title ?? meta.title, freePages: freePageCount('coloring', total), totalPages: total })
+    return
+  }
   if (meta.kind === 'blank') {
     markEditing()
     void startBlank(meta.width, meta.height, meta)
@@ -1334,7 +1341,7 @@ let autosaveTimer: ReturnType<typeof setTimeout> | undefined
 
 async function refreshMyWorks() {
   // what was painted on a locked page of a coloring book is kept on the device but not shown (see `artworkAccess`)
-  myWorks.value = visibleArtworks(await listArtworks())
+  myWorks.value = await listArtworks()
 }
 
 /** Runs `fn` when the browser has nothing better to do (Safari has no idle callback: then straight away). */
@@ -4325,7 +4332,7 @@ onMounted(() => {
   const workId = typeof route.query.work === 'string' ? route.query.work : ''
   if (workId && !queryBook.value && !querySource.value) {
     void listArtworks().then((all) => {
-      const meta = visibleArtworks(all).find((w) => w.id === workId)
+      const meta = all.find((w) => w.id === workId)
       if (meta) openWork(meta)
     })
   }

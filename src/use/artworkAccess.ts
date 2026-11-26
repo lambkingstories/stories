@@ -1,9 +1,9 @@
 /**
- * What the child painted on a page of a coloring book that is locked (Anton 22.11.2026): it is not shown while the page is locked (no Plus, book not bought), and it is kept on
- * the device, so it is back when Plus or the book comes again. Otherwise one month of Plus would be enough to paint a little in every book and keep seeing it afterwards.
+ * What the child painted on a page of a coloring book that is locked now (Plus ended, book not bought): it STAYS TO BE SEEN, but it cannot be painted on until Plus or the book
+ * comes again (Anton 26.11.2026; before that, from 22.11.2026, such pictures were not shown at all). Nothing is deleted.
  *
- * A page is locked when it comes after the free pictures of its book (see `useBookAccess`). Nothing is deleted: the lists of the screens only leave the picture out
- * (`visibleArtworks`), the backup of the pictures (`useArtworkBackup`) still takes all of them.
+ * A page is locked when it comes after the free pictures of its book (see `useBookAccess`). The screens show every painting (galleries, the book, reading the book);
+ * wherever painting would go on, only the paintable ones are offered (`paintableArtworks`, `isArtworkLocked`).
  */
 import { PREMIUM_TEASER, hasBook } from '@/use/usePremium'
 import { FREE_COLORING_BOOKS, FREE_COLORING_PAGES } from '@/use/useBookAccess'
@@ -42,7 +42,7 @@ export function isArtworkLocked(meta: Pick<ArtworkMeta, 'bookId' | 'bookPage'>):
   return bookPage > (typeof own === 'number' ? own : FREE_COLORING_PAGES)
 }
 
-/** The paintings the screens show: the ones on locked pages are left out. */
-export function visibleArtworks<T extends Pick<ArtworkMeta, 'bookId' | 'bookPage'>>(list: T[]): T[] {
+/** The paintings that can be painted on: the ones on locked pages are left out (they are only looked at). */
+export function paintableArtworks<T extends Pick<ArtworkMeta, 'bookId' | 'bookPage'>>(list: T[]): T[] {
   return list.filter((a) => !isArtworkLocked(a))
 }

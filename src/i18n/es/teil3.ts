@@ -1268,6 +1268,7 @@ export default {
     shelfEmpty: 'Tu estante todavía está vacío. Los libros para colorear los encuentras en «Leer», en la sección de libros para colorear. Abre un libro allí y toca «Añadir al estante de pintura», y entonces estará aquí.',
     shelfGo: 'Todos los libros para colorear',
     shelfPaint: 'Colorear',
+    lockedContinue: 'Desbloquear para seguir',
     shelfDoorTitle: 'Tu estante de pintura todavía está vacío',
     shelfDoorSub: 'Elige un libro para colorear. Cuando pintes en él, se quedará aquí en tu estante.',
     books: 'Libros para colorear',

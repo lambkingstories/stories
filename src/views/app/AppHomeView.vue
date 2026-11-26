@@ -37,7 +37,7 @@ import { inBibleOrder, journeyToBegin, journeyToContinue } from '@/utils/continu
 import { isColoringBook } from '@/utils/coloringBook'
 import usePremium, { PREMIUM_TEASER } from '@/use/usePremium'
 import { isJourneyPlusLocked } from '@/utils/adventureAccess'
-import { visibleArtworks } from '@/use/artworkAccess'
+import { paintableArtworks } from '@/use/artworkAccess'
 import PlusBadge from '@/components/atoms/PlusBadge.vue'
 import { requireParent } from '@/use/useParentalGate'
 import type { ApiBook, Locale } from '@/types/apiBook'
@@ -82,7 +82,8 @@ onMounted(() => {
   listArtworks()
     .then((list) => {
       // what was painted on a locked page is kept but not shown (see `artworkAccess`)
-      artworks.value = visibleArtworks(list)
+      // the tile on the start page goes on painting: only what can be painted on
+      artworks.value = paintableArtworks(list)
     })
     .catch(() => {
       artworks.value = []
