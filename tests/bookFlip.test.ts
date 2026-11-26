@@ -79,9 +79,9 @@ describe('BookFlip, lying on its side', () => {
     w.unmount()
   })
 
-  it('has only a back button, and it asks to close; the arrow keys and a tap on an edge turn the page', async () => {
+  it('has only the back button and the magnifier; back asks to close; the arrow keys and a tap on an edge turn the page', async () => {
     const w = open()
-    expect(document.body.querySelectorAll('button')).toHaveLength(1)
+    expect([...document.body.querySelectorAll('button')].map((b) => b.className)).toEqual(['bf-back', 'bf-magnify'])
     document.body.querySelector<HTMLButtonElement>('.bf-back')!.click()
     expect(w.emitted('close')).toHaveLength(1)
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }))

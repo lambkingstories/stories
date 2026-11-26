@@ -725,6 +725,8 @@ export default {
     digitalRead: 'Leer ahora',
     digitalDownload: 'Guardar como PDF',
     digitalReading: 'El libro completo',
+    zoomIn: 'Ampliar la página',
+    zoomOut: 'Página entera',
     digitalPending: 'La compra está esperando aprobación. Cuando se apruebe, podrás leer.',
     digitalFailed: 'La compra no funcionó. Inténtalo de nuevo más tarde.',
     digitalUnavailable: 'Este libro no se puede comprar ahora.',

@@ -5,13 +5,15 @@
  *
  * Lying on its side the phone shows two pages at a time (a spread: the cover alone on the right, then 2/3, 4/5 …); standing upright it shows
  * one page as large as the screen allows. A tap on the left or right edge, a swipe or the arrow keys turn the page. Turning the phone keeps
- * the page. Where the person wants less movement the page changes at once. The pages are pictures of one shape (`pages`, in reading order): square as
+ * the page. A magnifier enlarges the page (button, double tap in the middle, two fingers); enlarged, one finger moves it and the pages do not turn.
+ * Where the person wants less movement the page changes at once. The pages are pictures of one shape (`pages`, in reading order): square as
  * default, or the shape given with `ratio` (width divided by height; a coloring book has upright pages, for example 0.75).
  */
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ZIconography from '@/components/atoms/ZIconography.vue'
 import BookFlipPage, { type BookFlipPage as Page } from '@/components/atoms/BookFlipPage.vue'
+import { ZOOM_TAP, clampZoom, zoomAround, type Zoom, type ZoomRoom } from '@/utils/bookZoom'
 
 const props = withDefaults(defineProps<{ pages: Page[]; ratio?: number }>(), { ratio: 1 })
 const emit = defineEmits<{ close: [] }>()
@@ -105,6 +107,23 @@ const reducedMotion = () => typeof window !== 'undefined' && typeof window.match
 
 let timer: ReturnType<typeof setTimeout> | undefined
 
+// ── the magnifier ───────────────────────────────────────────────────
+const zoom = reactive<Zoom>({ s: 1, x: 0, y: 0 })
+const zoomed = computed(() => zoom.s > 1.01)
+/** Two fingers or one finger are moving the page: no easing then. */
+const gesturing = ref(false)
+const room = (): ZoomRoom => ({ w: w.value, h: h.value, bw: double.value ? pw.value * 2 : pw.value, bh: ph.value })
+const setZoom = (z: Zoom) => Object.assign(zoom, z)
+const resetZoom = () => setZoom({ s: 1, x: 0, y: 0 })
+/** Enlarges around a place on the screen (the middle without one), or goes back to the whole page. */
+function toggleZoom(clientX = w.value / 2, clientY = h.value / 2) {
+  if (zoomed.value) resetZoom()
+  else setZoom(zoomAround(zoom, ZOOM_TAP, clientX - w.value / 2, clientY - h.value / 2, room()))
+}
+// turning the phone: the page that was enlarged is another size now
+watch([w, h], resetZoom)
+const zoomStyle = computed(() => (zoomed.value ? { transform: `translate(${zoom.x}px, ${zoom.y}px) scale(${zoom.s})` } : {}))
+
 function settle(to: number) {
   clearTimeout(timer)
   page.value = pageOf(to)
@@ -114,6 +133,7 @@ function settle(to: number) {
 
 function go(dir: 1 | -1) {
   if (flip.value) return
+  resetZoom()
   const from = view.value
   const to = from + dir
   if (to < 0 || to >= views.value) return
@@ -176,19 +196,64 @@ function measure() {
   h.value = window.innerHeight
 }
 
-// a swipe to the side turns the page
+// a swipe to the side turns the page; two fingers enlarge it; one finger moves an enlarged page
 let startX = 0
 let startY = 0
+let swiped = 0
+let pinch: { d: number; s: number } | null = null
+let drag: { x: number; y: number } | null = null
+const distance = (a: Touch, b: Touch) => Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY)
 function onTouchStart(e: TouchEvent) {
   const p = e.touches[0]
   if (!p) return
+  const q = e.touches[1]
+  if (q) {
+    pinch = { d: Math.max(1, distance(p, q)), s: zoom.s }
+    drag = null
+    gesturing.value = true
+    swiped = Date.now()
+    return
+  }
   startX = p.clientX
   startY = p.clientY
+  drag = zoomed.value ? { x: p.clientX, y: p.clientY } : null
 }
-let swiped = 0
+function onTouchMove(e: TouchEvent) {
+  const p = e.touches[0]
+  if (!p) return
+  const q = e.touches[1]
+  if (pinch && q) {
+    const mx = (p.clientX + q.clientX) / 2 - w.value / 2
+    const my = (p.clientY + q.clientY) / 2 - h.value / 2
+    setZoom(zoomAround(zoom, (pinch.s * distance(p, q)) / pinch.d, mx, my, room()))
+    swiped = Date.now()
+    return
+  }
+  if (drag && zoomed.value) {
+    // a finger that only trembles is still a tap
+    if (Math.hypot(p.clientX - startX, p.clientY - startY) > 8) {
+      gesturing.value = true
+      swiped = Date.now()
+    }
+    setZoom(clampZoom({ s: zoom.s, x: zoom.x + p.clientX - drag.x, y: zoom.y + p.clientY - drag.y }, room()))
+    drag = { x: p.clientX, y: p.clientY }
+  }
+}
 function onTouchEnd(e: TouchEvent) {
   const p = e.changedTouches[0]
   if (!p) return
+  if (pinch) {
+    // one of the two fingers is up: the rest of this gesture does nothing
+    if ((e.touches?.length ?? 0) === 0) {
+      pinch = null
+      gesturing.value = false
+    }
+    swiped = Date.now()
+    return
+  }
+  drag = null
+  gesturing.value = false
+  if (zoomed.value) return
   const dx = p.clientX - startX
   const dy = p.clientY - startY
   if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) {
@@ -196,17 +261,33 @@ function onTouchEnd(e: TouchEvent) {
     go(dx < 0 ? 1 : -1)
   }
 }
-/** A tap on the left or right third turns the page (not the one that ended a swipe). */
+/**
+ * A tap on the left or right third turns the page (not the one that ended a swipe). A double tap in the middle enlarges the page; an enlarged page only
+ * answers to a double tap (back to the whole page), so that a finger that rests on it does not turn it away.
+ */
+let lastTap = 0
 function onTap(e: MouseEvent) {
   if (Date.now() - swiped < 450) return
   const x = e.clientX / Math.max(1, w.value)
-  if (x < 0.3) go(-1)
-  else if (x > 0.7) go(1)
+  if (!zoomed.value && (x < 0.3 || x > 0.7)) {
+    lastTap = 0
+    go(x < 0.3 ? -1 : 1)
+    return
+  }
+  if (Date.now() - lastTap < 350) {
+    lastTap = 0
+    toggleZoom(e.clientX, e.clientY)
+  } else lastTap = Date.now()
 }
 function onKeydown(e: KeyboardEvent) {
   if (e.key === 'ArrowRight' || e.key === 'PageDown') go(1)
   else if (e.key === 'ArrowLeft' || e.key === 'PageUp') go(-1)
-  else if (e.key === 'Escape') emit('close')
+  else if (e.key === '+') setZoom(zoomAround(zoom, zoom.s * 1.5, 0, 0, room()))
+  else if (e.key === '-') setZoom(zoomAround(zoom, zoom.s / 1.5, 0, 0, room()))
+  else if (e.key === 'Escape') {
+    if (zoomed.value) resetZoom()
+    else emit('close')
+  }
 }
 
 onMounted(() => {
@@ -234,32 +315,36 @@ onBeforeUnmount(() => {
   }
 })
 
-defineExpose({ go, page, double })
+defineExpose({ go, page, double, zoom, toggleZoom })
 </script>
 
 <template lang="pug">
-  div(class="bf-root" role="group" :aria-label="t('app.read.digitalReading')" @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd" @click="onTap")
+  div(class="bf-root" role="group" :aria-label="t('app.read.digitalReading')" @touchstart.passive="onTouchStart" @touchmove.passive="onTouchMove" @touchend.passive="onTouchEnd" @touchcancel.passive="onTouchEnd" @click="onTap")
     div(class="bf-bg" :style="{ backgroundImage: backdrop ? `url(${backdrop})` : 'none' }")
     button(type="button" class="bf-back" :aria-label="t('app.read.back')" @click.stop="emit('close')")
       ZIconography(name="chevron-left" :size="26")
 
-    div(class="bf-book" :class="{ 'is-double': double }" :style="bookStyle")
-      template(v-if="double")
-        div(v-if="baseSlots.l" class="bf-half bf-left")
-          BookFlipPage(:page="baseSlots.l")
-        div(v-if="baseSlots.r" class="bf-half bf-right")
-          BookFlipPage(:page="baseSlots.r")
-      div(v-else class="bf-single")
-        BookFlipPage(v-if="baseSlots.s" :page="baseSlots.s")
+    button(type="button" class="bf-magnify" :class="{ 'is-on': zoomed }" :aria-pressed="zoomed" :aria-label="zoomed ? t('app.read.zoomOut') : t('app.read.zoomIn')" @click.stop="toggleZoom()")
+      ZIconography(name="search" :size="26")
 
-      div(v-if="double" class="bf-spine" :class="{ 'is-on': spineOn, 'is-flipping': !!flip }")
+    div(class="bf-zoom" :class="{ 'is-gesturing': gesturing }" :style="zoomStyle")
+      div(class="bf-book" :class="{ 'is-double': double }" :style="bookStyle")
+        template(v-if="double")
+          div(v-if="baseSlots.l" class="bf-half bf-left")
+            BookFlipPage(:page="baseSlots.l")
+          div(v-if="baseSlots.r" class="bf-half bf-right")
+            BookFlipPage(:page="baseSlots.r")
+        div(v-else class="bf-single")
+          BookFlipPage(v-if="baseSlots.s" :page="baseSlots.s")
 
-      //- the page that is turning: its front, and its back (the other side of the leaf)
-      div(v-if="flip" class="bf-leaf" :class="leafClass" :style="leafStyle")
-        div(class="bf-face bf-front")
-          BookFlipPage(v-if="flip.front" :page="flip.front")
-        div(class="bf-face bf-rear")
-          BookFlipPage(v-if="flip.back" :page="flip.back")
+        div(v-if="double" class="bf-spine" :class="{ 'is-on': spineOn, 'is-flipping': !!flip }")
+
+        //- the page that is turning: its front, and its back (the other side of the leaf)
+        div(v-if="flip" class="bf-leaf" :class="leafClass" :style="leafStyle")
+          div(class="bf-face bf-front")
+            BookFlipPage(v-if="flip.front" :page="flip.front")
+          div(class="bf-face bf-rear")
+            BookFlipPage(v-if="flip.back" :page="flip.back")
 </template>
 
 <style scoped lang="sass">
@@ -286,11 +371,20 @@ defineExpose({ go, page, double })
   filter: blur(34px) brightness(0.42) saturate(1.15)
   transition: background-image 300ms
 
-.bf-back
+// the layer that is enlarged and moved by the magnifier (the book itself keeps its own place and turns inside it)
+.bf-zoom
+  position: relative
+  z-index: 1
+  flex: none
+  transition: transform 220ms ease-out
+
+  &.is-gesturing
+    transition: none
+
+.bf-back, .bf-magnify
   position: absolute
   z-index: 5
   top: calc(env(safe-area-inset-top, 0px) + 10px)
-  left: calc(env(safe-area-inset-left, 0px) + 10px)
   width: 46px
   height: 46px
   display: flex
@@ -306,6 +400,17 @@ defineExpose({ go, page, double })
 
   :deep(.z-icon-outline)
     color: currentColor
+
+.bf-back
+  left: calc(env(safe-area-inset-left, 0px) + 10px)
+
+.bf-magnify
+  right: calc(env(safe-area-inset-right, 0px) + 10px)
+
+  &.is-on
+    background: #fff
+    border-color: #fff
+    color: #14151f
 
 .bf-book
   position: relative
