@@ -5,7 +5,7 @@
  *
  * Lying on its side the phone shows two pages at a time (a spread: the cover alone on the right, then 2/3, 4/5 …); standing upright it shows
  * one page as large as the screen allows. A tap on the left or right edge, a swipe or the arrow keys turn the page. Turning the phone keeps
- * the page. A magnifier enlarges the page (button, double tap in the middle, two fingers); enlarged, one finger moves it and the pages do not turn.
+ * the page. Two fingers enlarge and shrink the page (a double tap in the middle does it too); enlarged, one finger moves it and the pages do not turn.
  * Where the person wants less movement the page changes at once. The pages are pictures of one shape (`pages`, in reading order): square as
  * default, or the shape given with `ratio` (width divided by height; a coloring book has upright pages, for example 0.75).
  */
@@ -324,9 +324,6 @@ defineExpose({ go, page, double, zoom, toggleZoom })
     button(type="button" class="bf-back" :aria-label="t('app.read.back')" @click.stop="emit('close')")
       ZIconography(name="chevron-left" :size="26")
 
-    button(type="button" class="bf-magnify" :class="{ 'is-on': zoomed }" :aria-pressed="zoomed" :aria-label="zoomed ? t('app.read.zoomOut') : t('app.read.zoomIn')" @click.stop="toggleZoom()")
-      ZIconography(name="search" :size="26")
-
     div(class="bf-zoom" :class="{ 'is-gesturing': gesturing }" :style="zoomStyle")
       div(class="bf-book" :class="{ 'is-double': double }" :style="bookStyle")
         template(v-if="double")
@@ -381,7 +378,7 @@ defineExpose({ go, page, double, zoom, toggleZoom })
   &.is-gesturing
     transition: none
 
-.bf-back, .bf-magnify
+.bf-back
   position: absolute
   z-index: 5
   top: calc(env(safe-area-inset-top, 0px) + 10px)
@@ -403,14 +400,6 @@ defineExpose({ go, page, double, zoom, toggleZoom })
 
 .bf-back
   left: calc(env(safe-area-inset-left, 0px) + 10px)
-
-.bf-magnify
-  right: calc(env(safe-area-inset-right, 0px) + 10px)
-
-  &.is-on
-    background: #fff
-    border-color: #fff
-    color: #14151f
 
 .bf-book
   position: relative

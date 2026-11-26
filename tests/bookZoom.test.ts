@@ -1,6 +1,6 @@
 /**
- * The magnifier of the digital book: a button, a double tap in the middle and two fingers enlarge the page; an enlarged page is moved with one finger and does
- * not turn; turning the phone or a page goes back to the whole page.
+ * Enlarging in the digital book: two fingers enlarge and shrink the page (a double tap in the middle does it too); an enlarged page is moved with one finger and
+ * does not turn; turning the phone or a page goes back to the whole page.
  */
 import { mount } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
@@ -53,17 +53,26 @@ describe('magnifier arithmetic', () => {
   })
 })
 
-describe('magnifier in the reader', () => {
-  it('has a button that enlarges and gives the whole page back', async () => {
+const pinch = async (w: ReturnType<typeof open>, from: number, to: number) => {
+  const root = w.find('.bf-root')
+  await root.trigger('touchstart', { touches: fingers([[200 - from / 2, 400], [200 + from / 2, 400]]) })
+  await root.trigger('touchmove', { touches: fingers([[200 - to / 2, 400], [200 + to / 2, 400]]) })
+  await root.trigger('touchend', { touches: [], changedTouches: fingers([[200 + to / 2, 400]]) })
+}
+
+describe('enlarging in the reader', () => {
+  it('two fingers apart enlarge, two fingers together shrink back to the whole page, never smaller', async () => {
     const w = open()
-    const button = w.find('.bf-magnify')
-    expect(button.attributes('aria-label')).toBe('Seite vergrößern')
-    await button.trigger('click')
-    expect(vm(w).zoom.s).toBe(ZOOM_TAP)
-    expect(w.find('.bf-magnify').attributes('aria-label')).toBe('Ganze Seite')
-    expect(w.find('.bf-zoom').attributes('style')).toContain('scale(2.5)')
-    await w.find('.bf-magnify').trigger('click')
-    expect(vm(w).zoom.s).toBe(1)
+    await pinch(w, 100, 300)
+    expect(vm(w).zoom.s).toBeCloseTo(3, 5)
+    expect(w.find('.bf-zoom').attributes('style')).toContain('scale(3)')
+    vi.setSystemTime(20_000)
+    await pinch(w, 300, 200)
+    expect(vm(w).zoom.s).toBeCloseTo(2, 5)
+    vi.setSystemTime(30_000)
+    await pinch(w, 300, 40)
+    expect(vm(w).zoom).toMatchObject({ s: 1, x: 0, y: 0 })
+    expect(vm(w).page).toBe(0)
     w.unmount()
   })
 
@@ -111,7 +120,7 @@ describe('magnifier in the reader', () => {
 
   it('goes back to the whole page when the phone is turned', async () => {
     const w = open()
-    await w.find('.bf-magnify').trigger('click')
+    await pinch(w, 100, 300)
     size(800, 400)
     await w.vm.$nextTick()
     expect(vm(w).zoom.s).toBe(1)
