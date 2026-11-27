@@ -148,7 +148,8 @@ function toRead(id: string) {
           span(:class="['book-cover', { tall: c.ratio < 0.9 }]" :style="{ aspectRatio: String(c.ratio) }")
             img(:src="c.cover" :alt="c.title" loading="lazy" draggable="false" @error="onImgFallback")
           span(class="book-info")
-            OwnBadge(v-if="PREMIUM_TEASER && !c.comingSoon" :state="ownOf(c)" class="book-own")
+            //- no Plus sign on a book: Plus does not open a picture book, it is bought on its own (Anton 27.11.2026)
+            OwnBadge(v-if="PREMIUM_TEASER && !c.comingSoon && ownOf(c) !== 'locked'" :state="ownOf(c)" class="book-own")
             span(v-if="c.comingSoon" class="book-soon") {{ t('app.read.comingSoon') }}
             span(v-if="c.series" class="book-series") {{ c.series }}
             h2(class="book-title") {{ c.title }}

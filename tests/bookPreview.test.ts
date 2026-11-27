@@ -1,6 +1,6 @@
 /**
- * The look inside a printed book (Books → Vorschau): seven pages (the cover, five sample pages, the page about buying), the last one offers
- * the digital book (a purchase in the app) and the printed book (a button to the store, which leaves the app through openExternal).
+ * The look inside a printed book (Books → Vorschau): read full screen with turning pages like the bought book (Anton 27.11.2026): seven pages
+ * (the cover, five sample pages, the closing page), the last one offers the digital book (a purchase in the app) and the printed book.
  */
 import { flushPromises, mount } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
@@ -45,65 +45,67 @@ describe('the preview of "Zachäus begegnet Jesus"', () => {
     expect(b.preview!.pages.map((p) => p.src).join(' ')).not.toContain('seite-6')
   })
 
-  it('can be paged through to page 7, which offers the digital book and the printed book', async () => {
+  it('is read full screen like the bought book; page 7 offers the digital book and the printed book', async () => {
     const { default: View } = await import('@/views/app/AppBookPreviewView.vue')
+    const { default: Flip } = await import('@/components/molecules/BookFlip.vue')
     const wrapper = mount(View, { global: { plugins: [i18n] }, attachTo: document.body })
     await flushPromises()
-    expect(wrapper.find('.bp-count').text()).toBe('1 / 7')
-    expect(wrapper.findAll('.bp-dot')).toHaveLength(7)
-    expect(wrapper.find('.bp-picture').attributes('src')).toContain('zachaeus-cover.webp')
-    const next = () => wrapper.findAll('.bp-arrow')[1]!
-    for (let i = 0; i < 5; i++) await next().trigger('click')
-    expect(wrapper.find('.bp-count').text()).toBe('6 / 7')
-    expect(wrapper.find('.bp-picture').attributes('src')).toContain('seite-5.webp')
-    await next().trigger('click')
-    expect(wrapper.find('.bp-count').text()).toBe('7 / 7')
-    expect(wrapper.find('.bp-buy').text()).toContain('Gefällt dir das Buch?')
-    expect(wrapper.find('.bp-digital').text()).toBe('Digital kaufen · 2,99 €')
-    expect(next().attributes('disabled')).toBeDefined()
+    const flip = wrapper.findComponent(Flip)
+    expect(flip.exists()).toBe(true)
+    expect(document.body.querySelector('.bf-root')).not.toBeNull()
+    const pages = flip.props('pages') as unknown[]
+    expect(pages).toHaveLength(7)
+    expect(String(pages[0])).toContain('zachaeus-cover.webp')
+    expect(String(pages[5])).toContain('seite-5.webp')
+    // the window of the test is wider than high: two pages side by side; turn to the end
+    for (let i = 0; i < 4; i++) {
+      ;(flip.vm as unknown as { go: (d: 1 | -1) => void }).go(1)
+      await new Promise((r) => setTimeout(r, 900))
+    }
+    const end = document.body.querySelector('[data-test="book-end-page"]')!
+    expect(end.textContent).toContain('Gefällt dir das Buch?')
+    expect(end.querySelector('.bp-digital')!.textContent).toBe('Digital kaufen · 2,99 €')
     // the printed book is in the store
-    await wrapper.find('.bp-store').trigger('click')
+    ;(end.querySelector('.bp-store') as HTMLButtonElement).click()
     expect(openExternal).toHaveBeenCalledWith('https://lambking.store/buch/der-mann-im-baum-zachaeus-begegnet-jesus/')
-    // back with the first arrow
-    await wrapper.findAll('.bp-arrow')[0]!.trigger('click')
-    expect(wrapper.find('.bp-count').text()).toBe('6 / 7')
     expect(warnings.filter((w) => /not defined on instance|is not a function|ERROR/.test(w))).toEqual([])
-  })
+    wrapper.unmount()
+  }, 15000)
 
   it('the digital book is bought (the test build pretends), then it is read page by page and can be downloaded', async () => {
     const { default: View } = await import('@/views/app/AppBookPreviewView.vue')
+    const { default: Flip } = await import('@/components/molecules/BookFlip.vue')
     const { setTestBook, ownsBook } = await import('@/use/usePremium')
     const b = storeBooks.find((x) => x.id === 'der-mann-im-baum-zachaeus')!
     expect(b.digital?.pages).toHaveLength(29)
     expect(ownsBook(b.id)).toBe(false)
+    const pagesOf = async () => {
+      const wrapper = mount(View, { global: { plugins: [i18n] }, attachTo: document.body })
+      await flushPromises()
+      return { wrapper, pages: wrapper.findComponent(Flip).props('pages') as unknown[] }
+    }
     // not owned: even on the route "lesen" only the look inside is shown
     current.name = 'app-book-read'
-    let wrapper = mount(View, { global: { plugins: [i18n] }, attachTo: document.body })
-    await flushPromises()
-    expect(wrapper.find('.bp-count').text()).toBe('1 / 7')
+    let { wrapper, pages } = await pagesOf()
+    expect(pages).toHaveLength(7)
     wrapper.unmount()
-    // owned: the buy page says so, and the route "lesen" has all 29 pages and no page about buying
+    // owned: the closing page says so and offers reading and the PDF, no buying
     setTestBook(b.id, true)
     current.name = 'app-book-preview'
-    wrapper = mount(View, { global: { plugins: [i18n] }, attachTo: document.body })
-    await flushPromises()
-    for (let i = 0; i < 6; i++) await wrapper.findAll('.bp-arrow')[1]!.trigger('click')
-    expect(wrapper.find('.bp-buy').text()).toContain('Dieses Buch gehört dir.')
-    expect(wrapper.find('.bp-digital').exists()).toBe(false)
-    await wrapper.find('.bp-read').trigger('click')
+    ;({ wrapper, pages } = await pagesOf())
+    const end = (pages[6] as { end: { title: string; buttons: { testid: string; action: () => void }[] } }).end
+    expect(end.title).toContain('Dieses Buch gehört dir.')
+    expect(end.buttons.map((x) => x.testid)).toEqual(['bp-read', 'bp-download', 'bp-test-undo'])
+    end.buttons[0]!.action()
     expect(push).toHaveBeenCalledWith({ name: 'app-book-read', params: { bookId: b.id } })
     wrapper.unmount()
+    // the route "lesen" has all 29 pages and no closing page
     current.name = 'app-book-read'
-    wrapper = mount(View, { global: { plugins: [i18n] }, attachTo: document.body })
-    await flushPromises()
-    // the whole book is a full-screen reader on top of everything: no header, no count, no buy page, only the book and a back button
-    expect(document.body.querySelector('.bf-root')).not.toBeNull()
+    ;({ wrapper, pages } = await pagesOf())
+    expect(pages).toHaveLength(29)
+    expect(String(pages[0])).toContain('seite-01.webp')
+    expect(pages.every((x) => typeof x === 'string')).toBe(true)
     expect(document.body.querySelectorAll('.bf-back')).toHaveLength(1)
-    expect(wrapper.find('.bp-count').exists()).toBe(false)
-    // lying on its side (the test window is wider than high) the cover is alone on the right
-    expect(document.body.querySelector('.bf-right img')?.getAttribute('src')).toContain('seite-01.webp')
-    expect(document.body.querySelector('.bf-left img')).toBeNull()
-    expect(wrapper.find('.bp-buy').exists()).toBe(false)
     setTestBook(b.id, false)
     wrapper.unmount()
     current.name = 'app-book-preview'
