@@ -28,7 +28,7 @@ export const BOOK_PAGES: Record<string, string> = {
   'lokal-912-weihnachten': 'die-weihnachtsgeschichte-jesus-ist-geboren',
   'lokal-912-ostern': 'ostern-jesus-lebt',
   // the printed books of the store shown under "Lesen → Bücher"
-  'eine-nacht-voller-freude': 'eine-nacht-voller-freude',
+  'eine-nacht-voller-freude': 'eine-nacht-voller-freude-jesus-wird-geboren',
   'der-mann-im-baum-zachaeus': 'der-mann-im-baum-zachaeus-begegnet-jesus'
 }
 
