@@ -64,7 +64,7 @@ const DIGITS = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
     transition(name="gate-modal")
       div(
         v-if="isOpen"
-        class="gate-backdrop fixed inset-0 z-[90] flex items-center justify-center px-5"
+        class="gate-backdrop fixed inset-0 flex items-center justify-center px-5"
         @click.self="cancel"
       )
         div(class="gate-wrap")
@@ -99,7 +99,9 @@ const DIGITS = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
 button
   -webkit-tap-highlight-color: transparent
 
+// above everything that covers the whole screen: the book reader (2000) and the games (up to 9999); Anton, 27.11.2026: the question opened behind the book
 .gate-backdrop
+  z-index: 10000
   background-color: rgba(8, 16, 26, 0.6)
   backdrop-filter: blur(4px)
 

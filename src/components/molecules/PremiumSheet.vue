@@ -8,8 +8,8 @@
 import { computed, onMounted, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import usePremium, { PLUS_TEST, setTestBook } from '@/use/usePremium'
-import usePurchases from '@/use/usePurchases'
-import { introRuns, plusOffer } from '@/data/plus'
+import usePurchases, { shownIntro } from '@/use/usePurchases'
+import { plusOffer } from '@/data/plus'
 import { bookProductId } from '@/data/plusProducts'
 import { openExternal } from '@/utils/openExternal'
 import { prependBaseUrl } from '@/utils/function'
@@ -30,6 +30,7 @@ const yearPrice = computed(() => purchases.prices.value.year ?? plusOffer.year)
 const canBuyBook = computed(() => !!bookId.value && (purchases.available || PLUS_TEST))
 watch(bookId, (id) => {
   purchases.resetPurchaseStatus()
+  if (id) void purchases.loadPlusProducts()
   if (id) void purchases.loadBookPrice(id)
 })
 
@@ -92,9 +93,9 @@ onUnmounted(() => window.removeEventListener('keydown', onKey))
             button(type="button" class="premium-opt is-plus is-best" @click="openPlusPage")
               span(class="premium-badge") {{ t('app.plus.cheaper') }}
               span(class="premium-opt-name") {{ t('app.premium.optPlus') }}
-              span(class="premium-opt-price") {{ introRuns() && plusOffer.introPrice ? plusOffer.introPrice : yearPrice }}
+              span(class="premium-opt-price") {{ shownIntro('year') ?? yearPrice }}
               span(class="premium-opt-sub")
-                s(v-if="introRuns() && plusOffer.introPrice" class="premium-old") {{ yearPrice }}
+                s(v-if="shownIntro('year')" class="premium-old") {{ yearPrice }}
                 | {{ t('app.premium.optPlusYear') }}
             button(v-if="canBuyBook" type="button" class="premium-opt is-book" :disabled="purchases.status.value === 'purchasing'" @click="buyThisBook")
               span(class="premium-opt-name") {{ t('app.premium.optBook') }}

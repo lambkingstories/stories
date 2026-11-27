@@ -37,9 +37,28 @@ async fn can_make_payments<R: Runtime>(app: tauri::AppHandle<R>) -> Result<CanMa
     }
 }
 
+/// `{ "offers": { productId: price } }`: the introductory prices this Apple account can still get.
+#[tauri::command]
+async fn intro_offers<R: Runtime>(app: tauri::AppHandle<R>, product_ids: Vec<String>) -> Result<serde_json::Value, String> {
+    #[cfg(target_os = "ios")]
+    {
+        use tauri::Manager;
+        let handle = app.state::<Handle<R>>();
+        return handle
+            .0
+            .run_mobile_plugin("introOffers", serde_json::json!({ "productIds": product_ids }))
+            .map_err(|e| e.to_string());
+    }
+    #[cfg(not(target_os = "ios"))]
+    {
+        let _ = (app, product_ids);
+        Err("the purchase check is only available on iOS".into())
+    }
+}
+
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     Builder::<R, ()>::new("purchase-check")
-        .invoke_handler(tauri::generate_handler![can_make_payments])
+        .invoke_handler(tauri::generate_handler![can_make_payments, intro_offers])
         .setup(|_app, _api| {
             #[cfg(target_os = "ios")]
             {

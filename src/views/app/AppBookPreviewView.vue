@@ -6,7 +6,7 @@
  * app through `openExternal`, which asks the parents first); who owns it finds "Jetzt lesen" and "Als PDF speichern" instead. A book that
  * is not in the store yet ("coming soon") only says that it comes soon. The route "lesen" shows all pages of a bought book.
  */
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref, shallowRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import BookFlip from '@/components/molecules/BookFlip.vue'
@@ -16,8 +16,10 @@ import { storeBooks } from '@/data/storeBooks'
 import { bookProductId } from '@/data/plusProducts'
 import usePremium, { PLUS_TEST } from '@/use/usePremium'
 import usePurchases from '@/use/usePurchases'
+import { requireParent } from '@/use/useParentalGate'
 import { goBackTo } from '@/utils/navBack'
 import { openExternal } from '@/utils/openExternal'
+import { deliverFile, loadFile } from '@/utils/deliverFile'
 import { prependBaseUrl } from '@/utils/function'
 
 const { t } = useI18n({ useScope: 'global' })
@@ -52,15 +54,30 @@ function toRead() {
   if (book.value) void router.push({ name: 'app-book-read', params: { bookId: book.value.id } })
 }
 
-/** The whole book as a file: the PDF is laid on the device. */
-function download() {
-  if (!book.value?.digital) return
-  const a = document.createElement('a')
-  a.href = prependBaseUrl(book.value.digital.pdf)
-  a.download = `${book.value.title.de}.pdf`
-  a.target = '_blank'
-  a.rel = 'noopener'
-  a.click()
+/**
+ * The whole book as a file. The PDF is read as soon as the book is owned, so that the share sheet can open right after the tap
+ * (WebKit only opens it shortly after a touch).
+ */
+const pdfFile = shallowRef<File | null>(null)
+const saveFailed = ref(false)
+async function readPdf(): Promise<File | null> {
+  const b = book.value
+  if (!b?.digital) return null
+  try {
+    pdfFile.value ??= await loadFile(prependBaseUrl(b.digital.pdf), `${b.title.de}.pdf`, 'application/pdf')
+  } catch (error) {
+    console.warn('[book] the PDF could not be read', error)
+  }
+  return pdfFile.value
+}
+watch(owned, (yes) => { if (yes) void readPdf() }, { immediate: true })
+
+/** The file leaves the app, so the parental gate comes first. */
+async function download() {
+  saveFailed.value = false
+  if (!(await requireParent())) return
+  const file = pdfFile.value ?? (await readPdf())
+  if (!file || (await deliverFile(file)) === 'failed') saveFailed.value = true
 }
 
 /** Said under the buy button when the purchase did not go through. */
@@ -83,7 +100,7 @@ const endPage = computed<BookFlipEnd>(() => {
       { label: t('app.read.digitalDownload'), kind: 'outline', testid: 'bp-download', action: download }
     ]
     if (PLUS_TEST) buttons.push({ label: t('app.read.digitalTestUndo'), kind: 'link', testid: 'bp-test-undo', action: () => setTestBook(b.id, false) })
-    return { cover, title: t('app.read.digitalOwned'), text: t('app.read.digitalOwnedText'), buttons }
+    return { cover, title: t('app.read.digitalOwned'), text: t('app.read.digitalOwnedText'), note: saveFailed.value ? t('app.read.digitalSaveFailed') : undefined, buttons }
   }
   const store = (label: string, kind: 'primary' | 'outline') => ({ label, kind, testid: 'bp-store', action: toStore })
   if (b.digital) {

@@ -14,6 +14,7 @@ import { ref } from 'vue'
 import { isIOS } from '@/utils/platform'
 import { requireParent } from '@/use/useParentalGate'
 import { PLUS_TEST, setOwnedBooks, setPlusInfo, setSubscribed, setTestBook, type PlusInfo } from '@/use/usePremium'
+import { introRuns, plusOffer } from '@/data/plus'
 import { PLUS_PRODUCTS, bookProductId, isBookProduct, type PlusPlan } from '@/data/plusProducts'
 import type { Product, Purchase, SubscriptionOffer } from '@choochmeque/tauri-plugin-iap-api'
 
@@ -38,6 +39,26 @@ const status = ref<PurchaseStatus>('idle')
 const prices = ref<Record<string, string>>({})
 /** Android: the offer to buy for each plan (the base plan with the best first price for this person). */
 const offerTokens: Record<string, string> = {}
+/** The start price of a plan, only where the store still offers it to this person (Apple gives it once; Anton, 27.11.2026). */
+const introPrices = ref<Record<string, string>>({})
+
+/** iOS: asks StoreKit which of these products still have a start price for this Apple account. No answer means no promise. */
+async function iosIntroOffers(ids: string[]): Promise<Record<string, string>> {
+  try {
+    const { invoke } = await import('@tauri-apps/api/core')
+    return (await invoke<{ offers: Record<string, string> }>('plugin:purchase-check|intro_offers', { productIds: ids })).offers ?? {}
+  } catch (error) {
+    console.warn('[purchases] start prices could not be asked', error)
+    return {}
+  }
+}
+
+/** The start price to show for a yearly plan: in the app only what the store still offers, in the browser the text of the page. */
+export function shownIntro(plan: 'year' | 'familyYear'): string | null {
+  if (!introRuns()) return null
+  if (PURCHASES_AVAILABLE) return introPrices.value[plan] ?? null
+  return plan === 'year' ? plusOffer.introPrice : plusOffer.familyIntroPrice
+}
 
 const iapApi = () => import('@choochmeque/tauri-plugin-iap-api')
 
@@ -54,6 +75,14 @@ export function pickOffer(offers: SubscriptionOffer[] | undefined, basePlanId: s
 export function regularPrice(offer: SubscriptionOffer | undefined): string | undefined {
   const phases = offer?.pricingPhases ?? []
   return phases[phases.length - 1]?.formattedPrice
+}
+
+/** The start price of an Android offer: its first phase when that is cheaper than the regular last one. */
+export function startPrice(offer: SubscriptionOffer | undefined): string | undefined {
+  const phases = offer?.pricingPhases ?? []
+  const first = phases[0]
+  const last = phases[phases.length - 1]
+  return first && last && first.priceAmountMicros < last.priceAmountMicros ? first.formattedPrice : undefined
 }
 
 /** The end of the paid period from the signed receipt of Apple (`expiresDate` in its payload); `undefined` when there is none or it cannot be read. */
@@ -174,6 +203,11 @@ export function loadPlusProducts(): Promise<void> {
           const price = label(products.find((p) => p.productId === PLUS_PRODUCTS.ios[plan]))
           if (price) prices.value = { ...prices.value, [plan]: price }
         }
+        const offers = await iosIntroOffers([PLUS_PRODUCTS.ios.year, PLUS_PRODUCTS.ios.familyYear])
+        for (const plan of ['year', 'familyYear'] as const) {
+          const start = offers[PLUS_PRODUCTS.ios[plan]]
+          if (start) introPrices.value = { ...introPrices.value, [plan]: start }
+        }
       } else {
         const { products } = await getProducts([PLUS_PRODUCTS.android.subscription], 'subs')
         const offers = products[0]?.subscriptionOfferDetails
@@ -189,6 +223,8 @@ export function loadPlusProducts(): Promise<void> {
           offerTokens[plan] = offer.offerToken
           const price = regularPrice(offer)
           if (price) prices.value = { ...prices.value, [plan]: price }
+          const start = startPrice(offer)
+          if (start) introPrices.value = { ...introPrices.value, [plan]: start }
         }
       }
       if (!prices.value.year) console.warn('[purchases] the store returned no Plus product')
@@ -249,6 +285,8 @@ async function buy(productId: string, type: 'subs' | 'inapp', offerToken?: strin
       console.warn('[purchases] acknowledge failed', error)
     }
     await refreshOwned()
+    // who has subscribed once gets no start price any more
+    if (type === 'subs') introPrices.value = {}
     status.value = 'done'
   } catch (error) {
     console.warn('[purchases] purchase did not complete', error)
