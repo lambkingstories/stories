@@ -36,7 +36,7 @@ describe('books in English', () => {
 
 describe('the preview of the history book is gone', () => {
   it('"Völker der Bibel" is no longer a book of the app, and its pictures are no longer shipped', () => {
-    expect(storeBooks.map((b) => b.id)).toEqual(['der-mann-im-baum-zachaeus'])
+    expect(storeBooks.map((b) => b.id)).toEqual(['der-mann-im-baum-zachaeus', 'eine-nacht-voller-freude'])
     expect(JSON.stringify(storeBooks)).not.toContain('Völker')
     expect(existsSync(resolve(process.cwd(), 'public/images/buecher/voelker-der-bibel'))).toBe(false)
     expect(read('data/bookPages.ts')).not.toContain('voelker')

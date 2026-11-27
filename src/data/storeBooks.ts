@@ -76,5 +76,19 @@ export const storeBooks: StoreBook[] = [
     preview: { pages: [1, 2, 3, 4, 5].map((n) => ({ src: `images/buecher/zachaeus-vorschau/seite-${n}.webp`, ratio: 1 })) },
     // the whole book: 29 pages (the cover first); the price of the store replaces this one on the phone
     digital: { price: '2,99 €', pages: digitalPages('images/buecher/zachaeus-voll-k7q2', 29), pdf: 'downloads/Der-Mann-im-Baum-Zachaeus-begegnet-Jesus-k7q2.pdf' }
+  },
+  {
+    id: 'eine-nacht-voller-freude',
+    series: 'LambKing Bilderbücher',
+    title: { de: 'Eine Nacht voller Freude', en: '' },
+    text: {
+      de: 'Die Weihnachtsgeschichte für Kinder von 8 bis 10 Jahren, nach dem Lukasevangelium: von der Botschaft an Maria bis zu den Hirten an der Krippe.',
+      en: ''
+    },
+    cover: 'images/buecher/nacht-cover.webp',
+    url: printedBookUrl('eine-nacht-voller-freude', STORE_URL),
+    preview: { pages: [1, 2, 3, 4, 5].map((n) => ({ src: `images/buecher/nacht-vorschau/seite-${n}.webp`, ratio: 1 })) },
+    // the whole book: the cover and the 38 pages; the price of the store replaces this one on the phone
+    digital: { price: '3,99 €', pages: digitalPages('images/buecher/nacht-voll-r8m4', 39), pdf: 'downloads/Eine-Nacht-voller-Freude-r8m4.pdf' }
   }
 ]

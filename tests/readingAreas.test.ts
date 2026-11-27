@@ -126,14 +126,15 @@ describe('Books: the preview of "Zachäus begegnet Jesus"', () => {
 })
 
 describe('Books: the preview of the history book is gone (Anton 22.11.2026)', () => {
-  it('shows only the picture book "Zachäus begegnet Jesus", with its store button and no "coming soon" book', async () => {
+  it('shows the picture books of the store (Zachäus and, since 27.11.2026, "Eine Nacht voller Freude"), each with its store button and no "coming soon" book', async () => {
     vi.doMock('@/use/useApiBooks', () => ({ default: () => ({ state: { all: [] }, loadAllBooks: vi.fn() }) }))
     vi.resetModules()
     const { default: View } = await import('@/views/app/AppBooksView.vue')
     const wrapper = mount(View, { global: { plugins: [i18n] }, attachTo: document.body })
     await flushPromises()
     const cards = wrapper.findAll('.book-card')
-    expect(cards).toHaveLength(1)
+    expect(cards).toHaveLength(2)
+    expect(wrapper.text()).toContain('Eine Nacht voller Freude')
     expect(wrapper.text()).not.toContain('Völker der Bibel')
     expect(wrapper.find('.book-soon').exists()).toBe(false)
     expect(cards[0]!.find('.book-store').exists()).toBe(true)
