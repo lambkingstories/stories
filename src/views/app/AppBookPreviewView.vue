@@ -59,7 +59,8 @@ function toRead() {
  * (WebKit only opens it shortly after a touch).
  */
 const pdfFile = shallowRef<File | null>(null)
-const saveFailed = ref(false)
+/** What the end page says after "Save as PDF" (empty while the system's own sheet says enough). */
+const saveNote = ref<'' | 'digitalSaved' | 'digitalSaveFailed'>('')
 async function readPdf(): Promise<File | null> {
   const b = book.value
   if (!b?.digital) return null
@@ -74,10 +75,12 @@ watch(owned, (yes) => { if (yes) void readPdf() }, { immediate: true })
 
 /** The file leaves the app, so the parental gate comes first. */
 async function download() {
-  saveFailed.value = false
+  saveNote.value = ''
   if (!(await requireParent())) return
   const file = pdfFile.value ?? (await readPdf())
-  if (!file || (await deliverFile(file)) === 'failed') saveFailed.value = true
+  const result = file ? await deliverFile(file) : 'failed'
+  if (result === 'failed') saveNote.value = 'digitalSaveFailed'
+  else if (result === 'saved') saveNote.value = 'digitalSaved'
 }
 
 /** Said under the buy button when the purchase did not go through. */
@@ -100,7 +103,7 @@ const endPage = computed<BookFlipEnd>(() => {
       { label: t('app.read.digitalDownload'), kind: 'outline', testid: 'bp-download', action: download }
     ]
     if (PLUS_TEST) buttons.push({ label: t('app.read.digitalTestUndo'), kind: 'link', testid: 'bp-test-undo', action: () => setTestBook(b.id, false) })
-    return { cover, title: t('app.read.digitalOwned'), text: t('app.read.digitalOwnedText'), note: saveFailed.value ? t('app.read.digitalSaveFailed') : undefined, buttons }
+    return { cover, title: t('app.read.digitalOwned'), text: t('app.read.digitalOwnedText'), note: saveNote.value ? t(`app.read.${saveNote.value}`) : undefined, buttons }
   }
   const store = (label: string, kind: 'primary' | 'outline') => ({ label, kind, testid: 'bp-store', action: toStore })
   if (b.digital) {

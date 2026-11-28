@@ -1,0 +1,14 @@
+{
+  "$schema": "../gen/schemas/mobile-schema.json",
+  "identifier": "android-save-file",
+  "description": "Digital picture books in the Android build: save the PDF to a place the person chooses. Android only, like the plugin itself.",
+  "platforms": [
+    "android"
+  ],
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "save-file:default"
+  ]
+}

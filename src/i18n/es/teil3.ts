@@ -720,6 +720,7 @@ export default {
     printedBook: 'Libro impreso en la tienda',
     digitalNote: 'Compra una vez, lee tantas veces como quieras y guárdalo como PDF.',
     digitalSaveFailed: 'No se pudo guardar el PDF. Toca otra vez, por favor.',
+    digitalSaved: 'El PDF está guardado.',
     digitalBuyText: 'Lee el libro completo aquí mismo, en la app, como libro digital. O pide el libro impreso en nuestra tienda.',
     digitalOwned: 'Este libro es tuyo.',
     digitalOwnedText: 'Puedes leer el libro completo aquí y guardar el archivo en tu dispositivo.',

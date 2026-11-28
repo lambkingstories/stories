@@ -7,6 +7,10 @@ pub fn run() {
     #[cfg(any(target_os = "ios", target_os = "android"))]
     let builder = builder.plugin(tauri_plugin_iap::init());
 
+    // "Save as PDF" of the digital picture books (see the plugin).
+    #[cfg(target_os = "android")]
+    let builder = builder.plugin(tauri_plugin_save_file::init());
+
     // Coloring page download — saves the picture to Photos (see the plugin).
     #[cfg(target_os = "ios")]
     let builder = builder.plugin(tauri_plugin_save_photo::init());

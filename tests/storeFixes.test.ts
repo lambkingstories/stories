@@ -3,6 +3,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { deliverFile } from '@/utils/deliverFile'
 import { startPrice } from '@/use/usePurchases'
 
+const invoke = vi.fn()
+vi.mock('@tauri-apps/api/core', async (original) => ({ ...(await original<object>()), invoke: (...a: unknown[]) => invoke(...a) }))
+
 // Anton, TestFlight 27.11.2026: the parental question opened behind the book, the PDF was not saved, the start price was promised to a subscriber.
 const phase = (micros: number, price: string) => ({ priceAmountMicros: micros, formattedPrice: price }) as never
 
@@ -28,6 +31,16 @@ describe('the findings from the first test on the iPad', () => {
     expect(await deliverFile(file, true)).toBe('failed')
     vi.stubGlobal('navigator', { canShare: () => true, share: () => Promise.reject(Object.assign(new Error('no'), { name: 'AbortError' })) })
     expect(await deliverFile(file, true)).toBe('cancelled')
+  })
+
+  it('saves through the system dialog on Android', async () => {
+    vi.stubGlobal('navigator', { userAgent: 'Mozilla/5.0 (Linux; Android 14)' })
+    const file = new File(['abc'], 'Buch.pdf', { type: 'application/pdf' })
+    invoke.mockResolvedValueOnce({ status: 'saved' })
+    expect(await deliverFile(file, true)).toBe('saved')
+    expect(invoke).toHaveBeenCalledWith('plugin:save-file|save', { name: 'Buch.pdf', mime: 'application/pdf', data: 'YWJj' })
+    invoke.mockRejectedValueOnce(new Error('no plugin'))
+    expect(await deliverFile(file, true)).toBe('failed')
   })
 
   it('names a start price only when the offer has a cheaper first phase', () => {

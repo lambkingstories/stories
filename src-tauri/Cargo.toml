@@ -43,3 +43,7 @@ lto = true
 incremental = false
 opt-level = "s"
 strip = true
+
+# Android: "Save as PDF" of the digital picture books (the web view cannot download).
+[target.'cfg(target_os = "android")'.dependencies]
+tauri-plugin-save-file = { path = "plugins/tauri-plugin-save-file" }
