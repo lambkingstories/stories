@@ -1,5 +1,6 @@
 import { stripAbrahamFiles, stripAdamFiles, stripBabelFiles, stripDanielFiles, stripEliaFiles, stripGideonFiles, stripJakobFiles, stripJonaFiles, stripJosuaFiles, stripMoseFiles, stripNoahFiles, stripRutFiles, stripSamuelFiles, stripDavidFiles, stripSalomoFiles, stripElisaFiles, stripEsterFiles, stripNehemiaFiles, stripProphetenFiles, stripWeihnachtenFiles, stripTaufeFiles, stripFreundeFiles, stripWuesteFiles, stripWunderFiles, stripHeilungFiles, stripGleichnisseFiles, stripZachaeusFiles, stripLetztewocheFiles, stripOsternFiles, stripPfingstenFiles, stripPaulusFiles, stripPaulusromFiles, stripOffenbarungFiles, stripSohnFiles, stripIchbinFiles, stripBergpredigtFiles, stripSimsonFiles, stripJohannesFiles, stripHiskiaFiles } from './vite.config.noah'
 import { splitMediaFiles } from './vite.config.media'
+import bookMedia from './src/data/bookMedia.json'
 import { fileURLToPath, URL } from 'node:url'
 import { resolve, dirname } from 'node:path'
 import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
@@ -240,7 +241,7 @@ export default defineConfig(({ mode }) => {
       // Media outside the program file (the test for 1.3, see src/utils/mediaSplit.ts): after the strips above, so only media that belong to the build are moved.
       if (env.VITE_MEDIA_SPLIT) {
         const ids = env.VITE_MEDIA_SPLIT.split(',').map((x) => x.trim()).filter(Boolean)
-        const r = splitMediaFiles(outDir, projectRoot, ids, env.VITE_MEDIA_SPLIT_WEB === 'true')
+        const r = splitMediaFiles(outDir, projectRoot, ids, env.VITE_MEDIA_SPLIT_WEB === 'true', env.VITE_MEDIA_SPLIT_BOOKS === 'true' ? bookMedia : [])
         console.log(`[media-split] ${ids.join(',')}: ${r.moved} folders moved to ${r.target}`)
       }
     }

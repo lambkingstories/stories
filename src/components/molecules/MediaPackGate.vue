@@ -16,9 +16,9 @@ const later = ref(false)
 let timer: ReturnType<typeof setInterval> | undefined
 
 const TEXTS = {
-  de: { title: 'Die Abenteuer werden geladen', sub: 'Bilder und Töne laden jetzt auf dein Gerät. Das passiert nur einmal und dauert ein paar Minuten.', wifi: 'Das Laden wartet auf WLAN.', failed: 'Das Laden hat einen Fehler gemeldet. Es wird weiter versucht.', later: 'Später', advTitle: 'Das Abenteuer wird geladen', advSub: 'Bilder und Töne kommen jetzt auf dein Gerät. Das dauert nur einen Moment.', cancel: 'Abbrechen' },
-  en: { title: 'Loading the adventures', sub: 'Pictures and sounds are being loaded onto your device. This happens only once and takes a few minutes.', wifi: 'Loading is waiting for Wi-Fi.', failed: 'Loading reported a problem. It keeps trying.', later: 'Later', advTitle: 'Loading the adventure', advSub: 'Pictures and sounds are coming to your device. It only takes a moment.', cancel: 'Cancel' },
-  es: { title: 'Cargando las aventuras', sub: 'Las imágenes y los sonidos se están cargando en tu dispositivo. Solo ocurre una vez y tarda unos minutos.', wifi: 'La carga espera a una red Wi-Fi.', failed: 'La carga ha informado de un problema. Sigue intentándolo.', later: 'Más tarde', advTitle: 'Cargando la aventura', advSub: 'Las imágenes y los sonidos llegan a tu dispositivo. Solo tarda un momento.', cancel: 'Cancelar' }
+  de: { title: 'Die Abenteuer werden geladen', sub: 'Bilder und Töne laden jetzt auf dein Gerät. Das passiert nur einmal und dauert ein paar Minuten.', wifi: 'Das Laden wartet auf WLAN.', failed: 'Das Laden hat einen Fehler gemeldet. Es wird weiter versucht.', later: 'Später', advTitle: 'Das Abenteuer wird geladen', advSub: 'Bilder und Töne kommen jetzt auf dein Gerät. Das dauert nur einen Moment.', bookTitle: 'Das Buch wird geladen', bookSub: 'Die Seiten kommen jetzt auf dein Gerät. Das dauert nur einen Moment.', cancel: 'Abbrechen' },
+  en: { title: 'Loading the adventures', sub: 'Pictures and sounds are being loaded onto your device. This happens only once and takes a few minutes.', wifi: 'Loading is waiting for Wi-Fi.', failed: 'Loading reported a problem. It keeps trying.', later: 'Later', advTitle: 'Loading the adventure', advSub: 'Pictures and sounds are coming to your device. It only takes a moment.', bookTitle: 'Loading the book', bookSub: 'The pages are coming to your device. It only takes a moment.', cancel: 'Cancel' },
+  es: { title: 'Cargando las aventuras', sub: 'Las imágenes y los sonidos se están cargando en tu dispositivo. Solo ocurre una vez y tarda unos minutos.', wifi: 'La carga espera a una red Wi-Fi.', failed: 'La carga ha informado de un problema. Sigue intentándolo.', later: 'Más tarde', advTitle: 'Cargando la aventura', advSub: 'Las imágenes y los sonidos llegan a tu dispositivo. Solo tarda un momento.', bookTitle: 'Cargando el libro', bookSub: 'Las páginas llegan a tu dispositivo. Solo tarda un momento.', cancel: 'Cancelar' }
 } as const
 const text = () => TEXTS[(String(locale.value).slice(0, 2) as keyof typeof TEXTS) in TEXTS ? (String(locale.value).slice(0, 2) as keyof typeof TEXTS) : 'de']
 
@@ -42,8 +42,8 @@ onUnmounted(() => clearInterval(timer))
 <template lang="pug">
   div(v-if="adventureWait.id" class="mpg" role="alertdialog" aria-live="polite" data-test="adventure-pack-gate")
     div(class="mpg-card")
-      h2(class="mpg-title") {{ text().advTitle }}
-      p(class="mpg-sub") {{ text().advSub }}
+      h2(class="mpg-title") {{ adventureWait.kind === 'book' ? text().bookTitle : text().advTitle }}
+      p(class="mpg-sub") {{ adventureWait.kind === 'book' ? text().bookSub : text().advSub }}
       div(class="mpg-bar" role="progressbar" :aria-valuenow="adventureWait.percent" aria-valuemin="0" aria-valuemax="100")
         div(class="mpg-fill" :style="{ width: Math.max(4, adventureWait.percent) + '%' }")
       p(class="mpg-pct") {{ adventureWait.percent }} %
@@ -66,7 +66,8 @@ onUnmounted(() => clearInterval(timer))
 .mpg
   position: fixed
   inset: 0
-  z-index: 900
+  // above the full-screen book reader (2000); below the question to the parents (10000)
+  z-index: 9600
   display: flex
   align-items: center
   justify-content: center

@@ -21,6 +21,7 @@ import { goBackTo } from '@/utils/navBack'
 import { openExternal } from '@/utils/openExternal'
 import { deliverFile, loadFile } from '@/utils/deliverFile'
 import { prependBaseUrl } from '@/utils/function'
+import { bookNeedsPack, ensureBookPack } from '@/utils/mediaSplit'
 
 const { t } = useI18n({ useScope: 'global' })
 const route = useRoute()
@@ -39,6 +40,22 @@ const price = computed(() => (book.value?.digital ? (purchases.prices.value[book
 function goBack() {
   goBackTo(router, { name: 'app-books' })
 }
+
+/**
+ * Android: the pages of a bought book lie in the Play pack of the book. The reader waits for it (a loading screen says so); without it the pages would stay empty.
+ */
+const pagesHere = ref(false)
+const waitsForPack = computed(() => fullBook.value && !!book.value && bookNeedsPack(book.value.id) && !pagesHere.value)
+watch(
+  () => (fullBook.value ? book.value?.id : undefined),
+  async (id) => {
+    pagesHere.value = false
+    if (!id || !bookNeedsPack(id)) return
+    if (await ensureBookPack(id)) pagesHere.value = true
+    else goBack()
+  },
+  { immediate: true }
+)
 
 function toStore() {
   if (book.value) void openExternal(book.value.url)
@@ -61,9 +78,12 @@ function toRead() {
 const pdfFile = shallowRef<File | null>(null)
 /** What the end page says after "Save as PDF" (empty while the system's own sheet says enough). */
 const saveNote = ref<'' | 'digitalSaved' | 'digitalSaveFailed'>('')
+let pdfAsked = false
 async function readPdf(): Promise<File | null> {
   const b = book.value
   if (!b?.digital) return null
+  // read ahead only what is on the phone already (the tap on "Save" fetches the pack of the book first)
+  if (bookNeedsPack(b.id) && !pdfAsked) return null
   try {
     pdfFile.value ??= await loadFile(prependBaseUrl(b.digital.pdf), `${b.title.de}.pdf`, 'application/pdf')
   } catch (error) {
@@ -77,6 +97,11 @@ watch(owned, (yes) => { if (yes) void readPdf() }, { immediate: true })
 async function download() {
   saveNote.value = ''
   if (!(await requireParent())) return
+  const id = book.value?.id
+  if (id && bookNeedsPack(id)) {
+    if (!(await ensureBookPack(id))) return
+    pdfAsked = true
+  }
   const file = pdfFile.value ?? (await readPdf())
   const result = file ? await deliverFile(file) : 'failed'
   if (result === 'failed') saveNote.value = 'digitalSaveFailed'
@@ -139,7 +164,7 @@ onMounted(() => {
   div(class="bp-page")
     //- a full-screen reader on top of everything (the page below stays empty); the look inside and the whole book each start at the cover
     Teleport(v-if="book" to="body")
-      BookFlip(:key="fullBook ? 'lesen' : 'vorschau'" :pages="pages" :ratio="book.coverRatio ?? 1" @close="goBack")
+      BookFlip(v-if="!waitsForPack" :key="fullBook ? 'lesen' : 'vorschau'" :pages="pages" :ratio="book.coverRatio ?? 1" @close="goBack")
     template(v-else)
       button(type="button" class="bp-back lk-btn lk-btn--outline lk-btn--small" @click="goBack")
         ZIconography(name="chevron-left" :size="20")

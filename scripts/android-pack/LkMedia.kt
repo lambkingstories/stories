@@ -35,6 +35,8 @@ import java.util.concurrent.Executors
 object LkMedia {
     private const val CORE = "lkcore"
     private val IDS: Set<String> = setOf(__IDS__)
+    // the digital books: path (a folder of pages, or the PDF) to the name of its pack
+    private val BOOKS: Map<String, String> = mapOf(__BOOKS__)
     private val PORTS = intArrayOf(47321, 47322, 47323)
 
     private class Pack(val name: String) {
@@ -60,11 +62,13 @@ object LkMedia {
 
     private fun packNameOfId(id: String) = "adv_" + id.replace('-', '_')
 
-    /** True for lkcore and for the pack of a known adventure. */
-    private fun isKnownPack(name: String): Boolean = name == CORE || IDS.any { packNameOfId(it) == name }
+    /** True for lkcore and for the pack of a known adventure or book. */
+    private fun isKnownPack(name: String): Boolean = name == CORE || BOOKS.containsValue(name) || IDS.any { packNameOfId(it) == name }
 
-    /** The pack a file lives in: the one of its adventure, or lkcore. */
+    /** The pack a file lives in: the one of its book or adventure, or lkcore. */
     private fun packOf(path: String): String {
+        val rel = path.trimStart('/')
+        for ((place, name) in BOOKS) if (rel == place || rel.startsWith("$place/")) return name
         val m = pathPattern.find(path) ?: return CORE
         val id = m.groupValues[1]
         // medals, cards and gifts of an adventure stay in lkcore (same rule as KEEP_IN_CORE in scripts/patch-android-assetpack.mjs)

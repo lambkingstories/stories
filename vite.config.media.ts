@@ -26,7 +26,7 @@ export function mediaDirsOf(outDir: string, ids: string[]): string[] {
   return ids.flatMap((id) => [`images/abenteuer/${id}`, `images/abenteuer/spiele/${id}`, `audio/abenteuer/${id}`])
 }
 
-export function splitMediaFiles(outDir: string, projectRoot: string, ids: string[], web: boolean): { moved: number; target: string } {
+export function splitMediaFiles(outDir: string, projectRoot: string, ids: string[], web: boolean, books: { folder: string; pdf: string }[] = []): { moved: number; target: string } {
   const target = web ? resolve(outDir, '__media__') : resolve(projectRoot, 'dist-media')
   rmSync(target, { recursive: true, force: true })
   mkdirSync(target, { recursive: true })
@@ -35,6 +35,16 @@ export function splitMediaFiles(outDir: string, projectRoot: string, ids: string
     const from = resolve(outDir, dir)
     if (!existsSync(from)) continue
     const to = resolve(target, dir)
+    mkdirSync(dirname(to), { recursive: true })
+    cpSync(from, to, { recursive: true })
+    rmSync(from, { recursive: true, force: true })
+    moved++
+  }
+  // the whole digital books (pages and PDF), only where `VITE_MEDIA_SPLIT_BOOKS` asks for it (Android: one Play pack per book); covers and sample pages stay
+  for (const path of books.flatMap((b) => [b.folder, b.pdf])) {
+    const from = resolve(outDir, path)
+    if (!existsSync(from)) continue
+    const to = resolve(target, path)
     mkdirSync(dirname(to), { recursive: true })
     cpSync(from, to, { recursive: true })
     rmSync(from, { recursive: true, force: true })

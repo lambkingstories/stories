@@ -48,7 +48,7 @@ if (!existsSync(MEDIA)) fail('no dist-media (run `VITE_MEDIA_SPLIT=* pnpm build-
 // the adventures: every folder below images/abenteuer and audio/abenteuer of the split media (the shared games live in `spiele`, which is no adventure)
 const ids = [...new Set([...dirsOf(join(MEDIA, 'images/abenteuer')), ...dirsOf(join(MEDIA, 'audio/abenteuer'))])].filter((d) => d !== 'spiele' && d !== 'ui').sort()
 
-for (const old of dirsOf(ANDROID).filter((d) => d === CORE || d.startsWith('adv_'))) rmSync(join(ANDROID, old), { recursive: true, force: true })
+for (const old of dirsOf(ANDROID).filter((d) => d === CORE || d.startsWith('adv_') || d.startsWith('book_'))) rmSync(join(ANDROID, old), { recursive: true, force: true })
 
 function makePack(name, delivery) {
   const dir = join(ANDROID, name)
@@ -96,6 +96,23 @@ for (const id of ids) {
     }
   }
 }
+// the digital books (src/data/bookMedia.json): one on-demand pack each, with the pages and the PDF (only when the build took them out)
+const books = JSON.parse(readFileSync(join(SCRIPT_ROOT, 'src/data/bookMedia.json'), 'utf8'))
+const bookPackNameOf = (id) => 'book_' + id.replace(/-/g, '_')
+const bookFiles = []
+for (const book of books) {
+  const paths = [book.folder, book.pdf].filter((rel) => existsSync(join(coreAssets, rel)))
+  if (!paths.length) continue
+  const pack = bookPackNameOf(book.id)
+  const assets = makePack(pack, 'on-demand')
+  names.push(pack)
+  for (const rel of paths) {
+    const to = join(assets, rel)
+    mkdirSync(dirname(to), { recursive: true })
+    renameSync(join(coreAssets, rel), to)
+    bookFiles.push([rel, pack])
+  }
+}
 const mb = (n) => (n / 1048576).toFixed(1)
 console.log(`[patch-android-assetpack] ${names.length} packs; ${CORE}: ${mb(sizeOf(coreAssets))} MB`)
 for (const n of names.slice(1)) console.log(`  ${n}: ${mb(sizeOf(join(ANDROID, n, 'src/main/assets')))} MB`)
@@ -140,6 +157,7 @@ writeFileSync(
   readFileSync(join(SCRIPT_ROOT, 'scripts/android-pack/LkMedia.kt'), 'utf8')
     .replace('__PACKAGE__', pkg)
     .replace('__IDS__', ids.map((i) => `"${i}"`).join(', '))
+    .replace('__BOOKS__', bookFiles.map(([rel, pack]) => `"${rel}" to "${pack}"`).join(', '))
 )
 if (!ma.includes('LkMedia.start')) {
   if (/override\s+fun\s+onCreate\s*\([^)]*\)\s*\{/.test(ma)) {

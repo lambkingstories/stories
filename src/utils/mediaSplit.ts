@@ -16,6 +16,7 @@
  * (`initAndroidPack`, scripts/android-pack/LkMedia.kt).
  */
 import { reactive } from 'vue'
+import bookMedia from '@/data/bookMedia.json'
 
 const IDS = ((import.meta.env.VITE_MEDIA_SPLIT as string | undefined) ?? '')
   .split(',')
@@ -44,7 +45,12 @@ export const SENTINEL = '__sentinel.png'
 /** Where the folder of the media was looked for, relative to the resource folder of the app (the first that answers wins). */
 export const CANDIDATES = ['_up_/dist-media', 'media', 'dist-media', 'assets/media', 'assets/_up_/dist-media', 'Resources/media']
 
-export const isSplitPath = (path: string): boolean => !!PATTERN && PATTERN.test(path)
+/** True in a build that also keeps the whole digital books outside the program file (Android: one Play pack per book). */
+export const BOOK_SPLIT_ON: boolean = MEDIA_SPLIT_ON && import.meta.env.VITE_MEDIA_SPLIT_BOOKS === 'true'
+
+const isBookPath = (path: string): boolean => BOOK_SPLIT_ON && bookMedia.some((b) => path === b.pdf || path.startsWith(`${b.folder}/`))
+
+export const isSplitPath = (path: string): boolean => (!!PATTERN && PATTERN.test(path)) || isBookPath(path)
 
 export interface MediaSplitReport {
   on: boolean
@@ -197,7 +203,7 @@ export async function initMediaSplit(): Promise<void> {
 export const packNameOf = (journeyId: string): string => 'adv_' + journeyId.replace(/-/g, '_')
 
 /** What the waiting screen shows while a pack of an adventure is downloaded (`id` is empty when nothing is waited for). */
-export const adventureWait = reactive({ id: '', percent: 0, status: '', cancelled: false })
+export const adventureWait = reactive({ id: '', percent: 0, status: '', cancelled: false, kind: 'adventure' as 'adventure' | 'book' })
 
 /** The packs that are known to be there (asked once, then remembered for this start). */
 const packReady = new Set<string>()
@@ -223,7 +229,22 @@ async function packAsk(port: number, pack: string, fetchIt: boolean): Promise<{ 
  */
 export async function ensureAdventurePack(journeyId: string): Promise<boolean> {
   if (!androidPackReady() || !journeyId) return true
-  const pack = packNameOf(journeyId)
+  return ensurePack(packNameOf(journeyId), journeyId, 'adventure')
+}
+
+/** The name of the Play pack of a digital book (the same rule as in scripts/patch-android-assetpack.mjs and LkMedia.kt). */
+export const bookPackNameOf = (bookId: string): string => 'book_' + bookId.replace(/-/g, '_')
+
+/** True where the pages of a book have to be fetched before they can be shown (Android with the books in Play packs). */
+export const bookNeedsPack = (bookId: string): boolean => BOOK_SPLIT_ON && androidPackReady() && bookMedia.some((b) => b.id === bookId)
+
+/** Like `ensureAdventurePack`, for the pages and the PDF of a digital book. */
+export async function ensureBookPack(bookId: string): Promise<boolean> {
+  if (!bookNeedsPack(bookId)) return true
+  return ensurePack(bookPackNameOf(bookId), bookId, 'book')
+}
+
+async function ensurePack(pack: string, waitId: string, kind: 'adventure' | 'book'): Promise<boolean> {
   if (packReady.has(pack)) return true
   const port = mediaSplitReport.pack.port
   let a = await packAsk(port, pack, false)
@@ -236,7 +257,8 @@ export async function ensureAdventurePack(journeyId: string): Promise<boolean> {
     return true
   }
   if (a.status === 'none') return true
-  adventureWait.id = journeyId
+  adventureWait.id = waitId
+  adventureWait.kind = kind
   adventureWait.cancelled = false
   adventureWait.percent = a.percent
   adventureWait.status = a.status
