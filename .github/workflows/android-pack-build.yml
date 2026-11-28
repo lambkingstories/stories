@@ -1,19 +1,18 @@
-name: Android Pack Test (Play Asset Delivery)
+name: Android Production AAB 1.2.3
 
-# TEST build 19 (books in Play packs, save-file plugin, new Christmas book; version 1.2.3: two-finger zoom, shelf button, view-only after Plus, Hiskia fix; symbols via own block, keepDebugSymbols removed, native debug symbols, Hiskia on, collection cards show again, paintings keep their name, finished adventures in mint green) (24.11.2026, core pack + one pack per adventure; medals, cards and gifts are served from the core pack; Simson and Johannes on, frees disk space, gives Gradle 6 GB; a requested pack is never reported as "none" while it is on its way): the media of ALL adventures are not inside the app but in a Play Asset Delivery pack (fast-follow), so the main file stays small.
-# Only the .aab is useful: the pack works only when the bundle is installed through Google Play (internal testing / Internal App Sharing), not as a loose .apk.
-# Not for the store release before Anton has seen the test page ("Ich" -> "Medien-Test") on a real phone.
-# Needs the same repository secrets as android-build.yml.
+# Production build from the source of internal build 1000919.
+# Keep Play Asset Delivery and generate only the signed upload artifact.
 
 on:
-  workflow_dispatch:
-  # a workflow can only be started by hand once the file is on `main`: this branch runs it when the file changes (like android-build.yml)
   push:
-    branches: [ueberarbeitung-2026-10]
+    branches: [android-release-1-2-3]
     paths: ['.github/workflows/android-pack-build.yml']
 
+permissions:
+  contents: read
+
 concurrency:
-  group: android-pack-build
+  group: android-release-1-2-3
   cancel-in-progress: true
 
 jobs:
@@ -23,6 +22,7 @@ jobs:
     timeout-minutes: 90
 
     env:
+      ANDROID_VERSION_CODE: "1000135"
       # Same build variables as the local `.env.tauri` (a clean checkout has none
       # of the gitignored .env files; without the client key every API call
       # answers 401 MISSING_CLIENT_KEY). Client keys are not secrets.
@@ -85,7 +85,7 @@ jobs:
       VITE_MEDIA_SPLIT_BOOKS: "true"
       # keep the symbols in the Rust library: Gradle strips it for the app and puts the symbol table into the bundle (patch-android-symbols.mjs)
       CARGO_PROFILE_RELEASE_STRIP: "false"
-      VITE_MEDIA_TEST: "true"
+      VITE_MEDIA_TEST: "false"
       VITE_CLIENT_KEY: tauri-key-public-1111
       VITE_API_BASE_URL: ${{ vars.API_BASE_URL || 'https://lbs-be.onrender.com' }}
 
@@ -98,11 +98,6 @@ jobs:
         run: |
           sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/share/boost /opt/hostedtoolcache/CodeQL /usr/local/lib/node_modules/.cache || true
           df -h /
-
-      # Play needs a strictly rising versionCode; the last one used by hand was
-      # 1000020. Builds from here count up with the run number.
-      - name: Compute versionCode
-        run: echo "ANDROID_VERSION_CODE=$((1000900 + ${{ github.run_number }}))" >> "$GITHUB_ENV"
 
       - name: Setup JDK 17
         uses: actions/setup-java@v4
@@ -223,7 +218,7 @@ jobs:
       - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
-          name: android-pack-aab
+          name: android-production-1.2.3-vc1000135
           path: src-tauri/gen/android/app/build/outputs/bundle/**/*.aab
           if-no-files-found: error
           retention-days: 14
